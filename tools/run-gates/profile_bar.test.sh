@@ -174,25 +174,50 @@ PYEOF
 )
 chk $([ "$INJ" = OK ] && echo 0 || echo 1) "injection arm: parse_verdicts returned $INJ"
 
-# ------------------------------- arm 6: a timing cache that did not move is REFUSED, not published
+# ------------------------------- arm 6: a LEDGER that did not move is REFUSED, not published
+# The store this arm freezes is `<git-dir>/gate-ledger.tsv`, which the run-record unit made the
+# one place per-leg durations live. It used to name `gate-ledger.tsv`; when that file stopped
+# being written the arm reported "first run wrote no timing cache", which is the freshness probe
+# correctly refusing to grade a store nothing updates.
 # PRECONDITION-ASSERTED: the arm first proves the cache is genuinely unwritable. If chmod does not
 # take on this platform the arm reports that instead of passing.
 S6=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (stale)"; exit 2; }
 ( cd "$S6" && "$PY" tools/run-gates/profile_bar.py --width 3 >/dev/null 2>&1 )
-chk $([ -s "$S6/.git/gate-timings.tsv" ] && echo 0 || echo 1) "stale arm: first run wrote no timing cache"
-chmod -w "$S6/.git/gate-timings.tsv" 2>/dev/null
-if ( echo "probe" >> "$S6/.git/gate-timings.tsv" ) 2>/dev/null; then
-  chk 1 "stale arm: PRECONDITION UNMET — the cache stayed writable after chmod -w, so this arm proves nothing"
-else
-  chk 0 "stale arm: precondition holds — the cache is unwritable"
-  ( cd "$S6" && "$PY" tools/run-gates/profile_bar.py --width 3 >"$S6/stale.txt" 2>&1 )
-  rc=$?
-  chk $([ "$rc" != 0 ] && echo 0 || echo 1) \
-      "stale arm: profiler exited 0 on a cache that did not move, publishing an earlier run's durations"
-  grep -qiE 'did not move|EARLIER run|impossible' "$S6/stale.txt"
-  chk $? "stale arm: the refusal did not name the stale cache"
-fi
-chmod +w "$S6/.git/gate-timings.tsv" 2>/dev/null
+chk $([ -s "$S6/.git/gate-ledger.tsv" ] && echo 0 || echo 1) "stale arm: first run wrote no ledger"
+ledger_before=$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)
+# THE FREEZE IS A RUNNER THAT DOES NOT WRITE, not a permission bit. Three ways of making the
+# ledger unwritable were measured on this platform and none of them holds: `chmod -w` on the file
+# and on its directory both leave `mv -f` free to replace it, because a rename is a directory
+# operation and MSYS does not enforce the mode. The earlier spelling therefore asserted a
+# PRECONDITION that silently stopped being true the moment the runner started replacing the
+# ledger atomically, and the arm went from proving something to proving nothing.
+#
+# A stub runner creates the state the refusal actually exists for — a run that produced no new
+# durations, so every duration available belongs to an earlier run — without depending on
+# filesystem semantics this platform does not offer. It emits the runner's own verdict grammar so
+# the profiler gets that far, and never touches the ledger.
+cat > "$S6/tools/run-gates/run-gates.sh" <<'STUB'
+#!/usr/bin/env bash
+echo "gate profile: stub  (fixture; width 3, timeout off; stub)"
+# The leg NAMES come from the manifest, so they match the ledger rows the real first run wrote.
+# A stub that invented its own names produced a different refusal — 'no executed leg carried a
+# duration' — which is also honest and is not the one this arm grades.
+nm=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' tools/gate-legs.json | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//; s/"$//')
+cnt=0
+while IFS= read -r n; do [ -n "$n" ] || continue; printf 'GATE ok    %s
+' "$n"; cnt=$((cnt+1)); done <<<"$nm"
+echo "----"
+echo "gates GREEN — $cnt/$cnt legs passed"
+exit 0
+STUB
+( cd "$S6" && "$PY" tools/run-gates/profile_bar.py --width 3 >"$S6/stale.txt" 2>&1 )
+rc=$?
+chk $([ "$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)" = "$ledger_before" ] && echo 0 || echo 1) \
+    "stale arm: PRECONDITION UNMET — the ledger moved under the stub runner, so this arm proves nothing"
+chk $([ "$rc" != 0 ] && echo 0 || echo 1) \
+    "stale arm: profiler exited 0 on a ledger that did not move, publishing an earlier run's durations"
+grep -qiE 'did not move|EARLIER run|impossible' "$S6/stale.txt"
+chk $? "stale arm: the refusal did not name the stale ledger"
 rm -rf "$S6"
 
 # --------------------------------------- arm 7: a RED bar is reported as red, with a named caveat

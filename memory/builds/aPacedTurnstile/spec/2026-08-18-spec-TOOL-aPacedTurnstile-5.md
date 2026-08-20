@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-7 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-9 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -32,17 +32,30 @@ including after a crash.
   the trap goes on covering it; `TOOL-aPacedTurnstile-4` widens that trap to INT, TERM and HUP and
   its scope is the SCRATCH dir alone. A trap that swept `<git-dir>/gate-run/` would erase the record
   on every ordinary exit and on every caught signal, which is every path except the crash the record
-  exists to make readable, and `-4` lands sixth so it would win by default. Nothing clears the
+  exists to make readable, and `-4` lands SECOND under the re-scoped order — immediately after this
+unit — so it would win by default. The re-scope shortened that gap from four units to one, which
+makes the separate-owners statement more load-bearing than it was when it was written, not less:
+`-4`'s builder now opens this file's trap line within one unit of it being narrowed. Nothing clears the
   record at the START of a run: per-run uniqueness is what closes blocker F2, and a start-of-run
   clear can partially fail on this platform against an open handle or an AV lock and inherit the
   previous run's verdicts — the exact branch F2 named.
 - **S2** — `<git-dir>/gate-run/<run-id>/header` is written BEFORE the first leg dispatches, in a
   key-per-line grammar, carrying the schema version, run id, start time, head, base and how the base
   was resolved, the tree fingerprint, whether the tree was CLEAN at start, the manifest path and its
-  blob hash, the full-run flag and the reason it was forced, the resolved width, the resolved
+  blob hash, the full-run flag and the reason it was forced, the RUN ENVELOPE below, the resolved
   DISPATCH ORDER, the leg count, and the worktree path. The dispatch order is here rather than in
   `TOOL-aPacedTurnstile-3` because this unit already writes the header at the point that value is in
   scope, and a record's key set must stay single-sourced; that unit's ordering criteria read it.
+  **The run envelope is four keys, not one, and `TOOL-aPacedTurnstile-2` is why.** An earlier draft
+  recorded "the resolved width" alone, written when the width was a number the runner computed. It is
+  now a DECLARED row: `tools/run-gates/gate-profiles.txt` names rows with a width and a per-leg
+  timeout each, and `run-gates.sh` composes the whole envelope as `PROF_LINE` before the first leg
+  dispatches. The header therefore records the selected profile ROW NAME, the resolved width, the
+  per-leg timeout, and the DETECTION SOURCE that picked the row. Recording the width alone loses the
+  three facts that explain it, and a later reader comparing two runs cannot tell a re-detected row
+  from a `GATE_JOBS` override. The keys are the components of `PROF_LINE` rather than a second
+  derivation of the same four values, because S2 declares itself the single source of the record's
+  key set and two derivations of one envelope is the two-answers-to-one-question class.
 - **S3** — each worker writes one TSV row per leg alongside the files it already writes — name,
   status, rc, seconds, started, ended, input key — through the same temp-then-rename the worker
   already uses for its completion signal. The per-leg OUTPUT copy the worker also writes becomes
@@ -85,10 +98,35 @@ including after a crash.
   independent implementations of one digest is the `two-answers-to-one-question` class, and here it
   fails toward FULL forever — safe, and it would permanently defeat the scoped path this build
   exists to enable, which is the kind of failure nobody investigates because it looks like caution.
+  **It SHIPS, and that is a decision rather than an accident of the payload rule.**
+  `tools/run-gates/kit.toml` claims the kit dir with a single `**` rule, so any new file in that
+  directory lands in every adopting tree unless another rule withholds it. The withholding precedent
+  is `run-gates.gov.test.sh`, and its stated reason is that its arms are keyed on THIS repo's corpus.
+  This helper has no corpus in it: it hashes a tree object, the porcelain lines and the dirty blobs,
+  which are true statements in any git repository, and its only caller inside gov is
+  `.githooks/pre-push`, which an adopter may or may not have. So it ships as a public kit affordance,
+  and this unit adds its row to `tools/run-gates/README.md`'s piece table so an adopter meets it as a
+  documented tool rather than as an unexplained executable. An adopting tree with no pre-push hook
+  simply never calls it, which costs nothing.
 - **S6** — `<git-dir>/gate-ledger.tsv` replaces the timing cache: rows gain status, input key and a
   timestamp while KEEPING the duration in field 2, so the existing dispatch-order parser needs no
   edit. The carry-forward merge for guard-skipped legs is kept exactly as written, and the rewrite
   becomes an atomic rename rather than a copy.
+  **`gate-timings.tsv` has a SECOND reader now, and switching the cache without it is a blocker this
+  item owns.** The compatibility argument above surveyed one parser — the runner's own dispatch-order
+  block, which splits on tab, reads field 2 and ignores every extra column — and that survey was
+  complete when it was written. The sibling build `aMeteredTurnstile` has since landed
+  `tools/run-gates/profile_bar.py`, which resolves the cache at a HARDCODED path, snapshots its mtime
+  before and after the run, and REFUSES with a non-zero exit when it did not move, on the stated
+  ground that every duration then available belongs to an earlier run. A ledger that silently stops
+  writing the old cache therefore does not degrade the profiler — it makes it refuse on every
+  invocation, which turns the `profile-bar selftest` leg into a leg whose subject can no longer run.
+  This unit takes the edit rather than leaving a compatibility shim behind: the profiler's path
+  resolution, its two mtime probes and its orphan measurement all move to the ledger, and
+  `aMeteredTurnstile`'s own spec authorizes exactly this by pledging to read this unit's ledger and
+  delete its wrapping path once `-5` lands. Keeping both files written for one release was the other
+  option and is refused: two stores of one fact, with the older one read by the only tool that grades
+  the newer one, is the shape this unit exists to remove.
 - **S7** — `<git-dir>/gate-full-green` is written ONLY when the run failed nothing, skipped nothing,
   reused nothing, the tree did not move, AND the tree was CLEAN when the run started. **CLEAN means
   exactly `git status --porcelain` EMPTY, untracked-and-unignored files included** — the same
@@ -108,11 +146,41 @@ including after a crash.
 - **S8** — `tools/gate-legs.json` gains an optional `impure` key carrying reason strings, seeded from
   MEASUREMENT rather than guess: the unattended legs call out to the remote, so their verdicts are a
   function of the remote as well as of the tree.
+  **The key is GOV-ONLY and cannot travel, and the spec states that rather than leaving a builder to
+  discover it.** Since `TOOL-aPacedTurnstile-1`, a target's manifest is no longer hand-authored:
+  `tools/govkit/govkit.py` emits each target leg row from a descriptor's `[[gate_leg]]` block and
+  reads `name`, `argv` and `guard` from it, and nothing else. An `impure` declaration written in a
+  descriptor is dropped on the floor, so gov can mark its own legs impure and no adopting tree can
+  mark any. Extending the descriptor grammar and govkit's emission is the obvious repair and is
+  explicitly OUT of this unit — it is a deployer-side change to a file this unit otherwise never
+  touches, and the re-scope that authorized this revision cut the arm that would have made the
+  omission visible rather than funding the extension. What an adopting tree's reuse path does with no
+  impure declarations at all is `TOOL-aPacedTurnstile-6`'s question, because that unit owns the reuse
+  verb and the denial rule; it is carried in §8 as an open fork with the two options, not resolved
+  here. The optional-key spelling is what makes the omission survivable in the meantime: a manifest
+  with no `impure` anywhere is a legal manifest, so the shipped canary of S10 grades the key's SHAPE
+  and never its presence.
 - **S9** — record arms in `tools/run-gates/run-gates.evidence.test.sh`: the header is readable BY A
   LEG while the run is in flight, the verdict file is absent after a hard kill, a red leg's ledger
-  row carries no reusable key, and a corrupt ledger is survived.
+  row carries no reusable key, a corrupt ledger is survived, and the header's run-envelope keys match
+  the `PROF_LINE` the same run printed across two fixtures whose profile rows differ. The migration
+  arm is not here: S6's obligation is graded where its subject's own gate already lives, in
+  `tools/run-gates/profile_bar.test.sh`, because an arm asserting a tool still works belongs beside
+  that tool rather than beside the store it reads.
 - **S10** — a canary arm pinning the manifest's known key set, so a mistyped `impure` cannot silently
-  make a network-reading leg reusable.
+  make a network-reading leg reusable. **It is a SCHEMA arm and it lives in the shipped canary, and
+  the corpus-keyed half that used to ride with it is CUT.** `TOOL-aPacedTurnstile-1` split the canary
+  in two and reserved the gov-only file for arms keyed on this repo's own legs, naming the reuse
+  unit's network-calling leg names as one of the three it expected. The key-set pin is not one of
+  those: it asserts that every row carries `name`, `argv` and optionally `guard` and `impure` and
+  nothing else, which is true of any manifest in any tree, so it belongs in
+  `tools/run-gates/run-gates.test.sh` and must read the manifest the way that file already derives
+  it. Hardcoding `tools/gate-legs.json` inside a harness that SHIPS is the
+  pin-copied-from-another-corpus class the kit's own README refuses by name. The other half — any
+  assertion about WHICH of gov's legs are declared impure — has no home left after the re-scope cut
+  `TOOL-aPacedTurnstile-6`'s network predicate, so nothing lands in `run-gates.gov.test.sh` from this
+  unit. That is recorded in §3 as a cut rather than dropped, because the reservation in the gov
+  harness's own header still names an arm nobody is now writing.
 
 ## 3. Non-goals (OUT)
 
@@ -123,6 +191,22 @@ including after a crash.
 - A new leg, a new process, or a daemon.
 - Committing any of this. The record lives in the git dir, which is already where the summary,
   the failure record and the per-leg logs live.
+- Making `impure` travel to an adopting tree. `tools/govkit/govkit.py` reads `name`, `argv` and
+  `guard` out of a descriptor's `[[gate_leg]]` block and emits nothing else, so extending it means
+  editing the descriptor grammar, the emitter and the deployer's own selfcheck. That is a deployer
+  unit, not a record unit, and §8 carries the fork.
+- The gov-corpus canary arm S10 used to carry. CUT by the 2026-08-20 re-scope, which cut
+  `TOOL-aPacedTurnstile-6`'s network predicate on the evidence that the predicate was run over the
+  real manifest for the first time during that re-scope and matched six legs, every one of them
+  hermetic. The arm existed to police that predicate's declarations; with the predicate gone it
+  polices nothing. The reservation for it still stands in `tools/run-gates/run-gates.gov.test.sh`'s
+  header, so this is a refusal on the record rather than a silent non-delivery.
+- AC12, the assertion-count criterion. CUT by the same re-scope, and the reason is the spec's own
+  green-by-absence rule turned on itself: `TOOL-aPacedTurnstile-1` landed both floors and left no row
+  for either harness in the count registry, so the criterion is green today, before this unit starts,
+  and cannot fail as a result of anything this unit does. The live obligation it was reaching for —
+  that the new arms RAISE the executed counts and the floors move with them — is a different sentence
+  and is stated in §5's testing line instead of pretending to be a criterion.
 
 ## 4. Design
 
@@ -133,9 +217,14 @@ already write them, plus one keyed TSV ledger.** No JSON, no JSONL, no lock, no 
 leg. Three requirements decide it before taste gets a vote.
 
 Surviving a crash means the record is written INCREMENTALLY — a single document composed at the end
-is lost precisely in the case it exists for. Eight concurrent writers mean an incrementally-written
+is lost precisely in the case it exists for. CONCURRENT writers mean an incrementally-written
 SHARED file needs a lock, and there is none available here; one file per writer needs no lock at
-all, because the atomicity is the filesystem's rename rather than ours. And it already exists: the
+all, because the atomicity is the filesystem's rename rather than ours. How many writers there are is
+not a constant this spec may state: `TOOL-aPacedTurnstile-2` made the pool width a DECLARED row in
+`tools/run-gates/gate-profiles.txt`, one width per hardware row, with `GATE_JOBS` overriding it. The
+argument holds at every width above one and is vacuous only at width one, which is the serial
+rollback and not a design point. An earlier draft said "eight", which was the width the runner
+computed before that row table existed. And it already exists: the
 worker writes its output, then its duration, then commits its completion through a temp-then-rename.
 That is already a per-leg, lock-free, atomically-committed completion record. The only reasons it is
 not durable are the scratch dir and the EXIT trap that deletes it.
@@ -156,8 +245,14 @@ here are shell — the pre-push hook and the runner itself — and bash cannot e
 a helper process per write. Key-per-line is grep-, awk- and python-parseable, and cannot be
 corrupted by an unescaped value.
 
-The per-leg rows are TSV instead, because they are single-line and written seventy times. Verified
-against the manifest: no leg name contains a tab, a newline or a colon, and all seventy are unique.
+The per-leg rows are TSV instead, because they are single-line and written once per non-sentinel leg.
+The count is DERIVED from `tools/gate-legs.json` and is not stated here — it was 70 when this spec
+was drafted, and re-deriving it on 2026-08-20 at `43a6c13` returns 86, so a number typed into this
+paragraph would have been wrong within two days of being written. TSV is legal only while three
+properties hold of the manifest, and the builder re-derives all three rather than trusting this
+sentence: no leg name contains a tab, a newline or a colon, and every name is unique. Re-derived at
+`43a6c13` on 2026-08-20 over the whole manifest, all three hold. If a later manifest breaks one, the
+row format changes and this paragraph is what says so.
 
 ### Data model
 
@@ -165,6 +260,16 @@ Every path below sits under the PER-RUN directory `<git-dir>/gate-run/<run-id>/`
 `<git-dir>/gate-run/current` is a pointer to the in-flight one. The flat spelling is deliberately
 absent: a completion file at a fixed path is a stale DISPATCH SUPPRESSOR, and that is the whole of
 blocker F2. A reader that wants the live run resolves `current` first.
+
+**`<git-dir>` is ONE variable, and this unit collapses the pair the runner currently carries.**
+`run-gates.sh` resolves the git dir twice under two names: once early, guarded against an empty
+answer before any path is composed from it, and again later for the durable-summary and timing-cache
+paths. This unit adds four more git-dir-rooted paths — the run directory, the pointer, the ledger and
+the full-green file — so a builder inheriting two answers would be choosing which one to hang them
+off, and a third resolution would follow the next time somebody adds a fifth path. The record uses
+the EARLY, guarded resolution, and the later one is folded into it in the same commit. That fold is
+the one behavioural change this unit makes to a path that already worked, and it is here rather than
+in a sibling because this is the unit that makes the ambiguity expensive.
 
 `<run-id>/header` exists to prove the run started; its absence proves nothing ran. Keys are listed in
 S2, and the dispatch-order key is the one `TOOL-aPacedTurnstile-3`'s ordering criteria read.
@@ -187,8 +292,12 @@ leg count. Nothing else reads it in this unit.
 ### The fingerprint
 
 One digest over three things: the committed tree object, the sorted porcelain status lines, and the
-blob hashes of every dirty-or-untracked file that still exists. Measured on this repo: the status
-plus hash-object pass completes in 0.41 s, once per run rather than per leg.
+blob hashes of every dirty-or-untracked file that still exists. Its cost is measured rather than
+assumed, and the measurement carries its own envelope: the status plus hash-object pass completed in
+0.44 s on node `a` at `43a6c13` on 2026-08-20, once per run rather than per leg. The 0.41 s this
+paragraph carried before was taken at the drafting base and re-measuring moved it, which is the
+expected behaviour of a figure that depends on the size of the working tree — a builder who needs the
+number for a decision re-runs the pass rather than quoting either value.
 
 **Two invocation forms over that one definition, per S5.** With no argument the tree object is
 `HEAD`'s and the other two components are measured from the live worktree — the runner's form. With
@@ -214,7 +323,8 @@ is a stated ceiling rather than a mystery.
 ### `tree_moved` is not decoration
 
 A concurrent editor moved a worktree underneath a measurement during this build's own kickoff.
-Capturing the fingerprint again at the end costs 0.4 s and is the difference between a green that
+Capturing the fingerprint again at the end costs one more pass of the measurement above and is the
+difference between a green that
 describes a tree and a green that describes no tree at all. When it is set, the ledger is not
 updated and the full-green file is not written.
 
@@ -231,22 +341,40 @@ is additive and nothing reads it until `TOOL-aPacedTurnstile-6` lands. "Restorin
 the whole trap in an earlier draft, which contradicted this unit's own narrowing — the trap is
 never removed, only its coverage of `<git-dir>/gate-run/` is.
 
+**This unit lands FIRST** in the re-scoped order `-5 → -4 → -6 → -7 → -3`, and the reason is the one
+the re-scope stated: the record is what `-4`, `-6` and `-7` all read, and nothing can be built against
+a record that does not exist. It has no upstream edge left. The old order put `-2` ahead of it so the
+record writer could gain the profile line, and `-2` has since landed, so that edge is discharged
+rather than dropped — S2's run-envelope keys are what discharging it looks like. The one edge OUT of
+this unit that is not simply "everything reads the record" is `-5 → -4`: `-4` widens the EXIT trap
+this unit narrows, so the trap's final shape has to be settled before it is widened.
+The rollback above is not made harder by landing first, because it restores a file no other unit in
+this build has touched yet.
+
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `tools/run-gates/run-gates.sh` | destination, trap narrowing, header, per-leg row, verdict, ledger, post-verdict sweep |
+| `tools/run-gates/run-gates.sh` | destination, trap narrowing, header, per-leg row, verdict, ledger, post-verdict sweep, and the collapse of the duplicate git-dir resolution onto the guarded one |
 | `tools/run-gates/gate-fingerprint.sh` | NEW — S5's digest in BOTH forms: no argument for the runner's working-tree stamp, `<rev>` for the hook's at-a-rev recomputation, equal on a clean tree |
 | `tools/run-gates/run-gates.evidence.test.sh` | S9's arms, plus AC15/AC16/AC17. `TOOL-aPacedTurnstile-7` also lands ONE arm here — AC6d's, reading the forced-full reason out of the header this unit writes — because that unit's own suite stubs the gate. Recorded on both sides so the file has one ownership statement (V4) |
-| `tools/run-gates/run-gates.test.sh` | S10's pinned key set |
-| `tools/gate-legs.json` | the `impure` key on the measured legs |
-| `AGENTS.md` | the durable-evidence bullet gains the record |
+| `tools/run-gates/run-gates.test.sh` | S10's pinned key set, read off the manifest path this harness already derives — never a gov spelling |
+| `tools/run-gates/profile_bar.py` | S6's obligation: the cache path it resolves, the two mtime probes that decide its did-not-move refusal, and its orphan measurement all move to the ledger. Authorized by `aMeteredTurnstile`'s own spec, which pledges the switch and the deletion of its wrapping path when this unit lands |
+| `tools/run-gates/profile_bar.test.sh` | AC18's arms: the migrated profiler still passes its own fixtures, and its did-not-move refusal still fires against a store that genuinely did not move |
+| `tools/run-gates/README.md` | S5's decision made visible: a piece-table row for `gate-fingerprint.sh`, which ships |
+| `tools/gate-legs.json` | the `impure` key on the measured legs. Gov-only by construction, per S8 |
+| `AGENTS.md` | the "How the bar behaves" paragraph gains the record, beside the sentence that already describes the per-leg logs and the failure file. The durable-evidence BULLET an earlier draft named here was dissolved when `TOOL-aPacedTurnstile-1` collapsed that section into prose |
 
 ### Alternatives rejected
 
-- **Append-only JSONL from every worker.** Rejected: interleaved writes from eight processes to one
-  descriptor are not atomic beyond a pipe buffer, and there is no lock available.
-- **One JSON document written at the end.** Rejected: lost in the crash case it exists for.
+- **Append-only JSONL from every worker.** Rejected: interleaved writes from CONCURRENT processes to
+  one descriptor are not atomic beyond a pipe buffer, and there is no lock available. The rejection is
+  scoped to the IN-RUN multi-writer case and condemns nothing else — `tools/run-gates/profile_bar.py`
+  writes a JSONL record of its own and is a single writer appending one line after the run has
+  finished, where neither half of this reason applies.
+- **One JSON document written at the end.** Rejected: lost in the crash case it exists for. This is
+  the reason the profiler's own record does not deliver this unit: it is composed after the run,
+  which is exactly the case the crash makes unreachable.
 - **A committed file.** Rejected: it is per-run machine state, and committing it would put a
   timestamp in every diff.
 - **git notes.** Rejected: keyed on a commit, and a run measures a working tree.
@@ -260,7 +388,8 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   the new files carry no command output — while S3 said they do, and §5 is the section a builder
   grades the security line against, so the contradiction sat in the half that gets read (round 2's
   R24). AC16 observes it.
-- perf / scale — 0.41 s for the fingerprint, twice per run; per-leg rows are one line each.
+- perf / scale — the fingerprint runs twice per run at the cost §4 measures, and per-leg rows are one
+  line each. The figure is re-derived rather than restated here, so this line cannot disagree with §4.
 - a11y — N/A: no user interface.
 - i18n — N/A: machine-readable keys and operator-facing English.
 - error / empty / loading states — an in-flight run is exactly "header present, verdict absent", and
@@ -270,10 +399,15 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   concurrency needs no lock. Data loss is bounded to the current run. The one real hazard is a stale
   record read by a later consumer, which is why the tree fingerprint and the manifest blob are both
   in the header.
-- testing + left-shift gates — the pinned key set left-shifts the mistyped-declaration class.
-- migration / rollback — the ledger supersedes the timing cache; an absent or corrupt ledger costs
-  dispatch order only, which the existing arm already gates.
-- user docs — the charter's durable-evidence bullet.
+- testing + left-shift gates — the pinned key set left-shifts the mistyped-declaration class. The new
+  arms must RAISE the executed assertion counts both harnesses already report, and the declared floors
+  move with them in the same commit; a new arm that leaves a floor where it was is an arm the count
+  gate cannot see. This is the live obligation the cut AC12 was reaching for.
+- migration / rollback — the ledger supersedes the timing cache, and the profiler that reads that
+  cache migrates with it in the same commit rather than being left to refuse. An absent or corrupt
+  ledger costs dispatch order only, which the existing arm already gates.
+- user docs — the charter's "How the bar behaves" paragraph, and the kit README's piece table for the
+  fingerprint helper that now ships.
 
 ## 6. Acceptance criteria
 
@@ -292,14 +426,22 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
 - **AC6** — When the ledger is corrupted to arbitrary bytes, the run still completes and reports its
   ordinary verdict, asserted in `tools/run-gates/run-gates.evidence.test.sh`.
 - **AC7** — When a run is green with nothing skipped, nothing reused and an unmoved tree,
-  `<git-dir>/gate-full-green` is written and its `manifest_blob` equals
-  `git hash-object tools/gate-legs.json`.
+  `<git-dir>/gate-full-green` is written and its `manifest_blob` equals `git hash-object` of THE
+  MANIFEST THAT RUN READ — the fixture the arm points `GATE_LEGS` at, resolved the way the runner
+  resolves it, never a literal `tools/gate-legs.json`. Every arm in
+  `tools/run-gates/run-gates.evidence.test.sh` drives the runner against a fixture manifest in a
+  scratch git dir, so hashing gov's manifest would grade a file the run under test never opened; and
+  that harness ships, so the gov spelling would also name a path an adopting tree may not have.
 - **AC8** — When a run is green but ANY leg was skipped, `<git-dir>/gate-full-green` is NOT written
   or updated — the precondition that makes the file's name true.
 - **AC9** — When the working tree is modified while the run is in flight, the verdict file records
   the tree as moved and `<git-dir>/gate-full-green` is not written.
-- **AC10** — When a leg row in `tools/gate-legs.json` carries a key outside the pinned known set,
-  `bash tools/run-gates/run-gates.test.sh` exits non-zero naming that key.
+- **AC10** — When a leg row in the manifest that harness DERIVES carries a key outside the pinned
+  known set, `bash tools/run-gates/run-gates.test.sh` exits non-zero naming that key. The arm reads
+  the derived path — the same `GATE_LEGS`-or-sibling resolution the file already performs for its
+  other arms — so it grades whatever manifest the tree it runs in actually has. Its control is a
+  manifest carrying no `impure` key anywhere, which must PASS: the key is optional and gov-only per
+  S8, and an arm that reds on its absence is the arm that reds in every adopting tree on arrival.
 - **AC11** — When a run REDS, `<git-dir>/gate-full-green` is neither written nor updated, asserted in
   `tools/run-gates/run-gates.evidence.test.sh` against a pre-existing file from an earlier green — so
   the arm distinguishes not-written from not-updated. This is the precondition the push-boundary
@@ -349,24 +491,69 @@ never removed, only its coverage of `<git-dir>/gate-run/` is.
   in `tools/run-gates/run-gates.evidence.test.sh`. Its control is the same fixture with the masking
   removed, which must red. S3 made this copy durable and §5 said the new files carried no command
   output; the criterion is what stops the two from disagreeing again (round 2's R24).
-- **AC12** — When `bash tools/check-testsuite-counts.sh` runs, both moved harnesses report their
-  executed assertion counts at or above their floors, and the count registry carries no row naming
-  either of them. Round 2's R4/R5 found this unsatisfiable while `TOOL-aPacedTurnstile-1` S11 kept
-  both rows: satisfying the count reds the registry's staleness arm the other way, so there was no
-  green state. The counters and BOTH row deletions now land together in `-1`, which owns the move
-  and the rows; this criterion is unchanged in substance and gains only the registry clause that
-  makes the join visible from this side.
+- **AC18** — When the ledger has replaced the timing cache,
+  `bash tools/run-gates/profile_bar.test.sh` is green AND a real `python tools/run-gates/profile_bar.py`
+  invocation completes without taking its did-not-move refusal branch. Both halves bind and neither
+  alone does: the self-test drives the profiler against its own fixtures and would stay green while
+  the real tool refuses on every run, and a single non-refusing invocation proves nothing about the
+  orphan measurement or the record it writes. Its control is the pre-migration profiler run against a
+  post-migration runner, which MUST take the refusal — if that control passes, the freshness probe is
+  reading something that still moves and the migration was not the switch it claims to be.
+- **AC19** — When a run's `header` is read, it carries the selected profile row NAME, the resolved
+  width, the per-leg timeout and the detection source, and those four values equal the components of
+  the `PROF_LINE` the same run printed — asserted in
+  `tools/run-gates/run-gates.evidence.test.sh` across two fixtures whose profile rows differ. One
+  fixture cannot separate a header that records the envelope from a header that hardcodes the
+  catch-all row's values, which is the shape S2 exists to prevent.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.test.sh` · `bash tools/run-gates/run-gates.evidence.test.sh` ·
-`bash tools/check-testsuite-counts.sh` · `python tools/govkit/govkit.py selfcheck` ·
-`bash tools/memory-tree/check-memory-hygiene.sh` · `python tools/memory-tree/check-arms.py --check`.
+`bash tools/run-gates/profile_bar.test.sh` · `bash tools/check-testsuite-counts.sh` ·
+`python tools/govkit/govkit.py selfcheck` · `bash tools/memory-tree/check-memory-hygiene.sh` ·
+`python tools/memory-tree/check-arms.py --check`.
+
+`profile_bar.test.sh` joins the list because S6 edits its subject. A unit that migrates the store a
+tool reads and does not name that tool's own gate is relying on the full bar to notice, which it
+would — as a red leg nobody predicted, at the push boundary, after the commit is written.
 
 ## 8. Open questions
 
-none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+none open — all three forks are RESOLVED. Each pick is the M3 ratification of the fork's own
 recommendation; the reason each survived the veto order is recorded with it.
+
+- **What an adopting tree's reuse path does with no `impure` declarations, given that the key cannot
+  travel.** OPEN, and named here rather than guessed at. S8 establishes the fact: `govkit.py` emits
+  `name`, `argv` and `guard` out of a descriptor and drops anything else, so gov can mark its own legs
+  impure and no target can mark any. `TOOL-aPacedTurnstile-6` makes the declaration the sole thing
+  that denies reuse, which means that in a target every leg is reusable on a byte-identical tree,
+  including one that reads the network. Three options, none of them this unit's to take. (a) Extend
+  the `[[gate_leg]]` grammar and govkit's emission so a descriptor can declare `impure`, which is a
+  deployer unit and touches the emitter, the grammar and the deployer selfcheck. (b) Keep `GATE_REUSE`
+  gov-only — it is already default-OFF — and say so in the kit README, which costs an adopter the
+  feature and costs nobody a wrong green. (c) Make the shipped reuse path deny by DEFAULT on any leg
+  with no declaration either way, inverting the key's polarity for targets only, which is safe and
+  makes reuse buy nothing in a tree that cannot declare. The owner of this fork is
+  `TOOL-aPacedTurnstile-6`, which owns the reuse verb and the denial rule; this unit records it
+  because this unit is what adds the key, and a key whose consumer is undecided should not look
+  settled from the writer's side.
+
+  RESOLVED (2026-08-20, at build time, on a measurement the fork did not have): **option (c) —
+  the shipped reuse path DENIES a leg it cannot see a declaration for, and the reuse unit
+  implements that.** Two facts settled the pick. The first is that gov's impure population is
+  exactly ONE leg, `unattended kit gate`, and it is a GATE rather than a self-test — every other
+  leg whose script names a network verb builds its origin under `mktemp -d`. So the key is not
+  carrying much weight even here, and (a)'s deployer work would buy an adopting tree the ability
+  to declare something most trees will never have. The second is that (b) and (c) are not
+  alternatives at the same altitude: (b) is a note in a README, which is a rule this repo
+  classifies as one a reader has to remember, and (c) is a property of the code. (c) also fails
+  in the safe direction by construction — in a tree that cannot declare, reuse simply buys
+  nothing, which is exactly the outcome (b) asks an operator to accept voluntarily.
+
+  What this unit owed the fork was the FACT, and it is now in S8: `govkit.py` emits `name`,
+  `argv` and `guard` out of a descriptor and drops everything else. What it does not own is the
+  denial rule, and naming `TOOL-aPacedTurnstile-6` as the fork's owner while leaving the question
+  open would have been the same non-answer one document further on.
 
 - **Whether the record directory is cleared at the start of a run or kept as a rolling history.**
   Options: clear each run (one run's state, simple, and the crash signal stays unambiguous), or keep
@@ -393,6 +580,47 @@ recommendation; the reason each survived the veto order is recorded with it.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-20 · BUILT and CLOSED. Two things the build found that the spec had wrong, both
+  recorded here because both were caught by an arm rather than by a reading.
+
+  **S1 asked for the completion files to MOVE into the run directory, and its own reasoning argues
+  the other way.** The item says, correctly, that the completion file is the DISPATCH SUPPRESSOR
+  rather than a log — the dispatch loop skips any leg that already has one, so a leftover makes
+  the runner skip a leg and print it green. That is an argument for keeping the suppressor OUT of
+  the record: a `mktemp -d` name nothing outside the process can predict cannot be planted, while
+  a run directory has a NAMEABLE path and this runner accepts a pinned id through `GATE_RUN_ID`.
+  Moving the suppressor somewhere addressable re-opened the hole the move was meant to close, and
+  AC14 is the criterion that caught it: with the completion file in the record, a planted
+  `<i>.rc` suppressed its leg and the run reported the plant's verdict as the leg's own. As built,
+  the suppressor stays in the scratch dir and the `.leg` row carries the durable half, written
+  before the completion signal so a reader that sees `.rc` sees a complete row. The record loses
+  nothing; the criterion is what made the disagreement visible rather than a re-reading of S1.
+
+  **S8's seeded population was wrong, and so was the re-scope's correction to it.** S8 said "the
+  unattended legs call out to the remote"; the re-scope, measuring the self-tests, concluded no leg
+  is impure at all. Measured properly at build time, the answer is ONE. Seven of the 86 legs name a
+  network verb in their own script and six of those build their origin under `mktemp -d`. The
+  seventh, `unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its
+  verdict is a function of the remote as well as of the tree. The key is declared on that leg alone.
+  Both earlier answers were reached by reading rather than by running the predicate, which is the
+  charter rule this unit's own S10 arm exists to enforce one level down.
+
+  **What the build added beyond the scope items.** The per-leg INPUT KEY is computed and written
+  here rather than left as a dash for the reuse unit to fill. S3 already listed it as a row field,
+  and a field that is always a dash makes AC4 — "a failed leg's row carries a dash" — pass by
+  finding nothing, since every row would. It is keyed on the guard pathspecs for a guarded leg and
+  on the whole-tree fingerprint for an unguarded one, from `git ls-files -s` plus that guard's
+  slice of the ONE porcelain listing the run already takes: one cheap git call per leg and no file
+  content read, where hashing each guarded file per leg would have re-read most of the tree fifty
+  times to produce a key nothing yet consumes. The reuse unit still owns what the key MEANS.
+
+  **And one arm elsewhere had to be rebuilt rather than repointed.** `profile_bar.test.sh`'s stale-
+  store arm froze the store with `chmod -w` and asserted the freeze as a precondition. Once the
+  ledger write became an atomic rename that precondition stopped being true — measured on this
+  platform, neither `chmod -w` on the file nor on its directory stops a rename, because a rename is
+  a directory operation MSYS does not enforce the mode on. The arm now swaps in a stub runner that
+  emits the verdict grammar and never writes the ledger, which creates the state the refusal
+  actually exists for instead of depending on filesystem semantics this platform does not offer.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-3 · 2026-08-18 · folded the blocker re-review, which found F2 only PARTLY closed. The first
   fold-in repointed the scope items and left §4 Data model and AC1 through AC3 spelling the flat
@@ -450,6 +678,41 @@ recommendation; the reason each survived the veto order is recorded with it.
   rev form can never reproduce. AC13 gains the untracked-only fixture that separates the two
   definitions. V4: §4's row for the evidence suite names `TOOL-aPacedTurnstile-7`'s cross-unit AC6d
   arm, so the file has one ownership statement rather than two units editing it silently.
+- rev-8 · 2026-08-20 · folded the owner's re-scope, which re-grounded all five unbuilt units against
+  what `-1` and `-2` actually landed. The forcing finding for THIS unit is that three things landed
+  under its feet while it sat at rev-7, and two of them made a scope item wrong rather than merely
+  dated. `aMeteredTurnstile` shipped `profile_bar.py`, which resolves `gate-timings.tsv` at a
+  hardcoded path and REFUSES when the file's mtime did not move; S6's compatibility argument surveyed
+  the runner's own parser, found it unaffected, and was complete when it was written and incomplete by
+  the time it was read — so retiring the cache silently would not have degraded the profiler, it would
+  have turned a green leg's subject into a tool that refuses on every invocation. S6 now takes the
+  profiler's three touch points into its own Files-touched table on the authority of
+  `aMeteredTurnstile`'s own pledge to switch. `-2` replaced the computed pool width with a DECLARED
+  row carrying a name, a timeout and a detection source, and S2's key list still said "the resolved
+  width", which records the number and discards the three facts that explain it; the header now
+  carries the four components `PROF_LINE` already composes, and AC19 grades them across two differing
+  profile rows because one fixture cannot tell a recorded envelope from a hardcoded catch-all. `-1`
+  split the canary and reserved the gov-only half for corpus-keyed arms, so S10's single item was
+  really two: the key-set pin is schema and stays in the shipped file reading the DERIVED manifest,
+  while the half that would have named gov's legs is CUT, because the re-scope cut the predicate it
+  policed on the evidence that the predicate matched six legs and every one of them was hermetic.
+  AC12 is CUT for the reason this spec's own §7 gives against green-by-absence: `-1` landed both
+  assertion floors and left no registry row for either harness, so the criterion was green before this
+  unit started and could not fail from anything it does; §5's testing line carries the live obligation
+  instead. Under D1 every pinned figure went: the leg count is derived rather than stated (70 at
+  drafting, 86 re-derived at `43a6c13` on 2026-08-20), the eight concurrent writers become the width
+  the selected profile row declares, and the fingerprint's 0.41 s becomes 0.44 s carrying its node,
+  sha and date — a figure that moves with the size of the working tree and should be re-run, not
+  quoted. Two dead pointers repaired: the `AGENTS.md` row named a durable-evidence bullet `-1`
+  dissolved into the "How the bar behaves" prose, and AC7 and AC10 both hashed the literal gov
+  manifest inside harnesses that SHIP and that drive the runner against fixtures, which grades a file
+  the run under test never opened. S5 gained the shipping decision its path implied but never stated,
+  and the `impure`-cannot-travel finding is recorded in S8 with its consequence carried to §8 as the
+  build's one open fork rather than resolved by this unit, which does not own the reuse verb. The
+  order edge changed: this unit is now FIRST, `-4` follows it immediately instead of four units later,
+  and the separate-trap-owners statement in S1 is more load-bearing for it. `base` is deliberately
+  unchanged — it is the sha this design was grounded against, and the re-scope's figures carry
+  `43a6c13` on their own faces instead of rewriting it.
 
 ## 10. Reuse audit
 
@@ -461,6 +724,16 @@ durable-evidence guarantee and its harness are `TOOL-dNomadicAtlas-1`'s, already
 `tools/run-gates/run-gates.evidence.test.sh`, which is where this unit's arms land. The
 carry-forward merge on the timing cache is review finding F6 from the aTimedTurnstile review and is
 preserved verbatim.
+
+A fourth prior arrived after this audit was first written and is both nearest neighbour and downstream
+consumer: `tools/run-gates/profile_bar.py`, from the sibling build `aMeteredTurnstile`. It writes an
+overlapping envelope — sha, host, width, width source, full-run flag, wall clock, exit and per-leg
+durations — and it does NOT deliver this unit, for reasons that are this spec's own: it composes its
+record after the run finishes, so the crash case is exactly where it has nothing; no leg can read it
+in flight; it carries no per-leg input key, no full-green stamp and no tree fingerprint; and on an
+anomaly it refuses and records nothing at all. It is prior art for the envelope keys and it is the
+tool S6 migrates, and its own spec already pledges to read this unit's ledger and delete its wrapping
+path once this lands, which is why S6 takes the edit rather than leaving a shim.
 
 Recall terms used: gate, leg, verdict, reuse, cache, lock, beacon, queue, concurrent, session,
 worktree, scoped, diff, GATE_FULL, guard, skip. The probe returned the aTimedTurnstile review's F6

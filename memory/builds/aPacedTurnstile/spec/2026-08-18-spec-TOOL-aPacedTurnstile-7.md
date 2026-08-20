@@ -1,13 +1,36 @@
 # TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation
 
-**Status:** OPEN · rev-8 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-10 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
-`.githooks/pre-push` exports `GATE_FULL=1`, so every landing runs all 70 legs and pays a measured
-873 s — a records-only landing included, at 14x the 62 s its own guards would have cost. Scope the
-push boundary to the diff, and replace the property that forcing bought with a bounded, recorded
-obligation instead of deleting it.
+`.githooks/pre-push:83` exports `GATE_FULL=1` unconditionally, so every landing runs the WHOLE leg
+manifest whatever its diff contains. The manifest's size is derived and not pinned:
+`python -c "import json;print(len(json.load(open('tools/gate-legs.json'))))"`. That read 86 at
+`43a6c13` on 2026-08-20 and 70 at `6517579f` on 2026-08-18, which is itself the argument for
+deriving it — the figure moved by sixteen in two days.
+
+The cost is measured by `python tools/run-gates/profile_bar.py`, the instrument the sibling build
+`aMeteredTurnstile` shipped for exactly this. Run with `GATE_FULL=1` on a QUIET node `a` at
+`43a6c13` on 2026-08-20 it reported 1033.2 s of wall clock, of which the single leg
+`unattended driver selftest` held 836.5 s. These figures are never to be taken from
+`<git-dir>/gate-timings.tsv`, which is last-write-wins across runs and whose copy on this node was
+written under four concurrent bars, where it held that same leg at 1252 s.
+
+The floor leg carries a guard. `tools/gate-legs.json` declares it as `["tools/lib/",
+"tools/unattended/"]`, so a landing touching neither does not run it at all. That is why scoping the
+boundary is one of only two things in this build that can move wall clock. `profile_bar.py` reports
+the bar as FLOOR-bound and states in its own output that only making the binding leg cheaper,
+sharding it, or removing it from the critical path buys anything; scoping the boundary removes it
+from the critical path of every landing that does not touch it.
+
+The saving itself is DERIVED at build time and is deliberately not pinned here: run the bar over the
+landing's own diff without `GATE_FULL` and read the wall from the same instrument. The 62 s figure
+this spec carried through rev-8 was measured at `6517579f` on a 70-leg bar and describes nothing
+that exists now.
+
+Scope the push boundary to the diff, and replace the property that forcing bought with a bounded,
+recorded obligation instead of deleting it.
 
 ## 2. Scope (IN)
 
@@ -30,7 +53,9 @@ obligation instead of deleting it.
   calling it from a pre-push hook takes the fingerprint at the pushed tip, which is round 2's
   blocker verbatim. It is never reimplemented — two implementations of
   one digest disagree silently and then force full forever, which reads as caution rather than as the
-  defect it is.
+  defect it is. The helper does not exist yet: `ls tools/run-gates/` at `43a6c13` shows no
+  `gate-fingerprint.sh`, and `-5` is the unit that ships it, which is the first half of §4's
+  ordering line.
 
   **Predicate 0 joins at the RECORDED sha, not at the tip, and round 2's blocker R1 is why.**
   `TOOL-aPacedTurnstile-5` defines the digest over the committed tree object, so it moves on every
@@ -66,7 +91,11 @@ obligation instead of deleting it.
   its §8 now ratifies per-run directories with nothing cleared at start (round 3's T18).
 - **S6** — `GATE_FULL_MAX_LAG` is a SOURCE CONSTANT in `.githooks/pre-push` with its justification in
   a comment beside it. No sibling creates a runtime conf the hook could read: the kit descriptor is
-  TOML a bash hook cannot parse, and the profile table's header forbids a coverage knob by rule. It
+  TOML a bash hook cannot parse, and the profile table forbids a coverage knob by rule.
+  **That last clause was a forecast when rev-2 wrote it and is now a landed rule**, so the
+  source-constant decision no longer rests on a prediction: `tools/run-gates/gate-profiles.txt:12-15`
+  declares "no knob here may ever turn a leg into a PASS or a SKIP", which `TOOL-aPacedTurnstile-2`
+  landed. It
   is deliberately NOT the `GOV_DEFAULT_BRANCH` shape, which the spec audit showed does not exist as
   described and would be fail-OPEN here — an environment value that widens the lag leaves no diff
   behind, which is the defeatable class `TOOL-aStandingWrit-4` recorded in this very hook.
@@ -79,42 +108,75 @@ obligation instead of deleting it.
   left unobserved, and the constant is validated by `.githooks/pre-push.test.sh` at EDIT time — an arm
   asserting the literal in the hook is a decimal integer, which reds on the edit that breaks it
   instead of at a push nobody is watching.
-- **S7** — the hook exports the no-halt flag `TOOL-aPacedTurnstile-3` defines, unconditionally and
-  independently of its own scoped-or-full decision, so a landing always gets a complete verdict list
-  instead of stopping at the first red chunk.
+- **S7 — CUT by the 2026-08-20 re-scope, and recorded here rather than deleted.** It exported the
+  no-halt flag `TOOL-aPacedTurnstile-3` was to define, so that a landing got a complete verdict list
+  instead of stopping at the first red chunk. The re-scope cut `-3`'s dispatch half, the boundary
+  HALT included, on the measurement that scheduling cannot move a floor-bound bar. With no halt
+  there is no flag, and an export of a flag nothing reads is a line that looks like a safeguard.
+  The property the item wanted is unaffected by this unit: the runner reports every leg it runs and
+  this unit changes only WHICH legs run. The number is kept vacant rather than reused, so a review
+  citing S7 against an earlier revision still resolves.
 - **S8** — `.githooks/pre-push.test.sh` gains one arm per forcing predicate, one arm proving the
-  scoped path actually scopes, one proving the no-halt export, and one asserting the lag constant in
-  the hook is a decimal integer at edit time (S6). **One arm of this unit lands in a SIBLING's
+  scoped path actually scopes, and one asserting the lag constant in
+  the hook is a decimal integer at edit time (S6). The no-halt arm goes with S7. **One arm of this
+  unit lands in a SIBLING's
   suite**: AC6d's header assertion goes in `tools/run-gates/run-gates.evidence.test.sh`, because
   that is the harness which really drives the runner and because `TOOL-aPacedTurnstile-5` owns the
   header — the hook's own suite stubs the gate by design. Named here rather than only in the
   criterion, because §4 Files touched is what a builder derives the commit's edits from and a
-  cross-unit arm recorded in neither unit is an arm nobody writes (round 4's V4). It also gains an EXECUTED ASSERTION COUNTER in the
+  cross-unit arm recorded in neither unit is an arm nobody writes (round 4's V4). **That arm must be
+  CORPUS-NEUTRAL**, which rev-8 did not require and `-1` made mandatory: `tools/run-gates/kit.toml:18-20`
+  ships this whole directory under `[[files]] include = "**"`, so an arm naming a gov leg, a gov
+  reason literal or the real manifest reds on arrival in an adopter tree. It drives the runner
+  through a fixture `GATE_LEGS` manifest and supplies the reason string from its own environment. If
+  it cannot be written that way it moves to `tools/run-gates/run-gates.gov.test.sh`, which
+  `tools/run-gates/kit.toml:33-35` withholds with `role = "project-owned"`, beside AC9's arm. It also gains an EXECUTED ASSERTION COUNTER in the
   agreed shape, and this unit DELETES that suite's row from
-  `memory/project/testsuite-count-waivers.txt` in the same commit. Both halves or neither: the
+  `memory/project/testsuite-count-waivers.txt:6` in the same commit. Both halves or neither: the
   registry reds on a waiver naming a suite that now complies, so a counter without the deletion and a
   deletion without the counter are each a red, and AC10 was unsatisfiable while the row stood
   (round 2's R18).
 - **S9** — the safety property is rewritten wherever it is stated, and the population is MEASURED
-  rather than enumerated: a whitespace-insensitive search for the claim across tracked product files
-  and the guides selects the carriers, and the search itself is what §6 grades. At this base it
-  selects seven, of which the first draft named three — the missed four are why this item stopped
-  enumerating. `AGENTS.md`. The playbook template's diff-scope line.
-  `tools/run-gates/run-gates.sh`'s own header comment, which `TOOL-aPacedTurnstile-1` ships into the
-  kit and therefore to adopters. **Two bullets of `parallel-coding-governance.domain-rules.md`**,
-  which state the once-at-the-push-boundary guarantee and name the pre-push hook as the sole mandated
-  full run — PRODUCT, received by every adopter, and the file the charter says is run in every Tier-2
-  review, so leaving it would have gov's own reviewers grading against a guarantee this unit deletes.
-  **`memory/guides/BUILD-METHOD.md` TOGETHER WITH its shipped source
-  `tools/memory-tree/BUILD-METHOD.template.md`** — edited as a pair and re-rendered, because
-  `kit-dogfood-parity.test.sh` compares exactly those two and reds on a one-sided edit. And
-  **`memory/guides/SESSION-KICKOFF.md`**, which states it a fourth time.
+  rather than enumerated: a whitespace-insensitive search for the claim across the tracked
+  non-archive tree selects the carriers, and the search itself is what §6 grades. The enumeration
+  frozen into an earlier AC7 is what rotted, twice: rev-2 found three where the tree held seven, and
+  the 2026-08-20 reground found two of those seven gone. The classes below are what a builder needs
+  and they do not rot the way a file list does. **The paths and line anchors in them are a SNAPSHOT
+  taken at `43a6c13` on 2026-08-20, kept for orientation and explicitly NON-BINDING.** What binds is
+  AC7, which grades the probe's return at build time; a builder who finds this snapshot disagreeing
+  with the probe follows the probe and does not repair the snapshot.
+  - **The charter, which has THREE sources and needs all three edited.** `AGENTS.md` is the
+    committed text. `coding-governance-agents.template.md:58` is the source of its template-fixed
+    sentences, this repo dogfooding its own product. `.governance/deploy.toml:36` is the renderer's
+    INPUT for the answer-fed ones, and it outranks an `AGENTS.md` edit alone, because
+    `tools/playbook/adopt-playbook.sh` fills the placeholder from that answer and the next deploy
+    writes the retired claim straight back in. `ci_file` there reads "the bar runs at the push
+    boundary via `.githooks/pre-push`", which stays literally true and stops being the whole truth.
+  - **The runner, which SHIPS.** `tools/run-gates/run-gates.sh:3` states the claim in its own
+    header, and `TOOL-aPacedTurnstile-1` made this directory a kit, so an adopter receives it.
+  - **The shipped canary**, `tools/run-gates/run-gates.test.sh:458-461`, whose arm 3i comment
+    carries the retired claim verbatim — that `.githooks/pre-push` sets `GATE_FULL`, so a guard can
+    only ever scope a NON-authoritative run and a too-narrow guard costs an early signal rather than
+    a wrong merge verdict. `-1` split the canary and left this half shipping.
+  - **`memory/guides/BUILD-METHOD.md:147` TOGETHER WITH its shipped source
+    `tools/memory-tree/BUILD-METHOD.template.md:147`** — edited as a pair and re-rendered, because
+    `kit-dogfood-parity.test.sh` compares exactly those two and reds on a one-sided edit.
+  - **`memory/guides/SESSION-KICKOFF.md:79`**, whose gate-command block glosses `GATE_FULL=1` as
+    "what `.githooks/pre-push` runs", which is the exact sentence this unit falsifies.
+  - `parallel-coding-governance.domain-rules.md` and `parallel-coding-governance.template.md` are
+    STRUCK from this item. Neither is tracked: `PLAY-aFusedCharter-1` collapsed the family into the
+    single `coding-governance-agents.template.md` at v3.0, and the only files still bearing the old
+    name are the frozen snapshots under `memory/archive/`, which must not be edited.
 - **S10** — close the one guard hole that is verified still open, named in
   `memory/builds/cKeyedLaunchpad/README.md` park 2 and in `cBriefedPilot-15`: the kit/dogfood parity
-  leg's guard omits `memory/guides/`, which is a file pair it actually validates. **The hole has TWO
-  carriers and both are closed here.** gov's own row in `tools/gate-legs.json` is the one an earlier
-  draft fixed; `tools/memory-tree/kit.toml` declares the SAME leg for DEPLOYMENT with an even
-  narrower guard, and `govkit.py`'s emit verb copies a descriptor's declared guard verbatim into the
+  leg's guard omits `memory/guides/`, which is a file pair it actually validates. Re-verified at
+  `43a6c13`: the leg's row in `tools/gate-legs.json` guards on `memory/HYGIENE.md`,
+  `memory/TEMPLATE-SPEC.md`, `tools/lib/` and `tools/memory-tree/`, while
+  `tools/memory-tree/kit-dogfood-parity.test.sh:53` really does validate the
+  `memory/guides/BUILD-METHOD.md` pair. **The hole has TWO carriers and both are closed here.** gov's
+  own row in `tools/gate-legs.json` is the one an earlier
+  draft fixed; `tools/memory-tree/kit.toml:112` declares the SAME leg for DEPLOYMENT with an even
+  narrower guard, and `govkit.py:2371` copies a descriptor's declared guard verbatim into the
   target's manifest. Fixing only gov's row leaves the half that SHIPS open, so an adopter taking
   memory-tree plus the promoted run-gates kit receives a parity leg that skips when their own
   build-method guide moves — the wrong-merge-verdict inversion this unit exists to bound, exported
@@ -124,17 +186,29 @@ obligation instead of deleting it.
   this leg's declared guard names `memory/guides/`, with a narrow-spelling fixture as its control.
   Stated as a scope obligation and not only in AC9b, because the criterion alone is the R11-R13
   shape one level down — it can fail, but nothing tells the builder to write it (round 4's V5). The
-  GENERAL descriptor-to-manifest guard join stays out and is `TOOL-aPacedTurnstile-12`; this is one
+  GENERAL descriptor-to-manifest guard join stays out and is `TOOL-aPacedTurnstile-12`, which
+  `memory/map/features/run-gates.md` already files in its Gaps section; this is one
   assertion about one leg.
 
 ## 3. Non-goals (OUT)
 
 - Changing what any leg asserts. Widening guards in general stays out: S10 closes the ONE hole that
-  is verified open and recorded twice, and does not open a survey of the other 41.
+  is verified open and recorded twice, and does not open a survey of the rest. The count of guarded
+  legs that stood here through rev-8 is struck. It read 41, `tools/gate-legs.json` holds 50 at
+  `43a6c13`, and a derived population written into prose is the class §7 of the charter bans. Derive
+  it if a reader needs it:
+  `python -c "import json;print(sum(1 for l in json.load(open('tools/gate-legs.json')) if l.get('guard')))"`.
 - The run record's format, location and writer. That is `TOOL-aPacedTurnstile-5`; this unit is a
   consumer and states only what it reads.
 - Removing `GATE_FULL`. It stays as the manual escape and as the mechanism this unit sets.
-- Making the bar faster. Scoping changes which legs run, never how fast a leg is.
+- Making the bar faster. Scoping changes which legs run, never how fast a leg is. The measurement
+  behind this build says a leg is where the remaining wall clock lives, and sharding it is its own
+  build.
+- Exporting a no-halt flag. **This is the S7 cut**, carried here so the refusal is on the record and
+  not merely absent. The 2026-08-20 re-scope cut the boundary HALT out of
+  `TOOL-aPacedTurnstile-3` because scheduling cannot move a floor-bound bar, and with no halt there
+  is no flag to export. AC8 graded that export and is struck with it; its number is left vacant so
+  older reviews still resolve.
 - Proving guard completeness. Named as the follow-up that would retire this unit's residual risk.
 
 ## 4. Design
@@ -143,15 +217,24 @@ obligation instead of deleting it.
 
 Today the hook's own comment states it. `GATE_FULL` marks "THE run that must be total: the self-test
 legs are diff-scoped on earlier runs, and if that scoping reached here no run would ever execute
-every leg against the tree that actually lands." That is accurate, and two records already lean on
-it. `memory/builds/cBriefedPilot/spec/2026-08-14-spec-cBriefedPilot-15.md` names a leg whose guard
+every leg against the tree that actually lands." That is accurate, and three records lean on it.
+`memory/builds/cBriefedPilot/spec/2026-08-14-spec-cBriefedPilot-15.md` names a leg whose guard
 omits `memory/guides/BUILD-METHOD.md` and is caught only at the push boundary.
 `memory/builds/cKeyedLaunchpad/README.md` refused to widen a guard because `GATE_FULL=1` covers it.
+`tools/run-gates/run-gates.gov.test.sh:143-150` arms it, grepping `.githooks/pre-push` for the
+literal line this unit deletes, so the arm reds at this unit's own landing — §8 carries the fork
+over what replaces it.
 
-The replacement property, as it will be written into `AGENTS.md`: every leg runs against a tree that
-lands at least once every `GATE_FULL_MAX_LAG` commits, and always when the leg set or its guards
-move. That is strictly weaker. It is also, unlike today's property, MEASURABLE — the record makes
-"when did every leg last run, and on what sha" answerable, which nothing answers today.
+The replacement property, as it will be written into every carrier S9 names: every leg runs against a
+tree that lands at least once every `GATE_FULL_MAX_LAG` commits, and always when the leg set or its
+guards move. That is strictly weaker. It is also, unlike today's property, MEASURABLE — the record
+makes "when did every leg last run, and on what sha" answerable, which nothing answers today.
+
+**This unit supersedes `TOOL-aTimedTurnstile-2`'s S3, "the push boundary stays full."** That is the
+correct shape and it is stated here so the supersession is a record rather than a silent
+contradiction: `-aTimedTurnstile-2` measured the case for guards and then declined to spend the
+boundary, and the owner reopened exactly that call on 2026-08-18. The earlier record is not
+rewritten.
 
 ### Data model
 
@@ -205,43 +288,58 @@ One commit. The rollback is restoring the unconditional `export GATE_FULL=1`, on
 anything else. The first push after this lands finds no record and forces full, which is the correct
 cold start rather than a special case.
 
+**Ordering, which does not follow from the one-commit shape and so is stated.** The re-scoped build
+order is `-5 → -4 → -6 → -7 → -3`, and this unit lands FOURTH of the five. Two edges bind it.
+`TOOL-aPacedTurnstile-5` must land first, because it ships `tools/run-gates/gate-fingerprint.sh`,
+absent from `tools/run-gates/` at `43a6c13`, and the record header key predicate 0 and AC6d read.
+`TOOL-aPacedTurnstile-6` must land first, because this unit consumes `changed()` against the base
+that unit sets, and settling base semantics before the boundary keeps the two failure surfaces
+apart. The edge to `TOOL-aPacedTurnstile-3` is GONE: it existed only because S7 exported a no-halt
+flag that unit was to define, and the re-scope cut both the halt and S7. `-3` now runs last because
+it is reporting-only and has no dependents, not because this unit waits on it.
+
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `.githooks/pre-push` | the decision block, the lag default with its comment, the no-halt export |
-| `.githooks/pre-push.test.sh` | one arm per predicate, the scoped-path arm, the no-halt arm |
-| `AGENTS.md` | the gate-suite paragraph's safety-property sentence |
-| `parallel-coding-governance.template.md` | its diff-scope and full-bar sentence |
-| `tools/run-gates/run-gates.sh` | the header comment stating the same retired claim |
-| `parallel-coding-governance.domain-rules.md` | the two bullets stating the retired guarantee (S9) |
+| `.githooks/pre-push` | the decision block, the lag default with its comment |
+| `.githooks/pre-push.test.sh` | one arm per predicate, the scoped-path arm, the lag-constant arm |
+| `AGENTS.md` | the committed charter's safety-property sentences (S9) |
+| `coding-governance-agents.template.md` | its diff-scope and full-bar line, the template-fixed source of those sentences (S9) |
+| `.governance/deploy.toml` | the `ci_file` answer, the RENDERER's input — without it the next deploy rewrites the retired claim into `AGENTS.md` (S9) |
+| `tools/run-gates/run-gates.sh` | the header comment stating the same retired claim, which ships to adopters (S9) |
+| `tools/run-gates/run-gates.test.sh` | arm 3i's comment, which states the retired claim verbatim in the SHIPPED half (S9) |
 | `memory/guides/BUILD-METHOD.md` + `tools/memory-tree/BUILD-METHOD.template.md` | the same claim, edited as a PAIR and re-rendered or kit/dogfood parity reds (S9) |
-| `memory/guides/SESSION-KICKOFF.md` | the fourth statement of the claim (S9) |
+| `memory/guides/SESSION-KICKOFF.md` | the gate-command gloss on `GATE_FULL=1` (S9) |
+| `tools/run-gates/run-gates.gov.test.sh` | G3, which greps for the exact line this unit deletes and reds on landing — §8's fork decides what replaces it |
 | `tools/gate-legs.json` | S10's guard row — gov's carrier |
 | `tools/memory-tree/kit.toml` | S10's OTHER carrier: the same leg's declared guard, which govkit emits verbatim into a target (R7) |
-| `tools/run-gates/run-gates.evidence.test.sh` | AC6d's header arm — a CROSS-UNIT edit into `TOOL-aPacedTurnstile-5`'s suite, because that unit owns the header and the hook's own suite stubs the gate (V4) |
+| `tools/run-gates/run-gates.evidence.test.sh` | AC6d's header arm — a CROSS-UNIT edit into `TOOL-aPacedTurnstile-5`'s suite, written corpus-neutral because this file now SHIPS (V4) |
 | `tools/govkit/selftest.py` | S10's guard assertion over `tools/memory-tree/kit.toml` and its narrow-spelling control (V5) |
 | `memory/project/testsuite-count-waivers.txt` | the pre-push suite's row, deleted beside S8's counter |
 
 ### Alternatives rejected
 
-- **Scope with no backstop at all.** Rejected: two live records depend on the backstop, and the
-  residual risk is a wrong merge verdict rather than a late signal.
-- **Keep forcing full on every push.** Rejected by owner decision on 2026-08-18, with the 873 s
-  against 62 s measurement in hand.
+- **Scope with no backstop at all.** Rejected: three live records depend on the backstop, one of
+  them an executable arm, and the residual risk is a wrong merge verdict rather than a late signal.
+- **Keep forcing full on every push.** Rejected by owner decision on 2026-08-18. The measurement in
+  hand at the time was 873 s against 62 s at `6517579f`; the decision was re-affirmed on 2026-08-20
+  against 1033.2 s of wall clock at `43a6c13`, with the binding leg at 836.5 s and guarded.
 - **Prove each guard complete, then scope freely.** The sound answer, and far larger than this
   build. Recorded as the follow-up that retires the residual risk.
 - **Reuse a previous green keyed on the tree sha instead of scoping.** Sound where legs are pure,
   and `git rev-parse HEAD^{tree}` makes it a one-command key. But `tools/unattended/check-unattended.sh`
   calls `git ls-remote`, so its verdict is a function of the remote as well as of the tree. Reuse
-  therefore belongs to `TOOL-aPacedTurnstile-5` behind a per-leg purity declaration, not here.
+  therefore belongs to `TOOL-aPacedTurnstile-6` behind a per-leg purity declaration, not here.
 
 ## 5. Production-readiness checklist
 
 - security — the record is read from the git dir, already trusted by every other hook path; a
   hostile record can only force MORE work, because every parse failure forces full.
-- perf / scale — five git commands, each O(1) or O(commits in range), all measured well under a
-  second on this repo.
+- perf / scale — one git command per row of §4's decision table, plus `gate-fingerprint.sh`'s own
+  calls. Each is O(1) or O(commits in range), all well under a second on this repo. The count that
+  stood here through rev-8 said five and the table has seven rows; the shape is what matters and the
+  arithmetic is now derivable from the table beside it.
 - a11y — N/A: no user interface.
 - i18n — N/A: operator-facing English strings in a shell hook, as everywhere else here.
 - error / empty / loading states — the absent-record and unparseable-record paths ARE the empty
@@ -250,14 +348,15 @@ cold start rather than a special case.
 - risks (concurrency, data-loss, rollback hazards) — the residual risk is a too-narrow guard landing
   a wrong verdict inside the lag window. Rollback is one line.
 - testing + left-shift gates — S8's arms: one per forcing predicate, the scoped-path arm, the
-  no-halt arm, the edit-time lag-constant arm, and AC6d's header arm in the sibling evidence suite.
+  edit-time lag-constant arm, and AC6d's corpus-neutral header arm in the sibling evidence suite.
   The class left-shifts as the forcing table itself.
 - migration / rollback — no migration. Cold start forces full, which is correct.
-- user docs — S9, across every carrier the measured search selects, seven at this base, two of them
-  product files an adopter receives and one of them the build-method guide edited as a pair with its
-  shipped template. Deliberately NOT a count restated here: this line read "all three carriers" for
-  one revision after S9 stopped enumerating three, which is the §5-contradicts-the-scope-item class
-  round 2 raised against `-5` (round 3's T13/T16/T23).
+- user docs — S9, across every carrier the measured search selects. Deliberately NOT a count
+  restated here, and now not a list either: this line read "all three carriers" for one revision
+  after S9 stopped enumerating three, and the enumeration that replaced it named two files the tree
+  no longer has (round 3's T13/T16/T23, then the 2026-08-20 reground). Three of the carriers are
+  product an adopter receives, and one is the build-method guide edited as a pair with its shipped
+  template.
 
 ## 6. Acceptance criteria
 
@@ -298,7 +397,12 @@ cold start rather than a special case.
 - **AC6d** — When the hook forces a full run for a known reason, that run's record header carries the
   SAME reason string under the declared key `TOOL-aPacedTurnstile-5` S2 defines — asserted in
   `tools/run-gates/run-gates.evidence.test.sh`, where the runner is really driven through
-  `GATE_LEGS` and where `-5` owns the header. **Not in `.githooks/pre-push.test.sh`:** that suite
+  `GATE_LEGS` and where `-5` owns the header. **The arm names no gov leg, no gov reason literal and
+  not the real manifest**, because `tools/run-gates/kit.toml:18` ships this file: it drives the
+  runner over a fixture `GATE_LEGS` manifest and supplies the reason from its own environment, and
+  the criterion is satisfied only by an arm that would pass in an empty adopter tree. An arm that
+  cannot be written that way moves to `tools/run-gates/run-gates.gov.test.sh` beside AC9's.
+  **Not in `.githooks/pre-push.test.sh`:** that suite
   stubs the gate through `GOV_GATE_CMD` so the bar never runs, which §10 leans on by name, so no
   runner-written header exists there and the cheap implementation would be a stub echoing its own
   environment into a file the arm then reads — certifying test code and leaving R21's gap open
@@ -306,19 +410,19 @@ cold start rather than a special case.
   the gate command's environment. S5's durable half is otherwise satisfied by a stdout-only
   implementation, and §4 rests the whole inversion on the record making "when did every leg last
   run, and on what sha" answerable.
-- **AC7** — When the retired claim is searched for after this lands, a WHITESPACE-INSENSITIVE search
-  (the carriers hard-wrap the sentence across lines, so a line-anchored `grep` matches nothing today
-  and would pass unchanged) finds it in NONE of the carriers S9 measures, AND a positive search finds
-  the replacement sentence naming `GATE_FULL_MAX_LAG` in each. Both halves are per-carrier, over the
-  MEASURED population and not a literal list: `AGENTS.md`, `tools/run-gates/run-gates.sh`,
-  `parallel-coding-governance.template.md`, `parallel-coding-governance.domain-rules.md`,
-  `memory/guides/BUILD-METHOD.md`, `tools/memory-tree/BUILD-METHOD.template.md` and
-  `memory/guides/SESSION-KICKOFF.md` at this base. The negative alone is satisfied by any rewording,
-  including one still false, and by a grep that never could have matched; an enumeration alone is
-  satisfied by editing three files and leaving four, which is what round 2's R8 found.
-- **AC8** — When the hook runs, it exports the no-halt flag regardless of which branch its forcing
-  table took, asserted in `.githooks/pre-push.test.sh` on both the scoped and the forced path — so a
-  landing never stops reporting at the first red chunk.
+- **AC7** — When the retired claim is searched for after this lands, the WHITESPACE-INSENSITIVE
+  probe run over the tracked non-archive tree returns ZERO hits for the retired sentence, AND for
+  every path that same probe selected BEFORE the edit it returns exactly one hit for the replacement
+  sentence naming `GATE_FULL_MAX_LAG`. **The criterion grades the probe's RETURN and never a list**,
+  and both halves read one enumeration the build computes from `git ls-files` at the time it runs, so
+  a carrier that appears between this revision and the build is graded without anybody editing this
+  file. The negative alone is satisfied by any rewording, including one still false, and by a grep
+  that never could have matched — the carriers hard-wrap the sentence across lines, so a
+  line-anchored `grep` matches nothing today and would pass unchanged. The positive alone is
+  satisfied by editing some carriers and leaving others, which is what round 2's R8 found. An
+  ENUMERATION is what rotted twice: rev-2 replaced a three-file list that missed four, and the
+  2026-08-20 reground found two of the seven that replaced it no longer tracked. S9 carries a dated,
+  explicitly NON-BINDING snapshot of the current selection for orientation only.
 - **AC9** — When `bash tools/run-gates/run-gates.gov.test.sh` runs — the GOV-ONLY harness
   `TOOL-aPacedTurnstile-1` S1 splits out, because this arm names a gov leg and would red on arrival in
   an adopter tree — the kit/dogfood parity leg's guard names `memory/guides/`, and a fixture touching
@@ -343,23 +447,62 @@ cold start rather than a special case.
   that suite. The second clause is the half round 2's R18 found missing: the registry reds on a waiver
   naming a suite that now complies, so the criterion was unsatisfiable while S8 added only arms, and
   an implementation that added a counter without deleting the row traded one red for another.
+- **AC11** — When the bar is profiled before and after this lands with
+  `python tools/run-gates/profile_bar.py`, both readings taken on a QUIET node, the scoped landing's
+  wall clock is recorded together with the sha it was taken at. This criterion exists because the
+  saving is the unit's whole justification and no current measurement of it exists: the figures this
+  spec carried were taken at `6517579f` on a 70-leg bar. It grades a measurement being TAKEN and
+  written down, not a threshold, because a threshold pinned here is the defect D1 of the re-scope
+  brief exists to remove.
 
 ## 7. Gates
 
 `bash .githooks/pre-push.test.sh` · `bash tools/push-main.test.sh` ·
-`bash tools/run-gates/run-gates.test.sh` (the post-move path — this unit lands seventh) ·
-`bash tools/run-gates/run-gates.gov.test.sh` · `bash tools/check-testsuite-counts.sh` ·
+`bash tools/run-gates/run-gates.test.sh` (the shipped canary, which this unit edits) ·
+`bash tools/run-gates/run-gates.gov.test.sh` (whose G3 this unit necessarily breaks — see §8) ·
+`bash tools/check-testsuite-counts.sh` ·
 `bash tools/check-playbook-parity.sh` · `bash tools/memory-tree/check-memory-hygiene.sh` ·
 `python tools/memory-tree/check-arms.py --check` · `python tools/govkit/govkit.py selfcheck` ·
 `python tools/govkit/selftest.py` · `bash tools/memory-tree/kit-dogfood-parity.test.sh` ·
-and the full bar, `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — the POST-move path, which is
-what this unit runs at its own landing and which the last entry still spelled pre-move.
+and the full bar, `GATE_FULL=1 bash tools/run-gates/run-gates.sh`, which is what this unit runs at
+its own landing.
 
 ## 8. Open questions
 
-none — the forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
-recommendation; the reason each survived the veto order is recorded with it.
+none open — the fork raised by the 2026-08-20 regrounding was RESOLVED at build time, and the two
+below it were already resolved; each pick is the
+M3 ratification of the fork's own recommendation, with the reason it survived the veto order.
 
+- **What replaces `run-gates.gov.test.sh`'s G3.** That arm greps `.githooks/pre-push` for the exact
+  literal `^export GATE_FULL=1$`, so S1 reds it at this unit's own landing. Deleting it is the one
+  answer this unit must not take alone: G3 is the only executable statement anywhere that the
+  authoritative run covers the whole bar, and removing the arm that guards a property while weakening
+  the property is the shape §7 of the charter calls gating the instance rather than the class.
+  Option A, REWRITE it in place to assert that the hook still contains a forcing path at all — cheap,
+  and weak enough to pass a hook that forces on nothing. Option B, MOVE the behavioural half to
+  `.githooks/pre-push.test.sh`, where the hook is really driven and where AC2 through AC6c already
+  live, and leave G3 asserting only the gov-specific fact that the hook exists and is wired.
+  Option C, replace G3 with an arm over the RECORD instead of over the hook — that the lag between
+  the recorded full green and the default-branch tip is within `GATE_FULL_MAX_LAG` — which grades the
+  replacement property rather than the mechanism, and reds when the obligation is actually missed.
+  Recommendation: C with B beneath it, because C is the only one of the three that can fail for the
+  reason the property exists. It is left OPEN because C makes a gov canary depend on the record's
+  presence in a fresh clone, and whether that is a red or a skip is a decision about the canary's
+  contract rather than about this unit.
+
+  RESOLVED (2026-08-20, at build time): **C with B beneath it, exactly as recommended, and the
+  question the fork could not answer resolves to a SKIP.** G3 went red the moment S1 landed, which
+  is the fork proving itself rather than a surprise. What replaced it: the behavioural half moved
+  to `.githooks/pre-push.test.sh`, which now carries one arm per forcing predicate PLUS the control
+  that a scoped run is ever chosen at all — without that control every forcing arm is satisfied by
+  a hook that forces unconditionally, which is the hook this unit replaced, passing its own tests.
+  What stayed in the gov canary is the half that is about this repository: that a forcing path
+  exists at all, and that the staleness bound is a SOURCE constant rather than an environment knob.
+
+  **The fresh-clone question is a skip, and a loud one.** A clone with no record is a legitimate
+  state, not a defect — the hook forces a total run there, which is the safe direction — so a red
+  would fail every clone on its first push while proving nothing. The arm announces the skip and
+  counts it, because a skip that looks like a pass is indistinguishable from coverage.
 - **The shipped default for `GATE_FULL_MAX_LAG`.** Options are `1` (full on nearly every push, so
   almost no saving), `10`, `25`, or a time bound rather than a commit bound. Recommendation: `10`.
   This repo took 13 commits between `origin/main` and the current tip inside a single build, so `10`
@@ -386,6 +529,38 @@ recommendation; the reason each survived the veto order is recorded with it.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-20 · BUILT and CLOSED. The push boundary DECIDES, and the property it retires
+  is replaced rather than deleted.
+
+  **Seven predicates, and every one of them FORCES.** There is no predicate that makes a run
+  smaller: the question is "is a scoped run good enough this time", and every way of not knowing
+  the answer is a force. That asymmetry is the whole safety argument — the block can be wrong in
+  one direction only. Predicate 4 joins the recorded fingerprint AT THE RECORDED SHA and calls the
+  shipped helper rather than reimplementing the digest; both were named blockers in earlier rounds
+  and both are now structural rather than remembered.
+
+  **S9 was executed as a SEARCH, and it found carriers the spec did not name.** Two of the seven
+  files it listed no longer exist. The live set was `AGENTS.md` twice, the product template, the
+  runner, the shipped canary, the kickoff manifest's gate-command block, and `.governance/
+  deploy.toml` — the last of which the spec never named and which OUTRANKS `AGENTS.md`, because it
+  is the renderer's input and the next deploy would have written the retired claim back. The
+  sweep is now clean over the whole tracked tree outside `archive/` and `builds/`, and this unit's
+  own hook comment was reworded so that a historical mention does not read as a live claim to the
+  probe.
+
+  **S10 closed the guard hole in BOTH carriers, which is the half that was nearly missed.**
+  `kit/dogfood doc parity` validates three pairs and guarded on two of them, so a change to only
+  `memory/guides/BUILD-METHOD.md` skipped the leg that checks it. While the boundary forced a total
+  run that cost a late signal; after this unit it would cost a wrong merge verdict. The same narrow
+  guard is declared in `tools/memory-tree/kit.toml`, and govkit copies a descriptor's guard verbatim
+  into a target — so fixing gov's manifest alone would have EXPORTED the hole rather than fixing it.
+
+  **The arm that mattered most was the one proving the cheap path is ever taken.** Its first
+  spelling read the hook's decision from stderr, as the refusal arms above it do; the decision line
+  is ordinary progress output on STDOUT, so `1>/dev/null` threw it away and seven arms reported
+  "the hook made no decision". A push with nothing to send also never invokes the hook at all, so
+  the helper now commits first — a hook that did not run is indistinguishable from one that decided
+  nothing.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-4 · 2026-08-18 · folded the blocker re-review: §2 described none of predicates 0, 6 or 7, so
   the scope under-described its own decision table; and predicate 0 is now stated as CALLING
@@ -448,17 +623,62 @@ recommendation; the reason each survived the veto order is recorded with it.
   recorded in neither unit is an arm nobody writes. V5: AC9b named a bash document-differ that reads
   no `kit.toml`; it points at `tools/govkit/selftest.py`, which already parses every descriptor, and
   S10 states the arm as an obligation rather than leaving it in the criterion alone.
+- rev-9 · 2026-08-20 · folded the owner's re-scope and the regrounding behind it. The mechanism is
+  untouched; what changed is that every figure it rested on had moved and two of its carriers had
+  stopped existing. **The numbers.** `profile_bar.py` on a quiet node at `43a6c13` reports 1033.2 s
+  of wall clock over 86 legs where §1 claimed 873 s over 70, and the bar is FLOOR-bound with one leg
+  at 836.5 s, so §1 now derives the leg count, dates every measurement to its sha, and refuses to
+  restate the 62 s scoped figure at all — it was taken on a bar sixteen legs smaller and the ratio
+  built on it was arithmetic about a tree that no longer exists. AC11 is added because the saving is
+  this unit's whole justification and nothing currently measures it; it grades a measurement being
+  taken, never a threshold, since a pinned threshold is the defect being removed. §3's "the other
+  41" guarded legs is struck for the same reason — the tree holds 50 and a derived population in
+  prose is what §7 of the charter bans. **The carriers.** S9 named
+  `parallel-coding-governance.domain-rules.md`, which `PLAY-aFusedCharter-1` dissolved into the
+  charter at v3.0, and `parallel-coding-governance.template.md`, whose only surviving instances are
+  frozen archive snapshots; a builder following §4 literally would have edited nothing or edited an
+  archive, and AC7 graded per-carrier so it was unsatisfiable as written. Both are struck with the
+  reason on the record. Three carriers are added, each verified in the tree: `.governance/deploy.toml`,
+  which is the renderer's INPUT and therefore outranks an `AGENTS.md` edit that the next deploy would
+  revert; `tools/run-gates/run-gates.test.sh`, whose arm 3i comment carries the retired claim
+  verbatim in the half `-1` left SHIPPING; and `tools/run-gates/run-gates.gov.test.sh`, whose G3
+  greps for the literal line S1 deletes and therefore reds at this unit's own landing. AC7 is
+  restated as the SEARCH's output rather than a list, because the enumeration is the half that rotted
+  twice and a criterion grading a probe's return cannot rot at all. **The cut.** S7 and AC8 exported
+  and graded a no-halt flag `TOOL-aPacedTurnstile-3` was to define; the re-scope cut that unit's
+  dispatch half and the boundary halt with it, on `profile_bar.py`'s own finding that scheduling
+  cannot move a floor-bound bar. Both numbers are left vacant rather than reused, the refusal is
+  recorded in §3, and the ordering edge to `-3` dissolves with them — §4's Rollout now states this
+  unit as fourth of five in `-5 → -4 → -6 → -7 → -3`, bound only by `-5`'s fingerprint helper, absent
+  from the tree today, and by `-6`'s base rule. **The corpus-neutrality obligation**, which is new
+  since rev-8 and not a re-scope item: `-1` made `tools/run-gates/` a deployable kit, so AC6d's arm
+  now travels to adopters and must name no gov leg and no gov reason literal, or move to the withheld
+  gov harness. §10 is repointed past `-1`'s move and records `profile_bar.py`'s partial run record
+  and why it is not the one this unit reads. §8 gains its first OPEN fork since rev-5, over what
+  replaces G3, because deleting the only executable statement of the property while weakening the
+  property is a decision this unit should not take silently.
 
 ## 10. Reuse audit
 
 The seam this extends is `.githooks/pre-push`'s existing `GOV_GATE_CMD` indirection together with its
 `export GATE_FULL=1` line, both already exercised by `.githooks/pre-push.test.sh` — the hook's test
-already stubs the gate, so the forcing arms need no new harness. `tools/run-gates.sh`'s `changed()`
-and its `GATE_FULL` bypass are consumed unchanged; this unit adds no scoping mechanism of its own.
-The record it reads is `TOOL-aPacedTurnstile-5`'s, cited there rather than duplicated here.
+already stubs the gate, so the forcing arms need no new harness.
+`tools/run-gates/run-gates.sh:117`'s `changed()` and its `GATE_FULL` bypass are consumed unchanged;
+this unit adds no scoping mechanism of its own. The path is the post-move one: `-1` moved the runner
+from `tools/run-gates.sh`, which §10 went on naming for two revisions after §4 and §7 were
+repointed.
+
+`tools/run-gates/profile_bar.py:368-385` writes a run record of its own, appending a row carrying the
+sha, the width, whether `GATE_FULL` was set, the exit code and the failed leg names to
+`<git-dir>/gate-profile.jsonl`. Structurally that is three of the four fields §4's data model wants,
+and it is NOT the record this unit reads. It is written only when an operator invokes the profiling
+verb rather than by the bar itself, it carries no manifest fingerprint, no tree fingerprint and no
+schema version, and `profile_bar.py:350-364` REFUSES to write at all on a stale timing cache or an
+impossible packing ratio. It is therefore absent exactly when a landing needs it. The record this
+unit reads stays `TOOL-aPacedTurnstile-5`'s, cited there rather than duplicated here.
 
 Recall terms used: gate, leg, verdict, reuse, cache, lock, beacon, queue, concurrent, session,
 worktree, scoped, diff, GATE_FULL. The probe returned `TOOL-aTimedTurnstile-2` (the owner call this
-unit executes), `cBriefedPilot-15` and the `cKeyedLaunchpad` park (both dependents on the property
-this unit weakens), and `TOOL-aStandingWrit-4` (the fail-OPEN class the decision table's
-fail-toward-FULL direction is written against).
+unit executes, and whose S3 it supersedes), `cBriefedPilot-15` and the `cKeyedLaunchpad` park (both
+dependents on the property this unit weakens), and `TOOL-aStandingWrit-4` (the fail-OPEN class the
+decision table's fail-toward-FULL direction is written against).

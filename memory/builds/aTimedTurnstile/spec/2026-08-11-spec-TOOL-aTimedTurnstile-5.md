@@ -1,6 +1,6 @@
 # TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently
 
-**Status:** INPROGRESS · rev-3 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · review aTimedTurnstile-1
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base af6de231 · streams tooling · review aTimedTurnstile-1
 
 ## 1. Goal
 
@@ -168,11 +168,14 @@ runs at the DoD, since every leg's verdict is the thing being preserved.
 
 ## 8. Open questions
 
-- **Where the S6 arms live.** They extend `tools/run-gates.test.sh` rather than adding a leg, which
-  keeps the leg count at 47 and avoids the codebase-map coverage assert, the map re-render, the
-  manifest ratchet and drift-audit's charter-citation pin all firing at once. Recommendation: keep
-  them there, since the file is already the runner's sibling self-test. The owner may prefer a named
-  leg for visibility, which costs the four-gate pass documented in `AGENTS.md`.
+none — RESOLVED by observation at close (2026-08-20), which is the only way a question this old
+should be answered. The fork was where the S6 arms live: extending the runner's sibling self-test,
+or paying for a named leg. Both halves came true and neither cost what the question feared. The arms
+live in the sibling self-test, which `TOOL-aPacedTurnstile-1` then moved into the kit as
+`tools/run-gates/run-gates.test.sh`; and that file IS a named leg, `run-gates canary`, so the
+visibility the owner might have preferred arrived without a separate row. The leg count did not stay
+at 47 either — it is 86 — and the four gates the question priced now fire on every leg-adding commit
+as ordinary cost rather than as a reason to avoid one.
 
 ## 9. Revision log
 
@@ -186,6 +189,24 @@ runs at the DoD, since every leg's verdict is the thing being preserved.
   progress guard declared undispatched legs dead once the cache decoupled dispatch from manifest
   order, measured at 6 of 30 on the second run. Replaced by a forced dispatch. Gates A2/A3/B2 are
   deferred to their own unit as the review recommends.
+- rev-4 · 2026-08-20 · CLOSED, on the same status audit. The bounded worker pool (S1), the
+  `GATE_JOBS` resolution (S2), the longest-first dispatch from `<git-dir>/gate-timings.tsv` (S3),
+  manifest-order reporting (S4) and the serial guard pre-pass (S5) are all in `run-gates.sh` and have
+  been through two later units. S2's `min(8, nproc)` default is SUPERSEDED by
+  `TOOL-aPacedTurnstile-2`, which moved the width into a declared table keyed on detected cores and
+  RAM (`tools/run-gates/gate-profiles.txt`); node `a` selects the `capable` row at width 8, so this
+  unit's behaviour did not move when the mechanism did. Leaving this record non-terminal made it the
+  spec of record for four seams that three later units rewrite, which is two builds holding one seam
+  open at once.
+
+  The prototype figure in §1 is superseded and worth keeping visible rather than editing: this unit
+  promised 79.9 s against a 47-leg serial bar. The bar is now 86 legs and, measured on a quiet node
+  `a` at `43a6c13` by `tools/run-gates/profile_bar.py`, runs 1033.2 s against 4614.6 s of leg work.
+  The pool did what this unit claimed — packing is 1.24x of the ideal — and the bar grew past it.
+  What the same instrument reports is that the bar is now FLOOR-bound: one leg is 836.5 s, 81 % of
+  the wall clock, so no width and no dispatch order can move it. That is the finding that re-scoped
+  `aPacedTurnstile`, and it is recorded here because this is the unit whose mechanism it retires as a
+  lever.
 - rev-2 · 2026-08-11 · folded two defects found while building, both caught by arming the arms rather
   than by the build passing. The dispatcher-plus-polling-reader design was replaced by a single shell
   blocking on `wait -n` after the poll tick was measured at 317s of a 617s serial run; and the

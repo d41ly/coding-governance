@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=91
+FLOOR_ASSERTIONS=102
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -74,6 +74,64 @@ if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
+# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard` and `impure`,
+#     and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
+#     silent: the reuse path reads the key it knows, finds nothing, and treats a leg whose verdict
+#     depends on a remote as reusable on a byte-identical tree. The typo is the whole failure
+#     mode, so the pin is on the SET rather than on any one key.
+#
+#     A SCHEMA ARM, which is why it ships. It asserts a shape true of any manifest in any tree and
+#     names no leg of this repo's corpus; the gov-only harness next door holds the arms that do.
+#     It reads LEGS_FILE — the derived path — so it grades whatever manifest the tree it runs in
+#     actually has, and hardcoding `tools/gate-legs.json` in a harness that ships is the
+#     pin-copied-from-another-corpus class this kit refuses by name.
+#
+#     ITS CONTROL IS A MANIFEST WITH NO `impure` ANYWHERE, WHICH MUST PASS. The key is optional
+#     and, until a deployer unit teaches govkit to carry it, gov-only: an adopting tree's emitted
+#     manifest cannot contain one. An arm that reds on its ABSENCE is an arm that reds in every
+#     adopting tree on arrival, which is the same defect one level up from the one it guards.
+n=$((n+1))
+"$PYBIN" -c '
+import json, sys
+KNOWN = {"name", "argv", "guard", "impure", "chunk"}
+try:
+    legs = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+stray = []
+for l in legs:
+    if not isinstance(l, dict):
+        print("canary: a leg row is not an object"); sys.exit(1)
+    for k in l:
+        if k not in KNOWN:
+            stray.append("%s -> %s" % (l.get("name", "?"), k))
+if stray:
+    print("canary: leg row(s) carry a key outside the pinned set %s: %s"
+          % (sorted(KNOWN), ", ".join(stray)))
+    print("canary: a near-miss spelling of `impure` is exactly what this pin exists to catch —")
+    print("canary: the reuse path would find no declaration and reuse a leg that reads a remote.")
+    sys.exit(1)
+' "$LEGS_FILE" || fail=1
+
+# 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
+#     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
+#     negative search passes just as happily over a population it never selected.
+n=$((n+1))
+ctl=$(mktemp -d)
+printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.sh"],"guard":["z/"]}]' > "$ctl/clean.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
+keyset_probe() { "$PYBIN" -c '
+import json, sys
+KNOWN = {"name", "argv", "guard", "impure", "chunk"}
+legs = json.load(open(sys.argv[1]))
+sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
+' "$1"; }
+if keyset_probe "$ctl/clean.json" && ! keyset_probe "$ctl/typo.json"; then :
+else
+  echo "canary: the manifest key-set predicate is unarmed — it must PASS a manifest with no impure key and FAIL a near-miss spelling; one of the two did not hold"
+  fail=1
+fi
+rm -rf "$ctl"
 # 1b. every `guard` pathspec matches at least one TRACKED path. This is the quietest hole a guard can
 #     open: `git diff --quiet BASE -- does/not/exist` reports NO difference, so a leg guarded on a
 #     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring
@@ -264,11 +322,11 @@ printf '#!/usr/bin/env bash\n%s\nsleep 1.5\nexit 0\n' "$rendezvous" > "$SCRATCH/
 
 # 3e. the timing cache is ADVISORY. A corrupt one must cost wall clock and nothing else, because it
 #     is written by every run and a half-written file after a kill is the expected state, not a bug.
-printf 'not\ta\tnumber\n\x00garbage\n' > "$SCRATCH/.git/gate-timings.tsv"
+printf 'not\ta\tnumber\n\x00garbage\n' > "$SCRATCH/.git/gate-ledger.tsv"
 corrupt=$(run_scratch 4)
 n=$((n+1))
 printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
-  || { echo "canary: a corrupt gate-timings.tsv changed the verdict"; printf '%s\n' "$corrupt" | sed 's/^/    /'; fail=1; }
+  || { echo "canary: a corrupt gate-ledger.tsv changed the verdict"; printf '%s\n' "$corrupt" | sed 's/^/    /'; fail=1; }
 
 # 3f. GATE_JOBS only schedules. A garbage, zero, negative or absurd width still reports EVERY leg —
 #     this knob must never be a way to make the bar check less than it checks. The sleeps are dropped
@@ -453,11 +511,13 @@ done
 # C1: the skipped leg produced no timing this run. Its CACHED row from pass 1 must survive, or every
 # diff-scoped run blanks the dispatch hint the next full run needs.
 n=$((n+1))
-grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
-  || { echo "canary: the skipped leg's cached timing row was dropped by the cache rewrite"; fail=1; }
+grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
+  || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
 
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
-#     `.githooks/pre-push` sets it, so a guard can only ever scope a NON-authoritative run and a
+#     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
+#     when no recorded full green covers the pushed tip. So a guard can now scope the
+#     authoritative run too, and what bounds the damage is that obligation rather than a
 #     too-narrow guard costs an early signal rather than a wrong merge verdict. Asserted against the
 #     SAME fixture that skips without it, so the two readings differ only by the variable.
 for w in 1 4; do
@@ -524,7 +584,7 @@ runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-ga
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
 # hint. Truncated to an integer: the arm compares magnitudes and `[` cannot read a decimal.
-leg_secs() { awk -F'\t' -v n="$1" '$1==n { printf "%d", $2 + 0 }' "$P/.git/gate-timings.tsv" 2>/dev/null; }
+leg_secs() { awk -F'\t' -v n="$1" '$1==n { printf "%d", $2 + 0 }' "$P/.git/gate-ledger.tsv" 2>/dev/null; }
 profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
 
 # THE FIXTURE TABLE the selection arms drive. Three rows, most-capable-first, zero-threshold
@@ -683,7 +743,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   runp GATE_PROFILES=fx/tbl-loose.txt >/dev/null 2>&1
   t_ctl=$(leg_secs sleeper)
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ]; } \
-    || { echo "canary: the timing cache carried no 'sleeper' row for one of the two runs, so the elapsed assertion could not look — an arm that could not measure has not measured (timed '${t_timed}', control '${t_ctl}')"; fail=1; }
+    || { echo "canary: the ledger carried no 'sleeper' row for one of the two runs, so the elapsed assertion could not look — an arm that could not measure has not measured (timed '${t_timed}', control '${t_ctl}')"; fail=1; }
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ] && [ "$(( t_ctl - t_timed ))" -ge 10 ]; } \
     || { echo "canary: the per-leg timeout bounded the VERDICT and not the CLOCK — the sleeper leg itself took ${t_timed}s under a 3s bound against ${t_ctl}s untimed over the same 20s fixture. A knob that reports 124 while the worker blocks for the whole hang leaves the bar wedged exactly as it was before the knob existed."; fail=1; }
   # THE KILL-AFTER, driven by a leg that ignores TERM. Nothing else reaches it, and the tail is
@@ -908,6 +968,123 @@ case "$pl" in
 esac
 rm -rf "$P/cg"
 
+# 5. THE BASE IS THE BRANCH POINT. A branch is graded on what IT changed, not on everything that
+#    landed while it was open, so the baseline is the merge-base with the default branch — used
+#    ONLY where it is a proper ancestor of HEAD, with the origin tip standing otherwise.
+#
+#    THE DIVERGED CASE IS THE ONLY ONE THAT SEPARATES THE TWO SEMANTICS, which is why it is built
+#    here rather than asserted against the fixture above: that one points its remote ref at HEAD,
+#    so merge-base == HEAD and both rules give the same answer. An arm that only used it would
+#    grade a distinction it cannot see.
+n=$((n+1))
+BB=$(mktemp -d)
+mkdir -p "$BB/tools/run-gates" "$BB/tools/lib" "$BB/fx" "$BB/ga" "$BB/gb"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/tools/run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$BB/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$BB/tools/lib/" 2>/dev/null || true
+printf '#!/usr/bin/env bash\nexit 0\n' > "$BB/fx/a.sh"
+echo x > "$BB/ga/f"; echo y > "$BB/gb/f"
+printf '%s\n' '[' \
+  '  {"name": "ga leg", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "gb leg", "argv": ["bash", "fx/a.sh"], "guard": ["gb/"]}' \
+  ']' > "$BB/tools/gate-legs.json"
+( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
+   && git add -A && git commit -qm seed \
+   && git update-ref refs/remotes/origin/main HEAD \
+   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+# diverge: the branch touches ga/, then the default branch advances on gb/ only
+( cd "$BB" && git checkout -q -b feature && echo edited > ga/f && git add -A && git commit -qm branch \
+   && git checkout -q main && echo advanced > gb/f && git add -A && git commit -qm advance \
+   && git update-ref refs/remotes/origin/main HEAD && git checkout -q feature ) >/dev/null 2>&1
+bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+if printf '%s' "$bout" | grep -q '^GATE skip  gb leg'; then
+  : # the branch never touched gb/, and against the BRANCH POINT it is unchanged
+else
+  echo "canary: on a diverged branch, a leg whose guard the BRANCH did not touch did not skip — the baseline is still the remote TIP, so every branch is graded on other people's commits"
+  printf '%s\n' "$bout" | grep '^GATE ' | sed 's/^/    /'; fail=1
+fi
+n=$((n+1))
+# THE CONTROL, and without it the arm above passes on a runner that skips everything: the leg the
+# branch DID touch must still run.
+printf '%s' "$bout" | grep -q '^GATE ok    ga leg' \
+  || { echo "canary: the leg whose guard the branch DID touch was skipped too — the baseline is scoping away real changes"; fail=1; }
+n=$((n+1))
+# An unresolvable baseline runs EVERYTHING. Fail-safe, and it is the property that makes every
+# scoping rule above safe to get wrong.
+( cd "$BB" && git update-ref -d refs/remotes/origin/main; git symbolic-ref -d refs/remotes/origin/HEAD ) >/dev/null 2>&1
+bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+printf '%s' "$bout2" | grep -q '^GATE skip' \
+  && { echo "canary: a leg skipped with NO resolvable baseline — the scoping rule does not fail safe"; fail=1; } || :
+rm -rf "$BB"
+# 6. CHUNKED REPORTING. Fixture-driven and true in any tree, so it ships; the assertion about
+#    which chunk names THIS repo declares is the gov harness's, next door.
+n=$((n+1))
+CK=$(mktemp -d)
+mkdir -p "$CK/tools/run-gates" "$CK/tools/lib" "$CK/fx" "$CK/g"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/tools/run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$CK/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$CK/tools/lib/" 2>/dev/null || true
+printf '#!/usr/bin/env bash\nexit 0\n' > "$CK/fx/a.sh"
+echo g > "$CK/g/f"
+# INTERLEAVED ON PURPOSE. The manifest is not grouped, so the reader's walk is a real permutation
+# rather than an identity — an arm over an already-grouped fixture would pass on a runner that
+# never grouped anything.
+printf '%s\n' '[' \
+  '  {"name": "alpha", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
+  '  {"name": "beta",  "argv": ["bash", "fx/a.sh"], "chunk": "two"},' \
+  '  {"name": "gamma", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
+  '  {"name": "delta", "argv": ["bash", "fx/a.sh"]}' \
+  ']' > "$CK/tools/gate-legs.json"
+( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
+   && git add -A && git commit -qm seed ) >/dev/null 2>&1
+cout=$( cd "$CK" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+# SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
+# DIFFERENT manifest with different chunk names — so an assertion deferred to the end looks for
+# this run's chunks in that run's file and reports a missing roll-up that is really a missing run.
+csum=$(cat "$CK/.git/gate-last-summary.txt" 2>/dev/null)
+order=$(printf '%s' "$cout" | grep -E '^GATE ok    ' | sed 's/^GATE ok    //' | tr '\n' ' ')
+case "$order" in
+  "alpha gamma beta delta "*) ;;
+  *) echo "canary: chunked reporting did not group an interleaved manifest — legs reported as: $order"; fail=1 ;;
+esac
+n=$((n+1))
+printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused\)$' \
+  || { echo "canary: the per-chunk verdict line is missing or off-grammar"; printf '%s\n' "$cout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+# A LEG WITH NO KEY falls into `default` rather than being dropped — a leg that vanishes from the
+# report because nobody classified it is the quietest possible green-by-absence.
+printf '%s' "$cout" | grep -q '^---- chunk default: green' \
+  || { echo "canary: a leg carrying no chunk key did not report under a default chunk"; fail=1; }
+n=$((n+1))
+# AN ALL-SKIPPED CHUNK REPORTS AS SKIPPED, NEVER GREEN. One altitude above the same rule for a
+# single leg, and the louder of the two: a green chunk line is what a reader scans for.
+printf '%s\n' '[' \
+  '  {"name": "guarded", "argv": ["bash", "fx/a.sh"], "guard": ["g/"], "chunk": "gone"},' \
+  '  {"name": "free", "argv": ["bash", "fx/a.sh"], "chunk": "here"}' \
+  ']' > "$CK/tools/gate-legs.json"
+( cd "$CK" && git add -A && git commit -qm two \
+   && git update-ref refs/remotes/origin/main HEAD \
+   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+if printf '%s' "$sout" | grep -q '^GATE skip  guarded'; then
+  printf '%s' "$sout" | grep -qE '^---- chunk gone: skipped' \
+    || { echo "canary: a chunk whose every leg was skipped did not report as skipped"; printf '%s\n' "$sout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
+else
+  echo "canary: the all-skipped chunk fixture did not skip anything, so that arm proves nothing"; fail=1
+fi
+n=$((n+1))
+# ITS CONTROL: the chunk that did run must still be green, or a runner that called every chunk
+# skipped would pass the arm above.
+printf '%s' "$sout" | grep -qE '^---- chunk here: green' \
+  || { echo "canary: the chunk that DID run was not reported green — the skipped verdict above is not discriminating"; fail=1; }
+n=$((n+1))
+# THE ROLL-UP IS DURABLE AND NOT ON STDOUT: per-chunk wall time belongs in a file, because a
+# duration on a terminal line invites comparison between runs that are not comparable.
+printf '%s' "$cout" | awk -F'\t' '$1=="chunk"{found=1} END{exit !found}' \
+  && { echo "canary: the chunk roll-up leaked onto stdout"; fail=1; } || :
+printf '%s\n' "$csum" | awk -F'\t' '$1=="chunk" && $2=="one"{found=1} END{exit !found}' \
+  || { echo "canary: the durable summary carries no chunk roll-up row"; fail=1; }
+rm -rf "$CK"
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1

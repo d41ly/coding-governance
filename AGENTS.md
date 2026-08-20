@@ -125,7 +125,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask.
 - That explicit ask has ONE substitute: a committed build folder the run did not create, whose shape your merge bar validates. The mandate is ASSERTED, never written by the run that uses it, and must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
-- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the FULL bar runs ONCE, at the push boundary.
+- After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
@@ -248,7 +248,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
 - Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- Wire the suite into remote CI as machine-required checks (`none yet — the bar runs at the push boundary via .githooks/pre-push`) — convention is not enforcement.
+- Wire the suite into remote CI as machine-required checks (`none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
 - Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.
@@ -480,7 +480,11 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard; what
 **Guards scope a run, never a verdict.** Each self-test leg carries a `guard` in the manifest naming
 the kit dir it exercises, so a records-only commit runs only the legs that check this repo's actual
 state. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
-is still total — a guard can only ever scope a NON-authoritative run, which is what makes a too-narrow
+is still available — but `.githooks/pre-push` no longer sets it unconditionally. It DECIDES, forcing a
+total run when no recorded full green covers the pushed tip, when that green is more than a declared
+number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, or
+when the leg manifest itself moved. A guard can therefore scope the authoritative run too, and a
+too-narrow
 guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
 skip forever and silently, so the run-gates canary refuses one.
 

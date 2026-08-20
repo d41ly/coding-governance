@@ -59,6 +59,15 @@ guard = ["{kit}/"]
 # not the real manifest, not the real timing cache. A guard may name what the leg READS.
 
 [[gate_leg]]
+name = "run-gates turnstile"
+argv = ["bash", "{kit}/run-gates.turnstile.test.sh"]
+guard = ["{kit}/"]
+# Guarded on the kit dir ALONE. Every arm builds its own scratch repository and drives the runner
+# there, so the suite reads nothing outside this kit — not the real manifest, and deliberately not
+# the real beacon: a suite that queued against the repository it is testing would serialize itself
+# behind the very bar that is running it.
+
+[[gate_leg]]
 name = "run-gates canary"
 argv = ["bash", "{kit}/run-gates.test.sh"]
 # Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
@@ -107,6 +116,11 @@ observed_failed = ["GATE FAIL  {name}"]
 # D8: without this the deployer's `skipped` state is unreachable and its DEAD-PROBE refusal is
 # structurally dead. The runner prints this verb on every guard-scoped run.
 observed_skipped = ["GATE skip  {name}"]
+# The reuse verb, for the same reason `observed_skipped` exists: without a template the deployer has
+# no state for a leg a target reused, so that outcome is structurally unreachable and its DEAD-PROBE
+# refusal can never fire. One trailing space after the verb, because the verbs are padded so the
+# NAME starts in one column.
+observed_reused = ["GATE reuse {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.

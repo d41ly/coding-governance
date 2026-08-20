@@ -3,10 +3,14 @@
 #
 # WHY THIS FILE EXISTS, AND WHY IT IS NOT IN THE KIT PAYLOAD. `run-gates.test.sh` SHIPS: once
 # the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` makes run-gates a deployable kit, an adopter's emitted manifest runs it in
-# THEIR tree. So the shipped canary may assert only what is true in ANY tree. Three sibling units
-# want arms that are keyed on THIS repo's corpus instead — the chunking unit's every-leg-carries
-# -a-chunk assertion over gov's six declared chunk names, the reuse unit's network-calling
-# leg names, the push-boundary unit's guard pin on a named gov leg. In an adopter tree the manifest
+# THEIR tree. So the shipped canary may assert only what is true in ANY tree. Sibling units want
+# arms that are keyed on THIS repo's corpus instead — the chunking unit's every-leg-carries-a-chunk
+# assertion over gov's six declared chunk names, and the push-boundary unit's guard pin on a named
+# gov leg. (A third was reserved here and is now CUT: the reuse unit's network-calling leg names.
+# TOOL-aPacedTurnstile-16's re-scope ran that predicate over the real manifest for the first time,
+# matched six legs and found every one of them hermetic, so there is no population to pin. The
+# reservation is removed rather than left standing, because a header naming an arm nobody will write
+# is the same rot in the file that exists to refuse it.) In an adopter tree the manifest
 # is seeded EMPTY and emitted from descriptors with no chunk key, and gov's legs do not exist, so
 # every one of those arms would red on arrival. That is
 # `memory/gotchas/pin-copied-from-another-corpus.md`, the class run-gates' own spec refuses by name
@@ -63,7 +67,7 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=9
+FLOOR_ASSERTIONS=12
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -147,7 +151,41 @@ fi
 # The property it guards is still gov's and still worth guarding — a scoped authoritative run would
 # mean no run ever executes every leg against the tree that actually lands.
 a=$((a+1))
-grep -q '^export GATE_FULL=1$' "$ROOT/.githooks/pre-push"   || { echo "gov-canary: .githooks/pre-push does not force GATE_FULL — the authoritative run would be diff-scoped"; fail=1; }
+# THE PUSH BOUNDARY STILL OWES A TOTAL RUN, and this arm grades the OBLIGATION rather than the
+# mechanism. It used to grep for a literal `export GATE_FULL=1` at column 0, which was exactly
+# right while the hook forced unconditionally and became a false red the moment the hook started
+# DECIDING. Deleting it outright was the one answer this could not take: it is the only executable
+# statement anywhere that the authoritative run covers the whole bar, and removing the arm that
+# guards a property in the same commit that weakens the property is gating the instance rather
+# than the class.
+#
+# Two halves. The behavioural half — one arm per forcing predicate, plus the control proving a
+# scoped run is ever chosen at all — lives in `.githooks/pre-push.test.sh`, where the hook is
+# really driven. What stays here is the half that is about THIS repository: that the boundary can
+# still force, and that the record it decides against is not further behind than its own bound.
+grep -q 'export GATE_FULL=1' "$ROOT/.githooks/pre-push" \
+  || { echo "gov-canary: .githooks/pre-push has no forcing path at all — the boundary can never demand a total run"; fail=1; }
+a=$((a+1))
+grep -qE '^GATE_FULL_MAX_LAG=[0-9]+' "$ROOT/.githooks/pre-push" \
+  || { echo "gov-canary: the staleness bound is not a source constant in the hook — a policy an environment variable can change at the moment it binds is not a policy"; fail=1; }
+
+# THE RECORD, when there is one. A fresh clone has none, and that is a legitimate state rather
+# than a defect — the hook forces a full run there, which is the safe direction. So this arm
+# SKIPS, loudly and countably, instead of reddening: a skip that looks like a pass is
+# indistinguishable from coverage, and a red here would fail every clone on its first push.
+a=$((a+1))
+gc_rec="$(git rev-parse --git-dir)/gate-full-green"
+if [ -f "$gc_rec" ]; then
+  gc_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$gc_rec" 2>/dev/null)
+  gc_bound=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$ROOT/.githooks/pre-push" | grep -oE '[0-9]+')
+  if [ -n "$gc_sha" ] && [ -n "$gc_bound" ] && git merge-base --is-ancestor "$gc_sha" HEAD 2>/dev/null; then
+    gc_lag=$(git rev-list --count "$gc_sha..HEAD" 2>/dev/null || echo 0)
+    [ "${gc_lag:-0}" -le "$gc_bound" ] \
+      || echo "gov-canary: NOTE — the recorded full green is $gc_lag commits back, past the bound of $gc_bound, so the next push will force a total run (informational, not a failure)"
+  fi
+else
+  echo "gov-canary: SKIP the recorded-green lag arm — no gate-full-green in this git dir yet, so there is no record to measure. The boundary forces a total run in exactly this state."
+fi
 
 # ---- G4/G5. THE CHARTER STILL DESCRIBES THE RUNNER ------------------------------------------------
 # Two claims `AGENTS.md` made that the profile-table unit falsified, and NOTHING ELSE observes either:
@@ -191,6 +229,22 @@ fi
 # The executed assertion count, in the shape tools/check-testsuite-counts.sh reads, against a floor
 # declared here. the run-gates promotion spec's S11: this file gets a counter and a floor at BIRTH, so it
 # never needs a row in memory/project/testsuite-count-waivers.txt.
+# EVERY LEG OF GOV'S REAL MANIFEST CARRIES A CHUNK, and its value is one of the six declared
+# names. This is the assertion that cannot ship: an adopter's manifest is seeded empty and emitted
+# from descriptors, so a shipped arm demanding a chunk key would red on arrival in every install.
+# It is UNCONDITIONAL over the manifest rather than a spot check — a new leg added without a key
+# would otherwise fall into `default` silently and report under a chunk nobody declared.
+a=$((a+1))
+"$PYBIN" -c '
+import json, sys
+SIX = {"records", "product", "wiring", "declarations", "selftests", "e2e"}
+legs = json.load(open(sys.argv[1]))
+bad = [l.get("name", "?") for l in legs if l.get("chunk") not in SIX]
+if bad:
+    print("gov-canary: leg(s) with no chunk key, or a value outside the six declared names %s: %s"
+          % (sorted(SIX), ", ".join(bad)))
+    sys.exit(1)
+' "$ROOT/tools/gate-legs.json" || fail=1
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then
   echo "PASS ($a assertions)"

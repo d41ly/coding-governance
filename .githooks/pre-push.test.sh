@@ -101,4 +101,85 @@ case "$msg" in
   *) bad "8 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
 esac
 
+# ============================================================================================
+# THE BOUNDARY DECIDES. One arm per forcing predicate, plus the one that matters most: the arm
+# proving a scoped run is EVER chosen. Without it every predicate below is satisfied by a hook
+# that forces unconditionally — which is the hook this unit replaced, passing its own tests.
+#
+# The gate is stubbed, so what these grade is the DECISION LINE the hook prints, not a bar run.
+decide() {   # -> the hook's decision line for a push of the current main
+  # A COMMIT FIRST, because a push with nothing to send never invokes the hook at all — and a hook
+  # that did not run is indistinguishable from one that decided nothing. Earlier cases have already
+  # pushed main, so without this every arm below reads an empty line and reports a failure that is
+  # really 'there was no push'.
+  git commit -q --allow-empty -m "decide $RANDOM" >/dev/null 2>&1
+  # BOTH streams. The refusal cases above capture stderr only, because a refusal is an error; the
+  # decision line is ordinary progress output on STDOUT, and `1>/dev/null` threw it away — which
+  # read as 'the hook made no decision' rather than 'the arm looked in the wrong place'.
+  ( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
+}
+stamp() {    # write a full-green record naming a sha, with a reproducible fingerprint
+  local sha=$1 gd; gd=$(git rev-parse --git-dir)
+  local fp=""
+  [ -x tools/run-gates/gate-fingerprint.sh ] && fp=$(bash tools/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
+  printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
+    "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
+}
+
+# --- the control FIRST: a fresh, covered record must choose SCOPED ---------------------------
+stamp "$(git rev-parse HEAD)"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*) ok "9 control — a current, covered recorded green chooses a SCOPED run" ;;
+  *) bad "9 a current recorded green did not produce a scoped run, so every forcing arm below is vacuous: ${line:-<no decision line>}" ;;
+esac
+
+# --- no record at all -------------------------------------------------------------------------
+rm -f "$(git rev-parse --git-dir)/gate-full-green"
+case "$(decide)" in
+  *"FULL gate"*"no recorded full green"*) ok "10 no recorded green → FULL, and the reason says so" ;;
+  *) bad "10 an absent record did not force a full run" ;;
+esac
+
+# --- a record naming a sha that is not an ancestor of the pushed tip --------------------------
+stamp "0000000000000000000000000000000000000000"
+case "$(decide)" in
+  *"FULL gate"*) ok "11 a record naming an unreachable sha → FULL" ;;
+  *) bad "11 a record naming an unreachable sha did not force" ;;
+esac
+
+# --- the record is further behind than the declared bound -------------------------------------
+base_sha=$(git rev-parse HEAD)
+lagbound=$(grep -m1 -oE 'GATE_FULL_MAX_LAG=[0-9]+' "$tmp/hooks/pre-push" | grep -oE '[0-9]+')
+# READ FROM THE HOOK rather than pinned here: a bound written into this arm is satisfied by
+# whatever the source happens to say, including a value that makes the arm unreachable.
+if [ -z "$lagbound" ]; then
+  bad "12 could not read GATE_FULL_MAX_LAG out of the hook, so the lag arm has no bound to grade"
+else
+  i=0; while [ "$i" -le "$lagbound" ]; do i=$((i+1)); echo "lag $i" >> lagfile.txt; git add -A >/dev/null 2>&1; git commit -qm "lag $i" >/dev/null 2>&1; done
+  stamp "$base_sha"
+  case "$(decide)" in
+    *"FULL gate"*"commits behind the tip"*) ok "12 a record more than GATE_FULL_MAX_LAG=$lagbound commits back → FULL" ;;
+    *) bad "12 a stale-by-lag record did not force a full run" ;;
+  esac
+fi
+
+# --- the pushed diff touches the leg manifest -------------------------------------------------
+stamp "$(git rev-parse HEAD)"
+case "$(decide)" in *"scoped gate"*) : ;; *) bad "13 precondition — could not get back to a scoped decision" ;; esac
+prev=$(git rev-parse HEAD)
+mkdir -p tools
+printf '%s\n' '[{"name":"x","argv":["bash","x.sh"]}]' > tools/gate-legs.json
+git add -A >/dev/null 2>&1; git commit -qm "touch the manifest" >/dev/null 2>&1
+stamp "$prev"
+case "$(decide)" in
+  *"FULL gate"*) ok "14 a diff touching the leg manifest → FULL (the scoping rules themselves moved)" ;;
+  *) bad "14 a diff that moved the leg manifest did not force a full run" ;;
+esac
+
+# --- and the decision is ALWAYS announced -----------------------------------------------------
+case "$(decide)" in
+  *"gate on main push"*) ok "15 the boundary prints its decision and its reason on one line, every time" ;;
+  *) bad "15 the boundary made a decision without announcing it" ;;
+esac
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

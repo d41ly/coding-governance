@@ -12,7 +12,7 @@ the rest `unverified`. A wall clock measured on a busy machine is a real number 
 WHY IT WRAPS RATHER THAN PATCHES. `run-gates.sh` already times every leg and already prints a
 parseable verdict per leg. What it does not record is the RUN those numbers came from: the width, the
 commit, the host, the wall clock, and whether guards were bypassed. Without that envelope two numbers
-taken a month apart are not comparable, which is how `<git-dir>/gate-timings.tsv` — a dispatch hint,
+taken a month apart are not comparable, which is how `<git-dir>/gate-ledger.tsv` — a dispatch hint,
 last-write-wins, never evicting a renamed leg — became the thing people read as a profile.
 
 THE ONE NUMBER THIS EXISTS FOR. A bounded-pool bar has two independent lower bounds on its wall clock:
@@ -24,7 +24,7 @@ this verb ships with the kit.
 
 WHY IT REFUSES SO READILY. Every refusal below exists because a wrong measurement is worse than no
 measurement: this record is advertised as comparable across months, and a confident wrong number in
-it gets believed. The refusals are a timing cache that did not move, and a packing ratio below 1.0 —
+it gets believed. The refusals are a ledger that did not move, and a packing ratio below 1.0 —
 arithmetically impossible for a real run, and therefore proof the durations came from another one.
 """
 import argparse
@@ -56,7 +56,13 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # `sed` after LF and after LF alone, so a leg emitting \x1e, \v or \f could otherwise present a
 # fabricated verdict at column 0 — and \x1e is the runner's own field separator, so that is reachable
 # by accident rather than only by malice.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL)\s\s+(.*)$")
+# `\s+` after the verb, not `\s\s+`. The verbs are padded so the NAME starts in one column —
+# "ok" takes four trailing spaces, "skip" and "FAIL" two, "reuse" one — so a two-space minimum
+# after the verb is an accident of the three short verbs rather than a property of the grammar.
+# The TAIL contract is unaffected and is what the split below relies on: two spaces before any
+# parenthesised tail. Requiring two here dropped every `GATE reuse` line silently, which
+# under-counts the bar without reporting anything.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse)\s+(.*)$")
 
 
 def parse_verdicts(stdout):
@@ -280,7 +286,12 @@ def main():
         print("profile-bar: no git dir, nowhere to write the record", file=sys.stderr)
         return 2
     record_path = args.out or os.path.join(gitdir, "gate-profile.jsonl")
-    timings_path = os.path.join(gitdir, "gate-timings.tsv")
+    # THE LEDGER, not the retired `gate-timings.tsv`. The run-record unit replaced that cache
+    # rather than writing both, so a profiler still pointed at the old path would find a file
+    # nothing updates and take its did-not-move refusal on EVERY invocation — turning this tool
+    # and its gate leg into a leg whose subject can no longer run. The parser below needs no
+    # edit: the ledger keeps the duration in field 2 for exactly this reason.
+    timings_path = os.path.join(gitdir, "gate-ledger.tsv")
     manifest_path = os.environ.get("GATE_LEGS") or os.path.join(os.path.dirname(KITDIR), "gate-legs.json")
 
     if args.report:
@@ -319,6 +330,20 @@ def main():
     proc = subprocess.run([bash, RUNNER], cwd=root, env=env, capture_output=True, text=True)
     wall = time.monotonic() - start
 
+    # THE QUEUE WAIT IS NOT WORK, so it comes out of the wall clock before anything is derived from
+    # it. The turnstile serializes bars per repository, so this process can sit waiting for another
+    # bar to finish while this bracket is running — and a wait folded into `wall` inflates the number
+    # this whole tool exists to publish. Worse, it inflates it in the one direction that trips the
+    # packing refusal below: wall goes up while the durations do not, so a long enough queue makes a
+    # perfectly ordinary run look arithmetically impossible and the profiler refuses its own
+    # measurement. The runner prints exactly one parseable line for this, always, zero when
+    # uncontended.
+    queued = 0.0
+    m = re.search(r"^gate queue: waited ([0-9]+(?:\.[0-9]+)?)s$", proc.stdout, re.M)
+    if m:
+        queued = float(m.group(1))
+        wall = max(0.0, wall - queued)
+
     verdicts = parse_verdicts(proc.stdout)
     if not verdicts:
         print("profile-bar: the run produced NO parseable verdict lines — refusing to record a "
@@ -348,7 +373,7 @@ def main():
     # did not move means every duration available belongs to an earlier run. Publishing that as this
     # run's measurement is exactly the confident wrong number this tool exists not to produce.
     if executed and not timings_moved:
-        print("profile-bar: the timing cache did not move, so every duration available belongs to an "
+        print("profile-bar: the ledger did not move, so every duration available belongs to an "
               "EARLIER run. Refusing to publish it as this run's measurement. The bar itself ran: "
               "%d leg(s) reported, runner exit %d." % (len(verdicts), proc.returncode), file=sys.stderr)
         return 2
@@ -376,6 +401,9 @@ def main():
         "width_source": width_source,
         "full": not args.scoped,
         "wall": round(wall, 3),
+        # Recorded rather than merely subtracted: a reader comparing two records needs to know a run
+        # queued, and a number that silently disappears from the wall is a number nobody can audit.
+        "queued": round(queued, 3),
         "exit": proc.returncode,
         "failed_legs": failed,
         "env": {

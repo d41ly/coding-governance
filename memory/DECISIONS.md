@@ -81,6 +81,8 @@
 - TOOL-aTetheredScratch-1 · the home-directory litter was AGENT-authored: no tracked file writes to `$HOME`, so the guard binds at the tool call. Its allowlist is DERIVED from `TMPDIR`/`TEMP`/`TMP` — `%TEMP%` is INSIDE `$HOME` on Windows, and a hardcoded one denied 73 of 123 legitimate commands
 - TOOL-aTetheredScratch-2 · the `TMPDIR` retarget was specced, audited and REFUSED on measurement: `/tmp` is a `usertemp` mount onto `%TEMP%`, which is under `$HOME`, so no external root exists. 71% of the crowding was one defect, so the defect was fixed instead
 
+- TOOL-aPacedTurnstile-16 · the bar is FLOOR-bound (one leg is 836.5 s of a 1033.2 s wall at 86 legs), so scheduling cannot move it: `-3` loses its reorder and its chunk-major dispatch and keeps reporting only. Order becomes -5 -> -4 -> -6 -> -7 -> -3
+
 ## DEPL — deployer
 
 *(none yet)*

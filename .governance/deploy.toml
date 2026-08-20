@@ -33,7 +33,7 @@ drop_blocks = []
 machine_a = "daily-agent"
 # CI_FILE derives to nothing here: this repo has no .github/workflows yet, and wiring the bar into
 # CI needs a workflow-scoped push. The answer records that rather than letting a blank ship.
-ci_file = "none yet — the bar runs at the push boundary via .githooks/pre-push"
+ci_file = "none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed"
 variances_a = "remote `origin`; Windows + Git-Bash, so give `git -C` forward-slash paths"
 stream_ownership = "no fixed ownership — a solo tooling repo, one stream per work-unit"
 doc_routing_table = "playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md"
