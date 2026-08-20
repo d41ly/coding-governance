@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -15,8 +15,10 @@ outside — before either the driver or the leg implements it.
   run-state file records which. The phase vocabulary itself does not grow.
 - **S2** — protocol section 6 gains the two-anchor rule: the remote observation is attempted FIRST
   and a local ancestry assertion is the fallback, never the reverse.
-- **S3** — protocol section 8's key table gains `LANDED_ANCHOR_CUTOFF`, and the shipped
-  `.unattended.conf.example` gains it with the same comment.
+- **S3** — **DELETED at rev-3.** The audit's M9 fold gave all three carriers of
+  `LANDED_ANCHOR_CUTOFF` to the unit that adds its READER, and said in the same breath to delete them
+  here; the fold moved them and left this item standing, so two specs claimed one key. Caught by
+  reading the pair at the pass boundary rather than by the audit that wrote the fold.
 - **S4** — protocol section 9 gains one paragraph naming what a local anchor cannot buy: the ref is
   inside the run's reach, so a local-anchored `LANDED` is a record of a merge rather than an
   observation of one, and the recorded anchor kind is what keeps the two distinguishable.
@@ -145,6 +147,16 @@ placement questions are settled in §4 against the document's existing organisat
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · built. The contract now states the two anchors, their ORDER, and what the
+  weaker one does not buy — the last in section 9, beside the boundary claim it is an instance of,
+  rather than in section 6 where an operator is looking for a procedure. Section 6 argues the ORDER
+  explicitly, because two anchors listed without one would permit an implementation that always takes
+  the cheaper and retires the observation while satisfying every word. Read path 109209 of 112987
+  after the edit, leaving 3778 for the two units still to write into it.
+- rev-3 · 2026-08-21 · S3 DELETED before any code. The audit's M9 fold gave the cutoff key's three
+  carriers to the unit that adds its reader and said to delete them here; the fold did the first half
+  and not the second, so two specs claimed one key. That is the third cross-spec leftover this build
+  has found at a pass boundary, and all three were interface claims rather than logic.
 - rev-2 · 2026-08-20 · folded the spec audit: H13 (the protocol pair and the Skill pair are graded by
   DIFFERENT mechanisms; AC6 named a script that does not compare the Skill pair, and §7 named a leg
   belonging to another kit), M3 (two scope items had no criterion, and the parity criteria standing in

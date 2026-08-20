@@ -308,9 +308,17 @@ discards the entire bar the authorization leaned on, and the gate greps your run
 bash tools/unattended/unattended.sh --landed <slug>
 ```
 
-**Run this AFTER the lander returns, not before.** It re-observes the remote and refuses unless HEAD
-is an ancestor of the tip the remote advertises, so it is the one phase claim you cannot simply
-assert — which is the point. Then commit the record it writes and land that commit too; until it is
+**Run this AFTER the lander returns, not before.** It re-observes the remote and takes the tip the
+remote advertises whenever your work is on it — the one phase claim you cannot simply assert, which
+is the point. **When that fails it falls back to the LOCAL default branch**, so a build you merged
+locally but cannot push still has a terminal to reach instead of an abort. The fallback asserts your
+own BRANCH TIP is an ancestor of local main, never that HEAD is; on the default branch HEAD is that
+ref, and a commit is its own ancestor.
+
+Two facts land in the record and you do not write either: `landed-anchor`, which says `remote` or
+`local`, and `unpushed-at-landing`, which counts what local main carries that the remote does not.
+Read the second before you believe the first — a local landing sits on top of whatever else is on
+that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here. Then commit the record it writes and land that commit too; until it is
 committed, every later run still counts yours as live and the bar reds on the second one.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the

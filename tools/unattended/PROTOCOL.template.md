@@ -220,8 +220,11 @@ is otherwise the cheapest way for a run that cannot substantiate a phase to say 
 the run is the sole author of that field.
 
 **A claim of a TERMINAL phase carries a sha specifically**, narrowing the three shapes above. At
-`LANDED` the ancestry of the witness IS the claim: the gate asserts that it lies on the history the
-anchor blesses, which is what makes the landing an observation rather than an assertion. A tag or a
+`LANDED` the ancestry of the witness IS the claim: the gate asserts that it lies on the history an
+anchor blesses. **There are TWO anchors and the record says which one answered.** The remote's
+advertised tip is the strong one and is tried first; the local default branch is the fallback, for a
+build merged locally that cannot push. `landed-anchor` carries `remote` or `local`, and section 9
+states what the weaker one does not buy. A tag or a
 workflow id there is unjudgeable, and a terminal claim is exactly where an unjudgeable witness costs
 the most — it is the last thing written and nothing later re-examines it.
 
@@ -294,6 +297,18 @@ either stalls or learns to bypass — and bypassing discards the entire bar the 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
 
+**`LANDED` is reachable on either of two anchors, and the ORDER is the rule.** The remote's own
+advertised tip is attempted FIRST: that is an observation of an external party and is the only thing
+here a run cannot construct for itself. Only when it fails does the local default branch answer, and
+then the arm asserts that the run's OWN BRANCH TIP is an ancestor of it — never that HEAD is, which
+on the default branch is a commit compared with itself. The run-state file records which anchor
+answered, because a record that cannot tell an observation from an assertion has thrown away the
+distinction that matters most.
+
+Listing two anchors without ordering them would permit an implementation that always takes the
+cheaper one, retiring the observation while satisfying every word of this section. The ordering is
+what preserves the strong claim wherever the strong claim is available.
+
 ## 7. The verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
@@ -365,6 +380,14 @@ An empty declaration is a refusal, not a pass: a vocabulary with no members and 
 items would both make every check keyed on them vacuously true.
 
 ## 9. The boundary this kit claims
+
+**The local landing anchor is a new instance of exactly this, and not a new kind of thing.** A local
+ref is inside the run's reach: one `update-ref` moves it, with no network and no push, which is the
+same lever this kit already records as a reproduced bypass against a remote-tracking ref. So a
+`local`-anchored `LANDED` is a RECORD that a merge happened, never an OBSERVATION that it did. The
+remote arm stays first and stays an observation; the recorded anchor kind is what keeps the two from
+being read as one claim. This is stated rather than fixed, because refusing the local arm is what
+would restore the deadlock it exists to remove — a build merged locally with no reachable terminal.
 
 Nothing a script running under the run's own uid constitutes authorization. Four independent
 mechanisms were designed for the anchor and all four were broken by adversarial review; they
