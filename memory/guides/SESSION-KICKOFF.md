@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-20T06:52:00+03:00 @ 30466769140de8c389fc41e5ac567f969658d8b2
+last-audit: 2026-08-20T06:58:00+03:00 @ 4a5778e5ae8350c8d3f3f1c65bd2bfc539854b46
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 56b945cbb0613b1352dd06221d4d39940db33419
+last-body-change: 4a5778e5ae8350c8d3f3f1c65bd2bfc539854b46
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -146,6 +146,10 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
+- Several sessions share this node and the bar has no admission control: four concurrent full
+  bars turned the run-gates canary's timing arms RED at every width and stretched the driver
+  selftest from 11 to 99 minutes. `both expired ... unproven either way` means contention —
+  re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
