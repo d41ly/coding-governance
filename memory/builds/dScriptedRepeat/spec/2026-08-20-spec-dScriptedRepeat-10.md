@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -10,8 +10,13 @@ the parts of the build method it must actually perform.
 
 ## 2. Scope (IN)
 
-- **S1.** The UNATTENDED start path in `tools/unattended/SKILL.template.md`, a third alongside the slug
-  and prompt paths: orient, ask ONCE if under-determined, write the build folder carrying the owner's
+- **S0.** The Skill gains a routing preamble naming FOUR paths, not three: slug, prompt, playbook-run
+  (S1) and playbook-CREATION, which is unit 11's and is a `prompt`-mode run rather than a playbook-mode
+  one. A reader arriving with no playbook must be sent to the path that makes one, because unit 4's
+  preflight refuses a `playbook:` that does not resolve at BASE — so a no-playbook start cannot reach
+  preflight at all.
+- **S1.** The UNATTENDED playbook-RUN start path in `tools/unattended/SKILL.template.md`, alongside the
+  slug and prompt paths: orient, ask ONCE if under-determined, write the build folder carrying the owner's
   prose plus `playbook:` and `pieces:`, commit, push, preflight, kickoff hand-back. Ordered, and the
   order is the point — everything before the push is provably older than the commit that authorizes
   the run.
@@ -25,9 +30,12 @@ the parts of the build method it must actually perform.
   budget, so this unit does NOT add a section to it. §4 gives the alternative and §8 F1 carries the
   fork if the owner prefers the budget rise.
 - **S5.** The REFUSAL of ordinary code builds, agent-facing: the Skill states that this mode is for
-  producing declared content and that a code build uses the slug or prompt path. This is the CHECK half
-  of fork 2, and it is written as a CHECK — unenforceable, paired with unit 8's machine half, and
-  labelled so nobody mistakes it for the gate.
+  producing declared content and that a code build uses the slug or prompt path. It is written as a
+  CHECK, and the PAIRING is stated per path rather than in general: on the UNATTENDED path it is paired
+  with unit 8's machine refusal; on the ATTENDED path there is no machine half at all, because unit 8's
+  two inputs — the recorded mode and the run's commit set — both exist only through the driver. The
+  previous revision claimed the pairing without that qualifier, which is true of one entry point and
+  false of the other.
 - **S6.** The Skill/registry JOIN, in both directions, for the directive table and — new this unit —
   for `AUTH_MODES`, closing unit 1's F2.
 - **S7.** Rendered-artifact arms: the render carries no surviving brace-shape, and the byte-compare
@@ -141,6 +149,10 @@ against a counter that includes it.
 - rev-1 · 2026-08-20 · initial draft. S2's shape follows from the research proving an attended run
   cannot close through the driver; S4's refusal to add a method section follows from the measured budget
   and from M1's own rule about re-reading cost.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F17 added S0's routing preamble and the fourth path,
+  after the audit found that the owner's FIRST stated verb — create a playbook when none exists — had no
+  owning unit anywhere in the roster and was structurally refused by unit 4's own preflight. The path
+  itself is unit 11. F10 qualified S5's pairing claim per entry point.
 
 ## 10. Reuse audit
 

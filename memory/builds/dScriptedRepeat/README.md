@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10
+ids: TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11
 ---
 
 # dScriptedRepeat — playbook mode: a third authorization discipline for repeatable content
@@ -142,10 +142,61 @@ which is a wall in front of the mode's second verb.
 Ten units. One mechanism each, per the build method's M2. Every one is Tier 2 except unit 9 — this
 is a kit contract change throughout, which the manifest's tier rule makes Tier 2 by definition.
 
-The ORDER matters and is not the id order. Unit 1 publishes the vocabulary every later unit joins
-against; units 2 and 3 are the artifact and its checker and can run in parallel with 4-8; unit 5 is
-the prerequisite for 6 and 7, because both read the record it defines; unit 10 is last because it
-renders a Skill that names what the other nine built.
+The ORDER matters, is not the id order, and is stated as a PREDECESSOR list because the previous prose
+version contradicted four dependencies the specs themselves assert. Units 5, 7 and 8 all deliver their
+acceptance through `check-playbook.sh`, which unit 3 creates, so 3 cannot run parallel to them; and
+every one of 5, 6, 7 and 8 reads a value unit 4's seam resolves.
+
+| Unit | Must land after |
+|---|---|
+| 1 | — |
+| 2 | 1 |
+| 3 | 1, 2 |
+| 4 | 1 |
+| 5 | 3, 4 |
+| 6 | 4, 5 · CO-LANDS with 8 |
+| 7 | 4, 5 · CO-LANDS with 6 |
+| 8 | 3, 4 · CO-LANDS with 6 |
+| 9 | 1 |
+| 10 | all of 1-9, 11 |
+| 11 | 2, 3 |
+
+Two co-landing constraints, both from the specs' own reasoning. Units 6 and 8 land together because 6's
+piece count consumes 8's diff population and counts the wrong thing without it. Units 6 and 7 land
+together because `CORE_FLOOR`'s Definition-of-Done half moves ONCE, from eight to ten, rather than
+twice — the two specs previously carried two different stories about which commit moves it.
+
+## What the spec audit changed
+
+The ten specs went through an M4 adversarial audit at base `7e2ac32f` — five lenses, batched refuting
+skeptics, one synthesis. It returned **BLOCKED**: 24 confirmed against 31 refuted, collapsing to 21
+distinct defects, fifteen of them HIGH. The record is under `reviews/`. All 21 are folded and every
+spec that moved carries its rev-2 log.
+
+**The blocker was mine and it reached runs that have nothing to do with this mode.** `verb_close`
+evaluates `DOD_CORE` for EVERY run with no mode branch anywhere, so the two new core items — which only
+a playbook run can satisfy — would have blocked `--close` on every `slug`- and `prompt`-mode run in the
+fleet, on a non-overridable item whose only exit is `--abort`. Units 6 and 7 now carry a term zero that
+meets the item and ANNOUNCES the skip when the mode does not match.
+
+**Four artifacts had readers and no writer.** Nothing in the ten units wrote the per-piece record or
+the set record, so the two Definition-of-Done items reading them could only be satisfied by hand — which
+unit 5 forbids. Unit 5 now owns the writer verb and a second caller for the attended path.
+
+**Two items were satisfied by recorded failures.** `verified` was a hash-join state alone, so
+`pieces-complete` was met by N pieces whose every declared leg had FAILED, and fork 5 was implemented by
+nothing. `set-checks-recorded` asserted a verdict existed and not what it said, so the unit built to
+stop a monoculture green closed green on a failed set check. Both now read the verdicts.
+
+**The owner's first stated verb had no owning unit.** Creating a playbook when none exists was in the
+ask and absent from the roster, and unit 4's preflight structurally refuses a run with no playbook to
+name. That is unit 11, and it also takes amendment — which removes the playbook from unit 8's exemption
+set, where it sat on a premise unit 9 denied in the same build.
+
+**And the audit re-measured my own repair and found it worse than what it replaced.** Unit 8's diff
+population was "enumerate the run's own commits"; measured, that is a SUPERSET of the `BASE..HEAD` range
+it rejects, because the merged-in default-branch history is still in `rev-list`. The population is now
+the research's own merge-base-plus-first-parent form.
 
 <!-- roster:units -->
 | # | Unit | Tier | Mechanism |
@@ -159,7 +210,8 @@ renders a Skill that names what the other nine built.
 | 7 | `TOOL-dScriptedRepeat-7` | 2 | the SET-scoped check population and where it runs |
 | 8 | `TOOL-dScriptedRepeat-8` | 2 | the output-scope refusal — the diff population, the exemption set, an observed failing case, and the stated CHECK half |
 | 9 | `TOOL-dScriptedRepeat-9` | 1 | the `proposal` park kind and the `--propose` verb |
-| 10 | `TOOL-dScriptedRepeat-10` | 2 | the Skill's two start paths and the playbook-scoped directives |
+| 10 | `TOOL-dScriptedRepeat-10` | 2 | the Skill's start paths and the playbook-scoped directives |
+| 11 | `TOOL-dScriptedRepeat-11` | 2 | authoring a playbook — the creation path, and where amendment lives |
 <!-- /roster:units -->
 
 ## What is deliberately NOT in this build
@@ -179,25 +231,26 @@ Named here because the research raised each one and an unstated exclusion reads 
 
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 10 unit(s) · node d · opened 2026-08-20 · streams tooling
-ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10
+**Build status:** SPECCED · 11 unit(s) · node d · opened 2026-08-20 · streams tooling
+ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-5 — the per-piece record as a property of the TREE](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | SPECCED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
@@ -207,10 +260,11 @@ Records live under `spec/` and `build/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 
-Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
+Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
 
-Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
+Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -228,6 +282,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-1 TOOL-dScripted
 - **`spec/`**
   - [2026-08-20-spec-dScriptedRepeat-1.md](spec/2026-08-20-spec-dScriptedRepeat-1.md)
   - [2026-08-20-spec-dScriptedRepeat-10.md](spec/2026-08-20-spec-dScriptedRepeat-10.md)
+  - [2026-08-20-spec-dScriptedRepeat-11.md](spec/2026-08-20-spec-dScriptedRepeat-11.md)
   - [2026-08-20-spec-dScriptedRepeat-2.md](spec/2026-08-20-spec-dScriptedRepeat-2.md)
   - [2026-08-20-spec-dScriptedRepeat-3.md](spec/2026-08-20-spec-dScriptedRepeat-3.md)
   - [2026-08-20-spec-dScriptedRepeat-4.md](spec/2026-08-20-spec-dScriptedRepeat-4.md)
@@ -243,4 +298,6 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-1 TOOL-dScripted
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
+- **`reviews/`**
+  - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)
 <!-- /gen:build-docs -->

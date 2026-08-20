@@ -1,40 +1,50 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
 Give a playbook a second check population that runs over ALL N pieces at once, because every
 composition failure in the reference corpus was found by measuring the set and none by measuring a
-piece — and a Definition of Done that verifies each piece individually ships a monoculture green.
+piece — and make its Definition-of-Done item read the verdicts rather than merely their existence.
 
 ## 2. Scope (IN)
 
-- **S1.** A `set_checks` population in the playbook's declaration block, parallel to the per-piece one,
+- **S1.** A `set_checks` key in the playbook's declaration block, parallel to the per-piece checks key,
   each entry tagged `GATE <leg>` or `CHECK <why>` by the same grammar unit 3 already enforces. One
-  grammar, two populations — not two grammars.
-- **S2.** Template section 8 (unit 2's canon) is where they are WRITTEN in prose, with the declaration
-  block naming the machine half. A playbook that genuinely has none declares `none — <why>`, and unit 3
-  distinguishes that from an empty section.
-- **S3.** The RUN POSITION. Set-scoped checks run at `--close`, over the set unit 5's reader
-  enumerates, after `pieces-complete` has established the set is non-empty and each piece is verified.
-  They need no new phase: the protocol already carries `RUNNING` as "a run between named passes", and
-  `RESEARCHING`/`TESTING` already establish the precedent that a position is not a pass kind.
-- **S4.** The SET RECORD: one tracked record per RUN, hash-joined to the SET — the ordered list of
-  piece content hashes — so a set verdict cannot survive a piece changing under it. Same four states as
-  unit 5's per-piece record, for the same reason.
-- **S5.** A tenth DoD item, `set-checks-recorded:machine`, asserting that a set record exists for this
-  run's set and that every declared set-scoped `GATE` has a verdict in it. It asserts a verdict EXISTS
-  and is bound to this set; it does not assert what the verdict concluded — the same honest limit
-  `closing-review-recorded` already states about itself.
-- **S6.** Arms: a set record bound to a stale set reds; a declared set-scoped `GATE` with no verdict
-  blocks the close; `none — <why>` passes; the single-piece case (N=1) runs set checks rather than
-  skipping them.
+  grammar, two populations. Unit 2's declaration-block key list carries both keys with this unit named
+  as their owner.
+- **S2.** Template section 8 is where they are WRITTEN in prose, with the declaration block naming the
+  machine half. A playbook with none declares `none — <why>`, and unit 3 distinguishes that from an
+  empty section.
+- **S3.** The RUN POSITION. Set-scoped checks run at `--close`, over `enumerate_run` as unit 5 defines
+  it, after `pieces-complete` has established the set is non-empty and each piece is `verified`. No new
+  phase: the protocol already carries `RUNNING` as "a run between named passes", and
+  `RESEARCHING`/`TESTING` establish that a position is not a pass kind.
+- **S4.** The SET RECORD: one tracked record per RUN, carrying a RUN IDENTITY and the ordered list of
+  piece content hashes, written by unit 5's writer function through a set-scoped caller. The run
+  identity is what makes a later run's larger set read `superseded` rather than `stale` — without it,
+  run 2 makes run 1's record stale by construction and unit 6 blocks a close it has nothing to do with.
+- **S5.** `set-checks-recorded:machine`, a tenth core item, with THREE terms:
+  0. the recorded mode is the playbook mode, else MET-and-announced with the `skipped` shape — the same
+     term zero unit 6 carries, and for the same reason: `verb_close` evaluates `DOD_CORE` for every run
+     with no mode branch, so an item only this mode can satisfy would wedge the fleet;
+  1. a set record exists for THIS run's set, joined by run identity and ordered hashes;
+  2. every declared `GATE`-tagged set check records a PASS. A recorded FAIL BLOCKS, naming the check.
+     A `CHECK`-tagged entry keeps the existence-only limit, and the leg header states which half is
+     which.
+- **S6.** The `CORE_FLOOR` slack arm is unit 6's S7 and is not duplicated here. Units 6 and 7 CO-LAND
+  as one commit-per-pair so the DoD half of `CORE_FLOOR` moves once, from eight to ten, with both arms
+  observing the RED before it moves.
+- **S7.** Arms: a set record bound to a superseded set is named as such and does not block; a declared
+  `GATE` set check with no verdict blocks; a declared `GATE` set check recording FAIL blocks with a
+  distinct message; a `CHECK`-tagged entry with a recorded FAIL does not block; `none — <why>` passes;
+  a `slug`-mode run closes GREEN with this item present; the single-piece case runs set checks.
 
 ## 3. Non-goals (OUT)
 
-- No new PHASE. S3's whole point. Adding one would need `CORE_FLOOR`'s phase half to move and would
-  claim a pass kind the build method's closed set does not contain.
+- No new PHASE. Adding one would move `CORE_FLOOR`'s phase half and claim a pass kind the build
+  method's closed set does not contain.
 - The kit ships no set-scoped check of its own. What counts as monoculture is domain knowledge and
   belongs to the playbook, per fork 7. The kit gates that the population is DECLARED and VERDICTED.
 - No averaging, no scores. A set check's verdict is binary and anchored, for the reason the reference
@@ -46,40 +56,45 @@ piece — and a Definition of Done that verifies each piece individually ships a
 ### The evidence this unit exists for
 
 In the reference corpus nine articles were each reviewed carefully and each passed, and the nine
-together were a monoculture no single review could have caught. The mechanism is not reviewer laziness
-— it is structural: a reviewer who has just spent an hour inside one piece cannot see that its shape is
-the previous piece's shape. The corpus's own repairs were all set-scoped: a byte-level repetition
-invariant, a heading-level one, a register share ceiling, and a read-the-previous-piece pass. Three of
-those four are machine checks, which is why this unit is not merely a documented CHECK.
+together were a monoculture no single review could have caught. The mechanism is structural rather than
+a reviewer failing: somebody who has just spent an hour inside one piece cannot see that its shape is
+the previous piece's shape. The corpus's own repairs were all set-scoped — a byte-level repetition
+invariant, a heading-level one, a share ceiling, and a read-the-previous-piece pass. Three of the four
+are machine checks, which is why this is not merely a documented CHECK.
 
-A second, sharper instance is in the template's own exemplar rule: one checklist's example phrase
-reached 8 of 9 bodies verbatim. Every one of those nine pieces passed every per-piece check.
+### Why term 2 reads the verdict
+
+The previous revision borrowed `closing-review-recorded`'s honest limit — assert a record EXISTS, not
+what it concluded — and the audit showed the borrowing does not transfer. That item's own source
+comment says a verdict grammar cannot be anchored over prose review records, which is a limitation of
+prose. Here S1 makes set checks `GATE <leg>` entries and §3 makes every verdict binary and anchored, so
+the stronger reading is available and declining it produced the exact failure this unit exists to
+prevent: a run ships N monocultured pieces, records the repetition check FAIL, and `--close` reports
+both DoD items met. The `CHECK` half keeps the existence-only limit because there the limit is real.
 
 ### Why a share ceiling must measure the SHIPPED population
 
 The reference's own register census counted all planned rows and reported healthy variety across
-articles nobody had written, while every published row carried one value. A set-scoped check that
-measures the planned set rather than the produced set is green-by-absence with extra steps. The set
-this unit's checks run over is therefore unit 5's ENUMERATION of pieces that exist, never a declared
-plan.
+articles nobody had written, while every published row carried one value. A set-scoped check measuring
+the planned set rather than the produced set is green-by-absence with extra steps. The set here is
+unit 5's `enumerate_run`, never a declared plan.
 
 ### N=1
 
-A set of one is still a set, and it is the case where a skip is most tempting and most wrong: piece one
-of a corpus is the piece every later piece will be compared against. Set checks run at N=1; a check
-that is meaningless at N=1 says so in its own `<why>` rather than being skipped by the engine.
+A set of one is still a set, and it is where a skip is most tempting and most wrong: piece one is what
+every later piece will be compared against. Set checks run at N=1; a check meaningless at N=1 says so
+in its own `<why>` rather than being skipped by the engine.
 
 ### Alternatives rejected
 
-**A new phase, `COMPOSING`.** Rejected by S3: the position vocabulary already covers it and a new phase
-member costs a floor move for no new information.
+**A new phase, `COMPOSING`.** The position vocabulary already covers it and a new member costs a floor
+move for no new information.
 
-**Folding set checks into the closing review.** Rejected: `closing-review-recorded` asserts a review of
-the DIFF exists. A set check is a measurement over artifacts, is machine-runnable, and would be
-invisible inside a prose review record.
+**Folding set checks into the closing review.** `closing-review-recorded` asserts a review of the DIFF
+exists. A set check is a machine-runnable measurement over artifacts and would be invisible inside a
+prose record.
 
-**Making it a documented CHECK only.** The owner considered and declined this at fork 10, and the
-evidence supports the decline: three of the reference's four set-level repairs are machine invariants.
+**Making it a documented CHECK only.** Declined at fork 10, and the evidence supports the decline.
 
 ## 5. Production-readiness checklist
 
@@ -90,33 +105,40 @@ evidence supports the decline: three of the reference's four set-level repairs a
 - a11y — N/A.
 - i18n — a repetition predicate over non-ASCII text must compare bytes or normalise deliberately; the
   kit does not choose, the playbook's leg does.
-- error / empty / loading states — a set record absent, stale, orphaned or verdict-incomplete are four
-  states with four messages. `none — <why>` is a fifth and distinct from all of them.
-- observability — the close prints the set size, the declared set-check count and the verdict count.
-- risks — the largest is that this unit gates the EXISTENCE of set checks while their QUALITY is the
-  thing that matters, and a playbook can satisfy it with one trivial check. Stated in the leg header;
-  the compensating control is that section 8's prose is read at every playbook review.
-- testing + left-shift gates — S6, with the N=1 arm as the one most likely to be wrongly optimised away
-  later.
-- migration / rollback — a tenth core DoD item; `CORE_FLOOR`'s DoD half moves with unit 6's in one
-  commit, and an arm asserts the INSTALLED conf.
-- user docs — protocol §4 gains a row; template section 8 is the author-facing documentation.
+- error / empty / loading states — set record absent, superseded, orphaned, verdict-incomplete, and
+  verdict-failing are five states with five messages. `none — <why>` is a sixth and distinct.
+- observability — the close prints the set size, the declared set-check count, the verdict count and
+  the pass count.
+- risks — this unit gates the EXISTENCE and now the VERDICTS of set checks, while their QUALITY is what
+  matters, and a playbook can still satisfy it with one trivial check. Stated in the leg header; the
+  compensating control is that section 8's prose is read at every playbook review.
+- testing + left-shift gates — S7, with the recorded-FAIL arm and the N=1 arm as the two most likely to
+  be wrongly optimised away later.
+- migration / rollback — a tenth core item, inert for every run of another mode via term zero. It
+  co-lands with unit 6 so `CORE_FLOOR`'s DoD half moves once.
+- user docs — protocol §4 gains a row naming the mode branch and the GATE/CHECK split; template section
+  8 is the author-facing documentation.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a playbook declares set-scoped checks and the run records a verdict for each,
-  `--close` reports `set-checks-recorded` met.
-- **AC2** — When a declared set-scoped `GATE` has NO verdict in the set record, `--close` BLOCKS naming
-  that check. Staged and observed.
-- **AC3** — When a piece is edited after the set record is written, the set record is STALE and
-  `--close` blocks with a message distinct from AC2's. Observed via the ordered-hash join.
-- **AC4** — When the playbook declares `set_checks` as `none — <why>`,
+- **AC0** — When a `slug`-mode run reaches `--close` with `set-checks-recorded` present, the item is MET
+  and announces itself with the `skipped` shape naming the mode. Observed via
+  `bash tools/unattended/unattended.sh --close`.
+- **AC1** — When every declared `GATE`-tagged set check records a PASS, `--close` reports
+  `set-checks-recorded` met.
+- **AC2** — When a declared `GATE`-tagged set check has NO verdict, `--close` BLOCKS naming that check.
+- **AC3** — When a declared `GATE`-tagged set check records a FAIL, `--close` BLOCKS with a message
+  distinct from AC2's. Staged and observed — this is the arm that stops the monoculture green.
+- **AC4** — When a `CHECK`-tagged entry records a FAIL, `--close` does NOT block, and the leg header
+  states that limit. Observed, because the asymmetry is deliberate and reads like a bug otherwise.
+- **AC5** — When a piece is edited after the set record is written, the set record is stale and
+  `--close` blocks; when a LATER run's set is larger, run 1's record reads `superseded` and blocks
+  nothing. Two arms, and the second is the one the previous revision got wrong.
+- **AC6** — When the playbook declares `set_checks` as `none — <why>`,
   `bash tools/unattended/check-playbook.sh` passes and `--close` does not block. When it declares an
   EMPTY section instead, the gate REDS. Two arms.
-- **AC5** — When N is 1, set checks RUN, observed through `bash tools/unattended/check-playbook.sh`.
+- **AC7** — When N is 1, set checks RUN, observed through `bash tools/unattended/check-playbook.sh`.
   Not assumed — the engine must not special-case it.
-- **AC6** — When `DOD_CORE` reaches ten items, `CORE_FLOOR` moves in the same commit and an arm reads
-  the INSTALLED `.unattended.conf`, not only the shipped example.
 
 ## 7. Gates
 
@@ -127,32 +149,38 @@ evidence supports the decline: three of the reference's four set-level repairs a
 ## 8. Open questions
 
 - **F1 — should a set-scoped check run against pieces from PREVIOUS runs of the same playbook?** The
-  monoculture the reference measured was across nine articles produced over months, not within one
-  run — so a set scoped to one run's output would not have caught it. Against that: a run cannot be
-  blocked by a corpus it did not produce, and unit 6 deliberately counts only the run's own pieces.
-  Recommendation: the set-check population is declared per check as `run` or `corpus`, the playbook
-  chooses, and a `corpus`-scoped check WARNS rather than blocks. **This is the sharpest question in the
-  unit and it is genuinely open — owner input welcome, but it is mechanism, so I will resolve it at the
-  first pass if you would rather not spend a turn on it.**
+  monoculture the reference measured was across nine articles produced over months, not within one run,
+  so a set scoped to one run's output would not have caught it. Against that: a run cannot be blocked by
+  a corpus it did not produce. RESOLVED (agent, 2026-08-20, delegated): the population is declared PER
+  CHECK as `run` or `corpus`, using unit 5's two named scopes; a `corpus`-scoped check WARNS and never
+  blocks, and its census prints. That resolution also removes the contradiction the audit found between
+  this fork and §4, which had already decided the question one way while the fork called it open.
 - **F2 — whether `set-checks-recorded` collapses into `pieces-complete`.** They read different
-  populations and fail for different reasons, and this repo's own DoD history is one long argument for
+  populations and fail for different reasons, and this repo's DoD history is one long argument for
   splitting terms rather than ANDing them. Recommendation: keep them separate. Deferred, not open.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft. The unit exists because of the research's single strongest
-  finding, which no kickoff fork covered; S3's use of an existing position rather than a new phase comes
-  from the protocol's own `RESEARCHING`/`TESTING` precedent, which the contradiction hunt surfaced.
+  finding, which no kickoff fork covered.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F1 added term zero, the mode branch. F4 made term 2
+  read the VERDICT rather than its existence — as written, this unit closed green on a failed set check,
+  which is verbatim the outcome it exists to prevent. F2 gave the set record a run identity so a later
+  run supersedes rather than staling. F6 named unit 5's writer as the set record's writer too. F3 moved
+  the `CORE_FLOOR` arm to unit 6 and made 6 and 7 an explicit co-landing pair, removing the
+  contradiction between this spec's §5 and unit 6's S1 about which commit moves the floor. F1 of §8 is
+  now resolved against unit 5's two named scopes.
 
 ## 10. Reuse audit
 
 The POSITION-not-a-pass-kind precedent is reused wholesale from the protocol's phase vocabulary, which
 already carries two positions and a stated rule that the build method's pass set is closed — so this
-unit needs no vocabulary change at all, which was not obvious before the research found it. The
-ORDERED-HASH set join extends unit 5's per-piece join by the same argument, one level up. The
-`closing-review-recorded` item is the model for S5's honest limit: it asserts a bound review EXISTS and
-explicitly not what it concluded, and copying that phrasing is what stops this item overclaiming. The
-BINARY ANCHORED VERDICT rule and the ban on averaging are the reference corpus's, adopted with its
-measured reason rather than as a style preference. Recall terms used: set scope corpus monoculture
-repetition census population shipped planned verdict binary anchored close position phase pass kind
-definition of done record join stale.
+unit needs no vocabulary change at all, which was not obvious before the research found it. The SET
+RECORD's writer is unit 5's, through a set-scoped caller rather than a second implementation. The
+ORDERED-HASH join extends unit 5's per-piece join one level up, now with a run identity the audit showed
+it needed. What is deliberately NOT reused any more is `closing-review-recorded`'s existence-only limit:
+§4 records why the borrowing failed, and that is the more useful half of a reuse audit — a seam
+correctly identified and then correctly rejected. The BINARY ANCHORED VERDICT rule and the ban on
+averaging are the reference corpus's, adopted with its measured reason. Recall terms used: set scope
+corpus run monoculture repetition census population shipped planned verdict binary anchored close
+position phase pass kind definition of done mode branch record join superseded stale identity.

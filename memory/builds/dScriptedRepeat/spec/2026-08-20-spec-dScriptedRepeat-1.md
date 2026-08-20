@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -11,8 +11,8 @@ so a misspelled mode is refused rather than silently agreed with in two places.
 ## 2. Scope (IN)
 
 - **S1.** Add `AUTH_MODES` to `tools/unattended/unattended.sh` beside `PHASES_CORE`, `DOD_CORE` and
-  `DIRECTIVES_CORE`, holding the closed set of authorization modes. It is the fifth vocabulary in
-  this driver and the only one that is a `case` arm rather than a named set.
+  `DIRECTIVES_CORE`, holding the closed set of authorization modes. It joins the constants `core_of`
+  already reads, and is today the only mode vocabulary spelled as a `case` arm rather than a named set.
 - **S2.** Rewrite the closed-set refusal at `unattended.sh:794-797` to test membership of `AUTH_MODES`
   rather than enumerate two values inline. The refusal message keeps its shape and DERIVES the legal
   set from the constant, so adding a member cannot leave the message stale.
@@ -146,12 +146,16 @@ that key on `tools/gate-legs.json`. Adding an arm costs `ARMS_FLOORS` and one ar
 - rev-1 · 2026-08-20 · initial draft. Decomposed from the research pass. S5 and the derived scope set
   come from the contradiction hunt's ranked decision 9, which two lenses reached independently and
   which no kickoff fork covered.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F21 dropped two prose counts of a derived population
+  that contradicted each other inside this spec - in the unit whose whole subject is not spelling a set
+  twice. Two audit passes produced two different corrected censuses, which is itself the argument for
+  writing no number at all.
 
 ## 10. Reuse audit
 
 The seam is the driver's existing vocabulary shape: three constants read through one `core_of` parse
-that the leg already shares. This unit adds a FOURTH member of that established pattern rather than a
-new mechanism, which is why it needs no new reader, no new conf key and no new leg. `scope_of` at
+that the leg already shares. This unit adds a member of that established pattern rather than a new
+mechanism, which is why it needs no new reader, no new conf key and no new leg. `scope_of` at
 `unattended.sh:123-132` is reused unchanged — its shortest-prefix/longest-prefix pair already yields
 `all` for a two-field entry, and that property is exactly what lets the scope set grow without
 touching a single existing directive row. Recall terms used: unattended driver closed vocabulary

@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-1 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-1 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -12,13 +12,26 @@ half of the mode's second verb — as a fifth `park()` KIND rather than a second
 - **S1.** A fifth parked kind, `proposal`, written by a new `--propose <slug> --item <what> --reason
   <why>` verb that reuses `verb_park`'s guards wholesale.
 - **S2.** One extra field the other kinds do not carry: the STEP the proposal amends, so a proposal is
-  joined to the playbook step it came from rather than being free-floating advice.
+  joined to the playbook step it came from rather than being free-floating advice. Its PLACEMENT is
+  `... · item <i> · step <s> · reason <r>`, keeping `reason` LINE-FINAL, because every existing reader
+  depends on that - `waivers_of` at `unattended.sh:654`, and check 17's trailing-strip at
+  `check-unattended.sh:503`. Appending after `reason` makes the step part of every reader's greedy
+  match. The ` · ` separator refusal, which screens the item only today because `reason` could not
+  previously be mis-parsed, EXTENDS to the step.
 - **S3.** The alternation in `verb_status`'s parked-kind regex at `unattended.sh:1566`, which today
   carries exactly four kinds.
 - **S4.** The row in protocol §2, which today states four kinds.
-- **S5.** NO DoD item, and no effect on the close. `parked-decisions-surfaced` already surfaces every
-  parked kind through one derived key, and a proposal must not block. §4 records that this asymmetry
-  already holds rather than needing to be built.
+- **S5.** NO DoD item, and no effect on the close. `parked-decisions-surfaced` surfaces every parked
+  kind through one key, and a proposal must not block. That key is agent-ATTESTED, not derived:
+  `DOD_CORE` spells it `parked-decisions-surfaced:agent` at `unattended.sh:93`, and `dod_met` grades it
+  by grepping for a line the run itself writes via `--attest` at `:1879-1880`. Under protocol §9 a
+  self-written line is exactly what does not constitute evidence, so fork 6's "surfaced at close" rests
+  on an attestation. Stated plainly rather than dressed up as a derivation.
+- **S5b.** TWO REUSE LIMITS, named because S1 calls the guards reused "wholesale" and two of them do
+  not travel. `verb_park` REFUSES with no run-state file at `unattended.sh:1940`, so `--propose` is
+  unattended-only and the attended path has no proposal channel - the same asymmetry unit 5 solved by
+  giving its writer a second caller, and the same solution applies. And the STEP field is a row GRAMMAR
+  change, so the parked-region parsers in the leg and in `verb_status` are in-scope readers.
 - **S6.** The verb-set carriers. The research found the verb set spelled in FIVE places with three
   already stale — the header docstring, `fail 14`'s message and protocol §7 each name fewer verbs than
   the dispatch handles. Adding a verb without fixing that ships a sixth stale copy, so this unit
@@ -46,7 +59,8 @@ of which looks at whether parks are outstanding. **The asymmetry the fork asked 
 
 So the ruling's INTENT — proposals are distinct from blockers and must read that way — is satisfied by
 a KIND, which is already the discriminator the protocol uses, at roughly a tenth of the cost of a
-register.
+register. What the SURFACING rests on is a separate question, and the answer is weaker than the
+previous revision claimed: it is an attestation, per S5.
 
 **The residual tension, recorded rather than smoothed over.** The fork's words were "distinct region",
 and a fifth kind is the same region with a different first token. If the owner meant region literally,
@@ -110,6 +124,11 @@ research lens priced this. It is named here so the build does not discover it at
 
 - rev-1 · 2026-08-20 · initial draft. Written after measuring `park()` and `dod_met` directly and
   finding the fork's premise false; the verb-carrier drift in S6 comes from the research.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F18 pinned the STEP field's placement before `reason`
+  and extended the separator refusal to it - `park()` is ONE format string and every reader depends on
+  `reason` being line-final, so the field's position is a correctness property rather than a style
+  choice. F19 corrected S5 and §4: `parked-decisions-surfaced` is agent-attested, not derived, and the
+  two reuse limits are named in S5b instead of being implied away by the word wholesale.
 
 ## 10. Reuse audit
 

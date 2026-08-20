@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -13,10 +13,15 @@ also at BASE. Fork 8's hybrid, which is what keeps the playbook self-describing 
 - **S1.** Two new build-README front-matter keys, read at BASE: `playbook:` (a repo-relative path) and
   `pieces:` (a positive integer, the count the owner asked for). Both are read only when the mode is
   the playbook mode; absent under any other mode is legal and means nothing.
-- **S2.** A SECOND blob read in the driver and independently in the leg: `GIT show "$base:$playbook"`,
-  parsed for the declaration block's `outputs` and `grain`. The existing front-matter scan is
-  untouched — its `No second GIT show: one blob, one parse` comment bounds THAT scan and is not a rule
-  against reading a second file, which this spec records because the comment reads like one.
+- **S2.** THE FRONT-MATTER SCAN GAINS TWO KEY-TAGGED EMISSIONS, in the driver's awk at
+  `unattended.sh:783-790` and in the leg's independent copy at `check-unattended.sh:444-471`. That awk
+  emits `slug=` and `mode=` and nothing else today, so `playbook:` and `pieces:` have no reader at all
+  without this edit and AC1 is unimplementable. The one-blob-one-parse property is PRESERVED: two more
+  key-tagged lines out of the same scan, never a second pass over the same blob.
+- **S2b.** A SECOND blob read, of a DIFFERENT file, in the driver and independently in the leg:
+  `GIT show "$base:$playbook"`, parsed for the declaration block's `outputs` and `grain`. The
+  `No second GIT show: one blob, one parse` comment bounds THAT front-matter scan and is not a rule
+  against reading a second file; this spec records that because the comment reads like one.
 - **S3.** REFUSALS, each with its own message: `playbook:` naming a path that does not resolve at BASE;
   a playbook at BASE whose declaration block does not parse; `outputs` empty or absent; `grain` absent
   or unresolvable; `pieces:` absent, zero, or non-numeric.
@@ -96,7 +101,9 @@ commit, which the leg cannot trust — the same argument protocol §1 cost 2 alr
 - risks — a grain glob that matches too broadly silently inflates the piece count. Unit 6's vacuity
   guard is the compensating control and the two units must be read together.
 - testing + left-shift gates — S6, every refusal staged RED.
-- migration / rollback — additive keys under one mode. Every existing README parses unchanged.
+- migration / rollback — additive keys under one mode. Every existing README parses unchanged, and the
+  index renderer is unaffected: `gen_build_index.py`'s `parse_front_matter` validates only its required
+  keys, so additive ones ride through. Measured by the research rather than assumed.
 - user docs — the template documents the declaration block; the Skill (unit 10) documents the two
   README keys.
 
@@ -141,6 +148,10 @@ independent re-derivation needs and the kit had zero such arms until it was buil
 - rev-1 · 2026-08-20 · initial draft. The hybrid was ruled by the owner on 2026-08-20 after the
   research found the fork-2 wording and the driver's own comment in conflict; S4's grain comes from a
   measured factor-of-three ambiguity on a single diff.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F16 split S2: the README half of fork 8's hybrid had
+  no reader at all, because the existing awk emits only `slug=` and `mode=`, and the previous revision
+  had said that scan stays untouched. The §10 reuse claim naming `parse_front_matter` was false on this
+  unit's path and moved to the migration row, where it is a true compatibility statement.
 
 ## 10. Reuse audit
 
@@ -149,8 +160,10 @@ using the same `GIT show "$base:$path"` form, the same failure handling, and the
 record-then-second-opinion pattern the mode declaration already uses — where the driver records and the
 leg re-derives independently rather than reading the driver's answer. That pattern is the reason a
 recorded binding is worth anything at all, and reusing it is what keeps this unit from being a second
-implementation that confirms the driver rather than checking it. Front-matter parsing reuses
-`gen_build_index.py`'s `parse_front_matter`, which validates only its required keys and therefore
-accepts additive ones without change — measured by the research, not assumed. Recall terms used: build
+implementation that confirms the driver rather than checking it. The reused front-matter seam is the driver's own KEY-TAGGED awk idiom, extended by two emissions in
+both readers. `gen_build_index.py`'s `parse_front_matter` is NOT on this unit's path — it is Python,
+its only caller is the index renderer, and no shell reader here touches it; that additive keys do not
+break the index render is a compatibility observation, and it now sits in the migration row rather than
+standing in for a reuse decision. Recall terms used: build
 README front matter base blob show authorization mode record second opinion leg independent derive
 glob grain output path declaration anchor published.

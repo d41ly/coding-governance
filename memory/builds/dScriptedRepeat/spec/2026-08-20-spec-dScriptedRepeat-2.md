@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -10,17 +10,25 @@ length budget the checker DERIVES rather than a number typed into prose.
 
 ## 2. Scope (IN)
 
-- **S1.** `tools/unattended/PLAYBOOK-TEMPLATE.template.md`, rendered into an adopting repo the way
-  the kit's two existing templates are, through the `[[files]]` `role = "rendered"` mechanism in
-  `kit.toml`.
+- **S1.** `tools/unattended/PLAYBOOK-TEMPLATE.template.md`, plus THE ADOPTER WORK THAT SHIPS IT.
+  `adopt-unattended.sh` never reads `kit.toml`: it hardcodes exactly two destinations at `:137` and
+  `:140`, renders one and copies the other, and its own comment at `:197` says "The adopter installs
+  TWO artifacts, so --check verifies two." The `[[files]]` rows are read by `govkit.py` for deployment
+  PLACEMENT, not by this kit's adopter. So this unit edits `adopt-unattended.sh` — a third destination,
+  a third `--check` arm with its own not-installed and drifted refusals, the placeholder arm, and that
+  comment — plus the `[[lf_pin]]` row. Without those edits nothing renders a third artifact and AC3 is
+  an observation nobody can make.
 - **S2.** The SECTION CANON, twelve required sections in fixed order, listed in §4. Every one is
   required-with-a-declared-null: a section that genuinely does not apply keeps its heading and carries
   the single line `none — <why>`. This is the memory kit's own `N/A — <why>` rule for spec sections,
   reused rather than reinvented.
-- **S3.** The DECLARATION BLOCK at the head of the file — a fenced TOML block holding the playbook's
-  machine-read declarations: its step selector, its step floor, its output globs, its piece grain, its
-  gate-leg registry and its coverage mode. Units 3, 4, 6 and 7 read from this one block; none of them
-  invents a second declaration site.
+- **S3.** The DECLARATION BLOCK at the head of the file — one fenced TOML block holding every
+  machine-read declaration, so a reader sees the whole machine contract at once and unit 3's checker has
+  one parse. Its key set is the UNION of what units 3, 4, 5, 7 and 8 declare, listed in ONE place with
+  an owning-unit column and enumerated nowhere else. The previous revision enumerated the keys here and
+  was wrong within the same build: unit 7 declares an eighth key this list did not carry, unit 5 reads a
+  per-piece checks key nothing declared, and the reader list named unit 6 (which reads none of it) while
+  omitting unit 8 (which reads `outputs`).
 - **S4.** The EXEMPLAR RULE, stated in the template and enforced in unit 3: every sentence quoted in a
   playbook as an illustration is PROHIBITED OUTPUT unless it is a tracked fixture. Derived from a
   measured failure, not a preference — see §4.
@@ -76,8 +84,11 @@ One fenced TOML block, immediately after section 1's heading, holding every mach
 block rather than per-section keys because a reader must be able to see the whole machine contract at
 once, and because unit 3's checker then has one parse.
 
-Keys: `step_selector` · `step_floor` · `outputs` · `grain` · `legs` · `coverage` · `curated`.
-Their semantics belong to the units that read them and are specced there, not restated here.
+The key table lives in the template itself with an owning-unit column, and unit 3 gates the JOIN in
+both directions — a declared key no unit owns REDS, and a unit reading a key the block does not declare
+REDS — the same both-directions join unit 10 already uses for the directive table. Their semantics
+belong to the units that read them and are specced there, never restated here; that restatement is
+exactly what went stale.
 
 ### The exemplar rule
 
@@ -142,14 +153,19 @@ early — a wall in front of "updates existing playbooks".
   `memory/builds/dScriptedRepeat/build/`. No section is silently skipped.
 - **AC2** — When the recipe-shaped reference is mapped, the sections it cannot fill resolve to
   `none — <why>` rather than to invented content, and the record names which and why.
-- **AC3** — When `PLAYBOOK-TEMPLATE.template.md` is rendered by the kit's adopter, the render carries
-  no surviving `{{` brace-shape, checked as its own arm — template parity and placeholder completeness
-  are two different questions and this repo has a recorded failure conflating them.
+- **AC3** — When `bash tools/unattended/adopt-unattended.sh --check` runs against a tree where the
+  third artifact is missing, it REFUSES; and when the installed copy has drifted from the shipped
+  template, it REFUSES with a distinct message. Two arms against the specific new `--check` arm S1 adds,
+  because a byte-compare that no code path produces is not an acceptance criterion.
+- **AC3b** — When the declaration block carries a key no unit owns, or a unit reads a key the block does
+  not declare, `bash tools/unattended/check-playbook.sh` REDS. Both directions, staged and observed.
 - **AC4** — When the template is read, the exemplar rule appears in `PLAYBOOK-TEMPLATE.template.md` and the template ITSELF quotes
   no sentence as a model except ones marked prohibited or pointing at a tracked fixture. Self-applying,
   and observed by reading, because a template that violates its own loudest rule teaches the violation.
-- **AC5** — When `curated:` is absent or empty, unit 3's gate REDS. Specified here because the freeze
-  is this unit's property; observed in unit 3.
+- **AC5** — When `curated:` is absent or empty, `bash tools/unattended/check-playbook.sh` REDS, with no
+  run binding involved. The rule is unit 3 S9c's and this line states the same one — the previous
+  revision and unit 3 F2 carried two different answers, and the freeze is fork 4's only machine
+  consequence, so it may not depend on which spec a reader opens first.
 - **AC6** — When the re-derivation mode runs over a corpus, it writes a CANDIDATE canon to a separate
   path and leaves the frozen template byte-identical, verified by `git status --porcelain`.
 
@@ -180,12 +196,20 @@ carrier of several landed in only one.
 - rev-1 · 2026-08-20 · initial draft. Canon derived from the corpus-anatomy and
   external-instruction-design records; section 4 and section 8 identified as filled by neither
   reference; the exemplar rule lifted from the reference's own measured failure.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F14 pulled the adopter work in scope after the audit
+  showed `adopt-unattended.sh` never reads `kit.toml` and hardcodes two destinations, making AC3 an
+  observation nothing could make. F15 replaced the enumerated key list with a pointer plus a
+  both-directions join, because the enumeration was already wrong against three other specs in the same
+  build. F13 aligned AC5 with unit 3's resolution of the same question.
 
 ## 10. Reuse audit
 
-Three seams are reused rather than rebuilt. The RENDER path is `kit.toml`'s existing
+Two seams are reused rather than rebuilt, and a third this spec claimed turned out to be false. The RENDER path is `kit.toml`'s existing
 `[[files]] role = "rendered"` mechanism with a `to =` target and a placeholder list, already used for
-the Skill and the protocol, so the template needs no new adopter code. The DECLARED-NULL escape is the
+the Skill and the protocol — but that mechanism drives govkit's deployment PLACEMENT and is NOT read by
+this kit's own `adopt-unattended.sh`, which hardcodes two destinations. So the render costs adopter
+edits after all and S1 carries them; what is genuinely reused is the render, byte-compare and `--check`
+SHAPE, a pattern rather than a free ride. The DECLARED-NULL escape is the
 memory kit's `N/A — <why>` rule for spec sections, which already has a working gate and an observed
 failing case. The DERIVE-THEN-FREEZE discipline with a `curated:` mark is the lexicon kit's, whose
 specs establish that a derived vocabulary nobody edited is a mirror of its subject — and whose adopter

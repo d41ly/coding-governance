@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-3 — the playbook validity gate
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -28,14 +28,33 @@ over every step it selects, the witness drain census, and whether each named leg
   witness present, counts them against the total, PRINTS the drain, and does not red on absence. Fork
   11's ruling, with the census as the thing that makes voluntary adoption visible.
 - **S5.** The RUNNABILITY ORACLE. A playbook declares `legs`, mapping each leg NAME used in a `GATE`
-  tag to something runnable, and `coverage`, declaring how completely the oracle can decide. The gate
-  reds a `GATE` naming a leg absent from the registry. Where an adopter declares no registry, the gate
-  emits a NAMED REFUSAL and reds — never a silent skip, and never a green.
+  tag to a RESOLVABLE TARGET — an argv, or a path that must exist in the adopting tree. The codomain is
+  specified because without it the oracle compares a document's tags against a table inside that same
+  document, which is the assertion-between-two-derived-values class unit 1 names. The gate reds a `GATE`
+  naming a leg absent from the registry AND a registry ENTRY whose target does not resolve.
+- **S5b.** `coverage` is DECLARED and GRADED, not merely recorded. Each mode is defined by what the
+  oracle does: `resolvable` = every target resolves, and a playbook declaring it over an unresolvable
+  target REDS; `probe` = existence-only, with its incompleteness printed on every run; `dark` = a named
+  refusal. An UNDECLARED mode reds. Three modes with no observable difference would be a declaration
+  nothing grades, which is the defect this key exists to avoid.
 - **S6.** The CANON check: the twelve required sections present, in order, each non-empty, each either
   filled or carrying `none — <why>`. Present-but-empty and `none — <why>` are distinguished.
 - **S7.** The EXEMPLAR check: a quoted sentence in a playbook must be marked prohibited or point at a
   tracked fixture path that resolves.
 - **S8.** The DERIVED LENGTH BUDGET, computed per addressable segment and printed on every run.
+- **S9b.** THE LEG'S VERDICT CHANNEL, named against what the runner can actually express.
+  `tools/run-gates/run-gates.sh:844-849` maps a leg's own exit: `0` prints `GATE ok`, anything else
+  `GATE FAIL`; `skip` comes ONLY from a guard file written before dispatch, and `run-gates.test.sh`
+  refuses a guard pathspec matching no tracked path. So a leg cannot say `skipped`, and this repo tracks
+  no playbook — meaning this leg would print `GATE ok` over an empty population forever while unit 5's
+  reader, unit 7's set records and unit 8's refusal all rode on it. The leg therefore exits NON-ZERO
+  when it can name a population and resolves none of it, prints an enumerated-count line, and ships ONE
+  TRACKED FIXTURE PLAYBOOK under `tools/unattended/` so the dogfood population is never empty and a
+  guard on that path passes the canary. Two zero-states stay distinct: no playbook declared at all, and
+  a declared grain resolving to zero pieces.
+- **S9c.** `curated:` is resolved HERE rather than deferred. The gate reds a playbook whose `curated:`
+  is absent or empty, with no run binding involved — the freeze is a tree property like everything else
+  this leg reads, and it is the only machine consequence fork 4 has. Unit 2 AC5 states the same rule.
 - **S9.** A self-test, `check-playbook.test.sh`, with every arm's failing case staged and observed RED
   before the arm lands. The candidate predicates in S2, S3 and S7 are run over BOTH reference
   playbooks first, printing hits AND near-misses, before any of them is wired.
@@ -124,13 +143,20 @@ only quantitative handle on the third.
 - **AC4** — When a `GATE` names a leg absent from the declared `legs` registry, the gate REDS.
 - **AC5** — When no `coverage` is declared, the gate REDS with a named refusal, and the message states
   that a missing declaration is not a pass. Observed, because a silent skip is the failure mode.
+- **AC5b** — When a playbook declares `coverage = resolvable` and one registry target does not resolve,
+  `bash tools/unattended/check-playbook.sh` REDS. Staged and observed — this is what makes the
+  declaration graded rather than recorded.
+- **AC5c** — When `curated:` is absent or empty, `bash tools/unattended/check-playbook.sh` REDS.
+  Staged and observed.
 - **AC6** — When `check-playbook.sh` runs over BOTH reference playbooks unmodified, its output names
   every hit AND near-miss and the run does not claim coverage it does not have. This is a measurement
   gate on the gate, run before wiring.
 - **AC7** — When a required canon section is present but EMPTY the gate REDS; when it carries
   `none — <why>` the gate PASSES. Two arms, because one arm cannot distinguish them.
-- **AC8** — When the tree contains no playbook at all, the leg reports `skipped` with its reason and
-  does not report green.
+- **AC8** — When the tree contains no playbook at all, `bash tools/unattended/check-playbook.sh` exits
+  non-zero and the bar prints `GATE FAIL` with the reason; and when the shipped fixture playbook is the
+  only one, the leg exits 0 having enumerated a non-zero population, printing that count. Two arms, and
+  the second is what proves the first is not a permanent red.
 
 ## 7. Gates
 
@@ -147,16 +173,22 @@ trips grows, so the full bar is the check rather than an enumerated list.
   it needs a second blob read, and folding it in would put an adopter-facing predicate inside the kit's
   self-check. Recommendation: a separate leg, and pay the meta-gate cost. **Agent-resolvable; recorded
   because the cheaper option was measured and deliberately declined.**
-- **F2 — does the gate red on a playbook whose `curated:` line is absent?** Unit 2 AC5 says yes. The
-  tension is that an in-progress playbook has no ratifier yet. Recommendation: red only for a playbook
-  the declaration seam names as ACTIVE for a run; a draft in the tree is not yet a contract. Resolving
-  this needs unit 4's seam, so it is deferred to that unit rather than guessed here.
+- **F2 — does the gate red on a playbook whose `curated:` line is absent?** RESOLVED (agent,
+  2026-08-20, delegated) in S9c: YES, with no run binding. The previous revision deferred this to unit 4,
+  which has no notion of an ACTIVE playbook and never received the deferral — and unit 2 AC5 meanwhile
+  asserted the opposite answer, so three specs carried two rulings and a dangling handoff. A draft that
+  is not ready to be graded is not yet a tracked playbook.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft. S2's declared selector and S3's structural window both come from
-  measured defects in the reference implementation of this same rule, recorded in the corpus-anatomy
-  and contradiction records.
+  measured defects in the reference implementation of this same rule.
+- rev-2 · 2026-08-20 · folded the M4 spec audit. F11 is the important one: the `skipped` verdict four
+  specs rested on does not exist in the gate runner's leg protocol, so this leg would have printed
+  `GATE ok` over an empty population forever while carrying the mode's entire enforcement. S9b names the
+  real channel and ships a tracked fixture playbook. F12 gave the `legs` registry a codomain and made
+  `coverage` graded. F13 resolved `curated:` here instead of deferring it to a unit that never received
+  the deferral.
 
 ## 10. Reuse audit
 
