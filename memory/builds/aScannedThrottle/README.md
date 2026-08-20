@@ -19,9 +19,11 @@ reconstructed after the fact without running anything.
 
 ## What the measurement says
 
-Four real `GATE_FULL=1` width-8 bars on node `a` reconstruct to spans of 925–1058 s at 60–70 %
-pool utilization. Every one is FLOOR-bound: the single longest leg exceeds leg-seconds over width,
-so no amount of width moves the span. `run-gates canary` is the third-largest leg at 466–587 s and
+Four real `GATE_FULL=1` width-8 bars on node `a` span 925–1058 s. THREE of them reconstruct fully,
+at 59.8–69.5 % pool utilization, and all three are FLOOR-bound: the single longest leg exceeds
+leg-seconds over width, so no amount of width moves the span. The fourth carries a recovered span
+and a recovered verdict only; its per-leg records are gone, so it is counted in the span range and
+in nothing else. `run-gates canary` is the third-largest leg at 466–587 s and
 sits entirely in the shadow of the two `unattended` selftests. Deleting it outright moves the
 bar's wall clock by 0.0 %.
 
@@ -50,6 +52,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md) | journal | TOOL-aScannedThrottle-1 |
+| [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md) | diff-review | TOOL-aScannedThrottle-1 |
 | [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md) | spec-audit | TOOL-aScannedThrottle-1 |
 <!-- /gen:build-index -->
 
@@ -70,5 +73,6 @@ Records live under `spec/`, `build/` and `reviews/`.
 - **`build/`**
   - [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md)
 - **`reviews/`**
+  - [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md)
   - [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md)
 <!-- /gen:build-docs -->
