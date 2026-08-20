@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -14,10 +14,21 @@ the one act the code already refuses so the method cannot authorise an impossibl
 - **S1** — M3's `What is delegated` paragraph is rewritten. A standing mandate delegates the owner's
   resolver authority for the named build INCLUDING scope, bounded by S2. The "park it" instruction
   for a scope fork is deleted, because it is the instruction that produced the stalls.
-- **S2** — the bound is stated as one invariant: **the build README's goal statement is what a run may
-  not amend.** Everything downstream of it — a spec's scope, its non-goals, the roster — is
-  amendable in service of that goal. This replaces veto 2's owner turn for changes made in service of
-  the stated goal, and leaves vetoes 1 and 3 in force.
+- **S1a** — M12's closing sentence carries a SECOND spelling of the same rule and is edited in the
+  same commit. Its trailing clause restates the substantive conclusion in its own words rather than
+  deferring, so deleting M3's sentence alone leaves the method holding two contradictory answers to
+  one question inside one file — which M1 calls a defect HERE whose resolution is deletion. The clause
+  is replaced by a pointer to M3. As a same-line replacement it is net zero or negative on the line
+  budget. Review fold: H11.
+- **S2** — the bound is TWO invariants, and BOTH are written into the rule text M3 ships, not into
+  this spec's commentary. A future run reads M3, never this file. **(a)** The build README's goal
+  statement is what a run may not amend; everything downstream of it — a spec's scope, its non-goals,
+  the roster — is amendable in service of that goal. **(b)** The delegation reaches the BUILD'S OWN
+  SCOPE only — retiring, superseding and adding units, and their spec content — and explicitly does
+  NOT reach veto 2's governance-carrier clause, M1's own budget included. Vetoes 1 and 3 stay in force
+  verbatim. Review fold: H10. The first draft stated (b) only in §4, which delegates dependency,
+  install-location, public-surface and governance-carrier changes on a purpose test the run applies to
+  itself — far wider than the owner's fork A, which was authority over UNITS.
 - **S3** — M2's `Act` block gains a fifth act, **AMEND**, with three forms: RETIRE a unit by moving
   its spec to `WONTDO` with a successor or reason pointer in the header tail; SUPERSEDE it by
   authoring a replacement unit and retiring the original; and ADD a unit the build turns out to need.
@@ -56,7 +67,17 @@ the one act the code already refuses so the method cannot authorise an impossibl
 | RETIRE | spec status to `WONTDO`, successor or reason in the header tail | id stays, row status changes | yes, and undocumented |
 | SUPERSEDE | author the replacement, retire the original, cross-point both | id added, original stays | yes, and undocumented |
 | ADD | author a new unit and its spec | id added | yes, and undocumented |
-| DELETE | remove the id from the roster | id removed | **no — structurally refused** |
+| DELETE | remove the id from the roster | id removed | **refused — with the anchor caveat below** |
+
+**The refusal is CONDITIONAL on the anchor, and M2 must say so.** `check_authorization`'s own comment
+is explicit: on the default-branch anchor the BASE blob is outside the run's reach and the subset test
+is a real integrity check; on the branch anchor it is NOT, because the run pushed that tip, and the
+comment closes that the check "does not close that hole and must not read as though it did." This repo
+declares the branch anchor. So S4 writes the refusal into M2 with one qualifying clause — it binds on
+the default-branch anchor and degrades on the branch anchor, where a project relies on the run not to
+delete rather than on the check to refuse it. Publishing an unconditional guarantee into a carrier
+every adopter reads, in the exact words the source says it must not read as, is what this clause
+avoids. Review fold: M17.
 
 The first three columns were verified against source before this spec was written. `WONTDO` is one of
 the two statuses `nonterminal_units` accepts as finished, so a retired unit does not block
@@ -147,6 +168,16 @@ prevent.
   `READ_PATH_CEILING`, since this file is one of its six members.
 - **AC6** — A reader can answer, from M2 and M3 alone, which of the four acts in §4's table the code
   refuses and why, observed in `memory/guides/BUILD-METHOD.md`.
+- **AC7** — `grep` over `memory/guides/BUILD-METHOD.md` finds M3 STATING both bounds of S2 — that a
+  run may not amend the build README's goal statement, and that the delegation does not reach veto 2's
+  governance-carrier clause. Review fold: M18, the one scope item bounding the whole delegation and
+  the one with no observation.
+- **AC8** — `grep` finds vetoes 1 and 3 byte-identical to their text at BASE, and finds M12 no longer
+  carrying its own spelling of the rule that scope is not delegated. Review fold: H11, M18.
+- **AC9** — the joint measurement that used to sit in `TOOL-dUnstalledConvoy-8`: `wc -l` on
+  `memory/guides/BUILD-METHOD.md` is at or under M1's stated line budget after BOTH method-editing
+  units have landed. This unit is the LATER of the pair in the reordered plan, so the observation is
+  takeable here and was not takeable there. Review fold: M15.
 
 ## 7. Gates
 
@@ -165,6 +196,10 @@ boundary.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-2 · 2026-08-20 · folded the spec audit: H10 (both delegation bounds moved into the rule TEXT),
+  H11 (M12's second spelling joins the edit set as S1a), M17 (the DELETE refusal qualified by anchor
+  scope), M18 and M15 (four new criteria, including the joint budget observation moved here from
+  unit 8, this unit now being the later of the method-editing pair).
 
 ## 10. Reuse audit
 

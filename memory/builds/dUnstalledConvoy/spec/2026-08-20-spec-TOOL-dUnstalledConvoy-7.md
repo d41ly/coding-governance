@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -26,7 +26,11 @@ anything, and produces the verdict `TOOL-dUnstalledConvoy-8` branches on. It shi
   If parallel passes can reach a row-merged file at all, that is E4's losing condition and it must be
   hit deliberately rather than discovered later.
 - **S5** — the record carries a single verdict token on its own line, in the shape the prior
-  parallelism record used, so unit 8 reads a token rather than parsing prose.
+  parallelism record used, so the inversion unit reads a token rather than parsing prose. The token
+  set is CLOSED and declared here: `parallelism route: cleared`, `parallelism route: failed`, or
+  `parallelism route: not-observed`. Review fold: M1. The first draft promised a token whose legal
+  values were enumerated in neither spec, which left the consuming unit branching on an undefined
+  input domain.
 - **S6** — every rejected candidate carries the test that rejected it. A rejected candidate with no
   recorded test is indistinguishable from one nobody tried, and the next build pays to re-run it.
 - **S7** — the record states which criteria were CLEARED by the prior hunt and are not re-run here.
@@ -148,7 +152,13 @@ the push boundary. This unit adds no gate.
 
 ## 8. Open questions
 
-- **F1 — if E3 clears and E4 fails, does the build ship a narrowed inversion?** A pass-level
+- **F1 — RESOLVED by the 2026-08-20 reorder, and restated here rather than deleted.** The original
+  text closed by saying a run could resolve this under the new scope authority — which was false at
+  the time, because the authority and the recording verb both landed AFTER this unit. Review fold:
+  M11. Under the reordered plan the authority is position 2 and the verb position 3, and this unit is
+  position 5, so a run reaching this fork genuinely can resolve and record it. The fork itself stays
+  open by design, because it is honestly unresolvable until the measurement is taken: if E3 clears and
+  E4 fails, does the build ship a narrowed inversion? A pass-level
   parallelism that cannot commit independently is still useful if the orchestrator commits for both,
   which changes M6's condition set rather than abandoning it. Options: record the failure and let
   unit 8 not ship; or record it and let unit 8 ship an inversion scoped to orchestrator-committed
@@ -159,6 +169,8 @@ the push boundary. This unit adds no gate.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: M1 (the verdict-token set is CLOSED and declared), M11 (F1 was
+  resolvable only under an authority that used to land later; the reorder makes its own text true).
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit

@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -15,7 +15,19 @@ refuses any transition no `rescope` row accounts for.
   inside the existing anchor loop, where the recorded BASE and the build README are already resolved.
 - **S2** — for each live run, the check derives two id sets from the build README's generated units
   region: the set at the recorded BASE, and the set at HEAD. Every id present at HEAD and absent at
-  BASE must be accounted for by a `rescope · item add <id>` row.
+  BASE must be accounted for by EITHER an `add` row naming it OR a `supersede` row naming it as the
+  successor. Review fold: H3. Requiring an `add` alone made a correctly performed supersession red the
+  bar: the successor is present at HEAD, absent at BASE, and the sibling verb refuses an `add` for an
+  id already in the region, so the run had no legal repair.
+- **S2a** — the comparison EXCLUDES an id whose spec was first committed at or before the commit where
+  the run entered `BUILDING`. Review fold: H4. Keying the exemption on the phase AT CHECK TIME buys
+  nothing, for two independent reasons the audit measured: the window is BASE-to-HEAD regardless of
+  phase, so a spec authored during `SPECCING` is still absent at BASE once the run advances; and the
+  authoritative run of this leg is the full bar at the push boundary, where `--close` has already set
+  the phase to `LANDING`, which is `BUILDING` onward. A run that classified a unit MISSING and
+  authored its spec — which M2 MANDATES — would red for obeying the method. The prompt-authorized
+  mode makes it sharper: such a run starts with an empty units region at BASE, so every spec it
+  legitimately authors would be unaccounted for.
 - **S3** — for each unit whose status is `WONTDO` at HEAD and was not `WONTDO` at BASE, a
   `rescope · item retire <id>` or `rescope · item supersede <id> -> <successor>` row must exist.
 - **S4** — a `supersede` row whose successor id is absent from the HEAD units region is a refusal. A
@@ -26,6 +38,16 @@ refuses any transition no `rescope` row accounts for.
 - **S6** — every case the check cannot compare ANNOUNCES itself with a named skip line: no recorded
   BASE, a BASE blob with no units region, a malformed marker pair on either side, or a BASE dated
   before `UNITS_REGION_CUTOFF`.
+- **S6a** — **THIS UNIT OWNS THE LEG OUTPUT CONTRACT, and amends it in the same commit as the first
+  skip line.** Review fold: H1, owner decision 2026-08-20. The leg header states that exit 0 with no
+  output is clean and that anything printed is a violation, and its sibling test hard-asserts empty
+  output in three places under a runner that folds stderr into stdout, so no channel escapes it. Four
+  units in this build specify an announced skip; under the reordered plan this one lands first, so it
+  decides the mechanism ONCE and the other three cite it. The disposition: a skip line is emitted on a
+  dedicated REPORT channel the default run does not print, and the contract sentence gains that
+  exception explicitly rather than being quietly falsified. The three green-control arms are amended
+  in the same commit and NONE is deleted — deleting the green control removes the arm that makes every
+  other arm in that file meaningful.
 - **S7** — the check's header states what it does not buy, per the rule that a gate's header states
   what it does NOT check.
 
@@ -83,8 +105,10 @@ for this unit to ship as a check that cannot fail.
 
 | File | Change |
 |---|---|
-| `tools/unattended/check-unattended.sh` | one check inside the anchor loop, four skip lines, four refusals |
+| `tools/unattended/check-unattended.sh` | one check inside the anchor loop, four skip lines, four refusals, AND the header output contract plus its three green-control arms (S6a) |
+| `tools/unattended/unattended.sh` | the id pattern promoted to a named constant the leg extracts, review fold M14 |
 | `tools/unattended/check-unattended.test.sh` | the cases in §6 and the `ARMS_FLOORS` bump |
+| `.memory-tree.conf` | the `ARMS_FLOORS` entry this unit moves — a BUILD-WIDE shared write, review fold M7 |
 
 ### Alternatives rejected
 
@@ -111,7 +135,11 @@ for this unit to ship as a check that cannot fail.
   which invalidates any unarmed-branch row beneath it.
 - migration / rollback — existing live runs carry no `rescope` rows and have made no amendments, so
   the check is silent on them. The cutoff skip covers older BASEs.
-- user docs — the protocol's check inventory gains a row alongside `TOOL-dUnstalledConvoy-3`.
+- user docs — the check's OWN SOURCE HEADER, which is what documents all twenty-one existing checks
+  in this leg and which S7 already requires. Review fold: M8. The first draft promised a row in the
+  protocol's check inventory; the installed protocol has ten sections and none of them is one, and the
+  unit this obligation was delegated to never creates one. Inventing an eleventh protocol section
+  would spend read-path margin this build is already spending elsewhere.
 
 ## 6. Acceptance criteria
 
@@ -128,6 +156,17 @@ for this unit to ship as a check that cannot fail.
   and is still refused by `authorization-reachable` in the driver.
 - **AC7** — Each new refusal and each skip is observed against a fixture before the unit lands, and
   the arms count in `ARMS_FLOORS` matches the new `fail` call sites.
+- **AC8** — A fixture performing a FULL supersession — original flipped to `WONTDO`, replacement
+  present at HEAD, exactly one `supersede` row and no `add` row — passes, observed in
+  `tools/unattended/check-unattended.test.sh`. Review fold: H3, the case AC4 inverted and never covered.
+- **AC9** — A fixture whose run authored a spec during `SPECCING` and then entered `BUILDING` does NOT
+  red, and a fixture whose BASE units region names no unit is outside this check entirely. Both in
+  `tools/unattended/check-unattended.test.sh`. Review fold: H4.
+- **AC10** — With S6a in place, `bash tools/unattended/check-unattended.sh` on a conforming tree still
+  prints nothing on its default channel, and the leg's three green-control arms in
+  `tools/unattended/check-unattended.test.sh` still pass with their intent unchanged. Review fold: H1.
+- **AC11** — The header of the new check STATES what it cannot buy, observed by `grep` over
+  `tools/unattended/check-unattended.sh`. Review fold: L1.
 
 ## 7. Gates
 
@@ -136,20 +175,32 @@ boundary.
 
 ## 8. Open questions
 
-- **F1 — should the check run for a run in `SPECCING`?** A build authors most of its roster during
-  `SPECCING`, so every spec written after preflight is an `add` transition and would need a row.
-  That is either a useful discipline or a row per spec for no benefit. Options: run at every phase; or
-  run only from `BUILDING` onward, treating the speccing phase as roster construction rather than
-  amendment. **Recommendation: run only from `BUILDING` onward**, and say so in the check's header.
-  It matches `TOOL-dUnstalledConvoy-5` F1's answer that the VERB does not refuse early, while keeping
-  the CHECK from demanding a record for ordinary spec authoring. Resolve before building — it decides
-  whether S2 needs a phase guard.
+- **F1 — RESOLVED (agent, 2026-08-20): key the exemption on WHEN the id appeared, not on the phase.**
+  The first draft recommended a phase guard from `BUILDING` onward; the audit measured that it bounds
+  nothing, and S2a now carries the resolution. A phase guard decides when the comparison RUNS while
+  the window stays BASE-to-HEAD, and the authoritative run happens at `LANDING`, which is past any
+  such guard. Review fold: H4.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-2 · 2026-08-20 · folded the spec audit: H3 (a supersede row accounts for its own successor),
+  H4 (the exemption keys on when the id appeared, and F1 is resolved rather than left open), H1 (this
+  unit OWNS the leg output contract by owner decision, S6a), M8 (the documentation is the check's own
+  source header, because the protocol section it named does not exist), M14 (§10 corrected — the leg
+  holds no id pattern, and the repair is a driver-side edit too), L1 (a criterion observing the
+  honest-limit header). Five new criteria.
 
 ## 10. Reuse audit
+
+**One dependency this unit needs is NOT in the leg, and the audit caught the reuse audit claiming it
+was.** Review fold: M14. S2 derives two id SETS, and the leg carries no id pattern of any kind —
+grepping it for the driver's `_ids_of` helper returns nothing. The seam that DOES exist is the leg's
+existing parse of the driver's core sets out of the driver source, which its own header defends: the
+core sets are read from the driver and never restated in the leg, because a second spelling is the
+drift the leg exists to catch. The id pattern rides that same parse, or becomes a named driver
+constant the leg extracts. Either way it is a DRIVER-side edit as well as a leg edit, and the
+Files-touched table names `tools/unattended/unattended.sh` for it.
 
 `python tools/codebase-map/reuse_lookup.py "a gate compares a build roster at two commits"` returns
 the `build-readme-surface` dossier and `apply_region` as its affordance seam, plus the `unattended`

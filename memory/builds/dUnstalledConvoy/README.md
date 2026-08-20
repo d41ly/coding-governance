@@ -133,49 +133,89 @@ the cost the recommendation was protecting against stated in the unit that owns 
   Adding a LEG trips a growing set of meta-gates and costs the leg manifest, a kit descriptor row and
   a coverage assert; adding a check inside an existing gate costs an `ARMS_FLOORS` bump and one arm
   per `fail` call site. This is a recorded trap in the kickoff manifest, not a preference.
-- **A kit-shipped document and this repo's installed copy are ONE mechanism**, because check 10
-  byte-compares them and a unit that moved one and not the other reds the bar. Units 3, 4, 8 and 12
-  each move a template and its render together. This is the one place this build's decomposition
-  reads looser than M2's "a separate document is a separate unit", and the parity gate is why.
+- **A kit-shipped document and this repo's installed copy are ONE mechanism.** Any unit whose
+  Files-touched names a kit template moves that template's render in the SAME commit. The
+  enumeration this rule used to carry named four units and the tables name six, which is a derived
+  count written in prose beside the thing it counts — the class this repo gates against elsewhere.
+  Each unit's own table is the operative list. Note the two pairs are graded by DIFFERENT mechanisms:
+  the protocol pair by the kit gate's single byte comparison, the Skill pair by re-running the
+  adopter's check mode, because the Skill render carries interpolated tokens and can never be
+  byte-identical to its template. Review fold: L2, H13.
 - **Every new check gets its failing case OBSERVED before it lands** — stage the break, confirm RED,
   unstage. Three of this build's checks grade records the RUN ITSELF writes, so each owes an explicit
-  statement of what it cannot buy in its own header.
+  statement of what it cannot buy in its own header — and that statement is a SCOPE item, so every
+  unit carrying one also carries a criterion that greps for it. A build-level rule nothing observes is
+  the same defect one level up. Review fold: L1.
+- **`.memory-tree.conf` is a BUILD-WIDE shared write, and it makes seven units mutually non-disjoint.**
+  Every unit that adds a `fail` call site moves that file's `ARMS_FLOORS` entry, and two units add a
+  cutoff key beside it. Seven of the thirteen therefore write one line-range of one file. They may
+  NEVER be dispatched as a concurrent pair, and each one's Files-touched table names the conf
+  explicitly rather than hiding the edit inside a test-file row. This is the build's own answer to the
+  rule units 10 and 11 are building. Review fold: M7.
+- **The leg output contract is owned by ONE unit, and it is `TOOL-dUnstalledConvoy-6`.** Four units
+  specify a check that prints an announced skip line and still exits 0, while the leg's header states
+  `Exit 0 + no output = clean` and its selftest hard-asserts empty output three times. Under the order
+  below unit 6 lands first among them, so it owns amending the contract and its green-control arms in
+  the same commit as the first skip line. The other three cite it and specify no contract change of
+  their own. Owner decision, 2026-08-20. Review fold: H1.
 - **No spec id in this build may be cited from product source while its status is non-terminal.** The
   drift signal reads `1 of 25` against a pin of 2, so one slot is free and a second citation reds it.
 
 ## The order is TOTAL
 
-`9` first — it deletes a false sentence every later unit's agents read, and it is independent of
-everything else. Then `7` (the measurement) → `8` (the inversion it decides). Then the landing chain
-`3` (the contract) → `1` (the driver) → `2` (the leg's second opinion). Then the rescope chain `4`
-(the authority) → `5` (the verb) → `6` (the check). Then the fidelity chain `12` (the grammar) → `13`
-(the check). Units 10 and 11 land last, because the write-set proof they record and grade only means
-something once `8` has inverted the default that makes proofs necessary.
+**REORDERED 2026-08-20 on the spec audit, by owner decision.** The first draft put the rescope chain
+seventh, eighth and ninth. Five confirmed defects were one shape — a unit obliged to use a mechanism a
+LATER unit builds — and the audit's cheapest single fix was to move that chain to the front. It closes
+H14 and M11 outright and defuses M6. The prior order is not reconstructed here; git carries it.
 
-`8` is CONDITIONAL: if unit 7 measures E3 or E4 as failing, unit 8 does not ship an inversion, and the
-build records the loss per M12 rather than shipping the rule anyway. The owner's answer authorized
-the inversion ON the measurement, not instead of it.
+| # | Unit | Why here |
+|---|---|---|
+| 1 | `PLAY-dUnstalledConvoy-1` | deletes a false sentence every later unit's agents read, and depends on nothing |
+| 2 | `TOOL-dUnstalledConvoy-4` | the scope authority — every later unit that amends anything needs it to exist |
+| 3 | `TOOL-dUnstalledConvoy-5` | the `--rescope` verb the authority points at |
+| 4 | `TOOL-dUnstalledConvoy-6` | the roster check, and the unit that owns the leg output contract |
+| 5 | `TOOL-dUnstalledConvoy-7` | the E3/E4 measurement |
+| 6 | `TOOL-dUnstalledConvoy-9` | the dispatch verb — moved AHEAD of the inversion so its pointer is live on arrival |
+| 7 | `TOOL-dUnstalledConvoy-8` | the M6 inversion, CONDITIONAL on unit 5 of this order |
+| 8 | `TOOL-dUnstalledConvoy-10` | the dispatch check |
+| 9 | `TOOL-dUnstalledConvoy-3` | the landing contract |
+| 10 | `TOOL-dUnstalledConvoy-1` | `verb_landed` |
+| 11 | `TOOL-dUnstalledConvoy-2` | check 15, the second opinion |
+| 12 | `TOOL-dUnstalledConvoy-11` | the ledger grammar |
+| 13 | `TOOL-dUnstalledConvoy-12` | the ledger check, and the LAST commit carries the kit-version bump |
+
+Three orderings are load-bearing rather than tidy. The authority and the verb precede everything that
+records an amendment, because at any earlier position M3 still says a scope fork is not yours and the
+verb does not exist — the exact stall three aborted runs recorded. The dispatch verb precedes the M6
+inversion, because the inversion's rule points at that verb and would otherwise ship inert with a dead
+pointer for several passes while M7 makes every run re-read it. And the kit-version bump rides the
+LAST commit of the ledger pair, because `verdict epoch` refuses a bump that is an ancestor of the
+engine edit it dates. Review fold: H14, H12, M6, M11.
+
+`TOOL-dUnstalledConvoy-8` is CONDITIONAL: if the measurement records E3 or E4 as anything other than
+CLEARED, it does not ship an inversion, and the build records the loss per M12 rather than shipping
+the rule anyway. The owner's answer authorized the inversion ON the measurement, not instead of it.
 
 ## Units — the authored roster (M2)
 
 One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
 
 <!-- roster:units -->
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-dUnstalledConvoy-1` | 2 | `verb_landed` accepts a local-main witness and records which kind it took |
-| 2 | `TOOL-dUnstalledConvoy-2` | 2 | leg check 15 grades both witness kinds instead of assuming a remote ancestor |
-| 3 | `TOOL-dUnstalledConvoy-3` | 2 | the protocol and Skill state the relaxed terminal and what it costs |
-| 4 | `TOOL-dUnstalledConvoy-4` | 2 | M2 and M3 gain the amendment vocabulary and the delegated scope authority |
-| 5 | `TOOL-dUnstalledConvoy-5` | 2 | the `--rescope` verb records an amendment in the run-state file |
-| 6 | `TOOL-dUnstalledConvoy-6` | 2 | the leg refuses a roster change with no rescope record behind it |
-| 7 | `TOOL-dUnstalledConvoy-7` | 2 | E3 and E4 are measured, and the verdict is recorded with its losses |
-| 8 | `TOOL-dUnstalledConvoy-8` | 2 | M6's default inverts to parallel-on-proof, conditional on unit 7 |
-| 9 | `PLAY-dUnstalledConvoy-1` | 2 | the charter and the shipped template drop the refuted sidechain premise |
-| 10 | `TOOL-dUnstalledConvoy-9` | 2 | the driver records a dispatch's declared write sets |
-| 11 | `TOOL-dUnstalledConvoy-10` | 2 | the leg compares declared write sets against the paths the commits touched |
-| 12 | `TOOL-dUnstalledConvoy-11` | 2 | the acceptance-ledger record grammar |
-| 13 | `TOOL-dUnstalledConvoy-12` | 2 | a hygiene check asserting every AC of a CLOSED spec is evidenced |
+| Unit | Tier | Mechanism |
+|---|---|---|
+| `TOOL-dUnstalledConvoy-1` | 2 | `verb_landed` accepts a local-main witness and records which kind it took |
+| `TOOL-dUnstalledConvoy-2` | 2 | leg check 15 grades both witness kinds instead of assuming a remote ancestor |
+| `TOOL-dUnstalledConvoy-3` | 2 | the protocol and Skill state the relaxed terminal and what it costs |
+| `TOOL-dUnstalledConvoy-4` | 2 | M2 and M3 gain the amendment vocabulary and the delegated scope authority |
+| `TOOL-dUnstalledConvoy-5` | 2 | the `--rescope` verb records an amendment in the run-state file |
+| `TOOL-dUnstalledConvoy-6` | 2 | the leg refuses a roster change with no rescope record behind it |
+| `TOOL-dUnstalledConvoy-7` | 2 | E3 and E4 are measured, and the verdict is recorded with its losses |
+| `TOOL-dUnstalledConvoy-8` | 2 | M6's default inverts to parallel-on-proof, conditional on unit 7 |
+| `PLAY-dUnstalledConvoy-1` | 2 | the charter and the shipped template drop the refuted sidechain premise |
+| `TOOL-dUnstalledConvoy-9` | 2 | the driver records a dispatch's declared write sets |
+| `TOOL-dUnstalledConvoy-10` | 2 | the leg compares declared write sets against the paths the commits touched |
+| `TOOL-dUnstalledConvoy-11` | 2 | the acceptance-ledger record grammar |
+| `TOOL-dUnstalledConvoy-12` | 2 | a hygiene check asserting every AC of a CLOSED spec is evidenced |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -187,18 +227,18 @@ ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | SPECCED | rev-1 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | SPECCED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

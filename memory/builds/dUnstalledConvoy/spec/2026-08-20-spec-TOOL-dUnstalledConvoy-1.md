@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -14,9 +14,19 @@ can tell an observation from a record.
 - **S1** — `verb_landed` keeps its current remote test as the FIRST arm. When `HEAD` is an ancestor of
   the tip the remote advertises, nothing about today's behaviour changes and the recorded anchor kind
   is `remote`.
-- **S2** — when that arm fails, a SECOND arm tests whether `HEAD` is an ancestor of the local branch
-  named by the advertised symref, resolved as the ref `observe_anchor` already returns in `AREF`. On
-  success the phase moves to `LANDED` and the recorded anchor kind is `local`.
+- **S2** — when that arm fails, a SECOND arm tests whether **the run's OWN branch tip** is an ancestor
+  of the local branch named by the advertised symref. Review fold: H8. The first draft tested `HEAD`
+  against that branch, which is decided before it reads anything on the only path the verb is ever
+  invoked: `verb_landed`'s own header records that it does not call the branch guard because landing
+  happens ON the default branch, the mandated lander refuses to run anywhere else, and on that branch
+  `HEAD` IS the local default ref — so a commit was being tested against itself. That is this repo's
+  catalogued `assertion-between-two-derived-values` class, whose recorded first instance is this same
+  kit. Testing the run's branch tip is false when nothing was merged and true when it was, which is
+  the question the arm exists to ask. On success the phase moves to `LANDED` and the recorded anchor
+  kind is `local`.
+- **S2a** — the run's branch is named in the refusal text, and the failing case of arm 2 is observed
+  with the run standing ON the default branch. A fixture standing elsewhere cannot distinguish this
+  arm from one that was never called. Review fold: H8.
 - **S3** — a new authored fact `landed-anchor` carries `remote` or `local`, written by the same
   `set_fact` path as `phase` and `witness`. It is written on every successful `--landed` and never
   defaulted, because an absent value would read as `remote` to any later reader.
@@ -100,6 +110,7 @@ block another build's terminal, which is the exact shape of the deadlock this bu
 |---|---|
 | `tools/unattended/unattended.sh` | `verb_landed`: the second arm, two `set_fact` calls, the widened `fail 32` message |
 | `tools/unattended/unattended.test.sh` | four cases below, plus the `ARMS_FLOORS` bump the new `fail` signature costs |
+| `.memory-tree.conf` | the `ARMS_FLOORS` entry this unit moves — a BUILD-WIDE shared write, review fold M7 |
 
 ### Alternatives rejected
 
@@ -143,8 +154,14 @@ block another build's terminal, which is the exact shape of the deadlock this bu
   `unpushed-at-landing: 3` with the oldest sha, observed in `unattended.test.sh`.
 - **AC5** — A fixture where the local default branch cannot be resolved records
   `unpushed-at-landing: unknown`, never `0`.
-- **AC6** — The failing case of each new arm is observed RED before the unit lands, and
-  `bash tools/unattended/check-unattended.sh` stays green across the change.
+- **AC6** — The failing case of each new arm is observed RED before the unit lands, WITH the fixture
+  standing on the default branch, and `bash tools/unattended/check-unattended.sh` stays green across
+  the change. Review fold: H8.
+- **AC7** — A fixture standing on the default branch whose own branch tip has NOT been merged into it
+  is REFUSED by arm 2, observed in `tools/unattended/unattended.test.sh`. This is the arm's real
+  failing case and the first draft had none. Review fold: H8.
+- **AC8** — The verb's header STATES what a local anchor cannot buy, observed by `grep` over
+  `tools/unattended/unattended.sh`. Review fold: L1.
 
 ## 7. Gates
 
@@ -164,6 +181,10 @@ block another build's terminal, which is the exact shape of the deadlock this bu
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: H8 (arm 2 tested a commit against itself on the only path the
+  verb is invoked — it now tests the run's own branch tip, and its failing case must be observed
+  standing on the default branch), M7 (`.memory-tree.conf` named as a build-wide shared write), L1.
+  Three new criteria.
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit

@@ -13,13 +13,22 @@ formality into a claim that can be caught out.
 
 - **S1** — a new check inside `tools/unattended/check-unattended.sh`, not a new gate leg, for the
   reason units 6 and 13 give.
-- **S2** — for each `dispatch` row, the check selects commits reachable from the run's tip but not
-  from the row's recorded group anchor, whose subject names the row's unit id.
+- **S2** — for each `dispatch` row, the check selects commits in a BOUNDED range: after the row's
+  recorded group anchor and at or before the group's recorded CLOSE anchor, whose subject names the
+  row's unit id. Review fold: H7. An open-topped range graded every later commit for that unit against
+  a window that had closed — and M6's pass set includes a spec reviewed and a review's fixes folded
+  in, both of which routinely happen after a concurrent group ends, so an ordinary sequential fold
+  would red the bar with no in-band repair. The close anchor is recorded by the same verb that records
+  the group, as its own row.
 - **S3** — the union of paths those commits touched must be a SUBSET of the row's declared set. A
   path outside it is a refusal naming the unit id, the path, and the commit that carried it.
-- **S4** — a `dispatch` row with NO matching commit is reported as an announced observation, not a
-  refusal. A declared pass that produced no change is legal — M6 says a pass producing no change
-  commits nothing and says so.
+- **S4** — the no-commit case is SPLIT, because one line was covering two very different states.
+  Review fold: M2. An EMPTY range between the anchors is an announced observation: a declared pass
+  that produced no change is legal, and M6 says so. But a range containing a commit whose subject
+  names NO unit id from the group is a REFUSAL — that is a pass which committed while evading the
+  only join this check has, and M6's id-in-subject rule is an instruction no gate anywhere enforces,
+  so it is reachable by accident as much as by design. Collapsing the two made the evasion look
+  exactly like the benign case.
 - **S5** — a commit whose subject names TWO unit ids from the same group is a refusal, because the
   join becomes ambiguous and a subset test over an ambiguous attribution proves nothing.
 - **S6** — every case the check cannot compare ANNOUNCES itself: an unresolvable group anchor, a run
@@ -89,6 +98,7 @@ every run in the tree today and would look like coverage of a mechanism nobody h
 |---|---|
 | `tools/unattended/check-unattended.sh` | one check, three refusals, three announced skips |
 | `tools/unattended/check-unattended.test.sh` | the cases in §6 and the `ARMS_FLOORS` bump |
+| `.memory-tree.conf` | the `ARMS_FLOORS` entry this unit moves — a BUILD-WIDE shared write, review fold M7 |
 
 ### Alternatives rejected
 
@@ -114,15 +124,22 @@ every run in the tree today and would look like coverage of a mechanism nobody h
 - migration / rollback — no run in this tree has a `dispatch` row, so the check announces a skip
   everywhere until the first concurrent dispatch lands. That is the correct initial state and AC7
   asserts it rather than letting it read as green.
-- user docs — the protocol's check inventory, alongside `TOOL-dUnstalledConvoy-3`.
+- user docs — the check's OWN SOURCE HEADER, which is how all twenty-one existing checks in this leg
+  are documented and which S7 already requires. Review fold: M8. The protocol section this first
+  pointed at does not exist, and the unit it was delegated to never creates one.
 
 ## 6. Acceptance criteria
 
 - **AC1** — A fixture whose pass commits a path inside its declared set passes, observed in `tools/unattended/check-unattended.test.sh`.
 - **AC2** — A fixture whose pass commits a path outside its declared set reds, naming the unit id,
   the path and the commit, observed in `tools/unattended/check-unattended.test.sh`.
-- **AC3** — A fixture whose declared pass made no commit produces an announced observation and does
-  NOT red, observed in `tools/unattended/check-unattended.test.sh`.
+- **AC3** — A fixture whose range between the anchors is EMPTY produces an announced observation and
+  does NOT red; a fixture whose range holds a commit with an id-less subject REDS. Both observed in
+  `tools/unattended/check-unattended.test.sh`. Review fold: M2, one criterion per branch.
+- **AC9** — A fixture with a post-group sequential commit naming the unit id, made after the recorded
+  close anchor, PASSES, observed in `tools/unattended/check-unattended.test.sh`. Review fold: H7.
+- **AC10** — The header of the new check STATES what it cannot buy, observed by `grep` over
+  `tools/unattended/check-unattended.sh`. Review fold: L1.
 - **AC4** — A fixture with one commit naming two unit ids from the same group reds on ambiguous
   attribution, observed in `tools/unattended/check-unattended.test.sh`.
 - **AC5** — A fixture whose group anchor cannot be resolved prints an announced skip and does not
@@ -152,6 +169,10 @@ boundary.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: H7 (the commit range gains a recorded CLOSE anchor, so a later
+  sequential fold is not graded against a window that has closed), M2 (the no-commit case splits — an
+  empty range announces, an id-less subject reds), M8 (documentation is the check's own source
+  header), M14 (§10 corrected: the leg holds no id pattern at all), L1. Three new criteria.
 - rev-1 · 2026-08-20 · initial draft.
 - rev-2 · 2026-08-20 · §10 corrected: the `id_pattern` seam is unreachable from a shell leg in a
   standalone-installed kit; the id shape comes from `_ids_of`. Same correction as unit 5 rev-2.
@@ -161,8 +182,13 @@ boundary.
 `python tools/codebase-map/reuse_lookup.py "compare what a commit touched against what was declared"`
 returns the `unattended` affordance seam and the `row-grammar` dossier. The `id_pattern` seam in that
 dossier is REJECTED for the same reason `TOOL-dUnstalledConvoy-5` rejects it: it is Python in a
-separately-installed kit and this leg is shell. The id shape comes from the driver's own `_ids_of`
-spelling, which the leg already mirrors. The check reuses the leg's existing anchor loop and the same
+separately-installed kit and this leg is shell. **And the leg does not mirror the driver's `_ids_of`
+either — grepping it for that helper returns nothing and it carries no id pattern of any kind.**
+Review fold: M14. The seam that exists is the leg's parse of the driver's core sets out of the driver
+SOURCE, which its own header defends on the ground that a second spelling is the drift the leg exists
+to catch. The id pattern rides that parse or becomes a named driver constant, and either way this is a
+driver-side edit as well as a leg edit, which `TOOL-dUnstalledConvoy-6` now carries in its
+Files-touched table. The check reuses the leg's existing anchor loop and the same
 region reader every sibling check uses.
 
 `python tools/memory-recall/query.py "how does a gate attribute a commit to the pass that made it"

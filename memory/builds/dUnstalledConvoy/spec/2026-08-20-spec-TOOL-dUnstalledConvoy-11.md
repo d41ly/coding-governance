@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -34,9 +34,16 @@ exists for evidence of what was built.
   ledger, because a retired unit built nothing.
 - **S6** — `memory/TEMPLATE-SPEC.md` §6 gains one sentence pointing at the ledger, so an author
   numbering criteria knows what will later cite them. It points and does not restate.
-- **S7** — the kit templates and this repo's rendered copies move together, and the kit version
-  marker is bumped across every carrier that holds one, derived from the markers rather than from a
-  remediation message an open row records as naming too few.
+- **S7** — the kit templates and this repo's rendered copies move together. **The kit-version bump is
+  NOT in this unit** — it moves to `TOOL-dUnstalledConvoy-12`, which is the LAST commit of the pair.
+  Review fold: H12. The `verdict epoch` leg names the hygiene engine and enforces a TOPOLOGICAL rule:
+  the newest commit that moves a behaviour-bearing line of the engine must be an ancestor of, or equal
+  to, the newest commit that changes the kit-version constant. Bumping here and editing the engine in
+  the next unit inverts that, so the leg reds at the push boundary and the repairs are a SECOND
+  full marker sweep or an after-the-fact reorder.
+- **S8** — this unit back-fills an acceptance ledger for every unit of THIS build closed before it.
+  Review fold: H2. See §4 Grandfathering for why the cutoff is the build's own date rather than the
+  day after it.
 
 ## 3. Non-goals (OUT)
 
@@ -81,8 +88,19 @@ This corpus holds roughly 149 closed specs, none of which carries a ledger. With
 check in `TOOL-dUnstalledConvoy-12` reds on every one of them and the unit is unlandable by any run —
 the same shape `UNITS_REGION_CUTOFF` exists to prevent, and the same idiom is used.
 
-`ACCEPTANCE_LEDGER_CUTOFF` is set to the day this pair lands. The conf comment states what moving it
-in either direction costs, matching the three cutoffs the file already carries.
+**RESOLVED (agent, 2026-08-20): the cutoff is the build's OWN date, and this build back-fills.** The
+audit found three sentences across this pair that could not all be true — the cutoff set to "the day
+this pair lands", an INCLUSIVE population, and a claim that the first run therefore sees nothing. Every
+spec filename in this build carries the same date, so on a same-day landing this build's own closed
+specs are inside the population the pair creates. Review fold: H2.
+
+Of the two viable picks, this one is taken because it is the only one that leaves the check having
+been exercised on a real unit. Setting the cutoff to the day AFTER landing grandfathers this build and
+ships a mechanism whose first run measures nothing — a gate seen only to pass, which this repo's own
+bar rules call an assertion about nothing. So S8 back-fills a ledger for every unit of this build that
+closed earlier, and the invariant the conf comment states is the one the sibling keys encode: no
+ALREADY-LANDED spec is retroactively red. This build's specs are not already landed; they are landing
+now, with their ledgers.
 
 ### Files touched (estimate)
 
@@ -128,8 +146,11 @@ in either direction costs, matching the three cutoffs the file already carries.
   moving it either way costs.
 - **AC4** — `bash tools/memory-tree/check-memory-hygiene.sh` stays green over the corpus after the
   documentation lands and before unit 12's check is armed.
-- **AC5** — `bash tools/check-kit-versions.sh` is green, with the marker bumped in every carrier that
-  holds one, derived by grepping for the marker rather than from a remediation message.
+- **AC5** — `bash tools/check-kit-versions.sh` is green WITHOUT this unit bumping anything, because
+  the bump belongs to the later unit of the pair. Review fold: H12.
+- **AC7** — Every unit of this build closed before this one carries a back-filled ledger, observed by
+  `python tools/memory-tree/gen_build_index.py --check` staying clean and by the sibling check passing
+  over them once it lands. Review fold: H2, S8.
 - **AC6** — A hand-written example ledger in the new sub-section parses under the grammar the section
   states, checked by reading it back against unit 12's parser once that lands, observed in `tools/memory-tree/check-memory-hygiene.sh`.
 
@@ -150,6 +171,10 @@ the push boundary.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: H12 (the kit-version bump moves to the LATER unit of the pair,
+  because `verdict epoch` refuses a bump that is an ancestor of the engine edit it dates), H2 (the
+  cutoff fork is RESOLVED to the build's own date, with S8 back-filling this build's ledgers so the
+  check ships exercised rather than vacuous).
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit

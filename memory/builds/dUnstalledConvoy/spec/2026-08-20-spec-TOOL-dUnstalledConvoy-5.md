@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -24,9 +24,13 @@ a gate and a wrap-up can both read it.
   optionally, because a retirement may or may not have a replacement.
 - **S5** — `retire` and `supersede` REFUSE a `--unit` that the build README's generated units region
   does not carry. A run cannot retire a unit its roster never held.
-- **S6** — `add` REFUSES a `--unit` the region already carries, because an id already on the roster is
-  not an addition and recording it as one would make the check in `TOOL-dUnstalledConvoy-6` grade a
-  transition that never happened.
+- **S6** — `add` on a `--unit` the region already carries is a NO-OP when a matching row already
+  exists, and a REFUSAL only when none does. The guards are ORDERED and §4 states the order: the
+  exact-line idempotence compare runs FIRST and returns the no-op before any region-membership test.
+  Review fold: M12. The first draft made membership an unconditional refusal, which cannot coexist
+  with S8 — the region is rendered from the specs that exist, so the moment the amendment is performed
+  the id IS in it, and a run recording the row after authoring the spec met a permanent refusal while
+  `TOOL-dUnstalledConvoy-6` demanded that row permanently. That is the wedge shape this build removes.
 - **S7** — every refusal `verb_park` already makes is inherited verbatim: no run-state file, missing
   reason, a newline in any field, the field separator inside a value, the declared bypass flag in any
   field, and a terminal record.
@@ -34,6 +38,12 @@ a gate and a wrap-up can both read it.
   same amendment does not duplicate the row.
 - **S9** — the verb writes the record and **changes nothing else**. It does not edit the spec, the
   roster or the build README.
+- **S10** — the Skill gains a `--rescope` section and the protocol's verb list gains its row, and both
+  are SCOPE rather than a Files-touched afterthought. Review fold: M4. The first draft edited two
+  documents that appeared in no scope item, no criterion and no gate, so a builder could satisfy every
+  criterion and ship a verb that neither document an unattended run reads ever mentions. The installed
+  protocol is also one of the six read-path files, so this unit re-measures that budget from its gate
+  like every other unit that writes one.
 
 ## 3. Non-goals (OUT)
 
@@ -89,6 +99,7 @@ record attached to a different edit, and the check says so where it reports.
 |---|---|
 | `tools/unattended/unattended.sh` | `verb_rescope`, its flag parsing, one dispatch row |
 | `tools/unattended/unattended.test.sh` | the cases in §6, plus the `ARMS_FLOORS` bump per new `fail` call site |
+| `.memory-tree.conf` | the `ARMS_FLOORS` entry this unit moves — a BUILD-WIDE shared write, review fold M7 |
 | `tools/unattended/SKILL.template.md` and its render | one section, in the shape `--park` already has |
 | `memory/guides/UNATTENDED-PROTOCOL.md` and its template | one row in section 7's verb list |
 
@@ -120,7 +131,7 @@ record attached to a different edit, and the check says so where it reports.
   literal signature, and a positional in a `fail` message cannot be armed, so every interpolation is
   bound to a name and placed after the sentence.
 - migration / rollback — none. Existing run-state files simply carry no `rescope` rows.
-- user docs — the Skill section and the protocol verb row, in S-scope above.
+- user docs — the Skill section and the protocol verb row, which S10 puts in scope.
 
 ## 6. Acceptance criteria
 
@@ -138,11 +149,24 @@ record attached to a different edit, and the check says so where it reports.
 - **AC8** — `--rescope` on a record in a terminal phase refuses through `refuse_if_terminal`.
 - **AC9** — Each new refusal is observed RED against a fixture before the unit lands, and
   `bash tools/unattended/check-unattended.sh` stays green.
+- **AC10** — `--act add` for an id already in the region AND already carrying a matching row reports
+  the no-op and appends nothing; the same call with no matching row refuses. Both observed in
+  `tools/unattended/unattended.test.sh`. Review fold: M12.
+- **AC11** — `grep` finds `--rescope` in the rendered `.claude/skills/unattended/SKILL.md` and in the
+  verb list of `memory/guides/UNATTENDED-PROTOCOL.md`. Review fold: M4.
+- **AC12** — `bash tools/unattended/adopt-unattended.sh --target . --check` exits 0, which is what
+  actually grades the Skill pair. Review fold: M4, H13.
+- **AC13** — `python tools/memory-tree/corpus_ids.py --report` shows the read path below
+  `READ_PATH_CEILING` after the protocol edit, with the figure in the commit message. Review fold: M4.
+- **AC14** — The verb's header STATES what it cannot buy, observed by `grep` over
+  `tools/unattended/unattended.sh`. Review fold: L1.
 
 ## 7. Gates
 
-`unattended driver selftest` · `unattended kit gate` · `harness arms` · the full bar at the push
-boundary. `ARMS_FLOORS` moves for `tools/unattended/unattended.sh`.
+`unattended driver selftest` · `unattended kit gate` · `unattended skill wiring` · `harness arms` ·
+`memory-tree hygiene` (check 16, the read path) · the full bar at the push boundary. `ARMS_FLOORS`
+moves for `tools/unattended/unattended.sh`, and that constant lives in `.memory-tree.conf`, which is
+therefore in this unit's write set. Review fold: M4, M7, H13.
 
 ## 8. Open questions
 
@@ -156,6 +180,11 @@ boundary. `ARMS_FLOORS` moves for `tools/unattended/unattended.sh`.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-3 · 2026-08-20 · folded the spec audit: M12 (the guards are ORDERED, idempotence first, and S6
+  becomes a no-op rather than a permanent refusal), M4 (the Skill section and the protocol verb row
+  promoted into scope with four criteria and the read-path re-measurement), M7 (`.memory-tree.conf`
+  named in Files touched as a build-wide shared write), H13 (the Skill pair is graded by the adopter's
+  check mode, not by the kit gate's byte comparison).
 - rev-2 · 2026-08-20 · S3 and §10 corrected: `id_pattern` is unreachable from this shell driver
   because it is a Python function in a separately-installed kit. The seam is the driver's own
   `_ids_of`. Caught by verifying the claim against source rather than by the spec audit.

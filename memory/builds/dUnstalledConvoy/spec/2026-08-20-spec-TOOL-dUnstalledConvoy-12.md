@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -12,16 +12,27 @@ numbers must appear in a tracked ledger, in one of the two legal forms.
 
 - **S1** — a new check inside `tools/memory-tree/check-memory-hygiene.sh`, not a new gate leg, for
   the reason units 6 and 11 give and which the kickoff manifest records as a trap.
-- **S2** — the population is every spec whose status is `CLOSED` and whose filename date is at or
-  after `ACCEPTANCE_LEDGER_CUTOFF`. `WONTDO` specs are excluded: a retired unit built nothing.
-- **S3** — the criterion set is derived by scanning the spec's §6 for criterion labels in the three
-  spellings `TEMPLATE-SPEC.md` already sanctions for the acceptance-witness rule, so the two checks
-  agree about what a criterion label looks like rather than each deciding.
+- **S2** — the population is every **Tier-2** spec whose status is `CLOSED`, whose filename date is at
+  or after `ACCEPTANCE_LEDGER_CUTOFF`, and which actually carries an acceptance-criteria HEADING.
+  `WONTDO` specs are excluded: a retired unit built nothing. Review fold: M13. The first draft had no
+  tier filter and read section 6 by NUMBER, but the spec format gives Tier-1 a light profile in which
+  the section canon is not enforced — two closed Tier-1 specs in this corpus number their criteria
+  under section 5 and carry Gates at section 6 — so the check would have redded specs that are legal
+  under the very format it enforces, and would have silently made an acceptance section mandatory for
+  Tier-1, a format change this build never states.
+- **S2a** — this build's OWN closed specs are inside the population, by the cutoff resolution in
+  `TOOL-dUnstalledConvoy-11`. They carry back-filled ledgers, so the check's first run measures real
+  units rather than an empty set. Review fold: H2.
+- **S3** — the criterion set is derived by locating the acceptance-criteria section BY HEADING TEXT,
+  using the same regex the sibling acceptance-witness rule already uses a few hundred lines above,
+  extracted into ONE shared fragment so the two checks cannot disagree. Labels are read in the three
+  spellings that rule already sanctions. Review fold: M13.
 - **S4** — for each criterion, a tracked record under the same build whose `**Serves:**` kind is
   `journal` and whose `**Evidences:**` line names the unit must carry a line for that label, in the
   OBSERVED form with a backticked token or the AMENDED form with a revision.
-- **S5** — a spec in the population whose §6 names NO criterion label at all is a refusal, not a
-  vacuous pass. A closed unit with no numbered criteria cannot be evidenced, and a subset test over
+- **S5** — a Tier-2 spec in the population whose acceptance-criteria section names NO criterion label
+  is a refusal, not a vacuous pass. Scoping it to Tier-2 is review fold M13; the refusal itself is the
+  real defect it was written for. A closed unit with no numbered criteria cannot be evidenced, and a subset test over
   an empty set is the vacuity this repo has already paid for twice.
 - **S6** — a ledger line whose form is neither OBSERVED nor AMENDED is a refusal naming the label and
   the two legal forms.
@@ -84,7 +95,9 @@ document that resolves it.
 |---|---|
 | `tools/memory-tree/check-memory-hygiene.sh` | one check, three refusals, one announced line |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | the cases in §6 and the `ARMS_FLOORS` bump |
-| the hygiene gate leg's NAME | only if it states a check count, which is a recorded cost of adding a check |
+| `.memory-tree.conf` | the `ARMS_FLOORS` entry this unit moves — a BUILD-WIDE shared write, review fold M7 |
+| `tools/memory-tree/README.md` | the stated check COUNT and the delegation breakdown that partitions it — review fold M19 |
+| the codebase-map dossier for this gate | the second carrier of that same count |
 
 ### Alternatives rejected
 
@@ -125,15 +138,25 @@ document that resolves it.
 - **AC4** — A closed spec dated after the cutoff numbering NO criteria reds, per S5, observed in `tools/memory-tree/check-memory-hygiene.test.sh`.
 - **AC5** — A `WONTDO` spec with no ledger passes.
 - **AC6** — A closed spec dated BEFORE the cutoff passes, and is counted in the announced line, observed in `tools/memory-tree/check-memory-hygiene.test.sh`.
-- **AC7** — Run against this repo as it stands, the check prints its empty-population line and
-  `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 with that line present.
+- **AC7** — Run against this repo as it stands, the check measures this build's OWN back-filled units
+  rather than an empty set, and `bash tools/memory-tree/check-memory-hygiene.sh` exits 0. The
+  empty-population line remains implemented and is exercised by a fixture instead. Review fold: H2.
+- **AC9** — A CLOSED Tier-1 spec whose section 6 is not Acceptance criteria PASSES, observed in
+  `tools/memory-tree/check-memory-hygiene.test.sh`. Review fold: M13.
+- **AC10** — `grep` over `tools/memory-tree/README.md` finds the updated check count and the updated
+  delegation breakdown, and the codebase-map dossier for this gate agrees. Review fold: M19.
+- **AC11** — `bash tools/check-kit-versions.sh` and the `verdict epoch` leg are both green, with the
+  kit-version bump carried by THIS unit's commit as the last of the pair. Review fold: H12.
+- **AC12** — The check's header STATES what it cannot buy, observed by `grep` over
+  `tools/memory-tree/check-memory-hygiene.sh`. Review fold: L1.
 - **AC8** — Each refusal is observed RED against a fixture with the range pin ARMED before the unit
   lands, and `ARMS_FLOORS` for the hygiene checker matches its new `fail` call-site count.
 
 ## 7. Gates
 
 `memory-tree hygiene` · `memory-tree hygiene selftest` · `harness arms` · `kit version markers` ·
-the full bar at the push boundary.
+`verdict epoch` · the full bar at the push boundary. Review fold: H12 — `verdict epoch` is the leg
+this unit's commit ordering actually trips, and the first draft did not name it.
 
 ## 8. Open questions
 
@@ -148,6 +171,12 @@ the full bar at the push boundary.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: M13 (the population is scoped to Tier-2 specs carrying an
+  acceptance-criteria HEADING, located by the sibling rule's own regex, because a Tier-1 spec legal
+  under the format would otherwise red), H2 (this build's own back-filled units are the first
+  population, so the check ships exercised), M19 (the kit README and the dossier carry the check
+  count, named outright instead of a conditional row that resolved to nothing), H12 (`verdict epoch`
+  added to the gates, and this unit carries the kit-version bump), L1. Five new criteria.
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit

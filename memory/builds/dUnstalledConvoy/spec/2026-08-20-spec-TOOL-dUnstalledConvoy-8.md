@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -21,14 +21,23 @@ unit inverts the default so the handle and the rule agree, conditional on
   sentence: work whose two path lists cannot be written down is not known to be disjoint and is
   sequenced. This is what stops the inversion becoming "parallelise by default and hope".
 - **S4** — M6 states that the proof is RECORDED, pointing at the verb `TOOL-dUnstalledConvoy-9`
-  builds rather than describing it, per M1's rule.
+  builds rather than describing it, per M1's rule. **That verb now lands BEFORE this unit** in the
+  2026-08-20 reorder, so the pointer is live on arrival. Review fold: M6. In the first draft the verb
+  landed seven passes later, and M7 makes a run re-read the method WHOLE at every pass boundary, so
+  the run itself would have read a rule pointing at a flag no reader could invoke.
 - **S5** — the Skill's directive table cell for `parallel-when-disjoint` is re-read after the change
   to confirm it still NAMES the rule rather than restating it. If the cell became accurate only by
   accident, it is corrected in the same commit.
-- **S6** — **CONDITIONAL.** If `TOOL-dUnstalledConvoy-7` records E3 or E4 as FAILED, this unit does
-  not ship the inversion. It ships the recorded loss instead, and its own status goes `WONTDO` with a
-  pointer to the record, which is an amendment under `TOOL-dUnstalledConvoy-4` and owes a `rescope`
-  row.
+- **S6** — **CONDITIONAL.** If `TOOL-dUnstalledConvoy-7` records E3 or E4 as anything other than
+  `cleared` — `failed` AND `not-observed` both — this unit does not ship the inversion. It ships the
+  recorded loss instead, and its own status goes `WONTDO` with a pointer to the record, which is an
+  amendment under `TOOL-dUnstalledConvoy-4` and owes a `rescope` row. Review fold: M1, because the
+  measurement's vocabulary is three-valued and a two-valued predicate lets an UNMEASURED criterion
+  ship the inversion — the exact thing the owner's fork-B answer refused. Review fold: H14 for the
+  other half: the authority and the verb now land at positions 2 and 3 against this unit's 7, so the
+  amendment row is writable when this branch needs it. In the first draft they landed at 7 and 8
+  against this unit's 3, and the run's only legal moves were to park — the recorded stall — or to flip
+  a status with no record, which the roster check then redded for the rest of the build.
 - **S7** — the result is measured against M1's stated budget before commit. Three lines of the seven
   available are this unit's share.
 
@@ -47,8 +56,9 @@ unit inverts the default so the handle and the rule agree, conditional on
 
 ### The change is a framing sentence and an obligation, not a rule set
 
-M6 today reads, in order: a framing sentence declaring sequence the default; three numbered
-conditions; a closing sentence on unwritable path lists; a paragraph recording that condition 3 was
+M6 today reads, in order: a framing sentence declaring sequence the default, which shares its LINE
+with the opening of the first condition; three conditions hard-wrapped as one continuing paragraph
+rather than a numbered list; a closing sentence on unwritable path lists; a paragraph recording that condition 3 was
 once vacuous; and a pointer to where the ceilings live.
 
 The inversion rewrites the first of those five and adds the recording pointer. Everything else is
@@ -117,12 +127,20 @@ This unit does not get to raise the budget of the file that states its own limit
 
 - **AC1** — M6's framing sentence requires concurrent dispatch for a proven-disjoint pair, verified by
   `grep` finding the new sentence and not the old one in `memory/guides/BUILD-METHOD.md`.
-- **AC2** — M6's three conditions are byte-identical to their text at BASE, verified by
-  `git diff 2dc9df35 -- memory/guides/BUILD-METHOD.md` showing no change inside the numbered list.
+- **AC2** — M6's three conditions are unchanged, verified as a CONTENT assertion rather than a diff:
+  extract the paragraph from `memory/guides/BUILD-METHOD.md`, strip newlines, and assert the substring
+  from the conditions' opening through their closing sentence is byte-identical to the same substring
+  at BASE. Review fold: M16. There is no numbered list to diff — the framing sentence this unit
+  REPLACES shares one hard-wrapped line with the opening of condition 1, and conditions 2 and 3 are
+  continuation lines of that same paragraph, so any correct implementation changes that line and a
+  diff assertion would fail on every valid edit.
 - **AC3** — `bash tools/memory-tree/check-method-carriers.sh` stays green, and the template and its
   render agree.
-- **AC4** — `wc -l` on `memory/guides/BUILD-METHOD.md` is at or under M1's stated line budget after
-  this unit AND `TOOL-dUnstalledConvoy-4` have both landed, with the figure in the commit message.
+- **AC4** — `wc -l` on `memory/guides/BUILD-METHOD.md` shows this unit's own edit within the
+  three-line share S7 states, measured at THIS unit's commit. Review fold: M15. The joint file-wide
+  assertion moved to `TOOL-dUnstalledConvoy-4` AC9, which is the later of the two method-editing units
+  in the reordered plan and can therefore actually take the observation; a criterion naming a joint
+  state that does not exist at its own pass is not an observation that proves this change.
 - **AC5** — The Skill's `parallel-when-disjoint` cell names the rule and does not restate it, read
   after the change.
 - **AC6** — If unit 7 recorded a FAILED criterion, this unit's spec status is `WONTDO` with the
@@ -147,6 +165,10 @@ bar at the push boundary.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: M6 (the pointer target now lands earlier, per the reorder),
+  M1 and H14 (S6 treats an unmeasured criterion as non-shipping, and the amendment row is writable at
+  this unit's new position), M16 (AC2 becomes a content assertion, because the conditions are not a
+  numbered list), M15 (the joint budget observation moves to the later method-editing unit).
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit

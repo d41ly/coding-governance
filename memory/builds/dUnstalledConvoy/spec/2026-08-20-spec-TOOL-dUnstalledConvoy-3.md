@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -22,9 +22,13 @@ outside — before either the driver or the leg implements it.
   observation of one, and the recorded anchor kind is what keeps the two distinguishable.
 - **S5** — the Skill's `Mark it landed` section states the fallback and the two new facts, in the
   Skill's own voice, pointing at the protocol rather than restating section 9's paragraph.
-- **S6** — `tools/unattended/PROTOCOL.template.md` and `tools/unattended/SKILL.template.md` move in
-  the SAME commit as their installed renders, because check 10 byte-compares each pair and a unit
-  that moved one side reds the bar.
+- **S6** — both templates move in the SAME commit as their installed copies, but the two pairs are
+  graded by DIFFERENT mechanisms and this unit must not conflate them. Review fold: H13. The kit
+  gate's check 10 compares exactly ONE pair — the shipped protocol against this repo's installed copy
+  — and says so in its own header. The Skill template is NOT byte-identical to its render: it carries
+  interpolated deploy tokens, so a byte comparison of that pair can never pass. The Skill pair is
+  graded by re-running the adopter in its check mode, wired as its own gate leg, and that leg is the
+  one this build must name.
 - **S7** — the change is measured against `READ_PATH_CEILING` before it is committed. The protocol is
   a read-path file and the margin at BASE is 7 152 bytes across all six.
 
@@ -116,13 +120,23 @@ its justification beside the number, which is this repo's established idiom and 
   in the protocol's section 8 table.
 - **AC5** — `python tools/memory-tree/corpus_ids.py --report` shows the read path below
   `READ_PATH_CEILING` after the edit, and the figure appears in the commit message.
-- **AC6** — The rendered Skill at `.claude/skills/unattended/SKILL.md` matches its template, observed
-  by `bash tools/check-wiring.sh --check` exiting 0.
+- **AC6** — The rendered Skill matches what the adopter renders, observed by
+  `bash tools/unattended/adopt-unattended.sh --target . --check` exiting 0. Review fold: H13. The
+  first draft named `tools/check-wiring.sh --check`, which does not compare that pair at all — its
+  Skill check reads line endings and NUL bytes only, and it reports on hooks, the merge driver, EOL
+  and the kickoff engine, never the unattended Skill render.
+- **AC7** — `grep` over the installed `memory/guides/UNATTENDED-PROTOCOL.md` finds section 3 naming
+  BOTH anchors and naming the recorded anchor-kind fact. Review fold: M3, the scope item that had no
+  observation and whose absence the parity criteria could not detect.
+- **AC8** — `grep` over the rendered `.claude/skills/unattended/SKILL.md` finds its landing section
+  naming the local fallback, both new facts, and the pointer to the protocol's boundary section.
+  Review fold: M3.
 
 ## 7. Gates
 
-`unattended kit gate` · `memory-tree hygiene` (check 16, the read path) · `memory-recall skill
-wiring` · the full bar at the push boundary.
+`unattended kit gate` · `unattended skill wiring` · `memory-tree hygiene` (check 16, the read path) ·
+the full bar at the push boundary. Review fold: H13 — `memory-recall skill wiring` belongs to a
+different kit entirely and was named here by mistake.
 
 ## 8. Open questions
 
@@ -131,6 +145,10 @@ placement questions are settled in §4 against the document's existing organisat
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · folded the spec audit: H13 (the protocol pair and the Skill pair are graded by
+  DIFFERENT mechanisms; AC6 named a script that does not compare the Skill pair, and §7 named a leg
+  belonging to another kit), M3 (two scope items had no criterion, and the parity criteria standing in
+  for them are true of an untouched pair).
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit
