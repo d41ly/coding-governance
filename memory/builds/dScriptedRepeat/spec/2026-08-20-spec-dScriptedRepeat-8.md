@@ -1,10 +1,10 @@
 # TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
-Refuse a code build wearing the playbook mode: red when a playbook-mode run's diff touches anything
+Refuse a code build wearing `recipe` mode: red when a `recipe`-mode run's diff touches anything
 outside the declared output globs plus a closed exemption set — and state, in the gate's own header,
 the class this predicate cannot see.
 
@@ -116,18 +116,18 @@ spent the mandate. Evaluated at both moments.
   diffs before wiring is the control, and it has already found one false red.
 - testing + left-shift gates — S6, including the merge-commit arm, which is the one a naive
   implementation gets wrong.
-- migration / rollback — scoped to the playbook mode, so no existing run is affected.
+- migration / rollback — scoped to `recipe` mode, so no existing run is affected.
 - user docs — the leg header carries the stated CHECK; the Skill names the exemption set.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a playbook-mode run's commit modifies a source file outside the declared globs and
+- **AC1** — When a `recipe`-mode run's commit modifies a source file outside the declared globs and
   outside the exemption set, `bash tools/unattended/check-playbook.sh` REDS naming that path. Staged
   and observed.
 - **AC2** — When the run writes its build folder, appends its backlog shard and re-renders the
   generated work-state index, `bash tools/unattended/check-playbook.sh` PASSES. This is the mandated memory update and a first cut of
   this predicate red it.
-- **AC3** — When a playbook-mode run edits its own PLAYBOOK,
+- **AC3** — When a `recipe`-mode run edits its own PLAYBOOK,
   `bash tools/unattended/check-playbook.sh` REDS. Staged and observed. This INVERTS the previous
   revision, which asserted the opposite; §9 records the inversion.
 - **AC4** — When a run's history contains a MERGE whose combined diff touches an out-of-scope source
@@ -141,7 +141,7 @@ spent the mandate. Evaluated at both moments.
   before wiring, the hits AND near-misses are recorded in
   `memory/builds/dScriptedRepeat/build/`, and any false red is either fixed or its exemption added with
   a reason. Per the charter's rule about running a predicate over the real tree first.
-- **AC7** — When the mode is not the playbook mode, the gate does not evaluate, and it says so through
+- **AC7** — When the mode is not `recipe` mode, the gate does not evaluate, and it says so through
   the channel unit 3 defines rather than through the bare word `skipped`, which no leg can emit.
 - **AC8** — When the remote does not answer, `bash tools/unattended/check-playbook.sh` REFUSES by name
   rather than falling back to a local ref. Staged and observed.
@@ -169,6 +169,9 @@ spent the mandate. Evaluated at both moments.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
+  the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
+  distinction once.
 - rev-1 · 2026-08-20 · initial draft. S1's population and S2's exemption set both come from measured
   results in the research: a factor-of-22.5 range error, a merge-visibility trap, and a false red on the
   mandated memory update, each reproduced rather than reasoned about.

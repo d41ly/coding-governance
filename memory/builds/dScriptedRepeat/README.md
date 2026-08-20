@@ -137,6 +137,26 @@ Measured precedent decides it: the soft rule drained voluntarily in 15 of 33 cas
 hard-equality canon in 0 of 11 — and hard equality FORBIDS a grandfathered file from conforming early,
 which is a wall in front of the mode's second verb.
 
+## The three owner rulings of 2026-08-20, after the audit
+
+**The mode value is `recipe`, and the artifact stays a playbook.** `playbook` collided with the
+`DISCIPLINES` enum, the `PLAY` family and the charter-renderer kit. None was a machine collision and
+all four subjects answered one grep. The mode names the authorization DISCIPLINE, exactly as `slug` and
+`prompt` do without naming any artifact; the playbook names the DOCUMENT. Unit 1 S3b states that once
+so the pair is not read as drift.
+
+**`READ_PATH_CEILING` rises 112987 to 131892**, which is 106292 measured plus the same 25,600 headroom
+every movement uses. The previous allowance is spent — it was consumed from 87387 to 106292, leaving
+6,695 — and this build owes a protocol mode row, two Definition-of-Done table rows, a parked-kind row
+and eleven units' worth of decision appends. Measured BEFORE this build spent any of it, which is
+stricter than the convention rather than looser, and the conf comment says so and tells whoever merges
+to re-derive.
+
+**The playbook directives point at existing build-method sections.** `BUILD-METHOD.md` does not move
+and its stated budget does not rise, so the mode adds nothing to a document M7 re-reads whole at every
+pass boundary. The accepted cost is that "follow a playbook to the letter" is described by the pass
+loop and the wrap-up derivation rather than by prose written for it.
+
 ## The unit set
 
 Ten units. One mechanism each, per the build method's M2. Every one is Tier 2 except unit 9 — this
@@ -237,16 +257,16 @@ ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dS
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-3 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-3 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | SPECCED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 

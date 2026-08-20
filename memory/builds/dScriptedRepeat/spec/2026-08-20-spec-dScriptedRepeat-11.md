@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
 
 ## 1. Goal
 
@@ -10,7 +10,7 @@ give owner-instructed AMENDMENT the same home.
 
 ## 2. Scope (IN)
 
-- **S1.** THE CREATION PATH is a `prompt`-mode run, not a playbook-mode one. It has no `playbook:` to
+- **S1.** THE CREATION PATH is a `prompt`-mode run, not a `recipe`-mode one. It has no `playbook:` to
   name, so unit 4's preflight would refuse it; and its diff is entirely outside any declared output
   glob, so unit 8 would red it. Both refusals are correct — a run that MAKES a playbook is not a run
   that FOLLOWS one, and the mode set already carries the right member for research-then-author work.
@@ -33,8 +33,8 @@ give owner-instructed AMENDMENT the same home.
   exception.
 - **S6.** THE SKILL SECTION, in unit 10's S0 routing preamble: a reader arriving with no playbook is
   routed here rather than into a preflight that will refuse them.
-- **S7.** Arms: a creation run's diff is NOT graded by unit 8 (it is not playbook mode); a playbook
-  that fails unit 3's gate cannot land; a playbook-mode run naming a playbook committed by an earlier
+- **S7.** Arms: a creation run's diff is NOT graded by unit 8 (it is not `recipe` mode); a playbook
+  that fails unit 3's gate cannot land; a `recipe`-mode run naming a playbook committed by an earlier
   creation run passes unit 4's resolution at BASE; a run that both creates and follows a playbook is
   refused.
 
@@ -101,7 +101,7 @@ run, which is exactly the branch the audit forced and is the first place it pays
 - **AC1** — When a run authors a playbook and commits it under `authorized-by: prompt`,
   `bash tools/unattended/check-playbook.sh` grades that playbook from the moment it is tracked.
 - **AC2** — When that same run's diff is evaluated, `bash tools/unattended/check-playbook.sh` does NOT
-  apply the scope refusal, because the mode is not the playbook mode. Observed, not assumed.
+  apply the scope refusal, because the mode is not `recipe` mode. Observed, not assumed.
 - **AC3** — When a playbook fails unit 3's gate, `bash tools/run-gates/run-gates.sh` REDS and the
   playbook cannot land. Staged and observed.
 - **AC4** — When a later run's build README names that playbook, `--preflight` resolves it at BASE and
@@ -133,6 +133,9 @@ run, which is exactly the branch the audit forced and is the first place it pays
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
+  the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
+  distinction once.
 - rev-1 · 2026-08-20 · initial draft, written as the fold of the M4 spec audit's F17. The audit found
   that the owner's first stated verb had no owning unit in the roster of ten and was structurally
   refused by unit 4's preflight; this unit is that hole closed. It also receives F9's redirect, which

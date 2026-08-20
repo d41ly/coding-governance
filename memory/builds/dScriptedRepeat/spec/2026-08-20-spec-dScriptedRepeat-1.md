@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -16,8 +16,13 @@ so a misspelled mode is refused rather than silently agreed with in two places.
 - **S2.** Rewrite the closed-set refusal at `unattended.sh:794-797` to test membership of `AUTH_MODES`
   rather than enumerate two values inline. The refusal message keeps its shape and DERIVES the legal
   set from the constant, so adding a member cannot leave the message stale.
-- **S3.** Add the third member. The default for an absent `authorized-by:` key stays `slug`,
+- **S3.** Add the third member, `recipe`. The default for an absent `authorized-by:` key stays `slug`,
   unchanged, because every build folder written before the key existed is one.
+- **S3b.** ONE SENTENCE in the driver beside the constant, and in protocol §1, stating that the MODE is
+  `recipe` and the ARTIFACT it binds is a PLAYBOOK. They are different nouns for different things — the
+  mode names the authorization discipline, as `slug` and `prompt` already do without naming any
+  artifact, and the playbook names the document. Said once, in one place, so the pair is not read as
+  drift by the next person to grep either word.
 - **S4.** Extend the directive SCOPE closed set with the third value, and extend `check_waiver_scope`
   at `unattended.sh:661-662` so a third-mode-scoped handle waived on a run of another mode is refused
   the way the existing scoped case already is.
@@ -130,13 +135,13 @@ that key on `tools/gate-legs.json`. Adding an arm costs `ARMS_FLOORS` and one ar
 
 ## 8. Open questions
 
-- **F1 — the mode's SPELLING.** `playbook` collides with three live things: the `DISCIPLINES` enum at
-  `.memory-tree.conf:11`, the `PLAY` family at `:15`, and the charter-renderer kit at `tools/playbook/`
-  with its own parity gate and map dossier. None is a MACHINE collision — the mode set and the
-  discipline enum are never compared — but a reader grepping the word gets four unrelated subjects, and
-  the mode value is user-facing and permanent. Candidates: `recipe`, `runbook`, `serial`, `script`.
-  Recommendation: `recipe`. It is unused anywhere in the tree, both reference artifacts call themselves
-  a recipe in their own prose, and it does not suggest the charter renderer. **Owner decision.**
+- **F1 — the mode's SPELLING.** RESOLVED (owner, 2026-08-20): **`recipe`**. `playbook` collided with
+  three live things — the `DISCIPLINES` enum at `.memory-tree.conf:11`, the `PLAY` family at `:15`, and
+  the charter-renderer kit at `tools/playbook/` with its own parity gate and map dossier. None was a
+  MACHINE collision, since the mode set and the discipline enum are never compared, but a reader
+  grepping the word got four unrelated subjects and the value is user-facing and permanent. `recipe` is
+  unused anywhere in the tree and does not suggest the charter renderer. The ARTIFACT keeps the name
+  playbook; S3b is where that distinction is stated once.
 - **F2 — whether `AUTH_MODES` is also joined to the rendered Skill's own list**, the way the directive
   registry is joined to its Skill table in both directions. Recommendation: yes, but authored in unit
   10 where the Skill is written, not here. Deferred rather than open.
@@ -146,6 +151,8 @@ that key on `tools/gate-legs.json`. Adding an arm costs `ARMS_FLOORS` and one ar
 - rev-1 · 2026-08-20 · initial draft. Decomposed from the research pass. S5 and the derived scope set
   come from the contradiction hunt's ranked decision 9, which two lenses reached independently and
   which no kickoff fork covered.
+- rev-3 · 2026-08-20 · owner ratified `recipe` as the mode value; S3 names it and S3b states the
+  mode-versus-artifact distinction in one place rather than letting two nouns drift.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F21 dropped two prose counts of a derived population
   that contradicted each other inside this spec - in the unit whose whole subject is not spelling a set
   twice. Two audit passes produced two different corrected censuses, which is itself the argument for

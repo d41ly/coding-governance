@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -12,7 +12,7 @@ also at BASE. Fork 8's hybrid, which is what keeps the playbook self-describing 
 
 - **S1.** Two new build-README front-matter keys, read at BASE: `playbook:` (a repo-relative path) and
   `pieces:` (a positive integer, the count the owner asked for). Both are read only when the mode is
-  the playbook mode; absent under any other mode is legal and means nothing.
+  `recipe` mode; absent under any other mode is legal and means nothing.
 - **S2.** THE FRONT-MATTER SCAN GAINS TWO KEY-TAGGED EMISSIONS, in the driver's awk at
   `unattended.sh:783-790` and in the leg's independent copy at `check-unattended.sh:444-471`. That awk
   emits `slug=` and `mode=` and nothing else today, so `playbook:` and `pieces:` have no reader at all
@@ -121,7 +121,7 @@ commit, which the leg cannot trust — the same argument protocol §1 cost 2 alr
   message for each of the three.
 - **AC6** — When the leg re-derives the binding independently and its answer differs from the recorded
   one, `bash tools/unattended/check-unattended.sh` REDS. Staged by editing the record after preflight.
-- **AC7** — When the mode is not the playbook mode, a README carrying `playbook:` and `pieces:` is
+- **AC7** — When the mode is not `recipe` mode, a README carrying `playbook:` and `pieces:` is
   accepted and the keys are ignored, verified by an arm rather than assumed.
 
 ## 7. Gates
@@ -145,6 +145,9 @@ independent re-derivation needs and the kit had zero such arms until it was buil
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
+  the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
+  distinction once.
 - rev-1 · 2026-08-20 · initial draft. The hybrid was ruled by the owner on 2026-08-20 after the
   research found the fork-2 wording and the driver's own comment in conflict; S4's grain comes from a
   measured factor-of-three ambiguity on a single diff.

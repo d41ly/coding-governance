@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -11,7 +11,7 @@ the parts of the build method it must actually perform.
 ## 2. Scope (IN)
 
 - **S0.** The Skill gains a routing preamble naming FOUR paths, not three: slug, prompt, playbook-run
-  (S1) and playbook-CREATION, which is unit 11's and is a `prompt`-mode run rather than a playbook-mode
+  (S1) and playbook-CREATION, which is unit 11's and is a `prompt`-mode run rather than a `recipe`-mode
   one. A reader arriving with no playbook must be sent to the path that makes one, because unit 4's
   preflight refuses a `playbook:` that does not resolve at BASE — so a no-playbook start cannot reach
   preflight at all.
@@ -24,7 +24,7 @@ the parts of the build method it must actually perform.
   same tracked per-piece and set records unit 5 and unit 7 define. It is documented in the Skill as a
   path that the merge bar sees and the driver does not, and it says that plainly.
 - **S3.** The MODE-SCOPED DIRECTIVES: `playbook-followed` and `pieces-recorded`, each a POINTER into a
-  build-method section, scoped to the playbook mode, appended to `DIRECTIVES_CORE` with
+  build-method section, scoped to `recipe` mode, appended to `DIRECTIVES_CORE` with
   `DIRECTIVES_FLOOR` rising in the same commit in this repo's INSTALLED conf as well as the example.
 - **S4.** The build-method carrier for those pointers. `memory/guides/BUILD-METHOD.md` is at its stated
   budget, so this unit does NOT add a section to it. §4 gives the alternative and §8 F1 carries the
@@ -76,7 +76,7 @@ Fork 1's "ONE gate" is true of the artifact gate and was never true of the drive
 
 Reused from the prompt path, including its strongest property: the turn sits BEFORE the push, so the
 owner's answers are provably older than the commit that authorizes the run. A run cannot have taken an
-answer later than the commit it is authorized by. For playbook mode the under-determined fields are
+answer later than the commit it is authorized by. For `recipe` mode the under-determined fields are
 narrower than the prompt path's — usually just `pieces:` and the output location — because the playbook
 itself answers most of what would otherwise be asked.
 
@@ -134,11 +134,12 @@ against a counter that includes it.
 
 ## 8. Open questions
 
-- **F1 — a new build-method section for the playbook directives?** §4 argues the pointers should aim at
-  existing sections, because the method's budget is nearly spent and a section per directive is how a
-  re-read-every-pass document becomes one nobody re-reads. The counter is that "follow a playbook to the
-  letter" is a genuinely new obligation and pointing it at the pass loop under-describes it. Costs a
-  ratified budget rise, which M3 veto 2 makes an owner turn. **Owner decision.**
+- **F1 — a new build-method section for the playbook directives?** RESOLVED (owner, 2026-08-20): NO —
+  the two directives POINT at existing sections. `memory/guides/BUILD-METHOD.md` does not move, its
+  stated budget does not rise, and the mode adds nothing a session must re-read at every pass boundary.
+  The cost accepted with this ruling is that "follow a playbook to the letter" is described by the pass
+  loop and the wrap-up derivation rather than by prose written for it; if that proves too thin once the
+  mode is in use, the fix is a section then, argued against a real failure rather than a predicted one.
 - **F2 — does the attended path need its own entry in the kickoff engine's exit list?** That engine
   enumerates the interactive exits an unattended run resolves without an owner turn, and an attended
   path has an owner by definition. Recommendation: no, and state why in the Skill so its absence is not
@@ -149,6 +150,9 @@ against a counter that includes it.
 - rev-1 · 2026-08-20 · initial draft. S2's shape follows from the research proving an attended run
   cannot close through the driver; S4's refusal to add a method section follows from the measured budget
   and from M1's own rule about re-reading cost.
+- rev-3 · 2026-08-20 · owner ruled F1: the directives point at existing build-method sections, so the
+  method's budget does not move and this build adds no re-read cost to a document M7 re-reads whole at
+  every pass boundary.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F17 added S0's routing preamble and the fourth path,
   after the audit found that the owner's FIRST stated verb — create a playbook when none exists — had no
   owning unit anywhere in the roster and was structurally refused by unit 4's own preflight. The path

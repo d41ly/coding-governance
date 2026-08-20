@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -26,7 +26,7 @@ piece — and make its Definition-of-Done item read the verdicts rather than mer
   identity is what makes a later run's larger set read `superseded` rather than `stale` — without it,
   run 2 makes run 1's record stale by construction and unit 6 blocks a close it has nothing to do with.
 - **S5.** `set-checks-recorded:machine`, a tenth core item, with THREE terms:
-  0. the recorded mode is the playbook mode, else MET-and-announced with the `skipped` shape — the same
+  0. the recorded mode is `recipe` mode, else MET-and-announced with the `skipped` shape — the same
      term zero unit 6 carries, and for the same reason: `verb_close` evaluates `DOD_CORE` for every run
      with no mode branch, so an item only this mode can satisfy would wedge the fleet;
   1. a set record exists for THIS run's set, joined by run identity and ordered hashes;
@@ -161,6 +161,9 @@ prose record.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
+  the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
+  distinction once.
 - rev-1 · 2026-08-20 · initial draft. The unit exists because of the research's single strongest
   finding, which no kickoff fork covered.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F1 added term zero, the mode branch. F4 made term 2

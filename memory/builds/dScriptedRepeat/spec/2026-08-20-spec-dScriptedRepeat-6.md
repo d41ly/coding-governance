@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -18,7 +18,7 @@ whether it may be overridden.
 - **S2.** THE MODE BRANCH, and it is term ZERO because everything else depends on it. `verb_close`
   evaluates `DOD_CORE` for EVERY run with no mode branch anywhere, so an item only a playbook run can
   satisfy would block `--close` on every `slug`- and `prompt`-mode run in the fleet, on a
-  non-overridable item whose only exit is `--abort`. When the recorded mode is not the playbook mode
+  non-overridable item whose only exit is `--abort`. When the recorded mode is not `recipe` mode
   this item is MET, and it ANNOUNCES that with the `skipped` shape naming the mode — never a silent
   pass, because a skip that looks like a pass is indistinguishable from coverage.
   Implemented as a branch in `dod_met`, NOT as a third `DOD_CORE` field: `checker_of` uses
@@ -29,7 +29,7 @@ whether it may be overridden.
   close over a tree that already held pieces — for a mode aimed at a growing corpus, that is the
   ordinary tree.
 - **S4.** THE PREDICATE, evaluated in `dod_met` as SEQUENTIAL terms each with its own message:
-  0. the recorded mode is the playbook mode, else MET-and-announced (S2);
+  0. the recorded mode is `recipe` mode, else MET-and-announced (S2);
   1. `enumerate_run` resolves and yields at least one piece — the vacuity guard, and it guards term 2
      in whatever scope term 2 lands in;
   2. every piece in `enumerate_run` is `verified` in unit 5's narrowed sense — hash-joined AND every
@@ -110,7 +110,7 @@ per piece, and commit counting is the wrong oracle for N.
 
 **A third `DOD_CORE` field carrying a mode scope.** Rejected by S2: `checker_of`'s shortest-prefix
 removal sends a three-field entry silently down the machine path in both consumers. The audit's own
-erratum on this is worth keeping: the literal example `${p#*:}` returns `machine:playbook`, so the
+erratum on this is worth keeping: the literal example `${p#*:}` returns `machine:recipe`, so the
 misclassification is real but arrives by a different route than the previous revision described.
 
 ## 5. Production-readiness checklist
@@ -141,7 +141,7 @@ misclassification is real but arrives by a different route than the previous rev
 - **AC0** — When a `slug`-mode run reaches `--close` with `pieces-complete` present in `DOD_CORE`, the
   item is MET and the output carries the `skipped` shape naming the mode. Observed via
   `bash tools/unattended/unattended.sh --close`, and staged BEFORE the branch lands to see it block.
-- **AC1** — When `enumerate_run` yields zero pieces on a playbook-mode run, `--close` BLOCKS with the
+- **AC1** — When `enumerate_run` yields zero pieces on a `recipe`-mode run, `--close` BLOCKS with the
   vacuity message, not with a count mismatch. Staged and observed.
 - **AC2** — When one piece is `stale`, `--close` blocks with a message naming staleness and the piece.
 - **AC3** — When the tree already holds N pieces and the run produced NONE, `--close` BLOCKS. Staged
@@ -178,6 +178,9 @@ misclassification is real but arrives by a different route than the previous rev
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
+  the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
+  distinction once.
 - rev-1 · 2026-08-20 · initial draft. S5 comes from a reproduced false green in the research; the
   vacuity guard and the sequential-message shape are both copied from `build-complete`'s own recorded
   repairs.
