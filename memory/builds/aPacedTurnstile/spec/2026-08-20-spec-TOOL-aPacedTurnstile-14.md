@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-14 — the authored roster is read with its refusal intact
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -24,7 +24,11 @@ build a roster the plan verb can read.
   already uses at its generated-pair site: a `fail` carrying a literal sentence, followed by a
   separate detail line that carries the interpolated path. The path never enters the `fail` message,
   because `check-arms.py` reads the literal text up to the first interpolation as a branch's
-  signature and an interpolated path there makes the branch permanently unarmable.
+  signature and an interpolated path there makes the branch permanently unarmable. The guard runs
+  where the generated-pair guard already runs — at the head of the verb, before the spec listing and
+  before the missing-unit loop. Position is load-bearing: that loop spells
+  `for miss in $(missing_units …)`, which discards the status a THIRD time, so S2's propagation buys
+  `verb_plan` nothing on its own. Codes 1 through 47 are contiguous and in use, so the new one is 48.
 - **S4** — the `build-complete` Definition-of-Done item reports the same refusal through `DOD_OUT`
   rather than reporting a harvested Records-table id as a unit the build owes a spec.
 - **S5** — `roster_refusal` is the one place that message is spelled, sibling to `units_refusal`.
@@ -37,7 +41,10 @@ build a roster the plan verb can read.
   before the fix lands. The arm that exists today builds a second GENERATED pair, so the authored
   path has never been exercised, and its comment claims the coverage the fixture does not supply.
 - **S8** — this build's README gets a readable roster: the authored units table moves to sit
-  immediately above the generated region and is wrapped in the pair there.
+  immediately above the generated region and is wrapped in the pair there, and it gains a row for
+  THIS unit. The table was authored when the build had seven units and this spec makes eight, so a
+  straight relocation would ship a plan that omits the unit which created it — green, because the
+  join only refuses ids the roster has and specs lack, and wrong.
 - **S9** — the codebase-map dossier bullet claiming this unit is already closed is corrected, and
   the backlog row is closed against what the fix actually does.
 
@@ -163,8 +170,10 @@ sentence could only name one of them or neither.
 
 - **AC1** — When a build README carries a `roster:units` open marker with no close, `roster_ids`
   exits `3` and prints no ids, where at base it exits `0` and prints ids drawn from the Records table.
-- **AC2** — When that same README is passed to `--plan`, the output names the authored pair and the
-  README path, and contains no id that the roster region does not enclose.
+- **AC2** — When that same README is passed to `--plan`, the verb exits non-zero, its output names
+  the authored pair and the README path, and it lists no unit at all. The refusal is asserted as a
+  refusal: a criterion phrased as "contains no id from outside the region" would pass by finding
+  nothing, because a refusing verb prints no ids either way.
 - **AC3** — When that same README is judged by the `build-complete` Definition-of-Done item, the
   unmet text is the named roster refusal and not the sentence about a plan naming a unit no tracked
   spec carries.
@@ -174,7 +183,10 @@ sentence could only name one of them or neither.
   names the generated region rather than the roster, and the arm asserting it carries the corrected
   literal.
 - **AC6** — When `bash tools/unattended/unattended.sh --plan aPacedTurnstile` runs after the README
-  change, its roster line reports the region as read with seven ids and none missing.
+  change, its roster line reports the region as READ rather than fallen back to, and the id count it
+  names equals the row count of the generated `gen:build-units` region, with none missing. The count
+  is compared against that region and is not written here: this build gained a unit when this very
+  spec landed, and a figure typed into an acceptance criterion would already be the old one.
 - **AC7** — When `python tools/memory-tree/gen_build_index.py --check-format` runs after the README
   change, it exits `0`, and its status is read from the process rather than through a `tail` pipe.
 - **AC8** — When `python tools/memory-tree/check-arms.py` runs after the driver change, it passes
@@ -199,12 +211,21 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh
 - the build-index freshness check, which the relocation must not disturb
 - the memory-tree hygiene gate, which grades this spec file and the backlog row
 - the arms check, whose floor this unit raises
-- the codebase-map coverage and freshness legs, which the dossier edit touches
+
+The codebase-map legs are deliberately NOT in that list. A rev-1 draft claimed the dossier edit
+moves them; measured at base with the corrected bullet in place, `gen_map.py --check` stays green,
+because coverage keys on a dossier's CLAIMS and this edit changes prose. The legs must stay green
+like every other; they are not legs this unit moves.
 
 No new gate leg. A new arm inside an existing suite is the cheaper form, and this unit does not need
 a leg of its own.
 
 ## 8. Open questions
+
+none — every fork below is RESOLVED in place, each naming its resolver and the date. This lead line
+is the machine-read one: `plan_state` reads only the FIRST non-blank line of this section, so a
+section whose resolutions live in the bullets alone classifies as FORKED. Observed on this very
+spec at rev-1, which the plan verb reported FORKED with both forks already resolved.
 
 - **Fork A — how far to take the fix.** The options were: repair the read path only; repair it and
   wrap this README; retire the authored roster; or make the pair mandatory across the corpus.
@@ -220,6 +241,13 @@ a leg of its own.
 
 - rev-1 · 2026-08-20 · initial draft. Both forks were resolved by the owner during the design pass,
   so the spec is written with them folded rather than carrying them open.
+- rev-2 · 2026-08-20 · folded a self-review of the draft, six findings. Section 8 gained the
+  machine-read lead line, without which the plan verb classified this spec FORKED with both forks
+  resolved — observed, not reasoned. The gates section dropped a false claim that the dossier edit
+  moves the codebase-map legs; measured green. AC6 stopped naming a count of a derived population
+  and AC2 stopped asserting an absence that a refusing verb satisfies for free. S3 gained the
+  guard's position and its code, because the missing-unit loop discards the status a third time. S8
+  gained the roster row for this unit, which the relocation would otherwise have omitted.
 
 ## 10. Reuse audit
 

@@ -214,7 +214,7 @@ ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 | [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-8 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-14 — the authored roster is read with its refusal intact](spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-aPacedTurnstile-14 — the authored roster is read with its refusal intact](spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md) | SPECCED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
