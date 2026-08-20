@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point
 
-**Status:** OPEN · rev-5 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling
 
 ## 1. Goal
 
@@ -384,6 +384,43 @@ RESOLVED or MOOT, marked in place.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-20 · BUILT and CLOSED. Both halves landed as re-scoped, and the base repair is
+  the one worth reading twice.
+
+  **The base is the branch point, and the fallback is what makes that safe.** The merge-base is
+  used only where it is a PROPER ANCESTOR of HEAD; otherwise the origin tip stands. Demonstrated
+  both directions on one fixture before the arm was written: on a diverged branch the leg whose
+  guard the branch never touched SKIPS under the new rule and RUNS under the old one, so the arm
+  has a real failing case rather than a hoped-for one. The canary builds that fixture itself,
+  because the harness's existing base fixture points its remote ref at HEAD — merge-base == HEAD
+  there, both rules agree, and an arm using it would grade a distinction it cannot see.
+
+  **Reuse is opt-in, and every positive arm carries its control.** "Nothing was reused" is the
+  state a cold ledger, a broken key and a correct refusal all produce, so each refusal arm also
+  proves that reuse WOULD have fired on the same run: the impure leg does not reuse while its pure
+  sibling does, the red leg runs again while the green sibling reuses, the changed guard defeats
+  reuse for that leg only. The opt-in arm states its precondition first — that the rows WOULD
+  match — then proves stdout is byte-identical to the same tree with the ledger removed.
+
+  **A cost this unit paid for and then gave back.** The record unit left three separate
+  `git status --porcelain` walks in the startup path: one for the clean test, one for the per-leg
+  input keys, one inside the fingerprint helper. Measured at 2136 ms from process start to the
+  header being on disk in a two-file scratch repo, and paid on every run of an 86-leg bar. Folded
+  to one walk in the runner plus the helper's own, which it keeps because a git hook calls that
+  executable directly and it has to be self-contained.
+
+  The measurement surfaced through an arm rather than through a profile: the evidence harness
+  killed a run at 2 s and asserted the header had been written, so it started reporting the crash
+  case as unreadable. That arm was grading the runner's STARTUP BUDGET, which is not its subject.
+  The kill now lands at 5 s against a 6 s leg — mid-run with room on both sides — and the startup
+  cost is a separate, real finding rather than a confusing red.
+
+  **The verb reaches its two consumers, which is the half a new verb usually loses.**
+  `profile_bar.py`'s verdict grammar required two spaces after the verb, which is an accident of
+  the three short verbs rather than a property of the contract — `reuse` is padded with one, so
+  every reused leg was being dropped silently and the bar under-counted. And `kit.toml`'s
+  `[gate_runner_seed]` now declares `observed_reused`, without which a target's reused leg has no
+  deployer state and that outcome is structurally unreachable.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-2 · 2026-08-18 · folded the spec audit. BLOCKER F4 — this unit had no position in the build
   order — is fixed in the build README, which now sequences it `-5 → -6 → -3` with its forcing edges.

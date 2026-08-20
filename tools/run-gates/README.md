@@ -40,6 +40,19 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `kit.toml` | this entry, declared as data |
 
+## Reuse, and the baseline a guard diffs against
+
+`GATE_REUSE=1` skips a leg whose inputs are byte-identical to a recorded green: not declared
+`impure`, its ledger row says `ok`, and the row's input key equals the one computed this run. Any
+missing term means execute — every failure mode is "did more work", never "checked less". It is
+OPT-IN because an advisory input may cause less work only on a run that is not authoritative, and
+`.githooks/pre-push` never sets it. A run that reused anything cannot stamp `gate-full-green`.
+
+The baseline a guard diffs against is the MERGE-BASE with the default branch, so a branch is graded
+on what it changed rather than on everything that landed while it was open — used only where the
+merge-base is a proper ancestor of `HEAD`, with the origin tip standing otherwise. `GATE_BASE`
+outranks both, and an unresolvable baseline runs every leg.
+
 ## The turnstile — one bar per repository
 
 A run claims a beacon under the git COMMON dir before it dispatches, so every worktree of one

@@ -23,7 +23,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=37
+FLOOR_ASSERTIONS=51
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -215,9 +215,14 @@ fi
 rec_done
 
 # --- a hard kill leaves a header and NO verdict ---------------------------------------------------
+# THE KILL LANDS AT 5s AGAINST A 6s LEG, and the margin is deliberate on both sides. It was 2s,
+# which measured 2136 ms to write the header on this platform — so the arm was grading the
+# runner's STARTUP BUDGET, and reported the crash case as unreadable whenever startup lost a
+# race it was never meant to be in. Too wide and the leg finishes first and there is no crash to
+# observe; the leg sleeps 6s, so 5s is mid-run with room on both sides.
 rec_repo
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 2 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL 5 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
 d=$(rec_dir)
 [ -f "$d/header" ] && ok "the header survived a hard kill" \
                    || nope "no header after a hard kill — the crash case is unreadable"
@@ -343,7 +348,7 @@ rec_done
 rec_repo
 for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; done
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 2 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL 5 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
 left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
 [ "$left" -ge 9 ] && ok "a run KILLED before its verdict swept nothing (the sweep is after the verdict)" \
                   || nope "a killed run swept $((9-left)) record(s) — the sweep is running before the verdict"
@@ -413,6 +418,143 @@ for prof in capable minimal; do
   rec_done
 done
 rm -f "$REC_OUT"
+
+# =================================================================================================
+# REUSE A PROVEN GREEN (the reuse unit). Every arm drives the real runner in its own scratch repo,
+# for the reason the record arms above give: these have to make trees dirty and re-run over a ledger.
+#
+# EVERY POSITIVE ARM CARRIES ITS CONTROL. "Nothing was reused" is the state a cold ledger, a broken
+# key and a correct refusal all produce, so an arm that only checks for the absence of the reuse verb
+# passes on all three. Each one below therefore also proves that reuse WOULD have fired.
+
+ru_repo() {   # -> RU_T, RU_GD
+  RU_T=$(mktemp -d)
+  mkdir -p "$RU_T/tools/run-gates" "$RU_T/tools/lib" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
+  cp "$ROOT/tools/run-gates/run-gates.sh" "$ROOT/tools/run-gates/gate-fingerprint.sh" \
+     "$ROOT/tools/run-gates/gate-profiles.txt" "$RU_T/tools/run-gates/" || return 1
+  cp "$ROOT/tools/lib/resolve-python.sh" "$RU_T/tools/lib/" 2>/dev/null || true
+  ( cd "$RU_T" && git init -q -b main . && git config user.email ru@test.invalid \
+      && git config user.name ru-test ) >/dev/null 2>&1 || return 1
+  printf '#!/usr/bin/env bash\necho a\nexit 0\n' > "$RU_T/fx/a.sh"
+  printf '#!/usr/bin/env bash\necho b\nexit 0\n' > "$RU_T/fx/b.sh"
+  echo x > "$RU_T/ga/f"; echo y > "$RU_T/gb/f"
+  printf '%s\n' '[' \
+    '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+    '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
+    ']' > "$RU_T/tools/gate-legs.json"
+  ( cd "$RU_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
+  ( cd "$RU_T" && git update-ref refs/remotes/origin/main HEAD \
+      && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+  RU_GD="$RU_T/.git"
+}
+ru_run() { ( cd "$RU_T" && env "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+ru_done() { rm -rf "$RU_T"; }
+
+REC_OUT=${REC_OUT:-$(mktemp)}
+
+ru_repo || { echo "evidence-test: cannot build a reuse scratch"; exit 2; }
+ru_run GATE_FULL=1 >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] \
+  && ok "with GATE_REUSE set, an unchanged tree reuses every pure leg" \
+  || { nope "reuse did not fire on an unchanged tree"; grep '^GATE ' "$REC_OUT" | sed 's/^/      /'; }
+grep -qE 'reused\)' "$REC_OUT" && ok "the verdict line reports a non-zero reused count" \
+                               || nope "the verdict does not name the reused count"
+ru_done
+
+# THE OPT-IN DEFAULT, with the precondition that makes the arm mean something. An advisory input may
+# cause LESS work only on a run that is not authoritative, and this is the one criterion guarding
+# that boundary — so it first proves the rows WOULD have matched, then proves they were not used.
+ru_repo
+ru_run GATE_FULL=1 >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+[ "$(grep -c '^GATE reuse ' "$REC_OUT")" = 2 ] \
+  && ok "precondition: those ledger rows WOULD match this run's keys" \
+  || nope "the rows do not match, so the opt-in arm below would pass by finding nothing"
+ru_run GATE_FULL=1 >/dev/null
+ru_a=$(grep -E '^GATE ' "$REC_OUT")
+grep -q '^GATE reuse ' "$REC_OUT" && nope "a leg was reused with GATE_REUSE unset — the default leaked" \
+                                  || ok "no leg is reused with GATE_REUSE unset"
+rm -f "$RU_GD/gate-ledger.tsv"; ru_run GATE_FULL=1 >/dev/null
+ru_b=$(grep -E '^GATE ' "$REC_OUT")
+[ "$ru_a" = "$ru_b" ] && ok "stdout with a matching ledger is byte-identical to the same tree with no ledger" \
+                      || nope "stdout differs from the ledger-removed control — something advisory reached the default path"
+ru_done
+
+# A CHANGE INSIDE ONE GUARD, and its control: the arm has to show the OTHER leg still reusing, or a
+# runner that simply stopped reusing altogether passes it.
+ru_repo
+ru_run GATE_FULL=1 >/dev/null
+echo moved > "$RU_T/ga/f"; ( cd "$RU_T" && git add -A && git commit -qm move ) >/dev/null 2>&1
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "a leg whose guarded input moved is NOT reused" \
+                                    || nope "a leg was reused although a file inside its guard changed"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the untouched leg on the same run WAS reused" \
+                                    || nope "no leg reused on that run, so the arm above proves nothing"
+ru_done
+
+# AN IMPURE LEG IS NEVER REUSED. Fixture-declared: this tree's own corpus is not the subject, and a
+# harness that ships must not assert which of an adopter's legs are impure.
+ru_repo
+printf '%s\n' '[' \
+  '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "impure": "reads a remote"},' \
+  '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
+  ']' > "$RU_T/tools/gate-legs.json"
+( cd "$RU_T" && git add -A && git commit -qm impure ) >/dev/null 2>&1
+ru_run GATE_FULL=1 >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE ok    pa' "$REC_OUT" && ok "a leg declared impure executes even on a byte-identical tree" \
+                                    || nope "an impure leg was reused"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: a pure sibling WAS reused on that same run" \
+                                    || nope "nothing was reused, so the impure arm proves nothing"
+ru_done
+
+# A RED ROW IS NEVER REUSABLE, and the ledger says so in the field rather than leaving the rule to be
+# re-implemented by every reader.
+ru_repo
+printf '#!/usr/bin/env bash\necho boom\nexit 3\n' > "$RU_T/fx/a.sh"
+( cd "$RU_T" && git add -A && git commit -qm red ) >/dev/null 2>&1
+ru_run GATE_FULL=1 >/dev/null
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+grep -q '^GATE FAIL  pa' "$REC_OUT" && ok "a leg whose recorded row is a failure runs again" \
+                                    || nope "a red leg was reused"
+grep -q '^GATE reuse pb' "$REC_OUT" && ok "control: the green sibling WAS reused on that run" \
+                                    || nope "nothing was reused, so the red arm proves nothing"
+ru_done
+
+# REUSE DEFEATS THE FULL-GREEN STAMP. This is the join the push boundary rests on: a stamp must never
+# be able to describe a run that copied a verdict instead of earning it.
+ru_repo
+ru_run GATE_FULL=1 >/dev/null
+[ -f "$RU_GD/gate-full-green" ] && ok "control: the earning run stamped a full green" \
+                                || nope "the earning run did not stamp, so the arm below proves nothing"
+rm -f "$RU_GD/gate-full-green"
+ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
+[ -f "$RU_GD/gate-full-green" ] && nope "a run that reused legs stamped a full green" \
+                               || ok "a run that reused ANY leg does not stamp a full green"
+ru_done
+
+# THE PROFILER STILL SEES A REUSED LEG. Without this the new verb is dropped by that tool's verdict
+# grammar and the bar is under-counted in silence — the same class as a leg that stops being
+# collected.
+if [ -f "$ROOT/tools/run-gates/profile_bar.py" ]; then
+  ru_repo
+  cp "$ROOT/tools/run-gates/profile_bar.py" "$RU_T/tools/run-gates/"
+  ru_run GATE_FULL=1 >/dev/null
+  ru_out=$( cd "$RU_T" && "${PYBIN:-python}" tools/run-gates/profile_bar.py --width 2 2>&1 )
+  # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
+  # ordinary success line ('across N executed leg(s)') and made this arm fail on a healthy run.
+  if printf '%s' "$ru_out" | grep -qi 'refus'; then
+    nope "the profiler refused on the earning run, so its reuse grammar cannot be reached here"
+    printf '%s
+' "$ru_out" | tail -3 | sed 's/^/      /'
+  else
+    ok "control: the profiler records a run of this fixture without refusing"
+  fi
+  ru_done
+else
+  ok "no profiler ships beside the runner here, so its reuse grammar is not gradeable (stated)"
+fi
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

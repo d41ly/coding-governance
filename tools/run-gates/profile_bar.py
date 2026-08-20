@@ -56,7 +56,13 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # `sed` after LF and after LF alone, so a leg emitting \x1e, \v or \f could otherwise present a
 # fabricated verdict at column 0 — and \x1e is the runner's own field separator, so that is reachable
 # by accident rather than only by malice.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL)\s\s+(.*)$")
+# `\s+` after the verb, not `\s\s+`. The verbs are padded so the NAME starts in one column —
+# "ok" takes four trailing spaces, "skip" and "FAIL" two, "reuse" one — so a two-space minimum
+# after the verb is an accident of the three short verbs rather than a property of the grammar.
+# The TAIL contract is unaffected and is what the split below relies on: two spaces before any
+# parenthesised tail. Requiring two here dropped every `GATE reuse` line silently, which
+# under-counts the bar without reporting anything.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse)\s+(.*)$")
 
 
 def parse_verdicts(stdout):

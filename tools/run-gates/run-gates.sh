@@ -109,7 +109,31 @@ redact() { sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g'; }
 # Baseline for conditional legs: the mainline tip we gate against. Override with GATE_BASE.
 # Unresolvable (no remote / shallow / detached) → empty, and changed() fails safe to "run".
 DEFBR=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); DEFBR=${DEFBR#origin/}
-BASE=$(git rev-parse --verify -q "${GATE_BASE:-origin/${DEFBR:-main}}" 2>/dev/null) || BASE=
+# THE BASE IS THE BRANCH POINT, not the remote tip, so a branch is graded on what IT changed
+# rather than on everything that landed while it was open. The merge-base is used only where it
+# is a PROPER ANCESTOR of HEAD; otherwise the origin tip stands.
+#
+# That fallback is not a nicety. An earlier draft REFUSED the base whenever the merge-base equalled
+# HEAD, on the reasoning that the merge-base is degenerate on the default branch itself. The
+# refusal cannot tell that case from a fresh branch cut off a fast-forwarded `main` — which is the
+# commonest scoped-run state in this repository — and in both it fell back to running all 86 legs.
+# Worse, it would have red the shipped canary on landing: that harness points its fixture remote at
+# HEAD, so merge-base == HEAD there and the arm expecting `GATE skip  guarded` would have lost its
+# skip. The origin tip handles both correctly, because `changed()` diffs BASE against the WORKING
+# TREE and therefore still sees uncommitted edits.
+BASE=
+if [ -n "${GATE_BASE:-}" ]; then
+  # An explicit base OUTRANKS the derivation, unchanged. It is the escape hatch for exactly the
+  # cases no derivation gets right.
+  BASE=$(git rev-parse --verify -q "$GATE_BASE" 2>/dev/null) || BASE=
+else
+  _tip=$(git rev-parse --verify -q "origin/${DEFBR:-main}" 2>/dev/null) || _tip=
+  if [ -n "$_tip" ]; then
+    _mb=$(git merge-base HEAD "$_tip" 2>/dev/null) || _mb=
+    _head=$(git rev-parse --verify -q HEAD 2>/dev/null) || _head=
+    if [ -n "$_mb" ] && [ "$_mb" != "$_head" ]; then BASE=$_mb; else BASE=$_tip; fi
+  fi
+fi
 # GATE_FULL bypasses every guard, so the run checks the whole bar. `.githooks/pre-push` sets it: a
 # guard may only ever scope a NON-authoritative run, which is what makes a too-narrow guard cost an
 # early signal rather than a wrong merge verdict. Both fail-safes below keep their meaning — an
@@ -551,8 +575,19 @@ FPRINT_START=$(fingerprint)
 # at any sha. The push boundary would then mismatch on every later push and force the full bar
 # forever while printing that the record describes a different tree — safe, permanent, and it reads
 # as caution rather than as the defect it is.
+# ONE PORCELAIN WALK, read by everything that needs it. Three separate `git status --porcelain`
+# calls accumulated here — one for the clean test, one for the per-leg input keys, and one inside
+# the fingerprint helper — and a status walk over a real tree is the expensive part of this
+# runner's startup. Measured before this fold: 2136 ms from process start to the header being on
+# disk, in a scratch repo with two files. The helper keeps its own walk because it is a separate
+# executable a git hook calls directly and must be self-contained; the other two are the same
+# question asked twice.
+PORCELAIN_START=$(LC_ALL=C git status --porcelain 2>/dev/null | LC_ALL=C sort)
+# CLEAN means this listing EMPTY, untracked-and-unignored files included — not `git diff --quiet`,
+# which is blind to a `??` line and would stamp a green over a tree the at-a-rev fingerprint form
+# cannot reproduce at any sha.
 TREE_CLEAN=no
-[ -z "$(git status --porcelain 2>/dev/null)" ] && TREE_CLEAN=yes
+[ -z "$PORCELAIN_START" ] && TREE_CLEAN=yes
 
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
@@ -579,17 +614,22 @@ if cache and os.path.exists(cache):
         durs = {}          # a corrupt cache is a missing cache, never a failed run
 order = sorted(range(len(data)), key=lambda i: -durs.get(data[i]["name"], 0.0))
 rows = [" ".join(str(i) for i in order)]
-rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"]) for l in data]
+# The fourth field is the `impure` declaration, carried through as a PRESENCE rather than as its
+# text: the reason string is for a human reading the manifest, and the runner only ever asks whether
+# there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
+# here, which is what keeps a prose reason from being able to corrupt the wire format.
+rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
+         + "\x1e" + ("1" if l.get("impure") else "") for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av <<<"$line"
-  names+=("$nm"); guards+=("$gd_"); argvs+=("$av")
+  IFS=$'\x1e' read -r nm gd_ av im <<<"$line"
+  names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -618,7 +658,6 @@ done
 #
 # Empty fingerprint means we could not measure the tree, and an unmeasurable input is NOT a
 # reusable one: the key is a dash, which the reuse unit must treat as "never matches".
-PORCELAIN_START=$(LC_ALL=C git status --porcelain 2>/dev/null | LC_ALL=C sort)
 input_key() { # leg index -> the key, or a dash
   local i=$1 gp comp dirt
   [ -n "$FPRINT_START" ] || { printf '%s' -; return; }
@@ -674,6 +713,33 @@ if [ -n "$RUNDIR" ]; then
     printf 'dispatch\t%s\n' "$ORDER"
   } > "$RUNDIR/header.tmp" 2>/dev/null && mv -f "$RUNDIR/header.tmp" "$RUNDIR/header" 2>/dev/null || true
   chmod 600 "$RUNDIR/header" 2>/dev/null || true
+fi
+
+# ---- reuse a proven green (the reuse unit) -------------------------------------------------
+# OPT-IN, and that is the boundary rule rather than caution: an advisory input may cause LESS work
+# only on a run that is not authoritative. `.githooks/pre-push` never sets this, so the run that
+# decides a landing always executes every leg it did not guard away.
+#
+# A leg is reused when ALL of: reuse is asked for, the leg is not declared `impure`, its ledger row
+# says `ok`, that row carries a key, and the key equals the one computed THIS run. Any missing term
+# means execute — every failure mode of this block is "did more work", never "checked less".
+reuses=0
+if [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ -f "$WORK/$i.rc" ] && continue                 # already decided by the guard pass
+    # An IMPURE leg is never reused, on any tree, however identical. Its verdict is a function of
+    # something outside the tree, so a byte-identical tree is not the same question twice.
+    [ -n "${impures[$i]}" ] && continue
+    _row=$(LC_ALL=C grep -m1 -F "${names[$i]}"$'\t' "$LEDGER" 2>/dev/null) || _row=
+    [ -n "$_row" ] || continue
+    IFS=$'\t' read -r _n _sec _st _key _end <<<"$_row"
+    [ "$_n" = "${names[$i]}" ] || continue
+    [ "$_st" = ok ] || continue                      # a RED row is never reusable
+    [ -n "$_key" ] && [ "$_key" != "-" ] || continue # no key recorded is not a match, it is a gap
+    [ "$_key" = "$(input_key "$i")" ] || continue
+    printf 'reuse' > "$WORK/$i.rc"
+  done
 fi
 
 runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
@@ -754,6 +820,10 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   rc=$(cat "$WORK/$i.rc")
   if [ "$rc" = skip ]; then
     skips=$((skips+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
+  elif [ "$rc" = reuse ]; then
+    # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
+    # contract: a reader splits the remainder on a double space and gets the bare leg name back.
+    reuses=$((reuses+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
   elif [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "${names[$i]}"
   else fails=$((fails+1))
        # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
@@ -850,11 +920,12 @@ fi
 
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
+[ "${reuses:-0}" -gt 0 ] && skipnote="$skipnote (${reuses} reused)"
 
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
-# `reuses` is zero here and is not decoration: it is the fourth precondition below, and the reuse
-# unit is what makes it able to be non-zero. Declaring it now keeps that unit from having to
-# reach back into this block and re-argue a precondition already written down.
+# `reuses` is the fourth full-green precondition, counted by the reuse verb above. A run that reused
+# ANY leg has not proven the whole bar this time, so it cannot stamp a full green — which is what
+# keeps the push boundary from ever resting on a verdict that was copied rather than earned.
 reuses=${reuses:-0}
 FPRINT_END=$(fingerprint)
 tree_moved=no

@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=93
+FLOOR_ASSERTIONS=96
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -966,6 +966,54 @@ case "$pl" in
 esac
 rm -rf "$P/cg"
 
+# 5. THE BASE IS THE BRANCH POINT. A branch is graded on what IT changed, not on everything that
+#    landed while it was open, so the baseline is the merge-base with the default branch — used
+#    ONLY where it is a proper ancestor of HEAD, with the origin tip standing otherwise.
+#
+#    THE DIVERGED CASE IS THE ONLY ONE THAT SEPARATES THE TWO SEMANTICS, which is why it is built
+#    here rather than asserted against the fixture above: that one points its remote ref at HEAD,
+#    so merge-base == HEAD and both rules give the same answer. An arm that only used it would
+#    grade a distinction it cannot see.
+n=$((n+1))
+BB=$(mktemp -d)
+mkdir -p "$BB/tools/run-gates" "$BB/tools/lib" "$BB/fx" "$BB/ga" "$BB/gb"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/tools/run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$BB/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$BB/tools/lib/" 2>/dev/null || true
+printf '#!/usr/bin/env bash\nexit 0\n' > "$BB/fx/a.sh"
+echo x > "$BB/ga/f"; echo y > "$BB/gb/f"
+printf '%s\n' '[' \
+  '  {"name": "ga leg", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
+  '  {"name": "gb leg", "argv": ["bash", "fx/a.sh"], "guard": ["gb/"]}' \
+  ']' > "$BB/tools/gate-legs.json"
+( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
+   && git add -A && git commit -qm seed \
+   && git update-ref refs/remotes/origin/main HEAD \
+   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+# diverge: the branch touches ga/, then the default branch advances on gb/ only
+( cd "$BB" && git checkout -q -b feature && echo edited > ga/f && git add -A && git commit -qm branch \
+   && git checkout -q main && echo advanced > gb/f && git add -A && git commit -qm advance \
+   && git update-ref refs/remotes/origin/main HEAD && git checkout -q feature ) >/dev/null 2>&1
+bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+if printf '%s' "$bout" | grep -q '^GATE skip  gb leg'; then
+  : # the branch never touched gb/, and against the BRANCH POINT it is unchanged
+else
+  echo "canary: on a diverged branch, a leg whose guard the BRANCH did not touch did not skip — the baseline is still the remote TIP, so every branch is graded on other people's commits"
+  printf '%s\n' "$bout" | grep '^GATE ' | sed 's/^/    /'; fail=1
+fi
+n=$((n+1))
+# THE CONTROL, and without it the arm above passes on a runner that skips everything: the leg the
+# branch DID touch must still run.
+printf '%s' "$bout" | grep -q '^GATE ok    ga leg' \
+  || { echo "canary: the leg whose guard the branch DID touch was skipped too — the baseline is scoping away real changes"; fail=1; }
+n=$((n+1))
+# An unresolvable baseline runs EVERYTHING. Fail-safe, and it is the property that makes every
+# scoping rule above safe to get wrong.
+( cd "$BB" && git update-ref -d refs/remotes/origin/main; git symbolic-ref -d refs/remotes/origin/HEAD ) >/dev/null 2>&1
+bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+printf '%s' "$bout2" | grep -q '^GATE skip' \
+  && { echo "canary: a leg skipped with NO resolvable baseline — the scoping rule does not fail safe"; fail=1; } || :
+rm -rf "$BB"
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1
