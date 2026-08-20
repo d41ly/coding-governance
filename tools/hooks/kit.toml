@@ -35,6 +35,31 @@ include = ["README.md"]
 role = "engine"
 to = "{prefix}/hooks/README.md"
 
+# scratch-guard — the second hook in this home. THREE rules for THREE files, not one rule with a
+# three-element include: govkit check 7i quantifies per FILE under a non-flat home, and every rule
+# here is already one-per-file for that reason. `.claude/settings.json` is deliberately NOT a
+# destination of this entry — it is owned by `settings-merge`, and check 4 reds on two entries
+# writing one destination. The wiring rides `settings-merge.py --fragment` instead.
+[[files]]
+include = ["scratch-guard.js"]
+role = "engine"
+to = ["{prefix}/hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js"]
+
+[[files]]
+include = ["scratch-guard.test.sh"]
+role = "engine"
+to = "{prefix}/hooks/scratch-guard.test.sh"
+
+[[files]]
+include = ["scratch-guard.fragment.json"]
+role = "engine"
+to = "{prefix}/hooks/scratch-guard.fragment.json"
+
+[[gate_leg]]
+name = "scratch-guard self-test"
+argv = ["bash", "{prefix}/hooks/scratch-guard.test.sh"]
+guard = ["{prefix}/hooks/"]
+
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
@@ -50,3 +75,7 @@ guard = ["{prefix}/hooks/"]
 none = """
 the kit ships a self-test that rides the bar as its own leg, and no adopter and no rendered artifact — so there is nothing here for `check` to run that is not already a gate. Whether the hook is WIRED is check-wiring's question, not this kit's
 """
+
+[[lf_pin]]
+pattern = "*.fragment.json"
+why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"

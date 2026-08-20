@@ -1,11 +1,12 @@
 # TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 Rev-1 specced a `TMPDIR` retarget. The spec audit measured it and the justification did not survive:
-there is no external scratch root on this machine, the tripwire could not fire, the carrier could not
-be verified, and unit 1's rev-2 allowlist made the retarget worthless to unit 1 anyway. Rev-2 keeps
-the sweep and replaces the retarget with the root cause it was working around.
+there is no external scratch root on this machine, the path spelling breaks a gate, the tripwire could
+not fire, and unit 1's rev-2 allowlist made the retarget worthless to unit 1 anyway. (A fourth reason,
+an unverifiable carrier, was withdrawn at rev-3 after unit 1's probe measured the opposite.) Rev-2
+keeps the sweep and replaces the retarget with the root cause it was working around.
 
 ## 1. Goal
 
@@ -64,9 +65,13 @@ sufficient:
   `git rev-parse --show-toplevel`. That divergence is MSYS-form versus drive-letter form and is
   invariant under every `TMPDIR` value, so the condition would have passed no matter what — the
   charter's own "a gate you have only ever seen pass" class, inside the AC written to prevent it.
-- **The carrier could not be verified.** An `env` block in `.claude/settings.local.json` is not
-  documented as reaching Bash tool calls, `CLAUDE_ENV_FILE` is unset in this session, and settings
-  `env` applies only at session start — so no acceptance run in this session could have proved it.
+- **The carrier turned out to WORK, and it changes nothing.** Rev-2 refused the retarget partly
+  because an `env` block in `.claude/settings.local.json` is undocumented for Bash-tool scope. Unit
+  1's AC0 probe then measured it directly: a `settings.local.json` carrying both a hook and
+  `env.SG_PROBE_OUT` fired mid-session with no restart, and the variable was readable from a
+  subsequent Bash call. So that objection is withdrawn as a matter of fact. The refusal stands on
+  the three above, which are about the destination rather than the delivery — a working carrier for
+  a root that does not exist is still nothing to ship.
 
 **The leak, and why one function fixes 31 call sites.** `tools/memory-recall/selftest.py:143-144` is
 `shutil.rmtree(root, ignore_errors=True)`. The directories it is asked to remove are git repositories
@@ -171,6 +176,12 @@ follows from this unit; unit 1 carries that because it edits `tools/gate-legs.js
   `%TEMP%` entries are `TOOL-aBranchedMandate-6`. Sweep corrected to exact names after the audit found
   two of the eighteen files are run-state snapshots rather than logs, and AC4 strengthened from
   eighteen named absences to a whole-directory set comparison.
+
+- **rev-3** — 2026-08-20 — one §4 measurement corrected rather than left standing. Rev-2 listed the
+  unverifiable carrier among the reasons the `TMPDIR` retarget was refused; unit 1's AC0 probe
+  measured the opposite, so the claim is withdrawn in place. The refusal is unchanged and rests on
+  the three destination findings. A spec that keeps a disproved reason is the two-answers-to-one-
+  question class, in the document that records the decision.
 
 ## 10. Reuse audit
 

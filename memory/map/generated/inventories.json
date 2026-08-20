@@ -72,6 +72,7 @@
       "run-gates evidence",
       "run-gates gov canary",
       "run-gates wiring",
+      "scratch-guard self-test",
       "settings-merge selftest",
       "template size <=48KiB",
       "template size gate selftest",

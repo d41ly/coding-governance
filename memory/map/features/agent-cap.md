@@ -1,8 +1,8 @@
-# agent-cap — the fan-out guard: one predicate, two modalities
+# agent-cap — the hooks kit: two PreToolUse guards, each one predicate over two modalities
 
 ```toml
 feature = "agent-cap"
-title = "PreToolUse fan-out guard — Workflow scripts read statically, direct Agent spawns counted"
+title = "PreToolUse guards — fan-out bounded across Workflow+Agent, scratch bounded across Bash+PowerShell"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -10,6 +10,7 @@ decisions = []
 [claims]
 gate-legs = [
   "agent-cap self-test",
+  "scratch-guard self-test",
   "verifier fan-out",
   "verifier fan-out self-test",
   "review-protocol parity (kit vs dogfood)",
@@ -29,6 +30,7 @@ lexicon-verbs = []
 globs = [
   "tools/hooks/*",
   ".claude/hooks/agent-cap.js",
+  ".claude/hooks/scratch-guard.js",
   "tools/check-agent-cap-restatement.sh",
   "tools/check-agent-cap-restatement.test.sh",
   "tools/agent-cap-restatement-waivers.txt",
@@ -88,6 +90,15 @@ hook cannot spend the turn's budget on one spawn.
 denies — the burden is on the fan-out. A spawn whose token cannot be CREATED denies. But a session
 whose token directory cannot be RESOLVED at all fails OPEN and silently, because a hook that denies
 every spawn on a filesystem hiccup is worse than the burst it prevents.
+
+**The home holds TWO guards now, and they share only their shape.** `agent-cap.js` bounds review
+fan-out and reads a Workflow script statically; `scratch-guard.js` bounds where agent scratch may be
+written and reads a shell command string. Both deny by stderr plus exit 2, both fail OPEN on stdin
+they cannot parse, and both are matched on a `|`-joined pair of exact tool names because a guard
+wired to one modality leaves the same act available through the other — the lesson `agent-cap`
+learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entry is still named
+`agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
+second constant would be invisible to govkit rather than gated by it.
 
 ## Shared seams
 

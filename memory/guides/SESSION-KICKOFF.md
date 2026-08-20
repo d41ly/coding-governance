@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-19T11:05:00+03:00 @ 960e3cd277c1ec55efe145fe1358cdd780269cf3
+last-audit: 2026-08-20T02:53:49+03:00 @ 56b945cbb0613b1352dd06221d4d39940db33419
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 960e3cd277c1ec55efe145fe1358cdd780269cf3
@@ -149,10 +149,14 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The `agent-cap` PreToolUse hook is wired on `Workflow|Agent` (kit 1.4) and enforces four rules;
+- The hooks kit (1.5) ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
   `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
   concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
+- `scratch-guard` is the second hook, wired on `Bash|PowerShell`: it DENIES a shell command that
+  writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
+  `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
+  scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
 - A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
   matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
   zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.

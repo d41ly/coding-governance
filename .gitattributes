@@ -6,6 +6,13 @@
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
+
+# Settings fragments are parsed by `sed` in check-wiring.sh, whose bracket-negated capture would
+# take a trailing CR into the value: a matcher of `Bash|PowerShell<CR>` matches nothing and the arm
+# reports UNWIRED against a correctly wired repo. Pinned as a CLASS, not an instance —
+# recall-opened.fragment.json shipped with the same exposure and no pin, and fixing only the new
+# file would certify coverage this does not have.
+*.fragment.json text eol=lf
 # The size gate's high-water record: a data file the gate PARSES and `--bump` REWRITES. The gate
 # strips CR from the value so it is tolerant either way, but an unpinned record makes every --bump
 # rewrite the whole file on a CRLF checkout, and the key side has no such tolerance to spare.

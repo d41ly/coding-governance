@@ -160,6 +160,17 @@
     ]
   },
   {
+    "name": "scratch-guard self-test",
+    "argv": [
+      "bash",
+      "tools/hooks/scratch-guard.test.sh"
+    ],
+    "guard": [
+      "tools/hooks/",
+      "tools/lib/"
+    ]
+  },
+  {
     "name": "agent-instructions self-test",
     "argv": [
       "bash",
@@ -630,8 +641,20 @@
       "tools/check-install-prefix.sh"
     ]
   },
-    {"name": "agent-cap restatement", "argv": ["bash", "tools/check-agent-cap-restatement.sh"]},
-    {"name": "agent-cap restatement self-test", "argv": ["bash", "tools/check-agent-cap-restatement.test.sh"]},
+  {
+    "name": "agent-cap restatement",
+    "argv": [
+      "bash",
+      "tools/check-agent-cap-restatement.sh"
+    ]
+  },
+  {
+    "name": "agent-cap restatement self-test",
+    "argv": [
+      "bash",
+      "tools/check-agent-cap-restatement.test.sh"
+    ]
+  },
   {
     "name": "install-prefix self-test",
     "argv": [

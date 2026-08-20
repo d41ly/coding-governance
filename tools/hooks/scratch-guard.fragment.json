@@ -1,0 +1,7 @@
+{
+  "name": "scratch-guard",
+  "event": "PreToolUse",
+  "matcher": "Bash|PowerShell",
+  "marker": "scratch-guard.js",
+  "hook_path": ".claude/hooks/scratch-guard.js"
+}

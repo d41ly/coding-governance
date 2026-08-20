@@ -145,6 +145,75 @@ else
   echo "skip agent-cap cases — settings-merge.py not found next to script"
 fi
 
+# AC13 — the scratch-guard arm, FOUR states in one repo. Written like the recall arm rather than the
+# agent-cap one because this arm reads marker/matcher/hook_path from the shipped fragment, so a
+# fixture that hardcodes them would be testing a second spelling of the contract instead of the one
+# the kit declares. Unlike recall the guard is NOT an opt-in, so a present-but-unwired hook is a real
+# UNWIRED and an absent hook file is "kit not adopted here".
+SGFRAG="$HERE/hooks/scratch-guard.fragment.json"
+if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
+  newrepo; mkdir -p tools/hooks .claude/hooks
+  cp "$SMERGE" tools/settings-merge.py
+  cp "$SGFRAG" tools/hooks/scratch-guard.fragment.json
+  git config core.hooksPath .githooks    # isolate: hooks wired, so only scratch-guard can move the exit
+
+  # 13a — fragment shipped, hook not installed, nothing in settings: NOT adopted, must not gate.
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     scratch'; } \
+    && ck "AC13a fragment present, hook absent -> skip, exit 0" 1 \
+    || ck "AC13a fragment present, hook absent -> skip, exit 0" 0
+
+  # 13b — hook installed but nothing in settings.json: the dormant-guard state, and the whole reason
+  # this arm exists. A guard that is silent because it is unwired looks exactly like one that passed.
+  printf '// stub\n' > .claude/hooks/scratch-guard.js
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch'; } \
+    && ck "AC13b hook present, unwired -> UNWIRED, exit 1" 1 \
+    || ck "AC13b hook present, unwired -> UNWIRED, exit 1" 0
+  chk --session >/dev/null; [ "$?" = 0 ] \
+    && ck "AC13b --session exits 0 despite scratch-guard unwired" 1 \
+    || ck "AC13b --session exits 0 despite scratch-guard unwired" 0
+
+  # 13c — THE STALE MATCHER. Wired under `Bash` alone: the state where the same write through the
+  # PowerShell surface meets no rule at all. A file-wide grep for the marker reports ok here, which
+  # is why the arm reads the matcher and why this fixture is written directly rather than merged —
+  # settings-merge ADDS a group beside a stale one instead of migrating it.
+  cat > .claude/settings.json <<'JSON'
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scratch-guard.js\""
+          }
+        ]
+      }
+    ]
+  }
+}
+JSON
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'Bash'"; } \
+    && ck "AC13c a stale Bash-only matcher -> UNWIRED naming the value found" 1 \
+    || ck "AC13c a stale Bash-only matcher -> UNWIRED naming the value found" 0
+
+  # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
+  # denies every matcher there is.
+  rm -f .claude/settings.json
+  "${PYBIN:-python}" tools/settings-merge.py --fragment tools/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
+    && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
+    || ck "AC13d the fragment's own matcher -> ok, exit 0" 0
+  cleanup
+else
+  echo "skip scratch-guard cases — fragment or settings-merge.py not found next to script"
+fi
+
 # AC8 — the memory-recall recall-opened arm, all SIX states in one repo. The hook is copied only
 # under `adopt-memory-recall.sh --with-hook`, so an ABSENT hook file is a TRUE signal and must print
 # a skip: mirroring the agent-cap arm literally would print a permanent false UNWIRED in the repo
