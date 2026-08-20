@@ -73,14 +73,34 @@ while [ "$attempt" -le "$max" ]; do
     # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
     # existence: a bare touched file is satisfied by any previous landing, which is the
     # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
-    # this. The unattended verb compares the sha AND the build slug it is about to record, so evidence
-    # of an earlier landing cannot stand in for this one. Written only on the branch where the push
-    # actually succeeded, which is the whole point of it being evidence.
+    # this. The unattended verb compares the sha, so evidence of an earlier landing cannot stand in
+    # for this one. Written only on the branch where the push actually succeeded, which is the whole
+    # point of it being evidence.
+    #
+    # SOURCED, not sed-parsed. The driver SOURCES this conf, so parsing it here with a pattern that
+    # only matches a double-quoted value read a DIFFERENT value than the reader did for any unquoted
+    # or single-quoted declaration - one half honouring a key the other could not see. A subshell
+    # source is the driver's exact semantics without polluting this script's namespace.
     if [ -f .unattended.conf ]; then
-      lm=$(sed -n 's/^LANDER_MARKER="\(.*\)"$/\1/p' .unattended.conf | head -1)
+      lm=$(. ./.unattended.conf 2>/dev/null; printf '%s' "${LANDER_MARKER:-}")
       if [ -n "$lm" ]; then
-        mkdir -p "$(dirname "$lm")" 2>/dev/null || true
-        printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$lm" 2>/dev/null || true
+        # RESOLVED AGAINST THE GIT COMMON DIR, which is the only directory both halves agree on. It
+        # was tree-relative and wrong twice: each half resolved it against its own cwd, and in a
+        # LINKED WORKTREE `.git` is a FILE, so `.git/unattended-landed` fails with `Not a directory`
+        # and no unattended run could ever land from one.
+        #
+        # AND THE FAILURE IS REPORTED. `2>/dev/null || true` meant a lander that pushed but could
+        # not record it still printed `landed`, and `--landed` then refused blaming the lander for
+        # writing nothing - the one diagnosis guaranteed to send the reader at the wrong half.
+        _gcd=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _gcd=""
+        if [ -z "$_gcd" ]; then
+          echo "push-main: pushed $def, but could not resolve the git common dir to write the lander marker ($lm). The push SUCCEEDED and is not recorded." >&2
+          exit 1
+        fi
+        if ! printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$_gcd/$lm"; then
+          echo "push-main: pushed $def, but could not write the lander marker at $_gcd/$lm. The push SUCCEEDED and is not recorded." >&2
+          exit 1
+        fi
       fi
     fi
     echo "push-main: landed $def on $remote." >&2

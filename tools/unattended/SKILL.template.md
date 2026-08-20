@@ -220,6 +220,34 @@ the build README's roster region against the tracked specs, so a planned unit no
 is reported as MISSING rather than silently omitted — and a roster whose markers are malformed is
 a named refusal rather than a complete-looking list.
 
+## Record each review round, and let the loop end itself
+
+A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
+not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
+would only move the stall earlier. Record every round and the verb tells you what the loop is doing:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <TOKEN> --blockers <N>
+```
+
+`--subject` is the spec document for a spec audit and the BUILD SLUG for the closing diff review.
+`--verdict` is one of exactly three: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`. `--blockers` is the
+confirmed-blocker count for THIS round, as a plain integer.
+
+It answers with one of four states, and the state is what you act on:
+
+- **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
+- **CONVERGED** — zero blockers. The loop is done for that subject.
+- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
+  becomes a UNIT of this build: specced at its tier, built, closed. Not parked, not waived, and not
+  re-reviewed — a promoted unit is audited as a SPEC, which is what makes promotion terminate.
+- **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
+  That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
+  record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
+
+Strictly smaller, not merely different: a sequence that oscillates 2, 1, 2 satisfies "the count
+changed" forever. A subject whose loop already ended does not take another round.
+
 ## Resume
 
 ```bash
@@ -298,7 +326,13 @@ bash {{KIT_DIR}}/unattended.sh --landed <slug>
 
 **Run this AFTER the lander returns, not before.** It re-observes the remote and refuses unless HEAD
 is an ancestor of the tip the remote advertises, so it is the one phase claim you cannot simply
-assert — which is the point. Then commit the record it writes and land that commit too; until it is
+assert — which is the point.
+
+**AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
+lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
+equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
+refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
+marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
 committed, every later run still counts yours as live and the bar reds on the second one.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the

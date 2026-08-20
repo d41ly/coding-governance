@@ -279,7 +279,7 @@ none - the forks below are RESOLVED in place.
 ## 9. Revision log
 
 - rev-1 · first
-'   > "$D/spec/2026-08-10-spec-tFixture-65.md"                                   # per-ITEM: 1 of 2 marked -> REDS
+'   > "$D/spec/2026-08-10-spec-tFixture-65.md"                                   # the PARKED gap: a fork below a `none` line, undetectable
 printf '# t64
 
 **Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
@@ -463,9 +463,10 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
   > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
 
 
-git add -A && git commit -q -m fixtures --no-verify
-rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
-
+# CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
+# engine selects its population with `git ls-files`, so a fixture written after this commit is
+# UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
+# the four arms over them failed — which is how this suite went red at HEAD.
 mkdir -p "$D/reviews"
 # CHECK 22, four red fixtures plus a conforming control and a grandfather. Each differs from the
 # control ONLY in its verdict token: a fixture that also moved the filename or the binding line could
@@ -482,6 +483,10 @@ printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED - 2 blocke
   > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-5.md"            # token plus a tally -> red
 printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE the cutoff\n' \
   > "$D/reviews/2026-08-01-review-ARCH-tFixture-1-6.md"            # grandfathered -> silent
+
+git add -A && git commit -q -m fixtures --no-verify
+rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
+
 out=$(bash "$SCRIPT" 2>/dev/null)
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
@@ -536,7 +541,14 @@ hit  'review-ARCH-tFixture-1-4.md (2 `## Verdict:` lines'
 hit  'review-ARCH-tFixture-1-5.md (verdict outside the closed set'
 miss 'review-ARCH-tFixture-1-1.md ('
 miss 'review-ARCH-tFixture-1-6.md ('
-hit  'tFixture-65.md (terminal Status with unresolved §8 items, graded PER ITEM'   # 1 of 2 marked, and the none line no longer suppresses it
+# ---- THE PARKED GAP, PINNED AS A GAP. This fixture opens §8 with a `none` line and then carries two
+# ---- option bullets, one marked and one not - an unresolved fork below an honest-looking `none`.
+# ---- Neither reader catches it, and this arm says so rather than leaving the case unmentioned.
+# ---- The per-item walk that WOULD catch it was withdrawn on measurement: this corpus does not
+# ---- distinguish a fork bullet from an option bullet, so a per-item walk called a RESOLVED fork
+# ---- unresolved on a live tracked spec, and any label-shape discriminator under-counts instead,
+# ---- which is worse. Closing it needs §8 to have a regular shape, which is a scope change.
+miss 'tFixture-65.md (terminal Status'
 # ...while the canon check STAYS Tier-2-only. tFixture-5's `## Whatever` and its miss arm are that
 # control, and it is what the cut still guards.
 hit  'tFixture-16.md (## sections differ'
@@ -1408,6 +1420,27 @@ n=$((n+1))
 # ---- key -- the exact hand-kept-list drift the derived loop was written to remove. A reader
 # ---- grepping for the assertion would have landed on whichever copy came first and concluded
 # ---- coverage was five keys. The derived loop is now the ONLY site naming .memory-tree.conf.example.
+
+# ---- THE README'S CHECK COUNT IS DERIVED, NEVER TRUSTED. AGENTS.md designates the kit README as THE
+# ---- carrier of this number and the gate-leg names carry none, so it is the one figure a reader is
+# ---- told to trust - and it has now been retyped wrong three times, most recently sitting at 21
+# ---- through a whole build that added check 22. Nothing gated it, because a number in prose beside
+# ---- the thing it counts is exactly the shape no check ever looks at.
+#
+# ---- The population is every site that can EMIT a check id: `fail <n>` in the shell, `check <n>:`
+# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` module constant, which is the
+# ---- one spelling the other two greps miss and the reason check 20 was invisible.
+n=$((n+1))
+_hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
+             grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
+             grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+_hy_derived=$(printf '%s
+' "$_hy_ids" | grep -c .)
+_hy_claimed=$(grep -oE 'the gate . [0-9]+ checks' "$HERE/README.md" | grep -oE '[0-9]+' | head -1)
+[ -n "$_hy_claimed" ] || { echo "FAIL the kit README states no check count in the shape this arm reads, so the figure AGENTS.md designates as canonical is now ungraded - fix the arm or the README, but do not leave the number unwatched"; st=1; }
+n=$((n+1))
+[ "$_hy_claimed" = "$_hy_derived" ] || { echo "FAIL the kit README claims $_hy_claimed checks and the engine defines $_hy_derived ($(echo $_hy_ids | tr '
+' ' ')) - the one figure a reader is told to trust is wrong"; st=1; }
 
 FLOOR_ASSERTIONS=224
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }

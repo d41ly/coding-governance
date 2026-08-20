@@ -210,7 +210,15 @@ done
 # THE TABLE IS THE CONTRACT. Neither reader restates it in prose.
 
 # The planning reader, sliced out of the SHIPPED driver bytes like the three above it.
-mk_awk r_plan "$U" "$(grep -n '^plan_state()' "$U" | cut -d: -f1)" "$(( $(grep -n '^plan_state()' "$U" | cut -d: -f1) + 45 ))"
+#
+# THE END LINE IS DERIVED, NOT COUNTED. It was `start + 45`, and the function has since grown past
+# that: the slice silently truncated the last seven lines, which are the ones that decide READY vs
+# FORKED. A magic span over a live function is a fixture that stops covering what it names, and it
+# reports nothing when it does - the same could-not-fail shape this contract exists to catch.
+_ps_start=$(grep -n '^plan_state()' "$U" | cut -d: -f1)
+_ps_end=$(awk -v s="$_ps_start" 'NR>s && /^}/ {print NR; exit}' "$U")
+[ -n "$_ps_end" ] && [ "$_ps_end" -gt "$_ps_start" ] || { echo "FAIL cannot find the closing brace of plan_state in $U, so the sliced reader below would be graded against a fragment"; exit 1; }
+mk_awk r_plan "$U" "$_ps_start" "$_ps_end"
 
 FT=$(mktemp -d) || exit 2
 trap 'rm -rf "$T" "$FT"' EXIT
@@ -237,14 +245,19 @@ spec_doc() {
 # hygiene gate ONCE over the whole tree. N gate runs would cost N process startups to learn the same
 # thing; the gate reports every file it faults, so one run answers every row.
 mark_case_n=0
-MARK_NAMES=""; MARK_WANT_HYG=""; MARK_WANT_PLAN=""
+# AN ARRAY, because these names are MULTI-WORD. As a space-separated string with `set -- $MARK_NAMES`
+# they word-split: ten cases became ~33 positional parameters, so case 1 reported as `none,`, case 2
+# as `zero`, case 3 as `items`. Grading was unaffected - the fixture index drives it - so the
+# misattribution surfaced only on the run where a row goes red, which is the one run the label has
+# to be right on. It surfaced on exactly such a run: a real failure reported itself as `[mark/on]`.
+MARK_NAMES=(); MARK_WANT_HYG=""; MARK_WANT_PLAN=""
 mark_case() { # name · want_hygiene(red|silent) · want_plan(READY|FORKED) · section-8 body
   mark_case_n=$((mark_case_n+1))
   local slug="tMark$mark_case_n"
   mkdir -p "$FT/memory/builds/$slug/spec"
   spec_doc "CLOSED" "$4" > "$FT/memory/builds/$slug/spec/2026-08-09-spec-ARCH-$slug-1.md"
   spec_doc "SPECCED" "$4" > "$T/plan-$mark_case_n.md"
-  MARK_NAMES="$MARK_NAMES $1"
+  MARK_NAMES+=("$1")
   MARK_WANT_HYG="$MARK_WANT_HYG $2"
   MARK_WANT_PLAN="$MARK_WANT_PLAN $3"
 }
@@ -255,7 +268,15 @@ mark_case "marked on the open line" silent    READY    '- **F1 — a question?**
 mark_case "marked on continuation"  silent    READY    '- **F1 — a question?** options.
   RESOLVED (agent, 2026-08-09, delegated): picked.'
 mark_case "word, no attribution"    red       FORKED   '- **F1 — a question?** RESOLVED: informally, sometime.'
-mark_case "none line, later open"   red       FORKED   'none - every fork below is RESOLVED in place.
+# THE PARKED GAP, PINNED AS A GAP RATHER THAN LEFT UNMENTIONED. A `none` opening line followed by an
+# unresolved fork is NOT caught by either reader, and both say READY/silent. The per-item walk that
+# would catch it was withdrawn on measurement: this corpus does not distinguish a FORK bullet from an
+# OPTION bullet - of 287 section-8 bullets, 69 carry descriptive labels, and among those are both
+# resolved forks and genuinely open ones - so a walk over-counts on real specs (it called a RESOLVED
+# fork unresolved on a live tracked spec whose three option bullets each demanded a mark) and any
+# label-shape discriminator under-counts instead, which is worse. Closing it needs section 8 to have
+# a regular shape, which is a scope change and not a predicate change.
+mark_case "none line, later open"   silent    READY    'none - every fork below is RESOLVED in place.
 
 - **F1 — answered?** yes.
   RESOLVED (owner, 2026-08-09): picked.
@@ -270,15 +291,26 @@ mark_case "fact-question, no mark"  red       FORKED   '- **FACT-QUESTION · F1 
 mark_case "fact-question + mark"    silent    READY    '- **FACT-QUESTION · F1 — does X hold?** a probe decides it.
   RESOLVED (agent, 2026-08-09, delegated): it holds.'
 mark_case "hollow: no item, no none" red      FORKED   'This section says nothing at all in prose.'
+# THE MARK WRAPS, which is this corpus's house style at its line width: fourteen tracked specs carry
+# one, and every reader matched line-by-line missed all fourteen. It wraps INSIDE the parenthesis, so
+# joining the section without squeezing whitespace leaves three spaces where the grammar wants one -
+# the half of the fix that a naive join silently omits.
+mark_case "mark wrapped at the paren" silent  READY    '- **F1 — a question?** options and a recommendation.
+  RESOLVED (owner,
+  2026-08-09): picked A.'
+# AN EMPTY SECTION IS A REFUSAL in both readers - the build's own ratified fork. plan_state printed
+# READY for it while the hygiene reader red it, and this is the one case that separates a resolved
+# section from a hollow one, so it is the case the contract most needed and did not have. The
+# neighbouring `hollow` row uses a PROSE line, which both readers already refuse.
+mark_case "empty: no body at all"   red       FORKED   ''
 
 ( cd "$FT" && git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m fx --no-verify ) >/dev/null 2>&1
 hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )
 
-set -- $MARK_NAMES
 i=0
 for want_h in $MARK_WANT_HYG; do
   i=$((i+1))
-  eval "nm=\${$i}"
+  nm=${MARK_NAMES[i-1]}
   ncase=$((ncase+1))
   # Only the section-8 verdict is read. The scratch tree reds other checks on purpose and that noise
   # is ignored, exactly as this kit's sibling test documents — but the grep is anchored on the FILE
@@ -290,7 +322,7 @@ done
 i=0
 for want_p in $MARK_WANT_PLAN; do
   i=$((i+1))
-  eval "nm=\${$i}"
+  nm=${MARK_NAMES[i-1]}
   ncase=$((ncase+1))
   got_p=$(r_plan "$T/plan-$i.md")
   [ "$got_p" = "$want_p" ] || { echo "FAIL [mark/$nm] plan_state said $got_p, contract says $want_p"; st=1; }
@@ -308,5 +340,28 @@ printf '%s\n' "$hyg_out" | grep -q 'tMark' || {
 fi
 
 
-[ "$st" = 0 ] && echo "PASS ($ncase cases across 2 contracts, marker-region and section-8 mark, held)"
+# =============================================================================================
+# CONTRACT 3 - THE REVIEW-VERDICT VOCABULARY. Spelled independently in two kits with nothing pairing
+# them: the unattended driver holds REVIEW_VERDICTS, the hygiene engine hardcodes the same three
+# tokens in its own awk. A drift lets a run RECORD a verdict the hygiene gate then refuses, on an
+# append-only record no verb can rewrite - the same cross-kit edge contract 2 exists to forbid, and
+# the one the sibling grammar got and this pair did not.
+#
+# BOTH SIDES ARE READ AS DATA, never sourced, so this compares the shipped bytes rather than a copy.
+ncase=$((ncase+1))
+_cv_drv=$(sed -n 's/^REVIEW_VERDICTS="\(.*\)"$//p' "$U" | head -1 | tr '|' '
+' | sort)
+_cv_hyg=$(grep -oE 'v != "[A-Z][A-Z ]*"' "$HYG" | sed 's/.*"\(.*\)"//' | sort -u)
+if [ -z "$_cv_drv" ] || [ -z "$_cv_hyg" ]; then
+  echo "FAIL [verdict/read] one side of the verdict vocabulary read as EMPTY, so the comparison below would pass by comparing nothing: driver=[$_cv_drv] hygiene=[$_cv_hyg]"
+  st=1
+elif [ "$_cv_drv" != "$_cv_hyg" ]; then
+  echo "FAIL [verdict/agree] the driver and the hygiene engine disagree on the closed verdict set, so a run can record a token the gate then refuses forever: driver=[$(echo $_cv_drv | tr '
+' ' ')] hygiene=[$(echo $_cv_hyg | tr '
+' ' ')]"
+  st=1
+fi
+
+
+[ "$st" = 0 ] && echo "PASS ($ncase cases across 3 contracts, marker-region, section-8 mark and review verdicts, held)"
 exit $st

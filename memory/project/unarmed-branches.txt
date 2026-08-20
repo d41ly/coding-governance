@@ -30,5 +30,5 @@ tools/unattended/unattended.sh	9	1	cannot stage the run-state file, and the gate
 #       failure modes were the ones now refused above it (a directory destination exits 0 and files
 #       the record INSIDE it; a differing file is refused by name), so what is left is an index or
 #       filesystem fault. Trying to arm this is what FOUND the directory case.
-tools/unattended/unattended.sh	27	4	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
+tools/unattended/unattended.sh	27	5	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
 tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved

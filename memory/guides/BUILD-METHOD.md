@@ -106,6 +106,8 @@ first line ends the section only when it has NO items; below one, an unresolved 
 **Which.** Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
 authored this run, is unreviewed.
 
+**Not the harness.** `tier2-review.js` reviews DIFFS; a spec is not code, so calling one reviewed by it is false.
+
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next user prompt to reset it: three specs audited by direct spawns exhaust it mid-set,
 and the remaining lenses are refused with nobody to read the refusal. Agents inside a `Workflow` sidechain are not
@@ -178,7 +180,7 @@ the other's output either way; (3) neither touches a shared mutable record — `
 cannot write both path lists down, the work is not known to be disjoint — sequence it.
 
 The fan-out and concurrency CEILINGS are the review protocol's; this is about WHICH work is parallel, never HOW
-MUCH. Why clause 3 is worded as it is — the vacuous form it replaced — is in the memory-tree README.
+MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in the memory-tree README.
 
 ## M7 — Regrounding
 

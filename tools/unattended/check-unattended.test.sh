@@ -126,6 +126,9 @@ reset_tree() {
   } | git update-ref --stdin --no-deref
 }
 run() { bash "$SCRIPT" 2>&1; }
+# A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
+# code path whose real trigger is a network partition, which no fixture can arrange.
+TMPBIN=$(mktemp -d)/bin
 
 # A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
 # real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
@@ -207,6 +210,24 @@ reset_tree
 
 
 
+
+# ---- EVERY DISPATCHED VERB IS DOCUMENTED, joined from the driver's own `case "$VERB"` arms to the
+# ---- three synopsis strings and the Skill template. `--review` shipped reachable and named NOWHERE:
+# ---- not in the Skill, not in the protocol's verb list, and missing from all three driver strings —
+# ---- directly under a comment claiming "THE SAME SET, in all three places". A verb no procedure
+# ---- mentions is a verb no run uses, and its gate check then grades a population nothing creates.
+D="$HERE/unattended.sh"
+verbs=$(awk '/^case "\$VERB" in/{f=1;next} f&&/^esac/{f=0} f{ if (match($0, /^  --[a-z]+\)/)) print substr($0, RSTART+2, RLENGTH-3) }' "$D")
+n=$((n+1)); [ -n "$verbs" ] || { echo "FAIL no dispatched verb could be read out of the driver, so the documentation join below would compare against an empty set"; st=1; }
+undoc=""
+for v in $verbs; do
+  grep -q -- "$v" "$HERE/SKILL.template.md" 2>/dev/null || undoc="$undoc $v(skill)"
+  awk '/^\[ -n "\$VERB" \]/' "$D" | grep -q -- "$v" || undoc="$undoc $v(usage)"
+  grep -q "the verbs are.*$v" "$D" || undoc="$undoc $v(refusal)"
+done
+n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a surface an agent reads, so no run can learn it exists:$undoc"; st=1; }
+
+
 # ---- THE REVIEW-LOOP CHECK. Its three clauses cannot be exercised by the corpus, which is exactly why
 # ---- they need fixtures — and the FIRST arm is about the check being able to run at all. It reads the
 # ---- ceiling from the driver through `core_of`, which parses only a DOUBLE-QUOTED value; when that
@@ -214,6 +235,16 @@ reset_tree
 # ---- indistinguishable from a clean corpus. An unreadable ceiling is a refusal now.
 reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
 sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
+
+# ---- AND THE SAME SHAPE FOR THE THREE REMOTE BOUNDS, which is where this class was actually LIVE:
+# ---- all three were declared unquoted in the driver, so every core_of read returned empty and a
+# ---- `${x:-60}` fallback restated the numbers from memory. The leg then observed the remote under
+# ---- bounds it invented while a comment above claimed a single source, and tuning the driver moved
+# ---- nothing. Unquoting one here reproduces exactly that read.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' tools/unattended/unattended.sh
+hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
+
 hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 
 # a group whose counts do not shrink and which records no exit
@@ -430,6 +461,39 @@ sed -i 's/RUN\.<phase>\.<blob8>\.md/RUN.the-old-spelling.md/g' memory/guides/UNA
 hit "$(run)" "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record"
 reset_tree
 miss "$(run)" "the installed protocol does not spell the archive filename grammar"
+
+# ---- check 22: the section-8 key table and the declared conf, joined BOTH WAYS. Three keys reached
+# ---- the tree undocumented and one of them REDS this leg when undeclared, so an adopter configuring
+# ---- from the contract got a refusal naming a key the contract never mentioned. Check 10 is a
+# ---- byte-diff of the pair and both copies were identically incomplete, which is the limitation its
+# ---- own header states. Misspelling ONE row fires both directions at once, which is the arm.
+reset_tree
+sed -i 's/| `HALT_FLOOR` |/| `HALT_FLOOOR` |/' memory/guides/UNATTENDED-PROTOCOL.md
+out=$(run)
+hit "$out" "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:"
+hit "$out" "undocumented in the protocol: HALT_FLOOR"
+hit "$out" "documented but declared nowhere: HALT_FLOOOR"
+reset_tree
+miss "$(run)" "the protocol's binding key table and the declared conf disagree"
+
+# ---- check 9: THE THREE OBSERVATION OUTCOMES, KEPT APART. One message covered all three, so a dead
+# ---- scratch dir and a fired wall-clock bound both reported as "the remote advertised no tips" and
+# ---- sent the reader at the network. The driver had already split these one file over.
+# the wall-clock bound FIRING, stubbed at `timeout` so the run does not actually wait it out
+reset_tree
+mkdir -p "$TMPBIN"; printf '#!/bin/sh\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
+out=$(PATH="$TMPBIN:$PATH" run)
+hit  "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing"
+miss "$out" "the remote advertised no tips"
+rm -f "$TMPBIN/timeout"
+
+# a scratch file that cannot be created: a fault on THIS side, and it used to skip both observations
+# in silence, which read downstream as a remote answering nothing
+reset_tree
+out=$(TMPDIR=/nonexistent-scratch-dir run)
+hit  "$out" "cannot create a scratch file to capture the remote advertisement, so this leg observed NOTHING and the BASE predicates below would be graded against an empty answer; this is a fault on THIS side, not the remote's"
+miss "$out" "the remote advertised no tips"
+reset_tree
 
 # ---- check 8: the region holds NO COPY. It used to assert the region EQUALLED the README slice,
 # ---- which was unmaintainable in the ordinary case — a spec rev bump moves the build index and the
@@ -785,7 +849,14 @@ reset_tree
 # the variables this file assigns from mktemp — the only legal redirect targets
 mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE/check-unattended.sh" \
       | sed -E 's/^[[:space:]]*(local +)?//; s/=\$\(mktemp$//' | sort -u)
-w=$(grep -nE '(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)' "$HERE/check-unattended.sh" \
+# ONE PATTERN VARIABLE, shared by this arm and by the BOUND on its exemption below. They used to
+# carry two different regexes: this one ends with a LITERAL dollar, matching a redirect into a
+# variable; the bound ended with a bare dollar, an end-of-line anchor, and dropped the leading
+# word-boundary group as well. So every redirect the exemption removes sat OUTSIDE the bound's
+# population and the stated bound did not hold over redirects at all - it still fired on mv, rm and
+# cp, which is why it read as armed.
+WRITE_RE='(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
+w=$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
 # A line is exempt when its write touches a SCRATCH variable and the line names no path in the
 # tree under judgement. That is the property spelled directly rather than a verb-by-verb chase:
@@ -803,7 +874,7 @@ n=$((n+1)); [ -z "$(printf '%s' "$w" | tr -d '[:space:]')" ] || { echo "FAIL the
 n=$((n+1)); [ -n "$mkt" ] || { echo "FAIL the read-only arm derived no mktemp scratch variable, so its exemption filtered nothing and the property it claims to check is not the one it checks"; st=1; }
 # THE EXEMPTION IS BOUNDED: no line it removed may also name the memory root, or the property
 # check would be exempting a real write to the tree under judgement.
-n=$((n+1)); [ -z "$(grep -nE '(mv|rm|cp|sed -i|tee|> *"?$)' "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' | grep -F -- "$mkt" | grep -E '($M|memory)/' || true)" ] || { echo "FAIL a line exempted as scratch also names the tree under judgement, so the read-only exemption is covering a real write"; st=1; }
+n=$((n+1)); [ -z "$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' | grep -F -- "$mkt" | grep -E '($M|memory)/' || true)" ] || { echo "FAIL a line exempted as scratch also names the tree under judgement, so the read-only exemption is covering a real write"; st=1; }
 
 # ---- SOURCE-level: the hot accessors must not fork. `fact_of`, `phase_of` and `core_of` run per
 # ---- run-state file per check, and as `sed | head | tr` they cost three processes each — measured

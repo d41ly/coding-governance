@@ -10,6 +10,7 @@
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
+#   unattended.sh --review <slug> --subject <id> --verdict <TOKEN> --blockers <N>  # a review round
 #   unattended.sh --abort <slug> --reason <text> --code <halt-code>           # end it, with the reason on the record
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -65,12 +66,12 @@ GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 # behind. Generous on purpose — the failure being guarded is a PARTITION, not a slow link, and a
 # tight bound converts a working close into a refused one, which is a new stall wearing the fix's
 # clothes. Both are stated in the refusal, so the number is discoverable without reading source.
-REMOTE_BOUND=60
-REMOTE_CONNECT_BOUND=20
+REMOTE_BOUND="60"
+REMOTE_CONNECT_BOUND="20"
 # The low-speed floor: bytes/sec under which git treats a transfer as stalled, for the window the
 # wall-clock bound already allows. This is the only mechanism that reaches a server which ACCEPTS
 # and then stalls mid-transfer, which no wall-clock cap can distinguish from a slow success.
-REMOTE_LOWSPEED_BYTES=1000
+REMOTE_LOWSPEED_BYTES="1000"
 
 # LIVENESS, probed with the options the run actually uses. A bare `timeout 1 true` passes on a build
 # whose `-k` is unsupported, and the gate runner already learned to probe with the real option set.
@@ -79,6 +80,10 @@ REMOTE_LOWSPEED_BYTES=1000
 # is indistinguishable from coverage.
 REMOTE_BOUND_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+# AND IT SAYS SO, which the comment above has always required and the code did not do: the flag's
+# only reader was the `if` in observe_remote, so a node without a working `timeout -k` produced
+# byte-identical output while running unbounded. The transport options survive on that path.
+[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply" >&2
 
 # EVERY remote observation goes through here, and the source-level arm asserts that no `ls-remote`
 # appears outside it. Three bounds, because no single mechanism covers every transport: the outer
@@ -286,11 +291,22 @@ halt_codes() { printf '%s %s\n' "$HALT_CODES_CORE" "$HALT_CODES_EXTRA"; }
 norm_endpoint() { # <url> -> host/path, comparable
   local u="$1"
   u=${u%/}; u=${u%.git}; u=${u%/}
+  # SCP-STYLE IS DETECTED BY GIT'S OWN RULE — a colon before any slash — and NOT by the presence of a
+  # user. Keying on `*@*:*` was wrong twice over, and both ways were measured against the shipped
+  # function before this fix: a USERLESS `github.com:alice/repo` fell through to the scheme path, where
+  # `${u%%/*}` then `${host%%:*}` DELETED the first path segment, so `github.com:alice/repo` and
+  # `github.com:bob/repo` both normalised to `github.com/repo` — two different repositories comparing
+  # EQUAL, which would let a split across repos take the warning branch and let a run anchor on one
+  # repo while landing on another. And `git@github.com:alice/repo` normalised differently from
+  # `github.com:alice/repo`, so one place in two spellings compared DIFFERENT, which is the wedge this
+  # unit exists to remove.
   case "$u" in
-    *://*) u=${u#*://} ;;                       # scheme
-    *@*:*) u=${u#*@}; u=$(printf '%s' "$u" | sed 's|:|/|') ;;   # scp-style host:path
+    *://*) u=${u#*://}; u=${u#*@} ;;            # scheme form: strip scheme, then userinfo
+    *)     u=${u#*@}                            # scp form: userinfo is optional
+           case "${u%%/*}" in
+             *:*) u="${u%%:*}/${u#*:}" ;;       # a colon BEFORE any slash separates host from path
+           esac ;;
   esac
-  u=${u#*@}                                     # userinfo, if the scheme form carried one
   local host=${u%%/*} rest=""
   case "$u" in */*) rest=${u#*/} ;; esac
   host=$(printf '%s' "$host" | tr 'A-Z' 'a-z')
@@ -412,7 +428,7 @@ observe_anchor() {
   # ---- injected is reading the run's answer rather than the repo's.
   names=""
   for v in GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS GIT_CONFIG_GLOBAL GIT_CONFIG_SYSTEM \
-           GIT_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE; do
+           GIT_DIR GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE; do
     eval "[ -n \"\${$v:-}\" ]" && names="$names $v"
   done
   if [ -n "$names" ]; then
@@ -451,10 +467,12 @@ observe_anchor() {
       # SAME PLACE, two spellings. A warning and not a refusal, because this check's own comment
       # says it is a cost-raiser and not the property — a relay the run seeded satisfies it with one
       # URL — and a cost-raiser that wedges an un-overridable item is disproportionate to its stated
-      # purpose. It rides the close-path diagnostic channel rather than only stdout, so a caller that
-      # discards output does not discard the fact.
-      DOD_OUT="${DOD_OUT:+$DOD_OUT
-}the fetch and push URLs for this remote are spelled differently and normalise to the SAME endpoint, so the anchor and the landing name one place: fetch $uf, push $up"
+      # purpose. STDOUT ONLY. It used to also append to DOD_OUT, claiming that "a caller that
+      # discards output does not discard the fact" — and no caller ever read it: `verb_close` calls
+      # observe_anchor, then the DoD loop opens with `gates-green`, whose arm begins with an
+      # unconditional `DOD_OUT=""`. So the note was destroyed on every ordinary close, and on a close
+      # where `gates-green` was OVERRIDDEN the arm was skipped, the stale text survived, and the next
+      # unmet item printed an endpoint note indented as ITS detail.
       echo "unattended: NOTE — fetch and push URLs differ in spelling and normalise to the same endpoint: fetch $uf, push $up"
     else
       fail 25 "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch $uf, push $up"
@@ -539,7 +557,7 @@ branch_tip_quiet() { # -> prints "<ref> <sha>" on stdout
   [ -n "$cur" ] && [ "$cur" != HEAD ] || return 1
   rem=$(GIT remote 2>/dev/null | head -1)
   [ -n "$rem" ] || return 2
-  advf=$(mktemp) || return 5
+  advf=$(mktemp) || return 6   # 6 = a LOCAL scratch failure, distinct from 5's transport fault
   observe_remote "$advf" ls-remote --exit-code "$rem" "refs/heads/$cur"; rc=$?
   adv=$(cat "$advf" 2>/dev/null); rm -f "$advf"
   # 0 = advertised · 2 = git's own "answered, advertised nothing" from --exit-code · anything else
@@ -573,6 +591,10 @@ emit_branch_fail() { # BR_RC -> the numbered refusal it stands for
     3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
     4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
     5) fail 32 "the remote could not be reached for this run's branch, or the wall-clock bound fired, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy and the endpoint is: refs/heads/$cur" ;;
+    # 6 IS LOCAL, and it used to render as 5 — sending the operator at the network for a dead TMPDIR,
+    # which is the misdiagnosis the 2-vs-5 split was introduced to remove. observe_anchor got a named
+    # refusal for this identical fault one function away.
+    6) fail 27 "cannot create a scratch file to capture the branch advertisement, so whether the branch is published was never asked; this is a fault on THIS side and the remote is not the remedy: refs/heads/$cur" ;;
     *) return 0 ;;
   esac
   return 1
@@ -1209,30 +1231,39 @@ plan_state() { # spec file -> prints the M2 state
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
       if (thin) { print "THIN"; exit }
-      # PER ITEM, and an item is its opening line PLUS its continuation lines. The mark almost never
-      # sits on the opening line in this corpus — measured, 246 of 339 tracked items carry a
-      # conforming mark and nearly all of them carry it on a continuation — so a walk that graded
-      # only the bullet line would call the whole corpus unresolved. An item is a list bullet or a
-      # `###` sub-head, which is the pair the spec format sanctions in as many words.
-      items = 0; resolved = 0; marked = 0
-      for (i = 1; i <= nf; i++) {
-        L = fl[i]
-        if (L ~ /^[-*][[:space:]]/ || L ~ /^###[[:space:]]/) {
-          if (items > 0 && marked) resolved++
-          items++; marked = 0
-        }
-        if (items > 0 && L ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) marked = 1
-      }
-      if (items > 0 && marked) resolved++
-      # The `none` form ends the section ONLY when the section has no items. With any item present
-      # the per-item walk decides and no first line suppresses it — that suppression is the second of
-      # the two failure modes above, and it is why a first-line-only reader cannot be repaired by
-      # tightening what the first line has to say.
+      # THE WHOLE SECTION IS ONE STRING, so a mark WRAPPED across a line break still matches. Measured
+      # over the tracked corpus: TWELVE specs carry a mark that wraps, which is the house
+      # style at its line width — a line-by-line match reported every one of them as unresolved.
+      blob = ""
+      for (i = 1; i <= nf; i++) blob = blob " " fl[i]
+      gsub(/[[:space:]]+/, " ", blob)   # the squeeze the hygiene reader does, so the two agree by construction
+      any_mark = (blob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
+      items = 0
+      for (i = 1; i <= nf; i++)
+        if (fl[i] ~ /^[-*][[:space:]]/ || fl[i] ~ /^###[[:space:]]/) items++
+      # WHY THIS IS NOT A PER-ITEM WALK, stated because the obvious tightening is WRONG here and was
+      # measured wrong. A per-item walk needs to tell a FORK bullet from an OPTION bullet, and this
+      # corpus does not distinguish them: of 287 section-8 bullets, 69 carry descriptive labels, and
+      # among those are both resolved forks and genuinely OPEN ones. A label-shape discriminator
+      # therefore UNDER-counts — it would let a real open fork pass, which is worse than the
+      # over-counting it replaces. Measured: a per-item walk called a RESOLVED fork FORKED on a live
+      # tracked spec, because its three option bullets each demanded their own mark.
+      #
+      # So the reader grades what it CAN: a first line that merely CONTAINS the resolution word no
+      # longer resolves the section — that was the live defect, a section announcing a fork was NOT
+      # resolved reading as resolved — and a section with items and no conforming mark ANYWHERE is
+      # unresolved. What it cannot see is an unresolved fork sitting below an honest-looking `none`
+      # line; that needs section 8 to have a regular shape, and making it regular is a scope change
+      # rather than a predicate change. Parked, not implied away.
       lf = tolower(forkline)
+      # AN EMPTY SECTION IS A REFUSAL, not a pass — the ratified fork, and TEMPLATE-SPEC names both
+      # readers: "A section 8 with neither an item nor a `none` form is a refusal, not a pass." The
+      # hygiene reader already refused it; this one printed READY, so the two readers the spec pairs
+      # disagreed on the one case that distinguishes a resolved section from a hollow one.
       if (items == 0) {
-        if (forkline == "" || lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"
+        if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"
       } else {
-        if (items == resolved) print "READY"; else print "FORKED"
+        if (lf ~ /^none/ || lf ~ /^n\/a/ || any_mark) print "READY"; else print "FORKED"
       }
     }' "$1"
 }
@@ -1488,14 +1519,27 @@ verb_landed() { # slug
   # AN UNDECLARED KEY DEGRADES rather than refusing, deliberately: an adopter who has not adapted their
   # lander must not be wedged by a key they have never heard of. A DECLARED key whose marker is absent
   # or names another commit IS a refusal, because then the project asked for the observation.
+  #
+  # RESOLVED AGAINST THE GIT COMMON DIR, exactly as the lander resolves it. The key used to be a
+  # tree-relative path, which named a different file in each half - the lander wrote relative to its
+  # own top, this verb read relative to ROOT - and could not be written AT ALL from a linked
+  # worktree, where `.git` is a file rather than a directory. One resolution rule, spelled the same
+  # way on both sides, and the key is now a bare name.
+  local _lm_head _lm_gcd _lm_path
   _lm_head=$(GIT rev-parse HEAD)
   if [ -n "$LANDER_MARKER" ]; then
-    if [ ! -f "$LANDER_MARKER" ]; then
-      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading: $LANDER_MARKER"
+    _lm_gcd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _lm_gcd=""
+    if [ -z "$_lm_gcd" ]; then
+      fail 34 "cannot resolve the git common dir, so the lander marker cannot be read where the lander writes it; this refuses rather than reporting a missing marker, which would blame the lander for a fault on this side: $LANDER_MARKER"
       return 1
     fi
-    if ! grep -qF -- "$_lm_head" "$LANDER_MARKER" 2>/dev/null; then
-      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records: $_lm_head"
+    _lm_path="$_lm_gcd/$LANDER_MARKER"
+    if [ ! -f "$_lm_path" ]; then
+      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading: $_lm_path"
+      return 1
+    fi
+    if ! grep -qF -- "$_lm_head" "$_lm_path" 2>/dev/null; then
+      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted $_lm_head, marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
       return 1
     fi
   fi
@@ -2034,7 +2078,11 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
-  local slug="$1" rel="$2" item="$3" ck="$4" rb
+  local slug="$1" rel="$2" item="$3" ck="$4" rb _pv _pn _pa
+  # CLEARED ON ENTRY. This is called in a loop and only some arms assign DOD_OUT, so an arm that set
+  # it left its text attached to whichever LATER item happened not to — printing one item's diagnostic
+  # as another item's detail. Clearing here means the channel always belongs to the item being graded.
+  DOD_OUT=""
   case "$item" in
     authorization-reachable)
       # RE-DERIVED, never read out of the run-state file. That file is written by the subject of the
@@ -2362,10 +2410,32 @@ verb_review() { # slug · subject · verdict · blockers
     fail 37 "the subject spells the declared bypass flag, and the gate greps this file whole for it, so recording this round would red the bar on a record nothing can rewrite; name the subject without the literal flag: $BYPASS_BAN"
     return 1
   fi
+  # THE ROW GRAMMAR IS park()'s, AND SO ARE ITS GUARDS. This verb was the fifth caller of park() and
+  # the only one screening nothing but the bypass flag: a newline in the subject forges an arbitrary
+  # parked row — a `decision` row among them, which inflates the very count `parked-decisions-surfaced`
+  # is compared against — and a subject spelling the reason separator silently re-keys the group,
+  # because both readers split on the FIRST occurrence.
+  #
+  # Spelled here rather than lifted into a helper shared with --park because check-arms discovers a
+  # branch by its LITERAL check number; a helper taking the code as a parameter makes every branch
+  # inside it invisible to the tool that proves these are armed.
+  if [ "$(printf '%s' "$subj" | wc -l)" -ne 0 ]; then
+    fail 37 "the review subject contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+    return 1
+  fi
+  case "$subj" in
+    *" · "*) fail 37 "the review subject spells the record's own field separator ' · ', which re-keys the round's group and makes the row unparseable by the check that reads it: $subj"; return 1 ;;
+  esac
   prior=$(review_counts "$rel" "$subj")
   # A subject whose group already ENDED does not take another round. The loop stopped; recording more
   # rounds against it would make the sequence say the opposite of what happened.
-  if grep -qE "^[0-9][0-9-]*T[0-9:]*Z review · item $subj · reason .*(CONVERGED|NON-CONVERGENT)" "$rel" 2>/dev/null; then
+  # TWO FIXES IN ONE LINE. CEILING is terminal — the leg's own `term` set is all three, and omitting
+  # it here accepted a round AFTER the backstop fired, which the leg then reds on permanently, on an
+  # append-only record no verb can rewrite. And the subject is matched with -F: interpolated into an
+  # ERE, a subject carrying `(` MISSED its own recorded terminal line and one carrying `.`
+  # over-matched into a spurious refusal. review_counts compares the item EXACTLY in awk, so as a
+  # regex here the two readers of one field disagreed on what "the same subject" means.
+  if grep -F -- " · item $subj · reason " "$rel" 2>/dev/null | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING)'; then
     fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history: $subj"
     return 1
   fi
@@ -2501,7 +2571,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --review, --attest, --close, --landed, --park and --abort: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -2509,7 +2579,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> --code <halt-code> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> --code <halt-code> | --park <slug> --item <text> --reason <text> | --review <slug> --subject <id> --verdict <TOKEN> --blockers <N> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;

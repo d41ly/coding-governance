@@ -116,12 +116,24 @@ else
     [ -f "$rvf" ] || continue
     grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
     rv_readme=${rvf%/RUN*.md}/README.md
-    rv_units=""
-    # THE MARKERS ARE SPELLED, not borrowed from the driver: `ROSTER_OPEN` is a DRIVER variable and
-    # is EMPTY here, which would have made the third clause silently inert — a skip that looks
-    # exactly like a pass, over the one clause a ratified fork resolution added.
-    [ -f "$rv_readme" ] && rv_units=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null || true)
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v units="$rv_units" '
+    # THE THIRD CLAUSE GRADES A DELTA, and the first cut did not — which made it the FOURTH silent
+    # skip found in this one check. It tested whether the SUBJECT appeared anywhere in the units
+    # region; per the spec the subject is the build slug or a spec path, and both are substrings of
+    # every generated row already. Measured against the real region: the slug, the spec path and a
+    # unit id were all silent, and only a fabricated id fired it. Promotion adds a NEW unit id, so
+    # what has to be observed is an id present at HEAD and ABSENT at the run's own pinned BASE.
+    rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
+    rv_now=""; rv_then=""; rv_readable=0
+    if [ -f "$rv_readme" ]; then
+      rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+      if [ -n "$rv_base" ] && GIT cat-file -e "$rv_base^{commit}" 2>/dev/null; then
+        rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+        rv_readable=1
+      fi
+    fi
+    rv_new=""
+    [ "$rv_readable" = 1 ] && rv_new=$(comm -23 <(printf '%s\n' "$rv_now") <(printf '%s\n' "$rv_then") | grep -c . || true)
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -140,13 +152,13 @@ else
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
-          else if (flat[it] >= 2 && !(it in term))
+          else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
           if (it in needs) {
-            if (units == "")
-              printf "\n  %s (subject %s: the loop EXITED without converging and this build README has no readable generated units region, so whether the blocker was promoted CANNOT BE OBSERVED — a check that cannot look says so rather than passing)", f, it
-            else if (index(units, it) == 0)
-              printf "\n  %s (subject %s: the loop EXITED without converging and the generated units region gained no unit row for it, so a blocker was neither fixed nor promoted)", f, it
+            if (readable != 1)
+              printf "\n  %s (subject %s: the loop EXITED without converging and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, it
+            else if (newids + 0 == 0)
+              printf "\n  %s (subject %s: the loop EXITED without converging and the generated units region gained NO unit id this run BASE lacked, so a blocker was neither fixed nor promoted)", f, it
           }
         }
       }' "$rvf")"
@@ -379,11 +391,26 @@ fi
 # driver — it reads it as data — so the constants are read FROM it the same way every other core set
 # is, through core_of, rather than spelled a second time here. A leg that carried its own copy of the
 # bound would be the two-answers class, and this file already refuses that shape elsewhere.
-REMOTE_BOUND=$(core_of REMOTE_BOUND); REMOTE_BOUND=${REMOTE_BOUND:-60}
-REMOTE_CONNECT_BOUND=$(core_of REMOTE_CONNECT_BOUND); REMOTE_CONNECT_BOUND=${REMOTE_CONNECT_BOUND:-20}
-REMOTE_LOWSPEED_BYTES=$(core_of REMOTE_LOWSPEED_BYTES); REMOTE_LOWSPEED_BYTES=${REMOTE_LOWSPEED_BYTES:-1000}
+REMOTE_BOUND=$(core_of REMOTE_BOUND)
+REMOTE_CONNECT_BOUND=$(core_of REMOTE_CONNECT_BOUND)
+REMOTE_LOWSPEED_BYTES=$(core_of REMOTE_LOWSPEED_BYTES)
+# NO FALLBACK. A `${x:-60}` made an unreadable bound indistinguishable from a successful read, and
+# that is exactly how this went green while reading nothing: the driver declared all three UNQUOTED,
+# core_of matches only KEY="value", and every read returned empty. The defaults then restated the
+# driver's numbers from memory, so the single-source comment above described something the code did
+# not do and tuning the driver moved nothing here. An unreadable bound now refuses, the way
+# RUNAWAY_CEILING already does.
+if [ -z "$REMOTE_BOUND" ] || [ -z "$REMOTE_CONNECT_BOUND" ] || [ -z "$REMOTE_LOWSPEED_BYTES" ]; then
+  fail 2 "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
+  REMOTE_BOUND=60; REMOTE_CONNECT_BOUND=20; REMOTE_LOWSPEED_BYTES=1000
+fi
 REMOTE_BOUND_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+# IT MUST SAY SO. The flag's only reader used to be the `if` below, so on a node with no working
+# `timeout -k` every observation ran with the wall-clock bound silently absent and byte-identical
+# output — a skip that looks like a pass. The transport options still apply on that path; it is the
+# wall clock specifically that is gone, and the line says which.
+[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended-check: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply"
 # WRITES TO `$adv_f` BY NAME, not to a parameter, and that is deliberate. This leg has a source-level
 # arm asserting it performs no write into the tree it judges, and that arm allows a redirect only when
 # its target variable is assigned from `mktemp` in this same file — a property check rather than a
@@ -411,13 +438,23 @@ observe_remote() { # <git args…> -> rc (124 = the bound fired); output lands i
   fi
   return "$rc"
 }
+# THE THREE OUTCOMES ARE KEPT APART. They used to collapse into one message: `mktemp` failing skipped
+# both observations SILENTLY, observe_remote's status was discarded by an `&&`, and the only branch
+# left downstream said "the remote advertised no tips" - so a dead TMPDIR and a fired wall-clock bound
+# both reported as a remote that answered nothing. The driver separates the same three one file over;
+# the fix was made there and not carried across.
+ADV_RC=0
 if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
   adv_f=$(mktemp) || adv_f=""
-  if [ -n "$adv_f" ]; then
-    observe_remote ls-remote --symref --exit-code "$adv_remote" HEAD \
-      && ADV_HEAD=$(awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }' "$adv_f")
-    observe_remote ls-remote --heads "$adv_remote" \
-      && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
+  if [ -z "$adv_f" ]; then
+    ADV_RC=98
+  else
+    observe_remote ls-remote --symref --exit-code "$adv_remote" HEAD; _rc1=$?
+    [ "$_rc1" = 0 ] && ADV_HEAD=$(awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }' "$adv_f")
+    observe_remote ls-remote --heads "$adv_remote"; _rc2=$?
+    [ "$_rc2" = 0 ] && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
+    # 124 is the bound firing. Either call hitting it means this leg observed nothing it can trust.
+    { [ "$_rc1" = 124 ] || [ "$_rc2" = 124 ]; } && ADV_RC=124
     rm -f "$adv_f"
   fi
 fi
@@ -518,15 +555,17 @@ while IFS= read -r f; do
   # well-formed pair. That is why this is safe to tighten and also why it needs a RED FIXTURE in the
   # sibling test: a check whose only evidence is a corpus that cannot trigger it is the
   # fixture-passes-by-finding-nothing class, which is this whole unit's subject.
-  rd=${f%/RUN.md}/README.md
+  # THE README GUARD IS GONE, AND IT WAS SKIPPING THE WHOLE CHECK ON EVERY ARCHIVED RECORD. `rd` was
+  # `${f%/RUN.md}/README.md`, but the selector above deliberately admits `RUN.<PHASE>.<8hex>.md`, where
+  # that suffix strip is a NO-OP - so `rd` named a path INSIDE the record file, the guard was always
+  # false, and three tracked archived records were silently exempt. That also took the measurement
+  # above over a population three records short. Nothing else read `rd`; the block reads only `$f`.
   term=0
   case " $PHASES_TERMINAL " in *" $ph "*) term=1 ;; esac
-  if [ -f "$rd" ]; then
-    a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
-      fail 8 "a run-state file's generated markers are malformed: $f"
-    [ "$term" = 1 ] || [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
-      fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
-  fi
+  a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
+    fail 8 "a run-state file's generated markers are malformed: $f"
+  [ "$term" = 1 ] || [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
+    fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
   # ---- is not a pin, and every mandate assertion hangs on this value.
@@ -554,7 +593,16 @@ while IFS= read -r f; do
       # second half, and (through the rb gate) the check-13 mandate assertion, silently absent on
       # a forged base. That is fail-OPEN under a comment promising the opposite, and a REGRESSION:
       # before this unit the leg read local refs and still checked something.
-      fail 9 "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction: $f"
+      # THREE OUTCOMES, THREE MESSAGES. "The remote answered nothing" is kept for the case where git
+      # actually answered; a fired bound and a dead scratch dir are different faults with different
+      # remedies, and one message for all three sent the reader at the network every time.
+      if [ "$ADV_RC" = 98 ]; then
+        fail 9 "cannot create a scratch file to capture the remote advertisement, so this leg observed NOTHING and the BASE predicates below would be graded against an empty answer; this is a fault on THIS side, not the remote's: $f"
+      elif [ "$ADV_RC" = 124 ]; then
+        fail 9 "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing: $f"
+      else
+        fail 9 "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction: $f"
+      fi
     else
       # D3: PROVED PRESENT, not merely non-empty. `$b` is the advertised HEAD tip, which a clone
       # that has not fetched does not have — and `--is-ancestor` against a missing object fails,
@@ -762,6 +810,31 @@ fi
 # ---- meets for the first time in a directory listing.
 if [ -f "$LIVEDOC" ] && ! grep -qF 'RUN.<phase>.<blob8>.md' "$LIVEDOC"; then
   fail 16 "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record: $LIVEDOC"
+fi
+
+# ---- 22: EVERY DECLARED CONF KEY IS DOCUMENTED, and every documented key is real. Joined in BOTH
+# ---- directions against section 8's table, which the protocol calls BINDING. Three keys this kit
+# ---- added reached the tree undocumented, one of them MANDATORY: `HALT_FLOOR` reds this leg when
+# ---- undeclared, so an adopter configuring from the contract got a red bar naming a key the
+# ---- contract never mentioned. Check 10 above cannot see it — it is a byte-diff of the pair, and
+# ---- both copies were identically incomplete, which is the whole limitation its own header states.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that a row DESCRIBES its key correctly. It grades presence of the
+# ---- key name in the table region, nothing more. A row whose prose is wrong is green here, and only
+# ---- a reader catches that.
+if [ -f "$LIVEDOC" ] && [ -f "$ROOT/.unattended.conf" ]; then
+  # SCOPED TO SECTION 8's OWN REGION. Read over the whole file it also collects the phase
+  # vocabulary, whose table has the same row shape - eleven phase names arriving as "documented
+  # but declared nowhere" is a checker grading the wrong population, and muting them would take an
+  # exclusion list that then hides a real dead key.
+  sec8=$(awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f' "$LIVEDOC")
+  doc_keys=$(printf '%s\n' "$sec8" | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
+  conf_keys=$(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | sort -u)
+  undocumented=$(comm -23 <(printf '%s\n' "$conf_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+  phantom=$(comm -13 <(printf '%s\n' "$conf_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+  if [ -n "$(printf '%s' "$undocumented$phantom" | tr -d '[:space:]')" ]; then
+    fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:${undocumented:- none} | documented but declared nowhere:${phantom:- none}"
+  fi
 fi
 
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not

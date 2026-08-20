@@ -932,17 +932,35 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       # ---- delegation qualifier. The regex is a `/.../` LITERAL rather than a -v string on purpose:
       # ---- awk processes escapes in a -v assignment, which turned `\(` into a group and made the
       # ---- sibling reader match nothing at all when it was written that way first.
-      bitems = 0; bresolved = 0; bmarked = 0
+      # ONE STRING for the mark, so a WRAPPED mark still matches — twelve tracked specs wrap one,
+      # which is the house style of this corpus at its line width, and a line-by-line match called every
+      # one of them unresolved.
+      #
+      # AND NOT A PER-ITEM WALK, which is the harder half and was measured wrong before it was
+      # measured right. A per-item walk has to tell a FORK bullet from an OPTION bullet, and this
+      # corpus does not distinguish them: of 287 section-8 bullets, 69 carry descriptive labels, and
+      # among those are both resolved forks and genuinely OPEN ones. So a label-shape discriminator
+      # UNDER-counts and lets a real open fork pass, which is worse than the over-counting it would
+      # replace — and the over-counting was not theoretical either: a per-item walk called a RESOLVED
+      # fork unresolved on a live tracked spec whose three option bullets each demanded a mark.
+      #
+      # What is graded is therefore what can be: a section with items and NO conforming mark
+      # anywhere. An unresolved fork below a none line that looks honest is NOT detectable here and
+      # is parked rather than implied away.
+      bblob = ""; bitems = 0
       for (i = 2; i <= q - 1; i++) {
         L = rng[i]
         if (L ~ /^[[:space:]]*$/) continue
-        if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) {
-          if (bitems > 0 && bmarked) bresolved++
-          bitems++; bmarked = 0
-        }
-        if (bitems > 0 && L ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) bmarked = 1
+        bblob = bblob " " L
+        if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) bitems++
       }
-      if (bitems > 0 && bmarked) bresolved++
+      # WHITESPACE SQUEEZED FIRST. Marks wrap INSIDE the parenthesis in this corpus - `RESOLVED
+      # (owner,` then a 2-space-indented continuation - so a raw join yields three spaces where the
+      # grammar wants one, and all fourteen wrapped marks still missed. The sibling reader trims
+      # every line as it reads, which is why it did not need this; squeezing here makes the two
+      # provably agree instead of agreeing by coincidence.
+      gsub(/[[:space:]]+/, " ", bblob)
+      bmark = (bblob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
       if (q == 0)
         print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
       else if (fcut != "" && fdate != "" && fdate >= fcut) {
@@ -952,8 +970,8 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         if (bitems == 0) {
           if (q8 !~ /^none/ && q8 !~ /^N\/A/)
             print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_MARK_CUTOFF " fcut "; a hollow section and a resolved one are the same byte)"
-        } else if (bitems != bresolved)
-          print f " (terminal Status with unresolved §8 items, graded PER ITEM for the shaped resolution mark at/after FORK_MARK_CUTOFF " fcut "): " bresolved " of " bitems " marked"
+        } else if (q8 !~ /^none/ && q8 !~ /^N\/A/ && !bmark)
+          print f " (terminal Status, §8 carries items and no conforming resolution mark anywhere, at/after FORK_MARK_CUTOFF " fcut ")"
       }
       else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
         print f " (terminal Status with unresolved §8 Open questions)"
