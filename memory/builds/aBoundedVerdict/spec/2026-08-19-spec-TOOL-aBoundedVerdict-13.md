@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-6 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -20,6 +20,21 @@ and **this unit delivers only the second**, so the row does not close when this 
   sites go through it: `observe_anchor`'s HEAD advertisement (`:240`) and `branch_tip_quiet`'s
   per-branch tip (`:298`, reached twice under `ANCHOR_SCOPE="published"` — once from `resolve_base`
   and once from `trusted_base`'s alternate).
+- **S1a** — **the helper captures through a FILE, never a command substitution**, and this is the
+  difference between a bound and a decoration rather than a style note. `out=$(timeout N cmd)` reads
+  until EOF, and EOF arrives only when the last inherited write end closes, so a surviving descendant
+  holds the pipe while `timeout` reports 124 on schedule. MEASURED on node `c` before the helper was
+  written: `out=$(timeout 1 bash -c 'sleep 6 & exit 0')` returned after **6 s** against a declared
+  **1 s** bound, and the same command redirected to a file returned in **0 s**. `timeout -k` follows,
+  for the child that ignores SIGTERM. Added at rev-5, from the recall probe this build's own method
+  requires before a pass: the gate runner hit the identical defect, its fix landed hours earlier at
+  `tools/run-gates/run-gates.sh`, and this helper follows that shape instead of re-deriving it. Had
+  the probe not run, this unit would have shipped a wall-clock bound that buys zero seconds — which is
+  the exact class it exists to remove, one level up.
+- **S1b** — the helper cannot call `GIT()`, because `timeout` needs an external command and `GIT` is a
+  shell function. So the dereference pins move into NAMED constants that `GIT()` and the helper both
+  expand. Spelling them twice was the alternative and it is the two-answers class: a pin added to one
+  copy and not the other is silent, and the whole point of `GIT()` is that no read escapes the pins.
 - **S2** — the bound is belt and braces, because no single mechanism covers every transport: an outer
   wall-clock cap, plus `http.lowSpeedLimit`/`http.lowSpeedTime` for the HTTP transports and
   `ssh -o ConnectTimeout` for the ssh ones. A wall-clock cap alone kills a slow-but-working clone; a
@@ -209,9 +224,21 @@ units in this build declare the same carrier for the same reason.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `--close` runs against a fixture whose remote URL is an unroutable address, it exits
-  non-zero within the declared bound and its output names the endpoint and the bound; measured with an
-  outer `timeout` set above the bound, which does not fire.
+- **AC1** — When `--close` runs against a fixture whose remote endpoint REFUSES the connection, it
+  exits non-zero promptly with the named refusal, and an outer `timeout` above the bound does not
+  fire. **What this fixture does not reach, stated so a green arm is never misread as coverage of the
+  wall clock:** a refused connection returns without the bound being consulted, so this arm proves the
+  refusal PATH and not the deadline. The deadline is graded instead by AC1a's mechanism arm and by
+  AC3's elapsed assertion, and no arm drives a blackholed endpoint for the full bound — that would add
+  the declared bound to the wall clock of the slowest leg on the bar, in a suite whose historical
+  failure mode is exactly a leg that takes too long. The trade is recorded rather than taken quietly.
+- **AC1a** — **the mechanism arm, and it is the one that makes the bound credible.** On the node
+  running the suite, `timeout -k 2s 1` around a process that leaves a background descendant is
+  measured twice: captured through a command substitution, and redirected to a FILE. The file form
+  must complete inside a small multiple of the declared 1 s; the substitution form is measured and
+  REPORTED rather than asserted, because it is a property of the platform and not of this kit. If the
+  file form does not bound the clock on this node, the helper's bound is inert here and the arm says
+  so — a bound nobody has watched fire is an assertion about nothing.
 - **AC2** — When the same fixture is driven through `bash tools/unattended/check-unattended.sh`, the
   leg reds within the bound rather than hanging.
 - **AC3** — When `--close` is invoked on a record whose phase is `LANDED`, no `ls-remote` runs —
@@ -223,16 +250,21 @@ units in this build declare the same carrier for the same reason.
   `tools/unattended/unattended.test.sh`.
 - **AC5** — When `grep -n 'ls-remote' tools/unattended/unattended.sh
   tools/unattended/check-unattended.sh` is taken, EVERY hit's LINE is a member of a sanctioned set
-  written into the arm: the bounded helper's own body, the offline `--get-url` line, or a COMMENT
-  line, matched as such by its leading `#` and excluded deliberately rather than by luck. Any other
+  written into the arm: a line whose `ls-remote` is an argument to the bounded helper, the offline
+  `--get-url` line, or a COMMENT line, matched as such by its leading `#` and excluded deliberately
+  rather than by luck. Any other
   hit fails the arm. The arm lives in `tools/unattended/unattended.test.sh` (§8 F2) and implements
   §5's testing + left-shift item. **`grep -c` cannot express this criterion** — it prints one number
   per file, a number that already includes the two prose hits, so no value of it distinguishes a call
   site from a sentence. That is the class at
   `memory/gotchas/absence-assertion-over-whole-file-text.md`, and rev-3's AC5 was an instance of it.
-- **AC6** — When a credential helper would prompt, it does not: asserted by driving a fixture whose
-  remote requires auth with `credential.interactive` observable as `never` in the invocation, via
-  `git -c credential.interactive=never`.
+- **AC6** — When a credential helper would prompt, it does not: `credential.interactive=never` is
+  observable in the helper's own invocation, passed with `-c` so it is scoped to that call and cannot
+  reach the landing push. Asserted at source level in the same arm that reads the other three options
+  no runtime fixture can reach — `http.lowSpeedLimit`, `http.lowSpeedTime` and
+  `ssh -o ConnectTimeout` — each of which appears in the invocation and whose runtime effect is
+  untested for the reason AC8 records. Source-level is the honest home for all four: a fixture that
+  could exercise them would need a server that authenticates, stalls mid-transfer, and speaks ssh.
 - **AC7** — When `tools/unattended/check-unattended.sh` is read, its comment about
   `GIT_TERMINAL_PROMPT=0` states that the variable bounds git's own prompt and not a configured
   helper.
@@ -355,6 +387,47 @@ This line is the machine-read one; the bullets carry the reasoning.
   correction. The rule is §5's testing + left-shift item, and the arm's home is
   `tools/unattended/unattended.test.sh` per F2's resolution, which the criterion had not carried.
   Both are now written where they belong.
+
+- rev-5 · 2026-08-20 · **written DURING the build, from what the M5 recall probe found.** The probe
+  returned a blocker this spec could not have known: a sibling build measured, hours earlier, that
+  `out=$(timeout N cmd)` does not bound the wall clock — the command substitution reads until EOF and
+  a surviving descendant holds the pipe — and its fix had already landed in the gate runner. This
+  spec's S1 said "an outer wall-clock cap" and nothing about capture, so the obvious implementation
+  was the broken one. Reproduced on node `c` before designing on it: 6 s against a declared 1 s bound
+  through a substitution, 0 s through a file. **S1a and S1b are new**, S1b because the helper cannot
+  call the driver's own `GIT()` wrapper through `timeout` and the dereference pins therefore needed a
+  single home rather than a second spelling. **AC1 is narrowed and AC1a is new:** the refusing-endpoint
+  fixture proves the refusal path and never consults the deadline, so claiming it covered the bound
+  would have been the green-by-absence class this build is full of gates against; the deadline is
+  graded by a mechanism arm plus AC3's elapsed assertion, and the decision NOT to spend the full bound
+  in the bar's slowest leg is recorded rather than taken quietly. **AC6 widened** to the three options
+  no fixture can reach, each asserted by inspection and each stated as runtime-untested. AC5's
+  sanctioned set now describes a line where `ls-remote` is an ARGUMENT to the helper, which is what the
+  implementation produced.
+
+- rev-6 · 2026-08-20 · **built, and four things the building corrected.** (1) The kit version is SIX
+  carriers, not the five this spec's Files-touched list inherited from the fold brief: the installed
+  `memory/guides/UNATTENDED-PROTOCOL.md` carries the `gov:kit` marker too, forced by the unattended
+  leg's check 10 rather than by `check-kit-versions.sh`, which is why a list derived from the latter
+  missed it. Observed by bumping five and watching check 10 red. The list now lives once, in the build
+  README's cross-unit rules. (2) The timeout refusal was first written as a shared
+  `remote_timeout_note` helper and `fail 27 "$(...)"`. That branch CANNOT BE ARMED —
+  `check-arms.py` signs a branch with the LITERAL source text of its `fail` call, so the signature
+  became the opening characters of a command substitution — which is the same class as the recorded
+  positional trap. The sentence is inlined with only interpolations trailing, and the helper is gone;
+  it had one caller, so the indirection bought nothing and cost the arm. (3) `ARMS_FLOORS` for the
+  driver moves 81:78 to 91:88, from `--report` rather than from arithmetic, and the two new refusals
+  are ARMED rather than pinned: the registry's contract is that a pin means no fixture CAN reach a
+  branch, and "chose not to" is a different fact wearing the same row. A dead `TMPDIR` reaches the
+  scratch-file guard; a stub `git` exiting 124 — the status `timeout` itself returns — reaches the
+  timeout refusal without spending the declared bound. (4) Inserting a `fail 27` branch RENUMBERED the
+  pinned row for an unrelated branch from ordinal 2 to 4, which surfaced as a stale-signature
+  complaint that reads like a rewording; the registry now records why the ordinal moved.
+  **One measurement for whoever runs this leg next:** the driver selftest did not complete inside
+  1200 s on node `c` while another session held the box, and produced no output at all inside 900 s
+  on a later attempt. Four cores, seven live `bash`/`git` processes, a second worktree active. That is
+  the recorded contention behaviour, not a hang — the leg's own tracked incident is a genuine hang and
+  the two are indistinguishable from a wall clock alone, which is why the arms print progress markers.
 
 ## 10. Reuse audit
 

@@ -30,7 +30,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -51,7 +51,83 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# The dereference pins live in NAMED constants because there are now two readers: GIT() below, and
+# the bounded remote helper further down, which cannot call a shell function — `timeout` needs an
+# external command, so it must spell `git` itself. Two spellings of one pin is the class this repo
+# calls two-answers-to-one-question, and a pin added to one copy and not the other is silent.
+GIT_PIN_REPLACE=core.useReplaceRefs=false
+GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
+GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
+
+# THE WALL-CLOCK BOUND on a remote observation, in seconds, and the ssh connect bound inside it.
+# FILE CONSTANTS with no conf channel and no environment override, on the same argument the review
+# protocol's fan-out cap is a file constant: a ceiling raisable from the environment leaves no diff
+# behind. Generous on purpose — the failure being guarded is a PARTITION, not a slow link, and a
+# tight bound converts a working close into a refused one, which is a new stall wearing the fix's
+# clothes. Both are stated in the refusal, so the number is discoverable without reading source.
+REMOTE_BOUND=60
+REMOTE_CONNECT_BOUND=20
+# The low-speed floor: bytes/sec under which git treats a transfer as stalled, for the window the
+# wall-clock bound already allows. This is the only mechanism that reaches a server which ACCEPTS
+# and then stalls mid-transfer, which no wall-clock cap can distinguish from a slow success.
+REMOTE_LOWSPEED_BYTES=1000
+
+# LIVENESS, probed with the options the run actually uses. A bare `timeout 1 true` passes on a build
+# whose `-k` is unsupported, and the gate runner already learned to probe with the real option set.
+# A node without a working `timeout` still runs — refusing every run over a missing coreutils binary
+# is worse than the hang — but it must SAY the bound is inert, because a skip that looks like a pass
+# is indistinguishable from coverage.
+REMOTE_BOUND_LIVE=1
+timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+
+# EVERY remote observation goes through here, and the source-level arm asserts that no `ls-remote`
+# appears outside it. Three bounds, because no single mechanism covers every transport: the outer
+# wall clock catches blackholed packets, `http.lowSpeed*` catches an HTTP server that accepts and
+# then stalls, and `ssh -o ConnectTimeout` catches the ssh handshake. A wall-clock cap alone kills a
+# slow-but-working clone; a transport option alone does not bound a server that stalls after
+# accepting.
+#
+# CAPTURED THROUGH A FILE, NOT A COMMAND SUBSTITUTION, and that is the whole difference between a
+# bound and a decoration. `out=$(timeout N cmd)` reads until EOF, and EOF arrives only when the last
+# inherited write end closes, so a surviving descendant holds the pipe while `timeout` cheerfully
+# reports 124. MEASURED on this node before this helper was written:
+# `out=$(timeout 1 bash -c 'sleep 6 & exit 0')` returned after 6 s against a declared 1 s bound; the
+# same command redirected to a file returned in 0 s. The gate runner carries the identical fix and
+# the identical measurement, which is where this shape comes from rather than being invented here.
+#
+# The credential path is CLOSED, not merely un-prompted. `GIT_TERMINAL_PROMPT=0` bounds git's OWN
+# prompt and says nothing about a configured helper: a helper that opens a GUI dialog blocks forever
+# with nothing on stdout. `credential.interactive=never` is what a helper reads. It is passed with
+# `-c`, so it is scoped to THIS invocation and cannot reach the landing push, which is a different
+# process and must still authenticate — a helper that can answer from its store still answers, and
+# only one that would PROMPT refuses.
+#
+# Returns the subprocess status, or 124 when the wall clock fired. Writes the advertisement to the
+# file named by the caller, never to stdout, so no caller can reintroduce the pipe this exists to
+# avoid.
+observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
+  local out="$1"; shift
+  local rc
+  if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
+    timeout -k 5s "$REMOTE_BOUND" \
+      env GIT_TERMINAL_PROMPT=0 \
+          "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
+      git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" \
+          -c credential.interactive=never \
+          -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
+          "$@" >"$out" 2>/dev/null
+    rc=$?
+  else
+    env GIT_TERMINAL_PROMPT=0 \
+        "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
+    git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" \
+        -c credential.interactive=never \
+        -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
+        "$@" >"$out" 2>/dev/null
+    rc=$?
+  fi
+  return "$rc"
+}
 
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -282,7 +358,18 @@ observe_anchor() {
   # ---- 27/28: the REMOTE names its own default branch. `--exit-code` is what makes "answered but
   # ---- advertised nothing" distinguishable from "answered": without it the call exits 0 and prints
   # ---- nothing, which is exactly what a bare repo with a dangling HEAD produces.
-  adv=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$rem" HEAD 2>/dev/null) && rc=0 || rc=$?
+  # BOUNDED, and captured through a FILE rather than a command substitution — the substitution is
+  # what makes a wall-clock bound a decoration, measured on this node before the helper was written.
+  # A fired bound is reported as ITSELF: "did not answer" and "was not waited for" are different
+  # facts, and check 27's message would have told an operator the remote was unreachable when the
+  # truth is that this kit stopped waiting.
+  local advf; advf=$(mktemp) || { fail 27 "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"; return 1; }
+  observe_remote "$advf" ls-remote --symref --exit-code "$rem" HEAD && rc=0 || rc=$?
+  adv=$(cat "$advf" 2>/dev/null); rm -f "$advf"
+  if [ "$rc" = 124 ]; then
+    fail 27 "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so nothing was learned about the endpoint and this is a timeout and not a refusal by the remote: $rem at $uf, bound ${REMOTE_BOUND}s, connect ${REMOTE_CONNECT_BOUND}s"
+    return 1
+  fi
   if [ "$rc" != 0 ] && [ "$rc" != 2 ]; then
     fail 27 "the remote did not answer, and the anchor is an observation of it rather than of any local ref; a run that cannot reach the remote cannot land on it either: $rem at $uf"
     return 1
@@ -334,13 +421,28 @@ BREF=""; BSHA=""
 # its return code, and observe_branch turns those codes into the numbered refusals.
 #   1 = not on a named branch · 2 = the remote advertises no tip for it
 #   3 = advertised a tip this clone lacks · 4 = the tip is not an ancestor of HEAD
+#   5 = the remote could not be reached, or the wall-clock bound fired. NOT 2, and that split is the
+#       whole of it: `|| return 2` collapsed git's 128 (could not connect) into "answered, no
+#       matching ref", so a network fault told the operator to push a branch that is already
+#       pushed — advice that is not merely unhelpful but wrong, and acted on it does nothing. The
+#       sibling function one file up already splits the same pair correctly; this is that logic
+#       applied at the call site whose author wrote the collapse.
 branch_tip_quiet() { # -> prints "<ref> <sha>" on stdout
-  local cur rem adv sha
+  local cur rem adv sha rc advf
   cur=$(GIT rev-parse --abbrev-ref HEAD 2>/dev/null) || return 1
   [ -n "$cur" ] && [ "$cur" != HEAD ] || return 1
   rem=$(GIT remote 2>/dev/null | head -1)
   [ -n "$rem" ] || return 2
-  adv=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --exit-code "$rem" "refs/heads/$cur" 2>/dev/null) || return 2
+  advf=$(mktemp) || return 5
+  observe_remote "$advf" ls-remote --exit-code "$rem" "refs/heads/$cur"; rc=$?
+  adv=$(cat "$advf" 2>/dev/null); rm -f "$advf"
+  # 0 = advertised · 2 = git's own "answered, advertised nothing" from --exit-code · anything else
+  # is a transport fault or the bound firing, and both are 5.
+  case "$rc" in
+    0) ;;
+    2) return 2 ;;
+    *) return 5 ;;
+  esac
   sha=$(printf '%s\n' "$adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
   [ -n "$sha" ] || return 2
   GIT rev-parse --verify --quiet "$sha^{commit}" >/dev/null 2>&1 || return 3
@@ -364,6 +466,7 @@ emit_branch_fail() { # BR_RC -> the numbered refusal it stands for
     2) fail 32 "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/$cur" ;;
     3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
     4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
+    5) fail 32 "the remote could not be reached for this run's branch, or the wall-clock bound fired, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy and the endpoint is: refs/heads/$cur" ;;
     *) return 0 ;;
   esac
   return 1
@@ -1603,12 +1706,24 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason
   n=${#OV_ITEMS[@]}
   check_slug "$slug" || return 1
+  # THE FREE REFUSALS COME FIRST, and the ordering is the point rather than tidiness. This function
+  # used to open with a network round-trip and only then discover that the record was already
+  # terminal, or absent — so a close against a finished record paid a full remote observation, and
+  # on an unreachable endpoint it paid the whole wall-clock bound, to reach a refusal that needed no
+  # network at all. The prologue's own refusals are explicitly NON-FATAL to --close (see below), so
+  # nothing downstream depended on it having run first, which is what makes the move safe as well as
+  # cheaper.
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
+  refuse_if_terminal "$rel" --close || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
-  # TOOL-aBoundedVerdict-12 S7 - one line BEFORE the network round-trip, so a close that is about to
-  # spend one has printed something. Unconditional: a progress line an unattended run cannot observe
-  # is not a progress line, and the arm that proves it needs stdout rather than a tty.
+  # One line BEFORE the network round-trip, so a close that is about to spend one has printed
+  # something. It sits with the observation rather than at the top of the verb: a run whose record is
+  # already terminal now spends no round-trip, so announcing one would be announcing something that
+  # does not happen. The arm that proves the line reads stdout on a LIVE record, which is the case
+  # the line exists for.
   echo "unattended: --close $slug - observing the anchor, then evaluating the Definition of Done"
   # S1 - the redirect is GONE. `fail` echoes to stdout, so `>/dev/null 2>&1` destroyed all EIGHT of
   # observe_anchor's named refusals (checks 22-25 and 27-30), and the only surviving output was the
@@ -1617,9 +1732,6 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # the refusals are not fatal to --close, which is why they were suppressed rather than returned on,
   # and that reasoning was always about the STATUS and never about the message.
   observe_anchor || true
-  rel=$(runmd_of "$slug")
-  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
-  refuse_if_terminal "$rel" --close || return 1
   # Validate EVERY pair before any of them is acted on. The three messages below are byte-unchanged
   # from the single-override form, so their arms stay valid and no per-check ordinal moves.
   while [ "$i" -lt "$n" ]; do

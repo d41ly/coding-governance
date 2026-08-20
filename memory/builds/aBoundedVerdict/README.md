@@ -178,6 +178,22 @@ concurrently — and their write sets intersect in the protocol document, so the
   that count until the enumeration there was replaced by a pointer at `tools/gate-legs.json`; it is
   NOT a carrier any more, and the charter body is generated between `gov:playbook` markers, so a
   hand-edit there reds the playbook parity leg. Do not recreate it.
+- **The kit version is SIX carriers, and this list is the build's only home for it.** Moving
+  `KIT_UNATTENDED_VERSION` touches `tools/unattended/unattended.sh` and
+  `tools/unattended/check-unattended.sh` — each the constant AND the `gov:kit` marker on the same
+  line — the marker in `tools/unattended/PROTOCOL.template.md` and
+  `tools/unattended/SKILL.template.md`, the marker in **`memory/guides/UNATTENDED-PROTOCOL.md`**, and
+  the re-rendered `.claude/skills/unattended/SKILL.md`.
+  **The fifth one is the trap, and it was found by hitting it.** The specs in this build were folded
+  against a list of FIVE carriers, derived by reading `tools/check-kit-versions.sh` — which does not
+  scan `memory/guides/`. The installed protocol half is forced by a DIFFERENT gate: the unattended
+  leg's check 10 byte-diffs it against its template. Observed rather than reasoned, by bumping five
+  and watching the leg red with *"the shipped protocol and this repo's installed copy have drifted"*.
+  An enumeration built by reading one gate misses whatever a second gate owns, which is the same
+  Files-touched-omits-a-carrier defect the 2026-08-20 audit raised eight times — reproduced while
+  fixing it, which is why the list lives here now instead of in nine spec copies. Where a spec's own
+  Files-touched list still spells five, THIS bullet supersedes it; the specs are not re-folded for it,
+  because re-folding eight documents to correct one list costs more than it buys.
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.
@@ -408,7 +424,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 | [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-9 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-11 — the units region becomes generated, mandatory, and read by name](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md) | CLOSED | rev-8 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-12 — a blocked close names its cause, not just the item it blocked on](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md) | CLOSED | rev-3 | 2026-08-19 |
-| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md) | SPECCED | rev-6 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-14 — an adversarial round after the first reviews the fold, not the build](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md) | CLOSED | rev-4 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-15 — every close-path write is staged, guarded, and reachable by a verb](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md) | CLOSED | rev-3 | 2026-08-19 |
 | [TOOL-aBoundedVerdict-16 — `closing-review-recorded` joins a diff-review, in range](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md) | CLOSED | rev-2 | 2026-08-19 |

@@ -15,7 +15,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -212,7 +212,20 @@ fi
 # ---- diff-scoped run pays it LOUDLY, which is the whole point: failing open would disarm the only
 # ---- BASE check on the bar, and that is the silent-skip shape this file refuses by name elsewhere.
 # ---- GIT_TERMINAL_PROMPT=0 is carried HERE rather than left to the driver: this leg runs under a
-# ---- hook with no tty, and a credential prompt would hang the push rather than refuse it.
+# ---- hook with no tty. WHAT IT ACTUALLY DOES, corrected: it bounds git's OWN prompt and says
+# ---- nothing about a configured credential HELPER, which is a separate process — a helper that
+# ---- opens a GUI dialog blocks with nothing on stdout and the variable never reaches it. That is
+# ---- why the observation below also passes `credential.interactive=never`, which is the setting a
+# ---- helper reads, and why it is passed with `-c` so it cannot reach the landing push. This comment
+# ---- previously claimed the variable made a prompt "refuse rather than hang"; it does not, and a
+# ---- comment asserting a bound nothing provides is worse than no comment, because it stops the next
+# ---- reader looking.
+# ---- BOUNDED. These two calls run inside $GATE_CMD, which runs inside .githooks/pre-push, so an
+# ---- unbounded one HANGS THE PUSH instead of reddening it — strictly worse than the driver's case,
+# ---- where at least an operator is watching. Both go through the same three-part bound the driver
+# ---- uses, spelled once in the helper below, and both capture through a FILE: a command
+# ---- substitution around `timeout` reads until EOF and a surviving descendant holds the pipe, so
+# ---- the verdict is bounded while the clock is not. Measured, on this node and in the gate runner.
 ADV_HEAD=""; ADV_TIPS=""
 # EXACTLY ONE remote, matching the driver's check 24. `| head -1` blessed whichever name sorted
 # first, with none of the endpoint guards the driver applies — so a run that adds a second
@@ -227,11 +240,47 @@ elif [ "$adv_nrem" != 0 ]; then
 fi
 # GUARDED on the population too: with no run-state file there is nothing whose BASE could be
 # checked, and two network round-trips per bar run bought exactly nothing. POP is computed above.
+# The bound, and the pins, in ONE place shared with the driver's helper. The leg cannot source the
+# driver — it reads it as data — so the constants are read FROM it the same way every other core set
+# is, through core_of, rather than spelled a second time here. A leg that carried its own copy of the
+# bound would be the two-answers class, and this file already refuses that shape elsewhere.
+REMOTE_BOUND=$(core_of REMOTE_BOUND); REMOTE_BOUND=${REMOTE_BOUND:-60}
+REMOTE_CONNECT_BOUND=$(core_of REMOTE_CONNECT_BOUND); REMOTE_CONNECT_BOUND=${REMOTE_CONNECT_BOUND:-20}
+REMOTE_LOWSPEED_BYTES=$(core_of REMOTE_LOWSPEED_BYTES); REMOTE_LOWSPEED_BYTES=${REMOTE_LOWSPEED_BYTES:-1000}
+REMOTE_BOUND_LIVE=1
+timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
+  local out="$1"; shift
+  local rc
+  if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
+    timeout -k 5s "$REMOTE_BOUND" \
+      env GIT_TERMINAL_PROMPT=0 \
+          "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
+      git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
+          -c credential.interactive=never \
+          -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
+          "$@" >"$out" 2>/dev/null
+    rc=$?
+  else
+    env GIT_TERMINAL_PROMPT=0 \
+        "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
+    git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
+        -c credential.interactive=never \
+        -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
+        "$@" >"$out" 2>/dev/null
+    rc=$?
+  fi
+  return "$rc"
+}
 if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
-  adv_raw=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$adv_remote" HEAD 2>/dev/null) \
-    && ADV_HEAD=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
-  ADV_TIPS=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --heads "$adv_remote" 2>/dev/null \
-    | awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }')
+  adv_f=$(mktemp) || adv_f=""
+  if [ -n "$adv_f" ]; then
+    observe_remote "$adv_f" ls-remote --symref --exit-code "$adv_remote" HEAD \
+      && ADV_HEAD=$(awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }' "$adv_f")
+    observe_remote "$adv_f" ls-remote --heads "$adv_remote" \
+      && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
+    rm -f "$adv_f"
+  fi
 fi
 
 # PUBLISHED = an ancestor of a tip the remote advertises. Ancestry and NOT equality, and the

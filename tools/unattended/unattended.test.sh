@@ -1560,7 +1560,16 @@ rm -rf "$gtmp"
 # ---- SOURCE-level: the pin is EXPORTED and every dereference on the authorization path goes through
 # ---- it. A pin that one call site skips is not a pin - that call site is the whole attack surface.
 n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FAIL the driver does not export GIT_GRAFT_FILE, so a graft file rewrites its merge-base"; st=1; }
-n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$SCRIPT"   || { echo "FAIL the driver defines no GIT() wrapper pinning core.useReplaceRefs"; st=1; }
+# The pins moved into NAMED CONSTANTS because a second reader arrived: the bounded remote helper
+# cannot call GIT(), since `timeout` needs an external command and GIT() is a shell function. So this
+# arm now checks the property through the indirection, in THREE parts, because an indirection is a way
+# to weaken a pin while a one-line grep stays green: the constants hold the right values, GIT()
+# expands both of them, and the bounded helper expands both of them too. Dropping any part leaves a
+# hole exactly the size of the call site that skips it, which is the whole attack surface here.
+n=$((n+1)); grep -q '^GIT_PIN_REPLACE=core\.useReplaceRefs=false$' "$SCRIPT"   || { echo "FAIL the driver does not bind the replace-refs pin to a constant with the value that suppresses it"; st=1; }
+n=$((n+1)); grep -q '^GIT_PIN_GRAFTADV=advice\.graftFileDeprecated=false$' "$SCRIPT"   || { echo "FAIL the driver does not bind the graft-advice pin to a constant with the value that suppresses it"; st=1; }
+n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV" "\$@"; }$' "$SCRIPT"   || { echo "FAIL the driver defines no GIT() wrapper expanding both pin constants"; st=1; }
+n=$((n+1)); [ "$(grep -c 'git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$SCRIPT")" -ge 3 ]   || { echo "FAIL the bounded remote helper does not expand both pin constants, so a remote observation dereferences unpinned"; st=1; }
 unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
 
@@ -2233,6 +2242,230 @@ out=$(run --preflight tUnpaired --keepalive-id k1)
 hit "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
 same "a malformed README leaves no orphan run-state file" "$([ -f memory/builds/tUnpaired/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
+
+
+# ---------------------------------------------------------------------------------------------
+# ---- THE BOUNDED REMOTE OBSERVATION. Every arm below grades the unit whose whole claim is that a
+# ---- remote round-trip terminates. The claim is worth exactly as much as the mechanism under it, so
+# ---- the mechanism is measured on THIS node first and the wiring is read at source afterwards.
+# ---------------------------------------------------------------------------------------------
+
+echo "MARK mechanism" >&2
+# ---- AC1a, THE MECHANISM ARM, and the reason it leads: `out=$(timeout N cmd)` does NOT bound the
+# ---- clock. The substitution reads until EOF, EOF arrives when the last inherited write end closes,
+# ---- and a surviving descendant holds the pipe while `timeout` reports 124 on schedule. A sibling
+# ---- build measured the same defect in the gate runner and its fix landed there hours before this
+# ---- helper was written. Measured here rather than trusted, because a bound nobody has watched fire
+# ---- is an assertion about nothing.
+# ---- The FILE form is ASSERTED. The substitution form is measured and REPORTED without asserting,
+# ---- because it is a property of this platform's coreutils and process groups, not of this kit —
+# ---- arming it would make the suite red on a platform where the pipe closes early, which is a
+# ---- different fact and not a defect here.
+mech_t0=$(date +%s)
+timeout -k 2s 1 bash -c 'sleep 8 & exit 0' >/dev/null 2>&1
+mech_file=$(( $(date +%s) - mech_t0 ))
+mech_t0=$(date +%s)
+mech_out=$(timeout -k 2s 1 bash -c 'sleep 8 & exit 0' 2>&1)
+mech_pipe=$(( $(date +%s) - mech_t0 ))
+echo "bounded-observation mechanism on this node: file-captured ${mech_file}s, substitution-captured ${mech_pipe}s, declared bound 1s"
+n=$((n+1)); [ "$mech_file" -le 4 ] || { echo "FAIL a wall-clock bound does not bound the clock on this node even when captured through a file (${mech_file}s against a declared 1s), so the driver's remote bound is INERT here and every arm below it grades a decoration"; st=1; }
+if [ "$mech_pipe" -le 4 ]; then
+  echo "bounded-observation note: a command substitution ALSO bounded the clock on this node (${mech_pipe}s) - the file capture is still required, because the platform where it does not is the one this kit shipped a fix for"
+fi
+
+echo "MARK ac5-source" >&2
+# ---- AC5: no `ls-remote` escapes the helper. A LOCATION property, so it is read from `grep -n` and
+# ---- never from `grep -c` — a count already includes the prose hits, so no value of it distinguishes
+# ---- a call site from a sentence, which is the absence-assertion-over-whole-file-text class. Comment
+# ---- lines are excluded BY THEIR LEADING `#`, deliberately and not by luck: the helper's own
+# ---- documentation names `ls-remote`, and a predicate that redded on the comment explaining it is
+# ---- the recorded shape this repo refuses.
+lsr_bad=""
+while IFS= read -r hit; do
+  # TWO fields to strip, not one: `grep -n` over MORE THAN ONE file prints `file:line:body`, and
+  # leaving the line number in front of the body made the comment test read "83:" as code before the
+  # `#` and keep a comment line. Measured while arming this: it reported an offender with an empty
+  # name, because the offending "line" was a comment about the helper.
+  body=${hit#*:}; body=${body#*:}
+  case "$body" in
+    *'#'*) case "${body%%\#*}" in *[!\ ]*) ;; *) continue ;; esac ;;
+  esac
+  case "$body" in
+    *'observe_remote '*'ls-remote'*) continue ;;
+    *'ls-remote --get-url'*)         continue ;;
+  esac
+  lsr_bad="$lsr_bad
+$hit"
+done <<EOF
+$(grep -n 'ls-remote' "$SCRIPT" "$HERE/check-unattended.sh" 2>/dev/null)
+EOF
+n=$((n+1)); [ -z "$(printf '%s' "$lsr_bad" | tr -d '[:space:]')" ] || { echo "FAIL an ls-remote call site sits outside the bounded helper, so a remote observation on that path is unbounded: $lsr_bad"; st=1; }
+
+echo "MARK ac6-source" >&2
+# ---- AC6 and the three options no fixture can reach. `credential.interactive=never` is what a
+# ---- credential HELPER reads; GIT_TERMINAL_PROMPT=0 bounds git's own prompt and never reaches a
+# ---- helper process, which is the correction this unit also makes to the leg's comment. Passed with
+# ---- `-c` so it is scoped to the observation and cannot disable credentials for the landing push,
+# ---- which is a different process and must still authenticate.
+# ---- Source-level is the HONEST home for all four: a fixture that exercised them would need a server
+# ---- that authenticates, stalls mid-transfer, and speaks ssh. Their runtime effect is untested and
+# ---- the spec says so, so a green arm here is never coverage of a stalling server.
+for opt in 'credential.interactive=never' 'http.lowSpeedLimit=' 'http.lowSpeedTime=' 'ConnectTimeout='; do
+  n=$((n+1)); grep -qF -- "$opt" "$SCRIPT"   || { echo "FAIL the bounded remote helper does not carry a transport or credential option the spec requires by inspection: $opt"; st=1; }
+  n=$((n+1)); grep -qF -- "$opt" "$HERE/check-unattended.sh"   || { echo "FAIL the leg's bounded remote helper does not carry a transport or credential option the spec requires by inspection: $opt"; st=1; }
+done
+# ---- and the two halves that make it a bound rather than a decoration, at source: `-k` for the child
+# ---- that ignores SIGTERM, and a redirect rather than a substitution.
+n=$((n+1)); grep -q 'timeout -k 5s "\$REMOTE_BOUND"' "$SCRIPT"   || { echo "FAIL the driver's bounded helper does not wrap the observation in timeout with a kill-after, so a child ignoring SIGTERM outlives the bound"; st=1; }
+# CODE LINES ONLY. The first cut of this arm grepped whole file text and redded on the COMMENT that
+# documents this very fix, which is memory/gotchas/absence-assertion-over-whole-file-text.md happening
+# inside the arm written to prevent its cousin. The comment has to be able to name the defect it warns
+# about, so the predicate reads code and the comment stays.
+subst_bad=$(grep -nE '^[^#]*out=\$\(timeout' "$SCRIPT" "$HERE/check-unattended.sh" 2>/dev/null | grep -v '^[^:]*:[0-9]*: *#' || true)
+n=$((n+1)); [ -z "$subst_bad" ] || { echo "FAIL a bounded observation is captured through a command substitution, which reads until EOF and makes the bound a decoration - the measured defect this helper exists to avoid: $subst_bad"; st=1; }
+
+echo "MARK ac1-refused" >&2
+# ---- AC1: an endpoint that REFUSES. Fast by construction, and that is stated rather than implied:
+# ---- a refused connection returns without the deadline being consulted, so this arm grades the
+# ---- refusal PATH and not the wall clock. The wall clock is AC1a's, above.
+reset_tree; readme tRef; scope published
+git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+ref_t0=$(date +%s)
+out=$(run --preflight tRef --keepalive-id k1)
+ref_el=$(( $(date +%s) - ref_t0 ))
+hit "$out" "the remote did not answer, and the anchor is an observation of it rather than of any local ref"
+n=$((n+1)); [ "$ref_el" -le 30 ] || { echo "FAIL a refused endpoint took ${ref_el}s to refuse, so the observation is not returning promptly on the one failure that needs no waiting at all"; st=1; }
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac3-terminal" >&2
+# ---- AC3: the FREE refusals come first. A close against an already-terminal record must spend NO
+# ---- round-trip, and the arm proves it the only way that cannot be faked: by pointing the remote at
+# ---- an address that would cost the entire declared bound, and asserting the refusal returns anyway.
+# ---- If the ordering regresses, this arm does not merely fail - it takes the whole bound to fail,
+# ---- which is the elapsed assertion below.
+bcopen
+# REPLACED, not appended. `fact()` returns the FIRST matching line, so a second `phase:` at the end of
+# the file is dead text — the fixture read RUNNING, the record was never terminal, and the arm dutifully
+# measured 24s of real network before reporting the ordering as broken. A fixture edit that changes
+# nothing is a fixture that tests nothing, which is why this suite has `mutate` at all.
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+git remote set-url origin "http://192.0.2.1:9418/blackhole.git" 2>/dev/null
+git remote set-url --push origin "http://192.0.2.1:9418/blackhole.git" 2>/dev/null
+term_t0=$(date +%s)
+out=$(run --close tRun)
+term_el=$(( $(date +%s) - term_t0 ))
+hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+miss "$out" "observing the anchor, then evaluating the Definition of Done"
+n=$((n+1)); [ "$term_el" -le 20 ] || { echo "FAIL a close against a terminal record paid a remote observation before refusing (${term_el}s against an unroutable endpoint), so the free refusal is still sequenced behind the expensive one"; st=1; }
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac4-transport" >&2
+# ---- AC4: a transport failure is not a semantic answer. The collapsed form returned the same status
+# ---- for "the remote advertises no tip" and "the remote could not be reached", so a network fault
+# ---- told the operator to push a branch that is already pushed - advice that is not merely useless
+# ---- but wrong, and acting on it changes nothing. The arm asserts BOTH halves: the new message
+# ---- appears, and the misleading one does not.
+reset_tree; readme tBr2; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+out=$(run --preflight tBr2 --keepalive-id k1)
+miss "$out" "push the branch first"
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac8-slowstub" >&2
+# ---- AC8, THE FALSE-POSITIVE ARM, and the only one proving the cap is not merely tight enough to
+# ---- pass the arms above. A stub `git` ahead of the real one on PATH sleeps UNDER the bound on
+# ---- ls-remote and forwards every other subcommand to the real binary. Wall clock only: no network,
+# ---- no git transport, no remote. An unroutable address cannot do this job - it transfers nothing,
+# ---- so it can never present a slow-but-working transfer.
+stubdir=$(mktemp -d)
+real_git=$(command -v git)
+cat > "$stubdir/git" <<STUB
+#!/usr/bin/env bash
+for a in "\$@"; do
+  if [ "\$a" = "ls-remote" ]; then sleep 3; break; fi
+done
+exec "$real_git" "\$@"
+STUB
+chmod +x "$stubdir/git"
+bcopen
+slow_t0=$(date +%s)
+out=$(PATH="$stubdir:$PATH" bash "$SCRIPT" --close tRun 2>&1)
+slow_el=$(( $(date +%s) - slow_t0 ))
+n=$((n+1)); [ "$slow_el" -ge 3 ] || { echo "FAIL the slow-but-working stub was never reached (${slow_el}s), so this arm proves nothing about a false positive - the fixture did not intercept the observation"; st=1; }
+miss "$out" "was KILLED by this kit"
+rm -rf "$stubdir"
+
+
+
+# ---- THE THREE NEW REFUSALS, each armed by a POSITIVE assertion naming its own failure text. All
+# ---- three are REACHABLE, which is why none of them is pinned: the registry's contract is that a pin
+# ---- means no fixture CAN reach a branch, and "chose not to" is a different fact wearing the same
+# ---- row. Two of them are reached by a stub `git` ahead of the real one on PATH, which is the only
+# ---- fixture that can make a remote observation fail in a chosen WAY rather than merely fail.
+
+echo "MARK arm-mktemp" >&2
+# ---- the scratch file the bound needs. Without a file to capture into there is no bound, so the
+# ---- observation is refused rather than run unbounded — the one case where failing to allocate is
+# ---- safer than proceeding. Reached with a TMPDIR that does not exist, which is what mktemp reads.
+bcopen
+out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --close tRun 2>&1)
+hit "$out" "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"
+
+echo "MARK arm-timeout" >&2
+# ---- the TIMEOUT refusal, and it says timeout rather than failure on purpose: "the remote did not
+# ---- answer" and "the remote was not waited for" are different facts, and an unattended run's record
+# ---- has to carry the second one as itself rather than as the first.
+# ---- The stub EXITS 124 directly, which is the status `timeout` returns when it kills a child. So
+# ---- this arm grades the refusal PATH — the message, the endpoint, the stated bound — without
+# ---- spending the declared bound in the slowest leg on the bar. WHAT IT DOES NOT COVER, said plainly:
+# ---- that the kill itself happens. That is AC1a's mechanism arm, above, which measures the platform.
+stub124=$(mktemp -d); real_git_124=$(command -v git)
+cat > "$stub124/git" <<STUB124
+#!/usr/bin/env bash
+for a in "\$@"; do
+  if [ "\$a" = "ls-remote" ]; then
+    case " \$* " in *" --get-url "*) exec "$real_git_124" "\$@" ;; esac
+    exit 124
+  fi
+done
+exec "$real_git_124" "\$@"
+STUB124
+chmod +x "$stub124/git"
+bcopen
+out=$(PATH="$stub124:$PATH" bash "$SCRIPT" --close tRun 2>&1)
+hit "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so nothing was learned about the endpoint and this is a timeout and not a refusal by the remote"
+rm -rf "$stub124"
+
+echo "MARK arm-transport" >&2
+# ---- the TRANSPORT split, which is the defect this unit came for at the second call site. The
+# ---- collapsed form returned one status for "the remote advertises no tip" and "the remote could not
+# ---- be reached", so a network fault told the operator to PUSH A BRANCH THAT IS ALREADY PUSHED.
+# ---- Reaching it needs the first anchor to SUCCEED and the branch query to FAIL, which no endpoint
+# ---- can do — one endpoint answers both — so the stub answers the HEAD advertisement from the real
+# ---- git and fails only the per-branch query, with 128, which is git's own "could not connect".
+reset_tree; readme tBrT; scope published; git add -A >/dev/null && git commit -q -m brt --no-verify
+git push -q -f origin unit 2>/dev/null
+stub128=$(mktemp -d); real_git_128=$(command -v git)
+cat > "$stub128/git" <<STUB128
+#!/usr/bin/env bash
+case " \$* " in
+  *" ls-remote "*" refs/heads/"*) exit 128 ;;
+esac
+exec "$real_git_128" "\$@"
+STUB128
+chmod +x "$stub128/git"
+out=$(PATH="$stub128:$PATH" bash "$SCRIPT" --preflight tBrT --keepalive-id k1 2>&1)
+hit "$out" "the remote could not be reached for this run's branch, or the wall-clock bound fired, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy and the endpoint is: refs/heads/"
+miss "$out" "push the branch first"
+rm -rf "$stub128"
+reset_tree
+
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
