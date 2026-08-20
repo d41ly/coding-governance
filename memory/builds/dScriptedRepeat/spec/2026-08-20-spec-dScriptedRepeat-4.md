@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 

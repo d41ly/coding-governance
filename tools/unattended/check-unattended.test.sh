@@ -1109,6 +1109,20 @@ git add -A >/dev/null
 hit "$(run)" "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are"
 anchor_restore
 
+# ---- TOOL-dScriptedRepeat-4: the DECLARATION SEAM second-opinioned. The record claims a
+# ---- playbook and a count the README at its own BASE does not declare. Two branches, two
+# ---- fixtures, because one arm asserting either message would pass on whichever fired.
+add_recipe_seam() { sed -i '/^slug: /a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3' memory/builds/tRun/README.md; }
+anchor_break add_recipe_seam
+sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
+sed -i '/^base: /a playbook: content/other.md' memory/builds/tRun/RUN.md
+sed -i '/^base: /a pieces: 99' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(run)
+hit "$out" "a run-state file records a playbook the build README at its own recorded BASE does not name, so the instructions the run says bound it are not the ones its authorization pointed at - recorded against declared follow:"
+hit "$out" "a run-state file records a piece count the build README at its own recorded BASE does not declare, so the number the run will be measured against is not the number it was asked for - recorded against declared follow:"
+anchor_restore
+
 # ---- THE NEW MEMBER IS LEGAL. Without this the two arms above pass over a set that could have
 # ---- been narrowed to nothing, and a membership test against an empty vocabulary reds everything -
 # ---- which looks like rigour and is the vacuity this repo reds by name.
