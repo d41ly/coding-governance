@@ -38,14 +38,14 @@ floor stops being the sum and becomes the longest leg under load.
 
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | INPROGRESS | rev-1 | 2026-08-11 |
-| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | INPROGRESS | rev-3 | 2026-08-11 |
+| [TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md) | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

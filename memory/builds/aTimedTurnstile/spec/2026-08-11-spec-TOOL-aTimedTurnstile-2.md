@@ -1,6 +1,6 @@
 # TOOL-aTimedTurnstile-2 — diff-scope the self-test legs, keep the push boundary full
 
-**Status:** INPROGRESS · rev-1 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-20 · node a · Tier-2 · base af6de231 · streams tooling
 
 ## 1. Goal
 
@@ -125,6 +125,19 @@ rejected alternative, on the grounds that `AGENTS.md` defines that run as the fu
 
 - rev-1 · 2026-08-11 · initial draft, written against the measurement in commit f638d8b and the
   runner delivered by TOOL-aTimedTurnstile-5.
+- rev-2 · 2026-08-20 · CLOSED, on a status audit run during the aPacedTurnstile re-scope. Every scope
+  item of this unit is in the tree and has been for some time: `tools/gate-legs.json` carries a
+  `guard` on 50 of its 86 legs (S1), `run-gates.sh` implements `GATE_FULL` (S2), `.githooks/pre-push`
+  exports it (S3), and the guard-must-name-a-tracked-path refusal is armed in the shipped canary,
+  which checks against `git ls-files` rather than the filesystem because a guard is a pathspec git
+  resolves (S4). The unit shipped and nobody moved the status word, which is the closed-plan-with-no-
+  status-move class this repo's own drift audit hunts. What the audit found FIRST was the cost of
+  leaving it open: a sibling survey reported this unit as a BLOCKER on `TOOL-aPacedTurnstile-7`,
+  because a non-terminal spec asserting "the push boundary stays full" is a live second owner of a
+  property another build is about to retire. It was never a design conflict, only an unclosed record.
+  S3 is now SUPERSEDED by `TOOL-aPacedTurnstile-7`, which makes the push boundary decide rather than
+  force. Superseded, not rewritten: this unit's decision was correct when it was taken and is the
+  reason the property existed to be replaced.
 
 ## 10. Reuse audit
 

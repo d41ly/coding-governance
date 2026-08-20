@@ -79,6 +79,8 @@
 
 - TOOL-aMeteredTurnstile-1 · the bar gets an INSTRUMENT before another fix. Its two lower bounds are the longest leg and work over width; the larger decides which lever works, and nothing computed it. The verb WRAPS an unmodified runner, since every unbuilt aPacedTurnstile unit edits that file
 
+- TOOL-aPacedTurnstile-16 · the bar is FLOOR-bound (one leg is 836.5 s of a 1033.2 s wall at 86 legs), so scheduling cannot move it: `-3` loses its reorder and its chunk-major dispatch and keeps reporting only. Order becomes -5 -> -4 -> -6 -> -7 -> -3
+
 ## DEPL — deployer
 
 *(none yet)*

@@ -3,10 +3,14 @@
 #
 # WHY THIS FILE EXISTS, AND WHY IT IS NOT IN THE KIT PAYLOAD. `run-gates.test.sh` SHIPS: once
 # the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` makes run-gates a deployable kit, an adopter's emitted manifest runs it in
-# THEIR tree. So the shipped canary may assert only what is true in ANY tree. Three sibling units
-# want arms that are keyed on THIS repo's corpus instead — the chunking unit's every-leg-carries
-# -a-chunk assertion over gov's six declared chunk names, the reuse unit's network-calling
-# leg names, the push-boundary unit's guard pin on a named gov leg. In an adopter tree the manifest
+# THEIR tree. So the shipped canary may assert only what is true in ANY tree. Sibling units want
+# arms that are keyed on THIS repo's corpus instead — the chunking unit's every-leg-carries-a-chunk
+# assertion over gov's six declared chunk names, and the push-boundary unit's guard pin on a named
+# gov leg. (A third was reserved here and is now CUT: the reuse unit's network-calling leg names.
+# TOOL-aPacedTurnstile-16's re-scope ran that predicate over the real manifest for the first time,
+# matched six legs and found every one of them hermetic, so there is no population to pin. The
+# reservation is removed rather than left standing, because a header naming an arm nobody will write
+# is the same rot in the file that exists to refuse it.) In an adopter tree the manifest
 # is seeded EMPTY and emitted from descriptors with no chunk key, and gov's legs do not exist, so
 # every one of those arms would red on arrival. That is
 # `memory/gotchas/pin-copied-from-another-corpus.md`, the class run-gates' own spec refuses by name
