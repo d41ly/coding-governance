@@ -418,6 +418,47 @@ printf '%s' "$(apay S1 Pfresh n1)" | node "$HOOK" >/dev/null 2>&1; rcf=$?
 [ "$rcf" = 0 ] && { echo "ok   rule4: a new prompt resets the budget with no cleanup"; pass=$((pass+1)); } \
                || { echo "FAIL rule4: a new prompt did not reset the budget (exit $rcf)"; fail=$((fail+1)); }
 
+# AC26 — a slot IDLE past SLOT_TTL_MS is reclaimed, and one still inside it is NOT. Both directions,
+# because an expiry that always fires is a cap that does not exist, and one that never fires is the
+# permanent budget this arm was added to end. The clock is moved with `touch -d`, never by sleeping:
+# the constant is 45 minutes and a test that waits for it is a test nobody runs.
+#
+# THE STALE CASE IS THE REGRESSION ARM. Before the expiry landed, five sequential spawns exhausted a
+# turn's budget forever — measured, six sequential spawns with distinct tool_use_ids and the sixth
+# denied against five long-idle slots. Revert SLOT_TTL_MS to Infinity and this arm goes red.
+for i in 1 2 3 4 5; do
+  printf '%s' "$(apay Sttl Pttl "t$i")" | node "$HOOK" >/dev/null 2>&1
+done
+TURNTTL="$AGROOT/Sttl__Pttl"
+if [ ! -d "$TURNTTL" ]; then
+  echo "FAIL rule4: the TTL fixture claimed no slots — $TURNTTL absent"; fail=$((fail+1))
+else
+  # Age slot-1 only. The remaining four stay fresh, which is what makes the second half a control
+  # rather than a restatement of the first.
+  touch -d '46 minutes ago' "$TURNTTL/slot-1" 2>/dev/null || touch -A -004600 "$TURNTTL/slot-1" 2>/dev/null
+  printf '%s' "$(apay Sttl Pttl t6)" | node "$HOOK" >/dev/null 2>&1; rcstale=$?
+  printf '%s' "$(apay Sttl Pttl t7)" | node "$HOOK" >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
+  if [ "$rcstale" = 0 ] && [ "$rcfresh" = 2 ] \
+     && grep -qF 'within the last' "$TMP/ttl.err"; then
+    echo "ok   rule4: an idle slot past the TTL is reclaimed; four fresh ones are not"; pass=$((pass+1))
+  else
+    echo "FAIL rule4: slot TTL (stale-reclaim exit $rcstale want 0, fresh-deny exit $rcfresh want 2)"
+    sed 's/^/     /' "$TMP/ttl.err"; fail=$((fail+1))
+  fi
+fi
+
+# ...and the DENY MESSAGE says which rule it is enforcing. It used to read "already spawned in this
+# turn", which described a permanent budget and named the concurrency rule in the same breath. A
+# message that misstates the rule sends the reader to consolidate work that did not need it.
+printf '%s' "$(apay Smsg Pmsg m1)" | node "$HOOK" >/dev/null 2>&1
+for i in 2 3 4 5 6; do
+  printf '%s' "$(apay Smsg Pmsg "m$i")" | node "$HOOK" >/dev/null 2>"$TMP/msg.err"
+done
+grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
+  && grep -qF 'is reclaimed on the next spawn' "$TMP/msg.err" \
+  && { echo "ok   rule4: the deny message states the window, not a permanent budget"; pass=$((pass+1)); } \
+  || { echo "FAIL rule4: deny message does not state the reclaim window"; sed 's/^/     /' "$TMP/msg.err"; fail=$((fail+1)); }
+
 # FAIL OPEN when the budget cannot be KEYED — and prove it by the ABSENCE of a token, not by the exit
 # code alone, which a hook that allowed everything would also produce. A hook that denies every spawn
 # because a payload field is missing is worse than the burst it prevents; a token it could not

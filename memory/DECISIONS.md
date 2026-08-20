@@ -86,3 +86,4 @@
 ## DEPL — deployer
 
 *(none yet)*
+- TOOL-aTaperedSluice-1 · an Agent slot had no release path, so the budget counted LIFETIME per prompt, not concurrency — 5 sequential agents refused the 6th all turn. A 45-min expiry makes it a rolling window. Open: does Agent fire PostToolUse? That unlocks a real release

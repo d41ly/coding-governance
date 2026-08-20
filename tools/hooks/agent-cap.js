@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.5' // gov:kit agent-cap@1.5 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.6' // gov:kit agent-cap@1.6 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -571,6 +571,39 @@ function capFindings(script) {
 // no payload field provides — and the concurrency rule binds every fan-out to the same number
 // anyway, so a uniform cap needs no such binding.
 const AGENT_TTL_MS = 12 * 60 * 60 * 1000
+// A SLOT expires too, and that is a different clock from the turn-directory sweep above.
+//
+// WHY IT HAS TO. A slot is claimed with O_EXCL and there is no release path, because PreToolUse is
+// the only event this hook is wired for and it fires BEFORE the work, never after. So the count is
+// LIFETIME-PER-PROMPT, not concurrency: five agents that ran one after another, each finishing
+// before the next began, exhaust the budget for the rest of the turn. Measured on node `a` — six
+// sequential spawns in one prompt, distinct tool_use_ids, the sixth denied with every slot long
+// since idle. The protocol's own words are "at most 5 run concurrently"; without an expiry this
+// mechanism could not measure that, and a permanent budget is not the rule it is named after.
+//
+// WHY 45 MINUTES, and why erring long. The failure this whole rule exists to prevent is a BURST —
+// ~40 agents at once, a tripped server rate limiter, ~3.65 M subagent tokens for nothing. A burst
+// claims its slots within a second of each other, so no expiry short of absurd lets one through:
+// the TTL is irrelevant to the case that matters. What the TTL trades is the opposite direction —
+// if five agents genuinely run CONCURRENTLY for longer than the TTL, a sixth is admitted. So the
+// value must exceed the longest realistic subagent, and it is set from measurement rather than
+// taste: subagent durations observed on this fleet run 2 s to 34 min (a 999 s review lens, a
+// 1 026 s engine split, a 2 029 s closing review). 45 min clears the longest by ~30%.
+//
+// ponytail: an expiry is a HEURISTIC standing in for a completion signal, and the ceiling is stated
+// rather than buried — five long-running concurrent agents plus a sixth after 45 min is admitted.
+// The precise fix is a release keyed on tool_use_id, which the harness guarantees to be the SAME id
+// in PreToolUse and PostToolUse for one tool execution. It is NOT built here because it turns on one
+// unmeasured fact: whether the `Agent` tool fires PostToolUse at all. The public hooks reference says
+// Agent skips both tool events in favour of SubagentStart/Stop, and SubagentStop carries no
+// tool_use_id to correlate on — while this repo's own protocol records, from measurement, that
+// PreToolUse DOES fire for Agent — re-confirmed here by watching a real spawn claim a slot. Both
+// cannot be right, and wiring a release for an event that never arrives would ship exactly the
+// mechanism-that-cannot-fire this repo gates against. Settle it with a PostToolUse[Agent] probe plus
+// a PostToolUse[Bash] CONTROL, in a FRESH session: settings are not hot-reloaded, which is why it
+// could not be settled where it was found. Then the TTL demotes to the crash/interrupt backstop the
+// hooks reference recommends and stops being the primary mechanism.
+const SLOT_TTL_MS = 45 * 60 * 1000
 const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
 
 // The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
@@ -649,11 +682,30 @@ function guardAgentSpawn(data) {
   }
 
   for (let n = 1; n <= MAX_VERIFIERS; n++) {
+    const slot = path.join(turn, `slot-${n}`)
     let fd
     try {
-      fd = fs.openSync(path.join(turn, `slot-${n}`), 'wx') // O_CREAT|O_EXCL — the atomic decision
+      fd = fs.openSync(slot, 'wx') // O_CREAT|O_EXCL — the atomic decision
     } catch (e) {
-      if (e.code === 'EEXIST') continue
+      // An EXPIRED slot is a free slot: unlink it and re-claim through the SAME O_EXCL create, so
+      // two hooks racing on one stale slot still resolve in the create — the only place that
+      // decides. A failed unlink (the other racer got there first) is not an error, and a failed
+      // re-create means that racer won the slot, so this one moves to the next ordinal rather than
+      // retrying. Nothing here ever overwrites a live claim: the age test gates the unlink, and the
+      // create is still exclusive.
+      if (e.code === 'EEXIST') {
+        let age = 0
+        try { age = Date.now() - fs.statSync(slot).mtimeMs } catch { age = 0 }
+        if (age > SLOT_TTL_MS) {
+          try { fs.unlinkSync(slot) } catch { /* another racer won it; the retry sees the truth */ }
+          try {
+            fd = fs.openSync(slot, 'wx')
+          } catch { continue }
+          try { fs.writeSync(fd, uid) } finally { try { fs.closeSync(fd) } catch { /* ignore */ } }
+          return null
+        }
+        continue
+      }
       return (
         `BLOCKED by agent-cap: this spawn's token could not be created in ${turn} ` +
         `(${e.code || e.message}), so the ${MAX_VERIFIERS}-agent budget could not be enforced for ` +
@@ -666,12 +718,15 @@ function guardAgentSpawn(data) {
 
   return (
     `BLOCKED by agent-cap: the direct-Agent spawn budget for this prompt is exhausted — ` +
-    `${MAX_VERIFIERS} of ${MAX_VERIFIERS} already spawned in this turn. A review's verify stage ` +
-    `spawns at most ${MAX_VERIFIERS} agents TOTAL and the charter binds every other fan-out to the ` +
-    `same number (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
+    `${MAX_VERIFIERS} of ${MAX_VERIFIERS} claimed in this turn within the last ` +
+    `${Math.round(SLOT_TTL_MS / 60000)} minutes. A review's verify stage spawns at most ` +
+    `${MAX_VERIFIERS} agents TOTAL and the charter binds every other fan-out to the same number ` +
+    `(memory/guides/REVIEW-PROTOCOL.md).\n\n` +
     `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
     `count and the agent count does not. For a review, tools/workflows/tier2-review.js already does ` +
-    `it. A new user prompt resets the budget; nothing needs cleaning up.\n`
+    `it. A new user prompt resets the budget, and a slot idle longer than ` +
+    `${Math.round(SLOT_TTL_MS / 60000)} minutes is reclaimed on the next spawn; nothing needs ` +
+    `cleaning up either way.\n`
   )
 }
 
