@@ -12,8 +12,8 @@ ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOO
 Node `d` · opened 2026-08-20 · streams tooling+playbook.
 
 The owner reports four breaking issues in both unattended build modes. Each was verified against
-source before a line of this file was written, and each is stronger than reported: **four of the five
-ABORTED runs in this tree aborted for exactly these causes.** The abort reasons are quoted per
+source before a line of this file was written, and each is stronger than reported: **every one of the
+five ABORTED runs in this tree aborted for exactly these causes.** The abort reasons are quoted per
 defect below and are the primary evidence for this build.
 
 ## Measured at BASE `2dc9df35`
@@ -22,7 +22,7 @@ defect below and are the primary evidence for this build.
 |---|---|---|
 | run-state files in the tree | 13 | `memory/builds/*/RUN.md` |
 | of those, `ABORTED` | 5 | 38 per cent |
-| aborts caused by the four defects below | 4 of 5 | quoted in each section |
+| aborts caused by the four defects below | **5 of 5** | quoted in each section |
 | `READ_PATH_CEILING` margin | 7 152 B of 112 987 | `corpus_ids.py --report` |
 | `BUILD-METHOD.md` margin | 1 961 B and **7 lines** of 22 528 / 290 | `wc` against M1's stated budget |
 | template margin | 989 B of 49 152 | `check-template-size.sh` |
@@ -44,6 +44,13 @@ yours — park it." M2's classification loop has four actions and none of them r
 
 > `aWalkedCorpus` · Raising another build's shrink-only pin **is a SCOPE decision a standing mandate
 > does not delegate**, so it is parked rather than absorbed.
+
+> `cBriefedPilot` · WHAT I REFUSED TO DECIDE: **whether 16 of 22 units is a landable build. That is a
+> scope decision, reserved to the owner by M3 and not delegated by a standing mandate.** The branch is
+> green and needs one command to merge if the owner agrees.
+
+That third one is the sharpest case in the corpus. The bar was GREEN on every leg of a full run, the
+work was complete enough to land, and the run stopped because the method gave it no way to say so.
 
 **The mechanism already exists and is legal.** `WONTDO` is terminal for the `build-complete` DoD
 item, and `check_authorization`'s roster test compares the BASE and HEAD unit-ID sets as a SUBSET —
