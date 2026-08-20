@@ -43,7 +43,10 @@ write its own mandate is about AUTHORIZATION — the mandate authorizes, the spe
 `memory/guides/SESSION-KICKOFF.md` assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
 **THIN → fill it as a `rev-N` bump on the existing file** with its §9 line, never a second file for a unit that has
 one — that is how a spec set stops agreeing with itself. **FORKED → M3.** **READY → build what it says**; to
-diverge, change the spec first (rev bump + §9 line), then code.
+diverge, change the spec first (rev bump + §9 line), then code. **AMEND → RETIRE (status `WONTDO`), SUPERSEDE
+(replacement authored, original retired) or ADD**, when building uncovers what speccing could not; each owes a
+recorded amendment. An id in the units region at the pinned BASE may never LEAVE it, so retiring is a status
+flip.
 
 **Hard floor.** Never build a MISSING or THIN unit; "I will spec it afterwards" is the same act with the record
 written last. When ACCEPTANCE or GATES cannot be *derived* from the goal, the code or the prior records, the
@@ -62,9 +65,11 @@ code arbitrate between two specs; a disagreement that is a choice rather than an
 Sweep §8 across the whole set before any code, including forks M2 just created. Resolved mid-build is a rewrite;
 resolved before it, a decision.
 
-**What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only, and
-only for forks the specs already state. It does not delegate SCOPE: a fork whose options differ in *what gets built*
-is not yours — park it. With no mandate, forks go to the owner and this section is preparation.
+**What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
+the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL
+statement is what a run may not amend, and the delegation does not reach veto 2's governance-carrier clause,
+M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
+With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —
 after these vetoes, in order. Discard any option that:
@@ -274,9 +279,9 @@ candidate passes. Write down what would make each candidate LOSE before running 
 cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar
 is full of gates against, one level up.
 
-**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after M3's
-vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your authority holds
-here too — a candidate set whose options differ in WHAT GETS BUILT is a scope fork, and scope is not delegated.
+**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after
+M3's vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your
+authority holds here too, and M3 is the one place it is stated.
 
 **Record the LOSS, not just the win.** §10 already names the seam and the recall terms; this section adds one thing
 to it — for each candidate tested and rejected, the test that rejected it. A rejected candidate with no recorded

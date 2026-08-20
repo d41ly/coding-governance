@@ -233,7 +233,7 @@ ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 T
 | [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | SPECCED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | CLOSED | rev-3 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | SPECCED | rev-3 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | SPECCED | rev-2 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | SPECCED | rev-2 | 2026-08-20 |

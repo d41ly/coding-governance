@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -110,7 +110,13 @@ it visible to a reader.
 the headroom is **seven lines** and units 4 and 8 both write this file. S1 replaces a paragraph of
 comparable length and is close to neutral. S3 and S4 are additions.
 
-This unit's budget is **four lines net**, leaving three for unit 8. It is measured with `wc` against
+This unit's budget was **four lines net**, leaving three for unit 8. **MEASURED at build: it spent
+FIVE** — 283 to 288 of M1's 290 — after two compression passes and a reflow of the paragraph whose
+clause this unit shortened. The overrun is one line and it comes out of unit 8's share, which now has
+TWO. Unit 8's edit is a framing-sentence REPLACEMENT plus one pointer, so two may hold; if it does
+not, the disposition is a PARK, because M1's budget is exactly the governance-carrier constraint this
+unit's own S2 writes OUT of the delegated authority. A run may not raise the budget of the file that
+states its own limits — that circularity is the reason the carve-out exists. It is measured with `wc` against
 M1's figures before commit, not estimated. If the pair does not fit, the disposition is a fork to the
 owner, because M1's budget is a stated constraint of a governance carrier and M3's veto 2 makes
 changing one an owner turn — a veto this unit deliberately does NOT relax for M1 itself, since a run
@@ -198,6 +204,11 @@ boundary.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-3 · 2026-08-20 · built. §4's line budget is corrected to the MEASURED five rather than the
+  projected four; the extra line comes out of unit 8's share and the disposition if unit 8 overruns is
+  a park, not a budget raise. M12's second spelling of the delegation rule was deleted as S1a
+  specified, and the carriers were re-wrapped to the file's own 110-column style so the 450-character
+  line gate holds.
 - rev-2 · 2026-08-20 · folded the spec audit: H10 (both delegation bounds moved into the rule TEXT),
   H11 (M12's second spelling joins the edit set as S1a), M17 (the DELETE refusal qualified by anchor
   scope), M18 and M15 (four new criteria, including the joint budget observation moved here from
