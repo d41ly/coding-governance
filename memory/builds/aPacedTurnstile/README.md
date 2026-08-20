@@ -200,7 +200,7 @@ recommendation is worth more on the record than off it:
   there: the split isolates the half a reviewer must be hostile toward.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-18 · streams tooling
+**Build status:** OPEN · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
 ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 
@@ -214,6 +214,7 @@ ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 | [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-8 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-14 — the authored roster is read with its refusal intact](spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md) | SPECCED | rev-1 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
@@ -227,6 +228,10 @@ Records live under `spec/` and `reviews/`.
 | [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
 | [2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md) | diff-review | TOOL-aPacedTurnstile-2 |
 | [2026-08-20-review-TOOL-aPacedTurnstile-2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md) | diff-review | TOOL-aPacedTurnstile-2 |
+
+Ids no record names: TOOL-aPacedTurnstile-14.
+
+Ids no `spec-audit` record has ever named: TOOL-aPacedTurnstile-14.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -249,6 +254,7 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-18-spec-TOOL-aPacedTurnstile-5.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md)
   - [2026-08-18-spec-TOOL-aPacedTurnstile-6.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md)
   - [2026-08-18-spec-TOOL-aPacedTurnstile-7.md](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md)
+  - [2026-08-20-spec-TOOL-aPacedTurnstile-14.md](spec/2026-08-20-spec-TOOL-aPacedTurnstile-14.md)
 - **`reviews/`**
   - [2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md)
   - [2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md)
