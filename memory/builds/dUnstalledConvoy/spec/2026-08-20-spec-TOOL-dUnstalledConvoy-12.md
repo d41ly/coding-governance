@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -160,7 +160,9 @@ this unit's commit ordering actually trips, and the first draft did not name it.
 
 ## 8. Open questions
 
-- **F1 — does the check read the ledger from the SAME build only?** S4 scopes it to the build's own
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): REPO-WIDE. The record-binding grammar deliberately lets a record name a spec in another build, because one closing review legitimately covers two, so scoping the ledger search to the same build would refuse a legitimately cross-filed record and wedge with no in-band repair. It costs one wider scan.**
+
+  The question this settles: does the check read the ledger from the SAME build only? S4 scopes it to the build's own
   records. But the record-binding grammar deliberately lets a record name a spec in another build,
   because one closing review legitimately covers two. Options: same build only, which is simpler and
   matches how journals are filed; or repo-wide, which matches the binding grammar's stated

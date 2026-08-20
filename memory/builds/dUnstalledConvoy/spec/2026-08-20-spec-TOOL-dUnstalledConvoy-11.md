@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -161,7 +161,9 @@ the push boundary.
 
 ## 8. Open questions
 
-- **F1 — does the ledger bind ATTENDED builds too?** S5 keys on spec status and date, so it does.
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): YES — the ledger binds attended builds too. An attended build's spec conformance is exactly as unobserved as an unattended one's, the ledger is cheap, and keying the rule on run mode makes it two rules. Same answer and same reasoning as the parallelism inversion's own fork, and surfaced in the wrap-up for the same reason.**
+
+  The question this settles: does the ledger bind ATTENDED builds too? S5 keys on spec status and date, so it does.
   That is a wider blast radius than the owner's report, which was about unattended runs. Options:
   keep it universal; or scope the requirement to units belonging to a build that has a run-state
   file. **Recommendation: keep it universal.** An attended build's spec conformance is exactly as

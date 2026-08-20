@@ -1,6 +1,6 @@
 # PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams playbook
+**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams playbook · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -136,7 +136,9 @@ build does not diagnose it twice.
 
 ## 8. Open questions
 
-- **F1 — which backlog family owns S6's row?** The instance is a playbook-carrier defect, so `PLAY`
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): the `TOOL` shard owns the drift-class row. The instance is a playbook-carrier defect but the CLASS is a tooling question about how a correction sweeps every carrier of one claim, and an open row already generalises exactly that for kit-version markers in `TOOL`. Two rows about the same shape belong in one shard so they can close together.**
+
+  The question this settles: which backlog family owns S6's row? The instance is a playbook-carrier defect, so `PLAY`
   fits; the CLASS is a tooling question about how a correction sweeps every carrier of one claim, and
   an open row already generalises exactly that for kit-version markers, in `TOOL`. **Recommendation:
   `TOOL`**, cross-referenced from this spec, so the two rows about "a fix naming more than one

@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -186,7 +186,9 @@ boundary.
 
 ## 8. Open questions
 
-- **F1 — does the AMEND act belong in M2 or in M3?** M2 owns classification and action; M3 owns
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): as specified — the AMEND acts live in M2, which owns classification and action, and the authority lives in M3, which owns authority. That matches how the two sections already divide. If the measured line budget refuses the split, the fallback is the M3-only placement; either way this is a placement choice and changes nothing the method permits.**
+
+  The question this settles: does the AMEND act belong in M2 or in M3? M2 owns classification and action; M3 owns
   authority. S3 puts the acts in M2 and the authority in M3, which matches how the two sections
   already divide. The alternative folds both into M3 and costs fewer lines, which matters given the
   seven-line headroom. **Recommendation: as specified**, and fall back to the M3-only placement only

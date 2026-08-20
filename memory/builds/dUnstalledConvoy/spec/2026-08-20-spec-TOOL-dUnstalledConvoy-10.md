@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -157,7 +157,9 @@ boundary.
 
 ## 8. Open questions
 
-- **F1 — should a path outside the declared set RED, or be reported?** Redding is the point of the
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): RED, with the widening repair. A report-only check is the toothless state the directive is already in and which the owner's report is about. The repair keeps it from becoming a wedge: `--dispatch` may be re-run with a widened set before the commit, and re-declaring before committing is the honest act the rule wants. The sibling verb's idempotence rule already admits a widening, folded at its rev-3.**
+
+  The question this settles: should a path outside the declared set RED, or be reported? Redding is the point of the
   unit, but it means a run that legitimately discovers a needed file mid-pass has its bar go red with
   no in-band repair, which is the wedge shape this build exists to remove. Options: red, and give the
   run a repair by letting `--dispatch` be re-run with a widened set before the commit; or report

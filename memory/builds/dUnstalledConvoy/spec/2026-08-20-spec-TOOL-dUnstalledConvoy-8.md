@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -154,7 +154,9 @@ bar at the push boundary.
 
 ## 8. Open questions
 
-- **F1 — does the inversion bind an ATTENDED build too?** M6 is binding for any build of more than
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): the inversion binds EVERY build, attended or not. M6's first line already says it is binding for any build of more than one pass, the disjointness proof is the same work either way, and an attended session that writes two path lists has earned the same concurrency. A rule that behaves differently by run mode is two rules. Recorded as the wider blast radius it is, and surfaced in the wrap-up because the owner may want the narrower reading.**
+
+  The question this settles: does the inversion bind an ATTENDED build too? M6 is binding for any build of more than
   one pass, attended or not, and its first line says so. Inverting it therefore changes what an
   attended session must do, which is a wider blast radius than the owner's report asked for. Options:
   invert M6 for all builds; or scope the obligation to runs under a mandate, leaving attended builds

@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -171,7 +171,9 @@ block another build's terminal, which is the exact shape of the deadlock this bu
 
 ## 8. Open questions
 
-- **F1 — should a run whose remote is UNREACHABLE be able to land locally?** `observe_anchor` refuses
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): NO — S6 stands, and a run whose remote is unreachable does not land locally. The fallback would let a run with no network reach a terminal phase against a branch name it chose itself, skipping every integrity tripwire in the anchor observation. A run that cannot see the remote it is meant to land on aborts with a reason, which is a verb it already has.**
+
+  The question this settles: should a run whose remote is UNREACHABLE be able to land locally? `observe_anchor` refuses
   at check 27 when the remote does not answer, so under S6 the local arm is unreachable in exactly
   the case a local landing sounds most useful. Options: keep S6 as written and let such a run abort;
   or let `AREF` fall back to a local symref when the remote is unreachable. **Recommendation: keep

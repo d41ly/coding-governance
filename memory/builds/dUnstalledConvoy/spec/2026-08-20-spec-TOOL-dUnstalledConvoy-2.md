@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -174,7 +174,9 @@ boundary. `ARMS_FLOORS` moves for `tools/unattended/check-unattended.sh`.
 
 ## 8. Open questions
 
-- **F1 — should the cutoff be a DATE or the presence of the key in the record's first blob?** A date
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): a DATE, matching the three cutoffs this conf already carries. A first-blob presence test would need no key at all and would grandfather correctly, but it makes the grandfathering invisible to anyone reading the conf, and a declared cutoff is readable where a derived one is not.**
+
+  The question this settles: should the cutoff be a DATE or the presence of the key in the record's first blob? A date
   is the idiom this conf already uses three times and is what S4 specifies. A first-blob presence
   test would need no conf key at all and would grandfather correctly with no value to maintain, but
   it makes the grandfathering invisible to anyone reading the conf. **Recommendation: the date**, for

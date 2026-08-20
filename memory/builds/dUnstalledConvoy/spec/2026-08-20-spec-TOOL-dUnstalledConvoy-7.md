@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -152,8 +152,9 @@ the push boundary. This unit adds no gate.
 
 ## 8. Open questions
 
-- **F1 — OPEN, and deliberately so: if E3 clears and E4 fails, does the build ship a narrowed
-  inversion?** It is honestly unresolvable until the measurement is taken, and writing the answer
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): if E3 clears and E4 fails, the build ships NO inversion. The rule is the same one the consuming unit now carries — anything other than `cleared` on either criterion is a non-shipping outcome — so the two units cannot disagree about a three-valued vocabulary. This resolves the DISPOSITION now, which is what M3 asks for, while leaving the measurement itself genuinely unmade: S1 still requires the losing conditions written before either test runs, and no result is presumed here.**
+
+  The question this settles: OPEN, and deliberately so: if E3 clears and E4 fails, does the build ship a narrowed inversion? It is honestly unresolvable until the measurement is taken, and writing the answer
   before the test is exactly what S1 exists to prevent. What the 2026-08-20 reorder fixed is not the
   fork but the CLAIM attached to it. The first draft said a run could resolve this under the new scope
   authority, which was false when written: the authority and the recording verb both landed after this

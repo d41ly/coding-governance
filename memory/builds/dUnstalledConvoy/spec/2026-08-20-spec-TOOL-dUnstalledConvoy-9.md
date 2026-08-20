@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -185,7 +185,9 @@ therefore in this unit's write set. Review fold: M4, M7, H13.
 
 ## 8. Open questions
 
-- **F1 — should the verb refuse when the current phase is not `BUILDING`?** A dispatch during
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): do NOT refuse outside `BUILDING`. The spec-audit fan this repo already performs is a concurrent dispatch during `SPECCING`, so refusing there would forbid the one parallel dispatch in daily use. The phase is RECORDED in the row instead, so the wrap-up can tell a spec-audit fan from a build fan without the verb policing the difference.**
+
+  The question this settles: should the verb refuse when the current phase is not `BUILDING`? A dispatch during
   `SPECCING` is legitimate — M6's pass set includes "a spec authored" and "a spec reviewed", and M4
   already dispatches spec audits concurrently. Refusing outside `BUILDING` would forbid the one
   concurrent dispatch this repo already performs. **Recommendation: do not refuse.** Record the phase

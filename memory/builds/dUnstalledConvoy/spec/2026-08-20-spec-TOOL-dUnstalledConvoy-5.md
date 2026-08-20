@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -170,7 +170,9 @@ therefore in this unit's write set. Review fold: M4, M7, H13.
 
 ## 8. Open questions
 
-- **F1 — should `--rescope` refuse before the phase reaches `BUILDING`?** An amendment declared during
+- **F1 — RESOLVED (agent, 2026-08-20, delegated): do NOT refuse early. A uniform record across every phase is worth more than a distinction the method itself does not draw, and a phase-gated verb is one more refusal a resumed run can meet and cannot interpret.**
+
+  The question this settles: should `--rescope` refuse before the phase reaches `BUILDING`? An amendment declared during
   `SPECCING` is ordinary spec authoring, which M2 already covers without a verb. Recording it anyway
   costs a row and buys a uniform history. Refusing it draws a line the method does not draw.
   **Recommendation: do not refuse.** A uniform record is worth more than a distinction the method
