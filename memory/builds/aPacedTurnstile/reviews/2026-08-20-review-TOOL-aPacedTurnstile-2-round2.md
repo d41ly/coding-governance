@@ -2,8 +2,9 @@
 
 **Range reviewed:** `d37c8a4049acbeb93d1f97f2f94565e95be91354...HEAD` (one commit, `2977316`).
 
-**Serves:** diff-review TOOL-aPacedTurnstile-2 · **Build:** aPacedTurnstile · **Date:** 2026-08-20
-· **Tier:** 2 · **Streams:** tooling
+**Serves:** diff-review TOOL-aPacedTurnstile-2
+
+**Build:** aPacedTurnstile · **Date:** 2026-08-20 · **Tier:** 2 · **Streams:** tooling
 **Judged against:** `memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md`
 (B1, M1–M5, L1–L3) and the contract
 `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md`, AC1–AC13.
