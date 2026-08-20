@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-14 — the authored roster is read with its refusal intact
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -28,15 +28,23 @@ build a roster the plan verb can read.
   where the generated-pair guard already runs — at the head of the verb, before the spec listing and
   before the missing-unit loop. Position is load-bearing: that loop spells
   `for miss in $(missing_units …)`, which discards the status a THIRD time, so S2's propagation buys
-  `verb_plan` nothing on its own. Codes 1 through 47 are contiguous and in use, so the new one is 48.
+  `verb_plan` nothing on its own. This RESTORES a branch rather than inventing one:
+  `TOOL-cBriefedPilot-6` S4 built exactly this refusal for the AUTHORED pair and its S7 shipped the
+  arms and the `ARMS_FLOORS` raise, and `TOOL-aBoundedVerdict-11` S8 repointed that one branch at the
+  generated pair instead of adding a second. So the branch count returns to what S4 already paid for,
+  and the floor moves by one again. Codes 1 through 47 are contiguous and in use, so the new one is 48.
 - **S4** — the `build-complete` Definition-of-Done item reports the same refusal through `DOD_OUT`
   rather than reporting a harvested Records-table id as a unit the build owes a spec.
 - **S5** — `roster_refusal` is the one place that message is spelled, sibling to `units_refusal`.
   Its remedy differs and must say so: the generated region is repaired by a render, and the authored
   pair is repaired by hand, so pointing an operator at a render command here would be a lie.
-- **S6** — the existing guard's message is corrected. It says "the roster this verb would join
-  against" while checking the generated region, and the verb joins against the authored one. Both
-  guards survive; only the sentence that misnames its subject changes.
+- **S6** — the misnaming is corrected at every carrier, not at the one that is easiest to find. The
+  same error — calling the GENERATED region the thing `--plan` joins against — sits at four places:
+  the guard message at `unattended.sh:1092`, the arm asserting that literal at
+  `unattended.test.sh:1399`, the verb-list comment at `unattended.sh:1378`, and check 21's header at
+  `check-unattended.sh:865`. Both guards survive; only the sentences change. A rev-2 draft scoped
+  this to the first two, which is the defect this build's README names as its own recurring one: a
+  fix naming more than one carrier lands in one of them.
 - **S7** — a test arm for the malformed AUTHORED pair, observed RED against the unfixed driver
   before the fix lands. The arm that exists today builds a second GENERATED pair, so the authored
   path has never been exercised, and its comment claims the coverage the fixture does not supply.
@@ -45,8 +53,18 @@ build a roster the plan verb can read.
   THIS unit. The table was authored when the build had seven units and this spec makes eight, so a
   straight relocation would ship a plan that omits the unit which created it — green, because the
   join only refuses ids the roster has and specs lack, and wrong.
-- **S9** — the codebase-map dossier bullet claiming this unit is already closed is corrected, and
-  the backlog row is closed against what the fix actually does.
+- **S9** — three stale map claims across two dossiers are corrected, not one across one:
+  `build-readme-surface.md`'s seam line asserting the roster pair is being RETIRED, its Gaps bullet
+  claiming this unit is already closed by another, and `unattended.md`'s claim that
+  `build-complete` is a conjunction over the AUTHORED roster and a run-state copy — which is wrong
+  on both halves, since it reads the generated region and the copy was removed. The one derived
+  figure in that Gaps bullet is DELETED rather than decremented, because the population is
+  derivable and a corrected count is the next commit's stale count.
+- **S10** — the backlog row is closed with a note carrying its residual. The row's trailing
+  suggestion to check the rest of the corpus is DECLINED by the first non-goal, not fixed, so the
+  closure states that or the residual vanishes silently. Hygiene check 8 grades that a row carries
+  one status token and never whether the token is true, so nothing else would catch it — and this
+  exact row is the proof: another unit already declared it closed and it is still OPEN today.
 
 ## 3. Non-goals (OUT)
 
@@ -63,6 +81,14 @@ build a roster the plan verb can read.
   does not renegotiate it.
 - **Generalising the marker contract to the row selector.** That is `TOOL-aPromptedMandate-14`, and
   it is a wider change than one reader's discarded status.
+- **Deciding whether `build-complete`'s missing-units term should exist at all.** That is a LIVE
+  parked owner decision, recorded through the park verb in `memory/builds/aBoundedVerdict/RUN.md`
+  and restated in that build's README: the authored pair was narrowed to the one question only it
+  can answer, and dropping the term outright remains the owner's to prefer. This unit builds on the
+  term as it stands and does not resolve its survival. S2 and S4 are scoped to that term, so if the
+  owner drops it both revert cleanly and nothing else in this unit depends on them. Naming the park
+  here rather than in section 8 keeps that section's first line machine-legal while leaving the
+  question visible to the next reader, which is what a park is for.
 
 ## 4. Design
 
@@ -78,6 +104,29 @@ Two marker pairs live in a build README and they answer different questions.
 The split is the whole point. Pointing the planned-unit question at the generated region makes it a
 tautology, because that region is rendered FROM the specs the question is asking about. That was
 measured mid-build and corrected, and the correction is why an authored reader still exists.
+
+**S8 reverses a ratified supersession, and the reversal is recorded here because the record it
+reverses is CLOSED and must not be rewritten.** `TOOL-aBoundedVerdict-11` states in its own section 4
+that this row's proposed remedy, wrapping the authored Units table in the marker pair, is
+"SUPERSEDED here rather than adopted", on the ground that "wrapping keeps an AUTHORED region on the
+authorization path". The same record declares this row closed. Both statements were true when
+written and the first is now void: that spec's own S6 moved authorization onto the generated id set,
+and its S8 then corrected itself mid-build to KEEP the authored reader rather than remove it. The
+consequence is checkable and was checked — `ROSTER_OPEN` has exactly two occurrences in the whole
+driver, the constant at `unattended.sh:151` and the reader at `:1008-1009`, both inside
+`roster_ids`. No authorization reader touches the roster slice. Wrapping therefore cannot put an
+authored region back on the authorization path, because there is no longer a path there to put it
+on. The closure claim is void for the same reason: what S8 closed was the `build-complete` half, and
+the read-path half this unit builds was never touched.
+
+**The behaviour S3 restores is already a published promise.** `memory/guides/UNATTENDED-PROTOCOL.md`
+describes `--plan` as reporting "a roster whose markers are malformed is a named refusal rather than
+a complete-looking list". The contract is correct and needs no edit; the CODE drifted from it when
+S8 repointed the guard. This unit is a contract restoration, not a contract extension, which is why
+no protocol file appears under Files touched.
+
+`gen_build_index.py`'s own `PLAN_OPEN` comment still describes the roster pair as being RETIRED. It
+is not, and that sentence is one of the stale carriers S9 corrects.
 
 ### Inventory
 
@@ -130,9 +179,11 @@ a new instance of the guarded class into the tree while the guard is still disca
 |---|---|
 | `tools/unattended/unattended.sh` | `roster_ids`, `missing_units`, `roster_refusal`, the `verb_plan` guard, the `build-complete` term |
 | `tools/unattended/unattended.test.sh` | the authored-malformed arm, and the corrected message in the existing arm |
-| `memory/builds/aPacedTurnstile/README.md` | the table relocation and the pair |
-| `memory/map/features/build-readme-surface.md` | the stale closure claim |
-| `memory/backlog/TOOL.md` | the row |
+| `tools/unattended/check-unattended.sh` | check 21's header, one of the four misnaming carriers |
+| `memory/builds/aPacedTurnstile/README.md` | the table relocation, the pair, and this unit's roster row |
+| `memory/map/features/build-readme-surface.md` | the RETIRED seam line and the stale closure bullet |
+| `memory/map/features/unattended.md` | the `build-complete` claim, stale on both of its halves |
+| `memory/backlog/TOOL.md` | the row, closed with its residual named |
 | `.memory-tree.conf` | the `ARMS_FLOORS` row, bumped in the same commit that earns it |
 
 ### Alternatives rejected
@@ -179,9 +230,11 @@ sentence could only name one of them or neither.
   spec carries.
 - **AC4** — When the new arm in `unattended.test.sh` is run against the driver at base `43a6c13e`,
   it FAILS, and that failure is recorded in the build record before the fix lands.
-- **AC5** — When `verb_plan`'s pre-existing guard fires on a duplicated generated pair, its message
-  names the generated region rather than the roster, and the arm asserting it carries the corrected
-  literal.
+- **AC5** — When `grep -rn "roster join\|roster this verb" tools/unattended/` runs after the change,
+  every surviving hit names the region it actually describes, and the count of hits that call the
+  generated region a roster join is zero. The criterion is a scoped grep over all four carriers
+  rather than an assertion about the arm, because an arm proves one carrier and this finding was
+  that a fix reaches one carrier.
 - **AC6** — When `bash tools/unattended/unattended.sh --plan aPacedTurnstile` runs after the README
   change, its roster line reports the region as READ rather than fallen back to, and the id count it
   names equals the row count of the generated `gen:build-units` region, with none missing. The count
@@ -192,9 +245,14 @@ sentence could only name one of them or neither.
 - **AC8** — When `python tools/memory-tree/check-arms.py` runs after the driver change, it passes
   with the `ARMS_FLOORS` row for `tools/unattended/unattended.sh` bumped in the same commit, and any
   `unarmed-branches.txt` row whose ordinal moved corrected in that commit too.
-- **AC9** — When `memory/map/features/build-readme-surface.md` is read after the change, it no longer
-  claims this unit is closed by another, and states instead that the correction kept the authored
-  reader.
+- **AC9** — When both dossiers are read after the change, `build-readme-surface.md` no longer says
+  the roster pair is being RETIRED and no longer claims this unit is closed by another, and
+  `unattended.md` no longer describes `build-complete` as reading the authored roster or a
+  run-state copy. All three are checked, because the rev-2 draft checked one of the three.
+- **AC11** — When `memory/backlog/TOOL.md` is read after the change, the row for this unit carries a
+  terminal status and a closure note naming the corpus-wide residual as declined rather than done.
+  The row is asserted directly: hygiene check 8 grades that a row has one status token and never
+  whether that token is true, so no gate observes this.
 - **AC10** — When `GATE_FULL=1 bash tools/run-gates/run-gates.sh` runs, every leg is green.
 
 ## 7. Gates
@@ -248,6 +306,15 @@ spec at rev-1, which the plan verb reported FORKED with both forks already resol
   and AC2 stopped asserting an absence that a refusing verb satisfies for free. S3 gained the
   guard's position and its code, because the missing-unit loop discards the status a third time. S8
   gained the roster row for this unit, which the relocation would otherwise have omitted.
+- rev-3 · 2026-08-20 · folded the M4 spec audit, seven confirmed findings of thirty-five raised at
+  0.57 precision, every one re-verified against source before folding. The load-bearing one is that
+  S8 REVERSES a ratified supersession: `TOOL-aBoundedVerdict-11` names this exact remedy as
+  superseded and declares this row closed, and section 4 now records the reversal and the checkable
+  fact that retires the objection. S3 stopped presenting a restored branch as a new one, S6 grew
+  from two carriers to the four that actually hold the misnaming, S9 grew from one stale map claim
+  to three across two dossiers, S10 appeared because closing a row was in scope with nothing
+  observing it, section 3 gained the live parked owner decision the audit found, and AC5 became a
+  scoped grep because an arm proves one carrier and the finding was about reaching all of them.
 
 ## 10. Reuse audit
 
@@ -264,5 +331,16 @@ answer their questions the same way.
 sentence, then a separate detail line carrying the path. That split exists because of the arms
 signature rule, and re-deriving it here would re-derive the bug it was written to avoid.
 
+`unattended.test.sh` already ships the fixture writer S7 needs. `roster()` at `:275-285` appends an
+authored pair to a build README and is deliberately pure shell, because a python launcher is
+unresolved there and `mkconf` leaves the tree dirty. The authored-malformed arm drives that helper;
+writing a second fixture writer beside it would be the two-answers class in the test suite.
+
 No new seam is created. The one new function is a message spelling, which is the pattern the kit
 already declares for the sibling region.
+
+The prior art this unit sits on, all of it verified against source rather than taken from prose:
+`TOOL-cBriefedPilot-6` S4 and S7 built the authored refusal and its arms, `TOOL-aBoundedVerdict-11`
+S8 repointed that branch at the generated pair, and `memory/guides/UNATTENDED-PROTOCOL.md` still
+promises the behaviour S8 repointed away. So this unit restores a contract rather than writing one,
+and the reuse question it had to answer was not "what seam fits" but "what already existed here".
