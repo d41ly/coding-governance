@@ -186,7 +186,8 @@
     "guard": [
       "tools/hooks/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "agent-instructions self-test",

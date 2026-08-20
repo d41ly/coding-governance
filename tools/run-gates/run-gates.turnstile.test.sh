@@ -181,8 +181,12 @@ R8=$tmp/pos; mk_repo "$R8"; B8=$(beacon "$R8")
 mkdir -p "$B8"; printf '%s' "$$" > "$B8/pid"; printf '%s' "$(date +%s)" > "$B8/heartbeat"; printf '%s' held > "$B8/nonce"
 legs "$R8" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 ( cd "$R8" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh >"$tmp/pos.out" 2>&1 ) &
-w8=$!; sleep 3
+w8=$!
 qs="$R8/.git/gate-queue-status"
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+  { [ -f "$qs" ] && grep -q 'queued at position' "$tmp/pos.out" 2>/dev/null; } && break
+  sleep 1
+done
 [ -f "$qs" ] && ok "a waiter writes a durable status file at the path the RUNNER resolves" \
              || nope "no durable queue-status file while waiting"
 grep -q 'queued at position' "$tmp/pos.out" && ok "a waiter announces its queue position on entry" \
@@ -268,10 +272,9 @@ if [ -z "$nested" ]; then
 else
   # Every such leg drives the runner inside a scratch repo, which is exactly what makes its common
   # dir different. Assert the property the arms rely on rather than the list.
-  realcommon=$(cd "$ROOT" && git rev-parse --git-common-dir)
+  realcommon=$(cd "$ROOT" && cd "$(git rev-parse --git-common-dir)" && pwd)
   probe=$tmp/nested; mk_repo "$probe"
-  probecommon=$(cd "$probe" && git rev-parse --git-common-dir)
-  [ "$(cd "$ROOT" && pwd -P; :)" ] && true
+  probecommon=$(cd "$probe" && cd "$(git rev-parse --git-common-dir)" && pwd)
   [ "$probecommon" != "$realcommon" ] \
     && ok "a scratch repo resolves a different git common dir, so a nested runner cannot queue against the real beacon" \
     || nope "a scratch repo resolved the SAME common dir as the real tree — every nested leg would deadlock on the real beacon"
