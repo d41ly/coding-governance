@@ -1,6 +1,6 @@
 # Handoff — the six rows aBranchedMandate opened and did not build
 
-**Serves:** journal TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11
+**Serves:** none — a handoff for a SEPARATE session; the six rows it details are OPEN backlog rows this build never specced, so it holds no spec to serve
 
 Written at the close of the `aBranchedMandate` unattended run (landed on `main` at `038ff91`) for a
 SEPARATE session to spec and build. Every row below was MEASURED during that run, not suspected.
