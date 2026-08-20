@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest
 
-**Status:** CLOSED · rev-6 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-7 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -476,6 +476,25 @@ survived the veto order.
   violate it.
 
 ## 9. Revision log
+
+- rev-7 · 2026-08-20 · A DEFECT this unit shipped, found while building `-3` and fixed in that
+  commit. The beacon was claimed and the release trap was installed later, with the whole manifest
+  parse, the fingerprint and the run-record setup in between — a window in which the beacon is HELD
+  and nothing would release it. A signal there killed the run and left the repository queueing
+  behind nobody until the TTL expired.
+
+  It surfaced as a FLAKE and was nearly written off as one. The signal arms passed three times in a
+  row run alone and failed on TERM and HUP the moment they ran after another harness; two earlier
+  explanations — signal delivery into a blocking `wait`, and the arm signalling a wrapper process —
+  were each partly right and neither was the cause. What settled it was that the window is exactly
+  the thing load widens, and process creation on this platform has been measured 25x slower under
+  contention. The trap now goes on at the instant of the claim and the later one SUPERSEDES it, so
+  there is never a moment with no handler and never two racing to remove one directory. Verified
+  under the load shape that reproduced it.
+
+  The lesson is the one this repo already writes down and this build re-learned: an intermittent arm
+  is a report about a real race until proven otherwise, and the proof is a mechanism rather than a
+  green re-run.
 
 - rev-6 · 2026-08-20 · BUILT and CLOSED. The turnstile keys on the git COMMON dir, so every
   worktree of one repository shares one beacon and two repositories never do — "one bar per repo"

@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends
 
-**Status:** OPEN · rev-9 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling
+**Status:** CLOSED · rev-10 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling
 
 ## 1. Goal
 
@@ -302,6 +302,8 @@ into a red bar it did not predict.
 
 ## 8. Open questions
 
+none open — all three are RESOLVED, and the first was answered at build time by measurement.
+
 - **Does the surviving reporting-only change actually move the first signal on a FULL bar?** The
   re-scope kept "the early first signal" in this unit's value while cutting chunk-major dispatch,
   which is the mechanism the previous rev argued was necessary for it. The two are in tension and
@@ -316,7 +318,30 @@ into a red bar it did not predict.
   taken, the number comes from `python tools/run-gates/profile_bar.py` on a quiet node and never from
   `<git-dir>/gate-timings.tsv`.
 
-The two forks below are RESOLVED. Every pick is the M3 ratification of the fork's own
+  RESOLVED (2026-08-20, at build time, from the tree rather than by assertion): **(a), and the
+  measurement says the full-run first-CHUNK-verdict is not moved by this unit — but not for the
+  reason the fork feared.**
+
+  The tension dissolves once the two "first signals" are separated. The first LEG LINE is
+  unchanged: `records` is the first chunk by order of first appearance, its first member is
+  manifest index 0, and the reader still prints each leg as it is reported — so the earliest line
+  arrives exactly when it did before. What is NEW is the first chunk VERDICT, and that waits for
+  the slowest leg in `records`. On this tree that is `memory hygiene`, measured at 813 s. So the
+  first chunk verdict on a full bar arrives around 813 s, and the mechanism did not move it.
+
+  The lever is the ASSIGNMENT, not the mechanism, and that is a one-line change in the manifest
+  whenever anyone wants it: give `memory hygiene` its own chunk, or route the fast records legs
+  into a chunk that closes early. Deliberately NOT taken here — the assignment is the taxonomy the
+  six declared names describe, and reshaping it to chase a wall-clock number would make the chunk
+  key mean two things at once. Option (b) is therefore not needed: no dispatch preference can help
+  a chunk whose own slowest leg is the bound, which is the same floor-bound arithmetic that cut the
+  dispatch half in the first place.
+
+  On a SCOPED run the win stands and is structural, per §4: the guard pre-pass decides those legs
+  before dispatch, so a chunk of skipped legs closes at once.
+
+All three forks are RESOLVED — the one above at build time, the two below at design time. Every
+pick is the M3 ratification of the fork's own
 recommendation; the reason each survived the veto order is recorded with it.
 
 - **Whether the first verdict timing belongs in acceptance at all.** The research brief proposed an
@@ -340,6 +365,38 @@ recommendation; the reason each survived the veto order is recorded with it.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-20 · BUILT and CLOSED, as the reporting half only. The build order put this
+  unit last and nothing waited on it, which is what the re-scope predicted once the halt was cut.
+
+  **Every leg carries a chunk, and the manifest was NOT reordered.** All 87 route under the six
+  declared names, assigned leg by leg in a table rather than inferred from a pattern over leg
+  NAMES — a pattern would be a second, undeclared taxonomy that drifts the first time a leg is
+  renamed. Chunk order is order of first appearance, which puts `records` first without an order
+  field. Because the manifest stays interleaved, the reader's walk is a REAL permutation rather
+  than an identity, and that is what makes the grouping observable: the shipped arm drives an
+  interleaved fixture and asserts the report groups it.
+
+  **The two arms that could have passed on nothing.** An all-skipped chunk must report as
+  `skipped` rather than green — one altitude above the same rule for a single leg, and the louder
+  of the two, because a green chunk line is what a reader scans for. Its control is the chunk on
+  the same run that DID run and must still be green, or a runner that called every chunk skipped
+  would pass. And a leg with no key falls into `default` rather than being dropped, because a leg
+  that vanishes from the report is the quietest green-by-absence available.
+
+  **Two defects the arms found in themselves, both worth the record.** The key-set pin the record
+  unit landed went RED on `chunk` — correctly, since a key nobody declared is indistinguishable
+  from a typo of one that matters, and the fix is to declare it rather than to loosen the pin. And
+  the roll-up assertions used `\s` inside `grep -E`, which is a GNU extension: on a host with a
+  POSIX grep the negative one would have passed vacuously and the positive one would have red. Both
+  now read the tab-delimited rows with `awk`. A third: the summary assertion looked at the file
+  AFTER a later fixture had overwritten it, so it reported a missing roll-up that was really a
+  missing run — the snapshot is now taken at the run that produced it.
+
+  **What this unit does NOT claim.** The bar is floor-bound, so grouping the report buys no wall
+  clock and the spec no longer pretends otherwise. What it buys is structure: a verdict per chunk
+  while the run is still going, on a bar whose first line used to appear minutes in. The per-chunk
+  wall time goes to the durable records and is banned from stdout, because a duration on a terminal
+  line invites comparison between two runs that are not comparable.
 - rev-9 · 2026-08-20 · folded the owner's re-scope. This unit was designed around SCHEDULING, and the
   measurement taken at sha `43a6c13e` says scheduling cannot pay here: one leg is 836.5 s of a
   1033.2 s wall, so the bar is floor-bound and `tools/run-gates/profile_bar.py` states in its own

@@ -468,6 +468,18 @@ if [ -n "$TS_COMMON" ]; then
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
+      # THE RELEASE TRAP GOES ON HERE, at the instant the beacon becomes ours, and not with the
+      # scratch-dir trap further down. Everything between this line and there — the manifest
+      # parse, the fingerprint, the whole run-record setup — is time during which the beacon is
+      # HELD and, without this, no trap would release it. A signal in that window killed the run
+      # and left the repository queueing behind nobody until the TTL expired.
+      #
+      # Measured, and it is the reason this is not merely tidy: the turnstile arms passed three
+      # times in a row run alone and failed on TERM and HUP the moment they ran after another
+      # harness. Under that load the window is seconds wide — process creation on this platform
+      # has been measured 25x slower under contention — so the window is not theoretical and it is
+      # widest exactly when two bars are most likely to collide.
+      trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP
       break
     fi
     ts_try_reap && continue
@@ -515,6 +527,9 @@ WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # clean exit turns every Ctrl-C into a repository that queues behind a run nobody is doing until
 # the TTL expires. The signal arms re-exit with the conventional 128+n so the caller still sees
 # what killed it. `cleanup` is idempotent: EXIT fires after them and must not undo a release.
+# SUPERSEDES the claim-time trap above with the same release plus the scratch dir. `trap` replaces
+# rather than appends, which is what makes this safe: there is never a moment with no handler, and
+# never two handlers racing to remove the same directory.
 cleanup() { rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'cleanup; exit 130' INT
@@ -626,17 +641,18 @@ rows = [" ".join(str(i) for i in order)]
 # there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
 # here, which is what keeps a prose reason from being able to corrupt the wire format.
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
-         + "\x1e" + ("1" if l.get("impure") else "") for l in data]
+         + "\x1e" + ("1" if l.get("impure") else "")
+         + "\x1e" + str(l.get("chunk", "") or "") for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im <<<"$line"
-  names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}")
+  IFS=$'\x1e' read -r nm gd_ av im ch <<<"$line"
+  names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -821,18 +837,18 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   local i=$1 rc ftail
   n=$((n+1))
   if [ ! -f "$WORK/$i.rc" ]; then
-    fails=$((fails+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
+    fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
   if [ "$rc" = skip ]; then
-    skips=$((skips+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
+    skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = reuse ]; then
     # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
     # contract: a reader splits the remainder on a double space and gets the bare leg name back.
-    reuses=$((reuses+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
-  elif [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "${names[$i]}"
-  else fails=$((fails+1))
+    reuses=$((reuses+1)); c_reuse=$((c_reuse+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
+  elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s\n' "${names[$i]}"
+  else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1))
        # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
        # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
        # exit code. Both stay behind the PROF_TIMEOUT guard, so a leg that chooses either for its own
@@ -853,17 +869,69 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
 # spent ~317s of a 617s serial run doing nothing but spawning them.
 # Dispatch order is the advisory longest-first hint; REPORTING walks the manifest, so a leg prints
 # only once every leg before it has printed.
-disp=($ORDER); ndisp=${#disp[@]}; di=0; next=0
+# ---- CHUNKS BOUND REPORTING, NEVER DISPATCH (the chunking unit) --------------------------------
+# The bar is FLOOR-bound: one leg is most of the wall clock, so no ordering of the other eighty-odd
+# moves it. Reordering dispatch was specced and then CUT on that measurement, and what survives is
+# the half the measurement supports — a reviewable verdict per chunk instead of one verdict at the
+# end, on a bar where the first line used to appear minutes in.
+#
+# So legs run at full pool width in whatever order the longest-first hint gives, across chunk lines
+# freely. Only the READER'S walk changes: from the raw index range to a flattened chunk-then-manifest
+# list. Chunk ORDER is order of FIRST APPEARANCE in the manifest — no second declaration file, no
+# order field, and a leg with no key falls into `default`.
+#
+# The manifest is deliberately NOT grouped, so this flattening is a real permutation rather than an
+# identity. That is what makes the grouping observable at all, and it is why the whole-manifest
+# reorder could be cut without costing this unit anything.
+CHUNK_ORDER=""
+for ((i=0; i<total; i++)); do
+  [ -z "${names[$i]}" ] && continue
+  case " $CHUNK_ORDER " in *" ${chunks[$i]} "*) ;; *) CHUNK_ORDER="$CHUNK_ORDER ${chunks[$i]}" ;; esac
+done
+WALK=()
+for c in $CHUNK_ORDER; do
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ "${chunks[$i]}" = "$c" ] && WALK+=("$i")
+  done
+done
+nwalk=${#WALK[@]}
+
+disp=($ORDER); ndisp=${#disp[@]}; di=0; wi=0; next=0
+[ "$nwalk" -gt 0 ] && next=${WALK[0]}
+# per-chunk tallies, reset at each boundary
+cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+CHUNK_ROLLUP=""
+chunk_close() {   # emit the verdict for the chunk just finished
+  [ -n "$cur_chunk" ] || return 0
+  local secs=$(( $(date +%s) - c_t0 )) verdict
+  if   [ "$c_fail" -gt 0 ]; then verdict="RED"
+  # A CHUNK IN WHICH EVERY LEG WAS SKIPPED REPORTS AS SKIPPED, never as green. On a scoped run the
+  # guard pre-pass decides those legs before dispatch, so the chunk closes at once — and calling that
+  # green would be the loudest possible green-by-absence, one altitude above a single leg.
+  elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && [ "$c_skip" -gt 0 ]; then verdict="skipped"
+  else verdict="green"; fi
+  printf -- '---- chunk %s: %s  (%s ran, %s failed, %s skipped, %s reused)\n' \
+    "$cur_chunk" "$verdict" "$c_ran" "$c_fail" "$c_skip" "$c_reuse"
+  # PER-CHUNK WALL TIME goes to the durable records and NOT to stdout: a wall clock on a terminal
+  # line invites comparison between runs that are not comparable, which is the whole reason the
+  # profiling verb records an envelope.
+  CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${secs}\n"
+  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+}
 live() { jobs -rp | wc -l; }
-while [ "$next" -lt "$total" ]; do
-  if [ -z "${names[$next]}" ]; then next=$((next+1)); continue; fi   # drop-sentinel: holds an index, never runs
+while [ "$wi" -lt "$nwalk" ]; do
+  next=${WALK[$wi]}
+  # THE CHUNK BOUNDARY. The walk is grouped, so a change of chunk here is the end of the previous
+  # one — every leg of it has printed, because the reader never advances past a leg with no result.
+  if [ "${chunks[$next]}" != "$cur_chunk" ]; then chunk_close; cur_chunk=${chunks[$next]}; fi
   di_before=$di
   while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
     runleg "$k" &
   done
-  if [ -f "$WORK/$next.rc" ]; then report_one "$next"; next=$((next+1)); continue; fi
+  if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
   if [ "$(live)" -gt 0 ]; then wait -n 2>/dev/null || true; continue; fi
   # Nothing running. That is NOT yet evidence this leg has no result: `jobs -rp` counts only RUNNING
   # jobs, so a worker that finished between the file check and the count is invisible, and with
@@ -887,9 +955,10 @@ while [ "$next" -lt "$total" ]; do
   fi
   wait                                     # everything dispatched and nothing running: reap, look once more
   [ -f "$WORK/$next.rc" ] && continue
-  report_one "$next"; next=$((next+1))     # genuinely no result: report it, never hang
+  report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
 wait
+chunk_close                                # the last chunk has no successor to close it
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
 # one fact, with the older one read by the only tool that grades the newer, is exactly the shape
@@ -990,16 +1059,20 @@ fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
 if [ "$fails" = 0 ]; then
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  # THE CHUNK ROLL-UP, with per-chunk wall time, goes into the DURABLE records and never to stdout.
+  # A wall clock on a terminal line invites comparison between two runs that are not comparable —
+  # the profiling verb exists precisely because a duration without its envelope is not a
+  # measurement.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
 else
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s\n' "$PROF_LINE"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
   echo "gates RED — $fails/$n legs failed$skipnote"

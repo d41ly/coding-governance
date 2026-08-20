@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=96
+FLOOR_ASSERTIONS=102
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -93,7 +93,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -122,7 +122,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -1016,6 +1016,75 @@ bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh
 printf '%s' "$bout2" | grep -q '^GATE skip' \
   && { echo "canary: a leg skipped with NO resolvable baseline — the scoping rule does not fail safe"; fail=1; } || :
 rm -rf "$BB"
+# 6. CHUNKED REPORTING. Fixture-driven and true in any tree, so it ships; the assertion about
+#    which chunk names THIS repo declares is the gov harness's, next door.
+n=$((n+1))
+CK=$(mktemp -d)
+mkdir -p "$CK/tools/run-gates" "$CK/tools/lib" "$CK/fx" "$CK/g"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/tools/run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$CK/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$CK/tools/lib/" 2>/dev/null || true
+printf '#!/usr/bin/env bash\nexit 0\n' > "$CK/fx/a.sh"
+echo g > "$CK/g/f"
+# INTERLEAVED ON PURPOSE. The manifest is not grouped, so the reader's walk is a real permutation
+# rather than an identity — an arm over an already-grouped fixture would pass on a runner that
+# never grouped anything.
+printf '%s\n' '[' \
+  '  {"name": "alpha", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
+  '  {"name": "beta",  "argv": ["bash", "fx/a.sh"], "chunk": "two"},' \
+  '  {"name": "gamma", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
+  '  {"name": "delta", "argv": ["bash", "fx/a.sh"]}' \
+  ']' > "$CK/tools/gate-legs.json"
+( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
+   && git add -A && git commit -qm seed ) >/dev/null 2>&1
+cout=$( cd "$CK" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+# SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
+# DIFFERENT manifest with different chunk names — so an assertion deferred to the end looks for
+# this run's chunks in that run's file and reports a missing roll-up that is really a missing run.
+csum=$(cat "$CK/.git/gate-last-summary.txt" 2>/dev/null)
+order=$(printf '%s' "$cout" | grep -E '^GATE ok    ' | sed 's/^GATE ok    //' | tr '\n' ' ')
+case "$order" in
+  "alpha gamma beta delta "*) ;;
+  *) echo "canary: chunked reporting did not group an interleaved manifest — legs reported as: $order"; fail=1 ;;
+esac
+n=$((n+1))
+printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused\)$' \
+  || { echo "canary: the per-chunk verdict line is missing or off-grammar"; printf '%s\n' "$cout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+# A LEG WITH NO KEY falls into `default` rather than being dropped — a leg that vanishes from the
+# report because nobody classified it is the quietest possible green-by-absence.
+printf '%s' "$cout" | grep -q '^---- chunk default: green' \
+  || { echo "canary: a leg carrying no chunk key did not report under a default chunk"; fail=1; }
+n=$((n+1))
+# AN ALL-SKIPPED CHUNK REPORTS AS SKIPPED, NEVER GREEN. One altitude above the same rule for a
+# single leg, and the louder of the two: a green chunk line is what a reader scans for.
+printf '%s\n' '[' \
+  '  {"name": "guarded", "argv": ["bash", "fx/a.sh"], "guard": ["g/"], "chunk": "gone"},' \
+  '  {"name": "free", "argv": ["bash", "fx/a.sh"], "chunk": "here"}' \
+  ']' > "$CK/tools/gate-legs.json"
+( cd "$CK" && git add -A && git commit -qm two \
+   && git update-ref refs/remotes/origin/main HEAD \
+   && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+if printf '%s' "$sout" | grep -q '^GATE skip  guarded'; then
+  printf '%s' "$sout" | grep -qE '^---- chunk gone: skipped' \
+    || { echo "canary: a chunk whose every leg was skipped did not report as skipped"; printf '%s\n' "$sout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
+else
+  echo "canary: the all-skipped chunk fixture did not skip anything, so that arm proves nothing"; fail=1
+fi
+n=$((n+1))
+# ITS CONTROL: the chunk that did run must still be green, or a runner that called every chunk
+# skipped would pass the arm above.
+printf '%s' "$sout" | grep -qE '^---- chunk here: green' \
+  || { echo "canary: the chunk that DID run was not reported green — the skipped verdict above is not discriminating"; fail=1; }
+n=$((n+1))
+# THE ROLL-UP IS DURABLE AND NOT ON STDOUT: per-chunk wall time belongs in a file, because a
+# duration on a terminal line invites comparison between runs that are not comparable.
+printf '%s' "$cout" | awk -F'\t' '$1=="chunk"{found=1} END{exit !found}' \
+  && { echo "canary: the chunk roll-up leaked onto stdout"; fail=1; } || :
+printf '%s\n' "$csum" | awk -F'\t' '$1=="chunk" && $2=="one"{found=1} END{exit !found}' \
+  || { echo "canary: the durable summary carries no chunk roll-up row"; fail=1; }
+rm -rf "$CK"
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1

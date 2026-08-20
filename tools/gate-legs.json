@@ -4,14 +4,16 @@
     "argv": [
       "bash",
       "skills/session-kickoff/manifest-check.sh"
-    ]
+    ],
+    "chunk": "records"
   },
   {
     "name": "template size <=48KiB",
     "argv": [
       "bash",
       "tools/check-template-size.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "charter size",
@@ -19,14 +21,16 @@
       "bash",
       "tools/check-template-size.sh",
       "AGENTS.md"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "micro-format definitions",
     "argv": [
       "bash",
       "tools/check-microformats.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "micro-format gate selftest",
@@ -37,14 +41,16 @@
     "guard": [
       "tools/check-microformats.sh",
       "tools/check-microformats.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "line length",
     "argv": [
       "bash",
       "tools/check-line-length.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "line-length gate selftest",
@@ -55,14 +61,16 @@
     "guard": [
       "tools/check-line-length.sh",
       "tools/check-line-length.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "playbook parity",
     "argv": [
       "bash",
       "tools/check-playbook-parity.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "playbook parity selftest",
@@ -74,14 +82,16 @@
     "argv": [
       "bash",
       "tools/check-playbook-parity.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "template size gate selftest",
     "argv": [
       "bash",
       "tools/check-template-size.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "kickoff engine size <=18KiB",
@@ -89,21 +99,24 @@
       "bash",
       "tools/check-template-size.sh",
       "skills/session-kickoff/SKILL.md"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "kit version markers",
     "argv": [
       "bash",
       "tools/check-kit-versions.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
     "argv": [
       "bash",
       "tools/memory-tree/check-verdict-epoch.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "verdict-epoch self-test",
@@ -114,7 +127,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "agent-instructions wiring",
@@ -124,7 +138,8 @@
       "--check",
       "--aliases",
       "claude"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "manifest-check self-test",
@@ -135,7 +150,8 @@
     "guard": [
       "skills/session-kickoff/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
@@ -146,7 +162,8 @@
     "guard": [
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "agent-cap self-test",
@@ -157,7 +174,8 @@
     "guard": [
       "tools/hooks/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "agent-instructions self-test",
@@ -168,7 +186,8 @@
     "guard": [
       "tools/agent-instructions/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "memory-hygiene self-test",
@@ -179,7 +198,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "row-keyed merge driver replay",
@@ -190,7 +210,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "kit/dogfood doc parity",
@@ -204,21 +225,24 @@
       "memory/guides/BUILD-METHOD.md",
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "method carriers (every pointer declared)",
     "argv": [
       "bash",
       "tools/memory-tree/check-method-carriers.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "method-carriers self-test",
     "argv": [
       "bash",
       "tools/memory-tree/check-method-carriers.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "build-index selftest",
@@ -230,7 +254,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "build README slot contract",
@@ -238,7 +263,8 @@
       "python3",
       "tools/memory-tree/gen_build_index.py",
       "--check-format"
-    ]
+    ],
+    "chunk": "records"
   },
   {
     "name": "corpus-ids selftest",
@@ -250,7 +276,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "gotchas selftest",
@@ -262,7 +289,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "row-grammar selftest",
@@ -274,7 +302,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
@@ -282,7 +311,8 @@
       "python3",
       "tools/memory-tree/check-arms.py",
       "--check"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "check-arms selftest",
@@ -294,7 +324,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-tree/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "branch-guard self-test",
@@ -305,7 +336,8 @@
     "guard": [
       ".githooks/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "pre-push self-test",
@@ -316,7 +348,8 @@
     "guard": [
       ".githooks/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "push-main self-test",
@@ -328,7 +361,8 @@
       ".githooks/",
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "check-wiring self-test",
@@ -340,7 +374,8 @@
       ".claude/",
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "verifier fan-out self-test",
@@ -351,7 +386,8 @@
     "guard": [
       "tools/lib/",
       "tools/workflows/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "review-protocol parity (kit vs dogfood)",
@@ -363,21 +399,24 @@
       "memory/guides/REVIEW-PROTOCOL.md",
       "tools/lib/",
       "tools/workflows/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "review-join ban (no ref-keyed join)",
     "argv": [
       "bash",
       "tools/workflows/check-review-join.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "workflow script syntax",
     "argv": [
       "node",
       "tools/workflows/check-workflow-syntax.js"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "review-join self-test",
@@ -388,7 +427,8 @@
     "guard": [
       "tools/lib/",
       "tools/workflows/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "pytest-guardrails self-test",
@@ -399,7 +439,8 @@
     "guard": [
       "tools/lib/",
       "tools/pytest-parallel-guardrails/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "codebase-map kit selftest",
@@ -410,14 +451,16 @@
     "guard": [
       "tools/codebase-map/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "codebase-map coverage + freshness",
     "argv": [
       "python3",
       "tools/codebase-map/test_codebase_map.py"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "codebase-map adopter e2e",
@@ -428,7 +471,8 @@
     "guard": [
       "tools/codebase-map/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "e2e"
   },
   {
     "name": "settings-merge selftest",
@@ -440,7 +484,8 @@
     "guard": [
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "memory-recall kit selftest",
@@ -451,7 +496,8 @@
     "guard": [
       "tools/lib/",
       "tools/memory-recall/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "recall floor",
@@ -462,7 +508,8 @@
     "guard": [
       "tools/memory-recall/",
       "memory/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "recall floor arms",
@@ -474,7 +521,8 @@
       "tools/memory-recall/",
       "memory/",
       "tools/govkit/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "memory-recall skill wiring",
@@ -482,7 +530,8 @@
       "bash",
       "tools/memory-recall/adopt-memory-recall.sh",
       "--check"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "drift-audit selftest",
@@ -493,7 +542,8 @@
     "guard": [
       "tools/drift-audit/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "drift-audit wiring",
@@ -501,7 +551,8 @@
       "bash",
       "tools/drift-audit/adopt-drift-audit.sh",
       "--check"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "drift-audit records",
@@ -509,7 +560,8 @@
       "python",
       "tools/drift-audit/drift_report.py",
       "--check"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "unattended kit gate",
@@ -517,7 +569,8 @@
       "bash",
       "tools/unattended/check-unattended.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`."
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+    "chunk": "declarations"
   },
   {
     "name": "unattended gate selftest",
@@ -529,7 +582,8 @@
       "memory/guides/UNATTENDED-PROTOCOL.md",
       "tools/lib/",
       "tools/unattended/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "unattended driver selftest",
@@ -540,7 +594,8 @@
     "guard": [
       "tools/lib/",
       "tools/unattended/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "unattended skill wiring",
@@ -548,7 +603,8 @@
       "bash",
       "tools/unattended/adopt-unattended.sh",
       "--check"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "unattended adopter e2e",
@@ -559,7 +615,8 @@
     "guard": [
       "tools/lib/",
       "tools/unattended/"
-    ]
+    ],
+    "chunk": "e2e"
   },
   {
     "name": "unattended cross-component",
@@ -570,7 +627,8 @@
     "guard": [
       "tools/lib/",
       "tools/unattended/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "run-gates canary",
@@ -582,7 +640,8 @@
       "tools/",
       "tools/gate-legs.json",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "run-gates evidence",
@@ -593,7 +652,8 @@
     "guard": [
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "run-gates turnstile",
@@ -604,7 +664,8 @@
     "guard": [
       "tools/run-gates/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "run-gates gov canary",
@@ -615,7 +676,8 @@
     "guard": [
       "tools/run-gates/",
       "tools/gate-legs.json"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "run-gates adopter e2e",
@@ -625,7 +687,8 @@
     ],
     "guard": [
       "tools/run-gates/"
-    ]
+    ],
+    "chunk": "e2e"
   },
   {
     "name": "run-gates wiring",
@@ -634,7 +697,8 @@
       "tools/run-gates/adopt-run-gates.sh",
       "--check"
     ],
-    "guard": []
+    "guard": [],
+    "chunk": "wiring"
   },
   {
     "name": "profile-bar selftest",
@@ -644,28 +708,32 @@
     ],
     "guard": [
       "tools/run-gates/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
       "tools/check-install-prefix.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "agent-cap restatement",
     "argv": [
       "bash",
       "tools/check-agent-cap-restatement.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "agent-cap restatement self-test",
     "argv": [
       "bash",
       "tools/check-agent-cap-restatement.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "install-prefix self-test",
@@ -676,14 +744,16 @@
     "guard": [
       "tools/",
       "tools/lib/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "dead-path carriers (deleted files still named)",
     "argv": [
       "bash",
       "tools/check-dead-paths.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "dead-path carriers self-test",
@@ -693,7 +763,8 @@
     ],
     "guard": [
       "tools/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "govkit selfcheck",
@@ -701,7 +772,8 @@
       "python",
       "tools/govkit/govkit.py",
       "selfcheck"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "govkit selftest",
@@ -711,7 +783,8 @@
     ],
     "guard": [
       "tools/govkit/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "lexicon naming predicates",
@@ -724,7 +797,8 @@
       "skills/session-kickoff/",
       ".githooks/",
       ".claude/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "lexicon selftest",
@@ -734,7 +808,8 @@
     ],
     "guard": [
       "tools/lexicon/"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "lexicon wiring",
@@ -745,14 +820,16 @@
     ],
     "guard": [
       "tools/lexicon/"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "playbook placeholder catalogue",
     "argv": [
       "bash",
       "tools/check-placeholders.sh"
-    ]
+    ],
+    "chunk": "product"
   },
   {
     "name": "placeholder-catalogue self-test",
@@ -763,28 +840,32 @@
     "guard": [
       "tools/check-placeholders.sh",
       "tools/check-placeholders.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "memory hygiene",
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
-    ]
+    ],
+    "chunk": "records"
   },
   {
     "name": "marker contract",
     "argv": [
       "bash",
       "tools/memory-tree/marker-contract.test.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "verifier fan-out",
     "argv": [
       "bash",
       "tools/workflows/check-verifier-fanout.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "govkit refusal join",
@@ -794,7 +875,8 @@
     ],
     "guard": [
       "tools/govkit/"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "govkit acceptance matrix",
@@ -807,21 +889,24 @@
       "tools/playbook/",
       "tools/check-microformats.sh",
       "tools/check-line-length.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
     "argv": [
       "bash",
       "tools/check-testsuite-counts.sh"
-    ]
+    ],
+    "chunk": "declarations"
   },
   {
     "name": "testsuite counts self-test",
     "argv": [
       "bash",
       "tools/check-testsuite-counts.test.sh"
-    ]
+    ],
+    "chunk": "selftests"
   },
   {
     "name": "playbook render wiring",
@@ -831,7 +916,8 @@
       "--target",
       ".",
       "--check"
-    ]
+    ],
+    "chunk": "wiring"
   },
   {
     "name": "playbook render selftest",
@@ -842,6 +928,7 @@
       "bash",
       "tools/playbook/adopt-playbook.sh",
       "--selftest"
-    ]
+    ],
+    "chunk": "selftests"
   }
 ]

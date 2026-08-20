@@ -67,7 +67,7 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=11
+FLOOR_ASSERTIONS=12
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -229,6 +229,22 @@ fi
 # The executed assertion count, in the shape tools/check-testsuite-counts.sh reads, against a floor
 # declared here. the run-gates promotion spec's S11: this file gets a counter and a floor at BIRTH, so it
 # never needs a row in memory/project/testsuite-count-waivers.txt.
+# EVERY LEG OF GOV'S REAL MANIFEST CARRIES A CHUNK, and its value is one of the six declared
+# names. This is the assertion that cannot ship: an adopter's manifest is seeded empty and emitted
+# from descriptors, so a shipped arm demanding a chunk key would red on arrival in every install.
+# It is UNCONDITIONAL over the manifest rather than a spot check — a new leg added without a key
+# would otherwise fall into `default` silently and report under a chunk nobody declared.
+a=$((a+1))
+"$PYBIN" -c '
+import json, sys
+SIX = {"records", "product", "wiring", "declarations", "selftests", "e2e"}
+legs = json.load(open(sys.argv[1]))
+bad = [l.get("name", "?") for l in legs if l.get("chunk") not in SIX]
+if bad:
+    print("gov-canary: leg(s) with no chunk key, or a value outside the six declared names %s: %s"
+          % (sorted(SIX), ", ".join(bad)))
+    sys.exit(1)
+' "$ROOT/tools/gate-legs.json" || fail=1
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then
   echo "PASS ($a assertions)"
