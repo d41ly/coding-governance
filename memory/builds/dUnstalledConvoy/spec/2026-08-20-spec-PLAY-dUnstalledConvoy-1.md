@@ -1,6 +1,6 @@
 # PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams playbook · ratified 2026-08-20
+**Status:** CLOSED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams playbook · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -72,10 +72,16 @@ second copy this unit exists to remove.
 
 ### Byte budget, and the known-red neighbour
 
-The template is 48 163 bytes against a 49 152 ceiling, so the margin is 989 bytes and the gate warns
-past a recorded high-water as well. The edit replaces a clause with a shorter one and should be net
-negative; it is measured with `bash tools/check-template-size.sh` rather than estimated, because that
-figure is recorded as having moved twice in one day.
+The template was 48 378 bytes after this edit against a 49 152 ceiling, leaving 774. **MEASURED, and
+the first draft's expectation was WRONG:** it predicted a net-negative edit because the refuted clause
+is deleted. The edit is net **+215 bytes**, because deleting a false premise obliges the correction to
+state the true one, and the true one is longer than the lie it replaces. The high-water is re-recorded
+with `bash tools/check-template-size.sh --bump`, which this unit owns as the only unit in the build
+that touches the template. The ceiling is untouched — raising that is an owner decision and this is
+not one.
+
+The correction is split across TWO bullets rather than one, because the single-bullet form measured
+560 characters against the 450-character per-line gate. Both bullets measure under it.
 
 Separately, the `govkit acceptance matrix` leg is RED on clean `main` for an unrelated reason the
 kickoff manifest carries as a dated correction, and it blocks every push through the mandated lander.
@@ -126,6 +132,10 @@ build does not diagnose it twice.
   is the render and not a hand edit.
 - **AC5** — `bash tools/check-template-size.sh` reports the file under the ceiling, and the commit
   message carries the measured figure.
+- **AC7** — `bash tools/check-line-length.sh coding-governance-agents.template.md` reports 0 over the
+  declared limit, which the single-bullet form would have breached.
+- **AC8** — The refuted sentence survives ONLY in `memory/archive/` version snapshots, which are
+  frozen records of what those versions said and are not edited, verified by `grep`.
 - **AC6** — A backlog row exists naming the drift class, and it names the carriers a correction to a
   shared claim must sweep, observed in `memory/backlog/TOOL.md`.
 
@@ -146,6 +156,10 @@ build does not diagnose it twice.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-20 · built. §4's byte projection was wrong and is corrected to the MEASURED +215:
+  a correction that deletes a false premise must state the true one, and that costs bytes. The edit
+  is two bullets rather than one, because the single-bullet form breached the 450-character line gate.
+  Two criteria added for both facts.
 - rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit
