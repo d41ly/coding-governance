@@ -178,7 +178,7 @@ cgroup_ram_mb() {   # -> prints the ENFORCED limit in MB, or nothing
   return 1
 }
 det_ram() {   # -> DET_RAM in MB
-  local pages pgsz kb v lim
+  local pages pgsz kb v
   DET_RAM=0
   if [ -n "${GATE_RAM_MB+x}" ]; then RAM_SRC="seam"; num_ok "${GATE_RAM_MB}" && DET_RAM=${GATE_RAM_MB}; return; fi
   RAM_SRC="getconf"
@@ -206,6 +206,12 @@ det_ram() {   # -> DET_RAM in MB
 det_ram_capped() {
   det_ram
   local lim
+  # THE SEAM WINS. `det_ram` returns early with RAM_SRC=seam precisely to signal a bypass, and capping
+  # it here handed the deciding vote back to ambient container state — in the arms written so the box
+  # could not decide, and against the runner's own documented promise that the seam overrides the
+  # reading. It also silently replaced the deliberate UNKNOWN of `GATE_RAM_MB=0`. The container guard
+  # still covers every genuinely DETECTED reading, which is the only population it was argued for.
+  [ "$RAM_SRC" = seam ] && return 0
   lim=$(cgroup_ram_mb) || return 0
   [ "$DET_RAM" = 0 ] && { DET_RAM=$lim; RAM_SRC="$RAM_SRC,cgroup"; return 0; }
   [ "$lim" -lt "$DET_RAM" ] && { DET_RAM=$lim; RAM_SRC="$RAM_SRC,cgroup"; }
@@ -296,7 +302,10 @@ fi
 
 # A knob the operator set and the host cannot honour is worse than no knob: say so rather than run
 # inert. `timeout` is RUN, not probed — the same rule the detection chain follows.
-if [ "$PROF_TIMEOUT" -gt 0 ] && ! timeout 1 true >/dev/null 2>&1; then
+# PROBED WITH THE OPTION SET THE RUN ACTUALLY USES. A bare `timeout 1 true` passes on a build that
+# rejects `-k`, so the probe cleared a path the leg exec then failed on — the probe and the subject
+# were two different commands, which is the shape a probe exists to rule out.
+if [ "$PROF_TIMEOUT" -gt 0 ] && ! timeout -k 1s 1 true >/dev/null 2>&1; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0
 fi
@@ -431,9 +440,13 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     skips=$((skips+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = 0 ]; then printf 'GATE ok    %s\n' "${names[$i]}"
   else fails=$((fails+1))
-       # `timeout` exits 124. Reported as a timeout ONLY when one was actually in force, so a leg
-       # that chooses 124 for its own reasons is still reported as the exit code it chose.
-       ftail="(exit $rc)"; { [ "$rc" = 124 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s)"
+       # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
+       # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
+       # exit code. Both stay behind the PROF_TIMEOUT guard, so a leg that chooses either for its own
+       # reasons is still reported as the code it chose.
+       ftail="(exit $rc)"
+       { [ "$rc" = 124 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s)"
+       { [ "$rc" = 137 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s, killed)"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY

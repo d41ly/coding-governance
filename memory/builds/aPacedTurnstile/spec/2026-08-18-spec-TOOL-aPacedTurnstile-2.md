@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-6 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** OPEN · rev-7 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -202,9 +202,15 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 - **AC7** — When `GATE_JOBS` is set alongside a selected profile, the canary observes the width
   taken from `GATE_JOBS` AND the timeout still taken from the row, proving the override is
   width-only.
-- **AC8** — When a fixture row sets a one-second timeout and a fixture leg sleeps past it, the
-  runner reports that leg FAILED with a timeout tail and the overall verdict is RED — never a skip
-  and never a green, asserted in `tools/run-gates/run-gates.test.sh`.
+- **AC8** — When a fixture row sets a per-leg timeout and a fixture leg sleeps past it, the runner
+  reports that leg FAILED with a timeout tail and the overall verdict is RED — never a skip and never
+  a green — AND `bash tools/run-gates/run-gates.test.sh` observes that leg's own measured duration to
+  be far below an untimed CONTROL over the same fixture. The elapsed half is the criterion, not
+  decoration: the first landing satisfied the message half while the bound applied to the verdict and
+  not the clock, so a criterion that grades only the tail is green over a knob that buys nothing. It
+  reads the leg's duration from the runner's timing cache rather than timing the process tree, because
+  the runner's own startup dwarfs the signal and its jitter does not cancel between two runs. No
+  literal timeout value is pinned here — the fixture's is the fixture's.
 - **AC9** — When a knob key is added to the table without being added to the canary's pinned set,
   `bash tools/run-gates/run-gates.test.sh` exits non-zero naming the unpinned key.
 - **AC10** — When the existing width-1 against width-4 equivalence arm runs, it filters the
@@ -286,6 +292,14 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-7 · 2026-08-20 · folded the RE-review of that fold. AC8 named a one-second timeout the arm no
+  longer sets and graded only the message — the blind spot rev-6 identified in the code and then left
+  standing in the criterion, so a later builder could delete the elapsed assertion and AC8 would stay
+  green. It now states the property: the leg's own measured duration against an untimed control. The
+  rest of that re-review is behaviour and folds into the code; its two blockers were both in the
+  machinery rev-6 added, which is the fix-creates-a-fresh-defect shape this build has now recorded
+  three times. The habit that catches it is stated here rather than in a gate: when a fix changes what
+  an arm asserts, the criterion it serves moves in the same commit.
 - rev-6 · 2026-08-20 · folded the closing diff review. The §3 non-goal on
   `memory/guides/SESSION-KICKOFF.md` asked for a state the merge bar forbids: the width claim in that
   file's gate-command block is one of the two claims S8 exists to falsify, and the kickoff-manifest

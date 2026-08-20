@@ -27,7 +27,14 @@
 #
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which
-# is the documented rollback for this whole mechanism.
+# is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
+# leaves every other knob of the selected row in force.
+#
+# THE READINGS themselves have overrides too, and they are the escape hatch when detection is wrong:
+# `GATE_CORES=<n>` and `GATE_RAM_MB=<mb>` replace what the chain would find and BYPASS it entirely —
+# a seam is never capped by the cgroup source below, or the operator could not raise a number.
+# `GATE_CGROUP_ROOT=<dir>` relocates the cgroup files the RAM chain reads, which is how a fixture
+# drives the container path on a host that is not in one.
 
 # --- 8+ cores AND a RAM class that can hold the width ---------------------------------------------
 # 24000 MB, and cores alone are the wrong question: each heavy leg builds its OWN `mktemp -d` scratch
