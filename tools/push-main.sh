@@ -70,6 +70,19 @@ while [ "$attempt" -le "$max" ]; do
   rm -f "$marker"
   if [ "$rc" -eq 0 ]; then
     rm -f "$pout"
+    # THE LANDER MARKER, when the project declares one. It carries the pushed COMMIT, not just its own
+    # existence: a bare touched file is satisfied by any previous landing, which is the
+    # pass-by-finding-anything shape the unattended kit's own Definition of Done was stuck in before
+    # this. The unattended verb compares the sha AND the build slug it is about to record, so evidence
+    # of an earlier landing cannot stand in for this one. Written only on the branch where the push
+    # actually succeeded, which is the whole point of it being evidence.
+    if [ -f .unattended.conf ]; then
+      lm=$(sed -n 's/^LANDER_MARKER="\(.*\)"$/\1/p' .unattended.conf | head -1)
+      if [ -n "$lm" ]; then
+        mkdir -p "$(dirname "$lm")" 2>/dev/null || true
+        printf 'landed %s at %s by push-main\n' "$def" "$(git rev-parse HEAD)" > "$lm" 2>/dev/null || true
+      fi
+    fi
     echo "push-main: landed $def on $remote." >&2
     exit 0
   fi

@@ -85,6 +85,9 @@ PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
 # driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
 # predicate hanging off it.
 PARK_KINDS_SURFACED=$(core_of PARK_KINDS_SURFACED)
+# The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
+# second spelling of a bound is a bound that goes wrong silently when one copy moves.
+RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
@@ -96,6 +99,60 @@ if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
 fi
 PHASES="$PHASES_CORE $PHASES_EXTRA"
 DOD="$DOD_CORE $DOD_EXTRA"
+
+# ---- THE REVIEW LOOP, graded from the parked region. Three clauses, and each exists because the
+# ---- corpus cannot exercise it: no group may exceed the runaway ceiling; no group's blocker counts
+# ---- may fail to shrink without carrying a TERMINAL LINE recording the exit; and a group that DID
+# ---- exit must have been disposed of, observed as a unit row the generated region gained.
+# ----
+# ---- There is no round-count fact to parse. The sequence is DERIVED from the line set, and the only
+# ---- grammar split here is the park helper's own output — which is why adding a round cannot make a
+# ---- record disagree with itself.
+if [ -z "$RUNAWAY_CEILING" ]; then
+  fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+else
+  rv_bad=""
+  for rvf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+    [ -f "$rvf" ] || continue
+    grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
+    rv_readme=${rvf%/RUN*.md}/README.md
+    rv_units=""
+    # THE MARKERS ARE SPELLED, not borrowed from the driver: `ROSTER_OPEN` is a DRIVER variable and
+    # is EMPTY here, which would have made the third clause silently inert — a skip that looks
+    # exactly like a pass, over the one clause a ratified fork resolution added.
+    [ -f "$rv_readme" ] && rv_units=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null || true)
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v units="$rv_units" '
+      /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+        line = $0; sub(/\r$/, "", line)
+        i = index(line, " · item "); if (i == 0) next
+        rest = substr(line, i + length(" · item "))
+        j = index(rest, " · reason "); if (j == 0) next
+        it = substr(rest, 1, j - 1); rs = substr(rest, j + length(" · reason "))
+        n[it]++
+        b = -1
+        if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
+        if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
+        last[it] = b
+        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING/) term[it] = 1
+        if (rs ~ /NON-CONVERGENT|CEILING/) needs[it] = 1
+      }
+      END {
+        for (it in n) {
+          if (n[it] > ceil)
+            printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
+          else if (flat[it] >= 2 && !(it in term))
+            printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
+          if (it in needs) {
+            if (units == "")
+              printf "\n  %s (subject %s: the loop EXITED without converging and this build README has no readable generated units region, so whether the blocker was promoted CANNOT BE OBSERVED — a check that cannot look says so rather than passing)", f, it
+            else if (index(units, it) == 0)
+              printf "\n  %s (subject %s: the loop EXITED without converging and the generated units region gained no unit row for it, so a blocker was neither fixed nor promoted)", f, it
+          }
+        }
+      }' "$rvf")"
+  done
+  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without promoting:$rv_bad"
+fi
 
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
 # ---- The floor behaves like its two siblings — undeclared or malformed is a REFUSAL, never a
@@ -452,12 +509,22 @@ while IFS= read -r f; do
   # region's only writer was `--preflight`, which refuses once a run is live. The refusal told the
   # reader to "re-run the driver", naming a path no verb walks. Asserting EMPTINESS is the same
   # invariant with the copy removed: one fact, one home, and nothing to go stale between reads.
+  # THE TERMINAL EXEMPTION IS SCOPED TO EMPTINESS, and only emptiness. It used to clear `rd`, which
+  # skipped BOTH refusals below — so a terminal record with MALFORMED generated markers was exempt from
+  # a shape check that has nothing to do with why the exemption exists. The exemption is for a finished
+  # run whose region legitimately holds a frozen roster; a marker pair is either well-formed or it is
+  # not, in every phase.
+  # MEASURED 2026-08-20: unexempting the marker-shape branch reds NOTHING — every tracked record has a
+  # well-formed pair. That is why this is safe to tighten and also why it needs a RED FIXTURE in the
+  # sibling test: a check whose only evidence is a corpus that cannot trigger it is the
+  # fixture-passes-by-finding-nothing class, which is this whole unit's subject.
   rd=${f%/RUN.md}/README.md
-  case " $PHASES_TERMINAL " in *" $ph "*) rd="" ;; esac
-  if [ -n "$rd" ] && [ -f "$rd" ]; then
+  term=0
+  case " $PHASES_TERMINAL " in *" $ph "*) term=1 ;; esac
+  if [ -f "$rd" ]; then
     a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
       fail 8 "a run-state file's generated markers are malformed: $f"
-    [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
+    [ "$term" = 1 ] || [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
       fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
   fi
 

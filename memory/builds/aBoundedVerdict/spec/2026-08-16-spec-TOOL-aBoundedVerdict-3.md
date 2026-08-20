@@ -388,6 +388,33 @@ This line is the machine-read one; the bullets carry the reasoning.
   it, and the kit version bump enumerated by site rather than abbreviated to "the kit version
   constants".
 
+- rev-8 · 2026-08-20 · **built, and the displacement this unit needed is DONE rather than deferred.**
+  The method was at 283 of its own 290-line cap with four paragraphs to add, and a cap raise is an
+  owner turn under M3 veto 2 — so M12's PROCEDURE moved to the memory-tree kit's README, into the
+  displaced-sections home that already held M5's probe taxonomy. What stayed in M12 is what changes
+  what an agent does next: what the section is for, that it adds no pass kind, and M3's limit on the
+  run's authority. The justification is the method's OWN budget rationale — it is re-read whole at
+  every pass boundary, so rarely-reached procedure is exactly what displacement is for, and M12 is
+  reached only by a prompt-authorized run that found no seam. Method 283 -> 270 lines before the
+  additions, 290 after; read path 108505 -> 107524 B.
+  **S2's collapse is the rule I had to derive by hand two passes earlier.** Resolving
+  `TOOL-aBoundedVerdict-21` F3 required knowing that a veto leaving ONE survivor is not a licence to
+  take the vetoed option — and the method said "vetoes 2 and 3 are owner turns" three lines above a
+  park sentence about a different condition. I reasoned it through and recorded the reasoning; now the
+  method states it, so the next run does not have to. That is the whole content of this scope item and
+  it was worth more than the two lines it costs.
+  **S4 CITES the fact-question grammar rather than spelling it**, per the build decision that the unit
+  owning the predicate owns the grammar — and the citation is a PARAPHRASE, not an id: the method's
+  template lives under `tools/`, so a non-terminal spec id there would take the citation drift signal
+  from 2 to 3 and break a shrink-only pin. That is the third time this run that writing a comment
+  about a unit nearly cited the unit.
+  **S8's fifth cost is stated in the list's own shape**, with the refused alternative and its reason:
+  narrowing scope-approval to a status past awaiting-approval deadlocks, because the method requires a
+  run to author a missing spec and an authored complete spec is written at exactly that status — a run
+  would author a unit it could then never build.
+  Not in scope and not done: no new gate. S1, S3 and S8 are protocol prose; S2, S4, S5 and S6 are the
+  method's. The carriers split exactly as S7 says.
+
 ## 10. Reuse audit
 
 `python tools/memory-recall/query.py` over the fork and owner-turn question returns the decision that

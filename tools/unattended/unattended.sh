@@ -140,7 +140,7 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -148,6 +148,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # supplying the item nobody typed.
 PK_ITEM=""
 HALT_CODE=""
+RV_SUBJECT=""; RV_VERDICT=""; RV_BLOCKERS=""
 M="$MEMORY_ROOT"
 
 status=0
@@ -228,6 +229,20 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 #                             and no run can split it.
 #   repo-state-out-of-mandate the repository state at start was outside what the mandate reaches.
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
+# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. The loop is bounded by a
+# CONVERGENCE PREDICATE, not by a count; this exists so a defect in that predicate cannot produce an
+# unbounded loop. It is set well above any observed converging sequence, so REACHING it is itself a
+# defect worth reporting rather than a routine outcome — and under the owner resolution the run
+# promotes and lands anyway rather than halting, which is why it must be loud in two carriers.
+# A file constant, not a conf key and not an environment variable, on the argument this repo already
+# recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
+RUNAWAY_CEILING="8"
+# THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
+# which enforces review-record grammar and renders the build method; a copy-installed kit cannot
+# import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
+# kit's conformance table rather than hoped away. Pipe-separated because one member contains a space,
+# which a space-separated set cannot hold.
+REVIEW_VERDICTS="CLEAN|CLEAN WITH FIXES|BLOCKED"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
 PARK_KINDS_SURFACED="decision abort override waiver"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
@@ -255,6 +270,33 @@ is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1
 # The EFFECTIVE halt vocabulary: kit core plus whatever the project appended. Same shape as the phase
 # and Definition-of-Done sets, so a project can extend it and cannot delete from it.
 halt_codes() { printf '%s %s\n' "$HALT_CODES_CORE" "$HALT_CODES_EXTRA"; }
+# ENDPOINT NORMALISATION for the fetch-vs-push comparison. Two spellings of the same place are not a
+# misconfiguration, and the check that compared them literally made an UN-OVERRIDABLE Definition-of-Done
+# item unsatisfiable for anyone whose clone carries a split fetch/push URL — which git offers two
+# separate mechanisms for. The rules are exactly the equivalences git itself accepts:
+#   scheme dropped            https://h/p and ssh://h/p are the same endpoint for this question
+#   scp-style recognised      git@host:owner/repo  ==  ssh://host/owner/repo
+#   userinfo dropped          a username is a credential, not an endpoint
+#   trailing .git and /       cosmetic in every form git accepts
+#   host case-folded          hostnames are case-insensitive; paths are NOT and stay exact
+# What it deliberately does NOT do: parse URLs in general, or judge whether the run CAN push over its
+# push URL. That is the lander's business. This asks one question — are these the same place — and
+# a genuinely different host or path is still a refusal, which is the honest misconfiguration the
+# check was written for.
+norm_endpoint() { # <url> -> host/path, comparable
+  local u="$1"
+  u=${u%/}; u=${u%.git}; u=${u%/}
+  case "$u" in
+    *://*) u=${u#*://} ;;                       # scheme
+    *@*:*) u=${u#*@}; u=$(printf '%s' "$u" | sed 's|:|/|') ;;   # scp-style host:path
+  esac
+  u=${u#*@}                                     # userinfo, if the scheme form carried one
+  local host=${u%%/*} rest=""
+  case "$u" in */*) rest=${u#*/} ;; esac
+  host=$(printf '%s' "$host" | tr 'A-Z' 'a-z')
+  host=${host%%:*}                              # an explicit port is not an identity difference here
+  printf '%s/%s\n' "$host" "$rest"
+}
 is_halt_code() { case " $(halt_codes) " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -401,8 +443,23 @@ observe_anchor() {
   uf=$(GIT ls-remote --get-url "$rem" 2>/dev/null)
   up=$(GIT remote get-url --push "$rem" 2>/dev/null)
   if [ "$uf" != "$up" ]; then
-    fail 25 "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch $uf, push $up"
-    return 1
+    # NORMALISE BEFORE JUDGING. A literal comparison read two spellings of one endpoint as two
+    # endpoints, and this check gates `authorization-reachable`, which has no override — so a clone
+    # with a split fetch/push URL could not satisfy an item it is not allowed to waive. git offers
+    # two separate mechanisms for that split and only one of them shows up in `remote.<n>.url`.
+    if [ "$(norm_endpoint "$uf")" = "$(norm_endpoint "$up")" ]; then
+      # SAME PLACE, two spellings. A warning and not a refusal, because this check's own comment
+      # says it is a cost-raiser and not the property — a relay the run seeded satisfies it with one
+      # URL — and a cost-raiser that wedges an un-overridable item is disproportionate to its stated
+      # purpose. It rides the close-path diagnostic channel rather than only stdout, so a caller that
+      # discards output does not discard the fact.
+      DOD_OUT="${DOD_OUT:+$DOD_OUT
+}the fetch and push URLs for this remote are spelled differently and normalise to the SAME endpoint, so the anchor and the landing name one place: fetch $uf, push $up"
+      echo "unattended: NOTE — fetch and push URLs differ in spelling and normalise to the same endpoint: fetch $uf, push $up"
+    else
+      fail 25 "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints: fetch $uf, push $up"
+      return 1
+    fi
   fi
   # ---- 27/28: the REMOTE names its own default branch. `--exit-code` is what makes "answered but
   # ---- advertised nothing" distinguishable from "answered": without it the call exits 0 and prints
@@ -1420,6 +1477,28 @@ verb_landed() { # slug
     return 1
   fi
   check_clean || return 1
+  # THE LANDER MARKER, read BEFORE the remote observation. It is the only verb that runs after the
+  # push, so this is where the evidence can exist — and it goes first because it is a local file read
+  # against a remote round-trip, and because an operator who has not run the lander should be told
+  # THAT rather than told about ancestry. Cheapest and most specific first.
+  #
+  # It carries IDENTITY, not existence: a bare touched file is satisfied by any previous landing, which
+  # is the pass-by-finding-anything shape this kit's own Definition of Done was stuck in.
+  #
+  # AN UNDECLARED KEY DEGRADES rather than refusing, deliberately: an adopter who has not adapted their
+  # lander must not be wedged by a key they have never heard of. A DECLARED key whose marker is absent
+  # or names another commit IS a refusal, because then the project asked for the observation.
+  _lm_head=$(GIT rev-parse HEAD)
+  if [ -n "$LANDER_MARKER" ]; then
+    if [ ! -f "$LANDER_MARKER" ]; then
+      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading: $LANDER_MARKER"
+      return 1
+    fi
+    if ! grep -qF -- "$_lm_head" "$LANDER_MARKER" 2>/dev/null; then
+      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records: $_lm_head"
+      return 1
+    fi
+  fi
   observe_anchor || return 1
   head=$(GIT rev-parse HEAD)
   if ! GIT merge-base --is-ancestor "$head" "$ASHA" 2>/dev/null; then
@@ -1996,7 +2075,22 @@ dod_met() { # slug · run-state file · item · checker
         && [ -z "$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | tr -d '[:space:]')" ] \
         && region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1 ;;
     landed-via-lander)
-      [ -n "$LANDER" ] && [ -n "$BYPASS_BAN" ] && ! grep -qF -- "$BYPASS_BAN" "$rel" ;;
+      # THE NARROW CLAIM, stated honestly, and the redundant grep is GONE. This asserted three facts:
+      # that LANDER is declared, that BYPASS_BAN is declared, and that the record does not name the
+      # flag. The third duplicates leg check 11 inside the same close — two answers to one question —
+      # and the first two only say the conf parsed. So the item cannot fail for anything the run DID,
+      # and it says so now rather than implying a check it does not run.
+      #
+      # THE REAL OBSERVATION IS NOT HERE, and that is a sequencing fact rather than a compromise: this
+      # predicate runs inside `--close`, which happens BEFORE the landing the item is named for. A
+      # marker written by the lander cannot exist yet, so requiring one here would make the item
+      # unsatisfiable by construction — the class this build has already fixed three times. The
+      # observation lives in `--landed`, the only verb that runs after the push.
+      if [ -z "$LANDER" ]; then
+        DOD_OUT="the project declares no LANDER, so there is no landing command this item could be about"
+        return 1
+      fi
+      return 0 ;;
     build-complete)
       # The owner's "merge and push only when the entire build is fully done", given a checker.
       # FIVE terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
@@ -2211,6 +2305,94 @@ verb_attest() { # slug · item · value
   return 0
 }
 
+# THE REVIEW LOOP'S BOUND. A round re-arms the loop only if this round's confirmed-blocker count is
+# STRICTLY SMALLER than the previous round's; anything else ends it. That is stricter than "the count
+# changed", and deliberately so: an oscillating sequence 2, 1, 2 converges under a changed-test and
+# never terminates, which is the shape this exists to stop.
+#
+# WHY A PREDICATE AND NOT A COUNT. Over the tracked review corpus the only exit the method states — a
+# literal clean verdict — occurs ZERO times, while BLOCKED occurs dozens of times with no disposition
+# anywhere. A round cap does not give a loop an exit; it moves the stall earlier. So the loop exits on
+# CONVERGENCE, and every blocker still standing at the exit is PROMOTED to a unit rather than parked.
+#
+# The verb reports one of four states and refuses none of them at the ceiling: CONVERGED (nothing
+# left), NON-CONVERGENT (stop and promote), CEILING (the backstop fired, which is a defect in the
+# predicate — reported loudly and survived), CONVERGING (go again).
+review_state() { # prior-counts (space separated) · this count -> the state
+  local prev="" n=0 c
+  for c in $1; do prev=$c; n=$((n+1)); done
+  if [ "$2" = 0 ]; then printf 'CONVERGED\n'; return 0; fi
+  if [ "$n" -gt 0 ] && [ "$2" -ge "$prev" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
+  if [ "$((n + 1))" -ge "$RUNAWAY_CEILING" ]; then printf 'CEILING\n'; return 0; fi
+  printf 'CONVERGING\n'
+}
+
+# The rounds already recorded for one subject, in order. Derived from the LINE SET — there is no
+# round-count fact to parse, and the only grammar split here is the park helper's own output.
+review_counts() { # run-state file · subject -> the blocker counts, in order
+  awk -v subj="$2" '
+    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+      line = $0; sub(/\r$/, "", line)
+      i = index(line, " · item "); if (i == 0) next
+      rest = substr(line, i + length(" · item "))
+      j = index(rest, " · reason "); if (j == 0) next
+      item = substr(rest, 1, j - 1)
+      if (item != subj) next
+      reason = substr(rest, j + length(" · reason "))
+      if (match(reason, /blockers [0-9]+/))
+        printf "%s ", substr(reason, RSTART + 9, RLENGTH - 9)
+    }' "$1"
+}
+
+verb_review() { # slug · subject · verdict · blockers
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" rel prior state note
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 37 "no run-state file, so there is no run to record a review round against: $rel"; return 1; }
+  refuse_if_terminal "$rel" --review || return 1
+  [ -n "$subj" ] || { fail 37 "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"; return 1; }
+  case "|$REVIEW_VERDICTS|" in
+    *"|$verdict|"*) ;;
+    *) fail 37 "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts: $REVIEW_VERDICTS"; return 1 ;;
+  esac
+  case "$blockers" in
+    ""|*[!0-9]*) fail 37 "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"; return 1 ;;
+  esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$subj" | grep -qF -- "$BYPASS_BAN"; then
+    fail 37 "the subject spells the declared bypass flag, and the gate greps this file whole for it, so recording this round would red the bar on a record nothing can rewrite; name the subject without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
+  prior=$(review_counts "$rel" "$subj")
+  # A subject whose group already ENDED does not take another round. The loop stopped; recording more
+  # rounds against it would make the sequence say the opposite of what happened.
+  if grep -qE "^[0-9][0-9-]*T[0-9:]*Z review · item $subj · reason .*(CONVERGED|NON-CONVERGENT)" "$rel" 2>/dev/null; then
+    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history: $subj"
+    return 1
+  fi
+  state=$(review_state "$prior" "$blockers")
+  note=""
+  case "$state" in
+    CONVERGED|NON-CONVERGENT) note=" · $state" ;;
+    CEILING) note=" · CEILING" ;;
+  esac
+  # THE TERMINAL LINE is the exit token written into the same free-text reason, after the verdict and
+  # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
+  # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
+  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note"
+  stage_or_fail "$rel" || return 1
+  case "$state" in
+    CONVERGED)      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject" ;;
+    NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT — the count did not shrink, so the loop STOPS here and every blocker still standing is PROMOTED to a unit of this build, specced at its tier and built. Not parked, not waived, not re-reviewed" ;;
+    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run promotes and lands anyway; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    *)              if [ -z "$(printf '%s' "$prior" | tr -d '[:space:]')" ]; then
+                      echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
+                    else
+                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CONVERGING — smaller than the round before it, so the loop may re-arm"
+                    fi ;;
+  esac
+  return 0
+}
+
 verb_park() { # slug · item · reason
   local slug="$1" item="$2" reason="$3" rel want pl
   check_slug "$slug" || return 1
@@ -2308,6 +2490,10 @@ while [ $# -gt 0 ]; do
                     elif [ "$WV_PEND" = wv ]; then WAIVE_REASONS[$(( ${#WAIVE_REASONS[@]} - 1 ))]="${2:-}"; WV_PEND=""
                     else REASON="${2:-}"; fi; shift 2 || shift ;;
     --code)         HALT_CODE="${2:-}"; shift 2 || shift ;;
+    --review)       VERB=--review; SLUG="${2:-}"; shift 2 || shift ;;
+    --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
+    --verdict)      RV_VERDICT="${2:-}"; shift 2 || shift ;;
+    --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
@@ -2333,6 +2519,7 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$RV_VERDICT" "$RV_BLOCKERS" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
 esac
 exit "$status"

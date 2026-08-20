@@ -194,6 +194,13 @@ concurrently — and their write sets intersect in the protocol document, so the
   fixing it, which is why the list lives here now instead of in nine spec copies. Where a spec's own
   Files-touched list still spells five, THIS bullet supersedes it; the specs are not re-folded for it,
   because re-folding eight documents to correct one list costs more than it buys.
+- **A review loop that reaches the RUNAWAY CEILING is recorded HERE, not only in the run's output.**
+  The ceiling is a backstop behind the convergence predicate, so reaching it means the predicate did
+  not terminate — a defect in the predicate rather than a routine outcome. Under the owner's
+  resolution the run promotes and lands anyway, which is exactly why the fact must not be quiet: a
+  landing that happened despite a defect looks identical to a clean one unless somebody wrote it down.
+  **Status at 2026-08-20: the ceiling has not fired in this build.** Stated rather than left blank,
+  because an empty section reads as "nothing to report" when it may mean "nobody wrote here".
 - **No spec id in this build may be cited from product source while its status is non-terminal.**
   The drift signal that counts such citations sits at its pin with zero tolerance, and the files
   these units edit are product source.
@@ -417,7 +424,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-10 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-11 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-9 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-8 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-8 | 2026-08-20 |

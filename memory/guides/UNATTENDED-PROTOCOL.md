@@ -88,8 +88,29 @@ to the build folder trades these properties:
 3. **It names no ACTIONS** and **cannot be revoked**: a build authorizes both, permanently.
 4. **It is self-propagating.** A run whose diff creates a new build README authorizes the NEXT run.
    Unrefused: §9 names the only thing that would.
+5. **It approves the SCOPE of every spec inside it.** A unit whose spec is reachable at the pinned
+   BASE carries the same owner act that authorized the run, so a build folder committed with a spec
+   the owner deliberately left unapproved has approved it. Ratified 2026-08-17 rather than inferred.
+   The alternative — only a spec past awaiting-approval counts — was refused because it deadlocks: the
+   method REQUIRES a run to author a missing spec, and an authored complete spec is written at exactly
+   that status, so a run would author a unit it could then never build.
 
 All were put to the owner and accepted.
+
+**A unit AWAITING SCOPE APPROVAL has three dispositions, and they are not interchangeable.** The
+status names an owner turn, and a run under a mandate has to know which of three situations it is in
+before deciding it is stuck. If the spec is REACHABLE at the pinned BASE, cost 5 above already
+approved it and the run proceeds. If the run AUTHORED the spec itself, the method's authoring rule
+governs and nothing is awaited. If the spec is present at BASE under a status naming an EXTERNAL
+PREREQUISITE, the run halts with the external-prerequisite halt code and NOT the scope-approval one —
+they are different owner turns, and conflating them tells a returning owner to approve a scope when
+the actual blocker is outside the repository.
+
+**A fork with no delegated resolver is parked THROUGH THE VERB, and the run continues.** Not noted in
+prose, not left for the wrap-up to notice: `--park` is what a gate reads. The run then carries on with
+the units that do not depend on that fork. Only when EVERY remaining unit depends on it does the run
+halt, with the fork-unresolvable code — a run that can still make progress on something else is not
+stuck, and stopping early spends an owner turn that was not needed.
 
 **The build method is a RUN-TIME dependency of this kit.** Every directive is a pointer into a
 section of `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, so `--preflight` refuses a tree where it is absent rather than starting a run bound
@@ -155,7 +176,9 @@ which is the test for belonging here:
    `PARK_KINDS_SURFACED`, and `history` is the COMPLEMENT — a kind absent from that set is history by
    construction, so there is no second list to keep in step and no way for the two to disagree. The
    split exists because a count of decisions the owner must adjudicate is worthless the moment
-   append-only round history shares the region with it, and the first such kind is already specced.
+   append-only round history shares the region with it. The first `history` kind is `review`, written
+   by `--review`: a review round carries a verdict and a blocker count, not a question and options, so
+   it is sequence rather than a decision anybody owes an answer to.
    Its shrink-only floor is NOT yet armed: the sets it sits beside pin their counts from the project
    conf, and adding a key there is a new public surface the owner has not been asked for. Stated
    rather than left to be discovered, because an unpinned set can quietly shrink.

@@ -159,6 +159,27 @@ against source before building on it, and say in §10 where a record and the sou
 theoretical: a recall pass during `TOOL-aWrittenMethod-1` returned four hits asserting the parity render runs
 LIVE to SHIPPED, which the source contradicts.
 
+### M12 — research, test, choose: the procedure
+
+**Find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
+three differing in MECHANISM is the shape; stop where a further candidate would differ only in detail. "Only one
+mechanism exists here" is a legitimate answer to RECORD, never a quota to fill — and it is a claim, so it owes the
+same evidence a pick does.
+
+**TEST before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
+refute it — a probe, a fixture, a measurement against the real tree — never by argument, and never by a test every
+candidate passes. Write down what would make each candidate LOSE before running anything: a test whose result
+cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar
+is full of gates against, one level up.
+
+**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after M3's
+vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your authority holds
+here too — a candidate set whose options differ in WHAT GETS BUILT is a scope fork, and scope is not delegated.
+
+**Record the LOSS, not just the win.** §10 already names the seam and the recall terms; this section adds one thing
+to it — for each candidate tested and rejected, the test that rejected it. A rejected candidate with no recorded
+test is indistinguishable from one nobody tried, and the next build pays to re-run it.
+
 ### The method's pointer table
 
 Read these, do not restate them — a rule appearing both in the method and in one of these is a defect in the

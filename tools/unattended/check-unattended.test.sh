@@ -184,6 +184,55 @@ hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could
 
 
 
+
+# ---- CHECK 8's MARKER-SHAPE BRANCH, on a TERMINAL record. The exemption used to clear `rd` for any
+# ---- terminal phase, which skipped this refusal as well as the emptiness one — so a finished record
+# ---- with malformed generated markers was exempt from a shape check that has nothing to do with why
+# ---- the exemption exists. Measured when it was scoped: unexempting this branch reds nothing in the
+# ---- corpus, which is exactly why it needs a fixture. A check whose only evidence is a corpus that
+# ---- cannot trigger it is the fixture-passes-by-finding-nothing class.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p memory/builds/tMarker
+printf '# tMarker - run state\n\n<!-- run:generated -->\n\n## Run facts\nphase: LANDED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\nunits-at-landing: ARCH-tMarker-1\n' > memory/builds/tMarker/RUN.md
+printf 'readme\n' > memory/builds/tMarker/README.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m marker --no-verify >/dev/null 2>&1
+hit "$(run)" "a run-state file's generated markers are malformed"
+# ...and the EMPTINESS refusal keeps its terminal exemption, which is the half the exemption is for:
+# a finished record legitimately carries a frozen roster in that region.
+printf '# tMarker - run state\n\n<!-- run:generated -->\nunits-at-landing frozen here\n<!-- /run:generated -->\n\n## Run facts\nphase: LANDED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\n' > memory/builds/tMarker/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m marker2 --no-verify >/dev/null 2>&1
+out=$(run)
+miss "$out" "a run-state file's generated markers are malformed"
+reset_tree
+
+
+
+# ---- THE REVIEW-LOOP CHECK. Its three clauses cannot be exercised by the corpus, which is exactly why
+# ---- they need fixtures — and the FIRST arm is about the check being able to run at all. It reads the
+# ---- ceiling from the driver through `core_of`, which parses only a DOUBLE-QUOTED value; when that
+# ---- read came back empty the whole three-clause check was skipped and said nothing, which is
+# ---- indistinguishable from a clean corpus. An unreadable ceiling is a refusal now.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
+hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+
+# a group whose counts do not shrink and which records no exit
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p memory/builds/tRev
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
+out=$(run)
+hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without promoting"
+hit "$out" "blocker counts did not shrink across consecutive rounds and no round carries an exit token"
+
+# ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
+# passing because the check reds on any review group at all.
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev2 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+reset_tree
+
+
 # ---- THE HALT VOCABULARY: six refusals, each armed by a POSITIVE assertion naming its own text. All
 # ---- six were OBSERVED against the real tree before they were armed here, which is the order this
 # ---- repo asks for — a gate whose failing case has only ever been imagined is an assertion about

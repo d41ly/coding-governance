@@ -2674,11 +2674,165 @@ for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md"; do
 done
 
 
+
+echo "MARK split-url" >&2
+# ---- A SPLIT FETCH/PUSH URL IS NOT A MISCONFIGURATION. Check 25 compared the two URLs LITERALLY, so
+# ---- two spellings of one endpoint read as two endpoints — and that check gates
+# ---- `authorization-reachable`, which has NO override. A clone with a split URL therefore could not
+# ---- satisfy an item it is not allowed to waive.
+# ----
+# ---- BOTH config mechanisms are exercised, because they are two different ways to produce the same
+# ---- split and only ONE of them is visible in `remote.<name>.url`. A fixture using only the visible
+# ---- one would pass while the other stayed broken.
+
+# the NORMALISER itself, over the equivalences it claims and the differences it must keep. Sliced out
+# of the shipped bytes, so an edit to the kit changes this verdict rather than this file's opinion.
+ne_ln=$(grep -n '^norm_endpoint()' "$SCRIPT" | cut -d: -f1)
+eval "$(sed -n "${ne_ln},$((ne_ln + 14))p" "$SCRIPT")"
+n=$((n+1)); declare -F norm_endpoint >/dev/null || { echo "FAIL norm_endpoint was not sliced out of the driver, so every arm below graded nothing"; st=1; }
+same "scp-style and https normalise together"   "$(norm_endpoint 'https://github.com/o/r.git')" "$(norm_endpoint 'git@github.com:o/r')"
+same "ssh:// and scp-style normalise together"  "$(norm_endpoint 'ssh://github.com/o/r')"       "$(norm_endpoint 'git@github.com:o/r.git')"
+same "host case and a trailing slash are noise" "$(norm_endpoint 'https://GitHub.com/o/r/')"    "$(norm_endpoint 'https://github.com/o/r')"
+n=$((n+1)); [ "$(norm_endpoint 'https://github.com/a/r')" != "$(norm_endpoint 'https://github.com/b/r')" ] || { echo "FAIL the normaliser folded two different PATHS together, so a genuinely wrong push target would read as the same place"; st=1; }
+n=$((n+1)); [ "$(norm_endpoint 'https://github.com/a/r')" != "$(norm_endpoint 'https://gitlab.com/a/r')" ] || { echo "FAIL the normaliser folded two different HOSTS together, which is the misconfiguration check 25 exists for"; st=1; }
+
+# MECHANISM ONE: remote.<name>.pushurl. Visible in `remote get-url --push` and NOT in the fetch URL.
+reset_tree; readme tSplit; scope published; git add -A >/dev/null && git commit -q -m split --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url --push origin "$(git remote get-url origin | sed 's|^|ssh://|; s|^ssh://\([A-Za-z]\):|\1:|')" 2>/dev/null || true
+out=$(run --preflight tSplit --keepalive-id k1)
+miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+# MECHANISM TWO: url.<base>.pushInsteadOf. Rewrites the push URL through config, so `remote.origin.url`
+# is untouched and a fixture reading only that would see nothing wrong.
+reset_tree; readme tSplit2; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
+git push -q -f origin unit 2>/dev/null
+git config "url.${ORIGIN}.pushInsteadOf" "$ORIGIN" 2>/dev/null
+out=$(run --preflight tSplit2 --keepalive-id k1)
+miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
+git config --unset "url.${ORIGIN}.pushInsteadOf" 2>/dev/null || true
+
+# ...and the REFUSAL survives for the case the check was written for: two genuinely different places.
+reset_tree; readme tSplit3; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url --push origin "https://example.invalid/not/the/same.git" 2>/dev/null
+out=$(run --preflight tSplit3 --keepalive-id k1)
+hit "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints"
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+reset_tree
+
+
+
+echo "MARK lander-marker" >&2
+# ---- `landed-via-lander` USED TO BE UNFAILABLE. It asserted that LANDER and BYPASS_BAN were declared
+# ---- — which only says the conf parsed — plus a grep that duplicated leg check 11 inside the same
+# ---- close. Nothing it checked could fail for anything the run DID.
+# ----
+# ---- THE REAL OBSERVATION IS IN --landed, NOT IN --close, and that is a sequencing fact rather than a
+# ---- preference: the close runs BEFORE the landing the item is named for, so a marker written by the
+# ---- lander cannot exist yet and requiring one there would make the item unsatisfiable by
+# ---- construction. Three units in this build were unsatisfiable exactly that way.
+# ----
+# ---- The marker carries IDENTITY: a bare touched file is satisfied by any previous landing, which is
+# ---- the pass-by-finding-anything class. Both arms below turn on the commit, not on the file existing.
+
+# a DECLARED marker the lander never wrote
+# THE SED-TO-LANDING PATTERN, which every other --landed arm here uses. `--close` does not reach
+# LANDING in this fixture — authorization-reachable cannot be met and is not overridable — so an arm
+# that closed first never reached the verb at all and its `hit` failed for a reason unrelated to the
+# marker. Setting the phase directly is what the sibling arms do, and for this reason.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER=".git/tmarker"\n' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+rm -f .git/tmarker
+fixture
+hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading"
+
+# a marker naming an EARLIER commit — the arm a presence test cannot fail
+printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > .git/tmarker
+hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records"
+
+# ...and the marker naming THIS commit is accepted. Without this the two arms above could be passing
+# because --landed refuses regardless.
+printf 'landed main at %s by push-main\n' "$(git rev-parse HEAD)" > .git/tmarker
+miss "$(run --landed tRun)" "the lander marker names a different commit"
+miss "$(run --landed tRun)" "the lander wrote none"
+
+# an UNDECLARED key does not refuse: an adopter who has not adapted their lander is not wedged by a
+# key they have never heard of. The asymmetry is deliberate and this is the arm that pins it.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+out=$(run --landed tRun)
+miss "$out" "the project declares a lander marker and the lander wrote none"
+rm -f .git/tmarker
+reset_tree
+
+
+
+echo "MARK review-loop" >&2
+# ---- THE REVIEW LOOP'S BOUND IS A PREDICATE, NOT A COUNT, and the arms below are ordered so the
+# ---- discriminating one is impossible to miss. Over the tracked review corpus the only exit the
+# ---- method states — a literal clean verdict — occurs ZERO times while BLOCKED occurs dozens of
+# ---- times with no disposition anywhere, so a round cap would not give the loop an exit: it would
+# ---- move the stall earlier. The loop exits on CONVERGENCE and promotes what is left.
+rv_ln=$(grep -n '^review_state()' "$SCRIPT" | cut -d: -f1)
+eval "$(sed -n "${rv_ln},$((rv_ln + 9))p" "$SCRIPT")"
+RUNAWAY_CEILING=$(sed -n 's/^RUNAWAY_CEILING="\([0-9]*\)".*/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); declare -F review_state >/dev/null || { echo "FAIL review_state was not sliced out of the driver, so every predicate arm below graded nothing"; st=1; }
+n=$((n+1)); [ -n "$RUNAWAY_CEILING" ] || { echo "FAIL the runaway ceiling could not be read out of the driver, so the ceiling arm below would compare against an empty string"; st=1; }
+
+same "first round, no predecessor to shrink against"  "$(review_state '' 3)"        "CONVERGING"
+same "a strictly smaller count re-arms the loop"      "$(review_state '3' 2)"       "CONVERGING"
+same "a count that did not shrink ends it"            "$(review_state '2' 2)"       "NON-CONVERGENT"
+same "a count that GREW ends it too"                  "$(review_state '2' 5)"       "NON-CONVERGENT"
+same "zero blockers is the clean exit"                "$(review_state '5 4' 0)"     "CONVERGED"
+# THE DISCRIMINATOR. 2, 1, 2 satisfies "the count changed" forever and never terminates; only
+# strictly-smaller stops it. An implementation that tested for change passes every arm above and
+# fails this one, which is the whole reason it is here.
+same "an oscillation 2,1,2 is NON-CONVERGENT"         "$(review_state '2 1' 2)"     "NON-CONVERGENT"
+# the backstop, reached only by a sequence that keeps shrinking — which means it fired because the
+# predicate did not terminate, not because the loop misbehaved.
+same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5 4 3' 2)" "CEILING"
+
+# ---- the verb's refusals, on disk
+bcopen
+hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
+hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
+hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
+same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
+# the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
+# bypass flag — so a subject naming it would red the bar permanently on a record no verb can
+# rewrite. A source-level arm caught this missing when the verb was first written.
+hit "$(run --review tRun --subject "fix the --no-verify path" --verdict BLOCKED --blockers 1)" "the subject spells the declared bypass flag, and the gate greps this file whole for it, so recording this round would red the bar on a record nothing can rewrite; name the subject without the literal flag"
+
+# ---- the recorded round, and the TERMINAL LINE the leg reads
+bcopen
+run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2)
+hit "$out" "NON-CONVERGENT"
+hit "$out" "PROMOTED"
+same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
+# ...and a subject whose loop ENDED does not take another round: the history would say the opposite
+# of what happened.
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+
+# ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
+bcopen
+run --park tRun --item "a real question" --reason "options seen, and why I refused" >/dev/null
+run --review tRun --subject S1 --verdict BLOCKED --blockers 1 >/dev/null
+same "a review round does not join the surfaced parked count" "$(run --status tRun | grep -c 'parked 1')" "1"
+reset_tree
+
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=453
+FLOOR_ASSERTIONS=487
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

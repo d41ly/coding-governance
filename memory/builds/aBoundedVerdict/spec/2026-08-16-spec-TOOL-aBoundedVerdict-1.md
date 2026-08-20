@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-10 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** SPECCED · rev-11 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -616,6 +616,32 @@ This line is the machine-read one; the bullets carry the reasoning.
   `history`, `review` is the first `history` kind, and the shipped counter is CORRECT today with all
   four live kinds surfaced — the claim of a present inflation is withdrawn and replaced by the real
   argument, which is that the counter goes wrong the day this unit lands a `history` kind.
+
+- rev-11 · 2026-08-20 · **built, and the leg check had THREE independent silent-skip mechanisms — every
+  one of which left it GREEN.** Recorded in that order because each was found only after fixing the one
+  before, and any of them alone would have shipped a check that grades nothing.
+  (1) `core_of` parses only a DOUBLE-QUOTED value and the ceiling was written `RUNAWAY_CEILING=8`, so
+  the leg read empty and the `if [ -n … ]` guard skipped the whole three-clause block. A guard around a
+  read that can fail IS the silent-skip shape; an unreadable ceiling is a refusal now.
+  (2) The middot is TWO BYTES in UTF-8, so `substr(line, i + 8)` left a stray space on every parsed
+  subject name and no group ever matched its own rows. This repo's own check 12 carries the warning
+  verbatim — offsetting past a middot is a property of the awk build and the ambient locale — and both
+  files now compute the offset with `length()`.
+  (3) S6's third clause read `ROSTER_OPEN`, which is a DRIVER variable and empty in the leg, so the
+  clause F3 ratified would have passed quietly forever. The markers are spelled, and an unreadable
+  region now reports that it CANNOT OBSERVE rather than passing.
+  **The predicate's discriminating arm is in the suite explicitly**, not implied: a 2, 1, 2 oscillation
+  satisfies "the count changed" forever and terminates only under strictly-smaller. An implementation
+  testing for change passes every other arm and fails that one alone.
+  **AC6's displacement was real work, not a formality.** The additions took the method to 301 lines
+  against its own 290-line cap, so two paragraphs moved to the memory-tree README — what the review
+  harness is NOT for, and why the parallelism rule's third clause is worded as it is — both pure
+  explanation, and my own new prose was compressed rather than displacing more of the file's existing
+  content. Final 288 lines / 22069 B, inside both caps, read path 111893 of 112987.
+  **S10's second carrier says the ceiling has NOT fired**, rather than leaving the section blank: an
+  empty section reads as "nothing to report" when it may mean "nobody wrote here".
+  One message bug caught by running the verb: the first round reported "smaller than the round before
+  it" when there is no round before it.
 
 ## 10. Reuse audit
 
