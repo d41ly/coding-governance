@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=91
+FLOOR_ASSERTIONS=93
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -74,6 +74,64 @@ if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
+# 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard` and `impure`,
+#     and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
+#     silent: the reuse path reads the key it knows, finds nothing, and treats a leg whose verdict
+#     depends on a remote as reusable on a byte-identical tree. The typo is the whole failure
+#     mode, so the pin is on the SET rather than on any one key.
+#
+#     A SCHEMA ARM, which is why it ships. It asserts a shape true of any manifest in any tree and
+#     names no leg of this repo's corpus; the gov-only harness next door holds the arms that do.
+#     It reads LEGS_FILE — the derived path — so it grades whatever manifest the tree it runs in
+#     actually has, and hardcoding `tools/gate-legs.json` in a harness that ships is the
+#     pin-copied-from-another-corpus class this kit refuses by name.
+#
+#     ITS CONTROL IS A MANIFEST WITH NO `impure` ANYWHERE, WHICH MUST PASS. The key is optional
+#     and, until a deployer unit teaches govkit to carry it, gov-only: an adopting tree's emitted
+#     manifest cannot contain one. An arm that reds on its ABSENCE is an arm that reds in every
+#     adopting tree on arrival, which is the same defect one level up from the one it guards.
+n=$((n+1))
+"$PYBIN" -c '
+import json, sys
+KNOWN = {"name", "argv", "guard", "impure"}
+try:
+    legs = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+stray = []
+for l in legs:
+    if not isinstance(l, dict):
+        print("canary: a leg row is not an object"); sys.exit(1)
+    for k in l:
+        if k not in KNOWN:
+            stray.append("%s -> %s" % (l.get("name", "?"), k))
+if stray:
+    print("canary: leg row(s) carry a key outside the pinned set %s: %s"
+          % (sorted(KNOWN), ", ".join(stray)))
+    print("canary: a near-miss spelling of `impure` is exactly what this pin exists to catch —")
+    print("canary: the reuse path would find no declaration and reuse a leg that reads a remote.")
+    sys.exit(1)
+' "$LEGS_FILE" || fail=1
+
+# 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
+#     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
+#     negative search passes just as happily over a population it never selected.
+n=$((n+1))
+ctl=$(mktemp -d)
+printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.sh"],"guard":["z/"]}]' > "$ctl/clean.json"
+printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
+keyset_probe() { "$PYBIN" -c '
+import json, sys
+KNOWN = {"name", "argv", "guard", "impure"}
+legs = json.load(open(sys.argv[1]))
+sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
+' "$1"; }
+if keyset_probe "$ctl/clean.json" && ! keyset_probe "$ctl/typo.json"; then :
+else
+  echo "canary: the manifest key-set predicate is unarmed — it must PASS a manifest with no impure key and FAIL a near-miss spelling; one of the two did not hold"
+  fail=1
+fi
+rm -rf "$ctl"
 # 1b. every `guard` pathspec matches at least one TRACKED path. This is the quietest hole a guard can
 #     open: `git diff --quiet BASE -- does/not/exist` reports NO difference, so a leg guarded on a
 #     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring
@@ -264,11 +322,11 @@ printf '#!/usr/bin/env bash\n%s\nsleep 1.5\nexit 0\n' "$rendezvous" > "$SCRATCH/
 
 # 3e. the timing cache is ADVISORY. A corrupt one must cost wall clock and nothing else, because it
 #     is written by every run and a half-written file after a kill is the expected state, not a bug.
-printf 'not\ta\tnumber\n\x00garbage\n' > "$SCRATCH/.git/gate-timings.tsv"
+printf 'not\ta\tnumber\n\x00garbage\n' > "$SCRATCH/.git/gate-ledger.tsv"
 corrupt=$(run_scratch 4)
 n=$((n+1))
 printf '%s\n' "$corrupt" | grep -q '^gates GREEN — 4/4 legs passed$' \
-  || { echo "canary: a corrupt gate-timings.tsv changed the verdict"; printf '%s\n' "$corrupt" | sed 's/^/    /'; fail=1; }
+  || { echo "canary: a corrupt gate-ledger.tsv changed the verdict"; printf '%s\n' "$corrupt" | sed 's/^/    /'; fail=1; }
 
 # 3f. GATE_JOBS only schedules. A garbage, zero, negative or absurd width still reports EVERY leg —
 #     this knob must never be a way to make the bar check less than it checks. The sleeps are dropped
@@ -453,8 +511,8 @@ done
 # C1: the skipped leg produced no timing this run. Its CACHED row from pass 1 must survive, or every
 # diff-scoped run blanks the dispatch hint the next full run needs.
 n=$((n+1))
-grep -q '^guarded	' "$G/.git/gate-timings.tsv" 2>/dev/null \
-  || { echo "canary: the skipped leg's cached timing row was dropped by the cache rewrite"; fail=1; }
+grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
+  || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
 
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
 #     `.githooks/pre-push` sets it, so a guard can only ever scope a NON-authoritative run and a
@@ -524,7 +582,7 @@ runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-ga
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
 # hint. Truncated to an integer: the arm compares magnitudes and `[` cannot read a decimal.
-leg_secs() { awk -F'\t' -v n="$1" '$1==n { printf "%d", $2 + 0 }' "$P/.git/gate-timings.tsv" 2>/dev/null; }
+leg_secs() { awk -F'\t' -v n="$1" '$1==n { printf "%d", $2 + 0 }' "$P/.git/gate-ledger.tsv" 2>/dev/null; }
 profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
 
 # THE FIXTURE TABLE the selection arms drive. Three rows, most-capable-first, zero-threshold
@@ -683,7 +741,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   runp GATE_PROFILES=fx/tbl-loose.txt >/dev/null 2>&1
   t_ctl=$(leg_secs sleeper)
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ]; } \
-    || { echo "canary: the timing cache carried no 'sleeper' row for one of the two runs, so the elapsed assertion could not look — an arm that could not measure has not measured (timed '${t_timed}', control '${t_ctl}')"; fail=1; }
+    || { echo "canary: the ledger carried no 'sleeper' row for one of the two runs, so the elapsed assertion could not look — an arm that could not measure has not measured (timed '${t_timed}', control '${t_ctl}')"; fail=1; }
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ] && [ "$(( t_ctl - t_timed ))" -ge 10 ]; } \
     || { echo "canary: the per-leg timeout bounded the VERDICT and not the CLOCK — the sleeper leg itself took ${t_timed}s under a 3s bound against ${t_ctl}s untimed over the same 20s fixture. A knob that reports 124 while the worker blocks for the whole hang leaves the bar wedged exactly as it was before the knob existed."; fail=1; }
   # THE KILL-AFTER, driven by a leg that ignores TERM. Nothing else reaches it, and the tail is

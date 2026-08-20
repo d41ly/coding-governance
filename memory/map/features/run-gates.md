@@ -5,7 +5,7 @@ feature = "run-gates"
 title = "The gate runner, its harnesses, and the adopter that keeps a target's verdict reader honest"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2"]
+decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-16"]
 
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring", "profile-bar selftest"]
@@ -26,10 +26,45 @@ globs = [
   "tools/run-gates/profile_bar.py",
   "tools/run-gates/profile_bar.test.sh",
   "tools/run-gates/gate-profiles.txt",
+  "tools/run-gates/gate-fingerprint.sh",
 ]
 ```
 
 ## Constraints & why
+
+**The run record, and why the completion file is NOT in it.** Every run writes
+`<git-dir>/gate-run/<run-id>/` — a header before dispatch, one TSV row and one redacted output copy
+per leg, a verdict last — and the verdict's ABSENCE is the crash signal. The `.rc` completion file
+deliberately stays in the `mktemp -d` scratch. It is the DISPATCH SUPPRESSOR: the loop skips any leg
+that already has one, so a leftover makes the runner skip a leg and print it green. The unit's spec
+asked for it to move into the record and its own reasoning argued the other way; the arm found the
+disagreement. A scratch name nothing outside the process can predict cannot be planted, while a run
+directory has a nameable path and the runner accepts a pinned id through `GATE_RUN_ID`. Measured:
+with the suppressor in the record, a planted `<i>.rc` suppressed its leg and the run reported the
+plant's verdict as the leg's own.
+
+**One store, because the second reader was the one that would have broken.** `gate-ledger.tsv`
+REPLACED `gate-timings.tsv` rather than sitting beside it, and field 2 is still the duration so the
+runner's dispatch parser needed no edit. The reason it could not simply be added is `profile_bar.py`,
+which snapshots the store's mtime before and after a run and REFUSES when it did not move: a runner
+that silently stopped writing the old path would not have degraded the profiler, it would have made
+it refuse on every invocation, turning `profile-bar selftest` into a leg whose subject can no longer
+run.
+
+**CLEAN means porcelain EMPTY, untracked included.** The full-green stamp's five preconditions are
+what make its name true, and this is the one a reader gets wrong: `git diff --quiet` is blind to an
+untracked file, so an implementation using it stamps a green over a tree with a `??` line — and the
+recorded digest then has a non-empty porcelain component that the at-a-rev fingerprint form cannot
+reproduce at any sha, which forces the full bar forever while printing that the record describes a
+different tree. Safe, permanent, and it reads as caution.
+
+**Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
+a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
+`unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its verdict is a
+function of the remote as well as of the tree. That is the population the `impure` key declares —
+measured 2026-08-20, and both the "all four unattended legs" guess and the "none of them" reading
+were wrong.
+
 
 **The leg manifest is the kit dir's SIBLING, derived and never spelled.** `<prefix>/gate-legs.json`,
 computed from the runner's own location. A hardcoded `tools/gate-legs.json` resolves to nothing at any

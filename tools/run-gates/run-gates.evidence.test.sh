@@ -23,7 +23,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=11
+FLOOR_ASSERTIONS=37
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -152,6 +152,267 @@ if [ "$rc" -eq 2 ] && printf '%s' "$out" | grep -q 'definitely-absent.json'; the
 else
   nope "an unreadable GATE_LEGS did not fail cleanly (rc=$rc)"
 fi
+
+# =================================================================================================
+# THE RUN RECORD (the run-record unit). Every arm below drives the real runner inside its OWN scratch
+# repository, because the record lives in the git dir and these arms have to make trees dirty, kill
+# runs, and plant files. The bare-GIT_DIR fixtures above cannot do that: they borrow this repo's
+# working tree, so "make the tree dirty" would mean dirtying the tree under test.
+#
+# WHY SO MANY NEGATIVE ARMS. The full-green stamp has five preconditions, and an implementation that
+# forgets exactly one of them passes every arm written for the other four. Each therefore gets its
+# own control, and the two that historically had none — the red run and the untracked-only dirty
+# tree — get theirs first.
+
+REC_OUT=$(mktemp)   # runner stdout goes OUTSIDE the repo under test: writing it inside makes the
+                    # tree untracked-dirty before the runner starts, which silently turns every
+                    # full-green arm into a no-op. Measured while building this suite.
+
+rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
+  REC_T=$(mktemp -d)
+  mkdir -p "$REC_T/tools/run-gates" "$REC_T/tools/lib" "$REC_T/fx"
+  cp "$ROOT/tools/run-gates/run-gates.sh" "$ROOT/tools/run-gates/gate-fingerprint.sh" \
+     "$ROOT/tools/run-gates/gate-profiles.txt" "$REC_T/tools/run-gates/" || return 1
+  cp "$ROOT/tools/lib/resolve-python.sh" "$REC_T/tools/lib/" 2>/dev/null || true
+  ( cd "$REC_T" && git init -q -b main . && git config user.email rec@test.invalid \
+      && git config user.name rec-test ) >/dev/null 2>&1 || return 1
+  printf '#!/usr/bin/env bash\necho hello\nexit 0\n' > "$REC_T/fx/a.sh"
+  printf '#!/usr/bin/env bash\necho boom\nexit 3\n'  > "$REC_T/fx/red.sh"
+  printf '#!/usr/bin/env bash\nsleep 6\nexit 0\n'    > "$REC_T/fx/slow.sh"
+  printf '#!/usr/bin/env bash\necho "https://u:p@example.com"\nexit 0\n' > "$REC_T/fx/leak.sh"
+  printf '%s\n' '[' \
+    '  {"name": "one", "argv": ["bash", "fx/a.sh"]},' \
+    '  {"name": "guarded", "argv": ["bash", "fx/a.sh"], "guard": ["fx/"]}' \
+    ']' > "$REC_T/tools/gate-legs.json"
+  ( cd "$REC_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
+  # A resolvable origin, so guards can compute a BASE and a skip is actually reachable. Without it
+  # BASE is empty, changed() fails safe to "run", and every skip arm passes by finding nothing.
+  ( cd "$REC_T" && git update-ref refs/remotes/origin/main HEAD \
+      && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
+  REC_GD="$REC_T/.git"
+}
+rec_run()  { ( cd "$REC_T" && env "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+rec_legs() { printf '%s\n' "$1" > "$REC_T/tools/gate-legs.json"
+             ( cd "$REC_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1; }
+rec_dir()  { printf '%s/gate-run/%s' "$REC_GD" "$(cat "$REC_GD/gate-run/current" 2>/dev/null)"; }
+rec_done() { rm -rf "$REC_T"; }
+
+# --- the header is readable BY A LEG while the run is in flight ----------------------------------
+rec_repo || { echo "evidence-test: cannot build a record scratch"; exit 2; }
+printf '%s\n' '#!/usr/bin/env bash' \
+  'gd=$(git rev-parse --git-dir)' \
+  'id=$(cat "$gd/gate-run/current" 2>/dev/null)' \
+  '[ -n "$id" ] || { echo "no current"; exit 1; }' \
+  'grep -q "^run_id	$id$" "$gd/gate-run/$id/header" || { echo "header does not name this run"; exit 1; }' \
+  'echo "read the header of run $id"' > "$REC_T/fx/reader.sh"
+rec_legs '[ {"name": "reader", "argv": ["bash", "fx/reader.sh"]} ]'
+rc=$(rec_run GATE_FULL=1)
+if [ "$rc" = 0 ] && grep -q 'GATE ok    reader' "$REC_OUT"; then
+  ok "a leg resolved gate-run/current and read this run's header WHILE the run was in flight"
+else
+  nope "a leg could not read the in-flight header (rc=$rc)"; sed 's/^/      /' "$REC_OUT"
+fi
+rec_done
+
+# --- a hard kill leaves a header and NO verdict ---------------------------------------------------
+rec_repo
+rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
+( cd "$REC_T" && timeout -s KILL 2 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+d=$(rec_dir)
+[ -f "$d/header" ] && ok "the header survived a hard kill" \
+                   || nope "no header after a hard kill — the crash case is unreadable"
+[ -f "$d/verdict" ] && nope "a verdict exists after a hard kill, so its absence is not the crash signal" \
+                    || ok "no verdict after a hard kill (absence IS the crash signal)"
+rec_done
+
+# --- the failed leg's ledger row, and the control that stops it passing by finding nothing --------
+rec_repo
+rec_legs '[ {"name": "red", "argv": ["bash", "fx/red.sh"]}, {"name": "one", "argv": ["bash", "fx/a.sh"]} ]'
+rec_run GATE_FULL=1 >/dev/null
+if awk -F'\t' '$1=="red" && $3=="fail" && $4=="-" {f=1} END{exit !f}' "$REC_GD/gate-ledger.tsv" 2>/dev/null; then
+  ok "a failed leg's ledger row is status fail with no reusable input key"
+else
+  nope "the failed leg's ledger row is wrong"; sed 's/^/      /' "$REC_GD/gate-ledger.tsv" 2>/dev/null
+fi
+if awk -F'\t' '$1=="one" && $3=="ok" && $4!="-" && length($4)>=7 {f=1} END{exit !f}' "$REC_GD/gate-ledger.tsv" 2>/dev/null; then
+  ok "control: a PASSING leg does carry an input key, so the dash above is a verdict and not a default"
+else
+  nope "no leg carries an input key at all — the dash assertion above proves nothing"
+fi
+rec_done
+
+# --- a corrupt ledger is survived ------------------------------------------------------------------
+rec_repo
+printf 'not\ta\tnumber\n\x00garbage\n' > "$REC_GD/gate-ledger.tsv"
+rc=$(rec_run GATE_FULL=1)
+[ "$rc" = 0 ] && ok "a corrupt ledger did not change the verdict" \
+              || nope "a corrupt ledger failed the run (rc=$rc)"
+rec_done
+
+# --- the full-green stamp, and its five preconditions, each with a control -------------------------
+rec_repo
+rc=$(rec_run GATE_FULL=1)
+if [ -f "$REC_GD/gate-full-green" ]; then
+  ok "control: a clean, fully-green, nothing-skipped run DOES stamp gate-full-green"
+  blob=$( cd "$REC_T" && git hash-object -- tools/gate-legs.json )
+  grep -q "^manifest_blob	$blob$" "$REC_GD/gate-full-green" \
+    && ok "the stamp's manifest_blob is the hash of the manifest THAT RUN READ" \
+    || { nope "the stamp's manifest_blob does not match the manifest the run read"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
+  stamp_before=$(cat "$REC_GD/gate-full-green")
+  # a RED run must neither write nor UPDATE it — the arm that distinguishes the two
+  printf '#!/usr/bin/env bash\necho boom\nexit 3\n' > "$REC_T/fx/a.sh"
+  ( cd "$REC_T" && git add -A && git commit -qm red ) >/dev/null 2>&1
+  rc=$(rec_run GATE_FULL=1)
+  [ "$rc" = 1 ] || nope "control: the red fixture did not red (rc=$rc)"
+  [ "$(cat "$REC_GD/gate-full-green")" = "$stamp_before" ] \
+    && ok "a RED run neither wrote nor updated an existing full-green stamp" \
+    || nope "a RED run rewrote the full-green stamp"
+else
+  nope "the control failed: a clean fully-green run did not stamp, so every arm below proves nothing"
+fi
+rec_done
+
+rec_repo
+rc=$(rec_run GATE_FULL=)     # guards live: the guarded leg is unchanged vs origin/main
+if grep -q 'GATE skip' "$REC_OUT"; then
+  ok "control: a leg actually skipped, so the skip precondition has something to grade"
+  [ -f "$REC_GD/gate-full-green" ] && nope "full-green stamped despite a skipped leg" \
+                                   || ok "a skipped leg defeats the full-green stamp"
+else
+  nope "nothing skipped, so the skip precondition arm would pass by finding nothing"
+fi
+rec_done
+
+rec_repo
+echo scribble >> "$REC_T/fx/a.sh"
+rec_run GATE_FULL=1 >/dev/null
+[ -f "$REC_GD/gate-full-green" ] && nope "full-green stamped from a tracked-dirty tree" \
+                                 || ok "a tracked modification at start defeats the full-green stamp"
+rec_done
+
+rec_repo
+touch "$REC_T/scratch.tmp"
+rec_run GATE_FULL=1 >/dev/null
+# THE FIXTURE THAT SEPARATES THE TWO READINGS OF "CLEAN". `git diff --quiet` is blind to an untracked
+# file, so an implementation using it passes every other dirty-tree arm and stamps a green here.
+[ -f "$REC_GD/gate-full-green" ] \
+  && nope "full-green stamped from a tree whose only dirt is UNTRACKED — CLEAN is being read as git diff --quiet" \
+  || ok "untracked-only dirt defeats the stamp (CLEAN means porcelain EMPTY, not diff --quiet)"
+rec_done
+
+rec_repo
+rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
+( sleep 2; echo moved >> "$REC_T/fx/a.sh" ) &
+rec_run GATE_FULL=1 >/dev/null
+wait
+grep -q '^tree_moved	yes' "$(rec_dir)/verdict" 2>/dev/null \
+  && ok "a tree that moved mid-run is recorded as moved in the verdict" \
+  || { nope "mid-run tree movement was not recorded"; cat "$(rec_dir)/verdict" 2>/dev/null | sed 's/^/      /'; }
+[ -f "$REC_GD/gate-full-green" ] && nope "full-green stamped although the tree moved mid-run" \
+                                 || ok "a tree that moved mid-run defeats the stamp"
+rec_done
+
+# --- a planted completion file cannot suppress a leg ----------------------------------------------
+# The run id is pinned through its seam so the plant lands in the directory this run actually opens.
+# Without the pin the plant goes somewhere the run never looks and the arm passes by finding nothing,
+# which is the exact shape it exists to rule out.
+rec_repo
+mkdir -p "$REC_GD/gate-run/PINNED"
+printf '0' > "$REC_GD/gate-run/PINNED/1.rc"
+printf '0' > "$REC_GD/gate-run/1.rc"
+rec_run GATE_FULL=1 GATE_RUN_ID=PINNED >/dev/null
+[ -f "$REC_GD/gate-run/PINNED/1.leg" ] \
+  && ok "a completion file planted in this run's own directory did NOT suppress its leg" \
+  || nope "a planted completion file suppressed a leg — a leftover reads as a green verdict"
+rec_done
+
+# --- retention, and the control that proves the sweep runs after the verdict ----------------------
+rec_repo
+for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; sleep 0.05; done
+rec_run GATE_FULL=1 >/dev/null
+left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
+keep=$(grep -m1 -oE 'GATE_RUN_KEEP:-[0-9]+' "$ROOT/tools/run-gates/run-gates.sh" | grep -oE '[0-9]+')
+# GRADED AGAINST THE CONSTANT BY NAME, read out of the runner. A bound written only into this arm is
+# satisfied by whatever a builder picked, including one above the fixture's size, which passes by
+# finding nothing.
+[ -n "$keep" ] || nope "could not read GATE_RUN_KEEP out of the runner, so this arm has no bound to grade"
+[ "$left" = "${keep:-x}" ] && ok "the sweep left exactly GATE_RUN_KEEP=$keep run directories" \
+                           || nope "the sweep left $left run directories, expected ${keep:-?}"
+rec_done
+
+rec_repo
+for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; done
+rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
+( cd "$REC_T" && timeout -s KILL 2 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
+[ "$left" -ge 9 ] && ok "a run KILLED before its verdict swept nothing (the sweep is after the verdict)" \
+                  || nope "a killed run swept $((9-left)) record(s) — the sweep is running before the verdict"
+rec_done
+
+# --- the durable output copy is redacted and restrictive, with a control --------------------------
+rec_repo
+rec_legs '[ {"name": "leak", "argv": ["bash", "fx/leak.sh"]} ]'
+rec_run GATE_FULL=1 >/dev/null
+d=$(rec_dir)
+if grep -rq 'u:p@example.com' "$d" 2>/dev/null; then
+  nope "the DURABLE per-leg output copy carries an unmasked credential"
+else
+  ok "the durable per-leg output copy is redacted"
+fi
+if grep -rq '\*\*\*:\*\*\*@example.com' "$d" 2>/dev/null; then
+  ok "control: the masked form IS present, so the arm above is not passing on an empty file"
+else
+  nope "neither the raw nor the masked credential is in the record — the redaction arm proves nothing"
+fi
+rec_done
+
+# --- the fingerprint helper's two forms ------------------------------------------------------------
+rec_repo
+FP="$REC_T/tools/run-gates/gate-fingerprint.sh"
+a=$( cd "$REC_T" && bash "$FP" ); b=$( cd "$REC_T" && bash "$FP" HEAD )
+[ -n "$a" ] && [ "$a" = "$b" ] \
+  && ok "on a clean tree the no-argument and at-a-rev forms agree" \
+  || nope "the two fingerprint forms disagree on a clean tree ('$a' vs '$b')"
+echo second > "$REC_T/fx/a.sh"; ( cd "$REC_T" && git add -A && git commit -qm second ) >/dev/null 2>&1
+c=$( cd "$REC_T" && bash "$FP" HEAD ); p=$( cd "$REC_T" && bash "$FP" HEAD~1 )
+[ -n "$p" ] && [ "$p" != "$c" ] \
+  && ok "the helper at HEAD~1 differs from the helper at HEAD (the argument is LIVE)" \
+  || nope "the helper returns the same digest for two different revs — the argument is dead, and the push boundary would take the digest at the tip"
+( cd "$REC_T" && git checkout -q HEAD~1 )
+q=$( cd "$REC_T" && bash "$FP" )
+[ "$q" = "$p" ] \
+  && ok "the at-a-rev digest equals the no-argument digest measured with that rev checked out clean" \
+  || nope "the at-a-rev form does not reproduce the working-tree form at the same rev"
+( cd "$REC_T" && git checkout -q main )
+echo dirty >> "$REC_T/fx/a.sh"
+e=$( cd "$REC_T" && bash "$FP" ); f=$( cd "$REC_T" && bash "$FP" HEAD )
+{ [ "$e" != "$f" ] && [ "$f" = "$c" ]; } \
+  && ok "on a dirty tree the forms differ and the at-a-rev form is unmoved" \
+  || nope "the dirty-tree behaviour is wrong (worktree '$e', rev '$f', clean-rev '$c')"
+rec_done
+
+# --- the header's run envelope is FOUR keys, across two fixtures with different profile rows -------
+# One fixture cannot separate a header that records the envelope from one that hardcodes the
+# catch-all row's values.
+for prof in capable minimal; do
+  rec_repo
+  rec_run GATE_FULL=1 GATE_PROFILE="$prof" >/dev/null
+  h=$(rec_dir)/header
+  pl=$(grep -m1 '^gate profile: ' "$REC_OUT")
+  hrow=$(awk -F'\t' '$1=="profile_row"{print $2}' "$h" 2>/dev/null)
+  hw=$(awk -F'\t' '$1=="width"{print $2}' "$h" 2>/dev/null)
+  ht=$(awk -F'\t' '$1=="leg_timeout"{print $2}' "$h" 2>/dev/null)
+  hf=$(awk -F'\t' '$1=="profile_from"{print $2}' "$h" 2>/dev/null)
+  if [ "$hrow" = "$prof" ] && [ -n "$hw" ] && [ -n "$ht" ] && [ -n "$hf" ] \
+     && printf '%s' "$pl" | grep -q "^gate profile: $prof " \
+     && printf '%s' "$pl" | grep -q "width $hw"; then
+    ok "the header's four envelope keys match the PROF_LINE this run printed (row $prof)"
+  else
+    nope "the header envelope disagrees with PROF_LINE for row $prof (row='$hrow' width='$hw' timeout='$ht' from='$hf' line='$pl')"
+  fi
+  rec_done
+done
+rm -f "$REC_OUT"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

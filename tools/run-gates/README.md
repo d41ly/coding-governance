@@ -29,12 +29,33 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 |---|---|
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
+| `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
+| `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
+| `profile_bar.test.sh` | the profiler's own arms |
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `kit.toml` | this entry, declared as data |
+
+## The run record
+
+Every run writes a durable, machine-readable record under `<git-dir>/gate-run/<run-id>/`, and
+`<git-dir>/gate-run/current` names the in-flight one so a concurrent reader — including a leg of the
+run itself — can find it. The `header` is written before the first leg dispatches; one `<i>.leg` TSV
+row and one redacted `<i>.out` copy land per leg; the `verdict` is written last, and ITS ABSENCE is
+the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
+dispatch, so a crashed run's record survives the next few ordinary runs.
+
+`<git-dir>/gate-ledger.tsv` is the cross-run store: one row per leg, with the duration in field 2 —
+which is what lets the runner read it as a dispatch hint and `profile_bar.py` read it as a
+measurement, with no second copy of the same fact.
+
+`<git-dir>/gate-full-green` is stamped only when the run failed nothing, skipped nothing, reused
+nothing, the tree did not move, AND the tree was CLEAN when the run started. CLEAN means
+`git status --porcelain` empty, untracked files included. All five preconditions are what make the
+file's name true, and an implementation that forgets one passes every arm written for the others.
 
 ## The leg manifest is the kit dir's SIBLING
 

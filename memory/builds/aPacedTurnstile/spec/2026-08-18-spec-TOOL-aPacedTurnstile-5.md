@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter
 
-**Status:** OPEN · rev-8 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-9 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -519,8 +519,8 @@ would — as a red leg nobody predicted, at the push boundary, after the commit 
 
 ## 8. Open questions
 
-One fork is OPEN and the two below it are RESOLVED. Each resolved pick is the M3 ratification of the
-fork's own recommendation; the reason each survived the veto order is recorded with it.
+none open — all three forks are RESOLVED. Each pick is the M3 ratification of the fork's own
+recommendation; the reason each survived the veto order is recorded with it.
 
 - **What an adopting tree's reuse path does with no `impure` declarations, given that the key cannot
   travel.** OPEN, and named here rather than guessed at. S8 establishes the fact: `govkit.py` emits
@@ -537,6 +537,23 @@ fork's own recommendation; the reason each survived the veto order is recorded w
   `TOOL-aPacedTurnstile-6`, which owns the reuse verb and the denial rule; this unit records it
   because this unit is what adds the key, and a key whose consumer is undecided should not look
   settled from the writer's side.
+
+  RESOLVED (2026-08-20, at build time, on a measurement the fork did not have): **option (c) —
+  the shipped reuse path DENIES a leg it cannot see a declaration for, and the reuse unit
+  implements that.** Two facts settled the pick. The first is that gov's impure population is
+  exactly ONE leg, `unattended kit gate`, and it is a GATE rather than a self-test — every other
+  leg whose script names a network verb builds its origin under `mktemp -d`. So the key is not
+  carrying much weight even here, and (a)'s deployer work would buy an adopting tree the ability
+  to declare something most trees will never have. The second is that (b) and (c) are not
+  alternatives at the same altitude: (b) is a note in a README, which is a rule this repo
+  classifies as one a reader has to remember, and (c) is a property of the code. (c) also fails
+  in the safe direction by construction — in a tree that cannot declare, reuse simply buys
+  nothing, which is exactly the outcome (b) asks an operator to accept voluntarily.
+
+  What this unit owed the fork was the FACT, and it is now in S8: `govkit.py` emits `name`,
+  `argv` and `guard` out of a descriptor and drops everything else. What it does not own is the
+  denial rule, and naming `TOOL-aPacedTurnstile-6` as the fork's owner while leaving the question
+  open would have been the same non-answer one document further on.
 
 - **Whether the record directory is cleared at the start of a run or kept as a rolling history.**
   Options: clear each run (one run's state, simple, and the crash signal stays unambiguous), or keep
@@ -563,6 +580,47 @@ fork's own recommendation; the reason each survived the veto order is recorded w
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-20 · BUILT and CLOSED. Two things the build found that the spec had wrong, both
+  recorded here because both were caught by an arm rather than by a reading.
+
+  **S1 asked for the completion files to MOVE into the run directory, and its own reasoning argues
+  the other way.** The item says, correctly, that the completion file is the DISPATCH SUPPRESSOR
+  rather than a log — the dispatch loop skips any leg that already has one, so a leftover makes
+  the runner skip a leg and print it green. That is an argument for keeping the suppressor OUT of
+  the record: a `mktemp -d` name nothing outside the process can predict cannot be planted, while
+  a run directory has a NAMEABLE path and this runner accepts a pinned id through `GATE_RUN_ID`.
+  Moving the suppressor somewhere addressable re-opened the hole the move was meant to close, and
+  AC14 is the criterion that caught it: with the completion file in the record, a planted
+  `<i>.rc` suppressed its leg and the run reported the plant's verdict as the leg's own. As built,
+  the suppressor stays in the scratch dir and the `.leg` row carries the durable half, written
+  before the completion signal so a reader that sees `.rc` sees a complete row. The record loses
+  nothing; the criterion is what made the disagreement visible rather than a re-reading of S1.
+
+  **S8's seeded population was wrong, and so was the re-scope's correction to it.** S8 said "the
+  unattended legs call out to the remote"; the re-scope, measuring the self-tests, concluded no leg
+  is impure at all. Measured properly at build time, the answer is ONE. Seven of the 86 legs name a
+  network verb in their own script and six of those build their origin under `mktemp -d`. The
+  seventh, `unattended kit gate`, runs `ls-remote` against the real remote and fails closed, so its
+  verdict is a function of the remote as well as of the tree. The key is declared on that leg alone.
+  Both earlier answers were reached by reading rather than by running the predicate, which is the
+  charter rule this unit's own S10 arm exists to enforce one level down.
+
+  **What the build added beyond the scope items.** The per-leg INPUT KEY is computed and written
+  here rather than left as a dash for the reuse unit to fill. S3 already listed it as a row field,
+  and a field that is always a dash makes AC4 — "a failed leg's row carries a dash" — pass by
+  finding nothing, since every row would. It is keyed on the guard pathspecs for a guarded leg and
+  on the whole-tree fingerprint for an unguarded one, from `git ls-files -s` plus that guard's
+  slice of the ONE porcelain listing the run already takes: one cheap git call per leg and no file
+  content read, where hashing each guarded file per leg would have re-read most of the tree fifty
+  times to produce a key nothing yet consumes. The reuse unit still owns what the key MEANS.
+
+  **And one arm elsewhere had to be rebuilt rather than repointed.** `profile_bar.test.sh`'s stale-
+  store arm froze the store with `chmod -w` and asserted the freeze as a precondition. Once the
+  ledger write became an atomic rename that precondition stopped being true — measured on this
+  platform, neither `chmod -w` on the file nor on its directory stops a rename, because a rename is
+  a directory operation MSYS does not enforce the mode on. The arm now swaps in a stub runner that
+  emits the verdict grammar and never writes the ledger, which creates the state the refusal
+  actually exists for instead of depending on filesystem semantics this platform does not offer.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-3 · 2026-08-18 · folded the blocker re-review, which found F2 only PARTLY closed. The first
   fold-in repointed the scope items and left §4 Data model and AC1 through AC3 spelling the flat
