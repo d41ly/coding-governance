@@ -1778,7 +1778,7 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
 before=$(sum)
-hit "$(run --landed tRun)" "HEAD is not an ancestor of the tip the remote advertises, so the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it"
+hit "$(run --landed tRun)" "HEAD is not an ancestor of the tip the remote advertises, and this run-state file names no branch ref, so there is no local arm to fall back to and the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it"
 same "the unlanded --landed wrote nothing" "$(sum)" "$before"
 
 # ---- AC18: an unobservable anchor is FATAL here and reports in the OBSERVATION's own words. --close
@@ -1810,6 +1810,9 @@ same "--landed witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RU
 # build touching that README would otherwise change a landed run's answer retroactively.
 same "--landed froze the roster into the record" \
   "$(sed -n 's/^units-at-landing: //p' memory/builds/tRun/RUN.md)" "ARCH-tRun-1"
+same "the remote arm records its anchor kind" \
+  "$(sed -n 's/^landed-anchor: //p' memory/builds/tRun/RUN.md)" "remote"
+hit "$out" "anchor remote"
 # ...and it survives the README moving underneath it, which is the whole point.
 printf '%s\n' '| [ARCH-tRun-2 — a unit added later](spec/two.md) | OPEN | rev-1 | 2026-08-02 |' >> memory/builds/tRun/README.md
 same "the frozen roster does not follow a later README edit" \
@@ -1818,6 +1821,68 @@ git checkout -q -- memory/builds/tRun/README.md 2>/dev/null || true
 n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md' \
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
+
+# ---- THE LOCAL ARM (TOOL-dUnstalledConvoy-1). A build merged into local main that could not push had
+# ---- no terminal to reach and aborted with the work complete; three of the five aborted runs in this
+# ---- tree died at or near that wall. The fixtures below are that shape exactly.
+# ----
+# ---- The branch ref is recorded BY HAND. Preflight writes one only where the project's anchor scope
+# ---- makes the run's own branch meaningful, and these arms are about the ANCHOR, not the conf
+# ---- plumbing, which has arms of its own.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+printf 'branch-ref: refs/heads/unit\n' >> memory/builds/tRun/RUN.md
+fixture
+RUNTIP=$(git rev-parse HEAD)
+git checkout -q -B main "$BASE"
+git merge -q --no-ff -m "land the run locally" "$RUNTIP"
+git checkout -q unit
+out=$(run --landed tRun)
+hit "$out" "phase LANDED"
+hit "$out" "anchor LOCAL"
+same "the local arm records its anchor kind" \
+  "$(sed -n 's/^landed-anchor: //p' memory/builds/tRun/RUN.md)" "local"
+same "the local arm reached the terminal phase" \
+  "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDED"
+# ...and it COUNTS what local main carries that the remote has not seen, because a local landing sits
+# on top of whatever else is on that branch, and a record that does not say how much is not readable.
+hit "$(sed -n 's/^unpushed-at-landing: //p' memory/builds/tRun/RUN.md)" "oldest"
+git branch -f main "$BASE"
+
+# ...the arm is FALSE when nothing was merged, which is what makes it a test and not a tautology. The
+# first draft compared HEAD with the local default branch, and on the only path this verb is invoked
+# HEAD IS that ref — a commit compared with itself, which no fixture standing elsewhere can detect.
+# HEAD must also be OFF the remote's history here, or the remote arm simply succeeds and this fixture
+# tests the wrong anchor.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+printf 'branch-ref: refs/heads/unit\n' >> memory/builds/tRun/RUN.md
+fixture
+git checkout -q -B main "$BASE"
+# THE FIXTURE HAS TO EXIST ON MAIN, or the verb refuses for want of a run-state file long before it
+# reaches either anchor — and the arm would pass for a reason that has nothing to do with anchors.
+git checkout -q unit -- memory/builds/tRun
+git add -A && git commit -q -m "the fixture, on the default branch, unmerged" --no-verify
+hit "$(run --landed tRun)" "this run is on neither anchor: its HEAD is not an ancestor of the tip the remote advertises, and its own branch tip is not an ancestor of the local default branch either, so the work is not landed anywhere; land it first, then mark it"
+git checkout -q unit; git branch -f main "$BASE"
+
+# ...and a branch ref that does not resolve in this clone is a named refusal, never a silent pass.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+printf 'branch-ref: refs/heads/no-such-branch\n' >> memory/builds/tRun/RUN.md
+fixture
+git checkout -q -B main "$BASE"
+# THE FIXTURE HAS TO EXIST ON MAIN, or the verb refuses for want of a run-state file long before it
+# reaches either anchor — and the arm would pass for a reason that has nothing to do with anchors.
+git checkout -q unit -- memory/builds/tRun
+git add -A && git commit -q -m "the fixture, on the default branch, unmerged" --no-verify
+hit "$(run --landed tRun)" "the run's own branch ref does not resolve in this clone, so whether its work reached the local default branch cannot be judged:"
+git checkout -q unit; git branch -f main "$BASE"
+
+# ---- THE HONEST LIMIT IS IN THE SOURCE, not only in the protocol. A reader who reaches the second
+# ---- arm has to be told there what it does and does not buy.
+same "the verb's own header states what the local anchor cannot buy" \
+  "$(grep -c 'compared with itself' "$SCRIPT")" "1"
 
 # ---- 33/34/35: --abort. It is deliberately NOT symmetric with --landed: an aborted run landed
 # ---- nothing, so the four machine items assert obligations it does not have — but it owes BOTH
@@ -2412,13 +2477,13 @@ hit "$out" "no run-state file, so there is no run to record an amendment against
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
 #
-# RAISED 338 -> 447 by TOOL-dUnstalledConvoy-9, because 338 was measured against an executed 398 and
+# RAISED 338 -> 447, then to 457 by TOOL-dUnstalledConvoy-1 by TOOL-dUnstalledConvoy-9, because 338 was measured against an executed 398 and
 # that SIXTY-ARM SLACK is what let the same defect happen again, twice, in one session: two whole
 # blocks — `--rescope`'s arms and `--dispatch`'s — were appended past this exit and never ran, while
 # the suite reported PASS and `check-arms` text-matched every one of them. A floor well below the
 # executed count is not a floor, it is a number. Pinned AT the count so the next stranding is a red
 # on the very next run.
-FLOOR_ASSERTIONS=447
+FLOOR_ASSERTIONS=457
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

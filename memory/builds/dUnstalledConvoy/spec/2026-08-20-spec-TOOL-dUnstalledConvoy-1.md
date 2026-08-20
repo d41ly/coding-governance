@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -183,6 +183,14 @@ block another build's terminal, which is the exact shape of the deadlock this bu
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · built. The second arm names an EXPLICIT REF — the run's own `branch-ref` — and
+  never HEAD, which is what makes it a test rather than the tautology the audit caught. Its negative
+  fixtures stand ON the default branch, because a fixture standing elsewhere cannot tell an arm that
+  was omitted from one that was never reached, and both had to carry the run-state file across to
+  main or the verb refused for want of a record long before reaching either anchor.
+  A THIRD state the spec did not name: a record with NO `branch-ref` has no local arm to attempt at
+  all, which is different from one attempted and failed, so it gets its own refusal rather than a
+  message implying a fallback the run never had.
 - rev-2 · 2026-08-20 · folded the spec audit: H8 (arm 2 tested a commit against itself on the only path the
   verb is invoked — it now tests the run's own branch tip, and its failing case must be observed
   standing on the default branch), M7 (`.memory-tree.conf` named as a build-wide shared write), L1.

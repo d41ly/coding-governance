@@ -1221,7 +1221,7 @@ verb_phase() { # slug · phase · witness
 # reports only the downstream unmet item, which is the message-channel scar this kit already carries;
 # this verb does not repeat it.
 verb_landed() { # slug
-  local slug="$1" rel cur head
+  local slug="$1" rel cur head lbranch unp oldest akind rbref rbtip
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to mark landed: $rel"; return 1; }
@@ -1232,14 +1232,68 @@ verb_landed() { # slug
     return 1
   fi
   check_clean || return 1
+  # OBSERVE_ANCHOR STAYS MANDATORY ON BOTH ARMS. It is what supplies AREF - the local arm needs the
+  # default branch's NAME and takes it from the remote's own advertisement, never from a local ref or
+  # from the environment, both of which this kit records as a reproduced bypass. Its checks 22 through
+  # 30 are integrity tripwires a local landing needs at least as much as a remote one, and a run that
+  # cannot see the remote it means to land on should abort rather than land against a branch name it
+  # chose for itself.
   observe_anchor || return 1
   head=$(GIT rev-parse HEAD)
-  if ! GIT merge-base --is-ancestor "$head" "$ASHA" 2>/dev/null; then
-    fail 32 "HEAD is not an ancestor of the tip the remote advertises, so the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it: $head against $AREF at $ASHA"
-    return 1
+  lbranch=${AREF#refs/heads/}
+  # UNPUSHED WORK, counted on BOTH arms. Local main is shared by every build on the node, and this
+  # repo records a run whose primary tree was clean and on main while carrying eleven unpushed
+  # commits, three of them another build's unreviewed work. A local landing claim sits on top of
+  # whatever else is there, and a record that does not say how much else is there is not readable.
+  # REPORTED, never refused: making one build's mid-flight work block another build's terminal is the
+  # deadlock shape this whole unit exists to remove.
+  if GIT rev-parse --verify --quiet "refs/heads/$lbranch" >/dev/null 2>&1; then
+    unp=$(GIT rev-list --count "$ASHA..refs/heads/$lbranch" 2>/dev/null || echo 0)
+    if [ "${unp:-0}" != 0 ]; then
+      oldest=$(GIT rev-list "$ASHA..refs/heads/$lbranch" 2>/dev/null | tail -1)
+      unp="$unp oldest $(GIT rev-parse --short=8 "$oldest" 2>/dev/null)"
+    fi
+  else
+    # `unknown` and never `0`. A zero that means "could not measure" is this repo's named
+    # green-by-absence class, and it would read as "nothing unpushed" to every later reader.
+    unp="unknown"
+  fi
+  akind=""
+  if GIT merge-base --is-ancestor "$head" "$ASHA" 2>/dev/null; then
+    akind=remote
+  else
+    # THE SECOND ARM NAMES AN EXPLICIT REF, and that is the whole of its correctness. Testing HEAD
+    # against the local default branch is decided before it reads anything on the only path this verb
+    # is invoked: the mandated lander refuses to run anywhere but the default branch, and there HEAD
+    # IS that ref, so a commit would be compared with itself. The run's OWN BRANCH TIP is false when
+    # nothing was merged and true when it was, which is the question the arm exists to ask.
+    rbref=$(fact "$rel" branch-ref)
+    if [ -z "$rbref" ]; then
+      # NO LOCAL ARM IS AVAILABLE, which is a different state from one that was tried and failed.
+      # `branch-ref` is written only where the project's anchor scope makes the run's own branch
+      # meaningful, so a record without it has exactly one anchor and the refusal says so rather than
+      # implying a fallback the run never had.
+      fail 32 "HEAD is not an ancestor of the tip the remote advertises, and this run-state file names no branch ref, so there is no local arm to fall back to and the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it: $head against $AREF at $ASHA"
+      return 1
+    fi
+    rbtip=$(GIT rev-parse --verify --quiet "$rbref" 2>/dev/null)
+    if [ -z "$rbtip" ]; then
+      fail 32 "the run's own branch ref does not resolve in this clone, so whether its work reached the local default branch cannot be judged: $rbref in $rel"
+      return 1
+    fi
+    if GIT merge-base --is-ancestor "$rbtip" "refs/heads/$lbranch" 2>/dev/null; then
+      akind=local
+    else
+      fail 32 "this run is on neither anchor: its HEAD is not an ancestor of the tip the remote advertises, and its own branch tip is not an ancestor of the local default branch either, so the work is not landed anywhere; land it first, then mark it: $head against $AREF at $ASHA, and $rbref at $rbtip against refs/heads/$lbranch"
+      return 1
+    fi
   fi
   set_fact "$rel" phase LANDED || return 1
   set_fact "$rel" witness "$head" || return 1
+  # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
+  # later reader, silently promoting a record to the stronger claim.
+  set_fact "$rel" landed-anchor "$akind" || return 1
+  set_fact "$rel" unpushed-at-landing "$unp" || return 1
   # THE ROSTER AT LANDING, frozen here and nowhere else. Deriving the unit list from the build README
   # is right while a run is LIVE — it cannot go stale between reads — but a FINISHED record must
   # still answer "which units did this run actually cover", and the README is mutable: a later build
@@ -1259,7 +1313,11 @@ verb_landed() { # slug
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
-  echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
+  if [ "$akind" = remote ]; then
+    echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
+  else
+    echo "unattended: phase LANDED · witness $head · anchor LOCAL · $(fact "$rel" branch-ref) is merged into refs/heads/$lbranch, which the remote has not seen · unpushed on local $lbranch: $unp"
+  fi
   return 0
 }
 
