@@ -37,7 +37,16 @@ All `GATE_FULL=1`, profile row `capable`, width 8, node `a` (16 cores / 32693 MB
 | 14:44 | 970.0 s | 4644 | 812.1 s | 59.8 % | 0.84 | RED |
 | 15:07 | 925.5 s | 5144 | 925.5 s | 69.5 % | **1.00** | GREEN |
 | 15:38 | 1051.4 s | 5245 | 887.9 s | 62.4 % | 0.84 | RED |
-| 16:05 | *in flight while this was written* | | | | | |
+| 16:05 | 1058.3 s | — | — | — | — | — |
+
+*Correction, 2026-08-21 (spec audit F7, F12).* The 16:05 row was left blank under a heading that
+claims four bars, and no run in this table carries the **throughput** figure AC1 names — so AC1 was
+graded met against a table missing a column it requires. The span above is RECOVERED ARITHMETIC,
+not a fresh read: §4's R2 gives "292 s (27.6 %) on run 130546", and 292 / 0.276 = 1058.3 s, which
+reconciles with 4 × 1001.3 − (970.0 + 925.5 + 1051.4) = 1058.3. Its remaining cells are
+UNRECOVERABLE: `<git-dir>/gate-run/` on node `a` now holds only `20260820T163240Z-457` onward, so
+the per-leg records this row would be reconstructed from are gone. Throughput is likewise
+unrecoverable for every row, because leg-seconds ÷ span needs the span this table lacked.
 
 **Every run is FLOOR-bound**: the single longest leg exceeds leg-seconds ÷ width. That one fact
 decides everything below. It means the bar's wall clock is set by one leg, and no scheduling
@@ -354,7 +363,8 @@ simulator says they buy. **Every entry states what it buys in seconds of span, o
 
 ### R1 — Share the dispatch hint across worktrees, and pair it with time-to-first-signal
 
-**Buys ~160 s (15.6–16.3 %) on any cold worktree, which today is 24 of 26.** `TOOL-aScannedThrottle-1`.
+**Buys ~160 s (15.6–16.3 %) on any cold worktree, which today is 24 of 26.** `TOOL-aScannedThrottle-8`
+*(re-minted 2026-08-21 from `-1`, which this spec's own H1 already owned — spec audit F6).*
 
 Three parts, and the third is not optional:
 
@@ -406,7 +416,10 @@ already reasons about queue time and cannot see it either.
 
 ### R4 — Measure Defender before excluding anything
 
-**Buys UNQUANTIFIED, and the honest answer is probably less than you would hope.**
+**Buys 0 s until measured** — *corrected 2026-08-21 (spec audit F8); it read "UNQUANTIFIED",
+which is neither a figure nor an explicit zero and breaks both AC4 and this section's own rule.*
+No span may be claimed for it until `New-MpPerformanceRecording` has run, and the honest
+expectation is that it is less than you would hope.
 `TOOL-aScannedThrottle-3`.
 
 Verified on this node: real-time protection, behaviour monitoring, on-access and script scanning all
@@ -498,7 +511,24 @@ landing bar while giving a wrong reason is worse than one that reds silently.
 | `TOOL-aTimedTurnstile-1` | **CLOSE** | False at HEAD. The pool landed, and the row's 79.9 s target sits 11× below the current floor. |
 | `TOOL-cFinalBerth-5` | **KEEP OPEN, note** | Did not reproduce in this sample. The canary's between-run spread is 25.9 % across comparable bars. |
 
-New rows to mint: `TOOL-aScannedThrottle-1` … `-5`, per §4.
+New rows to mint: `TOOL-aScannedThrottle-2` … `-8`, per §4 — seven rows. `-6` (legs dilate
+1.5–1.85× in the pool, §3.9) and `-7` (`run-gates evidence` reds under load on a 5-second bound)
+are both **0 s of span** — a correction factor and a load-dependent red — so neither belongs in the
+R-ranking, and §4 does not carry them. `-8` is the dispatch-hint row of R1, re-minted from `-1`.
+
+### 5.1 · Four more OPEN rows, added 2026-08-21 (spec audit F4)
+
+§2's S5 says **every** open backlog row about bar performance, and the table above is a curated
+eight. These four qualify on the same reading and were absent, which made an omission
+indistinguishable from a judgement call. The membership predicate is now written into the spec at
+§2 S5 so the set is derivable rather than authored.
+
+| id | action | why |
+|---|---|---|
+| id `TOOL-aTimedTurnstile-2` | **STALE** | Its population moved: 88 legs, not 47, and leg-seconds are 4644–5245 against the row's 368.7 s wall (§2). The per-leg `guard` it asks for landed. The ratio survives, unmeasured at this leg count. |
+| id `TOOL-aTimedTurnstile-3` | **REFINE** | Dilation holds — 1.66× confirmed at 1.5–1.85× (§3.9). The floor does not: 812–926 s across four bars, not ~76 s, and it is an `unattended` selftest. "Sharing fixture setup is the only route" is refuted by R2. |
+| id `TOOL-aTimedTurnstile-4` | **KEEP OPEN** | Its spawn figures ARE the 2026-08-11 baseline column of §3.8 and R4's Defender refutation rests on them, so they are load-bearing and must not be edited away. Its 1.59× cold/warm factor stays unverified — §6 says so. |
+| id `TOOL-aTimedTurnstile-6` | **KEEP OPEN, not re-measured** | Named so the omission is a recorded answer rather than a silent one. Its 617 s run predates the 88-leg bar. §3.6 corroborates the poll-tick mechanism independently at up to ~480 process creations per nested canary run. |
 
 ## 6 · What this build did NOT establish
 

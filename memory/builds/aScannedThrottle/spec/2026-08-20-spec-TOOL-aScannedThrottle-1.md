@@ -1,6 +1,6 @@
 # TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock
 
-**Status:** OPEN · rev-1 · 2026-08-20 · node a · Tier-1 · base 4773902f · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-1 · base 4773902f · streams tooling
 
 ## 1. Goal
 
@@ -19,7 +19,13 @@ named target is the real one, and return ranked recommendations each priced in s
 - **S4** — Re-measure the process-creation tax the backlog blames, on a quiet box, against the
   recorded baseline.
 - **S5** — A written report with recommendations, each carrying the span it buys or an explicit
-  zero, plus the reconciliation of every open backlog row about bar performance.
+  zero, plus the reconciliation of every open backlog row about bar performance, **applied to the
+  row and not only written in the report**. The population is DERIVED, not authored: every row in
+  `memory/backlog/TOOL.md` whose status token is `OPEN` and whose text names the bar's wall clock,
+  leg timings, pool width, dispatch order, spawn cost or scratch cost. A reconciliation is applied
+  when the row itself carries a dated disposition line citing the report section that measured it.
+  *(rev-2: the original said "every" and delivered a curated eight, which cannot distinguish an
+  omission from a judgement call, and applied none of them to the backlog — spec audit F1, F4.)*
 
 ## 3. Non-goals (OUT)
 
@@ -91,18 +97,65 @@ rather than the bar. The synthetic runs were kept only for the canary trace, whi
 
 ## 8. Open questions
 
-none — this unit had no fork to resolve. Two things it could not establish (the cold/warm factor at
-the current leg count, and the real distribution of turnstile queue wait) are not forks in its
-design; they are recorded as limits in the report's closing section and carried forward by
-`TOOL-aScannedThrottle-2`.
+none — this unit had no fork to resolve. Two things it could not establish are not forks in its
+design; they are recorded as limits in the report's closing section and carried forward by a row
+each. The real distribution of turnstile queue wait is `TOOL-aScannedThrottle-2`. The cold/warm
+factor at the current leg count is `TOOL-aTimedTurnstile-4`, which the report's §6 already names.
+*(rev-2: both limits used to cite the first row, which holds only one of them — spec audit F13.)*
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-20 · initial. The measurement is complete and every §6 criterion is met, but the
-  status stays OPEN deliberately: this unit's deliverable is a set of recommendations and NONE of
-  them is landed. A terminal status would assert that something shipped, and `drift-audit`'s
+- rev-1 · 2026-08-20 · initial. The measurement is complete, but the status stays OPEN
+  deliberately: this unit's deliverable is a set of recommendations and NONE of them is landed. A
+  terminal status would assert that something shipped, and `drift-audit`'s
   `closed_specs_with_no_product_commit` signal is right to say otherwise — it reds exactly this
   shape, a closed plan with no product commit. Close it when the rows it minted are dispositioned.
+- rev-2 · 2026-08-21 · the M4 spec audit that rev-1 never had, folded. Record:
+  [`reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md`](../reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md),
+  verdict CLEAN WITH FIXES, 38 confirmed of 46. What moved, and why:
+
+  **The closing condition is REPLACED (F2, F3).** rev-1's "close it when the rows it minted are
+  dispositioned" names a state no run bound to this build's scope can reach: four of the seven
+  rows need edits §3 forbids, two need admin the owner holds, and "dispositioned" is a corpus
+  hapax — it appears in this file and nowhere else, so it has no evaluable predicate at all. The
+  cost was mechanical, not academic: an OPEN unit fails the unattended kit's machine-checked
+  `build-complete` item, so every run carrying this build owed an override.
+
+  **The replacement, each clause checkable against a named file.** CLOSE this unit when all three
+  hold. (1) Every id in the report's §5 and §5.1 carries a dated disposition line in
+  `memory/backlog/TOOL.md` citing the report section that measured it. (2) The rows this build
+  minted — `TOOL-aScannedThrottle-2` … `-8` — are each present in that file. (3) A `spec-audit`
+  and a `diff-review` record naming this id exist under `reviews/`. **Landing a recommendation is
+  explicitly NOT a clause**: the build README puts that in separate units, and the seven minted
+  rows are forward pointers, never the close gate.
+
+  **What the flip to CLOSED still costs, recorded rather than taken (F5).** rev-1's drift premise
+  is TRUE and was re-measured: `TRACE_GLOBS` in `tools/drift-audit/drift_signals.py` does not
+  cover `memory/`, so a bare close takes `closed_specs_with_no_product_commit` to 2 against a pin
+  of 1 and reds the `drift-audit records` leg. What rev-1 never mentions is that the signal
+  documents its own escape for exactly this shape — `drift_report.py` names "a unit whose
+  deliverable is records-only", which this unit is verbatim (§5, §10) — and the registry
+  `memory/project/trace-waiver.txt` exists. **The trap:** the signal restricts its population to
+  TERMINAL specs and turns a leftover waiver row into a suspect of its own, so **the waiver row
+  and the status flip must land in ONE commit or neither.** All six existing rows are the OTHER
+  shape (product landed before the id-in-subject convention), so this would be the first
+  records-only waiver in the repo — a gate exemption of a new kind, which is an owner turn under
+  the fork rule, not an agent's. It is PARKED on this run's record, not taken.
+
+  **rev-1's §6 self-grade was wrong and is withdrawn (F7, F8).** It asserted "every §6 criterion
+  is met". AC1 was not: the report's §2 table carries no throughput column and left the fourth
+  run's row blank. AC4 was not: R4 read "UNQUANTIFIED", which is neither a figure nor an explicit
+  zero. Both are corrected in the report at §2 and §4 R4, dated and marked.
+
+  **Also folded:** the report's mint line undercounted its own rows and now reads `-2` … `-8`
+  (F10); the backlog row that duplicated this unit's own id is re-minted as
+  `TOOL-aScannedThrottle-8`, with R1's citation corrected (F6); the span range in the build
+  README is reconciled to 925–1058 s (F12).
+
+  **Not folded, and named so the omission is an answer.** Editing `AGENTS.md` — which still
+  states 873 s against a measured 1001.3 s mean, and still names the dead `gate-timings.tsv` as
+  the live dispatch input — is a change to a governance carrier and an owner turn. It is re-cited
+  in `TOOL-aMeteredTurnstile-4` instead, whose own line number had gone stale.
 
 ## 10. Reuse audit
 

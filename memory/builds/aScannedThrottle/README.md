@@ -19,7 +19,7 @@ reconstructed after the fact without running anything.
 
 ## What the measurement says
 
-Four real `GATE_FULL=1` width-8 bars on node `a` reconstruct to spans of 925–1051 s at 60–70 %
+Four real `GATE_FULL=1` width-8 bars on node `a` reconstruct to spans of 925–1058 s at 60–70 %
 pool utilization. Every one is FLOOR-bound: the single longest leg exceeds leg-seconds over width,
 so no amount of width moves the span. `run-gates canary` is the third-largest leg at 466–587 s and
 sits entirely in the shadow of the two `unattended` selftests. Deleting it outright moves the
@@ -42,7 +42,7 @@ ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | OPEN | rev-1 | 2026-08-20 |
+| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | OPEN | rev-2 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
