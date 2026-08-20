@@ -146,7 +146,7 @@ def cache_of(root: pathlib.Path) -> pathlib.Path:
 _SWEPT: list[pathlib.Path] = []
 
 
-def _force_writable(func, path, _exc):
+def _set_writable(func, path, _exc):
     """rmtree error hook: clear the read-only bit, then retry the operation that failed.
 
     NOT `ignore_errors=True`. These fixtures are git repositories, and git writes loose objects
@@ -172,7 +172,7 @@ def cleanup(root: pathlib.Path) -> None:
     # rather than version-pinned: this kit ships to adopters whose python this repo does not pick.
     key = 'onexc' if sys.version_info >= (3, 12) else 'onerror'
     try:
-        shutil.rmtree(root, **{key: _force_writable})
+        shutil.rmtree(root, **{key: _set_writable})
     except OSError:
         pass          # survivors are the final arm's business, not an exception here
 

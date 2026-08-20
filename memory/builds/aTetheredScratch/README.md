@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3
+ids: TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3 TOOL-aTetheredScratch-4
 ---
 
 # aTetheredScratch — agent scratch stops landing in the operator's home directory
@@ -81,7 +81,7 @@ there and repairs the leak that keeps refilling it.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-20 · streams tooling
-ids TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3
+ids TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3 TOOL-aTetheredScratch-4
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|

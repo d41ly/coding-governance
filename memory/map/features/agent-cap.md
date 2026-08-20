@@ -22,7 +22,10 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["trailing-comma-counted-as-an-element.md"]
+gotcha-classes = [
+  "trailing-comma-counted-as-an-element.md",
+  "allowlist-narrower-than-the-root-it-guards.md",
+]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []
 lexicon-verbs = []

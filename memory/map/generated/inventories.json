@@ -128,6 +128,7 @@
     ],
     "gotcha-classes": [
       "absence-assertion-over-whole-file-text.md",
+      "allowlist-narrower-than-the-root-it-guards.md",
       "armed-but-unreachable-rule.md",
       "assertion-between-two-derived-values.md",
       "concurrency-is-not-a-budget.md",

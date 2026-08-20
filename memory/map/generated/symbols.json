@@ -268,11 +268,6 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
-      "id": "blankRun",
-      "kind": "function",
-      "file": "tools/hooks/scratch-guard.js"
-    },
-    {
       "id": "blob_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -301,6 +296,11 @@
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "buildBlankedRun",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "buildCommandView",
