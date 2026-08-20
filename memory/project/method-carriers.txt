@@ -15,3 +15,4 @@ tools/memory-tree/kit.toml · the deployer descriptor names the method as a REND
 tools/unattended/check-unattended.sh · check 16 arm B resolves each cited M-section against the method's own heading grammar; it POINTS at the sections rather than restating any rule
 tools/unattended/PROTOCOL.template.md · §10 names the build method as the carrier every directive points into, and §1 names it a run-time dependency; both POINT, neither restates a rule
 tools/drift-audit/drift_signals.py · TRACE_CUTOFF cites the commit that landed the method, because that commit is what dates the commit-subject convention this signal judges
+tools/gate-legs.json · a GUARD pathspec names the method file, because the kit/dogfood parity leg validates it — a path the leg reads, never a restatement of what the method says

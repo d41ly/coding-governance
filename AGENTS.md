@@ -248,7 +248,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
 - Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- Wire the suite into remote CI as machine-required checks (`none yet — the bar runs at the push boundary via .githooks/pre-push`) — convention is not enforcement.
+- Wire the suite into remote CI as machine-required checks (`none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
 - Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.

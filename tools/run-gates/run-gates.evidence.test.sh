@@ -307,7 +307,16 @@ rec_done
 
 rec_repo
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( sleep 2; echo moved >> "$REC_T/fx/a.sh" ) &
+# THE EDIT WAITS FOR A FACT, NOT A CLOCK. `sleep 2` raced the runner's startup: the fingerprint is
+# taken before the first leg dispatches, so under an 8-wide bar the edit could land BEFORE it and
+# there was nothing to detect. Measured — this arm passed alone and failed inside a full bar run.
+# The run record's own header is the observable that says "the fingerprint has been taken".
+( for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+    c="$REC_GD/gate-run/current"
+    [ -f "$c" ] && [ -f "$REC_GD/gate-run/$(cat "$c")/header" ] && break
+    sleep 1
+  done
+  echo moved >> "$REC_T/fx/a.sh" ) &
 rec_run GATE_FULL=1 >/dev/null
 wait
 grep -q '^tree_moved	yes' "$(rec_dir)/verdict" 2>/dev/null \
