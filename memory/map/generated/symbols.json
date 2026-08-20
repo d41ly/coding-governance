@@ -2008,6 +2008,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolve_argv",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"

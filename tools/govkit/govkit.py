@@ -80,7 +80,7 @@ STEPS = (STEP_BASELINE, STEP_ATTRIBUTES, STEP_LAND, STEP_STAGE, STEP_HOOKPROBE, 
 _INTERPRETER_NAMES = ("bash", "sh")
 
 
-def exec_argv(argv):
+def resolve_argv(argv):
     """`argv` with a bare interpreter name resolved to an absolute path.
 
     Returns a NEW list. An unresolvable name is left exactly as given, so the caller still gets the
@@ -1399,7 +1399,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                 state = "landed-unmeasured"
                 detail = " (its check argv does not resolve)"
             else:
-                rc = subprocess.run(exec_argv([a for a, _m in pairs]), cwd=str(target),
+                rc = subprocess.run(resolve_argv([a for a, _m in pairs]), cwd=str(target),
                                     capture_output=True, text=True).returncode
                 state = "adopted" if rc == 0 else "landed-but-inert"
                 if rc != 0:
@@ -1435,7 +1435,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                        f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
                 continue
             try:
-                rc = subprocess.run(exec_argv(resolved), cwd=str(target), capture_output=True,
+                rc = subprocess.run(resolve_argv(resolved), cwd=str(target), capture_output=True,
                                     text=True).returncode
             except OSError as e:
                 r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
@@ -1700,7 +1700,7 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                        "memory_root": "memory"}
                 resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
                 try:
-                    if subprocess.run(exec_argv(resolved), cwd=str(target),
+                    if subprocess.run(resolve_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
                         return True          # the hole is genuinely undischarged, right now
                 except OSError:
@@ -2253,7 +2253,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         if not argv:
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(exec_argv(resolved), cwd=str(target), capture_output=True,
+        rc = subprocess.run(resolve_argv(resolved), cwd=str(target), capture_output=True,
                             text=True).returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None

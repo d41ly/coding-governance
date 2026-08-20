@@ -1621,7 +1621,7 @@ user_skills = "/tmp/gk-fake-skills"
                 check(f"[{eid}] {key} recovers the bare leg name from a real runner line",
                       got == "memory hygiene", f"recovered {got!r} from {sample!r} via {tmpl!r}")
 
-    # --- exec_argv: the interpreter a leg argv names is RESOLVED, never handed to the loader bare.
+    # --- resolve_argv: the interpreter a leg argv names is RESOLVED, never handed to the loader bare.
     # A bare `bash` is resolved by the OS loader, which on Windows finds the WSL launcher in
     # System32 before Git's bash — a different operating system with a different python. MEASURED on
     # node d, 2026-08-20: five acceptance-matrix arms FAILED with tracebacks naming a `/mnt/c/...`
@@ -1631,27 +1631,27 @@ user_skills = "/tmp/gk-fake-skills"
     sys.path.insert(0, str(HERE))
     import govkit  # noqa: E402 — the engine's OWN helper, imported rather than restated
     _want = _sh.which("bash")
-    check("[govkit] exec_argv resolves a bare interpreter name to an absolute path",
-          (not _want) or govkit.exec_argv(["bash", "x.sh"])[0] == _want,
-          f"got {govkit.exec_argv(['bash', 'x.sh'])[0]!r}, PATH says {_want!r}")
-    check("[govkit] exec_argv leaves the script and its arguments untouched",
-          govkit.exec_argv(["bash", "x.sh", "--check"])[1:] == ["x.sh", "--check"])
-    check("[govkit] exec_argv leaves a name it cannot resolve exactly as given",
-          govkit.exec_argv(["definitely-not-on-path-9271", "-c", "1"])[0]
+    check("[govkit] resolve_argv resolves a bare interpreter name to an absolute path",
+          (not _want) or govkit.resolve_argv(["bash", "x.sh"])[0] == _want,
+          f"got {govkit.resolve_argv(['bash', 'x.sh'])[0]!r}, PATH says {_want!r}")
+    check("[govkit] resolve_argv leaves the script and its arguments untouched",
+          govkit.resolve_argv(["bash", "x.sh", "--check"])[1:] == ["x.sh", "--check"])
+    check("[govkit] resolve_argv leaves a name it cannot resolve exactly as given",
+          govkit.resolve_argv(["definitely-not-on-path-9271", "-c", "1"])[0]
           == "definitely-not-on-path-9271")
-    check("[govkit] exec_argv resolves nothing that is not an interpreter name",
-          govkit.exec_argv(["git", "status"])[0] == "git")
-    check("[govkit] exec_argv returns a new list rather than mutating its argument",
-          (lambda a: (govkit.exec_argv(a), a == ["bash", "x.sh"])[1])(["bash", "x.sh"]))
+    check("[govkit] resolve_argv resolves nothing that is not an interpreter name",
+          govkit.resolve_argv(["git", "status"])[0] == "git")
+    check("[govkit] resolve_argv returns a new list rather than mutating its argument",
+          (lambda a: (govkit.resolve_argv(a), a == ["bash", "x.sh"])[1])(["bash", "x.sh"]))
 
     # THE CLASS, not the instance: no python in this kit may execute a leg/adopter argv without
-    # routing it through exec_argv. A fifth call site was missed on the first pass of this very fix
+    # routing it through resolve_argv. A fifth call site was missed on the first pass of this very fix
     # and cost a second diagnosis round, which is precisely what a source-level arm is for.
     for _f in ("tools/govkit/govkit.py", "tools/govkit/matrix.py"):
         _src = pathlib.Path(_f).read_text(encoding="utf-8")
-        _bare = _re.findall(r"subprocess\.run\((?!exec_argv|govkit\.exec_argv)"
+        _bare = _re.findall(r"subprocess\.run\((?!resolve_argv|govkit\.resolve_argv)"
                            r"(?:resolved|argv|\[a for a)[^)]*", _src)
-        check(f"[govkit] {_f} executes no leg argv without exec_argv",
+        check(f"[govkit] {_f} executes no leg argv without resolve_argv",
               not _bare, f"unrouted: {_bare}")
 
     print()
