@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -184,6 +184,16 @@ boundary.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-3 · 2026-08-21 · built, and TWO defects surfaced that the spec did not predict. **The check does
+  not belong inside the BASE-blob block.** That block is entered only when the build README exists AT
+  THE PINNED BASE, and a build folder created after the run's BASE has no blob there — measured on the
+  fixture, where every arm read green over a check that had never run. Check 22 needs the run-state
+  file's own history and the working README, never the pinned BASE, so it now runs in its own loop.
+  **And an EMPTY baseline roster is not a comparison.** It is not vacuously true, it is vacuously
+  ACCUSATORY: every unit the build has reads as added. That is precisely the prompt-authorized shape
+  S2a worried about, and keying on the BUILDING commit does not save it when the run carries a live
+  phase from its first commit. An empty baseline now SKIPS, announced. Both were caught by the
+  fixture, which is the argument for building the fixture before believing the design.
 - rev-2 · 2026-08-20 · folded the spec audit: H3 (a supersede row accounts for its own successor),
   H4 (the exemption keys on when the id appeared, and F1 is resolved rather than left open), H1 (this
   unit OWNS the leg output contract by owner decision, S6a), M8 (the documentation is the check's own

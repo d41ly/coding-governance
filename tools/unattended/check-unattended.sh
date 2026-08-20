@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-ONE checks over the tree.
+# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-TWO checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
 #
 # Exit 0 + no output = clean. Anything printed is a violation. Exit 2 = misconfigured.
+#
+# ONE EXCEPTION, and it is named rather than quietly taken: a check that cannot COMPARE announces
+# the case it could not reach, on the REPORT channel, which the default run does not print. Set
+# GOV_UNATTENDED_REPORT=1 to see them. A skip that looks like a pass is indistinguishable from
+# coverage, and a skip printed by default would falsify the contract line above — so the line keeps
+# its meaning and the announcement gets a channel of its own. TOOL-dUnstalledConvoy-6.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
 # nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
@@ -184,6 +190,14 @@ region()   { awk -v o="$2" -v c="$3" '
                inside { print }
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 # <<< kickoff_region
+
+# THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
+# green-control arms in the sibling test keep their meaning. A check that cannot compare says which
+# arm went unexercised and why, and an operator asks for those by setting the variable. Liveness is
+# not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
+# would notice this going quiet.
+REPORT=${GOV_UNATTENDED_REPORT:-0}
+report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
 # ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the
@@ -860,6 +874,102 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
     fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
   fi
 fi
+# ---- 22 runs in its OWN loop over the run population, NOT inside the BASE-blob block. That block
+# ---- is entered only when the build README exists AT THE PINNED BASE, and a build folder created
+# ---- after the run's BASE has no blob there — measured: the fixture's own run never reached the
+# ---- check, and every arm read as green over a check that had not run. This one needs the RUN-STATE
+# ---- file's own history and the working README, never the pinned BASE, so it has no business behind
+# ---- that gate.
+for f in $RUNS; do
+  [ -f "$f" ] || continue
+  case "$f" in *"/RUN.md") ;; *) continue ;; esac   # frozen retired records are not amendable
+  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
+  rb=$(fact_of "$f" base)
+  bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
+  bre="$M/builds/$bslug/README.md"
+  [ -f "$bre" ] || continue
+  # ---- 22: an AMENDMENT with no record. TOOL-dUnstalledConvoy-6.
+  # ---- M3 delegates this build's own scope and M2 names the three acts, so the failure mode moved
+  # ---- from STALLING to DRIFTING: a unit quietly retired because it was inconvenient, with
+  # ---- nothing in the record saying so. This compares the roster the run was authorized for
+  # ---- against the roster it is executing, and asks the run-state file to account for the
+  # ---- difference.
+  # ----
+  # ---- WHAT IT CANNOT BUY. Both inputs are inside the run's reach — the run wrote the rows and
+  # ---- the run made the edits. It catches the CHEAP failure, an amendment made with NO record.
+  # ---- It does not catch a truthful-looking row attached to a different edit, which takes a
+  # ---- deliberate lie. A green here is not proof an amendment was honest, and the two artifacts
+  # ---- are produced by different acts at different times, which is the whole of why it is worth
+  # ---- having anyway.
+  # ----
+  # ---- IT DOES NOT RE-IMPLEMENT THE REMOVAL REFUSAL. `check_authorization` refuses a narrowed id
+  # ---- set and `authorization-reachable` has no override; a second copy here would recompute the
+  # ---- driver's answer from the driver's inputs, which confirms rather than checks.
+  # ----
+  # ---- THE BASELINE IS THE COMMIT THE RUN ENTERED `BUILDING` AT, not the pinned BASE. A run that
+  # ---- classifies a unit MISSING and authors its spec is doing what M2 MANDATES, and every such
+  # ---- spec is absent at BASE — keying on BASE would red a run for obeying the method, and the
+  # ---- prompt-authorized mode makes it sharper still, since such a run starts with an empty
+  # ---- region. Using the REGION at that commit rather than per-id spec archaeology is equivalent
+  # ---- here because hygiene check 9 refuses a stale index, so a spec committed by then is in the
+  # ---- region by then; that dependency is the reason this shortcut is sound and is stated rather
+  # ---- than assumed.
+  rsbase=""
+  for rsc in $(GIT log --reverse --format=%H -- "$f" 2>/dev/null); do
+    case "$(GIT show "$rsc:$f" 2>/dev/null | grep -m1 '^phase:')" in
+      *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) rsbase="$rsc"; break ;;
+    esac
+  done
+  [ -n "$rsbase" ] || rsbase="$rb"
+  rsb=$(GIT show "$rsbase:$bre" 2>/dev/null || true)
+  rs_cut=${UNITS_REGION_CUTOFF:-}
+  rs_date=$(GIT show -s --format=%cs "$rsbase" 2>/dev/null || true)
+  if [ -z "$rsb" ]; then
+    report "check 22 skipped for $f — no build README at the baseline commit, so there is no authorized roster to compare against"
+  elif ! printf '%s\n' "$rsb" | grep -qxF -- '<!-- gen:build-units -->'; then
+    report "check 22 skipped for $f — the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
+  elif [ -n "$rs_cut" ] && [ -n "$rs_date" ] && ! printf '%s\n%s\n' "$rs_cut" "$rs_date" | sort -C; then
+    report "check 22 skipped for $f — the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
+  elif ! rs_was=$(printf '%s\n' "$rsb" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    report "check 22 skipped for $f — the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+  elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    report "check 22 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
+  elif ! printf '%s
+  ' "$rs_was" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+'; then
+    # AN EMPTY BASELINE ROSTER IS NOT A COMPARISON, and it is not vacuously TRUE either — it is
+    # vacuously ACCUSATORY: every unit the build has would read as added. MEASURED by this unit's
+    # own fixture, whose run carries a live phase from its first commit, so the baseline predates
+    # every spec. That is exactly the prompt-authorized shape, where a run legitimately authors
+    # its whole roster after preflight. Skipping is the honest answer and it says so out loud.
+    report "check 22 skipped for $f — the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+  else
+    rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
+    # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
+    # An `add` alone would red a correctly performed supersession, whose successor is present now
+    # and absent then with no `add` row that the sibling verb would even accept.
+    for rsid in $(printf '%s\n' "$rs_now" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+      printf '%s\n' "$rs_was" | grep -qF -- "$rsid" && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
+      fail 22 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
+    done
+    # RETIRED units: a status that is WONTDO now and was not then owes a retire or a supersede.
+    for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+      printf '%s\n' "$rs_was" | grep -F -- "$rsid" | grep -q '| WONTDO |' && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
+      fail 22 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
+    done
+    # A SUPERSESSION THAT NEVER LANDED ITS REPLACEMENT is a retirement wearing a better name.
+    printf '%s\n' "$rs_rows" | grep -oE 'item supersede [A-Za-z0-9-]+ -> [A-Za-z0-9-]+' | awk '{print $NF}' | sort -u \
+    | while IFS= read -r rssucc; do
+        [ -n "$rssucc" ] || continue
+        printf '%s\n' "$rs_now" | grep -qF -- "$rssucc" && continue
+        fail 22 "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name: $rssucc in $f"
+      done
+  fi
+
+done
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
 # ---- the authorization scope, `--plan`'s roster join, `--status`'s next unit and `build-complete`'s

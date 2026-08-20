@@ -1194,6 +1194,80 @@ reset_tree
 # frozen-versus-live PAIR survived and was rewritten against the new one; the anti-over-exemption
 # arm did not, because main's exemption has the same over-wide scoping and narrowing it is a
 # change the owner did not ask for. Filed as TOOL-cSettledDocket-11 rather than made silently.
+# ---- check 22 (TOOL-dUnstalledConvoy-6): an AMENDMENT with no record. M3 now delegates this build's
+# ---- own scope, so the failure mode moved from stalling to DRIFTING — a unit quietly retired with
+# ---- nothing on the record saying so.
+# ----
+# ---- THE BASELINE MUST CARRY A ROSTER or there is nothing to compare against, and that is not a
+# ---- fixture convenience: an EMPTY baseline is vacuously ACCUSATORY, because every unit the build
+# ---- has would read as added. The shared `tRun` fixture is exactly that shape — a live phase from
+# ---- its first commit — which is also the prompt-authorized shape, so these arms build their own
+# ---- run whose baseline already names a unit, and the empty case is asserted separately as a SKIP.
+URO='| [ARCH-tRos-1 — the first unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
+UR7='| [ARCH-tRos-7 — a later unit](spec/seven.md) | OPEN | rev-1 | 2026-08-01 |'
+UEND='<!-- /gen:build-units -->'
+seed_ros() {
+  reset_tree
+  build tRos
+  awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
+    && mv /tmp/ros.$$ memory/builds/tRos/README.md
+  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline" --no-verify
+}
+add_u7() {
+  awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
+    && mv /tmp/ros7.$$ memory/builds/tRos/README.md
+}
+rrow() { printf '\n2026-08-20T00:00:00Z rescope · item %s · reason %s\n' "$1" "$2" >> memory/builds/tRos/RUN.md; }
+
+# an id present now and absent at the baseline, with NO rescope row, is the whole point of the check
+seed_ros; add_u7
+git add -A && git commit -q -m "a unit nobody recorded" --no-verify
+hit "$(run)" "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so:"
+
+# ...an `add` row naming it ACCOUNTS for it.
+seed_ros; add_u7
+rrow "add ARCH-tRos-7" "the build needed it"
+git add -A && git commit -q -m recorded --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ...so does a SUPERSEDE row naming it as the SUCCESSOR, which is the case an add-only rule redded:
+# a correct supersession leaves the successor present now and absent then, and the sibling verb
+# refuses an `add` for an id the region already carries, so the run would have had no legal repair.
+seed_ros; add_u7
+rrow "supersede ARCH-tRos-1 -> ARCH-tRos-7" "the mechanism split"
+git add -A && git commit -q -m superseded --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ...a SUPERSESSION whose successor never landed is a retirement wearing a better name.
+seed_ros
+rrow "supersede ARCH-tRos-1 -> ARCH-tRos-9" "never landed"
+git add -A && git commit -q -m orphan --no-verify
+hit "$(run)" "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name:"
+
+# ...a unit that goes WONTDO after the baseline owes a retire or a supersede.
+seed_ros
+sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
+git add -A && git commit -q -m dropped --no-verify
+hit "$(run)" "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so:"
+
+# ...and the same transition WITH a retire row is accounted for.
+seed_ros
+sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
+rrow "retire ARCH-tRos-1" "the probe cannot see this tree"
+git add -A && git commit -q -m "retired on the record" --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
+# ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+out=$(run)
+miss "$out" "check 22 skipped"
+miss "$out" "check 22 FAILED"
+reset_tree
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
