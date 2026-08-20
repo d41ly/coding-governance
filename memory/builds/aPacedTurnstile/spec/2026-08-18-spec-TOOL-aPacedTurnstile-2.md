@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-4 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-8 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -43,8 +43,13 @@ chose, and is overridable.
   floored at roughly 660 s by one leg, so what this unit buys here is a RAM guard on the low end and
   one declared place for every future knob to land. Stated plainly rather than dressed up.
 - Sharding the heavy legs, which is what would actually move the floor. Separate build.
-- Editing `memory/guides/SESSION-KICKOFF.md`. `TOOL-aPacedTurnstile-3` owns that file's gate-command
-  block; two units editing three shared lines is the collision this build's reconcile pass caught.
+- Editing `memory/guides/SESSION-KICKOFF.md` BEYOND the one line this unit falsifies.
+  `TOOL-aPacedTurnstile-3` owns that file's gate-command block for its own content — the chunk
+  contract and the halt note — and two units editing three shared lines is the collision this build's
+  reconcile pass caught. What this unit may not do is add content there; what it MUST do is repair the
+  width claim in that block, because the kickoff-manifest ratchet refuses a commit touching a watched
+  file whose §B claims it falsified, and `tools/run-gates/run-gates.sh` is on that watch list. See §9
+  rev-6: the non-goal as first written asked for a state the merge bar forbids.
 - An exemption row for the table. It lands inside the kit directory, which the kit's own file rule
   already claims, so a row would be a stale exemption the deployer's selfcheck reds on.
 
@@ -184,7 +189,8 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
   `GATE ` line, and `bash tools/run-gates/run-gates.test.sh` asserts that line is present.
 - **AC2** — When `GATE_CORES=16` and `GATE_RAM_MB=32000` are set, the canary observes the
   most-capable row selected; when `GATE_CORES=16` and `GATE_RAM_MB=8000` are set, it observes the
-  middle row — the RAM guard, which today's formula cannot express, is the assertion.
+  middle row — the RAM guard, which today's formula cannot express, is the assertion. The table those
+  readings are matched against is a FIXTURE the canary writes, not the shipped one: see §9 rev-5.
 - **AC3** — When `GATE_CORES=0` and `GATE_RAM_MB=0` are set, the canary observes the catch-all row
   and a provenance tag naming the sources tried.
 - **AC4** — When `GATE_PROFILE` names a row that does not exist, the runner exits 2 and lists the
@@ -196,9 +202,15 @@ falling back to today's behaviour — so the rollback is exercised by an arm rat
 - **AC7** — When `GATE_JOBS` is set alongside a selected profile, the canary observes the width
   taken from `GATE_JOBS` AND the timeout still taken from the row, proving the override is
   width-only.
-- **AC8** — When a fixture row sets a one-second timeout and a fixture leg sleeps past it, the
-  runner reports that leg FAILED with a timeout tail and the overall verdict is RED — never a skip
-  and never a green, asserted in `tools/run-gates/run-gates.test.sh`.
+- **AC8** — When a fixture row sets a per-leg timeout and a fixture leg sleeps past it, the runner
+  reports that leg FAILED with a timeout tail and the overall verdict is RED — never a skip and never
+  a green — AND `bash tools/run-gates/run-gates.test.sh` observes that leg's own measured duration to
+  be far below an untimed CONTROL over the same fixture. The elapsed half is the criterion, not
+  decoration: the first landing satisfied the message half while the bound applied to the verdict and
+  not the clock, so a criterion that grades only the tail is green over a knob that buys nothing. It
+  reads the leg's duration from the runner's timing cache rather than timing the process tree, because
+  the runner's own startup dwarfs the signal and its jitter does not cancel between two runs. No
+  literal timeout value is pinned here — the fixture's is the fixture's.
 - **AC9** — When a knob key is added to the table without being added to the canary's pinned set,
   `bash tools/run-gates/run-gates.test.sh` exits non-zero naming the unpinned key.
 - **AC10** — When the existing width-1 against width-4 equivalence arm runs, it filters the
@@ -280,6 +292,42 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-8 · 2026-08-20 · CLOSED. Every criterion observed against the tree at `1ec761f`, two Tier-2
+  review rounds folded, and the shipped canary carries 91 executed assertions against the 37 it had at
+  this unit's base. What the close itself surfaced, recorded because it is the only place it lands: the
+  bar's first `--close` run RED on the run-gates canary's own clamp arms, which announced that the arm
+  AND its width-1 control both expired and that the clamp was therefore unproven either way. That is a
+  pre-existing arm reporting honestly under a machine carrying four concurrent full bars from other
+  sessions - an unarmed predicate REDDING rather than passing green, which is the property §7 asks for
+  and the reason the red was diagnosable at all. It is also this build's own case for `-4`, the
+  turnstile: a wall-clock-bounded arm is a correctness claim about a machine's spare capacity, and
+  nothing in this repo yet stops four bars from sharing one box.
+- rev-7 · 2026-08-20 · folded the RE-review of that fold. AC8 named a one-second timeout the arm no
+  longer sets and graded only the message — the blind spot rev-6 identified in the code and then left
+  standing in the criterion, so a later builder could delete the elapsed assertion and AC8 would stay
+  green. It now states the property: the leg's own measured duration against an untimed control. The
+  rest of that re-review is behaviour and folds into the code; its two blockers were both in the
+  machinery rev-6 added, which is the fix-creates-a-fresh-defect shape this build has now recorded
+  three times. The habit that catches it is stated here rather than in a gate: when a fix changes what
+  an arm asserts, the criterion it serves moves in the same commit.
+- rev-6 · 2026-08-20 · folded the closing diff review. The §3 non-goal on
+  `memory/guides/SESSION-KICKOFF.md` asked for a state the merge bar forbids: the width claim in that
+  file's gate-command block is one of the two claims S8 exists to falsify, and the kickoff-manifest
+  ratchet refuses any commit touching a watched file without repairing the §B claims it feeds. The
+  non-goal now cuts at CONTENT rather than at the file, and `TOOL-aPacedTurnstile-3`'s S9 editor map
+  is corrected to name this unit. The review's other confirmed findings are behaviour and are folded
+  into the code rather than into this spec; the blocker was the per-leg timeout bounding the verdict
+  and not the clock, which the acceptance criteria could not see because AC8 graded the message.
+- rev-5 · 2026-08-20 · built. One design decision S7 did not state, recorded because it changes what
+  the arms grade: every selection arm drives a FIXTURE table the canary writes, and exactly one arm
+  reads the shipped table — the pinned-knob one, whose subject IS that file's content. The shipped
+  table is DATA an adopter is expected to tune, so an arm keyed on its figures is a pin copied from
+  one corpus into a tree that never agreed to it, and it would red there while saying nothing about
+  it. The first draft did key on the shipped table and a control proved the cost: one malformed row
+  in it cascaded into twelve arms with nothing to do with it, which is a diagnostic that names
+  everything except the fault. The pinned-knob arm also announces its skip AND counts it, so the
+  executed total does not move with the table's presence — a skip that shrinks the count reds the
+  floor with a message about arithmetic instead of about what went ungraded. No criterion moved.
 - rev-4 · 2026-08-18 · folded the round-2 spec audit. R23: AC11b restores S8's width-formula half.
   The round-1 fix restated AC11 positively for the FIGURE and dropped the formula, relocating the
   defect rather than closing it — S8 could land half done with every criterion green while the

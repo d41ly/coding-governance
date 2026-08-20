@@ -1,0 +1,61 @@
+# gate-profiles.txt — the runner's knobs, DECLARED, keyed by detected hardware.
+#
+# GRAMMAR: `<name>\t<min cores>\t<min RAM MB>\t<comma-joined knobs>` per row. Comments carry the
+# justification for a threshold and every movement of it, because a number with no history beside it
+# is a number nobody can question. Modelled on `tools/template-size-limits.txt`, which is this tree's
+# settled answer to the same problem — a declared value read with `awk -F'\t'` and argued in place.
+#
+# SELECTION: rows are ordered MOST-CAPABLE-FIRST and the FIRST row whose BOTH thresholds are
+# satisfied wins. The last row is a zero-threshold catch-all, so an unknown-hardware run lands there
+# by ordinary threshold matching — one selection mechanism, no special case.
+#
+# THE GOVERNING INVARIANT: no knob here may ever turn a leg into a PASS or a SKIP. A knob may make
+# the bar slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar
+# check less. The runner declares the set it implements; the canary PINS the same set separately, so
+# a new knob cannot be added without an author reading this paragraph.
+#
+# KNOBS:
+#   width=<n>    the worker-pool width. `GATE_JOBS` overrides it — width ONLY: the row is still
+#                selected and still supplies every other knob.
+#   timeout=<s>  a per-leg wall-clock bound, 0 = off. A timeout that fires produces a RED naming its
+#                leg, never a skip and never a green: it converts a hang into a verdict AND returns
+#                the worker to the pool. The second half is not free — the first landing of this
+#                knob captured the leg through a pipe, so an orphaned grandchild held it open and
+#                the bound applied to the verdict alone: 51.4 s measured against a 1 s bound. The
+#                runner now captures through a file and adds a kill-after, and the canary grades
+#                the elapsed time against an untimed control rather than the message.
+#
+# OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
+# points at a different table; a path that does not exist falls back to the built-in formula, which
+# is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
+# leaves every other knob of the selected row in force.
+#
+# THE READINGS themselves have overrides too, and they are the escape hatch when detection is wrong:
+# `GATE_CORES=<n>` and `GATE_RAM_MB=<mb>` replace what the chain would find and BYPASS it entirely —
+# a seam is never capped by the cgroup source below, or the operator could not raise a number.
+# `GATE_CGROUP_ROOT=<dir>` relocates the cgroup files the RAM chain reads, which is how a fixture
+# drives the container path on a host that is not in one.
+
+# --- 8+ cores AND a RAM class that can hold the width ---------------------------------------------
+# 24000 MB, and cores alone are the wrong question: each heavy leg builds its OWN `mktemp -d` scratch
+# repo, so width 8 means up to eight scratch git repos and eight interpreters resident at once. The
+# threshold sits BELOW 32 GB deliberately — the honest distinction is a RAM class, not an exact
+# figure, and a 16-core / 8 GB VM selecting this row is the thrash this table exists to stop.
+# Width 8 is MEASURED, not guessed: at 16 each leg dilates under load faster than the extra worker
+# repays. Node `a` (16 cores, 32693 MB) selects this row, so its behaviour does not move.
+capable	8	24000	width=8,timeout=0
+
+# --- the 4-core class ------------------------------------------------------------------------------
+# Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
+# 4-core width in the same unit that introduces the table would confound the one measurement that
+# matters, and a knob whose first landing is also its first behaviour change has no control. This
+# row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
+# low-RAM box falls to.
+modest	4	0	width=4,timeout=0
+
+# --- the catch-all, and the detection-failure row --------------------------------------------------
+# Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
+# slow, not serial-only. Removing this row is an operator error and the runner refuses rather than
+# silently falling through to the built-in formula: absent and unmatchable are different states and
+# only one of them is a mistake.
+minimal	0	0	width=2,timeout=0

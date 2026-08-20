@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-20T00:46:10+03:00 @ 56b945cbb0613b1352dd06221d4d39940db33419
+last-audit: 2026-08-20T04:45:00+03:00 @ 56b945cbb0613b1352dd06221d4d39940db33419
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 960e3cd277c1ec55efe145fe1358cdd780269cf3
+last-body-change: 56b945cbb0613b1352dd06221d4d39940db33419
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -74,7 +74,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ### Gate commands (the merge bar)
 
 ```bash
-bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY (width min(8,nproc)), single-sourced from tools/gate-legs.json — read THAT for the list, not this line
+bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg guard — what .githooks/pre-push runs, and what a DoD needs
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review

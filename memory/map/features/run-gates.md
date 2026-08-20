@@ -5,7 +5,7 @@ feature = "run-gates"
 title = "The gate runner, its harnesses, and the adopter that keeps a target's verdict reader honest"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-aPacedTurnstile-1"]
+decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2"]
 
 [claims]
 gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring", "profile-bar selftest"]
@@ -25,6 +25,7 @@ globs = [
   "tools/run-gates/kit.toml",
   "tools/run-gates/profile_bar.py",
   "tools/run-gates/profile_bar.test.sh",
+  "tools/run-gates/gate-profiles.txt",
 ]
 ```
 
@@ -63,6 +64,21 @@ splits the remainder on a double space and recovers the bare leg name. A single 
 truncated name for any leg whose name contains one, which is most of them, and the deployer reads a
 target's verdicts exactly that way. The gov-only canary forbids a double space inside a leg NAME,
 which is what makes the split unambiguous rather than usually right.
+
+**The pool's knobs are DECLARED, and no knob may make the bar check less.** `gate-profiles.txt`
+maps detected cores and RAM to a named row; the FIRST row satisfying both thresholds wins and the
+last row is a zero-threshold catch-all, so unknown hardware is matched rather than special-cased.
+Cores alone were the wrong question — each heavy leg builds its own scratch repo, so a 16-core / 8 GB
+box used to select width 8 and thrash. The invariant is that a knob may cost SPEED or convert a hang
+into a bounded RED, never turn a leg into a pass or a skip — and the BOUND is on the clock as well as
+on the verdict, which cost a blocker to learn: a leg captured through a command substitution keeps
+the worker blocked until the last inherited write end closes, so an orphan defeats the timeout while
+`timeout` still reports 124. Capture through a file, and grade the elapsed time against an untimed
+control rather than against the message; the runner declares the implemented set
+and the shipped canary PINS the same set separately, so a new knob reds until an author edits the pin
+and reads the rule. An ABSENT table falls back to the built-in formula and is the documented
+rollback; a MALFORMED one refuses, because a silently ignored knob is a knob the operator believes
+they set. Matching NOTHING is a refusal too, and deliberately not the same state as absent.
 
 **`--check` is the join nothing else asserts.** A target's `[gate_runner]` declaration names the line
 heads the deployer matches to read verdicts; those heads are strings in the runner's own `printf`
@@ -109,6 +125,13 @@ time; extend by adding keys the deployer resolves, leaving runner-side placehold
   NOT ADOPTED and exits 0 where no target declares one.
 
 ## Gaps
+
+- The shipped canary's selection arms drive a FIXTURE table they write, not `gate-profiles.txt`,
+  because that file is data an adopter is expected to tune and an arm keyed on its figures would red
+  on their tree while saying nothing about it. Exactly one arm reads the shipped table — the pinned
+  knob set, whose subject is that file's own content. The cost is that nothing observes a gov
+  threshold drifting away from gov's hardware; the benefit is that a malformed shipped table reds one
+  arm instead of cascading into twelve that have nothing to do with it.
 
 - `adopt-run-gates.sh` has no WRITE path today: the `[gate_runner]` declaration is emitted by
   `govkit intake` from this kit's `[gate_runner_seed]`, because a declaration written at configure

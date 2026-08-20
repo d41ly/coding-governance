@@ -207,8 +207,8 @@ ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | CLOSED | rev-7 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-7 | 2026-08-18 |
+| [TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table](spec/2026-08-18-spec-TOOL-aPacedTurnstile-2.md) | CLOSED | rev-8 | 2026-08-20 |
+| [TOOL-aPacedTurnstile-3 — ordered chunks, and a verdict the operator sees before the run ends](spec/2026-08-18-spec-TOOL-aPacedTurnstile-3.md) | OPEN | rev-8 | 2026-08-20 |
 | [TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest](spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
@@ -223,6 +223,8 @@ Records live under `spec/` and `reviews/`.
 | [2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
 | [2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md) | diff-review | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
 | [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md) | diff-review | TOOL-aPacedTurnstile-2 |
+| [2026-08-20-review-TOOL-aPacedTurnstile-2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md) | diff-review | TOOL-aPacedTurnstile-2 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -251,4 +253,6 @@ Records live under `spec/` and `reviews/`.
   - [2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md)
   - [2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md)
   - [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md)
+  - [2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md)
+  - [2026-08-20-review-TOOL-aPacedTurnstile-2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md)
 <!-- /gen:build-docs -->
