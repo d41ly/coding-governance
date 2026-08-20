@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -148,19 +148,24 @@ prose record.
 
 ## 8. Open questions
 
-- **F1 — should a set-scoped check run against pieces from PREVIOUS runs of the same playbook?** The
-  monoculture the reference measured was across nine articles produced over months, not within one run,
-  so a set scoped to one run's output would not have caught it. Against that: a run cannot be blocked by
-  a corpus it did not produce. RESOLVED (agent, 2026-08-20, delegated): the population is declared PER
-  CHECK as `run` or `corpus`, using unit 5's two named scopes; a `corpus`-scoped check WARNS and never
-  blocks, and its census prints. That resolution also removes the contradiction the audit found between
-  this fork and §4, which had already decided the question one way while the fork called it open.
-- **F2 — whether `set-checks-recorded` collapses into `pieces-complete`.** They read different
-  populations and fail for different reasons, and this repo's DoD history is one long argument for
-  splitting terms rather than ANDing them. Recommendation: keep them separate. Deferred, not open.
+none — every fork below is RESOLVED in place.
+
+- **F1 — should a set-scoped check run against pieces from PREVIOUS runs of the same playbook?**
+  RESOLVED (agent, 2026-08-20, delegated): the population is declared PER CHECK as `run` or `corpus`,
+  using unit 5's two named scopes; a `corpus`-scoped check WARNS and never blocks, and its census
+  prints. A run cannot be blocked by a corpus it did not produce, and the monoculture the reference
+  measured was a corpus property — so both readings are real and the playbook picks per check. This
+  also removes the contradiction the audit found between this fork and §4.
+- **F2 — whether `set-checks-recorded` collapses into `pieces-complete`.** RESOLVED (agent,
+  2026-08-20, delegated): keep them SEPARATE. They read different populations and fail for different
+  reasons, and this repo's Definition-of-Done history is one long argument for splitting terms rather
+  than ANDing them into a verdict that cannot say which half failed.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
   the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
   distinction once.

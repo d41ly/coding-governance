@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -144,18 +144,21 @@ index, which the charter bans by name and which would serialise otherwise-indepe
 
 ## 8. Open questions
 
-- **F1 — where the per-piece record physically sits.** Beside the piece is self-joining and pollutes the
-  output tree an owner ships; under the build folder is clean and needs a derived path mapping.
-  RESOLVED (agent, 2026-08-20, delegated): under the build folder, at a path derived from the piece's
-  repo-relative path, because the output tree is the DELIVERABLE and a governance artifact in it is the
-  thing an owner will delete.
+none — every fork below is RESOLVED in place.
+
+- **F1 — where the per-piece record physically sits.** RESOLVED (agent, 2026-08-20, delegated): under
+  the build folder, at a path derived from the piece's repo-relative path. The output tree is the
+  DELIVERABLE, and a governance artifact sitting in it is the thing an owner will delete.
 - **F2 — should `stale` RED or WARN?** RESOLVED (agent, 2026-08-20, delegated) in S9: the reader
-  classifies and never grades; the leg warns; `--close` blocks. The previous revision deferred this to
-  unit 6, which answered only the close half and left the leg's mid-fold verdict undefined — the audit
-  caught the gap and the ruling now lives where the reader lives.
+  classifies and never grades; the leg warns with a count; `--close` blocks. The previous revision
+  deferred this to unit 6, which answered only the close half and left the leg's mid-fold verdict
+  undefined — the audit caught the gap and the ruling now lives where the reader lives.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. The tree-property design was ruled by the owner after the research
   proved an attended run cannot close through the driver.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F6 added S2 and S3, the writer and its second caller —

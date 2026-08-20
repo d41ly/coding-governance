@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -133,18 +133,22 @@ independent re-derivation needs and the kit had zero such arms until it was buil
 
 ## 8. Open questions
 
-- **F1 — RAISING `READ_PATH_CEILING`.** Not this unit's mechanism, but this unit's specs plus unit 2's
-  rendered template plus a protocol section will cross it. The declared ceiling in `.memory-tree.conf`
-  is a stated constraint of a governance carrier, which M3 veto 2 makes an OWNER turn rather than an
-  agent edit. The precedent raise for the previous mode was recorded with its argument beside the
-  number. `TOOL-aDeclaredCeiling-1` is OPEN and wants ceilings turned into declared pins first, so this
-  build argues that row's case either way. **Owner decision, needed before the build's first pass.**
+none — every fork below is RESOLVED in place.
+
+- **F1 — RAISING `READ_PATH_CEILING`.** RESOLVED (owner, 2026-08-20): raised 112987 to 131892, which
+  is 106292 measured plus the same 25,600 headroom every movement uses. The fifth movement's allowance
+  was consumed to 6,695, which this build's protocol rows and decision appends exceed. The conf carries
+  the argument beside the number and tells whoever merges to re-derive there.
 - **F2 — whether `pieces:` belongs in the README at all**, given that it is the one value the owner
-  changes per run while the playbook stays fixed. It is in the README precisely because it changes per
-  run and must be at BASE. Recorded because it looks misplaced beside `playbook:` and is not.
+  changes per run while the playbook stays fixed. RESOLVED (agent, 2026-08-20, delegated): YES, and for
+  exactly that reason — it changes per run, so it must sit at BASE where the run cannot have written it
+  after the fact. Recorded because it looks misplaced beside `playbook:` and is not.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
   the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
   distinction once.

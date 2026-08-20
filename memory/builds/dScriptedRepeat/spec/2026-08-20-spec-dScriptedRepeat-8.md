@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -156,19 +156,23 @@ spent the mandate. Evaluated at both moments.
 
 ## 8. Open questions
 
-- **F1 — does the exemption set live in the kit or the playbook?** In the kit it is closed and a
-  playbook cannot widen it, which is the property that makes it an exemption. In the playbook it can
-  name a project's own mandated-write paths, which differ per adopter. Recommendation: kit-owned CORE
-  plus a playbook EXTENSION, exactly the shape the phase, DoD and directive sets already use, so a
-  project may add and never delete. **Agent-resolvable; the precedent is strong enough that I will take
-  it unless you say otherwise.**
-- **F2 — what happens on a run that legitimately must touch machinery**, for instance a playbook run
-  that discovers its own checker is broken. Recommendation: it parks the decision and stops, because
-  fixing machinery is a code build and this mode refuses those by design. That is the mode working, not
-  a gap — recorded because it will read like a gap the first time it fires.
+none — every fork below is RESOLVED in place.
+
+- **F1 — does the exemption set live in the kit or the playbook?** RESOLVED (agent, 2026-08-20,
+  delegated): kit-owned CORE plus a playbook EXTENSION, which is the shape the phase, Definition-of-Done
+  and directive sets already use — a project may ADD and may never DELETE. A wholly kit-owned set
+  cannot name an adopter's own mandated-write paths; a wholly playbook-owned one is an exemption the
+  subject can widen, which is not an exemption.
+- **F2 — what happens on a run that legitimately must touch machinery**, for instance a run that
+  discovers its own checker is broken. RESOLVED (agent, 2026-08-20, delegated): it PARKS the decision
+  and stops. Fixing machinery is a code build and this mode refuses those by design, so the refusal
+  firing is the mode working. Recorded because it will read like a gap the first time it fires.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
   the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
   distinction once.

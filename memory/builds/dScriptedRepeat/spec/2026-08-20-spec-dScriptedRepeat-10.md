@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -134,19 +134,23 @@ against a counter that includes it.
 
 ## 8. Open questions
 
+none — every fork below is RESOLVED in place.
+
 - **F1 — a new build-method section for the playbook directives?** RESOLVED (owner, 2026-08-20): NO —
-  the two directives POINT at existing sections. `memory/guides/BUILD-METHOD.md` does not move, its
-  stated budget does not rise, and the mode adds nothing a session must re-read at every pass boundary.
-  The cost accepted with this ruling is that "follow a playbook to the letter" is described by the pass
-  loop and the wrap-up derivation rather than by prose written for it; if that proves too thin once the
-  mode is in use, the fix is a section then, argued against a real failure rather than a predicted one.
-- **F2 — does the attended path need its own entry in the kickoff engine's exit list?** That engine
-  enumerates the interactive exits an unattended run resolves without an owner turn, and an attended
-  path has an owner by definition. Recommendation: no, and state why in the Skill so its absence is not
-  read as an oversight. Deferred, not open.
+  the two directives POINT at existing sections. `memory/guides/BUILD-METHOD.md` does not move and its
+  stated budget does not rise, so the mode adds nothing to a document M7 re-reads whole at every pass
+  boundary. The accepted cost is that "follow a playbook to the letter" is described by the pass loop
+  and the wrap-up derivation rather than by prose written for it.
+- **F2 — does the attended path need its own entry in the kickoff engine's exit list?** RESOLVED
+  (agent, 2026-08-20, delegated): NO. That list enumerates the interactive exits an UNATTENDED run
+  resolves without an owner turn, and an attended path has an owner by definition. The Skill states
+  that reason, so the absence reads as a decision rather than an oversight.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. S2's shape follows from the research proving an attended run
   cannot close through the driver; S4's refusal to add a method section follows from the measured budget
   and from M1's own rule about re-reading cost.

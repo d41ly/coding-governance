@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -135,19 +135,22 @@ that key on `tools/gate-legs.json`. Adding an arm costs `ARMS_FLOORS` and one ar
 
 ## 8. Open questions
 
-- **F1 — the mode's SPELLING.** RESOLVED (owner, 2026-08-20): **`recipe`**. `playbook` collided with
-  three live things — the `DISCIPLINES` enum at `.memory-tree.conf:11`, the `PLAY` family at `:15`, and
-  the charter-renderer kit at `tools/playbook/` with its own parity gate and map dossier. None was a
-  MACHINE collision, since the mode set and the discipline enum are never compared, but a reader
-  grepping the word got four unrelated subjects and the value is user-facing and permanent. `recipe` is
-  unused anywhere in the tree and does not suggest the charter renderer. The ARTIFACT keeps the name
-  playbook; S3b is where that distinction is stated once.
+none — every fork below is RESOLVED in place.
+
+- **F1 — the mode's SPELLING.** RESOLVED (owner, 2026-08-20): **`recipe`**. `playbook` collided with the
+  `DISCIPLINES` enum, the `PLAY` family and the charter-renderer kit at `tools/playbook/`. None was a
+  MACHINE collision, but a reader grepping the word got four unrelated subjects and the value is
+  user-facing and permanent. The ARTIFACT keeps the name playbook; S3b states that distinction once.
 - **F2 — whether `AUTH_MODES` is also joined to the rendered Skill's own list**, the way the directive
-  registry is joined to its Skill table in both directions. Recommendation: yes, but authored in unit
-  10 where the Skill is written, not here. Deferred rather than open.
+  registry is joined to its Skill table in both directions. RESOLVED (agent, 2026-08-20, delegated):
+  YES, authored in unit 10 S6 where the Skill is written, and observed by unit 10 AC3. Mechanism, not
+  scope — the join already exists for directives and this extends it to a second vocabulary.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. Decomposed from the research pass. S5 and the derived scope set
   come from the contradiction hunt's ranked decision 9, which two lenses reached independently and
   which no kickoff fork covered.

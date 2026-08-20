@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-1 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-1 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -113,15 +113,25 @@ research lens priced this. It is named here so the build does not discover it at
 
 ## 8. Open questions
 
-- **F1 — did "distinct region" mean a distinct FILE?** Recommendation: no — a kind satisfies the
-  intent, costs a tenth as much, and keeps proposals inside the file the wrap-up already derives from.
-  **Owner decision if the literal reading was meant**; otherwise this is settled by §4.
-- **F2 — must `TOOL-aBoundedVerdict-6` close first?** Recommendation: yes, and it is small. Building
-  proposals on a region that can overflow mid-run means discovering the cap at the worst moment. Filed
-  as a prerequisite in the build plan rather than a follow-up.
+none — every fork below is RESOLVED in place.
+
+- **F1 — did "distinct region" mean a distinct FILE?** RESOLVED (agent, 2026-08-20, delegated): a
+  fifth `park()` KIND, not a separate file. Both options deliver the same thing the ruling asked for —
+  a proposal channel that reads as distinct from a blocker — so this is mechanism rather than scope,
+  and the kind costs roughly a tenth as much while keeping proposals inside the file the wrap-up
+  already derives from. If the owner meant a file literally, converting is a small follow-up and this
+  line is where a later reader finds that out.
+- **F2 — must `TOOL-aBoundedVerdict-6` close first?** RESOLVED (agent, 2026-08-20, delegated): NO, and
+  the reason is a limit on this run's authority rather than a judgement about the row. The 8 KB
+  run-state spill is a prerequisite for USING proposals at N-piece scale, not for building the verb;
+  closing another build's open row inside this mandate would be scope this run does not hold. Unit 9
+  lands, and the spill is recorded as a use-time dependency on that row.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. Written after measuring `park()` and `dod_met` directly and
   finding the fork's premise false; the verb-carrier drift in S6 comes from the research.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F18 pinned the STEP field's placement before `reason`

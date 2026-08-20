@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-3 — the playbook validity gate
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -167,20 +167,25 @@ trips grows, so the full bar is the check rather than an enumerated list.
 
 ## 8. Open questions
 
-- **F1 — one leg or a check inside the existing kit gate?** The research measured that a new CHECK is
-  far cheaper than a new LEG here, because the codebase-map coverage assert and drift-audit's leg
-  signal both key on the gate manifest. Against that: this gate's population is an adopter's playbooks,
-  it needs a second blob read, and folding it in would put an adopter-facing predicate inside the kit's
-  self-check. Recommendation: a separate leg, and pay the meta-gate cost. **Agent-resolvable; recorded
-  because the cheaper option was measured and deliberately declined.**
+none — every fork below is RESOLVED in place.
+
+- **F1 — one leg or a check inside the existing kit gate?** RESOLVED (agent, 2026-08-20, delegated): a
+  SEPARATE leg, and the cheaper option is declined deliberately. A check inside the kit gate costs less
+  meta-gate churn, but this predicate's population is an ADOPTER's playbooks rather than the kit's own
+  tree, and it needs a second blob read. Folding an adopter-facing predicate into the kit's self-check
+  would make one leg answer two questions about two populations, which is the two-answers defect one
+  level up. The meta-gate cost is paid rather than avoided.
 - **F2 — does the gate red on a playbook whose `curated:` line is absent?** RESOLVED (agent,
-  2026-08-20, delegated) in S9c: YES, with no run binding. The previous revision deferred this to unit 4,
-  which has no notion of an ACTIVE playbook and never received the deferral — and unit 2 AC5 meanwhile
-  asserted the opposite answer, so three specs carried two rulings and a dangling handoff. A draft that
-  is not ready to be graded is not yet a tracked playbook.
+  2026-08-20, delegated) in S9c: YES, with no run binding. The previous revision deferred this to unit
+  4, which has no notion of an ACTIVE playbook and never received the deferral, while unit 2 AC5
+  asserted the opposite answer — three specs, two rulings and a dangling handoff. A draft not ready to
+  be graded is not yet a tracked playbook.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. S2's declared selector and S3's structural window both come from
   measured defects in the reference implementation of this same rule.
 - rev-2 · 2026-08-20 · folded the M4 spec audit. F11 is the important one: the `skipped` verdict four

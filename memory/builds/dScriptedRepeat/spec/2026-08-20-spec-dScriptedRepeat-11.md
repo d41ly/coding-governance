@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
 
 ## 1. Goal
 
@@ -121,18 +121,23 @@ run, which is exactly the branch the audit forced and is the first place it pays
 
 ## 8. Open questions
 
-- **F1 — does a creation run need its own directive?** `prompt` mode's two scoped handles bind research
-  and a solution test, which is most of what authoring a playbook owes. What they do not bind is
-  CONFORMANCE to unit 2's canon — but unit 3's gate does that mechanically, and a directive duplicating
-  a gate is the gloss-that-grew-into-a-condition defect the directive design names. Recommendation: no
-  new directive. RESOLVED (agent, 2026-08-20, delegated): no new directive; the gate is the enforcement.
-- **F2 — should an amendment run be required to cite the proposals it acts on?** It would join the
-  improvement loop end to end. Against: it is a convention a gate cannot check without reading intent,
-  and unit 9's proposals already carry the step they amend. Recommendation: state it in the Skill as a
-  CHECK with its reason, not as a gate. Deferred to unit 10's prose, not open.
+none — every fork below is RESOLVED in place.
+
+- **F1 — does a creation run need its own directive?** RESOLVED (agent, 2026-08-20, delegated): NO;
+  the gate is the enforcement. `prompt` mode's two scoped handles already bind research and a solution
+  test, and the one thing they do not bind — CONFORMANCE to unit 2's canon — is what unit 3's gate
+  checks mechanically. A directive duplicating a gate is the gloss-that-grew-into-a-condition defect
+  the directive design names.
+- **F2 — should an amendment run be required to cite the proposals it acts on?** RESOLVED (agent,
+  2026-08-20, delegated): stated in the Skill as a CHECK with its reason, never as a gate. A gate
+  cannot check it without reading intent, and unit 9's proposals already carry the step they amend, so
+  the join exists even when the citation does not.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-2 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
   the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
   distinction once.

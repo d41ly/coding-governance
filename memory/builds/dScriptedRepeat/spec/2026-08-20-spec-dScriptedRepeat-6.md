@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,18 +166,20 @@ misclassification is real but arrives by a different route than the previous rev
 
 ## 8. Open questions
 
-- **F1 — does `pieces:` mean "at least N" or "exactly N"?** An owner asking for ten articles who gets
-  eleven has not been wronged; an owner asking for one hero image who gets three has. Recommendation:
-  exactly N, because the playbook declares the grain and a surprise extra is a grain bug more often than
-  a bonus. RESOLVED (agent, 2026-08-20, delegated): exactly N.
+none — every fork below is RESOLVED in place.
+
+- **F1 — does `pieces:` mean "at least N" or "exactly N"?** RESOLVED (agent, 2026-08-20, delegated):
+  exactly N. The playbook declares the grain, so a surprise extra is a grain bug more often than a
+  bonus, and an owner who wanted a range can declare one in a later revision of this item rather than
+  inherit an unstated tolerance.
 - **F2 — the moment `stale` is judged.** RESOLVED (agent, 2026-08-20, delegated): the RULING lives in
-  unit 5, where the reader lives — the reader classifies and never grades, the leg reports `stale` as a
-  warning with its count, and only `pieces-complete` at `--close` treats it as blocking. This fork is a
-  POINTER at that ruling, not its owner; the previous revision answered only the close half and left the
-  leg's mid-fold verdict undefined.
+  unit 5 S9, where the reader lives. This fork is a POINTER at that ruling and not its owner.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-3 · 2026-08-20 · owner ratified `recipe` as the authorization mode value; every reference to
   the mode (never to the playbook DOCUMENT, which keeps its name) renamed. Unit 1 S3b states the
   distinction once.

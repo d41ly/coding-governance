@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -179,20 +179,26 @@ carrier of several landed in only one.
 
 ## 8. Open questions
 
-- **F1 — is twelve the right canon size?** The corpus lens derived twelve required and nine optional;
-  the external lens's segment budget argues for fewer, larger segments. Nobody ran the derived budget
-  over the twelve-section set before this spec was written, and that measurement is the thing that
-  settles it. Recommendation: run it during the build's first pass and let the number choose between
-  twelve required and a smaller required set with the remainder optional. **Agent-resolvable once
-  measured — it is a measurement, not a scope choice.**
-- **F2 — where the template physically lives in an adopting repo.** The two rendered artifacts today
-  go to `.claude/skills/` and `{memory_root}/guides/`. A playbook TEMPLATE is authoring material, not
-  a protocol. Recommendation: `{memory_root}/guides/PLAYBOOK-TEMPLATE.md`, beside `BUILD-METHOD.md`,
-  because both are documents an author reads while working. Note this ADDS to the read path, which is
-  the budget the research found nearly spent — so it interacts with unit 4's ceiling fork.
+none — every fork below is RESOLVED in place.
+
+- **F1 — is twelve the right canon size?** RESOLVED (agent, 2026-08-20, delegated): the twelve stand
+  as REQUIRED, and a section exceeding the derived per-segment budget is SPLIT, never dropped. The
+  measurement decides how a section is SEGMENTED, which is a rendering question; it does not decide
+  which sections exist, which is scope. Dropping a required section to fit a budget would lose the
+  negative knowledge §4 argues is the template's most valuable content, and would trade a measured
+  problem for an unmeasured one.
+- **F2 — where the template physically lives in an adopting repo.** RESOLVED (agent, 2026-08-20,
+  delegated): `{memory_root}/guides/PLAYBOOK-TEMPLATE.md`, beside `BUILD-METHOD.md`, because both are
+  documents an author reads while working and neither is a protocol. This ADDS to the read path, which
+  is what made it a question — and the owner raised `READ_PATH_CEILING` on 2026-08-20 with this build's
+  spend named in the argument, so the constraint that made it doubtful is discharged rather than
+  ignored.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
+  place with its resolver and authority named, and §8's first non-blank line made machine-legal —
+  the driver classified nine of eleven specs FORKED on that line alone.
 - rev-1 · 2026-08-20 · initial draft. Canon derived from the corpus-anatomy and
   external-instruction-design records; section 4 and section 8 identified as filled by neither
   reference; the exemplar rule lifted from the reference's own measured failure.
