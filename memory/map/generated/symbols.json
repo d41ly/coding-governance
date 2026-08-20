@@ -2010,6 +2010,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
@@ -2069,6 +2074,11 @@
     },
     {
       "id": "resolve_selection",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_shell_argv",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },

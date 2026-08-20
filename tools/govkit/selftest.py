@@ -1639,17 +1639,17 @@ user_skills = "/tmp/gk-fake-skills"
           subprocess.run([rb, "-c", ":"], capture_output=True).returncode == 0,
           "resolved " + repr(rb) + " and it did not run")
 
-    got = govkit.shell_argv(["bash", "x.sh"])
-    check("shell_argv rewrites a LEADING bare bash", got == [rb, "x.sh"], "got " + repr(got))
-    got = govkit.shell_argv(["python", "x.py"])
-    check("shell_argv leaves a non-bash argv0 alone", got == ["python", "x.py"],
+    got = govkit.resolve_shell_argv(["bash", "x.sh"])
+    check("resolve_shell_argv rewrites a LEADING bare bash", got == [rb, "x.sh"], "got " + repr(got))
+    got = govkit.resolve_shell_argv(["python", "x.py"])
+    check("resolve_shell_argv leaves a non-bash argv0 alone", got == ["python", "x.py"],
           "got " + repr(got))
     # `bash` as an ARGUMENT is a value the target chose. Rewriting it would be govkit editing
     # the command rather than choosing the shell that runs it.
-    got = govkit.shell_argv(["sh", "-c", "bash"])
-    check("shell_argv leaves a bash in argument position alone", got == ["sh", "-c", "bash"],
+    got = govkit.resolve_shell_argv(["sh", "-c", "bash"])
+    check("resolve_shell_argv leaves a bash in argument position alone", got == ["sh", "-c", "bash"],
           "got " + repr(got))
-    check("shell_argv is a no-op on an empty argv", govkit.shell_argv([]) == [], "")
+    check("resolve_shell_argv is a no-op on an empty argv", govkit.resolve_shell_argv([]) == [], "")
 
     # An override that is SET and unusable must be THIS failure, never a quiet fall-through:
     # the operator would believe they had chosen. The memo is cleared around the arm so it

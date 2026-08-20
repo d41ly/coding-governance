@@ -288,7 +288,7 @@ def main() -> int:
             # Windows loader answers that with the System32 WSL launcher. A real operator's
             # runner is already inside bash and never sees it, so the harness has to ask for
             # the same shell the runner would have used, or it grades a leg nobody will run.
-            lp = subprocess.run(govkit.shell_argv(argv), cwd=str(g), capture_output=True,
+            lp = subprocess.run(govkit.resolve_shell_argv(argv), cwd=str(g), capture_output=True,
                                 text=True)
             out = (lp.stdout or "") + (lp.stderr or "")
             check("scratch install: leg '%s' prints its stated verdict where it was installed"

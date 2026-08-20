@@ -466,7 +466,7 @@ def resolve_bash() -> str:
     if _BASH:
         return _BASH
 
-    def runs(cand: str) -> bool:
+    def check_runs(cand: str) -> bool:
         try:
             return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
         except OSError:
@@ -474,7 +474,7 @@ def resolve_bash() -> str:
 
     override = os.environ.get("GOV_BASH")
     if override:
-        if runs(override):
+        if check_runs(override):
             _BASH = override
             return _BASH
         raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
@@ -487,7 +487,7 @@ def resolve_bash() -> str:
             low = cand.replace("\\", "/").lower()
             if "/system32/" in low or "/windowsapps/" in low:
                 continue          # a launcher for a DIFFERENT filesystem
-            if not runs(cand):
+            if not check_runs(cand):
                 continue          # on disk, cannot execute
             _BASH = cand
             return _BASH
@@ -495,7 +495,7 @@ def resolve_bash() -> str:
                   "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
 
 
-def shell_argv(argv: list[str]) -> list[str]:
+def resolve_shell_argv(argv: list[str]) -> list[str]:
     """Replace a LEADING bare `bash` with the resolved executable; every other argv is untouched.
 
     Only position 0 and only the bash names. A `bash` appearing as an ARGUMENT is a value the
@@ -1439,7 +1439,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                 state = "landed-unmeasured"
                 detail = " (its check argv does not resolve)"
             else:
-                rc = subprocess.run(shell_argv([a for a, _m in pairs]), cwd=str(target),
+                rc = subprocess.run(resolve_shell_argv([a for a, _m in pairs]), cwd=str(target),
                                     capture_output=True, text=True).returncode
                 state = "adopted" if rc == 0 else "landed-but-inert"
                 if rc != 0:
@@ -1475,7 +1475,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                        f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
                 continue
             try:
-                rc = subprocess.run(shell_argv(resolved), cwd=str(target), capture_output=True,
+                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
                                     text=True).returncode
             except OSError as e:
                 r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
@@ -1740,7 +1740,7 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                        "memory_root": "memory"}
                 resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
                 try:
-                    if subprocess.run(shell_argv(resolved), cwd=str(target),
+                    if subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
                         return True          # the hole is genuinely undischarged, right now
                 except OSError:
@@ -2293,7 +2293,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         if not argv:
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(shell_argv(resolved), cwd=str(target), capture_output=True, text=True).returncode
+        rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True, text=True).returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
         accepted = bool(outcome and outcome.get("ok"))
