@@ -111,6 +111,15 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # project-selectable scope is narrowing wearing a different name.
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
+# TOOL-dScriptedRepeat-1 - the AUTHORIZATION MODE set, published as a constant so it is spelled
+# ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
+# compare two records carrying the same misspelling and agree with both: it asked whether they
+# MATCH and never whether either is LEGAL. Kit-owned like the three sets below it, with no
+# `MODES_EXTRA` - a project-declarable authorization discipline is one nobody wrote. No floor
+# either: the sets below pin a shrink-only count because a project may EXTEND them, and nothing
+# extends this one, so a pin here would guard a variable only this kit moves.
+AUTH_MODES="slug prompt recipe"
+
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
 # TOOL-cBriefedPilot-2 - the third instance of a shape that already had two. Unit 3's membership test
@@ -130,6 +139,13 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
   done
   printf 'all'
 }
+# TOOL-dScriptedRepeat-1 - the directive SCOPE set is DERIVED, never a second constant: a scope is
+# exactly "every run" or "a run in mode M", so `all` plus every member IS the set. Deriving it is
+# what stops the two disagreeing - a second literal would need editing in step with this one, and
+# the pair that already existed did not.
+scopes()      { printf 'all %s\n' "$AUTH_MODES"; }
+is_auth_mode(){ case " $AUTH_MODES " in *" $1 "*) return 0;; esac; return 1; }
+is_scope()    { case " $(scopes) " in *" $1 "*) return 0;; esac; return 1; }
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -658,8 +674,12 @@ check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bo
   [ "$n" -gt 0 ] || return 0
   while [ "$i" -lt "$n" ]; do
     h=${WAIVE_ITEMS[$i]}; sc=$(scope_of "$h")
-    if [ "$sc" = prompt ] && [ "${AUTH_MODE:-}" != prompt ]; then
-      fail 45 "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it: $h"
+    # TOOL-dScriptedRepeat-1 - ANY mode scope, not the one literal. `all` binds every run; a scope
+    # naming a mode binds only a run of that mode. The test used to name `prompt` twice, so a
+    # handle scoped to a later member was silently unenforced - accepted rather than refused,
+    # which is the direction that loses.
+    if [ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]; then
+      fail 45 "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle $h, directive scope $sc, run mode ${AUTH_MODE:-unset}"
       return 1
     fi
     i=$((i + 1))
@@ -791,11 +811,13 @@ check_authorization() { # slug · base
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
   # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
   [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
-  case "$AUTH_MODE" in
-    prompt|slug) ;;
-    *) fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared: $AUTH_MODE"
-       return 1 ;;
-  esac
+  # TOOL-dScriptedRepeat-1 - MEMBERSHIP of the published set, and the message DERIVES the legal
+  # values from that same set. The refusal used to enumerate them in its own prose, so a third
+  # member would have left the sentence naming two and nothing would have reported the drift.
+  if ! is_auth_mode "$AUTH_MODE"; then
+    fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are $AUTH_MODES, declared: $AUTH_MODE"
+    return 1
+  fi
   if [ "$fmslug" != "$slug" ]; then
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1

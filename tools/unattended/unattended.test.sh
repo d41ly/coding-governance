@@ -2177,7 +2177,7 @@ reset_tree
 # ---- nothing" are two claims - and this branch sits BEFORE the write gate precisely so both hold.
 reset_tree
 out=$(run --preflight tModeBad --keepalive-id k1)
-hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared"
+hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are"
 same "check 44 created no run-state file" "$([ -f memory/builds/tModeBad/RUN.md ] && echo yes || echo no)" "no"
 
 # ---- the PASSING direction, which is the only thing that tells a WORKING reader from a dead one:
@@ -2204,7 +2204,7 @@ reset_tree
 # ---- always does. These arms are what prove it is evaluated where the mode exists.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
-hit "$out" "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it:"
+hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
 same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
 
 # ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
