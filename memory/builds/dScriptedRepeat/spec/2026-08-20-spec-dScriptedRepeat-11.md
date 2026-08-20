@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-21
 
 ## 1. Goal
 
@@ -133,13 +133,12 @@ run, which is exactly the branch the audit forced and is the first place it pays
 
 ## 8. Open questions
 
-none — every fork below is RESOLVED in place, but THIS UNIT'S EXISTENCE is parked for the owner
-(2026-08-20) and the parked entry in the run-state file carries the question. Round 1 of the spec audit
-said adding a creation path "needs an OWNER ruling first", and I added it without one; the corroborating
-signal is that this is the only spec of eleven with no `ratified` pointer. My reading — that the owner's
-ask names creation verbatim, so adding the unit implements the ask and declaring it OUT would have been
-the act needing a turn — is recorded in the park for the owner to weigh, not to inherit. This unit does
-not close while that is parked.
+none — every fork below is RESOLVED in place, and THIS UNIT'S EXISTENCE is RATIFIED by the owner
+(2026-08-21). Round 1 of the spec audit said adding a creation path needed an owner ruling and I
+added it without one; the ruling was taken afterwards rather than assumed, and the parked entry in
+the aborted run's record carries the question as it was put. The owner ratified the unit AS SPECCED,
+which includes S4's anchor qualification: under `published` the ordering property has no machine
+half and unit 8's non-exempt playbook is the backstop.
 
 - **F1 — does a creation run need its own directive?** RESOLVED (agent, 2026-08-20, delegated): NO;
   the gate is the enforcement. `prompt` mode's two scoped handles already bind research and a solution
@@ -153,6 +152,9 @@ not close while that is parked.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · the owner RATIFIED this unit's existence, which round 1 of the audit said was
+  their call and which the previous revision carried as a park. Header gains the `ratified` pointer
+  its ten siblings had; nothing about the mechanism moved.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

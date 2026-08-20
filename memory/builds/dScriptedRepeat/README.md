@@ -145,6 +145,22 @@ and its stated budget does not rise, so the mode adds nothing to a document M7 r
 pass boundary. The accepted cost is that "follow a playbook to the letter" is described by the pass
 loop and the wrap-up derivation rather than by prose written for it.
 
+## The owner rulings of 2026-08-21, after the aborted run
+
+The run aborted rather than override `build-complete`, and put its two parked decisions to the owner.
+Both are answered, so both units are unblocked.
+
+**Unit 11 EXISTS, ratified as specced** — including S4's anchor qualification: under `published`,
+which this repo declares, the ordering property has no machine half and unit 8's non-exempt playbook
+is the backstop. Round 1 said this was the owner's call and the run added it anyway; the ruling was
+taken afterwards rather than assumed.
+
+**Fork 6 is a fifth `park()` KIND, not a separate file.** "Distinct region" is satisfied in substance
+— a distinct kind, distinct rows, distinct Definition-of-Done treatment — and not literally.
+
+**Units 1-4 land first**, then 5-8 and 10 are built against a clean base. The four are self-contained
+and reference no unbuilt unit in code.
+
 ## The unit set
 
 One mechanism each, per the build method's M2, and every one is Tier 2 — this is a kit contract change
@@ -177,53 +193,23 @@ piece count consumes 8's diff population and counts the wrong thing without it. 
 together because `CORE_FLOOR`'s Definition-of-Done half moves ONCE, from eight to ten, rather than
 twice — the two specs previously carried two different stories about which commit moves it.
 
-## What the spec audit changed
+## What the spec audits changed
 
-The ten specs went through an M4 adversarial audit at base `7e2ac32f` — five lenses, batched refuting
-skeptics, one synthesis. It returned **BLOCKED**: 24 confirmed against 31 refuted, collapsing to 21
-distinct defects, fifteen of them HIGH. The record is under `reviews/`. All 21 are folded and every
-spec that moved carries its rev-2 log.
+Two adversarial rounds, both under `reviews/`. Round 1: BLOCKED, 24 confirmed against 31 refuted, 21
+distinct defects. Round 2 over the fold: BLOCKED, 20 against 12, precision up to 0.625, 15 defects.
+All 36 folded. Read the records rather than a summary — four are named here only because each was a
+defect of MINE the specs would otherwise have shipped.
 
-**The blocker was mine and it reached runs that have nothing to do with this mode.** `verb_close`
-evaluates `DOD_CORE` for EVERY run with no mode branch anywhere, so the two new core items — which only
-a playbook run can satisfy — would have blocked `--close` on every `slug`- and `prompt`-mode run in the
-fleet, on a non-overridable item whose only exit is `--abort`. Units 6 and 7 now carry a term zero that
-meets the item and ANNOUNCES the skip when the mode does not match.
+**The blocker reached past this feature.** `verb_close` evaluates `DOD_CORE` for EVERY run with no
+mode branch, so two core items only a playbook run can satisfy would have blocked `--close` on every
+`slug`- and `prompt`-mode run in the fleet. Units 6 and 7 carry a term zero now.
 
-**Four artifacts had readers and no writer.** Nothing in the ten units wrote the per-piece record or
-the set record, so the two Definition-of-Done items reading them could only be satisfied by hand — which
-unit 5 forbids. Unit 5 now owns the writer verb and a second caller for the attended path.
-
-**Two items were satisfied by recorded failures.** `verified` was a hash-join state alone, so
-`pieces-complete` was met by N pieces whose every declared leg had FAILED, and fork 5 was implemented by
-nothing. `set-checks-recorded` asserted a verdict existed and not what it said, so the unit built to
-stop a monoculture green closed green on a failed set check. Both now read the verdicts.
-
-**The owner's first stated verb had no owning unit.** Creating a playbook when none exists was in the
-ask and absent from the roster, and unit 4's preflight structurally refuses a run with no playbook to
-name. That is unit 11, and it also takes amendment — which removes the playbook from unit 8's exemption
-set, where it sat on a premise unit 9 denied in the same build.
-
-**And the audit re-measured my own repair and found it worse than what it replaced.** Unit 8's diff
-population was "enumerate the run's own commits"; measured, that is a SUPERSET of the `BASE..HEAD` range
-it rejects, because the merged-in default-branch history is still in `rev-list`. The population is now
-the research's own merge-base-plus-first-parent form.
-
-<!-- roster:units -->
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-dScriptedRepeat-1` | 2 | `AUTH_MODES` published as a driver constant, the third mode member, the directive scope set's third value, and the membership branch check 19 does not have |
-| 2 | `TOOL-dScriptedRepeat-2` | 2 | the PLAYBOOK TEMPLATE — derived from the corpus and the literature, frozen, marked human-curated, with a section canon and a DERIVED per-segment length budget |
-| 3 | `TOOL-dScriptedRepeat-3` | 2 | the playbook VALIDITY gate — the declared step selector and its shrink-only floor, the GATE/CHECK tag grammar, the witness drain census, and the leg-runnability oracle with a declared coverage mode and a named refusal |
-| 4 | `TOOL-dScriptedRepeat-4` | 2 | the declaration seam — the README names the playbook path at BASE, the gate reads `outputs:`, `pieces:` and the piece GRAIN from the playbook at BASE |
-| 5 | `TOOL-dScriptedRepeat-5` | 2 | the per-piece record as a TREE property — tracked, hash-joined to the piece, readable with no run-state file |
-| 6 | `TOOL-dScriptedRepeat-6` | 2 | `pieces-complete` — a ninth CORE DoD item, its vacuity guard, its grain, and whether it may be overridden |
-| 7 | `TOOL-dScriptedRepeat-7` | 2 | the SET-scoped check population and where it runs |
-| 8 | `TOOL-dScriptedRepeat-8` | 2 | the output-scope refusal — the diff population, the exemption set, an observed failing case, and the stated CHECK half |
-| 9 | `TOOL-dScriptedRepeat-9` | 1 | the `proposal` park kind and the `--propose` verb |
-| 10 | `TOOL-dScriptedRepeat-10` | 2 | the Skill's start paths and the playbook-scoped directives |
-| 11 | `TOOL-dScriptedRepeat-11` | 2 | authoring a playbook — the creation path, and where amendment lives |
-<!-- /roster:units -->
+**Four artifacts had readers and no writer**, so both items reading them could only be met by hand,
+which unit 5 forbids. **Two items were satisfied by recorded FAILURES** — `verified` was a hash-join
+state alone, and `set-checks-recorded` asserted a verdict existed rather than what it said, so the
+unit built to stop a monoculture green closed green on a failed set check. **And my own
+diff-population repair measured worse than what it replaced**: enumerating a run's commits is a
+superset of the `BASE..HEAD` range it rejects, because merged-in history is still in `rev-list`.
 
 ## What is deliberately NOT in this build
 
@@ -250,7 +236,7 @@ ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dS
 |---|---|---|---|
 | [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | INPROGRESS | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-4 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-5 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | INPROGRESS | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | INPROGRESS | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | INPROGRESS | rev-4 | 2026-08-21 |

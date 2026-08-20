@@ -115,17 +115,13 @@ research lens priced this. It is named here so the build does not discover it at
 
 none — every fork below is RESOLVED in place.
 
-- **F1 — did "distinct region" mean a distinct FILE?** **PARKED for the owner (2026-08-20)** — the
-  earlier `(agent, delegated)` mark on this fork was WRONG and is withdrawn. The two options differ in
-  what gets built, which the build method reserves to the owner, and §4 of this spec concedes as much
-  when it says the alternative costs a new file plus a unit-8 exemption row. The parked entry in the
-  run-state file carries the question, both options and the refusal. The BUILT shape described below
-  stays the fifth `park()` KIND so the design is complete either way, but this unit does not close until
-  the owner rules. Recorded here rather than left to be inferred from a missing stamp. Both options deliver the same thing the ruling asked for —
-  a proposal channel that reads as distinct from a blocker — so this is mechanism rather than scope,
-  and the kind costs roughly a tenth as much while keeping proposals inside the file the wrap-up
-  already derives from. If the owner meant a file literally, converting is a small follow-up and this
-  line is where a later reader finds that out.
+- **F1 — did "distinct region" mean a distinct FILE?** RESOLVED (owner, 2026-08-21): NO — a fifth
+  `park()` KIND. The previous `(agent, delegated)` mark on this fork was withdrawn as beyond this
+  run's authority, the question was put to the owner, and this is their answer. `park()` already
+  writes four kinds into one region and the close blocks on none of them, so a fifth costs one
+  alternation in the status regex and one protocol row. "Distinct region" is therefore satisfied in
+  SUBSTANCE — a distinct kind, distinct rows, distinct DoD treatment — and not literally, and that
+  is the reading the owner ratified rather than one this spec inferred.
 - **F2 — must `TOOL-aBoundedVerdict-6` close first?** RESOLVED (agent, 2026-08-20, delegated): NO, and
   the reason is a limit on this run's authority rather than a judgement about the row. The 8 KB
   run-state spill is a prerequisite for USING proposals at N-piece scale, not for building the verb;
@@ -134,6 +130,8 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · the owner resolved F1: a fifth `park()` kind, not a separate file. The
+  built shape is unchanged; what changed is who decided it.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit. D15 re-stamped this unit Tier-2 — it adds a new
   write path and changes a shared row grammar, which the charter's own §8 makes Tier-2 by definition,
   and the README said so in the same sentence that exempted it. D14 withdrew F1's delegated mark: the
