@@ -23,6 +23,17 @@ saw a six-path tree and reported collateral failures that drowned the real signa
 
 ## The fix
 
-Name the EXECUTABLE, not the command, and refuse the known launchers by path — `resolve_bash()` in
-`tools/memory-tree/corpus_ids.py`, with an environment override. No machine gate: the class has no
-source-level signature worth banning, and the remedy is one function every caller shares.
+Name the EXECUTABLE, not the command, and refuse the known launchers by path — `resolve_bash()`, with
+an environment override. TWO copies carry it, because a copy-installed kit cannot import across kit
+boundaries: `tools/memory-tree/corpus_ids.py` and `tools/govkit/govkit.py`, the latter paired with
+`shell_argv()`, which rewrites a descriptor argv's LEADING `bash` and nothing else.
+
+The govkit instance is worth reading before assuming this class is rare. It sat RED on `main` and
+blocked every `push-main.sh`, and nobody saw it: the leg is GUARDED, so only `GATE_FULL=1` runs it,
+and it only reproduces where WSL is INSTALLED. Nodes without WSL are green on the same commit. The
+first root cause proposed for it was wrong in a way worth remembering — an old python was blamed,
+when every python on the node was 3.12+ and the old one belonged to the WSL the shell name pulled in.
+
+No machine gate on the CLASS: it has no source-level signature worth banning. The govkit copy is
+armed in its own selftest instead, including that the resolver never returns a System32 or
+WindowsApps path.
