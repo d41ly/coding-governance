@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: de6a84cbd2c8aed20ec084811da391b9c0c9ebb0
+witness: 39a9a2c9483ea83a42805ac26c1537480f2538fa
 phase: BUILDING
 branch-sha: 4bd2a45a5a11eeb85b902df16b04b9c2453cd1dd
 branch-ref: refs/heads/branch/unattended-build-issues-38c32e
