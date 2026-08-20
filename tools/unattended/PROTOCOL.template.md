@@ -1,6 +1,13 @@
 <!-- gov:kit unattended@1.8 -->
 # Unattended runs — the protocol
 
+*Two legs compare this file against the template it ships from, byte for byte. **They compare the two
+copies to each other, so a claim that is FALSE IN BOTH is green.** Three defects in this document
+survived exactly that way — a Definition-of-Done cell describing a comparison the driver never makes,
+an override rule stated only at run start, and a roster bullet whose acceptance criterion was never
+met. A parity leg is a copy check, not a truth check; the only thing that grades a sentence here
+against the code is a reader. Said once, at the top, where the next author looks.*
+
 **Binding.** A session running with no human in the loop follows this document. It is
 project-agnostic: every value that differs per repo is a DECLARATION in the repo-root
 `.unattended.conf`, never a constant in this text. The driver and the gate leg both read the
@@ -140,6 +147,18 @@ which is the test for belonging here:
    `--close --override` and `--preflight --waive` respectively. DECISION had no writer for as long as
    this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
    with no route is a rule nobody follows, and it took a build hitting it to notice.
+
+   **Every kind belongs to one of two CLASSES, and the classes are not the kinds.** A `surfaced` kind
+   is one the owner must be shown; a `history` kind is one the owner need not adjudicate. All four
+   kinds above are `surfaced`, waiver included, because §10's waiver entry reaches the owner through
+   the same wrap-up derivation as the rest. Membership is declared in ONE place, the driver's
+   `PARK_KINDS_SURFACED`, and `history` is the COMPLEMENT — a kind absent from that set is history by
+   construction, so there is no second list to keep in step and no way for the two to disagree. The
+   split exists because a count of decisions the owner must adjudicate is worthless the moment
+   append-only round history shares the region with it, and the first such kind is already specced.
+   Its shrink-only floor is NOT yet armed: the sets it sits beside pin their counts from the project
+   conf, and adding a key there is a new public surface the owner has not been asked for. Stated
+   rather than left to be discovered, because an unpinned set can quietly shrink.
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
@@ -243,13 +262,13 @@ something no machine could have checked:
 | Item | Checked by | Asserts |
 |---|---|---|
 | `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
-| `records-current` | machine | every unit's status header and every generated region match a fresh render |
+| `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from its output being empty: a malformed pair prints nothing and exits non-zero, so testing emptiness alone would score a broken pair as a SATISFIED item, passing loudest exactly when the file is least readable. This cell used to describe a fresh-render comparison against unit status headers, which the driver never reads and which made an ordinary spec rev bump block the close with no reachable repair |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
-| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one |
+| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count**, via `--value`, and when it does `--close` refuses unless that integer equals the number of `surfaced`-class parked lines in the record — so "I surfaced them" becomes "I surfaced N, and the record holds N". The item stays agent-attested either way: no machine can observe a wrap-up. Omitting the count keeps the older behaviour exactly, so a record written before this existed is not retroactively red. Overrides that the same `--close` is about to write are EXCLUDED, because the Definition of Done is evaluated before they are appended and a count including them could never be satisfied |
 
 A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate pins the core set's
 COUNT against the same shrink-only floor, for the reason §3 gives.
@@ -266,6 +285,13 @@ attestation: the verb removes the hand edit, not the trust assumption §9 states
 parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
 override budget: attestation is not a machine verdict, and pretending otherwise makes an override
 look like a check that failed.
+
+**`authorization-reachable` has NO override, and this is where a close meets that.** §1 states it at
+run START, which is where the rule is decided and not where it is hit — an agent whose close refuses
+is reading this section. An override on the authorization check IS the authorization check, so the
+verb refuses the pair rather than recording it. There is no waiver, no attestation route and no
+project escape: an item the kit will not let a run override is the one item whose absence would make
+every other check decorative.
 
 ## 5. The keepalive — an AGENT obligation
 

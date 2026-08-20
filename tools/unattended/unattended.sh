@@ -185,6 +185,29 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 #
 # The scope is NOT a project knob. A project may EXTEND the set; it may not narrow the core, and a
 # project-selectable scope is narrowing wearing a different name.
+# THE PARKED-KIND TAXONOMY, and the word `decision` released back to one job. It was doing two —
+# the literal KIND TOKEN this kit writes into a parked line, and the CLASS the surfaced count
+# measures — and neither this constant nor the counter below is buildable while one name means both.
+# The two classes are `surfaced`, which the owner must be shown, and `history`, which the owner need
+# not adjudicate.
+#
+# MEMBERSHIP IS DECLARED HERE AND NOWHERE ELSE, and `history` is the COMPLEMENT: a kind absent from
+# this line is history by construction, so there is no second set to keep in step. That is the whole
+# reason it is one constant and not two.
+#
+# All four live kinds are `surfaced`, WAIVER INCLUDED — the protocol already records that a waiver
+# entry is surfaced by the wrap-up derivation with the other parked kinds, so a set built from an
+# earlier two-name reading ships short that member and regresses a stated behaviour. What follows is
+# that the counter below over-counts by NOTHING against any record that exists today; it becomes wrong
+# the moment the first `history` kind lands, which is why this taxonomy has to be declared BEFORE the
+# unit that adds one rather than alongside it.
+#
+# The shrink-only FLOOR this set deserves is NOT here, and that is stated rather than left to be
+# noticed: the two sets it sits beside pin their counts from the project conf, and a new conf key is a
+# new public surface for the kit. So the taxonomy ships with its constant and its single reader, and
+# its shrink-only property is UNARMED until that carrier is an owner decision. No criterion pretends
+# otherwise.
+PARK_KINDS_SURFACED="decision abort override waiver"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
@@ -1709,7 +1732,12 @@ verb_status() { # slug
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
   # it to a file nobody re-opens. Omitted at zero, so the ordinary line does not grow a `· 0`.
-  nparked=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z (decision|abort|override|waiver) · item ' "$rel" 2>/dev/null || true)
+  # DERIVED from the taxonomy constant, never spelled a second time. The alternation used to list
+  # the four tokens here, which was a SECOND SPELLING of a set declared above: correct today, and
+  # silently wrong the moment a `history` kind is added, with nothing to catch the drift because a
+  # counter has no arm that fails on over-counting. Building it from the constant means adding a kind
+  # is one edit.
+  nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(printf '%s' "$PARK_KINDS_SURFACED" | tr ' ' '|')) · item " "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
   printf 'unattended: %s · phase %s · witness %s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
@@ -1815,6 +1843,14 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         local _akey
         case "$item" in parked-decisions-surfaced) _akey=parked-surfaced ;; *) _akey="$item" ;; esac
         fail 13 "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict: $item"
+        # The DETAIL, when the item computed one. An agent-attested item is not necessarily
+        # detail-free: the parked-decisions count is machine-COMPARABLE even though the surfacing
+        # itself is not observable, and this branch used to discard that text — a message written
+        # into a channel nobody reads, which is the class this kit refuses by name elsewhere. Printed
+        # BEFORE the record-key hint, which stays because it is the remedy for the ordinary case.
+        [ -n "${DOD_OUT:-}" ] && printf '%s
+' "$DOD_OUT" | sed 's/^/    /'
+        DOD_OUT=""
         printf '    write the RECORD KEY, which is not always the item name: %s: yes
 ' "$_akey"
       else
@@ -2032,7 +2068,33 @@ $_bcnon"
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)
-      grep -qE '^parked-surfaced: (yes|true)' "$rel" ;;
+      # STILL AGENT-ATTESTED — no machine can observe a wrap-up — but "I surfaced them" becomes "I
+      # surfaced N, and the record holds N". The value is read off the SAME key rather than from a new
+      # authored fact, because the existing predicate already tolerates trailing text after the
+      # yes-or-true, so a richer value costs no new fact and does not move the authored region's
+      # count pin. Omitting the number keeps the old behaviour exactly, so nothing that attested
+      # before this landed becomes red.
+      grep -qE '^parked-surfaced: (yes|true)' "$rel" || return 1
+      _pv=$(fact "$rel" parked-surfaced)
+      case "$_pv" in
+        *[0-9]*) ;;
+        *) return 0 ;;   # no count offered: the attestation stands as it always did
+      esac
+      _pn=$(printf '%s' "$_pv" | grep -oE '[0-9]+' | head -1)
+      # The SURFACED class only, and the qualifier is load-bearing: a count inflated by `history`
+      # lines would report the opposite of what it is for.
+      _pa=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(printf '%s' "$PARK_KINDS_SURFACED" | tr ' ' '|')) · item " "$rel" 2>/dev/null || true)
+      # THE CLOSE VERB'S OWN OVERRIDE PARKS NEED NO ARITHMETIC, and getting that wrong once is why
+      # this comment is here. They are appended AFTER the Definition of Done is evaluated, so at the
+      # moment this predicate runs the record holds exactly the N the agent should have attested. The
+      # exclusion is a property of the ORDERING. Subtracting them as well double-counts and makes the
+      # honest case unsatisfiable — measured: a fixture attesting the true count then failed, which is
+      # precisely the defect the spec describes, reproduced while implementing the warning about it.
+      if [ "$_pn" != "$_pa" ]; then
+        DOD_OUT="the attested count of surfaced parked decisions does not match the record: attested $_pn, and this run-state file holds $_pa in the surfaced class (the overrides this close is about to write are excluded, because the Definition of Done is evaluated before they are appended)"
+        return 1
+      fi
+      return 0 ;;
     *)  # a PROJECT item the kit knows nothing about: it is attested unless the project says otherwise
       grep -qE "^$item: (yes|true)" "$rel" ;;
   esac

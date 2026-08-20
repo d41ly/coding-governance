@@ -240,12 +240,27 @@ can observe them: that you reaped the keepalive (`CronDelete`), and that every p
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
 gate says so wherever it reports them.
 
+**One item has NO override, and this is where you will meet it.** `authorization-reachable` cannot be
+overridden, waived or attested around: an override on the authorization check IS the authorization
+check, so the verb refuses the pair rather than recording it. If a close blocks on that item, the
+answer is never a flag — it is that this run cannot show what authorized it, and the remedy is
+outside the close.
+
 Write each with the VERB, never by editing the record:
 
 ```bash
 bash tools/unattended/unattended.sh --attest <slug> --item keepalive-reaped
 bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced
+bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced --value "yes, <n> surfaced"
 ```
+
+**The parked-decisions attestation may carry a COUNT, and if you give one it is CHECKED.** `--close`
+refuses unless that integer equals the number of `surfaced`-class parked lines in the record, so the
+claim stops being unfalsifiable — "I surfaced them" becomes "I surfaced four, and the record holds
+four". Omit the number and the older, weaker form still stands; it is not a machine verdict either
+way, and the gate says so wherever it reports it. Two things the count does NOT include: a `history`
+kind, which the owner need not adjudicate, and the overrides this same `--close` is about to write,
+because the Definition of Done is evaluated before they land.
 
 It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
 machine-checked item, so it cannot be used to certify anything the driver checks itself.

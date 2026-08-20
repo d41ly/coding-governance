@@ -2527,11 +2527,92 @@ fkspec '- **F1 — a question?** options and a recommendation.
 same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
 
 
+
+echo "MARK park-taxonomy" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- THE PARKED-KIND TAXONOMY AND THE COUNTABLE ATTESTATION.
+# ----
+# ---- `parked-decisions-surfaced` stays AGENT-ATTESTED, because no machine can observe a wrap-up.
+# ---- What changes is that "I surfaced them" can become "I surfaced N, and the record holds N" —
+# ---- and the count ranges over the SURFACED class only, which is the qualifier the whole taxonomy
+# ---- exists to make expressible.
+
+# ---- the count is OPTIONAL, and omitting it must behave exactly as it always did. Without this arm
+# ---- the change is a silent breakage of every record that attested before it landed.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- a count that DISAGREES with the record refuses, and names both numbers. The fixture parks two
+# ---- decisions and attests four, which is the honest mistake this exists to catch: an agent that
+# ---- surfaced some of them and rounded up.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 4 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- and the count that AGREES passes. Paired with the arm above so "it refused" and "it refused for
+# ---- the reason we think" are two claims rather than one.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 2 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+hit  "$out" "close OK"
+
+# ---- THE OVERRIDE EXCLUSION, and it needs a fixture CARRYING an override or it passes either way.
+# ---- The close evaluates the Definition of Done and only THEN appends its override lines, so a close
+# ---- with two overrides validates against N and leaves N+2 on disk. A count that included them could
+# ---- never be satisfied by any honest agent. The arm above already carries two overrides and attests
+# ---- the pre-override number, so this asserts the property the other way: attesting the POST-override
+# ---- total must refuse.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 3 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- S7b: A `history`-KIND LINE MUST NOT BE COUNTED, and this is the arm that can fail. At this
+# ---- unit's landing every LIVE kind is `surfaced`, so an implementation that counted every parked
+# ---- line would satisfy any fixture built only from today's kinds — the fixture has to carry a kind
+# ---- outside the taxonomy on purpose. `history` is the COMPLEMENT and is declared nowhere, so a kind
+# ---- absent from the constant is history by construction, which is exactly what this writes.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+printf '\n2026-08-20T00:00:00Z review · item some subject · reason round 1 of a review, which the owner need not adjudicate\n' >> memory/builds/tRun/RUN.md
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 1 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+# --status BEFORE the close, and the ordering is the whole point of putting it here. The close
+# appends one parked line per override, and those lines are `override` kind, which IS surfaced — so
+# after a close carrying two overrides the honest count is three. Asserting afterwards measured
+# that instead and read as the taxonomy leaking, when what leaked was the arm.
+same "a history-kind parked line is not counted by --status" "$(run --status tRun | grep -c 'parked 1')" "1"
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+# ...and the override parks DO join the count once WRITTEN, which is the same fact from the other
+# side: the exclusion is about evaluation ORDER, never about override lines being unsurfaced.
+same "an override park joins the surfaced count once the close has written it" "$(run --status tRun | grep -c 'parked 3')" "1"
+
+# ---- SOURCE level: the counter is DERIVED from the taxonomy, not spelled a second time. A second
+# ---- spelling is correct today and silently wrong the moment a kind is added, and no runtime arm can
+# ---- see the difference while every live kind is surfaced.
+n=$((n+1)); grep -q '^PARK_KINDS_SURFACED="' "$SCRIPT"   || { echo "FAIL the driver declares no parked-kind taxonomy constant, so the surfaced count has no single home"; st=1; }
+n=$((n+1)); [ -z "$(grep -n 'decision|abort|override|waiver' "$SCRIPT")" ]   || { echo "FAIL the four parked kinds are spelled as an alternation somewhere in the driver, which is a second spelling of the taxonomy and goes wrong the moment a kind is added: $(grep -n 'decision|abort|override|waiver' "$SCRIPT")"; st=1; }
+
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=432
+FLOOR_ASSERTIONS=442
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

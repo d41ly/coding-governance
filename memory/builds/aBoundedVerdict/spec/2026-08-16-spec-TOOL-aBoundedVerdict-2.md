@@ -112,9 +112,27 @@ stopped without reading prose.
   `tools/memory-tree/check-memory-hygiene.sh` enforce record grammar, and the build method is rendered
   by that kit, so the set lives where the records live.
 
-  S10 makes a member the FIRST line of a review record, adds it to check 5's grammar for
-  `diff-review` and `spec-audit` records, and `TOOL-aBoundedVerdict-1`'s `--review` verb accepts
-  exactly that set. **That is a duplication, and it is STATED rather than resolved**: the two homes
+  S10 makes a member a REQUIRED LINE of a review record, adds it to a NEW hygiene check, and
+  `TOOL-aBoundedVerdict-1`'s `--review` verb accepts exactly that set.
+
+  **Two corrections made at build time, because the files say otherwise.** First, NOT the first line:
+  check 21 already owns a review record's head with its `**Serves:**` binding line, and every record
+  in the corpus puts the verdict below it. So the rule is that the record carries exactly one
+  `## Verdict: <member>` line, position-independent, which is what the corpus already does and what
+  the build method's own wording approximates. Second, NOT check 5: that check is a recording-FILENAME
+  grammar, and hanging a content assertion off it would make a structural check read as a semantic one
+  to everybody who did not write it — the hazard this repo states as a rule about gate headers. A new
+  check number is the cheap option here and this repo says so in as many words: the leg is named
+  `memory hygiene` with no count in its name, and the codebase-map coverage assert and the drift leg
+  signal both key on `tools/gate-legs.json`, which does not move for a new CHECK. It costs an
+  `ARMS_FLOORS` bump, an arm per new `fail` site, and an entry in `memory/HYGIENE.md`.
+
+  **The forward-only SELECTOR is PICKED, and it is the pattern already in the conf:** a dated cutoff
+  key, set strictly ahead of every committed review record, so nothing landed is retroactively red and
+  no record is rewritten. The alternative was the grandfather registry, which is for files kept under
+  historical NAMES and is the wrong instrument for a content rule. This is the same instrument
+  `TOOL-aBoundedVerdict-4` S6 chose for the same reason one document over, which is the argument for
+  it rather than a coincidence. **That is a duplication, and it is STATED rather than resolved**: the two homes
   sit in independently installable kits and neither may import the other
   (`TOOL-aBoundedVerdict-4`'s spec records why at `:120-123`), so the set is spelled twice on purpose.
   The drift is ARMED and not left to prose — ONE row in the cross-kit case table
@@ -603,6 +621,20 @@ This line is the machine-read one; the bullets carry the reasoning.
   an id, a spec and a roster edit to fix a false sentence). Not folded by choice: the byte figures for
   the kickoff engine's size budget were deleted for the same reason as everything else here — the leg
   prints size, limit and headroom on every run, and the numbers rev-4 wrote had already moved.
+
+- rev-8 · 2026-08-20 · **written BEFORE this unit's code, because two of S10's instructions do not
+  survive contact with the files they name** — and the method's rule is that a divergence changes the
+  spec first. (1) "the FIRST line of a review record" is already check 21's, which requires the
+  `**Serves:**` binding line there; every record in the corpus puts the verdict below it. The rule is
+  now one `## Verdict: <member>` line, position-independent. (2) check 5 is a recording-FILENAME
+  grammar; a content assertion under its number would make a structural check read as a semantic one,
+  which is the gate-header hazard this repo states as a rule. S10 takes a NEW check number, which this
+  repo's own trap calls the cheap option — the leg's name carries no count and `tools/gate-legs.json`
+  does not move for a new check, so the cost is an arms floor, an arm per new fail site, and a
+  `memory/HYGIENE.md` entry. (3) The forward-only selector, left open by the fold, is PICKED: a dated
+  cutoff key, the instrument the conf already carries four times and the one the sibling unit chose
+  hours earlier for the same shape of problem. The grandfather registry was the alternative and is for
+  files kept under historical NAMES, which is a different question.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit
 
-**Status:** SPECCED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-10 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -408,6 +408,38 @@ This line is the machine-read one; the bullets carry the reasoning.
   fields two, `park()` callers four and unchanged at four, `--park` already the writer, `--status`
   already counting, and §10's "two callers" corrected to four. The rows that describe no delta say so
   instead of inventing one.
+
+- rev-10 · 2026-08-20 · **built.** S1-S4 needed no code: the verb shipped under `TOOL-cSettledDocket-1`
+  in the shape rev-7 reconciled to, and rev-9 had already withdrawn the inflation claim, so what this
+  pass actually built is the taxonomy, its single reader, and the countable attestation.
+  **The leg's join is ONE-DIRECTIONAL, and the missing direction is a design decision rather than an
+  omission.** It asserts that every token in `PARK_KINDS_SURFACED` is a kind some `park` call site can
+  write — which catches a STALE MEMBER, a kind deleted from the driver and left behind in the taxonomy,
+  silently widening a count that exists to be narrow. It does NOT assert the converse, that every
+  written kind is in the set, because that is false by design: `history` is the complement and is
+  declared nowhere, so the first history kind would red a check demanding it, and a future unit would
+  have to weaken this leg in the same commit that adds a legitimate kind. **The consequence is stated
+  in the leg's own comment: a new kind arrives unclassified and this leg stays silent about it.** A
+  reader who assumed both directions were covered would be wrong.
+  Both refusals were OBSERVED before landing, per the merge-bar rule: a fabricated member reds with the
+  stale-member message, and an empty constant reds with the vacuity message.
+  **The `history` arm carries a kind that does not exist yet, and that is the only fixture that can
+  fail.** At this landing every LIVE kind is `surfaced`, so an implementation counting every parked
+  line satisfies any fixture built from today's kinds. The arm therefore writes a `review` line
+  directly — legal precisely because a kind absent from the constant is history by construction — and
+  asserts both the attestation and `--status` ignore it.
+  **The override exclusion is measured, not reasoned.** The close evaluates the Definition of Done and
+  only afterwards appends its override lines, so a close carrying two overrides validates against N and
+  leaves N+2 on disk. It is armed from both sides: one fixture attests the pre-override number and
+  passes, another attests the post-override total and must refuse.
+  **The kit version stays at 1.8 for this whole build rather than moving per unit.** The sibling unit
+  moved it, these changes ride it, and they land together — a version bumped once per unit inside an
+  unlanded branch is churn nobody outside can observe, and the landed value is the only one an adopter
+  reads. Said here so a later unit does not bump it again for no reader.
+  **Read-path cost, measured:** the protocol pair grew by roughly 1.1 KB and the shared budget stands
+  at 105253 B against a ceiling of 112987. Recorded as a figure only in this rev entry, which is
+  history; no scope item or criterion carries it, because it is a consumable and the README's rule is
+  that the command is the authority.
 
 ## 10. Reuse audit
 

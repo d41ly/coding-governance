@@ -80,12 +80,41 @@ PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
 # TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
 # the leg never carries a second spelling of a driver declaration.
 PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
+# The parked-kind taxonomy. Read here for the same reason the four above are: a set declared in the
+# driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
+# predicate hanging off it.
+PARK_KINDS_SURFACED=$(core_of PARK_KINDS_SURFACED)
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
   exit "$status"
 fi
 PHASES="$PHASES_CORE $PHASES_EXTRA"
 DOD="$DOD_CORE $DOD_EXTRA"
+
+# ---- THE PARKED-KIND TAXONOMY, joined against the code that WRITES those kinds. One direction only,
+# ---- and the asymmetry is deliberate rather than an oversight:
+# ----
+# ----   ASSERTED — every token in the surfaced set is a kind some `park` call site can actually write.
+# ----   That catches a STALE MEMBER: a kind deleted from the driver and left behind in the taxonomy,
+# ----   which silently widens a count that exists to be narrow. Same shape as an exemption naming a
+# ----   path that no longer exists, which this repo reds in both directions elsewhere.
+# ----
+# ----   NOT ASSERTED — the converse, that every written kind is in the set. It is FALSE BY DESIGN:
+# ----   `history` is the complement and is declared nowhere, so the first history kind would red a
+# ----   check that demanded it. Writing that assertion would force a future unit to weaken this leg
+# ----   in the same commit that adds a legitimate kind, which is worse than not having it.
+# ----
+# ---- So a NEW kind arrives unclassified and this leg stays silent about it. Said plainly because a
+# ---- reader who assumes both directions are covered would be wrong, and the gap is in the design.
+if [ -n "$PARK_KINDS_SURFACED" ]; then
+  pk_dead=""
+  for pk in $PARK_KINDS_SURFACED; do
+    grep -qE "^[[:space:]]*park \"\\\$rel\" $pk " "$DRIVER" || pk_dead="$pk_dead $pk"
+  done
+  [ -z "$pk_dead" ] || fail 2 "the parked-kind taxonomy names a kind no park call site in the driver writes, so a count that exists to be narrow is silently wider than the code it measures:$pk_dead"
+else
+  fail 2 "the driver declares no PARK_KINDS_SURFACED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read: $DRIVER"
+fi
 
 # ---------------------------------------------------------------------- 2 + 3: the core-set floors
 # WHY A COUNT AND NOT A MEMBERSHIP LIST. The first cut asserted "every CORE member is present in the
@@ -583,6 +612,15 @@ EOF
 # ---- 10: the kit ships what this repo runs. ONE pair. The comparison is written here rather than
 # ---- borrowed from the memory-tree harness because each kit is copy-installed standalone and an
 # ---- adopter may hold one and not the other; the normalisation is copied deliberately.
+# ----
+# ---- WHAT THIS CHECK DOES NOT DO, stated here because the omission has cost real defects. It compares
+# ---- the two COPIES to each other. It says nothing about whether either one is TRUE. A sentence that
+# ---- is wrong in both halves is green, forever, and three defects in that document survived exactly
+# ---- that way: a Definition-of-Done cell describing a comparison the driver never makes, an override
+# ---- rule stated only at run start, and an acceptance criterion that was never met at the close it was
+# ---- claimed at. A parity leg is a copy check; the only thing that grades a sentence against the code
+# ---- is a reader, and a check whose header does not say so reads as a semantic guarantee to everybody
+# ---- who did not write it.
 SHIP="$HERE/PROTOCOL.template.md"
 LIVEDOC="$M/guides/UNATTENDED-PROTOCOL.md"
 KITREL=${HERE#"$(cd "$ROOT" && pwd)"/}

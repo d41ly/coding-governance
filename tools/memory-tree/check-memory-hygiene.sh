@@ -25,6 +25,7 @@ SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEM
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
 FORK_MARK_CUTOFF=""   # date; specs whose filename date >= this have every §8 ITEM graded for the SHAPED resolution mark (check 12); blank = never required
+REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST carry one `## Verdict: <member>` line from the closed set (check 22); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
 # and check 12 must pick one for every spec it grades. An empty string compares earlier than every
@@ -592,6 +593,62 @@ $bad8"
 if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
   if ! drift=$("$_PY" "$HERE/gen_build_index.py" --check 2>&1); then fail 9 "generated build index differs from a fresh render:
 $drift"; fi
+fi
+
+# 22 — THE REVIEW VERDICT VOCABULARY. A review record has to say what it concluded, in a token
+# something can read, and until this check existed it did not have to say anything at all.
+#
+# MEASURED over the tracked corpus when this landed: 111 review records, 66 carrying a `## Verdict:`
+# line and 45 carrying none, across 17 DISTINCT values — of which only `BLOCKED` and
+# `CLEAN WITH FIXES` are in the closed set, and `CLEAN`, the one token the build method names as the
+# review loop's only exit, occurs ZERO times. The rest are free prose: "FIX THE BLOCKER BEFORE
+# LANDING", "SHIP WITH FIXES", "CHANGES REQUESTED". So the vocabulary the method states in prose was
+# written consistently by nobody and read by nothing.
+#
+# WHY THIS IS ITS OWN CHECK NUMBER. Check 5 is a recording-FILENAME grammar and check 21 asks which
+# spec a record is evidence ABOUT; hanging a verdict assertion off either would make a structural
+# check read as a semantic one to everybody who did not write it. A new CHECK is the cheap option
+# here — the leg's name carries no count and `tools/gate-legs.json` does not move — so the honest
+# home costs an arms floor and an entry in the hygiene doc.
+#
+# FORWARD-ONLY, by a dated cutoff set strictly ahead of every committed record. 45 records carry no
+# verdict at all and rewriting a landed review is against this tree's own rule, so the cutoff carries
+# the corpus rather than a retrofit. Same instrument, and the same reason, as check 12's fork mark.
+if [ -n "$REVIEW_VERDICT_CUTOFF" ]; then
+  c22_sel=$(printf '%s
+' "$FILES" | grep -E "^$M/builds/[^/]+/reviews/" || true)
+  pop_guard 22 "no review record under $M/builds/*/reviews/" \
+    "$(printf '%s
+' "$c22_sel" | grep -c . || true)" "$PRE_BINDABLE"
+  bad22=$(printf '%s
+' "$c22_sel" | awk -v cut="$REVIEW_VERDICT_CUTOFF" '
+    $0 == "" { next }
+    {
+      f = $0
+      fbase = f; sub(/^.*\//, "", fbase)
+      fdate = ""
+      if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH)
+      if (fdate == "" || fdate < cut) next
+      nv = 0; bad = ""
+      while ((getline line < f) > 0) {
+        sub(/\r$/, "", line)
+        if (line ~ /^## Verdict:/) {
+          nv++
+          v = line; sub(/^## Verdict:[[:space:]]*/, "", v)
+          gsub(/[[:space:]]+$/, "", v)
+          # The CLOSED set, and nothing outside it. A trailing tally is not a member: the whole point
+          # is a token a machine can compare, and "BLOCKED - 2 blockers, 2 highs" is prose wearing a
+          # token as a prefix. Counts belong in the body, where 17 spellings do no harm.
+          if (v != "CLEAN" && v != "CLEAN WITH FIXES" && v != "BLOCKED") bad = v
+        }
+      }
+      close(f)
+      if (nv == 0) print "  " f " (no `## Verdict:` line, so the record states no conclusion anything can read)"
+      else if (nv > 1) print "  " f " (" nv " `## Verdict:` lines, so which one is the record\047s conclusion is a guess)"
+      else if (bad != "") print "  " f " (verdict outside the closed set CLEAN / CLEAN WITH FIXES / BLOCKED: " bad ")"
+    }')
+  [ -n "$bad22" ] && fail 22 "review records at/after REVIEW_VERDICT_CUTOFF whose verdict line is missing, duplicated, or outside the closed set:
+$bad22"
 fi
 
 # 21 — every record names the spec it is evidence about. Delegates the

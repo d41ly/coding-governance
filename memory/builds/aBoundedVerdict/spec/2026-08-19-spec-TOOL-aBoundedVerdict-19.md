@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -231,6 +231,27 @@ This line is the machine-read one; the bullets carry the reasoning.
   (S1); protocol §4's override paragraph still names only the two attested items (S2); the
   `TOOL-cBriefedPilot-18` record-keeping defect is untouched by the later fix (S3); and the parity legs
   still carry no statement of their own scope (S5). Three document edits plus a backlog row is a unit.
+
+- rev-4 · 2026-08-20 · **built. Every item was prose, and one of them changed where it lands.**
+  S1's `records-current` cell is rewritten to what the driver actually asserts — the generated region
+  being EMPTY plus both marker pairs being well-formed, read from the region reader's EXIT STATUS
+  rather than from its output being empty, because a malformed pair prints nothing and would otherwise
+  score as a satisfied item. S2 lands in two places as specified: the protocol's override paragraph,
+  and the Skill's Close section, which is the artifact an agent reads when a close refuses. S3 is
+  filed as `TOOL-aBoundedVerdict-32` rather than repaired, with the sha that finally satisfied the
+  unmet criterion and the sha that had broken it.
+  **S5 went into the LEG's source, per F1, and the wording is the point.** It is not a note that the
+  parity legs are approximate — it is a statement of what they CANNOT do: they compare the two copies
+  to each other, so a sentence false in BOTH halves is green forever. That is how all three of this
+  unit's defects survived, and check 10's header now says so where somebody about to trust it is
+  standing. This spec's §3 promised no new gate and none was added: a check that graded a document
+  against code would be a different and much larger unit, and pretending one sentence achieves it
+  would be the same class of defect this unit exists to fix.
+  **The note is deliberately in ONE half, not two.** The protocol pair is byte-compared, so anything
+  written into the document itself must be written twice and can drift; the leg's source has one copy.
+  A shorter version of the same fact does sit at the top of the protocol pair, because a reader who
+  never opens the leg still deserves the warning — that duplication is accepted knowingly and is the
+  smaller cost.
 
 ## 10. Reuse audit
 

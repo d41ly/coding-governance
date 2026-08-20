@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # FORK_MARK_CUTOFF sits between the two fixture eras for the same reason STREAMS_CUTOFF does: the
 # REAL cutoff is deliberately set ahead of every landed spec, so the tightened section-8 reader is
 # exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nFORK_MARK_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -466,6 +466,22 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
 git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
+mkdir -p "$D/reviews"
+# CHECK 22, four red fixtures plus a conforming control and a grandfather. Each differs from the
+# control ONLY in its verdict token: a fixture that also moved the filename or the binding line could
+# red for a reason that has nothing to do with the verdict, and would still look like coverage.
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: CLEAN\n\nbody\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-1.md"            # conforming -> silent
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\nbody with no verdict at all\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-2.md"            # no verdict -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: SHIP WITH FIXES\n\nbody\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-3.md"            # off-set token -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED\n\nb\n\n## Verdict: CLEAN\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-4.md"            # two verdicts -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED - 2 blockers, 1 high\n\nb\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-5.md"            # token plus a tally -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE the cutoff\n' \
+  > "$D/reviews/2026-08-01-review-ARCH-tFixture-1-6.md"            # grandfathered -> silent
 out=$(bash "$SCRIPT" 2>/dev/null)
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
@@ -508,6 +524,18 @@ hit  'tFixture-62.md (header rev-2 not logged in the §9 Revision log)'
 hit  'tFixture-63.md (terminal Status and a §8 carrying neither an item nor a none form'   # PAST the cutoff: prose only, §8 titled ## 7.
 # ...and a range that never opens must SAY SO: silence and a resolved fork were the same byte.
 hit  'tFixture-64.md (terminal Status and no Open questions section found'
+# ---- check 22. The GRANDFATHER arm is what proves the cutoff is a date and not a switch, and the
+# ---- token-plus-tally arm is what proves the check grades a MEMBER rather than a prefix — without
+# ---- it, a predicate anchored on the leading word would pass and 44 corpus records would too.
+# the check's own header text, which is what check-arms signs the branch with. The per-file lines
+# below say WHICH record; this says the branch fired at all.
+hit  'review records at/after REVIEW_VERDICT_CUTOFF whose verdict line is missing, duplicated, or outside the closed set'
+hit  'review-ARCH-tFixture-1-2.md (no `## Verdict:` line'
+hit  'review-ARCH-tFixture-1-3.md (verdict outside the closed set'
+hit  'review-ARCH-tFixture-1-4.md (2 `## Verdict:` lines'
+hit  'review-ARCH-tFixture-1-5.md (verdict outside the closed set'
+miss 'review-ARCH-tFixture-1-1.md ('
+miss 'review-ARCH-tFixture-1-6.md ('
 hit  'tFixture-65.md (terminal Status with unresolved §8 items, graded PER ITEM'   # 1 of 2 marked, and the none line no longer suppresses it
 # ...while the canon check STAYS Tier-2-only. tFixture-5's `## Whatever` and its miss arm are that
 # control, and it is what the cut still guards.

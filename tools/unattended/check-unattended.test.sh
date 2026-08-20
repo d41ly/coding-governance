@@ -179,6 +179,37 @@ hit "$out" "$((ncore-1)) against $ncore"
 # Two sets declared separately, so THAT one is falsifiable where the subset form was not.
 hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it"
 
+
+# ---- THE PARKED-KIND TAXONOMY, both refusals, driven the way every other core-set arm here is: by
+# ---- editing the DRIVER COPY, which is the only place the set lives. The re-stage before each edit
+# ---- is load-bearing — reset_tree's `git clean -qfd` removes the copied kit, and without it the sed
+# ---- edits nothing, the grep finds nothing, and the arm passes by finding nothing.
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# a STALE MEMBER: a kind in the taxonomy that no park call site writes. This is the direction the
+# join asserts, and the failure it exists for — a count that exists to be narrow, silently wider.
+sed -i 's|^PARK_KINDS_SURFACED=.*|PARK_KINDS_SURFACED="decision abort override waiver ghostkind"|' tools/unattended/unattended.sh
+out=$(run)
+hit "$out" "the parked-kind taxonomy names a kind no park call site in the driver writes, so a count that exists to be narrow is silently wider than the code it measures"
+
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# ...and the VACUITY arm. An empty set would make the surfaced count and the parked-decisions
+# Definition-of-Done item both range over nothing, which is the empty-population shape this kit
+# refuses by name everywhere else.
+sed -i 's|^PARK_KINDS_SURFACED=.*|PARK_KINDS_SURFACED=""|' tools/unattended/unattended.sh
+out=$(run)
+hit "$out" "the driver declares no PARK_KINDS_SURFACED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read"
+
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# ...and the CONTROL: the shipped set is green. Without it both arms above could be passing because
+# the check reds on everything.
+out=$(run)
+miss "$out" "the parked-kind taxonomy names a kind no park call site in the driver writes"
+miss "$out" "the driver declares no PARK_KINDS_SURFACED taxonomy"
+
+
 reset_tree; mkconf "PARKED" ""
 out=$(run)
 miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
