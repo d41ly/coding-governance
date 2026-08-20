@@ -118,8 +118,9 @@ factor at the current leg count is `TOOL-aTimedTurnstile-4`, which the report's 
   **The closing condition is REPLACED (F2, F3).** rev-1's "close it when the rows it minted are
   dispositioned" names a state no run bound to this build's scope can reach: four of the seven
   rows need edits §3 forbids, two need admin the owner holds, and "dispositioned" is a corpus
-  hapax — it was the only occurrence in the corpus at base `49aea26`, the only others since being
-  the audit record that raised it — so it has no evaluable predicate at all. The
+  hapax — it was the only occurrence in the corpus at base `49aea26`, and every later occurrence is
+  a mention of this finding rather than a defining usage — so it has no evaluable predicate at all.
+  The
   cost was mechanical, not academic: an OPEN unit fails the unattended kit's machine-checked
   `build-complete` item, so every run carrying this build owed an override.
 

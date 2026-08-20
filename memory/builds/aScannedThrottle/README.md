@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8
+ids: TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8 TOOL-aScannedThrottle-9 TOOL-aScannedThrottle-10 TOOL-aScannedThrottle-11
 ---
 
 # aScannedThrottle — the lander is floor-bound, and the canary is not the floor
@@ -39,7 +39,7 @@ recommendation against an existing backlog id or a new one; landing any of them 
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
-ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8
+ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8 TOOL-aScannedThrottle-9 TOOL-aScannedThrottle-10 TOOL-aScannedThrottle-11
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
@@ -52,6 +52,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md) | journal | TOOL-aScannedThrottle-1 |
+| [2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md) | diff-review | TOOL-aScannedThrottle-1 |
 | [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md) | diff-review | TOOL-aScannedThrottle-1 |
 | [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md) | spec-audit | TOOL-aScannedThrottle-1 |
 <!-- /gen:build-index -->
@@ -73,6 +74,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 - **`build/`**
   - [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md)
 - **`reviews/`**
+  - [2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md)
   - [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md)
   - [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md)
 <!-- /gen:build-docs -->
