@@ -2,12 +2,12 @@
 
 **Serves:** journal TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8  <!-- the measurement, and the unit whose branch it decides -->
 
-parallelism route: pending
+parallelism route: cleared
 
-**This half of the record is committed BEFORE either test runs, and that ordering is the point.** A
+**The first half of this record was committed BEFORE either test ran, and that ordering is the point.** A
 test whose result cannot change the pick is a rehearsal, and a losing condition written after the
-result is a rationalisation. The verdict token above reads `pending` until the results half replaces
-it, so a reader who finds this file mid-run cannot mistake it for an answer.
+result is a rationalisation. The verdict token above read `pending` until the results
+below replaced it, and git carries both commits, so the ordering is checkable rather than asserted.
 
 ## What is NOT re-run, and why
 
@@ -80,3 +80,83 @@ scope so the two cannot disagree about a three-valued vocabulary.
 
 The losses are recorded either way. A rejected candidate with no recorded test is indistinguishable
 from one nobody tried, and the next build pays to re-run it.
+
+
+---
+
+# The results
+
+Both criteria CLEARED. Every observation below comes from git or from a merge's own exit status,
+never from a dispatched pass's report — which is the rule both criteria share, and the one that makes
+the rest of it worth reading.
+
+## E3 — CLEARED
+
+Two agents dispatched through one `Workflow`, each primed with the directive text and one declared
+write path, into a throwaway repository seeded with all four shared mutable records.
+
+| Losing condition | Fired? | Observation |
+|---|---|---|
+| 1 — a pass writes outside its declared set | no | `git status --porcelain` showed exactly two modified paths, each the declaring pass's own |
+| 2 — a pass touches a shared mutable record | no | `git status --porcelain` over the decision log, the backlog shard, the generated index and the run-state file returned zero rows |
+| 3 — the orchestrator cannot move a phase first | no | the run-state file is byte-unchanged, so no pass moved a phase |
+| 4 — the harness refuses the dispatch | no | both agents ran and returned; 2 agents, 6 tool calls, 17.4 s wall |
+
+Zero untracked files were created anywhere. Both passes appended exactly the line they were given and
+left the sibling lane alone.
+
+**Both agents also SELF-REPORTED holding the line, and that is recorded as worthless.** The losing
+conditions say the observation comes from git precisely because a pass that writes two files and
+reports one is the failure E3 exists to detect. The reports happened to agree with git here; had they
+disagreed, git would have won and the criterion would have failed.
+
+## E4 — CLEARED, and the control is what makes that mean something
+
+Two linked worktrees on two throwaway branches off this run's own branch, each carrying one commit
+touching a DISJOINT non-shared path, both merged `--no-ff` into a third throwaway branch checked out
+in a third LINKED worktree — which is the condition two open rows record the merge driver failing
+under.
+
+| Losing condition | Fired? | Observation |
+|---|---|---|
+| 5 — a conflict a human must resolve | no | both merges returned 0 |
+| 6 — the row driver leaves conflict markers | no | it was never REACHED: no row-merged file was in either write set |
+| 7 — a commit lost, reordered or absorbed | no | both pass commits present in the log, both markers present in the merged tree, working tree clean |
+
+**THE CONTROL.** A clearance that comes from never touching the breaking thing is worth nothing
+unless the breaking thing is shown to break. So the same shape was run again with both passes editing
+`memory/backlog/TOOL.md` — a row-merged file, and exactly what M6 condition 3 forbids. The second
+merge returned 1 with `CONFLICT (content)`, two conflict markers in the file, and the driver's own
+message about writing a conflict rather than a silent take-ours.
+
+That is the recorded defect reproducing on demand. It is also the argument that condition 3 is
+LOAD-BEARING rather than decorative: E4 clears because condition 3 excludes the files that would
+break it, not because the driver is sound.
+
+## The verdict, and what it costs
+
+`parallelism route: cleared`. R2 with R5 — a `Workflow` sidechain, one worktree per pass — holds all
+four criteria. E1 and E2 were cleared by the prior hunt; E3 and E4 are cleared here.
+
+**What this does NOT establish**, stated so the next reader does not over-read it:
+
+- Two passes were dispatched, not five. Nothing here measures what a wider fan does to the rate
+  limiter, and the review protocol's caps are unchanged and still bind.
+- The passes were trivial — one append each. A pass that runs a gate, renders an index or resolves a
+  conf has a wider real write set than its declared one, and E3 measures the DISCIPLINE, not the
+  difficulty of declaring correctly.
+- E4 merged two commits, not two mid-flight passes racing. The index-per-worktree property was
+  already measured by the prior hunt and is not re-derived here.
+- Nothing was measured about WALL CLOCK. The owner's report is that unattended runs are slow, and
+  this record does not claim concurrency is faster — only that it is admissible.
+
+## Losses, recorded
+
+No candidate lost here, which is itself the finding: the two criteria the prior verdict recorded as
+NOT OBSERVED both clear when they are actually run. The prior verdict's own closing paragraph asked
+whoever re-opened it to know the difference between unmeasured and adverse evidence. It was
+unmeasured, and this is the measurement.
+
+R1, R3 and R4 remain rejected on the prior hunt's own tests — a budget key an unattended run cannot
+mint, a `command -v` that finds nothing, and a schedule the run does not control. None was re-run,
+and none is re-opened.

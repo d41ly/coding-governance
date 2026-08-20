@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -171,6 +171,13 @@ the push boundary. This unit adds no gate.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · MEASURED. Both criteria CLEARED and the verdict token reads `cleared`, so the
+  inversion unit ships. The losing conditions were committed one commit ahead of the results and git
+  carries both, so S1's ordering is checkable rather than asserted. E4 carries a CONTROL the spec did
+  not require and which the clearance is worth nothing without: the same two-worktree merge run again
+  with both passes editing a row-merged file reproduces the recorded driver defect on demand — a
+  conflict, two markers, failing closed. E4 therefore clears because M6 condition 3 excludes the files
+  that would break it, not because the driver is sound, and the record says so in those words.
 - rev-2 · 2026-08-20 · folded the spec audit: M1 (the verdict-token set is CLOSED and declared), M11 (F1 was
   resolvable only under an authority that used to land later; the reorder makes its own text true).
 - rev-1 · 2026-08-20 · initial draft.
