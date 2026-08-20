@@ -31,6 +31,7 @@ import json
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -56,6 +57,42 @@ STEP_AFTER = "AFTER"
 STEP_RECEIPT = "RECEIPT"
 STEPS = (STEP_BASELINE, STEP_ATTRIBUTES, STEP_LAND, STEP_STAGE, STEP_HOOKPROBE, STEP_CONFIGURE,
          STEP_OBSERVE, STEP_RENORMALIZE, STEP_LEGS, STEP_AFTER, STEP_RECEIPT)
+
+
+# --- the interpreter a leg argv names, resolved --------------------------------------------------
+# A BARE `bash` handed to subprocess is resolved by the OS loader, and on Windows that finds the WSL
+# launcher in System32 before Git's bash. That is a different operating system, a different
+# filesystem and a different python. `shutil.which` searches PATH the way the shell does and finds
+# the same interpreter every other leg on the bar already runs under.
+#
+# MEASURED on node d, 2026-08-20, which is why this exists: subprocess.run(["bash", ...]) reported
+# `Linux` with python 3.10.12 and no `tomllib`, while shutil.which("bash") gave Git's bash,
+# `MINGW64_NT` and python 3.14.5 with `tomllib`. Five acceptance-matrix arms FAILED, none of them
+# about the kit under test, and the tracebacks named a `/mnt/c/...` path no Git-Bash tool can produce.
+# The bar was RED on clean `main` and blocked every push through the mandated lander.
+#
+# Class: memory/gotchas/subprocess-resolves-a-different-shell.md
+#
+# WHAT THIS DOES NOT DO: it resolves the INTERPRETER only, never the script path or any argument, and
+# it does not assert the resolved interpreter is fit for the leg — an interpreter whose python lacks a
+# module the leg needs still fails, and fails in the leg's own words. Resolving argv[0] is about
+# running the shell the operator meant; it is not a capability check.
+_INTERPRETER_NAMES = ("bash", "sh")
+
+
+def exec_argv(argv):
+    """`argv` with a bare interpreter name resolved to an absolute path.
+
+    Returns a NEW list. An unresolvable name is left exactly as given, so the caller still gets the
+    loader's own OSError rather than a silent substitution nobody asked for.
+    """
+    argv = list(argv)
+    if not argv:
+        return argv
+    found = shutil.which(argv[0]) if argv[0] in _INTERPRETER_NAMES else None
+    if found:
+        argv[0] = found
+    return argv
 
 
 def step(name: str, detail: str = "") -> None:
@@ -1362,7 +1399,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                 state = "landed-unmeasured"
                 detail = " (its check argv does not resolve)"
             else:
-                rc = subprocess.run([a for a, _m in pairs], cwd=str(target),
+                rc = subprocess.run(exec_argv([a for a, _m in pairs]), cwd=str(target),
                                     capture_output=True, text=True).returncode
                 state = "adopted" if rc == 0 else "landed-but-inert"
                 if rc != 0:
@@ -1398,7 +1435,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                        f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
                 continue
             try:
-                rc = subprocess.run(resolved, cwd=str(target), capture_output=True,
+                rc = subprocess.run(exec_argv(resolved), cwd=str(target), capture_output=True,
                                     text=True).returncode
             except OSError as e:
                 r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
@@ -1663,7 +1700,7 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                        "memory_root": "memory"}
                 resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
                 try:
-                    if subprocess.run(resolved, cwd=str(target),
+                    if subprocess.run(exec_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
                         return True          # the hole is genuinely undischarged, right now
                 except OSError:
@@ -2216,7 +2253,8 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         if not argv:
             continue
         resolved = [resolve_tokens(a, ctx)[0] for a in argv]
-        rc = subprocess.run(resolved, cwd=str(target), capture_output=True, text=True).returncode
+        rc = subprocess.run(exec_argv(resolved), cwd=str(target), capture_output=True,
+                            text=True).returncode
         outcome = classify_outcome(target, d, ctx, rc)
         means = outcome.get("means") if outcome else None
         accepted = bool(outcome and outcome.get("ok"))

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-20T18:22:20+03:00 @ e6098aa43b8341c1977532d8fec17105cb7aa1e5
+last-audit: 2026-08-20T21:56:34+03:00 @ 2dc9df359a6b56c08e052f330655cff0c7ea87f9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: e6098aa43b8341c1977532d8fec17105cb7aa1e5
@@ -111,11 +111,7 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- 2026-08-20 · the DoD bar · `GATE_FULL=1 bash tools/run-gates/run-gates.sh` cannot go green on
-  `main` today: the `govkit acceptance matrix` leg is RED there, verified on a clean detached
-  worktree at `e6098aa`. `render_playbook.py:64` imports `tomllib` unconditionally and the scratch
-  install resolves a python below 3.11. The leg is GUARDED, so every scoped bar skips it and only a
-  full run sees it. · prune when `TOOL-dSettledRoster-3` closes.
+*(none — the DoD-bar entry pruned 2026-08-20 when `TOOL-dSettledRoster-3` closed.)*
 
 
 ### Environment traps worth front-loading

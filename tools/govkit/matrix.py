@@ -283,7 +283,7 @@ def main() -> int:
             want = SCRATCH_EXPECT.get(name)
             if want is None:
                 continue
-            lp = subprocess.run(argv, cwd=str(g), capture_output=True, text=True)
+            lp = subprocess.run(govkit.exec_argv(argv), cwd=str(g), capture_output=True, text=True)
             out = (lp.stdout or "") + (lp.stderr or "")
             check("scratch install: leg '%s' prints its stated verdict where it was installed"
                   % name, want in out, out)
