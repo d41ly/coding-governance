@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-2 — the runner's knobs become a declared hardware profile table
 
-**Status:** OPEN · rev-7 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-8 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -292,6 +292,16 @@ recommendation; the reason each survived the veto order is recorded with it.
 - rev-3 · 2026-08-18 · swept section 8 under the standing mandate: every fork RESOLVED in
   place per M3, and the section's first non-blank line made machine-legal so the classifier
   reads this unit as READY instead of FORKED.
+- rev-8 · 2026-08-20 · CLOSED. Every criterion observed against the tree at `1ec761f`, two Tier-2
+  review rounds folded, and the shipped canary carries 91 executed assertions against the 37 it had at
+  this unit's base. What the close itself surfaced, recorded because it is the only place it lands: the
+  bar's first `--close` run RED on the run-gates canary's own clamp arms, which announced that the arm
+  AND its width-1 control both expired and that the clamp was therefore unproven either way. That is a
+  pre-existing arm reporting honestly under a machine carrying four concurrent full bars from other
+  sessions - an unarmed predicate REDDING rather than passing green, which is the property §7 asks for
+  and the reason the red was diagnosable at all. It is also this build's own case for `-4`, the
+  turnstile: a wall-clock-bounded arm is a correctness claim about a machine's spare capacity, and
+  nothing in this repo yet stops four bars from sharing one box.
 - rev-7 · 2026-08-20 · folded the RE-review of that fold. AC8 named a one-second timeout the arm no
   longer sets and graded only the message — the blind spot rev-6 identified in the code and then left
   standing in the criterion, so a later builder could delete the elapsed assertion and AC8 would stay
