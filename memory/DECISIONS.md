@@ -75,6 +75,8 @@
 - TOOL-aLoosenedCeiling-2 · check 6's six per-class caps become conf keys. A malformed cap ABORTS at status 2 rather than failing a check, and validation is ARITHMETIC: a literal `0` match let `00` past into awk's coercion, redding every file with nothing naming the conf
 - TOOL-aLoosenedCeiling-3 · a ceiling is re-derived on the MERGED tree, never carried from a base the merge superseded. main raised this one mid-build keeping the old headroom; that stands as the fifth movement and this is the sixth, which changes the convention
 - TOOL-aLoosenedCeiling-4 · an adopter's ceiling is sized from a MEASURED growth rate, not the overshoot, and a raise is legitimate only because rotation is SPENT — 646 B, not the 16403 B its own comment advertised. A key their kit cannot read is NOT declared for them
+- TOOL-aTetheredScratch-1 · the home-directory litter was AGENT-authored: no tracked file writes to `$HOME`, so the guard binds at the tool call. Its allowlist is DERIVED from `TMPDIR`/`TEMP`/`TMP` — `%TEMP%` is INSIDE `$HOME` on Windows, and a hardcoded one denied 73 of 123 legitimate commands
+- TOOL-aTetheredScratch-2 · the `TMPDIR` retarget was specced, audited and REFUSED on measurement: `/tmp` is a `usertemp` mount onto `%TEMP%`, which is under `$HOME`, so no external root exists. 71% of the crowding was one defect, so the defect was fixed instead
 
 ## DEPL — deployer
 

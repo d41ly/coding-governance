@@ -1,6 +1,6 @@
 # TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 Rev-1 specced a `TMPDIR` retarget. The spec audit measured it and the justification did not survive:
 there is no external scratch root on this machine, the path spelling breaks a gate, the tripwire could

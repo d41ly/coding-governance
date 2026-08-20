@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-ids: TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2
+ids: TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3
 ---
 
 # aTetheredScratch — agent scratch stops landing in the operator's home directory
@@ -80,13 +80,13 @@ there and repairs the leak that keeps refilling it.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-20 · streams tooling
-ids TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2
+**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-20 · streams tooling
+ids TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3
 
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aTetheredScratch-1 — a PreToolUse guard that denies a home-directory write outside the sanctioned scratch roots](spec/2026-08-20-spec-TOOL-aTetheredScratch-1.md) | SPECCED | rev-2 | 2026-08-20 |
-| [TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding](spec/2026-08-20-spec-TOOL-aTetheredScratch-2.md) | SPECCED | rev-3 | 2026-08-20 |
+| [TOOL-aTetheredScratch-1 — a PreToolUse guard that denies a home-directory write outside the sanctioned scratch roots](spec/2026-08-20-spec-TOOL-aTetheredScratch-1.md) | INPROGRESS | rev-2 | 2026-08-20 |
+| [TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding](spec/2026-08-20-spec-TOOL-aTetheredScratch-2.md) | INPROGRESS | rev-3 | 2026-08-20 |
 
 Records live under `spec/` and `reviews/`.
 

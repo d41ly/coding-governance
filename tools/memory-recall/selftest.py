@@ -24,6 +24,7 @@ import os
 import pathlib
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -140,8 +141,40 @@ def cache_of(root: pathlib.Path) -> pathlib.Path:
     return git_common_dir(root) / "recall" / "cache" / key
 
 
+# Every root `cleanup()` was ASKED to remove. The final arm re-checks them, because the defect
+# this tracking exists for is a removal that reports success and leaves the directory standing.
+_SWEPT: list[pathlib.Path] = []
+
+
+def _force_writable(func, path, _exc):
+    """rmtree error hook: clear the read-only bit, then retry the operation that failed.
+
+    NOT `ignore_errors=True`. These fixtures are git repositories, and git writes loose objects
+    and packfiles READ-ONLY. On Windows `os.unlink` of a read-only file raises PermissionError,
+    which `ignore_errors` swallows -- so the tree survives and the caller believes it was
+    removed. That is TOOL-aBranchedMandate-6: 3,616 residues measured on node `a` on 2026-08-17,
+    4,905 by 2026-08-20. `.git` is the only read-only thing in these fixtures, which is why the
+    same idiom works for the plain-JSONL scratch dirs and fails only here.
+
+    Same shape as `query.py:_remove_cache_dir`, which carries the measured argument against
+    `ignore_errors=True` on this platform: a failure is reported, never silently absorbed.
+    """
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except OSError:
+        pass          # the final arm re-checks existence; this hook never decides the verdict
+
+
 def cleanup(root: pathlib.Path) -> None:
-    shutil.rmtree(root, ignore_errors=True)
+    _SWEPT.append(root)
+    # `onexc` replaced `onerror` in 3.12 and `onerror` is deprecated there. Feature-detected
+    # rather than version-pinned: this kit ships to adopters whose python this repo does not pick.
+    key = 'onexc' if sys.version_info >= (3, 12) else 'onerror'
+    try:
+        shutil.rmtree(root, **{key: _force_writable})
+    except OSError:
+        pass          # survivors are the final arm's business, not an exception here
 
 
 # ------------------------------------------------------------------------------------ the arms
@@ -1300,6 +1333,17 @@ def main() -> int:
             if after == before
             else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
         )
+
+    # The scratch sweep, asserted rather than assumed - the shape test_recall_floor.py already
+    # uses. Appended after the arity assert on purpose: it is a property of the RUN, not a
+    # declared arm, so it must not move the declared-vs-ran count.
+    _leaked = [d for d in _SWEPT if d.exists()]
+    _checks.append(
+        ("ok", "every scratch repo this run created was removed", f"{len(_SWEPT)} swept")
+        if not _leaked
+        else ("FAIL", "every scratch repo this run created was removed",
+              f"{len(_leaked)} of {len(_SWEPT)} survived, first: {_leaked[0]}")
+    )
 
     for state, name, detail in _checks:
         print(f"{state:<5}{name}" + (f" — {detail}" if detail else ""))

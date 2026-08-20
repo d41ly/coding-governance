@@ -1,6 +1,6 @@
 # TOOL-aTetheredScratch-1 — a PreToolUse guard that denies a home-directory write outside the sanctioned scratch roots
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-20 · node a · Tier-2 · base 56b945cb · streams tooling
 
 The reported defect is agent-authored, not code-authored: eighteen files in the operator's home
 directory, written by tool calls of the shape `... > ~/.merge-bar.log 2>&1`. No script is involved, so
