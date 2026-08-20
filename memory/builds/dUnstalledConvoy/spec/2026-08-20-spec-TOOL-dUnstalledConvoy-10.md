@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -169,13 +169,13 @@ boundary.
 
 ## 9. Revision log
 
-- rev-2 · 2026-08-20 · folded the spec audit: H7 (the commit range gains a recorded CLOSE anchor, so a later
-  sequential fold is not graded against a window that has closed), M2 (the no-commit case splits — an
-  empty range announces, an id-less subject reds), M8 (documentation is the check's own source
+- rev-3 · 2026-08-20 · folded the spec audit: H7 (the commit range gains a recorded CLOSE anchor, so a
+  later sequential fold is not graded against a window that has closed), M2 (the no-commit case splits
+  — an empty range announces, an id-less subject reds), M8 (documentation is the check's own source
   header), M14 (§10 corrected: the leg holds no id pattern at all), L1. Three new criteria.
-- rev-1 · 2026-08-20 · initial draft.
 - rev-2 · 2026-08-20 · §10 corrected: the `id_pattern` seam is unreachable from a shell leg in a
   standalone-installed kit; the id shape comes from `_ids_of`. Same correction as unit 5 rev-2.
+- rev-1 · 2026-08-20 · initial draft.
 
 ## 10. Reuse audit
 
