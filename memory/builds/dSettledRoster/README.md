@@ -42,14 +42,6 @@ the 3.10 in the traceback. The 3.10 belonged to the WSL that the bare name `bash
 wrong cause sat in `TOOL-dSettledRoster-3` for one commit before being replaced with the measured
 one.
 
-## Units — the authored roster
-
-<!-- roster:units -->
-| # | Unit | Tier | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-dSettledRoster-5` | 2 | name the bash EXECUTABLE, so a descriptor's leg stops running under WSL |
-<!-- /roster:units -->
-
 ## The rest of the roster — rows, not units
 
 These were minted by the same session and carry no spec. They are listed so the slug's id space is
@@ -79,6 +71,14 @@ Recorded because the value is in the misses, not the hits.
   verdict epoch, the kit-version markers, and the manifest maintenance stall. The last one found two
   genuinely stale §B claims, including the manifest stating node tag `a` as if it were the constant
   when four registered nodes share one primary tree.
+
+## Units — the authored roster
+
+<!-- roster:units -->
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dSettledRoster-5` | 2 | name the bash EXECUTABLE, so a descriptor's leg stops running under WSL |
+<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-20 · streams tooling+deployer
