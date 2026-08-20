@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-5 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -136,13 +136,13 @@ and it is real for that reason and not because a gate would catch it. S2, S4, S5
 rules and will not fit in the 14 lines M1's own budget leaves, so the displacement is identified and
 made in the same commit.
 
-The MECHANICAL budget is the charter read-path ceiling: 72122 bytes measured AT THE MERGE BASE
-against 86476, so **14354 bytes of headroom** — 1860 less than this spec first stated, because the
-protocol grew under it while the spec was open. This unit spends from it twice, growing both the method and the
-unattended protocol, and it is not the only spender — the full set is stated ONCE in the build
-README's cross-unit rules rather than in each spec, because two specs each naming the total and each
-other is how a shared budget gets spent twice. The builder re-measures with the corpus reporter
-before spending.
+The MECHANICAL budget is the charter read-path ceiling. **This spec no longer carries the figure**:
+rev-6 removed a total measured against a ceiling of 86476 that has since been retired, which is a
+number that was true once and then quietly stopped being — the exact failure mode the "stated ONCE"
+rule exists to prevent, reproduced by a spec that stated the rule. The live pair is in the build
+README's cross-unit rules, re-measured at this base, and the builder reads it from
+`python tools/memory-tree/corpus_ids.py --report` before spending. This unit spends from it twice,
+growing both the method and the unattended protocol, and it is one of seven spenders.
 
 ## 5. Production-readiness checklist
 
@@ -203,7 +203,7 @@ before spending.
   all three carriers live, and its own header states it is structural only.
 - **AC7** — When the kickoff engine is unchanged, `bash tools/unattended/check-unattended.sh` still
   finds at least the declared floor of interactive exits.
-- **AC8** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC8** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -211,7 +211,7 @@ before spending.
 `tools/unattended/adopt-unattended.sh --check` · `tools/memory-tree/check-memory-hygiene.sh` ·
 `tools/memory-tree/kit-dogfood-parity.test.sh` · `tools/memory-tree/check-method-carriers.sh` ·
 `tools/check-kit-versions.sh` · `python tools/codebase-map/test_codebase_map.py` ·
-`bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 
@@ -271,6 +271,19 @@ before spending.
 - rev-5 · 2026-08-17 · M7 REGROUND onto the new merge base. One claim moved: the read-path headroom
   is 14354 B, not 16214, because the unattended protocol grew 1103 B under this spec. No rule in this
   unit was affected.
+- rev-6 · 2026-08-19 · re-read against the close-path audit and `TOOL-aBoundedVerdict-1` rev-6. **No
+  scope item changes**, and that is the finding rather than an omission: the three dispositions here are
+  about FORKS and STATUSES, and S3's "continue with the units that do not depend on it" test is
+  meaningful at a fork in a way it was not at the closing review — which is exactly why the audit's
+  medium 25 landed on unit 1's S8 and not here. Two cross-references added by this rev, both to
+  mechanisms this unit's dispositions now depend on and neither of which existed when it was ratified:
+  the HALT disposition reaches `--abort`, which requires both agent-attested keys first, and those keys
+  have no writer until `TOOL-aBoundedVerdict-15`'s `--attest` verb lands — so this unit's halt path is
+  reachable only by a hand-edit today, and that dependency is named rather than assumed. And the review
+  side of "a thing the run cannot resolve" is now `TOOL-aBoundedVerdict-1` S9's park case, which is this
+  unit's rule applied to a blocker; the two must stay phrased as a SCOPE test rather than a difficulty
+  test, or both become an escape from ordinary work.
+
 ## 10. Reuse audit
 
 `python tools/memory-recall/query.py` over the fork and owner-turn question returns the decision that

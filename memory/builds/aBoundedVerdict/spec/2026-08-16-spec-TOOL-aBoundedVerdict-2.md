@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-4 · 2026-08-17 · node a · Tier-2 · base febba16b · streams tooling
+**Status:** SPECCED · rev-6 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -13,8 +13,10 @@ stopped without reading prose.
 ## 2. Scope (IN)
 
 - **S1** — a kit-owned core halt vocabulary in the driver, one member per halt site this build's
-  research actually enumerated, and no member invented for symmetry: the review budget was exhausted
-  with the unit not clean; a fork survived the method's vetoes with no resolution the mandate
+  research actually enumerated, and no member invented for symmetry: the review loop reached its
+  RUNAWAY CEILING with the subject not clean — rev-5's re-reading of a member that used to name a
+  routine cap refusal, and now names a backstop whose being reached is itself a defect
+  (`TOOL-aBoundedVerdict-1` S1a); a fork survived the method's vetoes with no resolution the mandate
   delegates; a unit awaits owner scope approval the mandate does not supply; a unit is blocked on an
   EXTERNAL PREREQUISITE, which is a different owner turn from an unapproved scope and is the case
   `TOOL-aBoundedVerdict-3` S1 routes here; a unit's acceptance or gates could not be derived; the
@@ -23,9 +25,14 @@ stopped without reading prose.
 - **S2** — `--abort <slug> --reason <text> --code <CODE>`, with the code REQUIRED and validated
   against the effective vocabulary. An unlisted code is refused naming the legal set.
 - **S3** — the code is recorded as an AUTHORED FACT through the existing fact writer, not buried in
-  the reason prose, so a reader is a field read rather than a parse. It is therefore the region's
-  NINTH fact, and S7 moves the pin that says eight rather than leaving the spec silently in breach
-  of it. The justification is the protocol's own membership test — nothing in the tree derives the
+  the reason prose, so a reader is a field read rather than a parse. It is therefore a NEW fact, and S7 moves
+  whatever ordinal the pin currently states rather than leaving the spec silently in breach of it.
+  **Rev-6 deletes every ordinal this spec used to spell.** The live pin reads ELEVEN — measured at
+  `memory/guides/UNATTENDED-PROTOCOL.md:110` and `tools/unattended/PROTOCOL.template.md:110`, with an
+  enumeration running 1..11 beneath it — so the halt code is the twelfth, not the ninth this spec
+  said, and not the eighth or seventh it said elsewhere. The ordinal is READ AT BUILD TIME from the
+  carrier and is never restated here: the pin's history across its carriers is non-monotone, so a
+  number written into a spec is a number that was true once. The justification is the protocol's own membership test — nothing in the tree derives the
   code, and only the run knows it — and the shape: a halt code is a per-run SINGLETON that three
   readers read by key, which is what a fact is for. **The in-tree precedent is now exact**: the
   eighth fact, the roster frozen at landing, is a singleton written by a TERMINAL verb, which is the
@@ -71,6 +78,20 @@ stopped without reading prose.
   at build time rather than from this bullet: it was seven when this spec was drafted.
 - **S8** — the protocol's phase and verb sections, the conf's key table, the adopter's seed conf, the
   rendered Skill, and the kit version constants.
+- **S10** — the REVIEW VERDICT vocabulary gets the same treatment as the halt vocabulary, because it
+  is the same defect one document over and this unit's title is the promise to fix it. Measured over 90
+  tracked review records: 18 distinct `## Verdict` lines, 5 leading tokens, 32 records with no verdict
+  line at all, 2 where `Verdict` is a section heading rather than a verdict, and **zero** carrying the
+  literal clean token the method names as the loop's only exit. So the vocabulary the method states in
+  prose is read by nothing and written consistently by no one. S10 makes a token from a closed set the
+  FIRST line of a review record, adds it to `memory/HYGIENE.md` check 5's grammar for `diff-review` and
+  `spec-audit` records, and makes `TOOL-aBoundedVerdict-1`'s `--review` verb accept exactly that set.
+  **Forward-only**: no retrofit of the 90, for the reason §3 already gives about existing records.
+  S10's write set is `memory/HYGIENE.md` (check 5's grammar),
+  `tools/memory-tree/check-memory-hygiene.sh` and its sibling test, and
+  `tools/memory-tree/HYGIENE.template.md` — none of which rev-5 declared, which is why rev-6 adds
+  them to Files touched and gives S10 its own acceptance criteria. A scope item with no observable
+  and no declared write set is half a unit.
 - **S9** — the three documented CALL SITES of the abort verb gain the new required argument, and one
   arm asserts they cannot silently stop carrying it. No existing gate joins a documented invocation
   to the driver's argument set — the adopter check, the protocol parity check and the kickoff-engine
@@ -87,7 +108,7 @@ stopped without reading prose.
   silently.
 - No code on the landed terminal. A landing needs no reason.
 - No code on a park. Parking is unit 5's mechanism and a park is not a halt.
-- No retrofit of existing terminal records BEYOND the one §4 enumerates. Exactly one tracked record
+- No retrofit of existing terminal records BEYOND the ones §4 enumerates. Exactly one tracked record
   claims the aborted terminal without a code, it is named, and it is migrated by this unit's commit.
   A blanket no-retrofit rule was the rev-3 position and rested on a population that was zero at the
   old base and is not at this one.
@@ -128,7 +149,7 @@ owner turn it needs:
 
 | Code | Reached from | The owner turn it names |
 |---|---|---|
-| review budget exhausted | unit 1's cap refusal | the unit's design is not converging; re-scope or split it |
+| review budget exhausted | unit 1's RUNAWAY CEILING, not its ordinary exit — the convergence predicate promotes a residual blocker to a unit and never halts | the convergence rule failed to terminate; read the round sequence and decide whether the ceiling or the predicate is wrong |
 | fork unresolvable | the method's vetoes 2 and 3, and a scope fork | decide the fork |
 | awaiting scope approval | a unit at the awaiting-approval status that is NEITHER reachable at the pinned base NOR authored by this run — the residual `TOOL-aBoundedVerdict-3` S1's three cases do not cover, reached when a spec arrives on the run's own branch from elsewhere | approve or amend the scope |
 | blocked on an external prerequisite | a unit whose status names a prerequisite outside the run | clear the prerequisite |
@@ -299,7 +320,7 @@ are both on its watch list) · the kit version constants.
 - **AC11** — When any NEW `fail` branch exists, it is armed in that gate's sibling test or pinned in
   `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
   --check` exits 0. `ARMS_FLOORS` moves only where `--report` shows the measured counts grew.
-- **AC12** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC12** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -313,7 +334,7 @@ grows a read-path member, and rev-2's gate list omitted it ·
 `python tools/memory-tree/corpus_ids.py --report` for the read-path share ·
 `python tools/memory-tree/check-arms.py` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
 `python tools/codebase-map/test_codebase_map.py` · `python tools/drift-audit/drift_report.py
---check` · `bash tools/run-gates.sh`.
+--check` · `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 
@@ -374,6 +395,17 @@ grows a read-path member, and rev-2's gate list omitted it ·
   completeness grep is rewritten NUMBER-AGNOSTIC — the two-value alternation would have returned
   nothing while two carriers still said eight, the criterion failing exactly as it exists to prevent.
   The kickoff size leg lost its positional; the ceiling now lives in a declared limits file.
+- rev-5 · 2026-08-19 · widened by the close-path audit's medium 24 and by `TOOL-aBoundedVerdict-1`'s
+  rev-6 reversal. Two changes, no removals. **S10 is new**: the review VERDICT vocabulary is the same
+  defect as the halt vocabulary one document over — measured at 18 distinct verdict lines, 5 leading
+  tokens, 32 records carrying none, and zero carrying the token the method calls the loop's only exit —
+  so this unit, whose title is about a vocabulary something reads, takes it. Forward-only, on §3's
+  existing no-retrofit reasoning. **The first core halt member is re-read**: it used to name unit 1's
+  cap refusal, and unit 1 no longer has a cap; it now names the runaway ceiling, whose being reached is
+  itself a defect, and the owner turn it names changes with it — the old wording would have told a
+  returning owner to re-scope a unit when the real question is whether the convergence predicate
+  terminated. The member is NOT removed, so the shrink-only floor does not move.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "terminal phase for a run that cannot continue"` returns
@@ -386,3 +418,4 @@ for the parse reason §4 gives.
 
 Recall terms used, recorded for the reground: halt code abort terminal phase vocabulary shrink-only
 floor run-state authored fact status resume reader unattended driver conf declaration.
+

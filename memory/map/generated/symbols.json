@@ -348,6 +348,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_tempdir",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "cache_dir",
       "kind": "function",
       "file": "tools/memory-recall/query.py"

@@ -122,6 +122,7 @@ that may rewrite the rules it is authorized under has no rules.
 ids TOOL-aPromptedMandate-1 TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 TOOL-aPromptedMandate-7 TOOL-aPromptedMandate-8 TOOL-aPromptedMandate-9 TOOL-aPromptedMandate-10 TOOL-aPromptedMandate-11 TOOL-aPromptedMandate-12
 ids TOOL-aPromptedMandate-13 TOOL-aPromptedMandate-14
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPromptedMandate-1 — the prompt-mode declaration, and where it is carried](spec/2026-08-18-spec-aPromptedMandate-1.md) | CLOSED | rev-2 | 2026-08-18 |
@@ -132,6 +133,7 @@ ids TOOL-aPromptedMandate-13 TOOL-aPromptedMandate-14
 | [TOOL-aPromptedMandate-4 — the two mode-scoped directives](spec/2026-08-18-spec-aPromptedMandate-4.md) | CLOSED | rev-3 | 2026-08-18 |
 | [TOOL-aPromptedMandate-5 — the Skill's prompt start path](spec/2026-08-18-spec-aPromptedMandate-5.md) | CLOSED | rev-4 | 2026-08-18 |
 | [TOOL-aPromptedMandate-6 — the driver-then-leg cross-component arm](spec/2026-08-18-spec-aPromptedMandate-6.md) | CLOSED | rev-3 | 2026-08-18 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

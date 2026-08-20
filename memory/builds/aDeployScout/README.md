@@ -18,7 +18,9 @@ A 12-agent study recommending `govkit`: one ratchet to deploy any/all kits into 
 **Build status:** SPECCED · 0 unit(s) · node a · opened 2026-07-12 · streams deployer
 ids DEPL-aDeployScout-1
 
+<!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
 
 Records live under `spec/`.
 <!-- /gen:build-index -->

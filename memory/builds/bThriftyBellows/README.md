@@ -23,7 +23,9 @@ the front matter above declares `status:` outright instead of leaving it to be d
 **Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling
 ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 
+<!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
 
 Records live under `build/`.
 

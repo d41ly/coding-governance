@@ -67,6 +67,32 @@ const head = a.head || 'HEAD'
 const repo = a.repo || '.'
 const context = a.context || 'the cumulative diff landing on main'
 const byDesign = a.byDesign || 'none supplied'
+// TOOL-aBoundedVerdict-14 S1/S2 - the fold-scoping inputs. `priorFindings` is deliberately NOT merged
+// into `byDesign`: they are different instructions. byDesign says "this is intended, do not report
+// it"; a prior finding says "this was reported and FIXED - check the fix, and do not re-raise the
+// original". Collapsing them loses the second half, which is the half this unit exists for. Measured
+// before building: byDesign is supplied by no caller anywhere in the tree, so smuggling load-bearing
+// content through it would put it in a field with a zero-use history.
+const priorFindings = Array.isArray(a.priorFindings) ? a.priorFindings : []
+// F1 resolved: accept an explicit integer AND infer 2 when prior findings arrive without one, so a
+// caller cannot silently get a round-1 brief while handing over a previous round's confirmed set.
+const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings.length ? 2 : 1
+// S3 - a base that is not an immutable sha is REFUSED at round > 1 and warned at round 1. The
+// harness has no filesystem and cannot resolve a ref, so this is a STRING check on the shape of what
+// it was handed: the caller resolves, and the harness refuses anything that does not look resolved.
+// F2 resolved at 7+ hex, the same floor the driver's own review-record join uses and the shortest
+// abbreviation git produces here - not 40, which would refuse the spelling the corpus actually uses.
+const baseLooksPinned = /^[0-9a-f]{7,40}$/.test(String(base))
+if (!baseLooksPinned) {
+  const why =
+    'tier2-review: `base` must be an immutable sha (7-40 hex), not a moving ref. Got ' +
+    JSON.stringify(base) +
+    '. M8 forbids a moving ref two paragraphs above the invocation it documents, and the default here ' +
+    'is `origin/main` - so a caller who lets it stand records provenance that points at whatever main ' +
+    'happened to be. Resolve it: git rev-parse <ref>.'
+  if (round > 1) throw new Error(why)
+  log('WARNING: ' + why)
+}
 const reviewDir = a.reviewDir || 'reviews/'
 const diffCmd = `git -C ${repo} diff ${base}...${head}`
 // H2/AC5, HONEST LIMIT: the harness CANNOT verify its own root. Workflow scripts have no
@@ -155,7 +181,15 @@ const finderResults = await boundedParallel(
     agent(
       `You are the ${L.key} reviewer. Review ONLY this diff (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers):\n\n` +
         `CONTEXT: ${context}\n` +
-        `BY DESIGN (do NOT re-report these): ${byDesign}\n\n` +
+        `REVIEW ROUND: ${round}${round > 1 ? ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.' : ''}\n` +
+        `BY DESIGN (do NOT re-report these): ${byDesign}\n` +
+        (priorFindings.length
+          ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n` +
+            priorFindings
+              .map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`)
+              .join('\n') +
+            `\n\n`
+          : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of the whole diff.\n\n`) +
         `LENS: ${L.brief}\n\n` +
         `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n` +
         `Return JSON {lens:"${L.key}", findings:[{file,line,severity,claim,impact,fix}]}.`,
@@ -312,7 +346,17 @@ const synth = await agent(
     // satisfies nothing. The harness cannot tell whether a mandate is in force — it has no
     // filesystem and no repo access — so M8 spelling the invocation with the pinned sha is what
     // makes this work, and the failure surfaces as an unmet DoD item naming the run's own record.
-    `Open the report with a line naming the reviewed range as ${base}...${head}. ` +
+    `Open the report with a line naming the reviewed range as ${base}...${head}, and state the ROUND as ${round}. ` +
+    // TOOL-aBoundedVerdict-14 S7 - the record's BINDING LINE, instructed here because the harness does
+    // not write the record: the synth AGENT does. Rev-1 said the harness writes one lacking a kind
+    // token; `grep -ni serves` over this file returned NOTHING, so it wrote no binding line at all and
+    // the premise was wrong in both halves. It must carry a kind AND at least one id: a kind with no
+    // id is MALFORMED under memory/HYGIENE.md's grammar, so emitting the kind alone would trade a
+    // missing line for an unparseable one. The FILENAME's id projection stays with M8's rename, which
+    // check 21's fourth branch also requires and which a harness with no repo access cannot perform.
+    `The report's FIRST line must be the record's binding line, exactly: **Serves:** diff-review ` +
+    `followed by every unit id in the diff, space-separated. A kind with no id is malformed under the ` +
+    `project's record-binding grammar, so never emit the kind alone. ` +
     `Return JSON {path, blockers, highs, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
@@ -329,6 +373,17 @@ const synth = await agent(
     },
   },
 )
+
+// TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
+// and reported; a dead synthesis was not, so `synth === null` returned report:null with a note reading
+// `complete` and every confirmed finding was lost with nothing logged. The findings exist here in
+// memory - the only thing missing was saying so before the return threw them away.
+if (!synth) {
+  log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below exist only in this log:`)
+  for (const f of confirmed)
+    log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | fix: ${f.fix}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+}
 
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
@@ -353,5 +408,9 @@ return {
       ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
       : lensesDead || skepticsDead || unverified.length
         ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-        : 'complete',
+        : !synth
+          ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+          : 'complete',
+  round,
+  priorFindings: priorFindings.length,
 }

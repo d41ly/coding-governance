@@ -86,6 +86,7 @@ from the status header of every spec in this folder — do not hand-edit it.
 **Build status:** OPEN · 7 unit(s) · node a · opened 2026-08-16 · streams deployer+tooling
 ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 DEPL-aTetheredConvoy-8 DEPL-aTetheredConvoy-9 TOOL-aTetheredConvoy-1
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | OPEN | rev-6 | 2026-08-16 |
@@ -95,6 +96,7 @@ ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aT
 | [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | OPEN | rev-4 | 2026-08-16 |
 | [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | OPEN | rev-4 | 2026-08-16 |
 | [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | OPEN | rev-4 | 2026-08-16 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

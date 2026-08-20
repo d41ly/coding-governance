@@ -39,15 +39,20 @@ the agent asks at its single opening turn. Four properties, all mechanical:
 - **It may declare an authorization MODE, and that declaration is a RECORD rather than a verdict.**
   An `authorized-by:` key in the front matter, over the closed set `prompt` / `slug`; absent is
   `slug`, which is every build folder written before the key existed. `--preflight` reads it from the
-  blob at BASE and records it, and the merge bar re-derives it from that same blob independently — so
+  blob at BASE and records it, and the merge bar re-derives it from that same blob independently - so
   a run cannot record a discipline its own authorization did not carry. What this does NOT buy is
   stated here rather than discovered: the key is a byte in a file, and §9's reduction applies to it
   exactly as it applies to every other local input. It says which discipline the run declared it was
   under, not that the declaration was true.
-- **Its ROSTER, when present, may not move under the run — on the DEFAULT-BRANCH anchor only.** A
-  Units table inside a roster marker pair is compared across the BASE. Opt-in by presence; INTEGRITY,
-  not a narrowing of the grant. **It does not hold on the second anchor**: there the BASE is a tip
-  the run itself pushed, so it can re-satisfy the comparison against its own new bytes.
+- **Its UNIT SET may not SHRINK under the run — on the DEFAULT-BRANCH anchor only.** The ids in the
+  GENERATED `gen:build-units` region are compared across the BASE and the BASE set must be a SUBSET of
+  the one at HEAD: additions admitted, removals and renames refused. IDS, never row bytes — a row
+  carries the unit's status, rev and date, so a byte comparison would refuse every run that BUILT
+  anything, which is the run this exists to permit. A BASE carrying no such region is a refusal from
+  `UNITS_REGION_CUTOFF` onward and inherits the old presence-based opt-in before it, because a run's
+  BASE is pinned before its own work and the BASE of the run that landed the region cannot carry it.
+  INTEGRITY, not a narrowing of the grant. **It does not hold on the second anchor**: there the BASE is
+  a tip the run itself pushed, so it can re-satisfy the comparison against its own new bytes.
 
 **A SECOND ANCHOR, when the project declares one.** `ANCHOR_SCOPE="published"` admits the tip the
 remote advertises for the run's OWN branch — used only when the README does not resolve at the
@@ -242,14 +247,22 @@ something no machine could have checked:
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
-| `closing-review-recorded` | machine | a TRACKED review record under this build names the BASE the run pinned once. It measures that the review covers what shipped, never what the review concluded |
-| `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted |
-| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up |
+| `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
+| `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
+| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one |
 
 A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate pins the core set's
 COUNT against the same shrink-only floor, for the reason §3 gives.
 
 `--close` BLOCKS on any unmet item. The override is named (it cites the item), recorded (it writes a
+**The two attested items have a VERB, and it is the only way to write one.** `--attest <slug> --item
+<item> [--value <text>]` refuses a machine-checked item by reading the item's declared CHECKER, so a
+project that declares its own agent-attested extra gets the verb and one that renames a machine item
+still gets the refusal. Before it existed the keys had no writer at all, which made `--abort` — the
+documented sole exit from a wedged run, and the verb that REQUIRES both — reachable only by
+hand-editing the authored region of a file this kit calls generated. An attestation is still an
+attestation: the verb removes the hand edit, not the trust assumption §9 states.
+
 parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
 override budget: attestation is not a machine verdict, and pretending otherwise makes an override
 look like a check that failed.

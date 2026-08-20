@@ -63,7 +63,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -142,7 +142,20 @@ GEN_OPEN='<!-- run:generated -->';   GEN_CLOSE='<!-- /run:generated -->'
 # machine-locatable. Locating it structurally instead - the slice between one heading and the next -
 # was the cheaper option and was refused: a renamed heading silently empties the comparison, which is
 # a check that passes by finding nothing.
+# TOOL-aBoundedVerdict-11 S8 - NARROWED, not retired. Four of the authored pair's five readers moved
+# to the GENERATED units region: the authorization scope comparison, `--plan`'s malformed-pair refusal,
+# and `build-complete`'s presence and non-empty terms. The FIFTH stays - `roster_ids`, which feeds
+# `missing_units` - because an authored plan is the only thing that can name a unit nobody has specced
+# yet, and reading the generated region there made the difference empty by construction. Absent, the
+# pair costs nothing. The spec said RETIRED; that was wrong and is corrected there too.
 ROSTER_OPEN='<!-- roster:units -->'; ROSTER_CLOSE='<!-- /roster:units -->'
+# TOOL-aBoundedVerdict-11 S1/S2 - the GENERATED units region, nested inside the build-index pair.
+# Addressed BY NAME. The three readers below used to select unit rows out of the enclosing region by
+# ROW SHAPE, and `gen_build_index.py` renders a records table into that same region, so every review
+# and journal record counted as an unfinished unit: `build-complete` could not pass on any build
+# holding a record, `--landed` would have frozen record filenames as the units a run covered, and
+# `--status` told a resuming agent its next unit was a shell script under `build/`.
+UNITS_OPEN='<!-- gen:build-units -->'; UNITS_CLOSE='<!-- /gen:build-units -->'
 
 # Exactly one open, exactly one close, CLOSE AFTER OPEN, print the slice between them. Never a
 # whole-file regex — the splice contract this borrows from gen_build_index.py's apply_region().
@@ -787,24 +800,55 @@ check_authorization() { # slug · base
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
   fi
-  # S8 - the roster region, when the BASE carries one. OPT-IN by presence, which is F1's ratified
-  # shape: a build without the markers is authorized on existence alone, exactly as before.
+  # TOOL-aBoundedVerdict-11 S6/S6a/S6b - the frozen scope is the GENERATED units region's unit-ID SET,
+  # compared BASE -> HEAD and required to be a SUBSET. Additions admitted, removals refused. This
+  # REPLACES the authored roster pair's byte comparison, which S8 retires by deleting this reader; the
+  # four build READMEs that carry such a pair keep their bytes, because a region nothing reads is inert.
   #
-  # PRESENCE is decided by grepping for the open marker, NOT by `region`'s exit status. `region` exits
-  # 3 for "absent" AND for "malformed or duplicated", and treating that one status as "absent" is how
-  # a second block once went uncompared - the discarded-signal defect this kit has already paid for.
-  if printf '%s\n' "$blob" | grep -qF -- "$ROSTER_OPEN"; then
-    local ra rb
-    if ! ra=$(printf '%s\n' "$blob" | region - "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
-      fail 20 "the build README at the pinned BASE carries a roster marker but not exactly one well-formed pair, so there is no single scope to compare against: $base:$rel"
+  # WHY IDS AND NOT BYTES. A row carries the unit's status, rev and last-change date, all rendered from
+  # its spec header, so they move whenever a unit is built. A byte-level "no row changed" test would
+  # refuse every run that BUILT anything, on the one item `verb_close` will not override - strictly
+  # worse than the opt-in hole it replaces. The id set IS the scope: which units the run may work on is
+  # frozen, and everything else in a row is derived from a document the run is authorized to edit. A
+  # RENAMED id is still refused, because renaming removes a BASE id.
+  #
+  # WHY A CUTOFF (S6a). A run's BASE is pinned BEFORE its own work, so the BASE of the run that lands
+  # the migration render cannot carry the region this check wants. Without the cutoff the unit is
+  # unlandable by ANY run - measured on the run that built it, the BASE blob carried no pair at all -
+  # so a BASE committed before UNITS_REGION_CUTOFF keeps presence-based opt-in.
+  #
+  # WHAT THIS BUYS, SCOPED (S6b). On the DEFAULT-BRANCH anchor the BASE blob is outside the run's reach
+  # and this is a real integrity check. On the BRANCH anchor it is NOT - the run pushed that tip - and
+  # `.unattended.conf`'s own comment plus the protocol's section 1 already say roster integrity stops
+  # being enforceable there. This check does not close that hole and must not read as though it did.
+  #
+  # PRESENCE is decided by grepping for the open marker, NOT by `region`'s exit status. `region` exits 3
+  # for "absent" AND for "malformed or duplicated", and treating that one status as "absent" is how a
+  # second block once went uncompared - the discarded-signal defect this kit has already paid for.
+  if printf '%s\n' "$blob" | grep -qF -- "$UNITS_OPEN"; then
+    local ub uh miss
+    if ! ub=$(printf '%s\n' "$blob" | region - "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null); then
+      fail 20 "the build README at the pinned BASE carries a units marker but not exactly one well-formed pair, so there is no single scope to compare against: $base:$rel"
       return 1
     fi
-    if ! rb=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null); then
-      fail 20 "the working copy's build README does not carry exactly one well-formed roster pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
+    if ! uh=$(region "$rel" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null); then
+      fail 20 "the working copy's build README does not carry exactly one well-formed units pair while the pinned BASE does, so the scope this run is executing against cannot be compared: $rel"
       return 1
     fi
-    if [ "$ra" != "$rb" ]; then
-      fail 20 "the roster differs from the one at the pinned BASE - the run rewrote the scope it is executing against, and a run that can edit its own scope mid-flight is not running the build that was authorized: $rel"
+    miss=$(comm -23 <(printf '%s\n' "$ub" | _ids_of) <(printf '%s\n' "$uh" | _ids_of) | tr '\n' ' ' | sed 's/[[:space:]]*$//')
+    if [ -n "$miss" ]; then
+      fail 20 "a unit in the scope at the pinned BASE is absent from it now, so this run narrowed or renamed the scope it was authorized for; additions are admitted and removals are not: $miss"
+      return 1
+    fi
+  elif [ -n "${UNITS_REGION_CUTOFF:-}" ]; then
+    local bdate
+    bdate=$(GIT show -s --format=%cs "$base" 2>/dev/null)
+    # `sort -C` exits 0 when its input is ALREADY SORTED, so cutoff-then-bdate sorted means
+    # bdate >= cutoff — exactly the refusal condition. The first cut NEGATED this and therefore
+    # refused every BASE before the cutoff while admitting every one after: the precise inversion
+    # the cutoff exists to prevent, and it would have refused the run that built this unit.
+    if [ -n "$bdate" ] && printf '%s\n%s\n' "$UNITS_REGION_CUTOFF" "$bdate" | sort -C; then
+      fail 20 "the build README at the pinned BASE carries no units marker pair and this BASE is dated at or after UNITS_REGION_CUTOFF, so an empty set would satisfy the subset test vacuously: $base:$rel · repair: the --write mode of tools/memory-tree/gen_build_index.py"
       return 1
     fi
   fi
@@ -947,11 +991,30 @@ plan_state() { # spec file -> prints the M2 state
 #
 # The ids are matched against the build's OWN slug. A looser pattern would mint units out of prose:
 # a roster row citing a sibling build's id names a DEPENDENCY, not a unit of this build.
-roster_ids() { # slug
+# TOOL-aBoundedVerdict-11 S8, CORRECTED mid-build. This reads the AUTHORED pair, deliberately: it is
+# the only carrier of a unit that is PLANNED and has no spec yet. Pointing it at the generated region
+# made `missing_units` a TAUTOLOGY - that region is rendered FROM the specs that exist, so roster_ids
+# became a subset of spec_ids by construction and the difference was empty always. Same class as
+# memory/gotchas/assertion-between-two-derived-values.md, and the M6 checklist named that class for
+# the very diff that introduced it.
+#
+# The two questions are SPLIT rather than merged. Authorization, the presence term and terminality read
+# the GENERATED region, which is what makes them satisfiable without a hand-edit. The
+# planned-but-unspecced question keeps the authored pair: absent, `missing_units` is trivially
+# satisfied, which is the status quo for 45 of 49 builds and weakens nothing that worked before.
+roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecced units
   local slug="$1" rel; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
   grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
   region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null \
+    | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+}
+# The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
+# uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
+unit_ids_of() { # slug
+  local slug="$1" rel; rel=$(readme_of "$slug")
+  [ -f "$rel" ] || return 0
+  region "$rel" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null \
     | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
 }
 # The ids verb_plan already derives, lifted so the listing and the join cannot disagree about what a
@@ -974,21 +1037,43 @@ missing_units() { # slug · dir
 # Reads the BUILD README's pair — the one home of the unit list since main's redesign removed the
 # run-state copy and required that region to be EMPTY. Pointing these at the emptied region made
 # `build-complete` unsatisfiable: a check that cannot PASS, caught by its own green control.
-# TOOL-aPromptedMandate-12 - the generated region renders TWO tables: the UNITS and the RECORDS.
-# Selecting every `^| [` row took both, so every review record M4 mandates and the closing review M8
-# mandates counted as a non-terminal unit and `build-complete` could never be met by a build that
-# followed the method. Measured on builds that had already LANDED: aBranchedMandate 13 rows against
-# 6 units, aStandingWrit 3 against 1.
+# TOOL-aBoundedVerdict-11 S2/S3. Returns rows on stdout and NOTHING else, because callers capture it
+# in a command substitution and test it for emptiness - a diagnostic printed here would be captured
+# as a row. So absence-or-malformation is an EXIT STATUS (3, the same one `region` uses) and the
+# message is the caller's to print; `units_refusal` is the one place that message is spelled.
 #
-# The discriminator is the LINK TARGET, which is what M2 already uses to define a unit's spec, so
-# this selector and that definition move together. Filtering on a status token instead would work
-# today and rot the moment a record's kind column holds a word that looks like one.
+# TWO independent guards against the record-row defect TOOL-aPromptedMandate-12 measured, because
+# they fail differently. The REGION is the nested `gen:build-units` pair, which encloses the units
+# table only, so a record row is out of range structurally rather than by filter. The SELECTOR is
+# still `](spec/` - the link target, which is what M2 already uses to define a unit's spec - so a
+# mis-rendered or hand-widened region cannot smuggle a record row back in. Either alone was enough
+# on the day it was written; a false GREEN here passes build-complete over an unfinished unit, and
+# that is worth paying one grep for.
 #
 # `.*` and NOT `[^]]*`: a negated class stops at the first `]`, so a unit whose title contains one
-# would be DROPPED - and a dropped unit row is a false GREEN, because nonterminal_units cannot see it
-# and build-complete passes over an unfinished unit. Greedy `.*` takes the last `](spec/` on the line.
-unit_rows() { region "$1" "$SRC_OPEN" "$SRC_CLOSE" 2>/dev/null | grep -E '^\| \[.*\]\(spec/'; }
+# would be DROPPED - and a dropped unit row is a false GREEN, because nonterminal_units cannot see
+# it. Greedy `.*` takes the last `](spec/` on the line.
+unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
+  local out
+  out=$(region "$1" "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null) || return 3
+  printf '%s\n' "$out" | grep -E '^\| \[.*\]\(spec/'
+}
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
+# TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
+# two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
+_ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
+# S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
+# exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
+# status as "absent", so the message names both possibilities and the repair.
+units_refusal() { # build README path
+  # The remedy names the SCRIPT and its flag, never a launcher. Spelling a bare launcher here
+  # tripped the driver's own resolver ban, and the ban is right about more than form: a bare
+  # launcher is what this repo cannot assume exists, so telling an operator to type one is the
+  # defect the ban exists to stop. Same shape as absence-assertion-over-whole-file-text: the
+  # check cannot tell an invocation from a sentence about one, and need not when the sentence
+  # is right anyway.
+  printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
+}
 
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state next="" miss nmiss=0
@@ -1002,9 +1087,9 @@ verb_plan() { # slug
   # the branch's signature, and a $( ) inside the message lands IN that signature - so no arm can
   # ever match it. Same class as the positional trap this repo already documents.
   local _rmp; _rmp=$(readme_of "$slug")
-  if grep -qF -- "$ROSTER_OPEN" "$_rmp" 2>/dev/null; then
-    if ! region "$_rmp" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
-      fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
+  if grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
+    if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+      fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
       return 1
     fi
   fi
@@ -1098,6 +1183,9 @@ verb_phase() { # slug · phase · witness
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
   set_fact "$rel" phase "$want" || return 1
+  # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
+  # that does not stage" was wrong. Three of five staged; this and --close were the two that did not.
+  stage_or_fail "$rel" || return 1
   set_fact "$rel" witness "$wit" || return 1
   echo "unattended: phase $want · witness $wit"
   return 0
@@ -1156,6 +1244,10 @@ verb_landed() { # slug
   # verb froze RECORD rows into `units-at-landing` - a terminal, permanent fact validated by nothing,
   # and the freeze is the whole reason the field exists. The second closing review reproduced it at
   # 1162 bytes of raw markdown against this build's own README.
+  #
+  # TOOL-aBoundedVerdict-11 S2 - and the region it reads is now the nested `gen:build-units` pair, so
+  # a record filename cannot reach this freeze by row shape either. Both existing frozen facts were
+  # measured clean across the change.
   set_fact "$rel" units-at-landing \
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
@@ -1281,6 +1373,23 @@ verb_preflight() { # slug · keepalive-id
     base="$TB"
     check_authorization "$slug" "$base" || true
   fi
+  # TOOL-aBoundedVerdict-11 S4 - the WORKING COPY's units region must be readable, and this is where
+  # an agent meets the requirement rather than discovering it at --close. The region is what every
+  # later verb reads for the unit list: --plan's roster join, --status's next unit, --landed's freeze
+  # and build-complete's terms. Refusing here costs one render; refusing at close costs a whole run.
+  #
+  # It reports through `status` rather than returning, so this refusal joins the others in one pass and
+  # the operator sees every unmet precondition at once instead of one per invocation.
+  # The test is on the REGION, not on `unit_rows`. `unit_rows` pipes through grep, so it returns 1 when
+  # the pair is WELL-FORMED BUT EMPTY - which is every build that has no specs yet, i.e. every brand
+  # new one. Refusing on any non-zero status therefore refused the ordinary case; only "no single
+  # well-formed pair" is a refusal, and that is what `region` alone reports.
+  if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+    fail 46 "the build README's unit list cannot be read, so every verb keyed on it would run blind"
+    units_refusal "$(readme_of "$slug")"
+    status=1
+  fi
+
   # TOOL-aPromptedMandate-4, S5 - the waiver SCOPE, and it CANNOT live in check_waivers: that runs
   # before the authorization block above, where AUTH_MODE is unset for BOTH modes, so a refusal keyed
   # there never fires for one spelling and always fires for the other. Placed here, after the read
@@ -1444,7 +1553,8 @@ verb_status() { # slug
   # helper, so narrowing `unit_rows` alone would have left --close reading the units table while
   # --status and --resume kept reading the records table - two answers to one question about one
   # region, which is what the extraction exists to prevent. It was already wrong before the narrowing:
-  # --status on a landed build offered a `build/` record filename as the next unit.
+  # --status on a landed build offered a `build/` record filename as the next unit, measured on
+  # aBranchedMandate by BOTH nodes independently.
   # `](spec/` and not a bare `]`: the selector deliberately admits a unit whose TITLE contains one,
   # so cutting at the first `]` would display a truncated id for exactly the row the narrowing was
   # written to keep. Cut at the link instead, which is the only `](spec/` a unit row carries.
@@ -1496,7 +1606,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
-  observe_anchor >/dev/null 2>&1 || true
+  # TOOL-aBoundedVerdict-12 S7 - one line BEFORE the network round-trip, so a close that is about to
+  # spend one has printed something. Unconditional: a progress line an unattended run cannot observe
+  # is not a progress line, and the arm that proves it needs stdout rather than a tty.
+  echo "unattended: --close $slug - observing the anchor, then evaluating the Definition of Done"
+  # S1 - the redirect is GONE. `fail` echoes to stdout, so `>/dev/null 2>&1` destroyed all EIGHT of
+  # observe_anchor's named refusals (checks 22-25 and 27-30), and the only surviving output was the
+  # bare `authorization-reachable` line - the one item `fail 21` forbids overriding. A wedge with no
+  # stated cause and no forward move. `|| true` alone is the form --landed and --preflight already use:
+  # the refusals are not fatal to --close, which is why they were suppressed rather than returned on,
+  # and that reasoning was always about the STATUS and never about the message.
+  observe_anchor || true
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
   refuse_if_terminal "$rel" --close || return 1
@@ -1507,6 +1627,15 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     case " $(dod) " in *" $ov:"*) ;;
       *) fail 12 "--override names an item that is not in the declared DoD set, and an override on an item nobody declared is not an override: $ov"; return 1;; esac
     [ -n "$reason" ] || { fail 12 "--override requires --reason: an unrecorded override is indistinguishable from a passing check"; return 1; }
+    # TOOL-aBoundedVerdict-15 S3 - the FOURTH caller of a guard that existed in triplicate. --abort,
+    # --waive and --park all refuse text spelling the declared bypass flag; the override park did not,
+    # so a TRUTHFUL reason - one that says why the flag matters - reds leg check 11 permanently on a
+    # record no verb can rewrite. Checked HERE, in the loop that validates every pair before any of
+    # them is acted on, because a guard that fires after the write has not prevented anything.
+    if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$ov" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+      fail 12 "an override item or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"
+      return 1
+    fi
     # THE AUTHORIZATION ITEM IS NOT OVERRIDABLE. The protocol says so in one sentence — "There is no
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
@@ -1524,7 +1653,15 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
+        # TOOL-aBoundedVerdict-12 S5 - the RECORD KEY, not only the item. `parked-decisions-surfaced`
+        # is read from a line spelled `parked-surfaced:`, so an operator obeying this refusal wrote a
+        # key nothing reads and re-ran forever. --abort already carries this mapping and says the key
+        # is not always the item name; this is that fix at the call site its author did not grep for.
+        local _akey
+        case "$item" in parked-decisions-surfaced) _akey=parked-surfaced ;; *) _akey="$item" ;; esac
         fail 13 "an agent-attested DoD item is unmet; the driver can only read back what the agent recorded, so this is an attestation, not a machine verdict: $item"
+        printf '    write the RECORD KEY, which is not always the item name: %s: yes
+' "$_akey"
       else
         fail 13 "a machine-checked DoD item is unmet, so --close blocks: $item"
         # What the item had to SAY, indented under the refusal that is still the headline. The
@@ -1552,6 +1689,11 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
   # make the record agree with reality.
   set_fact "$rel" phase LANDING || return 1
+  # TOOL-aBoundedVerdict-15 S1 - STAGED, like the four other phase writers. The gate leg's entire
+  # per-run population is `git ls-files`, which reads the INDEX, so an unstaged LANDING phase is
+  # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
+  # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
+  stage_or_fail "$rel" || return 1
   echo "unattended: close OK — every declared DoD item met; phase LANDING. Land with: $LANDER"
   return 0
 }
@@ -1566,7 +1708,17 @@ dod_met() { # slug · run-state file · item · checker
       # test, and an absent `base:` line used to degenerate the comparison to the git index. The
       # ASHA guard is not decoration: with no observation there is no anchor, and an unanchored
       # merge-base is the thing this item exists to refuse.
-      [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" >/dev/null 2>&1 ;;
+      # TOOL-aBoundedVerdict-12 S2 - the redirect is GONE here too, and this one was worse than S1's.
+      # A redirection on an `&&` list binds only to its LAST simple command, so it silenced
+      # check_authorization's six refusals while trusted_base's continued to print. The failure
+      # therefore looked INTERMITTENT: whether the operator saw a cause depended on which of two
+      # functions refused, and the silenced half was exactly the operator-repairable one.
+      #
+      # trusted_base's own header records that it was rebuilt to return through a global BECAUSE a
+      # captured refusal made --close print only the downstream symptom. The very next call in the
+      # chain re-introduced it. That is the whole argument for S6's rule: the fix was made once,
+      # correctly, and never became one.
+      [ -n "$ASHA" ] && trusted_base "$rel" && check_authorization "$slug" "$TB" ;;
     gates-green)
       # SURFACED, not discarded. `>/dev/null 2>&1` meant a blocked --close reported THAT the bar was
       # red and never WHICH leg, and recovering the name cost a second full bar run every time.
@@ -1601,18 +1753,51 @@ dod_met() { # slug · run-state file · item · checker
       # No new fail branch: this reports through verb_close's fail 13, which already prints the
       # exact --override spelling. A waiver on `land-once-done` relaxes the DIRECTIVE and never this
       # item, so a run that waived it still owes --override build-complete at close.
-      # THE ROSTER REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
+      # THE UNITS REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
       # README predating this item failed with a bare "unmet" and nothing said a marker pair was what
       # it wanted -- which is every build folder in this tree older than the item.
-      if ! region "$(readme_of "$slug")" "$ROSTER_OPEN" "$ROSTER_CLOSE" >/dev/null 2>&1; then
-        DOD_OUT="the build README carries no well-formed roster marker pair, and build-complete reads the roster from that region: $(readme_of "$slug")"
+      #
+      # TOOL-aBoundedVerdict-11 S8 - the GENERATED region, so this term stops being a hand-edit away
+      # from satisfiable. Before it, the term read the AUTHORED roster pair, which only four of 49
+      # build folders carried and which nothing creates: the item was unmeetable on the rest, and the
+      # only exit was `--override build-complete`, the run authorizing itself past the one item that
+      # means the build is done.
+      if ! region "$(readme_of "$slug")" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+        DOD_OUT="the build README carries no well-formed units marker pair, and build-complete reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
         return 1
       fi
+      # TOOL-aBoundedVerdict-12 S3 - the four surviving terms are evaluated SEQUENTIALLY so each can
+      # say which one failed. They were ANDed into one verdict, so all four printed the same sentence
+      # and `--override build-complete` became the natural next move for a reader who could not tell
+      # a missing spec from an unfinished unit. Every value below was already computed in a
+      # substitution that was thrown away: only the messages were missing.
       DOD_OUT=""
-      [ -n "$(roster_ids "$slug")" ] \
-        && [ -z "$(missing_units "$slug" "$M/builds/$slug")" ] \
-        && [ -n "$(unit_rows "$(readme_of "$slug")")" ] \
-        && [ -z "$(nonterminal_units "$(readme_of "$slug")")" ] ;;
+      local _bcids _bcmiss _bcrows _bcnon
+      # ROWS BEFORE IDS, deliberately. A region with no rows has no ids either, so testing ids first
+      # made the no-rows message unreachable from any fixture - a branch nothing can exercise, which
+      # is the same defect as an arm that cannot fire, one layer down. Structure first, then content.
+      _bcrows=$(unit_rows "$(readme_of "$slug")")
+      if [ -z "$_bcrows" ]; then
+        DOD_OUT="the generated units region carries no unit ROWS, and 'no unit row is non-terminal' is vacuously true over none of them, so completeness cannot be read from it: $(readme_of "$slug")"
+        return 1
+      fi
+      _bcids=$(unit_ids_of "$slug")
+      if [ -z "$_bcids" ]; then
+        DOD_OUT="the build's generated units region names no unit id, so there is no roster to judge completeness against: $(readme_of "$slug")"
+        return 1
+      fi
+      _bcmiss=$(missing_units "$slug" "$M/builds/$slug")
+      if [ -n "$_bcmiss" ]; then
+        DOD_OUT="the authored plan names a unit that no tracked spec carries, so the build is incomplete by its own roster: $_bcmiss"
+        return 1
+      fi
+      _bcnon=$(nonterminal_units "$(readme_of "$slug")")
+      if [ -n "$_bcnon" ]; then
+        DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO:
+$_bcnon"
+        return 1
+      fi
+      return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
       # sha because every filename and sequence join was measured wrong on 7 of 7 multi-unit builds
@@ -1638,9 +1823,57 @@ dod_met() { # slug · run-state file · item · checker
       # only by a self-authored override, which is the one shape this kit exists to refuse. Seven is
       # a floor rather than a lucky number: a shorter prefix is a prefix of every longer spelling, so
       # it still matches a record written at eight, ten or forty.
+      # TOOL-aBoundedVerdict-12 S4 - four distinguishable failure modes where there was one silence.
+      # The UNTRACKED case is the likeliest and the least guessable: the join reads --cached, so a
+      # review record sitting on disk and never staged is invisible here and the operator has no way
+      # to tell that from having written no review at all.
+      DOD_OUT=""
       rb=$(fact "$rel" base)
-      [ ${#rb} -ge 7 ] \
-        && GIT grep --cached -qF -- "${rb:0:7}" -- "$M/builds/$slug/reviews/*.md" ;;
+      if [ ${#rb} -lt 7 ] ; then
+        DOD_OUT="the run-state file records no usable pinned base, and an absent one would make this join select the FIRST review record in the build - passing by finding anything: $rel"
+        return 1
+      fi
+      if [ -z "$(GIT ls-files -- "$M/builds/$slug/reviews/*.md" 2>/dev/null)" ]; then
+        if [ -n "$(ls -1 "$M/builds/$slug/reviews/" 2>/dev/null)" ]; then
+          DOD_OUT="a review record exists on disk but is NOT TRACKED, and this join reads the index, so it is invisible here; stage it with git add: $M/builds/$slug/reviews/"
+        else
+          DOD_OUT="no review record exists under this build at all, so nothing records that the closing review happened: $M/builds/$slug/reviews/"
+        fi
+        return 1
+      fi
+      # TOOL-aBoundedVerdict-16 S1/S2/S3 - the join asks for a DIFF-REVIEW naming a commit IN RANGE,
+      # where it used to ask for any file quoting the pinned BASE. Measured over the seven tracked runs
+      # before the change: three had no matching record at all, and two of the four that matched did so
+      # on a SPEC-AUDIT - an item named `closing-review-recorded` satisfied by a spec audit that
+      # happened to quote a sha.
+      #
+      # RANGE, not the pin: a fold-scoped round names the fold's base, which is a DESCENDANT of BASE.
+      # Under TOOL-aBoundedVerdict-14 the honest closing round names a sha the old test rejected.
+      #
+      # Membership is decided by GIT ANCESTRY, both directions, not by string comparison: a substring
+      # test cannot express "in this range" and would accept a sha from any branch sharing a prefix.
+      local _crfound="" _crkindless="" _crf _crsha
+      for _crf in $(GIT ls-files -- "$M/builds/$slug/reviews/*.md" 2>/dev/null); do
+        # The KIND comes off the binding line. Read with a local grep rather than through the hygiene
+        # engine's parser: that parser lives in the memory-tree kit and this kit ships without it.
+        # Grammar owner: memory/HYGIENE.md, "Record bindings".
+        GIT grep --cached -qE '^\*\*Serves:\*\*.*diff-review' -- "$_crf" || { _crkindless="$_crkindless $_crf"; continue; }
+        for _crsha in $(GIT grep --cached -hoE '[0-9a-f]{7,40}' -- "$_crf" 2>/dev/null | sort -u); do
+          GIT merge-base --is-ancestor "$rb" "$_crsha" 2>/dev/null || continue
+          GIT merge-base --is-ancestor "$_crsha" HEAD 2>/dev/null || continue
+          _crfound="$_crf"; break
+        done
+        [ -n "$_crfound" ] && break
+      done
+      if [ -z "$_crfound" ]; then
+        if [ -n "$_crkindless" ]; then
+          DOD_OUT="tracked review records exist under this build but none is a diff-review naming a commit in BASE..HEAD; these carry no diff-review binding line, so a spec audit cannot stand in for a closing review:$_crkindless"
+        else
+          DOD_OUT="a tracked diff-review exists but names no commit between the pinned BASE and HEAD, so it reviewed something outside this run's range: looking under $M/builds/$slug/reviews/"
+        fi
+        return 1
+      fi
+      return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
     parked-decisions-surfaced)
@@ -1665,6 +1898,39 @@ park() { # file · kind · item · reason
 # seen, and the reason the run refused" - had no writer at all, so an agent that refused a decision
 # at pass four had nowhere to put it that any gate reads. Hit during cBriefedPilot's own fold, where
 # the workaround was a backlog row: a different document, read by different people, at a later time.
+# TOOL-aBoundedVerdict-15 S2 - the two AGENT-ATTESTED DoD keys had no writer anywhere in the kit, so
+# --abort (the documented sole exit from a wedged run, which REQUIRES both) was reachable only by
+# hand-editing the authored region of a file the kit calls generated and whose grammar the driver owns.
+#
+# It refuses a MACHINE-checked item, and it does so by reading the item's declared CHECKER rather than
+# matching a pair of names: a project that declares its own agent-attested extra item gets the verb,
+# and one that renames a machine item still gets the refusal. Writing a machine key by hand is exactly
+# the self-certification this kit exists to prevent.
+#
+# The RECORD KEY is derived here too, so an operator never spells one: `parked-decisions-surfaced` is
+# read from a line spelled `parked-surfaced:`, and that mismatch is why the close-path refusal used to
+# send people to write a key nothing reads.
+verb_attest() { # slug · item · value
+  local slug="$1" item="$2" val="${3:-yes}" rel key ck
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to attest anything about: $rel"; return 1; }
+  [ -n "$item" ] || { fail 47 "--attest requires --item: an attestation with no item named is not an attestation"; return 1; }
+  case " $(dod) " in *" $item:"*) ;;
+    *) fail 47 "--attest names an item that is not in the declared DoD set, so nothing would ever read it: $item"; return 1;; esac
+  ck=$(checker_of "$item")
+  if [ "$ck" != agent ]; then
+    fail 47 "--attest refuses a MACHINE-checked item, because writing its key by hand is the self-certification the Definition of Done exists to prevent; this item is checked by the driver: $item"
+    return 1
+  fi
+  refuse_if_terminal "$rel" --attest || return 1
+  case "$item" in parked-decisions-surfaced) key=parked-surfaced ;; *) key="$item" ;; esac
+  set_fact "$rel" "$key" "$val" || return 1
+  stage_or_fail "$rel" || return 1
+  echo "unattended: attested — $key: $val (an attestation, not a machine verdict)"
+  return 0
+}
+
 verb_park() { # slug · item · reason
   local slug="$1" item="$2" reason="$3" rel want pl
   check_slug "$slug" || return 1
@@ -1723,7 +1989,7 @@ PARKED
 # which is what `--abort <slug> --reason <text>` uses. A flag still pending when argv ends keeps the
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
-VERB=""; SLUG=""; KID=""; REASON=""; arg=""
+VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -1747,9 +2013,15 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
+    # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
+    # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
+    # the close can verify, and the current predicate already tolerates trailing text after
+    # yes-or-true. Named by what it is, not by its id: it is SPECCED and not built, and shipped source
+    # that spells an unbuilt id reads to the drift oracle as a status header nobody updated.
+    --value)        AT_VALUE="${2:-}"; shift 2 || shift ;;
     --override)     OV_ITEMS+=("${2:-}"); OV_REASONS+=(""); OV_PEND=ov; WV_PEND=""; shift 2 || shift ;;
     --waive)        WAIVE_ITEMS+=("${2:-}"); WAIVE_REASONS+=(""); WV_PEND=wv; OV_PEND=""; shift 2 || shift ;;
     --reason)       if [ "$OV_PEND" = ov ]; then OV_REASONS[$(( ${#OV_REASONS[@]} - 1 ))]="${2:-}"; OV_PEND=""
@@ -1770,7 +2042,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text>"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -1780,5 +2052,6 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
 esac
 exit "$status"

@@ -224,7 +224,7 @@ conf are both on its watch list).
   `memory/project/unarmed-branches.txt` with its reason, and `python tools/memory-tree/check-arms.py
   --check` exits 0. The `ARMS_FLOORS` entries move only where `--report` shows the measured counts
   actually grew.
-- **AC10** — `GATE_FULL=1 bash tools/run-gates.sh` is green.
+- **AC10** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 
@@ -233,7 +233,7 @@ conf are both on its watch list).
 `tools/memory-tree/kit-dogfood-parity.test.sh` · `python tools/memory-tree/check-arms.py` ·
 `tools/unattended/check-unattended.sh` and its two siblings ·
 `tools/memory-tree/marker-contract.test.sh` · `skills/session-kickoff/manifest-check.sh` ·
-`bash tools/run-gates.sh`.
+`bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 

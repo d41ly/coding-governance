@@ -56,7 +56,9 @@ Rendered by `gen_build_index.py` from this file's front matter — do not hand-e
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-16 · streams deployer
 ids DEPL-aFerriedDossier-1 DEPL-aFerriedDossier-2 DEPL-aFerriedDossier-3
 
+<!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
 
 Records live under `build/`.
 

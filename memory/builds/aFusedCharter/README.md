@@ -182,6 +182,7 @@ region rather than on two readings of the same prose.
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-18 · streams playbook+tooling+deployer
 ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCharter-3 TOOL-aFusedCharter-1 TOOL-aFusedCharter-2 TOOL-aFusedCharter-3 TOOL-aFusedCharter-4
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [DEPL-aFusedCharter-1 — the deploy path becomes a program, and the customize companion retires](spec/2026-08-18-spec-DEPL-aFusedCharter-1.md) | CLOSED | rev-6 | 2026-08-19 |
@@ -191,6 +192,7 @@ ids DEPL-aFusedCharter-1 PLAY-aFusedCharter-1 PLAY-aFusedCharter-2 PLAY-aFusedCh
 | [TOOL-aFusedCharter-1 — the product becomes one tracked path, and every consumer of the old three is repointed](spec/2026-08-18-spec-TOOL-aFusedCharter-1.md) | CLOSED | rev-5 | 2026-08-19 |
 | [TOOL-aFusedCharter-2 — the micro-format definitions become machine-gradeable against their own grammar](spec/2026-08-18-spec-TOOL-aFusedCharter-2.md) | CLOSED | rev-3 | 2026-08-19 |
 | [TOOL-aFusedCharter-3 — an instruction file's lines get a declared maximum, defaulting to 450 characters](spec/2026-08-18-spec-TOOL-aFusedCharter-3.md) | CLOSED | rev-3 | 2026-08-19 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

@@ -240,6 +240,16 @@ can observe them: that you reaped the keepalive (`{{KEEPALIVE_DELETE}}`), and th
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
 gate says so wherever it reports them.
 
+Write each with the VERB, never by editing the record:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --attest <slug> --item keepalive-reaped
+bash {{KIT_DIR}}/unattended.sh --attest <slug> --item parked-decisions-surfaced
+```
+
+It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
+machine-checked item, so it cannot be used to certify anything the driver checks itself.
+
 If you must override a blocked item, name it and give a reason:
 
 ```bash

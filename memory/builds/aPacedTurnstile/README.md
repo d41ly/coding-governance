@@ -204,6 +204,7 @@ recommendation is worth more on the record than off it:
 ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12
 ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aPacedTurnstile-1 — the gate runner becomes a deployable kit](spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md) | CLOSED | rev-7 | 2026-08-18 |
@@ -213,6 +214,7 @@ ids TOOL-aPacedTurnstile-13 TOOL-aPacedTurnstile-14 TOOL-aPacedTurnstile-15
 | [TOOL-aPacedTurnstile-5 — the run record: a durable, machine-readable status emitter](spec/2026-08-18-spec-TOOL-aPacedTurnstile-5.md) | OPEN | rev-7 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-6 — reuse a proven green, and scope a worktree to its own branch point](spec/2026-08-18-spec-TOOL-aPacedTurnstile-6.md) | OPEN | rev-4 | 2026-08-18 |
 | [TOOL-aPacedTurnstile-7 — the push boundary scopes to the diff, and "every leg" becomes a bounded obligation](spec/2026-08-18-spec-TOOL-aPacedTurnstile-7.md) | OPEN | rev-8 | 2026-08-18 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

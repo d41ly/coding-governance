@@ -75,6 +75,7 @@
 - TOOL-aLoosenedCeiling-2 · check 6's six per-class caps become conf keys. A malformed cap ABORTS at status 2 rather than failing a check, and validation is ARITHMETIC: a literal `0` match let `00` past into awk's coercion, redding every file with nothing naming the conf
 - TOOL-aLoosenedCeiling-3 · a ceiling is re-derived on the MERGED tree, never carried from a base the merge superseded. main raised this one mid-build keeping the old headroom; that stands as the fifth movement and this is the sixth, which changes the convention
 - TOOL-aLoosenedCeiling-4 · an adopter's ceiling is sized from a MEASURED growth rate, not the overshoot, and a raise is legitimate only because rotation is SPENT — 646 B, not the 16403 B its own comment advertised. A key their kit cannot read is NOT declared for them
+- TOOL-aBoundedVerdict-11 · the units region becomes GENERATED and MANDATORY; the frozen scope is its unit-ID SET (BASE subset of HEAD), never row bytes, which carry status and rev. Reverses aBoundedVerdict-1's cap knowingly (owner): the method's only exit occurs 0 of 90
 
 - TOOL-aMeteredTurnstile-1 · the bar gets an INSTRUMENT before another fix. Its two lower bounds are the longest leg and work over width; the larger decides which lever works, and nothing computed it. The verb WRAPS an unmodified runner, since every unbuilt aPacedTurnstile unit edits that file
 

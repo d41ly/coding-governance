@@ -44,9 +44,11 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 **Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling
 ids TOOL-bConvergentLodestar-1
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-bConvergentLodestar-1 — reuse-convergence layer for codebase-map](spec/2026-07-22-spec-bConvergentLodestar-1.md) | SPECCED | rev-2 | 2026-07-22 |
+<!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.
 

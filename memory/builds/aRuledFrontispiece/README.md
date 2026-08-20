@@ -295,6 +295,7 @@ five to reverse.
 **Build status:** CLOSED · 11 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11
 
+<!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aRuledFrontispiece-1 — the build README gets a slot contract and an immutable authored plan](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md) | CLOSED | rev-4 | 2026-08-17 |
@@ -308,6 +309,7 @@ ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-
 | [TOOL-aRuledFrontispiece-8 — check 8 stops judging a run it can no longer repair](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md) | CLOSED | rev-2 | 2026-08-17 |
 | [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | CLOSED | rev-2 | 2026-08-17 |
 | [TOOL-aRuledFrontispiece-11 — the corpus is conformed to the slot contract, by hand](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md) | CLOSED | rev-1 | 2026-08-17 |
+<!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
 

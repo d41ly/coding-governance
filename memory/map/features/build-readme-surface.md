@@ -42,10 +42,24 @@ one that fails when that happens.
 rendering a tree it would refuse to grade, or a corpus that violates the contract cannot be rendered
 into compliance. `--check-format` is the only caller, and the gate leg is what makes it binding.
 
-**The `roster:units` pair is authored and this generator never writes into it.** The unattended kit's
-`check_authorization` byte-compares that slice across a run's pinned BASE, so a renderer touching it
-would invalidate every run authorized against the file. It appears in the module only so the slot
-walk can find it.
+**The `gen:build-units` pair is NESTED inside `build-index`, and is the units table's address.**
+`TOOL-aBoundedVerdict-11` added it because the unattended driver selected unit rows out of the
+enclosing region by ROW SHAPE (`^| \[`) while this generator renders a records table into that same
+region — so every review and journal record counted as an unfinished unit. Nested rather than a fifth
+`GEN_REGIONS` entry: that tuple drives region CREATION and the canonical-order check, and registering
+it there would move the units table outside the region three legs and two dossiers bracket. So the
+enclosing region's extent is byte-unchanged and the driver gets a name to read instead of a shape to
+guess. Consumers address it with `region()` like any other pair; it is not in `GEN_REGIONS` and must
+not be added there.
+
+**The `roster:units` pair is authored, this generator never writes into it, and it is being RETIRED.**
+`check_authorization` byte-compared that slice across a run's pinned BASE, so a renderer touching it
+would have invalidated every run authorized against the file — which is why it appears in the module
+only so the slot walk can find it. `TOOL-aBoundedVerdict-11` moves the frozen authorization scope to
+the GENERATED region's unit-ID SET (BASE ⊆ HEAD, never row bytes, because those carry status and rev
+and would refuse every run that built anything), and retires the authored pair by removing its
+readers rather than by editing the four build READMEs that carry one. A region nothing reads is
+inert.
 
 **The roster is wrapped, never counted.** `TOOL-aMouldedFolio-2` renders the full roster here and only
 its count in `LIVE.md` and the ledger, and `render_region`'s own comment states that `unit(s)` and
@@ -82,10 +96,15 @@ creation and rendering.
 
 ## Gaps
 
-- The roster-wrapping half of the corpus surgery never fired. `--check-format` cannot identify an
-  authored plan that is not already wrapped, and an unwrapped plan is legal, so twelve build READMEs
-  carrying a roster table still have no `roster:units` pair. Making the pair mandatory is
-  `TOOL-cBriefedPilot-18` on another node.
+- The roster-wrapping half of the corpus surgery never fired, and it is now MOOT rather than pending:
+  `--check-format` cannot identify an authored plan that is not already wrapped, an unwrapped plan is
+  legal, and twelve build READMEs carrying a roster table have no `roster:units` pair — but
+  `TOOL-aBoundedVerdict-11` retires that pair's readers instead of wrapping the corpus, so the
+  population stops mattering. **The deferral this bullet used to carry was stale**: it named
+  `TOOL-cBriefedPilot-18` as the owner of making the pair mandatory, and that unit is CLOSED with its
+  own AC9 asserting a grep returns zero where it returns two — the requirement was never established.
+  `TOOL-aPacedTurnstile-14` then hit the same gap from another node's live run and is closed by
+  `TOOL-aBoundedVerdict-11` S8.
 - The `order` verb is PERMITTED and not required, so the build-order region is empty for every build
   that has not adopted it. Requiring it needs a dated cutoff, which the owner deferred to a follow-up.
 - Two build READMEs sit in `curation-debt.txt` above the byte tier they entered. Both belong to other

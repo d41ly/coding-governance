@@ -14,11 +14,35 @@ in-place run would read THIS repo's waivers while grading a fixture corpus, and 
 would be judging the wrong file.
 """
 
+import contextlib
 import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+
+@contextlib.contextmanager
+def build_tempdir():
+    """A temp dir whose CLEANUP cannot fail this program.
+
+    WINDOWS, and measured on this repo's own bar: a scanner or a lingering git child can still hold
+    a handle when the block exits, and `TemporaryDirectory` then raises PermissionError
+    [WinError 32] AFTER every arm has already passed. The leg reports exit 1 while its own output
+    says "OK - 80 arm(s)", and at width 8 it blocked a push whose bar had been green in another
+    worktree minutes earlier. A green selftest reported as a red gate is worse than a leaked
+    directory in the OS temp dir, which the OS reclaims.
+
+    `shutil.rmtree(ignore_errors=True)` rather than
+    `TemporaryDirectory(ignore_cleanup_errors=True)`: the latter is 3.10+, this kit ships to trees
+    with no declared Python floor, and guessing wrong is a TypeError on an adopter first run.
+    """
+    td = tempfile.mkdtemp()
+    try:
+        yield td
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+
 
 KIT = Path(__file__).resolve().parent
 FAILURES: list[str] = []
@@ -52,7 +76,7 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 def run_case(files: dict, conf: str | None, waivers: dict | None = None):
     """Build a throwaway repo, run the engine in it, return (exit_code, output)."""
-    with tempfile.TemporaryDirectory() as td:
+    with build_tempdir() as td:
         root = Path(td)
         shutil.copytree(KIT, root / "tools" / "lexicon",
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
@@ -403,7 +427,7 @@ for path, pattern, want, why in [
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
 # reader requires an alphabetic verb. A kit whose first command writes a file its second command
 # rejects has no working adoption path at all.
-with tempfile.TemporaryDirectory() as td:
+with build_tempdir() as td:
     root = Path(td)
     shutil.copytree(KIT, root / "tools" / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

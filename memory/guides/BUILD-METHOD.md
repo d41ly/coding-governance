@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.23 -->
+<!-- gov:kit memory-tree@2.24 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -183,14 +183,18 @@ the review records outrank your recollection. Keep passes small: a compaction la
 
 ## M8 — Closing the build
 
-Bug classes FIRST — run the M6 checklist over `<BASE>..HEAD`; its output is a lens brief for the review, not a
-report filed after it. Then ONE adversarial review of the cumulative diff, from the run's pinned BASE (an immutable
-sha, never a moving ref) to the tip. Per-pass reviews do not substitute: they re-scan overlapping code and never see
-the seam between two passes.
+Bug classes FIRST — the M6 checklist over `<BASE>..HEAD`, ALWAYS that full range and on EVERY round: a class a
+fold REINTRODUCES stays selected even where the fold's own files would not select it, and the probe costs seconds.
+Its output is a lens brief, not a report filed after. Then ONE adversarial review — round 1 from the run's pinned
+BASE (an immutable sha, never a moving ref) to the tip; round N>1 from round N-1's RECORDED TIP, so it reads the
+FOLD that round introduced instead of re-reading fixes, and passes that round's confirmed set as `priorFindings`.
+The harness refuses a base that is not a sha once the round is above 1. Per-pass reviews do not substitute: they
+re-scan overlapping code and never see the seam between two passes.
 
 ```
 Workflow { scriptPath: 'tools/workflows/tier2-review.js',
-           args: { repo: '<abs repo path>', base: '<BASE sha>', head: 'HEAD',
+           args: { repo: '<abs repo path>', base: '<sha: BASE at round 1, round N-1's tip after>',
+                   head: 'HEAD', round: <n>, priorFindings: [<round N-1's confirmed set>],
                    reviewDir: 'memory/builds/<slug>/reviews' } }
 ```
 
