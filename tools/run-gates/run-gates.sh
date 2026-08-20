@@ -343,13 +343,152 @@ prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
 echo "$PROF_LINE"
 
+
+# ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
+# Nothing coordinated two bars before this. `git worktree list` reports well into double figures on
+# this node, and the sibling profiling build measured three full bars running at once with CPU at
+# 39 %, both queues empty, and width 24 running 26 % SLOWER than width 8. The contended resource does
+# not parallelise, so two concurrent bars are worse than two sequential ones and serializing them is
+# the right shape for this machine rather than merely the polite one.
+#
+# THE KEY IS THE GIT COMMON DIR, resolved absolutely. Every worktree of one repository shares it, and
+# two different repositories never do — so "one bar per repo" falls out of the key derivation instead
+# of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
+# left exactly as they are: evidence is per-worktree, contention is per-repository.
+TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0
+if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+  TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
+  [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
+fi
+
+# THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
+# the gap between two heartbeat refreshes, and S4 refreshes at one site: a leg COMPLETING. So the
+# bound is "how long can one leg take", and the runner already has a declared answer for that when
+# the selected profile row sets one — `timeout=<s>`. When it does not, no number here is derivable
+# from anything, and the fallback is deliberately large and says so.
+#
+# ponytail: a single leg longer than TS_TTL with no per-leg deadline configured is reaped mid-run.
+# That is the named ceiling of the fallback, and the fix is to set `timeout=` on the profile row
+# rather than to raise this constant — a bigger fallback only moves the same cliff further out.
+if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
+else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
+# The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
+# derives and is never sized against a bar's wall clock. Four: long enough that a queue three deep
+# behind a stalled holder still drains rather than stampeding, short enough that a wedged node
+# releases within an hour.
+TS_MAXWAIT=$(( TS_TTL * 4 ))
+TS_TICK=${GATE_TURNSTILE_TICK:-2}
+
+ts_now()  { date +%s; }
+ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
+ts_alive(){ kill -0 "$1" 2>/dev/null; }
+
+# RELEASE IS NONCE-GUARDED. A run whose beacon was reaped for being stale must never delete its
+# successor's: without the nonce, a slow holder that comes back to life removes a directory it no
+# longer owns and two bars run anyway — the exact failure this unit exists to prevent, arriving
+# through its own cleanup path.
+ts_release() {
+  [ -n "$TS_DIR" ] || return 0
+  if [ "$(cat "$TS_DIR/nonce" 2>/dev/null)" = "$TS_NONCE" ]; then rm -rf "$TS_DIR" 2>/dev/null || true; fi
+  TS_DIR=""
+}
+ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TICKET=""; }
+
+# Reap a holder that cannot still be holding. TWO independent signals, because each covers a case the
+# other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
+# PID was recycled or which is alive but wedged.
+ts_try_reap() {
+  local hpid hb age
+  [ -d "$TS_DIR_C" ] || return 1
+  hpid=$(cat "$TS_DIR_C/pid" 2>/dev/null)
+  hb=$(cat "$TS_DIR_C/heartbeat" 2>/dev/null)
+  if [ -n "$hpid" ] && ! ts_alive "$hpid"; then
+    printf 'run-gates: reaping the beacon of a dead holder (pid %s)\n' "$hpid" >&2
+    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+  fi
+  case "$hb" in ''|*[!0-9]*) hb=0 ;; esac
+  age=$(( $(ts_now) - hb ))
+  if [ "$hb" != 0 ] && [ "$age" -gt "$TS_TTL" ]; then
+    printf 'run-gates: reaping the beacon of a stalled holder (heartbeat %ss old, ttl %ss)\n' "$age" "$TS_TTL" >&2
+    rm -rf "$TS_DIR_C" 2>/dev/null; return 0
+  fi
+  return 1
+}
+
+if [ -n "$TS_COMMON" ]; then
+  TS_DIR_C="$TS_COMMON/gate-bar-beacon"
+  TS_Q="$TS_COMMON/gate-bar-queue"
+  TS_NONCE="$$-$(ts_now)-$RANDOM"
+  mkdir -p "$TS_Q" 2>/dev/null || true
+  # EVERY RUN TAKES A TICKET, including an uncontended one. A ticket whose name sorts by time is all
+  # the ordering there is: every waiter reads the same listing and derives the same total order
+  # independently, so there is no counter file to corrupt and no coordinator to elect.
+  TS_TICKET="$TS_Q/$(date -u +%Y%m%dT%H%M%S)-$$-$RANDOM"
+  : > "$TS_TICKET" 2>/dev/null || TS_TICKET=""
+  ts_start=$(ts_now); ts_lastpos=""; ts_announced=0
+  while :; do
+    # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
+    # `flock` — which does not exist on this platform. The heartbeat is written FIRST on winning, so
+    # a just-claimed holder is never mistaken by a waiter for one with no clock.
+    if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
+       && mkdir "$TS_DIR_C" 2>/dev/null; then
+      TS_DIR="$TS_DIR_C"
+      printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat" 2>/dev/null || true
+      printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
+      printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
+      TS_HELD=1
+      break
+    fi
+    ts_try_reap && continue
+    TS_WAITED=$(( $(ts_now) - ts_start ))
+    if [ "$TS_WAITED" -ge "$TS_MAXWAIT" ]; then
+      # FAILS OPEN, LOUDLY. A turnstile that can wedge a bar is worse than two bars: the run drops
+      # its ticket and proceeds unqueued rather than becoming the outage. It contributes nothing to
+      # the exit code, ever.
+      echo "run-gates: turnstile WAIT EXPIRED after ${TS_WAITED}s (bound ${TS_MAXWAIT}s) — running UNQUEUED alongside whatever holds the beacon" >&2
+      ts_drop_ticket
+      break
+    fi
+    pos=$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | grep -n "^$(basename "${TS_TICKET:-none}")$" | cut -d: -f1)
+    [ -n "$pos" ] || pos="?"
+    if [ "$pos" != "$ts_lastpos" ] || [ "$ts_announced" = 0 ]; then
+      echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      [ -n "$gd" ] && printf 'position\t%s\nwaited\t%s\n' "$pos" "$TS_WAITED" > "$gd/gate-queue-status" 2>/dev/null || true
+      ts_lastpos=$pos; ts_announced=1
+    fi
+    sleep "$TS_TICK"
+  done
+  ts_drop_ticket
+  [ -n "$gd" ] && rm -f "$gd/gate-queue-status" 2>/dev/null || true
+  # A LINEAGE MARKER for any future nested caller. The primary path needs no exemption predicate —
+  # a nested run in a scratch repo resolves a different common dir and therefore a different beacon —
+  # but a caller that one day nests inside the SAME repo would deadlock against its own parent, and a
+  # marker it can read is cheaper than the incident.
+  export GATE_TURNSTILE_HELD="${GATE_TURNSTILE_HELD:-}${GATE_TURNSTILE_HELD:+,}$TS_NONCE"
+fi
+
+# ONE PARSEABLE LINE, always, zero when uncontended. A wrapper that brackets a wall clock around this
+# runner — `profile_bar.py` is exactly one — cannot otherwise tell waiting from working, and a queue
+# wait folded into a measured wall clock can push a packing ratio below 1.0, which that tool correctly
+# refuses as arithmetically impossible. This unit ships the line; who consumes it is a separate
+# question.
+echo "gate queue: waited ${TS_WAITED}s"
+
 WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
-# THE TRAP'S SCOPE IS THE SCRATCH DIR AND NOTHING ELSE, and that is now load-bearing rather than
-# incidental. The run record below lives under the git dir and is DURABLE: a trap that swept it would
-# erase the record on every ordinary exit and on every caught signal — which is every path except the
-# crash the record exists to make readable. The next unit widens this trap to INT, TERM and HUP; its
-# scope stays the scratch dir.
-trap 'rm -rf "$WORK"' EXIT
+# THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
+# the run record below lives under the git dir and is DURABLE, so a trap that swept it would erase
+# the record on every ordinary exit and on every caught signal — which is every path except the
+# crash the record exists to make readable.
+#
+# WIDENED past EXIT because a bar is routinely interrupted, and a beacon that only releases on a
+# clean exit turns every Ctrl-C into a repository that queues behind a run nobody is doing until
+# the TTL expires. The signal arms re-exit with the conventional 128+n so the caller still sees
+# what killed it. `cleanup` is idempotent: EXIT fires after them and must not undo a release.
+cleanup() { rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+trap cleanup EXIT
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
+trap 'cleanup; exit 129' HUP
 
 # ---- the run record (the run-record unit) --------------------------------------------------------
 # The runner used to forget everything on exit: the per-leg results lived in $WORK, which the trap
@@ -589,6 +728,12 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
       > "$RUNDIR/$i.leg.tmp" 2>/dev/null \
       && mv -f "$RUNDIR/$i.leg.tmp" "$RUNDIR/$i.leg" 2>/dev/null || true
   fi
+  # THE ONE HEARTBEAT SITE, and it is here rather than in the reader loop because this is the
+  # event the TTL is sized against: S4 refreshes at a leg COMPLETING, so "can the holder still be
+  # holding" and "has a leg finished lately" are the same question. A second site in the reader
+  # loop would refresh while no leg was making progress, which is the state the reaper exists to
+  # detect.
+  ts_hb
   printf '%s' "$rc" > "$WORK/$i.rc.tmp" && mv -f "$WORK/$i.rc.tmp" "$WORK/$i.rc"
 }
 

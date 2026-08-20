@@ -1,6 +1,6 @@
 # TOOL-aPacedTurnstile-4 — the turnstile: one bar per repo, and a queue for the rest
 
-**Status:** OPEN · rev-5 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-20 · node a · Tier-2 · base 6517579f · streams tooling
 
 ## 1. Goal
 
@@ -434,7 +434,8 @@ fork resolves toward this unit consuming the queue line rather than a follow-up 
 
 ## 8. Open questions
 
-One fork is OPEN for the owner; the two below it are RESOLVED and are kept with the reason each
+none open — all three forks are RESOLVED, and the first was decided at build time under the
+owner's instruction to build the set through to completion. Each is kept with the reason it
 survived the veto order.
 
 - **Who consumes S11's queue line.** `tools/run-gates/profile_bar.py` belongs to `aMeteredTurnstile`
@@ -447,6 +448,18 @@ survived the veto order.
   waiting from working. Recommendation: (a), because the mechanical edit is smaller than the record
   needed to defer it and the hazard exists from this unit's landing. The build runs attended, so the
   owner picks.
+  RESOLVED (2026-08-20): **(a), taken at build time and flagged rather than assumed.** The owner's
+  instruction was to build the set through to completion, which is authority to build and not
+  authority to re-scope, so the pick is recorded here with what made it the small choice rather than
+  the convenient one. Two things had changed since the fork was written. The record unit had already
+  edited `profile_bar.py` — repointing it at the ledger — on that build's own written pledge to read
+  this build's store, so "editing another build's file" was no longer a first crossing. And the
+  hazard is self-inflicted rather than theoretical: the profiler brackets a wall clock around the
+  runner, a queue wait inflates the wall while leaving the durations alone, and that is exactly the
+  direction that trips its own packing refusal — a queued run would make an ordinary bar look
+  arithmetically impossible and the tool would refuse its own measurement. The edit is four lines
+  and the wait is RECORDED as well as subtracted, because a number that silently disappears from a
+  published wall is one nobody can audit.
 - **Whether the TTL should be lowered once the heavy legs are sharded.** The fallback floor is set
   above any leg this repo has observed, deliberately.
   RESOLVED (agent, 2026-08-18, delegated): leave it, with the derivation written beside the
@@ -464,6 +477,29 @@ survived the veto order.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-20 · BUILT and CLOSED. The turnstile keys on the git COMMON dir, so every
+  worktree of one repository shares one beacon and two repositories never do — "one bar per repo"
+  falls out of the key derivation instead of needing a predicate. Verified on this node: the
+  primary tree and this worktree both resolve `C:/projects/coding-governance/.git`, so they now
+  serialize, which is precisely the contention that cost this build's own closing run about 100
+  minutes on one leg.
+
+  **What the arms cost to get right, recorded because both were the suite grading itself.** The
+  peak-occupancy arm is paired with a control that runs the SAME fixture with the turnstile off
+  and must observe an overlap; without it the arm passes on an implementation that serialized by
+  accident, and on a host too slow to overlap it now says so rather than claiming a pass. And the
+  suite's own `beacon()` helper returned `git rev-parse --git-common-dir` verbatim, which is
+  RELATIVE — plain `.git` in an ordinary clone — so eight arms tested a path that meant something
+  different from the harness's cwd. They reported "the run never claimed the beacon, so this
+  proves nothing", which is the arms refusing to grade rather than passing green, and is the only
+  reason the defect was visible at all.
+
+  **The TTL is derived, not copied.** What has to be outlasted is the gap between two heartbeat
+  refreshes, and S4 refreshes at one site — a leg COMPLETING. So the bound is "how long can one
+  leg take", which the profile row already declares as `timeout=`; when it declares nothing the
+  fallback is deliberately large and carries a `ponytail:` comment naming its ceiling and the fix,
+  which is setting `timeout=` rather than raising the fallback. AC4c arms that ceiling instead of
+  assuming it.
 - rev-1 · 2026-08-18 · initial draft.
 - rev-2 · 2026-08-18 · folded the spec audit: AC1 and AC2 move from timestamp-interval intersection
   to the rendezvous peak, the shape `TOOL-cSteadyMetronome-1` established after the interval form was

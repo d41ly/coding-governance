@@ -324,6 +324,20 @@ def main():
     proc = subprocess.run([bash, RUNNER], cwd=root, env=env, capture_output=True, text=True)
     wall = time.monotonic() - start
 
+    # THE QUEUE WAIT IS NOT WORK, so it comes out of the wall clock before anything is derived from
+    # it. The turnstile serializes bars per repository, so this process can sit waiting for another
+    # bar to finish while this bracket is running — and a wait folded into `wall` inflates the number
+    # this whole tool exists to publish. Worse, it inflates it in the one direction that trips the
+    # packing refusal below: wall goes up while the durations do not, so a long enough queue makes a
+    # perfectly ordinary run look arithmetically impossible and the profiler refuses its own
+    # measurement. The runner prints exactly one parseable line for this, always, zero when
+    # uncontended.
+    queued = 0.0
+    m = re.search(r"^gate queue: waited ([0-9]+(?:\.[0-9]+)?)s$", proc.stdout, re.M)
+    if m:
+        queued = float(m.group(1))
+        wall = max(0.0, wall - queued)
+
     verdicts = parse_verdicts(proc.stdout)
     if not verdicts:
         print("profile-bar: the run produced NO parseable verdict lines — refusing to record a "
@@ -381,6 +395,9 @@ def main():
         "width_source": width_source,
         "full": not args.scoped,
         "wall": round(wall, 3),
+        # Recorded rather than merely subtracted: a reader comparing two records needs to know a run
+        # queued, and a number that silently disappears from the wall is a number nobody can audit.
+        "queued": round(queued, 3),
         "exit": proc.returncode,
         "failed_legs": failed,
         "env": {

@@ -72,6 +72,7 @@
       "run-gates canary",
       "run-gates evidence",
       "run-gates gov canary",
+      "run-gates turnstile",
       "run-gates wiring",
       "settings-merge selftest",
       "template size <=48KiB",

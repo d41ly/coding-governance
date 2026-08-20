@@ -59,6 +59,15 @@ guard = ["{kit}/"]
 # not the real manifest, not the real timing cache. A guard may name what the leg READS.
 
 [[gate_leg]]
+name = "run-gates turnstile"
+argv = ["bash", "{kit}/run-gates.turnstile.test.sh"]
+guard = ["{kit}/"]
+# Guarded on the kit dir ALONE. Every arm builds its own scratch repository and drives the runner
+# there, so the suite reads nothing outside this kit — not the real manifest, and deliberately not
+# the real beacon: a suite that queued against the repository it is testing would serialize itself
+# behind the very bar that is running it.
+
+[[gate_leg]]
 name = "run-gates canary"
 argv = ["bash", "{kit}/run-gates.test.sh"]
 # Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which

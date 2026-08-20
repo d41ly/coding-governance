@@ -595,6 +595,17 @@
     ]
   },
   {
+    "name": "run-gates turnstile",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-gates.turnstile.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/",
+      "tools/lib/"
+    ]
+  },
+  {
     "name": "run-gates gov canary",
     "argv": [
       "bash",

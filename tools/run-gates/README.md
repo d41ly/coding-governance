@@ -35,9 +35,27 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 | `run-gates.test.sh` | the SHIPPED canary — every assertion here is true in any tree |
 | `run-gates.gov.test.sh` | the GOV-ONLY arms, withheld from the payload; see below |
 | `run-gates.evidence.test.sh` | the durability arm: a red leg's output survives on disk |
+| `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
 | `kit.toml` | this entry, declared as data |
+
+## The turnstile — one bar per repository
+
+A run claims a beacon under the git COMMON dir before it dispatches, so every worktree of one
+repository shares one beacon and two repositories never contend. A second run takes a time-sorted
+ticket and queues, announcing its position; the runner prints `gate queue: waited <n>s` on exactly
+one line, always, zero when uncontended, so a wrapper can tell waiting from working.
+
+A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the TTL. The TTL
+is DERIVED from the profile row's per-leg `timeout=` when it sets one, because the heartbeat
+refreshes when a leg COMPLETES — so "can the holder still be holding" and "has a leg finished
+lately" are the same question. Release is nonce-guarded and folded into a trap widened to INT, TERM
+and HUP: a run whose beacon was reaped can never delete its successor's.
+
+It FAILS OPEN. The wait is bounded at a declared multiple of the TTL; on expiry the run says so
+loudly, drops its ticket and proceeds unqueued. `GATE_TURNSTILE=0` disables it entirely. It never
+contributes to the exit code — a turnstile that can wedge a bar is worse than two bars.
 
 ## The run record
 
