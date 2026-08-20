@@ -200,8 +200,8 @@ This line is the machine-read one; the bullets carry the reasoning.
   the one state worth waking someone for. Options: leave it to resume, as specced; or treat it as a
   notify-and-stop. The options differ in whether this unit gains an owner-notification mechanism at
   all, so it goes up.
-  RESOLVED (agent, 2026-08-20, delegated by VETO, not by choice): left to the resume path, AS
-  SPECCED. Only one option survives M3's vetoes — notify-and-stop needs an owner-notification
+  RESOLVED (agent, 2026-08-20, delegated): left to the resume path, AS SPECCED — and by VETO
+  rather than by choice. Only one option survives M3's vetoes — notify-and-stop needs an owner-notification
   mechanism this kit does not have, which is veto 2, a new public surface. Declining to WIDEN scope
   is not exercising the scope authority a run does not hold; taking the notify option would have
   been. **The vetoed option is PARKED to the owner** in this run's run-state file and reaches them
