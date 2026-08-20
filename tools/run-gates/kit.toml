@@ -46,12 +46,10 @@ code = 0
 probe = { must_exist = "{kit}/run-gates.sh" }
 means = "adopted"
 
-# FOUR gate legs, and four is the RULE rather than a census: these are the legs the kit SHIPS. A
-# fifth harness — the gov-only canary above — exists on gov's own bar at this kit's landing and is
-# correctly absent here because it travels nowhere. the turnstile unit's turnstile suite is a
-# genuine fifth row and THAT unit adds it, to this file and to the manifest together: a descriptor
-# row naming a leg the manifest does not carry reds selfcheck at the adding unit's own landing,
-# which is the round-1 blocker this file was rewritten to avoid.
+# THE RULE, not a census: a row here must name a leg the TARGET's manifest can carry, and it moves
+# in the same commit as that manifest row — a descriptor row naming a leg the manifest lacks reds
+# selfcheck at the adding unit's own landing. The count is DERIVED by govkit and is deliberately
+# not written here; the number that used to sit in this sentence was wrong one commit later.
 [[gate_leg]]
 name = "profile-bar selftest"
 argv = ["bash", "{kit}/profile_bar.test.sh"]
