@@ -32,14 +32,39 @@ what found the largest finding in this report — see §3.1.
 
 All `GATE_FULL=1`, profile row `capable`, width 8, node `a` (16 cores / 32693 MB).
 
-| run (local) | span | leg-seconds | floor | utilization | packing | verdict |
-|---|---|---|---|---|---|---|
-| 14:44 | 970.0 s | 4644 | 812.1 s | 59.8 % | 0.84 | RED |
-| 15:07 | 925.5 s | 5144 | 925.5 s | 69.5 % | **1.00** | GREEN |
-| 15:38 | 1051.4 s | 5245 | 887.9 s | 62.4 % | 0.84 | RED |
-| 16:05 | *in flight while this was written* | | | | | |
+| run (local) | span | leg-seconds | throughput | floor | utilization | packing | verdict |
+|---|---|---|---|---|---|---|---|
+| 14:44 | 970.0 s | 4644 | 4.79 leg-s/s | 812.1 s | 59.8 % | 0.84 | RED |
+| 15:07 | 925.5 s | 5144 | 5.56 leg-s/s | 925.5 s | 69.5 % | **1.00** | GREEN |
+| 15:38 | 1051.4 s | 5245 | 4.99 leg-s/s | 887.9 s | 62.4 % | 0.84 | RED |
+| 16:05 | 1058.3 s | — | — | — | — | — | GREEN |
 
-**Every run is FLOOR-bound**: the single longest leg exceeds leg-seconds ÷ width. That one fact
+*Correction, 2026-08-21 (spec audit F7, F12; diff review H1).* The 16:05 row was left blank under
+a heading claiming four bars, and the **throughput** column AC1 names was absent — so AC1 was
+graded met against a table missing a column it requires. Both are now filled, and what is and is
+not recoverable is stated per cell rather than swept together.
+
+**Throughput was never missing — it was one division away, and the arithmetic had already been
+done.** It is leg-seconds ÷ span, and utilization × width reproduces it TO ROUNDING: 59.8 % × 8 =
+4.78 against 4.79, 69.5 % × 8 = 5.56, 62.4 % × 8 = 4.99 — the utilization column is itself rounded
+to one decimal, so the two agree to within that. A first pass at this
+correction claimed throughput was unrecoverable for EVERY row; that was wrong on three of four,
+and backwards on the fourth, which is the row that HAS a span and lacks leg-seconds.
+
+**The 16:05 span is RECOVERED ARITHMETIC**, not a fresh read: §4's R2 gives "292 s (27.6 %) on run
+130546", so 292 / 0.276 ≈ 1058 s (±4 s at the quoted three significant figures), carried at 1058.3 s.
+The four-run mean of 1001.3 s is NOT an independent check on it — that mean was computed from this
+same recovered value, so the identity is circular and is stated here only to show the arithmetic is
+self-consistent. Its verdict is recovered from §3.5, which lists that run at head `e6098aa43` with failed
+legs "none". **Its leg-seconds, throughput, floor, utilization and packing are unrecoverable —
+that row alone** — because it was never reconstructed while its per-leg records existed, and they no
+longer do. The sweep is not the discriminator: `<git-dir>/gate-run/` on node `a` now holds only
+`20260820T163240Z-457` onward, which excludes ALL FOUR bars (they ran at UTC 11:44 / 12:07 / 12:38 /
+13:05), so nothing in this table is re-derivable from records today. The other three rows are full
+because they were read BEFORE the sweep; this one is not because it was still in flight.
+
+**Every run whose per-leg records were reconstructed — three of four — is FLOOR-bound**: the single
+longest leg exceeds leg-seconds ÷ width. That one fact
 decides everything below. It means the bar's wall clock is set by one leg, and no scheduling
 change, no extra worker and no faster sibling leg can move it.
 
@@ -75,7 +100,7 @@ Top legs, 15:38 run:
 
 ## 3 · Findings
 
-### 3.1 · The dispatch hint is per-worktree, was renamed without migration, and 24 of 26 worktrees have none
+### 3.1 · The dispatch hint is per-worktree, was renamed without migration, and 24 of 26 worktrees had none
 
 **This is the largest finding and the cheapest fix.**
 
@@ -192,7 +217,7 @@ Every span in §2 measures **first leg start → last leg end**. It excludes the
 
 `run-gates.sh:378-518` serialises **one bar per repository** across every worktree on the node — the
 key is the git *common* dir, so all 26 worktrees here share one beacon. A lander arriving while a
-peer holds it waits for the peer's whole bar. With a service time of 925–1051 s, a lander that
+peer holds it waits for the peer's whole bar. With a service time of 925–1058 s, a lander that
 queues behind one peer experiences **~31–35 minutes**, and every span in this report reads it as
 ~16.
 
@@ -214,7 +239,7 @@ see it either.
 
 Partial arrival census (the last five records per worktree — `GATE_RUN_KEEP=5` has swept the rest),
 full bars, UTC: `11:44:16`, `12:07:52`, `12:38:54`, `13:05:47`. Inter-arrival 23.6 / 31.0 / 26.9 min
-against a 15.4–17.5 min service time, so the turnstile runs near **60 % utilization** — high enough
+against a 15.4–17.6 min service time, so the turnstile runs near **60 % utilization** — high enough
 that queueing is routine, not exceptional.
 
 ### 3.5 · The reds are real defects, not flakes — I checked, and my first reading was wrong
@@ -305,7 +330,7 @@ Median of 15, quiet box, 16:23:57:
 | `python -c pass` | 103.7 ms | 1297 ms | **151.2 ms** |
 | `mktemp -d` + `git init` | — | 2751 ms | **158.1 ms** |
 
-Process creation is back within ~1.5× of the August-11 baseline, and `git init` is **17× faster**
+Process creation is back within 1.4–2.1× of the August-11 baseline (`git rev-parse` is the 2.01×), and `git init` is **17× faster**
 than the degraded reading. `TOOL-aMeteredTurnstile-6` concludes *"serialized per-op latency, not
 contention"* on the strength of CPU at 39 % with empty queues. That conclusion does not survive
 this: the degraded readings were taken under four concurrent bars, and on a quiet box the same ops
@@ -354,7 +379,8 @@ simulator says they buy. **Every entry states what it buys in seconds of span, o
 
 ### R1 — Share the dispatch hint across worktrees, and pair it with time-to-first-signal
 
-**Buys ~160 s (15.6–16.3 %) on any cold worktree, which today is 24 of 26.** `TOOL-aScannedThrottle-1`.
+**Buys ~160 s (15.6–16.3 %) on any cold worktree, which was 24 of 26 when measured 2026-08-20.** `TOOL-aScannedThrottle-8`
+*(re-minted 2026-08-21 from `-1`, which this spec's own H1 already owned — spec audit F6).*
 
 Three parts, and the third is not optional:
 
@@ -406,7 +432,10 @@ already reasons about queue time and cannot see it either.
 
 ### R4 — Measure Defender before excluding anything
 
-**Buys UNQUANTIFIED, and the honest answer is probably less than you would hope.**
+**Buys 0 s until measured** — *corrected 2026-08-21 (spec audit F8); it read "UNQUANTIFIED",
+which is neither a figure nor an explicit zero and breaks both AC4 and this section's own rule.*
+No span may be claimed for it until `New-MpPerformanceRecording` has run, and the honest
+expectation is that it is less than you would hope.
 `TOOL-aScannedThrottle-3`.
 
 Verified on this node: real-time protection, behaviour monitoring, on-access and script scanning all
@@ -489,16 +518,61 @@ landing bar while giving a wrong reason is worse than one that reds silently.
 
 | id | action | why |
 |---|---|---|
-| `TOOL-aPacedTurnstile-8` | **KEEP OPEN, raise to top** | The one change that moves the span. Re-stamp to the crossover target of ~766 s rather than to a floor number. |
-| `TOOL-aMeteredTurnstile-6` | **REFINE** | The tax is **load-dependent**, not standing: quiet-box readings sit within ~1.5× of the 2026-08-11 baseline and `git init` is 17× faster than the degraded figure. The row's "not contention" conclusion does not survive §3.8. |
-| `TOOL-aMeteredTurnstile-3` | **REFINE** | The **live ledger is clean** — 0 orphans, 88 rows against 88 legs. The 964.2 s of orphan rows sits in the dead `gate-timings.tsv`, which nothing reads. Mechanism real, instance gone. |
+| id `TOOL-aPacedTurnstile-8` | **KEEP OPEN, first by measured span** | The one change that moves the span. Re-stamp to the crossover target of ~766 s, and RETRACT the row's "~660s at any width" floor — measured at 812–926 s on the three bars whose floor is recoverable. The backlog has no priority field, so "first" is this ranking's claim, not a state the file can hold. |
+| `TOOL-aMeteredTurnstile-6` | **REFINE** | The tax is **load-dependent**, not standing: quiet-box readings sit within 1.4–2.1× of the 2026-08-11 baseline (`git rev-parse` is the 2.01×) and `git init` is 17× faster than the degraded figure. The row's "not contention" conclusion does not survive §3.8. |
+| id `TOOL-aMeteredTurnstile-3` | **REFINE** | The **live ledger is clean** — 0 orphans, 88 rows against 88 legs. The orphan rows sit in the dead `gate-timings.tsv`, which nothing reads: measured 2026-08-20 at 964.2 s across the then-live per-worktree copies, and 13.96 s across four orphan rows in the common-dir copy surviving at HEAD (re-derived 2026-08-21). Mechanism real, instance gone. |
 | `TOOL-aMeteredTurnstile-2` | **KEEP OPEN** | Worse than recorded: **1053** scratch dirs against the row's 786, +34 %, with 291 created today. `run-gates.sh:520` never sets `TMPDIR`, and one export would redirect all 63 `mktemp -d` sites. |
-| `TOOL-aMeteredTurnstile-4` | **KEEP OPEN** | `AGENTS.md` still states an 873 s wall and a 4018 s leg-sum. Measured mean across four runs is **1001.3 s**, 14.7 % low. |
+| `TOOL-aMeteredTurnstile-4` | **KEEP OPEN** | `AGENTS.md` still states an 873 s wall and a 4018 s leg-sum. Measured mean across four runs is **1001.3 s** — the charter's 873 s is 12.8 % BELOW that mean, and the mean is 14.7 % ABOVE the charter's figure. Two readings of one gap; state the base. |
 | `TOOL-aMeteredTurnstile-5` | **KEEP OPEN, bind to R1** | Confirmed at **669.1 s versus 5.1 s** to first signal. It is the cost of fixing R1, not an independent item. |
 | `TOOL-aTimedTurnstile-1` | **CLOSE** | False at HEAD. The pool landed, and the row's 79.9 s target sits 11× below the current floor. |
 | `TOOL-cFinalBerth-5` | **KEEP OPEN, note** | Did not reproduce in this sample. The canary's between-run spread is 25.9 % across comparable bars. |
 
-New rows to mint: `TOOL-aScannedThrottle-1` … `-5`, per §4.
+New rows to mint: `TOOL-aScannedThrottle-2` … `-8`, per §4 — seven rows. `-6` (legs dilate
+1.5–1.85× in the pool, §3.9) and `-7` (`run-gates evidence` reds under load on a 5-second bound)
+are both **0 s of span** — a correction factor and a load-dependent red — so neither belongs in the
+R-ranking, and §4 does not carry them. `-8` is the dispatch-hint row of R1, re-minted from `-1`.
+
+### 5.1 · More OPEN rows, added 2026-08-21 (spec audit F4; diff review H2, H3)
+
+§2's S5 says **every** open backlog row about bar performance, and the table above is a curated
+eight. **Five more qualify on the same reading and were absent** — `aTimedTurnstile-2` `-3` `-4`
+`-6` and `aBoundedVerdict-10` — which made an omission indistinguishable from a judgement call. A
+sixth, `aTetheredScratch-3`, is adjudicated IN SCOPE BUT IMMATERIAL and recorded here so the
+exclusion is written rather than silent. The membership predicate is written into the spec at §2 S5
+so the set is derivable rather than authored — and the census below states what that costs.
+
+| id | action | why |
+|---|---|---|
+| id `TOOL-aTimedTurnstile-2` | **STALE** | Its population moved: 88 legs, not 47, and leg-seconds are 4644–5245 against the row's 368.7 s wall (§2). The per-leg `guard` it asks for landed. The ratio survives, unmeasured at this leg count. |
+| id `TOOL-aTimedTurnstile-3` | **REFINE** | Dilation holds — 1.66× confirmed at 1.5–1.85× (§3.9). The floor does not: 812–926 s on the three bars whose floor is recoverable (§2), not ~76 s, and it is an `unattended` selftest. "Sharing fixture setup is the only route" is refuted by R2. |
+| id `TOOL-aTimedTurnstile-4` | **KEEP OPEN** | Its spawn figures ARE the 2026-08-11 baseline column of §3.8 and R4's Defender refutation rests on them, so they are load-bearing and must not be edited away. Its 1.59× cold/warm factor stays unverified — §6 says so. |
+| id `TOOL-aTimedTurnstile-6` | **KEEP OPEN, not re-measured** | Named so the omission is a recorded answer rather than a silent one. Its 617 s run predates the 88-leg bar. §3.6 corroborates the poll-tick mechanism independently at up to ~480 process creations per nested canary run. |
+| id `TOOL-aBoundedVerdict-10` | **NOT REPRODUCED in this sample** | Found by running the predicate rather than by reading §5 — the defect H2 names. It says `unattended driver selftest` HANGS at zero output past 240 s and wedges the whole bar. That leg COMPLETED in all three bars §2 reconstructed before the sweep, at 812.1 / 925.5 / 887.9 s, so the 240-second symptom did not RECUR. Per-leg OUTPUT timing was never reconstructed and the traced `--preflight` hang is unaddressed, so this is not a refutation — the row stays OPEN and its no-per-leg-deadline clause stands. |
+| id `TOOL-aTetheredScratch-3` | **IN SCOPE, IMMATERIAL** | Adjudicated explicitly rather than skipped, and re-read: its subject is 2 empty `tmp.*` dirs per run of `memory-recall/selftest.py`, which IS scratch cost — against the 1053 populated scratch repos `TOOL-aMeteredTurnstile-2` measures. It moves no measurable span, so it is excluded on magnitude, not on population. A first reading excluded it for naming the scratchpad directory, which its text does not say. |
+
+**The predicate was RUN, and the ids are listed rather than counted** — a total cannot be checked,
+a list can. Over the 117 OPEN rows at HEAD (2026-08-21) a keyword reading of S5's six terms selects
+**22**, which partition into three disjoint sets that sum:
+
+- **11 selected, each carrying a dated disposition line** — `aMeteredTurnstile-2` `-3` `-4` `-5` `-6`,
+  `aPacedTurnstile-8`, `aTetheredScratch-3`, `aTimedTurnstile-2` `-3` `-4` `-6`.
+- **6 selected and this build's own** — `aScannedThrottle-2` `-4` `-5` `-6` `-7` `-8`.
+  (`aScannedThrottle-3` is a Defender/admin row and matches no term.)
+- **5 selected and ruled OUT**, each for naming a different subject that shares a word:
+  `aPromptedMandate-9` and `aDeclaredBound-6` ("concurrent" as a run condition, not a bar cost);
+  `aTetheredScratch-4` (a test fixture committed into the live repo — no bar cost at all);
+  `aBoundedVerdict-8` and `aWalkedCorpus-5` ("span" and "floor" as document metaphors).
+
+Three ids carrying a dated disposition line sit OUTSIDE that 22 and are why the counts do not line up naively:
+`aTimedTurnstile-1` is now CLOSED, so it is not in the OPEN selection at all; `cFinalBerth-5` and
+`aBoundedVerdict-10` are OPEN and qualify on reading but match none of the six terms. So §5 and
+§5.1 disposition **14** ids, of which 11 are keyword-selected and 3 are not.
+
+**And that is the honest finding: a prose predicate is not an executable one.**
+`aBoundedVerdict-10` is about the floor leg itself and matched nothing, so any keyword
+approximation of S5 is an unarmed check that passes by finding nothing. The left-shift is the
+`spec-population` leg the diff review proposes; until it exists, completeness here is a HUMAN
+reading of 117 rows, dated 2026-08-21, and not a derivation.
 
 ## 6 · What this build did NOT establish
 
