@@ -9,10 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aScannedThrottle-1
 parked-surfaced: yes
 keepalive-reaped: yes
-witness: 2861ea94c55d3a603deb94e383b46dcff9093480
-phase: LANDING
+witness: 44e7f18f87bbf6f445958e2474fe1495c1504117
+phase: LANDED
 mode: slug
 anchor-kind: default-branch
 keepalive: 6ade2146
