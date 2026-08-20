@@ -152,13 +152,14 @@ the push boundary. This unit adds no gate.
 
 ## 8. Open questions
 
-- **F1 — RESOLVED by the 2026-08-20 reorder, and restated here rather than deleted.** The original
-  text closed by saying a run could resolve this under the new scope authority — which was false at
-  the time, because the authority and the recording verb both landed AFTER this unit. Review fold:
-  M11. Under the reordered plan the authority is position 2 and the verb position 3, and this unit is
-  position 5, so a run reaching this fork genuinely can resolve and record it. The fork itself stays
-  open by design, because it is honestly unresolvable until the measurement is taken: if E3 clears and
-  E4 fails, does the build ship a narrowed inversion? A pass-level
+- **F1 — OPEN, and deliberately so: if E3 clears and E4 fails, does the build ship a narrowed
+  inversion?** It is honestly unresolvable until the measurement is taken, and writing the answer
+  before the test is exactly what S1 exists to prevent. What the 2026-08-20 reorder fixed is not the
+  fork but the CLAIM attached to it. The first draft said a run could resolve this under the new scope
+  authority, which was false when written: the authority and the recording verb both landed after this
+  unit, so at this position M3 still said a scope fork was not the run's to take and the verb did not
+  exist. Under the reordered plan the authority is position 2 and the verb position 3 against this
+  unit's 5, so the sentence is now true. Review fold: M11. A pass-level
   parallelism that cannot commit independently is still useful if the orchestrator commits for both,
   which changes M6's condition set rather than abandoning it. Options: record the failure and let
   unit 8 not ship; or record it and let unit 8 ship an inversion scoped to orchestrator-committed
