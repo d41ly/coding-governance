@@ -1,0 +1,177 @@
+# TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
+
+**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+
+## 1. Goal
+
+`TOOL-dUnstalledConvoy-4` gives a run the authority to retire, supersede and add units. An authority
+with no record is indistinguishable from a run quietly doing whatever it wants. This unit adds the
+verb that writes the amendment into the run-state file, in the row grammar the file already uses, so
+a gate and a wrap-up can both read it.
+
+## 2. Scope (IN)
+
+- **S1** — `--rescope <slug> --act <act> --unit <id> [--successor <id>] --reason "<why>"` writes one
+  row through the existing `park` helper with a new kind token `rescope`. No new region, no new
+  parser, no new file.
+- **S2** — `--act` takes a value from the closed set `retire supersede add`. A value outside it is a
+  refusal naming the value and the set, never a default.
+- **S3** — `--unit` must match the id pattern the memory-tree conf declares, resolved through the
+  same `id_pattern` seam the row grammar already uses rather than a second regex written here.
+- **S4** — arity by act. `supersede` REQUIRES `--successor`; `add` REFUSES it; `retire` accepts it
+  optionally, because a retirement may or may not have a replacement.
+- **S5** — `retire` and `supersede` REFUSE a `--unit` that the build README's generated units region
+  does not carry. A run cannot retire a unit its roster never held.
+- **S6** — `add` REFUSES a `--unit` the region already carries, because an id already on the roster is
+  not an addition and recording it as one would make the check in `TOOL-dUnstalledConvoy-6` grade a
+  transition that never happened.
+- **S7** — every refusal `verb_park` already makes is inherited verbatim: no run-state file, missing
+  reason, a newline in any field, the field separator inside a value, the declared bypass flag in any
+  field, and a terminal record.
+- **S8** — idempotent by the exact-line compare `verb_park` uses, so a resumed run that re-derives the
+  same amendment does not duplicate the row.
+- **S9** — the verb writes the record and **changes nothing else**. It does not edit the spec, the
+  roster or the build README.
+
+## 3. Non-goals (OUT)
+
+- Performing the amendment. S9 is the design, not an omission — see §4.
+- The gate that grades the record. That is `TOOL-dUnstalledConvoy-6`.
+- Any change to `--park`. The two verbs share a helper and a grammar; they do not share a code path,
+  and folding them would make one verb's refusals reachable from the other's flags.
+- A `--rescope` on a build with no run-state file. That is an attended build, where the amendment is
+  an ordinary spec edit and the owner is present to read it.
+
+## 4. Design
+
+### Data model
+
+One row per amendment, in the file's existing grammar:
+
+```
+<timestamp> rescope · item <act> <unit-id>[ -> <successor-id>] · reason <why>
+```
+
+The kind token sits where `decision`, `waiver` and `abort` already sit, so every existing reader that
+selects rows by kind keeps working and the two checks that parse the parked region line-wise need no
+new shape. This is the reuse that makes the unit small.
+
+### Why the verb records and does not act
+
+A record derived from a change it just made is a summary, and a check comparing the two confirms the
+driver rather than checking it — this repo's `second-implementation-is-not-a-second-opinion` class.
+Recording separately from acting is what gives `TOOL-dUnstalledConvoy-6` two independent inputs: the
+declared amendment, and the roster transition that actually happened in git.
+
+The honest limit, which the verb's header must state: nothing forces the verb to be called BEFORE the
+edit, so the record is a declaration in shape rather than in enforced ordering. What the pair buys is
+the detection of an amendment made with NO record at all, which is the failure mode that matters — a
+run quietly retiring a unit it found inconvenient. It does not buy detection of a truthful-looking
+record attached to a different edit, and the check says so where it reports.
+
+### Inventory of refusals
+
+| Condition | Refusal |
+|---|---|
+| `--act` outside the closed set | names the value and the three members |
+| `--unit` not id-shaped | names the pattern source, not a regex spelled here |
+| `supersede` with no `--successor` | names the act and the missing flag |
+| `add` with a `--successor` | names the act and the surplus flag |
+| `retire` or `supersede` naming an id absent from the units region | names the id and the region |
+| `add` naming an id already in the units region | names the id and the region |
+| every `verb_park` refusal in S7 | verbatim, same messages, same exit path |
+
+### Files touched (estimate)
+
+| File | Change |
+|---|---|
+| `tools/unattended/unattended.sh` | `verb_rescope`, its flag parsing, one dispatch row |
+| `tools/unattended/unattended.test.sh` | the cases in §6, plus the `ARMS_FLOORS` bump per new `fail` call site |
+| `tools/unattended/SKILL.template.md` and its render | one section, in the shape `--park` already has |
+| `memory/guides/UNATTENDED-PROTOCOL.md` and its template | one row in section 7's verb list |
+
+### Alternatives rejected
+
+- **A new region in the run-state file.** Rejected: the parked region's grammar already carries a
+  kind token, and a second region would need its own parser, its own malformed-marker refusal and its
+  own place in every reader. The kit has a recorded scar from a region whose zero-byte write was then
+  certified by its own check.
+- **Folding the amendment into `--park`.** Rejected: `--park` means "I refused to decide". An
+  amendment is the opposite — a decision taken. Overloading one verb with both would make the
+  wrap-up's open-and-parked row wrong, since it derives from parked entries.
+- **Having the verb perform the status flip.** Rejected in §4. It would also make the verb a writer
+  of spec files, which nothing else in this driver is.
+
+## 5. Production-readiness checklist
+
+- security — the verb writes only the run-state file and inherits the bypass-flag refusal in both
+  fields, which is a recorded defect class where screening one field left the other free.
+- perf / scale — one file append and one region scan per call.
+- a11y — N/A — a shell verb with no user surface.
+- i18n — N/A — the same.
+- error / empty / loading states — the seven refusals in §4's table, each naming itself.
+- observability — the row IS the observability, and it reaches the wrap-up through M9's
+  open-and-parked derivation.
+- risks (concurrency, data-loss, rollback hazards) — append-only to one file, staged by the same
+  helper every other verb uses. A resumed run cannot duplicate a row, by S8.
+- testing + left-shift gates — the cases in §6. Each new `fail` message must be armed with its entire
+  literal signature, and a positional in a `fail` message cannot be armed, so every interpolation is
+  bound to a name and placed after the sentence.
+- migration / rollback — none. Existing run-state files simply carry no `rescope` rows.
+- user docs — the Skill section and the protocol verb row, in S-scope above.
+
+## 6. Acceptance criteria
+
+- **AC1** — `bash tools/unattended/unattended.sh --rescope <slug> --act retire --unit <id> --reason
+  "<why>"` appends one row whose kind token is `rescope`, observed in the fixture's run-state file.
+- **AC2** — The same invocation run twice appends ONE row and reports the amendment as already
+  recorded, matching `--park`'s idempotence.
+- **AC3** — `--act sideways` refuses, naming the value and the three legal members.
+- **AC4** — `--act supersede` with no `--successor` refuses; `--act add` WITH `--successor` refuses.
+- **AC5** — `--act retire --unit <id>` where the id is absent from the build README's generated units
+  region refuses, naming the id and the region.
+- **AC6** — `--act add --unit <id>` where the id is already in that region refuses.
+- **AC7** — A `--reason` containing the declared bypass flag refuses, and so does an `--item`-side
+  spelling of it, matching `verb_park`'s both-fields rule.
+- **AC8** — `--rescope` on a record in a terminal phase refuses through `refuse_if_terminal`.
+- **AC9** — Each new refusal is observed RED against a fixture before the unit lands, and
+  `bash tools/unattended/check-unattended.sh` stays green.
+
+## 7. Gates
+
+`unattended driver selftest` · `unattended kit gate` · `harness arms` · the full bar at the push
+boundary. `ARMS_FLOORS` moves for `tools/unattended/unattended.sh`.
+
+## 8. Open questions
+
+- **F1 — should `--rescope` refuse before the phase reaches `BUILDING`?** An amendment declared during
+  `SPECCING` is ordinary spec authoring, which M2 already covers without a verb. Recording it anyway
+  costs a row and buys a uniform history. Refusing it draws a line the method does not draw.
+  **Recommendation: do not refuse.** A uniform record is worth more than a distinction the method
+  itself does not make, and a phase-gated verb is one more way for a resumed run to meet a refusal
+  it cannot interpret.
+
+## 9. Revision log
+
+- rev-1 · 2026-08-20 · initial draft.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "an unattended run changes its own build scope and retires
+a planned unit"` returns `id_pattern(conf)` in the `row-grammar` dossier as an affordance seam, and
+the `unattended` dossier. Both are used: S3 resolves the id shape through `id_pattern` rather than
+spelling a second regex, and S1 reuses the `park` helper and its kind token.
+
+Read at source before writing: `verb_park` at `tools/unattended/unattended.sh` carries six refusals
+and an exact-line idempotence compare whose header records that a `grep -qF` substring match
+previously reported success while writing nothing. S7 and S8 inherit that code path deliberately
+rather than re-deriving it, because re-deriving it is how the substring bug would return.
+
+`python tools/memory-recall/query.py "how does the unattended driver record a decision it took, and
+why does a gate need an input the driver did not derive" --terms "park verb kind token parked region
+row grammar idempotent record declaration second opinion driver gate amendment"` returns the
+park-verb records and the second-opinion class. No existing seam covers the amendment itself; the row
+is new and everything that carries it already ships.
+
+Recall terms used: park verb kind token parked region row grammar idempotent record declaration
+second opinion driver gate amendment.
