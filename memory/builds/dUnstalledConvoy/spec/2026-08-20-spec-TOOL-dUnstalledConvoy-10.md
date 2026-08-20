@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -153,13 +153,17 @@ boundary.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-2 · 2026-08-20 · §10 corrected: the `id_pattern` seam is unreachable from a shell leg in a
+  standalone-installed kit; the id shape comes from `_ids_of`. Same correction as unit 5 rev-2.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "compare what a commit touched against what was declared"`
-returns the `unattended` affordance seam and the `row-grammar` dossier, whose `id_pattern` seam is
-what makes the unit-id join in S2 precise rather than a loose substring. The check reuses the leg's
-existing anchor loop and the same region reader every sibling check uses.
+returns the `unattended` affordance seam and the `row-grammar` dossier. The `id_pattern` seam in that
+dossier is REJECTED for the same reason `TOOL-dUnstalledConvoy-5` rejects it: it is Python in a
+separately-installed kit and this leg is shell. The id shape comes from the driver's own `_ids_of`
+spelling, which the leg already mirrors. The check reuses the leg's existing anchor loop and the same
+region reader every sibling check uses.
 
 `python tools/memory-recall/query.py "how does a gate attribute a commit to the pass that made it"
 --terms "commit subject unit id pass attribution join declared write set subset dispatch group anchor

@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
 
-**Status:** SPECCED · rev-1 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling
 
 ## 1. Goal
 
@@ -16,8 +16,10 @@ a gate and a wrap-up can both read it.
   parser, no new file.
 - **S2** — `--act` takes a value from the closed set `retire supersede add`. A value outside it is a
   refusal naming the value and the set, never a default.
-- **S3** — `--unit` must match the id pattern the memory-tree conf declares, resolved through the
-  same `id_pattern` seam the row grammar already uses rather than a second regex written here.
+- **S3** — `--unit` must match the id shape the driver's OWN `_ids_of` helper already uses, reused
+  rather than re-spelled. The memory-tree kit's `id_pattern` is deliberately NOT the seam here: it is
+  a Python function in a DIFFERENT kit, and each kit is copy-installed standalone, so an adopter may
+  hold this one and not that one. Verified at source — `unattended.sh` names `id_pattern` nowhere.
 - **S4** — arity by act. `supersede` REQUIRES `--successor`; `add` REFUSES it; `retire` accepts it
   optionally, because a retirement may or may not have a replacement.
 - **S5** — `retire` and `supersede` REFUSE a `--unit` that the build README's generated units region
@@ -154,13 +156,19 @@ boundary. `ARMS_FLOORS` moves for `tools/unattended/unattended.sh`.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-2 · 2026-08-20 · S3 and §10 corrected: `id_pattern` is unreachable from this shell driver
+  because it is a Python function in a separately-installed kit. The seam is the driver's own
+  `_ids_of`. Caught by verifying the claim against source rather than by the spec audit.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "an unattended run changes its own build scope and retires
 a planned unit"` returns `id_pattern(conf)` in the `row-grammar` dossier as an affordance seam, and
-the `unattended` dossier. Both are used: S3 resolves the id shape through `id_pattern` rather than
-spelling a second regex, and S1 reuses the `park` helper and its kind token.
+the `unattended` dossier. The first is REJECTED and the rejection is the finding: `id_pattern` is a
+Python function in `tools/memory-tree/row_grammar.py`, and `tools/unattended/unattended.sh` is shell
+in a kit that ships standalone — check 10's own header records that an adopter may hold one kit and
+not the other. S3 therefore reuses the driver's `_ids_of` helper instead. S1 reuses the `park` helper
+and its kind token.
 
 Read at source before writing: `verb_park` at `tools/unattended/unattended.sh` carries six refusals
 and an exact-line idempotence compare whose header records that a `grep -qF` substring match
