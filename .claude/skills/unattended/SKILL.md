@@ -198,6 +198,19 @@ which is where the loop is stated.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
+- **When building uncovers what speccing could not, AMEND — do not stall.** M3 delegates this build's
+  own scope and M2 names the three acts: RETIRE a unit, SUPERSEDE it, or ADD one the build turns out
+  to need. Every amendment owes a row, and this is the verb that writes it:
+
+  ```bash
+  bash tools/unattended/unattended.sh --rescope <slug> --act retire|supersede|add --item <unit-id> [--successor <unit-id>] --reason "<what building uncovered>"
+  ```
+
+  Two bounds, and they are the whole of your authority here. The build README's GOAL statement is
+  what you may not amend, and the delegation does not reach a governance carrier's own stated
+  constraints. An id already in the units region may never LEAVE it — retiring is a status flip to
+  `WONTDO` with a successor or reason in the header tail, never a deletion, because the
+  authorization compares BASE against HEAD as a subset and refuses a removal.
 - Check yourself with `bash tools/unattended/unattended.sh --status <slug>`.
 
 ## While the work runs

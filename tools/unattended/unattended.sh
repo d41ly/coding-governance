@@ -10,6 +10,7 @@
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
+#   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -1978,6 +1979,88 @@ PARKED
   return 0
 }
 
+# TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
+# undocumented; M3 now delegates the build's own scope. An authority with no record is
+# indistinguishable from a run doing whatever it likes, so every amendment leaves a row here.
+#
+# IT RECORDS AND DOES NOT ACT, deliberately. A record derived from the change it just made is a
+# SUMMARY, and a check comparing the two confirms the driver rather than checking it. Recording
+# separately is what gives the leg two inputs produced by two acts at two times.
+#
+# WHAT THIS CANNOT BUY, stated because the pair's honest limit belongs at both ends: nothing forces
+# this verb to be called BEFORE the edit, so the row is a declaration in shape rather than in
+# enforced ordering. The pair catches an amendment made with NO record - a unit quietly retired
+# because it was inconvenient - and does not catch a truthful-looking row attached to a different
+# edit.
+#
+# THE ID SHAPE IS THE DRIVER'S OWN `_ids_of`, never the memory-tree kit's `id_pattern`: that is a
+# PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
+# header records that an adopter may hold one and not the other.
+verb_rescope() { # slug · act · unit · successor · reason
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to record an amendment against: $rel"; return 1; }
+  # CLOSED SET. A value outside it is a refusal and never a default: defaulting an unrecognised act
+  # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
+  # value guard exists to avoid.
+  case "$act" in
+    retire|supersede|add) ;;
+    *) local _bad=${act:-(none)}
+       fail 48 "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
+  esac
+  [ -n "$reason" ] || { fail 48 "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make: $act"; return 1; }
+  shaped=$(printf '%s\n' "$unit" | _ids_of)
+  [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
+    fail 48 "--rescope --unit is not id-shaped by the driver's own spelling, so the row would name something no roster can carry: $_u"; return 1; }
+  # ARITY BY ACT. A supersession with no successor is a retirement wearing a better name, and an
+  # addition with one is describing a relation it does not have.
+  case "$act" in
+    supersede) [ -n "$succ" ] || { fail 48 "--rescope --act supersede requires --successor, or the row is a retirement wearing a better name: $unit"; return 1; }
+               shaped=$(printf '%s\n' "$succ" | _ids_of)
+               [ "$shaped" = "$succ" ] || { fail 48 "--rescope --successor is not id-shaped by the driver's own spelling: $succ"; return 1; } ;;
+    add)       [ -z "$succ" ] || { fail 48 "--rescope --act add refuses --successor, because an addition names no unit it replaces: $succ"; return 1; } ;;
+  esac
+  # ALL THREE of --park's field refusals, inherited rather than re-derived. park() appends ONE line
+  # and the leg parses the region line-wise, so a newline forges a row nothing wrote; an item
+  # spelling the separator makes its own record unparseable by the check that grades it; and the
+  # bypass flag in EITHER field reds the bar permanently on a record no verb can rewrite.
+  if [ "$(printf '%s' "$reason$unit$succ" | wc -l)" -ne 0 ]; then
+    fail 48 "a rescope field contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second row nothing wrote: $act"; return 1
+  fi
+  case "$unit$succ$reason" in *" · "*) fail 48 "a rescope field spells the record's own separator, which makes the row unparseable by the check that reads it: $unit"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$unit" "$succ" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "a rescope field spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --rescope || return 1
+  # THE GUARDS ARE ORDERED AND THE ORDER IS THE POINT. The idempotence compare runs FIRST, before any
+  # membership test. The units region is RENDERED from the specs that exist, so the moment an
+  # amendment is performed the id IS in it - and an unconditional membership refusal on `add` would
+  # fire permanently on a run that recorded its row after authoring the spec, while the leg demanded
+  # that row permanently. That is the wedge shape this build exists to remove.
+  want="rescope · item $act $unit"
+  [ -n "$succ" ] && want="$want -> $succ"
+  want="$want · reason $reason"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: amendment already recorded, unchanged — $act $unit"
+    return 0
+  done <<RESCOPED
+$(grep -F -- ' rescope · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+RESCOPED
+  ids=$(unit_ids_of "$slug")
+  case "$act" in
+    retire|supersede)
+      printf '%s\n' "$ids" | grep -qxF -- "$unit" || { fail 48 "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held: $unit"; return 1; } ;;
+    add)
+      printf '%s\n' "$ids" | grep -qxF -- "$unit" && { fail 48 "a rescope adds a unit the generated units region already carries and no matching row explains it, so this records a transition that did not happen: $unit"; return 1; } ;;
+  esac
+  park "$rel" rescope "$act $unit${succ:+ -> $succ}" "$reason"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: amendment recorded — $act $unit${succ:+ -> $succ}"
+  return 0
+}
+
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -1990,6 +2073,7 @@ PARKED
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
+RS_ACT=""; RS_SUCC=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -2013,7 +2097,9 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--rescope) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
+    --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
@@ -2034,7 +2120,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope and --abort: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -2042,7 +2128,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2053,5 +2139,6 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
+  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
 esac
 exit "$status"

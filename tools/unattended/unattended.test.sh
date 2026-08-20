@@ -1435,11 +1435,11 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope and --abort: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
-for v in --preflight --plan --phase --status --resume --close --landed --park --abort; do
+for v in --preflight --plan --phase --status --resume --close --landed --park --rescope --abort; do
   n=$((n+1))
   [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
     || { echo "FAIL the header docstring omits $v"; st=1; }
@@ -2242,3 +2242,73 @@ FLOOR_ASSERTIONS=338
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
+
+# ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
+# ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
+# ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
+# ---- signature, because a readable prefix of a long message reds `check-arms`.
+reset_tree; mkconf; mkbuild tRun; run --preflight tRun --keepalive-id k1 >/dev/null
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the probe it needed cannot see this tree")
+hit "$out" "amendment recorded"
+same "exactly one rescope row" "$(grep -c 'rescope · item ' memory/builds/tRun/RUN.md)" "1"
+hit "$(cat memory/builds/tRun/RUN.md)" "rescope · item retire ARCH-tRun-1 · reason the probe it needed cannot see this tree"
+
+# ...IDEMPOTENT on the same triple, by --park's exact-line compare and for its reason: the protocol's
+# post-compaction recovery re-runs the run's own steps and a re-derived amendment must not duplicate.
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the probe it needed cannot see this tree")
+hit "$out" "already recorded, unchanged"
+same "the repeat added no row" "$(grep -c 'rescope · item ' memory/builds/tRun/RUN.md)" "1"
+
+# ...and the ORDER of the guards is the point. `add` on an id the region already carries is a NO-OP
+# when a matching row exists and a refusal only when none does, because the region is RENDERED from
+# the specs that exist — so the moment an amendment is performed the id IS in it, and an
+# unconditional membership refusal would fire forever on a run that recorded after authoring.
+run --rescope tRun --act add --item ARCH-tRun-1 --reason "recorded before the render caught up" >/dev/null 2>&1
+out=$(run --rescope tRun --act add --item ARCH-tRun-1 --reason "recorded before the render caught up")
+hit "$out" "a rescope adds a unit the generated units region already carries and no matching row explains it, so this records a transition that did not happen:"
+
+out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
+hit "$out" "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default:"
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1)
+hit "$out" "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make:"
+
+out=$(run --rescope tRun --act retire --item notanid --reason r)
+hit "$out" "--rescope --unit is not id-shaped by the driver's own spelling, so the row would name something no roster can carry:"
+
+out=$(run --rescope tRun --act supersede --item ARCH-tRun-1 --reason r)
+hit "$out" "--rescope --act supersede requires --successor, or the row is a retirement wearing a better name:"
+
+out=$(run --rescope tRun --act supersede --item ARCH-tRun-1 --successor notanid --reason r)
+hit "$out" "--rescope --successor is not id-shaped by the driver's own spelling:"
+
+out=$(run --rescope tRun --act add --item ARCH-tRun-2 --successor ARCH-tRun-1 --reason r)
+hit "$out" "--rescope --act add refuses --successor, because an addition names no unit it replaces:"
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-9 --reason r)
+hit "$out" "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held:"
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "$(printf 'two\nlines')")
+hit "$out" "a rescope field contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second row nothing wrote:"
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "spells · the separator")
+hit "$out" "a rescope field spells the record's own separator, which makes the row unparseable by the check that reads it:"
+
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "just use --no-verify")
+hit "$out" "a rescope field spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag:"
+
+# ...a SUPERSESSION writes the arrow form, which is what the leg reads to account for a successor
+# that is present at HEAD and absent at BASE with no `add` row behind it.
+run --rescope tRun --act supersede --item ARCH-tRun-1 --successor ARCH-tRun-2 --reason "the mechanism split in two" >/dev/null
+hit "$(cat memory/builds/tRun/RUN.md)" "rescope · item supersede ARCH-tRun-1 -> ARCH-tRun-2 · reason the mechanism split in two"
+
+# ...and a FINISHED record refuses it, because an amendment to a terminal run is a rewrite of history.
+run --abort tRun --reason "stop" >/dev/null 2>&1
+out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason r)
+hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+
+# ...with no run-state file at all there is no run to amend.
+reset_tree; mkbuild tNone
+out=$(run --rescope tNone --act retire --item ARCH-tNone-1 --reason r)
+hit "$out" "no run-state file, so there is no run to record an amendment against:"

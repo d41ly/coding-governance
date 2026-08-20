@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-4 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -182,6 +182,12 @@ therefore in this unit's write set. Review fold: M4, M7, H13.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-4 · 2026-08-20 · built. Twelve refusal branches, each armed with its entire literal signature;
+  the driver selftest passes 400 assertions and `check-arms` is clean with no floor move needed. The
+  S10 carriers landed: a Skill block and a protocol verb row, both templates and both renders.
+  RECORDED while building — the protocol's section 7 verb list omits `--park` and `--attest`
+  entirely, so this unit appended rather than claiming a position in a sequence it does not own.
+  TOOL-dUnstalledConvoy-17 carries that gap.
 - rev-3 · 2026-08-20 · folded the spec audit: M12 (the guards are ORDERED, idempotence first, and S6
   becomes a no-op rather than a permanent refusal), M4 (the Skill section and the protocol verb row
   promoted into scope with four criteria and the read-path re-measurement), M7 (`.memory-tree.conf`

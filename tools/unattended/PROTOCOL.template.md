@@ -323,6 +323,13 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
   items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
   it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the
+  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
+  three acts; this verb is the record. It RECORDS rather than acts, because a row derived from the
+  change it just made is a summary, and a check comparing the two confirms the driver instead of
+  checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
+  rather than in enforced ordering: the pair catches an amendment made with NO record, never a
+  truthful-looking row attached to a different edit.
 
 ## 8. What a project declares
 
