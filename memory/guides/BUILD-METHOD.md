@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.24 -->
+<!-- gov:kit memory-tree@2.25 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -77,9 +77,9 @@ Vetoes 2 and 3 are owner turns. Tie-break: fewer open questions, then reuse of a
 park**, never the least-bad option.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. **Keep §8's first non-blank line machine-legal** (`none — the forks below are
-RESOLVED …`): the hygiene gate reads that line and nothing else, so without it the spec reds the moment its status
-goes CLOSED.
+decision the owner did not make. **Every ITEM is graded, not the section's first line**, and the mark must be the
+documented SHAPE — the word, then `(<owner|agent>, <date>[, delegated])` — anywhere in that item's block. A `none`
+first line ends the section only when it has NO items; below one, an unresolved item still reds.
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 

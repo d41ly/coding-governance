@@ -147,7 +147,7 @@ argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
-name = "marker contract"
+name = "marker contracts"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
 

@@ -2473,11 +2473,65 @@ rm -rf "$stub128"
 reset_tree
 
 
+
+echo "MARK fork-mark" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- THE SECTION-8 RESOLUTION MARK. Both machine readers used to decide on the section's FIRST
+# ---- NON-BLANK LINE with an unanchored case-sensitive substring, and the two failure modes that
+# ---- bought were not hypothetical: a section whose opening sentence announced a fork was NOT
+# ---- resolved classified as RESOLVED, because the word appeared in the sentence denying it; and any
+# ---- unresolved item BELOW a `none` first line was invisible, because nothing past that line was
+# ---- read. Every rule this build writes about forks was therefore unenforceable.
+# ----
+# ---- EACH ARM CARRIES THE OLD PREDICATE AS A CONTROL. Asserting only the new verdict proves the
+# ---- reader is strict, never that it CHANGED anything — and a fixture that the old reader also
+# ---- rejected would pass this suite while demonstrating nothing. The control is the old one-line
+# ---- test, spelled here, run over the same bytes.
+old_reader() { # spec file -> what the FIRST-LINE reader would have said
+  awk '
+    /^## / { cur = ($0 ~ /^## 8\./) ? "forks" : ""; next }
+    cur == "" { next }
+    { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+    line == "" { next }
+    { if (fkl == "") fkl = line }
+    END { if (fkl ~ /RESOLVED/) print "READY"; else print "FORKED" }' "$1"
+}
+fkspec() { # section-8 body -> a live-status spec at $TMP/fk.md
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node c · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- a\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\n%s\n\n## 9. Revision log\n\n- r\n' "$1" > "$TMP/fk.md"
+}
+fk_ln=$(grep -n '^plan_state()' "$SCRIPT" | cut -d: -f1)
+eval "$(sed -n "${fk_ln},$((fk_ln + 45))p" "$SCRIPT")"
+n=$((n+1)); declare -F plan_state >/dev/null || { echo "FAIL plan_state was not sliced out of the driver, so every fork-mark arm below graded nothing"; st=1; }
+
+# a section whose FIRST LINE denies the resolution, and whose item is genuinely unmarked
+fkspec 'F1 below is NOT RESOLVED and needs the owner.
+
+- **F1 — a real question?** options, and no mark anywhere.'
+same "fork-mark: a first line DENYING resolution no longer resolves the section" "$(plan_state "$TMP/fk.md")" "FORKED"
+same "fork-mark control: the old first-line reader called those same bytes ready"  "$(old_reader "$TMP/fk.md")" "READY"
+
+# a none first line with an unresolved item BELOW it
+fkspec 'none - every fork below is RESOLVED in place.
+
+- **F1 — answered?** yes.
+  RESOLVED (agent, 2026-08-20, delegated): picked.
+
+- **F2 — not answered?** still open, and carrying no mark.'
+same "fork-mark: an unresolved item below a none first line is no longer invisible" "$(plan_state "$TMP/fk.md")" "FORKED"
+same "fork-mark control: the old reader stopped at the none line and called it ready" "$(old_reader "$TMP/fk.md")" "READY"
+
+# and the case that must NOT have changed: the mark on a CONTINUATION line, which is where this
+# corpus actually puts it. A tightening that broke this would have called the whole tree unresolved.
+fkspec '- **F1 — a question?** options and a recommendation.
+  RESOLVED (owner, 2026-08-20): picked, on the stated grounds.'
+same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
+
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=426
+FLOOR_ASSERTIONS=432
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

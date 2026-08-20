@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.24   # gov:kit memory-tree@2.24 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.25   # gov:kit memory-tree@2.25 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -24,6 +24,7 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+FORK_MARK_CUTOFF=""   # date; specs whose filename date >= this have every §8 ITEM graded for the SHAPED resolution mark (check 12); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
 # and check 12 must pick one for every spec it grades. An empty string compares earlier than every
@@ -709,7 +710,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -860,8 +861,43 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
           if (rng[i] ~ /RESOLVED/) resolved++
         }
       }
+      # ---- THE TIGHTENED READER, gated by FORK_MARK_CUTOFF. Two defects in the loose form above,
+      # ---- both live when this was written. First, `rng[i] ~ /RESOLVED/` grades only the line an
+      # ---- item OPENS with, and in this corpus the mark almost never sits there — measured over the
+      # ---- tracked specs, 246 of 339 items carry a conforming mark and nearly all of them carry it on
+      # ---- a continuation line — so `items == resolved` was reachable mainly through the first-line
+      # ---- escape beside it. Second, ANY first line starting `none` ended the question, so an
+      # ---- unresolved bullet below a none form was invisible; and any prose containing the word
+      # ---- resolved the section, including a sentence saying a fork was NOT resolved.
+      # ---- So the walk is per ITEM, an item being its opening line PLUS its continuation lines, and
+      # ---- the mark is the DOCUMENTED shape: the word, then a parenthesised attribution whose first
+      # ---- field is the resolver class, whose second is a date, and whose optional third is the
+      # ---- delegation qualifier. The regex is a `/.../` LITERAL rather than a -v string on purpose:
+      # ---- awk processes escapes in a -v assignment, which turned `\(` into a group and made the
+      # ---- sibling reader match nothing at all when it was written that way first.
+      bitems = 0; bresolved = 0; bmarked = 0
+      for (i = 2; i <= q - 1; i++) {
+        L = rng[i]
+        if (L ~ /^[[:space:]]*$/) continue
+        if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) {
+          if (bitems > 0 && bmarked) bresolved++
+          bitems++; bmarked = 0
+        }
+        if (bitems > 0 && L ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) bmarked = 1
+      }
+      if (bitems > 0 && bmarked) bresolved++
       if (q == 0)
         print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
+      else if (fcut != "" && fdate != "" && fdate >= fcut) {
+        # ---- A §8 with NO items and NO none form REFUSES, which the owner ratified: it is the only
+        # ---- genuinely undecided population, it is reached through the empty-first-line branch, and
+        # ---- an empty population passing is the shape this repo refuses by name everywhere else.
+        if (bitems == 0) {
+          if (q8 !~ /^none/ && q8 !~ /^N\/A/)
+            print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_MARK_CUTOFF " fcut "; a hollow section and a resolved one are the same byte)"
+        } else if (bitems != bresolved)
+          print f " (terminal Status with unresolved §8 items, graded PER ITEM for the shaped resolution mark at/after FORK_MARK_CUTOFF " fcut "): " bresolved " of " bitems " marked"
+      }
       else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
         print f " (terminal Status with unresolved §8 Open questions)"
     }

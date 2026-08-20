@@ -61,7 +61,10 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+# FORK_MARK_CUTOFF sits between the two fixture eras for the same reason STREAMS_CUTOFF does: the
+# REAL cutoff is deliberately set ahead of every landed spec, so the tightened section-8 reader is
+# exercised here or nowhere.
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nFORK_MARK_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -221,7 +224,7 @@ printf '# t61
 
 ## 8. Open questions
 
-### Q — RESOLVED at authoring
+### Q — a question · RESOLVED (owner, 2026-08-10): settled at authoring
 
 body
 
@@ -256,6 +259,27 @@ printf '# t63
 - rev-1 · first
 ' \
   > "$D/spec/2026-08-10-spec-tFixture-63.md"                                   # §8 at ## 7. -> REDS only if keyed on TITLE
+# PAST the cutoff, WITH items, one marked and one not: the per-item message, which no prose-only
+# fixture can reach. The marked item carries its mark on a CONTINUATION line, which is where this
+# corpus actually puts it — a fixture marking the opening line would pass under the loose reader too
+# and would prove nothing about the tightening.
+printf '# t65
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 8. Open questions
+
+none - the forks below are RESOLVED in place.
+
+- **F1 — answered?** options and a recommendation.
+  RESOLVED (owner, 2026-08-10): picked A.
+
+- **F2 — answered?** options, and nobody signed it.
+
+## 9. Revision log
+
+- rev-1 · first
+'   > "$D/spec/2026-08-10-spec-tFixture-65.md"                                   # per-ITEM: 1 of 2 marked -> REDS
 printf '# t64
 
 **Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
@@ -468,18 +492,23 @@ hit  'tFixture-13.md (tracked but missing from worktree'
 hit  'tFixture-14.md (unfilled skeleton placeholder'
 miss 'tFixture-15.md ('
 miss 'tFixture-43.md ('                       # every §8 item RESOLVED satisfies a terminal status
-hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'
+# THE CUTOFF BOUNDARY, and these four arms are it. 44 and 46 are dated 2026-08-01, BEFORE the
+# fixture cutoff, so they keep the loose first-line wording; 60 and 63 are dated 2026-08-10 and
+# get the per-item wording. Same defect, two eras, two messages — which is what proves the gate
+# is dated rather than merely strict.
+hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'   # dated BEFORE the cutoff
 miss 'tFixture-45.md ('                       # a ### sub-head fork, RESOLVED, satisfies a terminal status
 hit  'tFixture-46.md (terminal Status with unresolved §8 Open questions'
-hit  'tFixture-60.md (terminal Status with unresolved §8 Open questions'
+hit  'tFixture-60.md (terminal Status and a §8 carrying neither an item nor a none form'   # PAST the cutoff: prose only
 miss 'tFixture-61.md ('                      # resolved on Tier-1 is as green as resolved on Tier-2
 hit  'tFixture-62.md (header rev-2 not logged in the §9 Revision log)'
 # THE ARM THAT SEPARATES the fix from a half-fix: Tier-1 is canon-exempt, so a Tier-1 spec may
 # legally number Open questions anything. Keyed on the NUMBER this is silent and the rule stays
 # bypassable by doing exactly what the same gate permits; keyed on the TITLE it reds.
-hit  'tFixture-63.md (terminal Status with unresolved §8 Open questions'
+hit  'tFixture-63.md (terminal Status and a §8 carrying neither an item nor a none form'   # PAST the cutoff: prose only, §8 titled ## 7.
 # ...and a range that never opens must SAY SO: silence and a resolved fork were the same byte.
 hit  'tFixture-64.md (terminal Status and no Open questions section found'
+hit  'tFixture-65.md (terminal Status with unresolved §8 items, graded PER ITEM'   # 1 of 2 marked, and the none line no longer suppresses it
 # ...while the canon check STAYS Tier-2-only. tFixture-5's `## Whatever` and its miss arm are that
 # control, and it is what the cut still guards.
 hit  'tFixture-16.md (## sections differ'

@@ -48,7 +48,7 @@ Inventories: gate-legs: 86 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `line length` | playbook |
 | `line-length gate selftest` | playbook |
 | `manifest-check self-test` | baseline |
-| `marker contract` | row-grammar |
+| `marker contracts` | row-grammar |
 | `memory hygiene` | memory-tree-hygiene |
 | `memory-hygiene self-test` | memory-tree-hygiene |
 | `memory-recall kit selftest` | memory-recall |

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** SPECCED · rev-7 · 2026-08-20 · node a · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** SPECCED · rev-8 · 2026-08-20 · node a · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 
@@ -396,6 +396,52 @@ This line is the machine-read one; the bullets carry the reasoning.
   One harness, no new leg either way.
   **L1** — "none of the six registries under `memory/project/`" became "none of the registries";
   there are seven, the count was never load-bearing, and check 12 consults none of them regardless.
+
+- rev-8 · 2026-08-20 · **built. Six things the building settled, three of them measurements this
+  spec could not have carried.**
+  **(1) S2a's open choice is TAKEN: the hygiene side is driven through a fixture repo, not by lifting
+  its predicate into a sliceable function.** The alternative restructures a thousand-line single-quoted
+  awk program to make a test convenient, and the risk of that lands on every other check in the same
+  pass. The fixture-repo route is what this kit's own sibling test already does, and the conformance
+  table writes each case TWICE — once terminal for the hygiene reader, once live for the planning
+  verb — because the two readers grade disjoint status populations and no single document can be
+  graded by both. That is why the table carries a per-reader verdict rather than one shared answer.
+  **(2) The failing case was observed over the real corpus, and it is the number S6 exists for.** With
+  `FORK_MARK_CUTOFF` set retroactively to 2026-01-01, check 12 reds **33 TERMINAL specs**. Repairing a
+  ratified record is forbidden, so the cutoff carries the landed corpus instead — set to 2026-08-21,
+  strictly ahead of the newest tracked spec filename date, which is 2026-08-20 because another node
+  landed a spec today. The S5 measurement recorded in the conf beside it: 211 spec files carrying a
+  section 8, 339 items, 246 conforming marks, 93 non-conforming across 38 files, with `builder`,
+  `build` and `unattended build` among the resolver names in the wild.
+  **(3) Two escape levels, and the first one cost a cycle.** The mark was first handed to awk with
+  `-v mark=...`; awk processes escape sequences in a -v ASSIGNMENT, so `\(` arrived as a bare `(`,
+  the pattern became a GROUP instead of a literal paren, it matched nothing, and every spec in the
+  live build classified FORKED. It is spelled as a `/.../` literal now, which has no escape level to
+  lose — and which also keeps `plan_state` SLICEABLE, since the conformance harness lifts that body
+  out of the shipped bytes and a constant defined outside it would arrive empty. Then the second: an
+  apostrophe in a comment inside the hygiene engine's single-quoted awk program closed the string and
+  broke the shell parse. Neither is in this spec's Alternatives; both are in the code comments where
+  the next editor stands.
+  **(4) A fixture had to move, and saying which one matters.** `tFixture-61` exists to prove that a
+  resolved fork on Tier-1 is as green as on Tier-2 — the TIER is its subject — and its mark was the
+  bare word. Under the shaped grammar it was about to start testing mark shape by accident, so it now
+  carries the documented attribution and keeps testing the tier. `tFixture-60` and `-63` are dated
+  past the fixture cutoff and now carry the per-item message while `-44` and `-46`, dated before it,
+  keep the loose wording. Those four ARE the cutoff-boundary arm: same defect, two eras, two
+  messages, which is what proves the gate is dated rather than merely strict.
+  **(5) The memory-tree version is SEVEN sites across seven files**, not the engine constant alone:
+  the constant and its same-line marker in the engine, the marker in each of three shipped templates,
+  and the marker in each of three INSTALLED halves, which the dogfood-parity leg byte-compares against
+  those templates. Same shape as the sixth carrier `TOOL-aBoundedVerdict-13` found one kit over, and
+  found the same way — by moving the shipped side and watching a parity gate red.
+  **(6) The leg's display name is now plural and its header names both contracts.** The harness drove
+  one contract and was named for it; it drives two. The rename touches the five carriers section 3
+  enumerates, and the claiming dossier moves with them so the map's coverage assert stays balanced —
+  the old inventory key disappears and the new one has to be claimed in the same commit.
+  **The predicate was run over the real tree before it was wired**, per the merge-bar rule: on the
+  live build it classifies all nine open units READY, identically to the loose reader, which is both
+  the near-miss check and independent confirmation that this build's own fork sweep produced
+  conforming marks.
 
 ## 10. Reuse audit
 

@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-# The marker-region well-formedness CONTRACT, and the four live readers that must obey it.
+# The reader CONTRACTS this repo cannot express as shared code, and the live readers that must obey
+# each one. Two contracts live here now, which is why the leg is named in the plural:
+#
+#   1. MARKER-REGION well-formedness — four readers, three awk in the unattended kit and one Python
+#      here. The original contract, and the reason this harness exists.
+#   2. The section-8 RESOLUTION MARK — two readers, one per kit, grading whether a fork is resolved.
+#      Added when both were tightened from a first-line substring to a per-item shaped mark; they
+#      cannot share code across a kit boundary, so AGREEMENT is proven instead.
 #
 #   bash tools/memory-tree/marker-contract.test.sh    # "PASS (…cases × …readers)" + exit 0 = good
 #
@@ -178,5 +185,128 @@ for shape in "   $O" "$O  "; do
   }
 done
 
-[ "$st" = 0 ] && echo "PASS ($ncase cases x 4 readers, contract held)"
+
+# =============================================================================================
+# CONTRACT 2 — THE SECTION-8 RESOLUTION MARK. Two readers, one per kit, and they cannot share code:
+# `plan_state` is awk inside the unattended driver, the hygiene side is awk inside this kit's engine,
+# and a cross-kit edge is the thing this harness exists to forbid. So AGREEMENT is proven.
+#
+# WHY THE TWO SIDES ARE DRIVEN DIFFERENTLY, which is the part a reader will not guess. Three
+# obstacles, each measured rather than assumed:
+#
+#   1. NOT SLICEABLE. The hygiene predicate is inline inside one long single-quoted awk program with
+#      no function boundary, so the mk_awk slicing used above has nothing to cut. The alternative was
+#      lifting it into its own shell function first; that restructures a thousand-line program to make
+#      a test convenient, so the hygiene side is driven through a FIXTURE REPO instead — the way this
+#      kit's own sibling test already drives it.
+#   2. DISJOINT POPULATIONS. The hygiene section-8 block runs ONLY under a terminal status; the
+#      planning verb discards its own classification for exactly those statuses. So no single fixture
+#      document can be graded by both, and each case is written TWICE — same section 8, different
+#      status — which is why the table carries a per-reader verdict and not one shared answer.
+#   3. THE CUTOFF IS ONE-SIDED. FORK_MARK_CUTOFF gates the hygiene side alone; the planning verb is
+#      tightened unconditionally, because it grades only the specs of the build currently running.
+#      A case may therefore legitimately get two different verdicts, and the table says so per row.
+#
+# THE TABLE IS THE CONTRACT. Neither reader restates it in prose.
+
+# The planning reader, sliced out of the SHIPPED driver bytes like the three above it.
+mk_awk r_plan "$U" "$(grep -n '^plan_state()' "$U" | cut -d: -f1)" "$(( $(grep -n '^plan_state()' "$U" | cut -d: -f1) + 45 ))"
+
+FT=$(mktemp -d) || exit 2
+trap 'rm -rf "$T" "$FT"' EXIT
+HYG="$ROOT/$KIT_MT/check-memory-hygiene.sh"
+if [ ! -f "$HYG" ]; then
+  echo "marker-contract: SKIP contract 2 — no hygiene engine at $HYG, so only one of its two readers exists"
+else
+( cd "$FT" || exit 2
+  git init -q . >/dev/null 2>&1
+  git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+  # The cutoff sits BELOW the fixture dates on purpose: these documents are the only place the
+  # tightened hygiene reader can be exercised at all, because the real cutoff is deliberately set
+  # ahead of every landed spec so nothing ratified goes retroactively red.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_MARK_CUTOFF="2026-08-01"\n' > .memory-tree.conf
+  printf 'sentinel\n' > memory/HYGIENE.md 2>/dev/null || { mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md; }
+) >/dev/null 2>&1
+
+# spec_doc <status> <the section 8 body>
+spec_doc() {
+  printf '# ARCH-tMark-1 — fixture\n\n**Status:** %s · rev-1 · 2026-08-09 · node a · Tier-2 · base 0123abcd\n\n## 1. Goal\n\nA goal.\n\n## 2. Scope (IN)\n\n- S1 something.\n\n## 3. Non-goals (OUT)\n\n- Nothing else.\n\n## 4. Design\n\nThe design.\n\n## 5. Production-readiness checklist\n\n- security: N/A.\n\n## 6. Acceptance criteria\n\n- AC1 When run, `check-memory-hygiene.sh` passes.\n\n## 7. Gates\n\n- memory hygiene.\n\n## 8. Open questions\n\n%s\n\n## 9. Revision log\n\n- rev-1 · 2026-08-09 · initial draft.\n\n## 10. Reuse audit\n\nNo existing seam fits.\n' "$1" "$2"
+}
+
+# Write every case into the fixture repo as a TERMINAL spec, one build folder each, then run the
+# hygiene gate ONCE over the whole tree. N gate runs would cost N process startups to learn the same
+# thing; the gate reports every file it faults, so one run answers every row.
+mark_case_n=0
+MARK_NAMES=""; MARK_WANT_HYG=""; MARK_WANT_PLAN=""
+mark_case() { # name · want_hygiene(red|silent) · want_plan(READY|FORKED) · section-8 body
+  mark_case_n=$((mark_case_n+1))
+  local slug="tMark$mark_case_n"
+  mkdir -p "$FT/memory/builds/$slug/spec"
+  spec_doc "CLOSED" "$4" > "$FT/memory/builds/$slug/spec/2026-08-09-spec-ARCH-$slug-1.md"
+  spec_doc "SPECCED" "$4" > "$T/plan-$mark_case_n.md"
+  MARK_NAMES="$MARK_NAMES $1"
+  MARK_WANT_HYG="$MARK_WANT_HYG $2"
+  MARK_WANT_PLAN="$MARK_WANT_PLAN $3"
+}
+
+#          name                     hygiene   plan     the section 8 body
+mark_case "none, zero items"        silent    READY    'none - no forks here.'
+mark_case "marked on the open line" silent    READY    '- **F1 — a question?** RESOLVED (owner, 2026-08-09): picked.'
+mark_case "marked on continuation"  silent    READY    '- **F1 — a question?** options.
+  RESOLVED (agent, 2026-08-09, delegated): picked.'
+mark_case "word, no attribution"    red       FORKED   '- **F1 — a question?** RESOLVED: informally, sometime.'
+mark_case "none line, later open"   red       FORKED   'none - every fork below is RESOLVED in place.
+
+- **F1 — answered?** yes.
+  RESOLVED (owner, 2026-08-09): picked.
+
+- **F2 — not answered?** still open, no mark.'
+mark_case "first line denies it"    red       FORKED   'F1 below is NOT RESOLVED and needs the owner.
+
+- **F1 — a question?** options, unmarked.'
+mark_case "resolver off the set"    red       FORKED   '- **F1 — a question?** options.
+  RESOLVED (builder, 2026-08-09): picked by a name the grammar does not admit.'
+mark_case "fact-question, no mark"  red       FORKED   '- **FACT-QUESTION · F1 — does X hold?** a probe decides it.'
+mark_case "fact-question + mark"    silent    READY    '- **FACT-QUESTION · F1 — does X hold?** a probe decides it.
+  RESOLVED (agent, 2026-08-09, delegated): it holds.'
+mark_case "hollow: no item, no none" red      FORKED   'This section says nothing at all in prose.'
+
+( cd "$FT" && git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m fx --no-verify ) >/dev/null 2>&1
+hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )
+
+set -- $MARK_NAMES
+i=0
+for want_h in $MARK_WANT_HYG; do
+  i=$((i+1))
+  eval "nm=\${$i}"
+  ncase=$((ncase+1))
+  # Only the section-8 verdict is read. The scratch tree reds other checks on purpose and that noise
+  # is ignored, exactly as this kit's sibling test documents — but the grep is anchored on the FILE
+  # plus the section-8 reason, so an unrelated fault on the same file cannot forge a hit.
+  if printf '%s\n' "$hyg_out" | grep -q "tMark$i-1.md (terminal Status.*§8\|tMark$i-1.md (terminal Status and a §8"; then got_h=red; else got_h=silent; fi
+  [ "$got_h" = "$want_h" ] || { echo "FAIL [mark/$nm] hygiene said $got_h, contract says $want_h"; st=1; }
+done
+
+i=0
+for want_p in $MARK_WANT_PLAN; do
+  i=$((i+1))
+  eval "nm=\${$i}"
+  ncase=$((ncase+1))
+  got_p=$(r_plan "$T/plan-$i.md")
+  [ "$got_p" = "$want_p" ] || { echo "FAIL [mark/$nm] plan_state said $got_p, contract says $want_p"; st=1; }
+done
+
+# THE CONTROL, and without it every row above could be passing for the wrong reason. The gate must
+# have actually RUN over these fixtures: if the fixture repo were misbuilt, or the engine exited
+# early, every case would read `silent` and the four rows wanting `silent` would pass while the six
+# wanting `red` failed loudly — but a future edit that flipped all ten to `silent` would go green.
+ncase=$((ncase+1))
+printf '%s\n' "$hyg_out" | grep -q 'tMark' || {
+  echo "FAIL [mark/control] the hygiene engine named no fixture at all, so contract 2 graded nothing"
+  st=1
+}
+fi
+
+
+[ "$st" = 0 ] && echo "PASS ($ncase cases across 2 contracts, marker-region and section-8 mark, held)"
 exit $st

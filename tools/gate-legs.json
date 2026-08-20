@@ -760,7 +760,7 @@
     ]
   },
   {
-    "name": "marker contract",
+    "name": "marker contracts",
     "argv": [
       "bash",
       "tools/memory-tree/marker-contract.test.sh"

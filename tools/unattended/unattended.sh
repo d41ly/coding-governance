@@ -1065,6 +1065,27 @@ refuse_if_terminal() { # run-state file · verb
 # It performs NO filename join to `reviews/`. That join was measured wrong on 7 of 7 multi-unit builds
 # in this corpus and right on none: a spec's sequence number is a per-build record counter and a
 # review's is "which review is this", and they coincide only at one unit and one review.
+# THE FORK MARK, and the one place this kit spells it. A bare `RESOLVED` anywhere on the section's
+# FIRST line used to decide the whole question, which had two failure modes and both were live: a §8
+# whose opening line ANNOUNCED that a fork was unresolved classified as resolved, because the word
+# appeared in the sentence saying it had not happened; and any unresolved bullet BELOW a `none` first
+# line was invisible, because nothing past that line was read. So the rule every other unit in this
+# build writes about forks was unenforceable — a section could declare itself open and be graded shut.
+#
+# The mark is now the DOCUMENTED one: the resolution word, then a parenthesised attribution whose
+# first field is the resolver class, whose second is a date, and whose optional third is the
+# delegation qualifier. Prose containing the word no longer resolves anything.
+#
+# The sibling reader in the memory-tree kit grades the same grammar and cannot import this one — a
+# cross-kit edge is what that kit's conformance harness exists to forbid — so AGREEMENT is proven by
+# a case table there rather than by sharing code here. Change this regex and that table reds.
+# SPELLED AS A REGEX LITERAL INSIDE the awk program, and that is not a style choice. Handing it in
+# with `-v mark=...` cost a cycle here: awk processes escape sequences in a -v ASSIGNMENT, so `\(`
+# arrived as a bare `(` and the pattern became a GROUP instead of a literal paren — it then matched
+# nothing, and every spec in the live build read FORKED. Exactly the escape-reaches-the-regex class
+# this repo catalogues, one delimiter over. A single-quoted `/.../` literal has no escape level to
+# lose, and it also keeps this function SLICEABLE: the sibling kit's conformance harness lifts this
+# body out of the shipped bytes and evaluates it, so a constant defined outside it would arrive empty.
 plan_state() { # spec file -> prints the M2 state
   awk '
     /^## / { sec = ""
@@ -1077,14 +1098,36 @@ plan_state() { # spec file -> prints the M2 state
     { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
     line == "" { next }
     { seen[cur] = seen[cur] 1
-      if (cur == "forks" && forkline == "") forkline = line }
+      if (cur == "forks") { fl[++nf] = line; if (forkline == "") forkline = line } }
     END {
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
       if (thin) { print "THIN"; exit }
+      # PER ITEM, and an item is its opening line PLUS its continuation lines. The mark almost never
+      # sits on the opening line in this corpus — measured, 246 of 339 tracked items carry a
+      # conforming mark and nearly all of them carry it on a continuation — so a walk that graded
+      # only the bullet line would call the whole corpus unresolved. An item is a list bullet or a
+      # `###` sub-head, which is the pair the spec format sanctions in as many words.
+      items = 0; resolved = 0; marked = 0
+      for (i = 1; i <= nf; i++) {
+        L = fl[i]
+        if (L ~ /^[-*][[:space:]]/ || L ~ /^###[[:space:]]/) {
+          if (items > 0 && marked) resolved++
+          items++; marked = 0
+        }
+        if (items > 0 && L ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) marked = 1
+      }
+      if (items > 0 && marked) resolved++
+      # The `none` form ends the section ONLY when the section has no items. With any item present
+      # the per-item walk decides and no first line suppresses it — that suppression is the second of
+      # the two failure modes above, and it is why a first-line-only reader cannot be repaired by
+      # tightening what the first line has to say.
       lf = tolower(forkline)
-      if (forkline == "" || lf ~ /^none/ || lf ~ /^n\/a/ || forkline ~ /RESOLVED/) print "READY"
-      else print "FORKED"
+      if (items == 0) {
+        if (forkline == "" || lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"
+      } else {
+        if (items == resolved) print "READY"; else print "FORKED"
+      }
     }' "$1"
 }
 

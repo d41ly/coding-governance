@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.24 -->
+<!-- gov:kit memory-tree@2.25 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -166,6 +166,24 @@ One fork per bullet or ### sub-head; options and tradeoffs may span lines. Each 
 recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>, or
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
+
+**The mark is a SHAPE a machine reads, and it is graded PER ITEM.** Two readers grade it — the
+hygiene gate for a spec at a terminal status, and the planning verb for a live build — and both
+require the word followed by a parenthesised attribution whose first field is `owner` or `agent`,
+whose second is a date, and whose optional third is `delegated`. Anything else is prose: a bare
+`RESOLVED:` resolves nothing, and neither does a resolver name outside that pair.
+
+The mark may sit ANYWHERE in the item's block — its opening line or any continuation line — because
+that is where authors actually put it. What changed on 2026-08-20, and what older guidance said:
+these readers used to decide on §8's FIRST NON-BLANK LINE alone. So a section opening with a sentence
+saying a fork was *not* resolved classified as resolved, and an unresolved item below a `none` first
+line was invisible. Now `none` ends the section only when the section has NO items; with any item
+present, every item is graded and no first line suppresses that. A §8 with neither an item nor a
+`none` form is a refusal, not a pass.
+
+A fork that a stated PROBE decides, rather than a judgment call, may carry `FACT-QUESTION · ` at the
+head of its bolded label, before the fork id. The prefix is transparent to resolution: it never marks
+an item resolved and never suppresses a mark on the same item.
 
 ## 9. Revision log
 
