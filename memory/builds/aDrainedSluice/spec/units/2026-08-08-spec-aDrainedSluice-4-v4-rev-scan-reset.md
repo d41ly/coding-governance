@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-4 — V4: the §9 rev high-water stops at §9
 
-**Status:** INPROGRESS · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 

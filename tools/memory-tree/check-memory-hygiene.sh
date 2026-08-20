@@ -299,6 +299,7 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:legacy-files.txt|F:curation-debt.txt) ;;
   F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
   F:method-carriers.txt|F:testsuite-count-waivers.txt) ;;
+  F:trace-waiver.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then

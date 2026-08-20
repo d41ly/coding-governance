@@ -1,6 +1,6 @@
 # KICK-cKeyedLaunchpad-6 — evicting the traps that pay, and restoring the cap the kit already shipped
 
-**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-2 · base f006691f · streams kickoff+tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-2 · base f006691f · streams kickoff+tooling
 
 ## 1. Goal
 

@@ -532,6 +532,39 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "records: drop the straddling fixture", "--no-verify"], r)
 
+    # THE WAIVER, both directions over one fixture. `aWaived` is CLOSED, post-cutoff and certified by
+    # nothing, so it FIRES on its own — that is the precondition, asserted first, because a waiver arm
+    # over a spec that was already silent would pass without the waiver doing anything.
+    waiver = r / "memory" / "project" / "trace-waiver.txt"
+    wspec_rel = SPEC_DIR_FOR_FIXTURE + "/2026-02-02-spec-aWaived-1.md"
+    wspec = r / wspec_rel
+    wspec.write_text("# TOOL-aWaived-1 — a unit no product subject can name\n\n"
+                     "**Status:** CLOSED · rev-1 · 2026-02-02 · node a · Tier-2 · base 0000000\n",
+                     encoding="utf-8", newline="\n")
+    run(["git", "add", wspec_rel], r)
+    run(["git", "commit", "-q", "-m", "records: a unit nothing certifies", "--no-verify"], r)
+    v6w0 = report(r)["closed_specs_with_no_product_commit"]
+    check("the waiver fixture fires BEFORE it is waived",
+          [d["id"] for d in v6w0["detail"]] == ["TOOL-aWaived-1"],
+          f"got {v6w0['detail']} -- the arm below would pass vacuously")
+
+    waiver.write_text("# fixture\n" + wspec_rel + "\tTOOL-aWaived-1\tno subject can name it\n",
+                      encoding="utf-8", newline="\n")
+    v6w1 = report(r)["closed_specs_with_no_product_commit"]
+    check("a waived spec is silent", v6w1["value"] == 0,
+          f"got {v6w1['detail']} -- the waiver is not being read")
+
+    # A row must not outlive its subject. Deleting the spec leaves the row behind, which is the shape
+    # that silently widens the exemption, so it has to come back as a finding rather than as silence.
+    wspec.unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "records: drop the waived fixture", "--no-verify"], r)
+    v6w2 = report(r)["closed_specs_with_no_product_commit"]
+    check("a waiver row whose spec is gone becomes a finding of its own",
+          [d["id"] for d in v6w2["detail"]] == ["(stale waiver)"],
+          f"got {v6w2['detail']} -- a stale waiver is being swallowed")
+    waiver.unlink()
+
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
     sig = r / "drift-audit" / "drift_signals.py"

@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation
 
-**Status:** INPROGRESS · rev-3 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 

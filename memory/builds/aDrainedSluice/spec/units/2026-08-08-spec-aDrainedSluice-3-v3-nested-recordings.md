@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-3 — V3: check 5 governs a recording at any depth
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-20 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 

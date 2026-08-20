@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it
 
-**Status:** INPROGRESS · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 96141aed · streams tooling
 
 ## 1. Goal
 

@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line
 
-**Status:** INPROGRESS · rev-4 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 

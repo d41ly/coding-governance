@@ -1,6 +1,6 @@
 # DEPL-aSealedCaravan-2 — govkit, the mechanical deployer
 
-**Status:** INPROGRESS · rev-7 · 2026-08-11 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
+**Status:** CLOSED · rev-7 · 2026-08-20 · node a · Tier-2 · base 16aeb5ef · streams deployer · ratified 2026-08-11
 
 ## 1. Goal
 

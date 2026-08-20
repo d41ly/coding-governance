@@ -1,6 +1,6 @@
 # TOOL-aWireWarden-1 — Wiring-health check + SessionStart nudge for per-clone tool wiring
 
-**Status:** INPROGRESS · rev-3 · 2026-07-15 · node a · Tier-2 · base 06f5632f · review wf_f0164aef · ratified 2026-07-15
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 06f5632f · review wf_f0164aef · ratified 2026-07-15
 
 ## 1. Goal
 
@@ -154,20 +154,20 @@ fork 3 and rejected: a merge-bar leg would false-warn in CI where `core.hooksPat
 
 ## 8. Open questions
 
-### Fork 1 — SessionStart hook: nudge-only or auto-fix
+### Fork 1 — SessionStart hook: nudge-only or auto-fix · RESOLVED (owner, 2026-07-15): auto-fix on session start
 
 RESOLVED (owner, 2026-07-15): auto-fix on session start. The SessionStart hook runs `--session`, which
 auto-wires the hooks case when `core.hooksPath` is unset, never overwrites a set value, and always
 exits 0. No process-global `GOV_WIRING_AUTOFIX` env — the per-repo committed hook is itself the
 per-repo gate, which answers the security review's granularity objection.
 
-### Fork 2 — dogfood scope of the new `.claude/settings.json`
+### Fork 2 — dogfood scope of the new `.claude/settings.json` · RESOLVED (owner, 2026-07-15): also wire agent-cap on cg
 
 RESOLVED (owner, 2026-07-15): also wire agent-cap on cg. This build places `agent-cap.js` at
 `.claude/hooks/` and runs `settings-merge.py`, so cg dogfoods the fan-out cap it ships; the agent-cap
 PreToolUse hook and the SessionStart nudge share one `.claude/settings.json`.
 
-### Fork 3 — full machinery or a minimal run-gates warning
+### Fork 3 — full machinery or a minimal run-gates warning · RESOLVED (owner, 2026-07-15): full machinery
 
 RESOLVED (owner, 2026-07-15): full machinery. check-wiring ships to adopter repos, the multi-clone
 case where the value lives — the same rationale under which cg ships every kit it cannot fully
@@ -181,5 +181,8 @@ in CI where `core.hooksPath` is correctly never set.
   Check A delegates to `settings-merge.py --check`; added always-zero hook mode; added a version
   constant; dropped `GOV_HOOKS_DIR` and `GOV_WIRING_AUTOFIX`; added scope fork 3 and ACs for
   out-of-tree, non-literal, and skip paths.
+- rev-4 · 2026-08-20 · status to CLOSED. The three §8 forks were owner-ratified at rev-3 and the
+  resolutions were recorded in the fork bodies; the marks are now carried on the `###` item lines
+  themselves, which is where the hygiene gate reads them. No decision changed.
 - rev-3 · 2026-07-15 · owner ratified §8: auto-fix on session start via `--session` (fork 1), wire
   agent-cap on cg (fork 2), full machinery (fork 3); status to INPROGRESS; build underway.

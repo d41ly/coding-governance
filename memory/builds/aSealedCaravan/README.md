@@ -29,13 +29,17 @@ scoped re-audit of that fold at rev-6 that returned **BLOCKED** with two. Both f
 unresolved items — became READY at rev-5, and each audit then sent it back. It is READY at rev-7.
 §2, §6, §7 and §10 are all filled and name observable checks.
 
-**Next action.** Rollout commit 1 — `registry.toml`, a `kit.toml` per registry entry, and `selfcheck`.
+**Next action.** None — the build is CLOSED. Unit 1 landed at `82e6dcf` and unit 2 (govkit) merged at
+`7a4f904` with the full bar green at 53/53. Unit 2's remaining contract was re-scoped into
+`aTetheredConvoy`, which has since built and landed all seven of its units.
 **Stop auditing this document.** Precision fell 0.50 → 0.25 across the two passes on a narrowing
 scope, every rev-7 edit was a repair between two paragraphs of one earlier pass rather than a design
 gap, and the re-audit's own closing advice is that a further pass finds prose about the design instead
 of defects in it.
 
-**LANDING IS BLOCKED, and not by this build.** The unattended driver tests the run's pinned BASE by
+**Landing was blocked, and not by this build — since REPAIRED at `d34027c` (`TOOL-aSealedCaravan-6`),
+which made the driver test BASE by ancestry, matching what its own gate leg already did. The record
+below is kept as written because the reasoning still holds.** The unattended driver tested the run's pinned BASE by
 EQUALITY where its own gate leg deliberately tests ANCESTRY, so reconciling `origin/main` — which the
 mandated lander does before the gate anyway — wedges `--preflight` and `--close`. The run-state file's
 generated region cannot be re-spliced, which reds the bar. Filed as a backlog row and parked in
@@ -85,13 +89,13 @@ The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling
+**Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-10 · streams deployer+tooling
 ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSealedCaravan-1 TOOL-aSealedCaravan-2 TOOL-aSealedCaravan-3 TOOL-aSealedCaravan-4 TOOL-aSealedCaravan-5 TOOL-aSealedCaravan-6 TOOL-aSealedCaravan-7
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | INPROGRESS | rev-7 | 2026-08-11 |
+| [DEPL-aSealedCaravan-2 — govkit, the mechanical deployer](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md) | CLOSED | rev-7 | 2026-08-20 |
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | CLOSED | rev-4 | 2026-08-10 |
 <!-- /gen:build-units -->
 

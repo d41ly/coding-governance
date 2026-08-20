@@ -1,6 +1,6 @@
 # TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser
 
-**Status:** INPROGRESS · rev-3 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 

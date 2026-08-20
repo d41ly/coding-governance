@@ -1,6 +1,6 @@
 # TOOL-cKeyedLaunchpad-5 — the anchor selector without a diff, and the latent split it exposes
 
-**Status:** OPEN · rev-3 · 2026-08-13 · node c · Tier-1 · base f006691f · streams tooling+kickoff
+**Status:** CLOSED · rev-3 · 2026-08-20 · node c · Tier-1 · base f006691f · streams tooling+kickoff
 
 ## 1. Goal
 

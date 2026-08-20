@@ -1,6 +1,6 @@
 # TOOL-aDrainedSluice-2 — V1: the harness meta-gate discovers its gates
 
-**Status:** INPROGRESS · rev-2 · 2026-08-08 · node a · Tier-2 · base 76fcd09b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-20 · node a · Tier-2 · base 76fcd09b · streams tooling
 
 ## 1. Goal
 

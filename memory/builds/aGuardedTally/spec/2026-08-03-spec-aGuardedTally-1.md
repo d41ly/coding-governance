@@ -1,6 +1,6 @@
 # TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one
 
-**Status:** INPROGRESS · rev-4 · 2026-08-03 · node a · Tier-2 · base 57d9b5460
+**Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 57d9b5460
 
 ## 1. Goal
 
