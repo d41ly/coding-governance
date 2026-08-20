@@ -24,9 +24,14 @@ saw a six-path tree and reported collateral failures that drowned the real signa
 ## The fix
 
 Name the EXECUTABLE, not the command, and refuse the known launchers by path — `resolve_bash()`, with
-an environment override. TWO copies carry it, because a copy-installed kit cannot import across kit
-boundaries: `tools/memory-tree/corpus_ids.py` and `tools/govkit/govkit.py`, the latter paired with
-`shell_argv()`, which rewrites a descriptor argv's LEADING `bash` and nothing else.
+an environment override. THREE copies carry it, because a copy-installed kit cannot import across
+kit boundaries: `tools/memory-tree/corpus_ids.py`, `tools/run-gates/profile_bar.py`, and
+`tools/govkit/govkit.py` — the last paired with `resolve_shell_argv()`, which rewrites a descriptor
+argv's LEADING `bash` and nothing else. They do NOT agree on the probe: two ask whether the bash
+STARTS, `profile_bar` asks whether it can SEE THE SCRIPT, and only the second is the property the
+WSL launcher actually fails. Tracked as `TOOL-dSettledRoster-6`. An earlier revision of this line
+said TWO and named the function by a name it no longer has — which is how a count and a symbol
+written in prose beside the thing they describe both go stale in one sentence.
 
 The govkit instance is worth reading before assuming this class is rare. It sat RED on `main` and
 blocked every `push-main.sh`, and nobody saw it: the leg is GUARDED, so only `GATE_FULL=1` runs it,
