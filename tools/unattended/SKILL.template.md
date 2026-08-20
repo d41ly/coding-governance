@@ -307,11 +307,17 @@ Definition of Done was evaluated without evaluating it.
 ## If it cannot finish
 
 ```bash
-bash {{KIT_DIR}}/unattended.sh --abort <slug> --reason "<what stopped it, and what you refused to decide>"
+bash {{KIT_DIR}}/unattended.sh --abort <slug> --code <halt-code> --reason "<what stopped it, and what you refused to decide>"
 ```
 
-The reason is required and lands in the parked region, because an abort with no recorded reason is
-indistinguishable from a run that simply stopped. You still owe both attestations first — reap the
+**Both are required, and they are for different readers.** The reason is prose for the owner and
+lands in the parked region, because an abort with no recorded reason is indistinguishable from a run
+that simply stopped. The CODE is the field everything else joins on — the status line, the resume
+path and the gate leg all read it by key — because a single `ABORTED` terminal says a run stopped and
+never says why. It is validated against a closed vocabulary, and the refusal names the legal set, so
+you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
+closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
+better than a vocabulary with a hole in it. You still owe both attestations first — reap the
 keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
 leaves exactly the same decisions unseen. An abort does not merge and does not push.
 

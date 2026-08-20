@@ -134,7 +134,7 @@ reds. The collision test runs with the other preconditions, so a name that alrea
 DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
 passed, because the rename is what makes the tree dirty.
 
-**Authored**, carrying exactly eleven facts and nothing else. The file is CREATED by `--preflight`
+**Authored**, carrying exactly twelve facts and nothing else. The file is CREATED by `--preflight`
 and staged; the owner authors none of it. Nothing in the tree derives any of them,
 which is the test for belonging here:
 
@@ -173,9 +173,15 @@ which is the test for belonging here:
 9. **The anchor KIND**, `default-branch` or `run-branch`, recorded by `--preflight`.
 10. **The branch ref name**, as the remote advertised it — present only when the second anchor fired.
 11. **The branch tip sha**, from that same advertisement, and present under the same condition.
+12. **The HALT CODE**, written by `--abort` and by nothing else, validated against the effective
+    vocabulary before it is recorded. A single `ABORTED` terminal says a run stopped and never says
+    why; the parked reason is prose for the owner, and this is the field the status line, the resume
+    path and the gate leg all join on. Present only on an aborted record, under the same "bounds what
+    may appear, not what must" reading as facts 10 and 11.
 
-Facts 10 and 11 are ABSENT on a default-branch run, legally: the "nothing else" clause bounds what
-may appear, not what must. Fact 9 is always written.
+Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
+default-branch run for the first two, a run that did not abort for the third. That is legal: the
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
 
 Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
 branching on the recorded anchor kind would take a security decision from a value its subject wrote,
@@ -346,9 +352,12 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   record only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip
   the remote advertises. It does not refuse the default branch, because the mandated lander refuses
   every other one, so landing happens exactly where that guard would otherwise fire.
-- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
-  items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
-  it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
+- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
+  effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
+  nothing, so the machine items assert obligations it does not have, while the keepalive is still
+  orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
+  refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
+  phase said a run stopped and never said why.
 
 ## 8. What a project declares
 

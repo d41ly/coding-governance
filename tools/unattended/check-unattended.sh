@@ -48,6 +48,7 @@ fi
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -84,12 +85,60 @@ PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
 # driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
 # predicate hanging off it.
 PARK_KINDS_SURFACED=$(core_of PARK_KINDS_SURFACED)
+# The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
+# alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
+# constant whose name such an alternation would have matched.
+HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
+HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
   exit "$status"
 fi
 PHASES="$PHASES_CORE $PHASES_EXTRA"
 DOD="$DOD_CORE $DOD_EXTRA"
+
+# ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
+# ---- The floor behaves like its two siblings — undeclared or malformed is a REFUSAL, never a
+# ---- defaulted value, because a pin that quietly defaults is a pin nobody set.
+if [ -z "$HALT_FLOOR" ]; then
+  fail 2 "HALT_FLOOR is undeclared in .unattended.conf, and with no floor a deleted halt code is indistinguishable from a vocabulary that never had one"
+elif ! printf '%s' "$HALT_FLOOR" | grep -qE '^[0-9]+$'; then
+  fail 2 "HALT_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $HALT_FLOOR"
+else
+  nhalt=$(printf '%s' "$HALT_CODES_CORE" | wc -w)
+  [ "$nhalt" -ge "$HALT_FLOOR" ] \
+    || fail 2 "the kit's CORE halt vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record that cited it: $nhalt against $HALT_FLOOR"
+fi
+if [ -z "$HALT_CODES_CORE" ]; then
+  fail 2 "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything: $DRIVER"
+fi
+
+# ---- EVERY ABORTED RECORD CARRIES A LEGAL CODE. The population is every tracked run-state file,
+# ---- ARCHIVED ONES INCLUDED — a record that could dodge this by being rotated would make the check
+# ---- an honour system, and rotation is exactly what happens to a finished run.
+# ---- No exemption clause and no waiver: the records that existed when this landed were migrated in
+# ---- the same commit, so the check is green over the real tree on its first day rather than carrying
+# ---- a grandfather list that outlives the reason for it.
+if [ -n "$HALT_CODES_CORE" ]; then
+  hc_bad=""
+  for hcf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
+    [ -f "$hcf" ] || continue
+    hcp=$(awk -F': ' '/^phase: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    [ "$hcp" = ABORTED ] || continue
+    hcv=$(awk -F': ' '/^halt-code: /{ sub(/\r$/,"",$2); print $2; exit }' "$hcf")
+    if [ -z "$hcv" ]; then
+      hc_bad="$hc_bad
+  $hcf (phase ABORTED and no halt-code fact, so the record says a run stopped and never says why)"
+    else
+      case " $HALT_CODES " in
+        *" $hcv "*) ;;
+        *) hc_bad="$hc_bad
+  $hcf (halt-code outside the effective vocabulary: $hcv)" ;;
+      esac
+    fi
+  done
+  [ -z "$(printf '%s' "$hc_bad" | tr -d '[:space:]')" ] || fail 2 "aborted run-state records whose halt code is missing or outside the effective vocabulary:$hc_bad"
+fi
 
 # ---- THE PARKED-KIND TAXONOMY, joined against the code that WRITES those kinds. One direction only,
 # ---- and the asymmetry is deliberate rather than an oversight:
@@ -278,8 +327,12 @@ REMOTE_CONNECT_BOUND=$(core_of REMOTE_CONNECT_BOUND); REMOTE_CONNECT_BOUND=${REM
 REMOTE_LOWSPEED_BYTES=$(core_of REMOTE_LOWSPEED_BYTES); REMOTE_LOWSPEED_BYTES=${REMOTE_LOWSPEED_BYTES:-1000}
 REMOTE_BOUND_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
-observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
-  local out="$1"; shift
+# WRITES TO `$adv_f` BY NAME, not to a parameter, and that is deliberate. This leg has a source-level
+# arm asserting it performs no write into the tree it judges, and that arm allows a redirect only when
+# its target variable is assigned from `mktemp` in this same file — a property check rather than a
+# blessed spelling. A parameter would defeat it, and with exactly ONE caller here the parameter bought
+# nothing anyway. `adv_f` is set by that caller before this runs.
+observe_remote() { # <git args…> -> rc (124 = the bound fired); output lands in $adv_f
   local rc
   if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
     timeout -k 5s "$REMOTE_BOUND" \
@@ -288,7 +341,7 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
       git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
           -c credential.interactive=never \
           -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
-          "$@" >"$out" 2>/dev/null
+          "$@" >"$adv_f" 2>/dev/null
     rc=$?
   else
     env GIT_TERMINAL_PROMPT=0 \
@@ -296,7 +349,7 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
     git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
         -c credential.interactive=never \
         -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
-        "$@" >"$out" 2>/dev/null
+        "$@" >"$adv_f" 2>/dev/null
     rc=$?
   fi
   return "$rc"
@@ -304,9 +357,9 @@ observe_remote() { # <outfile> · <git args…> -> rc (124 = the bound fired)
 if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
   adv_f=$(mktemp) || adv_f=""
   if [ -n "$adv_f" ]; then
-    observe_remote "$adv_f" ls-remote --symref --exit-code "$adv_remote" HEAD \
+    observe_remote ls-remote --symref --exit-code "$adv_remote" HEAD \
       && ADV_HEAD=$(awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }' "$adv_f")
-    observe_remote "$adv_f" ls-remote --heads "$adv_remote" \
+    observe_remote ls-remote --heads "$adv_remote" \
       && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
     rm -f "$adv_f"
   fi

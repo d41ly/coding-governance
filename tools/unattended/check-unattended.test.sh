@@ -39,6 +39,8 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
+HALT_CODES_EXTRA=""
+HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 EOF
 }
 
@@ -81,6 +83,7 @@ EOF
 }
 
 DIRECTIVES_FLOOR_DERIVED="$(grep '^DIRECTIVES_CORE=' "$HERE/unattended.sh" | sed 's/^DIRECTIVES_CORE="//; s/"$//' | wc -w)"
+HALT_FLOOR_DERIVED="$(grep '^HALT_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HALT_CODES_CORE="//; s/"$//' | wc -w)"
 CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
@@ -178,6 +181,61 @@ hit "$out" "$((ncore-1)) against $ncore"
 # ...the member deleted was a TERMINAL one, so the independent terminal-membership check fires too.
 # Two sets declared separately, so THAT one is falsifiable where the subset form was not.
 hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it"
+
+
+
+# ---- THE HALT VOCABULARY: six refusals, each armed by a POSITIVE assertion naming its own text. All
+# ---- six were OBSERVED against the real tree before they were armed here, which is the order this
+# ---- repo asks for — a gate whose failing case has only ever been imagined is an assertion about
+# ---- nothing. The driver-editing arms re-stage the kit copy first: reset_tree's `git clean -qfd`
+# ---- removes it, and without the re-stage the sed edits nothing and the arm passes by finding nothing.
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_FLOOR=.*/HALT_FLOOR=""/' .unattended.conf
+# SED, not the override channel: `${HFLOOR_OVERRIDE:-$DERIVED}` substitutes the default when the
+# override is empty, so an empty override declares the key rather than clearing it — the arm passed
+# by testing the opposite of what it says.
+hit "$(run)" "HALT_FLOOR is undeclared in .unattended.conf, and with no floor a deleted halt code is indistinguishable from a vocabulary that never had one"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+HFLOOR_OVERRIDE="seven" mkconf
+# A WORD, not a numeral. The shrink-only comparison below it is `-ge`, which on a non-numeric operand
+# is a shell error rather than a verdict — so a floor that reads as English disarms the pin while
+# looking set, which is worse than one left blank.
+hit "$(run)" "HALT_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE="[a-z-]* /HALT_CODES_CORE="/' tools/unattended/unattended.sh
+hit "$(run)" "the kit's CORE halt vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record that cited it"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE=.*/HALT_CODES_CORE=""/' tools/unattended/unattended.sh
+hit "$(run)" "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything"
+
+# ---- and the two record-level refusals. The population is every TRACKED run-state file, archived ones
+# ---- included, so the fixture has to be committed for the check to see it at all.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p "memory/builds/tHalt"
+printf '# tHalt - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: ABORTED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\n' > memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt --no-verify >/dev/null 2>&1
+out=$(run)
+# the check's own header, which is what the arms gate signs the branch with; the per-record line
+# below says WHICH record.
+hit "$out" "aborted run-state records whose halt code is missing or outside the effective vocabulary"
+hit "$out" "phase ABORTED and no halt-code fact, so the record says a run stopped and never says why"
+
+sed -i 's/^phase: ABORTED/halt-code: not-a-real-code\nphase: ABORTED/' memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt2 --no-verify >/dev/null 2>&1
+hit "$(run)" "halt-code outside the effective vocabulary: not-a-real-code"
+
+# ...and the CONTROL: a legal code is silent. Without it every arm above could be passing because the
+# check reds on any aborted record at all, which is the shape that would also red the whole corpus.
+sed -i 's/^halt-code: not-a-real-code/halt-code: fork-unresolvable/' memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt3 --no-verify >/dev/null 2>&1
+out=$(run)
+miss "$out" "phase ABORTED and no halt-code fact"
+miss "$out" "halt-code outside the effective vocabulary"
+reset_tree
 
 
 # ---- THE PARKED-KIND TAXONOMY, both refusals, driven the way every other core-set arm here is: by
@@ -348,7 +406,10 @@ hit "$(run)" "a run-state file's generated region carries a COPY of the unit lis
 # property rather than as two arms about one past bug.
 reset_tree
 mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
 mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
 same "a terminal record carrying a copy leaves the leg green" "$(run; echo $?)" "0"
@@ -450,7 +511,10 @@ miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was don
 # aborted before its first commit — base pinned at HEAD through preflight's degenerate path — red the
 # bar with its own abort record, on the one exit that exists for a run which cannot meet its
 # obligations. The three that remain are the control: dropping ABORTED must not drop them too.
-sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; git add -A
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; git add -A
 miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done"
 for ph in LANDING LANDED VERIFYING; do
   sed -i "s/^phase: .*/phase: $ph/" memory/builds/tRun/RUN.md; git add -A
@@ -657,10 +721,40 @@ reset_tree
 
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
+# ----
+# ---- THE PROPERTY IS "NO WRITE INTO THE TREE IT JUDGES", not "no redirect anywhere", and the two
+# ---- stopped being the same thing when the leg's remote observations became BOUNDED. A wall-clock
+# ---- bound has to capture through a FILE — `out=$(timeout N cmd)` reads until EOF and a surviving
+# ---- descendant holds the pipe, so the verdict is bounded while the clock is not — and that file is a
+# ---- `mktemp` scratch path outside the repository.
+# ----
+# ---- So the exemption checks a PROPERTY rather than blessing a line: a redirect is allowed only when
+# ---- its target variable is assigned from `mktemp` somewhere in this same file. Blessing the spelling
+# ---- `>"$out"` would let any future variable called `out` write anywhere; deriving the allowed names
+# ---- from the mktemp assignments means the exemption shrinks and grows with the code it describes.
 reset_tree
+# the variables this file assigns from mktemp — the only legal redirect targets
+mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE/check-unattended.sh" \
+      | sed -E 's/^[[:space:]]*(local +)?//; s/=\$\(mktemp$//' | sort -u)
 w=$(grep -nE '(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)' "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
-n=$((n+1)); [ -z "$w" ] || { echo "FAIL the leg contains a write: $w"; st=1; }
+# A line is exempt when its write touches a SCRATCH variable and the line names no path in the
+# tree under judgement. That is the property spelled directly rather than a verb-by-verb chase:
+# a redirect into the scratch file and the cleanup that removes it are both fine, and either
+# would stop being fine the moment the same line also named the memory root.
+if [ -n "$w" ] && [ -n "$mkt" ]; then
+  for v in $mkt; do
+    w=$(printf '%s\n' "$w" | grep -vF -- "$v" || true)
+  done
+  w=$(printf '%s\n' "$w" | grep -v '^[[:space:]]*$' || true)
+fi
+n=$((n+1)); [ -z "$(printf '%s' "$w" | tr -d '[:space:]')" ] || { echo "FAIL the leg contains a write into the tree it judges: $w"; st=1; }
+# ...and the exemption is not vacuous: this file MUST actually declare a mktemp scratch variable, or
+# the loop above filtered nothing and the arm is the old one wearing a new comment.
+n=$((n+1)); [ -n "$mkt" ] || { echo "FAIL the read-only arm derived no mktemp scratch variable, so its exemption filtered nothing and the property it claims to check is not the one it checks"; st=1; }
+# THE EXEMPTION IS BOUNDED: no line it removed may also name the memory root, or the property
+# check would be exempting a real write to the tree under judgement.
+n=$((n+1)); [ -z "$(grep -nE '(mv|rm|cp|sed -i|tee|> *"?$)' "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' | grep -F -- "$mkt" | grep -E '($M|memory)/' || true)" ] || { echo "FAIL a line exempted as scratch also names the tree under judgement, so the read-only exemption is covering a real write"; st=1; }
 
 # ---- SOURCE-level: the hot accessors must not fork. `fact_of`, `phase_of` and `core_of` run per
 # ---- run-state file per check, and as `sed | head | tr` they cost three processes each — measured
@@ -779,7 +873,10 @@ RM
 # tRun's record is RUNNING, and a second live run trips check 7 — 'the run' stops being well
 # defined for anything keyed on it. Retire it in the same commit so this block's green control
 # measures check 17 rather than a collision this fixture created.
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
 sed -i 's/^phase: RUNNING$/phase: ABORTED/' memory/builds/tRun/RUN.md
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
 git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
 WP=$(git rev-parse HEAD)
@@ -1035,7 +1132,8 @@ reset_tree
 # ---- silence: widening DIRECTIVES_CORE reds check 16 by construction, and a builder chasing total
 # ---- silence would exempt check 16 on terminal records — the over-wide exemption this build has
 # ---- already committed once.
-frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; }
+frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+           sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; }
 
 # MOVE 1 — a COPY appears in the run-state region, which is what every pre-redesign record holds.
 # Collides with check 8. On a TERMINAL record it must be silent: no verb can empty that region once

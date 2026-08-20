@@ -157,10 +157,13 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-13 against the tree rather than carried forward. Three claims that stood here
-were stale: the units are on `main`, not unmerged; a run HAS been driven; and the authored region
-carries seven facts, not five. Dossier prose is ungated — only the claims tables above are — so this
-section rots silently and is worth re-deriving whenever the feature is touched.*
+*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
+carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
+resume comment, all at the same time. Three carriers, three values, none of them counted by any gate:
+that is what an ungated count does, and it is why the unit that added the twelfth fact enumerated the
+carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
+claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
+is touched.*
 
 - **A run has been driven end to end, and it exposed two defects rather than confirming the
   design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.

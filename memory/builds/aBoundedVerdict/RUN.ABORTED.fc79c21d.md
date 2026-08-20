@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+halt-code: gate-red-out-of-scope
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: ac7d2585f0501bd00ae860373571c8057792a83d

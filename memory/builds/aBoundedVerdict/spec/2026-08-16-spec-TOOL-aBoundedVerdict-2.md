@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** SPECCED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -635,6 +635,49 @@ This line is the machine-read one; the bullets carry the reasoning.
   cutoff key, the instrument the conf already carries four times and the one the sibling unit chose
   hours earlier for the same shape of problem. The grandfather registry was the alternative and is for
   files kept under historical NAMES, which is a different question.
+
+- rev-9 · 2026-08-20 · **built. The pin was worse than S7 described, and S7 was already the part of
+  this spec that expected the worst.** Read live at build time, the four carriers disagreed THREE WAYS
+  AT ONCE: the protocol pair said eleven, the driver's own resume comment said seven, the map dossier
+  said seven. Nothing counts facts, so no gate had ever compared them. All four now say twelve.
+  **AC8 then caught my own edit**, which is the best thing that happened in this pass: the dossier
+  printed NOTHING, because I had written "carries / twelve facts" across a line break and the
+  extraction is line-based. That is exactly the case AC8 says reds as loudly as a disagreement — a
+  carrier whose sentence stopped matching — and it fired on the person who wrote it.
+  **A `fail` message cannot contain a command substitution and still be armable.** Both new abort
+  refusals ended `Legal codes: $(halt_codes)`, and the arms gate signs a branch with the LITERAL source
+  text of its `fail` call, so the substitution became part of the signature and no runtime arm could
+  ever match it. Bound to a name, with only a plain interpolation after the sentence. Same family as
+  the recorded positional trap, third instance this build has hit.
+  **The migration was DERIVED and not copied, which is what AC4a asks, and the derivation held.** The
+  population was re-derived at build time with an assertion that would have caught a record another
+  node added — twenty-five commits arrived from `origin/main` during this run — and each code was read
+  out of that record's own parked text. All six matched the table. The one that deserved the scrutiny
+  is `dClosedLexicon`: its reason reads as review NON-CONVERGENCE, which would suggest the ceiling
+  member, but the CAUSE of the halt was a refused scope decision (ship weakened, cut scope, or land
+  the remainder), and reading it as the kit's runaway ceiling would be anachronistic — that ceiling did
+  not exist when the run stopped. `fork-unresolvable` stands.
+  **What migrating an ARCHIVED record costs, since nothing else says it.** A rotated record is named
+  `RUN.<phase>.<blob8>.md` from its own blob hash, so editing its bytes leaves a name that no longer
+  reproduces from its content, and nothing verifies that pair. It is BENIGN and the protocol says why:
+  the name exists so two records with the same content cannot collide, not as an integrity check, and
+  a later edit cannot reintroduce a collision. Recorded because a reader who assumes the name is a
+  checksum would conclude otherwise.
+  **A newly REQUIRED conf key has THREE seeds, not two**, and the third is the one that bites: this
+  repo's own conf, the adopter's seed conf, and the leg test's fixture conf. Omitting the third redded
+  every conforming-tree arm in that suite at once, which is the "a gate-required key missing from the
+  seed reds the first check on install" hazard happening inside the test written to catch it. The
+  fixture value is DERIVED from the shipped driver like its two siblings, because a literal floor in a
+  fixture goes stale the moment a member is added.
+  **All six new refusals were OBSERVED against the real tree before being armed** — floor undeclared,
+  floor malformed, vocabulary below floor, vocabulary empty, aborted record with no code, code outside
+  the vocabulary — and the record-level pair carries a CONTROL, without which every arm could be
+  passing on a check that reds on any aborted record at all.
+  **One id citation was caught before it landed.** The conf comment first read `TOOL-aBoundedVerdict-2`,
+  and `tools/unattended/.unattended.conf.example` is product source under `tools/`, so it would have
+  taken the non-terminal-citation drift signal from 2 to 3 and broken a shrink-only pin. Paraphrased.
+  This is the cross-unit rule this build states, and it is easy to break while writing a comment about
+  the unit itself.
 
 ## 10. Reuse audit
 

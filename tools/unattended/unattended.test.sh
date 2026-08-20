@@ -1157,7 +1157,12 @@ same "the example CORE_FLOOR equals the driver phase and DoD set sizes" \
   "$(sed -n 's/^CORE_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw PHASES_CORE):$(wcw DOD_CORE)"
 same "the example DIRECTIVES_FLOOR equals the driver directive count" \
   "$(sed -n 's/^DIRECTIVES_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw DIRECTIVES_CORE)"
-initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
+# THE WHOLE CONTIGUOUS BLOCK, derived rather than a fixed window. This read `grep -A1`, so the block
+# was whatever two lines happened to be there — and it silently stopped covering the block the moment
+# a third line of defaults was added, reporting the new keys as undefaulted when they were defaulted
+# one line below the window. A hardcoded window over a growing list is the same class as a count
+# written in prose.
+initblock=$(awk '/^MEMORY_ROOT=memory; /{f=1} f{ if ($0 ~ /^[A-Za-z_][A-Za-z_0-9]*=/) print; else exit }' "$SCRIPT")
 undefaulted=""
 checked=0
 for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
@@ -1637,7 +1642,8 @@ n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)"
 bcopen
 run --attest tRun --item keepalive-reaped >/dev/null
 run --attest tRun --item parked-decisions-surfaced >/dev/null
-hit "$(run --abort tRun --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
+# a legal code rides along: the code is required now, and this arm is about something else.
+hit "$(run --abort tRun --code fork-unresolvable --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
 
 # ---- S3: the override park is the FOURTH caller of a guard that existed in triplicate. A truthful
 # ---- reason -- one that says why the flag matters -- used to red leg check 11 permanently on a record
@@ -1844,16 +1850,19 @@ hit "$(run --abort tRun --reason "second thoughts")" "the run is already finishe
 # ...both attestations, one at a time, so the arm distinguishes them. Attesting only the keepalive
 # still refuses, which is the half a first cut of this unit let through.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
+# a legal code rides along: the code is required now, and this arm is about something else.
+hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
 printf 'keepalive-reaped: yes\n' >> memory/builds/tRun/RUN.md
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
+# a legal code rides along: the code is required now, and this arm is about something else.
+hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
 
 # ...and the success path. AC19: the parked entry names itself an ABORT. Routed through the old
 # hardcoded `park` it would have read "override · item …", and the build method derives the owner's
 # open/parked row from parked entries "plus any recorded DoD override" — so an abort would have
 # arrived in the one turn the owner gets wearing the label of an override that never happened.
 printf 'parked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
-out=$(run --abort tRun --reason "the remote never answered")
+# a legal code rides along: the code is required now, and this arm is about something else.
+out=$(run --abort tRun --code fork-unresolvable --reason "the remote never answered")
 hit "$out" "phase ABORTED"
 same "--abort wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "ABORTED"
 same "--abort witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
@@ -2092,7 +2101,8 @@ parked-surfaced: yes
 before=$(sum)
 hit "$(run --abort tRun --reason "the lander refused and I would not reach for --no-verify")" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag"
 same "the refused abort wrote nothing" "$(sum)" "$before"
-out=$(run --abort tRun --reason "the lander refused and I would not bypass it")
+# a legal code rides along: the code is required now, and this arm is about something else.
+out=$(run --abort tRun --code fork-unresolvable --reason "the lander refused and I would not bypass it")
 hit "$out" "phase ABORTED"
 miss "$(cat memory/builds/tRun/RUN.md)" "--no-verify"
 
@@ -2608,11 +2618,67 @@ n=$((n+1)); grep -q '^PARK_KINDS_SURFACED="' "$SCRIPT"   || { echo "FAIL the dri
 n=$((n+1)); [ -z "$(grep -n 'decision|abort|override|waiver' "$SCRIPT")" ]   || { echo "FAIL the four parked kinds are spelled as an alternation somewhere in the driver, which is a second spelling of the taxonomy and goes wrong the moment a kind is added: $(grep -n 'decision|abort|override|waiver' "$SCRIPT")"; st=1; }
 
 
+
+echo "MARK halt-code" >&2
+# ---- THE HALT CODE ON --abort. A single ABORTED terminal said a run stopped and never said why: the
+# ---- reason was free prose in a parked entry, which the owner reads and no check does. The code is
+# ---- REQUIRED and VALIDATED, and both refusals name the legal set — a validated vocabulary whose
+# ---- refusal does not say what is legal costs the operator a source read.
+bcopen
+out=$(run --abort tRun --reason "stopped for a stated reason")
+hit "$out" "--abort requires --code, because a single ABORTED terminal says a run stopped and never says why; the reason is prose for the owner and the code is the field every reader joins on"
+same "a refused abort wrote nothing" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
+
+bcopen
+out=$(run --abort tRun --reason "stopped for a stated reason" --code not-a-real-code)
+hit "$out" "--abort names a halt code that is not in the effective vocabulary, and an unvalidated code is free text wearing a field name; declare it in HALT_CODES_EXTRA or use one of these"
+same "a refused code wrote nothing either" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
+
+# ...and the accepted path, which is what makes the two refusals mean something. Both agent-attested
+# items are written first, because an abort owes both and would otherwise refuse for a different reason.
+bcopen
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+out=$(run --abort tRun --reason "stopped for a stated reason" --code gate-red-out-of-scope)
+hit "$out" "halt-code gate-red-out-of-scope"
+same "the code is an authored FACT, not a substring of the reason" "$(grep -c '^halt-code: gate-red-out-of-scope' memory/builds/tRun/RUN.md)" "1"
+# the two readers: --status names it, and --resume says the run FINISHED rather than paused.
+hit "$(run --status tRun)" "halt-code gate-red-out-of-scope"
+hit "$(run --resume tRun)" "this run FINISHED rather than paused: halt-code gate-red-out-of-scope"
+# a PROJECT extra is accepted, which is the half that proves the set is effective and not core-only.
+bcopen; mkconf; printf 'HALT_CODES_EXTRA="site-specific-halt"
+HALT_FLOOR="7"
+' >> .unattended.conf
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+out=$(run --abort tRun --reason "stopped for a stated reason" --code site-specific-halt)
+miss "$out" "not in the effective vocabulary"
+reset_tree
+
+
+
+# ---- AC7: EVERY DOCUMENTED ABORT INVOCATION SPELLS THE CODE. Three call sites — the Skill template,
+# ---- its render, and the protocol pair's verb row — and no gate joined a documented invocation to the
+# ---- driver's argument set before this, so the full bar stayed green while every documented call was
+# ---- missing a required argument. The render is regenerated from the template, so a drift between
+# ---- them is the adopter check's business; what this arm owns is that none of them loses the code.
+for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md"; do
+  [ -f "$f" ] || continue
+  if grep -q 'unattended.sh --abort <slug>' "$f"; then
+    n=$((n+1)); grep -q 'unattended.sh --abort <slug> --code' "$f"       || { echo "FAIL a documented abort invocation omits the required code argument: $f"; st=1; }
+  else
+    n=$((n+1)); grep -q 'requires a recorded reason, a HALT CODE' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
+  fi
+done
+
+
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=442
+FLOOR_ASSERTIONS=453
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -418,7 +418,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | SPECCED | rev-10 | 2026-08-20 |
-| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-8 | 2026-08-20 |
+| [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | SPECCED | rev-9 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | SPECCED | rev-8 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | SPECCED | rev-8 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | SPECCED | rev-10 | 2026-08-20 |

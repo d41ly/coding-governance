@@ -10,7 +10,7 @@
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
-#   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
+#   unattended.sh --abort <slug> --reason <text> --code <halt-code>           # end it, with the reason on the record
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -140,12 +140,14 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
 PK_ITEM=""
+HALT_CODE=""
 M="$MEMORY_ROOT"
 
 status=0
@@ -207,6 +209,26 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # new public surface for the kit. So the taxonomy ships with its constant and its single reader, and
 # its shrink-only property is UNARMED until that carrier is an owner decision. No criterion pretends
 # otherwise.
+# THE HALT VOCABULARY. A run that stops has to say WHY in a token something can read, and until this
+# existed the single `ABORTED` terminal said nothing at all — the reason lived in free prose in a
+# parked entry, which the owner reads and no check does.
+#
+# ONE MEMBER PER HALT SITE THIS BUILD ACTUALLY ENUMERATED, and none invented for symmetry. A vocabulary
+# with a member nothing produces is the phase vocabulary's own disease, and a catch-all member is a
+# hole that swallows the set within a few runs — so an unclassifiable halt takes the CLOSEST code and
+# puts the specifics in the free-text reason, and the mismatch earns a backlog row when it happens.
+#   runaway-ceiling-unclean   the review loop hit its runaway ceiling with the subject not clean. Its
+#                             being reached is itself a defect in the convergence predicate.
+#   fork-unresolvable         a fork survived the method vetoes with no resolution the mandate delegates.
+#   scope-approval-needed     a unit awaits owner scope approval the mandate does not supply.
+#   external-prerequisite     a unit is blocked on something outside the repo. A DIFFERENT owner turn
+#                             from an unapproved scope, and conflating them tells a returning owner to
+#                             do the wrong thing.
+#   acceptance-underivable    a unit acceptance or gate set could not be derived, so it is not Ready
+#                             and no run can split it.
+#   repo-state-out-of-mandate the repository state at start was outside what the mandate reaches.
+#   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
+HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
 PARK_KINDS_SURFACED="decision abort override waiver"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
@@ -230,6 +252,10 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
   printf 'all'
 }
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
+# The EFFECTIVE halt vocabulary: kit core plus whatever the project appended. Same shape as the phase
+# and Definition-of-Done sets, so a project can extend it and cannot delete from it.
+halt_codes() { printf '%s %s\n' "$HALT_CODES_CORE" "$HALT_CODES_EXTRA"; }
+is_halt_code() { case " $(halt_codes) " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
 # ------------------------------------------------------------------------------ the region grammar
@@ -1438,15 +1464,22 @@ verb_landed() { # slug
 #     and the build method derives the owner's only turn from those entries. The circularity
 #     objection - that the wrap-up has not happened yet - is identical at --close, where the same
 #     attestation is demanded before the same wrap-up, and it was accepted there.
-verb_abort() { # slug · reason
-  local slug="$1" reason="$2" rel head item ck key
+verb_abort() { # slug · reason · code
+  local slug="$1" reason="$2" code="$3" rel head item ck key
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to abort: $rel"; return 1; }
+  # ALREADY FINISHED beats every argument complaint below it. A terminal record is not going to
+  # become abortable because the operator supplies a better reason or a halt code, so telling them
+  # to supply one sends them to fix a thing that is not the problem. This moved above the argument
+  # validation when the code became required; the ordering is the point, not a side effect.
+  refuse_if_terminal "$rel" --abort || return 1
   if [ -z "$reason" ]; then
     fail 33 "--abort requires --reason, because an abort with no recorded reason is indistinguishable from a run that simply stopped, and the reason is the only thing the owner gets in place of the turn nobody took"
     return 1
   fi
+  # ...and it sits WITH the reason checks rather than after the code ones: it is a fact about the
+  # REASON, and grouping it below the code validation made a reason problem report as a code one.
   # A REASON MAY NOT SPELL THE BYPASS FLAG. park() writes it verbatim into the run-state file, and leg
   # check 11 greps that file WHOLE for the declared flag - so a perfectly truthful abort reason ("the
   # lander refused and I would not use it") would red the bar permanently, on a terminal record no
@@ -1456,7 +1489,23 @@ verb_abort() { # slug · reason
     fail 36 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag: $BYPASS_BAN"
     return 1
   fi
-  refuse_if_terminal "$rel" --abort || return 1
+  # THE CODE IS REQUIRED, and it is validated against the effective vocabulary rather than accepted as
+  # free text. A reason is for the owner; a code is for everything else — the status line, the resume
+  # path and the gate leg all read it by key. Refusing names the legal set, because a validated
+  # vocabulary whose refusal does not say what is legal costs the operator a source read.
+  # THE LEGAL SET IS BOUND TO A NAME before it reaches either message, and that is not style: the
+  # arms gate signs a branch with the LITERAL source text of its `fail` call, so a `$(...)`
+  # substitution inside one becomes part of the signature and no runtime arm can ever match it. A
+  # plain interpolation at the END of the sentence is the shape that arms.
+  local legal; legal=$(halt_codes)
+  if [ -z "$code" ]; then
+    fail 33 "--abort requires --code, because a single ABORTED terminal says a run stopped and never says why; the reason is prose for the owner and the code is the field every reader joins on: $legal"
+    return 1
+  fi
+  if ! is_halt_code "$code"; then
+    fail 33 "--abort names a halt code that is not in the effective vocabulary, and an unvalidated code is free text wearing a field name; declare it in HALT_CODES_EXTRA or use one of these: $legal"
+    return 1
+  fi
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
@@ -1475,9 +1524,14 @@ verb_abort() { # slug · reason
   head=$(GIT rev-parse HEAD)
   set_fact "$rel" phase ABORTED || return 1
   set_fact "$rel" witness "$head" || return 1
+  # AN AUTHORED FACT, not a substring of the reason. A reader is a field read rather than a parse, and
+  # three readers want it by key. It is a per-run SINGLETON written by a terminal verb, which is the
+  # same shape the roster-at-landing fact already has — the in-tree precedent, not an argument by
+  # analogy. Append-only history takes a park KIND instead, which is what the review-round unit does.
+  set_fact "$rel" halt-code "$code" || return 1
   park "$rel" abort "$slug" "$reason"
   stage_or_fail "$rel" || return 1
-  echo "unattended: phase ABORTED · witness $head · reason recorded as a parked entry"
+  echo "unattended: phase ABORTED · witness $head · halt-code $code · reason recorded as a parked entry"
   return 0
 }
 
@@ -1739,8 +1793,12 @@ verb_status() { # slug
   # is one edit.
   nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(printf '%s' "$PARK_KINDS_SURFACED" | tr ' ' '|')) · item " "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
-  printf 'unattended: %s · phase %s · witness %s · next %s%s
-' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
+  # The halt code on the status line, when the record carries one. A vocabulary with no reader is
+  # decoration, and this kit says so about its own phase writer.
+  local hc; hc=$(fact "$rel" halt-code)
+  [ -n "$hc" ] && hc=" · halt-code $hc"
+  printf 'unattended: %s · phase %s · witness %s%s · next %s%s
+' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
   return 0
 }
@@ -1749,11 +1807,16 @@ verb_resume() { # slug
   verb_status "$1" || return 1
   local rel p; rel=$(runmd_of "$1"); p=$(fact "$rel" phase)
   if is_terminal "$p"; then
-    echo "unattended: nothing to resume — phase $p is terminal"
+    local rhc; rhc=$(fact "$rel" halt-code)
+    if [ -n "$rhc" ]; then
+      echo "unattended: nothing to resume — phase $p is terminal, and this run FINISHED rather than paused: halt-code $rhc"
+    else
+      echo "unattended: nothing to resume — phase $p is terminal"
+    fi
   else
     echo "unattended: resume at phase $p — read $rel, then continue the first non-terminal unit above"
     # The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the authored region
-    # carries seven facts and never restates a derivable one (protocol section 2).
+    # carries twelve facts and never restates a derivable one (protocol section 2).
     [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
     echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
   fi
@@ -2203,7 +2266,7 @@ PARKED
 # free-text field the owner supplies is an injection, and the reason is exactly that field.
 #
 # `--reason` CLOSES the pair its preceding flag opened. With no pair open it keeps its scalar meaning,
-# which is what `--abort <slug> --reason <text>` uses. A flag still pending when argv ends keeps the
+# which is what `--abort <slug> --reason <text> --code <halt-code>` uses. A flag still pending when argv ends keeps the
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
@@ -2244,6 +2307,7 @@ while [ $# -gt 0 ]; do
     --reason)       if [ "$OV_PEND" = ov ]; then OV_REASONS[$(( ${#OV_REASONS[@]} - 1 ))]="${2:-}"; OV_PEND=""
                     elif [ "$WV_PEND" = wv ]; then WAIVE_REASONS[$(( ${#WAIVE_REASONS[@]} - 1 ))]="${2:-}"; WV_PEND=""
                     else REASON="${2:-}"; fi; shift 2 || shift ;;
+    --code)         HALT_CODE="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
@@ -2259,7 +2323,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> --code <halt-code> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2267,7 +2331,7 @@ case "$VERB" in
   --resume)    verb_resume "$SLUG" ;;
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
-  --abort)     verb_abort "$SLUG" "$REASON" ;;
+  --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
 esac
