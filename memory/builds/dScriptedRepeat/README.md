@@ -4,8 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling
 roster: TOOL
-status: OPEN
-ids: TOOL-dScriptedRepeat-1
+ids: TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10
 ---
 
 # dScriptedRepeat — playbook mode: a third authorization discipline for repeatable content
@@ -47,15 +46,16 @@ research→test→choose loop, which is exactly what "no playbook exists yet, do
 portable: the DoD item `build-complete`, which reads the units table and therefore counts units, not
 pieces.
 
-**The reference playbooks are two different shapes and both are evidence.** `PLAYBOOK.md` is a
-1,290-line step checklist where every step carries `GATE <leg>` or `CHECK <why>` — 92 GATE tags, 95
-CHECK tags, 110 numbered steps — and its own I21 invariant reds a step that is untagged or names no
-runnable leg. `HYBRID-PLAYBOOK.md` is a 245-line recipe: an exact parameter table, a prompt scaffold
-with named slots, hard rules each traced to an owner correction, an accepted-instance library, a
-"what was ruled out — don't re-try" section, and a dated bake-off marked don't-redo. The GATE/CHECK
-tagging is the same discipline this repo already states as a rule (a gate's own header names what it
-does not check; a skip must announce itself), which is why it is the template's spine rather than an
-import.
+**The reference playbooks are two different shapes and both are evidence.** `PLAYBOOK.md` is a step
+checklist where every step carries `GATE <leg>` or `CHECK <why>`, with its own I21 invariant redding a
+step that is untagged or names no runnable leg. `HYBRID-PLAYBOOK.md` is a recipe: an exact parameter
+table, a prompt scaffold with named slots, hard rules each traced to an owner correction, an
+accepted-instance library, a "what was ruled out — don't re-try" section, and a dated bake-off marked
+don't-redo. The GATE/CHECK tagging is the same discipline this repo already states as a rule (a gate's
+own header names what it does not check; a skip must announce itself), which is why it is the
+template's spine rather than an import. Every count over either file is DERIVED by the research
+records under `build/`, never restated here — the first draft of this paragraph carried three and one
+of them was already wrong.
 
 ## The seven forks, resolved at kickoff
 
@@ -74,23 +74,143 @@ spec set and every spec is measured against them.
 
 ## Constraints already measured
 
-Two budgets are nearly spent and both bind this build's design. `memory/guides/BUILD-METHOD.md` sits
-at 20,567 B of its 22 KB budget and 283 of its 290 lines — roughly 1,961 B and 7 lines of headroom,
-so a new method section is an owner call rather than an edit, exactly as M12's own budget rise was.
-The corpus read path sits at 106,194 B against a declared ceiling of 112,987 — 6,793 B of margin,
-which one protocol section plus this build's own generated row can plausibly exhaust. Externalizing
-is preferred to spending either.
+Two budgets are nearly spent and both bind this build's design, and neither figure is written here —
+read `bash tools/check-template-size.sh` and `python tools/memory-tree/corpus_ids.py --report` for the
+live pair. `memory/guides/BUILD-METHOD.md` is close enough to its stated 22 KB / 290 lines that a new
+method section is an owner call rather than an edit, exactly as M12's own budget rise was. The corpus
+READ PATH is the tighter of the two, and the research measured its warning coming true before a design
+byte was spent: opening this build rendered a row into the generated `memory/LIVE.md`, which is itself
+on the read path, and that row alone cost 94 B. Externalizing is preferred to spending either, and
+raising the ceiling is a fork for the owner rather than an edit.
+
+## What the research changed
+
+Six records under `build/` — five independent lenses and one contradiction hunt that cross-checked
+them against source. The hunt is the one to read first; it refuted four recommendations, found
+thirteen cites that do not resolve, and ranked twelve decisions still open.
+
+**Fork 6's stated premise is false, and the ruling survives on other grounds.** The fork was ruled on
+my framing that "a park blocks the close". It does not. `park()` already writes four KINDS — `abort`,
+`waiver`, `override`, `decision` — into one region, and `parked-decisions-surfaced` is satisfied by a
+single derived `parked-surfaced:` line that neither distinguishes kinds nor blocks per entry. The
+asymmetry the fork asked for already holds. What the ruling buys is therefore a fifth KIND at roughly
+a tenth of the cost, and the residual tension is the fork's words "distinct region" — a fifth kind is
+the same region with a different first token. Recorded rather than quietly switched.
+
+**Fork 5 is the most damaged.** The reference playbook that fork 4 derives the template from contains
+four measured instances of exactly the defect fork 5 exists to prevent, including two invariants its
+own validity gate has never once validated because they appear only in line-wrapped tags. The two
+playbooks also disagree on what a "step" is — nine or zero, depending on the selector — so a hardcoded
+step selector reports "every step is tagged" over an empty selection on one of the two files it was
+derived from. That is green-by-absence inside the fork meant to prevent it.
+
+**The single most important discovery is not in any fork.** Every composition failure in the reference
+corpus was found by measuring the SET, never a piece: nine articles each reviewed carefully and passed
+were a monoculture no single-article review could have caught. A Definition of Done that counts pieces
+and declares each piece's legs green ships N monocultured pieces and reports GREEN. Set-scoped checks
+are the characteristic need of repeated generation and no fork covers them.
+
+## The four forks the research opened, ruled 2026-08-20
+
+The seven kickoff forks were ruled before evidence. These four were ruled after it, and each
+overturns or completes something the first seven left wrong or unsaid.
+
+**Fork 8 — where `outputs:` and `pieces:` are declared: the hybrid nobody had priced.** The build
+README's front matter at BASE names the PLAYBOOK PATH; the gate takes a second `GIT show` of that path
+at BASE and reads the globs from the playbook. The driver's `No second GIT show: one blob, one parse`
+rule bounds ONE front-matter scan and does not forbid reading a second file. This is the only option
+that keeps the playbook self-describing across runs, which is the mode's whole premise.
+
+**Fork 9 — what fork 1's "ONE gate" means for the attended half: the per-piece record is a property of
+the TREE.** Tracked, hash-joined to the piece, readable by a merge-bar leg with no run-state file in
+sight. Both entry points then emit one evidence shape and "ONE gate" is literally true. The research
+proved an attended run cannot close through the driver at all, so the alternative was an honour system
+over half the surface.
+
+**Fork 10 — the mode owns SET-scoped checks.** A playbook declares two check populations: per-piece,
+and set-scoped over all N at close. Without the second, a Definition of Done that counts pieces and
+finds each piece's legs green ships N monocultured pieces and reports GREEN.
+
+**Fork 11 — the CHECK grammar is validated-when-present, with a drain census.** A `CHECK` may carry
+`· witness <field>`; the gate validates every one present and REPORTS the drain rather than redding.
+Measured precedent decides it: the soft rule drained voluntarily in 15 of 33 cases here, the
+hard-equality canon in 0 of 11 — and hard equality FORBIDS a grandfathered file from conforming early,
+which is a wall in front of the mode's second verb.
+
+## The unit set
+
+Ten units. One mechanism each, per the build method's M2. Every one is Tier 2 except unit 9 — this
+is a kit contract change throughout, which the manifest's tier rule makes Tier 2 by definition.
+
+The ORDER matters and is not the id order. Unit 1 publishes the vocabulary every later unit joins
+against; units 2 and 3 are the artifact and its checker and can run in parallel with 4-8; unit 5 is
+the prerequisite for 6 and 7, because both read the record it defines; unit 10 is last because it
+renders a Skill that names what the other nine built.
 
 <!-- roster:units -->
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dScriptedRepeat-1` | 2 | `AUTH_MODES` published as a driver constant, the third mode member, the directive scope set's third value, and the membership branch check 19 does not have |
+| 2 | `TOOL-dScriptedRepeat-2` | 2 | the PLAYBOOK TEMPLATE — derived from the corpus and the literature, frozen, marked human-curated, with a section canon and a DERIVED per-segment length budget |
+| 3 | `TOOL-dScriptedRepeat-3` | 2 | the playbook VALIDITY gate — the declared step selector and its shrink-only floor, the GATE/CHECK tag grammar, the witness drain census, and the leg-runnability oracle with a declared coverage mode and a named refusal |
+| 4 | `TOOL-dScriptedRepeat-4` | 2 | the declaration seam — the README names the playbook path at BASE, the gate reads `outputs:`, `pieces:` and the piece GRAIN from the playbook at BASE |
+| 5 | `TOOL-dScriptedRepeat-5` | 2 | the per-piece record as a TREE property — tracked, hash-joined to the piece, readable with no run-state file |
+| 6 | `TOOL-dScriptedRepeat-6` | 2 | `pieces-complete` — a ninth CORE DoD item, its vacuity guard, its grain, and whether it may be overridden |
+| 7 | `TOOL-dScriptedRepeat-7` | 2 | the SET-scoped check population and where it runs |
+| 8 | `TOOL-dScriptedRepeat-8` | 2 | the output-scope refusal — the diff population, the exemption set, an observed failing case, and the stated CHECK half |
+| 9 | `TOOL-dScriptedRepeat-9` | 1 | the `proposal` park kind and the `--propose` verb |
+| 10 | `TOOL-dScriptedRepeat-10` | 2 | the Skill's two start paths and the playbook-scoped directives |
 <!-- /roster:units -->
 
+## What is deliberately NOT in this build
+
+Named here because the research raised each one and an unstated exclusion reads as an oversight.
+
+- **No change to `check_authorization`, `resolve_base` or the anchor observation.** The precedent
+  build established that a mode is a RECORD rather than a verdict, and nothing here needs the
+  authorization to move. Repeating that finding is cheaper than re-deriving it.
+- **No content producers.** Fork 7 holds and the research agreed three ways, with one clarification
+  worth stating in the spec: the KIT is agnostic, the ADOPTER's checker is not and must not be.
+- **No migration of the reference playbooks.** They live in another repo and are somebody's
+  production artifacts. Fork 11's soft grammar exists so this build does not require one.
+- **The drift the research found in the kit's own records is filed, not fixed here** — the verb set
+  spelled in five places with three stale, a gate docstring stating a count of a derived population,
+  and an installed conf the bar reads but no arm grades.
+
+
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-08-20 · streams tooling
-ids TOOL-dScriptedRepeat-1
+**Build status:** SPECCED · 10 unit(s) · node d · opened 2026-08-20 · streams tooling
+ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-5 — the per-piece record as a property of the TREE](spec/2026-08-20-spec-dScriptedRepeat-5.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-1 | 2026-08-20 |
+| [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | SPECCED | rev-1 | 2026-08-20 |
 <!-- /gen:build-units -->
+
+Records live under `spec/` and `build/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
+
+Ids no record names: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
+
+Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -105,5 +225,22 @@ ids TOOL-dScriptedRepeat-1
 
 <!-- gen:build-docs -->
 
-*This build holds no records yet.*
+- **`spec/`**
+  - [2026-08-20-spec-dScriptedRepeat-1.md](spec/2026-08-20-spec-dScriptedRepeat-1.md)
+  - [2026-08-20-spec-dScriptedRepeat-10.md](spec/2026-08-20-spec-dScriptedRepeat-10.md)
+  - [2026-08-20-spec-dScriptedRepeat-2.md](spec/2026-08-20-spec-dScriptedRepeat-2.md)
+  - [2026-08-20-spec-dScriptedRepeat-3.md](spec/2026-08-20-spec-dScriptedRepeat-3.md)
+  - [2026-08-20-spec-dScriptedRepeat-4.md](spec/2026-08-20-spec-dScriptedRepeat-4.md)
+  - [2026-08-20-spec-dScriptedRepeat-5.md](spec/2026-08-20-spec-dScriptedRepeat-5.md)
+  - [2026-08-20-spec-dScriptedRepeat-6.md](spec/2026-08-20-spec-dScriptedRepeat-6.md)
+  - [2026-08-20-spec-dScriptedRepeat-7.md](spec/2026-08-20-spec-dScriptedRepeat-7.md)
+  - [2026-08-20-spec-dScriptedRepeat-8.md](spec/2026-08-20-spec-dScriptedRepeat-8.md)
+  - [2026-08-20-spec-dScriptedRepeat-9.md](spec/2026-08-20-spec-dScriptedRepeat-9.md)
+- **`build/`**
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
 <!-- /gen:build-docs -->
