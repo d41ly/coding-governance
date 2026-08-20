@@ -11,6 +11,7 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -59,12 +60,17 @@ cd "$ROOT" || exit 2
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — the kit reads every"; \
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
+# TOOL-dUnstalledConvoy-9 - condition 3's two halves are DECLARED, and both defaults sit ON the two
+# init lines below for the reason ANCHOR_SCOPE's comment already gives. SHARED_RECORDS defaults to a
+# memory tree at its conventional layout. GENERATED_INDEXES defaults to the EMPTY SET on purpose: its
+# value pairs an index with its GENERATOR, and a generator belongs to some other kit whose install
+# path this kit may not presume. A project declares it; blank means the conditional half is off.
 # ANCHOR_SCOPE defaults to the STRICT anchor: a blank, a typo or a value from a newer kit all keep
 # `default-branch`, because a value-set guard falling through to the wide behaviour would let a
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"; GENERATED_INDEXES=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -2061,6 +2067,127 @@ RESCOPED
   return 0
 }
 
+# TOOL-dUnstalledConvoy-9 - the write-set declaration a concurrent dispatch owes. M6 requires two path
+# lists written down before two passes run together, and until now nothing read one, which is the
+# whole of why `parallel-when-disjoint` has never produced a concurrent dispatch.
+#
+# IT RECORDS AND DOES NOT DISPATCH, for the reason its sibling verb records: a row derived from the
+# act it describes is a summary, and a check comparing the two confirms the driver rather than
+# checking it.
+#
+# WHAT IT CANNOT BUY. It refuses a declaration that is self-evidently wrong. It cannot refuse one that
+# is merely untrue - a pass declaring one path and writing three passes this verb, and is caught, if
+# at all, by the leg comparing the declaration against what the commit touched. Stated here so the
+# pair's division of labour is readable from either end.
+#
+# TWO OF M6's THREE CONDITIONS ARE DECIDABLE AND ARE DECIDED HERE. Condition 1 is the intersection
+# test below. Condition 3 is the shared-record refusal, in BOTH its halves: the records M6 names
+# outright are a flat refusal, and a generated index is refused ONLY together with its generator -
+# the qualifier M6 earned through a retraction, because every pass changes a spec header the index is
+# rendered from and a flat ban would refuse the ORDINARY declaration. Condition 2 is a judgement about
+# meaning and is NOT enforced; a verb that pretended to decide it would be a check that cannot fail.
+verb_dispatch() { # slug · unit · writes...
+  local slug="$1" unit="$2"; shift 2
+  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to declare a dispatch against: $rel"; return 1; }
+  shaped=$(printf '%s\n' "$unit" | _ids_of)
+  [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
+    fail 49 "--dispatch --pass is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
+  [ "$#" -gt 0 ] || { fail 49 "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof: $unit"; return 1; }
+  # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
+  # path has already become two tokens by the time this verb sees it, and nothing recovers that.
+  for p in "$@"; do
+    case "$p" in
+      "") fail 49 "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one: $unit"; return 1 ;;
+      /*|?:[/\\]*) fail 49 "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find: $p"; return 1 ;;
+      *..*) fail 49 "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound: $p"; return 1 ;;
+    esac
+    case "$p" in
+      *[[:space:]]*) fail 49 "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared: $p"; return 1 ;;
+    esac
+    # NO SEPARATE NEWLINE OR SEPARATOR BRANCH. Both are subsumed by the whitespace refusal above — a
+    # newline IS whitespace and the record's ` · ` separator contains spaces — so a branch for either
+    # is unreachable, and `check-arms` named both as having no assertion that could ever fire. A dead
+    # branch pinned as unarmed is worse than a deleted one: it reads as coverage.
+    if [ -n "$BYPASS_BAN" ] && printf '%s' "$p" | grep -qF -- "$BYPASS_BAN"; then
+      fail 49 "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it: $BYPASS_BAN"; return 1
+    fi
+  done
+  refuse_if_terminal "$rel" --dispatch || return 1
+  # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
+  # the kit already knows how to locate - and the rest come from the project's own declaration, so an
+  # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
+  for p in "$@"; do
+    if [ "$p" = "$rel" ]; then
+      fail 49 "--dispatch declares the run-state file, which every pass in the run shares, so two passes declaring it are not disjoint by construction: $p"; return 1
+    fi
+    for q in ${SHARED_RECORDS:-}; do
+      case "$p" in "$q"|"$q"/*) fail 49 "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally: $p"; return 1 ;; esac
+    done
+  done
+  # CONDITION 3, CONDITIONAL HALF. A generated index alone is ACCEPTED - every pass changes a spec
+  # header it is rendered from, and refusing that was the VACUOUS reading M6 retracted. What collides
+  # is one pass RENDERING an artifact while another edits its generator, so the refusal fires only
+  # when both appear, in this declaration or in a sibling's within the same group.
+  grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
+  [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
+  sibpaths=$(grep -F -- " dispatch · item $grp " "$rel" 2>/dev/null | sed 's/.* · reason //' | tr '\n' ' ')
+  for pair in ${GENERATED_INDEXES:-}; do
+    idx=${pair%%:*}; gen=${pair#*:}
+    [ "$idx" = "$pair" ] && continue
+    for p in "$@"; do
+      case "$p" in "$idx"|"$idx"/*) ;; *) continue ;; esac
+      for q in "$@" $sibpaths; do
+        case "$q" in "$gen"|"$gen"/*)
+          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1 ;;
+        esac
+      done
+    done
+  done
+  # CONDITION 1. Two passes in one group claiming one path are not disjoint, and this is decidable the
+  # moment the second declaration arrives.
+  while IFS= read -r sib; do
+    [ -n "$sib" ] || continue
+    case "$sib" in *" $unit · reason "*) continue ;; esac   # our own row is not a sibling
+    for p in "$@"; do
+      for q in ${sib#* · reason }; do
+        [ "$p" = "$q" ] || continue
+        local _who=${sib#* dispatch · item }; _who=${_who%% · reason *}
+        fail 49 "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: $p also in $_who"; return 1
+      done
+    done
+  done <<SIBS
+$(grep -F -- " dispatch · item $grp " "$rel" 2>/dev/null)
+SIBS
+  # THE RE-DECLARATION RULE, keyed on GROUP plus UNIT. Identical is a no-op; a strict SUPERSET
+  # REPLACES, which is the widening repair the leg's own fork resolution commits this build to; a
+  # NARROWING is refused, because narrowing a declaration after the fact is how a pass would hide a
+  # write it had already made.
+  want=$(printf '%s ' "$@"); want=${want% }
+  cur=$(grep -F -- " dispatch · item $grp $unit · reason " "$rel" 2>/dev/null | tail -1)
+  if [ -n "$cur" ]; then
+    curpaths=${cur#* · reason }
+    if [ "$curpaths" = "$want" ]; then
+      echo "unattended: dispatch already declared, unchanged — $unit"
+      return 0
+    fi
+    for q in $curpaths; do
+      for p in "$@"; do [ "$p" = "$q" ] && continue 2; done
+      fail 49 "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not: $q for $unit"; return 1
+    done
+    park "$rel" dispatch "$grp $unit" "$want"
+    stage_or_fail "$rel" || return 1
+    echo "unattended: dispatch WIDENED — $unit · $want"
+    return 0
+  fi
+  park "$rel" dispatch "$grp $unit" "$want"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: dispatch declared — $grp $unit · $want"
+  return 0
+}
+
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -2074,6 +2201,7 @@ RESCOPED
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 RS_ACT=""; RS_SUCC=""
+DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -2097,7 +2225,9 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--rescope) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--rescope|--dispatch) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
@@ -2120,7 +2250,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope, --dispatch and --abort: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -2128,7 +2258,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text> | --dispatch <slug> --pass <id> --writes <path> [--writes <path> …] | --attest <slug> --item <item> [--value <text>]"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2140,5 +2270,6 @@ case "$VERB" in
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
+  --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
 esac
 exit "$status"

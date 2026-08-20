@@ -330,6 +330,13 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
+- `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
+  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
+  lists written down before two passes run together, and until this verb nothing read one. It decides
+  two of that condition's three clauses — the intersection test, and the shared-record refusal in
+  BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
+  is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
+  faked. A re-declaration widens or no-ops; it never narrows.
 
 ## 8. What a project declares
 

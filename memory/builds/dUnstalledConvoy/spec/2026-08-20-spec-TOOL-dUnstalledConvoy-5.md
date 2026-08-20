@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary
 
-**Status:** CLOSED · rev-4 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -182,6 +182,13 @@ therefore in this unit's write set. Review fold: M4, M7, H13.
 ## 9. Revision log
 
 - rev-1 · 2026-08-20 · initial draft.
+- rev-5 · 2026-08-21 · CORRECTION to rev-4's evidence. rev-4 cited a 400-assertion PASS as proof this
+  unit's arms held. They had not run: the block was appended past the suite's terminal `exit` and was
+  stranded, and the 400 counted the suite WITHOUT it. The refusals were exercised by hand against the
+  live record at the time, so the verb was right, but the arms were not evidence of it. They run now —
+  the suite executes 447 — and the assertion floor is raised from 338 to that count, because a floor
+  sixty arms below the executed total is what let the stranding hide. TOOL-dUnstalledConvoy-19 carries
+  the class.
 - rev-4 · 2026-08-20 · built. Twelve refusal branches, each armed with its entire literal signature;
   the driver selftest passes 400 assertions and `check-arms` is clean with no floor move needed. The
   S10 carriers landed: a Skill block and a protocol verb row, both templates and both renders.

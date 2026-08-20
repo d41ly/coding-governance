@@ -211,6 +211,20 @@ which is where the loop is stated.
   constraints. An id already in the units region may never LEAVE it — retiring is a status flip to
   `WONTDO` with a successor or reason in the header tail, never a deletion, because the
   authorization compares BASE against HEAD as a subset and refuses a removal.
+- **Before dispatching two passes at once, DECLARE what each will write.** The build method requires
+  both path lists written down first, and this verb is what reads one:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
+  ```
+
+  `--writes` is REPEATABLE and each occurrence is ONE path. Two of the method's three disjointness
+  clauses are decided here and refused on the spot: two passes claiming one file, and a pass claiming
+  a shared mutable record. A generated index ALONE is fine — every pass changes a spec header it is
+  rendered from — and only the index together with its GENERATOR is refused. The third clause, whether
+  a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
+  pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
+  commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
 
 ## While the work runs

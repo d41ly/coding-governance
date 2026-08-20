@@ -1435,11 +1435,11 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope, --dispatch and --abort: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
-for v in --preflight --plan --phase --status --resume --close --landed --park --rescope --abort; do
+for v in --preflight --plan --phase --status --resume --close --landed --park --rescope --dispatch --abort; do
   n=$((n+1))
   [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
     || { echo "FAIL the header docstring omits $v"; st=1; }
@@ -2234,20 +2234,112 @@ hit "$out" "the build README's generated markers are malformed, and the unit lis
 same "a malformed README leaves no orphan run-state file" "$([ -f memory/builds/tUnpaired/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
-# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
-# shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
-# grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
-# which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=338
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
-[ "$st" = 0 ] && echo "PASS ($n assertions)"
-exit "$st"
+# ---- TOOL-dUnstalledConvoy-9: `--dispatch`, the write-set declaration a concurrent dispatch owes.
+# ---- M6 requires two path lists written down before two passes run together and nothing has ever
+# ---- read one. Two of M6's three conditions are decided here; the third is a judgement about
+# ---- meaning and is refused as undecidable rather than faked.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
+hit "$out" "dispatch declared"
+same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
+
+# ...IDENTICAL is a no-op, by the same post-compaction argument every other verb here makes.
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
+hit "$out" "dispatch already declared, unchanged"
+same "the repeat added no row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
+
+# ...a strict SUPERSET WIDENS. This is the in-band repair the leg's fork resolution commits this
+# build to: a run that discovers a needed file mid-pass re-declares BEFORE committing, and without
+# this the check becomes the wedge the build exists to remove.
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh --writes tools/c.sh)
+hit "$out" "dispatch WIDENED"
+
+# ...a NARROWING is refused, because narrowing after the fact is how a write gets hidden.
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+hit "$out" "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not:"
+
+# ---- CONDITION 1: two passes in one group claiming one path are not disjoint, decided the moment
+# ---- the second declaration arrives.
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/c.sh)
+hit "$out" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+
+# ...and a genuinely disjoint sibling is ACCEPTED.
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/z.sh)
+hit "$out" "dispatch declared"
+
+# ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, which every pass in the run shares, so two passes declaring it are not disjoint by construction:"
+
+# ---- CONDITION 3, CONDITIONAL HALF. A generated index ALONE is ACCEPTED — every pass changes a spec
+# ---- header the index is rendered from, and refusing that was the VACUOUS reading M6 retracted. The
+# ---- refusal fires only TOGETHER WITH the generator, which is the collision the condition names.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+# UNDECLARED is the shipped default and means the conditional half is OFF, so the index is accepted
+# here for TWO reasons and the next arm separates them by declaring the key.
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
+reset_tree
+printf '
+GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+' >> .unattended.conf
+run --preflight tRun --keepalive-id k1 >/dev/null
+# ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes tools/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+
+# ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
+# rather than about one declaration.
+reset_tree
+printf '
+GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+' >> .unattended.conf
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes tools/memory-tree/gen_build_index.py >/dev/null
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+
+# ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
+# ---- a space-joined value the path has already become two tokens by the time the verb sees it.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --dispatch tRun --pass notanid --writes tools/a.sh)" "--dispatch --pass is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'two words/x.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'spells · separator.sh')" "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes '')" "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one:"
+
+# ...and the HEAD branch, which is reachable ONLY in a repo with no commits — the one place a
+# hand-made run-state file can exist while `rev-parse HEAD` has nothing to answer with. Armed rather
+# than pinned as unarmed, because a dead branch carried in the pin file reads as coverage.
+UNBORN=$(mktemp -d)
+git -C "$UNBORN" init -q
+cp .unattended.conf "$UNBORN/"
+mkdir -p "$UNBORN/memory/builds/tRun"
+printf 'phase: BUILDING
+witness: x
+base: y
+' > "$UNBORN/memory/builds/tRun/RUN.md"
+hit "$(cd "$UNBORN" && bash "$SCRIPT" --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh 2>&1)" "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share:"
+rm -rf "$UNBORN"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it:"
+
+# ...a FINISHED record refuses a declaration, and with no run-state file there is no run to declare
+# ---- against.
+run --attest tRun --item keepalive-reaped >/dev/null 2>&1
+run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
+run --abort tRun --reason stop >/dev/null 2>&1
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+reset_tree; rm -f memory/builds/tRun/RUN.md
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
 # ---- signature, because a readable prefix of a long message reds `check-arms`.
-reset_tree; mkconf; mkbuild tRun; run --preflight tRun --keepalive-id k1 >/dev/null
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the probe it needed cannot see this tree")
 hit "$out" "amendment recorded"
@@ -2304,11 +2396,29 @@ run --rescope tRun --act supersede --item ARCH-tRun-1 --successor ARCH-tRun-2 --
 hit "$(cat memory/builds/tRun/RUN.md)" "rescope · item supersede ARCH-tRun-1 -> ARCH-tRun-2 · reason the mechanism split in two"
 
 # ...and a FINISHED record refuses it, because an amendment to a terminal run is a rewrite of history.
+run --attest tRun --item keepalive-reaped >/dev/null 2>&1
+run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason "stop" >/dev/null 2>&1
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason r)
 hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 
 # ...with no run-state file at all there is no run to amend.
-reset_tree; mkbuild tNone
-out=$(run --rescope tNone --act retire --item ARCH-tNone-1 --reason r)
+reset_tree; rm -f memory/builds/tRun/RUN.md
+out=$(run --rescope tRun --act retire --item ARCH-tNone-1 --reason r)
 hit "$out" "no run-state file, so there is no run to record an amendment against:"
+
+# FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. That build
+# shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
+# grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
+# which nothing compared to anything. Lower it in a reviewed diff or not at all.
+#
+# RAISED 338 -> 447 by TOOL-dUnstalledConvoy-9, because 338 was measured against an executed 398 and
+# that SIXTY-ARM SLACK is what let the same defect happen again, twice, in one session: two whole
+# blocks — `--rescope`'s arms and `--dispatch`'s — were appended past this exit and never ran, while
+# the suite reported PASS and `check-arms` text-matched every one of them. A floor well below the
+# executed count is not a floor, it is a number. Pinned AT the count so the next stranding is a red
+# on the very next run.
+FLOOR_ASSERTIONS=447
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
+exit "$st"

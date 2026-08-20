@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -10,8 +10,13 @@ and refuses at declaration time the two of M6's three conditions a machine can a
 
 ## 2. Scope (IN)
 
-- **S1** — `--dispatch <slug> --pass <unit-id> --writes "<paths>"` records one row per concurrently
-  dispatched pass, through the existing `park` helper with a new kind token `dispatch`.
+- **S1** — `--dispatch <slug> --pass <unit-id> --writes <path>` records one row per concurrently
+  dispatched pass, through the existing `park` helper with a new kind token `dispatch`. **`--writes`
+  is REPEATABLE and each occurrence is exactly ONE path**, never a space-separated list. Amended at
+  rev-3: S7 refuses a path containing whitespace, and in a space-JOINED value that refusal cannot be
+  implemented — the path has already become two tokens by the time the verb sees it, and no amount of
+  inspection recovers the difference. A repeatable flag makes the refusal expressible, which is the
+  only form in which S7 is more than a sentence.
 - **S2** — the GROUP is the run's `HEAD` at declaration time, recorded automatically. Two passes
   declared at the same `HEAD` are one parallel group. There is no group flag, because a flag is one
   more thing to spell wrong and the anchor is already unambiguous.
@@ -30,7 +35,13 @@ and refuses at declaration time the two of M6's three conditions a machine can a
   declaration illegal and the untruthful one redded by the sibling check, and it un-makes a retraction
   M6 records in the paragraph directly beneath the condition. S4's intersection test already catches
   two passes rendering one artifact, so the flat ban bought nothing and cost the declaration.
-- **S5a** — the shared-record set is DECLARED, not guessed. Review fold: H6. `.unattended.conf` is the
+- **S5a** — the shared-record set is DECLARED, not guessed, as TWO keys because M6's condition 3 has
+  two halves. `SHARED_RECORDS` is the flat set the condition names outright — the decision log and the
+  backlog root — and the run-state file is DERIVED from the memory root and the slug rather than
+  declared, because it is the one member the kit already knows how to locate. `GENERATED_INDEXES` is a
+  space-separated list of `index:generator` pairs, and an index is refused ONLY when the same
+  declaration or a sibling's in the group also names its generator. One key for the flat half and one
+  for the conditional half; collapsing them would lose the qualifier M6 spent a retraction earning. Review fold: H6. `.unattended.conf` is the
   only conf this kit reads and its sole layout value is the memory root; it declares no backlog path
   and no generated-index names, `.memory-tree.conf` declares neither either, and the loader §10 once
   cited does not exist in this tree. So this unit adds one declared key listing the shared records —
@@ -43,7 +54,8 @@ and refuses at declaration time the two of M6's three conditions a machine can a
   contract the other pass reads is a judgement about meaning, and a verb that pretended to decide it
   would be a check that cannot fail.
 - **S7** — paths are repo-relative. An absolute path, a path escaping the repo with `..`, an empty
-  `--writes`, and **a path containing whitespace** are each refused. Review fold: M5. The row grammar
+  `--writes`, and **a path containing whitespace** are each refused — the last of these being
+  implementable only because S1 made the flag repeatable. Review fold: M5. The row grammar
   puts the path list in a whitespace-delimited field with no quoting defined, so a path with a space
   would word-split into two tokens naming nothing — and the sibling check's subset test would then red
   a CORRECT dispatch with a message naming paths nobody declared. This repo has hit that class twice
@@ -52,8 +64,15 @@ and refuses at declaration time the two of M6's three conditions a machine can a
   SCOPE with their own criteria, and the protocol edit re-measures the read-path budget. Review fold:
   M4. The first draft edited both documents from the Files-touched table alone, so a builder could
   pass every criterion while shipping a verb neither document mentions.
-- **S8** — every `verb_park` refusal is inherited verbatim, and the row is idempotent by the same
-  exact-line compare.
+- **S8** — every `verb_park` refusal is inherited verbatim. The row is keyed on GROUP plus UNIT, and a
+  re-declaration for the same key is resolved three ways: an identical path set is a NO-OP; a strict
+  SUPERSET REPLACES the row, which is the widening repair; anything else — a narrowing, or a set that
+  merely differs — is a REFUSAL. **Amended at rev-3, and the amendment is the point:** `verb_park`'s
+  exact-line compare cannot express a widening, and `TOOL-dUnstalledConvoy-10`'s resolved fork commits
+  this build to one, because a run that discovers a needed file mid-pass must have an in-band repair
+  or the check becomes the wedge this build exists to remove. Widening BEFORE the commit is the honest
+  act; NARROWING after the fact is how a pass would hide a write, which is why only one direction is
+  admitted.
 
 ## 3. Non-goals (OUT)
 
@@ -157,7 +176,10 @@ either end.
 - **AC4** — `--writes` naming the run-state file, the decision log, a backlog shard or a generated
   index refuses in each of those four cases, with the path named.
 - **AC5** — An absolute path, a path containing `..`, and an empty `--writes` each refuse.
-- **AC6** — The same invocation twice appends ONE row, matching `verb_park`'s idempotence.
+- **AC6** — The same invocation twice appends ONE row and reports it unchanged; the same group and
+  unit with a strict SUPERSET of paths REPLACES the row and reports the widening; the same key with a
+  NARROWED or merely different set REFUSES. All three observed in
+  `tools/unattended/unattended.test.sh`.
 - **AC7** — The shared-record set is read from the DECLARED key, observed by pointing a fixture's
   conf at different backlog and index names and seeing the refusal name THOSE paths, not this repo's,
   observed in `tools/unattended/unattended.test.sh`. Review fold: H6.
@@ -196,6 +218,19 @@ therefore in this unit's write set. Review fold: M4, M7, H13.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · built. Two branches were DELETED rather than pinned as unarmed — a newline and
+  the record separator are both subsumed by the whitespace refusal, so neither could ever fire, and a
+  dead branch carried in the pin file reads as coverage. The HEAD branch is armed against an
+  unborn-repo fixture, which is the only place it is reachable.
+- rev-3 · 2026-08-21 · S8 amended before any code, per M2's rule that divergence changes the spec
+  first. `TOOL-dUnstalledConvoy-10`'s resolved fork commits this build to a WIDENING repair, and an
+  exact-line idempotence compare cannot express one — an interface disagreement between two specs,
+  caught by reading them together at the pass boundary rather than by the audit. The row is now keyed
+  on group plus unit: identical is a no-op, a strict superset replaces, anything else refuses. S1's
+  `--writes` becomes REPEATABLE in the same amendment, because S7's whitespace refusal is not
+  implementable against a space-joined value. S5a
+  splits into two conf keys because M6's condition 3 has two halves and collapsing them would lose the
+  qualifier a retraction earned.
 - rev-2 · 2026-08-20 · folded the spec audit: H5 (M6 condition 3 keeps its together-with-its-generator
   qualifier), H6 (the shared-record set becomes a DECLARED conf key — the derivation seam cited did
   not exist), M5 (a whitespace-bearing path is refused), M4 (the Skill section and protocol verb row
