@@ -158,7 +158,7 @@ Inventories: gate-legs: 90 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
-| `arm-literal-strands-on-message-edit.md` | UNCLAIMED |
+| `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |

@@ -13,6 +13,7 @@ parked-surfaced: yes
 keepalive-reaped: yes
 witness: fd737ed18e15fabb76f020acc534786f4c3530c4
 phase: ABORTED
+halt-code: scope-approval-needed
 branch-sha: c57ebbb96a53ab9ef5bf53f108fd9a9bf5c5c531
 branch-ref: refs/heads/branch/playbook-mode-unattended-kit-550410
 mode: slug
