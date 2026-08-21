@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -173,6 +173,12 @@ the push boundary.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · built, and the back-fill S8 owes is done: 103 criteria across the eleven units
+  closed before it, verified mechanically to cover every one with no gaps and no extras. One
+  clarification the grammar needed on contact: a record MAY carry several `**Evidences:**` blocks, one
+  per unit, so the back-fill is one readable file rather than eleven. The cutoff is set to this
+  build's OWN date, which is the fork's resolution — grandfathering the build that introduces the
+  mechanism would ship a gate whose first run measures nothing.
 - rev-2 · 2026-08-20 · folded the spec audit: H12 (the kit-version bump moves to the LATER unit of the pair,
   because `verdict epoch` refuses a bump that is an ancestor of the engine edit it dates), H2 (the
   cutoff fork is RESOLVED to the build's own date, with S8 back-filling this build's ledgers so the

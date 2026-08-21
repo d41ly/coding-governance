@@ -150,6 +150,8 @@ Numbered (AC1, AC2, …). Phrase each as "When <action>, <observable result>" �
 proves THIS change works: a test it adds, a gate it moves, a browser observation. Never an
 unrelated green gate.
 
+Once a unit is BUILT, each criterion here is answered by a line in that unit's acceptance ledger — the grammar is `HYGIENE.md`, "Acceptance ledger", and it is not restated here. Numbering the criteria is what makes that answerable.
+
 Once a spec's filename date reaches `SPEC_WITNESS_CUTOFF` (`.memory-tree.conf`), every acceptance
 bullet must carry at least one **backticked token** — the command, file, flag or test that makes the
 observation. The gate reads SHAPE only: it asserts the bullet names something, never that the named
