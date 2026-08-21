@@ -113,12 +113,22 @@ guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "unattended gate selftest"
-argv = ["bash", "{kit}/check-unattended.test.sh"]
+argv = ["bash", "{kit}/check-unattended.test.sh", "--shard", "1/2"]
+guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
+
+[[gate_leg]]
+name = "unattended gate selftest shard B"
+argv = ["bash", "{kit}/check-unattended.test.sh", "--shard", "2/2"]
 guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
 
 [[gate_leg]]
 name = "unattended driver selftest"
-argv = ["bash", "{kit}/unattended.test.sh"]
+argv = ["bash", "{kit}/unattended.test.sh", "--shard", "1/2"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
+name = "unattended driver selftest shard B"
+argv = ["bash", "{kit}/unattended.test.sh", "--shard", "2/2"]
 guard = ["{kit}/"]
 
 [[gate_leg]]

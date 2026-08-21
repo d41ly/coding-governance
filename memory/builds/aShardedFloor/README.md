@@ -79,9 +79,9 @@ ids TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aSharded
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md) | CLOSED | rev-2 | 2026-08-21 |
-| [TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md) | OPEN | rev-2 | 2026-08-21 |
-| [TOOL-aShardedFloor-3 — the gate selftest, split by the same contract](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md) | OPEN | rev-2 | 2026-08-21 |
-| [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | BLOCKED | rev-2 | 2026-08-21 |
+| [TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md) | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-aShardedFloor-3 — the gate selftest, split by the same contract](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md) | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | BLOCKED | rev-3 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -89,6 +89,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+| [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md) | journal | TOOL-aShardedFloor-4 |
 | [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
 <!-- /gen:build-index -->
 
@@ -112,6 +113,7 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-21-spec-TOOL-aShardedFloor-4.md](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md)
 - **`build/`**
   - [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md)
+  - [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md)
 - **`reviews/`**
   - [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md)
 <!-- /gen:build-docs -->
