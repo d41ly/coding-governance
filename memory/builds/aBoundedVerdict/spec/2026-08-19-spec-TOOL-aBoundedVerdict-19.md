@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-20 · node c · Tier-1 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 

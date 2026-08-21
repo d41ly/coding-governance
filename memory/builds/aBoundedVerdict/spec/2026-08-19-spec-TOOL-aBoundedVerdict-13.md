@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-13 — every remote observation is bounded, and pays its cost last
 
-**Status:** SPECCED · rev-6 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 

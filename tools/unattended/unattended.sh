@@ -557,7 +557,13 @@ branch_tip_quiet() { # -> prints "<ref> <sha>" on stdout
   [ -n "$cur" ] && [ "$cur" != HEAD ] || return 1
   rem=$(GIT remote 2>/dev/null | head -1)
   [ -n "$rem" ] || return 2
-  advf=$(mktemp) || return 6   # 6 = a LOCAL scratch failure, distinct from 5's transport fault
+  # RETURNS 5, THE UNKNOWN CODE, and a distinct code for a local scratch failure was tried and
+  # DELETED. It could not fire: this function is only reached through `[ -n "$ASHA" ] && trusted_base`,
+  # and a TMPDIR broken enough to fail mktemp here has already failed observe_anchor, which leaves
+  # ASHA empty. The two scratch failures have one cause, and observe_anchor names it first. What the
+  # distinct code was FOR - not sending the operator at the network for a local fault - is kept by
+  # code 5 naming all three possibilities instead of asserting the first.
+  advf=$(mktemp) || return 5
   observe_remote "$advf" ls-remote --exit-code "$rem" "refs/heads/$cur"; rc=$?
   adv=$(cat "$advf" 2>/dev/null); rm -f "$advf"
   # 0 = advertised · 2 = git's own "answered, advertised nothing" from --exit-code · anything else
@@ -590,11 +596,7 @@ emit_branch_fail() { # BR_RC -> the numbered refusal it stands for
     2) fail 32 "the remote advertises no tip for the branch this run is on, so nothing published authorizes it; push the branch first: refs/heads/$cur" ;;
     3) fail 30 "the remote advertises a branch tip this clone does not have, so no comparison against it means anything; fetch and re-run: refs/heads/$cur" ;;
     4) fail 33 "the advertised tip of this run's branch is not an ancestor of HEAD, so it names history this run does not build on and cannot be its base: refs/heads/$cur" ;;
-    5) fail 32 "the remote could not be reached for this run's branch, or the wall-clock bound fired, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy and the endpoint is: refs/heads/$cur" ;;
-    # 6 IS LOCAL, and it used to render as 5 — sending the operator at the network for a dead TMPDIR,
-    # which is the misdiagnosis the 2-vs-5 split was introduced to remove. observe_anchor got a named
-    # refusal for this identical fault one function away.
-    6) fail 27 "cannot create a scratch file to capture the branch advertisement, so whether the branch is published was never asked; this is a fault on THIS side and the remote is not the remedy: refs/heads/$cur" ;;
+    5) fail 32 "the remote could not be reached for this run's branch, the wall-clock bound fired, or this side could not create the scratch file the observation needs, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy, and the endpoint and the local scratch dir are: refs/heads/$cur" ;;
     *) return 0 ;;
   esac
   return 1
@@ -1529,13 +1531,15 @@ verb_landed() { # slug
   _lm_head=$(GIT rev-parse HEAD)
   if [ -n "$LANDER_MARKER" ]; then
     _lm_gcd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _lm_gcd=""
-    if [ -z "$_lm_gcd" ]; then
-      fail 34 "cannot resolve the git common dir, so the lander marker cannot be read where the lander writes it; this refuses rather than reporting a missing marker, which would blame the lander for a fault on this side: $LANDER_MARKER"
-      return 1
-    fi
     _lm_path="$_lm_gcd/$LANDER_MARKER"
+    # NO SEPARATE REFUSAL FOR AN UNRESOLVABLE COMMON DIR, and that is a deletion rather than an
+    # oversight. One was written and could never fire: this driver resolves ROOT with `rev-parse
+    # --show-toplevel` at startup and exits when that fails, so by the time this runs the repository
+    # is known good and `--git-common-dir` cannot fail. An unarmable branch is an assertion about
+    # nothing. What the branch was FOR - not blaming the lander for a fault on this side - is kept by
+    # printing the directory this side resolved, so an empty one is visible in the refusal itself.
     if [ ! -f "$_lm_path" ]; then
-      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading: $_lm_path"
+      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was [$_lm_gcd], for: $_lm_path"
       return 1
     fi
     if ! grep -qF -- "$_lm_head" "$_lm_path" 2>/dev/null; then

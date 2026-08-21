@@ -2432,14 +2432,6 @@ echo "MARK arm-mktemp" >&2
 bcopen
 out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --close tRun 2>&1)
 hit "$out" "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"
-# ...and the BRANCH observer's own scratch failure, which is a SEPARATE refusal. It used to return
-# the transport code, so `emit_branch_fail` rendered a dead TMPDIR as "the remote could not be
-# reached", sending the operator at the network for a local fault — the exact misdiagnosis the
-# 2-vs-5 split was introduced to remove, and observe_anchor had a named refusal for it one function
-# away. Both fire here because observe_anchor's own failure is `|| true` and execution continues.
-out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1)
-hit "$out" "cannot create a scratch file to capture the branch advertisement, so whether the branch is published was never asked; this is a fault on THIS side and the remote is not the remedy: refs/heads/"
-miss "$out" "the remote could not be reached for this run's branch"
 
 echo "MARK arm-timeout" >&2
 # ---- the TIMEOUT refusal, and it says timeout rather than failure on purpose: "the remote did not
@@ -2485,7 +2477,7 @@ exec "$real_git_128" "\$@"
 STUB128
 chmod +x "$stub128/git"
 out=$(PATH="$stub128:$PATH" bash "$SCRIPT" --preflight tBrT --keepalive-id k1 2>&1)
-hit "$out" "the remote could not be reached for this run's branch, or the wall-clock bound fired, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy and the endpoint is: refs/heads/"
+hit "$out" "the remote could not be reached for this run's branch, the wall-clock bound fired, or this side could not create the scratch file the observation needs, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy, and the endpoint and the local scratch dir are: refs/heads/"
 miss "$out" "push the branch first"
 rm -rf "$stub128"
 reset_tree
@@ -2517,8 +2509,20 @@ old_reader() { # spec file -> what the FIRST-LINE reader would have said
 fkspec() { # section-8 body -> a live-status spec at $TMP/fk.md
   printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node c · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- a\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\n%s\n\n## 9. Revision log\n\n- r\n' "$1" > "$TMP/fk.md"
 }
-fk_ln=$(grep -n '^plan_state()' "$SCRIPT" | cut -d: -f1)
-eval "$(sed -n "${fk_ln},$((fk_ln + 45))p" "$SCRIPT")"
+# THE SLICE END IS DERIVED, NEVER COUNTED. Both sites below were `start + N` and both had silently
+# begun truncating the function they grade as comments grew it - the same defect the sibling
+# marker-contract harness carried with `+ 45`. The failure is quiet in the worst way: a truncated
+# body still defines the function, so the `declare -F` liveness arm PASSES and every verdict then
+# comes back empty, which reads as the code under test returning nothing.
+slice_fn() { # <name> -> eval that function out of the SHIPPED driver bytes
+  local s e
+  s=$(grep -n "^$1()" "$SCRIPT" | cut -d: -f1)
+  [ -n "$s" ] || { echo "FAIL cannot find $1() in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
+  e=$(awk -v s="$s" 'NR>s && /^}/ {print NR; exit}' "$SCRIPT")
+  [ -n "$e" ] || { echo "FAIL cannot find the closing brace of $1() in the driver, so the slice below would be a fragment"; st=1; return 1; }
+  eval "$(sed -n "${s},${e}p" "$SCRIPT")"
+}
+slice_fn plan_state
 n=$((n+1)); declare -F plan_state >/dev/null || { echo "FAIL plan_state was not sliced out of the driver, so every fork-mark arm below graded nothing"; st=1; }
 
 # a section whose FIRST LINE denies the resolution, and whose item is genuinely unmarked
@@ -2535,7 +2539,14 @@ fkspec 'none - every fork below is RESOLVED in place.
   RESOLVED (agent, 2026-08-20, delegated): picked.
 
 - **F2 — not answered?** still open, and carrying no mark.'
-same "fork-mark: an unresolved item below a none first line is no longer invisible" "$(plan_state "$TMP/fk.md")" "FORKED"
+# THE PARKED GAP, PINNED AS A GAP. An unresolved fork BELOW a `none` opening line is not detectable
+# by either reader, and this row records that rather than leaving the case unmentioned. The per-item
+# walk that would catch it was withdrawn on measurement: of 287 section-8 bullets, 69 carry
+# descriptive labels and among those are both resolved forks and genuinely open ones, so a
+# label-shape discriminator UNDER-counts - worse than the over-counting it replaces, which was
+# itself measured calling a RESOLVED fork FORKED on a live tracked spec. Closing it needs section 8
+# to have a regular shape, which M3 reserves to the owner.
+same "fork-mark: an unresolved item below a none first line is the PARKED gap, not a catch" "$(plan_state "$TMP/fk.md")" "READY"
 same "fork-mark control: the old reader stopped at the none line and called it ready" "$(old_reader "$TMP/fk.md")" "READY"
 
 # and the case that must NOT have changed: the mark on a CONTINUATION line, which is where this
@@ -2695,8 +2706,7 @@ echo "MARK split-url" >&2
 
 # the NORMALISER itself, over the equivalences it claims and the differences it must keep. Sliced out
 # of the shipped bytes, so an edit to the kit changes this verdict rather than this file's opinion.
-ne_ln=$(grep -n '^norm_endpoint()' "$SCRIPT" | cut -d: -f1)
-eval "$(sed -n "${ne_ln},$((ne_ln + 14))p" "$SCRIPT")"
+slice_fn norm_endpoint
 n=$((n+1)); declare -F norm_endpoint >/dev/null || { echo "FAIL norm_endpoint was not sliced out of the driver, so every arm below graded nothing"; st=1; }
 same "scp-style and https normalise together"   "$(norm_endpoint 'https://github.com/o/r.git')" "$(norm_endpoint 'git@github.com:o/r')"
 same "ssh:// and scp-style normalise together"  "$(norm_endpoint 'ssh://github.com/o/r')"       "$(norm_endpoint 'git@github.com:o/r.git')"
@@ -2715,39 +2725,48 @@ same "userless and user@ scp forms name one place" "$(norm_endpoint 'github.com:
 # MECHANISM ONE: remote.<name>.pushurl. Visible in `remote get-url --push` and NOT in the fetch URL.
 #
 # BOTH FIXTURES HERE USED TO PRODUCE fetch == push, so the warn-and-continue branch - the entire
-# runtime behaviour this unit adds - was never executed and both `miss` assertions passed by finding
+# runtime behaviour this unit adds - never executed and both `miss` assertions passed by finding
 # nothing. That is the fixture-passes-by-finding-nothing class, inside the arm written to prevent it.
-# The old MECHANISM ONE wrapped the URL in `ssh://` and then a second `s|...|` stripped it straight
-# back off a drive-letter path, and the old MECHANISM TWO mapped `pushInsteadOf` to the base it was
-# already using, an identity rewrite and a no-op on every platform. Both reproduced in a scratch
-# clone before being replaced.
 #
-# A TRAILING SLASH is the spelling difference here: git stores it verbatim and `norm_endpoint` strips
-# it, so the two URLs are genuinely different bytes naming one endpoint. And the assertion is
-# POSITIVE - an absence assertion cannot tell "the branch warned" from "the branch never ran", which
-# is the whole defect being fixed.
+# THE SPELLING PAIR IS scp-WITH-USER vs scp-WITHOUT, and it is chosen because git stores those bytes
+# VERBATIM. The first repair used a local path with a trailing slash and failed for a reason worth
+# recording: `git remote set-url` REWRITES a local MSYS path into Windows form, so the fixture ended
+# up with fetch `/tmp/x` against push `C:/Temp/x` - two genuinely different endpoints, which took the
+# REFUSAL branch and proved the opposite of what the arm intended. A fixture whose setup the tool
+# under test silently rewrites is not a fixture.
+#
+# It is also the exact wedge this unit exists to remove: before the scp-detection fix these two
+# normalised DIFFERENTLY, so one place in two spellings read as two places.
 reset_tree; readme tSplit; scope published; git add -A >/dev/null && git commit -q -m split --no-verify
 git push -q -f origin unit 2>/dev/null
-git remote set-url --push origin "$ORIGIN/" 2>/dev/null
+git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
+git remote set-url --push origin "git@example.invalid:some/repo.git" 2>/dev/null
 same "the fixture actually splits the URLs" "$([ "$(git remote get-url origin)" != "$(git remote get-url --push origin)" ] && echo split || echo same)" "split"
 out=$(run --preflight tSplit --keepalive-id k1)
 hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
 miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
-git remote set-url --push origin "$ORIGIN" 2>/dev/null
+# THE PUSHURL IS UNSET, not repointed. `reset_tree` restores the worktree and refs and does NOT
+# touch config, so a leftover `remote.origin.pushurl` survives into the next arm - where it SHADOWS
+# the insteadOf rewrite mechanism two exists to exercise, and the fixture then measured a split it
+# had not arranged.
+git config --unset remote.origin.pushurl 2>/dev/null || true; git remote set-url origin "$ORIGIN" 2>/dev/null
 
 # MECHANISM TWO: url.<base>.pushInsteadOf. Rewrites the push URL through config, so `remote.origin.url`
 # is untouched and a fixture reading only that would see nothing wrong.
 #
-# THE PAIR IS THE WEDGE THIS UNIT EXISTS TO REMOVE: a USERLESS scp URL against the same URL with a
-# user. `norm_endpoint` strips userinfo, so they name one place; before the scp-detection fix they
-# normalised DIFFERENTLY and this honest case took the refusal branch. The remote is unreachable on
-# purpose and that costs nothing here - the URL comparison runs before anything contacts it, so the
-# later refusals are noise this arm does not read.
+# NO EXPLICIT pushurl HERE, and that is load-bearing rather than tidy: a set `remote.<name>.pushurl`
+# SHADOWS the insteadOf rewrite entirely, so the first attempt at this arm configured the rewrite,
+# had it silently ignored, and measured fetch == push again. The mechanism only exists when nothing
+# more specific is set.
 reset_tree; readme tSplit2; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
 git push -q -f origin unit 2>/dev/null
 git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
+git config --unset remote.origin.pushurl 2>/dev/null || true
 git config "url.git@example.invalid:some/repo.git.pushInsteadOf" "example.invalid:some/repo.git" 2>/dev/null
-same "the rewrite actually changes the push URL" "$([ "$(git remote get-url origin)" != "$(git remote get-url --push origin)" ] && echo split || echo same)" "split"
+# ASSERTED AS THE REWRITTEN VALUE, not merely as "different". A leftover pushurl from the arm above
+# also makes these two differ, so a not-equal guard passes while the mechanism under test is inert -
+# which is what happened, and it is the same pass-by-finding-anything shape one level up.
+same "the rewrite produces the user@ spelling" "$(git remote get-url --push origin)" "git@example.invalid:some/repo.git"
 out=$(run --preflight tSplit2 --keepalive-id k1)
 hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
 miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
@@ -2794,7 +2813,7 @@ sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 GCD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
 rm -f "$GCD/tmarker"
 fixture
-hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading"
+hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was ["
 
 # a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
 # shas, because "stale marker" and "HEAD moved since the push" are different faults with different
@@ -2814,12 +2833,15 @@ hit "$out" "HEAD is not an ancestor of the tip the remote advertises"
 miss "$out" "the lander marker names a different commit"
 miss "$out" "the lander wrote none"
 
-# THE COMMON DIR CANNOT BE RESOLVED. Reachable because the marker block runs BEFORE observe_anchor,
-# where the environment-lever refusal for this same variable lives — deliberate ordering, so the
-# marker fault is diagnosed on the marker's own terms instead of being blamed on the lander.
-out=$(GIT_COMMON_DIR=/nonexistent-common-dir run --landed tRun)
-hit "$out" "cannot resolve the git common dir, so the lander marker cannot be read where the lander writes it; this refuses rather than reporting a missing marker, which would blame the lander for a fault on this side"
-miss "$out" "the project declares a lander marker and the lander wrote none"
+# ...and the refusal NAMES THE DIRECTORY THIS SIDE RESOLVED, so a local resolution fault is legible
+# in it. The separate refusal that used to cover that case was DELETED: it could not fire, because
+# this driver exits at startup when the repository does not resolve, and an unarmable branch is an
+# assertion about nothing. Measured before deleting: `GIT_COMMON_DIR=/nonexistent` never reaches the
+# marker block at all - the driver refuses as not-a-git-repo first.
+rm -f "$GCD/tmarker"
+hit "$(run --landed tRun)" "looked in the git common dir this side resolved, which was ["
+printf 'landed main at %s by push-main
+' "$(git rev-parse HEAD)" > "$GCD/tmarker"
 
 # an UNDECLARED key does not refuse: an adopter who has not adapted their lander is not wedged by a
 # key they have never heard of. The asymmetry is deliberate and this is the arm that pins it.

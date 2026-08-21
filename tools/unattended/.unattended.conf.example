@@ -59,6 +59,11 @@ KICKOFF_EXITS=""
 # that key has a recorded failure where ONE malformed spelling disarms BOTH its pins while the
 # conf still looks configured, and a third field would make one typo disarm three.
 DIRECTIVES_EXTRA=""
+# The project-owned ROW SOURCE for anything DIRECTIVES_EXTRA declares: a repo-relative markdown
+# file carrying rows in the Skill table shape. Undeclared is the EMPTY SET, which is what every
+# adopter has today. Without it an extra handle is waivable by a verb and invisible to the agent,
+# and a project cannot fix that by editing the Skill, which is rendered from a kit template.
+DIRECTIVES_EXTRA_TABLE=""
 DIRECTIVES_FLOOR="13"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must

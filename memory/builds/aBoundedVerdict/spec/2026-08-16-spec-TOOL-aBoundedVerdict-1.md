@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** SPECCED · rev-11 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** CLOSED · rev-12 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -642,6 +642,45 @@ This line is the machine-read one; the bullets carry the reasoning.
   empty section reads as "nothing to report" when it may mean "nobody wrote here".
   One message bug caught by running the verb: the first round reported "smaller than the round before
   it" when there is no round before it.
+
+- rev-12 · 2026-08-21 · **the closing review's round 2 found the leg RED at HEAD, plus 32 more.**
+  The blocker was mine and unforced: check 22's six review fixtures were written AFTER the hygiene
+  suite's only `git add -A && git commit`, and the engine's population is `git ls-files`. Check 22
+  shipped grading an empty population, five arms failed, and I had never re-run that sibling suite.
+  The FOURTH silent-skip mechanism in this one leg check also surfaced here: the promotion clause
+  tested `index(units, it)`, and the subject is a substring of every generated row, so only a
+  fabricated id could fire it. It grades a unit-id DELTA against the roster at the run's pinned BASE
+  now, which is what a promotion actually produces.
+
+  Two fixes needed a second pass because the first was half-right. The §8 mark is matched over the
+  JOINED section so a wrapped mark matches — 14 corpus marks wrap — but they wrap INSIDE the
+  parenthesis, and the hygiene reader joins raw lines, so its blob carried the continuation's
+  two-space indent and still missed all 14; both readers squeeze whitespace now. And `--review` was
+  documented on all four surfaces, but the leg arm written to enforce that immediately reported
+  `--attest` missing from the driver's own refusal string — the arm earning its keep on the commit
+  that introduced it.
+
+  **The per-item §8 walk is WITHDRAWN, not repaired.** It must tell a FORK bullet from an OPTION
+  bullet, and this corpus does not distinguish them: of 287 §8 bullets, 69 carry descriptive labels,
+  and among those are both resolved forks and genuinely open ones. A label-shape discriminator
+  therefore UNDER-counts and lets a real open fork pass, which is worse than the over-counting it
+  replaces — and the over-counting was measured, not hypothetical: it called a RESOLVED fork FORKED
+  on a live tracked spec whose three option bullets each demanded their own mark. Making §8 regular
+  enough to grade per item changes what every future spec must look like, which M3 reserves to the
+  owner. Parked with all three options, and the residue is pinned as a GAP in two fixtures rather
+  than left unmentioned.
+
+  Two defects were found by fixing others rather than by the review. `marker-contract.test.sh`
+  sliced `plan_state` as `start + 45`; the comments added here grew the function past that, so the
+  slice had begun truncating the seven lines that decide READY vs FORKED — the bound is derived from
+  the closing brace now. And `GIT_COMMON_DIR` was absent from the env-lever ban list that already
+  holds `GIT_DIR`, which is its sibling; a check reading a repo location its own caller injected is
+  the hole that list exists to close.
+
+  AC6's displacement criterion was recorded MET and was not: two paragraphs were deleted rather than
+  moved, leaving M6 pointing at a README section that did not exist and M4 missing its `tier2-review
+  reviews DIFFS` rule while still telling the reader to run a Workflow. Both are real now. Recording
+  that here because rev-11 is the entry that got it wrong.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition
 
-**Status:** SPECCED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-8 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 

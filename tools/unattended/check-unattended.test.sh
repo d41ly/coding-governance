@@ -21,7 +21,10 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
-cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
+# The EXAMPLE CONF rides along: check 22 joins the protocol key table against it, and without it
+# here that check refuses on every arm in this suite. It is a tracked kit file, so a fixture that
+# omits it is modelling a broken install rather than a repo.
+cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/.unattended.conf.example" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -236,6 +239,9 @@ n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a s
 reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
 sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
 
+
+hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+
 # ---- AND THE SAME SHAPE FOR THE THREE REMOTE BOUNDS, which is where this class was actually LIVE:
 # ---- all three were declared unquoted in the driver, so every core_of read returned empty and a
 # ---- `${x:-60}` fallback restated the numbers from memory. The leg then observed the remote under
@@ -244,8 +250,6 @@ sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
 reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
 sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' tools/unattended/unattended.sh
 hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
-
-hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 
 # a group whose counts do not shrink and which records no exit
 reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
@@ -462,17 +466,26 @@ hit "$(run)" "the installed protocol does not spell the archive filename grammar
 reset_tree
 miss "$(run)" "the installed protocol does not spell the archive filename grammar"
 
-# ---- check 22: the section-8 key table and the declared conf, joined BOTH WAYS. Three keys reached
+# ---- check 22: the section-8 key table and the KIT'S EXAMPLE conf, joined both ways, plus a
+# ---- one-way check that this project sets nothing undocumented. Three keys reached
 # ---- the tree undocumented and one of them REDS this leg when undeclared, so an adopter configuring
 # ---- from the contract got a refusal naming a key the contract never mentioned. Check 10 is a
 # ---- byte-diff of the pair and both copies were identically incomplete, which is the limitation its
 # ---- own header states. Misspelling ONE row fires both directions at once, which is the arm.
+# ...and the check REFUSES when it cannot read its own reverse population, rather than skipping. A
+# `[ -f ]` guard around the whole thing made it vanish silently exactly where a documentation join is
+# worth most, and a check that says nothing reads identically to one that passed.
+reset_tree
+rm -f tools/unattended/.unattended.conf.example
+hit "$(run)" "the kit ships no .unattended.conf.example, so the key table below can be joined against nothing and this check would pass by grading an empty set"
+reset_tree
+
 reset_tree
 sed -i 's/| `HALT_FLOOR` |/| `HALT_FLOOOR` |/' memory/guides/UNATTENDED-PROTOCOL.md
 out=$(run)
 hit "$out" "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:"
 hit "$out" "undocumented in the protocol: HALT_FLOOR"
-hit "$out" "documented but declared nowhere: HALT_FLOOOR"
+hit "$out" "documented but in no example: HALT_FLOOOR"
 reset_tree
 miss "$(run)" "the protocol's binding key table and the declared conf disagree"
 
@@ -481,7 +494,7 @@ miss "$(run)" "the protocol's binding key table and the declared conf disagree"
 # ---- sent the reader at the network. The driver had already split these one file over.
 # the wall-clock bound FIRING, stubbed at `timeout` so the run does not actually wait it out
 reset_tree
-mkdir -p "$TMPBIN"; printf '#!/bin/sh\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
+mkdir -p "$TMPBIN"; printf '#!/bin/sh\ncase "$*" in *"1 true") exit 0 ;; esac\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
 out=$(PATH="$TMPBIN:$PATH" run)
 hit  "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing"
 miss "$out" "the remote advertised no tips"

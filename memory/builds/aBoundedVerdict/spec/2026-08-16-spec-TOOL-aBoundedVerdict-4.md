@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved
 
-**Status:** SPECCED · rev-8 · 2026-08-20 · node a · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
+**Status:** CLOSED · rev-8 · 2026-08-20 · node a · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-17
 
 ## 1. Goal
 

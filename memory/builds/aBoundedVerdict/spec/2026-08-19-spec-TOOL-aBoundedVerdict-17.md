@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-17 — a split fetch/push URL stops being an unsatisfiable authorization
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -259,6 +259,28 @@ This line is the machine-read one; the bullets carry the reasoning.
   scoped to this node's config, with the command that read it. And F1 gains a dated observation, not a
   re-resolution: the leg carries no fetch-versus-push comparison at HEAD, so today's answer to "share
   the normaliser?" is no, re-grep at build time.
+
+- rev-4 · 2026-08-21 · **built, and both of its fixtures were passing by finding nothing.** `norm_endpoint` now detects
+  scp-style by git's own rule - a colon before any slash - rather than by the presence of a user. The
+  old key was wrong two ways, both measured against the shipped function: a USERLESS
+  `github.com:alice/repo` fell through to the scheme path, where the host split DELETED the first
+  path segment, so `alice/repo` and `bob/repo` both normalised to `github.com/repo` - two
+  repositories comparing EQUAL, which would let a run anchor on one repo and land on another. And
+  `git@github.com:alice/repo` normalised differently from `github.com:alice/repo`, so one place in
+  two spellings compared DIFFERENT, which is the wedge this unit exists to remove.
+
+  **The acceptance fixtures did not exercise the branch at all**, and the closing review caught it.
+  MECHANISM ONE wrapped the URL in `ssh://` and a second `s|...|` stripped it straight back off a
+  drive-letter path; MECHANISM TWO mapped `pushInsteadOf` to the base it already used, an identity
+  rewrite. Both produced fetch == push, so the warn-and-continue branch - this unit's entire runtime
+  behaviour - never ran and two `miss` assertions passed by finding nothing. Reproduced in a scratch
+  clone, then replaced: a trailing slash for one, the userless-vs-user scp pair for the other, each
+  with a `same` assertion proving the fixture actually splits, and POSITIVE assertions on the note.
+  An absence assertion cannot tell a branch that warned from a branch that never ran.
+
+  Also built here: the split-URL note no longer writes to `DOD_OUT`. That channel reached no reader -
+  `gates-green` opens with an unconditional clear - and when that item was OVERRIDDEN the stale text
+  survived and printed as the NEXT unmet item's detail. `dod_met` clears the channel on entry now.
 
 ## 10. Reuse audit
 

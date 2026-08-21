@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads
 
-**Status:** SPECCED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-9 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 

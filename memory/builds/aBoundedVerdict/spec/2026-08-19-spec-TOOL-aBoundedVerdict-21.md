@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-21 — the landing push is bounded too
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** WONTDO · rev-3 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -226,6 +226,18 @@ This line is the machine-read one; the bullets carry the reasoning.
   not have, veto 2 discards it, and one option survives. The vetoed option is parked to the owner so
   the turn this run did not take is still theirs. §8's first non-blank line is now the machine-legal
   `none` form, which is what lets this unit reach terminal at all.
+
+- rev-3 · 2026-08-21 · **WONTDO, and the reason is an M3 veto rather than a judgement about
+  value.** This unit would bound the landing push the way `TOOL-aBoundedVerdict-13` bounds every
+  observation. The mechanism fork has no survivor the run may pick: the lander is MANDATED and
+  project-declared, so bounding its push means either editing a command the project owns or
+  wrapping it in the kit, and choosing between those changes what an adopter's `LANDER` means.
+  M3 reserves that to the owner, and an unattended run may not resolve a fork by preferring one
+  option. Parked with both options and this reason; the spec stays for whoever answers it.
+
+  Recorded as WONTDO rather than left SPECCED because a non-terminal unit blocks `build-complete`,
+  and blocking the close on a question nobody is present to answer is the stall this whole build
+  exists to remove. WONTDO says the run declined it; it does not say the idea was rejected.
 
 ## 10. Reuse audit
 

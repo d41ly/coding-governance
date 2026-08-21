@@ -39,6 +39,17 @@ Twice in this repo, independently, days apart:
   `out=$(timeout 1 bash -c 'sleep 6 & exit 0')` returned after 6 s; the same command redirected to a
   file returned in 0 s.
 
+- The HARNESS, not the product, and it is the orphan half of this note arriving on schedule.
+  Four selftests were killed mid-run over one session. Each left its scratch subtree held open by a
+  surviving grandchild: 99 stale `/tmp/tmp.*` directories, 94 removable and 5 not, and the next
+  suite aborted at startup with `rm: cannot remove ...: Device or resource busy`. Six orphaned
+  `*.test.sh` processes had accumulated 3 to 21 s of CPU each and were still running; with them
+  alive every suite produced ZERO bytes for twenty minutes and read as a hang in the code under
+  test. After killing them by command line, the hygiene engine finished in 42 s green. Nothing was
+  wrong with the code, and two rounds of bisecting it found nothing because there was nothing.
+  **Diagnostic:** a suite emitting no output at all, rather than stopping partway, is a machine
+  symptom and not a logic one — check for orphans before reading the diff.
+
 ## The fix
 
 Redirect to a file, let `timeout` return, then read the file. Add `-k` for the child that ignores

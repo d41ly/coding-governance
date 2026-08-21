@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -362,6 +362,19 @@ This line is the machine-read one; the bullets carry the reasoning.
   "other seventeen leg checks" in §3 became "the leg's other checks" for the same reason. AC1a is new:
   it arms the marker-shape branch S3 unexempts, with a control arm proving the emptiness exemption
   survived the edit.
+
+- rev-5 · 2026-08-21 · **built, and the check this unit exists to give a subject had a FOURTH silent-skip mechanism.** The
+  promotion clause tested whether the subject appeared anywhere in the generated units region; per
+  S5 the subject is the build slug or a spec path, and both are substrings of every row already.
+  Measured against the real region: slug, spec path and unit id were all silent, and only a
+  fabricated id fired it. It grades a unit-id DELTA against the roster at the run's pinned BASE now,
+  matched as a whole id, which is what a promotion actually leaves behind.
+
+  `landed-via-lander` is the other subjectless check, and its honest predicate turned out to be
+  narrower than the row claimed: the bypass grep duplicated leg check 11 inside the same close, so
+  it is gone and the protocol row says what remains. The real observation is `--landed`'s marker
+  check, which is EQUALITY against the pushed commit rather than ancestry - a rule that reached no
+  agent-facing carrier until this fold put it in the Skill and beside the verb's own row.
 
 ## 10. Reuse audit
 

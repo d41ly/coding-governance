@@ -1436,7 +1436,12 @@ _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '
              grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s
 ' "$_hy_ids" | grep -c .)
-_hy_claimed=$(grep -oE 'the gate . [0-9]+ checks' "$HERE/README.md" | grep -oE '[0-9]+' | head -1)
+# ANCHORED ON THE ROW, NOT ON THE DASH. The first spelling was `the gate . [0-9]+ checks`, and the
+# separator is an EM DASH - three bytes in UTF-8, which a single `.` matches one byte of under this
+# repo's own ambient locale. The read came back EMPTY and the arm refused, which is the behaviour it
+# was written to have; it is still the wrong predicate. Same byte-offset trap check 12 carries a
+# warning about, one file over.
+_hy_claimed=$(grep -F 'check-memory-hygiene.sh' "$HERE/README.md" | grep -oE '[0-9]+ checks' | grep -oE '^[0-9]+' | head -1)
 [ -n "$_hy_claimed" ] || { echo "FAIL the kit README states no check count in the shape this arm reads, so the figure AGENTS.md designates as canonical is now ungraded - fix the arm or the README, but do not leave the number unwatched"; st=1; }
 n=$((n+1))
 [ "$_hy_claimed" = "$_hy_derived" ] || { echo "FAIL the kit README claims $_hy_claimed checks and the engine defines $_hy_derived ($(echo $_hy_ids | tr '

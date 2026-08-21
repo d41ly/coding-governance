@@ -822,18 +822,38 @@ fi
 # ---- WHAT THIS DOES NOT CHECK: that a row DESCRIBES its key correctly. It grades presence of the
 # ---- key name in the table region, nothing more. A row whose prose is wrong is green here, and only
 # ---- a reader catches that.
-if [ -f "$LIVEDOC" ] && [ -f "$ROOT/.unattended.conf" ]; then
+EXAMPLE_CONF="$HERE/.unattended.conf.example"
+# A MISSING EXAMPLE IS A REFUSAL, not a skip. Guarding the whole check on `[ -f ]` made it vanish
+# silently wherever the kit ships without its example - which is exactly where a documentation join
+# is worth most - and a check that says nothing is indistinguishable from a check that passed. The
+# example is a tracked kit file, so its absence is a broken install rather than a configuration.
+if [ ! -f "$EXAMPLE_CONF" ]; then
+  fail 22 "the kit ships no .unattended.conf.example, so the key table below can be joined against nothing and this check would pass by grading an empty set: $EXAMPLE_CONF"
+elif [ -f "$LIVEDOC" ]; then
   # SCOPED TO SECTION 8's OWN REGION. Read over the whole file it also collects the phase
   # vocabulary, whose table has the same row shape - eleven phase names arriving as "documented
   # but declared nowhere" is a checker grading the wrong population, and muting them would take an
   # exclusion list that then hides a real dead key.
   sec8=$(awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f' "$LIVEDOC")
   doc_keys=$(printf '%s\n' "$sec8" | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
-  conf_keys=$(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | sort -u)
-  undocumented=$(comm -23 <(printf '%s\n' "$conf_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
-  phantom=$(comm -13 <(printf '%s\n' "$conf_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
-  if [ -n "$(printf '%s' "$undocumented$phantom" | tr -d '[:space:]')" ]; then
-    fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:${undocumented:- none} | documented but declared nowhere:${phantom:- none}"
+  # THE KIT'S EXAMPLE CONF IS THE REVERSE POPULATION, not the adopting project's. A project declares
+  # the keys it needs and leaves the optional ones out, so "documented but not declared here" is the
+  # NORMAL state of any real conf - graded against one, this check red six keys on a conforming
+  # fixture tree, which is a checker measuring the wrong set rather than a repo with a fault. The
+  # example is the kit's own full declaration and is what makes the reverse direction meaningful:
+  # a documented key absent from it is a row describing something no adopter can copy.
+  ex_keys=$(grep -oE '^[A-Z_]+=' "$EXAMPLE_CONF" | tr -d '=' | sort -u)
+  undocumented=$(comm -23 <(printf '%s\n' "$ex_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+  phantom=$(comm -13 <(printf '%s\n' "$ex_keys") <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+  # ...and the ADOPTING project may declare nothing the table does not carry. One direction only,
+  # because an optional key it never sets is not a fault.
+  if [ -f "$ROOT/.unattended.conf" ]; then
+    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+  else
+    proj_extra=""
+  fi
+  if [ -n "$(printf '%s' "$undocumented$phantom$proj_extra" | tr -d '[:space:]')" ]; then
+    fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol: ${undocumented:-none} | documented but in no example: ${phantom:-none} | set by this project and undocumented: ${proj_extra:-none}"
   fi
 fi
 
@@ -1109,8 +1129,7 @@ if [ -f "$proto" ]; then
         seven) cn=7 ;; eight) cn=8 ;; nine) cn=9 ;; ten) cn=10 ;; eleven) cn=11 ;; twelve) cn=12 ;;
         *) cn=-1 ;;
       esac
-      ndod=$(printf '%s
-' "$dcore" | grep -c . || true)
+      ndod=$(printf '%s\n' "$dcore" | grep -c . || true)
       [ "$cn" = "$ndod" ]         || fail 16 "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '$cw', driver carries $ndod"
     fi
   fi
