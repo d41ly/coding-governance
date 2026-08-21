@@ -1,6 +1,6 @@
 # TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock
 
-**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-1 · base 4773902f · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-21 · node a · Tier-1 · base 4773902f · streams tooling
 
 ## 1. Goal
 
@@ -178,6 +178,17 @@ factor at the current leg count is `TOOL-aTimedTurnstile-4`, which the report's 
   states 873 s against a measured 1001.3 s mean, and still names the dead `gate-timings.tsv` as
   the live dispatch input — is a change to a governance carrier and an owner turn. It is re-cited
   in `TOOL-aMeteredTurnstile-4` instead, whose own line number had gone stale.
+- rev-3 · 2026-08-21 · CLOSED, on the owner's decision. rev-2 replaced the closing condition with
+  three clauses checkable against named files, and all three were already met: 14 of 14
+  dispositioned ids carry a dated backlog line, rows `-2` … `-8` are present, and both a
+  `spec-audit` and a `diff-review` record name this id. What stood in the way was never the unit.
+  It was that `closed_specs_with_no_product_commit` sits at 1 against a pin of 1, so a bare close
+  reds the `drift-audit records` leg, and the only escape is a `memory/project/trace-waiver.txt`
+  row of a shape this repo had never granted. rev-2 parked that as an owner turn under the fork
+  rule's veto 2. **The owner took it.** The waiver row and this flip land in ONE commit, because
+  the signal restricts its population to TERMINAL specs and turns a leftover waiver row into a
+  suspect of its own — neither half is safe alone. The two `AGENTS.md` claims rev-2 declined to
+  touch also move on the owner's decision, in this same landing.
 
 ## 10. Reuse audit
 

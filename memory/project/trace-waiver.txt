@@ -17,7 +17,7 @@
 #
 # Fields: <spec-path>	ab<unit-id>	ab<reason>.
 #
-# All five seed rows are the SAME shape, and it is the residual the header-date key knowingly trades
+# The SEED rows below are the same shape, and it is the residual the header-date key knowingly trades
 # in (§4 of that spec: "touching a grandfathered CLOSED spec's header advances its date and pulls it
 # into the population, where it will red for want of a convention it never had"). Each unit's product
 # landed BEFORE TRACE_CUTOFF 2026-08-11, so its subjects follow the older convention — the unit
@@ -29,3 +29,4 @@ memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-
 memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md	TOOL-aDrainedSluice-9	product landed 6ff9a73 2026-08-08, subject 'fix(memory-tree): V8 — …'; pre-cutoff, names the unit number
 memory/builds/aWireWarden/spec/2026-07-15-spec-aWireWarden-1.md	TOOL-aWireWarden-1	product landed 78b23be 2026-07-15; it DOES name TOOL-aWireWarden-1, in the BODY, and subject-only is a declared non-goal of this signal
 memory/builds/dSettledRoster/spec/2026-08-20-spec-TOOL-dSettledRoster-5.md	TOOL-dSettledRoster-5	record written AFTER the work landed (474043e, d2a40aa) at the owner request, so no product subject could name a slug that did not exist yet
+memory/builds/aScannedThrottle/spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md	TOOL-aScannedThrottle-1	RECORDS-ONLY, the first of that shape here: this unit's deliverable IS a report and a set of backlog dispositions, so no product commit exists to name it and none ever will. drift_report.py's own header admits this shape by name. The five aDrainedSluice/aWireWarden rows are pre-cutoff subjects and TOOL-dSettledRoster-5 is a record-after-the-work waiver; this row is neither.
