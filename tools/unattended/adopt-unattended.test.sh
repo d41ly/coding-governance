@@ -26,7 +26,7 @@ seed() { # dir  -> a git repo carrying the kit and a conf
   mkdir -p "$1/tools/unattended"
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
-  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" \
+  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
      "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$1/tools/unattended/"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory

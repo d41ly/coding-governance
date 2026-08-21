@@ -1328,8 +1328,15 @@ done
 # ---- (those are internals, not overrides), MINUS a DECLARED exclusion carrying its reason. The
 # ---- exclusion is asserted in BOTH directions: a name it lists that the engine no longer reads reds
 # ---- too, because a stale exemption silently widens the surface it was written to narrow.
-_engreads=$(grep -oE '\$\{[A-Z][A-Z0-9_]+:-' "$HERE/check-memory-hygiene.sh" | sed 's/^\${//; s/:-$//' | sort -u)
-_engassigns=$(grep -oE '^[[:space:]]*[A-Z][A-Z0-9_]+=' "$HERE/check-memory-hygiene.sh" | tr -d ' \t' | sed 's/=$//' | sort -u)
+# COMMENT-STRIPPED, and with NO subtraction of the names the engine assigns itself. The first cut
+# subtracted them on the rationale that a self-assigned name is an internal rather than an override,
+# and `comm -12` over its own two derivations returned exactly one name — SPEC10_CUTOFF — which is a
+# live adopter key with a shipped default that the conf overrides on top of. It was silently outside
+# the parity requirement, which is precisely the failure this arm exists to prevent, one level up.
+# The comment strip matters for the same reason: the raw pattern matched prose, so a key could reach
+# the population by being MENTIONED rather than read.
+_engreads=$(sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memory-hygiene.sh" \
+  | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//' | sort -u)
 # NOT conf keys, and each says why. GOV_PYTHON is an environment override for the python launcher and
 # belongs to no conf; MAP_ROOT is the codebase-map kit's key, read from ITS conf by a check that
 # integrates with it. Declaring either here would tell adopters to set a key this kit does not own.
@@ -1342,7 +1349,6 @@ for _k in $_engexempt; do
     || { echo "FAIL the example-conf exemption names $_k, which the engine no longer reads as an override — a stale exemption widens the surface it was written to narrow"; st=1; }
 done
 for _k in $_engreads; do
-  printf '%s\n' "$_engassigns" | grep -qx "$_k" && continue
   case " $_engexempt " in *" $_k "*) continue ;; esac
   n=$((n+1))
   grep -qE "^$_k=" "$EX" \

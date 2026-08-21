@@ -21,7 +21,7 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
-cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
+cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -166,7 +166,7 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 reset_tree
 # reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
 # Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
 ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
 short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
@@ -185,7 +185,7 @@ miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
 ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
 sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
@@ -1292,48 +1292,78 @@ mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
 
-# ---- THE WIDENING REPAIR MUST NOT RED THIS LEG (closing review H2). `--dispatch` re-declared with a
-# ---- strict superset APPENDS a superseding row — the parked region is append-only and nothing
-# ---- rewrites the earlier one — so a leg grading EVERY row grades a declaration the driver has
-# ---- already replaced. The pass below commits inside its WIDENED set and outside its first one,
-# ---- which is precisely what the repair exists to permit. It redded before the fix.
-# `drow` COMMITS, so two of them put the widened row at a different anchor from the first — which is
-# what a real run does, since `--dispatch` stages the run-state file and the run commits it. A
-# collapse keyed on (group, unit) leaves both rows standing here and grades the stale narrow one.
+# ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
+# ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
+# ---- ANCHOR, so a widened declaration is two rows under one key and the later binds. A widening
+# ---- asked for AFTER the pass committed cannot reuse that anchor — the driver no longer finds the
+# ---- row to supersede — so it lands under a new key and the original narrow row is still graded.
+# ---- That is the ordering constraint, obtained by construction instead of by comparing timestamps.
+drows() {              # unit · paths-for-row-1 · paths-for-row-2 — BOTH at the current anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$3" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+
+# A: the sanctioned repair. Widened at its own anchor, commits inside the widened set.
 reset_tree
-drow ARCH-tRun-1 "work/one.txt"
-drow ARCH-tRun-1 "work/one.txt work/two.txt"
+drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run)" "check 23 FAILED"
 
-# ...and the same repair with NO commit between the two rows, which is what the driver writes when it
-# widens at an unmoved HEAD. Both shapes reach the same collapse; only one of them reached the first
-# version of it, and the fixture is the only reason that was ever visible.
+# B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
+# from switching the check off for any pass that ever re-declared, which is a larger hole.
 reset_tree
-G=$(git rev-parse --short=8 HEAD)
-printf '\n2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt\n' "$G" >> memory/builds/tRun/RUN.md
-printf '2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt work/two.txt\n' "$G" >> memory/builds/tRun/RUN.md
-git add -A && git commit -q -m "declare ARCH-tRun-1" --no-verify
-mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
-git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "check 23 FAILED"
-
-# ...and the superseding row is still GRADED, not merely skipped: a commit outside the WIDE set reds.
-# Without this arm the fix above would be indistinguishable from switching the check off for any unit
-# that ever re-declared, which is a larger hole than the one it closes.
-reset_tree
-drow ARCH-tRun-1 "work/one.txt"
-drow ARCH-tRun-1 "work/one.txt work/two.txt"
+drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
 
-# ...and a NARROWER unit id is not confused with a wider one. `ARCH-tRun-1` is a prefix of
-# `ARCH-tRun-10`, and the row key is compared whole (closing review H3/H4).
+# C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
+# The finding must survive: a declaration cannot be rewritten to cover a write already made. The
+# first repair folded on the unit alone with no ordering constraint, and this case went GREEN.
 reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+drow ARCH-tRun-1 "work/one.txt work/stray.txt"
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
+# once per kind. Each row governs its own pass. Folding them together graded pass one's commit
+# against pass two's declaration and redded a correct run.
+reset_tree
+drow ARCH-tRun-1 "work/spec.txt"
+mkdir -p work && printf 's\n' > work/spec.txt
+git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
+drow ARCH-tRun-1 "work/build.txt"
+printf 'b\n' > work/build.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
+# pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
+reset_tree
+drow ARCH-tRun-1 "work/spec.txt"
+mkdir -p work && printf 's\n' > work/spec.txt
+git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
+drow ARCH-tRun-1 "work/build.txt"
+printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# F: BOTH IDS IN ONE FIXTURE, which is the whole of this arm. The first version declared only
+# `ARCH-tRun-10`, so no shorter id existed for a substring match to over-reach, and it passed
+# identically against the un-anchored leg — `fixture-passes-by-finding-nothing`, and the direct
+# reason the surviving substring site in the ambiguity arm went unnoticed by an otherwise thorough
+# sweep.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
 drow ARCH-tRun-10 "work/ten.txt"
-mkdir -p work && printf 'a\n' > work/ten.txt
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
 miss "$(run)" "check 23 FAILED"
 

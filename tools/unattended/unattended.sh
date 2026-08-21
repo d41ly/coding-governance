@@ -53,7 +53,17 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# THE KIT LIBRARY, sourced before anything reads history. It holds every predicate this script and
+# the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
+# this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
+# `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
+_LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+[ -f "$_LIB_DIR/lib-unattended.sh" ] || {
+  echo "unattended: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $_LIB_DIR/lib-unattended.sh" >&2
+  exit 2
+}
+# shellcheck source=lib-unattended.sh
+. "$_LIB_DIR/lib-unattended.sh"
 
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -1305,6 +1315,9 @@ verb_landed() { # slug
   # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
   # later reader, silently promoting a record to the stronger claim.
   set_fact "$rel" landed-anchor "$akind" || return 1
+  # The message names the commit the RECORD carries. It printed `$head` while writing `$wit`, so on
+  # the local arm the operator was told one sha and the terminal record kept another.
+  head="$wit"
   set_fact "$rel" unpushed-at-landing "$unp" || return 1
   # THE ROSTER AT LANDING, frozen here and nowhere else. Deriving the unit list from the build README
   # is right while a run is LIVE — it cannot go stale between reads — but a FINISHED record must
@@ -2156,11 +2169,6 @@ RESCOPED
 # the qualifier M6 earned through a retraction, because every pass changes a spec header the index is
 # rendered from and a flat ban would refuse the ORDINARY declaration. Condition 2 is a judgement about
 # meaning and is NOT enforced; a verb that pretended to decide it would be a check that cannot fail.
-# PATH CONTAINMENT, written once. Four sites in `--dispatch` need one of these two relations and each
-# had spelled it by hand: two tested "under" where the collision is symmetric, and a third used string
-# equality, which certifies `memory/` and `memory/DECISIONS.md` disjoint. TOOL-dUnstalledConvoy-21.
-covers()   { case "$2" in "$1"|"$1"/*) return 0 ;; esac; return 1; }
-overlaps() { covers "$1" "$2" || covers "$2" "$1"; }
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
@@ -2179,6 +2187,9 @@ verb_dispatch() { # slug · unit · writes...
       /*|?:[/\\]*) fail 49 "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find: $p"; return 1 ;;
       *..*) fail 49 "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound: $p"; return 1 ;;
     esac
+    if is_repo_root "$p"; then
+      fail 49 "--dispatch declares the repository root, which covers every path and sits under none, so no containment test can express it and a pass declaring it is disjoint from nothing: $p"; return 1
+    fi
     case "$p" in
       *'*'*|*'?'*|*'['*|*']'*) fail 49 "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one: $p"; return 1 ;;
     esac
@@ -2219,19 +2230,22 @@ verb_dispatch() { # slug · unit · writes...
   [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
   # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
   # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
-  # empties the sibling set at the moment the second pass declares — and condition 1 then passes by
-  # finding nobody to collide with, which is a vacuous selector wearing a green row. Openness is read
-  # the same way the leg reads it: a pass is closed once a commit after its own anchor names its unit.
+  # empties the sibling set at the moment the second pass declares, and condition 1 then passes by
+  # finding nobody to collide with.
+  #
+  # OPENNESS COMES FROM `pass_commit` IN THE KIT LIBRARY, which the gate leg calls too. The first
+  # version of this hunk answered the question here instead, and asserted in a comment that it read
+  # it "the same way the leg reads it". It did not: it counted the run-state bookkeeping commit that
+  # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
+  # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
+  # now a function call, which cannot be wrong about what the leg does.
   sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
       _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
       _g=${_i%% *}; _u=${_i#* }
-      # An anchor this clone cannot resolve, or one off the current history, leaves the pass OPEN.
+      # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
       # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
-      if GIT rev-parse --verify --quiet "$_g^{commit}" >/dev/null 2>&1 &&
-         GIT log --format=%s "$_g..HEAD" 2>/dev/null | grep -qE "(^|[^A-Za-z0-9-])$_u([^A-Za-z0-9-]|\$)"; then
-        continue
-      fi
+      pass_commit "$_g" "$_u" "$rel" >/dev/null && continue
       printf '%s\n' "$_r"
     done)
   sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
@@ -2242,9 +2256,12 @@ verb_dispatch() { # slug · unit · writes...
     # only made the refusal order-dependent: the pass that declares the index first is clean, and the
     # sibling that later declares the generator never looks for the index anywhere but its own args.
     for p in "$@" $sibpaths; do
-      covers "$idx" "$p" || continue
+      overlaps "$idx" "$p" || continue
       for q in "$@" $sibpaths; do
-        if covers "$gen" "$q"; then
+        # OVERLAP on both halves. `covers` asks whether q sits under the generator, which misses a
+        # declaration that CONTAINS the generator — the same one-way reading that let `--writes
+        # memory` through the shared-records refusal, left behind at this one site.
+        if overlaps "$gen" "$q"; then
           fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1
         fi
       done
@@ -2272,9 +2289,29 @@ SIBS
   # NARROWING is refused, because narrowing a declaration after the fact is how a pass would hide a
   # write it had already made.
   want=$(printf '%s ' "$@"); want=${want% }
-  cur=$(grep -F -- " dispatch · item $grp $unit · reason " "$rel" 2>/dev/null | tail -1)
+  # KEYED ON THE UNIT'S OPEN ROW, not on the current HEAD. `$grp` moves the moment the run commits
+  # its own declaration, and a lookup keyed on it then finds nothing and admits a NARROWING as a
+  # first declaration — which is the one thing this rule exists to refuse. `sibrows` already holds
+  # exactly the rows whose pass has not committed, so the open row for this unit is in there.
+  cur=$(printf '%s\n' "$sibrows" | grep -F -- " dispatch · item " | while IFS= read -r _r; do
+      [ -n "$_r" ] || continue
+      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
+      [ "${_i#* }" = "$unit" ] && printf '%s\n' "$_r"
+    done | tail -1)
   if [ -n "$cur" ]; then
     curpaths=${cur#* · reason }
+    # THE WIDENED ROW KEEPS THE SUPERSEDED ROW'S ANCHOR, and this is the whole of what makes the leg
+    # able to stay simple. `--dispatch` stages the run-state file and the run commits that
+    # declaration, so HEAD has almost always moved by the time a widening is asked for; parking the
+    # new row at the CURRENT HEAD gave it a different group from the row it replaces, the leg saw two
+    # unrelated declarations, and the stale narrow one was graded forever. Reusing the anchor makes
+    # the pair one declaration under one key, which is what it is.
+    #
+    # It also closes the post-hoc rewrite: once the pass has COMMITTED, `sibrows` no longer carries
+    # its row, `cur` is empty, and this branch is not reached at all — so a widening that arrives
+    # after the write lands as a NEW row at a new anchor and does not supersede anything. The leg
+    # then still grades the original narrow declaration against the commit, and still reds.
+    curgrp=${cur#* dispatch · item }; curgrp=${curgrp%% *}
     if [ "$curpaths" = "$want" ]; then
       echo "unattended: dispatch already declared, unchanged — $unit"
       return 0
@@ -2283,7 +2320,7 @@ SIBS
       for p in "$@"; do [ "$p" = "$q" ] && continue 2; done
       fail 49 "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not: $q for $unit"; return 1
     done
-    park "$rel" dispatch "$grp $unit" "$want"
+    park "$rel" dispatch "$curgrp $unit" "$want"
     stage_or_fail "$rel" || return 1
     echo "unattended: dispatch WIDENED — $unit · $want"
     return 0

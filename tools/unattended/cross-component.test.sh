@@ -38,7 +38,7 @@ mkdir -p memory/guides tools/unattended .claude/skills/unattended
 # checks that have nothing to do with the subject, and a naive arm reading "the leg failed" scores
 # that as a correct refusal. This is `fixture-passes-by-finding-nothing` inverted — the fixture fails
 # by finding the WRONG thing — which is why the completeness precondition below runs before any arm.
-cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" \
+cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
    "$HERE/SKILL.template.md" tools/unattended/
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/

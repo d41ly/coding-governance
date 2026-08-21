@@ -35,7 +35,17 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.
 # reds on another node's git is a false positive on the merge bar. The levers that matter are pinned
 # below rather than detected.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# THE KIT LIBRARY, sourced before anything reads history. It holds every predicate this script and
+# the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
+# this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
+# `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
+_LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+[ -f "$_LIB_DIR/lib-unattended.sh" ] || {
+  echo "unattended-check: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $_LIB_DIR/lib-unattended.sh" >&2
+  exit 2
+}
+# shellcheck source=lib-unattended.sh
+. "$_LIB_DIR/lib-unattended.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended-check: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -198,18 +208,6 @@ region()   { awk -v o="$2" -v c="$3" '
 # not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
 # would notice this going quiet.
 REPORT=${GOV_UNATTENDED_REPORT:-0}
-# An id compared as a SUBSTRING joins `-1` to `-10`, and the joined pair is always the wrong one:
-# `TOOL-x-1` is a prefix of every `TOOL-x-1N` this build will ever mint. TOOL-dUnstalledConvoy-21 —
-# every id test in this file routes through these two, so the anchoring is written ONCE. It was
-# written at five sites by hand and three of them were unanchored, which is the argument for a
-# helper over a convention.
-id_rows() {  # haystack-text · id  -> the lines carrying that id as a whole token
-  printf '%s\n' "$1" | grep -E "(^|[^A-Za-z0-9-])$2([^A-Za-z0-9-]|\$)" || true
-}
-id_in() {    # haystack-text · id  -> 0 when the id appears as a whole token
-  [ -n "$(id_rows "$1" "$2")" ]
-}
-
 report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
@@ -1051,30 +1049,23 @@ for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
-  # ONE ROW PER UNIT: the EARLIEST anchor, the WIDEST declaration. The driver's widening repair
-  # appends a superseding row rather than rewriting the earlier one, because the parked region is
-  # append-only; grading every row grades a declaration the driver itself has replaced, and the
-  # documented repair would then red this leg forever with nothing a run could do about it in band.
+  # ONE ROW PER (group, unit) — THE LAST. The driver's widening repair supersedes an OPEN pass's row
+  # and parks the replacement AT THE SAME ANCHOR, so a widened declaration is two rows under one key
+  # and the later one is the one that binds. That anchor reuse is what lets this stay a plain fold
+  # with no ordering arithmetic in it.
   #
-  # KEYED ON THE UNIT AND NOT ON (group, unit), which was the first draft and was wrong for the case
-  # that matters. A widening after any commit — the run-state bookkeeping commit the declaration
-  # itself makes is enough — sees a moved HEAD, so the two rows carry DIFFERENT groups and a
-  # (group, unit) key leaves both standing. The stale narrow row is then graded against the pass's
-  # real diff and reds, which is the whole defect wearing a slightly different hat.
-  #
-  # The synthesised row takes the FIRST row's anchor, because that is when the pass began and the
-  # commit window has to open there, and the LAST row's paths, because that is the declaration that
-  # binds. Reporting order follows first appearance; `sort -u` would have reordered the findings.
+  # KEYED ON (group, unit) AND NOT ON THE UNIT ALONE, which the first repair tried and which is wrong
+  # twice over. M6 defines five pass kinds and one unit may be dispatched once per kind, so a unit
+  # legitimately owns several rows at several anchors; merging them graded one pass's commit against
+  # another pass's declaration, and left the second pass ungraded entirely. And because a post-hoc
+  # widening cannot reuse a closed pass's anchor, it lands under a NEW key here and the original
+  # narrow declaration is still graded — which is the ordering constraint, obtained by construction
+  # rather than by comparing timestamps after the fact.
   dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
-      { pre = $0; sub(/ dispatch · item .*$/, "", pre)
-        k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
-        g = k; sub(/ .*$/, "", g)
-        u = k; sub(/^[^ ]* /, "", u)
-        pth = $0; sub(/^.* · reason /, "", pth)
-        if (!(u in first)) { first[u] = g; head[u] = pre; ord[++n] = u }
-        paths[u] = pth }
-      END { for (i = 1; i <= n; i++) { u = ord[i]
-              print head[u] " dispatch · item " first[u] " " u " · reason " paths[u] } }' || true)
+      { k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
+        if (!(k in row)) ord[++n] = k
+        row[k] = $0 }
+      END { for (i = 1; i <= n; i++) print row[ord[i]] }' || true)
   if [ -z "$dsrows" ]; then
     report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
     continue
@@ -1098,14 +1089,10 @@ for f in $RUNS; do
     # commit's subject names the unit, being about it. Without this skip the DECLARATION is read as
     # the pass's own commit, the subset test runs against a diff touching only the run-state file, and
     # the check reds on every correctly declared pass. Measured on this unit's own fixture.
-    dshit=""
-    for dsc in $(GIT log --reverse --format=%H "$dsgrp"..HEAD 2>/dev/null); do
-      id_in "$(GIT log -1 --format=%s "$dsc" 2>/dev/null)" "$dsunit" || continue
-      case "$(GIT diff-tree --no-commit-id --name-only -r "$dsc" 2>/dev/null | grep -v -x -F "$f")" in
-        "") continue ;;
-      esac
-      dshit="$dsc"; break
-    done
+    # THE KIT LIBRARY ANSWERS THIS, not a loop written here. The driver's condition 1 asks the same
+    # question, and when the two were written separately the driver's copy omitted the run-state skip
+    # below and closed every pass on its own declaration commit.
+    dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" || true)
     if [ -z "$dshit" ]; then
       # NO COMMIT NAMES THE PASS. Legal when the pass produced no change - M6 says a pass that
       # changed nothing commits nothing. NOT legal when the declared paths moved anyway: that is the
@@ -1132,7 +1119,9 @@ for f in $RUNS; do
       dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
       dssunit=${dssitem#* }
       [ "$dssunit" = "$dsunit" ] && continue
-      case "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" in *"$dssunit"*) dsother="$dssunit" ;; esac
+      # ANCHORED, like every other id test in this file. Left as a substring, a group holding a
+      # `-1` and a `-10` reports the pair as ambiguous on the `-1` commit and reds a correct run.
+      id_in "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" "$dssunit" && dsother="$dssunit"
     done <<DSSIBS
 $(printf '%s\n' "$dsrows" | grep -F -- " dispatch · item $dsgrp ")
 DSSIBS
