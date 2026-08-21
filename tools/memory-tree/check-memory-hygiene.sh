@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.25   # gov:kit memory-tree@2.25 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.26   # gov:kit memory-tree@2.26 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -24,7 +24,7 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
-FORK_MARK_CUTOFF=""   # date; specs whose filename date >= this have every §8 ITEM graded for the SHAPED resolution mark (check 12); blank = never required
+FORK_MARK_CUTOFF=""   # date; at/after it a terminal spec's §8 SECTION must carry the SHAPED resolution mark somewhere (check 12) - not per ITEM, see TEMPLATE-SPEC; blank = never required
 REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST carry one `## Verdict: <member>` line from the closed set (check 22); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
@@ -973,7 +973,10 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         if (bitems == 0) {
           if (q8 !~ /^none/ && q8 !~ /^n\/a/)
             print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_MARK_CUTOFF " fcut "; a hollow section and a resolved one are the same byte)"
-        } else if (q8 !~ /^none/ && q8 !~ /^n\/a/ && !bmark)
+        # SAME RULE AS THE SIBLING READER: with items present, only a MARK resolves the section. The
+        # opening line used to vote here too, and `/^none/` matches "none of the forks below are
+        # resolved" - a denial - once the line is lowercased.
+        } else if (!bmark)
           print f " (terminal Status, §8 carries items and no conforming resolution mark anywhere, at/after FORK_MARK_CUTOFF " fcut ")"
       }
       else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^n\/a/ && !(items > 0 && items == resolved))

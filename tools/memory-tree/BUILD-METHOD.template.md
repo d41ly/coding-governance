@@ -97,9 +97,9 @@ resolved AGAINST the better measurement for exactly that reason, so a testing ru
 have got it wrong.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. **Every ITEM is graded, not the section's first line**, and the mark must be the
-documented SHAPE — the word, then `(<owner|agent>, <date>[, delegated])` — anywhere in that item's block. A `none`
-first line ends the section only when it has NO items; below one, an unresolved item still reds.
+decision the owner did not make. The mark must be the documented SHAPE — the word, then
+`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
+item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 

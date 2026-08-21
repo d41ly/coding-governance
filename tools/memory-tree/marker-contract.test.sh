@@ -303,6 +303,23 @@ mark_case "mark wrapped at the paren" silent  READY    '- **F1 — a question?**
 # section from a hollow one, so it is the case the contract most needed and did not have. The
 # neighbouring `hollow` row uses a PROSE line, which both readers already refuse.
 mark_case "empty: no body at all"   red       FORKED   ''
+# CASE AND WRAPPING GET THEIR OWN ROWS, because reverting either fix left this table green. The case
+# alignment and the whitespace squeeze were both landed with no row that could see them, which is the
+# could-not-fail shape this whole build is about - in the artifact whose job is proving the two
+# readers agree.
+#
+# THE DENIAL ROW is the one that matters most: `/^none/` is an UNANCHORED prefix on a lowercased
+# line, so a sentence saying the forks are NOT resolved read as a none-form and resolved the section.
+# Aligning the readers on case aligned them on that. With items present the opening line no longer
+# votes at all; only a conforming mark does.
+mark_case "denial that starts with none" red   FORKED   'None of the forks below are resolved.
+
+- **F1 — open?** nobody has signed this off.'
+mark_case "none form in mixed case"     silent READY    'None - every fork below is RESOLVED in place.
+
+- **F1 — answered?** yes.
+  RESOLVED (owner, 2026-08-09): picked.'
+mark_case "N/A in upper case, no items" silent READY    'N/A'
 
 ( cd "$FT" && git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m fx --no-verify ) >/dev/null 2>&1
 hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )

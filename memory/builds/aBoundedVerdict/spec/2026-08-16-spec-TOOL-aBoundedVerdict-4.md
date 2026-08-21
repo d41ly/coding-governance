@@ -134,6 +134,23 @@ are reachable in ordinary authoring and the first is reachable by accident.
 
 ### Inventory
 
+**SUPERSEDED IN PART by `TOOL-aBoundedVerdict-22`, 2026-08-21 — read this table with that in hand.**
+The three rows below that say *per item* or *over the item's block* describe a walk that was BUILT and
+then WITHDRAWN in the same build, on a measurement this spec did not have: of 287 tracked §8 bullets,
+69 carry descriptive labels, and among those are both resolved forks and genuinely open ones. A
+per-item walk therefore cannot tell a FORK bullet from an OPTION bullet, and the two failure modes
+are not symmetric — a label-shape discriminator UNDER-counts and lets a real open fork pass, while the
+unguarded walk over-counts and was measured calling a RESOLVED fork unresolved on a live tracked spec.
+
+What both readers do now: grade the SECTION as one whitespace-squeezed string, and with any item
+present require a conforming mark somewhere — the opening line does not vote. The rest of this table
+stands: the shaped mark, the hollow-section refusal and the `FACT-QUESTION` prefix all shipped as
+written. The residue — an unresolved fork below an honest `none` line — is a pinned gap, not a
+pending item, and `memory/TEMPLATE-SPEC.md` §8 is the current contract.
+
+This note is appended rather than edited into the rows above, because a ratified record is superseded
+and never rewritten.
+
 | Site | Today | After |
 |---|---|---|
 | `unattended.sh` `plan_state` | the bare word, on the first non-blank line only | the shaped mark, over every item's block; the none form ends the section only when there are no items |

@@ -416,7 +416,7 @@ generated region is a subset of the specs by construction. Each rev names what w
 was found.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 15 unit(s) · node a · opened 2026-08-16 · streams tooling
+**Build status:** CLOSED · 16 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12
 ids TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-20 TOOL-aBoundedVerdict-21 TOOL-aBoundedVerdict-22 TOOL-aBoundedVerdict-23 TOOL-aBoundedVerdict-24
 ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL-aBoundedVerdict-28 TOOL-aBoundedVerdict-29 TOOL-aBoundedVerdict-30 TOOL-aBoundedVerdict-31 TOOL-aBoundedVerdict-32
@@ -424,7 +424,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | CLOSED | rev-12 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md) | CLOSED | rev-13 | 2026-08-21 |
 | [TOOL-aBoundedVerdict-2 — a halted run records WHY, in a vocabulary something reads](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md) | CLOSED | rev-9 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-3 — every remaining place a run would wait for the owner gets a disposition](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md) | CLOSED | rev-8 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-4 — a fork that says it is unresolved stops reading as resolved](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md) | CLOSED | rev-8 | 2026-08-20 |
@@ -439,6 +439,7 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 | [TOOL-aBoundedVerdict-18 — the two checks that cannot fail get subjects](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md) | CLOSED | rev-5 | 2026-08-21 |
 | [TOOL-aBoundedVerdict-19 — the protocol pair says what the code does, and one closed AC is settled](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md) | CLOSED | rev-4 | 2026-08-20 |
 | [TOOL-aBoundedVerdict-21 — the landing push is bounded too](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md) | WONTDO | rev-3 | 2026-08-21 |
+| [TOOL-aBoundedVerdict-22 — the promoted blockers: the fold's own defects, specced rather than re-reviewed](spec/2026-08-21-spec-TOOL-aBoundedVerdict-22.md) | CLOSED | rev-1 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -453,6 +454,12 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
 | [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
 | [2026-08-20-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+| [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
+
+Ids no record names: TOOL-aBoundedVerdict-22.
+
+Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-22.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -483,6 +490,7 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-19-spec-TOOL-aBoundedVerdict-18.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md)
   - [2026-08-19-spec-TOOL-aBoundedVerdict-19.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md)
   - [2026-08-19-spec-TOOL-aBoundedVerdict-21.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md)
+  - [2026-08-21-spec-TOOL-aBoundedVerdict-22.md](spec/2026-08-21-spec-TOOL-aBoundedVerdict-22.md)
 - **`build/`**
   - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
   - [2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md)
@@ -493,4 +501,6 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md)
   - [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md)
   - [2026-08-20-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md)
+  - [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md)
+  - [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md)
 <!-- /gen:build-docs -->

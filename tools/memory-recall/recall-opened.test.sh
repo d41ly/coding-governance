@@ -96,7 +96,11 @@ cleanup
 # empty for the majority session shape. It is also what isolates that scan — for a read inside the
 # hook's OWN checkout the two arms are redundant, so mutating either alone changes nothing.
 newrepo docs
-WT=$(mktemp -d)/wt
+# THE PARENT IS CAPTURED AND TRAPPED. `$(mktemp -d)/wt` leaks the parent on every run, and this
+# file had no EXIT trap at all. Orphaned scratch dirs are not cosmetic here: 99 accumulated in one
+# session and the next suite aborted at startup with `Device or resource busy`.
+WT_PARENT=$(mktemp -d); WT="$WT_PARENT/wt"
+trap 'rm -rf "${WT_PARENT:-}"' EXIT
 git -C "$D" worktree add -q -b side "$WT" >/dev/null 2>&1
 if [ -d "$WT/docs/tooling" ]; then
   logquery 11 "$NOW" docs/tooling/DECISIONS.md

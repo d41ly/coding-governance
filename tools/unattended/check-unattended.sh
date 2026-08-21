@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # check-unattended.sh - the merge-bar leg for the unattended-run kit. Its check ids run 1..22; the
 # count is NOT retyped in prose anywhere, because it has now been wrong twice - derive it with
-# `grep -oE 'fail [0-9]+' tools/unattended/check-unattended.sh | sort -un`.
+# `grep -oE 'fail [0-9]+' tools/unattended/check-unattended.sh | grep -oE '[0-9]+' | sort -un` -
+# the second grep is load-bearing: `sort -un` on `fail 7` sorts the WORD, reads every line as 0, and
+# prints exactly one.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -41,6 +43,19 @@ CONF="$ROOT/.unattended.conf"
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
+
+# DEFINED HERE, ABOVE ITS FIRST CALLER, and that placement is the whole point. It used to sit 200
+# lines below the review-loop check that calls it, so at call time it was not a function yet: bash
+# reported command-not-found, `2>/dev/null` hid the message, and `|| true` turned the failure into an
+# empty result. The clause then compared an empty id set against the BASE roster, found no new ids,
+# and reported that nothing had been promoted - dead while it was silent, and a FALSE RED the moment
+# a run finally exited non-convergent. Fifth silent-skip mechanism found in this one check.
+region()   { awk -v o="$2" -v c="$3" '
+               { ln=$0; sub(/\r$/,"",ln) }
+               index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
+               index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
+               inside { print }
+               END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 
 # ---------------------------------------------------------------------------------- 1: the conf
 if [ ! -f "$CONF" ]; then
@@ -333,12 +348,6 @@ phase_of() { fact_of "$1" phase; }
 # block a human reads. Reproduced at gate exit 0 with no output. CR-normalised before comparing,
 # because the prefix test tolerated a CRLF worktree by accident and an equality test does not.
 # >>> kickoff_region
-region()   { awk -v o="$2" -v c="$3" '
-               { ln=$0; sub(/\r$/,"",ln) }
-               index(ln,o)==1 { if (ln!=o) bad=1; no++; if (no==1) oat=NR; if (nc==0) inside=1; next }
-               index(ln,c)==1 { if (ln!=c) bad=1; nc++; if (nc==1) cat=NR; inside=0; next }
-               inside { print }
-               END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 # <<< kickoff_region
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
@@ -471,6 +480,16 @@ if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
     [ "$_rc2" = 0 ] && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
     # 124 is the bound firing. Either call hitting it means this leg observed nothing it can trust.
     { [ "$_rc1" = 124 ] || [ "$_rc2" = 124 ]; } && ADV_RC=124
+    # ...and ANY OTHER non-zero is a transport failure, which is also not an answer. Splitting 124 out
+    # left every other failure - auth refused, DNS gone, the endpoint 404ing - landing on a message
+    # about what the remote ADVERTISED, which is a claim this leg never got close enough to make.
+    # `--exit-code` makes 2 mean "answered, advertised nothing", so 2 is a real answer and stays.
+    if [ "$ADV_RC" = 0 ]; then
+      case "$_rc1:$_rc2" in
+        0:0|0:2|2:0|2:2) ;;
+        *) ADV_RC=95 ;;
+      esac
+    fi
     rm -f "$adv_f"
   fi
 fi
@@ -491,18 +510,29 @@ fi
 #
 # The driver has carried the distinction for longer (its check 30, "the remote advertises a tip this
 # clone does not have"); this side had not been given it.
-is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, no advertised tip is local
-  local c="$1" t have=0
-  if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then
-    have=1
-    GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
+is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a tip could not be read
+  # THE INVARIANT IS "EVERY TIP WAS READABLE", not "at least one was". The first cut tracked PRESENCE
+  # and returned 2 only when ALL advertised tips were absent, so a single stale locally-present branch
+  # restored the forgery-shaped false red for every record. Reproduced against this clone: three tips
+  # advertised, one present and two absent, so `have` was 1 and the answer came back a definite
+  # "not published" computed from a third of the evidence. Sound form: not-published requires that no
+  # present tip contains the commit AND that nothing was unreadable; anything less is cannot-tell.
+  local c="$1" t miss=0
+  if [ -n "$ADV_HEAD" ]; then
+    if GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then
+      GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
+    else
+      miss=1
+    fi
   fi
   for t in $ADV_TIPS; do
-    GIT cat-file -e "$t^{commit}" 2>/dev/null || continue
-    have=1
-    GIT merge-base --is-ancestor "$c" "$t" 2>/dev/null && return 0
+    if GIT cat-file -e "$t^{commit}" 2>/dev/null; then
+      GIT merge-base --is-ancestor "$c" "$t" 2>/dev/null && return 0
+    else
+      miss=1
+    fi
   done
-  [ "$have" = 1 ] || return 2
+  [ "$miss" = 0 ] || return 2
   return 1
 }
 
@@ -632,6 +662,8 @@ while IFS= read -r f; do
         fail 9 "this clone declares NO remote, so there is no endpoint to observe and whether a recorded BASE is published was never asked; that is a fault in this clone rather than an answer about any remote: recorded $rb in $f"
       elif [ "$ADV_NREM_RC" = 97 ]; then
         fail 9 "this clone declares more than one remote, so which endpoint published would even mean is a guess; the leg refuses to pick one rather than measuring the BASE against whichever name sorts first: recorded $rb in $f"
+      elif [ "$ADV_RC" = 95 ]; then
+        fail 9 "the remote could not be reached to observe its tips, so whether a recorded BASE is published is UNKNOWN rather than answered no; that is a transport or credential fault and not a statement about what the remote holds: recorded $rb in $f"
       elif [ "$ADV_RC" = 98 ]; then
         fail 9 "cannot create a scratch file to capture the remote advertisement, so this leg observed NOTHING and the BASE predicates below would be graded against an empty answer; this is a fault on THIS side, not the remote's: $f"
       elif [ "$ADV_RC" = 124 ]; then

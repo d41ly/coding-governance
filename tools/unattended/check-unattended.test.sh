@@ -234,11 +234,27 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # ...minus the FLAGS, which are arguments rather than verbs and are documented by the verb they
 # belong to. Named explicitly, because a flag silently treated as a verb would demand a Skill
 # section nobody should write.
-for _f in --keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --witness --version; do
+# `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
+# case arm, so it never enters the derived population and exempting it removed nothing. The
+# assertion below caught that on its first run, which is the entire reason it exists.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers'
+for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
 done
-n=$((n+1)); [ -n "$verbs" ] || { echo "FAIL no dispatched verb could be read out of the driver, so the documentation join below would compare against an empty set"; st=1; }
+# A FLOOR, NOT A NON-EMPTINESS TEST. The old guard refused only an EMPTY population, which is exactly
+# how a nine-of-eleven population passed while reporting full coverage. The floor is shrink-only and
+# is the number of verbs this kit dispatches; adding one and forgetting to document it now reds here
+# rather than widening the set the join grades.
+_nverbs=$(printf '%s
+' "$verbs" | grep -c .)
+n=$((n+1)); [ "$_nverbs" -ge 12 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 12, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
+# population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
+# the cheap proxy is that it must still appear as a case arm in the driver.
+for _f in $_denied; do
+  n=$((n+1)); grep -qE "^ +\Q$_f\E\)" "$D" 2>/dev/null || grep -qE "^ +$_f\)" "$D" || { echo "FAIL the flag denylist exempts $_f, which the driver no longer dispatches - a stale exemption narrows the verb set this join grades and nothing else would notice"; st=1; }
+done
 undoc=""
 for v in $verbs; do
   grep -q -- "$v" "$HERE/SKILL.template.md" 2>/dev/null || undoc="$undoc $v(skill)"
@@ -500,6 +516,31 @@ out=$(run)
 hit  "$out" "this clone declares more than one remote, so which endpoint published would even mean is a guess; the leg refuses to pick one rather than measuring the BASE against whichever name sorts first: recorded"
 miss "$out" "the remote advertised no tips"
 git remote remove second
+reset_tree
+
+# ---- THE PROMOTION CLAUSE, which had NO arm at all - neither of its two messages was assertedanywhere, so the rewrite that made it count across subjects was landed unobserved. Two subjects both
+# ---- exit NON-CONVERGENT and the region gains exactly ONE id since the run BASE, so the count is
+# ---- short by one and the clause must say so. A per-subject reading would have passed this.
+reset_tree; mkconf
+mkdir -p memory/builds/tProm
+printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
+git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m promobase --no-verify
+PROMBASE=$(git rev-parse HEAD)
+printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n| TOOL-tProm-2 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
+printf '# tProm\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n\n2026-08-20T02:00:00Z review · item S2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' "$PROMBASE" > memory/builds/tProm/RUN.md
+git add -A >/dev/null 2>&1
+hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+reset_tree
+
+# ---- check 9: A TRANSPORT FAILURE IS NOT AN ANSWER EITHER. Splitting the wall-clock bound out left
+# ---- every OTHER non-zero - auth refused, DNS gone, a 404 endpoint - reporting as a statement about
+# ---- what the remote advertised, which is a claim the leg never got close enough to make.
+reset_tree; mkconf
+git remote set-url origin "https://nonexistent.invalid/no/such.git"
+out=$(run)
+hit  "$out" "the remote could not be reached to observe its tips, so whether a recorded BASE is published is UNKNOWN rather than answered no; that is a transport or credential fault and not a statement about what the remote holds: recorded"
+miss "$out" "the remote advertised no tips"
+git remote set-url origin "$ORIGIN"
 reset_tree
 
 # ---- check 9: A TIP THIS CLONE DOES NOT HAVE IS NOT AN ANSWER. `merge-base --is-ancestor` fails
@@ -806,8 +847,12 @@ anchor_restore
 # ---- the whole block was skipped, so every BASE predicate, check 15's second half and the check-13
 # ---- mandate assertion went silently absent on an unreachable remote — fail-OPEN under a comment
 # ---- promising the opposite. The control is the arms above, which pass with the remote reachable.
+# AN EMPTY BARE REPO, not a missing one. A path that does not exist is a TRANSPORT fault and reports
+# as one since the five-cause split; "advertised no tips" is reserved for a remote that answered and
+# had nothing to say, which is what an initialised-but-empty bare repo produces.
 reset_tree
-git remote set-url origin "$ORIGIN_DIR/gone.git"
+git init -q --bare "$ORIGIN_DIR/empty.git"
+git remote set-url origin "$ORIGIN_DIR/empty.git"
 hit "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction"
 git remote set-url origin "$ORIGIN"
 miss "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published"

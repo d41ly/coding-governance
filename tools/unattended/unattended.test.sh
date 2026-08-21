@@ -1440,7 +1440,7 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --review, --attest, --close, --landed, --park and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --review, --attest, --close, --landed, --park, --abort and --version: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
@@ -2814,6 +2814,19 @@ GCD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
 rm -f "$GCD/tmarker"
 fixture
 hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was ["
+
+# A MARKER VALUE CARRYING A SEPARATOR is refused, because the key is a bare NAME resolved against the
+# git common dir. Joined instead, it lands somewhere the declaration never named and the two halves
+# can disagree about where while both look conformant.
+mkconf; printf 'LANDER_MARKER=".git/tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+hit "$(run --landed tRun)" "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named"
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
 
 # a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
 # shas, because "stale marker" and "HEAD moved since the push" are different faults with different

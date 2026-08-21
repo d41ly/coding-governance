@@ -15,6 +15,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | Class | Kind | Anchors | Universal | Description |
 |---|---|---:|---|---|
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
+| [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 2 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 6 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
@@ -32,6 +33,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 6 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-17 record(s): 17 class, 0 note, 0 superseded · 3 universal · 0 unanchored
+18 record(s): 18 class, 0 note, 0 superseded · 3 universal · 0 unanchored
 
 <!-- END GENERATED -->

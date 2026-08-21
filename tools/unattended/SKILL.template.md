@@ -248,6 +248,15 @@ It answers with one of four states, and the state is what you act on:
 Strictly smaller, not merely different: a sequence that oscillates 2, 1, 2 satisfies "the count
 changed" forever. A subject whose loop already ended does not take another round.
 
+## Which kit version is installed
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --version
+```
+
+It prints the engine identity and exits. Worth one line here because it is a dispatched entry point
+like any other, and a verb no surface names is a verb the documentation join treats as missing.
+
 ## Resume
 
 ```bash

@@ -1265,7 +1265,14 @@ plan_state() { # spec file -> prints the M2 state
       if (items == 0) {
         if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"
       } else {
-        if (lf ~ /^none/ || lf ~ /^n\/a/ || any_mark) print "READY"; else print "FORKED"
+        # WITH ITEMS PRESENT THE OPENING LINE DOES NOT VOTE. It used to, and `/^none/` is an
+        # UNANCHORED prefix on a lowercased line, so "None of the forks below are resolved." - a
+        # sentence saying the exact opposite - read as a none-form and resolved the section. The
+        # hygiene reader rejected that one only by accident of case, and aligning the two on case
+        # aligned them on the WRONG behaviour. A section with items is resolved by a MARK or not at
+        # all. Measured over the corpus: no terminal spec at or after FORK_MARK_CUTOFF loses by this,
+        # and the 12 older ones that would are already exempt by that cutoff.
+        if (any_mark) print "READY"; else print "FORKED"
       }
     }' "$1"
 }
@@ -1530,6 +1537,13 @@ verb_landed() { # slug
   local _lm_head _lm_gcd _lm_path
   _lm_head=$(GIT rev-parse HEAD)
   if [ -n "$LANDER_MARKER" ]; then
+    # A BARE NAME, and the key says so - so a value carrying a separator is REFUSED rather than joined
+    # into a path. Joined, it resolves somewhere the declaration never named, and the lander and this
+    # verb can disagree about where while both look like they are following the conf.
+    case "$LANDER_MARKER" in
+      */*|*"\\"*|.|..) fail 34 "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named: $LANDER_MARKER"
+         return 1 ;;
+    esac
     _lm_gcd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _lm_gcd=""
     _lm_path="$_lm_gcd/$LANDER_MARKER"
     # NO SEPARATE REFUSAL FOR AN UNRESOLVABLE COMMON DIR, and that is a deletion rather than an
@@ -2580,7 +2594,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --review, --attest, --close, --landed, --park and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --review, --attest, --close, --landed, --park, --abort and --version: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -2588,7 +2602,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> --code <halt-code> | --park <slug> --item <text> --reason <text> | --review <slug> --subject <id> --verdict <TOKEN> --blockers <N> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> --code <halt-code> | --park <slug> --item <text> --reason <text> | --review <slug> --subject <id> --verdict <TOKEN> --blockers <N> | --attest <slug> --item <item> [--value <text>] | --version"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;

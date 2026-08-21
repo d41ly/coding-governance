@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-1 — the review loop converges or promotes, and no round is refused by a counter
 
-**Status:** CLOSED · rev-12 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
+**Status:** CLOSED · rev-13 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling · ratified 2026-08-19
 
 ## 1. Goal
 
@@ -681,6 +681,25 @@ This line is the machine-read one; the bullets carry the reasoning.
   moved, leaving M6 pointing at a README section that did not exist and M4 missing its `tier2-review
   reviews DIFFS` rule while still telling the reader to run a Workflow. Both are real now. Recording
   that here because rev-11 is the entry that got it wrong.
+
+- rev-13 · 2026-08-21 · **the convergence predicate fired NON-CONVERGENT on this build's own review
+  loop, which is the outcome F1 was resolved knowing about.** Recorded rounds: 1 blocker, then 3. The
+  count did not shrink, so the loop STOPPED and the disposition is promotion rather than another
+  round. The standing set is EMPTY - all three of round 3's blockers were fixed in the fold that
+  round 4 is reviewing - so nothing is promoted, and the loop ended without the stall this unit was
+  written to remove.
+
+  **Why the count ROSE rather than fell, stated because it looks like a regression and is not.** The
+  two rounds reviewed different things: round 2 the build, round 3 the FIX. F1 resolved this
+  deliberately - one build-level sequence, on the recorded grounds that a finding-keyed sequence
+  needs a stable finding identity across rounds the harness does not provide - and its resolution
+  says in as many words that a mixed fold exits early to promotion. It did. The predicate is not
+  measuring quality across rounds; it is bounding how many rounds a subject gets, and it bounded
+  this one at two.
+
+  One naming mismatch worth knowing before reading the record: the verb numbers the rounds IT has
+  recorded, so its `round 1` and `round 2` are the review documents named round2 and round3. The
+  documents are the durable artifact and the verb's counter is a sequence position, not a citation.
 
 ## 10. Reuse audit
 
