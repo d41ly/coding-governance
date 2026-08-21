@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** INPROGRESS · rev-6 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-21
+**Status:** CLOSED · rev-6 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-21
 
 ## 1. Goal
 

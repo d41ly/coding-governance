@@ -174,6 +174,14 @@ PARK_KINDS="decision abort override waiver proposal rescope dispatch"
 # dispatch is a claim about what two passes will write. Counting any of them as parked would make a
 # run that recorded six of its own acts look like a run that stalled on six decisions.
 PARK_KINDS_OWED="decision abort override waiver"
+# The Definition-of-Done items an override may NOT buy. A DECLARED set rather than a name hardcoded
+# into a case arm: it WAS one name, and the second arrived as an acceptance criterion this build had
+# ratified and never implemented — found by writing the arms the item never had.
+#
+# `pieces-complete` joins it because it is the item that says the run produced what the owner asked
+# for, over content nothing else in the bar can grade. An override on it is the run certifying its
+# own output, which is the same shape the authorization item is protected from.
+DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -348,6 +356,7 @@ AUTH_PLAYBOOK=""
 AUTH_PIECES=""
 AUTH_OUTPUTS=""
 AUTH_GRAIN=""
+AUTH_RECORDS=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -934,6 +943,7 @@ check_authorization() { # slug · base
     # belong to the units that read them and are parsed there.
     AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
     AUTH_GRAIN=$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
+    AUTH_RECORDS=$(printf '%s\n' "$_pb" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
     case "$_pb" in
       *'```toml'*) ;;
       *) fail 46 "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing: $AUTH_PLAYBOOK"
@@ -1728,6 +1738,7 @@ verb_preflight() { # slug · keepalive-id
     [ -n "$(fact "$rel" playbook)" ] || set_fact "$rel" playbook "$AUTH_PLAYBOOK" || return 1
     [ -n "$(fact "$rel" pieces)" ]   || set_fact "$rel" pieces   "$AUTH_PIECES"   || return 1
     [ -n "$(fact "$rel" grain)" ]    || set_fact "$rel" grain    "$AUTH_GRAIN"    || return 1
+    [ -n "$(fact "$rel" records)" ]  || set_fact "$rel" records  "$AUTH_RECORDS"  || return 1
   fi
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
@@ -1852,7 +1863,7 @@ is_overridden() { # item -> 0 when it appears in OV_ITEMS
 }
 
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
-  local slug="$1" rel item ck unmet=0 i=0 n ov reason
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
   n=${#OV_ITEMS[@]}
   check_slug "$slug" || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
@@ -1892,9 +1903,13 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
     # It fires wherever the item appears in the list, not only first: the loop reaches every pair.
-    case "$ov" in
-      authorization-reachable)
-        fail 21 "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+    case " $DOD_NO_OVERRIDE " in
+      *" $ov "*)
+        case "$ov" in
+          authorization-reachable) _why="an override on the authorization check IS the authorization check" ;;
+          *) _why="it is the item that says this run made what the owner asked for, so an override on it is the run certifying its own output" ;;
+        esac
+        fail 21 "a Definition-of-Done item in the non-overridable set cannot be bought with --override, and --abort is the honest exit when it cannot be met - item and reason follow: $ov, $_why"
         return 1 ;;
     esac
     i=$((i + 1))
@@ -2026,12 +2041,29 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="a recipe-mode run records no playbook or no piece count, so there is nothing to measure this item against: playbook '$_pb' count '$_n'"
         return 1
       fi
-      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" 2>/dev/null | head -1)
+      # THE GRAIN AND THE RECORDS ROOT COME FROM THE PINNED FACTS, not from the working-tree
+      # playbook. Round-1 HIGH 4: this arm handed `--counts` a PATH, which the leg read off disk,
+      # while `set-checks-recorded` twenty-seven lines down read the BASE blob — two halves of one
+      # arm reading two different files. An uncommitted one-line grain edit moved the count from 2
+      # to 1, and the run is the actor that can make that edit. Preflight goes to the trouble of
+      # reading both from the blob at BASE precisely so the run cannot supply them.
+      _gr=$(fact "$rel" grain)
+      _rrf=$(fact "$rel" records)
+      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$_gr" "$_rrf" 2>/dev/null \
+                | grep -m1 '^pieces=')
+      # SELECTED BY SHAPE, never by position. `head -1` took whatever the leg printed first, so any
+      # note reaching stdout made every field below parse to that line's first word — the parse
+      # cannot fail, it just yields nonsense, and the close then blocks on a fabricated count.
+      if [ -z "$_counts" ]; then
+        DOD_OUT="the piece enumerator produced no machine-readable count line, so there is no population to measure this item against and a parsed value here would be invented: $_pb"
+        return 1
+      fi
       _pc=${_counts#pieces=}; _pc=${_pc%% *}
       _vc=${_counts#*verified=}; _vc=${_vc%% *}
       _fc=${_counts#*failed=}; _fc=${_fc%% *}
       _sc=${_counts#*stale=}; _sc=${_sc%% *}
       _uc=${_counts#*unrecorded=}; _uc=${_uc%% *}
+      _xc=${_counts#*unchecked=}; _xc=${_xc%% *}
       if [ "$item" = pieces-complete ]; then
         # TERM 1 - the VACUITY GUARD, and it is ordered before term 2 for `build-complete`'s reason:
         # "every piece is verified" is vacuously true over no pieces at all.
@@ -2040,11 +2072,22 @@ dod_met() { # slug · run-state file · item · checker
           return 1
         fi
         [ "${_sc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced is STALE - its record describes bytes the piece no longer has, so the verdict on it is about a different file: $_sc stale"; return 1; }
-        [ "${_uc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced carries no record, so nothing says whether its declared checks ran at all: $_uc unrecorded"; return 1; }
+        # M7 (round-1 diff review): THERE IS NO `unrecorded` TERM, and its absence is the honest
+        # state rather than an omission. `--counts` run-scoped derives membership FROM the records,
+        # so a piece with no record belongs to no run and is excluded before it can be counted — the
+        # enumerator says so in its own comment. This arm therefore read `_uc`, which is structurally
+        # always zero here, under a message that reads as enforcement. Term 3's count comparison
+        # catches the same condition and can actually fire. A branch no fixture can reach is the
+        # shape this kit gates against everywhere else.
         # TERM 2 - PROVENANCE and DONENESS are two questions. `verified` requires the hash join AND
         # every declared leg recording PASS, which is what makes "its declared legs green" implemented
         # rather than merely cited.
         [ "${_fc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced records a FAILING leg verdict, so its declared checks ran and one of them said no: $_fc failed"; return 1; }
+        # TERM 2b - UNCHECKED. A piece whose record names no verdict for a leg the playbook DECLARES
+        # is not verified and never was: before this term the census tested for the ABSENCE of a FAIL,
+        # so a record carrying no verdict at all counted as verified and this item certified pieces
+        # nothing had checked. An explicit NA satisfies a declared leg; an absent row does not.
+        [ "${_xc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced records no verdict for a leg its playbook DECLARES, so the check was never run and 'verified' would be a word about provenance alone: $_xc unchecked"; return 1; }
         # TERM 3 - the COUNT, against the number the owner asked for at BASE.
         [ "${_vc:-0}" -eq "${_n:-0}" ] || { DOD_OUT="this run's verified piece count is not the count its build README asked for at the pinned BASE - verified against requested: $_vc against $_n"; return 1; }
         DOD_OUT=""; return 0
@@ -2053,15 +2096,71 @@ dod_met() { # slug · run-state file · item · checker
       # was modelled on asserts a bound review EXISTS because a prose verdict grammar cannot be
       # anchored, and that limit does not transfer here - a set check is a declared leg with a binary
       # anchored verdict, so declining to read it shipped the exact green this unit exists to prevent.
-      _rr=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
-      _set="$_rr/set-$slug.md"
-      _declared=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)
+      # THE BLOB, READ ONCE AND ASSERTED. M2 (round-1 diff review): both extractions below came from
+      # separate `GIT show` calls with stderr discarded, so a wrong path, a wrong base or a swallowed
+      # failure ALL yielded the empty string — which the `case` immediately read as "declares
+      # nothing" and returned MET. A probe that cannot move must say so, and the sibling arm has
+      # exactly that assertion, so the asymmetry was internal and the coverage accidental.
+      _blob=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null)
+      if [ -z "$_blob" ] || ! printf '%s\n' "$_blob" | grep -q '^```toml'; then
+        DOD_OUT="the playbook does not resolve at the pinned BASE or carries no declaration block there, so this item would read an empty set_checks and certify set coverage over a playbook nothing could read: $_pb"
+        return 1
+      fi
+      _rr=$(printf '%s\n' "$_blob" | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+      # M1: the escape is matched against a TRIMMED value. It compared RAW text, and the line the
+      # kit's own template ships - `set_checks   = []    # the checks that run over ALL N…` - does not
+      # equal `[]`, so an author who declares none and keeps the template's own comment was told they
+      # declared some, on a run with nobody present to make the call. The `_rr` extraction one line up
+      # already trimmed; the inconsistency was between two lines of one arm.
+      #
+      # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
+      _declared=$(printf '%s\n' "$_blob" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
+                  | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+                  | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
       case "$_declared" in
         ''|'[]'|'none'*) DOD_OUT=""; return 0 ;;
       esac
+      # M2, second half: with checks DECLARED and no records root, `_rr` was empty and `_set`
+      # degenerated to the absolute path `/set-<slug>.md`, so the item red naming a path outside the
+      # repository — a true refusal for a false reason, which sends the reader to the wrong file.
+      if [ -z "$_rr" ]; then
+        DOD_OUT="the playbook declares set-scoped checks and no records root at the pinned BASE, so a set verdict has nowhere to be written that this item could read: $_pb"
+        return 1
+      fi
+      _set="$_rr/set-$slug.md"
       [ -f "$_set" ] || { DOD_OUT="the playbook declares set-scoped checks and this run recorded no set verdict, so the population a per-piece review structurally cannot see went unmeasured: $_set"; return 1; }
       if grep -q '^leg .* · verdict FAIL$' "$_set"; then
         DOD_OUT="a set-scoped check recorded a FAILING verdict, and these are the checks that see what a per-piece review cannot - a monoculture passes every piece and fails here: $_set"
+        return 1
+      fi
+      # THE JOIN, against the DECLARED set. Round-1 HIGH 1: this arm required a set record to exist
+      # and to carry no FAIL, so ONE `NA` on a leg the playbook never declared satisfied it while the
+      # declared checks went unrun - the same hole as the per-piece blocker, one population up, under
+      # a comment claiming it "reads the VERDICTS and not merely their existence". An explicit NA
+      # satisfies a declared check; an absent row does not.
+      _smiss=""
+      for _sl in $(printf '%s' "$_declared" | tr -d '[]",'); do
+        grep -qxF -- "leg $_sl · verdict PASS" "$_set" && continue
+        grep -qxF -- "leg $_sl · verdict NA" "$_set" && continue
+        _smiss="$_smiss $_sl"
+      done
+      if [ -n "$_smiss" ]; then
+        DOD_OUT="the playbook declares a set-scoped check this run's set record carries no verdict for, so the population a per-piece review structurally cannot see went unmeasured under a record that looks complete - declared and unrecorded:$_smiss in $_set"
+        return 1
+      fi
+      # L1 (round-1 diff review): the SET IDENTITY, compared. `record_set` writes the ordered member
+      # hashes and its own comment names a `superseded` state — a set verdict beside a stale member
+      # list is a verdict about a different set — and nothing anywhere read the line. The reachable
+      # path is ordinary: record a set PASS, then re-record any piece, which re-stamps that piece's
+      # hash, and the verdict now describes a set that no longer exists. Derived the same way the
+      # writer derives it, so the two cannot disagree about what the set IS.
+      _live=$(for _r in $(GIT ls-files -- "$_rr/*.md"); do
+                [ "$(sed -n 's/^run: //p' "$_r" | head -1)" = "$slug" ] || continue
+                sed -n 's/^hash: //p' "$_r" | head -1
+              done | LC_ALL=C sort | tr '\n' ',' | sed 's/,$//')
+      _rec=$(sed -n 's/^set: //p' "$_set" | head -1)
+      if [ "$_rec" != "$_live" ]; then
+        DOD_OUT="the set verdict describes a SUPERSEDED set - its recorded member list is not this run's pieces as they now stand, so a passing set check was taken over a population that has since changed: $_set"
         return 1
       fi
       DOD_OUT=""; return 0 ;;
@@ -2398,6 +2497,28 @@ record_path_of() { # records-root · piece-path
   # reader read another, and the live leg looked green only because the files had been moved by hand.
   printf '%s/%s.md' "$1" "$(printf '%s' "$2" | tr '/' '~')"
 }
+# HIGH 2 (round-1 diff review) - the ROW DROPPER, and it takes no regex. Both writers spelled this
+# `sed -i "/^leg $leg · verdict /d"`, interpolating a CALLER-SUPPLIED leg name into a sed ADDRESS,
+# which is a regular expression:
+#
+#   * a leg named `.*` matched EVERY verdict row and deleted them all, silently erasing a recorded
+#     FAIL and flipping the piece back to verified on the next write;
+#   * a leg containing `/` — `tools/lint.sh`, an ordinary thing to call a leg — closed the address
+#     early, so sed aborted while the `printf` that follows still ran, leaving TWO verdict rows for
+#     one leg on a record the reader then cannot decide either way.
+#
+# The `case` pattern below is a QUOTED expansion, which shell treats as a literal even when the value
+# spells a glob, and the single trailing `*` is the only wildcard in it. No escaping to get wrong.
+drop_leg_row() { # record · leg
+  local rec="$1" lg="$2" tmp line
+  tmp=$(mktemp) || return 1
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in "leg $lg · verdict "*) continue ;; esac
+    printf '%s\n' "$line"
+  done < "$rec" > "$tmp"
+  mv "$tmp" "$rec"
+}
+
 record_piece() { # records-root · piece-path · leg · verdict · playbook-sha · run-id
   local root="$1" piece="$2" leg="$3" verdict="$4" pbsha="$5" runid="$6" rec want line h
   [ -f "$piece" ] || { fail 47 "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows: $piece"; return 1; }
@@ -2447,7 +2568,7 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha 
   done < "$rec"
   # A leg may be RE-recorded with a different verdict and the newest wins: two verdicts for one leg
   # is a record that cannot be read either way.
-  sed -i "/^leg $leg · verdict /d" "$rec"
+  drop_leg_row "$rec" "$leg" || return 1
   printf '%s\n' "$want" >> "$rec"
   stage_or_fail "$rec" || return 1
   echo "unattended: piece verdict recorded — $leg $verdict on $piece"
@@ -2459,6 +2580,19 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
     PASS|FAIL|NA) ;;
     *) fail 47 "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given: $verdict"; return 1 ;;
   esac
+  # HIGH 3 (round-1 diff review) - THE THREE FIELD GUARDS, which this writer alone did not carry
+  # while its four siblings all did. A newline in `--leg` forged a second verdict row nothing wrote:
+  # the row the run meant to record said FAIL, the forged one said PASS, and the Definition-of-Done
+  # reader four functions away greps this file line-wise and saw the PASS. Reproduced against the
+  # shipped driver before this landed. Same three refusals, same reasons, same wording as the piece
+  # writer's - the point is that a writer of this record has them, not that each argues them again.
+  if [ "$(printf '%s' "$leg$verdict$runid$hashes" | wc -l)" -ne 0 ]; then
+    fail 47 "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
+  fi
+  case "$leg$runid" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $runid"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s' "$leg" "$runid" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a set record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows: $BYPASS_BAN"; return 1
+  fi
   rec="$root/set-$runid.md"
   mkdir -p "$(dirname "$rec")" || return 1
   if [ ! -f "$rec" ]; then
@@ -2477,7 +2611,7 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
     echo "unattended: set verdict already recorded, unchanged — $leg"
     return 0
   done < "$rec"
-  sed -i "/^leg $leg · verdict /d" "$rec"
+  drop_leg_row "$rec" "$leg" || return 1
   printf '%s\n' "$want" >> "$rec"
   stage_or_fail "$rec" || return 1
   echo "unattended: set verdict recorded — $leg $verdict for $runid"
@@ -2528,7 +2662,12 @@ verb_record_piece() { # slug · piece · leg · verdict
   refuse_if_terminal "$rel" --record-piece || return 1
   rr_root=$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
-  record_piece "$rr_root" "$piece" "$leg" "$verdict" "$(fact "$rel" playbook)" "$slug"
+  # M6 (round-1 diff review): the BLOB SHA, not the path. This passed `$(fact "$rel" playbook)` —
+  # the same expression used one line up as the PATH half of a `GIT show` — into a field printed as
+  # `playbook-sha:`. Dead plumbing carrying wrong data is worse than no plumbing: the instant anyone
+  # wires the provenance join it exists for, every unattended-written record fails it.
+  record_piece "$rr_root" "$piece" "$leg" "$verdict" \
+    "$(GIT rev-parse "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null)" "$slug"
 }
 # TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
 # undocumented; M3 now delegates the build's own scope. An authority with no record is

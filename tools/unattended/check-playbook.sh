@@ -33,7 +33,13 @@ note() { printf 'playbook: %s\n' "$1"; }
 # checking it, and the two drift on the first edit to either.
 COUNTS_FOR=""
 COUNTS_RUN=""
-[ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; }
+# The GRAIN and the RECORDS ROOT may be SUPPLIED, and the driver supplies them from the facts its
+# run-state file pinned at BASE. Parsing them out of the working-tree playbook is right on the
+# merge bar, where no run exists and the tree is all there is; it is wrong at the close, where the
+# run is the actor that can edit the file being parsed. Empty means "parse the file".
+COUNTS_GRAIN=""
+COUNTS_RECORDS=""
+[ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; COUNTS_GRAIN="${4:-}"; COUNTS_RECORDS="${5:-}"; }
 
 command -v git >/dev/null 2>&1 || { echo "check-playbook: no git on PATH"; exit 2; }
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-playbook: not a git work tree"; exit 2; }
@@ -185,7 +191,6 @@ for pb in $PLAYBOOKS; do
   done <<CANONEOF
 $CANON
 CANONEOF
-done
 
   # ---- 8: THE PER-PIECE RECORD READER. It CLASSIFIES and never grades: `stale` and `failed` are
   # ---- reported here with their counts and do NOT red, because only `--close` blocks on them. That
@@ -195,15 +200,25 @@ done
   # ---- run-state file: this leg runs on the merge bar where no run exists, and a scope that needed
   # ---- one would be a scope the bar can never evaluate.
   gr=$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  # SUPPLIED WINS. See the COUNTS_GRAIN note at the top: at the close these come from the BASE
+  # blob through the run-state file's pinned facts, so an uncommitted edit to the playbook cannot
+  # move the population the Definition of Done measures.
+  [ -n "$COUNTS_GRAIN" ] && gr="$COUNTS_GRAIN"
   rr=$(printf '%s
 ' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  [ -n "$COUNTS_RECORDS" ] && rr="$COUNTS_RECORDS"
+  # THE DECLARED PER-PIECE LEGS. Round-1 blocker: this list had no reader anywhere in the kit while
+  # three documents asserted the join, so `verified` meant "the hash matches and nobody wrote FAIL"
+  # and a record carrying NO verdict at all counted as verified.
+  pchk=$(printf '%s\n' "$body" | sed -n 's/^piece_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
+         | tr -d '[]",' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
   if [ -n "$gr" ] && [ -z "$rr" ]; then
     fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
   fi
   if [ -n "$gr" ] && [ -n "$rr" ]; then
     pieces=$(GITLS "$gr")
     npieces=$(printf '%s' "$pieces" | grep -c . || true)
-    v=0; f=0; st_=0; un=0; inscope=0
+    v=0; f=0; st_=0; un=0; uc=0; inscope=0
     for pc in $pieces; do
       [ -n "$pc" ] || continue
       rec=$(record_for "$rr" "$pc")
@@ -225,8 +240,29 @@ done
       # PROVENANCE and DONENESS are two questions. The hash join answers the first; the verdicts
       # answer the second, and `verified` requires BOTH — otherwise it is a semantic word for a
       # structural state, and the count that means "the build made what was asked" keys on it.
+      #
+      # THE JOIN IS AGAINST THE PLAYBOOK'S OWN `piece_checks`, and its absence is what the round-1
+      # review called a blocker: testing for the ABSENCE of a FAIL row makes a record with no verdicts
+      # at all `verified`, and `pieces-complete` then certifies pieces nothing ever checked.
+      #
+      # AN EXPLICIT `NA` SATISFIES A DECLARED LEG; an ABSENT row does not. That distinction is the
+      # whole rule: `NA` is a judgement somebody recorded about this piece, absence is nothing at all,
+      # and collapsing them would put the hole back one level down. A playbook declaring no per-piece
+      # checks keeps the old meaning, which is the honest reading of declaring none.
       inscope=$((inscope + 1))
-      if grep -q '^leg .* · verdict FAIL$' "$rec"; then f=$((f + 1)); else v=$((v + 1)); fi
+      if grep -q '^leg .* · verdict FAIL$' "$rec"; then f=$((f + 1)); continue; fi
+      miss_=""
+      for lg_ in $pchk; do
+        grep -qxF -- "leg $lg_ · verdict PASS" "$rec" && continue
+        grep -qxF -- "leg $lg_ · verdict NA" "$rec" && continue
+        miss_="$miss_ $lg_"
+      done
+      if [ -n "$miss_" ]; then
+        uc=$((uc + 1))
+        [ -n "$COUNTS_FOR" ] || note "unchecked — $pc records no verdict for declared leg(s):$miss_ ($pb)"
+      else
+        v=$((v + 1))
+      fi
     done
     # THE LIVENESS ASSERTION, first and unconditional. Every count below can be satisfied by a tree
     # with no pieces in it, and a reader that enumerates zero, joins zero and reports zero failures
@@ -234,13 +270,45 @@ done
     if [ -n "$COUNTS_FOR" ]; then
       # The machine line. DEAD PROBE is carried as a FIELD rather than as prose, so the caller can
       # distinguish "zero pieces" from "the grain resolved nothing" without parsing English.
-      printf 'pieces=%s verified=%s failed=%s stale=%s unrecorded=%s
-' "$inscope" "$v" "$f" "$st_" "$un"
+      printf 'pieces=%s verified=%s failed=%s stale=%s unrecorded=%s unchecked=%s
+' "$inscope" "$v" "$f" "$st_" "$un" "$uc"
     elif [ "${npieces:-0}" -eq 0 ]; then
       note "DEAD PROBE — the grain resolves no piece for $pb, so every per-piece count below is over an empty set and means nothing; reported and NOT redded here, because only --close blocks on it"
     else
-      note "pieces $npieces · verified $v · failed $f · stale $st_ · unrecorded $un ($pb)"
+      note "pieces $npieces · verified $v · failed $f · stale $st_ · unrecorded $un · unchecked $uc ($pb)"
     fi
+    # THE SET RECORD, READ AND REPORTED. M4 (round-1 diff review): three documents said this leg read
+    # the set record and nothing in here opened one — `record_for` and the orphan sweep both key on a
+    # `piece:` line, which a set record does not carry, so both walked straight past it. The
+    # set-scoped verdicts are the population a per-piece pass structurally cannot see, and on the
+    # ATTENDED path, which never calls `--close`, they were graded by nothing at all.
+    #
+    # REPORTED, never redded, for check 8's stated reason: this block classifies and `--close` blocks.
+    # The Skill says exactly that now, so the document and the code agree about which is which.
+    schk=$(printf '%s\n' "$body" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
+           | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+           | sed 's/^\[//; s/\]$//; s/,/ /g')
+    if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
+      # The run ids come from the PIECE records, so this reports on the runs that actually produced
+      # something here rather than on a roster no merge-bar run can see.
+      for rid_ in $(for r_ in $(GITLS "$rr/*.md"); do sed -n 's/^run: //p' "$r_" | head -1; done \
+                    | grep . | LC_ALL=C sort -u); do
+        srec_="$rr/set-$rid_.md"
+        if [ -z "$(GITLS "$srec_")" ]; then
+          note "no set record — run $rid_ produced pieces under $pb, which declares set-scoped checks, and nothing records whether they ran; only --close blocks on this"
+          continue
+        fi
+        smiss_=""
+        for sl_ in $schk; do
+          grep -qxF -- "leg $sl_ · verdict PASS" "$srec_" && continue
+          grep -qxF -- "leg $sl_ · verdict NA" "$srec_" && continue
+          smiss_="$smiss_ $sl_"
+        done
+        [ -z "$smiss_" ] || note "set checks unrecorded — $srec_ carries no verdict for declared check(s):$smiss_"
+        grep -q '^leg .* · verdict FAIL$' "$srec_" && note "set check FAILED — $srec_ records a failing set-scoped verdict, which is the check a monoculture passes every piece and fails here"
+      done
+    fi
+
     # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
     # silently reports coverage it no longer has.
     [ -n "$COUNTS_FOR" ] || for rc_ in $(GITLS "$rr/*.md"); do
@@ -250,6 +318,9 @@ done
       [ -e "$op" ] || note "orphan record — $rc_ describes $op, which is not in this tree; the record outlived its piece and is coverage nobody has"
     done
   fi
+done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-piece
+      # ---- reader while that reader stayed indented as its body, so the reader ran ONCE over
+      # ---- the last iteration's leftover $pb and $body. Latent while the population was one.
 
 # ---- 9: the DERIVED length budget and the drain, PRINTED. No number is written in this file.
 [ -n "$COUNTS_FOR" ] || note "steps $TOTAL_STEPS · CHECK tags $TOTAL_CHECKS · of those carrying a witness $TOTAL_WITNESS"

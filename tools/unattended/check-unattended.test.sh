@@ -1349,7 +1349,7 @@ reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING 
 hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
 
-# ---- the proposal-kind unit: check 22, the VERB SET across the documents that spell it. Each arm
+# ---- the proposal-kind unit: check 26, the VERB SET across the documents that spell it. Each arm
 # ---- removes ONE carrier and asserts THIS check speaks, because a leg that reds on everything arms
 # ---- every branch and checks nothing.
 reset_tree; mutate tools/unattended/unattended.sh '/^#   unattended[.]sh --propose /d'
@@ -1370,7 +1370,7 @@ hit "$(run)" "a declared verb is never invoked in the Skill an agent actually re
 reset_tree; mutate tools/unattended/unattended.sh 's/^VERBS_SLUG=".*"$/VERBS_SLUG=""/'
 hit "$(run)" "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing:"
 
-# ---- check 23: the parked-kind vocabulary against the call sites that write it, BOTH directions.
+# ---- check 27: the parked-kind vocabulary against the call sites that write it, BOTH directions.
 reset_tree; mutate tools/unattended/unattended.sh 's/^  park "[$]rel" decision /  park "$rel" notakind /'
 hit "$(run)" "a park() call site writes a kind the driver does not declare, and every reader of that region parses BY kind, so the row would be written and then counted by nothing:"
 

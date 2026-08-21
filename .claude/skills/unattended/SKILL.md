@@ -341,16 +341,24 @@ keepalive and no Definition of Done. Every check in the kit gate that is keyed o
 sees nothing here, and that is what "not the driver" means.
 
 **What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
-tracked files, hash-joined to the pieces, and the playbook leg reads them without knowing who wrote
+tracked files, hash-joined to the pieces, and the playbook leg reads both without knowing who wrote
 them or how. So the honest sentence is this one: **the attended path is gated on what it produced,
 the unattended path on that plus how it ran.**
+
+**And read the split exactly, because it is narrower than it sounds.** The leg CLASSIFIES and reports
+— verified, failed, stale, unrecorded, unchecked, orphan, and whether a declared set check has a
+verdict at all. What BLOCKS on any of it is `--close`, which the attended path never calls. So on this
+path those counts are evidence a human must read, and the only thing that reds the bar for you is a
+record whose shape the leg refuses. An earlier revision of this paragraph said the leg read the set
+record when nothing in it opened one; the reader who believed that stopped looking for a gate that
+was not there.
 
 Both writers take a records ROOT instead of a slug — one function, two callers, never two
 implementations:
 
 ```bash
 bash tools/unattended/unattended.sh --record-piece - --records-root <root> --path <piece> --leg <name> --verdict PASS --run <label>
-bash tools/unattended/unattended.sh --record-set - --records-root <root> --leg <name> --verdict PASS --set <hash,hash>
+bash tools/unattended/unattended.sh --record-set - --records-root <root> --leg <name> --verdict PASS --run <label> --set <hash,hash>
 ```
 
 The root is the playbook's own `records` declaration — read it from the playbook rather than choosing

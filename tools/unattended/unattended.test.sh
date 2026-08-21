@@ -177,6 +177,9 @@ step_selector = "^\\*\\*[A-Z][0-9]+\\."
 step_floor   = 1
 outputs      = ["content/pieces/**"]
 grain        = "content/pieces/*/index.md"
+records      = "content/recs"
+piece_checks = ["shape"]
+set_checks   = ["distinct"]
 curated      = "t 2026-08-01"
 ```
 PBEOF
@@ -203,6 +206,11 @@ PBEOF
 git add content >/dev/null
 readme tRecipeOk
 mutate memory/builds/tRecipeOk/README.md '/^slug: tRecipeOk$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3'
+# The Definition-of-Done fixture: a recipe build whose playbook declares a records root, a per-piece
+# check and a set check, so the two piece-scoped items have something to actually read. Two pieces,
+# because a run of one cannot distinguish "every piece" from "the piece".
+readme tDoD
+mutate memory/builds/tDoD/README.md '/^slug: tDoD$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: 2'
 readme tRecipeNoPb
 mutate memory/builds/tRecipeNoPb/README.md '/^slug: tRecipeNoPb$/a authorized-by: recipe'
 readme tRecipeGonePb
@@ -813,7 +821,7 @@ same "four overrides parked, one per pair — the scalar form kept only the last
 # ---- ever see the FINAL pair, so a first-position authorization-reachable was invisible to it.
 reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
 out=$(run --close tRun --override authorization-reachable --reason "first" --override gates-green --reason "second")
-hit "$out" "the authorization item is NOT overridable"
+hit "$out" "a Definition-of-Done item in the non-overridable set cannot be bought with --override, and --abort is the honest exit when it cannot be met - item and reason follow: authorization-reachable"
 miss "$out" "close OK"
 
 # ---- a flag left pending when argv ends keeps its EMPTY reason, so it meets the missing-reason
@@ -1676,11 +1684,11 @@ hit "$out" "authorization-reachable"
 miss "$out" "close OK"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ---- check 21: the authorization item is NOT overridable. The generic override loop accepted it,
+# ---- check 21: the NON-OVERRIDABLE SET. The generic override loop accepted its members,
 # ---- which makes the override on the authorization check BE the authorization check — and the
 # ---- protocol says in one sentence that there is no override for this one.
 reset_tree
-hit "$(run --close tRun --override authorization-reachable --reason "trust me")" "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+hit "$(run --close tRun --override authorization-reachable --reason "trust me")" "a Definition-of-Done item in the non-overridable set cannot be bought with --override, and --abort is the honest exit when it cannot be met - item and reason follow:"
 
 # ---- THE DEREFERENCE PIN. A sha is a NAME, and both levers below rewrite what it resolves to at a
 # ---- PERFECTLY HONEST anchor - so no amount of anchor hardening closes either, and an anchor fix
@@ -1733,6 +1741,13 @@ rm -rf "$gtmp"
 
 # ---- SOURCE-level: the pin is EXPORTED and every dereference on the authorization path goes through
 # ---- it. A pin that one call site skips is not a pin - that call site is the whole attack surface.
+# ---- HIGH 5 (round-1 diff review): the machine count line is selected by its SHAPE, never by
+# ---- position. `head -1` cannot fail — it just yields the wrong line, and every `${_counts#*x=}`
+# ---- below then parses to that line's first word, so the close blocks on a fabricated count.
+n=$((n+1)); grep -q "grep -m1 '\^pieces='" "$SCRIPT" \
+  || { echo "FAIL the driver does not select the counts line by shape, so a note on stdout is parsed as a count"; st=1; }
+n=$((n+1)); [ "$(grep -c 'check-playbook.sh" --counts .* | head -1' "$SCRIPT")" -eq 0 ] \
+  || { echo "FAIL the driver still takes the counts line by position"; st=1; }
 n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FAIL the driver does not export GIT_GRAFT_FILE, so a graft file rewrites its merge-base"; st=1; }
 # The wrapper moved into the kit library, which the driver and the gate leg both source, so the pin
 # is asserted THERE and the driver is asserted to reach it. Two arms, because either half alone is
@@ -2586,6 +2601,42 @@ out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS
 hit "$out" "set verdict recorded"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)" "already recorded, unchanged"
 
+# ---- HIGH 3 (round-1 diff review): the THREE FIELD GUARDS this writer alone did not carry while its
+# ---- four siblings all did. The newline is the load-bearing one: a set record is parsed line-wise by
+# ---- the Definition-of-Done reader, so a newline in --leg forges a verdict row nothing wrote — and
+# ---- the forged row can say PASS over an honest FAIL recorded a line above it.
+run --record-set tRun --records-root recs2 --run R1 --leg honest --verdict FAIL >/dev/null
+before=$(git hash-object recs2/set-R1.md)
+out=$(run --record-set tRun --records-root recs2 --run R1 --leg "$(printf 'x\nleg honest · verdict PASS')" --verdict NA)
+hit "$out" "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
+same "the forged PASS never landed" "$(git hash-object recs2/set-R1.md)" "$before"
+same "the honest FAIL is still the only verdict for that leg" "$(grep -c '^leg honest · verdict FAIL$' recs2/set-R1.md)" "1"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows:"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows:"
+
+# ---- HIGH 2: the row dropper takes NO REGEX. Both writers spelled it as a `sed` ADDRESS carrying an
+# ---- unescaped caller-supplied leg name, so a leg named `.*` matched every verdict row and erased a
+# ---- recorded FAIL on the next write. Armed on BOTH writers, because the defect was in both and a
+# ---- fix to one is a fix to neither.
+out=$(run --record-set tRun --records-root recs2 --run R1 --leg '.*' --verdict PASS)
+hit "$out" "set verdict recorded"
+same "a leg named .* erased no other row in the SET record" "$(grep -c '^leg honest · verdict FAIL$' recs2/set-R1.md)" "1"
+same "...and recorded its own" "$(grep -c '^leg [.][*] · verdict PASS$' recs2/set-R1.md)" "1"
+mkdir -p pc3; printf 'a piece\n' > pc3/one.md; git add -A >/dev/null
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg honest --verdict FAIL >/dev/null
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg '.*' --verdict PASS >/dev/null
+same "a leg named .* erased no other row in the PIECE record" \
+  "$(grep -c '^leg honest · verdict FAIL$' "$(ls recs3/*.md | head -1)")" "1"
+# ...and a leg carrying a SLASH does not abort the dropper while the append still runs, which left two
+# verdict rows for one leg on a record no reader can decide.
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg 'tools/lint.sh' --verdict PASS >/dev/null
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg 'tools/lint.sh' --verdict FAIL >/dev/null
+same "a slashed leg name leaves exactly ONE verdict row" \
+  "$(grep -c '^leg tools/lint.sh · verdict ' "$(ls recs3/*.md | head -1)")" "1"
+reset_tree
+mkdir -p recs2; git add -A >/dev/null
+run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS >/dev/null
+
 # ---- and the SLUG callers refuse without a run-state file, which is what makes the attended path a
 # ---- second CALLER rather than a second implementation.
 rm -f memory/builds/tRun/RUN.md
@@ -2666,6 +2717,124 @@ reset_tree
 out=$(run --preflight tFresh --keepalive-id k1)
 hit "$out" "preflight OK"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+reset_tree
+
+# ---- THE TWO PIECE-SCOPED DEFINITION-OF-DONE ITEMS, exercised through `--close` for the first time.
+# ---- Both shipped with NO arm at all: the round-1 diff review found their reader certified pieces
+# ---- nothing had checked, and nothing in this suite could have noticed. Every arm below asserts a
+# ---- SPECIFIC message rather than a green close — this fixture's close is unmet for reasons that
+# ---- have nothing to do with pieces, so a green would prove something else entirely.
+dod_pieces() { # make N pieces under the playbook's grain and record a PASS for the declared leg
+  local i=1
+  while [ "$i" -le "${1:-2}" ]; do
+    mkdir -p "content/pieces/p$i"; printf 'piece %s\n' "$i" > "content/pieces/p$i/index.md"
+    i=$((i + 1))
+  done
+  git add -A >/dev/null && git commit -qm pieces --no-verify
+  for p in content/pieces/*/index.md; do
+    run --record-piece tDoD --path "$p" --leg shape --verdict PASS >/dev/null
+  done
+}
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+
+# U6 AC1 - the VACUITY GUARD, ordered first because "every piece is verified" is vacuously true over
+# no pieces at all.
+hit "$(run --close tDoD)" "this run produced no piece under the playbook's declared grain, and 'every piece is verified' is vacuously true over none of them, so completeness cannot be read from it:"
+
+# U6 AC4 - the PASSING direction. Two pieces, each hash-joined, each recording a PASS for the leg the
+# playbook declares. Without this arm every red below is satisfied by an item that blocks on anything.
+dod_pieces 2
+out=$(run --close tDoD)
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: pieces-complete"
+
+# B1's TERM 2b - a record carrying NO verdict for a DECLARED leg. This is the blocker: the census
+# tested for the ABSENCE of a FAIL, so this state read as verified and the item certified it.
+sed -i '/^leg /d' content/recs/*.md
+hit "$(run --close tDoD)" "a piece this run produced records no verdict for a leg its playbook DECLARES, so the check was never run and 'verified' would be a word about provenance alone:"
+for p in content/pieces/*/index.md; do run --record-piece tDoD --path "$p" --leg shape --verdict PASS >/dev/null; done
+
+# U6 AC5 - a hash-fresh piece recording a FAILING verdict, and its message is DISTINCT from the
+# staleness one. Two states that block for different reasons must not share a sentence.
+run --record-piece tDoD --path content/pieces/p1/index.md --leg shape --verdict FAIL >/dev/null
+out=$(run --close tDoD)
+hit "$out" "a piece this run produced records a FAILING leg verdict, so its declared checks ran and one of them said no:"
+miss "$out" "is STALE - its record describes bytes the piece no longer has"
+run --record-piece tDoD --path content/pieces/p1/index.md --leg shape --verdict PASS >/dev/null
+
+# U6 AC2 - STALE: the piece moved after its record was written.
+printf 'edited after the record\n' >> content/pieces/p1/index.md
+git add -A >/dev/null && git commit -qm edit --no-verify
+hit "$(run --close tDoD)" "a piece this run produced is STALE - its record describes bytes the piece no longer has, so the verdict on it is about a different file:"
+run --record-piece tDoD --path content/pieces/p1/index.md --leg shape --verdict PASS >/dev/null
+
+# U6 AC7 - `pieces-complete` is NOT overridable. Ratified as an acceptance criterion by this build's
+# own spec and never implemented until the arms were written; only the authorization item was.
+hit "$(run --close tDoD --override pieces-complete --reason 'we would rather not')" "a Definition-of-Done item in the non-overridable set cannot be bought with --override, and --abort is the honest exit when it cannot be met - item and reason follow:"
+
+# U7 AC2 - a DECLARED set check with no verdict at all. The item used to require only that a set
+# record EXIST and carry no FAIL, so one NA on an undeclared leg satisfied it.
+run --record-set tDoD --leg something-undeclared --verdict NA >/dev/null
+hit "$(run --close tDoD)" "the playbook declares a set-scoped check this run's set record carries no verdict for, so the population a per-piece review structurally cannot see went unmeasured under a record that looks complete - declared and unrecorded:"
+
+# U7 AC3 - a DECLARED set check recording FAIL, with its own message.
+run --record-set tDoD --leg distinct --verdict FAIL >/dev/null
+hit "$(run --close tDoD)" "a set-scoped check recorded a FAILING verdict, and these are the checks that see what a per-piece review cannot - a monoculture passes every piece and fails here:"
+
+# U7 AC1 - the PASSING direction for the set item.
+run --record-set tDoD --leg distinct --verdict PASS >/dev/null
+out=$(run --close tDoD)
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
+
+# U6 AC3 / AC6 - THE RUN SCOPE. The tree holds pieces under the grain and NONE of them belongs to
+# this run, which is both "a second run over a tree already holding run 1's pieces" and "the tree has
+# N and this run produced none". Membership is derived from each record's own `run:` line, so a run is
+# never answerable for a piece somebody else left here.
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+mkdir -p content/pieces/q1; printf 'not this run\n' > content/pieces/q1/index.md
+git add -A >/dev/null && git commit -qm other --no-verify
+run --record-piece tDoD --records-root content/recs --path content/pieces/q1/index.md --leg shape --verdict PASS --run someoneElse >/dev/null
+git add -A >/dev/null && git commit -qm otherrec --no-verify
+hit "$(run --close tDoD)" "this run produced no piece under the playbook's declared grain, and 'every piece is verified' is vacuously true over none of them, so completeness cannot be read from it:"
+# ...and the same tree with THIS run's pieces added stops blocking on it, so the arm above is about
+# the scope and not about an enumerator that counts nothing.
+dod_pieces 2
+miss "$(run --close tDoD)" "'every piece is verified' is vacuously true over none of them"
+
+# U5 AC10 - a NON-ASCII piece path still joins. `record_path_of` folds `/` to `~` to name the record,
+# and a byte outside ASCII survives that untouched; without an arm the claim rested on reading the
+# transform rather than on running it.
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+mkdir -p "content/pieces/pièce-é"; printf 'accented\n' > "content/pieces/pièce-é/index.md"
+git add -A >/dev/null && git commit -qm accented --no-verify
+out=$(run --record-piece tDoD --path "content/pieces/pièce-é/index.md" --leg shape --verdict PASS)
+hit "$out" "piece verdict recorded"
+same "the accented piece produced exactly one record" \
+  "$(grep -l 'pièce-é' content/recs/*.md 2>/dev/null | grep -c .)" "1"
+same "...and the record names the accented path back, byte for byte" \
+  "$(sed -n 's/^piece: //p' "$(grep -l 'pièce-é' content/recs/*.md | head -1)" | head -1)" \
+  "content/pieces/pièce-é/index.md"
+
+# U7 AC7 - N of ONE. Set checks still RUN: the population a per-piece pass cannot see is not defined
+# by being larger than one, and an implementation that skipped the singleton would be green here for
+# the wrong reason.
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+dod_pieces 1
+run --record-set tDoD --leg distinct --verdict FAIL >/dev/null
+hit "$(run --close tDoD)" "a set-scoped check recorded a FAILING verdict, and these are the checks that see what a per-piece review cannot - a monoculture passes every piece and fails here:"
+# ...and the state the NEXT block was written against is handed back deliberately: two pieces, each
+# recorded, and a PASSING set verdict over them. A bare reset here left the arm below asserting a
+# superseded set over a tree with no pieces in it at all.
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+dod_pieces 2
+run --record-set tDoD --leg distinct --verdict PASS >/dev/null
+
+# L1 - the SUPERSEDED set. Re-record a piece and the set verdict now describes a member list that is
+# no longer this run's pieces. The `set:` line had no reader at all, so the state its own comment
+# named had no detector.
+printf 'moved again\n' >> content/pieces/p2/index.md
+git add -A >/dev/null && git commit -qm move --no-verify
+run --record-piece tDoD --path content/pieces/p2/index.md --leg shape --verdict PASS >/dev/null
+hit "$(run --close tDoD)" "the set verdict describes a SUPERSEDED set - its recorded member list is not this run's pieces as they now stand, so a passing set check was taken over a population that has since changed:"
 reset_tree
 
 # ---- the playbook-authoring unit: THE ORDERING PROPERTY. A run that authors its own instructions and
@@ -3168,8 +3337,8 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- catch is measured in tens of arms, never in ones.
 # ----
 # ---- MEASURED unsharded 519, shard one 205, shard two 327. 205 + 327 - 519 = 13 prologue arms, both regions pay them; unchanged by this merge, which is what says the added arms distributed across both regions rather than piling into one.
-# ---- RE-MEASURED at the playbook-mode merge, 2026-08-21, node d: unsharded 626, shard one 208, shard two 432, so 208 + 432 - 626 = 14 prologue arms. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
-FLOOR_ASSERTIONS=607
+# ---- RE-MEASURED after the round-1 review fold, 2026-08-21, node d: unsharded 656, shard one 209, shard two 462, so 209 + 462 - 656 = 15 prologue arms. Fourteen of the added arms are the two piece-scoped Definition-of-Done items, which shipped with none. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
+FLOOR_ASSERTIONS=636
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -3189,9 +3358,9 @@ FLOOR_ASSERTIONS=607
 #
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
-PROLOGUE_ARMS=14
-FLOOR_SHARD_1=201
-FLOOR_SHARD_2=419
+PROLOGUE_ARMS=15
+FLOOR_SHARD_1=202
+FLOOR_SHARD_2=448
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

@@ -94,7 +94,29 @@ CREATION is a `prompt` run, because making instructions and following them are t
 authorizations. The fifth is the ATTENDED path, which writes no run-state file and calls no driver
 verb — it is not in the routing table for that reason, since listing it beside four mode values would
 teach a reader to look for a mode it does not have. It shares the per-piece and set records with the
-unattended paths, which is the only surface the merge bar grades it on.
+unattended paths, which is the only surface the merge bar sees it through — and READ THAT EXACTLY,
+because an earlier revision of this sentence said "grades" and the leg opened no set record at all.
+The leg CLASSIFIES and reports; `--close` is what blocks, and the attended path never calls it. So
+the counts are evidence a human must read, and the only thing that reds the bar on this path is a
+record whose shape the leg refuses.
+
+## What `verified` means, and what it used to mean
+
+`verified` is a piece whose record hash-joins it AND carries a PASS — or an explicit NA — for every
+leg the playbook's `piece_checks` declares. Anything short of that is `unchecked`, the sixth state,
+and `pieces-complete` blocks on it.
+
+It shipped meaning "the hash matches and nobody wrote FAIL", with `piece_checks` read by nothing
+anywhere in the kit while three documents asserted the join. A record carrying no verdict at all
+counted as verified. Two properties of the test fixture hid it from 43 assertions and a 92-leg bar:
+every fixture record carried a PASS, so *no FAIL* and *every declared leg passed* were the same
+observation; and the population was one playbook, so the per-piece reader sitting outside the
+population loop ran anyway. Round-1 diff review, 2026-08-21, both blockers.
+
+The same join, one population up: `set-checks-recorded` required a set record to EXIST and carry no
+FAIL, so a single `NA` on a leg the playbook never declared satisfied it. It now requires a PASS or an
+explicit NA per declared set check, and compares the record's `set:` member list against a live
+re-derivation so a verdict taken over a superseded population reds.
 
 ## Shared seams
 

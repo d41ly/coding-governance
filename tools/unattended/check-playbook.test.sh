@@ -62,7 +62,7 @@ n=$((n+1))
 [ -z "$(cd "$W" && git ls-files '*/RUN.md' 'RUN.md' 2>/dev/null)" ] \
   || bad "the scratch tree carries a run-state file, so 'the records are read with no run to name' is not what the census arm below observed"
 n=$((n+1))
-run | grep -qE 'pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0' \
+run | grep -qE 'pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0 · unchecked 0' \
   || bad "the leg did not report the per-piece census over the tracked records, so the attended path's only gated surface is ungraded"
 
 probe() { # label · expected check · sed program · expected message signature
@@ -122,26 +122,50 @@ probe "grain, no records"   8 's|^records .*||' "a playbook declares a piece gra
 cp "$KEEP" "$F"
 P1="$W/tools/unattended/fixture-pieces/one/piece.md"
 R1=$(ls "$W"/tools/unattended/fixture-records/*one*.md 2>/dev/null | head -1)
-counts() { run | grep -oE 'pieces [0-9]+ · verified [0-9]+ · failed [0-9]+ · stale [0-9]+ · unrecorded [0-9]+' | head -1; }
+counts() { run | grep -oE 'pieces [0-9]+ · verified [0-9]+ · failed [0-9]+ · stale [0-9]+ · unrecorded [0-9]+ · unchecked [0-9]+' | head -1; }
 PKEEP="$TMP/p1.keep"; RKEEP="$TMP/r1.keep"
 if [ -n "$R1" ] && [ -f "$P1" ]; then
   cp "$P1" "$PKEEP"; cp "$R1" "$RKEEP"
-  [ "$(counts)" = "pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0" ] && ok \
+  [ "$(counts)" = "pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0 · unchecked 0" ] && ok \
     || bad "the reader's clean state is not two verified pieces — every state arm below is measured against this one"
 
   printf '\nedited after its record\n' >> "$P1"
-  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 1 · unrecorded 0" ] && ok \
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 1 · unrecorded 0 · unchecked 0" ] && ok \
     || bad "editing a piece after its record did not move it to STALE — the hash join is not joining"
   cp "$PKEEP" "$P1"
 
   mv "$R1" "$R1.hidden"
-  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 0 · unrecorded 1" ] && ok \
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 0 · unrecorded 1 · unchecked 0" ] && ok \
     || bad "removing a record did not move its piece to UNRECORDED"
   mv "$R1.hidden" "$R1"
 
   sed -i 's/verdict PASS/verdict FAIL/' "$R1"
-  [ "$(counts)" = "pieces 2 · verified 1 · failed 1 · stale 0 · unrecorded 0" ] && ok \
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 1 · stale 0 · unrecorded 0 · unchecked 0" ] && ok \
     || bad "a recorded FAIL verdict did not move its piece out of VERIFIED — verified would then be a hash-join state alone, which is the defect that made fork 5 implemented by nothing"
+  cp "$RKEEP" "$R1"
+
+  # ---- B1 (round-1 diff review): the SIXTH state. `verified` used to mean "the hash matches and
+  # ---- nobody wrote FAIL", so a record carrying NO verdict for a leg the playbook DECLARES counted
+  # ---- as verified and `pieces-complete` certified pieces nothing had checked. The fixture always
+  # ---- carried a PASS, so "no FAIL" and "every declared leg passed" were the same observation in the
+  # ---- only tree that tested it — which is why 43 assertions and a 92-leg bar were green over it.
+  sed -i '/^leg /d' "$R1"
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 0 · unrecorded 0 · unchecked 1" ] && ok \
+    || bad "a record carrying NO verdict for a DECLARED leg still counted as verified — the piece_checks join is not joining, and pieces-complete would certify a piece nothing checked"
+  cp "$RKEEP" "$R1"
+
+  # ...and an EXPLICIT NA satisfies a declared leg, where an ABSENT row does not. That distinction is
+  # the whole rule: NA is a judgement somebody recorded about this piece, absence is nothing at all.
+  sed -i 's/^leg \(.*\) · verdict PASS$/leg \1 · verdict NA/' "$R1"
+  [ "$(counts)" = "pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0 · unchecked 0" ] && ok \
+    || bad "an EXPLICIT NA on a declared leg did not satisfy it — NA and absence are then the same thing, and a playbook cannot record that a check does not apply to a piece"
+  cp "$RKEEP" "$R1"
+
+  # ...and a verdict for a leg the playbook does NOT declare satisfies nothing. Without this the join
+  # is satisfied by any row at all, which is the shape it replaced wearing a longer predicate.
+  sed -i 's/^leg .* · verdict PASS$/leg not-declared-anywhere · verdict PASS/' "$R1"
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 0 · unrecorded 0 · unchecked 1" ] && ok \
+    || bad "a verdict naming an UNDECLARED leg satisfied the join, so any row at all counts and the declaration is decorative"
   cp "$RKEEP" "$R1"
 
   mv "$P1" "$P1.hidden"
@@ -167,11 +191,114 @@ fi
 seed_out=$(run | grep -c 'canon 11 section' || true)
 [ "$seed_out" = 1 ] && ok || bad "the leg did not report the shrunken canon count it derived"
 
+# ---- M4 (round-1 diff review): THE SET RECORD IS READ. Three documents said this leg read it while
+# ---- nothing in it opened one — `record_for` and the orphan sweep both key on a `piece:` line, which
+# ---- a set record does not carry, so both walked past it. On the ATTENDED path, which never calls
+# ---- `--close`, the set-scoped verdicts were graded by nothing at all.
+# ----
+# ---- GREEN CONTROL FIRST: the shipped fixture now carries a complete set record, so silence here is
+# ---- a reader finding nothing wrong rather than a reader that never ran. The three red arms below
+# ---- are what tell those apart.
+SR="$W/tools/unattended/fixture-records/set-dScriptedRepeat.md"
+n=$((n+1)); [ -f "$SR" ] || bad "the fixture ships no set record, so every arm below would report a missing one and prove nothing about the reader"
+out=$(run)
+n=$((n+1)); grep -qF -- "no set record" <<<"$out" && bad "the complete fixture still reports a missing set record"
+n=$((n+1)); grep -qF -- "set checks unrecorded" <<<"$out" && bad "the complete fixture reports an unrecorded declared set check"
+
+# ...the record REMOVED. The playbook declares a set check, pieces exist, and nothing records whether
+# it ran — which is exactly the attended path's blind spot.
+( cd "$W" && git rm -q tools/unattended/fixture-records/set-dScriptedRepeat.md )
+n=$((n+1)); grep -qF -- "no set record" <<<"$(run)" \
+  || bad "removing the set record produced no report — the leg is not reading set records at all"
+( cd "$W" && git checkout -q HEAD -- tools/unattended/fixture-records/set-dScriptedRepeat.md 2>/dev/null || git reset -q HEAD -- tools/unattended/fixture-records/set-dScriptedRepeat.md )
+
+# ...the record PRESENT but carrying no verdict for the DECLARED check. A record that merely exists is
+# the shape `set-checks-recorded` used to accept, one population up from the per-piece blocker.
+sed -i 's/^leg fixture-distinct · verdict PASS$/leg something-else · verdict PASS/' "$SR"
+n=$((n+1)); grep -qF -- "set checks unrecorded" <<<"$(run)" \
+  || bad "a set record carrying a verdict only for an UNDECLARED check was accepted, so any row at all counts"
+sed -i 's/^leg something-else · verdict PASS$/leg fixture-distinct · verdict PASS/' "$SR"
+
+# ...and a recorded FAIL is reported. This is the check a monoculture passes every piece and fails on.
+sed -i 's/^leg fixture-distinct · verdict PASS$/leg fixture-distinct · verdict FAIL/' "$SR"
+n=$((n+1)); grep -qF -- "set check FAILED" <<<"$(run)" \
+  || bad "a FAILING set-scoped verdict went unreported"
+sed -i 's/^leg fixture-distinct · verdict FAIL$/leg fixture-distinct · verdict PASS/' "$SR"
+n=$((n+1)); grep -qF -- "set check FAILED" <<<"$(run)" && bad "the restore did not take, so the arm above passes on every later run"
+
+# ---- B2 (round-1 diff review): THE READER MUST RUN FOR EVERY PLAYBOOK, not for the last one.
+# ---- The whole per-piece block sat AFTER the `done` closing the population loop while indented as
+# ---- its body, so it ran once over the previous iteration's leftover variables. With a population
+# ---- of one — which is every tree that ships this fixture and nothing else — inside-the-loop and
+# ---- after-the-loop are the same program, which is why 43 assertions and a 92-leg bar were green.
+# ----
+# ---- The arm is POSITIONAL by construction: the violating playbook is placed where `git ls-files`
+# ---- sorts it FIRST, so under the defective code the fixture wins the leftover variables and the
+# ---- violation is never read. A second playbook that sorted last would pass on the broken code too.
+cp "$KEEP" "$F"
+mkdir -p "$W/content"
+cat > "$W/content/pb-first.md" <<'PBTWO'
+# a second playbook, sorting BEFORE the kit's fixture
+
+```toml
+step_selector = "^[*][*]F[0-9]+[.]"
+step_floor    = 1
+outputs       = ["content/own/**"]
+grain         = "content/own/*/piece.md"
+piece_checks  = []
+set_checks    = []
+legs          = { }
+coverage      = "dark"
+curated       = "the round-1 fold, node d, 2026-08-21"
+```
+
+**F1.** the only step. `CHECK it exists · witness none`
+
+## 1. Identity and provenance
+none — a fixture for the multi-playbook arm.
+## 2. Ground rules
+none — see section 1.
+## 3. Inputs and preconditions
+none — see section 1.
+## 4. Outputs
+none — see section 1.
+## 5. The step checklist
+**F1.** the only step. `CHECK it exists · witness none`
+## 6. The producer recipe
+none — see section 1.
+## 7. Per-piece checks
+none — see section 1.
+## 8. Set-scoped checks
+none — see section 1.
+## 9. Declared gate legs
+none — see section 1.
+## 10. Ruled out — do not re-try
+none — see section 1.
+## 11. Measured failure modes
+none — see section 1.
+## 12. Corrections to this file
+none — see section 1.
+PBTWO
+( cd "$W" && git add -A >/dev/null && git commit -qm "second playbook" )
+n=$((n+1))
+[ "$(cd "$W" && git ls-files | grep -n 'content/pb-first.md' | cut -d: -f1)" -lt \
+  "$(cd "$W" && git ls-files | grep -n 'playbook.fixture.md' | cut -d: -f1)" ] \
+  || bad "the second playbook does not sort before the fixture, so this arm cannot distinguish inside-the-loop from after-the-loop"
+out=$(run)
+n=$((n+1))
+grep -qF -- "population 2 playbook" <<<"$out" \
+  || bad "the leg did not see two playbooks, so the arm below would pass over a population it never enumerated"
+n=$((n+1))
+grep -qF -- "a playbook declares a piece grain and no records root" <<<"$out" \
+  || bad "the FIRST-sorting playbook's grain-without-records violation was never read — the per-piece reader is running outside the population loop and grading only the last playbook"
+( cd "$W" && git rm -q content/pb-first.md && git commit -qm "drop second playbook" )
+cp "$KEEP" "$F"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, in the shape the bar's
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=43
+FLOOR_ASSERTIONS=56
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

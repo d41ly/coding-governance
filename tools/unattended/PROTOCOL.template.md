@@ -100,6 +100,13 @@ by a set that resolves to nothing.
 Absent or unreachable authorization → the run does not start. There is no override for this one: an
 override on the authorization check is the authorization check.
 
+**A SECOND item joined that set**, and the driver holds it as a declared list rather than a name in a
+case arm. `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
+produced what the owner asked for, over content nothing else on the merge bar can grade, so an
+override on it is the run certifying its own output. `--abort` is the honest exit when it cannot be
+met. The build that introduced the item ratified this as an acceptance criterion and then shipped
+without it — found by writing the arms that item had never had.
+
 ## 2. The run-state file
 
 `<MEMORY_ROOT>/builds/<slug>/RUN.md`, split mechanically rather than by discipline.
@@ -356,8 +363,11 @@ what preserves the strong claim wherever the strong claim is available.
   reachable only by hand-editing a file this kit calls generated.
 - `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
   piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
-  exact-line idempotence. The writer takes a records ROOT rather than a slug, so the attended path
-  reaches the same function; the VERB requires a run-state file and is therefore unattended-only.
+  exact-line idempotence. The writer takes a records ROOT rather than a slug, and `--records-root`
+  reaches it BEFORE the slug and run-state checks — so the attended path calls the same function with
+  no run at all, which is what makes it a second CALLER rather than a second implementation. Without
+  that flag the verb resolves a slug and requires a run-state file. An earlier revision of this line
+  called the verb "unattended-only", which contradicted its own first half and the code.
 - `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
   that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
   structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
