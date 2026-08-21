@@ -19,9 +19,16 @@ tools/unattended/unattended.sh	9	1	cannot stage the run-state file, and the gate
 #       fails over a file that exists and was just read. The phase cannot be empty here — `is_terminal`
 #       has already matched it against the closed PHASES_TERMINAL set — so reaching this needs a git
 #       or filesystem fault, which no fixture in this suite can produce.
+#   The 27 row's ORDINAL moved 2 -> 4 on 2026-08-20, and the branch it pins did not change. Two
+#   `fail 27` branches were inserted ABOVE it inside `observe_anchor` when the remote observation
+#   became bounded, and ordinals are assigned by line order within a check — so every pinned row
+#   below an insertion point goes stale at once, with a message that reads like a rewording. Both new
+#   branches are ARMED rather than pinned, because both are reachable: a dead TMPDIR makes the
+#   scratch-file guard fire, and a stub `git` exiting 124 drives the timeout refusal without spending
+#   the declared bound.
 #   29  `GIT mv -f` after both pre-write tests cleared the destination. MEASURED: the two reachable
 #       failure modes were the ones now refused above it (a directory destination exits 0 and files
 #       the record INSIDE it; a differing file is refused by name), so what is left is an index or
 #       filesystem fault. Trying to arm this is what FOUND the directory case.
-tools/unattended/unattended.sh	27	2	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
+tools/unattended/unattended.sh	27	4	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
 tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved

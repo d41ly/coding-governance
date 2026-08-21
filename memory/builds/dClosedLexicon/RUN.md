@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+halt-code: fork-unresolvable
 witness: 365be1c7d48e74b75defb60e2b8fdbee8a917a89
 phase: ABORTED
 keepalive: 6d0f3c29

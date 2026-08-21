@@ -73,21 +73,40 @@ after these vetoes, in order. Discard any option that:
 2. needs a new external dependency, install location, public surface, or a change to a governance carrier;
 3. widens a security, data or write surface beyond what the unit's risk tier priced.
 
-Vetoes 2 and 3 are owner turns. Tie-break: fewer open questions, then reuse of a seam M5 found. **No survivors →
-park**, never the least-bad option.
+Vetoes 2 and 3 are owner turns, **and that COLLAPSES onto the park rule rather than sitting beside it**: if the
+only surviving option trips one of them, no resolver the mandate delegates exists, so the fork is parked exactly as
+if nothing had survived. A veto is not a licence to take the vetoed option, and "owner turn" three lines above the
+park sentence has been read as though it were. Tie-break: fewer open questions, then reuse of a seam M5 found.
+**No survivors → park**, never the least-bad option.
+
+**A FACT-QUESTION is a fork a stated PROBE decides, and the one kind a run may resolve without an owner even
+where judgment is otherwise reserved.** Mark it with the `FACT-QUESTION · ` label prefix the §8 readers recognise,
+and it is legal only when the spec names the probe, the observation that decides it, and a LIVENESS assertion
+showing that probe can produce a negative result. Take the winner only when it falls out of the observation with no
+further judgment; the moment a preference is needed it is not a fact question and the rule above governs.
+
+**A probe READS. It does not build.** It measures over artifacts that already exist, and it may not construct an
+arm of the fork to see how that arm behaves — for two reasons, both structural: building an arm is not one of M6's
+five pass kinds, so it inherits no commit, no regrounding and no gate; and it puts code before the fork is
+resolved, which this file calls a rewrite rather than a decision.
+
+**And the counter-rule, because the evidence demands it.** An observation that decides a fork by making some
+signal read ZERO is refused by name: that is the vacuous-selector class, and a probe cannot distinguish "the
+predicate is satisfied" from "the predicate matched nothing". One of this corpus's real forks was deliberately
+resolved AGAINST the better measurement for exactly that reason, so a testing rule without this exception would
+have got it wrong.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. **Keep §8's first non-blank line machine-legal** (`none — the forks below are
-RESOLVED …`): the hygiene gate reads that line and nothing else, so without it the spec reds the moment its status
-goes CLOSED.
+decision the owner did not make. The mark must be the documented SHAPE — the word, then
+`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
+item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 
 **Which.** Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
 authored this run, is unreviewed.
 
-**Not the harness.** `tools/workflows/tier2-review.js` reviews DIFFS with code-shaped lenses. It cannot be
-pointed at a document, and calling a spec "reviewed" by it is false.
+**Not the harness.** `tier2-review.js` reviews DIFFS; a spec is not code, so calling one reviewed by it is false.
 
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next user prompt to reset it: three specs audited by direct spawns exhaust it mid-set,
@@ -105,6 +124,8 @@ verdict line; write it anyway, because M9 derives from these records. **Carry th
 `**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
 answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
+
+**A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is PROMOTED** to a unit of this build, specced at its tier and built; not parked, not waived, not re-reviewed, and audited as a SPEC, which is what makes promotion terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README.
 
 ## M5 — Recall and reuse
 
@@ -158,9 +179,8 @@ the other's output either way; (3) neither touches a shared mutable record — `
 `memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
 cannot write both path lists down, the work is not known to be disjoint — sequence it.
 
-Clause 3 once named the build README outright, which was VACUOUS not strict: every pass changes a spec header it
-is regenerated from. What collides is two passes RENDERING one artifact, or one editing a generator another runs. The fan-out and concurrency
-CEILINGS are `memory/guides/REVIEW-PROTOCOL.md`'s; this is about WHICH work is parallel, never HOW MUCH.
+The fan-out and concurrency CEILINGS are the review protocol's; this is about WHICH work is parallel, never HOW
+MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in the memory-tree README.
 
 ## M7 — Regrounding
 
@@ -221,7 +241,7 @@ from, the line does not go in.**
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
-| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver |
+| open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
 
 **Completeness test, the only one that matters:** every row has a source on disk. A field you cannot cite a source
@@ -263,21 +283,8 @@ the passes that set does name — it is what "a spec authored" costs when the sp
 first — and under a mandate the run occupies the `RESEARCHING` and `TESTING` positions while doing it. Commit
 boundaries and reground points stay exactly where M6 and M7 put them.
 
-**Find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
-three differing in MECHANISM is the shape; stop where a further candidate would differ only in detail. "Only one
-mechanism exists here" is a legitimate answer to RECORD, never a quota to fill — and it is a claim, so it owes the
-same evidence a pick does.
-
-**TEST before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
-refute it — a probe, a fixture, a measurement against the real tree — never by argument, and never by a test every
-candidate passes. Write down what would make each candidate LOSE before running anything: a test whose result
-cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar
-is full of gates against, one level up.
-
-**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after M3's
-vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your authority holds
-here too — a candidate set whose options differ in WHAT GETS BUILT is a scope fork, and scope is not delegated.
-
-**Record the LOSS, not just the win.** §10 already names the seam and the recall terms; this section adds one thing
-to it — for each candidate tested and rejected, the test that rejected it. A rejected candidate with no recorded
-test is indistinguishable from one nobody tried, and the next build pays to re-run it.
+**The rest of M12 is one hop away**, in the memory-tree kit's `README.md` under the build method's displaced
+sections: finding candidates that differ in MECHANISM, testing what DISCRIMINATES before choosing, choosing by
+M3's rule, and recording the LOSS as well as the win. It is procedure a run reads when it actually reaches this
+section, and this file is re-read WHOLE at every pass boundary — so rarely-needed procedure is exactly what
+displacement is for. The RULES that bind stayed here: no new pass kind, and M3's limit on your authority.

@@ -61,7 +61,10 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+# FORK_MARK_CUTOFF sits between the two fixture eras for the same reason STREAMS_CUTOFF does: the
+# REAL cutoff is deliberately set ahead of every landed spec, so the tightened section-8 reader is
+# exercised here or nowhere.
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -221,7 +224,7 @@ printf '# t61
 
 ## 8. Open questions
 
-### Q — RESOLVED at authoring
+### Q — a question · RESOLVED (owner, 2026-08-10): settled at authoring
 
 body
 
@@ -256,6 +259,27 @@ printf '# t63
 - rev-1 · first
 ' \
   > "$D/spec/2026-08-10-spec-tFixture-63.md"                                   # §8 at ## 7. -> REDS only if keyed on TITLE
+# PAST the cutoff, WITH items, one marked and one not: the per-item message, which no prose-only
+# fixture can reach. The marked item carries its mark on a CONTINUATION line, which is where this
+# corpus actually puts it — a fixture marking the opening line would pass under the loose reader too
+# and would prove nothing about the tightening.
+printf '# t65
+
+**Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
+
+## 8. Open questions
+
+none - the forks below are RESOLVED in place.
+
+- **F1 — answered?** options and a recommendation.
+  RESOLVED (owner, 2026-08-10): picked A.
+
+- **F2 — answered?** options, and nobody signed it.
+
+## 9. Revision log
+
+- rev-1 · first
+'   > "$D/spec/2026-08-10-spec-tFixture-65.md"                                   # the PARKED gap: a fork below a `none` line, undetectable
 printf '# t64
 
 **Status:** CLOSED · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture
@@ -439,6 +463,27 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
   > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
 
 
+# CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
+# engine selects its population with `git ls-files`, so a fixture written after this commit is
+# UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
+# the four arms over them failed — which is how this suite went red at HEAD.
+mkdir -p "$D/reviews"
+# CHECK 22, four red fixtures plus a conforming control and a grandfather. Each differs from the
+# control ONLY in its verdict token: a fixture that also moved the filename or the binding line could
+# red for a reason that has nothing to do with the verdict, and would still look like coverage.
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: CLEAN\n\nbody\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-1.md"            # conforming -> silent
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\nbody with no verdict at all\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-2.md"            # no verdict -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: SHIP WITH FIXES\n\nbody\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-3.md"            # off-set token -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED\n\nb\n\n## Verdict: CLEAN\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-4.md"            # two verdicts -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED - 2 blockers, 1 high\n\nb\n' \
+  > "$D/reviews/2026-08-10-review-ARCH-tFixture-1-5.md"            # token plus a tally -> red
+printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE the cutoff\n' \
+  > "$D/reviews/2026-08-01-review-ARCH-tFixture-1-6.md"            # grandfathered -> silent
+
 git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
@@ -468,18 +513,42 @@ hit  'tFixture-13.md (tracked but missing from worktree'
 hit  'tFixture-14.md (unfilled skeleton placeholder'
 miss 'tFixture-15.md ('
 miss 'tFixture-43.md ('                       # every §8 item RESOLVED satisfies a terminal status
-hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'
+# THE CUTOFF BOUNDARY, and these four arms are it. 44 and 46 are dated 2026-08-01, BEFORE the
+# fixture cutoff, so they keep the loose first-line wording; 60 and 63 are dated 2026-08-10 and
+# get the per-item wording. Same defect, two eras, two messages — which is what proves the gate
+# is dated rather than merely strict.
+hit  'tFixture-44.md (terminal Status with unresolved §8 Open questions'   # dated BEFORE the cutoff
 miss 'tFixture-45.md ('                       # a ### sub-head fork, RESOLVED, satisfies a terminal status
 hit  'tFixture-46.md (terminal Status with unresolved §8 Open questions'
-hit  'tFixture-60.md (terminal Status with unresolved §8 Open questions'
+hit  'tFixture-60.md (terminal Status and a §8 carrying neither an item nor a none form'   # PAST the cutoff: prose only
 miss 'tFixture-61.md ('                      # resolved on Tier-1 is as green as resolved on Tier-2
 hit  'tFixture-62.md (header rev-2 not logged in the §9 Revision log)'
 # THE ARM THAT SEPARATES the fix from a half-fix: Tier-1 is canon-exempt, so a Tier-1 spec may
 # legally number Open questions anything. Keyed on the NUMBER this is silent and the rule stays
 # bypassable by doing exactly what the same gate permits; keyed on the TITLE it reds.
-hit  'tFixture-63.md (terminal Status with unresolved §8 Open questions'
+hit  'tFixture-63.md (terminal Status and a §8 carrying neither an item nor a none form'   # PAST the cutoff: prose only, §8 titled ## 7.
 # ...and a range that never opens must SAY SO: silence and a resolved fork were the same byte.
 hit  'tFixture-64.md (terminal Status and no Open questions section found'
+# ---- check 22. The GRANDFATHER arm is what proves the cutoff is a date and not a switch, and the
+# ---- token-plus-tally arm is what proves the check grades a MEMBER rather than a prefix — without
+# ---- it, a predicate anchored on the leading word would pass and 44 corpus records would too.
+# the check's own header text, which is what check-arms signs the branch with. The per-file lines
+# below say WHICH record; this says the branch fired at all.
+hit  'review records at/after REVIEW_VERDICT_CUTOFF whose verdict line is missing, duplicated, or outside the closed set'
+hit  'review-ARCH-tFixture-1-2.md (no `## Verdict:` line'
+hit  'review-ARCH-tFixture-1-3.md (verdict outside the closed set'
+hit  'review-ARCH-tFixture-1-4.md (2 `## Verdict:` lines'
+hit  'review-ARCH-tFixture-1-5.md (verdict outside the closed set'
+miss 'review-ARCH-tFixture-1-1.md ('
+miss 'review-ARCH-tFixture-1-6.md ('
+# ---- THE PARKED GAP, PINNED AS A GAP. This fixture opens §8 with a `none` line and then carries two
+# ---- option bullets, one marked and one not - an unresolved fork below an honest-looking `none`.
+# ---- Neither reader catches it, and this arm says so rather than leaving the case unmentioned.
+# ---- The per-item walk that WOULD catch it was withdrawn on measurement: this corpus does not
+# ---- distinguish a fork bullet from an option bullet, so a per-item walk called a RESOLVED fork
+# ---- unresolved on a live tracked spec, and any label-shape discriminator under-counts instead,
+# ---- which is worse. Closing it needs §8 to have a regular shape, which is a scope change.
+miss 'tFixture-65.md (terminal Status'
 # ...while the canon check STAYS Tier-2-only. tFixture-5's `## Whatever` and its miss arm are that
 # control, and it is what the cut still guards.
 hit  'tFixture-16.md (## sections differ'
@@ -1351,6 +1420,32 @@ n=$((n+1))
 # ---- key -- the exact hand-kept-list drift the derived loop was written to remove. A reader
 # ---- grepping for the assertion would have landed on whichever copy came first and concluded
 # ---- coverage was five keys. The derived loop is now the ONLY site naming .memory-tree.conf.example.
+
+# ---- THE README'S CHECK COUNT IS DERIVED, NEVER TRUSTED. AGENTS.md designates the kit README as THE
+# ---- carrier of this number and the gate-leg names carry none, so it is the one figure a reader is
+# ---- told to trust - and it has now been retyped wrong three times, most recently sitting at 21
+# ---- through a whole build that added check 22. Nothing gated it, because a number in prose beside
+# ---- the thing it counts is exactly the shape no check ever looks at.
+#
+# ---- The population is every site that can EMIT a check id: `fail <n>` in the shell, `check <n>:`
+# ---- in the two delegated pythons, and row_grammar's `CHECK = <n>` module constant, which is the
+# ---- one spelling the other two greps miss and the reason check 20 was invisible.
+n=$((n+1))
+_hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
+             grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
+             grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+_hy_derived=$(printf '%s
+' "$_hy_ids" | grep -c .)
+# ANCHORED ON THE ROW, NOT ON THE DASH. The first spelling was `the gate . [0-9]+ checks`, and the
+# separator is an EM DASH - three bytes in UTF-8, which a single `.` matches one byte of under this
+# repo's own ambient locale. The read came back EMPTY and the arm refused, which is the behaviour it
+# was written to have; it is still the wrong predicate. Same byte-offset trap check 12 carries a
+# warning about, one file over.
+_hy_claimed=$(grep -F 'check-memory-hygiene.sh' "$HERE/README.md" | grep -oE '[0-9]+ checks' | grep -oE '^[0-9]+' | head -1)
+[ -n "$_hy_claimed" ] || { echo "FAIL the kit README states no check count in the shape this arm reads, so the figure AGENTS.md designates as canonical is now ungraded - fix the arm or the README, but do not leave the number unwatched"; st=1; }
+n=$((n+1))
+[ "$_hy_claimed" = "$_hy_derived" ] || { echo "FAIL the kit README claims $_hy_claimed checks and the engine defines $_hy_derived ($(echo $_hy_ids | tr '
+' ' ')) - the one figure a reader is told to trust is wrong"; st=1; }
 
 FLOOR_ASSERTIONS=224
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }

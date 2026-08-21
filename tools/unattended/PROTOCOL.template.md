@@ -1,5 +1,9 @@
-<!-- gov:kit unattended@1.7 -->
+<!-- gov:kit unattended@1.8 -->
 # Unattended runs — the protocol
+
+*Two legs byte-compare this file against the template it ships from. **They compare the two copies to
+each other, so a claim FALSE IN BOTH is green** — three defects here survived exactly that way. A
+parity leg is a copy check, not a truth check; only a reader grades a sentence against the code.*
 
 **Binding.** A session running with no human in the loop follows this document. It is
 project-agnostic: every value that differs per repo is a DECLARATION in the repo-root
@@ -81,8 +85,27 @@ to the build folder trades these properties:
 3. **It names no ACTIONS** and **cannot be revoked**: a build authorizes both, permanently.
 4. **It is self-propagating.** A run whose diff creates a new build README authorizes the NEXT run.
    Unrefused: §9 names the only thing that would.
+5. **It approves the SCOPE of every spec inside it.** A unit whose spec is reachable at the pinned
+   BASE carries the same owner act that authorized the run, so a build folder committed with a spec
+   the owner deliberately left unapproved has approved it. Ratified 2026-08-17 rather than inferred.
+   The alternative — only a spec past awaiting-approval counts — was refused because it deadlocks: the
+   method REQUIRES a run to author a missing spec, and an authored complete spec is written at exactly
+   that status, so a run would author a unit it could then never build.
 
 All were put to the owner and accepted.
+
+**A unit AWAITING SCOPE APPROVAL has three dispositions and they are not interchangeable.** Reachable
+at the pinned BASE: cost 5 already approved it, proceed. Authored by the run itself: the method's
+authoring rule governs, nothing is awaited. Present at BASE under a status naming an EXTERNAL
+PREREQUISITE: halt with the external-prerequisite code, NOT the scope-approval one — different owner
+turns, and conflating them tells a returning owner to approve a scope when the blocker is outside the
+repository.
+
+**A fork with no delegated resolver is parked THROUGH THE VERB, and the run continues.** Not noted in
+prose, not left for the wrap-up to notice: `--park` is what a gate reads. The run then carries on with
+the units that do not depend on that fork. Only when EVERY remaining unit depends on it does the run
+halt, with the fork-unresolvable code — a run that can still make progress on something else is not
+stuck, and stopping early spends an owner turn that was not needed.
 
 **The build method is a RUN-TIME dependency of this kit.** Every directive is a pointer into a
 section of `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, so `--preflight` refuses a tree where it is absent rather than starting a run bound
@@ -127,9 +150,11 @@ reds. The collision test runs with the other preconditions, so a name that alrea
 DIFFERENT bytes refuses over an untouched tree; the rename itself runs after every precondition has
 passed, because the rename is what makes the tree dirty.
 
-**Authored**, carrying exactly eleven facts and nothing else. The file is CREATED by `--preflight`
-and staged; the owner authors none of it. Nothing in the tree derives any of them,
-which is the test for belonging here:
+**Authored**, carrying these facts and nothing else. NO COUNT IS WRITTEN HERE: it was re-derived
+once and was still wrong, because the list below omits `mode` and the two keys `--attest` writes. The
+set is the driver's `set_fact` keys plus those; count it there. CREATED by `--preflight` and staged;
+the owner authors none of it. Nothing in the tree derives any of them, which is the test for
+belonging here:
 
 1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
 2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
@@ -140,6 +165,17 @@ which is the test for belonging here:
    `--close --override` and `--preflight --waive` respectively. DECISION had no writer for as long as
    this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
    with no route is a rule nobody follows, and it took a build hitting it to notice.
+
+   **Every kind belongs to one of two CLASSES, and the classes are not the kinds.** A `surfaced` kind
+   the owner must be shown; a `history` kind they need not adjudicate. All four kinds above are
+   `surfaced`, waiver included, since §10's waiver entry reaches the owner through the same wrap-up.
+   Membership is declared once, in the driver's `PARK_KINDS_SURFACED`, and `history` is the COMPLEMENT
+   — absent from that set IS history, so there is no second list to keep in step. The split exists
+   because a count of decisions the owner must adjudicate is worthless once append-only round history
+   shares the region. The first `history` kind is `review`: a round carries a verdict and a count, not
+   a question and options. Its shrink-only floor is NOT armed — the sets beside it pin from the project
+   conf, and a new key there is a public surface nobody asked for. Said plainly, because an unpinned
+   set can quietly shrink.
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
@@ -154,9 +190,15 @@ which is the test for belonging here:
 9. **The anchor KIND**, `default-branch` or `run-branch`, recorded by `--preflight`.
 10. **The branch ref name**, as the remote advertised it — present only when the second anchor fired.
 11. **The branch tip sha**, from that same advertisement, and present under the same condition.
+12. **The HALT CODE**, written by `--abort` and by nothing else, validated against the effective
+    vocabulary before it is recorded. A single `ABORTED` terminal says a run stopped and never says
+    why; the parked reason is prose for the owner, and this is the field the status line, the resume
+    path and the gate leg all join on. Present only on an aborted record, under the same "bounds what
+    may appear, not what must" reading as facts 10 and 11.
 
-Facts 10 and 11 are ABSENT on a default-branch run, legally: the "nothing else" clause bounds what
-may appear, not what must. Fact 9 is always written.
+Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
+default-branch run for the first two, a run that did not abort for the third. That is legal: the
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
 
 Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
 branching on the recorded anchor kind would take a security decision from a value its subject wrote,
@@ -243,13 +285,13 @@ something no machine could have checked:
 | Item | Checked by | Asserts |
 |---|---|---|
 | `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
-| `records-current` | machine | every unit's status header and every generated region match a fresh render |
+| `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from its output being empty: a malformed pair prints nothing and exits non-zero, so testing emptiness alone would score a broken pair as a SATISFIED item, passing loudest exactly when the file is least readable. This cell used to describe a fresh-render comparison against unit status headers, which the driver never reads and which made an ordinary spec rev bump block the close with no reachable repair |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
-| `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
+| `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED. That is the whole predicate: the bypass-flag grep it used to carry duplicated leg check 11 and is gone. It runs inside `--close`, BEFORE the landing it is named for, so it cannot observe the push and cannot fail for anything the run did. The observation lives in `--landed`, the only verb that runs after it |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
-| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one |
+| `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
 
 A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the gate pins the core set's
 COUNT against the same shrink-only floor, for the reason §3 gives.
@@ -266,6 +308,13 @@ attestation: the verb removes the hand edit, not the trust assumption §9 states
 parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
 override budget: attestation is not a machine verdict, and pretending otherwise makes an override
 look like a check that failed.
+
+**`authorization-reachable` has NO override, and this is where a close meets that.** §1 states it at
+run START, which is where the rule is decided and not where it is hit — an agent whose close refuses
+is reading this section. An override on the authorization check IS the authorization check, so the
+verb refuses the pair rather than recording it. There is no waiver, no attestation route and no
+project escape: an item the kit will not let a run override is the one item whose absence would make
+every other check decorative.
 
 ## 5. The keepalive — an AGENT obligation
 
@@ -318,11 +367,23 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   only writer of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, and an OBSERVATION rather than a claim. It accepts a
   record only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip
-  the remote advertises. It does not refuse the default branch, because the mandated lander refuses
-  every other one, so landing happens exactly where that guard would otherwise fire.
-- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
-  items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
-  it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
+  the remote advertises. Where the project declares `LANDER_MARKER` it ALSO refuses unless the marker
+  names HEAD exactly — equality, not ancestry, so any commit made between the push and this verb is a
+  refusal. It does not refuse the default branch, because the mandated lander refuses every other
+  one, so landing happens exactly where that guard would otherwise fire.
+- `--review` — records ONE review round for a subject and reports what the loop is doing:
+  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
+  in the parked region, a `history` kind, so it never inflates the count of decisions the owner must
+  be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY smaller than the
+  round before; at the exit every blocker still standing is promoted to a unit rather than parked. It
+  refuses a verdict outside the closed set, a missing subject or count, and a round on a subject whose
+  loop has already ended.
+- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
+  effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
+  nothing, so the machine items assert obligations it does not have, while the keepalive is still
+  orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
+  refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
+  phase said a run stopped and never said why.
 
 ## 8. What a project declares
 
@@ -346,6 +407,11 @@ where this document says it may:
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
 | `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
+| `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
+| `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
+| `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
+| `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.

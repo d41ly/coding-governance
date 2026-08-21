@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+halt-code: gate-red-out-of-scope
 witness: 4240167bc26ef8c2cf5c7149fe84a5c4129ebe8f
 phase: ABORTED
 branch-sha: 3355837aa7e072de44a7e1d10c8e5e8020c22b15

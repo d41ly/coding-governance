@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["row-grammar selftest", "marker contract"]
+gate-legs = ["row-grammar selftest", "marker contracts"]
 kits = []
 git-hooks = []
 workflow-scripts = []

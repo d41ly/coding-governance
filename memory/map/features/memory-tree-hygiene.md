@@ -28,7 +28,7 @@ globs = [
 
 ## What it is
 
-One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 21 checks, plus the epoch rule that
+One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 22 checks, plus the epoch rule that
 makes its verdicts datable. Checks 9 and 13-21 delegate to sibling Python modules
 (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`); this dossier owns the engine,
 its self-test and the epoch, not those modules.

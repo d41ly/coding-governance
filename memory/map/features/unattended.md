@@ -16,6 +16,7 @@ skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
+  "bounded-through-a-pipe-is-unbounded.md",
 ]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []
@@ -91,6 +92,46 @@ taken at preflight and nowhere else — enforced by one branch rather than promi
 cannot take an answer and a re-preflight re-issues the recorded set. A waiver relaxes the directive,
 never a DoD item and never a gate.
 
+**Every remote observation is BOUNDED, and the bound is a file constant.** The kit makes remote
+round-trips on the authorization path — the default-branch HEAD advertisement, the per-branch tip
+under the published anchor, and the leg's own two — and until 2026-08-20 not one of them had a
+deadline. A partitioned endpoint therefore turned `--close` into an indefinite silent wait, and the
+same calls inside the leg turned a `git push` into a HUNG push rather than a red one, because the leg
+runs under `.githooks/pre-push`. The tracked incident is a driver selftest that produced zero output
+at 240 s and wedged the whole bar.
+
+Three bounds, because no single mechanism covers every transport: an outer wall clock for blackholed
+packets, `http.lowSpeed{Limit,Time}` for a server that ACCEPTS and then stalls — which no wall clock
+can distinguish from a slow success — and `ssh -o ConnectTimeout` for the handshake. The credential
+path is closed separately: `GIT_TERMINAL_PROMPT=0` bounds git's OWN prompt and never reaches a
+configured helper, so `credential.interactive=never` is passed too, with `-c` so it is scoped to the
+observation and cannot disable credentials for the landing push.
+
+**The load-bearing detail is the CAPTURE, not the deadline.** `out=$(timeout N cmd)` does not bound
+the clock: the substitution reads until EOF, EOF arrives only when the last inherited write end
+closes, and a surviving descendant holds the pipe while `timeout` reports 124 on schedule. Measured
+on node `c` inside the suite that grades it — 8 s through a substitution against a declared 1 s
+bound, 0 s through a file. So the helper redirects to a file and reads it after `timeout` returns,
+with `-k` for the child that ignores SIGTERM. The gate runner carries the identical fix for the
+identical reason, discovered independently days apart, which is why the arm that proves it MEASURES
+elapsed time rather than asserting a message.
+
+Two consequences worth knowing before extending this. The helper cannot call the driver's own `GIT()`
+wrapper — `timeout` needs an external command and `GIT()` is a shell function — so the dereference
+pins live in named constants that both expand, and the arm checks the constants' VALUES as well as
+their expansion, because an indirection is otherwise a way to weaken a pin while a one-line grep
+stays green. And a transport failure is no longer reported as a semantic answer: the per-branch query
+used to collapse git's 128 into "the remote advertises no tip", so a network fault told the operator
+to push a branch that was already pushed.
+
+**What the bound does NOT buy, stated so a green suite is not misread.** No arm drives a blackholed
+endpoint for the full declared bound — that would add the bound to the wall clock of the slowest leg
+on the bar, in a suite whose historical failure mode is a leg that takes too long — so the deadline is
+graded by the mechanism arm plus an elapsed assertion on the terminal-record path, and the refusal
+path is driven by a stub exiting the status `timeout` itself returns. The `http.lowSpeed*` and
+`ConnectTimeout` options are asserted BY INSPECTION only: exercising them needs a server that
+authenticates, stalls mid-transfer, and speaks ssh, and no fixture here has one.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -116,10 +157,13 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-13 against the tree rather than carried forward. Three claims that stood here
-were stale: the units are on `main`, not unmerged; a run HAS been driven; and the authored region
-carries seven facts, not five. Dossier prose is ungated — only the claims tables above are — so this
-section rots silently and is worth re-deriving whenever the feature is touched.*
+*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
+carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
+resume comment, all at the same time. Three carriers, three values, none of them counted by any gate:
+that is what an ungated count does, and it is why the unit that added the twelfth fact enumerated the
+carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
+claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
+is touched.*
 
 - **A run has been driven end to end, and it exposed two defects rather than confirming the
   design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.
