@@ -23,12 +23,27 @@ tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 bad=0
 # An EXECUTED assertion count with a floor, carried at birth: a suite that prints a hardcoded total
 # is a suite whose count stops tracking its arms the first time somebody deletes one.
-FLOOR_ASSERTIONS=28
+# Raised from 28 by TOOL-aShardedFloor-1, which adds the queue-record arms (6b, 7c, 13c-13e, 14).
+# Stated ABSOLUTELY rather than as a delta: TOOL-aShardedFloor-4 raises the same pin, and
+# whichever lands second has to say the number it expects. The compare below is `-ge`, so arms
+# left under an unraised floor are STRANDED rather than red — which is why this moves with them.
+FLOOR_ASSERTIONS=42
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
 
 # ------------------------------------------------------------------ fixtures ----------------------
+# hdrkey <repo> <key> — one value out of the run record's header, or empty.
+# The runner writes `<git-dir>/gate-run/current` holding the run id, then `<id>/header` in a
+# key-per-line TAB grammar. Selecting BY NAME is deliberate and is what makes an additive key
+# harmless: an arm that counted keys or read them by position would red on every future addition.
+hdrkey() {
+  local d=$1 k=$2 id
+  id=$(cat "$d/.git/gate-run/current" 2>/dev/null) || return 1
+  [ -n "$id" ] || return 1
+  awk -F'\t' -v k="$k" '$1==k{print $2; exit}' "$d/.git/gate-run/$id/header" 2>/dev/null
+}
+
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
@@ -195,6 +210,22 @@ grep -q 'queued at position' "$tmp/pos.out" && ok "a waiter announces its queue 
 rm -rf "$B8"; wait "$w8" 2>/dev/null
 [ -f "$qs" ] && nope "the queue-status file survived the wait" || ok "the queue-status file is gone once the waiter stops waiting"
 
+# ---- 6b: the wait REACHES THE RUN RECORD, and is not merely printed ---------------------------
+# The status file above is deleted the moment the wait ends, the stdout line is not durable, and
+# before this pair the header carried 19 keys and none of them was the wait. A bar that spent 20
+# minutes queued was afterwards indistinguishable from one that spent none.
+#
+# GRADED AS A RANGE THE FIXTURE ITSELF OBSERVED, never a tick-exact number: this harness documents
+# its own timing sensitivity, and a pinned second is how a timing arm becomes a flake.
+q8=$(hdrkey "$R8" queued); qf8=$(hdrkey "$R8" queued_from)
+if [ -n "${q8:-}" ] && [ "$q8" != - ] && [ "$q8" -gt 0 ] 2>/dev/null; then
+  ok "a contended run RECORDS its queue wait in the run record (${q8}s), not only on stdout"
+else
+  nope "a contended run recorded no positive queue wait in its header (got '${q8:-<absent>}')"
+fi
+[ "${qf8:-}" = held ] && ok "the recorded wait names its source as held — the run queued and then acquired" \
+                      || nope "the contended run's queued_from is '${qf8:-<absent>}', not held"
+
 # ---------------------------------------- 7/7b: the bounded wait fails OPEN, and stays quiet ------
 R9=$tmp/expire; mk_repo "$R9"; B9=$(beacon "$R9")
 mkdir -p "$B9"; printf '%s' "$$" > "$B9/pid"; printf '%s' "$(date +%s)" > "$B9/heartbeat"; printf '%s' held > "$B9/nonce"
@@ -208,6 +239,34 @@ printf '%s' "$out9" | grep -q 'WAIT EXPIRED\|stalled holder' \
 [ "$rc9" = 0 ] && ok "the turnstile contributed nothing to the exit code (the bar's own verdict stands)" \
                || nope "the run exited $rc9 — the turnstile changed the verdict"
 rm -rf "$B9"
+
+# ------------------------------------ 7c: `expired` is a DISTINCT state, on a fixture that reaches it
+# R9 above CANNOT reach it, and its own arm admits as much by accepting either outcome: it plants a
+# STATIC heartbeat, so at TTL 1 the holder is reapable within two seconds and the run REAPS long
+# before the bounded wait (TTL * 4 = 4s) burns. It ends `held`.
+#
+# Reaching `expired` needs a heartbeat that keeps being REFRESHED — a holder that is alive and
+# simply will not let go. TTL 2 with a refresher writing every second keeps the age at or under 1
+# while TS_MAXWAIT=8 burns down. Costs about nine seconds, and it is the only way this state is
+# evidence rather than an assertion.
+R9b=$tmp/expired; mk_repo "$R9b"; B9b=$(beacon "$R9b")
+mkdir -p "$B9b"; printf '%s' "$$" > "$B9b/pid"; printf '%s' held > "$B9b/nonce"
+legs "$R9b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+( while [ -d "$B9b" ]; do printf '%s' "$(date +%s)" > "$B9b/heartbeat" 2>/dev/null || true; sleep 1; done ) &
+hb=$!
+out9b=$( cd "$R9b" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 ); rc9b=$?
+q9b=$(hdrkey "$R9b" queued); qf9b=$(hdrkey "$R9b" queued_from)
+rm -rf "$B9b"; kill "$hb" 2>/dev/null; wait "$hb" 2>/dev/null
+if [ "${qf9b:-}" = expired ]; then
+  ok "a run that burned the bounded wait records queued_from=expired, distinct from held"
+else
+  nope "a run that ran UNQUEUED alongside a live holder recorded '${qf9b:-<absent>}', not expired"
+fi
+[ -n "${q9b:-}" ] && [ "$q9b" != - ] && [ "$q9b" -gt 0 ] 2>/dev/null \
+  && ok "the expired run still records the seconds it burned (${q9b}s)" \
+  || nope "the expired run recorded no positive wait (got '${q9b:-<absent>}')"
+[ "$rc9b" = 0 ] && ok "expiring contributed nothing to the exit code" \
+                || nope "the expired run exited $rc9b — the turnstile changed the verdict"
 
 R10=$tmp/quiet; mk_repo "$R10"
 legs "$R10" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
@@ -312,6 +371,41 @@ printf '%s' "$out12" | grep -q '^gate queue: ' && printf '%s' "$out12" | grep -q
   && nope "the queue line matches the runner's verdict grammar — a wrapper would count it as a leg" \
   || ok "the queue line cannot be mistaken for a leg verdict by the runner's own alternation"
 
+# 13c: an uncontended ZERO is a real zero, and the two emissions agree on the SAME run.
+# The cross-check is the cheapest guard against the header and the stdout line drifting apart, and
+# it is the reason both are fed from one variable rather than formatted twice.
+q12=$(hdrkey "$R12" queued); qf12=$(hdrkey "$R12" queued_from)
+[ "${q12:-}" = 0 ] && ok "an uncontended run records a queue wait of zero" \
+                   || nope "an uncontended run recorded '${q12:-<absent>}' rather than 0"
+[ "${qf12:-}" = held ] && ok "an uncontended run still names its source as held" \
+                       || nope "an uncontended run's queued_from is '${qf12:-<absent>}', not held"
+sec12=$(printf '%s' "$out12" | sed -n 's/^gate queue: waited \([0-9][0-9]*\)s$/\1/p' | head -1)
+[ -n "${sec12:-}" ] && [ "$sec12" = "${q12:-}" ] \
+  && ok "the header and the stdout line report the SAME wait on one run" \
+  || nope "stdout says '${sec12:-<none>}' and the header says '${q12:-<absent>}' on one run"
+
+# 13d: A DISABLED TURNSTILE WRITES A DASH. This is the dead-probe arm and the whole justification
+# for the second key. A `0` here would be a reassuring number about a probe that never ran, and
+# nothing downstream could tell it from a genuine uncontended zero.
+out12b=$( cd "$R12" && env GATE_FULL=1 GATE_TURNSTILE=0 bash tools/run-gates/run-gates.sh 2>&1 )
+q12b=$(hdrkey "$R12" queued); qf12b=$(hdrkey "$R12" queued_from)
+[ "${q12b:-}" = - ] && ok "a run with the turnstile DISABLED records a dash, never a zero" \
+                    || nope "a disabled turnstile recorded '${q12b:-<absent>}' rather than a dash"
+[ "${qf12b:-}" = off ] && ok "a disabled turnstile names its source as off" \
+                       || nope "a disabled turnstile's queued_from is '${qf12b:-<absent>}', not off"
+
+# 13e: THE GUARD ON THE ACQUIRE-PATH REFRESH. Refreshing TS_WAITED unconditionally before the
+# acquire break makes an UNCONTENDED run nondeterministic — `date +%s` truncates and the five
+# processes in the claim sometimes straddle a second — which would flake the arm above that pins
+# `waited 0s`. Repeat the uncontended acquire and require every run to report zero.
+qz=0
+for _ in 1 2 3 4 5; do
+  outz=$( cd "$R12" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+  printf '%s' "$outz" | grep -q '^gate queue: waited 0s$' || qz=$((qz+1))
+done
+[ "$qz" = 0 ] && ok "repeated uncontended acquires all report zero — the refresh is guarded" \
+              || nope "$qz of 5 uncontended acquires reported a non-zero wait — the refresh is unguarded"
+
 # ------------------- 13b: the profiler SUBTRACTS the queue wait rather than reporting it as work
 # The consumer half of the queue line, and the reason the line exists. A wrapper that brackets a
 # wall clock around the runner cannot tell waiting from working, and folding a wait into the wall
@@ -337,6 +431,25 @@ if [ -f "$HERE/profile_bar.py" ]; then
 else
   ok "no profiler ships beside this runner in this tree, so there is no consumer to grade (stated, not skipped silently)"
 fi
+# ---- 14: the summary FILE carries the queue line on both verdicts ------------------------------
+# `gate-last-summary.txt` is what a reader opens after the terminal has scrolled. A line present on
+# green runs and absent on red ones would mean two things, so it is emitted unconditionally beside
+# `PROF_LINE` on every path.
+s12="$R12/.git/gate-last-summary.txt"
+[ -f "$s12" ] && grep -q '^gate queue: queued ' "$s12" \
+  && ok "the durable summary carries the queue line on a GREEN run" \
+  || nope "the green summary file carries no queue line"
+R13=$tmp/qred; mk_repo "$R13"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$R13/fx/bad.sh"; chmod +x "$R13/fx/bad.sh" 2>/dev/null || true
+legs "$R13" '[ {"name": "bad", "argv": ["bash", "fx/bad.sh"]} ]'
+( cd "$R13" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ) || true
+[ -f "$R13/.git/gate-last-summary.txt" ] && grep -q '^gate queue: queued ' "$R13/.git/gate-last-summary.txt" \
+  && ok "the durable summary carries the queue line on a RED run too" \
+  || nope "the red summary file carries no queue line"
+[ -f "$R13/.git/gate-last-failure.txt" ] && grep -q '^gate queue: queued ' "$R13/.git/gate-last-failure.txt" \
+  && ok "the RED-only durable copy carries it as well" \
+  || nope "the durable failure record carries no queue line"
+
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
 [ "$bad" = 0 ] && echo "PASS ($n assertions)"

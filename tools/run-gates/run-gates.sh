@@ -480,6 +480,24 @@ if [ -n "$TS_COMMON" ]; then
       # has been measured 25x slower under contention — so the window is not theoretical and it is
       # widest exactly when two bars are most likely to collide.
       trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP
+      # S4 (TOOL-aShardedFloor-1), and the GUARD is the whole of it. `TS_WAITED` is refreshed at
+      # the BOTTOM of this loop and this path breaks above it, so a contended acquire records the
+      # previous tick's value and understates the wait by up to one `TS_TICK`.
+      #
+      # Refreshing unconditionally — which is the obvious fix and the one first specced — breaks
+      # the UNCONTENDED case instead: `ts_now` is `date +%s` and truncates, the five processes
+      # above (`ls`, `sort`, `head`, `basename`, `mkdir`) sometimes straddle a second boundary,
+      # and the line below then prints `waited 1s` where `run-gates.turnstile.test.sh` asserts
+      # `^gate queue: waited 0s$`. Measured on node a: 4 of 60 first-iteration acquires crossed,
+      # on an idle box, in a leg that normally runs inside a concurrent bar where process
+      # creation is 25x slower. `ts_announced` is 1 only once the loop has reported a position,
+      # which is exactly the predicate "this run actually queued".
+      #
+      # RESIDUAL, named rather than left to be rediscovered: `ts_try_reap && continue` above
+      # skips both this refresh AND the announce, so a run that reaps a stale holder on its first
+      # iteration still records the stale value. Closing that needs a second predicate and is
+      # deliberately not in this unit.
+      [ "$ts_announced" = 1 ] && TS_WAITED=$(( $(ts_now) - ts_start ))
       break
     fi
     ts_try_reap && continue
@@ -510,11 +528,42 @@ if [ -n "$TS_COMMON" ]; then
   export GATE_TURNSTILE_HELD="${GATE_TURNSTILE_HELD:-}${GATE_TURNSTILE_HELD:+,}$TS_NONCE"
 fi
 
+# THE QUEUE FACTS, resolved ONCE here and emitted at three sites — the same shape as `PROF_LINE`,
+# which is built once and echoed to stdout, to `gate-last-summary.txt` and to the RED-only durable
+# copy. `PROF_LINE` cannot absorb the wait: it is echoed BEFORE this block, and folding the wait
+# into it would delay the profile line by the entire queue wait.
+#
+# THE VALUE IS A DASH WHEN IT IS UNMEASURABLE, which is this file's own idiom for an input it could
+# not measure (see `input_key`). A `0` recorded for a run whose turnstile was DISABLED is a
+# reassuring number about a probe that never ran, and this repo's rule is that such a probe says so.
+#
+# `queued_from` earns its place on a TWO-way ambiguity, not a three-way one. With `-` emitted for
+# `off` and `unresolved`, a `queued 0` can only mean held-and-uncontended — an `expired` run has
+# burned at least `TS_MAXWAIT`, which is `TS_TTL * 4` and therefore never 0. What the second key
+# carries that a bare integer cannot is the `held`/`expired` split, and the `off`/`unresolved` one.
+#
+# WHAT THIS DOES NOT CHECK, stated here because a reader will assume otherwise: `unresolved` is
+# UNARMED. Reaching it needs `git rev-parse --git-common-dir` to fail while the runner is already
+# past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
+# too, so the runner exits 2 before this line. No fixture in the turnstile suite can produce it.
+QUEUED="-"; QUEUED_FROM=off
+if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+  if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
+  elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
+  else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired
+  fi
+fi
+QUEUE_SUMMARY="gate queue: queued $QUEUED from $QUEUED_FROM"
+
 # ONE PARSEABLE LINE, always, zero when uncontended. A wrapper that brackets a wall clock around this
 # runner — `profile_bar.py` is exactly one — cannot otherwise tell waiting from working, and a queue
 # wait folded into a measured wall clock can push a packing ratio below 1.0, which that tool correctly
 # refuses as arithmetically impossible. This unit ships the line; who consumes it is a separate
 # question.
+#
+# ITS BYTES ARE PINNED by two consumers — `profile_bar.py`'s `$`-anchored regex and
+# `run-gates.turnstile.test.sh` — so the state word above is NOT appended here. It goes to the
+# header and the summary file, which is why `QUEUE_SUMMARY` is a separate string.
 echo "gate queue: waited ${TS_WAITED}s"
 
 WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
@@ -730,6 +779,14 @@ if [ -n "$RUNDIR" ]; then
     printf 'profile_from\t%s\n' "$PROF_TAG"
     printf 'legs\t%s\n' "$total"
     printf 'worktree\t%s\n' "$(git rev-parse --show-toplevel 2>/dev/null)"
+    # THE QUEUE WAIT, paired value and source, in the header's own `value`/`_from` grammar —
+    # `base`/`base_from`, `full`/`full_from`, `profile_row`/`profile_from`. Fourth instance.
+    # DELIBERATELY OUTSIDE the run-envelope block above: `run-gates.evidence.test.sh` asserts that
+    # block is four keys and selects them BY NAME, so a key added inside would leave that arm green
+    # and only its comment lying. `schema` does not bump — every reader selects by key name, so an
+    # additive key breaks none, and a bump could not be armed because nothing reads the field.
+    printf 'queued\t%s\n'      "$QUEUED"
+    printf 'queued_from\t%s\n' "$QUEUED_FROM"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -1063,16 +1120,18 @@ if [ "$fails" = 0 ]; then
   # A wall clock on a terminal line invites comparison between two runs that are not comparable —
   # the profiling verb exists precisely because a duration without its envelope is not a
   # measurement.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  # `QUEUE_SUMMARY` rides beside `PROF_LINE` on every path — green, red, and the durable RED copy —
+  # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
 else
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s\n' "$PROF_LINE"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
   echo "gates RED — $fails/$n legs failed$skipnote"

@@ -78,7 +78,7 @@ ids TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aSharded
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md) | OPEN | rev-2 | 2026-08-21 |
+| [TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md) | CLOSED | rev-2 | 2026-08-21 |
 | [TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md) | OPEN | rev-2 | 2026-08-21 |
 | [TOOL-aShardedFloor-3 — the gate selftest, split by the same contract](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md) | OPEN | rev-2 | 2026-08-21 |
 | [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | BLOCKED | rev-2 | 2026-08-21 |

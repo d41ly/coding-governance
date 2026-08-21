@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-1 — record the turnstile queue wait in the run record
 
-**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -135,7 +135,7 @@ suite the manifest already runs, and one raised floor.
 
 ## 8. Open questions
 
-`none — the forks below are RESOLVED.`
+none — the forks below are RESOLVED.
 
 (1) *Does `schema` bump?* NO, resolved by grep: the field has no reader, every real reader selects by key name, and a bump could
 not be armed because nothing observes the field. Resolver: this session, under the standing

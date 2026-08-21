@@ -158,7 +158,7 @@ whose message would name a leg script path that does not exist. Narrow it to tok
 
 ## 8. Open questions
 
-`none — the forks below are RESOLVED, except the last, which is the OWNER's.`
+none — the forks below are RESOLVED, except the last, which is the OWNER's.
 
 (1) *Flag in `argv` or a new manifest key?* `argv`: the manifest key set is pinned and a new key would move that pin for nothing.
 (2) *Shard 1's name?* Keep the existing name and append a letter to shard 2 — the warm-ledger sort
