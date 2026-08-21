@@ -1616,6 +1616,9 @@ done
 # header has been stripped the sed matches nothing, and a bare "usage:" over an empty list is
 # indistinguishable from a driver with no verbs.
 sed '/^#   unattended[.]sh /d' "$SCRIPT" > "$TMP/stripped.sh"
+# The LIBRARY travels with it. The driver refuses outright without one and never reaches `usage`, so
+# without this copy the arm below measures the library refusal and reports it as a missing usage line.
+cp "$(dirname "$SCRIPT")/lib-unattended.sh" "$TMP/lib-unattended.sh"
 hit "$(bash "$TMP/stripped.sh" 2>&1)" "cannot read this file's own header at"
 hit "$(bash "$TMP/stripped.sh" 2>&1)" "so the argument shapes are unavailable; the verbs are "
 
@@ -1737,7 +1740,7 @@ n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FA
 # a source line pointing at a lib without the wrapper is a working script with no pin in it.
 n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$(dirname "$SCRIPT")/lib-unattended.sh" \
   || { echo "FAIL the kit library defines no GIT() wrapper pinning core.useReplaceRefs"; st=1; }
-n=$((n+1)); grep -q '^\. "\$_LIB_DIR/lib-unattended.sh"' "$SCRIPT" \
+n=$((n+1)); grep -q '^\. "\$KIT_DIR/lib-unattended.sh"' "$SCRIPT" \
   || { echo "FAIL the driver does not source the kit library, so the GIT() pin defined there never reaches it"; st=1; }
 unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
@@ -3165,7 +3168,8 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- catch is measured in tens of arms, never in ones.
 # ----
 # ---- MEASURED unsharded 519, shard one 205, shard two 327. 205 + 327 - 519 = 13 prologue arms, both regions pay them; unchanged by this merge, which is what says the added arms distributed across both regions rather than piling into one.
-FLOOR_ASSERTIONS=503
+# ---- RE-MEASURED at the playbook-mode merge, 2026-08-21, node d: unsharded 626, shard one 208, shard two 432, so 208 + 432 - 626 = 14 prologue arms. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
+FLOOR_ASSERTIONS=607
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -3185,9 +3189,9 @@ FLOOR_ASSERTIONS=503
 #
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
-PROLOGUE_ARMS=13
-FLOOR_SHARD_1=198
-FLOOR_SHARD_2=317
+PROLOGUE_ARMS=14
+FLOOR_SHARD_1=201
+FLOOR_SHARD_2=419
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
