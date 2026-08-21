@@ -3128,17 +3128,29 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=338
+FLOOR_ASSERTIONS=418
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
-# The per-shard floors carry the SAME proportional discount the unsharded pin does — 338 against a
-# measured 398 is ~15 % of headroom — rather than pinning at 100 % of observation, which would red on
-# the first arm anyone legitimately removes.
+# The per-shard floors carry the SAME proportional discount the unsharded pin does — ~80.5 % of the
+# measured count — rather than pinning at 100 % of observation, which would red on the first arm
+# anyone legitimately removes. That ratio is main's own: 338/419, 165/205 and 183/227 all sit at
+# 0.805, and it is applied unchanged here rather than re-chosen.
+#
+# RE-MEASURED 2026-08-21 on the merged tree, because a branch adding 690 lines of arms to this file
+# inherited floors computed WITHOUT them. Floors are MINIMUMS, so the stale numbers would have passed
+# — the ratchet would have slackened and no gate could have said so. Measured: unsharded 520,
+# shard one 205, shard two 328. Region ONE is unchanged at 205, which is the check that the new arms
+# all landed in region two where they were put.
 #
 # PROLOGUE_ARMS is the arms BOTH regions pay, and it is DERIVED rather than reasoned about:
-# n(shard 1) + n(shard 2) - n(unsharded). Measured on node a, 2026-08-21: unsharded 419 / 343 s,
-# shard one 205, shard two 227. 205 + 227 - 419 = 13.
+# n(shard 1) + n(shard 2) - n(unsharded). Measured on node a, 2026-08-21: unsharded 419, shard one
+# 205, shard two 227. 205 + 227 - 419 = 13.
+#
+# RE-DERIVED on the merged tree the same day, after 690 lines of arms landed in region two:
+# 205 + 328 - 520 = 13. The identity survives the change, which is the only evidence that the added
+# arms are inside ONE region rather than straddling the split — and per the note below, no static
+# predicate over the FLOORS can see that, so this re-derivation is the check.
 #
 # That relation is a MEASUREMENT recorded in this build's record, NOT a gate. The floors below are
 # discounted, so no static predicate over these three constants can see it — and asserting it over
@@ -3150,7 +3162,7 @@ FLOOR_ASSERTIONS=338
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=13
 FLOOR_SHARD_1=165
-FLOOR_SHARD_2=183
+FLOOR_SHARD_2=264
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
