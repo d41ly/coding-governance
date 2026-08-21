@@ -14,8 +14,17 @@ memory/builds/aDrainedSluice/README.md
 memory/builds/aRuledFrontispiece/README.md
 # memory/backlog/TOOL.md — a MERGE-INDUCED overflow, not a curation lapse. Both parents were legal
 # and within a hair of the cap (theirs 20435 B, ours 20479 B, cap 20480); the row driver unioned
-# them correctly to 86 rows / 21762 B. Rotation cannot fix it: TERMINAL is ("CLOSED","WONTDO") and
-# exactly ONE row qualifies, so rotating sheds less than the rotation note it must add. This is
+# them correctly to 86 rows / 21762 B. Rotation could NOT fix it when this was written: TERMINAL is
+# ("CLOSED","WONTDO") and exactly ONE row qualified, so rotating shed less than the rotation note
+# it must add.
+#
+# THAT PREMISE EXPIRED, 2026-08-21. Re-derived on the same tree: 159 rows, 71855 B against a cap
+# of 61440, and NINETEEN rows are terminal. aShardedFloor closed four of them in one landing.
+# Rotation is now the live remedy rather than a rejected one, and this row is no longer
+# describing why it cannot be drained — it is describing a drain nobody has performed. The count
+# is deliberately re-derived here rather than trusted: the original was true and stopped being
+# true without anyone editing it, which is the whole class this file exists to make visible.
+# This is
 # TOOL-cSettledDocket-16 arriving — "new rows are now paid for by shortening old ones" — and paying
 # that fee by trimming 1 KB of other builds' prose mid-merge is the wrong moment, on the same
 # reasoning the aRuledFrontispiece row above already carries.
