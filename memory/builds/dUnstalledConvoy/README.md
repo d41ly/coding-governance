@@ -219,7 +219,7 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 16 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
+**Build status:** CLOSED · 16 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
 
@@ -239,7 +239,7 @@ ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 T
 | [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | SPECCED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | CLOSED | rev-5 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
 <!-- /gen:build-units -->
@@ -250,6 +250,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 |---|---|---|
 | [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md) | journal | TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-11 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 |
+| [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md) | journal | TOOL-dUnstalledConvoy-23 |
 | [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md) | journal | TOOL-dUnstalledConvoy-24 |
 | [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md) | journal | TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 |
 | [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
@@ -296,6 +297,7 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
 - **`build/`**
   - [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md)
+  - [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md)
 - **`reviews/`**

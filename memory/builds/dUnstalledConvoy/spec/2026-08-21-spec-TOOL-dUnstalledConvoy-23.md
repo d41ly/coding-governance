@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading
 
-**Status:** SPECCED · rev-4 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
 ## 1. Goal
 
@@ -158,6 +158,9 @@ way to make a check dark without saying so.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · BUILT and closed. Nine scope items; the record names how each was
+  observed and which were measured rather than staged, because deleting a key or a comment has
+  no failing case and calling it RED would be a lie in the ledger.
 - rev-4 · 2026-08-21 · a third spec review returned BLOCKED on two measured facts. `report()` is
   `[ "$REPORT" = 1 ] &&` and nothing outside the leg's own test sets it, so rev-3's "REPORT" would have
   emitted zero bytes everywhere — S1 now says stdout, unconditionally. S2 left the fold-versus-subset

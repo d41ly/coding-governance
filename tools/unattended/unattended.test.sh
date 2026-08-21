@@ -2566,7 +2566,7 @@ same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md
 # gone with the branch that implemented it: every version of that branch was wrong in a different
 # direction, and its last one let a pass that had already written outside its lane re-park a widened
 # row at the original anchor and RETRACT a check-23 failure the leg had emitted. The record is
-# append-only now and TOOL-dUnstalledConvoy-23 owns the redesign.
+# append-only now, and TOOL-dUnstalledConvoy-23 built the comparison that reads it.
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
 hit "$out" "dispatch declared"
 same "the repeat parked its own row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "2"
@@ -2652,6 +2652,28 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes 'tools/*.sh')" "--dispatc
 # ---- disjoint. The pair below is exactly that shape.
 run --dispatch tRun --pass ARCH-tRun-3 --writes tools/beta >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-4 --writes tools/beta/one.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+
+# ---- `normpath` AND THE DOT SPELLINGS (spec 23 S5 / AC7). A trailing `/.` and an interior `/./` name
+# ---- the same directory as the plain path, and every containment answer is built on normpath, so a
+# ---- declaration spelled either way was compared as a different string. Round 4 found the interior
+# ---- case; the trailing one is broken by the same missing step, which is why fixing one is how a
+# ---- class becomes an instance.
+np_is() {   # input · expected
+  n=$((n+1))
+  got=$(bash -c ". \"$HERE/lib-unattended.sh\"; normpath '$1'")
+  [ "$got" = "$2" ] || { echo "FAIL normpath '$1': expected [$2], got [$got]"; st=1; }
+}
+np_is 'a/./b'      'a/b'
+np_is 'a/b/.'      'a/b'
+np_is 'a/b/./'     'a/b'
+np_is './a/./b/.'  'a/b'
+np_is 'a//./b'     'a/b'
+np_is 'a/././b'    'a/b'
+# ...and the spellings that must NOT move, or the fix has eaten the repository-root case the
+# `--writes` boundary depends on.
+np_is 'a/b'        'a/b'
+np_is '.'          '.'
+np_is './'         '.'
 
 # ---- ONE TRAILING SLASH USED TO TURN EVERY CONTAINMENT REFUSAL OFF (closing review F2). `memory`,
 # ---- `memory/` and `./memory` are one path; compared as raw strings they are three, and the
