@@ -358,6 +358,12 @@ one, or the leg reads a different directory from the one you wrote. `--run` labe
 later reader can tell one sitting's pieces from another's; on the unattended path the slug fills that
 in.
 
+**`--set` is WEAKER here than on the unattended path, and the difference is worth knowing.** There
+the set identity is DERIVED from the run's own piece records, because a caller that names its own set
+could name a set it did not produce. Here you name it, so it is a claim rather than a derivation —
+which is the same trade the whole attended path makes, one field further down. Take the hashes from
+the piece records you just wrote, not from memory.
+
 **The CHECK about code builds binds here too, and here it has no machine half at all** — not even a
 withdrawn one. The refusal that was to enforce it reads a recorded mode and a run's commit set, and
 both exist only through the driver. An attended path is outside it by construction, which is the kind
