@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-ONE checks over the tree.
+# check-unattended.sh - the merge-bar leg for the unattended-run kit. Its check ids run 1..22; the
+# count is NOT retyped in prose anywhere, because it has now been wrong twice - derive it with
+# `grep -oE 'fail [0-9]+' tools/unattended/check-unattended.sh | sort -un`.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
@@ -149,17 +151,24 @@ else
         if (rs ~ /NON-CONVERGENT|CEILING/) needs[it] = 1
       }
       END {
+        nneed = 0
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
           else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
-          if (it in needs) {
-            if (readable != 1)
-              printf "\n  %s (subject %s: the loop EXITED without converging and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, it
-            else if (newids + 0 == 0)
-              printf "\n  %s (subject %s: the loop EXITED without converging and the generated units region gained NO unit id this run BASE lacked, so a blocker was neither fixed nor promoted)", f, it
-          }
+          if (it in needs) nneed++
+        }
+        # COUNTED ACROSS SUBJECTS, because `newids` is a per-FILE delta. Consumed inside the
+        # per-subject loop it let ONE promotion satisfy every subject in the file that exited
+        # without converging. A per-subject attribution is not available - the region records ids,
+        # not which subject promoted them - so the honest claim is the counting one: N subjects that
+        # exited owe at least N ids this run BASE lacked.
+        if (nneed > 0) {
+          if (readable != 1)
+            printf "\n  %s (%d subject(s) EXITED without converging and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
+          else if (newids + 0 < nneed)
+            printf "\n  %s (%d subject(s) EXITED without converging and the generated units region gained only %d unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted)", f, nneed, newids + 0
         }
       }' "$rvf")"
   done
@@ -383,8 +392,14 @@ adv_remote=""
 if [ "$adv_nrem" = 1 ]; then
   adv_remote=$(GIT remote 2>/dev/null | head -1)
 elif [ "$adv_nrem" != 0 ]; then
-  adv_remote=""   # left empty on purpose: the fail-closed branch in check 9 reports it
+  adv_remote=""
 fi
+# CARRIED AS ITS OWN CAUSE. Both remote-count states used to arrive downstream as an empty
+# advertisement and print "the remote advertised no tips" - a message about the REMOTE for a fault in
+# this clone's own configuration. The split above already existed; only the reporting was missing.
+ADV_NREM_RC=0
+[ "$adv_nrem" = 0 ] && ADV_NREM_RC=96
+{ [ "$adv_nrem" != 0 ] && [ "$adv_nrem" != 1 ]; } && ADV_NREM_RC=97
 # GUARDED on the population too: with no run-state file there is nothing whose BASE could be
 # checked, and two network round-trips per bar run bought exactly nothing. POP is computed above.
 # The bound, and the pins, in ONE place shared with the driver's helper. The leg cannot source the
@@ -409,8 +424,9 @@ timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
 # IT MUST SAY SO. The flag's only reader used to be the `if` below, so on a node with no working
 # `timeout -k` every observation ran with the wall-clock bound silently absent and byte-identical
 # output — a skip that looks like a pass. The transport options still apply on that path; it is the
-# wall clock specifically that is gone, and the line says which.
-[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended-check: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply"
+# wall clock specifically that is gone, and the line says which. TO STDERR: fail() writes to
+# stdout, so an advisory sharing that channel is indistinguishable from a violation.
+[ "$REMOTE_BOUND_LIVE" = 1 ] || echo "unattended-check: NOTE - this node has no working 'timeout -k', so the ${REMOTE_BOUND}s wall-clock bound on remote observation is INERT; http.lowSpeed and ssh ConnectTimeout still apply" >&2
 # WRITES TO `$adv_f` BY NAME, not to a parameter, and that is deliberate. This leg has a source-level
 # arm asserting it performs no write into the tree it judges, and that arm allows a redirect only when
 # its target variable is assigned from `mktemp` in this same file — a property check rather than a
@@ -465,12 +481,28 @@ fi
 # it to do — and the advertised tip moves PAST the pin. Equality reds from that moment on, forever,
 # and worse after a branch delete or a squash-merge landing. This file already records being moved
 # off equality once for that reason; writing it back in a second place would re-earn the same wedge.
-is_published() { # commit -> 0 if it is an ancestor of any advertised tip
-  local c="$1" t
-  [ -n "$ADV_HEAD" ] && GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
+# THREE ANSWERS, NOT TWO, and the third is the one that cost a red bar. `--is-ancestor` fails both
+# when the commit is NOT an ancestor and when the tip is not in this clone's object store, and this
+# function used to collapse those into "not published". A clone that has not fetched since the remote
+# advanced therefore reported EVERY record as naming a commit that exists only locally - measured
+# here on 2026-08-21: sixteen records, every one of them honest, all sixteen red, and the same leg
+# green minutes later once the tip had been fetched. A bar that reds on network timing rather than on
+# the tree is worse than one that reds stably, because the fix people reach for is a re-run.
+#
+# The driver has carried the distinction for longer (its check 30, "the remote advertises a tip this
+# clone does not have"); this side had not been given it.
+is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, no advertised tip is local
+  local c="$1" t have=0
+  if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then
+    have=1
+    GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
+  fi
   for t in $ADV_TIPS; do
+    GIT cat-file -e "$t^{commit}" 2>/dev/null || continue
+    have=1
     GIT merge-base --is-ancestor "$c" "$t" 2>/dev/null && return 0
   done
+  [ "$have" = 1 ] || return 2
   return 1
 }
 
@@ -596,7 +628,11 @@ while IFS= read -r f; do
       # THREE OUTCOMES, THREE MESSAGES. "The remote answered nothing" is kept for the case where git
       # actually answered; a fired bound and a dead scratch dir are different faults with different
       # remedies, and one message for all three sent the reader at the network every time.
-      if [ "$ADV_RC" = 98 ]; then
+      if [ "$ADV_NREM_RC" = 96 ]; then
+        fail 9 "this clone declares NO remote, so there is no endpoint to observe and whether a recorded BASE is published was never asked; that is a fault in this clone rather than an answer about any remote: recorded $rb in $f"
+      elif [ "$ADV_NREM_RC" = 97 ]; then
+        fail 9 "this clone declares more than one remote, so which endpoint published would even mean is a guess; the leg refuses to pick one rather than measuring the BASE against whichever name sorts first: recorded $rb in $f"
+      elif [ "$ADV_RC" = 98 ]; then
         fail 9 "cannot create a scratch file to capture the remote advertisement, so this leg observed NOTHING and the BASE predicates below would be graded against an empty answer; this is a fault on THIS side, not the remote's: $f"
       elif [ "$ADV_RC" = 124 ]; then
         fail 9 "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing: $f"
@@ -618,10 +654,20 @@ while IFS= read -r f; do
         # ANCHOR names rather than on the branch the run authored.
         if ! GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
           fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
-        elif ! is_published "$rb"; then
-          fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
-        elif ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
-          fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
+        else
+          # CAPTURED, not read off $? two conditions later. Threading a three-way status through an
+          # elif chain makes the second branch read the status of the first TEST rather than of the
+          # call, which is the guard-shares-state-with-what-it-guards shape this kit refuses.
+          is_published "$rb"; _pubrc=$?
+          if [ "$_pubrc" = 0 ]; then
+            if ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
+              fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
+            fi
+          elif [ "$_pubrc" = 2 ]; then
+            fail 9 "the remote advertised tips this clone does not have, so whether a recorded BASE is published CANNOT BE OBSERVED and this leg will not answer a question it could not ask; fetch and re-run: recorded $rb in $f"
+          else
+            fail 9 "a recorded BASE is not published on the remote — it is an ancestor of no tip the remote advertises, so it names a commit that exists only where this run could have authored it: recorded $rb in $f"
+          fi
         fi
         # ONLY once the run claims to have built something. At PREFLIGHT and through the pass
         # phases the base legitimately equals HEAD - that is a run that has correctly built

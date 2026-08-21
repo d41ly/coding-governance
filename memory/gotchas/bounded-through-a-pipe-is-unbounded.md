@@ -47,6 +47,8 @@ Twice in this repo, independently, days apart:
   alive every suite produced ZERO bytes for twenty minutes and read as a hang in the code under
   test. After killing them by command line, the hygiene engine finished in 42 s green. Nothing was
   wrong with the code, and two rounds of bisecting it found nothing because there was nothing.
+  It is NOT only killed runs: a merge-bar run that COMPLETED normally left its own leg children
+  orphaned too, so the count climbs during ordinary use and not just after an interrupt.
   **Diagnostic:** a suite emitting no output at all, rather than stopping partway, is a machine
   symptom and not a logic one — check for orphans before reading the diff.
 

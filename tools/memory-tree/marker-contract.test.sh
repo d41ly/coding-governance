@@ -349,9 +349,9 @@ fi
 #
 # BOTH SIDES ARE READ AS DATA, never sourced, so this compares the shipped bytes rather than a copy.
 ncase=$((ncase+1))
-_cv_drv=$(sed -n 's/^REVIEW_VERDICTS="\(.*\)"$//p' "$U" | head -1 | tr '|' '
+_cv_drv=$(sed -n 's/^REVIEW_VERDICTS="\(.*\)"$/\1/p' "$U" | head -1 | tr '|' '
 ' | sort)
-_cv_hyg=$(grep -oE 'v != "[A-Z][A-Z ]*"' "$HYG" | sed 's/.*"\(.*\)"//' | sort -u)
+_cv_hyg=$(grep -oE 'v != "[A-Z][A-Z ]*"' "$HYG" | sed 's/.*"\(.*\)"/\1/' | sort -u)
 if [ -z "$_cv_drv" ] || [ -z "$_cv_hyg" ]; then
   echo "FAIL [verdict/read] one side of the verdict vocabulary read as EMPTY, so the comparison below would pass by comparing nothing: driver=[$_cv_drv] hygiene=[$_cv_hyg]"
   st=1

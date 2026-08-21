@@ -2439,7 +2439,12 @@ verb_review() { # slug · subject · verdict · blockers
   # ERE, a subject carrying `(` MISSED its own recorded terminal line and one carrying `.`
   # over-matched into a spurious refusal. review_counts compares the item EXACTLY in awk, so as a
   # regex here the two readers of one field disagreed on what "the same subject" means.
-  if grep -F -- " · item $subj · reason " "$rel" 2>/dev/null | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING)'; then
+  # SCOPED TO `review` ROWS, and to the REASON field. The -F rewrite that removed the regex
+  # injection also removed both qualifiers the old predicate had: any parked kind carrying the same
+  # subject matched, and an exit token appearing anywhere on the line counted - including inside a
+  # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
+  # subject comparison so the subject is never a pattern.
+  if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING)'; then
     fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history: $subj"
     return 1
   fi

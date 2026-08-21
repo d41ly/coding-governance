@@ -131,7 +131,12 @@ reset_tree() {
 run() { bash "$SCRIPT" 2>&1; }
 # A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
 # code path whose real trigger is a network partition, which no fixture can arrange.
-TMPBIN=$(mktemp -d)/bin
+# ITS PARENT IS TRAPPED, not just the stub inside it. `$(mktemp -d)/bin` leaked one scratch directory
+# per invocation, and the EXIT trap above never learned the parent. Orphaned scratch dirs are not
+# cosmetic here: 99 of them accumulated in one session and the next suite aborted at startup with
+# `Device or resource busy` - see memory/gotchas/bounded-through-a-pipe-is-unbounded.md.
+TMPBIN_PARENT=$(mktemp -d); TMPBIN="$TMPBIN_PARENT/bin"
+trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}" "${TMPBIN_PARENT:-}"' EXIT
 
 # A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
 # real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
@@ -220,7 +225,19 @@ reset_tree
 # ---- directly under a comment claiming "THE SAME SET, in all three places". A verb no procedure
 # ---- mentions is a verb no run uses, and its gate check then grades a population nothing creates.
 D="$HERE/unattended.sh"
-verbs=$(awk '/^case "\$VERB" in/{f=1;next} f&&/^esac/{f=0} f{ if (match($0, /^  --[a-z]+\)/)) print substr($0, RSTART+2, RLENGTH-3) }' "$D")
+# THE POPULATION IS BOTH DISPATCH SITES, not one. The first cut scanned only `case "$VERB" in` for
+# 2-space-indented arms and found nine verbs; `--plan` and `--phase` are dispatched from the ARGV
+# loop at a different indent and were invisible to it. An arm that grades nine of eleven verbs
+# reports full coverage of a set it never saw - the same could-not-fail shape one level up, and the
+# reason this derives the set from every `--verb)` case arm in the file rather than from one block.
+verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
+# ...minus the FLAGS, which are arguments rather than verbs and are documented by the verb they
+# belong to. Named explicitly, because a flag silently treated as a verb would demand a Skill
+# section nobody should write.
+for _f in --keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --witness --version; do
+  verbs=$(printf '%s
+' "$verbs" | grep -vxF -- "$_f" || true)
+done
 n=$((n+1)); [ -n "$verbs" ] || { echo "FAIL no dispatched verb could be read out of the driver, so the documentation join below would compare against an empty set"; st=1; }
 undoc=""
 for v in $verbs; do
@@ -465,6 +482,43 @@ sed -i 's/RUN\.<phase>\.<blob8>\.md/RUN.the-old-spelling.md/g' memory/guides/UNA
 hit "$(run)" "the installed protocol does not spell the archive filename grammar 'RUN.<phase>.<blob8>.md', so the rules a run is measured against do not describe what --preflight does to a finished record"
 reset_tree
 miss "$(run)" "the installed protocol does not spell the archive filename grammar"
+
+# ---- check 9: THE REMOTE COUNT IS ITS OWN FAULT, not an answer about the remote. Zero remotes and
+# ---- two-plus remotes both used to arrive downstream as an empty advertisement and print 'the
+# ---- remote advertised no tips' - a sentence about the REMOTE for a misconfiguration in this
+# ---- clone. The split existed above; only the reporting did not.
+reset_tree; mkconf
+git remote remove origin
+out=$(run)
+hit  "$out" "this clone declares NO remote, so there is no endpoint to observe and whether a recorded BASE is published was never asked; that is a fault in this clone rather than an answer about any remote: recorded"
+miss "$out" "the remote advertised no tips"
+git remote add origin "$ORIGIN"
+
+reset_tree; mkconf
+git remote add second "$ORIGIN"
+out=$(run)
+hit  "$out" "this clone declares more than one remote, so which endpoint published would even mean is a guess; the leg refuses to pick one rather than measuring the BASE against whichever name sorts first: recorded"
+miss "$out" "the remote advertised no tips"
+git remote remove second
+reset_tree
+
+# ---- check 9: A TIP THIS CLONE DOES NOT HAVE IS NOT AN ANSWER. `merge-base --is-ancestor` fails
+# ---- both when the commit is not an ancestor AND when the tip object is missing, and is_published
+# ---- used to collapse those into 'not published'. Cost a red bar for real on 2026-08-21: the
+# ---- remote advanced, this clone had not fetched, and all SIXTEEN honest run records reported as
+# ---- naming commits that exist only locally - then the same leg went green minutes later once the
+# ---- tip arrived. A bar that reds on network timing rather than on the tree teaches people to
+# ---- re-run instead of to read.
+# ---- The fixture advertises a tip built INSIDE the bare origin, so the clone cannot have it.
+reset_tree; mkconf
+ghost=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" rev-parse HEAD^{tree})" -m ghost -p "$(git --git-dir="$ORIGIN" rev-parse HEAD)")
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$ghost"
+n=$((n+1)); git cat-file -e "$ghost^{commit}" 2>/dev/null && { echo "FAIL the ghost tip IS present in this clone, so the arm below would grade the ordinary published path instead of the unobservable one"; st=1; }
+out=$(run)
+hit  "$out" "the remote advertised tips this clone does not have, so whether a recorded BASE is published CANNOT BE OBSERVED and this leg will not answer a question it could not ask; fetch and re-run: recorded"
+miss "$out" "is an ancestor of no tip the remote advertises"
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$ANCHOR0"
+reset_tree
 
 # ---- check 22: the section-8 key table and the KIT'S EXAMPLE conf, joined both ways, plus a
 # ---- one-way check that this project sets nothing undocumented. Three keys reached

@@ -110,9 +110,11 @@ DOD_EXTRA=""
 HALT_CODES_EXTRA=""
 HALT_FLOOR="7"
 
-# The LANDER MARKER. When declared, the lander writes this path on a successful push and
-# `--landed` reads it — the only verb that runs after the push, so the only one that can
-# observe it. What a COMPLIANT LANDER must write: a line naming the commit it pushed. Identity,
+# The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
+# `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in
+# each half and cannot be written at all from a linked worktree, where `.git` is a FILE. When
+# declared, the lander writes it on a successful push and `--landed` reads it — the only verb that
+# runs after the push, so the only one that can observe it. What a COMPLIANT LANDER must write: a line naming the commit it pushed. Identity,
 # not existence — a bare touched file is satisfied by any previous landing. Leave it EMPTY and
 # the observation is simply not asked for; an adopter who has not adapted their lander is not
 # wedged by a key they have never heard of.

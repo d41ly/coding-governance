@@ -167,19 +167,27 @@ recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
 
-**The mark is a SHAPE a machine reads, and it is graded PER ITEM.** Two readers grade it — the
+**The mark is a SHAPE a machine reads.** Two readers grade it — the
 hygiene gate for a spec at a terminal status, and the planning verb for a live build — and both
 require the word followed by a parenthesised attribution whose first field is `owner` or `agent`,
 whose second is a date, and whose optional third is `delegated`. Anything else is prose: a bare
 `RESOLVED:` resolves nothing, and neither does a resolver name outside that pair.
 
-The mark may sit ANYWHERE in the item's block — its opening line or any continuation line — because
-that is where authors actually put it. What changed on 2026-08-20, and what older guidance said:
-these readers used to decide on §8's FIRST NON-BLANK LINE alone. So a section opening with a sentence
-saying a fork was *not* resolved classified as resolved, and an unresolved item below a `none` first
-line was invisible. Now `none` ends the section only when the section has NO items; with any item
-present, every item is graded and no first line suppresses that. A §8 with neither an item nor a
-`none` form is a refusal, not a pass.
+The mark may sit ANYWHERE in the section — an item's opening line or any continuation line, and it
+may WRAP across a line break, which is this corpus's house style at its width. What the readers grade
+is the section as one whitespace-squeezed string: a section carrying items and no conforming mark
+anywhere is unresolved, and a first line that merely CONTAINS the word no longer resolves it. A §8
+with neither an item nor a `none` form is a refusal, not a pass.
+
+**What they do NOT grade, stated because the obvious tightening is wrong here.** They do not grade
+PER ITEM. That needs a fork bullet to be distinguishable from an OPTION bullet, and this corpus does
+not distinguish them — measured: of 287 §8 bullets, 69 carry descriptive labels, and among those are
+both resolved forks and genuinely open ones. So a label-shape discriminator UNDER-counts and lets a
+real open fork pass, which is worse than the over-counting it would replace; the over-counting was
+measured too, calling a RESOLVED fork unresolved on a live tracked spec whose three option bullets
+each demanded their own mark. The consequence to know: an unresolved fork sitting below an honest
+`none` opening line is NOT detectable, and is pinned as a gap in both readers' fixtures rather than
+implied away. Closing it needs §8 to have a regular shape, which is a scope change.
 
 A fork that a stated PROBE decides, rather than a judgment call, may carry `FACT-QUESTION · ` at the
 head of its bolded label, before the fork id. The prefix is transparent to resolution: it never marks

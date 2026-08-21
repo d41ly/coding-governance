@@ -2862,8 +2862,10 @@ echo "MARK review-loop" >&2
 # ---- method states — a literal clean verdict — occurs ZERO times while BLOCKED occurs dozens of
 # ---- times with no disposition anywhere, so a round cap would not give the loop an exit: it would
 # ---- move the stall earlier. The loop exits on CONVERGENCE and promotes what is left.
-rv_ln=$(grep -n '^review_state()' "$SCRIPT" | cut -d: -f1)
-eval "$(sed -n "${rv_ln},$((rv_ln + 9))p" "$SCRIPT")"
+# THE THIRD SLICE SITE. `slice_fn` was introduced in this range precisely to kill magic spans and
+# was applied to two of the three; this one kept `+ 9`. Same defect, same silence: a truncated body
+# still defines the function, so the liveness check passes and every verdict comes back empty.
+slice_fn review_state
 RUNAWAY_CEILING=$(sed -n 's/^RUNAWAY_CEILING="\([0-9]*\)".*/\1/p' "$SCRIPT" | head -1)
 n=$((n+1)); declare -F review_state >/dev/null || { echo "FAIL review_state was not sliced out of the driver, so every predicate arm below graded nothing"; st=1; }
 n=$((n+1)); [ -n "$RUNAWAY_CEILING" ] || { echo "FAIL the runaway ceiling could not be read out of the driver, so the ceiling arm below would compare against an empty string"; st=1; }

@@ -906,7 +906,10 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       q8 = ""; items = 0; resolved = 0
       for (i = 2; i <= q - 1; i++) {
         if (rng[i] ~ /^[[:space:]]*$/) continue
-        if (q8 == "") q8 = rng[i]
+        if (q8 == "") { q8 = rng[i]; gsub(/^[[:space:]]+|[[:space:]]+$/, "", q8); q8 = tolower(q8) }  # TRIMMED AND LOWERCASED, matching the sibling reader byte for byte: it lowercases
+        # its own opening line, so testing the RAW line here made `None`, `NONE` and a lowercase
+        # `n/a` a none-form to one reader and not to the other - and the planning verb then routed
+        # a run at READY on a spec this gate reds.
         # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
         # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
         # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
@@ -968,12 +971,12 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         # ---- genuinely undecided population, it is reached through the empty-first-line branch, and
         # ---- an empty population passing is the shape this repo refuses by name everywhere else.
         if (bitems == 0) {
-          if (q8 !~ /^none/ && q8 !~ /^N\/A/)
+          if (q8 !~ /^none/ && q8 !~ /^n\/a/)
             print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_MARK_CUTOFF " fcut "; a hollow section and a resolved one are the same byte)"
-        } else if (q8 !~ /^none/ && q8 !~ /^N\/A/ && !bmark)
+        } else if (q8 !~ /^none/ && q8 !~ /^n\/a/ && !bmark)
           print f " (terminal Status, §8 carries items and no conforming resolution mark anywhere, at/after FORK_MARK_CUTOFF " fcut ")"
       }
-      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
+      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^n\/a/ && !(items > 0 && items == resolved))
         print f " (terminal Status with unresolved §8 Open questions)"
     }
 

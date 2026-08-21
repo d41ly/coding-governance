@@ -38,8 +38,12 @@ mkdir -p memory/guides tools/unattended .claude/skills/unattended
 # checks that have nothing to do with the subject, and a naive arm reading "the leg failed" scores
 # that as a correct refusal. This is `fixture-passes-by-finding-nothing` inverted — the fixture fails
 # by finding the WRONG thing — which is why the completeness precondition below runs before any arm.
+# THE EXAMPLE CONF RIDES ALONG. check 22 joins the protocol key table against it and REFUSES when it
+# is absent, so a fixture that omits it makes every leg run inside this file fail on a fault the
+# fixture created. The identical line was added to the sibling fixture in the same commit and missed
+# here - one of two paired carriers, which is this range's dominant defect shape.
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" \
-   "$HERE/SKILL.template.md" tools/unattended/
+   "$HERE/SKILL.template.md" "$HERE/.unattended.conf.example" tools/unattended/
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
