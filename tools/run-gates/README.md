@@ -60,6 +60,14 @@ repository shares one beacon and two repositories never contend. A second run ta
 ticket and queues, announcing its position; the runner prints `gate queue: waited <n>s` on exactly
 one line, always, zero when uncontended, so a wrapper can tell waiting from working.
 
+That line is not durable, and the status file beside it is deleted the moment the wait ends, so the
+wait also reaches the RUN RECORD as the paired keys `queued` and `queued_from`, and the summary
+file as its own line. `queued_from` is a closed four-word vocabulary: `held` (queued, then
+acquired), `expired` (burned the bounded wait and ran unqueued), `off` (the turnstile was disabled)
+and `unresolved` (the common dir did not resolve). The last two record a DASH rather than a zero,
+because a zero for a probe that never ran is a reassuring number about nothing. `unresolved` is
+UNARMED and the suite header says why.
+
 A holder is reaped on either of two signals: a dead PID, or a heartbeat older than the TTL. The TTL
 is DERIVED from the profile row's per-leg `timeout=` when it sets one, because the heartbeat
 refreshes when a leg COMPLETES — so "can the holder still be holding" and "has a leg finished
