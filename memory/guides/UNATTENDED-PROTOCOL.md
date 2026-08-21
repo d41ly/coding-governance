@@ -384,6 +384,7 @@ where this document says it may:
 | `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
+| `DISPATCH_GRADING` | non-blank turns ON the grading of a dispatch declaration against what the pass committed. **Blank, and blank is the default.** The grading is retired pending `TOOL-dUnstalledConvoy-23`; four adversarial rounds are recorded under the governing repo's `builds/dUnstalledConvoy/reviews/`, the last of which reproduced a driver call retracting a failure the leg had already emitted. Declarations are still RECORDED either way |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no

@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -221,14 +221,14 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- gen:build-index -->
 **Build status:** CLOSED · 13 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
-ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19
+ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | CLOSED | rev-2 | 2026-08-20 |
 | [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | CLOSED | rev-6 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | CLOSED | rev-4 | 2026-08-21 |
@@ -252,6 +252,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -289,4 +290,5 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md)
+  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md)
 <!-- /gen:build-docs -->

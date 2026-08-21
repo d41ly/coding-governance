@@ -2346,24 +2346,22 @@ out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/
 hit "$out" "dispatch declared"
 same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
 
-# ...IDENTICAL is a no-op, by the same post-compaction argument every other verb here makes.
+# ...RE-DECLARING PARKS ANOTHER ROW, full stop. The identical/widen/narrow trio that stood here is
+# gone with the branch that implemented it: every version of that branch was wrong in a different
+# direction, and its last one let a pass that had already written outside its lane re-park a widened
+# row at the original anchor and RETRACT a check-23 failure the leg had emitted. The record is
+# append-only now and TOOL-dUnstalledConvoy-23 owns the redesign.
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
-hit "$out" "dispatch already declared, unchanged"
-same "the repeat added no row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
-
-# ...a strict SUPERSET WIDENS. This is the in-band repair the leg's fork resolution commits this
-# build to: a run that discovers a needed file mid-pass re-declares BEFORE committing, and without
-# this the check becomes the wedge the build exists to remove.
-out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh --writes tools/c.sh)
-hit "$out" "dispatch WIDENED"
-
-# ...a NARROWING is refused, because narrowing after the fact is how a write gets hidden.
-out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
-hit "$out" "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not:"
+hit "$out" "dispatch declared"
+same "the repeat parked its own row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "2"
+miss "$out" "unchanged"
+miss "$out" "WIDENED"
 
 # ---- CONDITION 1: two passes in one group claiming one path are not disjoint, decided the moment
 # ---- the second declaration arrives.
-out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/c.sh)
+# tools/b.sh, not tools/c.sh: c was only ever declared by the WIDENING arm above, and with that
+# branch gone no row claims it — an arm pointed at it would pass by finding nothing.
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/b.sh)
 hit "$out" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 
 # ...and a genuinely disjoint sibling is ACCEPTED.
@@ -2477,32 +2475,22 @@ mkdir -p work && printf 'a\n' > work/shared
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared"
 
-# ---- A WIDENING REUSES THE ANCHOR IT SUPERSEDES (closing review F3). Parking the replacement at the
-# ---- CURRENT HEAD gave it a different group from the row it replaces, so the leg saw two unrelated
-# ---- declarations and graded the stale narrow one forever. The run-state commit below is what moves
-# ---- HEAD, and it is what a real run does between the two calls.
+# ---- A DECLARATION IS APPEND-ONLY: nothing rewrites, supersedes or retracts an earlier one. The
+# ---- property asserted here is the ABSENCE of the widening branch, because its return is exactly
+# ---- what would re-open the retraction escape.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one >/dev/null 2>&1
 A0=$(sed -n 's/^.* dispatch · item \([0-9a-f]*\) ARCH-tRun-1 · reason .*$/\1/p' memory/builds/tRun/RUN.md | tail -1)
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two)
-hit "$out" "dispatch WIDENED"
-A1=$(sed -n 's/^.* dispatch · item \([0-9a-f]*\) ARCH-tRun-1 · reason .*$/\1/p' memory/builds/tRun/RUN.md | tail -1)
-same "the widened row reuses the superseded row's anchor" "$A1" "$A0"
+hit "$out" "dispatch declared"
+miss "$out" "WIDENED"
 n=$((n+1))
-[ -n "$A0" ] || { echo "FAIL the widening fixture read no anchor, so the comparison above proves nothing"; st=1; }
-# ...and the anchor genuinely MOVED in between, or the arm is a tautology.
+grep -q " dispatch · item $A0 ARCH-tRun-1 · reason work/one\$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL the first declaration was rewritten; an append-only record must still carry it verbatim"; st=1; }
 n=$((n+1))
-[ "$A0" != "$(git rev-parse --short=8 HEAD)" ] \
-  || { echo "FAIL the widening fixture left HEAD at the original anchor, so reuse is indistinguishable from taking HEAD"; st=1; }
-
-# ---- ...and a NARROWING is still refused after HEAD has moved (closing review F6). The rule was
-# ---- keyed on the current HEAD while the leg was keyed on the unit, so once the run committed its
-# ---- declaration the lookup found nothing and a narrowing was appended as a first declaration.
-reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev/null 2>&1
-git add -A && git commit -q -m "chore: park the run-state" --no-verify
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not:"
+[ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
+  || { echo "FAIL the second declaration did not park its own row"; st=1; }
 reset_tree
 
 # ---- B1: THE DECLARATION COMMIT'S REAL SHAPE. The round-2 arm committed RUN.md alone, and the
@@ -2546,12 +2534,13 @@ miss "$out" "narrowing is not"
 n=$((n+1))
 [ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
   || { echo "FAIL the legal second pass did not park its own row, so the leg has one declaration for two passes"; st=1; }
-# ...and a NARROWING still is one. A strict subset always overlaps, so it enters the branch and is
-# refused even after HEAD has moved — which is the property the overlap gate had to preserve.
+# ...and there is NO narrowing refusal any more, deliberately. With grading dark there is nothing a
+# narrowing can hide from, and the refusal that existed could not be cleared in band — which is the
+# stall this build exists to remove. Asserted as an ABSENCE so its return is visible.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev/null 2>&1
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is not"
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is not"
 
 # ---- B3: THE RECORD CARRIES ONE SPELLING. Normalised for the refusals and parked raw, `work/sub/`
 # ---- passed every guard and was then graded as a literal by the leg, which reds forever with

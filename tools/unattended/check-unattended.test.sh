@@ -39,6 +39,10 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
+# The dispatch write-set GRADING is dark by default (TOOL-dUnstalledConvoy-23 owns its
+# redesign). The fixture declares it ON so the grading arms below still exercise the code;
+# a separate arm removes the key and asserts the dark path announces itself.
+DISPATCH_GRADING=1
 EOF
 }
 
@@ -1444,6 +1448,32 @@ git add -A && git commit -q -m "a group anchor this clone does not carry" --no-v
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
 reset_tree
 
+
+# ---- CHECK 23'S GRADING IS DARK BY DEFAULT, and the dark state ANNOUNCES itself. Four adversarial
+# ---- rounds over this mechanism are recorded under memory/builds/dUnstalledConvoy/reviews/; the last
+# ---- reproduced a driver call retracting a failure this check had already emitted, and the one
+# ---- before it a refusal that ended a unit outright. It ships inert until TOOL-dUnstalledConvoy-23
+# ---- redesigns it. The arms above run with DISPATCH_GRADING declared, so the code stays exercised.
+# ----
+# ---- BOTH HALVES ARE ARMED: the announcement when declarations exist, and the SILENCE when none do,
+# ---- because a leg that narrates a dark check on every run for every project trains people to skip
+# ---- its output.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
+git add -A
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "check 23 DARK for"
+hit "$out" "a green verdict here is coverage of nothing"
+miss "$(run)" "check 23 FAILED"
+# ...and with NO dispatch rows at all the dark check says nothing, so the announcement stays a signal.
+reset_tree
+sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
+git add -A
+miss "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 DARK for"
+reset_tree
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather

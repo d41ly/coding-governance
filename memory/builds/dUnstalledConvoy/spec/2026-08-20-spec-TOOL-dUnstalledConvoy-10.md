@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed
 
-**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-6 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -178,6 +178,29 @@ boundary.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · SCOPE AMENDED at the landing edge, per M2, and the amendment is a reduction.
+  The GRADING half of this unit — comparing a declaration against what the pass committed — ships
+  DARK behind `DISPATCH_GRADING`, default blank, and the leg announces the dark state on any run
+  carrying dispatch rows. The declarations are still recorded and every other check in the leg still
+  runs. The driver's re-declaration and widening branch is REMOVED rather than gated: it was the
+  vector, and a record that cannot be rewritten needs no rule about rewriting it.
+
+    WHY. Four adversarial rounds over this mechanism are recorded in `../reviews/`. They found 16, 10,
+  8 and 10 defects; the repairs introduced 5, 3 and 5 in turn, and the introduction rate did not
+  fall. Round 3 shipped a refusal that ended a unit outright with no way to clear it — a stall, in
+  the build whose subject is stalls. Round 4 reproduced a driver call RETRACTING a check-23 failure
+  the leg had already emitted, rc=1 to rc=0 over the same violating tree, and a cross-lane collision
+  laundered green. A disjointness proof that can be talked out of a finding is worth less than no
+  proof, because it is believed.
+
+    This is §1's own handling for unverified Tier-2 behaviour: ship it inert, flip it on after
+  in-place verification, never land it on because it is nearly there. The redesign is
+  `TOOL-dUnstalledConvoy-23` in `memory/backlog/TOOL.md`, which carries the four reports as its
+  starting evidence rather than a blank page.
+
+    What is NOT amended: the declaration grammar, the recording verb, condition 1 and condition 3's
+  refusals at declaration time, and every arm that exercises the grading — the fixture declares
+  `DISPATCH_GRADING=1` so the code stays exercised and the redesign inherits a live test surface.
 - rev-5 · 2026-08-21 · built, and ONE defect the spec could not have predicted: `--dispatch` STAGES
   the run-state file, so the run commits the DECLARATION itself — and that commit's subject names the
   unit, being about it. The join therefore read the declaration as the pass's own commit, ran the

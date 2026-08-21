@@ -97,7 +97,7 @@ line says so rather than implying it was.
 - AC4 — `tools/unattended/check-unattended.test.sh` — one commit naming two passes of a group reds on ambiguous attribution.
 - AC5 — `tools/unattended/check-unattended.test.sh` — an unresolvable group anchor announces a skip.
 - AC6 — `tools/unattended/check-unattended.test.sh` — declaring three paths and committing one passes.
-- AC7 — `bash tools/unattended/check-unattended.sh` — the no-dispatch-rows skip prints on this repo and the default run stays silent.
+- AC7 — amended rev-6 — the default run no longer stays silent when dispatch rows exist: it announces that grading is DARK. The criterion described the behaviour of a mechanism whose grading now ships off, and the AMENDED form exists so a reduction in scope has a home on the record rather than being written as an observation that was never made.
 - AC8 — `tools/unattended/check-unattended.test.sh` — every refusal observed RED against a fixture.
 - AC9 — `tools/unattended/check-unattended.test.sh` — a later commit naming the same unit passes; it is outside the group by construction.
 - AC10 — `grep` — the check's header states what it cannot buy.

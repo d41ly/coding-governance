@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-21T06:19:27+03:00 @ 2dc9df359a6b56c08e052f330655cff0c7ea87f9
+last-audit: 2026-08-21T13:25:13+03:00 @ 2dc9df359a6b56c08e052f330655cff0c7ea87f9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: c1b3734a34e6121e42422eff79c5a58e9819aa41
@@ -51,7 +51,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
   parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
   authority are M3's and M6's; they are not restated here, for the reason the directives bullet
-  below gives.
+  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
+  pass's declared write set, but grading it against what the pass committed ships DARK behind
+  `DISPATCH_GRADING` after four adversarial rounds failed to make it correct, and the leg says so on
+  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` owns the redesign. Declare your write
+  sets anyway — a redesign reads them — but do not treat a green leg as a disjointness proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit

@@ -1061,6 +1061,25 @@ for f in $RUNS; do
   # widening cannot reuse a closed pass's anchor, it lands under a NEW key here and the original
   # narrow declaration is still graded — which is the ordering constraint, obtained by construction
   # rather than by comparing timestamps after the fact.
+  # GRADING IS OFF UNLESS A PROJECT DECLARES IT ON, and the default is off because this mechanism is
+  # not verified. Four adversarial rounds over it are recorded under `memory/builds/dUnstalledConvoy/reviews/`; the
+  # last one reproduced a driver call RETRACTING a failure this check had already emitted, and the
+  # round before that a refusal that ended a unit outright. The introduction rate across the four
+  # rounds did not fall. TOOL-dUnstalledConvoy-23 owns the redesign.
+  #
+  # THE DECLARATIONS ARE STILL RECORDED by `--dispatch`, and every other check in this leg still runs.
+  # What is dark is the GRADING of a declaration against a commit — the one part that was never
+  # right. This is the charter's own handling for unverified Tier-2 behaviour: ship it inert, flip it
+  # on after in-place verification, never land it on because it is nearly there.
+  #
+  # A DARK CHECK ANNOUNCES ITSELF. A skip that looks like a pass is indistinguishable from coverage,
+  # and this leg has redded twice for exactly that shape.
+  if [ -z "${DISPATCH_GRADING:-}" ]; then
+    if grep -qF -- ' dispatch · item ' "$f" 2>/dev/null; then
+      report "check 23 DARK for $f — dispatch declarations are recorded but NOT graded against commits; the grading is retired pending TOOL-dUnstalledConvoy-23 and DISPATCH_GRADING is unset, so a green verdict here is coverage of nothing"
+    fi
+    continue
+  fi
   dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
       { k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
         if (!(k in row)) ord[++n] = k

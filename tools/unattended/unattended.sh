@@ -2315,64 +2315,24 @@ SIBS
   want=""
   for p in "$@"; do want="$want $(normpath "$p")"; done
   want=${want# }
-  # KEYED ON THE UNIT'S OPEN ROW, not on the current HEAD. `$grp` moves the moment the run commits
-  # its own declaration, and a lookup keyed on it then finds nothing and admits a NARROWING as a
-  # first declaration — which is the one thing this rule exists to refuse. `sibrows` already holds
-  # exactly the rows whose pass has not committed, so the open row for this unit is in there.
-  cur=$(printf '%s\n' "$sibrows" | grep -F -- " dispatch · item " | while IFS= read -r _r; do
-      [ -n "$_r" ] || continue
-      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
-      [ "${_i#* }" = "$unit" ] && printf '%s\n' "$_r"
-    done | tail -1)
-  # ...AND A ROW AT ANOTHER ANCHOR IS ONLY A RE-DECLARATION IF IT SHARES PATHS WITH THIS ONE. Keying
-  # on the unit alone made every later pass of that unit a narrowing of the first: M6 sanctions
-  # several pass kinds per unit, a pass that produced no change never commits, and its row therefore
-  # stays open for the rest of the run. The next pass of that unit was then refused, terminally,
-  # because an unattended run has no owner turn to override it — a stall shipped by the build whose
-  # whole subject is stalls.
+  # THE RE-DECLARATION AND WIDENING MACHINERY IS GONE, and its absence is the fix rather than a gap.
+  # TOOL-dUnstalledConvoy-23 owns its redesign; four adversarial rounds are recorded under
+  # `memory/builds/dUnstalledConvoy/reviews/`.
   #
-  # A NARROWING IS A STRICT SUBSET, so it always overlaps and is still refused after HEAD has moved.
-  # A genuinely new pass with a disjoint set falls through and parks a fresh row at the current
-  # anchor, which is the state the leg's own (group, unit) key already grades. The residual is a new
-  # pass that PARTLY overlaps its predecessor: it is read as a narrowing and refused, which is the
-  # conservative direction — refusing a legal declaration is visible, mis-grading one is not.
-  if [ -n "$cur" ]; then
-    curpaths=${cur#* · reason }
-    curgrp=${cur#* dispatch · item }; curgrp=${curgrp%% *}
-    if [ "$curgrp" != "$grp" ]; then
-      _shares=""
-      for q in $curpaths; do
-        for p in "$@"; do overlaps "$p" "$q" && { _shares=1; break 2; }; done
-      done
-      [ -n "$_shares" ] || cur=""
-    fi
-  fi
-  if [ -n "$cur" ]; then
-    curpaths=${cur#* · reason }
-    # THE WIDENED ROW KEEPS THE SUPERSEDED ROW'S ANCHOR, and this is the whole of what makes the leg
-    # able to stay simple. `--dispatch` stages the run-state file and the run commits that
-    # declaration, so HEAD has almost always moved by the time a widening is asked for; parking the
-    # new row at the CURRENT HEAD gave it a different group from the row it replaces, the leg saw two
-    # unrelated declarations, and the stale narrow one was graded forever. Reusing the anchor makes
-    # the pair one declaration under one key, which is what it is.
-    #
-    # It also closes the post-hoc rewrite: once the pass has COMMITTED, `sibrows` no longer carries
-    # its row, `cur` is empty, and this branch is not reached at all — so a widening that arrives
-    # after the write lands as a NEW row at a new anchor and does not supersede anything. The leg
-    # then still grades the original narrow declaration against the commit, and still reds.
-    if [ "$curpaths" = "$want" ]; then
-      echo "unattended: dispatch already declared, unchanged — $unit"
-      return 0
-    fi
-    for q in $curpaths; do
-      for p in "$@"; do [ "$p" = "$q" ] && continue 2; done
-      fail 49 "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not: $q for $unit"; return 1
-    done
-    park "$rel" dispatch "$curgrp $unit" "$want"
-    stage_or_fail "$rel" || return 1
-    echo "unattended: dispatch WIDENED — $unit · $want"
-    return 0
-  fi
+  # WHY IT WAS REMOVED RATHER THAN REPAIRED. The branch existed to let a pass widen a declaration it
+  # had already made, and to refuse a narrowing. Every version of it was wrong in a different
+  # direction: keyed on HEAD it lost the row the moment the run committed its own declaration; keyed
+  # on the unit it refused a legal second pass forever, which is terminal in a run with no owner turn;
+  # keyed on the unit with an overlap gate it let a pass that had ALREADY written outside its lane
+  # re-park a widened row at the original anchor and RETRACT a check-23 failure that had already been
+  # emitted — rc=1 to rc=0 over the same violating tree, reproduced end to end. A disjointness proof
+  # that can be talked out of a finding is worth less than no proof, because it is believed.
+  #
+  # A declaration is now APPEND-ONLY and each one stands on its own: every `--dispatch` parks a row at
+  # the current anchor, and nothing rewrites, supersedes or retracts an earlier one. A pass that needs
+  # more paths declares again; both rows are on the record and a redesign can read them. There is no
+  # narrowing refusal, because with grading dark there is nothing for a narrowing to hide from — and a
+  # refusal nobody can clear is the stall this build exists to remove.
   park "$rel" dispatch "$grp $unit" "$want"
   stage_or_fail "$rel" || return 1
   echo "unattended: dispatch declared — $grp $unit · $want"
