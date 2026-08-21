@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it
 
-**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -194,6 +194,36 @@ problem entirely, at the cost of the warm-ledger sort penalty on both.
   nor §8 (F12); the gov-canary floor must rise (F13); the guard-parity invariant is unenforceable
   by the join cited and is now a named manual check (F20); §7 implied no manifest row (F22); and
   the canary's leg-path heuristic will collect the shard token (F24).
+- rev-3 · 2026-08-21 · BUILT, and INPROGRESS rather than CLOSED because AC13 binds it to a sibling
+  that is not ready. Everything in this unit's own scope is done and measured on node a:
+
+  | mode | assertions | wall |
+  |---|---|---|
+  | unsharded | 398 | 435 s |
+  | `--shard 1/2` | 196 | 261 s |
+  | `--shard 2/2` | 206 | 150 s |
+
+  `196 + 206 = 398 + 4`, confirming `PROLOGUE_ARMS=4` exactly — independently re-confirmed by the
+  stranded-region break, which executed exactly 4. **AC12's balance: max(shard) is 261 s against an
+  unsharded 435 s, 60.0 %**, better than the 63/37 the seam was priced at. Five staged breaks each
+  observed RED and green on unstage: a lost shard row, both rows on one index, a script called with
+  `--shard` that declares no arity (the live pre-change shape), a script declaring arity that no row
+  calls, and a stranded region. The gov-canary contract arms both directions.
+
+  **Why it does not land:** `TOOL-aShardedFloor-3` is BLOCKED, and this unit's AC13 requires the
+  pair in one commit. Alone it buys 3.7 %, because the gate selftest simply becomes the new floor.
+  The work sits on the branch; the manifest and descriptor rows are written and green.
+- rev-4 · 2026-08-21 · CLOSED. The sibling is unblocked, so the pair lands together as AC13
+  requires. **Re-measured on current `main`**, because another node landed arms into this suite
+  while the unit sat on the branch and the rev-3 triple no longer described it: unsharded 419
+  assertions / 343 s, shard one 205, shard two 227. `PROLOGUE_ARMS` is DERIVED as
+  `205 + 227 - 419 = 13`, not the 4 rev-3 recorded, and the per-shard floors are re-derived at the
+  unsharded pin's own ~19 % discount to 165 and 183.
+
+  **One trap worth naming, because it cost a `check-arms` red.** Restoring this unit's work from its
+  WIP commit clobbered arms another node had landed on `main` in the meantime — the file went back
+  to a base that predated them. The fix is to re-apply the change onto current `main` rather than
+  restore the file; a WIP commit on a branch is a patch, not a file.
 
 ## 10. Reuse audit
 

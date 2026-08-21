@@ -497,8 +497,13 @@ heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree.
 scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
-clock only. Measured on node `a`: the full bar costs 873 s of wall clock against a 4018 s leg-sum,
-so concurrency is already paying and a single leg is most of what remains. Every leg's output is persisted
+clock only. Measured on node `a` 2026-08-21, after the `unattended` selftests were sharded: the
+full bar costs 477 s of wall clock against a 2587 s leg-sum, and its longest leg is 297 s. That
+leg is now BELOW leg-seconds over width (323 s), so the bar is no longer FLOOR-bound — the thing
+that binds it is throughput, and the next lever is total work rather than any single leg. The
+earlier reading here (873 s against 4018 s) was taken before that landing AND on a busier box, so
+the gap between the two is not attributable to the sharding alone; what IS attributable is the
+floor, which the shard pair moved from ~660 s to 297 s. Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
 only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.

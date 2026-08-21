@@ -67,7 +67,9 @@ PYBIN=$(resolve_python) || { echo "gov-canary: no usable python"; exit 2; }
 
 fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
-FLOOR_ASSERTIONS=12
+# Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
+# reverse declaration). Stated ABSOLUTELY, never as a delta.
+FLOOR_ASSERTIONS=14
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -208,11 +210,10 @@ else
   # G4 — the stale MEASUREMENT. The pair that replaced it is a real reading of the current bar.
   a=$((a+1))
   if grep -qE '335s|~?95s' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 873 s wall against a 4018 s leg-sum"; fail=1
+    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 477 s wall against a 2587 s leg-sum"; fail=1
   fi
   a=$((a+1))
-  { grep -q '873 s' "$CHARTER" && grep -q '4018 s' "$CHARTER"; } \
-    || { echo "gov-canary: $CHARTER no longer states the measured pair (873 s wall against a 4018 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
+  { grep -q '477 s' "$CHARTER" && grep -q '2587 s' "$CHARTER"; }     || { echo "gov-canary: $CHARTER no longer states the measured pair (477 s wall against a 2587 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
   # G5 — the stale WIDTH FORMULA, in the backticked spelling the file actually uses. The runner reads
   # its width from a declared table now, so a charter naming a formula is telling a session something
   # it cannot verify anywhere in the tree.
@@ -245,6 +246,69 @@ if bad:
           % (sorted(SIX), ", ".join(bad)))
     sys.exit(1)
 ' "$ROOT/tools/gate-legs.json" || fail=1
+# ---- THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2) ----------------------------------
+# A sharded suite is TWO manifest rows on ONE script, and the failure that costs is silent: delete
+# one row and the bar goes green having run half the suite. Nothing else notices, because every
+# surviving row passes and the manifest is not compared to anything.
+#
+# BOTH DIRECTIONS, because either alone is satisfiable by doing nothing. Forward: every index a
+# sharded script declares is present in the manifest. Reverse: a script CALLED with `--shard`
+# declares a `SHARD_ARITY`, and a script that declares one is CALLED with `--shard` — which is the
+# arm that catches the live pre-change shape, a script parsing no argv at all, where two `--shard`
+# rows would each run the full suite: bar green, wall unchanged, leg-seconds doubled.
+#
+# WHAT THIS DOES NOT CHECK: that a shard actually runs the region it claims. Only the suite's own
+# per-mode assertion floor sees that. This arm reads the manifest and a declaration, nothing more.
+a=$((a+2))
+"$PYBIN" -c '
+import json, os, re, sys
+root, legs_file = sys.argv[1], sys.argv[2]
+legs = json.load(open(legs_file))
+bad = []
+
+# forward — every declared index present, exactly once
+sharded = {}
+for l in legs:
+    argv = l.get("argv") or []
+    if "--shard" not in argv:
+        continue
+    i = argv.index("--shard")
+    val = argv[i + 1] if i + 1 < len(argv) else ""
+    script = next((t for t in argv if t.endswith(".sh") or t.endswith(".py")), "?")
+    m = re.fullmatch(r"([0-9]+)/([0-9]+)", val)
+    if not m:
+        bad.append("leg %r carries a malformed --shard value %r" % (l.get("name", "?"), val)); continue
+    sharded.setdefault(script, []).append((int(m.group(1)), int(m.group(2)), l.get("name", "?")))
+for script, rows in sorted(sharded.items()):
+    arities = {r[1] for r in rows}
+    if len(arities) != 1:
+        bad.append("%s is called with more than one shard arity: %s" % (script, sorted(arities))); continue
+    n_ = arities.pop()
+    have = sorted(r[0] for r in rows)
+    want = list(range(1, n_ + 1))
+    if have != want:
+        bad.append("%s declares arity %d but the manifest carries indices %s — expected %s"
+                   % (script, n_, have, want))
+
+# reverse — the declaration and the call agree, in both directions
+for script in sorted({t for l in legs for t in (l.get("argv") or []) if t.endswith(".sh")}):
+    p = os.path.join(root, script)
+    if not os.path.isfile(p):
+        continue
+    declares = re.search(r"^SHARD_ARITY=", open(p, encoding="utf-8", errors="replace").read(), re.M)
+    called = script in sharded
+    if declares and not called:
+        bad.append("%s declares SHARD_ARITY but no manifest row calls it with --shard — it runs whole, once" % script)
+    if called and not declares:
+        bad.append("%s is called with --shard but declares no SHARD_ARITY — the flag is IGNORED and every row runs the whole suite" % script)
+
+if bad:
+    print("gov-canary: shard contract violated:")
+    for b in bad:
+        print("  " + b)
+    sys.exit(1)
+' "$ROOT" "$ROOT/tools/gate-legs.json" || fail=1
+
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then
   echo "PASS ($a assertions)"

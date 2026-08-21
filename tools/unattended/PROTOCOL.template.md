@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.7 -->
+<!-- gov:kit unattended@1.8 -->
 # Unattended runs — the protocol
 
 **Binding.** A session running with no human in the loop follows this document. It is

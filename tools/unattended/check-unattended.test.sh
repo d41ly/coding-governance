@@ -10,6 +10,40 @@
 # on that prefix being the scratch repo's, not this one's.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+
+# ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
+# The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of
+# tools/unattended/unattended.test.sh: one file and two guarded contiguous regions rather than a
+# physical split (which `check-arms.py`'s one-gate-one-sibling map and the armed-branch pin refuse),
+# the flag PARSED rather than position-read, and the refusal before any scratch dir exists.
+#
+# What differs here is the SEAM and the floors, which is why this is a second unit rather than a
+# second paragraph. Its HOIST SET is two — `anchor_break` and `anchor_restore`.
+SHARD_ARITY=2
+SHARD=""; SHARD_GIVEN=0
+if [ "${1:-}" = --shard ]; then
+  SHARD_GIVEN=1; SHARD="${2:-}"
+elif [ $# -gt 0 ]; then
+  echo "check-unattended.test: unrecognised argument '$1' — this suite takes '--shard <i>/<n>' or nothing"; exit 2
+fi
+# A BARE `--shard` takes the same refusal branch as a bad value. Keying on a non-empty value instead
+# lets a bare flag run the FULL suite under a leg that claims to be a shard.
+if [ "$SHARD_GIVEN" = 1 ]; then
+  [ -n "$SHARD" ] || { echo "check-unattended.test: --shard takes '<i>/<n>', got no value"; exit 2; }
+  case "$SHARD" in
+    */*) : ;;
+    *) echo "check-unattended.test: --shard takes '<i>/<n>', got '$SHARD'"; exit 2 ;;
+  esac
+  SH_I=${SHARD%%/*}; SH_N=${SHARD##*/}
+  case "$SH_I$SH_N" in *[!0-9]*|"") echo "check-unattended.test: --shard indices must be numeric, got '$SHARD'"; exit 2 ;; esac
+  [ "$SH_N" = "$SHARD_ARITY" ] || { echo "check-unattended.test: --shard arity must be $SHARD_ARITY, got '$SHARD'"; exit 2; }
+  [ "$SH_I" -ge 1 ] 2>/dev/null && [ "$SH_I" -le "$SHARD_ARITY" ] \
+    || { echo "check-unattended.test: --shard index out of range 1..$SHARD_ARITY, got '$SHARD'"; exit 2; }
+else
+  SH_I=0
+fi
+in_shard() { [ "$SH_I" = 0 ] || [ "$SH_I" = "$1" ]; }
+
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}"' EXIT
 st=0; n=0
@@ -135,7 +169,38 @@ mutate() { # file · sed-script
   [ "$(git hash-object "$f")" != "$before" ] || { echo "FAIL fixture no-op on $f: $2"; st=1; }
 }
 
-# ---- THE GREEN CONTROL, first. Every red arm below is worthless if the clean tree is not clean:
+# ---- HOISTED FOR THE SHARD CONTRACT. Region two drives these too; they are MOVED rather than
+# ---- duplicated, because two definitions of one helper is two answers to one question.
+# ---- Each arm has to break the README AT THE ANCHOR COMMIT, not in the working copy: the leg reads
+# ---- `<recorded base>:<path>`, so a working-copy edit changes nothing it looks at. Editing main,
+# ---- pushing, merging back and RE-RECORDING the base is the only shape that actually arms these -
+# ---- an arm that edits the working tree passes against a leg that does no check at all.
+anchor_break() { # everything after the first argument runs on main, then the base is re-recorded
+  reset_tree
+  git checkout -q main
+  "$@"
+  git add -A >/dev/null && git commit -q -m anchor-break --no-verify && git push -q -f origin main
+  git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
+  sed -i "s|^base: .*|base: $(git merge-base origin/main HEAD)|" memory/builds/tRun/RUN.md
+  sed -i "s|^witness: .*|witness: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+  git add -A >/dev/null
+}
+anchor_restore() {
+  # DROP the unit branch's staged fixture edits FIRST. Without this, `git checkout main` refuses
+  # because the checkout would overwrite them, the `&&` swallows the refusal, main keeps the previous
+  # arm's break, and every later arm starts from a tree it did not build - which is how one arm here
+  # passed for the wrong reason and the next could not pass at all.
+  git reset -q --hard "$PRISTINE"
+  git checkout -qf main && git reset -q --hard "$ANCHOR0"
+  git push -q -f origin "$ANCHOR0":main
+  git checkout -qf unit
+  reset_tree
+}
+
+# ---- REGION ONE ----------------------------------------------------------------------------------
+# Bodies are NOT reindented: `check-arms.py` reads lines and skips comments, so an unindented wrapper
+# leaves every arm signature byte-identical and the armed-branch pin untouched.
+if in_shard 1; then
 # ---- a leg that reds on everything arms every branch and checks nothing.
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
@@ -484,31 +549,7 @@ miss "$(GOV_DEFAULT_BRANCH= run)" "a record claims LANDED with a witness that is
 # ---- was about, so every authorization defect was invisible here. The subject moved to the build
 # ---- folder; the obligation did not.
 # ----
-# ---- Each arm has to break the README AT THE ANCHOR COMMIT, not in the working copy: the leg reads
-# ---- `<recorded base>:<path>`, so a working-copy edit changes nothing it looks at. Editing main,
-# ---- pushing, merging back and RE-RECORDING the base is the only shape that actually arms these -
-# ---- an arm that edits the working tree passes against a leg that does no check at all.
-anchor_break() { # everything after the first argument runs on main, then the base is re-recorded
-  reset_tree
-  git checkout -q main
-  "$@"
-  git add -A >/dev/null && git commit -q -m anchor-break --no-verify && git push -q -f origin main
-  git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
-  sed -i "s|^base: .*|base: $(git merge-base origin/main HEAD)|" memory/builds/tRun/RUN.md
-  sed -i "s|^witness: .*|witness: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
-  git add -A >/dev/null
-}
-anchor_restore() {
-  # DROP the unit branch's staged fixture edits FIRST. Without this, `git checkout main` refuses
-  # because the checkout would overwrite them, the `&&` swallows the refusal, main keeps the previous
-  # arm's break, and every later arm starts from a tree it did not build - which is how one arm here
-  # passed for the wrong reason and the next could not pass at all.
-  git reset -q --hard "$PRISTINE"
-  git checkout -qf main && git reset -q --hard "$ANCHOR0"
-  git push -q -f origin "$ANCHOR0":main
-  git checkout -qf unit
-  reset_tree
-}
+# ---- The anchor helpers are HOISTED to the prologue for the shard contract.
 
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
@@ -579,6 +620,39 @@ out=$(run); rc=$?
 same "a LANDED run-state record leaves the bar green" "$out" ""
 same "a LANDED run-state record exits 0" "$rc" "0"
 git checkout -q unit; reset_tree
+
+fi   # ---- end REGION ONE ----------------------------------------------------------------------
+
+# ---- REGION TWO ----------------------------------------------------------------------------------
+# THE SEAM, chosen between two block-edge candidates and MEASURED. It sits at the end of the
+# lifecycle block, which is the safer of the two: it keeps that block's un-restored `main`/origin
+# state on one side rather than straddling the boundary. The alternative, the end of check 14, is
+# the more balanced candidate and its timing is recorded in this build's record beside this one.
+#
+# NOT chosen by arm count. One tokenisation of this file splits nearly evenly while the
+# git-operation weight splits about 2:1 — and the bar's floor is the LARGER shard, so an imbalance
+# measured the wrong way eats the win directly.
+#
+# Neither candidate separates an arm from its control. The obvious-looking cut one line earlier
+# does exactly that, which is why the boundary is stated here rather than left to a line number.
+if in_shard 2; then
+# REPLAY WHAT REGION ONE LEAVES, and it is one property rather than a pile of state: region one's
+# anchor arms repeatedly check out main, commit, force-push and then merge main back into unit, so by
+# this seam `unit` is an ANCESTOR of `main`. The tWaive fixture below relies on that without saying
+# so — its `git merge -q --no-edit main >/dev/null 2>&1` is a FAST-FORWARD in the whole-suite run.
+#
+# MEASURED, both ways. Whole suite at this point: `Updating d0faf46..ab26c43`, merge rc 0. Shard two
+# without this line: the branches have diverged, that merge is a real one, it CONFLICTS on
+# memory/builds/tRun/RUN.md, and `>/dev/null 2>&1` swallows the conflict whole. `BUILD-METHOD.md`
+# then never reaches unit, `--preflight` refuses on check 34 with "no build method under the memory
+# root", no run-state file is written — and THREE arms fail naming a waiver, none of them naming the
+# cause. That is what this one line buys, and it is why it is a line rather than a comment.
+if [ "$SH_I" = 2 ]; then
+  git checkout -qf main && git merge -q --no-edit unit >/dev/null 2>&1
+  git push -q -f origin main >/dev/null 2>&1
+  git checkout -qf unit
+fi
+reset_tree
 
 # ---- check 14: a replace ref or a graft file is itself the violation. The GIT() pin makes THIS
 # ---- leg's reads honest; it binds no other tool reading the same objects.
@@ -757,6 +831,8 @@ RM
 # measures check 17 rather than a collision this fixture created.
 sed -i 's/^phase: RUNNING$/phase: ABORTED/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
+# A FAST-FORWARD, and the region-two opener above is what keeps it one. A real merge here conflicts
+# on tRun/RUN.md and this redirection swallows it whole — measured, and the reason that opener exists.
 git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
 WP=$(git rev-parse HEAD)
 wreset() { git reset -q --hard "$WP"; git clean -qfd; }
@@ -1259,7 +1335,39 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
+fi   # ---- end REGION TWO ----------------------------------------------------------------------
+
 FLOOR_ASSERTIONS=200
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
+# per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
+# measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
+# the first arm anyone legitimately removes.
+#
+# MEASURED on node a: unsharded 230 assertions / 478 s, shard one 84 / 190 s, shard two 146 / 246 s.
+# `84 + 146 = 230` EXACTLY: unlike the driver suite this file has no prologue arms, so its
+# PROLOGUE_ARMS is 0 and the two shards partition the count with nothing paid twice. Balance is
+# max(shard) 246 s over 478 s = 51.5 %, which is what the floor actually drops to.
+#
+# The two per-shard floors sum to exactly FLOOR_ASSERTIONS, which falls out of one discount applied
+# to a clean partition. That is a coincidence of these numbers and NOT an invariant — do not write a
+# check asserting it, because the driver suite's own three constants cannot satisfy the same
+# relation, and asserting it over floors rather than executed counts is how the first draft of the
+# sibling spec shipped an identity that was false by 60.
+FLOOR_SHARD_1=73
+FLOOR_SHARD_2=127
+case "$SH_I" in
+  1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
+  2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
+  *) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
+esac
+[ "$n" -ge "$FLOOR" ] || { echo "FAIL executed $n assertions in $MODE against a floor of $FLOOR — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT: its own region, and nothing else. Neither shard alone is
+# this suite, and the whole-suite claim lives only in a run with no `--shard` argument.
+#
+# TWO CONTROLS LOSE THEIR MEANING WITHOUT FAILING when this file is split, and they are named here
+# because no gate sees it: a "the tree is still clean after N mutations" control is a control only if
+# those N mutations ran in the same process. Split away from them it degrades into a duplicate of the
+# opening control — still green, and no longer evidence.
+[ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
