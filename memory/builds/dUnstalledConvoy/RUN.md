@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9
+unpushed-at-landing: 1 oldest 8e1a81bc
+landed-anchor: local
 parked-surfaced: yes
 keepalive-reaped: yes
-witness: 6576d7820f32bae76497f889c9a47b67bc26d39d
-phase: LANDING
+witness: 38d0b09ed8069b2a61a24d8efe8f5db2fa4b3d6e
+phase: LANDED
 branch-sha: 4bd2a45a5a11eeb85b902df16b04b9c2453cd1dd
 branch-ref: refs/heads/branch/unattended-build-issues-38c32e
 mode: slug
