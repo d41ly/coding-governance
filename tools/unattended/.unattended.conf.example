@@ -43,7 +43,7 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
-CORE_FLOOR="12:8"
+CORE_FLOOR="12:10"
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many

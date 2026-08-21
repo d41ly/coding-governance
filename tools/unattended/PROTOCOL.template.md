@@ -237,7 +237,7 @@ deny) or pick one arbitrarily (nondeterminism, which is the worst property a gat
 
 ## 4. The Definition of Done
 
-Eight kit-owned core items. Each names its checker, because an override budget must not be spent on
+Ten kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
@@ -248,6 +248,8 @@ something no machine could have checked:
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
+| `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
+| `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one |
 

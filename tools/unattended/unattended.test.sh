@@ -2256,6 +2256,34 @@ rm -f memory/builds/tRun/RUN.md
 hit "$(run --record-piece tRun --path pc/one/piece.md --leg L --verdict PASS)" "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers:"
 reset_tree
 
+# ---- check 47, the SET writer. Same shape as the piece writer's arms: every refusal, then the
+# ---- passing direction, because refusal arms alone are satisfied by a writer that refuses all.
+reset_tree
+mkdir -p recs2; git add -A >/dev/null
+hit "$(run --record-set tRun --records-root recs2 --verdict PASS)" "--record-set requires --leg, because a set verdict that names no check cannot be compared against the playbook's declared set"
+hit "$(run --record-set tRun --records-root recs2 --leg S)" "--record-set requires --verdict, because an absent one is indistinguishable from a check that never ran"
+hit "$(run --record-set tRun --records-root recs2 --leg S --verdict MAYBE)" "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
+out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)
+hit "$out" "set verdict recorded"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)" "already recorded, unchanged"
+
+# ---- and the SLUG callers refuse without a run-state file, which is what makes the attended path a
+# ---- second CALLER rather than a second implementation.
+rm -f memory/builds/tRun/RUN.md
+hit "$(run --record-set tRun --leg S --verdict PASS)" "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead:"
+reset_tree
+
+# ---- the RECORDS ROOT comes from the playbook the run is bound to, at BASE. A run bound to a
+# ---- playbook that declares none has nowhere to write, and both writers say so separately: one
+# ---- message per writer, because an operator reading it needs to know which verb refused.
+reset_tree
+sed -i '/^base: /a playbook: content/pb-noblock.md' memory/builds/tRun/RUN.md
+sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run --record-piece tRun --path content/pb.md --leg L --verdict PASS)" "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"
+hit "$(run --record-set tRun --leg S --verdict PASS)" "the playbook this run is bound to declares no records root at the pinned BASE, so a set verdict has nowhere to be written that the merge bar will read"
+reset_tree
+
 # ---- check 44: the authorization mode is a CLOSED set, and a value outside it refuses rather than
 # ---- defaulting. Paired with a no-write arm, because "it printed a refusal" and "it changed
 # ---- nothing" are two claims - and this branch sits BEFORE the write gate precisely so both hold.

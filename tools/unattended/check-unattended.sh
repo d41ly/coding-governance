@@ -138,6 +138,19 @@ ndod=$(printf '%s\n' $DOD_CORE | grep -c . || true)
 if [ -n "${dfloor:-}" ] && [ "$ndod" -lt "$dfloor" ]; then
   fail 3 "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it: $ndod against $dfloor"
 fi
+# THE SLACK ARM, the mirror of the one above. A floor BELOW the kit's own core count is not a pin
+# at all: the set grew and the declaration did not, so the pin sits under the value it guards and
+# would not notice a later deletion. The DIRECTIVES half has carried this arm; the two CORE halves
+# did not, which is how a core set grows in the shipped example and not in a project's own conf
+# while every check stays green.
+nph=$(printf '%s
+' $PHASES_CORE | grep -c . || true)
+if [ -n "${pfloor:-}" ] && [ "$pfloor" -lt "$nph" ]; then
+  fail 3 "the declared PHASE floor sits below the kit's own core count, so the pin guards nothing and a later deletion would pass it - declared against core: $pfloor against $nph"
+fi
+if [ -n "${dfloor:-}" ] && [ "$dfloor" -lt "$ndod" ]; then
+  fail 3 "the declared Definition-of-Done floor sits below the kit's own core count, so the pin guards nothing and a later deletion would pass it - declared against core: $dfloor against $ndod"
+fi
 
 # --------------------------------------------------------------- the population, two granularities
 FILES=$(git ls-files "$M/")

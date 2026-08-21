@@ -27,6 +27,14 @@ st=0
 fail() { st=1; printf 'PLAYBOOK check %s FAILED — %s\n' "$1" "$2"; }
 note() { printf 'playbook: %s\n' "$1"; }
 
+# --counts <playbook> — the machine-readable form, so the Definition-of-Done items read THIS
+# enumerator instead of growing a second one. One implementation, two callers: the same shape unit
+# 5 uses for its writer, and for the same reason — a second copy confirms the first rather than
+# checking it, and the two drift on the first edit to either.
+COUNTS_FOR=""
+COUNTS_RUN=""
+[ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; }
+
 command -v git >/dev/null 2>&1 || { echo "check-playbook: no git on PATH"; exit 2; }
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-playbook: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
@@ -62,7 +70,12 @@ $(git ls-files -- '*.md')
 EOF
 POP=$(printf '%s' "$PLAYBOOKS" | grep -c . || true)
 
-note "population $POP playbook(s) · canon $CANON_N section(s)${CONF_GLOB:+ · declared glob $CONF_GLOB}"
+if [ -n "$COUNTS_FOR" ]; then
+  PLAYBOOKS="$COUNTS_FOR
+"
+  POP=1
+fi
+[ -n "$COUNTS_FOR" ] || note "population $POP playbook(s) · canon $CANON_N section(s)${CONF_GLOB:+ · declared glob $CONF_GLOB}"
 
 if [ "${POP:-0}" -eq 0 ]; then
   fail 1 "no tracked file carries a playbook declaration block, so every check in this leg would pass over an empty population and print a green that means the opposite of what it looks like - this leg ships a fixture playbook precisely so that cannot be the ordinary state"
@@ -190,30 +203,47 @@ done
   if [ -n "$gr" ] && [ -n "$rr" ]; then
     pieces=$(GITLS "$gr")
     npieces=$(printf '%s' "$pieces" | grep -c . || true)
-    v=0; f=0; st_=0; un=0
+    v=0; f=0; st_=0; un=0; inscope=0
     for pc in $pieces; do
       [ -n "$pc" ] || continue
       rec=$(record_for "$rr" "$pc")
-      if [ -z "$rec" ]; then un=$((un + 1)); continue; fi
+      if [ -z "$rec" ]; then
+        # A piece with NO record belongs to no run, so it is outside `enumerate_run` entirely rather
+        # than being an unrecorded member of it. Counting it there would make a run answerable for a
+        # piece somebody else left in the tree.
+        [ -n "$COUNTS_RUN" ] && continue
+        un=$((un + 1)); inscope=$((inscope + 1)); continue
+      fi
+      # ENUMERATE_RUN, derived from the RECORD's own run identity and never from a run-state file:
+      # this leg runs on the merge bar where no run exists.
+      if [ -n "$COUNTS_RUN" ]; then
+        [ "$(sed -n 's/^run: //p' "$rec" | head -1)" = "$COUNTS_RUN" ] || continue
+      fi
       rh=$(sed -n 's/^hash: //p' "$rec" | head -1)
       ah=$(git hash-object "$pc" 2>/dev/null)
-      if [ "$rh" != "$ah" ]; then st_=$((st_ + 1)); continue; fi
+      if [ "$rh" != "$ah" ]; then st_=$((st_ + 1)); inscope=$((inscope + 1)); continue; fi
       # PROVENANCE and DONENESS are two questions. The hash join answers the first; the verdicts
       # answer the second, and `verified` requires BOTH — otherwise it is a semantic word for a
       # structural state, and the count that means "the build made what was asked" keys on it.
+      inscope=$((inscope + 1))
       if grep -q '^leg .* · verdict FAIL$' "$rec"; then f=$((f + 1)); else v=$((v + 1)); fi
     done
     # THE LIVENESS ASSERTION, first and unconditional. Every count below can be satisfied by a tree
     # with no pieces in it, and a reader that enumerates zero, joins zero and reports zero failures
     # is indistinguishable from a clean run.
-    if [ "${npieces:-0}" -eq 0 ]; then
+    if [ -n "$COUNTS_FOR" ]; then
+      # The machine line. DEAD PROBE is carried as a FIELD rather than as prose, so the caller can
+      # distinguish "zero pieces" from "the grain resolved nothing" without parsing English.
+      printf 'pieces=%s verified=%s failed=%s stale=%s unrecorded=%s
+' "$inscope" "$v" "$f" "$st_" "$un"
+    elif [ "${npieces:-0}" -eq 0 ]; then
       note "DEAD PROBE — the grain resolves no piece for $pb, so every per-piece count below is over an empty set and means nothing; reported and NOT redded here, because only --close blocks on it"
     else
       note "pieces $npieces · verified $v · failed $f · stale $st_ · unrecorded $un ($pb)"
     fi
     # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
     # silently reports coverage it no longer has.
-    for rc_ in $(GITLS "$rr/*.md"); do
+    [ -n "$COUNTS_FOR" ] || for rc_ in $(GITLS "$rr/*.md"); do
       [ -n "$rc_" ] || continue
       op=$(sed -n 's/^piece: //p' "$rc_" | head -1)
       [ -n "$op" ] || continue
@@ -222,7 +252,7 @@ done
   fi
 
 # ---- 9: the DERIVED length budget and the drain, PRINTED. No number is written in this file.
-note "steps $TOTAL_STEPS · CHECK tags $TOTAL_CHECKS · of those carrying a witness $TOTAL_WITNESS"
-[ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
+[ -n "$COUNTS_FOR" ] || note "steps $TOTAL_STEPS · CHECK tags $TOTAL_CHECKS · of those carrying a witness $TOTAL_WITNESS"
+[ -z "$COUNTS_FOR" ] && [ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
 
 exit "$st"

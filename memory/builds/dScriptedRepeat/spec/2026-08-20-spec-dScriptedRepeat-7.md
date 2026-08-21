@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,6 +166,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · BUILT. The set record and its Definition-of-Done item, with term zero and
+  a verdict-reading term 2. `CORE_FLOOR` moved 12:8 to 12:10 once for the co-landing pair, and the
+  SLACK arm both CORE halves were missing landed with it.
 - rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

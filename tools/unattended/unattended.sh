@@ -53,6 +53,10 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
+# The kit's own directory, DERIVED. A sibling script this driver invokes is found relative to THIS
+# file and never by a spelled prefix: a hardcoded one breaks silently at any other install root,
+# which this fleet has a recorded case of.
+KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
@@ -92,7 +96,7 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -1832,6 +1836,64 @@ dod_met() { # slug · run-state file · item · checker
       region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1 \
         && [ -z "$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | tr -d '[:space:]')" ] \
         && region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1 ;;
+    pieces-complete|set-checks-recorded)
+      # TERM ZERO, and it is first because everything else depends on it. `verb_close` evaluates
+      # DOD_CORE for EVERY run with no mode branch anywhere, so an item only a recipe-mode run can
+      # satisfy would block --close on every slug- and prompt-mode run in the fleet, on an item whose
+      # only exit is --abort. Implemented HERE rather than as a third DOD_CORE field: `checker_of`
+      # uses shortest-prefix removal and would route a three-field entry silently down the machine
+      # path in both consumers.
+      #
+      # MET, and it ANNOUNCES the skip. A silent pass is indistinguishable from coverage.
+      if [ "$(fact "$rel" mode)" != recipe ]; then
+        DOD_OUT="skipped — $item is scoped to recipe-mode runs and this run's recorded mode is $(fact "$rel" mode)"
+        return 0
+      fi
+      _pb=$(fact "$rel" playbook)
+      _n=$(fact "$rel" pieces)
+      if [ -z "$_pb" ] || [ -z "$_n" ]; then
+        DOD_OUT="a recipe-mode run records no playbook or no piece count, so there is nothing to measure this item against: playbook '$_pb' count '$_n'"
+        return 1
+      fi
+      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" 2>/dev/null | head -1)
+      _pc=${_counts#pieces=}; _pc=${_pc%% *}
+      _vc=${_counts#*verified=}; _vc=${_vc%% *}
+      _fc=${_counts#*failed=}; _fc=${_fc%% *}
+      _sc=${_counts#*stale=}; _sc=${_sc%% *}
+      _uc=${_counts#*unrecorded=}; _uc=${_uc%% *}
+      if [ "$item" = pieces-complete ]; then
+        # TERM 1 - the VACUITY GUARD, and it is ordered before term 2 for `build-complete`'s reason:
+        # "every piece is verified" is vacuously true over no pieces at all.
+        if [ "${_pc:-0}" -eq 0 ]; then
+          DOD_OUT="this run produced no piece under the playbook's declared grain, and 'every piece is verified' is vacuously true over none of them, so completeness cannot be read from it: $_pb"
+          return 1
+        fi
+        [ "${_sc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced is STALE - its record describes bytes the piece no longer has, so the verdict on it is about a different file: $_sc stale"; return 1; }
+        [ "${_uc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced carries no record, so nothing says whether its declared checks ran at all: $_uc unrecorded"; return 1; }
+        # TERM 2 - PROVENANCE and DONENESS are two questions. `verified` requires the hash join AND
+        # every declared leg recording PASS, which is what makes "its declared legs green" implemented
+        # rather than merely cited.
+        [ "${_fc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced records a FAILING leg verdict, so its declared checks ran and one of them said no: $_fc failed"; return 1; }
+        # TERM 3 - the COUNT, against the number the owner asked for at BASE.
+        [ "${_vc:-0}" -eq "${_n:-0}" ] || { DOD_OUT="this run's verified piece count is not the count its build README asked for at the pinned BASE - verified against requested: $_vc against $_n"; return 1; }
+        DOD_OUT=""; return 0
+      fi
+      # set-checks-recorded. It reads the VERDICTS and not merely their existence: the sibling item it
+      # was modelled on asserts a bound review EXISTS because a prose verdict grammar cannot be
+      # anchored, and that limit does not transfer here - a set check is a declared leg with a binary
+      # anchored verdict, so declining to read it shipped the exact green this unit exists to prevent.
+      _rr=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+      _set="$_rr/set-$slug.md"
+      _declared=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)
+      case "$_declared" in
+        ''|'[]'|'none'*) DOD_OUT=""; return 0 ;;
+      esac
+      [ -f "$_set" ] || { DOD_OUT="the playbook declares set-scoped checks and this run recorded no set verdict, so the population a per-piece review structurally cannot see went unmeasured: $_set"; return 1; }
+      if grep -q '^leg .* · verdict FAIL$' "$_set"; then
+        DOD_OUT="a set-scoped check recorded a FAILING verdict, and these are the checks that see what a per-piece review cannot - a monoculture passes every piece and fails here: $_set"
+        return 1
+      fi
+      DOD_OUT=""; return 0 ;;
     landed-via-lander)
       [ -n "$LANDER" ] && [ -n "$BYPASS_BAN" ] && ! grep -qF -- "$BYPASS_BAN" "$rel" ;;
     build-complete)
@@ -2087,8 +2149,8 @@ record_path_of() { # records-root · piece-path
   # reader read another, and the live leg looked green only because the files had been moved by hand.
   printf '%s/%s.md' "$1" "$(printf '%s' "$2" | tr '/' '~')"
 }
-record_piece() { # records-root · piece-path · leg · verdict · playbook-sha
-  local root="$1" piece="$2" leg="$3" verdict="$4" pbsha="$5" rec want line h
+record_piece() { # records-root · piece-path · leg · verdict · playbook-sha · run-id
+  local root="$1" piece="$2" leg="$3" verdict="$4" pbsha="$5" runid="$6" rec want line h
   [ -f "$piece" ] || { fail 47 "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows: $piece"; return 1; }
   case "$verdict" in
     PASS|FAIL|NA) ;;
@@ -2112,10 +2174,12 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha
       printf '# piece record — %s\n\n' "$piece"
       printf 'piece: %s\n' "$piece"
       printf 'hash: %s\n' "$h"
-      # The RUN identity, so `enumerate_run` is derivable from the RECORD rather than by asking a run
-      # that may not exist. The reader runs on the merge bar with no run-state file, so a scope that
-      # needed one would be a scope the bar can never evaluate.
-      printf 'run: %s\n' "$(basename "$root")"
+      # The RUN identity, PASSED IN rather than derived from the records root. `enumerate_run` reads
+      # it from the RECORD, so the scope is derivable on the merge bar where no run-state file
+      # exists. Deriving it from `basename "$root"` was the first cut and it named a DIRECTORY: the
+      # root is the playbook's own `records` declaration, so its basename says where records live and
+      # nothing about who wrote them. Wiring the filter is what made that visible.
+      printf 'run: %s\n' "$runid"
       printf 'playbook-sha: %s\n' "$pbsha"
       printf '\n## Verdicts\n'
     } > "$rec"
@@ -2140,8 +2204,61 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha
   echo "unattended: piece verdict recorded — $leg $verdict on $piece"
   return 0
 }
+record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
+  local root="$1" runid="$2" leg="$3" verdict="$4" hashes="$5" rec want line
+  case "$verdict" in
+    PASS|FAIL|NA) ;;
+    *) fail 47 "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given: $verdict"; return 1 ;;
+  esac
+  rec="$root/set-$runid.md"
+  mkdir -p "$(dirname "$rec")" || return 1
+  if [ ! -f "$rec" ]; then
+    { printf '# set record — %s\n\n' "$runid"
+      printf 'run: %s\n' "$runid"
+      printf 'set: %s\n' "$hashes"
+      printf '\n## Verdicts\n'; } > "$rec"
+  else
+    # The SET is re-stamped on every write, the way a piece record re-stamps its hash. A set verdict
+    # beside a stale member list is a verdict about a different set, which is the `superseded` state.
+    sed -i "s|^set: .*|set: $hashes|" "$rec"
+  fi
+  want="leg $leg · verdict $verdict"
+  while IFS= read -r line; do
+    [ "$line" = "$want" ] || continue
+    echo "unattended: set verdict already recorded, unchanged — $leg"
+    return 0
+  done < "$rec"
+  sed -i "/^leg $leg · verdict /d" "$rec"
+  printf '%s\n' "$want" >> "$rec"
+  stage_or_fail "$rec" || return 1
+  echo "unattended: set verdict recorded — $leg $verdict for $runid"
+  return 0
+}
+verb_record_set() { # slug · leg · verdict
+  local slug="$1" leg="$2" verdict="$3" rel rr_root pb hashes
+  [ -n "$leg" ] || { fail 47 "--record-set requires --leg, because a set verdict that names no check cannot be compared against the playbook's declared set"; return 1; }
+  [ -n "$verdict" ] || { fail 47 "--record-set requires --verdict, because an absent one is indistinguishable from a check that never ran"; return 1; }
+  if [ -n "${RP_ROOT:-}" ]; then
+    record_set "$RP_ROOT" "${RP_RUN:-$slug}" "$leg" "$verdict" "${RP_SET:-}"
+    return $?
+  fi
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead: $rel"; return 1; }
+  refuse_if_terminal "$rel" --record-set || return 1
+  pb=$(fact "$rel" playbook)
+  rr_root=$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+  [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a set verdict has nowhere to be written that the merge bar will read"; return 1; }
+  # The set IDENTITY is the ORDERED list of this run's piece hashes, DERIVED here rather than
+  # supplied: a caller that names its own set could name a set it did not produce.
+  hashes=$(for r in $(GIT ls-files -- "$rr_root/*.md"); do
+             [ "$(sed -n 's/^run: //p' "$r" | head -1)" = "$slug" ] || continue
+             sed -n 's/^hash: //p' "$r" | head -1
+           done | LC_ALL=C sort | tr '\n' ',' | sed 's/,$//')
+  record_set "$rr_root" "$slug" "$leg" "$verdict" "$hashes"
+}
 verb_record_piece() { # slug · piece · leg · verdict
-  local slug="$1" piece="$2" leg="$3" verdict="$4" rel
+  local slug="$1" piece="$2" leg="$3" verdict="$4" rel rr_root
   # THE THREE FIELD REFUSALS ARE HOISTED, above the caller branch. They were duplicated once per
   # caller, which is three refusals with two spellings each and six arms to keep in step - the
   # shape that goes stale on the first edit to either copy.
@@ -2153,14 +2270,16 @@ verb_record_piece() { # slug · piece · leg · verdict
   # name. One function, two callers, never two implementations - the second would confirm the first
   # rather than check it, and they would drift the first time either changed.
   if [ -n "${RP_ROOT:-}" ]; then
-    record_piece "$RP_ROOT" "$piece" "$leg" "$verdict" "${RP_PBSHA:-}"
+    record_piece "$RP_ROOT" "$piece" "$leg" "$verdict" "${RP_PBSHA:-}" "${RP_RUN:-$slug}"
     return $?
   fi
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers: $rel"; return 1; }
   refuse_if_terminal "$rel" --record-piece || return 1
-  record_piece "$M/builds/$slug" "$piece" "$leg" "$verdict" "$(fact "$rel" playbook)"
+  rr_root=$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+  [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
+  record_piece "$rr_root" "$piece" "$leg" "$verdict" "$(fact "$rel" playbook)" "$slug"
 }
 
 # --------------------------------------------------------------------------------------- dispatch
@@ -2175,7 +2294,7 @@ verb_record_piece() { # slug · piece · leg · verdict
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
-RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""
+RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -2199,13 +2318,15 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--record-piece) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--record-piece|--record-set) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
     --verdict)      RP_VERDICT="${2:-}"; shift 2 || shift ;;
     --records-root) RP_ROOT="${2:-}"; shift 2 || shift ;;
     --playbook-sha) RP_PBSHA="${2:-}"; shift 2 || shift ;;
+    --run)          RP_RUN="${2:-}"; shift 2 || shift ;;
+    --set)          RP_SET="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
     # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
@@ -2245,5 +2366,6 @@ case "$VERB" in
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
+  --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$RP_VERDICT" ;;
 esac
 exit "$status"

@@ -157,6 +157,15 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 # ---- vocabulary is a different failure. The other core sets stay readable, so the leg runs on and
 # ---- every mode-membership test passes over nothing - a green that means the opposite of what it
 # ---- looks like, which is exactly why it refuses instead of carrying on.
+# ---- the SLACK arms, the mirror of the shrink arms above. A floor BELOW the kit's own core count
+# ---- is not a pin: the set grew, the declaration did not, and the pin now sits under the value it
+# ---- guards. Both halves, because a pin armed on one half is a pin on one half.
+reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="12:2"/' .unattended.conf
+hit "$(run)" "the declared Definition-of-Done floor sits below the kit's own core count, so the pin guards nothing and a later deletion would pass it - declared against core:"
+reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="2:10"/' .unattended.conf
+hit "$(run)" "the declared PHASE floor sits below the kit's own core count, so the pin guards nothing and a later deletion would pass it - declared against core:"
+reset_tree
+
 reset_tree; sed -i 's/^AUTH_MODES=.*/AUTH_MODES=unparseable/' tools/unattended/unattended.sh
 hit "$(run)" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true"
 
@@ -934,12 +943,12 @@ reset_tree
 
 # E, the COUNT SENTENCE: the rows can all be right while the prose above them miscounts, which is
 # exactly what shipped — an eight-row table under a sentence saying six, in both copies, parity green.
-reset_tree; pedit 's/^Eight kit-owned core items\./Six kit-owned core items./'
+reset_tree; pedit 's/^Ten kit-owned core items\./Six kit-owned core items./'
 hit "$(run)" "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '"
 
 # ...and the sentence gone entirely. Absence is its own refusal for the reason every locator here
 # has one: a summary nobody can find is a summary nobody can join.
-reset_tree; pedit 's/^Eight kit-owned core items\. //'
+reset_tree; pedit 's/^Ten kit-owned core items\. //'
 hit "$(run)" "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
 reset_tree
 

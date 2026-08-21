@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** INPROGRESS · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -164,6 +164,10 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · BUILT. The records root moved from the build folder to a PLAYBOOK
+  declaration: the memory-tree gate's build-folder shape is a closed whitelist and its top level is
+  closed too, so F1's answer needed another kit's contract edited. Evidence about content belongs
+  with the project that owns the content.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

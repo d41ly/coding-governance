@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -180,6 +180,12 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · BUILT, with one divergence recorded rather than made silently. S5 said term 3
+  counts pieces using unit 8's diff population; it counts them through unit 5's `enumerate_run`
+  instead, which derives the run's own pieces from the run identity each RECORD carries. That is the
+  direction the round-2 fold pushed for (D11): the diff population needs a live remote observation
+  and a run-state file, and the reader that owns this enumeration has neither on the merge bar.
+  Unit 8 is not landed, so consuming it was not available either.
 - rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

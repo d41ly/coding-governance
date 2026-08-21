@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see
 
-**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** SPECCED · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -182,6 +182,21 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · ATTEMPTED AND WITHDRAWN from the landing, with what the attempt found.
+  TWO DEFECTS IN THE FIRST IMPLEMENTATION, both of which read exactly like working code:
+  (a) the globs were read from the BUILD README blob rather than the PLAYBOOK blob, so they were
+  always empty and the run always reached the no-globs refusal - a different branch wearing the same
+  red, which two staged breaks agreed with before anybody asked WHICH branch had spoken;
+  (b) the population used `git diff --name-only --first-parent -m`, and `git diff` SILENTLY IGNORES
+  both flags, so it walked a plain range while its own comment claimed a first-parent walk - which is
+  the 22.5x over-count S1 exists to reject, reintroduced by a decorative flag. Measured by running
+  both forms and getting identical output on a history where they must differ.
+  WHY IT DID NOT LAND: the check was observed firing correctly in the real tree, on the right branch,
+  naming real out-of-scope paths. Its HERMETIC arm could not be made to fire and the cause was not
+  diagnosed. Pinning it in `memory/project/unarmed-branches.txt` was refused: that registry's own
+  header requires a row to mean "cannot be written from here" rather than "not yet written", and this
+  is the latter. A check whose arm nobody can fire is an assertion about nothing, so it was removed
+  rather than shipped green.
 - rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.
