@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went
 
-**Status:** SPECCED · rev-2 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
 ## 1. Goal
 
@@ -71,7 +71,8 @@ refusal stays a refusal.
   an unreadable one all fall back to today's message; S3's negative arm pins the first.
 - **observability** — the refusal text IS the deliverable.
 - **testing/gates** — the driver self-test plus the full bar. The cross-tree arm needs a second
-  worktree in the fixture, which `adopt-unattended.test.sh` already demonstrates is buildable.
+  worktree in the fixture. The precedent is `tools/memory-recall/recall-opened.test.sh`, which does
+  `git worktree add`; `adopt-unattended.test.sh` does NOT, and rev-2 named it from memory.
 - **migration/rollback** — message-only, no state, no conf key. Rollback is a revert.
 - **help/ docs** — `PROTOCOL.template.md`'s close-then-land sequence gains the commit step S1 names.
 
@@ -82,7 +83,10 @@ refusal stays a refusal.
 - **AC2** — with a second worktree whose run-state file reads `LANDING` and this tree at `BUILDING`,
   check 31's refusal names that tree's path, observed in `tools/unattended/unattended.test.sh`.
 - **AC3** — with this tree at `BUILDING` and no other tree holding `LANDING`, the refusal is today's
-  message verbatim, observed in `tools/unattended/unattended.test.sh`.
+  message verbatim, observed in `tools/unattended/unattended.test.sh`. This arm is GREEN at base by
+  construction, so it is a negative control and never evidence on its own; AC2 is the arm that
+  carries the unit, and the two are asserted against the SAME fixture differing only in whether the
+  second tree holds `LANDING`.
 - **AC4** — the refusal still REFUSES in every case above; no arm asserts a stranded `LANDING` is
   accepted, observed in `tools/unattended/unattended.test.sh`.
 - **AC5** — both new arms were observed RED against the pre-fix code, observed in
@@ -95,16 +99,21 @@ refusal stays a refusal.
 
 ## 8. Open questions
 
-**F1 — should `--close` refuse to report success while its write is uncommitted?** RESOLVED: no. It
+- **F1 — should `--close` refuse to report success while its write is uncommitted?** RESOLVED: no. It
 stages, and that is its contract; a verb policing the caller's commit discipline would still be
 defeated by a caller that does not commit. `--landed` is where the missing commit actually matters.
 
-**F2 — is the cross-tree read worth its cost when most runs use one tree?** RESOLVED: yes, and the
+- **F2 — is the cross-tree read worth its cost when most runs use one tree?** RESOLVED: yes, and the
 cost is bounded to the refusal path. A single-tree run enumerates one worktree and falls straight to
 today's message, which AC3 pins.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · a second spec review found two AC defects. The worktree-fixture precedent
+  named in section 5 was wrong — `adopt-unattended.test.sh` contains no `git worktree` call at all,
+  and the real precedent is in the memory-recall kit. AC3 was stated as though it were evidence when
+  it is green at base by construction; it is now labelled a negative control and tied to AC2's
+  fixture so the pair discriminates instead of both passing for unrelated reasons.
 - rev-2 · 2026-08-21 · re-grounded after a spec review returned BLOCKED. rev-1's premise that check 31
   reports the committed phase is false — `fact()` reads the file on disk — so its S1 discriminator was
   empty in both trees of the incident and its AC1 pinned a state no verb can produce. `--abort` parity

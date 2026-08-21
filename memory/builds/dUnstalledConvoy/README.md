@@ -239,9 +239,9 @@ ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 T
 | [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | CLOSED | rev-3 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-23 — the dispatch write-set grading, re-grounded on the append-only record, and the conditions for turning it on](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | SPECCED | rev-2 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | SPECCED | rev-2 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-25 — a spec that names code its own BASE does not carry is refused before it is committed](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | SPECCED | rev-1 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | SPECCED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | SPECCED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -256,9 +256,8 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 |
-
-Ids no record names: TOOL-dUnstalledConvoy-25.
 
 Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25.
 <!-- /gen:build-index -->
@@ -302,5 +301,6 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md)
+  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md)
 <!-- /gen:build-docs -->
