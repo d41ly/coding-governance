@@ -54,6 +54,17 @@ n=$((n+1))
 grep -qF -- "$W/tools/unattended/playbook.fixture.md" <<<"$(cd "$W" && git ls-files | sed "s|^|$W/|")" \
   || bad "the fixture playbook is not tracked, and the leg reads git ls-files, so the population arm above passed over something else"
 
+# ---- AC6, the ATTENDED path: the record census is read with NO run-state file anywhere in the tree.
+# ---- That is the whole claim the attended path rests on — it is gated on WHAT IT PRODUCED and not
+# ---- on how it ran — and the seeded tree is exactly that shape, so the arm is a check rather than a
+# ---- construction. Without it the claim is true here by accident.
+n=$((n+1))
+[ -z "$(cd "$W" && git ls-files '*/RUN.md' 'RUN.md' 2>/dev/null)" ] \
+  || bad "the scratch tree carries a run-state file, so 'the records are read with no run to name' is not what the census arm below observed"
+n=$((n+1))
+run | grep -qE 'pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0' \
+  || bad "the leg did not report the per-piece census over the tracked records, so the attended path's only gated surface is ungraded"
+
 probe() { # label · expected check · sed program · expected message signature
   cp "$KEEP" "$F"; ( cd "$W" && sed -i "$3" tools/unattended/playbook.fixture.md )
   out=$(run); r=$?
@@ -160,7 +171,7 @@ seed_out=$(run | grep -c 'canon 11 section' || true)
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=41
+FLOOR_ASSERTIONS=43
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

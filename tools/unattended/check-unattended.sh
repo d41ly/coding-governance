@@ -1042,4 +1042,63 @@ else
   done
 fi
 
+# ---- 24: the MODE SET, joined to the ROUTING TABLE an agent reads, in both directions. This closes
+# ---- the fork the mode vocabulary left open: the driver publishes `AUTH_MODES` so nothing has to
+# ---- spell it twice, and the one document that has to spell it anyway — the Skill, because a reader
+# ---- choosing a path is choosing a mode — was joined to nothing.
+# ----
+# ---- The extraction takes the LAST backticked lowercase cell of each routing row, so the table's
+# ---- prose columns may be rewritten freely and the mode column may not move to the middle without
+# ---- this noticing. WHAT IT DOES NOT CHECK: whether the row's PROSE describes the mode correctly.
+if [ -f "$tmpl" ]; then
+  modesec=$(tr -d '\r' < "$tmpl" | awk '/^## Which path/{f=1;next} f&&/^## /{exit} f')
+  if [ -z "$modesec" ]; then
+    fail 24 "the Skill template carries no routing section, so a reader holding a build to start is never told which mode their path declares and every join below would have nothing to read; the heading this looks for is '## Which path'"
+  else
+    tblmodes=$(printf '%s\n' "$modesec" | awk -F'|' '
+      /^[[:space:]]*[|]/ {
+        m = ""
+        for (i = 2; i <= NF; i++) {
+          cell = $i; gsub(/^[[:space:]]+|[[:space:]]+$/, "", cell)
+          if (cell ~ /^`[a-z][a-z-]*`$/) { gsub(/`/, "", cell); m = cell }
+        }
+        if (m != "") print m
+      }' | sort -u | tr '\n' ' ')
+    if [ -z "$tblmodes" ]; then
+      fail 24 "the Skill's routing section carries no row naming an authorization mode, so both joins below would compare the driver's mode set against an empty one and pass by finding nothing"
+    else
+      for _m in $AUTH_MODES; do
+        case " $tblmodes " in *" $_m "*) ;;
+          *) fail 24 "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: $_m against [$tblmodes]" ;;
+        esac
+      done
+      for _m in $tblmodes; do
+        case " $AUTH_MODES " in *" $_m "*) ;;
+          *) fail 24 "the Skill's routing table names an authorization mode the driver does not declare, so a reader following that row writes a build README preflight will refuse: $_m against [$AUTH_MODES]" ;;
+        esac
+      done
+    fi
+  fi
+fi
+
+# ---- 25: the content-scope rule is labelled a CHECK and denies its own machine half. A prose rule
+# ---- that reads like enforcement is worse than no rule: the reader stops looking for the gate.
+# ---- This one has NO gate on either entry point — the refusal that was to provide it was withdrawn
+# ---- unbuilt on the unattended path, and on the attended path its two inputs do not exist at all.
+# ----
+# ---- Grepped as LITERALS, which is what check 12 does to the kickoff engine and for its reason: a
+# ---- heading survives a gutted body, and the sentence that has to be there is the qualifier, not
+# ---- the section. WHAT THIS DOES NOT CHECK: that the surrounding paragraph is true.
+if [ -f "$tmpl" ]; then
+  pbsec=$(tr -d '\r' < "$tmpl" | awk '/^## Start a PLAYBOOK run/{f=1;next} f&&/^## /{exit} f')
+  if [ -z "$pbsec" ]; then
+    fail 25 "the Skill template carries no playbook-run section, so the mode the driver accepts has no start path an agent can follow: $tmpl"
+  else
+    printf '%s\n' "$pbsec" | grep -qF 'there is no machine half' \
+      || fail 25 "the Skill's playbook-run path does not deny its own machine half, and a prose rule that reads like enforcement stops the reader looking for the gate that is not there: $tmpl"
+    printf '%s\n' "$pbsec" | grep -qF 'ordinary code build' \
+      || fail 25 "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose: $tmpl"
+  fi
+fi
+
 exit "$status"

@@ -86,6 +86,16 @@ alternation is derived from it, and check 23 joins it to the `park()` call sites
 The reverse direction is not theoretical — this kit declared a DECISION kind that no verb wrote for
 as long as its contract had instructed runs to park one.
 
+## The five paths, and which of them is a run
+
+Four start paths declare an `authorization-by:` mode and one does not. Slug and prompt predate this
+build. `recipe` is the playbook RUN: a playbook already exists and the owner wants N pieces. Playbook
+CREATION is a `prompt` run, because making instructions and following them are two acts with two
+authorizations. The fifth is the ATTENDED path, which writes no run-state file and calls no driver
+verb — it is not in the routing table for that reason, since listing it beside four mode values would
+teach a reader to look for a mode it does not have. It shares the per-piece and set records with the
+unattended paths, which is the only surface the merge bar grades it on.
+
 ## Shared seams
 
 The leg reads `git ls-files`, so it grades TRACKED files only — staging is a precondition, which is
@@ -124,9 +134,10 @@ seam: the tracked FIXTURE pattern — reuse for any leg whose population can leg
 - `PLAYBOOK_GLOB` is read from the conf and is not yet used to widen the population — a playbook that
   carries no declaration block is invisible, which is intended for now and is the reason the block is
   what defines membership.
-- Unit 10 is specced and unbuilt: the Skill's routing preamble with its four start paths, and the two
-  playbook-scoped directives. A reader arriving with no playbook reaches the creation section by
-  reading the Skill in order rather than by being routed there.
+- **The content-scope rule has NO machine half on either entry point.** It was specced with one on
+  the unattended path; unit 8 was withdrawn, so what remains is prose the Skill labels a CHECK and a
+  leg check that greps for the labelling. That is a gate on the WORDING and not on the behaviour, and
+  the distinction is the whole point of check 25's own header.
 - **A run authoring BOTH its own build folder and its own playbook, under `published`, is refused by
   nothing.** Measured while building unit 11, against a spec sentence claiming the opposite in a wider
   form. `resolve_base` reaches the second anchor only when the build README fails to resolve at the

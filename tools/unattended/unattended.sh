@@ -167,7 +167,7 @@ PARK_KINDS_OWED="decision abort override waiver"
 #
 # The scope is NOT a project knob. A project may EXTEND the set; it may not narrow the core, and a
 # project-selectable scope is narrowing wearing a different name.
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt playbook-followed:M7:recipe pieces-recorded:M9:recipe"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could

@@ -1161,28 +1161,37 @@ out=$(run --status tRun)
 miss "$out" "unbound variable"
 hit "$out" "phase "
 
-# ---- THIRTEEN pairs, read from the driver's OWN constant line — the same line the gate leg's
-# ---- core_of() parses, so a count here and a count there cannot disagree. It was eleven until
-# ---- TOOL-aPromptedMandate-4 added the two prompt-scoped handles.
+# ---- EVERY pair parses, and the count is DERIVED both ways rather than typed. This arm asserted a
+# ---- literal thirteen and had to be edited by hand every time the registry grew - a count typed
+# ---- beside the thing it counts, in the file whose job is to notice exactly that. The two
+# ---- derivations disagree only when the `:M<n>` extraction misses an entry, which is what it is for.
 dirline=$(grep '^DIRECTIVES_CORE=' "$SCRIPT")
 ndir=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*' | wc -l | tr -d ' ')
-same "the registry declares thirteen handles" "$ndir" "13"
+nwords=$(printf '%s\n' "$dirline" | cut -d\" -f2 | wc -w | tr -d ' ')
+same "every registry entry carries a build-method pointer the extraction can see" "$ndir" "$nwords"
+same "the registry is not empty, so every arm below has something to read" \
+  "$([ "$ndir" -ge 10 ] && echo yes || echo no)" "yes"
 
 # ---- every handle POINTS at a build-method section and none of them restates one. The pointer is
 # ---- the whole design: a gloss grown into a condition would be the M1 defect this build exists to
 # ---- avoid, and a shape check is the cheapest thing that notices it happening.
 # ----
-# ---- The grammar admits an OPTIONAL third field since TOOL-aPromptedMandate-4, over the closed set
-# ---- `all|prompt` and nothing wider - a free-text third field would be exactly the gloss this arm
-# ---- exists to refuse, one colon further along.
+# ---- The optional third field is a SCOPE, and its legal set is DERIVED from the driver's own
+# ---- AUTH_MODES plus `all`. It was typed here as `all|prompt`, so the day a second mode gained a
+# ---- scoped handle this arm redded a correct registry - the vocabulary-typed-into-a-test defect,
+# ---- in the arm written to refuse a free-text third field.
+authmodes=$(grep -m1 '^AUTH_MODES=' "$SCRIPT" | cut -d\" -f2)
+scopealt=$(printf 'all %s' "$authmodes" | tr -s ' ' '|')
+same "the scope vocabulary was read from the driver" \
+  "$([ "$scopealt" != "all|" ] && [ -n "$authmodes" ] && echo yes || echo no)" "yes"
 nbad=$(printf '%s\n' "$dirline" | sed -e 's/^DIRECTIVES_CORE="//' -e 's/"$//' | tr ' ' '\n' \
-       | grep -v '^$' | grep -cvE '^[a-z][a-z-]*:M[0-9]+(:(all|prompt))?$' || true)
-same "every registry entry is handle:M-section with at most a closed scope" "$nbad" "0"
+       | grep -v '^$' | grep -cvE "^[a-z][a-z-]*:M[0-9]+(:($scopealt))?\$" || true)
+same "every registry entry is handle:M-section with at most a declared scope" "$nbad" "0"
 
-# ---- ...and the scope vocabulary is CLOSED at the source, so a typo cannot invent a third value
-# ---- that the arm above would then bless as legal grammar.
-nscope=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*:[a-z]*' | sed 's/.*://' | sort -u | grep -cvE '^(all|prompt)$' || true)
-same "no registry entry declares a scope outside all/prompt" "$nscope" "0"
+# ---- ...and the scope vocabulary is CLOSED at the source, so a typo cannot invent a value that the
+# ---- arm above would then bless as legal grammar.
+nscope=$(printf '%s\n' "$dirline" | grep -o ':M[0-9][0-9]*:[a-z-]*' | sed 's/.*://' | sort -u | grep -cvE "^($scopealt)\$" || true)
+same "no registry entry declares a scope the driver does not publish" "$nscope" "0"
 
 # ---- S5, the resume pointer. Armed because S2 taught this unit what an unarmed scope item costs:
 # ---- it can silently not ship while the suite stays green.
@@ -2563,6 +2572,23 @@ out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does
 hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
 same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
 
+# ...and the SECOND scope value, on its own arm. This file's own history is the reason: an arm naming
+# one scoped member twice left a later member unenforced and green, so every new scope value gets an
+# arm the day it exists rather than the day someone notices it never had one.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1 --waive playbook-followed --reason "no playbook here")
+hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
+same "the recipe-scoped waiver created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
+# ...and the same handle on a RECIPE-authorized run is ACCEPTED, which is what tells a working scope
+# join from a refusal that fires on everything.
+reset_tree
+out=$(run --preflight tRecipeOk --keepalive-id k1 --waive playbook-followed --reason "the owner said so")
+miss "$out" "--waive names a directive whose scope is a mode this run is not"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tRecipeOk/RUN.md)" "waiver · item playbook-followed · reason the owner said so"
+git rm -q --cached memory/builds/tRecipeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tRecipeOk/RUN.md
+reset_tree
+
 # ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
 # ---- waiver path wearing a scope's name.
 reset_tree
@@ -2594,7 +2620,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=515
+FLOOR_ASSERTIONS=522
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

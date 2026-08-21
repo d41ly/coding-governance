@@ -741,7 +741,17 @@ reset_tree
 # arms that run the driver live; nothing else in this file reads the remote's advertisement.
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 git checkout -q main
-printf '# method\n\n## M2\n\n## M3\n\n## M4\n\n## M5\n\n## M6\n\n## M8\n\n## M9\n\n## M10\n\n## M12\n' > memory/guides/BUILD-METHOD.md
+# The build-method carrier for the driver arms below, DERIVED from the registry it must satisfy.
+# Typed out, it listed the sections the registry cited on the day it was written and every later
+# directive redded the GREEN CONTROL of an unrelated arm — a fixture falling behind the thing it
+# exists to support, reported as a failure of whatever ran next. The MISSING-section case keeps its
+# own hand-written carrier at arm 6 above, which is where that negative belongs.
+{ printf '# method\n'
+  grep -m1 '^DIRECTIVES_CORE=' tools/unattended/unattended.sh \
+    | grep -oE ':M[0-9]+' | tr -d ':' | sort -u | while read -r _sec; do printf '\n## %s\n' "$_sec"; done
+} > memory/guides/BUILD-METHOD.md
+n=$((n+1)); [ "$(grep -c '^## M' memory/guides/BUILD-METHOD.md)" -ge 8 ] \
+  || { echo "FAIL the derived build-method carrier holds too few sections to satisfy the registry"; st=1; }
 mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
@@ -778,8 +788,9 @@ dout=$(drive --preflight tWaive --keepalive-id k1 --waive minimal-prose --reason
 hit "$dout" "preflight OK"
 same "the driver wrote a waiver line the leg can select" "$([ -n "$(wline)" ] && echo yes)" "yes"
 git add -A && git commit -q -m waived --no-verify
-out=$(run)
-same "a tree whose waiver was taken at preflight exits 0" "$?" "0"
+out=$(run); wrc=$?
+same "a tree whose waiver was taken at preflight exits 0" \
+  "$wrc$([ "$wrc" != 0 ] && printf ' — %s' "$(printf '%s\n' "$out" | grep -m1 'FAILED')")" "0"
 miss "$out" "check 17"
 
 # arm 1 — an UNDECLARED handle. Edited before the first commit, so the join is satisfied and this
@@ -1182,7 +1193,7 @@ hit "$(run)" "the directive scopes the registry declares are not the scopes the 
 
 # G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
 # green - the vacuity shape every other join in this leg carries a guard for.
-reset_tree; mutate tools/unattended/SKILL.template.md 's/ | all | D/ | D/; s/ | prompt | D/ | D/'
+reset_tree; mutate tools/unattended/SKILL.template.md 's/ | [a-z][a-z-]* | D\([0-9]\)/ | D\1/'
 out=$(run)
 hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds one of:"
 miss "$out" "the agent is told which runs a rule binds by a table that disagrees"
@@ -1244,7 +1255,7 @@ reset_tree
 # I, review H1: a floor BELOW the kit's own core count. This build SHIPPED that state - the bump to
 # 13 was reverted by a `git checkout --` during an unrelated probe and arm C passed, because it only
 # asked whether the count met the floor and never whether the floor met the kit.
-reset_tree; mutate .unattended.conf 's/^DIRECTIVES_FLOOR="13"$/DIRECTIVES_FLOOR="11"/'
+reset_tree; mutate .unattended.conf 's/^DIRECTIVES_FLOOR=".*"$/DIRECTIVES_FLOOR="1"/'
 hit "$(run)" "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it:"
 
 # I, review L2: a PROJECT-declared scope. Two carriers say the scope is kit-owned; nothing enforced
@@ -1295,6 +1306,38 @@ reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS=".*"$/PARK_KIND
 hit "$(run)" "cannot read the parked-kind vocabulary or cannot find a single park() call site, so the membership join below would pass over an empty set - declared and found follow: ["
 reset_tree
 
+# ---- check 24: the MODE SET against the routing table, both directions, plus the two vacuity arms.
+# ---- A join whose extraction returns nothing passes over nothing, which is the shape every other
+# ---- arm in this file exists because of.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/^## Which path$/## Something Else/'
+hit "$(run)" "the Skill template carries no routing section, so a reader holding a build to start is never told which mode their path declares and every join below would have nothing to read; the heading this looks for is '## Which path'"
+
+# The section present and carrying no readable mode cell. Backticks stripped from every mode, so the
+# rows survive and the extraction does not — which is exactly the state a green would be a lie about.
+reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `\([a-z][a-z-]*\)` |/| \1 |/'
+hit "$(run)" "the Skill's routing section carries no row naming an authorization mode, so both joins below would compare the driver's mode set against an empty one and pass by finding nothing"
+
+# A declared mode with no row. The playbook row's cell is retyped as an existing mode, so the table
+# stays well-formed and one mode simply stops being reachable — the failure that does not look like
+# a failure.
+reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
+hit "$(run)" "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: recipe against"
+
+# ...and the reverse: a row for a mode the driver will refuse.
+reset_tree; mutate tools/unattended/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `sonnet` |/'
+hit "$(run)" "the Skill's routing table names an authorization mode the driver does not declare, so a reader following that row writes a build README preflight will refuse: sonnet against"
+
+# ---- check 25: the content-scope rule stays a CHECK that denies its own machine half.
+reset_tree; mutate tools/unattended/SKILL.template.md 's/^## Start a PLAYBOOK run$/## Start a playbook run/'
+hit "$(run)" "the Skill template carries no playbook-run section, so the mode the driver accepts has no start path an agent can follow:"
+
+reset_tree; mutate tools/unattended/SKILL.template.md 's/there is no machine half/it is enforced end to end/'
+hit "$(run)" "the Skill's playbook-run path does not deny its own machine half, and a prose rule that reads like enforcement stops the reader looking for the gate that is not there:"
+
+reset_tree; mutate tools/unattended/SKILL.template.md 's/ordinary code build/perfectly ordinary build/'
+hit "$(run)" "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose:"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1305,7 +1348,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=249
+FLOOR_ASSERTIONS=264
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
