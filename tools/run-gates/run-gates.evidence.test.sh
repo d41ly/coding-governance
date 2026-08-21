@@ -191,7 +191,16 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
   REC_GD="$REC_T/.git"
 }
-rec_run()  { ( cd "$REC_T" && env "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+# THE AMBIENT SCOPING ENV IS CLEARED, and this is load-bearing rather than tidy. This fixture builds
+# a scratch repo and drives a nested runner to grade what that runner RECORDS — including whether a
+# guard fired. `.githooks/pre-push` exports GATE_BASE before it runs the bar, so when this leg runs
+# at the push boundary the nested runner inherits a sha that does not exist in the scratch repo,
+# resolves an EMPTY base, and falls back to running everything. Nothing is skipped, and the arm whose
+# whole subject is a skipped leg refuses — correctly, and for a reason outside its own repo.
+#
+# This is the `inputs-inside-the-subjects-reach` class: the harness measuring the subject shares an
+# input with it. Every call site's own `KEY=VALUE` still wins, because `-u` is applied first.
+rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
 rec_legs() { printf '%s\n' "$1" > "$REC_T/tools/gate-legs.json"
              ( cd "$REC_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1; }
 rec_dir()  { printf '%s/gate-run/%s' "$REC_GD" "$(cat "$REC_GD/gate-run/current" 2>/dev/null)"; }
