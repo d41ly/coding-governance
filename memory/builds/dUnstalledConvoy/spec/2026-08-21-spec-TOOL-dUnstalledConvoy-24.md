@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went
 
-**Status:** SPECCED · rev-3 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
 ## 1. Goal
 
@@ -109,6 +109,8 @@ today's message, which AC3 pins.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · BUILT and closed. Both arms observed RED against a staged break before
+  their fix; the record names which break per arm.
 - rev-3 · 2026-08-21 · a second spec review found two AC defects. The worktree-fixture precedent
   named in section 5 was wrong — `adopt-unattended.test.sh` contains no `git worktree` call at all,
   and the real precedent is in the memory-recall kit. AC3 was stated as though it were evidence when

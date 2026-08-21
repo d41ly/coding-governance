@@ -1323,7 +1323,27 @@ verb_landed() { # slug
   refuse_if_terminal "$rel" --landed || return 1
   cur=$(fact "$rel" phase)
   if [ "$cur" != LANDING ]; then
-    fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
+    # A LANDING EVALUATED IN ANOTHER TREE DOES NOT TRAVEL. `--close` stages the phase and the RUN
+    # commits it, so a run that closed in a linked worktree and then merged from the primary tree
+    # arrives here carrying the older phase. The refusal was already accurate and named nothing that
+    # helps: the recovery is to commit the phase where it was evaluated, or to re-close here, and a
+    # run cannot choose between those without knowing which tree holds it. TOOL-dUnstalledConvoy-24.
+    _elsewhere=""
+    while IFS= read -r _wl; do
+      case "$_wl" in "worktree "*) _wp=${_wl#worktree } ;; *) continue ;; esac
+      [ "$_wp" = "$ROOT" ] && continue
+      [ -f "$_wp/$rel" ] || continue
+      case "$(sed -n 's/^phase: //p' "$_wp/$rel" 2>/dev/null | head -1)" in
+        LANDING) _elsewhere="$_elsewhere $_wp" ;;
+      esac
+    done <<WTS
+$(GIT worktree list --porcelain 2>/dev/null)
+WTS
+    if [ -n "$_elsewhere" ]; then
+      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
+    else
+      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
+    fi
     return 1
   fi
   check_clean || return 1
@@ -1873,7 +1893,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
   # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
   stage_or_fail "$rel" || return 1
-  echo "unattended: close OK — every declared DoD item met; phase LANDING. Land with: $LANDER"
+  # THE COMMIT IS NAMED because this verb only STAGES the phase. A run that merges from another
+  # tree without committing carries the older phase into the merge, and `--landed` then refuses a
+  # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
+  echo "unattended: close OK — every declared DoD item met; phase LANDING. COMMIT the run-state file, then land with: $LANDER"
   return 0
 }
 
