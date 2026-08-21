@@ -61,7 +61,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -439,6 +439,41 @@ printf '# retired run\n' > memory/builds/tRunOk/RUN.ABORTED.g1b2c3d4.md  # 'g' i
   > memory/builds/tRunBig/RUN.md                                    # ~24 KB -> RED on 6 (BYTES); 340-char row -> silent on 7
 
 
+# ---- acceptance-ledger fixtures (TOOL-dUnstalledConvoy-12). The cutoff sits between the eras, so the
+# ---- same tree carries specs that owe a ledger and specs that cannot.
+ledspec() {   # file · status · tier · heading · body
+  { printf '# ARCH-tFixture-%s — a unit\n\n' "$1"
+    printf '**Status:** %s · rev-1 · 2026-08-%s · node a · Tier-%s · base 1234abcd · streams architecture\n\n' "$2" "$3" "$4"
+    printf '## 1. Goal\n\nA unit.\n\n## 2. Scope (IN)\n\n- S1 — a thing.\n\n## 3. Non-goals (OUT)\n\nnone.\n\n'
+    printf '## 4. Design\n\nA mechanism.\n\n## 5. Production-readiness checklist\n\n- security — N/A.\n\n'
+    printf '## %s\n\n%s\n\n' "$5" "$6"
+    printf '## 7. Gates\n\nthe bar.\n\n## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-08-%s · initial draft.\n\n' "$3"
+    printf '## 10. Reuse audit\n\nno existing seam fits.\n'
+  } > "$D/spec/2026-08-$3-spec-tFixture-$1.md"
+}
+# 70: CLOSED Tier-2 after the cutoff, two criteria, ONE evidenced — the missing one is the whole check
+ledspec 70 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.
+- **AC2** — another thing, observed by `y`.'
+# 71: CLOSED Tier-2 after the cutoff whose acceptance section numbers NO criterion
+ledspec 71 CLOSED 20 2 '6. Acceptance criteria' 'The unit works well.'
+# 72: CLOSED Tier-2 whose ledger line is in NEITHER form
+ledspec 72 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.'
+# 73: CLOSED Tier-2 after the cutoff, GRANDFATHERED by id
+ledspec 73 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.'
+# 74: WONTDO owes nothing — a retired unit built nothing
+ledspec 74 WONTDO 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.'
+# 75: CLOSED Tier-1 whose section 6 is GATES, which the format permits. Reading section 6 by NUMBER
+#     rather than by heading text would red a spec that is legal under the format this gate enforces.
+ledspec 75 CLOSED 20 1 '6. Gates' 'the bar.'
+# 76: CLOSED Tier-2 dated BEFORE the cutoff — excluded, and it carries no ledger
+ledspec 76 CLOSED 01 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `x`.'
+sed -i 's/^- rev-1 · 2026-08-01 · initial draft.$/- rev-1 · 2026-08-01 · initial draft./' "$D/spec/2026-08-01-spec-tFixture-76.md"
+mkdir -p "$D/build"
+{ printf '# ledger\n\n**Serves:** journal ARCH-tFixture-70 ARCH-tFixture-72 ARCH-tFixture-73\n\n'
+  printf '**Evidences:** ARCH-tFixture-70\n- AC1 — `x` — observed.\n\n'
+  printf '**Evidences:** ARCH-tFixture-72\n- AC1 — it just works.\n\n'
+  printf '**Evidences:** ARCH-tFixture-73\n- AC1 — `x` — observed.\n'
+} > "$D/build/2026-08-20-build-ARCH-tFixture-70-1-ledger.md"
 git add -A && git commit -q -m fixtures --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
@@ -464,6 +499,19 @@ miss 'tFixture-2.md ('
 miss 'tFixture-5.md ('
 miss 'tFixture-11.md ('
 miss 'tFixture-12.md ('
+# ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
+hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
+miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
+hit  'ARCH-tFixture-71'                        # a Tier-2 acceptance section numbering no criterion
+hit  'ARCH-tFixture-72/AC1'                    # a line in neither legal form
+miss 'ARCH-tFixture-73'                        # grandfathered BY ID, with its reason in the conf
+miss 'ARCH-tFixture-74'                        # WONTDO owes nothing
+miss 'ARCH-tFixture-75'                        # Tier-1 whose section 6 is Gates: legal, and located by HEADING
+miss 'ARCH-tFixture-76'                        # dated before the cutoff
+hit  'a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable'
+hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
+hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'
+
 hit  'tFixture-13.md (tracked but missing from worktree'
 hit  'tFixture-14.md (unfilled skeleton placeholder'
 miss 'tFixture-15.md ('
@@ -1352,7 +1400,7 @@ n=$((n+1))
 # ---- grepping for the assertion would have landed on whichever copy came first and concluded
 # ---- coverage was five keys. The derived loop is now the ONLY site naming .memory-tree.conf.example.
 
-FLOOR_ASSERTIONS=224
+FLOOR_ASSERTIONS=235
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -133,3 +133,26 @@ line says so rather than implying it was.
 - AC8 — `tools/unattended/check-unattended.test.sh` — an omitted key runs to a normal verdict; a blank one behaves as the shipped date.
 - AC9 — `tools/unattended/check-unattended.test.sh` — the branch NAME resolves from the advertisement, and the node-scope skip prints rather than redding.
 - AC10 — `grep` — the check's header states what it cannot buy.
+
+**Evidences:** TOOL-dUnstalledConvoy-11
+- AC1 — `memory/HYGIENE.md` — the `Acceptance ledger` sub-section is present, states the two forms, and its template is byte-identical.
+- AC2 — `memory/TEMPLATE-SPEC.md` — section 6 points at the grammar in one sentence and does not restate it.
+- AC3 — `ACCEPTANCE_LEDGER_CUTOFF` — declared with a comment stating what moving it either way costs.
+- AC4 — `bash tools/memory-tree/check-memory-hygiene.sh` — green over the corpus with the documentation landed and before the check was armed.
+- AC5 — `bash tools/check-kit-versions.sh` — green without this unit bumping anything; the bump belongs to the later unit of the pair.
+- AC6 — `tools/memory-tree/check-memory-hygiene.sh` — the example in the sub-section parses under this file's own parser, read back once the check landed.
+- AC7 — `python` — every unit closed before this one carries a block, verified mechanically: 103 criteria, no gaps and no extras.
+
+**Evidences:** TOOL-dUnstalledConvoy-12
+- AC1 — `tools/memory-tree/check-memory-hygiene.test.sh` — a fully evidenced closed spec passes.
+- AC2 — `tools/memory-tree/check-memory-hygiene.test.sh` — a missing criterion reds, naming the unit and the label.
+- AC3 — `tools/memory-tree/check-memory-hygiene.test.sh` — a line in neither form reds, naming both legal forms.
+- AC4 — `tools/memory-tree/check-memory-hygiene.test.sh` — a Tier-2 spec numbering no criterion reds.
+- AC5 — `tools/memory-tree/check-memory-hygiene.test.sh` — a `WONTDO` spec with no ledger passes.
+- AC6 — `tools/memory-tree/check-memory-hygiene.test.sh` — a spec dated before the cutoff is excluded.
+- AC7 — `bash tools/memory-tree/check-memory-hygiene.sh` — run against this repo, the check measures this build's own back-filled units rather than an empty set; it fired on real gaps before they were filled.
+- AC8 — `tools/memory-tree/check-memory-hygiene.test.sh` — each refusal observed RED against a fixture.
+- AC9 — `tools/memory-tree/check-memory-hygiene.test.sh` — a CLOSED Tier-1 spec whose section 6 is Gates passes, which is why the heading is located by TEXT.
+- AC10 — `grep` — the kit README's check count and its delegation breakdown updated, and the dossier agrees.
+- AC11 — `bash tools/check-kit-versions.sh` — green with the kit-version bump carried by this unit as the last commit of the pair.
+- AC12 — `grep` — the check's header states what it cannot buy.

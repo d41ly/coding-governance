@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-3 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -173,6 +173,14 @@ this unit's commit ordering actually trips, and the first draft did not name it.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-21 · built. It fired on TWO real gaps before they were filled, which is the only
+  kind of first run worth having. One was another build's spec sharing the cutoff DATE — a date
+  boundary falls mid-day and cannot separate a unit that closed before this grammar existed from one
+  that closed after. Back-filling another build's ledger is not this build's to do, so the exemption
+  is DECLARED by unit id in the conf, shrink-only, with its reason beside it and no compensating check
+  claimed, because for an aborted run none is possible.
+  The Tier-1 fixture is the audit's M13 proven: a CLOSED Tier-1 spec whose section 6 is Gates passes,
+  and would have redded under any check reading section 6 by number.
 - rev-2 · 2026-08-20 · folded the spec audit: M13 (the population is scoped to Tier-2 specs carrying an
   acceptance-criteria HEADING, located by the sibling rule's own regex, because a Tier-1 spec legal
   under the format would otherwise red), H2 (this build's own back-filled units are the first

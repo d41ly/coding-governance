@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.25   # gov:kit memory-tree@2.25 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.26   # gov:kit memory-tree@2.26 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -966,6 +966,82 @@ $badL"
   badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
   [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+fi
+
+# ---- 22: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
+# ---- TOOL-dUnstalledConvoy-12. Specs number their criteria and nothing joined a built unit back to
+# ---- those numbers: `build-complete` reads terminal STATUS only, and the closing-review item says
+# ---- outright that it measures a review EXISTS and never what it concluded. This is the join.
+# ----
+# ---- WHAT IT DOES NOT CHECK, and the header says so because a structural check reads as a semantic
+# ---- one to everybody who did not write it: that an observation token names anything real, that the
+# ---- observation was actually made, or that an amendment was justified. It reads SHAPE and
+# ---- COVERAGE. Its inputs are both authored by whoever built the unit, so a green row here is not
+# ---- evidence the unit was built correctly — only that it says which criterion each claim answers.
+# ----
+# ---- THE HEADING IS LOCATED BY TEXT, never by number, and by the SAME regex the acceptance-witness
+# ---- rule above uses. Tier-1 has a light profile in which the section canon is not enforced, so a
+# ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
+# ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
+alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
+if [ -n "$alcut" ]; then
+  # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
+  # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
+  alledger=$(for r in $(GIT ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
+    awk '
+      /^\*\*Serves:\*\*/ { j = ($0 ~ /\*\*Serves:\*\* *journal/) }
+      /^\*\*Evidences:\*\* / { u = (j ? $2 : ""); next }
+      /^#/ { u = ""; next }
+      u != "" && /^- *AC[0-9]+/ {
+        lab = $2; sub(/[^A-Za-z0-9].*$/, "", lab)
+        form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
+        print u " " lab " " form
+      }' "$r"
+  done)
+  alpop=0; algap=""; albad=""; alnolab=""
+  for sp in $(GIT ls-files "$M/builds/*/spec/*.md" 2>/dev/null); do
+    case "$(basename "$sp")" in
+      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) sdate=$(basename "$sp" | cut -c1-10) ;;
+      *) continue ;;
+    esac
+    printf '%s\n%s\n' "$alcut" "$sdate" | sort -C || continue
+    hdr=$(sed -n '1,6p' "$sp" | grep -m1 '^\*\*Status:\*\*')
+    case "$hdr" in *" CLOSED "*) ;; *) continue ;; esac
+    case "$hdr" in *"Tier-2"*) ;; *) continue ;; esac
+    grep -qE '^## [0-9]+[.] Acceptance criteria[ 	]*$' "$sp" || continue
+    uid=$(sed -n 's/^# \([A-Z][A-Za-z0-9-]*\) .*/\1/p' "$sp" | head -1)
+    [ -n "$uid" ] || continue
+    # A DECLARED, NARROW EXEMPTION, listed by unit id and never by pattern. The cutoff is a DATE and
+    # a date boundary falls mid-day: a unit that closed before this grammar existed can share its
+    # cutoff date with one that closed after. Back-filling another build's ledger is not this build's
+    # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
+    # shrink-only, with its reason beside it in the conf.
+    case " ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " in *" $uid "*) continue ;; esac
+    alpop=$((alpop + 1))
+    labs=$(awk '
+      /^## / { inac = ($0 ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/); next }
+      !inac { next }
+      /^([ 	]*(-|\*)[ 	]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/ {
+        lab = $0; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab); print lab
+      }' "$sp" | sort -u)
+    if [ -z "$labs" ]; then
+      # A CLOSED Tier-2 spec with the heading and no labels cannot be evidenced, and "every criterion
+      # is evidenced" is vacuously TRUE over none of them. That vacuity is the whole reason this arm
+      # exists rather than being an oversight the check tolerates.
+      alnolab="$alnolab $uid"
+      continue
+    fi
+    for lab in $labs; do
+      row=$(printf '%s\n' "$alledger" | grep -m1 -E "^$uid $lab (obs|amd|bad)$" || true)
+      if [ -z "$row" ]; then algap="$algap $uid/$lab"
+      else case "$row" in *" bad") albad="$albad $uid/$lab" ;; esac
+      fi
+    done
+  done
+  [ -z "$algap" ] || fail 22 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
+  [ -z "$albad" ] || fail 22 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
+  [ -z "$alnolab" ] || fail 22 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
+  [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 22 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
 fi
 
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the
