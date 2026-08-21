@@ -47,6 +47,18 @@ new specs only — examines 4 tokens across 7 specs, and is blind to this class 
 dead items here were shell identifiers and two of them were unbackticked prose. Cheap enough to ship
 and useless; useful and unshippable. `TOOL-dUnstalledConvoy-25` was retired on those measurements.
 
+## How this one is delivered
+
+NOT by `gotchas.py --for-diff`. Measured over the commit that created this record: 0 anchored classes
+selected. The anchors a record derives are its backticked paths, and the only one here is a shell
+library — so a diff that touches SPECS, which is the only diff this class can occur in, never selects
+it. Marking it universal would put it on every checklist and the universal budget is already at its
+declared cap.
+
+It is delivered at SPEC-AUTHORING time instead, by the build method's spec step, which is where the
+check has to happen anyway: you cannot verify a spec against its base after the spec is written from
+something else. That is the AC2 this record's retired unit carries.
+
 ## The rule that generalises
 
 A record is evidence about a moment. When you write from one, date it against the tree you are

@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading
 
-**Status:** SPECCED · rev-3 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
 ## 1. Goal
 
@@ -17,14 +17,23 @@ never contain it. rev-2 claimed union supplied that exit. It does not, and the c
 
 ## 2. Scope (IN)
 
-- **S1 — the comparison is a REPORT.** check 23 emits on the report channel and never sets the leg's
-  status. `DISPATCH_GRADING` and the dark announcement are both DELETED, in the engine, both confs, the
-  shipped example and the protocol's key table — with a report there is no failure to gate, so there is
-  nothing to flip and no rollback key to keep.
-- **S2 — the reported set for a unit is the UNION of its rows whose window contains the commit.** The
-  record is append-only and the driver tells a run needing more paths to declare again; the leg's fold
-  keeps only the LAST row per `(group, unit)` and discards the rest. Union does not rescue a post-hoc
-  widening, and must not: a row anchored after the commit has a window that excludes it.
+- **S1 — the comparison PRINTS TO STDOUT and never sets the leg's status.** NOT through `report()`:
+  that helper is `[ "$REPORT" = 1 ] &&`, and measured at this base the only thing in the tracked tree
+  that ever sets `GOV_UNATTENDED_REPORT=1` is the leg's own test file. Routing the output there would
+  emit zero bytes on every bar, every pre-push and every unattended run — dark while claiming not to
+  be, which is worse than the dark announcement it replaces. The line is unconditional and carries no
+  `FAILED` token, so a reader and a grep can both tell it from a refusal.
+- **S1b — `DISPATCH_GRADING` is deleted from every carrier, DERIVED not listed.** `git grep -l` at this
+  base returns eight live ones: the leg, its test, `kit.toml`'s `optional_keys`, this project's conf,
+  the shipped example conf, `PROTOCOL.template.md`, the rendered `UNATTENDED-PROTOCOL.md`, and
+  `SESSION-KICKOFF.md` — the manifest every session front-loads. `unattended.sh` carries ZERO, so
+  rev-3 calling the driver "the engine" for this key was wrong.
+- **S2 — the reported set for a unit is the UNION of its rows whose window contains the commit, and
+  the union is computed AT THE SUBSET TEST, not in the fold.** The fold stops collapsing: it emits
+  every row, keyed by `(group, unit, anchor)`, and the subset test gathers the rows whose window
+  contains the commit under test. rev-3 left this open and its own AC2 and AC4 pinned opposite
+  implementations. Union does not rescue a post-hoc widening and must not: a row anchored after the
+  commit has a window that excludes it, which is what preserves leg arm C.
 - **S3 — a row's window is stated, not implied.** It opens AFTER the row's own anchor and closes AT the
   next anchor for the same unit, inclusive of that anchor's commit. Rows are ordered by ANCESTRY, not
   by file order. A row whose anchor is not an ancestor of HEAD is an announced skip.
@@ -32,11 +41,17 @@ never contain it. rev-2 claimed union supplied that exit. It does not, and the c
   and S3 does not reach it.
 - **S5 — `normpath` handles an interior `/./` and a trailing `/.`**, both broken by one missing case.
 - **S6 — the empty-proof announcement measures condition 1's own population**, not `sibrows`.
-- **S7 — the orphaned widening prose is deleted from BOTH carriers**: `unattended.sh`'s
-  re-declaration-rule comment sitting above the code that replaced it, and the matching block in
-  `check-unattended.sh`. One of them is where rev-1 of this spec got its false mental model.
+- **S7 — the orphaned widening prose is deleted from EVERY carrier, derived by grep rather than
+  counted in prose.** rev-3 said "BOTH" and named two; the population is whatever
+  `git grep -lE 'RE-DECLARATION RULE|widening repair|A strict SUPERSET'` returns over `tools/` and
+  `memory/guides/`, and it includes the protocol template and its rendered twin, which are byte-paired
+  by a check. One of these carriers is where rev-1 of this spec got its false mental model.
 - **S8 — the two arms round 4 named as missing:** the `case`-to-`covers` leg fix reverts green today,
   and cross-component arm 3b never lets either pass commit.
+- **S9b — the nine arms that assert `check 23 FAILED` are converted, and the conversion is SCOPE.**
+  Measured: `grep -c 'check 23 FAILED'` returns 9 in the leg's test. Turning the failure into a printed
+  line makes every one of them either red or permanently unfalsifiable, and rev-3 owned none of them.
+  Each becomes an assertion on the new text, and each `miss` becomes a `miss` on that text.
 - **S9 — every change lands with its arm in the same commit.** An arm over a REPORT asserts the text
   AND a negative control asserting silence, because a report cannot be observed RED the way a failure
   can and "it printed nothing" is what a broken report also does.
@@ -93,8 +108,9 @@ reader what a pass said versus what it did.
 
 ## 6. Acceptance criteria
 
-- **AC1** — `grep -c DISPATCH_GRADING` returns 0 across the engine, both confs, the shipped example and
-  the protocol template, observed by `grep`.
+- **AC1** — `git grep -l DISPATCH_GRADING -- tools/ memory/guides/ .unattended.conf` returns nothing,
+  so every live carrier is cleared including `kit.toml` and `SESSION-KICKOFF.md`, observed by
+  `git grep`. Records under `memory/builds/` keep their citations and are out of the population.
 - **AC2** — a unit with two rows at ONE anchor committing inside the union of both produces NO report
   line, and committing outside it produces one naming the path, observed in
   `tools/unattended/check-unattended.test.sh`.
@@ -111,8 +127,10 @@ reader what a pass said versus what it did.
   `tools/unattended/unattended.test.sh`.
 - **AC8** — the empty-proof announcement fires when condition 1's population is empty and is silent
   otherwise, observed in `tools/unattended/unattended.test.sh`.
-- **AC9** — the leg's exit status is 0 for every check-23 discrepancy, asserted directly, observed in
-  `tools/unattended/check-unattended.test.sh`.
+- **AC9** — the leg's exit status is 0 for every check-23 discrepancy AND the discrepancy line appears
+  on stdout with no `GOV_UNATTENDED_REPORT` set, asserted directly, observed in
+  `tools/unattended/check-unattended.test.sh`. Both halves, because status-0-and-silent is exactly the
+  failure this scope item exists to avoid.
 - **AC10** — `grep -c 'RE-DECLARATION RULE'` returns 0 in both `tools/unattended/unattended.sh` and
   `tools/unattended/check-unattended.sh`, observed by `grep`.
 - **AC11** — round 4's `case`-to-`covers` fix reverts to a changed report, and arm 3b commits for at
@@ -140,6 +158,13 @@ way to make a check dark without saying so.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · a third spec review returned BLOCKED on two measured facts. `report()` is
+  `[ "$REPORT" = 1 ] &&` and nothing outside the leg's own test sets it, so rev-3's "REPORT" would have
+  emitted zero bytes everywhere — S1 now says stdout, unconditionally. S2 left the fold-versus-subset
+  question open and rev-3's own AC2 and AC4 pinned opposite answers; the union is now specified at the
+  subset test with the fold keyed on the anchor. Added S1b and S9b for two populations rev-3 asserted
+  instead of measuring: eight live conf carriers, not four, and nine existing arms that the
+  fail-to-print conversion breaks and no scope item owned.
 - rev-3 · 2026-08-21 · a second spec review returned BLOCKED. rev-2's central claim — that union gives a
   corrective declaration an in-band exit — is FALSE: `pass_commit`'s window excludes its anchor, so a
   later row cannot cover an earlier commit. The owner then resolved the underlying fork: the comparison
