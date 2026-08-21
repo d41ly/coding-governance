@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-3 — the gate selftest, split by the same contract
 
-**Status:** OPEN · rev-1 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -18,7 +18,13 @@ sibling: alone, either one buys 3.7 % because the other simply becomes the new f
 - **S4** — two manifest rows carrying this leg's own three-entry `guard` array byte-identically. The
   identical-guard rule binds WITHIN a sibling pair, not across the two units — the driver's guard is
   a different array and stays that way.
-- **S5** — a per-arm PASS/FAIL VECTOR comparison against the unsharded run, not an assertion count.
+- **S5** — a STATE comparison against the unsharded run at the boundary and at the end of each mode.
+- **S6** — **both leg names, stated.** Shard 1 KEEPS `unattended gate selftest`, so it inherits its
+  warm ledger row and still dispatches first; shard 2 is `unattended gate selftest shard B`. This is
+  the sibling's naming resolution and it BINDS this file too, because the names are load-bearing
+  twice — warm-ledger dispatch rank, and the codebase-map key swap. No digit-bearing parenthetical:
+  the descriptor grammar refuses one.
+- **S7** — `tools/unattended/kit.toml`: a second `[[gate_leg]]` row, as the sibling.
 
 ## 3. Non-goals (OUT)
 
@@ -72,25 +78,41 @@ splits ~2:1 — and the bar's floor is the LARGER shard, so imbalance eats the w
 
 - **AC1** — each shard of `tools/unattended/check-unattended.test.sh` exits 0 and prints its PASS
   line. Satisfiable only with the corrected flag parsing, which is the sibling's contract.
-- **AC2** — each shard's per-arm PASS/FAIL VECTOR equals the corresponding slice of the unsharded
-  run at the same commit. A count equality is NOT sufficient and the spec says why: the counters
-  increment unconditionally when reached and the only loop is fixed-iteration, so `n1 + n2 == n`
-  passes even when a leaked ref makes a shard-two arm pass for a different reason. Additionally
-  observe both shards at a commit where a known arm is deliberately broken, so the comparison is
-  exercised RED as well as green.
+- **AC2** — compare STATE, not verdicts. Capture `git ls-remote --heads "$ORIGIN"` and
+  `git for-each-ref refs/heads refs/remotes` at the boundary and at the end of each mode, and
+  require shard 2's capture to equal the unsharded run's at the same point, failing with both
+  listings named. **The named negative:** run `--shard 2/2` with `refs/heads/ahead` planted and
+  again with it absent and require a DIFFERENCE, naming the specific arm to break so two builders do
+  not break two different ones — otherwise the arm does not read the leak and AC2 protects nothing.
+  rev-1 required a per-arm PASS/FAIL vector, which fails twice: it has the SAME blindness to an arm
+  passing for the wrong reason (PASS in both runs, vectors equal), and the artifact does not exist,
+  because this suite's helpers print only on failure and a green run emits one PASS line with no
+  per-arm vector to slice. The sibling's per-arm BYTE comparison belongs here too.
 - **AC3** — the unsharded invocation of `tools/unattended/check-unattended.test.sh` still exits 0
   above its own `FLOOR_ASSERTIONS`.
-- **AC4** — `--shard 3/2`, `--shard two`, and a bare `--shard` each exit 2, name the argument, and
-  run nothing.
+- **AC4** — all FIVE refusals, each exiting 2, naming the argument, and running nothing:
+  `--shard 3/2`, `--shard 1/3`, `--shard 0/2`, `--shard two`, and a bare `--shard`. rev-1 tested
+  three and dropped `1/3` and `0/2` — the two a manifest edit or an off-by-one in the dispatcher
+  produces, as opposed to the two a typist produces. Since refusal happens before the first scratch
+  dir, an unarmed arity check means a shard that silently runs the WRONG region rather than one
+  that refuses.
 - **AC5** — the per-part floors sum to at least `FLOOR_ASSERTIONS`, asserted in every invocation;
   setting the sum one below reds all three modes.
 - **AC6** — byte-identical `guard` arrays within THIS pair and the same chunk; a diff touching only
   the protocol document runs both shards or skips both.
-- **AC7** — `max(shard one, shard two)` standalone is at most 55 % of the unsharded standalone wall,
-  with BOTH candidate boundary timings recorded including the rejected one.
+- **AC7** — the threshold is DERIVED from the two candidate timings this spec already requires
+  recording, not authored. rev-1 required 55 %, which this spec's own §4 refutes: the git-operation
+  weight splits about 2:1, i.e. 66.7 %, and both legal boundaries sit AFTER the git-heavy region so
+  neither can move that weight forward — while §3 forbids a physical split or a third shard. Record
+  both candidates, take the better, and **if both miss the target, accept the imbalance and
+  re-price the headline** rather than keeping a criterion nothing can satisfy. Witness: the two
+  standalone walls of `tools/unattended/check-unattended.test.sh`, both recorded in the build record.
 - **AC8** — `check-arms.py --check` green with the armed-floor pin unchanged.
 - **AC9** — `check-testsuite-counts.sh` green, no new waiver row.
-- **AC10** — `govkit selfcheck` green and any retired leg name absent from the manifest.
+- **AC10** — `govkit selfcheck` green, with both S6 names claimed by `tools/unattended/kit.toml`.
+  **No leg name is retired** — the sibling's resolution keeps shard 1's existing name, so one key
+  arrives and none departs. rev-1's "any retired leg name absent" was a live signal that this file
+  might intend the symmetric rename the sibling rejected.
 - **AC11** — codebase-map coverage + freshness green in both directions in the same commit, with
   `memory/map/features/unattended.md` and the generated artifacts moved together.
 - **AC12** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` green, with the charter sentence and
@@ -100,15 +122,21 @@ splits ~2:1 — and the bar's floor is the LARGER shard, so imbalance eats the w
   is evidence about its own part only, and names where the whole-suite claim lives.
 - **AC14** — `TOOL-aShardedFloor-2` ships in the SAME landing, witnessed by both pairs of rows
   existing in `tools/gate-legs.json` at one commit, or the win is 3.7 % instead of 27.6 %.
-- **AC15** — the objective itself, observed: over the bars taken after the change, the mean span
-  reconstructed from the per-leg run records is at least the predicted margin below the recorded
-  pre-change mean, with both means and the run count quoted in the build record. The witness is
-  `<git-dir>/gate-run/<id>/*.leg`, whose rows already carry per-leg start and end in nanoseconds, so
-  this costs nothing but reading them.
+- **AC15** — the objective itself, observed, **with its three literals stated rather than chosen
+  after measuring**. BASELINE: the 1001.3 s four-run mean recorded in
+  `memory/builds/aScannedThrottle/build/2026-08-20-build-TOOL-aScannedThrottle-1.md` — the only
+  candidate that IS a mean. MARGIN: at least 200 s, conservative against the 282-292 s the
+  simulator predicts. N: at least 3 `GATE_FULL` bars at the same profile row and width. The witness
+  is `<git-dir>/gate-run/<id>/*.leg`, whose rows carry per-leg start and end in nanoseconds.
+  **RETENTION NOTE:** the runner keeps only the last five run dirs and sweeps older ones, so copy
+  the `.leg` files aside before the sixth bar or the evidence is gone before it is read.
 
 ## 7. Gates
 
-As `TOOL-aShardedFloor-2`. This unit adds no gate leg and no gate arm beyond its own floors.
+As `TOOL-aShardedFloor-2`. **This unit adds a second manifest ROW on an existing script plus its
+descriptor row** — no new script and no new checking surface — and its own floors. Guard parity
+within this pair is a DOCUMENTED MANUAL CHECK, not a gated one: the descriptor join reads names and
+never a `guard` field. Tracked as `TOOL-aPacedTurnstile-12`; AC6 is its compensating observation.
 
 ## 8. Open questions
 
@@ -116,10 +144,14 @@ none — one fork is RESOLVED here and one is deliberately left to measurement. 
 boundary is chosen by the recorded timings of both candidates, not by argument, and if they tie the
 safer candidate wins because it keeps the un-restored `main`/origin state inside one shard.
 Resolver: this session. **Left to measurement, which is not a fork:** which of the two candidates is
-faster. A stray fact worth one minute first — a comment in this file claims `git clean -qfd` removes
-the copied kit and so the arm re-copies it, but the kit was committed earlier and is therefore
-TRACKED, so `clean` cannot touch it. Confirm in a scratch repo before trusting any other claim that
-comment's neighbours make.
+faster. *(resolver: this session.)*
+
+**One stray fact, RESOLVED here so the minute is spent once.** A comment in this file claims
+`git clean -qfd` removes the copied kit and so the arm re-copies it. It does not: the kit is copied
+early, COMMITTED, and `PRISTINE` is a later commit on the same history, so the file is TRACKED and
+`clean` without `-x` cannot touch it. The independent proof is an arm that resets and edits the kit
+with no re-copy and asserts green. The comment is wrong and the re-copy beside it is dead code.
+Keep the surrounding warning: this comment's neighbours are not trustworthy.
 
 ## 9. Revision log
 
@@ -129,6 +161,16 @@ comment's neighbours make.
   boundary was off by one and separated an arm from its control, the flag must be parsed rather than
   position-read, and the count-equality acceptance was replaced with a per-arm vector comparison
   because the counters make the arithmetic pass over a genuinely wrong run.
+- rev-2 · 2026-08-21 · M4 spec audit folded, record [`reviews/2026-08-21-review-TOOL-aShardedFloor-1.md`](../reviews/2026-08-21-review-TOOL-aShardedFloor-1.md), verdict BLOCKED, 40 confirmed of
+  65. The high against this unit was **F3**: AC7's 55 % bound is refuted by this spec's own §4, and
+  neither legal boundary can reach it. AC7 now derives its threshold and states the fallback. Also
+  folded: rev-1's replacement per-arm vector had the same blindness as the count it replaced AND
+  named an artifact this suite cannot produce, so AC2 compares STATE with a named negative (F7);
+  AC15 carried none of its three literals and would have been graded after measuring (F4); both leg
+  names are now stated and AC10's retired-name clause is resolved (F15); two of the five refusals —
+  the two a machine produces rather than a typist — were dropped (F16); §7 implied no manifest row
+  (F22); guard parity is a named manual check (F20); and §8's stray errand is resolved from source
+  (F25).
 
 ## 10. Reuse audit
 

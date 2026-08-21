@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store
 
-**Status:** BLOCKED · rev-1 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** BLOCKED · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -26,7 +26,18 @@ Discharges `TOOL-aScannedThrottle-8`.
   coverage count on its OWN output row.
 - **S5** — two header keys recording the resolved source and the coverage.
 - **S6** — fold in the fix to the nested-run population line this unit's own proof leans on: it
-  selects one leg where six qualify, which is a near-vacuous arm holding up a load-bearing claim.
+  selects one leg where seven qualify, which is a near-vacuous arm holding up a load-bearing claim.
+- **S7** — **spell the vocabulary and the keys.** The five source tokens are `worktree`, `common`,
+  `both`, `legacy` and `NONE`; the two header keys are `dispatch_source` and `dispatch_known`,
+  joining `dispatch`. A closed vocabulary written as English descriptions cannot be armed.
+- **S8** — **re-word `TOOL-aScannedThrottle-8` at discharge.** That row prescribes the OPPOSITE
+  precedence to S1 — common dir first with a per-worktree fallback, against S1's per-worktree first,
+  merged first-wins. They are not equivalent: under S1 a stale local row shadows a fresher shared
+  one, which is exactly what the coverage count exists to expose. Fixing the spec and leaving the
+  row is the two-answers-to-one-question class this repo already tracks.
+- **S9** — the four `FLOOR_ASSERTIONS` raises this unit's arms require, each stated as an ABSOLUTE
+  value. `run-gates.turnstile.test.sh` is raised by `TOOL-aShardedFloor-1` too, so whichever lands
+  second states the number it expects.
 
 ## 3. Non-goals (OUT)
 
@@ -111,12 +122,21 @@ As the sibling units, plus `run-gates evidence` and `profile-bar selftest`.
 
 ## 8. Open questions
 
-**Two, and the first is why this spec's status is BLOCKED rather than OPEN.**
+**Three, and the first is why this spec's status is BLOCKED rather than OPEN.**
+
+**0. PREREQUISITE, not a question:** this unit lands AFTER `TOOL-aShardedFloor-2` and
+`TOOL-aShardedFloor-3`. The mechanism, not just the sequence: the dispatch sort keys an unknown leg
+name at 0.0 and every known leg at a negative, so a NEW shard name sorts dead last on a warm
+ledger — and this unit's whole job is warming every worktree's ledger. Landing it first makes the
+shard rename penalty worse, not better.
 
 1. **Does this unit wait for a reserved short-leg slot, or ship with a measured 131× regression in
    time-to-first-signal?** Not resolvable here. Measured: 669.1 s to first verdict on a warm ledger
-   against 5.1 s on a cold one, a swing decided solely by ledger warmth. Today 24 of 26 worktrees were
-   ACCIDENTALLY protected by having no hint; this unit removes that protection everywhere at once. So
+   against 5.1 s on a cold one, a swing decided solely by ledger warmth. The worktree population is
+   RE-DERIVED at write time with `git worktree list`, never quoted from the report: it was 24 of 26
+   when measured and the cleanup at `49aea26` took it to six the same night, which is in this
+   branch's history. What does not move is the PROPERTY — every worktree with no hint is
+   accidentally protected, and this unit removes that protection everywhere at once. So
    a real 16 % span win reads as a large regression to the person who filed the complaint that
    started `aScannedThrottle`, and the complaint was about PERCEIVED latency. The fix is
    `TOOL-aMeteredTurnstile-5` — dispatch longest-first into width-1 workers while one worker pulls
@@ -129,6 +149,10 @@ As the sibling units, plus `run-gates evidence` and `profile-bar selftest`.
    inside one worktree — but it raises the hit rate from rare to routine.** Widening the key
    invalidates every cached key at once, so it is its own unit and its own landing. Recorded here so
    the next reader does not rediscover it.
+3. **Does the legacy filename fallback EXPIRE?** A permanent fallback keeps a dead filename alive
+   forever; a migrate-then-delete needs a write on the READ path, which S1 otherwise avoids
+   entirely. Measured today at 78.4 % coverage, so the fallback is worth something now and worth
+   nothing once every worktree has run a bar. Owner's, with the sequencing question.
 
 ## 9. Revision log
 
@@ -139,7 +163,14 @@ As the sibling units, plus `run-gates evidence` and `profile-bar selftest`.
   corrections folded before first writing: the coverage count must not ride the dispatch line (it
   would change a verdict), the vocabulary needs five tokens rather than three, the write stays
   per-worktree so `profile_bar.py` needs no edit, and the nested-run arm this design leans on selects
-  one leg where six qualify.
+  one leg where seven qualify.
+- rev-2 · 2026-08-21 · M4 spec audit folded, record [`reviews/2026-08-21-review-TOOL-aShardedFloor-1.md`](../reviews/2026-08-21-review-TOOL-aShardedFloor-1.md), verdict BLOCKED, 40 confirmed of
+  65. This unit was already correctly BLOCKED; the audit added what it was missing rather than
+  changing its disposition. Folded: the 2-and-3 prerequisite and its MECHANISM are now stated (F9);
+  the backlog row's opposite read precedence is superseded in the row itself, not only in this spec
+  (F17); the five source tokens and both header key names are spelled (F18); the worktree count is
+  re-derived rather than quoted from a night it expired (F19); the four floor raises are named
+  (F13); and the legacy-fallback-expiry fork joins §8 (F12's sibling).
 
 ## 10. Reuse audit
 

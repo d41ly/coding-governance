@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-2 — the shard contract, and the driver selftest split by it
 
-**Status:** OPEN · rev-1 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -27,7 +27,17 @@ buys anything worth having.
 - **S6** — the CONTRACT, written in the script as prose a sibling can copy: flag grammar, refusal
   set, floor selection, and the cover arm that proves no shard index went missing.
 - **S7** — gov-canary arms: complete cover over shard indices, and the reverse direction — a script
-  declaring no shard arity may not be called with `--shard`, and one that declares it must be.
+  declaring no shard arity may not be called with `--shard`, and one that declares it must be. The
+  suite's `FLOOR_ASSERTIONS` rises to a stated ABSOLUTE value, never a delta.
+- **S8** — `tools/unattended/kit.toml`: a second `[[gate_leg]]` row, because the descriptor join
+  reds on any manifest name claimed by no descriptor.
+- **S9** — **the adopter transition.** Both suites are EMITTED gate legs, and the emitter compares a
+  receipt's recorded row against a FRESH RENDER rather than against the target's current row — so a
+  kit-side argv change is indistinguishable from target drift, and one drifted leg blocks the
+  manifest write for EVERY kit in that apply. Gov's own tree is unaffected because its manifest is
+  hand-authored, so the failure lands only in an adopter re-applying after the change, which is
+  exactly where nobody is watching. This class is not novel — a prior review reproduced it end to
+  end against a scratch target. §8 picks the mechanism; §6 observes it.
 
 ## 3. Non-goals (OUT)
 
@@ -70,16 +80,33 @@ assertion count cannot see it; AC1, AC7 and AC8 can.
   the only mitigation for the second; there is no gate for it, and the spec says so rather than
   implying coverage it does not have.
 - testing + left-shift gates — two new gov-canary arms, both directions.
-- migration / rollback — revert is one manifest edit plus four lines; the ledger self-heals in a bar.
+- migration / rollback — revert is one manifest edit plus four lines and the ledger self-heals in a
+  bar. **True of this repo and silent about adopters** — see S9.
+- guard parity — S5's byte-identical-guard invariant is NOT enforceable by the descriptor join this
+  spec cites: that join reads NAMES and never a `guard` field in either direction, and the
+  divergence is live today between `tools/gate-legs.json` and `tools/unattended/kit.toml`. Tracked
+  as `TOOL-aPacedTurnstile-12`. Until it lands, guard identity is a DOCUMENTED MANUAL CHECK, named
+  here with its compensating observation (AC6) rather than implied to be gated.
 - user docs — N/A: internal harness.
 
 ## 6. Acceptance criteria
 
 - **AC1** — the no-argument run exits 0 at `PASS (398 assertions)` with output byte-identical to the
   pre-change run.
-- **AC2** — `--shard 1/2` exits 0 with n ≥ 196 and `--shard 2/2` with n ≥ 206, and the identity
-  `FLOOR_SHARD_1 + FLOOR_SHARD_2 = FLOOR_ASSERTIONS + 4` is asserted in EVERY mode. This is a
-  tripwire over three authored constants, not a measurement, and its header says so.
+- **AC2** — **two claims, because rev-1 conflated them into one that is arithmetically false.**
+  (a) *Per-shard floors.* `FLOOR_SHARD_1` and `FLOOR_SHARD_2` are each compared to that mode's
+  EXECUTED count with `-ge`, the inequality form the sibling unit already uses so both files spell
+  ONE rule. They are set at the same proportional discount the existing pin carries, NOT at the
+  measured 196/206 — pinning at 100 % of observation destroys the ~15 % headroom the current
+  338-against-398 pin deliberately holds, against a source comment reading "Lower it in a reviewed
+  diff or not at all".
+  (b) *A duplication tripwire over EXECUTED counts*, not over floors:
+  `n(shard 1) + n(shard 2) = n(unsharded) + PROLOGUE_ARMS`, with `PROLOGUE_ARMS=4` declared as its
+  own named constant beside the seam constant.
+  rev-1 asserted `FLOOR_SHARD_1 + FLOOR_SHARD_2 = FLOOR_ASSERTIONS + 4` in every mode. The `+4`
+  relation is true of the MEASURED totals — §4 writes `196 + 206 = 398 + 4` correctly — and AC2 then
+  substituted the pinned floor 338 for the measured 398. 196 + 206 = 402 against 338 + 4 = 342, so
+  built literally the tripwire fired on all three modes including the unsharded one.
 - **AC3** — each sharded run of `tools/unattended/unattended.test.sh` prints which region it ran and
   that the other was not exercised.
 - **AC4** — the header of `tools/unattended/unattended.test.sh` states what a sharded run does NOT
@@ -100,9 +127,21 @@ assertion count cannot see it; AC1, AC7 and AC8 can.
 - **AC11** — codebase-map coverage + freshness green in BOTH directions, generated artifacts
   regenerated in the same commit — `memory/map/generated/inventories.json` and
   `memory/map/generated/MAP.md`.
-- **AC12** — both shard legs' in-pool durations, read from `<git-dir>/gate-run/<id>/*.leg`, are
-  below the ~766 s throughput bound.
-- **AC13** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` green, with the charter's measured pair
+- **AC12** — the shard BALANCE, read from `<git-dir>/gate-run/<id>/*.leg`: `max(shard)` over the two
+  legs is at most the measured seam's own 63/37 split plus a stated tolerance. rev-1 required only
+  "below the ~766 s throughput bound", which the measured shard 1 clears more than threefold and
+  which is a SPAN figure used as a per-leg cap — it could not fail on any plausible build. The
+  balance is NOT pushed to the sibling's 55 %: §3 forbids per-arm assignment because this file has
+  fixture epochs that must run contiguously, so this seam is not free to rebalance.
+- **AC13** — `TOOL-aShardedFloor-3` ships in the SAME landing, witnessed by both pairs of rows
+  existing in `tools/gate-legs.json` at one commit. The mirror of the sibling's own criterion:
+  rev-1 stated the rule in prose three times and enforced it in one document, while every other AC
+  here was satisfiable by this unit standing alone — worth 3.7 % instead of 27.6 %.
+- **AC14** — the adopter transition, observed: run the kit adopter twice ACROSS the change on a
+  scratch target and the second apply succeeds, writing its `tools/gate-legs.json`.
+- **AC15** — `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.gov.test.sh` is raised to a stated
+  ABSOLUTE value covering S7's arms.
+- **AC16** — `GATE_FULL=1 bash tools/run-gates/run-gates.sh` green, with the charter's measured pair
   and both halves of its gov-canary arm moved in the SAME commit as the last span-moving landing.
 
 ## 7. Gates
@@ -110,18 +149,32 @@ assertion count cannot see it; AC1, AC7 and AC8 can.
 `bash tools/run-gates/run-gates.sh`, full at the push boundary. Named legs: `unattended driver
 selftest` (both shards), `unattended gate selftest`, `run-gates gov canary`, `run-gates canary`,
 `testsuite counts`, `harness arms`, `govkit selfcheck`, `codebase-map coverage + freshness`,
-`kickoff-manifest ratchet`, `memory hygiene`. This unit adds gov-canary ARMS, not a leg.
+`kickoff-manifest ratchet`, `memory hygiene`. **This unit adds a second manifest ROW on an existing
+script plus its descriptor row, and gov-canary ARMS — no new checking surface and no new script.**
+It also narrows one canary predicate: the leg-path heuristic collects every argv token containing a
+slash and greps the runner for it, so `1/2` joins that population and buys a false-positive channel
+whose message would name a leg script path that does not exist. Narrow it to tokens ending `.sh` or
+`.py`, or resolving to a tracked path.
 
 ## 8. Open questions
 
-none — the forks this unit had are RESOLVED and marked here. (1) *Flag in `argv` or a new manifest
-key?* `argv`: the manifest key set is pinned and a new key would move that pin for nothing.
+`none — the forks below are RESOLVED, except the last, which is the OWNER's.`
+
+(1) *Flag in `argv` or a new manifest key?* `argv`: the manifest key set is pinned and a new key would move that pin for nothing.
 (2) *Shard 1's name?* Keep the existing name and append a letter to shard 2 — the warm-ledger sort
 penalty then falls on the smaller shard only, and map churn halves. Resolver: this session, under
 the standing authority to settle forks the specs already state; the alternative (symmetric renaming)
 is tidier and takes the penalty on both, and is recorded here so the choice is visible rather than
 silent. (3) *Does `TOOL-aPacedTurnstile-8` split into two ids?* It does not: one row, discharged
-jointly by this unit and `TOOL-aShardedFloor-3`, because they must land together to buy anything.
+jointly by this unit and `TOOL-aShardedFloor-3`, because they must land together to buy anything. *(resolver for 1-3: this session, standing
+authority over forks the specs already state.)*
+
+(4) **OWNER — does `KIT_UNATTENDED_VERSION` bump 1.7 to 1.8?** Eight spellings across six files
+plus a re-render, paired by `tools/check-kit-versions.sh`. Nothing GATES a bump on a content
+change, but the descriptor's declared leg set is an adopter-visible contract and it changes here,
+which is the fork rule's veto 2. Recommendation is bump. **Not resolvable by this session**, and
+S9's mechanism choice rides on it: new names for both shards would sidestep the receipt-drift
+problem entirely, at the cost of the warm-ledger sort penalty on both.
 
 ## 9. Revision log
 
@@ -131,6 +184,16 @@ jointly by this unit and `TOOL-aShardedFloor-3`, because they must land together
   PARSED not position-read (the original would have made both legs exit 2 on every bar forever), the
   hoist set is six and not five, the assertion floor must be mode-selected or every shard leg reds
   forever, and the warm-ledger dispatch case is a regression rather than the null the brief assumed.
+- rev-2 · 2026-08-21 · M4 spec audit folded, record [`reviews/2026-08-21-review-TOOL-aShardedFloor-1.md`](../reviews/2026-08-21-review-TOOL-aShardedFloor-1.md), verdict BLOCKED, 40 confirmed of
+  65. **The blocker was F1, and it was mine:** AC2 substituted the pinned floor for the measured
+  total, making its identity false by 60 and reddening all three modes on the first run — the exact
+  "every shard leg reds forever" failure rev-1's own §9 claimed to have corrected. AC2 is now two
+  claims. Also folded: the co-landing rule was witnessed from one side only (F8); AC12 stated a
+  bound it clears threefold rather than the balance (F5); the adopter transition through the kit
+  emitter reached no scope item (F6); the descriptor row and the version fork reached neither §2
+  nor §8 (F12); the gov-canary floor must rise (F13); the guard-parity invariant is unenforceable
+  by the join cited and is now a named manual check (F20); §7 implied no manifest row (F22); and
+  the canary's leg-path heuristic will collect the shard token (F24).
 
 ## 10. Reuse audit
 
