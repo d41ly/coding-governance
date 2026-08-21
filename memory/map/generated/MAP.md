@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 17 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 20 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -163,14 +163,17 @@ Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
+| `containment-tested-one-way.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
+| `id-matched-as-a-substring.md` | unattended |
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
+| `status-set-in-a-subshell.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `two-answers-to-one-question.md` | baseline |

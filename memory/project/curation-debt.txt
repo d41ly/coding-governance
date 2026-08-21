@@ -25,3 +25,15 @@ memory/builds/aRuledFrontispiece/README.md
 # against a 300 budget. So nothing is hidden today, but that row is AT the limit and the check
 # that would catch it going over is now off. Drains when the TOOL index is curated or split.
 memory/backlog/TOOL.md
+# memory/builds/dUnstalledConvoy/README.md - a GENERATED record-bindings row that scales with the
+# UNIT COUNT. This build's spec audit legitimately serves all 13 units, so the Records-table row the
+# renderer emits carries 13 ids and measures 438 chars against the 350 tier. No authoring choice
+# inside the record shortens it: the binding grammar expands a contiguous range at authoring time,
+# so the record must spell every id, and splitting one review into two records to shorten a row
+# would be two answers to one question. Renderer-shaped, exactly like the aRuledFrontispiece row
+# above, and TOOL-dUnstalledConvoy-13 is the row that records the structural cause.
+# BLAST RADIUS, measured before listing: this silences checks 6 and 7 on this file. Check 8's
+# population is the backlog shards alone, so it never reached this path. Check 6 passes today with
+# room - 17996 B against a 25600 cap - and the longest line that is NOT the bindings row measures
+# 319 chars against the 350 tier. So nothing is hidden today. Drains when the row shape is revisited.
+memory/builds/dUnstalledConvoy/README.md

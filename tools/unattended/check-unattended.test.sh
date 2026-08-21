@@ -55,7 +55,7 @@ cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
-cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
+cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -73,6 +73,10 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
+# The dispatch write-set GRADING is dark by default (TOOL-dUnstalledConvoy-23 owns its
+# redesign). The fixture declares it ON so the grading arms below still exercise the code;
+# a separate arm removes the key and asserts the dark path announces itself.
+DISPATCH_GRADING=1
 EOF
 }
 
@@ -238,7 +242,7 @@ hit "$(run)" "cannot read the kit's core sets from the driver, so every membersh
 reset_tree
 # reset_tree's `git clean -qfd` removes the copied kit, so the arm re-stages it before editing.
 # Without this the sed edits nothing, the grep counts nothing, and the arm passes by finding nothing.
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
 ncore=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w)
 short=$(grep '^PHASES_CORE=' tools/unattended/unattended.sh | tr -d '
@@ -257,7 +261,7 @@ miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 same "a project phase EXTENSION is green" "$(run)" ""
 
 reset_tree
-mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" tools/unattended/
 ndod=$(grep '^DOD_CORE=' tools/unattended/unattended.sh | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)
 sed -i 's/ parked-decisions-surfaced:agent"$/"/' tools/unattended/unattended.sh
@@ -1331,13 +1335,372 @@ reset_tree
 # frozen-versus-live PAIR survived and was rewritten against the new one; the anti-over-exemption
 # arm did not, because main's exemption has the same over-wide scoping and narrowing it is a
 # change the owner did not ask for. Filed as TOOL-cSettledDocket-11 rather than made silently.
+# ---- check 22 (TOOL-dUnstalledConvoy-6): an AMENDMENT with no record. M3 now delegates this build's
+# ---- own scope, so the failure mode moved from stalling to DRIFTING — a unit quietly retired with
+# ---- nothing on the record saying so.
+# ----
+# ---- THE BASELINE MUST CARRY A ROSTER or there is nothing to compare against, and that is not a
+# ---- fixture convenience: an EMPTY baseline is vacuously ACCUSATORY, because every unit the build
+# ---- has would read as added. The shared `tRun` fixture is exactly that shape — a live phase from
+# ---- its first commit — which is also the prompt-authorized shape, so these arms build their own
+# ---- run whose baseline already names a unit, and the empty case is asserted separately as a SKIP.
+URO='| [ARCH-tRos-1 — the first unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
+UR7='| [ARCH-tRos-7 — a later unit](spec/seven.md) | OPEN | rev-1 | 2026-08-01 |'
+UEND='<!-- /gen:build-units -->'
+seed_ros() {
+  reset_tree
+  build tRos
+  awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
+    && mv /tmp/ros.$$ memory/builds/tRos/README.md
+  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline" --no-verify
+}
+add_u7() {
+  awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
+    && mv /tmp/ros7.$$ memory/builds/tRos/README.md
+}
+rrow() { printf '\n2026-08-20T00:00:00Z rescope · item %s · reason %s\n' "$1" "$2" >> memory/builds/tRos/RUN.md; }
+
+# an id present now and absent at the baseline, with NO rescope row, is the whole point of the check
+seed_ros; add_u7
+git add -A && git commit -q -m "a unit nobody recorded" --no-verify
+hit "$(run)" "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so:"
+
+# ...an `add` row naming it ACCOUNTS for it.
+seed_ros; add_u7
+rrow "add ARCH-tRos-7" "the build needed it"
+git add -A && git commit -q -m recorded --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ...so does a SUPERSEDE row naming it as the SUCCESSOR, which is the case an add-only rule redded:
+# a correct supersession leaves the successor present now and absent then, and the sibling verb
+# refuses an `add` for an id the region already carries, so the run would have had no legal repair.
+seed_ros; add_u7
+rrow "supersede ARCH-tRos-1 -> ARCH-tRos-7" "the mechanism split"
+git add -A && git commit -q -m superseded --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ...a SUPERSESSION whose successor never landed is a retirement wearing a better name.
+seed_ros
+rrow "supersede ARCH-tRos-1 -> ARCH-tRos-9" "never landed"
+git add -A && git commit -q -m orphan --no-verify
+hit "$(run)" "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name:"
+
+# ...a unit that goes WONTDO after the baseline owes a retire or a supersede.
+seed_ros
+sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
+git add -A && git commit -q -m dropped --no-verify
+hit "$(run)" "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so:"
+
+# ...and the same transition WITH a retire row is accounted for.
+seed_ros
+sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
+rrow "retire ARCH-tRos-1" "the probe cannot see this tree"
+git add -A && git commit -q -m "retired on the record" --no-verify
+miss "$(run)" "check 22 FAILED"
+
+# ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
+# ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+out=$(run)
+miss "$out" "check 22 skipped"
+miss "$out" "check 22 FAILED"
+reset_tree
+
+# ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.
+# ---- The sibling verb records what a dispatched pass said it would write; this is the half that can
+# ---- catch the declaration out, because the two artifacts are made by different acts at different
+# ---- times. What it cannot buy is in its own header: both are authored by the run.
+drow() {               # unit · declared paths — a dispatch row at the CURRENT HEAD
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' \
+    "$(git rev-parse --short=8 HEAD)" "$1" "$2" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+
+# a pass that commits INSIDE its declared set is clean
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
+# ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
+# ---- ANCHOR, so a widened declaration is two rows under one key and the later binds. A widening
+# ---- asked for AFTER the pass committed cannot reuse that anchor — the driver no longer finds the
+# ---- row to supersede — so it lands under a new key and the original narrow row is still graded.
+# ---- That is the ordering constraint, obtained by construction instead of by comparing timestamps.
+drows() {              # unit · paths-for-row-1 · paths-for-row-2 — BOTH at the current anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$3" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+
+# A: the sanctioned repair. Widened at its own anchor, commits inside the widened set.
+reset_tree
+drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
+# from switching the check off for any pass that ever re-declared, which is a larger hole.
+reset_tree
+drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
+# The finding must survive: a declaration cannot be rewritten to cover a write already made. The
+# first repair folded on the unit alone with no ordering constraint, and this case went GREEN.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+drow ARCH-tRun-1 "work/one.txt work/stray.txt"
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
+# once per kind. Each row governs its own pass. Folding them together graded pass one's commit
+# against pass two's declaration and redded a correct run.
+reset_tree
+drow ARCH-tRun-1 "work/spec.txt"
+mkdir -p work && printf 's\n' > work/spec.txt
+git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
+drow ARCH-tRun-1 "work/build.txt"
+printf 'b\n' > work/build.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
+# pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
+reset_tree
+drow ARCH-tRun-1 "work/spec.txt"
+mkdir -p work && printf 's\n' > work/spec.txt
+git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
+drow ARCH-tRun-1 "work/build.txt"
+printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
+# versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
+# parks its two ids at different anchors never reaches the comparison it claims to pin — and reverting
+# the anchoring left the whole suite green. `ARCH-tRun-1` is a prefix of `ARCH-tRun-10`, so under an
+# unanchored `case ... in *"$dssunit"*` the `-10` commit reads as naming `-1` too and a correct run is
+# refused for ambiguous attribution.
+gdrows() {             # unit1 · paths1 · unit2 · paths2 — both rows at the CURRENT anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$3" "$4" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1 and $3" --no-verify
+}
+reset_tree
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-10 "work/ten.txt"
+mkdir -p work && printf 'b\n' > work/ten.txt
+git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
+out=$(run)
+miss "$out" "one commit names two passes of the same dispatch group"
+miss "$out" "check 23 FAILED"
+# ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
+# names both passes IS ambiguous, and the refusal must fire.
+reset_tree
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 build together" --no-verify
+hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
+
+# ...declaring MORE than you use is conservative and fine
+reset_tree
+drow ARCH-tRun-1 "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
+# ---- the same silence with the declared paths MOVED is the join being dodged.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
+miss "$(run)" "check 23 FAILED"
+
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
+hit "$(run)" "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
+
+# ---- AMBIGUOUS ATTRIBUTION is refused rather than guessed: a subset test over a commit that could
+# ---- belong to either of two passes proves nothing about either.
+reset_tree
+# BOTH ROWS AT ONE ANCHOR — that is what makes them one GROUP. Declaring them in two commits gives
+# them two anchors and no sibling relation, which is a fixture that tests nothing.
+G=$(git rev-parse --short=8 HEAD)
+printf '
+2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt
+' "$G" >> memory/builds/tRun/RUN.md
+printf '
+2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-2 · reason work/two.txt
+' "$G" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "declare both passes of one group" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 in one commit" --no-verify
+hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
+
+# ---- THE WINDOW IS THE FIRST COMMIT AND NOTHING AFTER IT. A pass's later review fold lands outside
+# ---- its group by construction, and grading it would red an ordinary sequential fold with no
+# ---- in-band repair — which is the defect this rule was rewritten to avoid.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf 'folded\n' > work/later.txt
+git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
+# ---- default run must still print nothing.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
+out=$(run)
+miss "$out" "check 23 skipped"
+miss "$out" "check 23 FAILED"
+
+reset_tree
+printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "a group anchor this clone does not carry" --no-verify
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
+reset_tree
+
+
+# ---- CHECK 23'S GRADING IS DARK BY DEFAULT, and the dark state ANNOUNCES itself. Four adversarial
+# ---- rounds over this mechanism are recorded under memory/builds/dUnstalledConvoy/reviews/; the last
+# ---- reproduced a driver call retracting a failure this check had already emitted, and the one
+# ---- before it a refusal that ended a unit outright. It ships inert until TOOL-dUnstalledConvoy-23
+# ---- redesigns it. The arms above run with DISPATCH_GRADING declared, so the code stays exercised.
+# ----
+# ---- BOTH HALVES ARE ARMED: the announcement when declarations exist, and the SILENCE when none do,
+# ---- because a leg that narrates a dark check on every run for every project trains people to skip
+# ---- its output.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
+git add -A
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "check 23 DARK for"
+hit "$out" "a green verdict here is coverage of nothing"
+miss "$(run)" "check 23 FAILED"
+# ...and with NO dispatch rows at all the dark check says nothing, so the announcement stays a signal.
+reset_tree
+sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
+git add -A
+miss "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 DARK for"
+reset_tree
+
+# ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
+# ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather
+# ---- than an observation of one — so a clone that never had that merge says so instead of redding.
+# ---- Without that, a run lands locally on one node and the same leg reds on every other node that
+# ---- has not fast-forwarded its own default branch.
+land_as() {            # anchor-kind · witness
+  sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+  sed -i "s/^witness: .*/witness: $2/" memory/builds/tRun/RUN.md
+  [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
+  git add -A
+}
+
+# a REMOTE record whose witness never reached the remote is the claim this half exists to refuse
+reset_tree
+land_as remote "$(git rev-parse HEAD)"
+hit "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default"
+
+# ...the SAME witness under a LOCAL record, once the local default branch carries it, is the whole
+# point of the two-anchor landing: green here, and red under the line above.
+reset_tree
+W=$(git rev-parse HEAD)
+git branch -f main "$W"
+land_as local "$W"
+miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+git branch -f main "$ANCHOR0"
+
+# ...a LOCAL witness this clone carries on NEITHER branch is an announced SKIP, never a refusal. That
+# is the cross-node case: the run-state file travels and a local ref does not.
+reset_tree
+land_as local "$(git rev-parse HEAD)"
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
+miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ...an anchor kind outside the closed set is a refusal. Defaulting an unrecognised one would promote
+# the record to whichever claim the reader assumed, which is the failure shape a value guard exists
+# to prevent.
+reset_tree
+land_as sideways "$(git rev-parse HEAD)"
+hit "$(run)" "a record claims LANDED with an anchor kind outside the closed set of remote and local, and defaulting an unrecognised one would promote the record to whichever claim the reader assumed:"
+
+# ---- THE CUTOFF. Every LANDED record written before this unit carries no anchor kind and every one
+# ---- of them is in fact remote-anchored, so a check that redded them would be unlandable by any run.
+# ---- A record whose FIRST commit is at or after the declared date has no such excuse.
+reset_tree
+land_as "" "$(git rev-parse HEAD)"
+printf '\nLANDED_ANCHOR_CUTOFF="1999-01-01"\n' >> .unattended.conf
+git add -A
+hit "$(run)" "a record claims LANDED and names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all:"
+
+# ...and the same record under a FUTURE cutoff is grandfathered, read as remote, and meets the
+# ordinary ancestry refusal rather than the missing-kind one.
+reset_tree
+land_as "" "$(git rev-parse HEAD)"
+printf '\nLANDED_ANCHOR_CUTOFF="2999-01-01"\n' >> .unattended.conf
+git add -A
+out=$(run)
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff"
+hit "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+reset_tree
+
+# RAISED 200 -> 243, then to 251 by TOOL-dUnstalledConvoy-2 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
+# it is a number: the sibling suite carried a sixty-arm slack and hid FIFTY stranded arms behind it in
+# this same session. Pinned AT the count.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
+# ---- Main sharded this suite while this branch added arms to it. The SHARDING is kept — it is
+# ---- the structure — and the floors below are RE-MEASURED against the merged suite rather than
+# ---- carried over, because a floor inherited across a merge is a number, not a floor.
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
-FLOOR_ASSERTIONS=200
+# ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
+# ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is
+# ---- recorded here rather than left for the next reader to re-derive from whichever half they open.
+# ----
+# ---- MAIN's argument: discount the floor ~15% so it does not red on the first arm somebody
+# ---- legitimately removes. THIS BRANCH's argument: a 338 floor under a 398 executed count is a
+# ---- SIXTY-ARM SLACK, and that slack is exactly what let two whole blocks be appended past an
+# ---- unconditional `exit` and never run, twice in one session, while the suite reported PASS and
+# ---- `check-arms` text-matched every stranded arm.
+# ----
+# ---- Both are right and they pull opposite ways, so the headroom is ~3%: large enough that pruning
+# ---- one arm is not a red, small enough that a stranded BLOCK is. The failure this pin exists to
+# ---- catch is measured in tens of arms, never in ones.
+# ----
+# ---- MEASURED unsharded 271, shard one 84, shard two 187. 84 + 187 = 271 EXACTLY: this file has no prologue arms, so the shards partition the count with nothing paid twice.
+FLOOR_ASSERTIONS=263
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -1353,8 +1716,8 @@ FLOOR_ASSERTIONS=200
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=73
-FLOOR_SHARD_2=127
+FLOOR_SHARD_1=81
+FLOOR_SHARD_2=181
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

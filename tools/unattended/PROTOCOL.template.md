@@ -220,8 +220,11 @@ is otherwise the cheapest way for a run that cannot substantiate a phase to say 
 the run is the sole author of that field.
 
 **A claim of a TERMINAL phase carries a sha specifically**, narrowing the three shapes above. At
-`LANDED` the ancestry of the witness IS the claim: the gate asserts that it lies on the history the
-anchor blesses, which is what makes the landing an observation rather than an assertion. A tag or a
+`LANDED` the ancestry of the witness IS the claim: the gate asserts that it lies on the history an
+anchor blesses. **There are TWO anchors and the record says which one answered.** The remote's
+advertised tip is the strong one and is tried first; the local default branch is the fallback, for a
+build merged locally that cannot push. `landed-anchor` carries `remote` or `local`, and section 9
+states what the weaker one does not buy. A tag or a
 workflow id there is unjudgeable, and a terminal claim is exactly where an unjudgeable witness costs
 the most — it is the last thing written and nothing later re-examines it.
 
@@ -294,6 +297,18 @@ either stalls or learns to bypass — and bypassing discards the entire bar the 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
 
+**`LANDED` is reachable on either of two anchors, and the ORDER is the rule.** The remote's own
+advertised tip is attempted FIRST: that is an observation of an external party and is the only thing
+here a run cannot construct for itself. Only when it fails does the local default branch answer, and
+then the arm asserts that the run's OWN BRANCH TIP is an ancestor of it — never that HEAD is, which
+on the default branch is a commit compared with itself. The run-state file records which anchor
+answered, because a record that cannot tell an observation from an assertion has thrown away the
+distinction that matters most.
+
+Listing two anchors without ordering them would permit an implementation that always takes the
+cheaper one, retiring the observation while satisfying every word of this section. The ordering is
+what preserves the strong claim wherever the strong claim is available.
+
 ## 7. The verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
@@ -323,6 +338,27 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
   items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
   it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the
+  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
+  three acts; this verb is the record. It RECORDS rather than acts, because a row derived from the
+  change it just made is a summary, and a check comparing the two confirms the driver instead of
+  checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
+  rather than in enforced ordering: the pair catches an amendment made with NO record, never a
+  truthful-looking row attached to a different edit.
+- `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
+  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
+  lists written down before two passes run together, and until this verb nothing read one. It decides
+  two of that condition's three clauses — the intersection test, and the shared-record refusal in
+  BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
+  is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
+  faked. A re-declaration of a pass that is still OPEN widens or no-ops; it never narrows.
+  Once that pass has COMMITTED, a further declaration of the same unit is a new pass — M6
+  sanctions several pass kinds per unit — and is recorded as its own row rather than judged
+  against the previous one. The driver distinguishes the two by whether the new set overlaps
+  the old: a narrowing is a strict subset and always overlaps, so it is still refused; a
+  disjoint set is a new pass. A new pass whose set PARTLY overlaps its predecessor is read as
+  a narrowing and refused, which is the conservative direction and is stated here rather than
+  discovered.
 
 ## 8. What a project declares
 
@@ -346,11 +382,23 @@ where this document says it may:
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
 | `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
+| `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
+| `DISPATCH_GRADING` | non-blank turns ON the grading of a dispatch declaration against what the pass committed. **Blank, and blank is the default.** The grading is retired pending `TOOL-dUnstalledConvoy-23`; four adversarial rounds are recorded under the governing repo's `builds/dUnstalledConvoy/reviews/`, the last of which reproduced a driver call retracting a failure the leg had already emitted. Declarations are still RECORDED either way |
+| `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.
 
 ## 9. The boundary this kit claims
+
+**The local landing anchor is a new instance of exactly this, and not a new kind of thing.** A local
+ref is inside the run's reach: one `update-ref` moves it, with no network and no push, which is the
+same lever this kit already records as a reproduced bypass against a remote-tracking ref. So a
+`local`-anchored `LANDED` is a RECORD that a merge happened, never an OBSERVATION that it did. The
+remote arm stays first and stays an observation; the recorded anchor kind is what keeps the two from
+being read as one claim. This is stated rather than fixed, because refusing the local arm is what
+would restore the deadlock it exists to remove — a build merged locally with no reachable terminal.
 
 Nothing a script running under the run's own uid constitutes authorization. Four independent
 mechanisms were designed for the anchor and all four were broken by adversarial review; they

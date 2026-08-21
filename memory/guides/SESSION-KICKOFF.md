@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-21T04:10:00+03:00 @ 381345dd4d44d47cb2332f8323119df7ecedf3c8
+last-audit: 2026-08-21T13:25:13+03:00 @ 2dc9df359a6b56c08e052f330655cff0c7ea87f9
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: e6098aa43b8341c1977532d8fec17105cb7aa1e5
+last-body-change: c1b3734a34e6121e42422eff79c5a58e9819aa41
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -45,6 +45,17 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md` — the spec set, the fork
   rule, the pass loop, regrounding, the closing review and the wrap-up derivation. It is rendered by
   the memory-tree kit and is in `watch:`, so editing it forces this manifest to be re-audited.
+- **A build MAY restructure itself, and MUST parallelise what it can prove disjoint.** Both are
+  BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
+  otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
+  build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
+  parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
+  authority are M3's and M6's; they are not restated here, for the reason the directives bullet
+  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
+  pass's declared write set, but grading it against what the pass committed ships DARK behind
+  `DISPATCH_GRADING` after four adversarial rounds failed to make it correct, and the leg says so on
+  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` owns the redesign. Declare your write
+  sets anyway — a redesign reads them — but do not treat a green leg as a disjointness proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
@@ -61,6 +72,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid.
+
+- **A CLOSED Tier-2 unit owes an acceptance ledger** — one line per numbered criterion, in a record
+  whose `**Serves:**` kind is `journal`, in one of two forms and no third. The grammar is
+  `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
+  cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
+  it; anything this session closes is inside it.
 
 ### Pointer map (load the row(s) the task touches)
 
