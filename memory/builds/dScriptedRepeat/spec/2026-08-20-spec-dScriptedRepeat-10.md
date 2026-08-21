@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives
 
-**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 

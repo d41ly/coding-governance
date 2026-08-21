@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** CLOSED · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 

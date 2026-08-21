@@ -97,3 +97,29 @@ UNITS_REGION_CUTOFF=""
 
 PHASES_EXTRA=""
 DOD_EXTRA=""
+
+# The two halves of the build method's condition 3, for a concurrently dispatched pass. A pass may not
+# declare a write under SHARED_RECORDS; a GENERATED_INDEXES entry is refused only TOGETHER WITH its
+# generator, because a generated index alone is what every ordinary pass touches. The run-state file
+# is derived, never declared. Blank is the empty set; absent takes the kit default.
+SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
+GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py memory/ledger:tools/memory-tree/gen_build_index.py"
+
+# The date from which a LANDED record must name its anchor kind (`remote` or `local`). A record whose
+# first commit predates it is read as `remote`, which is what every pre-existing record in fact is.
+# Blank or absent grandfathers every record. Set it to the day you adopt the two-anchor landing.
+LANDED_ANCHOR_CUTOFF=""
+
+# DISPATCH_GRADING — non-blank turns ON check 23's grading of a dispatch declaration against what the
+# pass actually committed. BLANK, and blank is the default, because that grading is not verified.
+#
+# Four adversarial review rounds over it are recorded in the governing repo under
+# builds/dUnstalledConvoy/reviews/. Round 4 reproduced a driver call RETRACTING a check-23 failure
+# the leg had already emitted — rc=1 to rc=0 over the same violating tree — and round 3 a refusal
+# that ended a unit outright with no way to clear it. Across those rounds the rate at which repairs
+# introduced new defects did not fall.
+#
+# The declarations are still RECORDED, and every other check in the leg still runs. What is dark is
+# the grading, and the leg SAYS SO on any run where dispatch rows exist. Turning it on means opting
+# into a mechanism whose failure mode is a green verdict over a violating tree.
+DISPATCH_GRADING=""

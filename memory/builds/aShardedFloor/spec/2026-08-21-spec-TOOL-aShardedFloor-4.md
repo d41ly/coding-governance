@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store
 
-**Status:** BLOCKED · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** WONTDO · rev-4 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling · reason build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md
 
 ## 1. Goal
 
@@ -9,7 +9,22 @@ dispatches in manifest order and starts its floor leg ~158 s late. Read the hint
 repository-wide store, keep the reuse KEY per-worktree, and SAY when the hint is missing.
 Discharges `TOOL-aScannedThrottle-8`.
 
-**BLOCKED, and this is the unit's most important line.** It must not land alone. See §8.
+**WONTDO on the owner's decision, 2026-08-21 — and the reason is a measurement, not a change of
+mind.** The design stands and every acceptance criterion below is still the right one; what stopped
+it is that its own siblings destroyed its business case. See §9 rev-4.
+
+**RE-PRICED 2026-08-21, and the number this unit was justified by no longer holds.** Its siblings
+`TOOL-aShardedFloor-2` and `-3` removed the property the 15.6–16.3 % figure depended on: the bar
+was FLOOR-bound when that was measured and is THROUGHPUT-bound now. A controlled pair on the
+primary tree — same box, consecutive, hint absent then present — measures **38.5 s, 8.9 % of the
+cold span**, not ~160 s. The mechanism is confirmed unchanged (the floor leg moves from dispatch
+rank 59 at +98.6 s to rank 1 at +0.0 s); what shrank is what that buys, because packing recovers
+0.90 → 0.98 and the pool absorbs most of the late start. Evidence:
+[`build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md`](../build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md).
+
+This does not resolve §8's fork — it re-prices one side of it. The cost of shipping without a
+reserved short-leg slot is unchanged at 5.1 s → 669.1 s to first signal; the benefit is now 8.9 %
+rather than 16 %, so the trade the owner was asked to make is a different trade.
 
 ## 2. Scope (IN)
 
@@ -122,7 +137,10 @@ As the sibling units, plus `run-gates evidence` and `profile-bar selftest`.
 
 ## 8. Open questions
 
-**Three, and the first is why this spec's status is BLOCKED rather than OPEN.**
+none — the forks below are MOOT, resolved by this unit going WONTDO rather than by anyone
+answering them. They are kept verbatim because a later session that revives this unit inherits
+the questions along with the design, and re-deriving them is the expensive half. Question 1 was
+what held the unit at BLOCKED; the re-pricing in §9 rev-4 is what made answering it unnecessary.
 
 **0. PREREQUISITE, not a question:** this unit lands AFTER `TOOL-aShardedFloor-2` and
 `TOOL-aShardedFloor-3`. The mechanism, not just the sequence: the dispatch sort keys an unknown leg
@@ -171,6 +189,29 @@ shard rename penalty worse, not better.
   (F17); the five source tokens and both header key names are spelled (F18); the worktree count is
   re-derived rather than quoted from a night it expired (F19); the four floor raises are named
   (F13); and the legacy-fallback-expiry fork joins §8 (F12's sibling).
+- rev-4 · 2026-08-21 · WONTDO, on the owner's decision, with the design left intact for whoever
+  revisits it. The sequence that got here is worth keeping because it is the whole argument:
+
+  This unit was approved at 15.6–16.3 % of span. `TOOL-aShardedFloor-2` and `-3` then sharded both
+  `unattended` selftests and took the bar from FLOOR-bound to THROUGHPUT-bound — which is precisely
+  the property this unit's number depended on, since its entire mechanism is starting the FLOOR leg
+  earlier. Re-measured as a controlled pair: **38.5 s, 8.9 %**, roughly half.
+
+  So the trade the fork asked about changed underneath it. Building the reserved short-leg slot —
+  itself an undesigned scheduler unit — plus this one, to recover 8.9 %, against a shard pair that
+  already moved the floor from ~660 s to 336 s. The next real lever is TOTAL WORK, not scheduling.
+
+  **What is NOT abandoned.** The mechanism is confirmed and the evidence is durable: with no hint
+  every leg keys 0.0, the stable sort yields manifest order, and the floor leg lands at dispatch rank
+  59 starting +98.6 s in, against rank 1 at +0.0 s warm. `TOOL-aScannedThrottle-8` stays OPEN and
+  now carries the re-priced figure, so a later session prices it from 8.9 % rather than from a number
+  this build's own work invalidated. If total work ever drops far enough to make the bar floor-bound
+  again, this unit's price goes back up and its spec is ready.
+- rev-3 · 2026-08-21 · RE-PRICED, not resolved. Its siblings landed and removed the property this
+  unit's 15.6-16.3 % figure depended on — the bar was FLOOR-bound then and is THROUGHPUT-bound now.
+  A controlled pair measures 38.5 s / 8.9 %, roughly half. The mechanism is confirmed unchanged; the
+  price is not. §8's fork stands, but it is now a different trade: 8.9 % against the same 5.1 s to
+  669.1 s cost. Evidence in the build record named above. §1 carries the summary.
 
 ## 10. Reuse audit
 

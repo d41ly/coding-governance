@@ -11,6 +11,8 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
+#   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
@@ -34,7 +36,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -55,11 +57,21 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
-# The kit's own directory, DERIVED. A sibling script this driver invokes is found relative to THIS
-# file and never by a spelled prefix: a hardcoded one breaks silently at any other install root,
-# which this fleet has a recorded case of.
-KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# THE KIT'S OWN DIRECTORY, DERIVED, and the LIBRARY it sources from there. ONE name for one
+# derivation: `KIT_DIR` is what the Skill placeholder, the sibling-script lookup and the header
+# self-read all spell, so this block uses it rather than minting a second name for the same path.
+#
+# The library is sourced before anything reads history. It holds every predicate this script and
+# the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
+# this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
+# `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
+KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+[ -f "$KIT_DIR/lib-unattended.sh" ] || {
+  echo "unattended: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $KIT_DIR/lib-unattended.sh" >&2
+  exit 2
+}
+# shellcheck source=lib-unattended.sh
+. "$KIT_DIR/lib-unattended.sh"
 
 # ------------------------------------------------------------------------------ THE VERB SET, ONCE
 # the verb-carrier unit. Four carriers used to type this set independently - the header
@@ -69,7 +81,7 @@ GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set"
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase"
@@ -105,12 +117,17 @@ cd "$ROOT" || exit 2
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "unattended: no .unattended.conf at the repo root — the kit reads every"; \
                     echo "unattended: project-specific value from there and restates none of them."; exit 2; }
+# TOOL-dUnstalledConvoy-9 - condition 3's two halves are DECLARED, and both defaults sit ON the two
+# init lines below for the reason ANCHOR_SCOPE's comment already gives. SHARED_RECORDS defaults to a
+# memory tree at its conventional layout. GENERATED_INDEXES defaults to the EMPTY SET on purpose: its
+# value pairs an index with its GENERATOR, and a generator belongs to some other kit whose install
+# path this kit may not presume. A project declares it; blank means the conditional half is off.
 # ANCHOR_SCOPE defaults to the STRICT anchor: a blank, a typo or a value from a newer kit all keep
 # `default-branch`, because a value-set guard falling through to the wide behaviour would let a
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -118,6 +135,12 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 M="$MEMORY_ROOT"
+# SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
+# of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
+# `memory`, so an adopter at any other layout got a default naming a directory it does not have — a
+# refusal that can never fire, which is the same shape as no refusal at all. The sentinel is what
+# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises.
+[ "$SHARED_RECORDS" = "__kit-default__" ] && SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -144,10 +167,12 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal"
-# The kinds that are OWED to the owner as an answer. `proposal` is deliberately absent: it is an
-# improvement the run noticed, not a question it refused, and counting the two together would make a
-# run that spotted six wording fixes look like a run that stalled on six decisions.
+PARK_KINDS="decision abort override waiver proposal rescope dispatch"
+# The kinds that are OWED to the owner as an ANSWER. Three are deliberately absent, and they are
+# absent for one reason: each is a DECLARATION the run made, not a question it refused. A proposal is
+# an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
+# dispatch is a claim about what two passes will write. Counting any of them as parked would make a
+# run that recorded six of its own acts look like a run that stalled on six decisions.
 PARK_KINDS_OWED="decision abort override waiver"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
@@ -1351,7 +1376,7 @@ verb_phase() { # slug · phase · witness
 # reports only the downstream unmet item, which is the message-channel scar this kit already carries;
 # this verb does not repeat it.
 verb_landed() { # slug
-  local slug="$1" rel cur head
+  local slug="$1" rel cur head lbranch unp oldest akind rbref rbtip
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to mark landed: $rel"; return 1; }
@@ -1362,14 +1387,77 @@ verb_landed() { # slug
     return 1
   fi
   check_clean || return 1
+  # OBSERVE_ANCHOR STAYS MANDATORY ON BOTH ARMS. It is what supplies AREF - the local arm needs the
+  # default branch's NAME and takes it from the remote's own advertisement, never from a local ref or
+  # from the environment, both of which this kit records as a reproduced bypass. Its checks 22 through
+  # 30 are integrity tripwires a local landing needs at least as much as a remote one, and a run that
+  # cannot see the remote it means to land on should abort rather than land against a branch name it
+  # chose for itself.
   observe_anchor || return 1
   head=$(GIT rev-parse HEAD)
-  if ! GIT merge-base --is-ancestor "$head" "$ASHA" 2>/dev/null; then
-    fail 32 "HEAD is not an ancestor of the tip the remote advertises, so the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it: $head against $AREF at $ASHA"
-    return 1
+  lbranch=${AREF#refs/heads/}
+  # UNPUSHED WORK, counted on BOTH arms. Local main is shared by every build on the node, and this
+  # repo records a run whose primary tree was clean and on main while carrying eleven unpushed
+  # commits, three of them another build's unreviewed work. A local landing claim sits on top of
+  # whatever else is there, and a record that does not say how much else is there is not readable.
+  # REPORTED, never refused: making one build's mid-flight work block another build's terminal is the
+  # deadlock shape this whole unit exists to remove.
+  if GIT rev-parse --verify --quiet "refs/heads/$lbranch" >/dev/null 2>&1; then
+    unp=$(GIT rev-list --count "$ASHA..refs/heads/$lbranch" 2>/dev/null || echo 0)
+    if [ "${unp:-0}" != 0 ]; then
+      oldest=$(GIT rev-list "$ASHA..refs/heads/$lbranch" 2>/dev/null | tail -1)
+      unp="$unp oldest $(GIT rev-parse --short=8 "$oldest" 2>/dev/null)"
+    fi
+  else
+    # `unknown` and never `0`. A zero that means "could not measure" is this repo's named
+    # green-by-absence class, and it would read as "nothing unpushed" to every later reader.
+    unp="unknown"
+  fi
+  akind=""
+  if GIT merge-base --is-ancestor "$head" "$ASHA" 2>/dev/null; then
+    akind=remote
+  else
+    # THE SECOND ARM NAMES AN EXPLICIT REF, and that is the whole of its correctness. Testing HEAD
+    # against the local default branch is decided before it reads anything on the only path this verb
+    # is invoked: the mandated lander refuses to run anywhere but the default branch, and there HEAD
+    # IS that ref, so a commit would be compared with itself. The run's OWN BRANCH TIP is false when
+    # nothing was merged and true when it was, which is the question the arm exists to ask.
+    rbref=$(fact "$rel" branch-ref)
+    if [ -z "$rbref" ]; then
+      # NO LOCAL ARM IS AVAILABLE, which is a different state from one that was tried and failed.
+      # `branch-ref` is written only where the project's anchor scope makes the run's own branch
+      # meaningful, so a record without it has exactly one anchor and the refusal says so rather than
+      # implying a fallback the run never had.
+      fail 32 "HEAD is not an ancestor of the tip the remote advertises, and this run-state file names no branch ref, so there is no local arm to fall back to and the work this run means to mark landed is not on the branch the remote calls its default; land it first, then mark it: $head against $AREF at $ASHA"
+      return 1
+    fi
+    rbtip=$(GIT rev-parse --verify --quiet "$rbref" 2>/dev/null)
+    if [ -z "$rbtip" ]; then
+      fail 32 "the run's own branch ref does not resolve in this clone, so whether its work reached the local default branch cannot be judged: $rbref in $rel"
+      return 1
+    fi
+    if GIT merge-base --is-ancestor "$rbtip" "refs/heads/$lbranch" 2>/dev/null; then
+      akind=local
+    else
+      fail 32 "this run is on neither anchor: its HEAD is not an ancestor of the tip the remote advertises, and its own branch tip is not an ancestor of the local default branch either, so the work is not landed anywhere; land it first, then mark it: $head against $AREF at $ASHA, and $rbref at $rbtip against refs/heads/$lbranch"
+      return 1
+    fi
   fi
   set_fact "$rel" phase LANDED || return 1
-  set_fact "$rel" witness "$head" || return 1
+  # THE WITNESS IS THE COMMIT THE TAKEN ARM ACTUALLY VALIDATED. The local arm tests the run's own
+  # branch tip against the local default branch and never looks at HEAD; recording HEAD there writes a
+  # terminal fact about a commit nothing in this verb examined, and the two differ exactly when the
+  # worktree has moved on since the merge — which is the ordinary case, not a corner one.
+  local wit="$head"
+  [ "$akind" = local ] && wit="$rbtip"
+  set_fact "$rel" witness "$wit" || return 1
+  # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
+  # later reader, silently promoting a record to the stronger claim.
+  set_fact "$rel" landed-anchor "$akind" || return 1
+  # The message names the commit the RECORD carries. It printed `$head` while writing `$wit`, so on
+  # the local arm the operator was told one sha and the terminal record kept another.
+  head="$wit"
+  set_fact "$rel" unpushed-at-landing "$unp" || return 1
   # THE ROSTER AT LANDING, frozen here and nowhere else. Deriving the unit list from the build README
   # is right while a run is LIVE — it cannot go stale between reads — but a FINISHED record must
   # still answer "which units did this run actually cover", and the README is mutable: a later build
@@ -1389,7 +1477,11 @@ verb_landed() { # slug
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
   stage_or_fail "$rel" || return 1
-  echo "unattended: phase LANDED · witness $head · observed on $AREF at $ASHA"
+  if [ "$akind" = remote ]; then
+    echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
+  else
+    echo "unattended: phase LANDED · witness $head · anchor LOCAL · $(fact "$rel" branch-ref) is merged into refs/heads/$lbranch, which the remote has not seen · unpushed on local $lbranch: $unp"
+  fi
   return 0
 }
 
@@ -1686,7 +1778,7 @@ set_fact() { # file · key · value
 }
 
 verb_status() { # slug
-  local slug="$1" rel p w unit nparked parked unowed nprop
+  local slug="$1" rel p w unit nparked parked unowed nnoted
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
@@ -1714,13 +1806,16 @@ verb_status() { # slug
   # recognise at all - the silent-skip shape, one verb over from the gate that bans it.
   nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$PARK_KINDS_OWED")) · item " "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
-  # PROPOSALS, counted apart and printed apart, because they are not a question the owner owes an
-  # answer to. Folded into `parked` a run that noticed six wording fixes would read exactly like a
-  # run that stalled on six decisions, and the owner would open the file to tell them apart.
+  # The rows the owner is TOLD about but owes no answer to, counted apart and printed apart. Folded
+  # into `parked`, a run that recorded six of its own acts would read exactly like a run that stalled
+  # on six decisions, and the owner would open the file to tell them apart. The field is `noted`
+  # rather than any kind's name: the unowed set is DERIVED and holds three kinds, so a label naming
+  # one of them would be wrong about the other two the day a merge added them - which is the day
+  # this line was written.
   unowed=$(park_kinds_unowed)
   if [ -n "$unowed" ]; then
-    nprop=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null || true)
-    [ "${nprop:-0}" -gt 0 ] 2>/dev/null && parked="$parked · proposals $nprop"
+    nnoted=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null || true)
+    [ "${nnoted:-0}" -gt 0 ] 2>/dev/null && parked="$parked · noted $nnoted"
   fi
   printf 'unattended: %s · phase %s · witness %s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
@@ -2435,6 +2530,276 @@ verb_record_piece() { # slug · piece · leg · verdict
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
   record_piece "$rr_root" "$piece" "$leg" "$verdict" "$(fact "$rel" playbook)" "$slug"
 }
+# TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
+# undocumented; M3 now delegates the build's own scope. An authority with no record is
+# indistinguishable from a run doing whatever it likes, so every amendment leaves a row here.
+#
+# IT RECORDS AND DOES NOT ACT, deliberately. A record derived from the change it just made is a
+# SUMMARY, and a check comparing the two confirms the driver rather than checking it. Recording
+# separately is what gives the leg two inputs produced by two acts at two times.
+#
+# WHAT THIS CANNOT BUY, stated because the pair's honest limit belongs at both ends: nothing forces
+# this verb to be called BEFORE the edit, so the row is a declaration in shape rather than in
+# enforced ordering. The pair catches an amendment made with NO record - a unit quietly retired
+# because it was inconvenient - and does not catch a truthful-looking row attached to a different
+# edit.
+#
+# THE ID SHAPE IS THE DRIVER'S OWN `_ids_of`, never the memory-tree kit's `id_pattern`: that is a
+# PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
+# header records that an adopter may hold one and not the other.
+verb_rescope() { # slug · act · unit · successor · reason
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to record an amendment against: $rel"; return 1; }
+  # CLOSED SET. A value outside it is a refusal and never a default: defaulting an unrecognised act
+  # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
+  # value guard exists to avoid.
+  case "$act" in
+    retire|supersede|add) ;;
+    *) local _bad=${act:-(none)}
+       fail 48 "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
+  esac
+  [ -n "$reason" ] || { fail 48 "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make: $act"; return 1; }
+  shaped=$(printf '%s\n' "$unit" | _ids_of)
+  [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
+    fail 48 "--rescope --unit is not id-shaped by the driver's own spelling, so the row would name something no roster can carry: $_u"; return 1; }
+  # ARITY BY ACT. A supersession with no successor is a retirement wearing a better name, and an
+  # addition with one is describing a relation it does not have.
+  case "$act" in
+    supersede) [ -n "$succ" ] || { fail 48 "--rescope --act supersede requires --successor, or the row is a retirement wearing a better name: $unit"; return 1; }
+               shaped=$(printf '%s\n' "$succ" | _ids_of)
+               [ "$shaped" = "$succ" ] || { fail 48 "--rescope --successor is not id-shaped by the driver's own spelling: $succ"; return 1; } ;;
+    add)       [ -z "$succ" ] || { fail 48 "--rescope --act add refuses --successor, because an addition names no unit it replaces: $succ"; return 1; } ;;
+  esac
+  # ALL THREE of --park's field refusals, inherited rather than re-derived. park() appends ONE line
+  # and the leg parses the region line-wise, so a newline forges a row nothing wrote; an item
+  # spelling the separator makes its own record unparseable by the check that grades it; and the
+  # bypass flag in EITHER field reds the bar permanently on a record no verb can rewrite.
+  if [ "$(printf '%s' "$reason$unit$succ" | wc -l)" -ne 0 ]; then
+    fail 48 "a rescope field contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second row nothing wrote: $act"; return 1
+  fi
+  case "$unit$succ$reason" in *" · "*) fail 48 "a rescope field spells the record's own separator, which makes the row unparseable by the check that reads it: $unit"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$unit" "$succ" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "a rescope field spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --rescope || return 1
+  # THE GUARDS ARE ORDERED AND THE ORDER IS THE POINT. The idempotence compare runs FIRST, before any
+  # membership test. The units region is RENDERED from the specs that exist, so the moment an
+  # amendment is performed the id IS in it - and an unconditional membership refusal on `add` would
+  # fire permanently on a run that recorded its row after authoring the spec, while the leg demanded
+  # that row permanently. That is the wedge shape this build exists to remove.
+  want="rescope · item $act $unit"
+  [ -n "$succ" ] && want="$want -> $succ"
+  want="$want · reason $reason"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: amendment already recorded, unchanged — $act $unit"
+    return 0
+  done <<RESCOPED
+$(grep -F -- ' rescope · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+RESCOPED
+  ids=$(unit_ids_of "$slug")
+  case "$act" in
+    retire|supersede)
+      printf '%s\n' "$ids" | grep -qxF -- "$unit" || { fail 48 "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held: $unit"; return 1; } ;;
+    add)
+      printf '%s\n' "$ids" | grep -qxF -- "$unit" && { fail 48 "a rescope adds a unit the generated units region already carries and no matching row explains it, so this records a transition that did not happen: $unit"; return 1; } ;;
+  esac
+  park "$rel" rescope "$act $unit${succ:+ -> $succ}" "$reason"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: amendment recorded — $act $unit${succ:+ -> $succ}"
+  return 0
+}
+
+# TOOL-dUnstalledConvoy-9 - the write-set declaration a concurrent dispatch owes. M6 requires two path
+# lists written down before two passes run together, and until now nothing read one, which is the
+# whole of why `parallel-when-disjoint` has never produced a concurrent dispatch.
+#
+# IT RECORDS AND DOES NOT DISPATCH, for the reason its sibling verb records: a row derived from the
+# act it describes is a summary, and a check comparing the two confirms the driver rather than
+# checking it.
+#
+# WHAT IT CANNOT BUY. It refuses a declaration that is self-evidently wrong. It cannot refuse one that
+# is merely untrue - a pass declaring one path and writing three passes this verb, and is caught, if
+# at all, by the leg comparing the declaration against what the commit touched. Stated here so the
+# pair's division of labour is readable from either end.
+#
+# TWO OF M6's THREE CONDITIONS ARE DECIDABLE AND ARE DECIDED HERE. Condition 1 is the intersection
+# test below. Condition 3 is the shared-record refusal, in BOTH its halves: the records M6 names
+# outright are a flat refusal, and a generated index is refused ONLY together with its generator -
+# the qualifier M6 earned through a retraction, because every pass changes a spec header the index is
+# rendered from and a flat ban would refuse the ORDINARY declaration. Condition 2 is a judgement about
+# meaning and is NOT enforced; a verb that pretended to decide it would be a check that cannot fail.
+verb_dispatch() { # slug · unit · writes...
+  local slug="$1" unit="$2"; shift 2
+  local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to declare a dispatch against: $rel"; return 1; }
+  shaped=$(printf '%s\n' "$unit" | _ids_of)
+  [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
+    fail 49 "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
+  [ "$#" -gt 0 ] || { fail 49 "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof: $unit"; return 1; }
+  # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
+  # path has already become two tokens by the time this verb sees it, and nothing recovers that.
+  for p in "$@"; do
+    case "$p" in
+      "") fail 49 "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one: $unit"; return 1 ;;
+      /*|?:[/\\]*) fail 49 "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find: $p"; return 1 ;;
+      *..*) fail 49 "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound: $p"; return 1 ;;
+    esac
+    if is_repo_root "$p"; then
+      fail 49 "--dispatch declares the repository root, which covers every path and sits under none, so no containment test can express it and a pass declaring it is disjoint from nothing: $p"; return 1
+    fi
+    case "$p" in
+      *'*'*|*'?'*|*'['*|*']'*) fail 49 "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one: $p"; return 1 ;;
+    esac
+    case "$p" in
+      *[[:space:]]*) fail 49 "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared: $p"; return 1 ;;
+    esac
+    # NO SEPARATE NEWLINE OR SEPARATOR BRANCH. Both are subsumed by the whitespace refusal above — a
+    # newline IS whitespace and the record's ` · ` separator contains spaces — so a branch for either
+    # is unreachable, and `check-arms` named both as having no assertion that could ever fire. A dead
+    # branch pinned as unarmed is worse than a deleted one: it reads as coverage.
+    if [ -n "$BYPASS_BAN" ] && printf '%s' "$p" | grep -qF -- "$BYPASS_BAN"; then
+      fail 49 "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it: $BYPASS_BAN"; return 1
+    fi
+  done
+  refuse_if_terminal "$rel" --dispatch || return 1
+  # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
+  # the kit already knows how to locate - and the rest come from the project's own declaration, so an
+  # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
+  # BOTH DIRECTIONS, and that is the whole of the refusal's reach. Testing only "is the declared
+  # path UNDER a shared record" licenses the widest declaration a pass could possibly make: a bare
+  # `--writes memory` contains every shared record in the tree and is under none of them, so the
+  # narrow declarations get refused and the one that claims everything sails through.
+  for p in "$@"; do
+    if overlaps "$p" "$rel"; then
+      fail 49 "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
+    fi
+    for q in ${SHARED_RECORDS:-}; do
+      if overlaps "$p" "$q"; then
+        fail 49 "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally: $p against $q"; return 1
+      fi
+    done
+  done
+  # CONDITION 3, CONDITIONAL HALF. A generated index alone is ACCEPTED - every pass changes a spec
+  # header it is rendered from, and refusing that was the VACUOUS reading M6 retracted. What collides
+  # is one pass RENDERING an artifact while another edits its generator, so the refusal fires only
+  # when both appear, in this declaration or in a sibling's within the same group.
+  grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
+  [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
+  # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
+  # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
+  # empties the sibling set at the moment the second pass declares, and condition 1 then passes by
+  # finding nobody to collide with.
+  #
+  # OPENNESS COMES FROM `pass_commit` IN THE KIT LIBRARY, which the gate leg calls too. The first
+  # version of this hunk answered the question here instead, and asserted in a comment that it read
+  # it "the same way the leg reads it". It did not: it counted the run-state bookkeeping commit that
+  # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
+  # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
+  # now a function call, which cannot be wrong about what the leg does.
+  sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
+      [ -n "$_r" ] || continue
+      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
+      _g=${_i%% *}; _u=${_i#* }
+      # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
+      # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
+      _pcommit=$(pass_commit "$_g" "$_u" "$rel" || true)
+      if [ -n "$_pcommit" ]; then
+        # ...AND THAT COMMIT MUST HAVE WRITTEN INSIDE THE ROW'S DECLARED SET before it closes the
+        # pass. Subtracting the run-state file alone is not enough: a declaration commit made with
+        # `git add -A` carries a regenerated index or a formatter fix alongside it, names the unit
+        # because it is about that unit, and closed the pass at declaration time. That is the
+        # ordinary commit shape a run produces, not an exotic one.
+        _decl=${_r#* · reason }
+        _wrote=$(GIT diff-tree --no-commit-id --name-only -r "$_pcommit" 2>/dev/null || true)
+        _hit=""
+        for _dp in $_decl; do
+          for _wp in $_wrote; do overlaps "$_dp" "$_wp" && { _hit=1; break 2; }; done
+        done
+        [ -n "$_hit" ] && continue
+      fi
+      printf '%s\n' "$_r"
+    done)
+  sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
+  # A PROOF OVER NOBODY SAYS SO. The condition-1 loop below iterates the sibling rows and returns
+  # success over zero of them, which is byte-indistinguishable from a proof over somebody — and an
+  # empty sibling set is exactly what both openness defects produced. A probe that cannot move must
+  # announce it (§7), so the run log carries the difference even when the verdict cannot.
+  if [ -z "$(printf '%s' "$sibrows" | tr -d '[:space:]')" ]; then
+    echo "unattended: dispatch — no sibling pass is open, so condition 1 is a proof over an empty set for $unit" >&2
+  fi
+  for pair in ${GENERATED_INDEXES:-}; do
+    idx=${pair%%:*}; gen=${pair#*:}
+    [ "$idx" = "$pair" ] && continue
+    # BOTH HALVES read our paths AND the siblings'. Searching for the index in our own declaration
+    # only made the refusal order-dependent: the pass that declares the index first is clean, and the
+    # sibling that later declares the generator never looks for the index anywhere but its own args.
+    for p in "$@" $sibpaths; do
+      overlaps "$idx" "$p" || continue
+      for q in "$@" $sibpaths; do
+        # OVERLAP on both halves. `covers` asks whether q sits under the generator, which misses a
+        # declaration that CONTAINS the generator — the same one-way reading that let `--writes
+        # memory` through the shared-records refusal, left behind at this one site.
+        if overlaps "$gen" "$q"; then
+          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1
+        fi
+      done
+    done
+  done
+  # CONDITION 1. Two passes in one group claiming one path are not disjoint, and this is decidable the
+  # moment the second declaration arrives.
+  while IFS= read -r sib; do
+    [ -n "$sib" ] || continue
+    case "$sib" in *" $unit · reason "*) continue ;; esac   # our own row is not a sibling
+    for p in "$@"; do
+      for q in ${sib#* · reason }; do
+        # OVERLAP, never equality. Two passes declaring `memory/builds/x/` and
+        # `memory/builds/x/spec/s.md` collide on every write, and string equality calls them disjoint.
+        overlaps "$p" "$q" || continue
+        local _who=${sib#* dispatch · item }; _who=${_who%% · reason *}
+        fail 49 "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: $p also in $_who"; return 1
+      done
+    done
+  done <<SIBS
+$sibrows
+SIBS
+  # THE RE-DECLARATION RULE, keyed on GROUP plus UNIT. Identical is a no-op; a strict SUPERSET
+  # REPLACES, which is the widening repair the leg's own fork resolution commits this build to; a
+  # NARROWING is refused, because narrowing a declaration after the fact is how a pass would hide a
+  # write it had already made.
+  # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
+  # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
+  # through the driver and then redded the leg permanently.
+  want=""
+  for p in "$@"; do want="$want $(normpath "$p")"; done
+  want=${want# }
+  # THE RE-DECLARATION AND WIDENING MACHINERY IS GONE, and its absence is the fix rather than a gap.
+  # TOOL-dUnstalledConvoy-23 owns its redesign; four adversarial rounds are recorded under
+  # `memory/builds/dUnstalledConvoy/reviews/`.
+  #
+  # WHY IT WAS REMOVED RATHER THAN REPAIRED. The branch existed to let a pass widen a declaration it
+  # had already made, and to refuse a narrowing. Every version of it was wrong in a different
+  # direction: keyed on HEAD it lost the row the moment the run committed its own declaration; keyed
+  # on the unit it refused a legal second pass forever, which is terminal in a run with no owner turn;
+  # keyed on the unit with an overlap gate it let a pass that had ALREADY written outside its lane
+  # re-park a widened row at the original anchor and RETRACT a check-23 failure that had already been
+  # emitted — rc=1 to rc=0 over the same violating tree, reproduced end to end. A disjointness proof
+  # that can be talked out of a finding is worth less than no proof, because it is believed.
+  #
+  # A declaration is now APPEND-ONLY and each one stands on its own: every `--dispatch` parks a row at
+  # the current anchor, and nothing rewrites, supersedes or retracts an earlier one. A pass that needs
+  # more paths declares again; both rows are on the record and a redesign can read them. There is no
+  # narrowing refusal, because with grading dark there is nothing for a narrowing to hide from — and a
+  # refusal nobody can clear is the stall this build exists to remove.
+  park "$rel" dispatch "$grp $unit" "$want"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: dispatch declared — $grp $unit · $want"
+  return 0
+}
 
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
@@ -2449,6 +2814,8 @@ verb_record_piece() { # slug · piece · leg · verdict
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
+RS_ACT=""; RS_SUCC=""
+DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -2472,6 +2839,10 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
+    --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
+    --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
+    --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
@@ -2532,5 +2903,7 @@ case "$VERB" in
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$RP_VERDICT" ;;
+  --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
+  --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
 esac
 exit "$status"

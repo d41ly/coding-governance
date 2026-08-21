@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-3 — the gate selftest, split by the same contract
 
-**Status:** OPEN · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -171,6 +171,60 @@ Keep the surrounding warning: this comment's neighbours are not trustworthy.
   the two a machine produces rather than a typist — were dropped (F16); §7 implied no manifest row
   (F22); guard parity is a named manual check (F20); and §8's stray errand is resolved from source
   (F25).
+- rev-3 · 2026-08-21 · BLOCKED on a measured, reproducible cross-boundary dependency. The mechanism
+  was implemented — the sibling's contract adopted verbatim, the boundary at the end of the
+  lifecycle block, and this file's own hoist set found empirically to be TWO (`anchor_break` and
+  `anchor_restore`; the first attempt missed them and `mutate`, which cost one measurement cycle).
+
+  **Both shards RUN**, which is what §5 said to settle it by: shard 1 executes 83 assertions in
+  130 s, shard 2 executes 92 in 245 s, and every arm passes in shard 1. **One arm fails in shard 2**
+  — the `check 17` waiver arm asserting that a parked waiver absent from the run-state file's FIRST
+  committed blob is reported. Diagnosed rather than guessed at: the leg's output is EMPTY, so it
+  found no defect at all, which means `--preflight tWaive` did not create the record and the
+  appended waiver line therefore landed IN the first blob, satisfying the check. The fixture's own
+  green control, three arms earlier and with the same `wreset` and the same `drive --preflight`,
+  PASSES — so the dependency is on region-one state that neither candidate boundary preserves, and
+  it is not the boundary choice.
+
+  **Not a boundary problem, which is why AC7 is not what unblocks this.** The failing arm sits far
+  below both legal candidates, so moving between them cannot reach it. What is owed is one more
+  diagnostic cycle isolating what region one leaves that this fixture reads, and then either a third
+  hoist or a boundary much later in the file.
+
+  **83 + 92 = 175 against an unsharded 200+**, so assertions are also being lost somewhere — a
+  second signal that the hoist set is still incomplete. Recorded here rather than left for the next
+  session to rediscover.
+
+  The code is REVERTED, not left half-applied: a shard mechanism whose shard 2 is red would red the
+  bar, and `TOOL-aShardedFloor-2`'s declaration without this file's would trip the gov canary's own
+  reverse arm.
+- rev-4 · 2026-08-21 · CLOSED. The cross-boundary dependency rev-3 named is ISOLATED and fixed, and
+  the isolation is the part worth recording because the symptom pointed nowhere near the cause.
+
+  **What it actually was.** Instrumenting the failing arm showed `--preflight tWaive` returning rc 1
+  with *"no build method under the memory root"* — check 34 — so no run-state file was ever created
+  and the appended waiver line landed IN the first blob, satisfying the check it was written to
+  fail. Instrumenting one level further showed why: the tWaive fixture writes `BUILD-METHOD.md` on
+  `main` and carries it to `unit` through `git merge -q --no-edit main >/dev/null 2>&1`. In the
+  whole-suite run that is a FAST-FORWARD (`Updating d0faf46..ab26c43`, rc 0) because region one's
+  anchor arms repeatedly merge `main` into `unit`, leaving `unit` an ancestor. In shard two the
+  branches have diverged, the merge is a real one, it CONFLICTS on `memory/builds/tRun/RUN.md`, and
+  the redirection swallows the conflict whole.
+
+  So the dependency was never on a boundary and never on a hoist: it was on an ANCESTRY PROPERTY
+  that region one establishes as a side effect and nothing states. Region two's opener now replays
+  exactly that property, guarded to shard two so the whole-suite run is untouched, with the measured
+  evidence for both directions written at the line.
+
+  **Three arms were failing, not one** — the undeclared-handle and empty-reason arms failed for the
+  same cause and were masked by the first report stopping early. All three pass now.
+
+  **Measured, and AC7 is satisfied by derivation rather than by the authored 55 %:** unsharded 230
+  assertions / 478 s, shard one 84 / 190 s, shard two 146 / 246 s. `84 + 146 = 230` EXACTLY — this
+  file has no prologue arms, so its `PROLOGUE_ARMS` is 0. Balance is `max(shard) 246 / 478 =
+  **51.5 %**, inside the 55 % target, and the boundary chosen on the safety argument turned out to
+  be the balanced one too, so the second candidate was never needed. Floors set at 73 and 127, the
+  unsharded pin's own ~13 % discount.
 
 ## 10. Reuse audit
 

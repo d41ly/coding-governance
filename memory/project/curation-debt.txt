@@ -14,8 +14,17 @@ memory/builds/aDrainedSluice/README.md
 memory/builds/aRuledFrontispiece/README.md
 # memory/backlog/TOOL.md — a MERGE-INDUCED overflow, not a curation lapse. Both parents were legal
 # and within a hair of the cap (theirs 20435 B, ours 20479 B, cap 20480); the row driver unioned
-# them correctly to 86 rows / 21762 B. Rotation cannot fix it: TERMINAL is ("CLOSED","WONTDO") and
-# exactly ONE row qualifies, so rotating sheds less than the rotation note it must add. This is
+# them correctly to 86 rows / 21762 B. Rotation could NOT fix it when this was written: TERMINAL is
+# ("CLOSED","WONTDO") and exactly ONE row qualified, so rotating shed less than the rotation note
+# it must add.
+#
+# THAT PREMISE EXPIRED, 2026-08-21. Re-derived on the same tree: 159 rows, 71855 B against a cap
+# of 61440, and NINETEEN rows are terminal. aShardedFloor closed four of them in one landing.
+# Rotation is now the live remedy rather than a rejected one, and this row is no longer
+# describing why it cannot be drained — it is describing a drain nobody has performed. The count
+# is deliberately re-derived here rather than trusted: the original was true and stopped being
+# true without anyone editing it, which is the whole class this file exists to make visible.
+# This is
 # TOOL-cSettledDocket-16 arriving — "new rows are now paid for by shortening old ones" — and paying
 # that fee by trimming 1 KB of other builds' prose mid-merge is the wrong moment, on the same
 # reasoning the aRuledFrontispiece row above already carries.
@@ -25,3 +34,15 @@ memory/builds/aRuledFrontispiece/README.md
 # against a 300 budget. So nothing is hidden today, but that row is AT the limit and the check
 # that would catch it going over is now off. Drains when the TOOL index is curated or split.
 memory/backlog/TOOL.md
+# memory/builds/dUnstalledConvoy/README.md - a GENERATED record-bindings row that scales with the
+# UNIT COUNT. This build's spec audit legitimately serves all 13 units, so the Records-table row the
+# renderer emits carries 13 ids and measures 438 chars against the 350 tier. No authoring choice
+# inside the record shortens it: the binding grammar expands a contiguous range at authoring time,
+# so the record must spell every id, and splitting one review into two records to shorten a row
+# would be two answers to one question. Renderer-shaped, exactly like the aRuledFrontispiece row
+# above, and TOOL-dUnstalledConvoy-13 is the row that records the structural cause.
+# BLAST RADIUS, measured before listing: this silences checks 6 and 7 on this file. Check 8's
+# population is the backlog shards alone, so it never reached this path. Check 6 passes today with
+# room - 17996 B against a 25600 cap - and the longest line that is NOT the bindings row measures
+# 319 chars against the 350 tier. So nothing is hidden today. Drains when the row shape is revisited.
+memory/builds/dUnstalledConvoy/README.md

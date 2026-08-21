@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-ONE checks over the tree.
+# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-THREE checks over the tree.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   bash tools/unattended/check-unattended.sh
 #
 # Exit 0 + no output = clean. Anything printed is a violation. Exit 2 = misconfigured.
+#
+# ONE EXCEPTION, and it is named rather than quietly taken: a check that cannot COMPARE announces
+# the case it could not reach, on the REPORT channel, which the default run does not print. Set
+# GOV_UNATTENDED_REPORT=1 to see them. A skip that looks like a pass is indistinguishable from
+# coverage, and a skip printed by default would falsify the contract line above — so the line keeps
+# its meaning and the announcement gets a channel of its own. TOOL-dUnstalledConvoy-6.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
 # nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
@@ -15,7 +21,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -29,7 +35,17 @@ KIT_UNATTENDED_VERSION=1.7   # gov:kit unattended@1.7 — must match unattended.
 # reds on another node's git is a false positive on the merge bar. The levers that matter are pinned
 # below rather than detected.
 export GIT_GRAFT_FILE=/dev/null
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# THE KIT LIBRARY, sourced before anything reads history. It holds every predicate this script and
+# the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
+# this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
+# `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
+_LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+[ -f "$_LIB_DIR/lib-unattended.sh" ] || {
+  echo "unattended-check: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $_LIB_DIR/lib-unattended.sh" >&2
+  exit 2
+}
+# shellcheck source=lib-unattended.sh
+. "$_LIB_DIR/lib-unattended.sh"
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended-check: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -45,8 +61,9 @@ if [ ! -f "$CONF" ]; then
   fail 1 "no .unattended.conf at the repo root, and every value this leg checks is declared there"
   exit "$status"
 fi
+ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -205,6 +222,14 @@ region()   { awk -v o="$2" -v c="$3" '
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 # <<< kickoff_region
 
+# THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
+# green-control arms in the sibling test keep their meaning. A check that cannot compare says which
+# arm went unexercised and why, and an operator asks for those by setting the variable. Liveness is
+# not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
+# would notice this going quiet.
+REPORT=${GOV_UNATTENDED_REPORT:-0}
+report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
+
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
 # ---- only a mechanism to suppress. The `GIT()` pin makes THIS leg's reads honest; nothing binds the
 # ---- next tool that reads the same objects, and the run can add one at any moment.
@@ -250,6 +275,12 @@ fi
 if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
   adv_raw=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$adv_remote" HEAD 2>/dev/null) \
     && ADV_HEAD=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  # THE SYMREF NAME, beside the sha. TOOL-dUnstalledConvoy-2: the local landing arm needs the default
+  # branch's NAME and this leg held none — grepping it for one returns two comments, and one of them
+  # records that GOV_DEFAULT_BRANCH and every `refs/remotes/*` read were purged from this path because
+  # the run can write both. The advertisement is the only admissible source, and it carried the name
+  # all along in the line beside the one already parsed.
+  ADV_NAME=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); sub(/^refs\/heads\//,"",$1); print $1; exit }')
   ADV_TIPS=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --heads "$adv_remote" 2>/dev/null \
     | awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }')
 fi
@@ -426,8 +457,47 @@ while IFS= read -r f; do
             # GUARDED on a non-empty anchor. `$b` is the ADVERTISED HEAD tip now, and a remote that answers
             # with heads but no HEAD symref leaves it empty — `--is-ancestor "$w" ""` then fails, and this
             # fired on an honest LANDED record. The old `$b` was a loop variable that could not be empty.
-            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
-              fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1; then
+              # THE RECORDED ANCHOR KIND DECIDES WHICH HISTORY BLESSES THE WITNESS. A `local` record is
+              # a claim about ONE clone: the protocol says plainly it is a RECORD of a merge and not an
+              # OBSERVATION of one, so a clone that never had that merge cannot judge it and says so
+              # rather than redding. Without that, a run lands locally on one node and the same leg
+              # reds on every other node that has not fast-forwarded its own default branch.
+              #
+              # THIS GRADES THE RECORDED CLAIM, it does not re-derive the driver's pick. The driver
+              # chose an anchor by testing ancestry; this asks whether the claim is well-formed and
+              # whether history still supports it — two questions the driver never asked, both of which
+              # can fail on a record the driver wrote happily.
+              ak=$(fact_of "$f" landed-anchor)
+              case "$ak" in
+                remote|"") ;;
+                local) ;;
+                *) fail 15 "a record claims LANDED with an anchor kind outside the closed set of remote and local, and defaulting an unrecognised one would promote the record to whichever claim the reader assumed: $ak in $f" ;;
+              esac
+              if [ -z "$ak" ]; then
+                # GRANDFATHERED BY DATE, the same idiom this kit's other cutoffs use. Every LANDED
+                # record written before this unit carries no anchor kind and every one of them is in
+                # fact remote-anchored; a record dated at or after the cutoff has no such excuse.
+                fcommit=$(GIT log --diff-filter=A --format=%cs -- "$f" 2>/dev/null | tail -1)
+                if [ -n "$LANDED_ANCHOR_CUTOFF" ] && [ -n "$fcommit" ] \
+                   && printf '%s\n%s\n' "$LANDED_ANCHOR_CUTOFF" "$fcommit" | sort -C; then
+                  fail 15 "a record claims LANDED and names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all: $f"
+                else
+                  ak=remote
+                fi
+              fi
+              if [ "$ak" = local ]; then
+                if [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME" >/dev/null 2>&1 \
+                   && GIT merge-base --is-ancestor "$w" "refs/heads/$ADV_NAME" 2>/dev/null; then
+                  : # the local default branch carries it, which is the claim
+                elif GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+                  : # ...or it reached the remote afterwards, which is an UPGRADE and not a defect
+                else
+                  report "check 15 skipped for $f — a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
+                fi
+              elif ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+                fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+              fi
             fi ;;
         esac
     fi
@@ -912,6 +982,243 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
     fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
   fi
 fi
+# ---- 22 runs in its OWN loop over the run population, NOT inside the BASE-blob block. That block
+# ---- is entered only when the build README exists AT THE PINNED BASE, and a build folder created
+# ---- after the run's BASE has no blob there — measured: the fixture's own run never reached the
+# ---- check, and every arm read as green over a check that had not run. This one needs the RUN-STATE
+# ---- file's own history and the working README, never the pinned BASE, so it has no business behind
+# ---- that gate.
+for f in $RUNS; do
+  [ -f "$f" ] || continue
+  case "$f" in *"/RUN.md") ;; *) continue ;; esac   # frozen retired records are not amendable
+  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
+  rb=$(fact_of "$f" base)
+  bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
+  bre="$M/builds/$bslug/README.md"
+  [ -f "$bre" ] || continue
+  # ---- 22: an AMENDMENT with no record. TOOL-dUnstalledConvoy-6.
+  # ---- M3 delegates this build's own scope and M2 names the three acts, so the failure mode moved
+  # ---- from STALLING to DRIFTING: a unit quietly retired because it was inconvenient, with
+  # ---- nothing in the record saying so. This compares the roster the run was authorized for
+  # ---- against the roster it is executing, and asks the run-state file to account for the
+  # ---- difference.
+  # ----
+  # ---- WHAT IT CANNOT BUY. Both inputs are inside the run's reach — the run wrote the rows and
+  # ---- the run made the edits. It catches the CHEAP failure, an amendment made with NO record.
+  # ---- It does not catch a truthful-looking row attached to a different edit, which takes a
+  # ---- deliberate lie. A green here is not proof an amendment was honest, and the two artifacts
+  # ---- are produced by different acts at different times, which is the whole of why it is worth
+  # ---- having anyway.
+  # ----
+  # ---- IT DOES NOT RE-IMPLEMENT THE REMOVAL REFUSAL. `check_authorization` refuses a narrowed id
+  # ---- set and `authorization-reachable` has no override; a second copy here would recompute the
+  # ---- driver's answer from the driver's inputs, which confirms rather than checks.
+  # ----
+  # ---- THE BASELINE IS THE COMMIT THE RUN ENTERED `BUILDING` AT, not the pinned BASE. A run that
+  # ---- classifies a unit MISSING and authors its spec is doing what M2 MANDATES, and every such
+  # ---- spec is absent at BASE — keying on BASE would red a run for obeying the method, and the
+  # ---- prompt-authorized mode makes it sharper still, since such a run starts with an empty
+  # ---- region. Using the REGION at that commit rather than per-id spec archaeology is equivalent
+  # ---- here because hygiene check 9 refuses a stale index, so a spec committed by then is in the
+  # ---- region by then; that dependency is the reason this shortcut is sound and is stated rather
+  # ---- than assumed.
+  rsbase=""
+  for rsc in $(GIT log --reverse --format=%H -- "$f" 2>/dev/null); do
+    case "$(GIT show "$rsc:$f" 2>/dev/null | grep -m1 '^phase:')" in
+      *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) rsbase="$rsc"; break ;;
+    esac
+  done
+  [ -n "$rsbase" ] || rsbase="$rb"
+  rsb=$(GIT show "$rsbase:$bre" 2>/dev/null || true)
+  rs_cut=${UNITS_REGION_CUTOFF:-}
+  rs_date=$(GIT show -s --format=%cs "$rsbase" 2>/dev/null || true)
+  if [ -z "$rsb" ]; then
+    report "check 22 skipped for $f — no build README at the baseline commit, so there is no authorized roster to compare against"
+  elif ! printf '%s\n' "$rsb" | grep -qxF -- '<!-- gen:build-units -->'; then
+    report "check 22 skipped for $f — the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
+  elif [ -n "$rs_cut" ] && [ -n "$rs_date" ] && ! printf '%s\n%s\n' "$rs_cut" "$rs_date" | sort -C; then
+    report "check 22 skipped for $f — the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
+  elif ! rs_was=$(printf '%s\n' "$rsb" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    report "check 22 skipped for $f — the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+  elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    report "check 22 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
+  elif ! printf '%s
+  ' "$rs_was" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+'; then
+    # AN EMPTY BASELINE ROSTER IS NOT A COMPARISON, and it is not vacuously TRUE either — it is
+    # vacuously ACCUSATORY: every unit the build has would read as added. MEASURED by this unit's
+    # own fixture, whose run carries a live phase from its first commit, so the baseline predates
+    # every spec. That is exactly the prompt-authorized shape, where a run legitimately authors
+    # its whole roster after preflight. Skipping is the honest answer and it says so out loud.
+    report "check 22 skipped for $f — the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+  else
+    rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
+    # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
+    # An `add` alone would red a correctly performed supersession, whose successor is present now
+    # and absent then with no `add` row that the sibling verb would even accept.
+    for rsid in $(printf '%s\n' "$rs_now" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+      id_in "$rs_was" "$rsid" && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
+      fail 22 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
+    done
+    # RETIRED units: a status that is WONTDO now and was not then owes a retire or a supersede.
+    for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+      id_rows "$rs_was" "$rsid" | grep -q '| WONTDO |' && continue
+      printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
+      fail 22 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
+    done
+    # A SUPERSESSION THAT NEVER LANDED ITS REPLACEMENT is a retirement wearing a better name.
+    # A `for`, never a `| while`: `fail` in a pipeline subshell sets a status the parent never
+    # sees, so the leg reports the violation and exits 0 — the shape this whole build is about.
+    for rssucc in $(printf '%s\n' "$rs_rows" | grep -oE 'item supersede [A-Za-z0-9-]+ -> [A-Za-z0-9-]+' | awk '{print $NF}' | sort -u); do
+        [ -n "$rssucc" ] || continue
+        id_in "$rs_now" "$rssucc" && continue
+        fail 22 "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name: $rssucc in $f"
+      done
+  fi
+
+done
+
+# ---- 23: a DECLARED write set against what the pass actually committed. TOOL-dUnstalledConvoy-10.
+# ---- The sibling verb records what a concurrently dispatched pass SAID it would write; this is the
+# ---- half that can catch the declaration out. The two artifacts are produced by different acts at
+# ---- different times, which is the whole of why the comparison is worth making.
+# ----
+# ---- WHAT IT CANNOT BUY: both artifacts are authored by the run — it wrote the rows and it made the
+# ---- commits — so a run determined to hide a collision can simply declare the wider set up front.
+# ---- That is a more expensive lie than the failure this catches, and this check does not claim to
+# ---- reach it. A green row here is not proof two passes were disjoint.
+# ----
+# ---- THE JOIN is the unit id in the commit subject, which the build method already requires of every
+# ---- pass commit for its own reasons. This check consumes that rule rather than inventing an
+# ---- attribution mechanism, and refuses an ambiguous subject rather than guessing which pass a
+# ---- commit belongs to.
+# ----
+# ---- THE WINDOW is the FIRST commit after the group anchor naming the unit, and nothing later. A
+# ---- pass's own review fold or spec bump lands after its group has ended and is outside it by
+# ---- construction; grading those would red an ordinary sequential fold with no in-band repair.
+for f in $RUNS; do
+  [ -f "$f" ] || continue
+  case "$f" in *"/RUN.md") ;; *) continue ;; esac
+  ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
+  # ONE ROW PER (group, unit) — THE LAST. The driver's widening repair supersedes an OPEN pass's row
+  # and parks the replacement AT THE SAME ANCHOR, so a widened declaration is two rows under one key
+  # and the later one is the one that binds. That anchor reuse is what lets this stay a plain fold
+  # with no ordering arithmetic in it.
+  #
+  # KEYED ON (group, unit) AND NOT ON THE UNIT ALONE, which the first repair tried and which is wrong
+  # twice over. M6 defines five pass kinds and one unit may be dispatched once per kind, so a unit
+  # legitimately owns several rows at several anchors; merging them graded one pass's commit against
+  # another pass's declaration, and left the second pass ungraded entirely. And because a post-hoc
+  # widening cannot reuse a closed pass's anchor, it lands under a NEW key here and the original
+  # narrow declaration is still graded — which is the ordering constraint, obtained by construction
+  # rather than by comparing timestamps after the fact.
+  # GRADING IS OFF UNLESS A PROJECT DECLARES IT ON, and the default is off because this mechanism is
+  # not verified. Four adversarial rounds over it are recorded under `memory/builds/dUnstalledConvoy/reviews/`; the
+  # last one reproduced a driver call RETRACTING a failure this check had already emitted, and the
+  # round before that a refusal that ended a unit outright. The introduction rate across the four
+  # rounds did not fall. TOOL-dUnstalledConvoy-23 owns the redesign.
+  #
+  # THE DECLARATIONS ARE STILL RECORDED by `--dispatch`, and every other check in this leg still runs.
+  # What is dark is the GRADING of a declaration against a commit — the one part that was never
+  # right. This is the charter's own handling for unverified Tier-2 behaviour: ship it inert, flip it
+  # on after in-place verification, never land it on because it is nearly there.
+  #
+  # A DARK CHECK ANNOUNCES ITSELF. A skip that looks like a pass is indistinguishable from coverage,
+  # and this leg has redded twice for exactly that shape.
+  if [ -z "${DISPATCH_GRADING:-}" ]; then
+    if grep -qF -- ' dispatch · item ' "$f" 2>/dev/null; then
+      report "check 23 DARK for $f — dispatch declarations are recorded but NOT graded against commits; the grading is retired pending TOOL-dUnstalledConvoy-23 and DISPATCH_GRADING is unset, so a green verdict here is coverage of nothing"
+    fi
+    continue
+  fi
+  dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
+      { k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
+        if (!(k in row)) ord[++n] = k
+        row[k] = $0 }
+      END { for (i = 1; i <= n; i++) print row[ord[i]] }' || true)
+  if [ -z "$dsrows" ]; then
+    report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
+    continue
+  fi
+  while IFS= read -r dsrow; do
+    [ -n "$dsrow" ] || continue
+    dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
+    dsgrp=${dsitem%% *}; dsunit=${dsitem#* }
+    dsdecl=${dsrow#* · reason }
+    if ! GIT rev-parse --verify --quiet "$dsgrp^{commit}" >/dev/null 2>&1; then
+      report "check 23 skipped for $dsunit in $f — the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
+      continue
+    fi
+    if ! GIT merge-base --is-ancestor "$dsgrp" HEAD 2>/dev/null; then
+      report "check 23 skipped for $dsunit in $f — the group anchor is not an ancestor of HEAD, so this clone does not carry the history the declaration was made against"
+      continue
+    fi
+    # THE FIRST commit naming the unit, oldest-first, and nothing after it.
+    # A RUN-STATE BOOKKEEPING COMMIT IS NOT A PASS COMMIT, and skipping it is not a convenience.
+    # `--dispatch` STAGES the run-state file, so the run commits the declaration itself — and that
+    # commit's subject names the unit, being about it. Without this skip the DECLARATION is read as
+    # the pass's own commit, the subset test runs against a diff touching only the run-state file, and
+    # the check reds on every correctly declared pass. Measured on this unit's own fixture.
+    # THE KIT LIBRARY ANSWERS THIS, not a loop written here. The driver's condition 1 asks the same
+    # question, and when the two were written separately the driver's copy omitted the run-state skip
+    # below and closed every pass on its own declaration commit.
+    dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" || true)
+    if [ -z "$dshit" ]; then
+      # NO COMMIT NAMES THE PASS. Legal when the pass produced no change - M6 says a pass that
+      # changed nothing commits nothing. NOT legal when the declared paths moved anyway: that is the
+      # declared work happening while the join is dodged, and it is the only reading of this state
+      # that is a defect. Keyed on the PATHS and not on a subject naming no id at all, because the
+      # latter reds on every witness commit a run makes between passes.
+      dsmoved=""
+      for dsp in $dsdecl; do
+        GIT log --format=%H "$dsgrp"..HEAD -- "$dsp" 2>/dev/null | grep -q . && dsmoved="$dsmoved $dsp"
+      done
+      # ...and the run-state file is excluded from the OUTSIDE test too, for the same reason.
+      if [ -n "$dsmoved" ]; then
+        fail 23 "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged: $dsunit wrote$dsmoved in $f"
+      else
+        report "check 23 observed for $dsunit in $f — no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
+      fi
+      continue
+    fi
+    # AMBIGUOUS ATTRIBUTION is a refusal, never a guess: a subset test over a commit that could
+    # belong to either of two passes proves nothing about either.
+    dsother=""
+    while IFS= read -r dssib; do
+      [ -n "$dssib" ] || continue
+      dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
+      dssunit=${dssitem#* }
+      [ "$dssunit" = "$dsunit" ] && continue
+      # ANCHORED, like every other id test in this file. Left as a substring, a group holding a
+      # `-1` and a `-10` reports the pair as ambiguous on the `-1` commit and reds a correct run.
+      id_in "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" "$dssunit" && dsother="$dssunit"
+    done <<DSSIBS
+$(printf '%s\n' "$dsrows" | grep -F -- " dispatch · item $dsgrp ")
+DSSIBS
+    if [ -n "$dsother" ]; then
+      fail 23 "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available: $dsunit and $dsother in $f"
+      continue
+    fi
+    # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
+    # declaration is the defect.
+    dsout=""
+    for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+      dsok=0
+      for dsp in $dsdecl; do
+        # THROUGH THE LIBRARY, which normalises. A bare `case` graded the recorded spelling as a
+        # literal, so a declaration the driver accepted as `work/sub/` matched nothing the commit
+        # touched and redded this leg permanently, with narrowing refused and no in-band repair.
+        covers "$dsp" "$dsq" && { dsok=1; break; }
+      done
+      [ "$dsok" = 1 ] || dsout="$dsout $dsq"
+    done
+    [ -z "$dsout" ] || fail 23 "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked: $dsunit at $dshit wrote$dsout in $f"
+  done <<DSROWS
+$dsrows
+DSROWS
+done
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
 # ---- the authorization scope, `--plan`'s roster join, `--status`'s next unit and `build-complete`'s
