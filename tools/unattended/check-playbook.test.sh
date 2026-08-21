@@ -22,6 +22,11 @@ seed() { # dir
       && git config core.autocrlf false )
   cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/tools/unattended/"
   cp "$HERE/playbook.fixture.md" "$1/tools/unattended/"
+  # The PIECES and their records. Without them the reader's population is empty in the scratch tree,
+  # its five states are unreachable, and the arms below would each pass by finding nothing — which is
+  # the defect this whole leg is about, reproduced inside its own test.
+  cp -r "$HERE/fixture-pieces" "$1/tools/unattended/"
+  cp -r "$HERE/fixture-records" "$1/tools/unattended/"
   ( cd "$1" && git add -A >/dev/null && git commit -qm seed )
 }
 
@@ -86,6 +91,51 @@ cp "$KEEP" "$F"
 cp "$KEEP" "$F"
 [ "$(rc)" = 0 ] && ok || bad "the fixture's `none — <why>` section 6 does not satisfy the canon check"
 
+probe "grain, no records"   8 's|^records .*||' "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook:"
+
+# ---- THE READER'S FIVE STATES. Each is staged and the COUNTS are asserted, not just a red/green:
+# ---- the reader CLASSIFIES and never grades, so none of these reds the leg and an arm asserting a
+# ---- red would fail on every one of them. What distinguishes a working reader from a dead one is
+# ---- which column moved.
+cp "$KEEP" "$F"
+P1="$W/tools/unattended/fixture-pieces/one/piece.md"
+R1=$(ls "$W"/tools/unattended/fixture-records/*one*.md 2>/dev/null | head -1)
+counts() { run | grep -oE 'pieces [0-9]+ · verified [0-9]+ · failed [0-9]+ · stale [0-9]+ · unrecorded [0-9]+' | head -1; }
+PKEEP="$TMP/p1.keep"; RKEEP="$TMP/r1.keep"
+if [ -n "$R1" ] && [ -f "$P1" ]; then
+  cp "$P1" "$PKEEP"; cp "$R1" "$RKEEP"
+  [ "$(counts)" = "pieces 2 · verified 2 · failed 0 · stale 0 · unrecorded 0" ] && ok \
+    || bad "the reader's clean state is not two verified pieces — every state arm below is measured against this one"
+
+  printf '\nedited after its record\n' >> "$P1"
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 1 · unrecorded 0" ] && ok \
+    || bad "editing a piece after its record did not move it to STALE — the hash join is not joining"
+  cp "$PKEEP" "$P1"
+
+  mv "$R1" "$R1.hidden"
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 0 · stale 0 · unrecorded 1" ] && ok \
+    || bad "removing a record did not move its piece to UNRECORDED"
+  mv "$R1.hidden" "$R1"
+
+  sed -i 's/verdict PASS/verdict FAIL/' "$R1"
+  [ "$(counts)" = "pieces 2 · verified 1 · failed 1 · stale 0 · unrecorded 0" ] && ok \
+    || bad "a recorded FAIL verdict did not move its piece out of VERIFIED — verified would then be a hash-join state alone, which is the defect that made fork 5 implemented by nothing"
+  cp "$RKEEP" "$R1"
+
+  mv "$P1" "$P1.hidden"
+  run | grep -q 'orphan record' && ok || bad "a record whose piece is gone was not reported as an ORPHAN — the reverse direction, without which a corpus reports coverage it no longer has"
+  mv "$P1.hidden" "$P1"
+
+  # THE LIVENESS ASSERTION. Every count above can be satisfied by a tree with no pieces, so the arm
+  # that matters most is the one proving the reader SAYS SO instead of reporting a clean zero.
+  ( cd "$W" && sed -i 's|^grain .*|grain         = "tools/unattended/nowhere/*/piece.md"|' tools/unattended/playbook.fixture.md )
+  run | grep -q 'DEAD PROBE' && ok || bad "a grain resolving no piece did not report a DEAD PROBE — a reader that enumerates zero and reports zero failures is indistinguishable from a clean run"
+  [ "$(rc)" = 0 ] && ok || bad "the dead probe REDDED the leg; the reader classifies and never grades, and only --close blocks"
+  cp "$KEEP" "$F"
+else
+  bad "the scratch tree carries no piece or no record, so all six reader arms were skipped — a skip that looks like a pass is the thing this suite exists to refuse"
+fi
+
 # ---- THE CANON IS DERIVED, and this is the arm that proves it. Removing a row from the shipped
 # ---- template must shrink what the leg demands; if it does not, the canon is hardcoded somewhere
 # ---- and the template is decoration.
@@ -99,7 +149,7 @@ seed_out=$(run | grep -c 'canon 11 section' || true)
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=28
+FLOOR_ASSERTIONS=35
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

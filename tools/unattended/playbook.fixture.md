@@ -10,6 +10,7 @@ step_selector = "^[*][*]F[0-9]+[.]"
 step_floor    = 3
 outputs       = ["tools/unattended/fixture-pieces/**"]
 grain         = "tools/unattended/fixture-pieces/*/piece.md"
+records       = "tools/unattended/fixture-records"
 piece_checks  = ["fixture-shape"]
 set_checks    = ["fixture-distinct"]
 legs          = { fixture-shape = "tools/unattended/check-playbook.sh", fixture-distinct = "tools/unattended/check-playbook.sh" }

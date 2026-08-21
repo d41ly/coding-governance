@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 

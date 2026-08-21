@@ -308,6 +308,17 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
   by an agent hand-editing an artifact this kit calls generated.
+- `--park` — writes a decision the run REFUSED to take into the parked region, with the question, the
+  options seen and the reason. Refused on a terminal record and refused with no run-state file at
+  all, because a park minted for a run that never started records nothing about a run.
+- `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
+  so no operator spells one, and REFUSING a machine-checked item by reading that item's declared
+  checker. Before it existed those keys had no writer at all and `--abort`, which requires both, was
+  reachable only by hand-editing a file this kit calls generated.
+- `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
+  piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
+  exact-line idempotence. The writer takes a records ROOT rather than a slug, so the attended path
+  reaches the same function; the VERB requires a run-state file and is therefore unattended-only.
 - `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
   names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
   against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a

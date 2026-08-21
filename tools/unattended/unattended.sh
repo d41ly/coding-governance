@@ -11,6 +11,8 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
+#   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
+#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -2067,6 +2069,100 @@ PARKED
   return 0
 }
 
+# ------------------------------------------------------------------- the PER-PIECE RECORD writer
+# The spec's previous revision had four READERS of this record and no writer at all, so the two
+# Definition-of-Done items reading it could only be met by hand — which the same spec forbids.
+#
+# ONE writer, TWO callers. `record_piece` takes an explicit records ROOT rather than a slug, so the
+# attended path — which has no run-state file — reaches this function instead of a second
+# implementation that would confirm this one rather than check it.
+#
+# THE PATH IS DERIVED from the piece's own repo-relative path. The record lives under the BUILD
+# folder and not beside the piece, because the output tree is the DELIVERABLE and a governance
+# artifact sitting in it is the thing an owner deletes.
+record_path_of() { # records-root · piece-path
+  # FLAT under the declared root. The root is the playbook's own `records` declaration, so a `pieces/`
+  # segment underneath it would be a second naming rule the reader has to know - and the reader globs
+  # the root. The driver's self-test caught exactly that split: the writer wrote one place and the
+  # reader read another, and the live leg looked green only because the files had been moved by hand.
+  printf '%s/%s.md' "$1" "$(printf '%s' "$2" | tr '/' '~')"
+}
+record_piece() { # records-root · piece-path · leg · verdict · playbook-sha
+  local root="$1" piece="$2" leg="$3" verdict="$4" pbsha="$5" rec want line h
+  [ -f "$piece" ] || { fail 47 "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows: $piece"; return 1; }
+  case "$verdict" in
+    PASS|FAIL|NA) ;;
+    *) fail 47 "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given: $verdict"; return 1 ;;
+  esac
+  # verb_park's three guards, REUSED rather than re-argued. Each exists because of a recorded defect:
+  # a newline forges a row nothing wrote, the field separator makes a row unparseable by the check
+  # that reads it, and the bypass flag reds the bar permanently on a record no verb repairs.
+  if [ "$(printf '%s' "$leg$verdict$piece" | wc -l)" -ne 0 ]; then
+    fail 47 "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
+  fi
+  case "$leg$piece" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $piece"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s' "$leg" "$piece" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a piece record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows: $BYPASS_BAN"; return 1
+  fi
+  rec=$(record_path_of "$root" "$piece")
+  mkdir -p "$(dirname "$rec")" || return 1
+  h=$(GIT hash-object "$piece") || return 1
+  if [ ! -f "$rec" ]; then
+    {
+      printf '# piece record — %s\n\n' "$piece"
+      printf 'piece: %s\n' "$piece"
+      printf 'hash: %s\n' "$h"
+      # The RUN identity, so `enumerate_run` is derivable from the RECORD rather than by asking a run
+      # that may not exist. The reader runs on the merge bar with no run-state file, so a scope that
+      # needed one would be a scope the bar can never evaluate.
+      printf 'run: %s\n' "$(basename "$root")"
+      printf 'playbook-sha: %s\n' "$pbsha"
+      printf '\n## Verdicts\n'
+    } > "$rec"
+  else
+    # The hash is RE-STAMPED on every write. A record is a claim about the piece AS IT STANDS, and a
+    # stale hash beside a fresh verdict is exactly the `stale` state the reader exists to name.
+    sed -i "s|^hash: .*|hash: $h|" "$rec"
+  fi
+  want="leg $leg · verdict $verdict"
+  # EXACT LINE compare, not a substring search. `verb_park` had to repair precisely this: a prefix
+  # match reported success while writing nothing, silently dropping a distinct entry.
+  while IFS= read -r line; do
+    [ "$line" = "$want" ] || continue
+    echo "unattended: piece verdict already recorded, unchanged — $leg on $piece"
+    return 0
+  done < "$rec"
+  # A leg may be RE-recorded with a different verdict and the newest wins: two verdicts for one leg
+  # is a record that cannot be read either way.
+  sed -i "/^leg $leg · verdict /d" "$rec"
+  printf '%s\n' "$want" >> "$rec"
+  stage_or_fail "$rec" || return 1
+  echo "unattended: piece verdict recorded — $leg $verdict on $piece"
+  return 0
+}
+verb_record_piece() { # slug · piece · leg · verdict
+  local slug="$1" piece="$2" leg="$3" verdict="$4" rel
+  # THE THREE FIELD REFUSALS ARE HOISTED, above the caller branch. They were duplicated once per
+  # caller, which is three refusals with two spellings each and six arms to keep in step - the
+  # shape that goes stale on the first edit to either copy.
+  [ -n "$piece" ] || { fail 47 "--record-piece requires --path, because a verdict with no piece to join to is a verdict about nothing"; return 1; }
+  [ -n "$leg" ] || { fail 47 "--record-piece requires --leg, because a verdict that names no check cannot be compared against the playbook's declared set"; return 1; }
+  [ -n "$verdict" ] || { fail 47 "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"; return 1; }
+  # S3 - THE SECOND CALLER. `--records-root` reaches the SAME writer with an explicit root instead of
+  # a slug, which is how the attended path records a piece: it has no run-state file and no run to
+  # name. One function, two callers, never two implementations - the second would confirm the first
+  # rather than check it, and they would drift the first time either changed.
+  if [ -n "${RP_ROOT:-}" ]; then
+    record_piece "$RP_ROOT" "$piece" "$leg" "$verdict" "${RP_PBSHA:-}"
+    return $?
+  fi
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers: $rel"; return 1; }
+  refuse_if_terminal "$rel" --record-piece || return 1
+  record_piece "$M/builds/$slug" "$piece" "$leg" "$verdict" "$(fact "$rel" playbook)"
+}
+
 # --------------------------------------------------------------------------------------- dispatch
 # TOOL-cBriefedPilot-1 - the PAIRED accumulator. `--override) OV="${2:-}"` stored a scalar, so a
 # second occurrence overwrote the first and `verb_close` blocked on the second unmet item forever,
@@ -2079,6 +2175,7 @@ PARKED
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
+RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -2102,8 +2199,13 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
+    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--record-piece) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
+    --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
+    --verdict)      RP_VERDICT="${2:-}"; shift 2 || shift ;;
+    --records-root) RP_ROOT="${2:-}"; shift 2 || shift ;;
+    --playbook-sha) RP_PBSHA="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
     # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
@@ -2123,7 +2225,7 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: $arg"; exit 1 ;;
+    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --abort, --attest and --record-piece: $arg"; exit 1 ;;
   esac
 done
 # S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
@@ -2131,7 +2233,7 @@ done
 # (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
 # header. A prior review asked for both to be fixed and only the header landed.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>] | --record-piece <slug> --path <p> --leg <name> --verdict <PASS|FAIL|NA>"; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2142,5 +2244,6 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
+  --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
 esac
 exit "$status"

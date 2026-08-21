@@ -1489,7 +1489,7 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park and --abort: --frobnicate"
+hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --abort, --attest and --record-piece: --frobnicate"
 # ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
 # ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
 # ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
@@ -2224,6 +2224,36 @@ reset_tree; rm -f memory/builds/tRun/RUN.md
 out=$(run --park tRun --item q --reason r)
 hit "$out" "no run-state file, so there is no run to park a decision against"
 same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
+reset_tree
+
+# ---- check 47: --record-piece. Every refusal, plus the two PASSING directions that tell a working
+# ---- writer from one that refuses everything: the records-root caller (the attended path, which has
+# ---- no run-state file) and idempotence on a re-issued verdict.
+reset_tree
+mkdir -p pc/one recs; printf 'a fixture piece
+' > pc/one/piece.md; git add -A >/dev/null
+hit "$(run --record-piece tRun --records-root recs --leg L --verdict PASS)" "--record-piece requires --path, because a verdict with no piece to join to is a verdict about nothing"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --verdict PASS)" "--record-piece requires --leg, because a verdict that names no check cannot be compared against the playbook's declared set"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L)" "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"
+hit "$(run --record-piece tRun --records-root recs --path pc/nope.md --leg L --verdict PASS)" "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict MAYBE)" "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg "$(printf 'a
+b')" --verdict PASS)" "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
+
+# ---- THE ATTENDED CALLER SUCCEEDS. Eight refusal arms and no pass arm are satisfied by a writer
+# ---- that refuses everything, and that writer looks exactly this armed.
+out=$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict PASS)
+hit "$out" "piece verdict recorded"
+same "the record carries the piece it joins to" "$(sed -n 's/^piece: //p' recs/*.md | head -1)" "pc/one/piece.md"
+same "the record carries the piece HASH, not a placeholder" "$(sed -n 's/^hash: //p' recs/*.md | head -1)" "$(git hash-object pc/one/piece.md)"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict PASS)" "already recorded, unchanged"
+
+# ---- and the SLUG caller refuses with no run-state file, which is what makes the attended path need
+# ---- a second CALLER rather than a second implementation.
+rm -f memory/builds/tRun/RUN.md
+hit "$(run --record-piece tRun --path pc/one/piece.md --leg L --verdict PASS)" "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers:"
 reset_tree
 
 # ---- check 44: the authorization mode is a CLOSED set, and a value outside it refuses rather than

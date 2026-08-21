@@ -69,6 +69,20 @@ if [ "${POP:-0}" -eq 0 ]; then
   exit "$st"
 fi
 
+# ---------------------------------------------------------------- piece-record helpers
+GITLS() { git ls-files -- "$1" 2>/dev/null; }
+# The record is found by its OWN `piece:` field rather than by re-deriving the writer's path rule.
+# Re-deriving would be a second implementation of the writer's naming, which confirms it rather than
+# checks it — and the two would drift the first time either changed.
+record_for() { # records-root · piece-path -> its record, or empty
+  local r
+  for r in $(GITLS "$1/*.md"); do
+    [ -n "$r" ] || continue
+    [ "$(sed -n 's/^piece: //p' "$r" | head -1)" = "$2" ] && { printf '%s' "$r"; return 0; }
+  done
+  return 0
+}
+
 # ------------------------------------------------------------------------ per playbook
 TOTAL_STEPS=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
 for pb in $PLAYBOOKS; do
@@ -160,7 +174,54 @@ $CANON
 CANONEOF
 done
 
-# ---- 8: the DERIVED length budget and the drain, PRINTED. No number is written in this file.
+  # ---- 8: THE PER-PIECE RECORD READER. It CLASSIFIES and never grades: `stale` and `failed` are
+  # ---- reported here with their counts and do NOT red, because only `--close` blocks on them. That
+  # ---- split is what keeps this leg from redding the bar for the ordinary mid-fold state.
+  # ----
+  # ---- RUN-INDEPENDENT BY CONSTRUCTION. The scopes are derived from the RECORDS, never from a
+  # ---- run-state file: this leg runs on the merge bar where no run exists, and a scope that needed
+  # ---- one would be a scope the bar can never evaluate.
+  gr=$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  rr=$(printf '%s
+' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  if [ -n "$gr" ] && [ -z "$rr" ]; then
+    fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
+  fi
+  if [ -n "$gr" ] && [ -n "$rr" ]; then
+    pieces=$(GITLS "$gr")
+    npieces=$(printf '%s' "$pieces" | grep -c . || true)
+    v=0; f=0; st_=0; un=0
+    for pc in $pieces; do
+      [ -n "$pc" ] || continue
+      rec=$(record_for "$rr" "$pc")
+      if [ -z "$rec" ]; then un=$((un + 1)); continue; fi
+      rh=$(sed -n 's/^hash: //p' "$rec" | head -1)
+      ah=$(git hash-object "$pc" 2>/dev/null)
+      if [ "$rh" != "$ah" ]; then st_=$((st_ + 1)); continue; fi
+      # PROVENANCE and DONENESS are two questions. The hash join answers the first; the verdicts
+      # answer the second, and `verified` requires BOTH — otherwise it is a semantic word for a
+      # structural state, and the count that means "the build made what was asked" keys on it.
+      if grep -q '^leg .* · verdict FAIL$' "$rec"; then f=$((f + 1)); else v=$((v + 1)); fi
+    done
+    # THE LIVENESS ASSERTION, first and unconditional. Every count below can be satisfied by a tree
+    # with no pieces in it, and a reader that enumerates zero, joins zero and reports zero failures
+    # is indistinguishable from a clean run.
+    if [ "${npieces:-0}" -eq 0 ]; then
+      note "DEAD PROBE — the grain resolves no piece for $pb, so every per-piece count below is over an empty set and means nothing; reported and NOT redded here, because only --close blocks on it"
+    else
+      note "pieces $npieces · verified $v · failed $f · stale $st_ · unrecorded $un ($pb)"
+    fi
+    # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
+    # silently reports coverage it no longer has.
+    for rc_ in $(GITLS "$rr/*.md"); do
+      [ -n "$rc_" ] || continue
+      op=$(sed -n 's/^piece: //p' "$rc_" | head -1)
+      [ -n "$op" ] || continue
+      [ -e "$op" ] || note "orphan record — $rc_ describes $op, which is not in this tree; the record outlived its piece and is coverage nobody has"
+    done
+  fi
+
+# ---- 9: the DERIVED length budget and the drain, PRINTED. No number is written in this file.
 note "steps $TOTAL_STEPS · CHECK tags $TOTAL_CHECKS · of those carrying a witness $TOTAL_WITNESS"
 [ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
 

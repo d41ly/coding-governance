@@ -24,6 +24,8 @@ globs = [
   "tools/unattended/check-playbook.test.sh",
   "tools/unattended/PLAYBOOK-TEMPLATE.template.md",
   "tools/unattended/playbook.fixture.md",
+  "tools/unattended/fixture-pieces/",
+  "tools/unattended/fixture-records/",
 ]
 ```
 
@@ -91,6 +93,10 @@ seam: the tracked FIXTURE pattern — reuse for any leg whose population can leg
 - The leg grades SHAPE only, and its header enumerates the four semantic questions it cannot reach.
 - The scope refusal (unit 8) cannot evaluate on the attended entry point at all: both its inputs, the
   recorded mode and the run's commit set, exist only through the driver.
+- The per-piece RECORDS ROOT is declared by the playbook, not by the kit. Found by building: the
+  spec put these under the build folder, and the memory-tree gate refuses both a new subdir there and
+  a new top-level directory — its structure is closed and owned by another kit. A piece record is
+  evidence about CONTENT and belongs with the project that owns the content.
 - `PLAYBOOK_GLOB` is read from the conf and is not yet used to widen the population — a playbook that
   carries no declaration block is invisible, which is intended for now and is the reason the block is
   what defines membership.
