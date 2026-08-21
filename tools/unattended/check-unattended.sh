@@ -51,8 +51,9 @@ if [ ! -f "$CONF" ]; then
   fail 1 "no .unattended.conf at the repo root, and every value this leg checks is declared there"
   exit "$status"
 fi
+ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -244,6 +245,12 @@ fi
 if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
   adv_raw=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --symref --exit-code "$adv_remote" HEAD 2>/dev/null) \
     && ADV_HEAD=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  # THE SYMREF NAME, beside the sha. TOOL-dUnstalledConvoy-2: the local landing arm needs the default
+  # branch's NAME and this leg held none — grepping it for one returns two comments, and one of them
+  # records that GOV_DEFAULT_BRANCH and every `refs/remotes/*` read were purged from this path because
+  # the run can write both. The advertisement is the only admissible source, and it carried the name
+  # all along in the line beside the one already parsed.
+  ADV_NAME=$(printf '%s\n' "$adv_raw" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); sub(/^refs\/heads\//,"",$1); print $1; exit }')
   ADV_TIPS=$(GIT_TERMINAL_PROMPT=0 GIT ls-remote --heads "$adv_remote" 2>/dev/null \
     | awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }')
 fi
@@ -420,8 +427,47 @@ while IFS= read -r f; do
             # GUARDED on a non-empty anchor. `$b` is the ADVERTISED HEAD tip now, and a remote that answers
             # with heads but no HEAD symref leaves it empty — `--is-ancestor "$w" ""` then fails, and this
             # fired on an honest LANDED record. The old `$b` was a loop variable that could not be empty.
-            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1                && ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
-              fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1; then
+              # THE RECORDED ANCHOR KIND DECIDES WHICH HISTORY BLESSES THE WITNESS. A `local` record is
+              # a claim about ONE clone: the protocol says plainly it is a RECORD of a merge and not an
+              # OBSERVATION of one, so a clone that never had that merge cannot judge it and says so
+              # rather than redding. Without that, a run lands locally on one node and the same leg
+              # reds on every other node that has not fast-forwarded its own default branch.
+              #
+              # THIS GRADES THE RECORDED CLAIM, it does not re-derive the driver's pick. The driver
+              # chose an anchor by testing ancestry; this asks whether the claim is well-formed and
+              # whether history still supports it — two questions the driver never asked, both of which
+              # can fail on a record the driver wrote happily.
+              ak=$(fact_of "$f" landed-anchor)
+              case "$ak" in
+                remote|"") ;;
+                local) ;;
+                *) fail 15 "a record claims LANDED with an anchor kind outside the closed set of remote and local, and defaulting an unrecognised one would promote the record to whichever claim the reader assumed: $ak in $f" ;;
+              esac
+              if [ -z "$ak" ]; then
+                # GRANDFATHERED BY DATE, the same idiom this kit's other cutoffs use. Every LANDED
+                # record written before this unit carries no anchor kind and every one of them is in
+                # fact remote-anchored; a record dated at or after the cutoff has no such excuse.
+                fcommit=$(GIT log --diff-filter=A --format=%cs -- "$f" 2>/dev/null | tail -1)
+                if [ -n "$LANDED_ANCHOR_CUTOFF" ] && [ -n "$fcommit" ] \
+                   && printf '%s\n%s\n' "$LANDED_ANCHOR_CUTOFF" "$fcommit" | sort -C; then
+                  fail 15 "a record claims LANDED and names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all: $f"
+                else
+                  ak=remote
+                fi
+              fi
+              if [ "$ak" = local ]; then
+                if [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME" >/dev/null 2>&1 \
+                   && GIT merge-base --is-ancestor "$w" "refs/heads/$ADV_NAME" 2>/dev/null; then
+                  : # the local default branch carries it, which is the claim
+                elif GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+                  : # ...or it reached the remote afterwards, which is an UPGRADE and not a defect
+                else
+                  report "check 15 skipped for $f — a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
+                fi
+              elif ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+                fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
+              fi
             fi ;;
         esac
     fi

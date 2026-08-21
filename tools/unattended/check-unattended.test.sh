@@ -1356,14 +1356,76 @@ git add -A && git commit -q -m "a group anchor this clone does not carry" --no-v
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
 reset_tree
 
-# RAISED 200 -> 243 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
+
+# ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
+# ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather
+# ---- than an observation of one — so a clone that never had that merge says so instead of redding.
+# ---- Without that, a run lands locally on one node and the same leg reds on every other node that
+# ---- has not fast-forwarded its own default branch.
+land_as() {            # anchor-kind · witness
+  sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+  sed -i "s/^witness: .*/witness: $2/" memory/builds/tRun/RUN.md
+  [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
+  git add -A
+}
+
+# a REMOTE record whose witness never reached the remote is the claim this half exists to refuse
+reset_tree
+land_as remote "$(git rev-parse HEAD)"
+hit "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default"
+
+# ...the SAME witness under a LOCAL record, once the local default branch carries it, is the whole
+# point of the two-anchor landing: green here, and red under the line above.
+reset_tree
+W=$(git rev-parse HEAD)
+git branch -f main "$W"
+land_as local "$W"
+miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+git branch -f main "$ANCHOR0"
+
+# ...a LOCAL witness this clone carries on NEITHER branch is an announced SKIP, never a refusal. That
+# is the cross-node case: the run-state file travels and a local ref does not.
+reset_tree
+land_as local "$(git rev-parse HEAD)"
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
+miss "$(run)" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+
+# ...an anchor kind outside the closed set is a refusal. Defaulting an unrecognised one would promote
+# the record to whichever claim the reader assumed, which is the failure shape a value guard exists
+# to prevent.
+reset_tree
+land_as sideways "$(git rev-parse HEAD)"
+hit "$(run)" "a record claims LANDED with an anchor kind outside the closed set of remote and local, and defaulting an unrecognised one would promote the record to whichever claim the reader assumed:"
+
+# ---- THE CUTOFF. Every LANDED record written before this unit carries no anchor kind and every one
+# ---- of them is in fact remote-anchored, so a check that redded them would be unlandable by any run.
+# ---- A record whose FIRST commit is at or after the declared date has no such excuse.
+reset_tree
+land_as "" "$(git rev-parse HEAD)"
+printf '\nLANDED_ANCHOR_CUTOFF="1999-01-01"\n' >> .unattended.conf
+git add -A
+hit "$(run)" "a record claims LANDED and names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all:"
+
+# ...and the same record under a FUTURE cutoff is grandfathered, read as remote, and meets the
+# ordinary ancestry refusal rather than the missing-kind one.
+reset_tree
+land_as "" "$(git rev-parse HEAD)"
+printf '\nLANDED_ANCHOR_CUTOFF="2999-01-01"\n' >> .unattended.conf
+git add -A
+out=$(run)
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff"
+hit "$out" "a record claims LANDED with a witness that is not an ancestor of the anchor"
+reset_tree
+
+# RAISED 200 -> 243, then to 251 by TOOL-dUnstalledConvoy-2 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
 # it is a number: the sibling suite carried a sixty-arm slack and hid FIFTY stranded arms behind it in
 # this same session. Pinned AT the count.
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=243
+FLOOR_ASSERTIONS=251
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

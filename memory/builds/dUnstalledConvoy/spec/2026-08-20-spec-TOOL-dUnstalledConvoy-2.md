@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach
 
-**Status:** SPECCED · rev-2 · 2026-08-20 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -29,13 +29,18 @@ become a second copy of the driver's arm.
   returns two COMMENTS, one recording that those reads were deliberately purged from this path because
   the run can write both. A builder reaching for either substitute would re-open a reproduced bypass
   on the check that grades a terminal claim.
-- **S2c** — the local arm is **scoped to the node that wrote the record**, and SKIPS elsewhere through
-  the announced-skip mechanism this unit already adds. Review fold: H9, second half. The run-state
-  file is tracked and travels to every node; a local default-branch ref does not. Without this, node
-  `d` lands locally and commits a `local`-witness record, node `b` pulls the branch without
-  fast-forwarding its own default branch, and the same leg reds there on a record that is green where
-  it was written — while the leg's own header states the intent this would defeat, that its value
-  comes from running in a clone the run never touched.
+- **S2c** — a `local` witness this clone cannot see is an announced SKIP, never a refusal. Review
+  fold: H9, second half — **amended at rev-3, because the drafted disposition names something the
+  record does not carry.** It said to scope the arm to the node that wrote the record; there is no
+  node field in a run-state file, and inventing one to answer a question the protocol already answers
+  would be a second spelling. The protocol says plainly that a `local` anchor is a RECORD of a merge
+  and not an observation of one, so a clone that never had that merge cannot judge it — and saying so
+  is the honest verdict. The order is: an ancestor of the local default branch passes; failing that,
+  an ancestor of the advertised tip passes, because a local landing later pushed is an upgrade and
+  not a defect; failing both, the check announces that this clone cannot judge a local-anchored claim
+  and moves on. Without this, node `d` lands locally and commits the record, node `b` pulls the branch
+  without fast-forwarding its own default branch, and the same leg reds there on a record that is
+  green where it was written.
 - **S5** — the check ANNOUNCES the case it cannot reach. Where no default branch resolves, the
   ancestry half is skipped today in silence, inherited from check 9. This unit prints a named skip
   line instead, stating which arm went unexercised and why — **through the report channel
@@ -185,6 +190,15 @@ boundary. `ARMS_FLOORS` moves for `tools/unattended/check-unattended.sh`.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · built. The symref NAME was carried by the advertisement all along, in the line
+  beside the one the loop already parsed — so the local arm needs no local ref and no environment
+  read, which is what makes it admissible at all. S6 grew: the protocol's key table was missing this
+  build's OTHER two keys as well, so the unit that adds a reader now files all three, closing a gap of
+  its own making rather than leaving it for the open row that records the class.
+- rev-3 · 2026-08-21 · S2c amended before any code. The fold's disposition scoped the local arm to
+  "the node that wrote the record" and a run-state file records no node; adding one to answer a
+  question the protocol already answers would be a second spelling of it. A `local` witness this clone
+  cannot see is now an announced SKIP, which is what the protocol's own boundary section implies.
 - rev-2 · 2026-08-20 · folded the spec audit: H9 (the leg holds no default-branch NAME — S2b parses it out of
   the advertisement, and S2c scopes the local arm to the writing node so the record does not red on
   another clone), M9 (this unit owns all three carriers of the new key, and AC7 stops leaning on a
