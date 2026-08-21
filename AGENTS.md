@@ -477,9 +477,10 @@ GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code pa
 GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard; what pre-push runs, and what a DoD needs
 ```
 
-**Guards scope a run, never a verdict.** Each self-test leg carries a `guard` in the manifest naming
-the kit dir it exercises, so a records-only commit runs only the legs that check this repo's actual
-state. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
+**Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
+the kit dir they exercise, so a records-only commit runs only the legs that check this repo's actual
+state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —
+an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
 is still available — but `.githooks/pre-push` no longer sets it unconditionally. It DECIDES, forcing a
 total run when no recorded full green covers the pushed tip, when that green is more than a declared
 number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, or
@@ -493,7 +494,8 @@ bounded pool whose width is DECLARED rather than computed: `tools/run-gates/gate
 the detected cores and RAM to a named row of knobs, the runner prints the row it chose before the
 first leg verdict, and `GATE_JOBS` overrides the width alone. Legs are safe together because each
 heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
-scheduled longest-first from a timing cache at `<git-dir>/gate-timings.tsv`, while REPORTING is
+scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
+while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
 clock only. Measured on node `a`: the full bar costs 873 s of wall clock against a 4018 s leg-sum,
 so concurrency is already paying and a single leg is most of what remains. Every leg's output is persisted
