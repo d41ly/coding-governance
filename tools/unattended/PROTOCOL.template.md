@@ -351,7 +351,14 @@ what preserves the strong claim wherever the strong claim is available.
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
   is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
-  faked. A re-declaration widens or no-ops; it never narrows.
+  faked. A re-declaration of a pass that is still OPEN widens or no-ops; it never narrows.
+  Once that pass has COMMITTED, a further declaration of the same unit is a new pass — M6
+  sanctions several pass kinds per unit — and is recorded as its own row rather than judged
+  against the previous one. The driver distinguishes the two by whether the new set overlaps
+  the old: a narrowing is a strict subset and always overlaps, so it is still refused; a
+  disjoint set is a new pass. A new pass whose set PARTLY overlaps its predecessor is read as
+  a narrowing and refused, which is the conservative direction and is stated here rather than
+  discovered.
 
 ## 8. What a project declares
 

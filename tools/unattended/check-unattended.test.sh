@@ -1353,19 +1353,32 @@ printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
 hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
 
-# F: BOTH IDS IN ONE FIXTURE, which is the whole of this arm. The first version declared only
-# `ARCH-tRun-10`, so no shorter id existed for a substring match to over-reach, and it passed
-# identically against the un-anchored leg — `fixture-passes-by-finding-nothing`, and the direct
-# reason the surviving substring site in the ambiguity arm went unnoticed by an otherwise thorough
-# sweep.
+# F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
+# versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
+# parks its two ids at different anchors never reaches the comparison it claims to pin — and reverting
+# the anchoring left the whole suite green. `ARCH-tRun-1` is a prefix of `ARCH-tRun-10`, so under an
+# unanchored `case ... in *"$dssunit"*` the `-10` commit reads as naming `-1` too and a correct run is
+# refused for ambiguous attribution.
+gdrows() {             # unit1 · paths1 · unit2 · paths2 — both rows at the CURRENT anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$3" "$4" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1 and $3" --no-verify
+}
 reset_tree
-drow ARCH-tRun-1 "work/one.txt"
-drow ARCH-tRun-10 "work/ten.txt"
-mkdir -p work && printf 'a\n' > work/one.txt
-git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-printf 'b\n' > work/ten.txt
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-10 "work/ten.txt"
+mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
-miss "$(run)" "check 23 FAILED"
+out=$(run)
+miss "$out" "one commit names two passes of the same dispatch group"
+miss "$out" "check 23 FAILED"
+# ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
+# names both passes IS ambiguous, and the refusal must fire.
+reset_tree
+gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 build together" --no-verify
+hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
 
 # ...declaring MORE than you use is conservative and fine
 reset_tree

@@ -1875,6 +1875,11 @@ out=$(run --landed tRun)
 hit "$out" "anchor LOCAL"
 same "the local arm witnesses the commit it validated" \
   "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$RUNTIP"
+# ...and the MESSAGE names the same commit the record does. It printed `$head` while writing `$wit`,
+# so the operator was told one sha and the terminal record kept another — and reverting that fix left
+# the whole suite green, which is a repair nothing was holding.
+hit "$out" "witness $RUNTIP"
+miss "$out" "witness $HEADNOW"
 # ...and that is a DIFFERENT commit from HEAD, or the arm above proves nothing.
 [ "$RUNTIP" != "$HEADNOW" ] \
   || { echo "FAIL the witness fixture left HEAD and the branch tip equal, so it cannot tell the two apart"; st=1; }
@@ -2499,6 +2504,87 @@ run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev
 git add -A && git commit -q -m "chore: park the run-state" --no-verify
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "--dispatch re-declares a pass with a path the earlier declaration carried and this one drops, and narrowing a declaration after the fact is how a write gets hidden; widening is the repair, narrowing is not:"
 reset_tree
+
+# ---- B1: THE DECLARATION COMMIT'S REAL SHAPE. The round-2 arm committed RUN.md alone, and the
+# ---- openness filter subtracted exactly that one path — so a declaration commit made the ordinary
+# ---- way, `git add -A` with a regenerated index or a formatter fix riding along, closed the pass at
+# ---- declaration time and condition 1 proved disjointness against nobody. Two shapes, because they
+# ---- fail differently: with the extra file OUTSIDE the declared set the leg reds downstream, and
+# ---- with it INSIDE nothing anywhere reports the collision.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
+mkdir -p work && printf 'x\n' > work/unrelated.txt
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/shared >/dev/null 2>&1
+mkdir -p work/shared && printf 'x\n' > work/shared/inside.txt
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+# ...and the BOUNDARY, stated rather than wished away: a commit that writes INSIDE the declared
+# lane closes the pass, even when it also carries the declaration. "Has this pass committed yet"
+# cannot tell "wrote its work" from "wrote some of it and continues", and nothing in the record
+# can. This arm pins the answer the code actually gives, so a later reader is not misled by
+# silence into thinking the stricter reading was implemented.
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/shared)" "no sibling pass is open"
+
+# ---- ...and a proof over NOBODY announces itself, so an empty sibling set is visible in the run log
+# ---- rather than byte-identical to a proof over somebody.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/first)" "no sibling pass is open, so condition 1 is a proof over an empty set"
+
+# ---- B2: A LEGAL SECOND PASS OF ONE UNIT IS NOT A NARROWING. M6 defines several pass kinds per unit
+# ---- and a pass that produced no change commits nothing, so its row stays open for the rest of the
+# ---- run. Keyed on the unit alone, every later pass of that unit was refused — terminally, because
+# ---- an unattended run has no owner turn. A stall, shipped by the build whose subject is stalls.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/spec >/dev/null 2>&1
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/build)
+hit "$out" "dispatch declared"
+miss "$out" "narrowing is not"
+n=$((n+1))
+[ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
+  || { echo "FAIL the legal second pass did not park its own row, so the leg has one declaration for two passes"; st=1; }
+# ...and a NARROWING still is one. A strict subset always overlaps, so it enters the branch and is
+# refused even after HEAD has moved — which is the property the overlap gate had to preserve.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one --writes work/two >/dev/null 2>&1
+git add -A && git commit -q -m "chore: park the run-state" --no-verify
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/one)" "narrowing is not"
+
+# ---- B3: THE RECORD CARRIES ONE SPELLING. Normalised for the refusals and parked raw, `work/sub/`
+# ---- passed every guard and was then graded as a literal by the leg, which reds forever with
+# ---- narrowing refused and no in-band repair.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/sub/ --writes ./work/other >/dev/null 2>&1
+n=$((n+1))
+grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory/builds/tRun/RUN.md \
+  || { echo "FAIL the parked declaration kept a spelling the refusals never judged: $(grep ' ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md | tail -1)"; st=1; }
+
+# ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
+# ---- site reverted with the whole suite still green, which is a repair nothing was holding.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+cp .unattended.conf .unattended.conf.bak
+printf '\nGENERATED_INDEXES="work/idx.md:work/gen"\n' >> .unattended.conf
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/idx.md --writes work/gen)" "--dispatch declares a generated index together with its generator"
+# ...and the CONTAINING spelling of each half, which is the direction `covers` could not see.
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/idx.md --writes work)" "--dispatch declares a generated index together with its generator"
+# ...and the index ALONE is still accepted, which is the reading M6 retracted and must stay retracted.
+miss "$(run --dispatch tRun --pass ARCH-tRun-3 --writes work/idx.md)" "--dispatch declares a generated index together with its generator"
+mv .unattended.conf.bak .unattended.conf
+
+# ---- L2: THE MISSING-LIBRARY REFUSAL, observed. Landed unobserved in both scripts and sitting
+# ---- outside every armed population, it is the one branch whose failure mode is a silent exit 2.
+n=$((n+1))
+_nolib=$(mktemp -d); cp "$SCRIPT" "$_nolib/unattended.sh"
+_out=$(cd "$_nolib" && bash ./unattended.sh --status tRun 2>&1); _rc=$?
+case "$_out" in
+  *"the kit library is missing beside this script"*) : ;;
+  *) echo "FAIL the driver ran without its library instead of refusing: rc=$_rc out=$_out"; st=1 ;;
+esac
+n=$((n+1)); [ "$_rc" = 2 ] || { echo "FAIL the missing-library refusal did not exit 2: got $_rc"; st=1; }
+rm -rf "$_nolib"
 
 hit "$(run --dispatch tRun --pass notanid --writes tools/a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"

@@ -2245,10 +2245,31 @@ verb_dispatch() { # slug · unit · writes...
       _g=${_i%% *}; _u=${_i#* }
       # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
       # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
-      pass_commit "$_g" "$_u" "$rel" >/dev/null && continue
+      _pcommit=$(pass_commit "$_g" "$_u" "$rel" || true)
+      if [ -n "$_pcommit" ]; then
+        # ...AND THAT COMMIT MUST HAVE WRITTEN INSIDE THE ROW'S DECLARED SET before it closes the
+        # pass. Subtracting the run-state file alone is not enough: a declaration commit made with
+        # `git add -A` carries a regenerated index or a formatter fix alongside it, names the unit
+        # because it is about that unit, and closed the pass at declaration time. That is the
+        # ordinary commit shape a run produces, not an exotic one.
+        _decl=${_r#* · reason }
+        _wrote=$(GIT diff-tree --no-commit-id --name-only -r "$_pcommit" 2>/dev/null || true)
+        _hit=""
+        for _dp in $_decl; do
+          for _wp in $_wrote; do overlaps "$_dp" "$_wp" && { _hit=1; break 2; }; done
+        done
+        [ -n "$_hit" ] && continue
+      fi
       printf '%s\n' "$_r"
     done)
   sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
+  # A PROOF OVER NOBODY SAYS SO. The condition-1 loop below iterates the sibling rows and returns
+  # success over zero of them, which is byte-indistinguishable from a proof over somebody — and an
+  # empty sibling set is exactly what both openness defects produced. A probe that cannot move must
+  # announce it (§7), so the run log carries the difference even when the verdict cannot.
+  if [ -z "$(printf '%s' "$sibrows" | tr -d '[:space:]')" ]; then
+    echo "unattended: dispatch — no sibling pass is open, so condition 1 is a proof over an empty set for $unit" >&2
+  fi
   for pair in ${GENERATED_INDEXES:-}; do
     idx=${pair%%:*}; gen=${pair#*:}
     [ "$idx" = "$pair" ] && continue
@@ -2288,7 +2309,12 @@ SIBS
   # REPLACES, which is the widening repair the leg's own fork resolution commits this build to; a
   # NARROWING is refused, because narrowing a declaration after the fact is how a pass would hide a
   # write it had already made.
-  want=$(printf '%s ' "$@"); want=${want% }
+  # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
+  # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
+  # through the driver and then redded the leg permanently.
+  want=""
+  for p in "$@"; do want="$want $(normpath "$p")"; done
+  want=${want# }
   # KEYED ON THE UNIT'S OPEN ROW, not on the current HEAD. `$grp` moves the moment the run commits
   # its own declaration, and a lookup keyed on it then finds nothing and admits a NARROWING as a
   # first declaration — which is the one thing this rule exists to refuse. `sibrows` already holds
@@ -2298,6 +2324,29 @@ SIBS
       _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
       [ "${_i#* }" = "$unit" ] && printf '%s\n' "$_r"
     done | tail -1)
+  # ...AND A ROW AT ANOTHER ANCHOR IS ONLY A RE-DECLARATION IF IT SHARES PATHS WITH THIS ONE. Keying
+  # on the unit alone made every later pass of that unit a narrowing of the first: M6 sanctions
+  # several pass kinds per unit, a pass that produced no change never commits, and its row therefore
+  # stays open for the rest of the run. The next pass of that unit was then refused, terminally,
+  # because an unattended run has no owner turn to override it — a stall shipped by the build whose
+  # whole subject is stalls.
+  #
+  # A NARROWING IS A STRICT SUBSET, so it always overlaps and is still refused after HEAD has moved.
+  # A genuinely new pass with a disjoint set falls through and parks a fresh row at the current
+  # anchor, which is the state the leg's own (group, unit) key already grades. The residual is a new
+  # pass that PARTLY overlaps its predecessor: it is read as a narrowing and refused, which is the
+  # conservative direction — refusing a legal declaration is visible, mis-grading one is not.
+  if [ -n "$cur" ]; then
+    curpaths=${cur#* · reason }
+    curgrp=${cur#* dispatch · item }; curgrp=${curgrp%% *}
+    if [ "$curgrp" != "$grp" ]; then
+      _shares=""
+      for q in $curpaths; do
+        for p in "$@"; do overlaps "$p" "$q" && { _shares=1; break 2; }; done
+      done
+      [ -n "$_shares" ] || cur=""
+    fi
+  fi
   if [ -n "$cur" ]; then
     curpaths=${cur#* · reason }
     # THE WIDENED ROW KEEPS THE SUPERSEDED ROW'S ANCHOR, and this is the whole of what makes the leg
@@ -2311,7 +2360,6 @@ SIBS
     # its row, `cur` is empty, and this branch is not reached at all — so a widening that arrives
     # after the write lands as a NEW row at a new anchor and does not supersede anything. The leg
     # then still grades the original narrow declaration against the commit, and still reds.
-    curgrp=${cur#* dispatch · item }; curgrp=${curgrp%% *}
     if [ "$curpaths" = "$want" ]; then
       echo "unattended: dispatch already declared, unchanged — $unit"
       return 0

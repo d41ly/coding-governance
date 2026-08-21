@@ -1135,7 +1135,10 @@ DSSIBS
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       dsok=0
       for dsp in $dsdecl; do
-        case "$dsq" in "$dsp"|"$dsp"/*) dsok=1; break ;; esac
+        # THROUGH THE LIBRARY, which normalises. A bare `case` graded the recorded spelling as a
+        # literal, so a declaration the driver accepted as `work/sub/` matched nothing the commit
+        # touched and redded this leg permanently, with narrowing refused and no in-band repair.
+        covers "$dsp" "$dsq" && { dsok=1; break; }
       done
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done

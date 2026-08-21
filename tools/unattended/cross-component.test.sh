@@ -95,6 +95,33 @@ out=$(leg); rc=$?
 same "arm 3: the leg accepts a run-branch anchor, exit code" "$rc" "0"
 same "arm 3: the leg accepts a run-branch anchor, output" "$out" ""
 
+# ---- ARM 3b: THE DRIVER MUST NOT REFUSE WHAT ITS OWN LEG CALLS LEGAL. This is the class that produced
+# ---- a terminal stall: `check-unattended.sh` states in capitals that it is keyed on (group, unit)
+# ---- BECAUSE one unit legitimately owns several rows at several anchors, while the driver had been
+# ---- re-keyed on the unit alone and refused the second row as a narrowing. An unattended run has no
+# ---- owner turn, so that refusal ends the unit.
+# ----
+# ---- It lives HERE and not in either suite because the defect is exactly the disagreement between
+# ---- the two, and a fixture that hand-writes its rows with `drow` cannot see it: drive the DRIVER,
+# ---- then run the LEG over what the driver actually produced, and assert both are quiet.
+out=$(drive --dispatch tRun --pass ARCH-tRun-1 --writes work/spec)
+hit "$out" "dispatch declared"
+git add -A >/dev/null && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+# The first pass produced NO change, which M6 sanctions and the leg has its own arm for, so nothing
+# ever commits for it and its row stays open. The next pass kind of the SAME unit must still declare.
+out=$(drive --dispatch tRun --pass ARCH-tRun-1 --writes work/build)
+hit "$out" "dispatch declared"
+miss "$out" "narrowing is not"
+n=$((n+1))
+[ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
+  || { echo "FAIL the driver did not park a second row, so the leg has one declaration for two passes"; st=1; }
+git add -A >/dev/null && git commit -q -m "ARCH-tRun-1 declare second dispatch" --no-verify
+git push -qf origin unit
+out=$(leg); rc=$?
+same "arm 3b: the leg is silent over what the driver produced, exit code" "$rc" "0"
+same "arm 3b: the leg is silent over what the driver produced, output" "$out" ""
+
+
 # ---- ARM 4a/4b: the SCOPE-INTEGRITY seam, RE-AIMED by the aBoundedVerdict merge. These arms were
 # ---- written against the AUTHORED `roster:units` pair and byte-equality; TOOL-aBoundedVerdict-11 S6
 # ---- moved the authorization subject to the GENERATED `gen:build-units` region and compares unit-ID
@@ -146,7 +173,9 @@ sed -i 's/^mode: prompt$/mode: slug/' memory/builds/tPrompt/RUN.md
 git add -A >/dev/null && git commit -q -m "forged mode" --no-verify && git push -qf origin unit2
 hit "$(leg)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 
-FLOOR_ASSERTIONS=13
+FLOOR_ASSERTIONS=19
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
+
+
 exit "$st"
