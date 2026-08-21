@@ -22,6 +22,14 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
 placeholders = []
 
+# the playbook template. Placeholder-free like the protocol, so the
+# adopter copies it rather than rendering it.
+[[files]]
+include = ["PLAYBOOK-TEMPLATE.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+placeholders = []
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"
@@ -53,6 +61,20 @@ name = "unattended kit gate"
 argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
 red_after_land = true
+
+# the playbook validity leg. No guard: it grades an adopter's playbooks and
+# the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
+# change a playbook.
+[[gate_leg]]
+name = "playbook validity gate"
+argv = ["bash", "{kit}/check-playbook.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
+name = "playbook validity selftest"
+argv = ["bash", "{kit}/check-playbook.test.sh"]
+guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "unattended skill wiring"
@@ -115,7 +137,10 @@ pattern = "{kit}/.unattended.conf.example"
 why = "the adopter copies it verbatim into the line above"
 [[lf_pin]]
 pattern = "{kit}/*.md"
-why = "the protocol is byte-compared against the shipped copy"
+why = "the protocol and the playbook template are byte-compared against the shipped copies"
+[[lf_pin]]
+pattern = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
+why = "an installed artifact its own adopter byte-compares"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

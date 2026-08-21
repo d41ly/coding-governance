@@ -111,6 +111,15 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # project-selectable scope is narrowing wearing a different name.
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
+# the AUTHORIZATION MODE set, published as a constant so it is spelled
+# ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
+# compare two records carrying the same misspelling and agree with both: it asked whether they
+# MATCH and never whether either is LEGAL. Kit-owned like the three sets below it, with no
+# `MODES_EXTRA` - a project-declarable authorization discipline is one nobody wrote. No floor
+# either: the sets below pin a shrink-only count because a project may EXTEND them, and nothing
+# extends this one, so a pin here would guard a variable only this kit moves.
+AUTH_MODES="slug prompt recipe"
+
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
 # TOOL-cBriefedPilot-2 - the third instance of a shape that already had two. Unit 3's membership test
@@ -130,6 +139,13 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
   done
   printf 'all'
 }
+# the directive SCOPE set is DERIVED, never a second constant: a scope is
+# exactly "every run" or "a run in mode M", so `all` plus every member IS the set. Deriving it is
+# what stops the two disagreeing - a second literal would need editing in step with this one, and
+# the pair that already existed did not.
+scopes()      { printf 'all %s\n' "$AUTH_MODES"; }
+is_auth_mode(){ case " $AUTH_MODES " in *" $1 "*) return 0;; esac; return 1; }
+is_scope()    { case " $(scopes) " in *" $1 "*) return 0;; esac; return 1; }
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -239,6 +255,16 @@ AREF=""; ASHA=""; AURL=""
 # trusted_base, dod_met). It is EVIDENCE and never an input: nothing in this kit branches on the
 # recorded value, for the reason anchor-kind carries in its own comment.
 AUTH_MODE=""
+# fork 8's hybrid. The build README at BASE names the PLAYBOOK PATH and
+# the requested piece COUNT; the playbook at that same BASE carries the output globs and the piece
+# grain. The path must come from somewhere the run cannot have written, and the globs must travel
+# with the playbook - a playbook re-run next month must not depend on a run author retyping its
+# outputs correctly. Both are read ONLY in `recipe` mode; absent under any other mode is legal and
+# means nothing.
+AUTH_PLAYBOOK=""
+AUTH_PIECES=""
+AUTH_OUTPUTS=""
+AUTH_GRAIN=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -658,8 +684,12 @@ check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bo
   [ "$n" -gt 0 ] || return 0
   while [ "$i" -lt "$n" ]; do
     h=${WAIVE_ITEMS[$i]}; sc=$(scope_of "$h")
-    if [ "$sc" = prompt ] && [ "${AUTH_MODE:-}" != prompt ]; then
-      fail 45 "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it: $h"
+    # ANY mode scope, not the one literal. `all` binds every run; a scope
+    # naming a mode binds only a run of that mode. The test used to name `prompt` twice, so a
+    # handle scoped to a later member was silently unenforced - accepted rather than refused,
+    # which is the direction that loses.
+    if [ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]; then
+      fail 45 "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle $h, directive scope $sc, run mode ${AUTH_MODE:-unset}"
       return 1
     fi
     i=$((i + 1))
@@ -754,7 +784,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm
+  local slug="$1" base="$2" rel blob fmslug _fm _pb
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -783,19 +813,68 @@ check_authorization() { # slug · base
     NR == 1 { next }
     /^---[[:space:]]*\r?$/ { exit }
     /^slug:/ { v = $0; sub(/^slug:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "slug=" v; next }
-    /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }')
+    /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }
+    /^playbook:/ { v = $0; sub(/^playbook:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "playbook=" v; next }
+    /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
+  # out of the SAME scan. The `No second GIT show` rule above bounds THAT
+  # front-matter parse and is not a rule against reading a second FILE, which S2b does.
+  AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
+  AUTH_PIECES=$(printf '%s\n' "$_fm" | sed -n 's/^pieces=//p' | head -1)
   # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
   # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
   # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
   [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
-  case "$AUTH_MODE" in
-    prompt|slug) ;;
-    *) fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared: $AUTH_MODE"
-       return 1 ;;
-  esac
+  # MEMBERSHIP of the published set, and the message DERIVES the legal
+  # values from that same set. The refusal used to enumerate them in its own prose, so a third
+  # member would have left the sentence naming two and nothing would have reported the drift.
+  if ! is_auth_mode "$AUTH_MODE"; then
+    fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are $AUTH_MODES, declared: $AUTH_MODE"
+    return 1
+  fi
+  # the declaration seam, evaluated where the MODE exists and nowhere else.
+  # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
+  # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
+  # splitting its terms.
+  if [ "$AUTH_MODE" = recipe ]; then
+    if [ -z "$AUTH_PLAYBOOK" ]; then
+      fail 46 "a recipe-mode build README declares no playbook, and the mode is the discipline of FOLLOWING one, so there is nothing for this run to follow - add a playbook: key naming a repo-relative path at BASE"
+      return 1
+    fi
+    if ! _pb=$(GIT show "$base:$AUTH_PLAYBOOK" 2>/dev/null); then
+      fail 46 "a recipe-mode build README names a playbook that does not resolve at the pinned BASE, so the instructions this run would follow are not ones anything committed before it can vouch for - path and base follow: $AUTH_PLAYBOOK at $base"
+      return 1
+    fi
+    # The declaration block is unit 2's fenced TOML. Read for the two keys THIS unit owns; the rest
+    # belong to the units that read them and are parsed there.
+    AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
+    AUTH_GRAIN=$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
+    case "$_pb" in
+      *'```toml'*) ;;
+      *) fail 46 "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing: $AUTH_PLAYBOOK"
+         return 1 ;;
+    esac
+    case "$AUTH_OUTPUTS" in
+      ''|'[]') fail 46 "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against: $AUTH_PLAYBOOK"
+         return 1 ;;
+    esac
+    if [ -z "$AUTH_GRAIN" ]; then
+      fail 46 "the playbook at the pinned BASE declares no piece grain, and a grain is what says whether three changed files are three pieces or one, so refusing beats defaulting a count nobody declared: $AUTH_PLAYBOOK"
+      return 1
+    fi
+    if [ -z "$AUTH_PIECES" ]; then
+      fail 46 "a recipe-mode build README declares no piece count, so the run has no number to be measured against and the Definition-of-Done item that means it made what was asked would compare against nothing - add a pieces: key"
+      return 1
+    fi
+    case "$AUTH_PIECES" in
+      *[!0-9]*) fail 46 "a recipe-mode build README declares a non-numeric piece count, and defaulting or truncating one would put a number nobody wrote into the record the close is judged against - declared: $AUTH_PIECES"
+         return 1 ;;
+      0) fail 46 "a recipe-mode build README declares a piece count of zero, which asks for a run that produces nothing and would satisfy its own completeness check vacuously - declared: $AUTH_PIECES"
+         return 1 ;;
+    esac
+  fi
   if [ "$fmslug" != "$slug" ]; then
     fail 20 "the build README at the pinned BASE declares a different slug, so the folder was renamed or its README copied from another build and the authorization does not name this one: declared $fmslug, requested $slug"
     return 1
@@ -1490,6 +1569,16 @@ verb_preflight() { # slug · keepalive-id
   # global empty, and preflight has already refused by then - the default never reaches disk on a
   # run that got here without the read.
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
+  # the resolved binding, recorded so a later reader can tell WHICH
+  # playbook bound the run without re-deriving it, and so the leg has a recorded answer to
+  # SECOND-OPINION rather than a value only the driver ever saw. Recorded only in recipe mode:
+  # under any other mode there is no binding, and a blank fact would be a key that reads as
+  # configured while carrying nothing.
+  if [ "${AUTH_MODE:-}" = recipe ]; then
+    [ -n "$(fact "$rel" playbook)" ] || set_fact "$rel" playbook "$AUTH_PLAYBOOK" || return 1
+    [ -n "$(fact "$rel" pieces)" ]   || set_fact "$rel" pieces   "$AUTH_PIECES"   || return 1
+    [ -n "$(fact "$rel" grain)" ]    || set_fact "$rel" grain    "$AUTH_GRAIN"    || return 1
+  fi
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1

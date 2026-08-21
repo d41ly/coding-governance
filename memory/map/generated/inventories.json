@@ -56,6 +56,8 @@
       "playbook placeholder catalogue",
       "playbook render selftest",
       "playbook render wiring",
+      "playbook validity gate",
+      "playbook validity selftest",
       "pre-push self-test",
       "profile-bar selftest",
       "push-main self-test",
@@ -149,6 +151,7 @@
     ],
     "guides": [
       "BUILD-METHOD.md",
+      "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",
       "UNATTENDED-PROTOCOL.md"

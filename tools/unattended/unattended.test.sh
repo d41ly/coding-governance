@@ -122,6 +122,60 @@ readme tModeBad
 mutate memory/builds/tModeBad/README.md '/^slug: tModeBad$/a authorized-by: banana'
 readme tModeOk
 mutate memory/builds/tModeOk/README.md '/^slug: tModeOk$/a authorized-by: prompt'
+# the DECLARATION SEAM fixtures. All on MAIN, for tFresh's reason: the seam
+# is read at BASE, so a fixture authored on the unit branch tests the authorization refusal instead
+# of the seam and proves nothing about it.
+mkdir -p content
+cat > content/pb.md <<'PBEOF'
+# a playbook
+
+```toml
+step_selector = "^\\*\\*[A-Z][0-9]+\\."
+step_floor   = 1
+outputs      = ["content/pieces/**"]
+grain        = "content/pieces/*/index.md"
+curated      = "t 2026-08-01"
+```
+PBEOF
+# A playbook whose block omits the grain, and one with no block at all. Two files rather than one
+# because the two refusals are different messages and an arm that cannot tell them apart is an arm
+# that would pass on either.
+cat > content/pb-nograin.md <<'PBEOF'
+# a playbook
+
+```toml
+outputs = ["content/pieces/**"]
+```
+PBEOF
+printf '# a playbook with no declaration block at all\n' > content/pb-noblock.md
+# A block carrying a grain and NO outputs. The refusal order is block, then outputs, then grain, so
+# a fixture missing both would never reach the outputs branch and its arm would prove nothing.
+cat > content/pb-noout.md <<'PBEOF'
+# a playbook
+
+```toml
+grain = "content/pieces/*/index.md"
+```
+PBEOF
+git add content >/dev/null
+readme tRecipeOk
+mutate memory/builds/tRecipeOk/README.md '/^slug: tRecipeOk$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3'
+readme tRecipeNoPb
+mutate memory/builds/tRecipeNoPb/README.md '/^slug: tRecipeNoPb$/a authorized-by: recipe'
+readme tRecipeGonePb
+mutate memory/builds/tRecipeGonePb/README.md '/^slug: tRecipeGonePb$/a authorized-by: recipe\nplaybook: content/nope.md\npieces: 3'
+readme tRecipeNoBlock
+mutate memory/builds/tRecipeNoBlock/README.md '/^slug: tRecipeNoBlock$/a authorized-by: recipe\nplaybook: content/pb-noblock.md\npieces: 3'
+readme tRecipeNoOut
+mutate memory/builds/tRecipeNoOut/README.md '/^slug: tRecipeNoOut$/a authorized-by: recipe\nplaybook: content/pb-noout.md\npieces: 3'
+readme tRecipeNoGrain
+mutate memory/builds/tRecipeNoGrain/README.md '/^slug: tRecipeNoGrain$/a authorized-by: recipe\nplaybook: content/pb-nograin.md\npieces: 3'
+readme tRecipeNoN
+mutate memory/builds/tRecipeNoN/README.md '/^slug: tRecipeNoN$/a authorized-by: recipe\nplaybook: content/pb.md'
+readme tRecipeBadN
+mutate memory/builds/tRecipeBadN/README.md '/^slug: tRecipeBadN$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: banana'
+readme tRecipeZeroN
+mutate memory/builds/tRecipeZeroN/README.md '/^slug: tRecipeZeroN$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: 0'
 # review M1's subject: a README whose generated marker pair is UNPAIRED. On MAIN for tFresh's
 # reason - authored on the unit branch it never resolves at BASE, so check_authorization refuses
 # first and the region validation this arm is about is never reached. Measured.
@@ -2177,7 +2231,7 @@ reset_tree
 # ---- nothing" are two claims - and this branch sits BEFORE the write gate precisely so both hold.
 reset_tree
 out=$(run --preflight tModeBad --keepalive-id k1)
-hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set of prompt and slug, and defaulting an unrecognised mode would select a discipline nobody declared"
+hit "$out" "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are"
 same "check 44 created no run-state file" "$([ -f memory/builds/tModeBad/RUN.md ] && echo yes || echo no)" "no"
 
 # ---- the PASSING direction, which is the only thing that tells a WORKING reader from a dead one:
@@ -2188,6 +2242,54 @@ out=$(run --preflight tModeOk --keepalive-id k1)
 hit "$out" "preflight OK"
 hit "$(cat memory/builds/tModeOk/RUN.md)" "mode: prompt"
 git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
+
+# ---- the declaration seam. SIX refusals, each with its own message,
+# ---- because a single ANDed verdict sends a reader to diff a parse against a path. Every arm is
+# ---- paired with a no-write assertion for check 44's reason: "it printed a refusal" and "it changed
+# ---- nothing" are two claims, and this block sits before the write gate so both hold.
+reset_tree
+out=$(run --preflight tRecipeNoPb --keepalive-id k1)
+hit "$out" "a recipe-mode build README declares no playbook, and the mode is the discipline of FOLLOWING one, so there is nothing for this run to follow - add a playbook: key naming a repo-relative path at BASE"
+same "no playbook: created no run-state file" "$([ -f memory/builds/tRecipeNoPb/RUN.md ] && echo yes || echo no)" "no"
+
+reset_tree
+hit "$(run --preflight tRecipeGonePb --keepalive-id k1)" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE, so the instructions this run would follow are not ones anything committed before it can vouch for - path and base follow:"
+
+reset_tree
+hit "$(run --preflight tRecipeNoBlock --keepalive-id k1)" "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing:"
+
+reset_tree
+hit "$(run --preflight tRecipeNoOut --keepalive-id k1)" "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against:"
+
+reset_tree
+hit "$(run --preflight tRecipeNoGrain --keepalive-id k1)" "the playbook at the pinned BASE declares no piece grain, and a grain is what says whether three changed files are three pieces or one, so refusing beats defaulting a count nobody declared:"
+
+reset_tree
+hit "$(run --preflight tRecipeNoN --keepalive-id k1)" "a recipe-mode build README declares no piece count, so the run has no number to be measured against and the Definition-of-Done item that means it made what was asked would compare against nothing - add a pieces: key"
+
+reset_tree
+hit "$(run --preflight tRecipeBadN --keepalive-id k1)" "a recipe-mode build README declares a non-numeric piece count, and defaulting or truncating one would put a number nobody wrote into the record the close is judged against - declared:"
+
+reset_tree
+hit "$(run --preflight tRecipeZeroN --keepalive-id k1)" "a recipe-mode build README declares a piece count of zero, which asks for a run that produces nothing and would satisfy its own completeness check vacuously - declared:"
+
+# ---- THE PASSING DIRECTION, which is what tells a working seam from one that refuses everything.
+# ---- Seven refusal arms and no pass arm would be satisfied by a seam that rejects every recipe run,
+# ---- and that seam would look exactly this green.
+reset_tree
+out=$(run --preflight tRecipeOk --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tRecipeOk/RUN.md)" "mode: recipe"
+git rm -q --cached memory/builds/tRecipeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tRecipeOk/RUN.md
+
+# ---- THE OTHER-MODE DIRECTION. A slug-mode README carrying these keys is accepted and the keys are
+# ---- ignored, which is asserted rather than assumed: the seam is gated on the mode, and a gate that
+# ---- fires on every mode would red every adopter's existing builds.
+reset_tree
+out=$(run --preflight tFresh --keepalive-id k1)
+hit "$out" "preflight OK"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
+reset_tree
 
 # ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
 # ---- tFresh, an untouched fixture, so the arm cannot pass because of something this unit wrote.
@@ -2204,7 +2306,7 @@ reset_tree
 # ---- always does. These arms are what prove it is evaluated where the mode exists.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
-hit "$out" "--waive names a directive scoped to prompt-authorized runs while this run is not one, so the waiver would record the relaxation of a rule that never bound it:"
+hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
 same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
 
 # ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken

@@ -153,6 +153,13 @@ hit "$out" "LANDER"
 reset_tree; sed -i 's/^PHASES_CORE=.*/PHASES_CORE=unparseable/' tools/unattended/unattended.sh
 hit "$(run)" "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set"
 
+# ---- a FOURTH branch, separate from the one above because an empty mode
+# ---- vocabulary is a different failure. The other core sets stay readable, so the leg runs on and
+# ---- every mode-membership test passes over nothing - a green that means the opposite of what it
+# ---- looks like, which is exactly why it refuses instead of carrying on.
+reset_tree; sed -i 's/^AUTH_MODES=.*/AUTH_MODES=unparseable/' tools/unattended/unattended.sh
+hit "$(run)" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true"
+
 # ---- checks 2 and 3: the CORE sets are one-directional. Deleting a member reds; ADDING a project
 # ---- member is green — and that green half is the arm that keeps the check from being "the sets
 # ---- must be exactly the core sets", which would make PHASES_EXTRA and DOD_EXTRA unusable.
@@ -1072,6 +1079,60 @@ anchor_restore
 # ---- absence. tRun's pristine record is exactly such a file.
 reset_tree
 miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+
+# ---- MEMBERSHIP, which is a different question from agreement and needs
+# ---- its own arm because the fixture that proves it is the one the agreement arm CANNOT see.
+# ----
+# ---- THE AGREEING-MISSPELLING case. Both sides carry the SAME illegal value, so the agreement
+# ---- branch is satisfied and says nothing; before this unit the check passed here, which is the
+# ---- whole defect - it asked whether two values MATCH and never whether either was LEGAL. This
+# ---- arm therefore asserts the membership message HITS and the agreement message MISSES: an arm
+# ---- that only asserted a red would have passed on the old code for the wrong reason.
+add_bad_mode() { sed -i '/^slug: /a authorized-by: slugg' memory/builds/tRun/README.md; }
+anchor_break add_bad_mode
+sed -i '/^base: /a mode: slugg' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit  "$(run)" "a run-state file records an authorization mode outside the kit's published set, so the discipline it names is one no kit member defines - legal values are"
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+anchor_restore
+
+# ---- THE README SIDE. MEASURED while writing this arm: the whole mode block is guarded by
+# ---- `[ -n "$recmode" ]`, so a SILENT record never computes `dmode` and this branch is unreachable
+# ---- from any fixture whose record carries no mode. That guard is correct — a legacy record is
+# ---- outside the arm by construction — and it means the fixture must pair a LEGAL recorded mode
+# ---- with an ILLEGAL declared one. The agreement branch fires too on that pair, which is expected;
+# ---- this arm asserts only its own message, because asserting the absence of the other would be
+# ---- asserting a coincidence rather than a behaviour.
+anchor_break add_bad_mode
+sed -i '/^base: /a mode: slug' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run)" "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are"
+anchor_restore
+
+# ---- the DECLARATION SEAM second-opinioned. The record claims a
+# ---- playbook and a count the README at its own BASE does not declare. Two branches, two
+# ---- fixtures, because one arm asserting either message would pass on whichever fired.
+add_recipe_seam() { sed -i '/^slug: /a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3' memory/builds/tRun/README.md; }
+anchor_break add_recipe_seam
+sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
+sed -i '/^base: /a playbook: content/other.md' memory/builds/tRun/RUN.md
+sed -i '/^base: /a pieces: 99' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+out=$(run)
+hit "$out" "a run-state file records a playbook the build README at its own recorded BASE does not name, so the instructions the run says bound it are not the ones its authorization pointed at - recorded against declared follow:"
+hit "$out" "a run-state file records a piece count the build README at its own recorded BASE does not declare, so the number the run will be measured against is not the number it was asked for - recorded against declared follow:"
+anchor_restore
+
+# ---- THE NEW MEMBER IS LEGAL. Without this the two arms above pass over a set that could have
+# ---- been narrowed to nothing, and a membership test against an empty vocabulary reds everything -
+# ---- which looks like rigour and is the vacuity this repo reds by name.
+add_recipe_mode() { sed -i '/^slug: /a authorized-by: recipe' memory/builds/tRun/README.md; }
+anchor_break add_recipe_mode
+sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
+git add -A >/dev/null
+miss "$(run)" "outside the kit's published set"
+miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
+anchor_restore
 reset_tree
 
 # TOOL-aPromptedMandate-2 - the PASS-KIND subset, joined both ways and guarded against its own
@@ -1114,7 +1175,7 @@ hit "$(run)" "the directive scopes the registry declares are not the scopes the 
 # green - the vacuity shape every other join in this leg carries a guard for.
 reset_tree; mutate tools/unattended/SKILL.template.md 's/ | all | D/ | D/; s/ | prompt | D/ | D/'
 out=$(run)
-hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds exactly all or prompt"
+hit "$out" "the Skill's directive table carries no scope cell this leg can read, so the scope join would compare the registry against nothing and pass by finding nothing; the cell it looks for holds one of:"
 miss "$out" "the agent is told which runs a rule binds by a table that disagrees"
 
 # G, the PROJECT's own extra rows carry no scope column and must NOT red: the kit never asked an
