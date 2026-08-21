@@ -20,4 +20,4 @@ terminal status. Nothing here is edited by hand.
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 11 |
-| [dUnstalledConvoy](builds/dUnstalledConvoy/README.md) | SPECCED | d | 2026-08-20 | tooling+playbook | 22 |
+| [dUnstalledConvoy](builds/dUnstalledConvoy/README.md) | SPECCED | d | 2026-08-20 | tooling+playbook | 23 |

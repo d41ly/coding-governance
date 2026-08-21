@@ -1,88 +1,93 @@
-# TOOL-dUnstalledConvoy-24 — a staged LANDING is a state the refusal can see, so it stops reading as a run that never closed
+# TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went
 
-**Status:** SPECCED · rev-1 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-21 · node d · Tier-2 · base d9728f89 · streams tooling
 
 ## 1. Goal
 
-`--close` STAGES the LANDING phase and nothing commits it. A run that then merges from another tree
-carries `BUILDING` into the merge, and `--landed` refuses with check 31 — reporting the COMMITTED
-phase and saying nothing about the staged one sitting in the index. The refusal is correct and its
-diagnosis is misleading, which is the worst combination a refusal can have.
+`--close` writes `LANDING` into the run-state file and STAGES it. Nothing commits it. A run that then
+merges from another tree carries the older phase into the merge, and `--landed` refuses with check 31.
+
+**rev-1 of this spec was wrong about why.** It claimed check 31 reports the COMMITTED phase while a
+staged `LANDING` sits unseen in the index. `fact()` reads the file on disk, so check 31 reports the
+WORKING-TREE phase and reported it truthfully. Verified against this build's own merge `c5da884`, whose
+run-state file carries `phase: BUILDING` with nothing staged; `LANDING` first appears as a commit at
+`8e1a81b`, in the other tree.
+
+The real defect is that the LANDING evaluation is confined to the tree that performed it, and the
+refusal — while accurate — names nothing that helps a run find it.
 
 ## 2. Scope (IN)
 
-- **S1 — check 31 reads the index as well as the tree.** When the committed phase is not `LANDING` but
-  the STAGED run-state file says `LANDING`, the refusal names that state and says the phase is staged
-  and uncommitted, rather than reporting the committed value alone.
-- **S2 — `--close`'s success message names the commit as the next step**, in the same line that already
-  names the lander. It currently ends at "Land with: …", which reads as though nothing is outstanding.
-- **S3 — the same reading for `--abort`**, which stages a terminal phase by the identical path and has
-  the identical trap. A fix that lands on one verb and not its sibling is the "more than one carrier"
-  defect this repo has now hit twice.
-- **S4 — an arm per state**, including the one that must NOT fire: a genuinely un-closed run at
-  `BUILDING` with nothing staged still gets today's message, unchanged.
+- **S1 — `--close`'s success message names committing the run-state file** as a step before the lander.
+  It ends at "Land with: …" today, which reads as though nothing is outstanding. This is the only item
+  that reaches the flow the incident actually took, and it is the primary fix.
+- **S2 — check 31's refusal enumerates the other worktrees** and names any whose run-state file for
+  this slug reads `LANDING`, so "your run is at BUILDING" becomes "this tree is at BUILDING; the LANDING
+  is uncommitted in `<path>`". When no other tree has one, the message is today's, unchanged.
+- **S3 — an arm per state, including the one that must NOT fire:** a genuinely un-closed run at
+  `BUILDING` with no other tree holding `LANDING` gets today's message verbatim.
 
 ## 3. Non-goals (OUT)
 
-- **`--close` committing the phase itself.** The kit deliberately never commits for the run: the run
-  owns its commits and the driver stages. Committing here would take an action the protocol reserves,
-  and it would do it at the one moment the run is about to hand off to a lander that expects a clean
-  index it controls.
-- Changing what check 31 REQUIRES. A run still reaches `LANDED` only from a committed `LANDING`, and
-  the phase still attests that `--close` evaluated the Definition of Done. This unit changes the
-  DIAGNOSIS, never the bar.
-- Any change to the DoD set, the attestation verbs, or the landing anchors.
+- **Reading the staged blob.** rev-1's S1. `git show :<path>` returns the same value as the working
+  tree for a clean tracked file, so the discriminator is empty in both trees of the recorded incident,
+  and the state it was written for is producible by no verb in the kit. An arm pinning a state the kit
+  cannot enter goes green while the trap stays — the shape this build has now shipped twice.
+- **`--abort` parity.** rev-1's S3 assumed `--abort` reaches check 31. It does not: `refuse_if_terminal`
+  fires check 26 first for an already-terminal record, and `--abort` is not a path to `LANDED` at all.
+  The claim was inherited from a mental model, not from the source.
+- **`--close` committing the phase itself.** The driver stages and the run commits; committing here
+  would take an action the protocol reserves, at the moment the run is about to hand a clean index to a
+  lander it controls.
+- Changing what check 31 REQUIRES. A run still reaches `LANDED` only from a `LANDING` phase in the tree
+  it is landing from. This unit changes what the refusal SAYS, never the bar.
 
 ## 4. Design
 
-The refusal today reads one source — the phase in the working tree — and reports it. The staged blob is
-a second source that already exists, is already what the run needs to act on, and is already reachable
-with `git show :<path>`. Reading it costs one command and turns "your run is at BUILDING" into "your
-run has LANDING staged and uncommitted; commit it, then run `--landed`".
+S1 is small and reaches the real flow. `--close` already prints the lander; adding the commit to that
+same line costs nothing and removes the step whose omission caused the incident.
 
-S3 is the load-bearing half of the scope rather than a courtesy. `--abort` reaches its terminal phase
-through `set_fact` + `stage_or_fail`, exactly as `--close` does, so the trap is identical; and an abort
-is the path a WEDGED run takes, which is precisely when a misleading refusal costs the most.
+S2 is the half that helps a run already in the hole. `git worktree list --porcelain` is cheap, the
+run-state path is derived from the slug the verb already holds, and reading each tree's copy is a file
+read. The refusal keeps its verdict and gains the one fact a run cannot otherwise get: which tree
+evaluated the Definition of Done. Without it the only recovery is to re-run `--close` on the merged
+tree, which is what this build did at the cost of a full bar.
 
-What this deliberately does not do is make the staged state acceptable. The phase is a machine-checked
-attestation that the DoD was evaluated, and a staged-but-uncommitted attestation is not one — it can be
-discarded by any `git restore` and leaves no record. So the refusal stays a refusal. It just explains
-itself.
+S3's negative arm is what stops S2 from swallowing the ordinary case. A run that never closed and a
+run whose close is stranded elsewhere are different states, and the message must distinguish them or it
+has replaced one misleading answer with another.
 
-The negative arm in S4 is what keeps this honest: a run at `BUILDING` with nothing staged must still
-get the ordinary message, or the new branch has swallowed the case it was written beside.
+What this deliberately does not do is make the stranded state acceptable. A phase attests that `--close`
+evaluated the Definition of Done in a specific tree; it does not transfer by being described. The
+refusal stays a refusal.
 
 ## 5. Production-readiness checklist
 
-- **security** — none. The refusal reads one more source and its verdict is unchanged; nothing becomes
-  reachable that was not.
-- **perf/scale** — one `git show :<path>` per refusal, on a path already known. The refusal path is not
-  hot.
+- **security** — none. The refusal reads worktree paths already listed by git and its verdict is
+  unchanged.
+- **perf/scale** — one `git worktree list` plus one file read per other tree, on a refusal path.
 - **a11y / i18n** — N/A.
-- **error/empty/loading states** — the staged blob may be absent (nothing staged) or unreadable (no
-  index entry); both fall back to today's message rather than erroring, and S4's negative arm pins it.
-- **observability** — the refusal text IS the observability here; that is the whole unit.
-- **testing/gates** — the driver self-test, plus the full bar.
+- **error/empty/loading states** — no other worktrees, a tree with no run-state file for this slug, or
+  an unreadable one all fall back to today's message; S3's negative arm pins the first.
+- **observability** — the refusal text IS the deliverable.
+- **testing/gates** — the driver self-test plus the full bar. The cross-tree arm needs a second
+  worktree in the fixture, which `adopt-unattended.test.sh` already demonstrates is buildable.
 - **migration/rollback** — message-only, no state, no conf key. Rollback is a revert.
-- **help/ docs** — `PROTOCOL.template.md` describes the close-then-land sequence; S2's message change is
-  a step it should name, so the protocol's sequence line is checked and updated if it implies the phase
-  is committed.
+- **help/ docs** — `PROTOCOL.template.md`'s close-then-land sequence gains the commit step S1 names.
 
 ## 6. Acceptance criteria
 
-- **AC1** — with `LANDING` staged and `BUILDING` committed, `--landed` refuses AND its message names the
-  staged phase and the missing commit, observed in `tools/unattended/unattended.test.sh`.
-- **AC2** — with `BUILDING` committed and NOTHING staged, `--landed` gives today's message unchanged,
-  observed in `tools/unattended/unattended.test.sh`.
-- **AC3** — `--close`'s success message names committing the run-state file as a step before the lander,
-  observed in `tools/unattended/unattended.test.sh`.
-- **AC4** — `--abort` carries the same staged-phase reading as `--close`, with its own arm, observed in
-  `tools/unattended/unattended.test.sh`.
-- **AC5** — the refusal still REFUSES in every staged case; no arm asserts a staged phase is accepted,
-  observed in `tools/unattended/unattended.test.sh`.
-- **AC6** — both new arms were observed RED against the pre-fix code, observed in
+- **AC1** — `--close`'s success message names committing the run-state file before the lander, observed
+  in `tools/unattended/unattended.test.sh`.
+- **AC2** — with a second worktree whose run-state file reads `LANDING` and this tree at `BUILDING`,
+  check 31's refusal names that tree's path, observed in `tools/unattended/unattended.test.sh`.
+- **AC3** — with this tree at `BUILDING` and no other tree holding `LANDING`, the refusal is today's
+  message verbatim, observed in `tools/unattended/unattended.test.sh`.
+- **AC4** — the refusal still REFUSES in every case above; no arm asserts a stranded `LANDING` is
+  accepted, observed in `tools/unattended/unattended.test.sh`.
+- **AC5** — both new arms were observed RED against the pre-fix code, observed in
   `2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md`.
-- **AC7** — the full bar is green, observed by `bash tools/run-gates/run-gates.sh`.
+- **AC6** — the full bar is green, observed by `bash tools/run-gates/run-gates.sh`.
 
 ## 7. Gates
 
@@ -90,21 +95,26 @@ get the ordinary message, or the new branch has swallowed the case it was writte
 
 ## 8. Open questions
 
-**F1 — should `--close` refuse to report success while its own write is unstaged or uncommittable?**
-RESOLVED: no. `--close` stages and that is its contract; a verb that policed the caller's commit
-discipline would be doing the caller's job and would still be defeated by a caller that simply does not
-commit. The refusal at `--landed` is the correct place to catch it, because that is where the missing
-commit actually matters.
+**F1 — should `--close` refuse to report success while its write is uncommitted?** RESOLVED: no. It
+stages, and that is its contract; a verb policing the caller's commit discipline would still be
+defeated by a caller that does not commit. `--landed` is where the missing commit actually matters.
+
+**F2 — is the cross-tree read worth its cost when most runs use one tree?** RESOLVED: yes, and the
+cost is bounded to the refusal path. A single-tree run enumerates one worktree and falls straight to
+today's message, which AC3 pins.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-21 · re-grounded after a spec review returned BLOCKED. rev-1's premise that check 31
+  reports the committed phase is false — `fact()` reads the file on disk — so its S1 discriminator was
+  empty in both trees of the incident and its AC1 pinned a state no verb can produce. `--abort` parity
+  was also wrong: check 26 fires first. S2 replaces the index read with a cross-tree one, which is
+  where the missing LANDING actually is.
 - rev-1 · 2026-08-21 · initial draft, written from the trap hit during `dUnstalledConvoy`'s own landing
-  on 2026-08-21, where the workaround was re-running `--close` on the merged tree at the cost of a full
-  bar.
+  without verifying how check 31 reads the phase.
 
 ## 10. Reuse audit
 
-`fact`/`set_fact` already read and write the run-state file, and the refusal already knows the path, so
-this reads the staged blob of a path it holds rather than introducing a locator. No new helper is
-needed unless S3 shows the two verbs want the same three lines, in which case one function in
-`lib-unattended.sh` serves both — which is the existing seam, not a new one.
+`runmd_of` already derives the run-state path from a slug and `fact` already reads a phase out of one,
+so S2 composes two existing helpers over a path list git supplies. No new helper unless S1 and S2 want
+the same lines, which they do not — one is an echo and the other a refusal.
