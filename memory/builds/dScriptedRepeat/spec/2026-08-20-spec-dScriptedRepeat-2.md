@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen
 
-**Status:** INPROGRESS · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -201,6 +201,8 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · CLOSED: built and landed on main at c8e0436, full bar GREEN 90/90 before
+  the merge and again over the merged tree.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

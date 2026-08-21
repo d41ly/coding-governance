@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined
 
-**Status:** INPROGRESS · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-4 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -148,6 +148,8 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-21 · CLOSED: built and landed on main at c8e0436, full bar GREEN 90/90 before
+  the merge and again over the merged tree.
 - rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.
