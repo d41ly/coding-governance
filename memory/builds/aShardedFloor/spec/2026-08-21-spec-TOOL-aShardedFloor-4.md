@@ -1,6 +1,6 @@
 # TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store
 
-**Status:** BLOCKED · rev-2 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
+**Status:** BLOCKED · rev-3 · 2026-08-21 · node a · Tier-2 · base 36d0ad3b · streams tooling
 
 ## 1. Goal
 
@@ -10,6 +10,19 @@ repository-wide store, keep the reuse KEY per-worktree, and SAY when the hint is
 Discharges `TOOL-aScannedThrottle-8`.
 
 **BLOCKED, and this is the unit's most important line.** It must not land alone. See §8.
+
+**RE-PRICED 2026-08-21, and the number this unit was justified by no longer holds.** Its siblings
+`TOOL-aShardedFloor-2` and `-3` removed the property the 15.6–16.3 % figure depended on: the bar
+was FLOOR-bound when that was measured and is THROUGHPUT-bound now. A controlled pair on the
+primary tree — same box, consecutive, hint absent then present — measures **38.5 s, 8.9 % of the
+cold span**, not ~160 s. The mechanism is confirmed unchanged (the floor leg moves from dispatch
+rank 59 at +98.6 s to rank 1 at +0.0 s); what shrank is what that buys, because packing recovers
+0.90 → 0.98 and the pool absorbs most of the late start. Evidence:
+[`build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md`](../build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md).
+
+This does not resolve §8's fork — it re-prices one side of it. The cost of shipping without a
+reserved short-leg slot is unchanged at 5.1 s → 669.1 s to first signal; the benefit is now 8.9 %
+rather than 16 %, so the trade the owner was asked to make is a different trade.
 
 ## 2. Scope (IN)
 
@@ -171,6 +184,11 @@ shard rename penalty worse, not better.
   (F17); the five source tokens and both header key names are spelled (F18); the worktree count is
   re-derived rather than quoted from a night it expired (F19); the four floor raises are named
   (F13); and the legacy-fallback-expiry fork joins §8 (F12's sibling).
+- rev-3 · 2026-08-21 · RE-PRICED, not resolved. Its siblings landed and removed the property this
+  unit's 15.6-16.3 % figure depended on — the bar was FLOOR-bound then and is THROUGHPUT-bound now.
+  A controlled pair measures 38.5 s / 8.9 %, roughly half. The mechanism is confirmed unchanged; the
+  price is not. §8's fork stands, but it is now a different trade: 8.9 % against the same 5.1 s to
+  669.1 s cost. Evidence in the build record named above. §1 carries the summary.
 
 ## 10. Reuse audit
 
