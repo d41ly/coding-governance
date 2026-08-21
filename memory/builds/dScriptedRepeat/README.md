@@ -236,7 +236,7 @@ ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dS
 |---|---|---|---|
 | [TOOL-dScriptedRepeat-1 — the mode vocabulary, published and joined](spec/2026-08-20-spec-dScriptedRepeat-1.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives](spec/2026-08-20-spec-dScriptedRepeat-10.md) | SPECCED | rev-4 | 2026-08-20 |
-| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | SPECCED | rev-5 | 2026-08-21 |
+| [TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment](spec/2026-08-20-spec-dScriptedRepeat-11.md) | INPROGRESS | rev-6 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | CLOSED | rev-4 | 2026-08-21 |

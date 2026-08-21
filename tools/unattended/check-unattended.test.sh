@@ -1258,7 +1258,7 @@ reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING 
 hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
 
-# ---- TOOL-dScriptedRepeat-9: check 22, the VERB SET across the documents that spell it. Each arm
+# ---- the proposal-kind unit: check 22, the VERB SET across the documents that spell it. Each arm
 # ---- removes ONE carrier and asserts THIS check speaks, because a leg that reds on everything arms
 # ---- every branch and checks nothing.
 reset_tree; mutate tools/unattended/unattended.sh '/^#   unattended[.]sh --propose /d'

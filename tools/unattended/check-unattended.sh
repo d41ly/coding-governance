@@ -974,7 +974,7 @@ if [ -f "$tmpl" ]; then
   fi
 fi
 
-# ---- 22: THE VERB SET, joined across the documents that spell it. TOOL-dScriptedRepeat-9 S6.
+# ---- 22: THE VERB SET, joined across the documents that spell it. the verb-carrier unit.
 # ----
 # ---- The driver DERIVES its own two prose carriers now - refusal 14 from the declaration, the usage
 # ---- text from the header - so this leg re-checks neither. What no runtime derivation can reach is a

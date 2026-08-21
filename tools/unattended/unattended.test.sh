@@ -176,6 +176,11 @@ readme tRecipeBadN
 mutate memory/builds/tRecipeBadN/README.md '/^slug: tRecipeBadN$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: banana'
 readme tRecipeZeroN
 mutate memory/builds/tRecipeZeroN/README.md '/^slug: tRecipeZeroN$/a authorized-by: recipe\nplaybook: content/pb.md\npieces: 0'
+# the playbook-authoring unit: the CREATE-AND-FOLLOW fixture. The README is on main so it resolves at
+# BASE under either anchor; the playbook it names is authored by the RUN, on the unit branch, which
+# is the ordering property's failing case and the reason creation is a separate run.
+readme tOwnPb
+mutate memory/builds/tOwnPb/README.md '/^slug: tOwnPb$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
 # review M1's subject: a README whose generated marker pair is UNPAIRED. On MAIN for tFresh's
 # reason - authored on the unit branch it never resolves at BASE, so check_authorization refuses
 # first and the region validation this arm is about is never reached. Measured.
@@ -1491,7 +1496,7 @@ git reset -q --hard HEAD~1; git clean -qfd
 out=$(run --frobnicate tRun)
 hit "$out" "unknown argument; the verbs are "
 miss "$out" "the verbs are :"
-# ---- TOOL-dScriptedRepeat-9 S6: every carrier joined to the ONE declaration, never to a list typed
+# ---- the verb-carrier unit: every carrier joined to the ONE declaration, never to a list typed
 # ---- here. S10's arm asserted a hand-written NINE-verb list and stayed green while --record-set
 # ---- shipped into the dispatch alone - a fixed list in a test cannot notice a verb nobody added to
 # ---- it, which is the same could-not-fail shape one level up from the defect it was written for.
@@ -2252,7 +2257,7 @@ hit "$out" "no run-state file, so there is no run to park a decision against"
 same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
-# ---- TOOL-dScriptedRepeat-9: `--propose`, the FIFTH parked kind. A recipe-mode run follows its
+# ---- the proposal-kind unit: `--propose`, the FIFTH parked kind. A recipe-mode run follows its
 # ---- playbook to the letter, so the one thing it must not do is improve that playbook mid-run: a run
 # ---- that rewrites the checklist it is graded by has no rules left. GREEN CONTROL, then the refusals.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -2471,6 +2476,75 @@ hit "$out" "preflight OK"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 reset_tree
 
+# ---- the playbook-authoring unit: THE ORDERING PROPERTY. A run that authors its own instructions and
+# ---- then follows them has no external check on either half, and every gate downstream would be
+# ---- grading a document that run wrote for itself. Both anchors, because the property has a machine
+# ---- half under one of them and none under the other, and a spec claiming a protection its own
+# ---- dogfood tree cannot fire is an assertion about nothing.
+own_pb() { # write the playbook the RUN authors, on the unit branch only
+  mkdir -p content
+  cat > content/pb-own.md <<'OWNEOF'
+# a playbook this run wrote for itself
+
+```toml
+outputs = ["content/own/**"]
+grain   = "content/own/*/piece.md"
+```
+OWNEOF
+  git add -A >/dev/null && git commit -q -m "the run authors its own playbook" --no-verify
+}
+
+# AC5, the `default-branch` anchor: BASE is a merge-base this run cannot move, the playbook is not
+# there, and preflight refuses.
+reset_tree; own_pb
+hit "$(run --preflight tOwnPb --keepalive-id k1)" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE, so the instructions this run would follow are not ones anything committed before it can vouch for - path and base follow:"
+same "the refused create-and-follow run wrote no record" "$([ -f memory/builds/tOwnPb/RUN.md ] && echo yes || echo no)" "no"
+
+# ...and the SAME tree under `published` is refused IDENTICALLY, which is the finding this arm exists
+# to pin. The second anchor is reached only when the build README does NOT resolve at the merge-base
+# — `resolve_base` takes the first anchor whenever it does — so a run whose build folder predates it
+# keeps `default-branch` semantics whatever the scope says, and the ordering property keeps its
+# machine half. The spec predicted the opposite; the arm was written and the prediction was wrong.
+reset_tree; scope published; own_pb
+git push -q -f origin unit 2>/dev/null
+hit "$(run --preflight tOwnPb --keepalive-id k1)" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE, so the instructions this run would follow are not ones anything committed before it can vouch for - path and base follow:"
+
+# AC5b, THE STATE THAT IS ACTUALLY UNPROTECTED: the run authors BOTH halves. Its build folder does
+# not resolve at the merge-base, so the second anchor applies and the BASE becomes the tip the run
+# itself pushed — and that tip carries the playbook the run just wrote. Nothing refuses it. That is
+# the `published` anchor's declared cost, reaching one step further than the protocol spells out:
+# a run that can author its own authorization can author the instructions it is judged against too.
+reset_tree; scope published
+readme tOwn2
+mutate memory/builds/tOwn2/README.md '/^slug: tOwn2$/a authorized-by: recipe\nplaybook: content/pb-own.md\npieces: 2'
+own_pb
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tOwn2 --keepalive-id k1)
+miss "$out" "a recipe-mode build README names a playbook that does not resolve at the pinned BASE"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tOwn2/RUN.md)" "anchor-kind: run-branch"
+reset_tree; git push -q -f origin unit 2>/dev/null
+
+# ---- AC6: the piece-scoped items' TERM ZERO, OBSERVED. Both are MET for a run that is not in recipe
+# ---- mode, and both ANNOUNCE the skip — which is the half that did not work: dod_met set the
+# ---- announcement and returned MET, and --close printed DOD_OUT under the UNMET arm only, so the
+# ---- skip was silent. A skip that looks like a pass is indistinguishable from coverage, which is
+# ---- what the announcing branch was written to prevent.
+reset_tree
+run --preflight tModeOk --keepalive-id k1 >/dev/null
+out=$(run --close tModeOk)
+hit "$out" "skipped — pieces-complete is scoped to recipe-mode runs and this run's recorded mode is prompt"
+hit "$out" "skipped — set-checks-recorded is scoped to recipe-mode runs and this run's recorded mode is prompt"
+# ...and neither is counted against the close. The items block nothing here; whatever else this
+# fixture's close is unmet for, it is not these.
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: pieces-complete"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
+# ...and EXACTLY TWO announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
+# so an item with nothing to say would otherwise inherit the previous item's text and print one
+# item's explanation under another item's name.
+same "exactly two skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "2"
+reset_tree
+
 # ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
 # ---- tFresh, an untouched fixture, so the arm cannot pass because of something this unit wrote.
 reset_tree
@@ -2520,7 +2594,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=502
+FLOOR_ASSERTIONS=515
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

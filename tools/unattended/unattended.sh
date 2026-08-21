@@ -62,7 +62,7 @@ KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
 # ------------------------------------------------------------------------------ THE VERB SET, ONCE
-# TOOL-dScriptedRepeat-9 S6. Four carriers used to type this set independently - the header
+# the verb-carrier unit. Four carriers used to type this set independently - the header
 # docstring, the usage line, refusal 14 and the dispatch - and THREE were stale the day this landed:
 # `--record-set` had shipped into the dispatch alone, which is precisely the drift a prior unit's own
 # comment claimed to have fixed. The dispatch now READS this line, so a verb missing from it does not
@@ -139,7 +139,7 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # override look like a check that failed.
 DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
-# TOOL-dScriptedRepeat-9 - the PARKED KINDS, closed and kit-owned like the three sets above it, and
+# the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
 # for the reason those are: a parked row whose kind is outside this set lands in a region every
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
@@ -1807,6 +1807,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
     is_overridden "$item" && continue
+    # CLEARED BEFORE THE CALL, not only after a print. `dod_met` does not clear it on entry, so an
+    # item that says nothing would otherwise inherit whatever the previous item left behind and
+    # attribute one item's explanation to another.
+    DOD_OUT=""
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
@@ -1832,6 +1836,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
 ' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
       fi
+    else
+      # the playbook-authoring unit - A MET ITEM WITH SOMETHING TO SAY SAYS IT. The piece-scoped items
+      # carry a term zero that is MET for every non-recipe run and sets DOD_OUT to announce the skip,
+      # under a comment reading "a silent pass is indistinguishable from coverage" - and the print
+      # above reached only the UNMET arm, so the announcement went nowhere and the skip was silent.
+      # The defect the announcing branch exists to prevent, one level up from where it was written,
+      # and found by an acceptance criterion asking to OBSERVE the announcement rather than the code.
+      [ -n "${DOD_OUT:-}" ] && printf 'unattended: %s
+' "$DOD_OUT"
+      DOD_OUT=""
     fi
   done
   [ "$unmet" = 0 ] || return 1
@@ -2220,7 +2234,7 @@ PARKED
   return 0
 }
 
-# TOOL-dScriptedRepeat-9 - the FIFTH parked kind, and the only one a pass writes for the OWNER's
+# the proposal-kind unit - the FIFTH parked kind, and the only one a pass writes for the OWNER's
 # benefit rather than its own. A `recipe`-mode run follows a playbook to the letter, so the one thing
 # it must not do is improve that playbook mid-run: a run that rewrites the checklist it is graded by
 # has no rules left. What it CAN do is say what it would change, joined to the step that provoked it,
@@ -2499,7 +2513,7 @@ while [ $# -gt 0 ]; do
             fail 14 "unknown argument; the verbs are $vl: $arg"; exit 1; fi ;;
   esac
 done
-# S10, and then TOOL-dScriptedRepeat-9 S6, because S10's fix did not hold: the three spellings were
+# S10, and then the verb-carrier unit, because S10's fix did not hold: the three spellings were
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
 # left here to re-synchronise.

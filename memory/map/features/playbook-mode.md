@@ -124,6 +124,11 @@ seam: the tracked FIXTURE pattern — reuse for any leg whose population can leg
 - `PLAYBOOK_GLOB` is read from the conf and is not yet used to widen the population — a playbook that
   carries no declaration block is invisible, which is intended for now and is the reason the block is
   what defines membership.
-- Units 10 and 11 are specced and unbuilt: the Skill's routing preamble with its four start paths,
-  the two playbook-scoped directives, and the playbook CREATION path. Until 11 lands, a project
-  adopting this mode writes its first playbook by hand from the shipped template.
+- Unit 10 is specced and unbuilt: the Skill's routing preamble with its four start paths, and the two
+  playbook-scoped directives. A reader arriving with no playbook reaches the creation section by
+  reading the Skill in order rather than by being routed there.
+- **A run authoring BOTH its own build folder and its own playbook, under `published`, is refused by
+  nothing.** Measured while building unit 11, against a spec sentence claiming the opposite in a wider
+  form. `resolve_base` reaches the second anchor only when the build README fails to resolve at the
+  merge-base, so the ordinary case keeps its refusal and the both-halves case does not. The protocol
+  records the reach and the Skill states the CHECK; there is no machine half for that one state.

@@ -43,6 +43,17 @@ KEEP="$TMP/keep.md"; cp "$F" "$KEEP"
 hitline=$(run | grep -c 'population 1 playbook' || true)
 [ "$hitline" = 1 ] && ok || bad "the leg did not report a population of exactly one over the seeded tree"
 
+# ---- the playbook-authoring unit, AC1: the population is TREE-DERIVED, and that is what makes a playbook
+# ---- gradeable from the commit that adds it — before any build README names it, and whether or not
+# ---- one ever does. A creation run's whole output is a playbook with no run bound to it yet; under
+# ---- the seam-derived predicate this replaced, that playbook was invisible to its own gate.
+n=$((n+1))
+[ -z "$(ls -A "$W/memory/builds" 2>/dev/null)" ] \
+  || bad "the scratch tree carries a build README, so 'graded with no README naming it' is not what the arm above observed"
+n=$((n+1))
+grep -qF -- "$W/tools/unattended/playbook.fixture.md" <<<"$(cd "$W" && git ls-files | sed "s|^|$W/|")" \
+  || bad "the fixture playbook is not tracked, and the leg reads git ls-files, so the population arm above passed over something else"
+
 probe() { # label · expected check · sed program · expected message signature
   cp "$KEEP" "$F"; ( cd "$W" && sed -i "$3" tools/unattended/playbook.fixture.md )
   out=$(run); r=$?
@@ -149,7 +160,7 @@ seed_out=$(run | grep -c 'canon 11 section' || true)
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=35
+FLOOR_ASSERTIONS=41
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

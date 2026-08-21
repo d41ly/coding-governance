@@ -182,6 +182,56 @@ override available and nobody to interpret it.
 `solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
 which is where the loop is stated.
 
+## Author a PLAYBOOK — creation, and owner-instructed amendment
+
+**A run that MAKES a playbook is not a run that FOLLOWS one, and it uses the PROMPT path above, not
+`recipe`.** It has no playbook to name, so a `recipe`-mode preflight refuses it outright; and its
+whole diff lands outside any declared output glob, which is the shape a content run is scoped to
+avoid. There is no third mode here and no new discipline: the loop a playbook is written by is the
+build method's research-then-test-then-choose section, which this path's two scoped directives
+already bind. What this section adds is the ROUTING and one ordering property.
+
+**Arriving with no playbook and a topic is this path, not an error.** Research the subject and the
+code the pieces must relate to, decide what one piece IS, then write the playbook from
+`{{MEMORY_ROOT}}/guides/PLAYBOOK-TEMPLATE.md` — its canon is closed, and the gate grades against the
+template's own section table rather than a list typed somewhere else.
+
+```bash
+bash {{KIT_DIR}}/check-playbook.sh
+```
+
+The gate grades **every tracked file carrying a declaration block**, whether or not a build README
+names it. So a playbook you commit is graded from that commit forward, and a playbook that does not
+validate cannot land — which is what lets a later run name it without re-validating anything.
+
+**THE ORDERING PROPERTY: the playbook must be older than the BASE of the run that follows it.** Two
+acts, two authorizations. A single run that authored its own instructions and then followed them has
+no external check on either half, and every gate downstream would be grading a document that run
+wrote for itself.
+
+- **Whenever your build folder was committed before your run**, this has a machine half under either
+  anchor. The BASE is then a merge-base you cannot move, a playbook you committed yourself does not
+  resolve there, and preflight refuses with *a recipe-mode build README names a playbook that does not
+  resolve at the pinned BASE*. The scope value does not change this: the second anchor is reached only
+  when the build folder itself fails to resolve at the merge-base.
+- **The one unprotected state is a run that authors BOTH halves** — its own build folder and its own
+  playbook — under `published`, which this project declares (`{{ANCHOR_SCOPE}}`). Its BASE is the tip
+  it pushed, that tip carries the playbook it just wrote, and nothing refuses it. This is the
+  `published` anchor's declared cost reaching one step further than the protocol spells out: a run
+  that can author its own authorization can author the instructions it is judged against too.
+  So this is a CHECK you keep, stated plainly rather than dressed up as a derivation: **land the
+  playbook in its own earlier run, then start the run that follows it.**
+
+**Amendment rides this same path.** Proposals accumulate on the run-state files of the runs that
+found them, and acting on them is a later, owner-instructed run that reads the surfaced proposals,
+edits the playbook and lands it. That is why a piece-producing run may not edit its own playbook and
+needs no exception to say so.
+
+- CHECK, not a gate: **cite the proposals you acted on**, and say which you declined and why. No gate
+  can check this without reading intent, and a proposal already carries the step it amends, so the
+  join survives even when the citation does not — but the owner reading the amendment is entitled to
+  know which of their run's findings survived it.
+
 ## While it runs
 
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with

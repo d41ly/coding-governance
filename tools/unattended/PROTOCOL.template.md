@@ -63,6 +63,15 @@ strict anchor. Both anchors observe the endpoint the landing push goes to.
 
 1. **Self-authorization gets cheaper.** A branch push is not gated by the pre-push hook, so a run can
    authorize ITSELF in two commands, where before it could only authorize its successor (cost 4).
+
+   **It reaches one step further than that sentence suggests, and the reach was measured rather than
+   reasoned.** A `recipe`-mode run names a playbook and the driver resolves it at BASE, so a playbook
+   the run wrote itself does not normally resolve and preflight refuses. But a run that authors its
+   own build folder is exactly the run this anchor moves onto the branch tip — and that tip carries
+   the playbook it just wrote. So a run authoring BOTH halves authors the instructions it is judged
+   against as well as its own authorization, with nothing refusing it. A run whose build folder
+   predates it keeps the strict anchor and keeps that refusal, which is why this is a narrow state
+   and not a general hole.
 2. **The BAR weakens for adopters who never opt in.** The key gates the DRIVER and cannot gate the
    leg: the conf is a working-tree file the run can commit, so a leg reading it would be reading its
    subject's answer. The leg's BASE check therefore asks "published on the remote" in every repo.
