@@ -70,6 +70,22 @@ whether the playbook is right about its subject. The witness drain census is the
 handle on the third, and it REPORTS rather than reds so a playbook can adopt the witness a step at a
 time instead of in one migration.
 
+## The verb set, and why it is one line
+
+The driver's verbs were spelled in five places and three were stale on the day unit 9 landed —
+`--record-set` had shipped into the dispatch alone. The fix is not a re-synchronisation, which is
+what the previous fix was and it lasted exactly one verb. `VERBS_SLUG` is now READ by the dispatch,
+so a verb missing from it does not read wrong, it does not run; refusal 14 renders from that
+declaration; and the usage text renders from the header docstring, which is the only place a verb's
+ARGUMENTS are spelled. The two carriers in other files — the protocol's verb section and the Skill's
+invocations — are joined to the declaration by leg check 22, because no runtime derivation crosses a
+file boundary.
+
+The same shape one level down: `PARK_KINDS` is the parked-region vocabulary, the `--status`
+alternation is derived from it, and check 23 joins it to the `park()` call sites in BOTH directions.
+The reverse direction is not theoretical — this kit declared a DECISION kind that no verb wrote for
+as long as its contract had instructed runs to park one.
+
 ## Shared seams
 
 The leg reads `git ls-files`, so it grades TRACKED files only — staging is a precondition, which is
@@ -91,8 +107,16 @@ seam: the tracked FIXTURE pattern — reuse for any leg whose population can leg
 ## Gaps
 
 - The leg grades SHAPE only, and its header enumerates the four semantic questions it cannot reach.
-- The scope refusal (unit 8) cannot evaluate on the attended entry point at all: both its inputs, the
-  recorded mode and the run's commit set, exist only through the driver.
+- The output-scope refusal (unit 8) is WITHDRAWN, not deferred. It found two real defects — the globs
+  were read from the wrong blob so every run reached the no-globs branch, and
+  `git diff --name-only --first-parent -m` silently ignores both flags while its comment claims a
+  first-parent walk — and both are fixed and recorded. What could not be done is fire its hermetic
+  arm, and a check whose failing case nobody has observed is an assertion about nothing. It is also
+  unevaluable on the attended entry point by construction: both its inputs, the recorded mode and the
+  run's commit set, exist only through the driver.
+- `--propose` requires a run-state file, so the ATTENDED path has no proposal channel. The same
+  asymmetry was solved for the piece record by giving its writer a second caller; it was left here
+  deliberately, because an attended run has an owner in the loop and can say the thing.
 - The per-piece RECORDS ROOT is declared by the playbook, not by the kit. Found by building: the
   spec put these under the build folder, and the memory-tree gate refuses both a new subdir there and
   a new top-level directory — its structure is closed and owned by another kit. A piece record is
@@ -100,6 +124,6 @@ seam: the tracked FIXTURE pattern — reuse for any leg whose population can leg
 - `PLAYBOOK_GLOB` is read from the conf and is not yet used to widen the population — a playbook that
   carries no declaration block is invisible, which is intended for now and is the reason the block is
   what defines membership.
-- Units 5 through 8 and 10 are specced and unbuilt, so the piece-level halves this leg is designed to
-  carry — the record reader, the piece count, the set checks, the scope refusal — are absent. The leg
-  is honest about its population today and will grow.
+- Units 10 and 11 are specced and unbuilt: the Skill's routing preamble with its four start paths,
+  the two playbook-scoped directives, and the playbook CREATION path. Until 11 lands, a project
+  adopting this mode writes its first playbook by hand from the shipped template.

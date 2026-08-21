@@ -198,6 +198,23 @@ which is where the loop is stated.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
+- A playbook you are FOLLOWING is not a playbook you may edit. A run that rewrites the checklist it
+  is graded by has no rules left, so what you would change goes on the record joined to the step that
+  provoked it, and the amendment is a separate authoring run the owner starts:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --propose <slug> --item "<the amendment>" --step "<the step it applies to>" --reason "<what you saw that provoked it>"
+  ```
+
+  Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
+  costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
+- Record a verdict where a check ran over content rather than over code — one piece at a time, and
+  once over the whole set, which is the population a per-piece pass structurally cannot see:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+  bash {{KIT_DIR}}/unattended.sh --record-set <slug> --leg <name> --verdict PASS
+  ```
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
 
 ## While the work runs

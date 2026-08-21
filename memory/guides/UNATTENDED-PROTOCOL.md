@@ -133,13 +133,20 @@ which is the test for belonging here:
 
 1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
 2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
-3. **Parked entries**, of four kinds, which `park()`'s own kind argument already discriminates: a
+3. **Parked entries**, of five kinds, which `park()`'s own kind argument already discriminates: a
    parked DECISION — the question, the options seen, and the reason the run refused, because a bare
-   "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, and an
-   owner directive WAIVER (§10). Each kind names the verb that writes it: `--park`, `--abort`,
-   `--close --override` and `--preflight --waive` respectively. DECISION had no writer for as long as
+   "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, an
+   owner directive WAIVER (§10), and a PROPOSAL. Each kind names the verb that writes it: `--park`,
+   `--abort`, `--close --override`, `--preflight --waive` and `--propose` respectively. DECISION had no writer for as long as
    this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
    with no route is a rule nobody follows, and it took a build hitting it to notice.
+
+   The PROPOSAL is the only kind the owner is owed no ANSWER to, and the only one carrying a further
+   field: the playbook STEP it amends, written between the item and the reason because the reason is
+   line-final and two readers recover a field by matching up to it. A run FOLLOWING a playbook may
+   not edit that playbook — a run that rewrites the checklist it is graded by has no rules left — so
+   what it noticed goes here and the amendment is a separate authoring run. Nothing blocks on a
+   proposal, and `--status` counts them apart from the kinds that are questions.
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
@@ -313,6 +320,12 @@ a bypass flag in both directions: the lander must be present, the flag must be a
 - `--park` — writes a decision the run REFUSED to take into the parked region, with the question, the
   options seen and the reason. Refused on a terminal record and refused with no run-state file at
   all, because a park minted for a run that never started records nothing about a run.
+- `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
+  joined to the step that provoked it. It is not a question, so nothing blocks on it; it is not an
+  edit, because a run that rewrites the checklist it is graded by has no rules left. It reuses
+  `--park`'s newline, separator, bypass and terminal refusals, widened over the new step field, and
+  its exact-line idempotence — with the step inside the identity, so the same amendment at two steps
+  is two rows.
 - `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
   so no operator spells one, and REFUSING a machine-checked item by reading that item's declared
   checker. Before it existed those keys had no writer at all and `--abort`, which requires both, was
@@ -321,6 +334,9 @@ a bypass flag in both directions: the lander must be present, the flag must be a
   piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
   exact-line idempotence. The writer takes a records ROOT rather than a slug, so the attended path
   reaches the same function; the VERB requires a run-state file and is therefore unattended-only.
+- `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
+  that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
+  structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
 - `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
   names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
   against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a

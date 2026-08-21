@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb
 
-**Status:** SPECCED · rev-3 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** INPROGRESS · rev-6 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -130,6 +130,18 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · BUILT. `--propose`, `park()`'s optional step field, `PARK_KINDS` and its owed
+  subset, the status split, and S6's verb-set single source. Three things the spec did not foresee:
+  (1) S6's drift had already RECURRED — `--record-set` shipped in unit 5 into the dispatch alone,
+  leaving the docstring, the usage line and refusal 14 naming a set two verbs short, so this unit
+  found the defect live rather than historical. (2) The fix is a derivation and not a
+  re-synchronisation: the dispatch READS `VERBS_SLUG`, so a verb absent from it does not read wrong,
+  it does not run; refusal 14 renders from that declaration and the usage text renders from the
+  header, which is the only place a verb's ARGUMENTS are spelled. (3) The header self-read needed a
+  liveness arm — through a copy whose header is stripped the sed matches nothing, and a bare `usage:`
+  over an empty list is indistinguishable from a driver with no verbs, so it refuses into the derived
+  set instead. Two new leg checks, 22 and 23, each staged RED before landing. The status-line rev
+  number said rev-3 against a log at rev-5 and was corrected here.
 - rev-5 · 2026-08-21 · the owner resolved F1: a fifth `park()` kind, not a separate file. The
   built shape is unchanged; what changed is who decided it.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit. D15 re-stamped this unit Tier-2 — it adds a new
@@ -146,6 +158,23 @@ none — every fork below is RESOLVED in place.
   `reason` being line-final, so the field's position is a correctness property rather than a style
   choice. F19 corrected S5 and §4: `parked-decisions-surfaced` is agent-attested, not derived, and the
   two reuse limits are named in S5b instead of being implied away by the word wholesale.
+
+### What was built, against what was specced
+
+- **S2's field placement held under a live test**, and the arm that proves it is the one asserting a
+  file which HOLDS a proposal yields no waiver handle. Asserted over a file without one, the same arm
+  passes for the wrong reason.
+- **S3 was discharged upward.** The spec asked for one more alternative in `verb_status`'s regex; what
+  landed is `PARK_KINDS` and `PARK_KINDS_OWED` as kit-owned declarations with the alternation DERIVED
+  from them, because the alternation was a second spelling of a vocabulary two files read. Check 23
+  then joins the declaration to the call sites in both directions.
+- **S5's honesty survived contact.** Nothing blocks on a proposal, and the arm asserting that is a
+  DIFFERENCE across a close rather than a green close: this fixture's close is unmet for reasons that
+  have nothing to do with parks, so a green would have proved something else entirely.
+- **S5b's first limit stands unfixed and is not a defect**: `--propose` requires a run-state file, so
+  the attended path has no proposal channel. Unit 5 solved the same asymmetry for the piece record by
+  giving its writer a second caller; the same solution is available here and was not taken, because
+  an attended run has an owner in the loop and can simply say the thing.
 
 ## 10. Reuse audit
 

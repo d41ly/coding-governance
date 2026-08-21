@@ -10,9 +10,11 @@
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
+#   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
+#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA>
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -59,6 +61,45 @@ export GIT_GRAFT_FILE=/dev/null
 KIT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
 
+# ------------------------------------------------------------------------------ THE VERB SET, ONCE
+# TOOL-dScriptedRepeat-9 S6. Four carriers used to type this set independently - the header
+# docstring, the usage line, refusal 14 and the dispatch - and THREE were stale the day this landed:
+# `--record-set` had shipped into the dispatch alone, which is precisely the drift a prior unit's own
+# comment claimed to have fixed. The dispatch now READS this line, so a verb missing from it does not
+# read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
+# place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
+# the gate leg, because no runtime derivation crosses a file boundary.
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set"
+# The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
+# dispatch cannot treat them alike, and merged again for every reader, who does not care.
+VERBS_INLINE="--plan --phase"
+verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
+is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
+verb_list() { # -> "--a, --b and --c", for a human reading a refusal
+  local out="" w n=0 total
+  total=$(set -- $(verbs_all); echo $#)
+  for w in $(verbs_all); do
+    n=$((n+1))
+    if   [ "$n" = 1 ];      then out="$w"
+    elif [ "$n" = "$total" ]; then out="$out and $w"
+    else out="$out, $w"; fi
+  done
+  printf '%s' "$out"
+}
+# The usage text, READ FROM THIS FILE'S OWN HEADER. A second spelling of every verb's arguments is
+# the drift this block removes, and the header is the spelling that documents them. The self-read
+# assumes $0 names this file - which KIT_DIR above already assumes, so it adds no new one.
+SELF="$KIT_DIR/$(basename -- "$0")"
+usage() {
+  local u; u=$(sed -n 's|^#   unattended[.]sh |  unattended.sh |p' "$SELF")
+  # A PROBE THAT CANNOT MOVE SAYS SO. Read through a copy whose header was stripped, or through any
+  # invocation where $0 does not name this file, the sed above matches nothing - and a bare "usage:"
+  # over an empty list is indistinguishable from a driver with no verbs. Refuse into the derived set
+  # instead, which is the one carrier that cannot go missing.
+  [ -n "$u" ] || { echo "usage: cannot read this file's own header at $SELF, so the argument shapes are unavailable; the verbs are $(verb_list)"; return 0; }
+  echo "usage:"; printf '%s\n' "$u"
+}
+
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
 CONF="$ROOT/.unattended.conf"
@@ -75,7 +116,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
-PK_ITEM=""
+PK_ITEM=""; PK_STEP=""
 M="$MEMORY_ROOT"
 
 status=0
@@ -97,6 +138,17 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
 DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+
+# TOOL-dScriptedRepeat-9 - the PARKED KINDS, closed and kit-owned like the three sets above it, and
+# for the reason those are: a parked row whose kind is outside this set lands in a region every
+# reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
+# when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
+# - one spelling of a vocabulary that two files read.
+PARK_KINDS="decision abort override waiver proposal"
+# The kinds that are OWED to the owner as an answer. `proposal` is deliberately absent: it is an
+# improvement the run noticed, not a question it refused, and counting the two together would make a
+# run that spotted six wording fixes look like a run that stalled on six decisions.
+PARK_KINDS_OWED="decision abort override waiver"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -1634,7 +1686,7 @@ set_fact() { # file · key · value
 }
 
 verb_status() { # slug
-  local slug="$1" rel p w unit nparked parked
+  local slug="$1" rel p w unit nparked parked unowed nprop
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
@@ -1658,8 +1710,18 @@ verb_status() { # slug
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
   # it to a file nobody re-opens. Omitted at zero, so the ordinary line does not grow a `· 0`.
-  nparked=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z (decision|abort|override|waiver) · item ' "$rel" 2>/dev/null || true)
+  # DERIVED alternation. This line typed four kinds, so the fifth was a row --status did not
+  # recognise at all - the silent-skip shape, one verb over from the gate that bans it.
+  nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$PARK_KINDS_OWED")) · item " "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
+  # PROPOSALS, counted apart and printed apart, because they are not a question the owner owes an
+  # answer to. Folded into `parked` a run that noticed six wording fixes would read exactly like a
+  # run that stalled on six decisions, and the owner would open the file to tell them apart.
+  unowed=$(park_kinds_unowed)
+  if [ -n "$unowed" ]; then
+    nprop=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null || true)
+    [ "${nprop:-0}" -gt 0 ] 2>/dev/null && parked="$parked · proposals $nprop"
+  fi
   printf 'unattended: %s · phase %s · witness %s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
@@ -2041,8 +2103,35 @@ $_bcnon"
 # parked region, and the build method derives the owner's open/parked row from parked entries "plus any
 # recorded DoD override" - so an abort would have arrived in the one turn the owner gets, wearing the
 # label of a Definition-of-Done override that never happened.
-park() { # file · kind · item · reason
-  printf '\n%s %s · item %s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$4" >> "$1"
+kinds_re() { # word-list -> word|word|word
+  # DERIVED, never typed. A leading, trailing or doubled space in the source set would otherwise mint
+  # an EMPTY alternative, and an empty alternative matches every line: the widest possible predicate,
+  # produced by whitespace nobody can see. Unquoted expansion word-splits and drops the empties.
+  local out="" w
+  for w in $1; do out="${out:+$out|}$w"; done
+  printf '%s' "$out"
+}
+park_kinds_unowed() { # -> the kinds the owner is NOT owed an answer to, by DIFFERENCE
+  # A difference rather than a second list, so the two sets cannot disagree. A sixth kind added to
+  # PARK_KINDS and not to the owed set appears in the status split automatically instead of becoming
+  # a row `--status` counts nowhere.
+  local out="" k
+  for k in $PARK_KINDS; do
+    case " $PARK_KINDS_OWED " in *" $k "*) continue ;; esac
+    out="${out:+$out }$k"
+  done
+  printf '%s' "$out"
+}
+
+park() { # file · kind · item · reason · [step]
+  # THE STEP IS OPTIONAL AND IT IS NOT LINE-FINAL. `reason` is, and two live readers depend on
+  # that: `recorded_waivers` takes the handle as the token between ' · item ' and ' · reason ',
+  # and the leg's check 17 recovers an item by stripping a trailing reason. Appending `step`
+  # AFTER `reason` would pull it inside both of those matches, so a proposal row could rename the
+  # handle a waiver row records. It goes BETWEEN the two fields, where no existing reader looks.
+  local step=""
+  [ -n "${5:-}" ] && step=" · step $5"
+  printf '\n%s %s · item %s%s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$step" "$4" >> "$1"
 }
 
 # TOOL-cSettledDocket-1 - the fourth writer of a parked entry, and the first one available MID-RUN.
@@ -2128,6 +2217,57 @@ PARKED
   park "$rel" decision "$item" "$reason"
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"
+  return 0
+}
+
+# TOOL-dScriptedRepeat-9 - the FIFTH parked kind, and the only one a pass writes for the OWNER's
+# benefit rather than its own. A `recipe`-mode run follows a playbook to the letter, so the one thing
+# it must not do is improve that playbook mid-run: a run that rewrites the checklist it is graded by
+# has no rules left. What it CAN do is say what it would change, joined to the step that provoked it,
+# and leave the amendment to a separate authoring run.
+#
+# A KIND and not a register, which the owner ratified (spec F1). The close blocks on NO parked kind -
+# measured against `dod_met` and `--abort`, not assumed - so a proposal is non-blocking already and
+# needs no Definition-of-Done item of its own. What surfaces it at the wrap-up is an ATTESTATION,
+# `parked-decisions-surfaced`, and the spec says so plainly rather than calling it a derivation.
+#
+# The guards are verb_park's, REUSED and widened to the new field rather than re-argued. Each exists
+# because of a recorded defect, and the STEP is a third place every one of them can be broken: a
+# newline forges a row, the separator makes the row unparseable by the check that grades it, and the
+# bypass flag reds the bar on a record no verb can rewrite.
+verb_propose() { # slug · item · step · reason
+  local slug="$1" item="$2" step="$3" reason="$4" rel want pl
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to propose a playbook amendment against: $rel"; return 1; }
+  [ -n "$item" ] || { fail 48 "--propose requires --item, because a proposal naming no amendment is the bare 'noticed something' that a wrap-up cannot act on and the next run cannot find"; return 1; }
+  [ -n "$step" ] || { fail 48 "--propose requires --step, because an amendment floating free of the playbook step that provoked it is advice, and the owner would have to re-derive where it applies"; return 1; }
+  [ -n "$reason" ] || { fail 48 "--propose requires --reason, because a proposal recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make"; return 1; }
+  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
+    fail 48 "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
+  # two are read back as the tokens between the separators, so either one spelling a separator makes
+  # its own record unparseable - by the very check that reads it.
+  case "$item$step" in *" · "*) fail 48 "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --propose || return 1
+  # EXACT LINE COMPARE, for verb_park's recorded reason: the reason is line-final, so a `grep -qF`
+  # matched any row whose reason merely STARTS with this one, and the verb then reported success
+  # while writing nothing - silently dropping a distinct proposal.
+  want="proposal · item $item · step $step · reason $reason"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: proposal already recorded, unchanged — $item"
+    return 0
+  done <<PROPOSED
+$(grep -F -- ' proposal · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+PROPOSED
+  park "$rel" proposal "$item" "$reason" "$step"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: proposal recorded against step $step — $item"
   return 0
 }
 
@@ -2318,8 +2458,8 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--record-piece|--record-set) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
     --verdict)      RP_VERDICT="${2:-}"; shift 2 || shift ;;
@@ -2346,15 +2486,25 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --abort, --attest and --record-piece: $arg"; exit 1 ;;
+    # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
+    # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
+    # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above
+    # would otherwise be tested against it, and it must not shadow --plan, --phase or --version.
+    *) if is_slug_verb "${1:-}"; then VERB="$1"; SLUG="${2:-}"; shift 2 || shift
+       else arg="$1"; vl=$(verb_list)
+            # THE LIST IN A VARIABLE, not a command substitution inside the message. check-arms reads
+            # a branch's literal signature up to its first interpolation and does not treat $( ) as
+            # one, so the inline form demanded a test arm quoting `$(verb_list)` verbatim - an arm
+            # that would pass while the list it renders was empty.
+            fail 14 "unknown argument; the verbs are $vl: $arg"; exit 1; fi ;;
   esac
 done
-# S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
-# and the refusal above used to name three DIFFERENT sets: the usage line was already two verbs behind
-# (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
-# header. A prior review asked for both to be fixed and only the header landed.
+# S10, and then TOOL-dScriptedRepeat-9 S6, because S10's fix did not hold: the three spellings were
+# re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
+# above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
+# left here to re-synchronise.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --attest <slug> --item <item> [--value <text>] | --record-piece <slug> --path <p> --leg <name> --verdict <PASS|FAIL|NA>"; exit 2; }
+[ -n "$VERB" ] || { usage; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2364,6 +2514,7 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$RP_VERDICT" ;;

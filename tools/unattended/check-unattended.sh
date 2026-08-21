@@ -537,9 +537,10 @@ while IFS= read -r f; do
   # ---- file's FIRST committed blob. Unit 3 refuses a bad waiver at the moment of writing; this is
   # ---- the SECOND OPINION over what actually landed.
   # ----
-  # ---- Only the waiver kind is joined. `park()` writes four, and the other three legitimately
-  # ---- arrive late — an `override` is written at `--close`, an `abort` reason later still — so
-  # ---- joining them to the first blob would red every honest run. The waiver's whole claim is that
+  # ---- Only the waiver kind is joined. `park()` writes every declared kind, and the others
+  # ---- legitimately arrive late — an `override` at `--close`, an `abort` reason later still, a
+  # ---- `proposal` at any point at all — so joining them to the first blob would red every honest
+  # ---- run. The waiver's whole claim is that
   # ---- it was taken at preflight, which is exactly why the join means something on it alone.
   # ----
   # ---- HONEST LIMIT, in source rather than in a document read at a different time (check 13's
@@ -971,6 +972,74 @@ if [ -f "$tmpl" ]; then
       [ "$pshl" -lt "$pfl2" ] || fail 20 "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run: $pshl against $pfl2"
     fi
   fi
+fi
+
+# ---- 22: THE VERB SET, joined across the documents that spell it. TOOL-dScriptedRepeat-9 S6.
+# ----
+# ---- The driver DERIVES its own two prose carriers now - refusal 14 from the declaration, the usage
+# ---- text from the header - so this leg re-checks neither. What no runtime derivation can reach is a
+# ---- carrier in ANOTHER FILE: the protocol's verb section is what an owner reads, the Skill's
+# ---- invocations are what an agent reads, and a verb missing from either is a verb nobody knows
+# ---- exists. Three of the five carriers were stale the day this check was written, and the previous
+# ---- fix for exactly that drift was a hand-resynchronisation that lasted one verb.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: whether a verb's DESCRIPTION anywhere is true. It joins names.
+VERBS_SLUG=$(core_of VERBS_SLUG)
+VERBS_INLINE=$(core_of VERBS_INLINE)
+VERBS_ALL="$VERBS_SLUG $VERBS_INLINE"
+nverbs=$(printf '%s\n' $VERBS_ALL | grep -c . || true)
+if [ "$nverbs" -lt 10 ]; then
+  fail 22 "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing: $DRIVER"
+else
+  for v in $VERBS_ALL; do
+    grep -qE "^#   unattended[.]sh $v( |\$)" "$DRIVER" \
+      || fail 22 "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks: $v in $DRIVER"
+    if [ -f "$SHIP" ] && ! grep -qE "^- .$v. — " "$SHIP"; then
+      fail 22 "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call: $v in $SHIP"
+    fi
+    if [ -f "$tmpl" ] && ! grep -qF -- "unattended.sh $v " "$tmpl"; then
+      fail 22 "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it: $v in $tmpl"
+    fi
+  done
+fi
+
+# ---- 23: every park() CALL SITE names a DECLARED kind. The parked region is parsed by kind - by
+# ---- --status, by check 17 and by the build method's own wrap-up derivation - so a row whose kind is
+# ---- outside the set is a row nothing counts and nothing surfaces. It fails SILENTLY and in the
+# ---- direction that loses: the entry is written, the file looks right, and the owner never hears it.
+# ----
+# ---- Source-level, because every call site passes a literal and no invocation of this driver can
+# ---- reach a mistyped one. A runtime guard inside park() would be a branch nothing can fire.
+PARK_KINDS=$(core_of PARK_KINDS)
+PARK_KINDS_OWED=$(core_of PARK_KINDS_OWED)
+# SPACE-SEPARATED, because both joins below are ' word ' membership tests and a newline inside the
+# haystack makes every one of them miss - which reds five correct call sites and would be read as
+# the check being wrong rather than the shell being literal.
+pk_sites=$(grep -oE '^[[:space:]]*park "[$][a-zA-Z_]+" [a-zA-Z-]+' "$DRIVER" | awk '{print $3}' | sort -u | tr '\n' ' ')
+npk=$(printf '%s' "$pk_sites" | wc -w)
+if [ -z "$PARK_KINDS" ] || [ "$npk" -eq 0 ]; then
+  fail 23 "cannot read the parked-kind vocabulary or cannot find a single park() call site, so the membership join below would pass over an empty set - declared and found follow: [$PARK_KINDS] and [$pk_sites]"
+else
+  for k in $pk_sites; do
+    case " $PARK_KINDS " in *" $k "*) ;;
+      *) fail 23 "a park() call site writes a kind the driver does not declare, and every reader of that region parses BY kind, so the row would be written and then counted by nothing: $k against [$PARK_KINDS]" ;;
+    esac
+  done
+  # BOTH DIRECTIONS. A declared kind with no writer is the other half of the same defect, and it is
+  # the half this kit has a recorded case of: the protocol declared DECISION for as long as it had
+  # instructed a run to park one, and no verb wrote it, so the instruction could not be obeyed.
+  for k in $PARK_KINDS; do
+    case " $pk_sites " in *" $k "*) ;;
+      *) fail 23 "the driver declares a parked kind that no park() call site ever writes, so the vocabulary names a row nothing can produce and the instruction to record one cannot be obeyed: $k" ;;
+    esac
+  done
+  # The OWED subset is a subset. A kind owed to the owner but absent from the full set is counted by
+  # --status's first alternation and by nothing else, which is a row that exists in one reader only.
+  for k in $PARK_KINDS_OWED; do
+    case " $PARK_KINDS " in *" $k "*) ;;
+      *) fail 23 "a kind the owner is owed an answer to is not in the declared parked-kind set, so the status split and the vocabulary disagree about which rows exist: $k against [$PARK_KINDS]" ;;
+    esac
+  done
 fi
 
 exit "$status"

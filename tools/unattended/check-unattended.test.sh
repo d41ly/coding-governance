@@ -1258,6 +1258,43 @@ reset_tree; mutate tools/unattended/unattended.sh 's/^PHASES_PASSKIND="SPECCING 
 hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
 
+# ---- TOOL-dScriptedRepeat-9: check 22, the VERB SET across the documents that spell it. Each arm
+# ---- removes ONE carrier and asserts THIS check speaks, because a leg that reds on everything arms
+# ---- every branch and checks nothing.
+reset_tree; mutate tools/unattended/unattended.sh '/^#   unattended[.]sh --propose /d'
+hit "$(run)" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
+
+# The protocol carrier. BOTH copies, so check 10's byte-parity arm does not fire alongside and leave
+# two messages where the arm under test is one of them.
+reset_tree
+mutate tools/unattended/PROTOCOL.template.md '/^- .--propose. — writes a PROPOSAL/d'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^- .--propose. — writes a PROPOSAL/d'
+hit "$(run)" "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call:"
+
+reset_tree; mutate tools/unattended/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
+hit "$(run)" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
+
+# LIVENESS. Every arm above iterates the declared set, so a set that fails to parse would run zero
+# comparisons and report exactly the green a fully-wired driver reports.
+reset_tree; mutate tools/unattended/unattended.sh 's/^VERBS_SLUG=".*"$/VERBS_SLUG=""/'
+hit "$(run)" "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing:"
+
+# ---- check 23: the parked-kind vocabulary against the call sites that write it, BOTH directions.
+reset_tree; mutate tools/unattended/unattended.sh 's/^  park "[$]rel" decision /  park "$rel" notakind /'
+hit "$(run)" "a park() call site writes a kind the driver does not declare, and every reader of that region parses BY kind, so the row would be written and then counted by nothing:"
+
+# The other direction, which is the half this kit has a recorded case of: DECISION was declared for
+# as long as the contract had instructed a run to park one, and no verb wrote it.
+reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS="decision /PARK_KINDS="invented decision /'
+hit "$(run)" "the driver declares a parked kind that no park() call site ever writes, so the vocabulary names a row nothing can produce and the instruction to record one cannot be obeyed:"
+
+reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS_OWED="decision /PARK_KINDS_OWED="ghost decision /'
+hit "$(run)" "a kind the owner is owed an answer to is not in the declared parked-kind set, so the status split and the vocabulary disagree about which rows exist:"
+
+reset_tree; mutate tools/unattended/unattended.sh 's/^PARK_KINDS=".*"$/PARK_KINDS=""/'
+hit "$(run)" "cannot read the parked-kind vocabulary or cannot find a single park() call site, so the membership join below would pass over an empty set - declared and found follow: ["
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1268,7 +1305,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=200
+FLOOR_ASSERTIONS=249
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

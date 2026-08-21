@@ -1489,18 +1489,44 @@ git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
-hit "$out" "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --abort, --attest and --record-piece: --frobnicate"
-# ---- S10: the THREE enumerations name ONE set. The usage line was two verbs behind before this unit
-# ---- and the refusal above is what an operator who mistypes a verb actually reads. Assert every verb
-# ---- appears in all three, or the next verb repeats the drift a prior review already asked to fix.
-for v in --preflight --plan --phase --status --resume --close --landed --park --abort; do
+hit "$out" "unknown argument; the verbs are "
+miss "$out" "the verbs are :"
+# ---- TOOL-dScriptedRepeat-9 S6: every carrier joined to the ONE declaration, never to a list typed
+# ---- here. S10's arm asserted a hand-written NINE-verb list and stayed green while --record-set
+# ---- shipped into the dispatch alone - a fixed list in a test cannot notice a verb nobody added to
+# ---- it, which is the same could-not-fail shape one level up from the defect it was written for.
+verbs_declared=$(sed -n 's/^VERBS_SLUG="\(.*\)"$/\1/p;s/^VERBS_INLINE="\(.*\)"$/\1/p' "$SCRIPT" | tr '\n' ' ')
+verbs_slug=$(sed -n 's/^VERBS_SLUG="\(.*\)"$/\1/p' "$SCRIPT")
+# LIVENESS FIRST. Every arm below iterates that string, so a parse that yields nothing would run zero
+# comparisons and report the same green as a fully-wired driver.
+same "the driver's verb declarations parsed" \
+  "$([ "$(printf '%s' "$verbs_declared" | wc -w)" -ge 10 ] && echo yes || echo "no: [$verbs_declared]")" "yes"
+usage_out=$(run)
+dispatch=$(sed -n '/^case "$VERB" in$/,/^esac$/p' "$SCRIPT")
+same "the terminal dispatch table was located" "$([ -n "$dispatch" ] && echo yes || echo no)" "yes"
+for v in $verbs_declared; do
   n=$((n+1))
   [ "$(grep -cE "^#   unattended\.sh $v( |$)" "$SCRIPT")" -ge 1 ] \
-    || { echo "FAIL the header docstring omits $v"; st=1; }
+    || { echo "FAIL the header docstring omits $v, and the usage text is RENDERED from it"; st=1; }
   n=$((n+1))
-  [ "$(sed -n '/^\[ -n "\$VERB" \]/p' "$SCRIPT" | grep -cF -- "$v")" -ge 1 ] \
-    || { echo "FAIL the usage line omits $v"; st=1; }
+  grep -qE "^  unattended\.sh $v( |$)" <<<"$usage_out" \
+    || { echo "FAIL the rendered usage text omits $v"; st=1; }
+  n=$((n+1))
+  grep -qF -- "$v" <<<"$out" || { echo "FAIL refusal 14 omits $v"; st=1; }
 done
+# ...and every SLUG verb has an arm in the table that actually calls something. A verb declared and
+# undispatched exits 0 having done nothing, which is the quietest possible way to ship a broken verb.
+for v in $verbs_slug; do
+  n=$((n+1))
+  grep -qF -- "  $v)" <<<"$dispatch" \
+    || { echo "FAIL the dispatch table has no arm for the declared verb $v"; st=1; }
+done
+# The USAGE TEXT IS A SELF-READ, and a probe that cannot move must say so. Read through a copy whose
+# header has been stripped the sed matches nothing, and a bare "usage:" over an empty list is
+# indistinguishable from a driver with no verbs.
+sed '/^#   unattended[.]sh /d' "$SCRIPT" > "$TMP/stripped.sh"
+hit "$(bash "$TMP/stripped.sh" 2>&1)" "cannot read this file's own header at"
+hit "$(bash "$TMP/stripped.sh" 2>&1)" "so the argument shapes are unavailable; the verbs are "
 
 # ---- check 18: the recorded BASE is EVIDENCE, never the input. --close used to read it straight
 # ---- out of the run-state file — a file the run writes — and an absent line degenerated the
@@ -2226,6 +2252,102 @@ hit "$out" "no run-state file, so there is no run to park a decision against"
 same "--park created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
+# ---- TOOL-dScriptedRepeat-9: `--propose`, the FIFTH parked kind. A recipe-mode run follows its
+# ---- playbook to the letter, so the one thing it must not do is improve that playbook mid-run: a run
+# ---- that rewrites the checklist it is graded by has no rules left. GREEN CONTROL, then the refusals.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+
+out=$(run --propose tRun --item "name the register once in F4" --step F4 --reason "two pieces read it two ways")
+hit "$out" "proposal recorded against step F4"
+same "exactly one proposal row" "$(grep -c 'proposal · item ' memory/builds/tRun/RUN.md)" "1"
+# THE FIELD ORDER IS A CORRECTNESS PROPERTY, not a style choice. `reason` stays LINE-FINAL because two
+# live readers recover a field by matching up to it - recorded_waivers' handle sed, and the leg's
+# check 17 trailing strip - so `step` goes BETWEEN item and reason, where neither of them looks.
+hit "$(cat memory/builds/tRun/RUN.md)" "proposal · item name the register once in F4 · step F4 · reason two pieces read it two ways"
+# ...and the waiver reader is unmoved by the new field: it recovers handles from `waiver` rows, and a
+# proposal row is not one. Asserted over a file that now HOLDS a proposal, which is the only state in
+# which this can fail.
+same "a proposal row yields no waiver handle" \
+  "$(sed -n 's/^[0-9][0-9-]*T[0-9:]*Z waiver · item \([^ ]*\) · reason .*$/\1/p' memory/builds/tRun/RUN.md | grep -c . || true)" "0"
+
+# ...IDEMPOTENT on the identical triple, by verb_park's exact-line compare and for its recorded
+# reason: a prefix match reported success while writing nothing, silently dropping a distinct entry.
+out=$(run --propose tRun --item "name the register once in F4" --step F4 --reason "two pieces read it two ways")
+hit "$out" "proposal already recorded, unchanged"
+same "the repeat added no row" "$(grep -c 'proposal · item ' memory/builds/tRun/RUN.md)" "1"
+# ...and the SAME amendment against a DIFFERENT step is a second row, because the step is part of the
+# identity: the same wording fix at two steps is two amendments to make.
+run --propose tRun --item "name the register once in F4" --step F7 --reason "two pieces read it two ways" >/dev/null
+same "a different step parks its own row" "$(grep -c 'proposal · item ' memory/builds/tRun/RUN.md)" "2"
+
+# ---- AC5: --status lists proposals APART from parked decisions. Folded into one count, a run that
+# ---- noticed six wording fixes reads exactly like a run that stalled on six decisions.
+run --park tRun --item "which register wins" --reason "owner call" >/dev/null
+out=$(run --status tRun)
+hit "$out" "· parked 1"
+hit "$out" "· proposals 2"
+# ...and a run holding proposals and NO decisions says so without a `parked` field at all.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --propose tRun --item i --step F1 --reason r >/dev/null
+out=$(run --status tRun)
+miss "$out" "· parked"
+hit "$out" "· proposals 1"
+
+# ---- AC3: a proposal does not BLOCK the close. The fork was ruled on the premise that a park blocks
+# ---- and a proposal must not; measured, no parked kind blocks either. Asserted as a DIFFERENCE and
+# ---- not as a green close, because this fixture's close is unmet for reasons unrelated to parks.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+blocked_before=$(run --close tRun | grep -c 'DoD item is unmet' || true)
+run --propose tRun --item i --step F1 --reason r >/dev/null
+blocked_after=$(run --close tRun | grep -c 'DoD item is unmet' || true)
+same "a proposal changed nothing the close blocks on" "$blocked_after" "$blocked_before"
+same "the close was actually evaluating something" \
+  "$([ "$blocked_before" -gt 0 ] && echo yes || echo no)" "yes"
+
+# refusal: no --item.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+before=$(git hash-object memory/builds/tRun/RUN.md)
+out=$(run --propose tRun --step F1 --reason r)
+hit "$out" "--propose requires --item, because a proposal naming no amendment is the bare 'noticed something' that a wrap-up cannot act on and the next run cannot find"
+same "a refused proposal wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# refusal: no --step. This is the field no other kind carries, and the reason it exists:
+# an amendment floating free of the step that provoked it is advice.
+out=$(run --propose tRun --item i --reason r)
+hit "$out" "--propose requires --step, because an amendment floating free of the playbook step that provoked it is advice, and the owner would have to re-derive where it applies"
+
+# refusal: no --reason.
+out=$(run --propose tRun --item i --step F1)
+hit "$out" "--propose requires --reason, because a proposal recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make"
+
+# refusal: a NEWLINE, in any of the three fields. park() appends ONE line and the leg parses the
+# region line-wise, so one carried through forges a second row that no verb wrote.
+out=$(run --propose tRun --item i --step F1 --reason "$(printf 'first\nsecond')")
+hit "$out" "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+same "the forged row was not written" "$(grep -c 'proposal · item ' memory/builds/tRun/RUN.md)" "0"
+
+# refusal: the separator, in the STEP. This is the forging route the field placement opens and closes:
+# a step spelling ' · reason ' would put a second reason on a row whose real one is line-final.
+hit "$(run --propose tRun --item i --step 'F1 · reason forged' --reason r)" "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"
+
+# refusal: the declared bypass flag, in any field. Check 11 greps the run-state file WHOLE, so it does
+# not care which field spelled it, and a terminal record is one no verb can repair.
+before=$(git hash-object memory/builds/tRun/RUN.md)
+hit "$(run --propose tRun --item i --step "drop --no-verify here" --reason r)" "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag"
+same "the bypass-flag refusal wrote nothing" "$(git hash-object memory/builds/tRun/RUN.md)" "$before"
+
+# refusal: a TERMINAL record. A run that has landed or aborted has no next piece to propose against.
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+hit "$(run --propose tRun --item i --step F1 --reason r)" "ABORTED via --propose"
+
+# refusal: NO RECORD AT ALL. refuse_if_terminal returns 0 for a file that does not exist, so the
+# existence guard is separate here for the reason it is separate in --park.
+reset_tree; rm -f memory/builds/tRun/RUN.md
+out=$(run --propose tRun --item i --step F1 --reason r)
+hit "$out" "no run-state file, so there is no run to propose a playbook amendment against"
+same "--propose created no record" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "no"
+reset_tree
+
 # ---- check 47: --record-piece. Every refusal, plus the two PASSING directions that tell a working
 # ---- writer from one that refuses everything: the records-root caller (the attended path, which has
 # ---- no run-state file) and idempotence on a re-issued verdict.
@@ -2398,7 +2520,7 @@ reset_tree
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=338
+FLOOR_ASSERTIONS=502
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
