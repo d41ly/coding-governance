@@ -210,10 +210,10 @@ else
   # G4 — the stale MEASUREMENT. The pair that replaced it is a real reading of the current bar.
   a=$((a+1))
   if grep -qE '335s|~?95s' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 477 s wall against a 2587 s leg-sum"; fail=1
+    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 393 s wall against a 3085 s leg-sum"; fail=1
   fi
   a=$((a+1))
-  { grep -q '477 s' "$CHARTER" && grep -q '2587 s' "$CHARTER"; }     || { echo "gov-canary: $CHARTER no longer states the measured pair (477 s wall against a 2587 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
+  { grep -q '393 s' "$CHARTER" && grep -q '3085 s' "$CHARTER"; }     || { echo "gov-canary: $CHARTER no longer states the measured pair (393 s wall against a 3085 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
   # G5 — the stale WIDTH FORMULA, in the backticked spelling the file actually uses. The runner reads
   # its width from a declared table now, so a charter naming a formula is telling a session something
   # it cannot verify anywhere in the tree.
