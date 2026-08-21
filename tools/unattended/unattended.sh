@@ -111,7 +111,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # project-selectable scope is narrowing wearing a different name.
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
 
-# TOOL-dScriptedRepeat-1 - the AUTHORIZATION MODE set, published as a constant so it is spelled
+# the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
 # compare two records carrying the same misspelling and agree with both: it asked whether they
 # MATCH and never whether either is LEGAL. Kit-owned like the three sets below it, with no
@@ -139,7 +139,7 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
   done
   printf 'all'
 }
-# TOOL-dScriptedRepeat-1 - the directive SCOPE set is DERIVED, never a second constant: a scope is
+# the directive SCOPE set is DERIVED, never a second constant: a scope is
 # exactly "every run" or "a run in mode M", so `all` plus every member IS the set. Deriving it is
 # what stops the two disagreeing - a second literal would need editing in step with this one, and
 # the pair that already existed did not.
@@ -255,7 +255,7 @@ AREF=""; ASHA=""; AURL=""
 # trusted_base, dod_met). It is EVIDENCE and never an input: nothing in this kit branches on the
 # recorded value, for the reason anchor-kind carries in its own comment.
 AUTH_MODE=""
-# TOOL-dScriptedRepeat-4 - fork 8's hybrid. The build README at BASE names the PLAYBOOK PATH and
+# fork 8's hybrid. The build README at BASE names the PLAYBOOK PATH and
 # the requested piece COUNT; the playbook at that same BASE carries the output globs and the piece
 # grain. The path must come from somewhere the run cannot have written, and the globs must travel
 # with the playbook - a playbook re-run next month must not depend on a run author retyping its
@@ -684,7 +684,7 @@ check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bo
   [ "$n" -gt 0 ] || return 0
   while [ "$i" -lt "$n" ]; do
     h=${WAIVE_ITEMS[$i]}; sc=$(scope_of "$h")
-    # TOOL-dScriptedRepeat-1 - ANY mode scope, not the one literal. `all` binds every run; a scope
+    # ANY mode scope, not the one literal. `all` binds every run; a scope
     # naming a mode binds only a run of that mode. The test used to name `prompt` twice, so a
     # handle scoped to a later member was silently unenforced - accepted rather than refused,
     # which is the direction that loses.
@@ -818,7 +818,7 @@ check_authorization() { # slug · base
     /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
-  # TOOL-dScriptedRepeat-4 - out of the SAME scan. The `No second GIT show` rule above bounds THAT
+  # out of the SAME scan. The `No second GIT show` rule above bounds THAT
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
   AUTH_PIECES=$(printf '%s\n' "$_fm" | sed -n 's/^pieces=//p' | head -1)
@@ -827,14 +827,14 @@ check_authorization() { # slug · base
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
   # nobody declared, which is the failure shape ANCHOR_SCOPE's own value guard exists to avoid.
   [ -n "$AUTH_MODE" ] || AUTH_MODE=slug
-  # TOOL-dScriptedRepeat-1 - MEMBERSHIP of the published set, and the message DERIVES the legal
+  # MEMBERSHIP of the published set, and the message DERIVES the legal
   # values from that same set. The refusal used to enumerate them in its own prose, so a third
   # member would have left the sentence naming two and nothing would have reported the drift.
   if ! is_auth_mode "$AUTH_MODE"; then
     fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are $AUTH_MODES, declared: $AUTH_MODE"
     return 1
   fi
-  # TOOL-dScriptedRepeat-4 - the declaration seam, evaluated where the MODE exists and nowhere else.
+  # the declaration seam, evaluated where the MODE exists and nowhere else.
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
   # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
   # splitting its terms.
@@ -1569,7 +1569,7 @@ verb_preflight() { # slug · keepalive-id
   # global empty, and preflight has already refused by then - the default never reaches disk on a
   # run that got here without the read.
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
-  # TOOL-dScriptedRepeat-4 - the resolved binding, recorded so a later reader can tell WHICH
+  # the resolved binding, recorded so a later reader can tell WHICH
   # playbook bound the run without re-deriving it, and so the leg has a recorded answer to
   # SECOND-OPINION rather than a value only the driver ever saw. Recorded only in recipe mode:
   # under any other mode there is no binding, and a blank fact would be a key that reads as

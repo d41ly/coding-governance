@@ -122,7 +122,7 @@ readme tModeBad
 mutate memory/builds/tModeBad/README.md '/^slug: tModeBad$/a authorized-by: banana'
 readme tModeOk
 mutate memory/builds/tModeOk/README.md '/^slug: tModeOk$/a authorized-by: prompt'
-# TOOL-dScriptedRepeat-4 - the DECLARATION SEAM fixtures. All on MAIN, for tFresh's reason: the seam
+# the DECLARATION SEAM fixtures. All on MAIN, for tFresh's reason: the seam
 # is read at BASE, so a fixture authored on the unit branch tests the authorization refusal instead
 # of the seam and proves nothing about it.
 mkdir -p content
@@ -2243,7 +2243,7 @@ hit "$out" "preflight OK"
 hit "$(cat memory/builds/tModeOk/RUN.md)" "mode: prompt"
 git rm -q --cached memory/builds/tModeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tModeOk/RUN.md
 
-# ---- TOOL-dScriptedRepeat-4: the declaration seam. SIX refusals, each with its own message,
+# ---- the declaration seam. SIX refusals, each with its own message,
 # ---- because a single ANDed verdict sends a reader to diff a parse against a path. Every arm is
 # ---- paired with a no-write assertion for check 44's reason: "it printed a refusal" and "it changed
 # ---- nothing" are two claims, and this block sits before the write gate so both hold.

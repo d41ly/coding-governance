@@ -80,7 +80,7 @@ PHASES_TERMINAL=$(core_of PHASES_TERMINAL)
 # TOOL-aPromptedMandate-2 - the pass-kind subset, read the SAME way as every other core set, so
 # the leg never carries a second spelling of a driver declaration.
 PHASES_PASSKIND=$(core_of PHASES_PASSKIND)
-# TOOL-dScriptedRepeat-1 - the mode set, read through the SAME parse. A second spelling here is
+# the mode set, read through the SAME parse. A second spelling here is
 # what this unit exists to remove.
 AUTH_MODES=$(core_of AUTH_MODES)
 AUTH_SCOPES="all $AUTH_MODES"
@@ -477,7 +477,7 @@ while IFS= read -r f; do
           /^---[[:space:]]*\r?$/ { exit }
           /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
         [ -n "$dmode" ] || dmode=slug
-        # ---- TOOL-dScriptedRepeat-1 - MEMBERSHIP first, then agreement, and they are two
+        # ---- MEMBERSHIP first, then agreement, and they are two
         # ---- questions. This arm compared the two recorded values and had no opinion about
         # ---- whether either was LEGAL, so a README and a record carrying the SAME misspelling
         # ---- AGREED and passed - an assertion between two values one typo produced. Membership
@@ -491,7 +491,7 @@ while IFS= read -r f; do
           *) fail 19 "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are $AUTH_MODES, declared: $dmode" ;;
         esac
         [ "$recmode" = "$dmode" ] || fail 19 "a run-state file records an authorization mode the build README at its own recorded BASE does not declare, so the discipline the run says bound it is not the one its authorization asked for: $recmode against $dmode"
-        # ---- TOOL-dScriptedRepeat-4: the DECLARATION SEAM, second-opinioned the same way the
+        # ---- the DECLARATION SEAM, second-opinioned the same way the
         # ---- mode is. The leg re-derives the binding from the same blob and compares it against
         # ---- what the run RECORDED - never reading the driver's answer, which would confirm it
         # ---- rather than check it. Scoped to recipe runs because no other mode has a binding.

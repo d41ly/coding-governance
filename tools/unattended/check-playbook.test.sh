@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-playbook.test.sh — the self-test for the playbook validity leg. TOOL-dScriptedRepeat-3.
+# check-playbook.test.sh — the self-test for the playbook validity leg.
 #
 # HERMETIC: every arm runs in its own scratch git repo under `mktemp -d`, never in the real tree.
 # The leg reads `git ls-files`, so a test that mutated the real tree would be testing this
@@ -95,5 +95,11 @@ cp "$KEEP" "$F"
 seed_out=$(run | grep -c 'canon 11 section' || true)
 [ "$seed_out" = 1 ] && ok || bad "the leg did not report the shrunken canon count it derived"
 
-echo "PASS ($n assertions)"
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, in the shape the bar's
+# `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
+# past an exit leaves the suite reporting success over the arms it never reached, which is the same
+# green-by-absence this leg's own subject is about.
+FLOOR_ASSERTIONS=28
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

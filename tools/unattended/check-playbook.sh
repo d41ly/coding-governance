@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-playbook.sh — the merge-bar leg over every tracked PLAYBOOK. TOOL-dScriptedRepeat-3.
+# check-playbook.sh — the merge-bar leg over every tracked PLAYBOOK.
 #
 # WHAT THIS DOES NOT CHECK, said here because a structural check reads as a semantic one to everybody
 # who did not write it:

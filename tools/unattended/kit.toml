@@ -22,7 +22,7 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
 placeholders = []
 
-# TOOL-dScriptedRepeat-2 - the playbook template. Placeholder-free like the protocol, so the
+# the playbook template. Placeholder-free like the protocol, so the
 # adopter copies it rather than rendering it.
 [[files]]
 include = ["PLAYBOOK-TEMPLATE.template.md"]
@@ -62,7 +62,7 @@ argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
 red_after_land = true
 
-# TOOL-dScriptedRepeat-3 - the playbook validity leg. No guard: it grades an adopter's playbooks and
+# the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
 # change a playbook.
 [[gate_leg]]

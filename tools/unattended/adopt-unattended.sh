@@ -138,7 +138,7 @@ SKILL_OUT="$SKILL_DIR/SKILL.md"
 PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"
 PROTO_REL="$MEMORY_ROOT/guides/UNATTENDED-PROTOCOL.md"
 PROTO_OUT="$ROOT/$PROTO_REL"
-# TOOL-dScriptedRepeat-2 - the THIRD artifact. COPIED rather than rendered, for the reason the
+# the THIRD artifact. COPIED rather than rendered, for the reason the
 # protocol is: it carries no placeholder, so a render step would be a second spelling of `cat`.
 PBT_SHIP="$KIT_DIR/PLAYBOOK-TEMPLATE.template.md"
 PBT_REL="$MEMORY_ROOT/guides/PLAYBOOK-TEMPLATE.md"
@@ -210,7 +210,7 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1; then
     echo "unattended: $PROTO_REL has drifted from the shipped protocol; re-run $0"; exit 1
   fi
-  # TOOL-dScriptedRepeat-2 - the third artifact, with its own TWO refusals. NOT-INSTALLED and
+  # the third artifact, with its own TWO refusals. NOT-INSTALLED and
   # DRIFTED are separate messages: one sends the reader to run the adopter and the other to read a
   # diff, and one message would send half of them to the wrong place.
   if [ ! -f "$PBT_OUT" ]; then
@@ -233,7 +233,7 @@ if [ ! -f "$PROTO_OUT" ] || ! diff -q <(tr -d '' < "$PROTO_OUT") "$PROTO_SHIP" 
   tr -d '' < "$PROTO_SHIP" > "$PROTO_OUT"
   echo "unattended: installed $PROTO_REL"
 fi
-# TOOL-dScriptedRepeat-2 - the playbook template, the same shape as the protocol above it.
+# the playbook template, the same shape as the protocol above it.
 if [ ! -f "$PBT_OUT" ] || ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$PBT_SHIP" > "$PBT_OUT"
   echo "unattended: installed $PBT_REL"

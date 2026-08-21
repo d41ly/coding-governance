@@ -153,7 +153,7 @@ hit "$out" "LANDER"
 reset_tree; sed -i 's/^PHASES_CORE=.*/PHASES_CORE=unparseable/' tools/unattended/unattended.sh
 hit "$(run)" "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set"
 
-# ---- TOOL-dScriptedRepeat-1: a FOURTH branch, separate from the one above because an empty mode
+# ---- a FOURTH branch, separate from the one above because an empty mode
 # ---- vocabulary is a different failure. The other core sets stay readable, so the leg runs on and
 # ---- every mode-membership test passes over nothing - a green that means the opposite of what it
 # ---- looks like, which is exactly why it refuses instead of carrying on.
@@ -1080,7 +1080,7 @@ anchor_restore
 reset_tree
 miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 
-# ---- TOOL-dScriptedRepeat-1: MEMBERSHIP, which is a different question from agreement and needs
+# ---- MEMBERSHIP, which is a different question from agreement and needs
 # ---- its own arm because the fixture that proves it is the one the agreement arm CANNOT see.
 # ----
 # ---- THE AGREEING-MISSPELLING case. Both sides carry the SAME illegal value, so the agreement
@@ -1109,7 +1109,7 @@ git add -A >/dev/null
 hit "$(run)" "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are"
 anchor_restore
 
-# ---- TOOL-dScriptedRepeat-4: the DECLARATION SEAM second-opinioned. The record claims a
+# ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two
 # ---- fixtures, because one arm asserting either message would pass on whichever fired.
 add_recipe_seam() { sed -i '/^slug: /a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3' memory/builds/tRun/README.md; }

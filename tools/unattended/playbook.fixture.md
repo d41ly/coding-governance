@@ -14,13 +14,13 @@ piece_checks  = ["fixture-shape"]
 set_checks    = ["fixture-distinct"]
 legs          = { fixture-shape = "tools/unattended/check-playbook.sh", fixture-distinct = "tools/unattended/check-playbook.sh" }
 coverage      = "resolvable"
-curated       = "TOOL-dScriptedRepeat-3 2026-08-21"
+curated       = "the playbook-mode build, node d, 2026-08-21"
 ```
 
 ## 1. Identity and provenance
 
-Ratified by `TOOL-dScriptedRepeat-3`, 2026-08-21, as the kit's population fixture. Its evidence is
-that unit's spec; it has no owner acceptance because it produces nothing anybody ships.
+Ratified as the kit's population fixture on 2026-08-21 by the build that introduced this leg.
+Its evidence is that build's spec set; it has no owner acceptance because it produces nothing anybody ships.
 
 ## 2. Ground rules
 
