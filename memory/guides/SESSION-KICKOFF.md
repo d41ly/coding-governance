@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-21T14:53:18+03:00 @ c5da884593910c62a1069bc765dc12cbdb446bba
+last-audit: 2026-08-21T18:38:56+03:00 @ d163804cbf399cbc0c145b4a547c68ca8c31ea8f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c1b3734a34e6121e42422eff79c5a58e9819aa41
+last-body-change: 2f28951450582ab7727cfe35517aed7492785f2f
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -62,7 +62,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
-  ask, or a build folder committed before the run's branch existed (`memory/guides/UNATTENDED-PROTOCOL.md`).
+  ask, or a committed build folder the run did not create. What "did not create" admits depends on the
+  ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
+  "committed before the run's branch existed", which describes one anchor and is false of the other.
+  `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
@@ -72,6 +75,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid.
+
+- **An unattended run declares a MODE, and which one decides what binds it**: the authorization
+  discipline, which scoped directives apply, and whether the piece-scoped Definition-of-Done items
+  evaluate at all or announce a skip. The set is a driver constant, the unattended Skill's routing
+  table names a start path per member, and a leg joins the two in both directions. Neither the
+  members nor their count are written here, for the reason the directives bullet above gives.
 
 - **A CLOSED Tier-2 unit owes an acceptance ledger** — one line per numbered criterion, in a record
   whose `**Serves:**` kind is `journal`, in one of two forms and no third. The grammar is
