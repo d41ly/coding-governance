@@ -470,7 +470,11 @@ ledspec 76 CLOSED 01 2 '6. Acceptance criteria' '- **AC1** — a thing, observed
 sed -i 's/^- rev-1 · 2026-08-01 · initial draft.$/- rev-1 · 2026-08-01 · initial draft./' "$D/spec/2026-08-01-spec-tFixture-76.md"
 mkdir -p "$D/build"
 { printf '# ledger\n\n**Serves:** journal ARCH-tFixture-70 ARCH-tFixture-72 ARCH-tFixture-73\n\n'
-  printf '**Evidences:** ARCH-tFixture-70\n- AC1 — `x` — observed.\n\n'
+  # THE BOLD SPELLING, deliberately. The spec-side extractor accepts `- **AC1**` and the ledger
+  # flattener accepted only `- AC1`, so one legal label was two labels depending on which half read
+  # it — and the half nobody consults while writing a ledger was the strict one. Writing the fixture
+  # in the bold form makes the `miss 'ARCH-tFixture-70/AC1'` arm below the pin for that.
+  printf '**Evidences:** ARCH-tFixture-70\n- **AC1** — `x` — observed.\n\n'
   printf '**Evidences:** ARCH-tFixture-72\n- AC1 — it just works.\n\n'
   printf '**Evidences:** ARCH-tFixture-73\n- AC1 — `x` — observed.\n'
 } > "$D/build/2026-08-20-build-ARCH-tFixture-70-1-ledger.md"
@@ -1313,6 +1317,36 @@ n=$((n+1))
 for _k in $_engkeys READ_PATH_HEADROOM; do
   n=$((n+1))
   grep -qE "^$_k=" "$EX" || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
+done
+
+# ---- ...and the DATE CUTOFFS, which the loop above structurally cannot reach: they are read as
+# ---- `${NAME:-}` and never validated by the cap loop, so a cutoff key added to the engine and
+# ---- forgotten in the example was invisible to a parity arm derived from that loop alone. That is
+# ---- what happened to both ACCEPTANCE_LEDGER keys, and the arm above passed the whole time.
+# ----
+# ---- THE HONEST POPULATION is every `${NAME:-}` the engine reads, MINUS the names it assigns itself
+# ---- (those are internals, not overrides), MINUS a DECLARED exclusion carrying its reason. The
+# ---- exclusion is asserted in BOTH directions: a name it lists that the engine no longer reads reds
+# ---- too, because a stale exemption silently widens the surface it was written to narrow.
+_engreads=$(grep -oE '\$\{[A-Z][A-Z0-9_]+:-' "$HERE/check-memory-hygiene.sh" | sed 's/^\${//; s/:-$//' | sort -u)
+_engassigns=$(grep -oE '^[[:space:]]*[A-Z][A-Z0-9_]+=' "$HERE/check-memory-hygiene.sh" | tr -d ' \t' | sed 's/=$//' | sort -u)
+# NOT conf keys, and each says why. GOV_PYTHON is an environment override for the python launcher and
+# belongs to no conf; MAP_ROOT is the codebase-map kit's key, read from ITS conf by a check that
+# integrates with it. Declaring either here would tell adopters to set a key this kit does not own.
+_engexempt="GOV_PYTHON MAP_ROOT"
+n=$((n+1))
+[ -n "$_engreads" ] || { echo "FAIL could not derive the engine's conf reads; the cutoff-parity arm below would pass by finding nothing"; st=1; }
+for _k in $_engexempt; do
+  n=$((n+1))
+  printf '%s\n' "$_engreads" | grep -qx "$_k" \
+    || { echo "FAIL the example-conf exemption names $_k, which the engine no longer reads as an override — a stale exemption widens the surface it was written to narrow"; st=1; }
+done
+for _k in $_engreads; do
+  printf '%s\n' "$_engassigns" | grep -qx "$_k" && continue
+  case " $_engexempt " in *" $_k "*) continue ;; esac
+  n=$((n+1))
+  grep -qE "^$_k=" "$EX" \
+    || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, which the engine reads as an override, so an adopter cannot discover it"; st=1; }
 done
 
 # ---- SPEC10_CUTOFF is a CONF DECLARATION, and the environment no longer reaches it

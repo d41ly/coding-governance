@@ -198,6 +198,18 @@ region()   { awk -v o="$2" -v c="$3" '
 # not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
 # would notice this going quiet.
 REPORT=${GOV_UNATTENDED_REPORT:-0}
+# An id compared as a SUBSTRING joins `-1` to `-10`, and the joined pair is always the wrong one:
+# `TOOL-x-1` is a prefix of every `TOOL-x-1N` this build will ever mint. TOOL-dUnstalledConvoy-21 —
+# every id test in this file routes through these two, so the anchoring is written ONCE. It was
+# written at five sites by hand and three of them were unanchored, which is the argument for a
+# helper over a convention.
+id_rows() {  # haystack-text · id  -> the lines carrying that id as a whole token
+  printf '%s\n' "$1" | grep -E "(^|[^A-Za-z0-9-])$2([^A-Za-z0-9-]|\$)" || true
+}
+id_in() {    # haystack-text · id  -> 0 when the id appears as a whole token
+  [ -n "$(id_rows "$1" "$2")" ]
+}
+
 report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
 
 # ---- 14: a replace ref or a graft file in a repo running an unattended run IS the violation, not
@@ -994,22 +1006,23 @@ for f in $RUNS; do
     # An `add` alone would red a correctly performed supersession, whose successor is present now
     # and absent then with no `add` row that the sibling verb would even accept.
     for rsid in $(printf '%s\n' "$rs_now" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
-      printf '%s\n' "$rs_was" | grep -qF -- "$rsid" && continue
+      id_in "$rs_was" "$rsid" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
       fail 22 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
     done
     # RETIRED units: a status that is WONTDO now and was not then owes a retire or a supersede.
     for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
-      printf '%s\n' "$rs_was" | grep -F -- "$rsid" | grep -q '| WONTDO |' && continue
+      id_rows "$rs_was" "$rsid" | grep -q '| WONTDO |' && continue
       printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
       fail 22 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
     done
     # A SUPERSESSION THAT NEVER LANDED ITS REPLACEMENT is a retirement wearing a better name.
-    printf '%s\n' "$rs_rows" | grep -oE 'item supersede [A-Za-z0-9-]+ -> [A-Za-z0-9-]+' | awk '{print $NF}' | sort -u \
-    | while IFS= read -r rssucc; do
+    # A `for`, never a `| while`: `fail` in a pipeline subshell sets a status the parent never
+    # sees, so the leg reports the violation and exits 0 — the shape this whole build is about.
+    for rssucc in $(printf '%s\n' "$rs_rows" | grep -oE 'item supersede [A-Za-z0-9-]+ -> [A-Za-z0-9-]+' | awk '{print $NF}' | sort -u); do
         [ -n "$rssucc" ] || continue
-        printf '%s\n' "$rs_now" | grep -qF -- "$rssucc" && continue
+        id_in "$rs_now" "$rssucc" && continue
         fail 22 "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name: $rssucc in $f"
       done
   fi
@@ -1038,7 +1051,30 @@ for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
-  dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null || true)
+  # ONE ROW PER UNIT: the EARLIEST anchor, the WIDEST declaration. The driver's widening repair
+  # appends a superseding row rather than rewriting the earlier one, because the parked region is
+  # append-only; grading every row grades a declaration the driver itself has replaced, and the
+  # documented repair would then red this leg forever with nothing a run could do about it in band.
+  #
+  # KEYED ON THE UNIT AND NOT ON (group, unit), which was the first draft and was wrong for the case
+  # that matters. A widening after any commit — the run-state bookkeeping commit the declaration
+  # itself makes is enough — sees a moved HEAD, so the two rows carry DIFFERENT groups and a
+  # (group, unit) key leaves both standing. The stale narrow row is then graded against the pass's
+  # real diff and reds, which is the whole defect wearing a slightly different hat.
+  #
+  # The synthesised row takes the FIRST row's anchor, because that is when the pass began and the
+  # commit window has to open there, and the LAST row's paths, because that is the declaration that
+  # binds. Reporting order follows first appearance; `sort -u` would have reordered the findings.
+  dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
+      { pre = $0; sub(/ dispatch · item .*$/, "", pre)
+        k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
+        g = k; sub(/ .*$/, "", g)
+        u = k; sub(/^[^ ]* /, "", u)
+        pth = $0; sub(/^.* · reason /, "", pth)
+        if (!(u in first)) { first[u] = g; head[u] = pre; ord[++n] = u }
+        paths[u] = pth }
+      END { for (i = 1; i <= n; i++) { u = ord[i]
+              print head[u] " dispatch · item " first[u] " " u " · reason " paths[u] } }' || true)
   if [ -z "$dsrows" ]; then
     report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
     continue
@@ -1064,7 +1100,7 @@ for f in $RUNS; do
     # the check reds on every correctly declared pass. Measured on this unit's own fixture.
     dshit=""
     for dsc in $(GIT log --reverse --format=%H "$dsgrp"..HEAD 2>/dev/null); do
-      case "$(GIT log -1 --format=%s "$dsc" 2>/dev/null)" in *"$dsunit"*) ;; *) continue ;; esac
+      id_in "$(GIT log -1 --format=%s "$dsc" 2>/dev/null)" "$dsunit" || continue
       case "$(GIT diff-tree --no-commit-id --name-only -r "$dsc" 2>/dev/null | grep -v -x -F "$f")" in
         "") continue ;;
       esac
@@ -1098,7 +1134,7 @@ for f in $RUNS; do
       [ "$dssunit" = "$dsunit" ] && continue
       case "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" in *"$dssunit"*) dsother="$dssunit" ;; esac
     done <<DSSIBS
-$(grep -F -- " dispatch · item $dsgrp " "$f" 2>/dev/null)
+$(printf '%s\n' "$dsrows" | grep -F -- " dispatch · item $dsgrp ")
 DSSIBS
     if [ -n "$dsother" ]; then
       fail 23 "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available: $dsunit and $dsother in $f"

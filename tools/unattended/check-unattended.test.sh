@@ -1292,6 +1292,51 @@ mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
 
+# ---- THE WIDENING REPAIR MUST NOT RED THIS LEG (closing review H2). `--dispatch` re-declared with a
+# ---- strict superset APPENDS a superseding row — the parked region is append-only and nothing
+# ---- rewrites the earlier one — so a leg grading EVERY row grades a declaration the driver has
+# ---- already replaced. The pass below commits inside its WIDENED set and outside its first one,
+# ---- which is precisely what the repair exists to permit. It redded before the fix.
+# `drow` COMMITS, so two of them put the widened row at a different anchor from the first — which is
+# what a real run does, since `--dispatch` stages the run-state file and the run commits it. A
+# collapse keyed on (group, unit) leaves both rows standing here and grades the stale narrow one.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+drow ARCH-tRun-1 "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ...and the same repair with NO commit between the two rows, which is what the driver writes when it
+# widens at an unmoved HEAD. Both shapes reach the same collapse; only one of them reached the first
+# version of it, and the fixture is the only reason that was ever visible.
+reset_tree
+G=$(git rev-parse --short=8 HEAD)
+printf '\n2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt\n' "$G" >> memory/builds/tRun/RUN.md
+printf '2026-08-21T00:00:00Z dispatch · item %s ARCH-tRun-1 · reason work/one.txt work/two.txt\n' "$G" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "declare ARCH-tRun-1" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
+# ...and the superseding row is still GRADED, not merely skipped: a commit outside the WIDE set reds.
+# Without this arm the fix above would be indistinguishable from switching the check off for any unit
+# that ever re-declared, which is a larger hole than the one it closes.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+drow ARCH-tRun-1 "work/one.txt work/two.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+
+# ...and a NARROWER unit id is not confused with a wider one. `ARCH-tRun-1` is a prefix of
+# `ARCH-tRun-10`, and the row key is compared whole (closing review H3/H4).
+reset_tree
+drow ARCH-tRun-10 "work/ten.txt"
+mkdir -p work && printf 'a\n' > work/ten.txt
+git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
+miss "$(run)" "check 23 FAILED"
+
 # ...declaring MORE than you use is conservative and fine
 reset_tree
 drow ARCH-tRun-1 "work/one.txt work/two.txt"

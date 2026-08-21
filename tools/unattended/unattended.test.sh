@@ -1849,6 +1849,31 @@ same "the local arm reached the terminal phase" \
 hit "$(sed -n 's/^unpushed-at-landing: //p' memory/builds/tRun/RUN.md)" "oldest"
 git branch -f main "$BASE"
 
+# ---- THE WITNESS IS THE COMMIT THE TAKEN ARM VALIDATED (closing review H7). Every arm above lands
+# ---- with HEAD and the branch tip at the same commit, so none of them could tell the two apart —
+# ---- and the verb recorded HEAD on both arms while the local one validates the branch ref. This
+# ---- fixture forces them apart: the run's branch is merged into local main, then HEAD moves onto
+# ---- unrelated work that the remote has never seen, which is also what makes arm 1 miss.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+printf 'branch-ref: refs/heads/unit\n' >> memory/builds/tRun/RUN.md
+fixture
+RUNTIP=$(git rev-parse HEAD)
+git checkout -q -B main "$BASE"
+git merge -q --no-ff -m "land the run locally" "$RUNTIP"
+git checkout -q -B scratch "$RUNTIP"
+git commit -q --allow-empty -m "unrelated work after the merge" --no-verify
+HEADNOW=$(git rev-parse HEAD)
+out=$(run --landed tRun)
+hit "$out" "anchor LOCAL"
+same "the local arm witnesses the commit it validated" \
+  "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$RUNTIP"
+# ...and that is a DIFFERENT commit from HEAD, or the arm above proves nothing.
+[ "$RUNTIP" != "$HEADNOW" ] \
+  || { echo "FAIL the witness fixture left HEAD and the branch tip equal, so it cannot tell the two apart"; st=1; }
+n=$((n+1))
+git checkout -q unit; git branch -q -D scratch; git branch -f main "$BASE"
+
 # ...the arm is FALSE when nothing was merged, which is what makes it a test and not a tautology. The
 # first draft compared HEAD with the local default branch, and on the only path this verb is invoked
 # HEAD IS that ref — a commit compared with itself, which no fixture standing elsewhere can detect.
@@ -2335,9 +2360,9 @@ hit "$out" "dispatch declared"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, which every pass in the run shares, so two passes declaring it are not disjoint by construction:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog/TOOL.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds/tRun/RUN.md)" "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
 
 # ---- CONDITION 3, CONDITIONAL HALF. A generated index ALONE is ACCEPTED — every pass changes a spec
 # ---- header the index is rendered from, and refusing that was the VACUOUS reading M6 retracted. The
@@ -2368,7 +2393,41 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispa
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
 # ---- a space-joined value the path has already become two tokens by the time the verb sees it.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --dispatch tRun --pass notanid --writes tools/a.sh)" "--dispatch --pass is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
+# The two refusal texts, named once: an arm carrying half a signature passes on a message that
+# no longer says what it used to, which `check-arms` exists to catch.
+SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
+RELF_MSG="--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
+# ---- CONTAINMENT IS SYMMETRIC (closing review H5/H6, TOOL-dUnstalledConvoy-21). The refusals tested
+# ---- only "is the declared path UNDER the protected one", so the NARROW declarations were refused
+# ---- and the one claiming everything sailed through. Each arm below passed before the fix.
+# `memory` CONTAINS the run-state file without being under it, so the old `[ "$p" = "$rel" ]` let the
+# widest possible declaration through while refusing the exact one. Both arms are that shape.
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory)" "$RELF_MSG"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/builds)" "$RELF_MSG"
+# ...and the SAME direction at the shared-records site, which needs a record deep enough to have a
+# container that is not also the run-state file's. Declared for these two arms and taken back after:
+# a conf value left set would silently re-scope every arm below it.
+cp .unattended.conf .unattended.conf.bak
+printf '\nSHARED_RECORDS="memory/backlog/TOOL.md"\n' >> .unattended.conf
+hit  "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/backlog)" "$SHARED_MSG"
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/gotchas)" "$SHARED_MSG"
+mv .unattended.conf.bak .unattended.conf
+# ...and a genuinely disjoint sibling path is still ACCEPTED, so the widened relation did not simply
+# refuse everything — a refusal that fires on all inputs is the same nothing as one that fires on none.
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/alpha.sh)" "$SHARED_MSG"
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/alpha.sh)" "$RELF_MSG"
+
+# ---- A GLOB METACHARACTER in a declared path is refused (M1): both readers of the recorded row
+# ---- expand it unquoted, so the declared set and the compared set would differ by construction.
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes 'tools/*.sh')" "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one:"
+
+# ---- THE SIBLING INTERSECTION USES OVERLAP, not string equality (H6). A pass declaring a directory
+# ---- and a sibling declaring a file inside it collide on every write, and equality called them
+# ---- disjoint. The pair below is exactly that shape.
+run --dispatch tRun --pass ARCH-tRun-3 --writes tools/beta >/dev/null 2>&1
+hit "$(run --dispatch tRun --pass ARCH-tRun-4 --writes tools/beta/one.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+
+hit "$(run --dispatch tRun --pass notanid --writes tools/a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"

@@ -70,7 +70,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"; GENERATED_INDEXES=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
 # shellcheck disable=SC1090
 . "$CONF"
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
@@ -78,6 +78,12 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 # supplying the item nobody typed.
 PK_ITEM=""
 M="$MEMORY_ROOT"
+# SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
+# of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
+# `memory`, so an adopter at any other layout got a default naming a directory it does not have — a
+# refusal that can never fire, which is the same shape as no refusal at all. The sentinel is what
+# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises.
+[ "$SHARED_RECORDS" = "__kit-default__" ] && SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -1289,7 +1295,13 @@ verb_landed() { # slug
     fi
   fi
   set_fact "$rel" phase LANDED || return 1
-  set_fact "$rel" witness "$head" || return 1
+  # THE WITNESS IS THE COMMIT THE TAKEN ARM ACTUALLY VALIDATED. The local arm tests the run's own
+  # branch tip against the local default branch and never looks at HEAD; recording HEAD there writes a
+  # terminal fact about a commit nothing in this verb examined, and the two differ exactly when the
+  # worktree has moved on since the merge — which is the ordinary case, not a corner one.
+  local wit="$head"
+  [ "$akind" = local ] && wit="$rbtip"
+  set_fact "$rel" witness "$wit" || return 1
   # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
   # later reader, silently promoting a record to the stronger claim.
   set_fact "$rel" landed-anchor "$akind" || return 1
@@ -2144,6 +2156,11 @@ RESCOPED
 # the qualifier M6 earned through a retraction, because every pass changes a spec header the index is
 # rendered from and a flat ban would refuse the ORDINARY declaration. Condition 2 is a judgement about
 # meaning and is NOT enforced; a verb that pretended to decide it would be a check that cannot fail.
+# PATH CONTAINMENT, written once. Four sites in `--dispatch` need one of these two relations and each
+# had spelled it by hand: two tested "under" where the collision is symmetric, and a third used string
+# equality, which certifies `memory/` and `memory/DECISIONS.md` disjoint. TOOL-dUnstalledConvoy-21.
+covers()   { case "$2" in "$1"|"$1"/*) return 0 ;; esac; return 1; }
+overlaps() { covers "$1" "$2" || covers "$2" "$1"; }
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
@@ -2152,7 +2169,7 @@ verb_dispatch() { # slug · unit · writes...
   [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to declare a dispatch against: $rel"; return 1; }
   shaped=$(printf '%s\n' "$unit" | _ids_of)
   [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
-    fail 49 "--dispatch --pass is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
+    fail 49 "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
   [ "$#" -gt 0 ] || { fail 49 "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof: $unit"; return 1; }
   # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
   # path has already become two tokens by the time this verb sees it, and nothing recovers that.
@@ -2161,6 +2178,9 @@ verb_dispatch() { # slug · unit · writes...
       "") fail 49 "--dispatch was given an empty --writes path, and an empty declaration is not a narrow one: $unit"; return 1 ;;
       /*|?:[/\\]*) fail 49 "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find: $p"; return 1 ;;
       *..*) fail 49 "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound: $p"; return 1 ;;
+    esac
+    case "$p" in
+      *'*'*|*'?'*|*'['*|*']'*) fail 49 "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one: $p"; return 1 ;;
     esac
     case "$p" in
       *[[:space:]]*) fail 49 "--dispatch was given a --writes path containing whitespace, which the declaration's own field separator cannot carry, so the leg would split it into paths nobody declared: $p"; return 1 ;;
@@ -2177,12 +2197,18 @@ verb_dispatch() { # slug · unit · writes...
   # CONDITION 3, FLAT HALF. The run-state file is DERIVED rather than declared - it is the one member
   # the kit already knows how to locate - and the rest come from the project's own declaration, so an
   # adopter whose layout differs gets refusals about THEIR paths and not this repo's.
+  # BOTH DIRECTIONS, and that is the whole of the refusal's reach. Testing only "is the declared
+  # path UNDER a shared record" licenses the widest declaration a pass could possibly make: a bare
+  # `--writes memory` contains every shared record in the tree and is under none of them, so the
+  # narrow declarations get refused and the one that claims everything sails through.
   for p in "$@"; do
-    if [ "$p" = "$rel" ]; then
-      fail 49 "--dispatch declares the run-state file, which every pass in the run shares, so two passes declaring it are not disjoint by construction: $p"; return 1
+    if overlaps "$p" "$rel"; then
+      fail 49 "--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction: $p"; return 1
     fi
     for q in ${SHARED_RECORDS:-}; do
-      case "$p" in "$q"|"$q"/*) fail 49 "--dispatch declares a path under a shared mutable record this project declares, and the build method names those outright rather than conditionally: $p"; return 1 ;; esac
+      if overlaps "$p" "$q"; then
+        fail 49 "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally: $p against $q"; return 1
+      fi
     done
   done
   # CONDITION 3, CONDITIONAL HALF. A generated index alone is ACCEPTED - every pass changes a spec
@@ -2191,16 +2217,36 @@ verb_dispatch() { # slug · unit · writes...
   # when both appear, in this declaration or in a sibling's within the same group.
   grp=$(GIT rev-parse --short=8 HEAD 2>/dev/null)
   [ -n "$grp" ] || { fail 49 "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share: $slug"; return 1; }
-  sibpaths=$(grep -F -- " dispatch · item $grp " "$rel" 2>/dev/null | sed 's/.* · reason //' | tr '\n' ' ')
+  # THE SIBLING SET IS EVERY PASS THAT HAS NOT COMMITTED YET, not the rows sharing this exact HEAD.
+  # A commit landing between two concurrent declarations moves HEAD, so a group key that IS HEAD
+  # empties the sibling set at the moment the second pass declares — and condition 1 then passes by
+  # finding nobody to collide with, which is a vacuous selector wearing a green row. Openness is read
+  # the same way the leg reads it: a pass is closed once a commit after its own anchor names its unit.
+  sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
+      [ -n "$_r" ] || continue
+      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
+      _g=${_i%% *}; _u=${_i#* }
+      # An anchor this clone cannot resolve, or one off the current history, leaves the pass OPEN.
+      # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
+      if GIT rev-parse --verify --quiet "$_g^{commit}" >/dev/null 2>&1 &&
+         GIT log --format=%s "$_g..HEAD" 2>/dev/null | grep -qE "(^|[^A-Za-z0-9-])$_u([^A-Za-z0-9-]|\$)"; then
+        continue
+      fi
+      printf '%s\n' "$_r"
+    done)
+  sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
   for pair in ${GENERATED_INDEXES:-}; do
     idx=${pair%%:*}; gen=${pair#*:}
     [ "$idx" = "$pair" ] && continue
-    for p in "$@"; do
-      case "$p" in "$idx"|"$idx"/*) ;; *) continue ;; esac
+    # BOTH HALVES read our paths AND the siblings'. Searching for the index in our own declaration
+    # only made the refusal order-dependent: the pass that declares the index first is clean, and the
+    # sibling that later declares the generator never looks for the index anywhere but its own args.
+    for p in "$@" $sibpaths; do
+      covers "$idx" "$p" || continue
       for q in "$@" $sibpaths; do
-        case "$q" in "$gen"|"$gen"/*)
-          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1 ;;
-        esac
+        if covers "$gen" "$q"; then
+          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1
+        fi
       done
     done
   done
@@ -2211,13 +2257,15 @@ verb_dispatch() { # slug · unit · writes...
     case "$sib" in *" $unit · reason "*) continue ;; esac   # our own row is not a sibling
     for p in "$@"; do
       for q in ${sib#* · reason }; do
-        [ "$p" = "$q" ] || continue
+        # OVERLAP, never equality. Two passes declaring `memory/builds/x/` and
+        # `memory/builds/x/spec/s.md` collide on every write, and string equality calls them disjoint.
+        overlaps "$p" "$q" || continue
         local _who=${sib#* dispatch · item }; _who=${_who%% · reason *}
         fail 49 "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint: $p also in $_who"; return 1
       done
     done
   done <<SIBS
-$(grep -F -- " dispatch · item $grp " "$rel" 2>/dev/null)
+$sibrows
 SIBS
   # THE RE-DECLARATION RULE, keyed on GROUP plus UNIT. Identical is a no-op; a strict SUPERSET
   # REPLACES, which is the widening repair the leg's own fork resolution commits this build to; a

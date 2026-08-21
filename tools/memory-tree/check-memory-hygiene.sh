@@ -987,19 +987,26 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 if [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
-  alledger=$(for r in $(GIT ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
+  alledger=$(for r in $(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
     awk '
       /^\*\*Serves:\*\*/ { j = ($0 ~ /\*\*Serves:\*\* *journal/) }
       /^\*\*Evidences:\*\* / { u = (j ? $2 : ""); next }
       /^#/ { u = ""; next }
-      u != "" && /^- *AC[0-9]+/ {
-        lab = $2; sub(/[^A-Za-z0-9].*$/, "", lab)
+      u != "" && /^- *(\*\*)?AC[0-9]+/ {
+        lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
         form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
         print u " " lab " " form
       }' "$r"
   done)
   alpop=0; algap=""; albad=""; alnolab=""
-  for sp in $(GIT ls-files "$M/builds/*/spec/*.md" 2>/dev/null); do
+  alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null || true)
+  # The LISTING, guarded, not the post-cutoff population: a tree whose closed Tier-2 specs all
+  # predate the cutoff is a real empty and says so below, but a listing that comes back empty
+  # while spec files exist is a broken selector, and it reds. That distinction is the whole
+  # difference between an announced skip and a check that is dark and looks identical to green.
+  pop_guard 22 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
+' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
+  for sp in $alspecs; do
     case "$(basename "$sp")" in
       [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) sdate=$(basename "$sp" | cut -c1-10) ;;
       *) continue ;;

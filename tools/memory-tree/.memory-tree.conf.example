@@ -112,3 +112,16 @@ RECALL_CACHE_BUDGET_MB="512"
 # pin: ship it with a value. `row_grammar.py --emit-pin` prints the measured count for a tree
 # that already has content.
 ROW_DUPLICATE_PIN="0"
+
+# ACCEPTANCE_LEDGER_CUTOFF — the date from which a CLOSED Tier-2 spec owes an acceptance ledger: one
+# line per numbered criterion, in a record whose `**Serves:**` kind is `journal`. The grammar is in
+# HYGIENE.md under "Acceptance ledger", and the check reads SHAPE and COVERAGE only.
+#
+# BLANK GRANDFATHERS EVERYTHING AND THE CHECK RUNS DARK — set it to the date you adopt the grammar,
+# not to a date in the past, or every spec that closed before it reds and the adoption is unlandable.
+ACCEPTANCE_LEDGER_CUTOFF=""
+
+# ACCEPTANCE_LEDGER_GRANDFATHER — a space-separated list of unit IDS, never patterns, exempted from
+# the rule above. For the units that close across the cutoff date, where a date boundary falling
+# mid-day is the whole of the reason. Naming them individually is what keeps the exemption auditable.
+ACCEPTANCE_LEDGER_GRANDFATHER=""
