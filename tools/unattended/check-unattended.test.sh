@@ -1442,6 +1442,13 @@ gut_parser() { # fn-name · whole replacement body (one line)
 reset_tree; gut_parser declared_list "  printf ''"
 hit "$(run)" "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: ["
 
+# ...and the MULTI-LINE refusal itself: a parser that ANSWERS an unterminated array rather than
+# refusing it is round 3's blocker, and this check used to certify that answer because empty was all
+# it ever asserted.
+reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
+hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - exit status and answer follow: exited"
+
 reset_tree; gut_parser declared_list '  ((this is not shell'
 hit "$(run)" "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 
@@ -1866,7 +1873,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ----
 # ---- MEASURED unsharded 271, shard one 84, shard two 187. 84 + 187 = 271 EXACTLY: this file has no prologue arms, so the shards partition the count with nothing paid twice.
 # ---- RE-MEASURED at the playbook-mode merge, 2026-08-21, node d: unsharded 305, shard one 86, shard two 219, so the two regions share no prologue arm here. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
-FLOOR_ASSERTIONS=324
+# ---- RE-MEASURED after the ROUND-3 fold, 2026-08-22, node d: unsharded 337, shard one 86, shard two 251,
+# ---- and 86 + 251 = 337 EXACTLY, so this file still has no prologue arm. The three new arms are all in
+# ---- region two, which is why shard one did not move. NOTE for whoever reads the line above: the pin it
+# ---- sat under was 324, which no measurement line here accounts for — it was raised against a 334 that
+# ---- nobody recorded. A floor whose measurement is missing is a number, so this line records all three.
+FLOOR_ASSERTIONS=326
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -1883,7 +1895,7 @@ FLOOR_ASSERTIONS=324
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=83
-FLOOR_SHARD_2=220
+FLOOR_SHARD_2=243
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

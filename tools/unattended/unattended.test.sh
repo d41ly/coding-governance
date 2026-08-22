@@ -1745,8 +1745,13 @@ rm -rf "$gtmp"
 # ---- fix pinned `grain` and `records` and left `piece_checks` on the working tree, so one
 # ---- uncommitted line still moved a piece from `unchecked` to `verified` on the item that takes no
 # ---- override. A per-field pin is a list somebody has to remember to extend; the sha is not.
-n=$((n+1)); grep -q 'check-playbook.sh" --counts "$_pb" "$slug" "$(fact "$rel" base)"' "$SCRIPT" \
+n=$((n+1)); grep -q 'check-playbook.sh" --counts "$_pb" "$slug" "$_at"' "$SCRIPT" \
   || { echo "FAIL the close does not hand --counts the pinned BASE, so the playbook it measures is the one the run can edit"; st=1; }
+# ...and the pin is BOUND AND CHECKED before the call rather than passed straight through. `fact`
+# returns empty with exit 0 for an absent key, so an unvalidated pass-through is how an absent BASE
+# reached the leg as "no pin" — round 3, HIGH 2.
+n=$((n+1)); grep -q '_at=$(fact "$rel" base)' "$SCRIPT" \
+  || { echo "FAIL the close does not bind the BASE before calling, so an absent fact reaches the leg as no pin at all"; st=1; }
 # POINTED AT THE FILE THAT HELD THEM. Round 3, HIGH 5: this grepped the DRIVER, where those names
 # never existed — 0 hits at the pre-fix base too, so it could not fail. They lived in the LEG, six
 # hits there at that same sha. An assertion already true before the change it certifies is not a
@@ -2584,7 +2589,12 @@ hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --verd
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L)" "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"
 hit "$(run --record-piece tRun --records-root recs --path pc/nope.md --leg L --verdict PASS)" "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg L --verdict MAYBE)" "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given:"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg ["
+# LOW 10 (round-3): the refusal must name its CAUSE. The guard was widened to every
+# caller-supplied field and the message still printed two of them, so `--set 'AAAA · …'` was
+# refused correctly and the reader was told the offender was `other R9` — a true refusal for a
+# false reason, which is the kit's own recorded class sending them to the wrong field.
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "leg [a · b]"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg "$(printf 'a
 b')" --verdict PASS)" "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
@@ -2614,6 +2624,18 @@ out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS
 hit "$out" "set verdict recorded"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)" "set verdict unchanged"
 
+# ---- MEDIUM 9 (round-3): the enumerator's OWN refusal survives the caller's pipeline. `fail` prints
+# ---- to stdout and the close piped the leg through `grep -m1 '^pieces='`, so an unresolvable sha, an
+# ---- undeclared records root, a git failure and an unterminated declaration all arrived as the same
+# ---- empty string under one generic sentence. The `gates-green` arm eleven lines up carries this
+# ---- exact lesson in its own comment — surfaced, not discarded.
+reset_tree; run --preflight tDoD --keepalive-id k1 >/dev/null
+sed -i 's|^playbook: .*|playbook: content/not-a-playbook.md|' memory/builds/tDoD/RUN.md
+out=$(run --close tDoD)
+hit "$out" "the piece enumerator produced no machine-readable count line, so there is no population to measure this item against and a parsed value here would be invented:"
+hit "$out" "PLAYBOOK check"
+reset_tree
+
 # ---- HIGH 3 (round-1 diff review): the THREE FIELD GUARDS this writer alone did not carry while its
 # ---- four siblings all did. The newline is the load-bearing one: a set record is parsed line-wise by
 # ---- the Definition-of-Done reader, so a newline in --leg forges a verdict row nothing wrote — and
@@ -2624,7 +2646,10 @@ out=$(run --record-set tRun --records-root recs2 --run R1 --leg "$(printf 'x\nle
 hit "$out" "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
 same "the forged PASS never landed" "$(git hash-object recs2/set-R1.md)" "$before"
 same "the honest FAIL is still the only verdict for that leg" "$(grep -c '^leg honest · verdict FAIL$' recs2/set-R1.md)" "1"
-hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows:"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the three fields tested follow: leg ["
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "leg [a · reason b]"
+# ...and a separator in the SET, which is the field the widening added and the message did not.
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg ok --verdict PASS --set 'AAAA · leg honest · verdict PASS')" "set [AAAA · leg honest · verdict PASS]"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
 
 # ---- HIGH 2: the row dropper takes NO REGEX. Both writers spelled it as a `sed` ADDRESS carrying an
@@ -2657,7 +2682,7 @@ run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS >/dev
 run --record-set tDoD2 --records-root recs4 --run R9 --leg honest --verdict FAIL >/dev/null 2>&1
 before=$(git hash-object recs4/set-R9.md 2>/dev/null)
 out=$(run --record-set tDoD2 --records-root recs4 --run R9 --leg other --verdict PASS --set 'AAAA · leg honest · verdict PASS')
-hit "$out" "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows:"
+hit "$out" "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the three fields tested follow: leg ["
 same "the forged member-list row never landed" "$(git hash-object recs4/set-R9.md)" "$before"
 hit "$(run --record-set tDoD2 --records-root recs4 --run R9 --leg other --verdict PASS --set "$(printf 'AAAA\nleg honest · verdict PASS')")" "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
 same "the honest FAIL is still the only verdict for that leg" "$(grep -c '^leg honest · verdict FAIL$' recs4/set-R9.md)" "1"
@@ -3381,7 +3406,10 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ----
 # ---- MEASURED unsharded 519, shard one 205, shard two 327. 205 + 327 - 519 = 13 prologue arms, both regions pay them; unchanged by this merge, which is what says the added arms distributed across both regions rather than piling into one.
 # ---- RE-MEASURED after the ROUND-2 fold, 2026-08-22, node d: unsharded 667, shard one 209, shard two 473, so 209 + 473 - 667 = 15 prologue arms, unchanged across both folds. The round-1 figures were 656 / 209 / 462. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
-FLOOR_ASSERTIONS=647
+# ---- RE-MEASURED after the ROUND-3 fold, 2026-08-22, node d: unsharded 673, shard one 209, shard two 479, so
+# ---- 209 + 479 - 673 = 15 prologue arms — a third measurement at a third arm count, and the same 15. The six
+# ---- new arms all landed in region two, which is why shard one did not move at all.
+FLOOR_ASSERTIONS=653
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -3403,7 +3431,7 @@ FLOOR_ASSERTIONS=647
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=15
 FLOOR_SHARD_1=202
-FLOOR_SHARD_2=458
+FLOOR_SHARD_2=464
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

@@ -226,16 +226,65 @@ n=$((n+1))
   || bad "a leg no record satisfies did not grade its pieces unchecked, so the arm below cannot tell the pinned read from the tree read: [$PIN0]"
 sed -i '/^piece_checks/d' "$F"
 PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
-TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md | head -1 )
+TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh | grep -oE 'pieces [0-9]+ · verified [0-9]+' | head -1 )
 n=$((n+1))
 [ "$PIN1" = "$PIN0" ] \
   || bad "an UNCOMMITTED piece_checks delete moved the PINNED census, so the close still reads the file the run can edit: [$PIN0] then [$PIN1]"
 n=$((n+1))
-[ "$TREE1" != "$PIN1" ] \
-  || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch"
+case "$PIN1" in *"verified=0"*) [ "${TREE1#*verified }" != 0 ] || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch" ;; *) bad "the pinned read is not the unchecked one, so the comparison below is not the one this arm makes: [$PIN1]" ;; esac
 ( cd "$W" && git checkout -q -- tools/unattended/playbook.fixture.md 2>/dev/null )
 cp "$KEEP" "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm restore-fixture )
+
+# ---- BLOCKER (round-3): a LEGAL MULTI-LINE TOML ARRAY. Every call site did its own
+# ---- `sed … | head -1`, so an array spread over lines yielded the bare `[`, parsed to the DECLARED
+# ---- NULL, and graded every verdict-less piece `verified` — on the one Definition-of-Done item that
+# ---- takes no override. No attacker needed: an author formatting an array the ordinary way was
+# ---- enough, and check 28 CERTIFIED that output because empty was all it ever asserted.
+cp "$KEEP" "$F"
+sed -i 's|^piece_checks  = \["fixture-shape"\]|piece_checks  = [\n  "fixture-shape",\n]|' "$F"
+n=$((n+1))
+grep -q '^piece_checks  = \[$' "$F" || bad "the multi-line fixture edit did not take, so the arm below tests a single-line declaration"
+out=$(run)
+n=$((n+1))
+grep -qF -- "a playbook opens a per-piece check list and does not close it on the same line, and this parser reads one line - an unarmed parse must red rather than return the declared null, because the declared null makes every piece verified on the one Definition-of-Done item that takes no override; playbook:" <<<"$out" \
+  || bad "a multi-line declaration was accepted rather than refused, so it parses to the declared null and every unchecked piece grades verified"
+n=$((n+1))
+grep -qE 'pieces [0-9]+ · verified' <<<"$out" \
+  && bad "the leg printed a census for a playbook whose declaration it could not read, which is a number the caller would trust"
+cp "$KEEP" "$F"
+
+# ...and the SET list refuses the same way. Both declarations are read by one parser, so both had to
+# gain the refusal — a fix to one is a fix to neither, which is how the comment strip landed on one of
+# them in round 2.
+cp "$KEEP" "$F"
+sed -i 's|^set_checks    = \["fixture-distinct"\]|set_checks    = [\n  "fixture-distinct",\n]|' "$F"
+n=$((n+1))
+grep -q '^set_checks    = \[$' "$F" || bad "the multi-line set_checks edit did not take"
+n=$((n+1))
+grep -qF -- "a playbook opens a set-scoped check list and does not close it on the same line, and this parser reads one line - an unarmed parse must red rather than return the declared null; playbook" <<<"$(run)" \
+  || bad "a multi-line set_checks declaration was accepted rather than refused"
+cp "$KEEP" "$F"
+
+# ---- HIGH 2 (round-3): the sha is MANDATORY. Round 2 blocked a per-FIELD pin that silently reverted
+# ---- when a field was missing; the fold replaced it with a per-SHA pin that silently reverted when
+# ---- the sha was missing. `fact` returns empty with exit 0, so the only caller could hand this
+# ---- nothing and never know.
+emptypin=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' '' 2>&1 )
+n=$((n+1))
+grep -qF -- "--counts requires the sha to read the playbook at; an absent pin would silently parse the working tree, which is the file the run itself can edit" <<<"$emptypin" \
+  || bad "--counts accepted an EMPTY sha, so an absent pin silently reads the file the run can edit"
+
+# ---- HIGH 3 (round-3): the declared null is the WORD `none`. The escape prefix-matched, so a check
+# ---- named `nonempty-rows` read as "declares nothing" and the item returned MET with no record.
+cp "$KEEP" "$F"
+sed -i 's|^set_checks    = \["fixture-distinct"\]|set_checks    = ["nonempty-rows"]|' "$F"
+n=$((n+1))
+grep -q 'nonempty-rows' "$F" || bad "the nonempty fixture edit did not take"
+n=$((n+1))
+grep -qF -- "set checks unrecorded" <<<"$(run)" \
+  || bad "a set check whose name merely STARTS with none read as declaring nothing, so the item passes with no record and no verdict"
+cp "$KEEP" "$F"
 
 # ---- B1 (round-2 fold): THE TEMPLATE'S OWN COMMENT. The kit ships
 # ---- `piece_checks = []    # the checks that run over ONE piece.`, and the parser that read it had
@@ -362,8 +411,9 @@ cp "$KEEP" "$F"
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, in the shape the bar's
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
-# green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=62
+# green-by-absence this leg's own subject is about. RE-MEASURED at the round-3 fold: 72 executed,
+# same absolute headroom as the pin it replaces.
+FLOOR_ASSERTIONS=64
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

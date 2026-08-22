@@ -1456,19 +1456,20 @@ else
     # extraction and a correct parse of `[]` were one observation, and replacing both parser bodies
     # with `printf ''` left this check silent and green while the census went verified-over-unchecked.
     # A dead harness must not be byte-indistinguishable from a working one.
-    dl_run() { # raw value -> the parser's answer on stdout; rc is the parser's own
+    dl_run() { # body · key -> the parser's answer on stdout; rc is the parser's own
       bash -c "$dl_a
-declared_list \"\$1\"" _ "$1"
+declared_list \"\$1\" \"\$2\"" _ "$1" "$2"
     }
+    tpl_block=$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f' "$tpl")
     dlk=0
     # THE POSITIVE DIRECTION, FIRST AND FIXED. The template declares every list key as `[]`, so the
     # template loop below has NO input whose expected parse is non-empty — it is structurally
     # incapable of telling a working parser from one that answers nothing, which is the answer that
     # disables both consumers. These specimens are the check's only non-empty expectation.
-    for spec in 'X["a", "b#c"]    # trailing commentX|Xa b#cX' 'X[ "solo" ]X|XsoloX' 'X[]X|XX'; do
+    for spec in 'Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX'; do
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
-      _got=$(dl_run "$_in"); _rc=$?
+      _got=$(dl_run "$_in" k); _rc=$?
       if [ "$_rc" -ne 0 ]; then
         fail 28 "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: [$_in] exited $_rc"
       elif [ "$_got" != "$_want" ]; then
@@ -1476,11 +1477,22 @@ declared_list \"\$1\"" _ "$1"
       fi
       dlk=$((dlk + 1))
     done
+    # THE MULTI-LINE ARRAY, which is round 3's blocker. A legal TOML array spread over lines used to
+    # yield the bare `[`, parse to the declared null, and grade every verdict-less piece `verified` on
+    # the one item that takes no override — and this check CERTIFIED that output, because empty was
+    # all it ever asserted. The parser must REFUSE it, not answer it.
+    _ml=$(printf 'k = [\n  "a",\n]\n')
+    _got=$(dl_run "$_ml" k); _rc=$?
+    [ "$_rc" -eq 2 ] || fail 28 "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - exit status and answer follow: exited $_rc with [$_got]"
+    dlk=$((dlk + 1))
+    # The built-in specimens are done; everything counted past this point came from the template. The
+    # threshold below is therefore DERIVED from where the specimens stopped, not typed — an added
+    # specimen used to silently satisfy the liveness assertion it was supposed to be excluded from.
+    dlk_builtin=$dlk
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
       dlk=$((dlk + 1))
-      raw=${tl#*=}
-      got=$(dl_run "$raw"); rc=$?
+      got=$(dl_run "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
       # NO rc BRANCH HERE, deliberately. The specimens above run the same extracted parser and
       # assert its exit status, so a parser that cannot execute has already failed by this point —
       # a branch here could be reached by no fixture, which is the shape round 3 filed against this
@@ -1503,9 +1515,8 @@ TPLEOF
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
       dlk=$((dlk + 1))
-      raw=${tl#*=}
       got=$(bash -c "$ds_a
-declared_scalar \"\$1\"" _ "$raw"); rc=$?
+declared_scalar \"\$1\" \"\$2\"" _ "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
       if [ "$rc" -ne 0 ]; then
         fail 28 "the extracted declared-scalar parser could not be executed over the shipped template's own line, and an unexecutable parser returns the empty string every assertion here reads as clean - key and exit status follow: ${tl%%=*} exited $rc"
       else
@@ -1524,7 +1535,7 @@ TPLSEOF
     # parser going quiet. Every fence key reaches one of the two loops by construction — a value
     # starting `[` goes to the list parse, everything else to the scalar one — so what is worth
     # asserting is that the template half RAN, not that two derivations of one number agree.
-    [ "$dlk" -gt 3 ] || fail 28 "the shipped template's declaration block yielded no key this check could parse, so only the built-in specimens ran and the template half of this assertion covered nothing: $tpl"
+    [ "$dlk" -gt "$dlk_builtin" ] || fail 28 "the shipped template's declaration block yielded no key this check could parse, so only the built-in specimens ran and the template half of this assertion covered nothing: $tpl"
   fi
 fi
 

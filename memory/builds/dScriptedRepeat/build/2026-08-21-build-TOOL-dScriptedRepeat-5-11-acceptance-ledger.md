@@ -18,7 +18,17 @@ did, and `--counts` was pinned per-field so one field stayed on the working tree
 still hold — they name observations, and every observation still reproduces — but the mechanism under
 AC1 of unit 5 and AC4 of unit 6 is the round-2 one, not the round-1 one.
 
-Suite counts at the time of writing: driver 656, leg 305, playbook 56, cross-component 13.
+**Round 3 re-judged the round-2 fold and blocked again**, and its most useful finding was about this
+ledger's own evidence rather than about the code: three of its six top findings were GATES THAT COULD
+NOT FAIL, written in the round-2 fold to hold the round-2 repairs. Check 28's answer arm asserted only
+that the parse was empty, so a parser returning nothing for every input scored correct; check 28's
+template loop reached two of the block's ten keys; and the `--counts` behavioural arm produced
+byte-identical output pinned and unpinned. Every criterion below still names an observation and every
+observation still reproduces — but three of them were being answered by an arm that had never been seen
+to fail, which is the same green-by-absence the ledger was written to end. The round-3 fold staged a RED
+for each before re-arming it. The mechanism under unit 5's AC1 and unit 6's AC4 is now the round-3 one.
+
+Suite counts at the time of writing: driver 673, leg 337, playbook 72, cross-component 19.
 
 ## TOOL-dScriptedRepeat-5 — the per-piece record
 

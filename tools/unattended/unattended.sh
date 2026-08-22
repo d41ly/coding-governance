@@ -942,8 +942,8 @@ check_authorization() { # slug · base
     # The declaration block is unit 2's fenced TOML. Read for the two keys THIS unit owns; the rest
     # belong to the units that read them and are parsed there.
     AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
-    AUTH_GRAIN=$(declared_scalar "$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1)")
-    AUTH_RECORDS=$(declared_scalar "$(printf '%s\n' "$_pb" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
+    AUTH_GRAIN=$(declared_scalar "$_pb" grain)
+    AUTH_RECORDS=$(declared_scalar "$_pb" records)
     case "$_pb" in
       *'```toml'*) ;;
       *) fail 46 "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing: $AUTH_PLAYBOOK"
@@ -2048,13 +2048,32 @@ dod_met() { # slug · run-state file · item · checker
       #
       # A SHA, not a field list. A per-field pin is a list somebody has to remember to extend, and
       # the evidence that nobody does is this arm's own history.
-      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$(fact "$rel" base)" 2>/dev/null \
-                | grep -m1 '^pieces=')
+      # THE PIN IS BOUND AND CHECKED BEFORE THE CALL. `fact` returns empty with exit 0 for an
+      # absent key, so passing it straight through let an absent BASE reach the leg as "no pin" —
+      # which silently read the working tree. The leg refuses that now too; both ends, because this
+      # is the third round in which an optional pin turned out to be the whole defect.
+      _at=$(fact "$rel" base)
+      if [ -z "$_at" ]; then
+        DOD_OUT="this run's record pins no BASE, so the playbook this item measures could only be read from the working tree - the file the run itself can edit: $rel"
+        return 1
+      fi
+      # CAPTURED ONCE, SELECTED FROM. Piping the leg straight into `grep -m1 '^pieces='` threw away
+      # every refusal it prints — an unresolvable sha, an undeclared records root, a git failure and
+      # an unterminated declaration all arrived here as the same empty string, and the generic
+      # sentence below named none of them. The `gates-green` arm eleven lines up carries this exact
+      # lesson in its own comment: SURFACED, not discarded.
+      _raw=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$_at" 2>&1)
+      _counts=$(printf '%s\n' "$_raw" | grep -m1 '^pieces=')
       # SELECTED BY SHAPE, never by position. `head -1` took whatever the leg printed first, so any
       # note reaching stdout made every field below parse to that line's first word — the parse
       # cannot fail, it just yields nonsense, and the close then blocks on a fabricated count.
       if [ -z "$_counts" ]; then
         DOD_OUT="the piece enumerator produced no machine-readable count line, so there is no population to measure this item against and a parsed value here would be invented: $_pb"
+        # THE ENUMERATOR'S OWN WORDS, when it had any. Without this the operator learns only THAT the
+        # count is missing and has to re-run the leg by hand to learn why.
+        _why=$(printf '%s\n' "$_raw" | grep -m1 'FAILED' || true)
+        [ -z "$_why" ] || DOD_OUT="$DOD_OUT
+    $_why"
         return 1
       fi
       _pc=${_counts#pieces=}; _pc=${_pc%% *}
@@ -2105,7 +2124,7 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="the playbook does not resolve at the pinned BASE or carries no declaration block there, so this item would read an empty set_checks and certify set coverage over a playbook nothing could read: $_pb"
         return 1
       fi
-      _rr=$(declared_scalar "$(printf '%s\n' "$_blob" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
+      _rr=$(declared_scalar "$_blob" records)
       # M1: the escape is matched against a TRIMMED value. It compared RAW text, and the line the
       # kit's own template ships - `set_checks   = []    # the checks that run over ALL N…` - does not
       # equal `[]`, so an author who declares none and keeps the template's own comment was told they
@@ -2113,9 +2132,12 @@ dod_met() { # slug · run-state file · item · checker
       # already trimmed; the inconsistency was between two lines of one arm.
       #
       # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
-      _declared=$(declared_list "$(printf '%s\n' "$_blob" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
+      _declared=$(declared_list "$_blob" set_checks)
+      # HIGH 3 (round-3): the declared null is the WORD `none`, not any value starting with it. A
+      # set check named `nonempty-rows` read as "declares nothing" and this item returned MET with no
+      # record, no verdict and no override entry.
       case "$_declared" in
-        ''|'none'*) DOD_OUT=""; return 0 ;;
+        ''|none|'none '*|none[!A-Za-z0-9-]*) DOD_OUT=""; return 0 ;;
       esac
       # M2, second half: with checks DECLARED and no records root, `_rr` was empty and `_set`
       # degenerated to the absolute path `/set-<slug>.md`, so the item red naming a path outside the
@@ -2320,22 +2342,38 @@ $_bcnon"
 # the only way two inlined copies stay one answer.
 #
 # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
-declared_list() { # raw value -> members, space-separated
-  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+declared_list() { # body · key -> members space-separated; rc 2 on an unterminated array
+  # THE LINE SELECTION LIVES HERE, and that is the whole point. Round 3's blocker: all three call
+  # sites did their own `sed … | head -1`, so a LEGAL multi-line TOML array yielded the bare `[`,
+  # parsed to the declared null, and every piece carrying no verdict graded `verified` — on the one
+  # Definition-of-Done item that takes no `--override`. No attacker needed; an author formatting an
+  # array the ordinary way was enough.
+  #
+  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
+  # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
+  local raw
+  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1)
+  case "$raw" in
+    *'['*']'*) ;;
+    *'['*) return 2 ;;
+  esac
+  printf '%s\n' "$raw" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
     | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
-declared_scalar() { # raw value -> the scalar it declares, comment/quotes/space stripped
-  # THE SIBLING OF `declared_list`, and it exists for the reason that one does. Round 3, HIGH 6: the
-  # list parse was consolidated and the SCALAR reads were left as five ad-hoc pipelines, so an adopter
-  # who filled the shipped template in place and kept its comments got `grain = "out/*/piece.md"
-  # # a glob…` parsed WITH the comment — a DEAD PROBE over a tree holding real pieces — while
-  # `curated = ""    # who ratified…` satisfied the freeze check on an unratified playbook.
+declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
+  # THE SIBLING OF `declared_list`, and it selects its own line for that helper's reason: a `head -1`
+  # spelled at each call site is a decision nobody reviews again. Round 3, HIGH 6: the list parse was
+  # consolidated while five scalar reads stayed ad-hoc, so an adopter who filled the shipped template
+  # in place and kept its comments got `grain` parsed WITH the comment — a DEAD PROBE over a tree of
+  # real pieces — while `curated = ""    # who ratified…` satisfied the freeze on an unratified
+  # playbook.
   #
-  # Same copy-inlined discipline: each kit script installs standalone and cannot import, so both
-  # copies are byte-compared by the leg check that compares `declared_list`'s.
-  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+  # Same copy-inlined discipline as its sibling: each kit script installs standalone and cannot
+  # import, so both copies are byte-compared by the leg check that compares that one's.
+  printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
+    | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
@@ -2588,7 +2626,7 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha 
   if [ "$(printf '%s' "$leg$verdict$piece$pbsha$runid" | wc -l)" -ne 0 ]; then
     fail 47 "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
   fi
-  case "$leg$piece$pbsha$runid" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $piece"; return 1 ;; esac
+  case "$leg$piece$pbsha$runid" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg [$leg] piece [$piece] playbook-sha [$pbsha] run [$runid]"; return 1 ;; esac
   if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s%s' "$leg" "$piece" "$pbsha" "$runid" | grep -qF -- "$BYPASS_BAN"; then
     fail 47 "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
@@ -2653,7 +2691,7 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
   if [ "$(printf '%s' "$leg$verdict$runid$hashes" | wc -l)" -ne 0 ]; then
     fail 47 "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
   fi
-  case "$leg$runid$hashes" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $runid"; return 1 ;; esac
+  case "$leg$runid$hashes" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the three fields tested follow: leg [$leg] run [$runid] set [$hashes]"; return 1 ;; esac
   if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s' "$leg" "$runid" "$hashes" | grep -qF -- "$BYPASS_BAN"; then
     fail 47 "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
@@ -2698,7 +2736,7 @@ verb_record_set() { # slug · leg · verdict
   [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead: $rel"; return 1; }
   refuse_if_terminal "$rel" --record-set || return 1
   pb=$(fact "$rel" playbook)
-  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null)" records)
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a set verdict has nowhere to be written that the merge bar will read"; return 1; }
   # The set IDENTITY is the ORDERED list of this run's piece hashes, DERIVED here rather than
   # supplied: a caller that names its own set could name a set it did not produce.
@@ -2728,7 +2766,7 @@ verb_record_piece() { # slug · piece · leg · verdict
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers: $rel"; return 1; }
   refuse_if_terminal "$rel" --record-piece || return 1
-  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null)" records)
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
   # M6 (round-1 diff review): the BLOB SHA, not the path. This passed `$(fact "$rel" playbook)` —
   # the same expression used one line up as the PATH half of a `GIT show` — into a field printed as

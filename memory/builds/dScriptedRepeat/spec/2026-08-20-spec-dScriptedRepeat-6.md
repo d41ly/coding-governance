@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** CLOSED · rev-8 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-9 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -180,6 +180,13 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-22 · the round-3 fold. The BASE sha `--counts` reads at is MANDATORY: `fact` returns empty with exit
+  0 for an absent key, so the rev-8 pin was advisory in exactly the way the rev-7 per-field pin was — an empty fourth
+  positional silently reverted to the working-tree parse, which is the file the run itself can edit. The leg now
+  refuses an empty sha with exit 2 and the close BINDS the fact before calling rather than passing it through. The
+  leg's own liveness refusal reaches the reader: `--close` used to filter the leg through `grep -m1 '^pieces='`, which
+  discarded an unresolvable sha, an undeclared records root and an unterminated declaration into one generic
+  sentence, and the item's FAILED line is now carried up whole.
 - rev-8 · 2026-08-22 · the round-2 fold. `--counts` takes the pinned BASE sha and reads the playbook from the blob, so `pieces-complete` can no longer be moved by an uncommitted edit — the round-1 fix pinned `grain` and `records` and left `piece_checks` on the working tree, which defeated the item this same build had made non-overridable.
 - rev-6 · 2026-08-21 · BUILT, with one divergence recorded rather than made silently. S5 said term 3
   counts pieces using unit 8's diff population; it counts them through unit 5's `enumerate_run`

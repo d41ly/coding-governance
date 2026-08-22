@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** CLOSED · rev-8 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-9 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -164,6 +164,14 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-22 · the round-3 fold. The shared `declared_list` now REFUSES an array left open at the end of its
+  line (rc 2) instead of answering the declared null, and every reader treats that refusal as a red rather than as
+  "declares nothing": a legal multi-line TOML array used to yield the bare `[`, parse to empty, and grade every
+  verdict-less piece `verified` — the rev-8 consolidation to one parser did not close that, because all three call
+  sites still fed it `head -1`. The declared-null escape is an EXACT match on `none` rather than a prefix match, so a
+  check named `nonempty-rows` no longer reads as no declaration at all; `piece_checks` got the `none — <why>` form its
+  sibling had; and `GITSHOW` reads the blob under the same replace-ref and graft pins the driver's header says every
+  such read goes through.
 - rev-8 · 2026-08-22 · the round-2 fold. `verified` now parses `piece_checks` through the shared `declared_list`, which is inlined in both scripts and byte-compared by leg check 28 — the round-1 fold wrote a third spelling of that parse without the trailing-comment strip, so the kit's own template line word-split into eight phantom legs. Both record writers lost their last `sed` re-stamp and gained guards over EVERY caller-supplied field: `--set` and `--playbook-sha` each forged a well-formed verdict row through the attended path.
 - rev-5 · 2026-08-21 · BUILT. The records root moved from the build folder to a PLAYBOOK
   declaration: the memory-tree gate's build-folder shape is a closed whitelist and its top level is

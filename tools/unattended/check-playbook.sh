@@ -45,6 +45,14 @@ COUNTS_RUN=""
 # BLOCK closes the class: no declaration added to it later can be forgotten here.
 COUNTS_AT=""
 [ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; COUNTS_AT="${4:-}"; }
+# MANDATORY, not advisory. Round 2 blocked a per-FIELD pin that silently reverted when a field was
+# missing; the fold replaced it with a per-SHA pin that silently reverted when the sha was missing.
+# `fact` returns empty with exit 0 for an absent key, so the only caller could hand this nothing and
+# never know. The merge-bar path does not use `--counts`, so an absent pin is always a caller error.
+if [ -n "$COUNTS_FOR" ] && [ -z "$COUNTS_AT" ]; then
+  echo "check-playbook: --counts requires the sha to read the playbook at; an absent pin would silently parse the working tree, which is the file the run itself can edit"
+  exit 2
+fi
 
 command -v git >/dev/null 2>&1 || { echo "check-playbook: no git on PATH"; exit 2; }
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-playbook: not a git work tree"; exit 2; }
@@ -122,22 +130,38 @@ record_for() { # records-root · piece-path -> its record, or empty
 # the only way two inlined copies stay one answer.
 #
 # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
-declared_list() { # raw value -> members, space-separated
-  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+declared_list() { # body · key -> members space-separated; rc 2 on an unterminated array
+  # THE LINE SELECTION LIVES HERE, and that is the whole point. Round 3's blocker: all three call
+  # sites did their own `sed … | head -1`, so a LEGAL multi-line TOML array yielded the bare `[`,
+  # parsed to the declared null, and every piece carrying no verdict graded `verified` — on the one
+  # Definition-of-Done item that takes no `--override`. No attacker needed; an author formatting an
+  # array the ordinary way was enough.
+  #
+  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
+  # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
+  local raw
+  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1)
+  case "$raw" in
+    *'['*']'*) ;;
+    *'['*) return 2 ;;
+  esac
+  printf '%s\n' "$raw" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
     | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
-declared_scalar() { # raw value -> the scalar it declares, comment/quotes/space stripped
-  # THE SIBLING OF `declared_list`, and it exists for the reason that one does. Round 3, HIGH 6: the
-  # list parse was consolidated and the SCALAR reads were left as five ad-hoc pipelines, so an adopter
-  # who filled the shipped template in place and kept its comments got `grain = "out/*/piece.md"
-  # # a glob…` parsed WITH the comment — a DEAD PROBE over a tree holding real pieces — while
-  # `curated = ""    # who ratified…` satisfied the freeze check on an unratified playbook.
+declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
+  # THE SIBLING OF `declared_list`, and it selects its own line for that helper's reason: a `head -1`
+  # spelled at each call site is a decision nobody reviews again. Round 3, HIGH 6: the list parse was
+  # consolidated while five scalar reads stayed ad-hoc, so an adopter who filled the shipped template
+  # in place and kept its comments got `grain` parsed WITH the comment — a DEAD PROBE over a tree of
+  # real pieces — while `curated = ""    # who ratified…` satisfied the freeze on an unratified
+  # playbook.
   #
-  # Same copy-inlined discipline: each kit script installs standalone and cannot import, so both
-  # copies are byte-compared by the leg check that compares `declared_list`'s.
-  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+  # Same copy-inlined discipline as its sibling: each kit script installs standalone and cannot
+  # import, so both copies are byte-compared by the leg check that compares that one's.
+  printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
+    | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
@@ -160,11 +184,11 @@ for pb in $PLAYBOOKS; do
   fi
 
   # ---- 2: the FREEZE. `curated` is fork 4's only machine consequence.
-  cur=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^curated[[:space:]]*=[[:space:]]*//p' | head -1)")
+  cur=$(declared_scalar "$body" curated)
   [ -n "$cur" ] || fail 2 "a playbook declares no curator, and the freeze is the only machine consequence a derive-then-freeze template has - a derived canon nobody ratified is a mirror of the corpus it came from, which is the one shape a template must not have; playbook: $pb"
 
   # ---- 3: the declared STEP SELECTOR and its shrink-only floor.
-  sel=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^step_selector[[:space:]]*=[[:space:]]*//p' | head -1)")
+  sel=$(declared_scalar "$body" step_selector)
   flo=$(printf '%s\n' "$body" | sed -n 's/^step_floor[[:space:]]*=[[:space:]]*//p' | head -1 | tr -dc '0-9')
   if [ -z "$sel" ]; then
     fail 3 "a playbook declares no step selector, and a kit-fixed one either misses a playbook's steps entirely - reporting every step tagged over an empty set - or selects its prose; playbook: $pb"
@@ -201,7 +225,7 @@ for pb in $PLAYBOOKS; do
   TOTAL_CHECKS=$((TOTAL_CHECKS + nchecks)); TOTAL_WITNESS=$((TOTAL_WITNESS + nwit))
 
   # ---- 6: the RUNNABILITY ORACLE and its GRADED coverage mode.
-  cov=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^coverage[[:space:]]*=[[:space:]]*//p' | head -1)")
+  cov=$(declared_scalar "$body" coverage)
   case "$cov" in
     resolvable|probe|dark) ;;
     '') fail 6 "a playbook declares no coverage mode for its leg registry, and a gate that quietly skips what it forgot looks exactly like coverage - declare resolvable, probe or dark; playbook: $pb" ;;
@@ -250,12 +274,21 @@ CANONEOF
   # ---- RUN-INDEPENDENT BY CONSTRUCTION. The scopes are derived from the RECORDS, never from a
   # ---- run-state file: this leg runs on the merge bar where no run exists, and a scope that needed
   # ---- one would be a scope the bar can never evaluate.
-  gr=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1)")
-  rr=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
+  gr=$(declared_scalar "$body" grain)
+  rr=$(declared_scalar "$body" records)
   # THE DECLARED PER-PIECE LEGS. Round-1 blocker: this list had no reader anywhere in the kit while
   # three documents asserted the join, so `verified` meant "the hash matches and nobody wrote FAIL"
   # and a record carrying NO verdict at all counted as verified.
-  pchk=$(declared_list "$(printf '%s\n' "$body" | sed -n 's/^piece_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
+  if ! pchk=$(declared_list "$body" piece_checks); then
+    fail 8 "a playbook opens a per-piece check list and does not close it on the same line, and this parser reads one line - an unarmed parse must red rather than return the declared null, because the declared null makes every piece verified on the one Definition-of-Done item that takes no override; playbook: $pb"
+    # AND NO CENSUS IS PRINTED FOR IT. A machine count over a declaration nothing could read is a
+    # number the caller would trust; the caller's own "no count line" refusal is the honest outcome.
+    continue
+  fi
+  # MEDIUM 7 (round 3): the `none — <why>` escape its sibling got seventy-four lines below, in the
+  # same fold. A playbook writing `none` declares no per-piece checks, and grading every piece
+  # `unchecked` against the word `none` is the declared null misread as a check name.
+  case "$pchk" in none|'none '*|none[!A-Za-z0-9-]*) pchk="" ;; esac
   if [ -n "$gr" ] && [ -z "$rr" ]; then
     fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
   fi
@@ -329,11 +362,18 @@ CANONEOF
     #
     # REPORTED, never redded, for check 8's stated reason: this block classifies and `--close` blocks.
     # The Skill says exactly that now, so the document and the code agree about which is which.
-    schk=$(declared_list "$(printf '%s\n' "$body" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
+    if ! schk=$(declared_list "$body" set_checks); then
+      fail 8 "a playbook opens a set-scoped check list and does not close it on the same line, and this parser reads one line - an unarmed parse must red rather than return the declared null; playbook: $pb"
+      schk=""
+    fi
     # M2 (round-2): the DECLARED-NULL escape its driver sibling had and this reader did not. A
     # playbook writing `none — <why>` declares no set checks, and reporting a missing set record for
     # it is a note the author cannot act on.
-    case "$schk" in none*) schk="" ;; esac
+    #
+    # HIGH 3 (round-3): matched as a WORD, not a prefix. `none*` swallowed every check whose name
+    # merely starts with those letters — `nonempty-rows` read as "declares nothing", and the item
+    # returned MET with no record, no verdict and no override entry.
+    case "$schk" in none|'none '*|none[!A-Za-z0-9-]*) schk="" ;; esac
     if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
       # The run ids come from the PIECE records, so this reports on the runs that actually produced
       # something here rather than on a roster no merge-bar run can see.
