@@ -1430,84 +1430,107 @@ ds_b=$(awk '/^declared_scalar\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check
 tpl="$HERE/PLAYBOOK-TEMPLATE.template.md"
 
 # ---- THE KIT'S OWN SOURCE POPULATION, derived once for the three rules below. A hand-typed file list
-# ---- is a declaration that rots: round 5 found 28c scanning three names while the kit had five, and
-# ---- the two it did not name held thirty of the thirty-two sha reads.
+# ---- is a declaration that rots: round 5 found 28c scanning three names while the kit had seven, and
+# ---- the ones it did not name held thirty of the thirty-two sha reads.
 KIT_SH=""
-KIT_N=0
 for _f in "$HERE"/*.sh; do
   case "$_f" in *.test.sh) continue ;; esac
   [ -f "$_f" ] || continue
   KIT_SH="$KIT_SH $_f"
-  KIT_N=$((KIT_N + 1))
 done
 # LIVENESS BY MEMBERSHIP, not by count. A count floor is unreachable here - this script and the
 # adopter are themselves non-test `*.sh` in this directory, so the population is never empty and a
 # branch guarding emptiness could be reached by no fixture, which is the shape round 3 filed against
-# this very check. What the three rules below actually need is that the two files they exist to
-# police are IN the population, so name them.
-# NO BRANCH FOR THE DRIVER, and that is deliberate. Check 1 exits the whole leg when the driver's core
-# sets are unreadable, nine hundred lines above here, so a driver-missing branch at this point could be
-# reached by no fixture - and an unarmable branch is what round 3 filed against this check and round 5
-# filed against the count floor this replaced. The leg CAN go missing without stopping the run.
+# this very check. What the three rules below actually need is that the file they exist to police is
+# IN the population. There is no branch for the DRIVER: check 1 exits the whole leg when its core sets
+# are unreadable, nine hundred lines above here, so a driver-missing branch could not be reached
+# either. The leg CAN go missing without stopping the run.
 case " $KIT_SH " in
   *" $HERE/check-playbook.sh "*) ;;
   *) fail 28 "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined: $HERE/check-playbook.sh" ;;
 esac
 
-# ---- 28a - THE REFUSAL MUST BE READ, AT EVERY CALL SITE. A parser that can refuse and a caller that
-# ---- discards its status are one defect, and this build shipped it in three consecutive rounds:
-# ---- round 3 gave `declared_list` a `return 2`, round 4 found two of its three call sites branching
-# ---- on it, and round 5 found THIS RULE grading `… || true` compliant, which is the same discard in
-# ---- the one spelling the first cut whitelisted.
+# ---- 28a - THE REFUSAL MUST BE READ, AT EVERY CALL SITE, and the rule ENUMERATES WHAT IS COMPLIANT
+# ---- rather than what is not. Four rounds have broken here. Round 3 gave `declared_list` a
+# ---- `return 2`; round 4 found two of three call sites branching on it; round 5 found this rule
+# ---- whitelisting any line containing `||`, so `… || true` graded compliant; round 6 found the
+# ---- replacement enumerating three discard spellings while `|| return 0` and `|| _x=""` walked past,
+# ---- and an honest refusal whose PROSE contained the word `true` matched the discard arm and red.
+# ----
+# ---- Enumerating discards is unwinnable: every new spelling widens the hole, and the default is pass.
+# ---- Enumerating the compliant set inverts that - the default is FAIL, and a new spelling has to be
+# ---- added deliberately. The compliant set is exactly two shapes: a negated conditional around the
+# ---- call, or a `||` whose right-hand side provably refuses.
+# ----
+# ---- AND THE DECISION IS TAKEN ON A TOKEN, NEVER ON A LINE. The line is split at the call, the part
+# ---- BEFORE it is asked about the conditional and the part AFTER it about the refusal, so prose
+# ---- anywhere else on the line cannot vote. That is round 6's own diagnosis of seven of its ten
+# ---- defects, applied here first.
 # ----
 # ---- The rule binds a parser that CAN refuse, and that property is DERIVED from the parser's own
-# ---- body rather than listed here: a `return <nonzero>` in the extracted text is what makes rc
-# ---- load-bearing. Give `declared_scalar` one tomorrow and its call sites start being policed
-# ---- without a byte of this check changing.
+# ---- body: a `return <nonzero>` in the extracted text. Give `declared_scalar` one tomorrow and its
+# ---- call sites start being policed without a byte of this check changing.
 # ----
-# ---- WHAT THIS DOES NOT CHECK: whether the branch a caller takes is the RIGHT one. It sees that the
-# ---- status is read and that it is not read into a no-op, never what is done with it.
+# ---- WHAT THIS DOES NOT CHECK: whether the refusal a caller takes is the RIGHT one for the item.
 rc_refusers=0
 for _p in declared_list declared_scalar; do
   case "$_p" in declared_list) _body=$dl_a ;; *) _body=$ds_a ;; esac
   printf '%s\n' "$_body" | grep -qE '(^|[^[:alnum:]_])return[[:space:]]+[1-9]' || continue
   rc_refusers=$((rc_refusers + 1))
-  # PER PARSER AND PER FILE, because one global counter is the defect this same check fixed for the
-  # two template loops one block down. A parser whose calls all live in one file, and a file whose
-  # calls this pattern stopped matching, are different failures and neither may be masked by the other.
   _p_sites=0
   for _f in $KIT_SH; do
+    _f_named=0
+    grep -q "$_p" "$_f" && _f_named=1
     _f_sites=0
     while IFS= read -r _cs; do
       [ -n "$_cs" ] || continue
       _f_sites=$((_f_sites + 1)); _p_sites=$((_p_sites + 1))
       _ln=${_cs%%:*}; _txt=${_cs#*:}
-      case "$_txt" in
-        # THE DISCARD SPELLINGS, TESTED FIRST. `|| true` and `|| :` read the status and throw it away,
-        # which is the bare assignment with two extra words - round 5's HIGH 2, and it graded compliant
-        # under a rule that whitelisted any line containing `||`.
-        *'||'*true*|*'||'*' :'*|*'||'*':;'*) ;;
-        *'if !'*|*'while !'*|*'until !'*|*'||'*) continue ;;
+      _head=${_txt%%"\$($_p"*}
+      _tail=${_txt#*"\$($_p"}
+      _tail=${_tail#*)}
+      case "$_head" in
+        *'if !'*|*'while !'*|*'until !'*|*'if ! '*) continue ;;
       esac
-      fail 28 "a parser that can REFUSE is called at a site that discards its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: $_p at $_f:$_ln spells [$_txt]"
+      # A `||` COUNTS ONLY IF ITS RIGHT-HAND SIDE REFUSES. `return 0`, an assignment and `true` are
+      # not refusals; `return <nonzero>`, `exit <nonzero>`, `fail ` and `bad ` are.
+      case "$_tail" in
+        *'||'*)
+          case "$_tail" in
+            *'return '[1-9]*|*'exit '[1-9]*|*'fail '*|*'bad '*|*'continue'*) continue ;;
+          esac ;;
+      esac
+      fail 28 "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: $_p at $_f:$_ln spells [$_txt]"
     done <<RCEOF
 $(grep -nE '\$\('"$_p"'[[:space:]]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
 RCEOF
+    # PER FILE, for a file that NAMES the parser. A file that never mentions it legitimately has no
+    # call sites; a file that mentions it and has none this pattern can see is a call spelling that
+    # drifted, which is the masking direction the per-parser counter alone cannot see. The adopter and
+    # this checker mention the names in prose, so the assertion is scoped to files holding a `$(`-call.
+    # DETECTED BROADLY, ENUMERATED NARROWLY, and the gap between the two is the finding. The
+    # enumerator wants `$(<parser><space>`; this detector accepts any whitespace after the `$(` too,
+    # so a call written with a space after the substitution is seen here and missed there - which is
+    # exactly the drift this branch exists to report rather than to silently tolerate. COMMENTS ARE
+    # FILTERED, because the first cut of this detector matched the sentence above describing it.
+    if [ "$_f_named" = 1 ] && [ "$_f_sites" -eq 0 ] && grep -E "[$][(][[:space:]]*$_p" "$_f" | grep -qvE '^[[:space:]]*#'; then
+      fail 28 "a file spells a call to a refusing parser in a shape this rule cannot enumerate, so its call sites go unpoliced while the rule reports nothing about them - parser and file follow: $_p in $_f"
+    fi
   done
   [ "$_p_sites" -gt 0 ] || fail 28 "a refusing parser has NO call site this rule can see, so it was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls this parser: $_p"
 done
 [ "$rc_refusers" -gt 0 ] || fail 28 "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
 
-# ---- 28b - EVERY DECLARATION KEY IS BOUND TO THE PARSER ITS REAL READER CALLS, and the binding is
-# ---- asserted POSITIVELY. The first cut searched for one exact `sed` spelling and found zero hits
-# ---- over all ten keys - vacuous the day it landed, while `legs` sat certified through
-# ---- `declared_scalar` with a bespoke `grep -oE` as its only reader, verbatim the state its own
-# ---- comment said it existed to refuse.
-# ----
-# ---- A key with no parser read is REFUSED unless an exemption names the reader that owns it, and the
-# ---- exemption carries a literal that must still be present in that file - so a reader that is
-# ---- rewritten takes its exemption red with it rather than widening the gap silently.
-KEY_EXEMPT="legs|check-playbook.sh|grep -oE \"(^[[:space:]]*|[{,][[:space:]]*)\\\"?\$g\\\"?"
+# ---- 28b - EVERY DECLARATION KEY IS BOUND TO THE PARSER ITS REAL READER CALLS, asserted POSITIVELY.
+# ---- Round 5 found the first cut vacuous; round 6 found the second cut's EXEMPTION TABLE destroyed by
+# ---- word-splitting - `for _e in $KEY_EXEMPT` over a record containing spaces yields its first field
+# ---- and the literal resolved to the 4-byte string `grep`, present nineteen times in the file it
+# ---- names, so the freshness half had no failing input at all. The table is newline-separated and
+# ---- read without splitting now, which is the only shape that survives a value with spaces in it.
+KEY_EXEMPT=$(cat <<'EXEMPTEOF'
+legs|check-playbook.sh|ent=$(printf '%s\n' "$body" | grep -oE
+EXEMPTEOF
+)
 kb_keys=0
 if [ -f "$tpl" ]; then
   while IFS= read -r _k; do
@@ -1515,18 +1538,9 @@ if [ -f "$tpl" ]; then
     kb_keys=$((kb_keys + 1))
     _reads=0
     for _f in $KIT_SH; do
-      grep -qE "declared_(list|scalar) .* $_k\)" "$_f" && _reads=$((_reads + 1))
-      # THE NEGATIVE HALF, and its predicate is the LINE ANCHOR rather than the `=` shape. The first
-      # cut searched for one exact `sed` spelling and matched nothing; the second widened to the key
-      # plus any text tool on the line and matched four `fail` messages that merely mention the word.
-      # What every ad-hoc read of a declaration actually spells is `^<key>` inside a pattern - the
-      # round-4 defects were `s/^outputs[[:space:]]*=` and `s/^step_floor[[:space:]]*=` - and prose
-      # does not.
-      #
-      # MEASURED OVER THE TREE BEFORE WIRING, which is the rule this check keeps breaking: the refined
-      # predicate has exactly one near-miss, `check-playbook.sh`'s `grep -q '^step_selector…'`, and
-      # that is a PRESENCE test choosing the playbook population rather than a read of the value. A
-      # `grep -q` cannot capture what it matched, so excluding it is a property and not an exception.
+      # THE COMMENT FILTER ON THE POSITIVE HALF TOO. Its negative half has had one since round 5, and
+      # a key whose only "read" is a commented-out call is a key nothing reads.
+      grep -nE "declared_(list|scalar) .* $_k\)" "$_f" | grep -qvE '^[0-9]+:[[:space:]]*#' && _reads=$((_reads + 1))
       while IFS= read -r _hit; do
         [ -n "$_hit" ] || continue
         fail 28 "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: $_k at $_f:${_hit%%:*} spells [${_hit#*:}]"
@@ -1535,16 +1549,20 @@ $(grep -nE "\^$_k([^A-Za-z_]|$)" "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | grep
 KBEOF
     done
     [ "$_reads" -gt 0 ] && continue
-    # NO PARSER READ. An exemption may stand in, and it has to still resolve.
     _ex=""
-    for _e in $KEY_EXEMPT; do
+    while IFS= read -r _e; do
+      [ -n "$_e" ] || continue
       case "$_e" in "$_k|"*) _ex=$_e ;; esac
-    done
+    done <<EXEOF
+$KEY_EXEMPT
+EXEOF
     if [ -z "$_ex" ]; then
       fail 28 "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it: $_k in $tpl"
       continue
     fi
-    _exf=${_ex#*|}; _exlit=${_exf#*|}; _exf=${_exf%%|*}
+    _exrest=${_ex#*|}
+    _exf=${_exrest%%|*}
+    _exlit=${_exrest#*|}
     grep -qF -- "$_exlit" "$HERE/$_exf" \
       || fail 28 "a key exemption names a reader whose signature is no longer in that file, so the key is unread by any parser AND unaccounted for by the exemption that excused it - key, file and missing literal follow: $_k in $_exf wants [$_exlit]"
   done <<KEYEOF
@@ -1554,18 +1572,31 @@ KEYEOF
 fi
 
 # ---- 28c - EVERY SHA DEREFERENCE IN THIS KIT GOES THROUGH A PINNED READ. A forced replace ref
-# ---- rewrites what a sha dereference returns without touching one tracked byte, and ONLY
-# ---- `-c core.useReplaceRefs=false` suppresses it. The exported `GIT_GRAFT_FILE` a child process
-# ---- inherits does not, and a `-c` is per-invocation, so nothing propagates it to a spawned leg.
+# ---- rewrites what a dereference returns without touching one tracked byte, and ONLY
+# ---- `-c core.useReplaceRefs=false` suppresses it. The exported `GIT_GRAFT_FILE` a child inherits
+# ---- does not, and a `-c` is per-invocation, so nothing propagates it to a spawned leg. The committed
+# ---- BASE blob is one of exactly two inputs outside the run's own reach; an unpinned read puts it
+# ---- back inside, on the item that takes no override.
 # ----
-# ---- The committed BASE blob is one of exactly two inputs the security model places outside the
-# ---- run's own reach. An unpinned read puts it back inside, on the item that takes no override.
+# ---- EACH LINE IS GRADED TWICE AND INDEPENDENTLY. Round 6: classifying a whole line as
+# ---- wrapper-routed on the substring `GIT ` meant a trailing comment mentioning the wrapper excused a
+# ---- bare unpinned read on the same line. A line carrying both is graded on its raw half.
 # ----
-# ---- BOTH SPELLINGS, because the first cut matched only lowercase `git` and its whole live
-# ---- population was the ONE line it exempts - the driver's thirty `GIT` wrapper reads, including the
-# ---- BASE-blob authorization read, were invisible, and gutting the pin out of the wrapper left this
-# ---- check green. A `GIT` site is accepted only because the wrapper's own definition is proven
-# ---- pinned HERE, inside this gate, rather than by an arm in another suite.
+# ---- THE VERB SET IS WIDE, and the exemptions are PROPERTIES rather than a list of lines. Measured
+# ---- over this tree before wiring, per §7: the wide set surfaces eight bare invocations, seven of
+# ---- which name no revision at all (`rev-parse --show-toplevel` and friends) or enumerate refs. Those
+# ---- two properties are why they are exempt, and both are derived per invocation:
+# ----   * every argument after the verb is a flag  -> the invocation cannot name a revision;
+# ----   * the verb is `for-each-ref`               -> it enumerates refs, and the kit's own
+# ----     replace-ref DETECTOR is one of these: pinning it would blind the check that finds them.
+GITV='show|cat-file|ls-tree|archive|rev-list|rev-parse|log|grep|diff|diff-tree|merge-base|for-each-ref|describe|blame'
+# THE INVOCATION HAS TO BE IN COMMAND POSITION, which is the difference between code and prose about
+# code. The first cut boundaried on "not a word character", so the sentence "every bare git invocation
+# ... or for-each-ref property" - inside this check's OWN refusal message - matched as a bare unpinned
+# dereference and the gate red on itself. A `git` preceded by an ordinary word is being TALKED ABOUT;
+# a `git` preceded by a separator or a command substitution is being RUN. Same lesson as everywhere
+# else in this check: decide on the token, never on the line.
+GITPOS='(^|[|&;(){}!]|[$][(])[[:space:]]*'
 _wrapdef=0
 for _f in $KIT_SH; do
   while IFS= read -r _hit; do
@@ -1579,30 +1610,57 @@ for _f in $KIT_SH; do
 $(grep -nE '^[[:space:]]*GIT\(\)[[:space:]]*\{' "$_f" || true)
 WDEOF
 done
-[ "$_wrapdef" -gt 0 ] || fail 28 "no git wrapper definition was found anywhere in this kit, so the `GIT`-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
+[ "$_wrapdef" -gt 0 ] || fail 28 "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
 sha_raw=0
+sha_raw_graded=0
 sha_wrapped=0
 for _f in $KIT_SH; do
+  # THE RAW ARM.
   while IFS= read -r _hit; do
     [ -n "$_hit" ] || continue
-    _txt=${_hit#*:}
-    case "$_txt" in
-      *'GIT '*) sha_wrapped=$((sha_wrapped + 1)); continue ;;
-    esac
     sha_raw=$((sha_raw + 1))
-    case "$_txt" in
+    _inv=$(printf '%s\n' "${_hit#*:}" | grep -oE "${GITPOS}git[[:space:]]+[^|;&)]*" | head -1)
+    _inv="git ${_inv#*git }"
+    # THE VERB IS THE FIRST TOKEN THAT IS NEITHER A FLAG NOR A FLAG'S ARGUMENT. `-C <dir>` and
+    # `-c <name>=<value>` each take one, and skipping the flag while grading its argument is how
+    # `git -C "$ROOT" rev-parse` came out with a verb of `"$ROOT"`.
+    _verb=""; _skip=0
+    for _tok in $_inv; do
+      [ "$_skip" = 1 ] && { _skip=0; continue; }
+      case "$_tok" in
+        git) continue ;;
+        -c|-C) _skip=1; continue ;;
+        -*|*=*) continue ;;
+        *) _verb=$_tok; break ;;
+      esac
+    done
+    [ "$_verb" = for-each-ref ] && continue
+    _args=${_inv#*"$_verb"}; _args=${_args%%2>*}
+    _names_rev=0
+    for _tok in $_args; do
+      case "$_tok" in -*|'') continue ;; *) _names_rev=1; break ;; esac
+    done
+    [ "$_names_rev" = 1 ] || continue
+    sha_raw_graded=$((sha_raw_graded + 1))
+    case "$_inv" in
       *'core.useReplaceRefs=false'*) continue ;;
     esac
-    fail 28 "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow: $_f:${_hit%%:*} spells [$_txt]"
-  done <<SHEOF
-$(grep -nE '(^|[^-[:alnum:]_])(git|GIT)[[:space:]]+([^|;&]*[[:space:]])?(show|cat-file|ls-tree|archive|rev-list|merge-base|diff-tree)[[:space:]]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
-SHEOF
+    fail 28 "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow: $_f:${_hit%%:*} spells [${_hit#*:}]"
+  done <<RAWEOF
+$(grep -nE "${GITPOS}git[[:space:]]+([^|;&]*[[:space:]])?($GITV)([[:space:]]|\$)" "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
+RAWEOF
+  # THE WRAPPED ARM, counted independently of whether the same line also matched the raw one.
+  # `grep -c` prints 0 and exits 1 on no match, so the count is taken FIRST and the status swallowed
+  # after it - `|| echo 0` appended a second line and the arithmetic below silently failed on it.
+  _wn=$(grep -cE "${GITPOS}GIT[[:space:]]+([^|;&]*[[:space:]])?($GITV)([[:space:]]|\$)" "$_f" 2>/dev/null || true)
+  sha_wrapped=$((sha_wrapped + ${_wn:-0}))
 done
-# LIVENESS ON BOTH SPELLINGS SEPARATELY. This rule's first cut matched exactly one of the two and
-# reported a clean nothing about the other thirty sites; a count that can go to zero for one spelling
-# while the other holds it up is the same blindness one level down.
-[ "$sha_raw" -gt 0 ] || fail 28 "this scan found no BARE git sha dereference anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped dereferencing - an unpinned raw read would now pass unseen"
-[ "$sha_wrapped" -gt 0 ] || fail 28 "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its `GIT`-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
+# LIVENESS ON EACH SPELLING SEPARATELY, and on the raw arm's GRADED population rather than its
+# candidate one. Round 5's cut counted a candidate it then exempted and called that coverage; a raw
+# arm whose every candidate is excused has reached nothing, and the two states must not look alike.
+[ "$sha_raw" -gt 0 ] || fail 28 "this scan found no BARE git invocation anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped calling git - an unpinned raw read would now pass unseen"
+[ "$sha_raw_graded" -gt 0 ] || fail 28 "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
+[ "$sha_wrapped" -gt 0 ] || fail 28 "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its GIT-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
 
 if [ -z "$ds_a" ] || [ -z "$ds_b" ]; then
   fail 28 "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow: $DRIVER and $HERE/check-playbook.sh"
@@ -1650,7 +1708,7 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
     # `declared_scalar` to an empty printf visited seven template keys with zero failures, and swapping
     # its comment strip for a delete-the-whole-line sed - which empties every commented declaration,
     # the mirror image of the leak this arm exists to catch - left the whole kit green.
-    for spec in 'Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX' 'Xk = # globs. Where pieces land [see 7]X|XX' 'Xk =X|XX'; do
+    for spec in 'Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX' 'Xk = # globs. Where pieces land [see 7]X|XX' 'Xk =X|XX' 'Xk = ["a", "b"] X|Xa bX' 'Xk = ["a"]	X|XaX' 'Xk =# globsX|XX' 'Xk =#globsX|XX' 'Xk = [ ]X|XX'; do
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
       _got=$(dl_run "$_in" k); _rc=$?
@@ -1660,7 +1718,7 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
         fail 28 "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: [$_in] wanted [$_want] got [$_got]"
       fi
     done
-    for spec in 'Xk = "v"    # trailing commentX|XvX' 'Xk = 0X|X0X' 'Xk = {}    # noteX|X{}X' 'Xk = memory/records    # where they landX|Xmemory/recordsX' 'Xk = # who ratified and whenX|XX' 'Xk =    # TBDX|XX'; do
+    for spec in 'Xk = "v"    # trailing commentX|XvX' 'Xk = 0X|X0X' 'Xk = {}    # noteX|X{}X' 'Xk = memory/records    # where they landX|Xmemory/recordsX' 'Xk = # who ratified and whenX|XX' 'Xk =    # TBDX|XX' 'Xk =# who ratifiedX|XX' 'Xk =#whoX|XX' 'Xk = "v" X|XvX'; do
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
       _got=$(ds_run "$_in" k); _rc=$?

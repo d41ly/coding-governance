@@ -1575,74 +1575,127 @@ mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|
 hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
 
 # ---- THE SOURCE POPULATION the three rules scan, derived from the kit directory rather than typed:
-# ---- round 5 found 28c naming three files while the kit had seven, and the ones it did not name held
-# ---- thirty of the thirty-two sha reads. Its liveness is MEMBERSHIP rather than a count - this
-# ---- checker and the adopter are themselves in that directory, so the population is never empty and
-# ---- a count floor could be reached by no fixture. What is worth asserting is that the two files the
-# ---- rules exist to police are in it.
+# ---- round 5 found 28c naming three files while the kit had seven. Its liveness is MEMBERSHIP rather
+# ---- than a count - this checker and the adopter are themselves in that directory, so the population
+# ---- is never empty and a count floor could be reached by no fixture.
 reset_tree; rm -f tools/unattended/check-playbook.sh
 hit "$(run)" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
 
-# ---- 28c — the WRAPPER-routed spelling's own liveness, the mirror of the bare one. Renaming the
-# ---- wrapper leaves the raw population healthy and the wrapper one empty.
-reset_tree
-mutate tools/unattended/lib-unattended.sh 's@^GIT() {@GITX() {@'
-mutate tools/unattended/unattended.sh     's@GIT show@GITX show@g'
-mutate tools/unattended/unattended.sh     's@GIT merge-base@GITX merge-base@g'
-mutate tools/unattended/unattended.sh     's@GIT rev-list@GITX rev-list@g'
-mutate tools/unattended/unattended.sh     's@GIT diff-tree@GITX diff-tree@g'
-mutate tools/unattended/check-unattended.sh 's@GIT show@GITX show@g'
-mutate tools/unattended/check-unattended.sh 's@GIT merge-base@GITX merge-base@g'
-mutate tools/unattended/check-unattended.sh 's@GIT diff-tree@GITX diff-tree@g'
-mutate tools/unattended/lib-unattended.sh 's@GIT diff-tree@GITX diff-tree@g'
-out=$(run)
-hit "$out" "no git wrapper definition was found anywhere in this kit, so the `GIT`-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
-hit "$out" "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its `GIT`-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
+# ---- 28a, RE-ARMED AFTER ROUND 6 FOUND THE DISCARD ENUMERATION UNWINNABLE. The rule now enumerates
+# ---- the COMPLIANT set, so the default is FAIL and a new spelling cannot widen the hole by existing.
+# ---- Four spellings are staged, and the last two are the ones round 6 found walking past the
+# ---- enumerate-the-discards version.
+DISC='does not act on its exit status'
+reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
+hit "$(run)" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
+reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
+hit "$(run)" "$DISC"
+reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || _declared=""; if false; then@'
+hit "$(run)" "$DISC"
+reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks); if false; then@'
+hit "$(run)" "$DISC"
 
-# ---- 28b — its own liveness: a template whose fence yields no key to bind.
+# ...and TWO CONTROLS, which are as load-bearing as the four breaks. A rule tightened until it reds on
+# an honest caller has traded one false answer for another, and round 6 found exactly that: an honest
+# refusal whose PROSE contained the word `true` matched the old discard arm.
+reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || { DOD_OUT=x; return 1; }; if false; then@'
+miss "$(run)" "$DISC"
+reset_tree; mutate tools/unattended/unattended.sh 's@so this item would read the declared null@so this item would read what is not true, the declared null@'
+miss "$(run)" "$DISC"
+
+# ---- 28a's per-FILE branch, which is the masking direction the per-parser counter cannot see: one
+# ---- file's call spelling drifts, the other file still has calls, and the parser-level count stays
+# ---- healthy while a whole file goes unpoliced.
+reset_tree; mutate tools/unattended/check-playbook.sh 's@$(declared_list "@$( declared_list "@g'
+hit "$(run)" "a file spells a call to a refusing parser in a shape this rule cannot enumerate, so its call sites go unpoliced while the rule reports nothing about them - parser and file follow"
+
+# ---- 28a's per-PARSER liveness. Renaming the calls in BOTH files leaves the refusal in place and the
+# ---- enumeration empty, which a hit count of zero cannot tell from compliance.
+reset_tree
+mutate tools/unattended/check-playbook.sh 's@$(declared_list @$(declared_list_X @g'
+mutate tools/unattended/unattended.sh     's@$(declared_list @$(declared_list_X @g'
+hit "$(run)" "a refusing parser has NO call site this rule can see, so it was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls this parser"
+
+# ---- ...and the rule binding nothing at all, if the refusal itself is removed.
+reset_tree
+mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
+hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
+
+# ---- 28b. THE EXEMPTION ROW IS RETARGETED, never replaced with a synthetic: round 6's BLOCKER 1 was
+# ---- a `key|file|literal` record destroyed by word-splitting, and the staged break that was supposed
+# ---- to cover it substituted a value with no spaces in it, so it could not exhibit the split. The
+# ---- table is newline-separated and read without splitting now, and this arm keeps the shipped
+# ---- record's real spacing while pointing its key at one the template does not declare.
+reset_tree; mutate tools/unattended/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
+hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
+
+# ...and the exemption going STALE, which is the failure mode an exemption list adds. Rewriting the
+# reader it names takes its excuse with it.
+reset_tree; mutate tools/unattended/check-playbook.sh 's@    ent=$(printf .%s.n. "$body" | grep -oE@    ent=$(printf "%s" "$body" | grep -oE@'
+hit "$(run)" "a key exemption names a reader whose signature is no longer in that file, so the key is unread by any parser AND unaccounted for by the exemption that excused it - key, file and missing literal follow"
+
+# ...and a parser read that is COMMENTED OUT, which the positive half had no filter for until round 6.
+reset_tree; mutate tools/unattended/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@#  cur=$(declared_scalar "$body" curated)@'
+hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
+
+# ...and the NEGATIVE half: an ad-hoc read added BESIDE a parser read, never instead of it.
+reset_tree; mutate tools/unattended/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@  cur=$(declared_scalar "$body" curated); _x=$(printf "%s" "$body" | sed -n "s/^curated[[:space:]]*=//p")@'
+hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: curated at"
+
+# ---- 28b's own liveness: a template whose fence yields no key to bind.
 reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
 hit "$(run)" "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set"
 
-# ---- the scalar SPECIMEN loop's exec branch, which is a different branch from the template loop's.
+# ---- 28c. The WRAPPER's own pin first, which round 5's cut could not see at all.
+reset_tree; mutate tools/unattended/lib-unattended.sh 's|^GIT() { git -c core.useReplaceRefs=false|GIT() { git|'
+hit "$(run)" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
+
+# ...a bare unpinned read on a verb the first widening did not carry.
+reset_tree; mutate tools/unattended/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
+hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
+
+# ...and the same read with a trailing comment mentioning the WRAPPER, which is round 6's MEDIUM 2:
+# classifying the whole LINE as wrapper-routed let prose excuse the code beside it.
+reset_tree; mutate tools/unattended/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git cat-file -p "$1"; }  # routed through GIT show elsewhere@'
+hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
+
+# ...and the raw arm reaching NO graded candidate, which must not look like a pass. Routing the kit's
+# last bare dereference through the wrapper leaves only exempt candidates behind.
+reset_tree; mutate tools/unattended/check-playbook.sh 's@^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show@GITSHOW() { GIT show@'
+hit "$(run)" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
+
+# ---- 28c's three liveness statements. The wrapper DEFINITION going missing, the bare spelling going
+# ---- missing, and the wrapped spelling going missing are three different blindnesses, and round 5's
+# ---- cut reported a clean nothing for two of them.
+reset_tree; mutate tools/unattended/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
+hit "$(run)" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
+
+reset_tree
+mutate tools/unattended/check-playbook.sh    's@$(git @$(gitx @g'
+mutate tools/unattended/check-playbook.sh    's@{ git @{ gitx @g'
+mutate tools/unattended/check-unattended.sh  's@$(git @$(gitx @g'
+mutate tools/unattended/adopt-unattended.sh  's@$(git @$(gitx @g'
+hit "$(run)" "this scan found no BARE git invocation anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped calling git - an unpinned raw read would now pass unseen"
+
+reset_tree
+mutate tools/unattended/unattended.sh       's@GIT show@GITX show@g'
+mutate tools/unattended/unattended.sh       's@GIT merge-base@GITX merge-base@g'
+mutate tools/unattended/unattended.sh       's@GIT rev-list@GITX rev-list@g'
+mutate tools/unattended/unattended.sh       's@GIT diff-tree@GITX diff-tree@g'
+mutate tools/unattended/check-unattended.sh 's@GIT show@GITX show@g'
+mutate tools/unattended/check-unattended.sh 's@GIT merge-base@GITX merge-base@g'
+mutate tools/unattended/check-unattended.sh 's@GIT diff-tree@GITX diff-tree@g'
+mutate tools/unattended/lib-unattended.sh   's@GIT diff-tree@GITX diff-tree@g'
+hit "$(run)" "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its GIT-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
+
+# ---- the scalar SPECIMEN loop's exec branch, a different branch from the template loop's.
 reset_tree; gut_parser declared_scalar '  ((this is not shell'
 hit "$(run)" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 
 # ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
-# ---- `check-playbook.sh` excludes this template from its population, so this loop is its only grader.
 reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
 hit "$(run)" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
-
-# ---- 28b — the POSITIVE binding. Round 5, HIGH 3: the first cut was a fixed-string search for one
-# ---- `sed` spelling and found zero hits over all ten keys, while `legs` sat certified through a
-# ---- parser its only reader does not call. Emptying the exemption list must name that key.
-reset_tree; mutate tools/unattended/check-unattended.sh 's@^KEY_EXEMPT=.*@KEY_EXEMPT=""@'
-hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
-
-# ...and a STALE exemption, which is the failure mode an exemption list adds. It names a reader
-# signature that must still be in that file, so a rewritten reader takes its excuse with it.
-reset_tree; mutate tools/unattended/check-unattended.sh 's@^KEY_EXEMPT=.*@KEY_EXEMPT="legs|check-playbook.sh|THIS_LITERAL_IS_GONE"@'
-hit "$(run)" "a key exemption names a reader whose signature is no longer in that file, so the key is unread by any parser AND unaccounted for by the exemption that excused it - key, file and missing literal follow"
-
-# ...and the NEGATIVE half: an ad-hoc read added BESIDE a parser read, never instead of it. Replacing
-# the parser read exercises the no-reader rule above, which is a different claim.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@^  cur=$(declared_scalar "$body" curated)@  cur=$(declared_scalar "$body" curated); _x=$(printf "%s" "$body" | sed -n "s/^curated[[:space:]]*=//p")@'
-hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: curated at"
-
-# ---- 28c — the WRAPPER's own pin, which the first cut could not see at all. Round 5, HIGH 4: it
-# ---- grepped lowercase `git` only, so its entire live population was the one already-pinned line it
-# ---- exempts, and gutting `GIT()` left the check green over thirty unpinned reads.
-reset_tree; mutate tools/unattended/lib-unattended.sh 's|^GIT() { git -c core.useReplaceRefs=false|GIT() { git|'
-hit "$(run)" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
-
-# ...and a bare unpinned read added to the driver, which is the raw half of the same rule.
-reset_tree; mutate tools/unattended/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git merge-base --is-ancestor "$1" HEAD; }@'
-hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
-
-# ...and LIVENESS ON EACH SPELLING SEPARATELY. Routing the kit's last bare read through the wrapper
-# leaves the wrapper population healthy and the raw one empty — the exact blindness that let the first
-# cut report a clean nothing about thirty sites.
-reset_tree; mutate tools/unattended/check-playbook.sh 's@^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show@GITSHOW() { GIT show@'
-hit "$(run)" "this scan found no BARE git sha dereference anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped dereferencing - an unpinned raw read would now pass unseen"
 
 reset_tree
 

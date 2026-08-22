@@ -2406,21 +2406,32 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # Stripping the whole line first cannot have that ordering hazard: the whitespace before a trailing
   # `#` is still there when the strip runs. A `#` with NO whitespace before it is a member character
   # (`["a#b"]`) and survives, which is the property the strip was written to keep.
+  # NORMALISE FIRST, CLASSIFY SECOND, and never the other way round. Every round of this build has
+  # broken here and always the same way: a decision taken on the LINE rather than on the TOKEN it is
+  # about. `*'['*']'*` asked whether a `]` appeared anywhere; the comment strip asked for whitespace
+  # the key strip had already eaten; and the positional closer that replaced them ran BEFORE the trims,
+  # so `["a", "b"] ` - one trailing space on a perfectly closed array - was refused at rc 2 and the
+  # driver told the author their bracket was unclosed. Three spellings of one mistake, each introduced
+  # by the commit fixing the last.
+  #
+  # So the pipeline below produces a fully normalised VALUE - comment gone, key gone, CR gone, ends
+  # trimmed - and nothing is asked about it until it is. A `#` at position zero is then unambiguous:
+  # a TOML value cannot begin with one, so it is a comment on a key with no value at all.
   local raw
   raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
         | sed 's/[[:space:]][[:space:]]*#.*$//' \
-        | sed "s/^$2[[:space:]]*=[[:space:]]*//")
-  # THE CLOSER IS TESTED POSITIONALLY, not by containment. `*'['*']'*` asked only whether a `]` appears
-  # anywhere after a `[`, so `k = ["a[0]",` - an ordinary first line of a multi-line glob array -
-  # satisfied the closed arm and every member on the following lines was SILENTLY DROPPED at rc 0.
-  # This parser's contract is to refuse rather than answer wrongly, and a containment test cannot keep
-  # it: `["a"]`, `[]`, `[ ]` and `["a[0]", "b"]` all end in `]`; `[`, `[   # x]` and `["a[0]",` do not.
+        | sed "s/^$2[[:space:]]*=[[:space:]]*//" \
+        | tr -d '\r' \
+        | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  case "$raw" in '#'*) raw='' ;; esac
+  # AND THE CLOSER IS ANCHORED AT BOTH ENDS. A value is an array only if it STARTS with `[`, so
+  # `k = "a[0]"` is not one and is not refused for failing to close; an array that starts is closed
+  # only if it ENDS with `]`, so `["a[0]",` refuses instead of silently dropping the members below it.
   case "$raw" in
-    *']') ;;
-    *'['*) return 2 ;;
+    '['*']') ;;
+    '['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | tr -d '\r"' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+  printf '%s\n' "$raw" | tr -d '"' \
     | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
@@ -2438,9 +2449,12 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
   # the key strip consumed the whitespace this strip requires, so `curated = # who ratified...` parsed
   # to its own comment and the freeze - fork 4's only machine consequence - passed on an unratified
   # playbook. A `#` with no whitespace before it stays, because that is a value character.
+  # THE `#` AT POSITION ZERO, for its sibling's reason: the trailing-comment strip needs whitespace
+  # before the `#` and a key with no value at all leaves none, so `k =# note` and `k =#note` came back
+  # as their own comment text at rc 0. A TOML value cannot begin with `#`.
   printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
     | sed 's/[[:space:]][[:space:]]*#.*$//' \
-    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | tr -d '\r' \
+    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | sed 's/^#.*$//' | tr -d '\r' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
