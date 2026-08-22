@@ -163,11 +163,28 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # preceded by whitespace inside a quoted member (`["a", "b #c"]`) now REFUSES rather than
   # corrupting silently - the honest outcome for a line-oriented shell parser that cannot tokenise
   # TOML, and the reason this returns rather than guessing.
+  # THE COMMENT COMES OFF THE WHOLE LINE, BEFORE THE KEY IS REMOVED, and the ORDER of those two is
+  # the fix. Round 4 moved the strip in front of the terminator test and left it AFTER the key strip,
+  # which had already eaten the whitespace the strip needs: `outputs = # globs...` lost `outputs =`
+  # first, so the `#` no longer had whitespace before it, survived, and became the VALUE. Measured on
+  # the shipped parser, that returned the comment text at rc 0 for every empty-valued declaration -
+  # and the round-4 fold had just narrowed the outputs guard to the empty string, so a recipe-mode run
+  # declaring no output globs was authorized by the repair.
+  #
+  # Stripping the whole line first cannot have that ordering hazard: the whitespace before a trailing
+  # `#` is still there when the strip runs. A `#` with NO whitespace before it is a member character
+  # (`["a#b"]`) and survives, which is the property the strip was written to keep.
   local raw
-  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
-        | sed 's/[[:space:]][[:space:]]*#.*$//')
+  raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
+        | sed 's/[[:space:]][[:space:]]*#.*$//' \
+        | sed "s/^$2[[:space:]]*=[[:space:]]*//")
+  # THE CLOSER IS TESTED POSITIONALLY, not by containment. `*'['*']'*` asked only whether a `]` appears
+  # anywhere after a `[`, so `k = ["a[0]",` - an ordinary first line of a multi-line glob array -
+  # satisfied the closed arm and every member on the following lines was SILENTLY DROPPED at rc 0.
+  # This parser's contract is to refuse rather than answer wrongly, and a containment test cannot keep
+  # it: `["a"]`, `[]`, `[ ]` and `["a[0]", "b"]` all end in `]`; `[`, `[   # x]` and `["a[0]",` do not.
   case "$raw" in
-    *'['*']'*) ;;
+    *']') ;;
     *'['*) return 2 ;;
   esac
   printf '%s\n' "$raw" | tr -d '\r"' \
@@ -185,8 +202,13 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
   #
   # Same copy-inlined discipline as its sibling: each kit script installs standalone and cannot
   # import, so both copies are byte-compared by the leg check that compares that one's.
-  printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
-    | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+  # THE COMMENT COMES OFF THE WHOLE LINE FIRST. Same ordering repair as the list parser, same reason:
+  # the key strip consumed the whitespace this strip requires, so `curated = # who ratified...` parsed
+  # to its own comment and the freeze - fork 4's only machine consequence - passed on an unratified
+  # playbook. A `#` with no whitespace before it stays, because that is a value character.
+  printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
+    | sed 's/[[:space:]][[:space:]]*#.*$//' \
+    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | tr -d '\r' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
@@ -220,8 +242,9 @@ for pb in $PLAYBOOKS; do
   # naming a floor its author never wrote, while `step_floor =    # TBD 5` parsed to 5 and bypassed
   # the no-floor refusal below with a number nobody declared.
   flo=$(declared_scalar "$body" step_floor)
+  flo_bad=""
   case "$flo" in
-    ''|*[!0-9]*) [ -z "$flo" ] || { fail 3 "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [$flo] in $pb"; flo=""; } ;;
+    ''|*[!0-9]*) [ -z "$flo" ] || { fail 3 "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [$flo] in $pb"; flo=""; flo_bad=1; } ;;
   esac
   if [ -z "$sel" ]; then
     fail 3 "a playbook declares no step selector, and a kit-fixed one either misses a playbook's steps entirely - reporting every step tagged over an empty set - or selects its prose; playbook: $pb"
@@ -229,7 +252,11 @@ for pb in $PLAYBOOKS; do
   fi
   nsteps=$(printf '%s\n' "$body" | grep -cE "$sel" 2>/dev/null || true)
   TOTAL_STEPS=$((TOTAL_STEPS + nsteps))
-  if [ -z "$flo" ]; then
+  # THE REFUSAL IS CARRIED AS ITS OWN STATE, not by emptying the value. Round 5, LOW 10: a non-numeric
+  # floor red twice - once correctly, and once more as "declares no floor", which is the wrong-cause
+  # message the numeric refusal was written to replace. An author reading the second goes looking for
+  # a line that is right there.
+  if [ -z "$flo" ] && [ -z "$flo_bad" ]; then
     fail 3 "a playbook declares a step selector and no floor, so a selector that quietly matches nothing would report every step tagged over an empty selection; playbook: $pb"
   elif [ "$nsteps" -lt "$flo" ]; then
     fail 3 "a playbook's declared step selector matches fewer lines than its own declared floor, which is the signal that the selector stopped reaching the steps rather than that the steps went away - matched, floor and playbook follow: $nsteps against $flo in $pb"

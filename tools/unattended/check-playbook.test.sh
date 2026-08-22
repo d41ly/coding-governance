@@ -31,6 +31,11 @@ require_shape() { # value · glob · what-it-is
 
 seed() { # dir
   mkdir -p "$1/tools/unattended"
+  # HERMETIC AGAINST THE MACHINE'S OWN GIT CONFIG, not only against the real tree. Round 5, MEDIUM 7:
+  # the replace-ref arm below asserts a pinned read is unmoved, and a developer with
+  # `core.useReplaceRefs=false` set globally would see that arm pass no matter what the leg does. A
+  # fixture that reads ambient machine state is this project's own `fixture-inherits-ambient-machine-state`.
+  export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
   cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/tools/unattended/"
@@ -233,12 +238,12 @@ n=$((n+1))
 grep -q 'phantom-leg' "$F" || bad "the phantom-leg fixture edit did not take, so both halves below would measure the shipped declaration"
 ( cd "$W" && git add -A >/dev/null && git commit -qm phantom )
 AT=$( cd "$W" && git rev-parse HEAD )
-PIN0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+PIN0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
 n=$((n+1))
 [ "$PIN0" = "pieces=2 verified=0 failed=0 stale=0 unrecorded=0 unchecked=2" ] \
   || bad "a leg no record satisfies did not grade its pieces unchecked, so the arm below cannot tell the pinned read from the tree read: [$PIN0]"
 sed -i '/^piece_checks/d' "$F"
-PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | grep -m1 '^pieces=' )
 TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh | grep -oE 'pieces [0-9]+ · verified [0-9]+' | head -1 )
 require_shape "$TREE1" 'pieces * · verified *' "the tree read of the census"
 n=$((n+1))
@@ -308,6 +313,12 @@ sed -i 's|^step_floor.*$|step_floor    = 1     # at least 1, per section 5 and F
 n=$((n+1))
 grep -q '^step_floor    = 1     # at least 1, per section 5 and F2$' "$F" || bad "the digit-bearing floor comment edit did not take"
 out=$(run)
+# THE ANCHOR, before the two negatives. Round 5, MEDIUM 9: an arm made only of `&& bad` assertions
+# passes when the capture is empty, which is indistinguishable from the leg being silent for the
+# right reason. Something the leg always prints has to be present first.
+n=$((n+1))
+grep -qE 'population [0-9]+ playbook' <<<"$out" \
+  || bad "the leg produced no population line, so the two refusals asserted ABSENT below were asserted over nothing"
 n=$((n+1))
 grep -qE 'check 3 FAILED' <<<"$out" \
   && bad "a valid playbook whose floor line carries a digit-bearing comment red check 3, so the floor was spliced out of the prose rather than parsed: $(grep -m1 'check 3 FAILED' <<<"$out")"
@@ -324,9 +335,13 @@ cp "$KEEP" "$F"
 sed -i 's|^step_floor.*$|step_floor    = soon|' "$F"
 n=$((n+1))
 grep -q '^step_floor    = soon$' "$F" || bad "the non-numeric floor edit did not take"
+out=$(run)
 n=$((n+1))
-grep -qF -- "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [" <<<"$(run)" \
+grep -qF -- "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [" <<<"$out" \
   || bad "a non-numeric step floor was accepted rather than refused, so whatever prose follows the equals sign becomes the floor"
+n=$((n+1))
+grep -qF -- 'declares a step selector and no floor' <<<"$out" \
+  && bad "a non-numeric floor ALSO reported itself absent, which is the wrong-cause message the numeric refusal exists to replace"
 cp "$KEEP" "$F"
 
 # ---- BLOCKER (round-4): THE REPLACE REF. `git replace -f <base> <forged>` rewrites what a sha
@@ -347,12 +362,13 @@ cp "$KEEP" "$F"
 sed -i 's|^piece_checks  = .*|piece_checks  = ["phantom-leg"]|' "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm honest-strict )
 HONEST=$( cd "$W" && git rev-parse HEAD )
-PINH=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | head -1 )
+PINH=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
 require_shape "$PINH" 'pieces=* verified=*' "the honest pinned census this arm compares against"
 cp "$KEEP" "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm forged-permissive )
 FORGED=$( cd "$W" && git rev-parse HEAD )
-PINF=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$FORGED" | head -1 )
+PINF=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$FORGED" | grep -m1 '^pieces=' )
+require_shape "$PINF" 'pieces=* verified=*' "the forged pinned census this arm compares against"
 n=$((n+1))
 [ "$PINF" != "$PINH" ] \
   || bad "the forged tree grades identically to the honest one, so this arm cannot detect a substitution and would pass against the defect it exists to catch: [$PINH]"
@@ -362,7 +378,14 @@ n=$((n+1))
 n=$((n+1))
 [ -n "$( cd "$W" && git for-each-ref refs/replace/ )" ] \
   || bad "no replace ref exists after installing one, so the read below is unpinned against nothing"
-PINR=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | head -1 )
+# THE LEVER BITES. Round 5, MEDIUM 7: this arm proved a replace ref EXISTED and then that the pinned
+# read was unmoved, which is also what a git that ignores replace refs entirely would produce - the
+# arm could not tell a working pin from a machine where the lever does nothing. An UNPINNED read of
+# the same sha must return the forged bytes, or there is no lever to be pinned against.
+n=$((n+1))
+[ "$( cd "$W" && git show "$HONEST:tools/unattended/playbook.fixture.md" | grep -c 'phantom-leg' )" = "0" ] \
+  || bad "an UNPINNED read at the honest sha returned the honest bytes, so the replace ref does nothing on this machine and the pinned assertion below proves nothing"
+PINR=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | grep -m1 '^pieces=' )
 n=$((n+1))
 [ "$PINR" = "$PINH" ] \
   || bad "a replace ref moved the PINNED census at an unchanged, honest sha, so the run supplies the playbook it is measured against on the one item that takes no override: honest [$PINH] became [$PINR]"
@@ -516,8 +539,8 @@ cp "$KEEP" "$F"
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about. RE-MEASURED at the round-3 fold: 72 executed,
-# same absolute headroom as the pin it replaces. RE-MEASURED again at the round-4 fold: 86 executed.
-FLOOR_ASSERTIONS=78
+# same absolute headroom as the pin it replaces. RE-MEASURED again at the round-4 fold: 86 executed, and at the round-5 fold: 90.
+FLOOR_ASSERTIONS=82
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

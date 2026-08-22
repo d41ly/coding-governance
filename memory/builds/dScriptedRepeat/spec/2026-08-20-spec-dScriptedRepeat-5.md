@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** CLOSED · rev-10 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -175,6 +175,16 @@ none — every fork below is RESOLVED in place.
   before and after the commit this revision describes; the pin landed at rev-10. Left standing rather
   than edited away, because a revision log that silently repairs its own false entries is worth less
   than one that shows where a claim outran the code — see rev-10 and round 4's BLOCKER 3.
+- rev-11 · 2026-08-22 · the round-5 fold. Both parsers take the comment off the WHOLE LINE before the key
+  is removed, and the order is the whole repair: rev-10 moved the strip in front of the terminator test and
+  left it after the key strip, which had already eaten the whitespace the strip needs, so an EMPTY-VALUED
+  declaration carrying a trailing comment parsed to the comment text at rc 0. The closer is tested
+  POSITIONALLY rather than by containment, so `["a[0]",` refuses instead of silently dropping every member on
+  the lines below it. Check 28's three source rules are rewritten from instance gates into class gates over a
+  DERIVED kit-source population: 28a reds the discard spellings it used to whitelist, 28b binds every template
+  key POSITIVELY to a parser read with a resolving exemption list for the one key a bespoke reader owns, and
+  28c matches the wrapper spelling as well as the bare one and proves the wrapper's own pin inside the gate.
+  Every one of the eight breaks and both controls was observed against a hermetic copy before it was written.
 - rev-10 · 2026-08-22 · the round-4 fold. `declared_list` strips the trailing comment BEFORE its
   terminator test: rev-9's refusal ran the `case` on the RAW line, so a `]` anywhere in a comment
   satisfied the closed arm and a legal multi-line array parsed to the declared null at rc 0 — the

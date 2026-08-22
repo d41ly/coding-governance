@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** CLOSED · rev-10 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,6 +166,10 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-11 · 2026-08-22 · the round-5 fold. `set_checks` inherits the parser ordering repair, and the rule
+  that its refusal must be READ is now enforced against the discard spellings as well as the bare assignment:
+  `|| true` and `|| :` read the status into a no-op, which check 28a used to grade compliant because it
+  whitelisted any line carrying `||`.
 - rev-10 · 2026-08-22 · the round-4 fold. `set-checks-recorded` READS the refusal. Rev-9 said
   `set_checks` inherits the parser refusal because one parser meant one fix; the driver's call site
   was a bare assignment, so rc 2 arrived as empty stdout, the declared-null escape matched it, and

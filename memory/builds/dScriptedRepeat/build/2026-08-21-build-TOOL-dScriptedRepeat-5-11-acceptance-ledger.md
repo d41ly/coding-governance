@@ -39,7 +39,18 @@ at every call site; 28b, every template key bound to the parser its real reader 
 observed RED against the live tree before the fixes went in, which is the discipline this ledger's own
 preamble was written about.
 
-Suite counts at the time of writing: driver 673, leg 337, playbook 72, cross-component 19.
+**Round 5 blocked on the fold again, and its finding was about the three gates round 4 added.** All
+three were instance gates: 28a whitelisted any line carrying `||`, so the discard it existed to catch
+came back spelled `|| true`; 28b was a fixed-string search that matched nothing over all ten template
+keys; 28c matched only lowercase `git`, so its whole live population was the one already-pinned line it
+exempts while thirty wrapper-routed reads stayed invisible. Each had been observed RED against the live
+tree before the round-4 fixes went in, which is exactly what made them look armed — redding on the
+instance in front of you is not the same claim as covering the class, and this ledger now records the
+difference. The round-5 fold rewrites all three over a DERIVED kit-source population and arms each with
+eight staged breaks and two controls, the controls being the half that proves a tightened rule has not
+simply traded a false green for a false red.
+
+Suite counts at the time of writing: driver 680, leg 405, playbook 90, cross-component 19.
 
 ## TOOL-dScriptedRepeat-5 — the per-piece record
 

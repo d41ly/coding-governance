@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** CLOSED · rev-10 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -180,6 +180,9 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-11 · 2026-08-22 · the round-5 fold. No change to this item's mechanism. Its guard moved with the
+  parser: `outputs` is read through the shared list parser, and the ordering repair above is what stops an
+  empty-valued declaration from arriving here as its own comment.
 - rev-10 · 2026-08-22 · the round-4 fold. Round 4 asked for the leg's EXIT STATUS to be read here, and
   the answer is a measured NO recorded at the call site rather than left as a silent discard.
   `--counts` runs the same per-playbook validity checks the full leg does, so the status reports a

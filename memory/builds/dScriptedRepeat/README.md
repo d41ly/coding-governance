@@ -253,9 +253,9 @@ ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14
 | [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | CLOSED | rev-10 | 2026-08-22 |
-| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | CLOSED | rev-10 | 2026-08-22 |
-| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-10 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | CLOSED | rev-11 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | CLOSED | rev-11 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-11 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-6 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | CLOSED | rev-6 | 2026-08-21 |
 <!-- /gen:build-units -->
