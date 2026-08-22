@@ -203,15 +203,39 @@ n=$((n+1))
 badsha=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' 0000000000000000000000000000000000000000 2>&1 )
 grep -qF -- "the playbook does not resolve at the sha this count was asked for, so every declaration it carries would parse to nothing and the census would report a clean run over an unreadable file - sha and playbook follow" <<<"$badsha" \
   || bad "--counts at an unresolvable sha did not refuse, so an empty body would parse as declaring no checks"
-# ...and at a REAL sha it reads the blob rather than the tree: the uncommitted edit that used to move
-# the verdict now moves nothing.
-n=$((n+1))
-AT=$( cd "$W" && git rev-parse HEAD )
-C0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
-sed -i '/^piece_checks/d' "$F"
-C1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
-[ "$C0" = "$C1" ] || bad "an UNCOMMITTED piece_checks delete moved the census the close reads — the count is still taken from the file the run can edit: [$C0] then [$C1]"
+# ...and at a REAL sha it reads the BLOB, not the tree — asserted in the one direction where the
+# two answers DIFFER. Round 3, HIGH 5: this arm deleted `piece_checks` on disk and asserted the
+# census did not move, but the fixture records carry a PASS for every declared leg, so
+# "declares nothing" and "declares legs that all passed" are the SAME census. All four cells
+# printed `verified=2 unchecked=0`, including the defective working-tree read the arm was written
+# to catch. `fixture-passes-by-finding-nothing`, from this project's own checklist, sitting on a
+# blocker.
+#
+# The distinguishing input is a declared leg NO RECORD SATISFIES: committed, the pinned read must
+# report it unchecked; deleted on disk, an unpinned read must not. Both halves in one arm, so the
+# PAIR is what passes rather than either number alone.
 cp "$KEEP" "$F"
+sed -i 's|^piece_checks  = \["fixture-shape"\]|piece_checks  = ["phantom-leg"]|' "$F"
+n=$((n+1))
+grep -q 'phantom-leg' "$F" || bad "the phantom-leg fixture edit did not take, so both halves below would measure the shipped declaration"
+( cd "$W" && git add -A >/dev/null && git commit -qm phantom )
+AT=$( cd "$W" && git rev-parse HEAD )
+PIN0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+n=$((n+1))
+[ "$PIN0" = "pieces=2 verified=0 failed=0 stale=0 unrecorded=0 unchecked=2" ] \
+  || bad "a leg no record satisfies did not grade its pieces unchecked, so the arm below cannot tell the pinned read from the tree read: [$PIN0]"
+sed -i '/^piece_checks/d' "$F"
+PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md | head -1 )
+n=$((n+1))
+[ "$PIN1" = "$PIN0" ] \
+  || bad "an UNCOMMITTED piece_checks delete moved the PINNED census, so the close still reads the file the run can edit: [$PIN0] then [$PIN1]"
+n=$((n+1))
+[ "$TREE1" != "$PIN1" ] \
+  || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch"
+( cd "$W" && git checkout -q -- tools/unattended/playbook.fixture.md 2>/dev/null )
+cp "$KEEP" "$F"
+( cd "$W" && git add -A >/dev/null && git commit -qm restore-fixture )
 
 # ---- B1 (round-2 fold): THE TEMPLATE'S OWN COMMENT. The kit ships
 # ---- `piece_checks = []    # the checks that run over ONE piece.`, and the parser that read it had
@@ -339,7 +363,7 @@ cp "$KEEP" "$F"
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=61
+FLOOR_ASSERTIONS=62
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

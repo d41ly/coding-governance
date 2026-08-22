@@ -1422,6 +1422,57 @@ reset_tree; mutate tools/unattended/SKILL.template.md 's/ordinary code build/per
 hit "$(run)" "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose:"
 reset_tree
 
+# ---- check 28, ROUND-3 HALF: the answer arm now has a POSITIVE direction and asserts the parser's
+# ---- EXIT STATUS. Before this it fed only the template's `[]` lines and asserted the output was
+# ---- EMPTY — so a syntax error, a truncated extraction and a correct parse were ONE observation, and
+# ---- gutting both parser bodies to a dead `printf` left the check silent and green while the census
+# ---- went verified-over-unchecked. A dead harness must not be byte-indistinguishable from a live one.
+# ----
+# ---- Every arm replaces the WHOLE function body in BOTH copies, so the byte-compare stays satisfied
+# ---- and the ANSWER assertions are what speak. Replacing only the first line left the pipeline's
+# ---- continuation lines orphaned, which fired the rc branch instead of the one under test — caught
+# ---- because `mutate` proves the edit landed and the arm still named the wrong branch.
+gut_parser() { # fn-name · whole replacement body (one line)
+  local f
+  for f in tools/unattended/check-playbook.sh tools/unattended/unattended.sh; do
+    mutate "$f" "/^$1() {/,/^}/ { /^$1() {/b; /^}/b; d; }"
+    mutate "$f" "/^$1() {/a\\$2"
+  done
+}
+reset_tree; gut_parser declared_list "  printf ''"
+hit "$(run)" "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: ["
+
+reset_tree; gut_parser declared_list '  ((this is not shell'
+hit "$(run)" "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
+
+reset_tree; gut_parser declared_scalar '  ((this is not shell'
+hit "$(run)" "the extracted declared-scalar parser could not be executed over the shipped template's own line, and an unexecutable parser returns the empty string every assertion here reads as clean - key and exit status follow:"
+
+# ---- the SCALAR sibling, byte-compared on the same terms as the list one. Round 3, HIGH 6: the list
+# ---- parse was consolidated and compared while five scalar reads stayed ad-hoc, so this check
+# ---- generalised the PARSE across list keys and the GATE across `*_checks` — two of the ten keys.
+reset_tree; rm -f tools/unattended/check-playbook.sh
+hit "$(run)" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+
+reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/a\  # a line only this copy carries'
+hit "$(run)" "the two inlined copies of the declared-scalar parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
+
+# ...and the ANSWER for the scalar keys: the COMMENT must not survive. Every key in the shipped block
+# is a declared null of its own type, so a `#` in the parse is the leak signature — and it is the same
+# signature for all ten keys rather than for the two the old pattern matched.
+reset_tree
+mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate tools/unattended/unattended.sh     '/^declared_scalar() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+hit "$(run)" "the shipped template's own declaration line parses with its COMMENT still attached, so an adopter who fills the template in place and keeps the comments gets that prose as the value - key and parse follow:"
+
+# ...and the template half must have RUN. Without this both loops are green over a fence that yielded
+# nothing, which the built-in specimens cannot distinguish from a fence that yielded everything. The
+# keys are INDENTED rather than renamed: the population awk anchors at column 0, and a rename to
+# `x_<key>` still matched it — the first attempt at this arm, caught by the arm staying green.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
+hit "$(run)" "the shipped template's declaration block yielded no key this check could parse, so only the built-in specimens ran and the template half of this assertion covered nothing:"
+reset_tree
+
 # ---- check 28 (round-2 fold): the inlined parser is ONE answer in two files, and the answer is the
 # ---- one an adopter gets. Both branches, because agreement and correctness are different claims and
 # ---- this check makes both.
@@ -1441,8 +1492,6 @@ hit "$(run)" "the shipped template's own declaration line does not parse to the 
 reset_tree; rm -f tools/unattended/PLAYBOOK-TEMPLATE.template.md
 hit "$(run)" "the shipped playbook template is missing, so the parser cannot be run over the line every adopter actually copies and this check would grade agreement alone:"
 
-reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^piece_checks /d; /^set_checks /d'
-hit "$(run)" "the shipped template declares no *_checks key this check can read, so the parse assertion above ran over nothing and its green means only that it found no work:"
 reset_tree
 
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
@@ -1817,7 +1866,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ----
 # ---- MEASURED unsharded 271, shard one 84, shard two 187. 84 + 187 = 271 EXACTLY: this file has no prologue arms, so the shards partition the count with nothing paid twice.
 # ---- RE-MEASURED at the playbook-mode merge, 2026-08-21, node d: unsharded 305, shard one 86, shard two 219, so the two regions share no prologue arm here. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
-FLOOR_ASSERTIONS=303
+FLOOR_ASSERTIONS=324
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on

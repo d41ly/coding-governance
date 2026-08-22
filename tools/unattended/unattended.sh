@@ -942,8 +942,8 @@ check_authorization() { # slug · base
     # The declaration block is unit 2's fenced TOML. Read for the two keys THIS unit owns; the rest
     # belong to the units that read them and are parsed there.
     AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
-    AUTH_GRAIN=$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
-    AUTH_RECORDS=$(printf '%s\n' "$_pb" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
+    AUTH_GRAIN=$(declared_scalar "$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1)")
+    AUTH_RECORDS=$(declared_scalar "$(printf '%s\n' "$_pb" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
     case "$_pb" in
       *'```toml'*) ;;
       *) fail 46 "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing: $AUTH_PLAYBOOK"
@@ -1942,8 +1942,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         # 68 of them "GATE ok" -- which buries the one line the operator needs in the noise the
         # unit exists to remove. Anything that is not an ok/skip line survives, so a FAIL, a
         # summary and any stderr all reach the operator while the roll-call does not.
-        [ -n "${DOD_OUT:-}" ] && printf '%s
-' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
+        [ -n "${DOD_OUT:-}" ] && printf '%s\n' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
       fi
     else
@@ -2106,7 +2105,7 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="the playbook does not resolve at the pinned BASE or carries no declaration block there, so this item would read an empty set_checks and certify set coverage over a playbook nothing could read: $_pb"
         return 1
       fi
-      _rr=$(printf '%s\n' "$_blob" | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+      _rr=$(declared_scalar "$(printf '%s\n' "$_blob" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
       # M1: the escape is matched against a TRIMMED value. It compared RAW text, and the line the
       # kit's own template ships - `set_checks   = []    # the checks that run over ALL N…` - does not
       # equal `[]`, so an author who declares none and keeps the template's own comment was told they
@@ -2324,7 +2323,21 @@ $_bcnon"
 declared_list() { # raw value -> members, space-separated
   printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
-    | sed 's/^\[//; s/\]$//; s/,/ /g' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+declared_scalar() { # raw value -> the scalar it declares, comment/quotes/space stripped
+  # THE SIBLING OF `declared_list`, and it exists for the reason that one does. Round 3, HIGH 6: the
+  # list parse was consolidated and the SCALAR reads were left as five ad-hoc pipelines, so an adopter
+  # who filled the shipped template in place and kept its comments got `grain = "out/*/piece.md"
+  # # a glob…` parsed WITH the comment — a DEAD PROBE over a tree holding real pieces — while
+  # `curated = ""    # who ratified…` satisfied the freeze check on an unratified playbook.
+  #
+  # Same copy-inlined discipline: each kit script installs standalone and cannot import, so both
+  # copies are byte-compared by the leg check that compares `declared_list`'s.
+  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
 kinds_re() { # word-list -> word|word|word
@@ -2685,7 +2698,7 @@ verb_record_set() { # slug · leg · verdict
   [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead: $rel"; return 1; }
   refuse_if_terminal "$rel" --record-set || return 1
   pb=$(fact "$rel" playbook)
-  rr_root=$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a set verdict has nowhere to be written that the merge bar will read"; return 1; }
   # The set IDENTITY is the ORDERED list of this run's piece hashes, DERIVED here rather than
   # supplied: a caller that names its own set could name a set it did not produce.
@@ -2715,7 +2728,7 @@ verb_record_piece() { # slug · piece · leg · verdict
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers: $rel"; return 1; }
   refuse_if_terminal "$rel" --record-piece || return 1
-  rr_root=$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null | awk -F= '/^records[[:space:]]*=/{v=$2; gsub(/^[[:space:]"]+|[[:space:]"]+$/,"",v); print v; exit}')
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
   [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
   # M6 (round-1 diff review): the BLOB SHA, not the path. This passed `$(fact "$rel" playbook)` —
   # the same expression used one line up as the PATH half of a `GIT show` — into a field printed as

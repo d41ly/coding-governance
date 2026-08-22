@@ -125,7 +125,21 @@ record_for() { # records-root · piece-path -> its record, or empty
 declared_list() { # raw value -> members, space-separated
   printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
-    | sed 's/^\[//; s/\]$//; s/,/ /g' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+declared_scalar() { # raw value -> the scalar it declares, comment/quotes/space stripped
+  # THE SIBLING OF `declared_list`, and it exists for the reason that one does. Round 3, HIGH 6: the
+  # list parse was consolidated and the SCALAR reads were left as five ad-hoc pipelines, so an adopter
+  # who filled the shipped template in place and kept its comments got `grain = "out/*/piece.md"
+  # # a glob…` parsed WITH the comment — a DEAD PROBE over a tree holding real pieces — while
+  # `curated = ""    # who ratified…` satisfied the freeze check on an unratified playbook.
+  #
+  # Same copy-inlined discipline: each kit script installs standalone and cannot import, so both
+  # copies are byte-compared by the leg check that compares `declared_list`'s.
+  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
 
 # ------------------------------------------------------------------------ per playbook
@@ -146,11 +160,11 @@ for pb in $PLAYBOOKS; do
   fi
 
   # ---- 2: the FREEZE. `curated` is fork 4's only machine consequence.
-  cur=$(printf '%s\n' "$body" | sed -n 's/^curated[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  cur=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^curated[[:space:]]*=[[:space:]]*//p' | head -1)")
   [ -n "$cur" ] || fail 2 "a playbook declares no curator, and the freeze is the only machine consequence a derive-then-freeze template has - a derived canon nobody ratified is a mirror of the corpus it came from, which is the one shape a template must not have; playbook: $pb"
 
   # ---- 3: the declared STEP SELECTOR and its shrink-only floor.
-  sel=$(printf '%s\n' "$body" | sed -n 's/^step_selector[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
+  sel=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^step_selector[[:space:]]*=[[:space:]]*//p' | head -1)")
   flo=$(printf '%s\n' "$body" | sed -n 's/^step_floor[[:space:]]*=[[:space:]]*//p' | head -1 | tr -dc '0-9')
   if [ -z "$sel" ]; then
     fail 3 "a playbook declares no step selector, and a kit-fixed one either misses a playbook's steps entirely - reporting every step tagged over an empty set - or selects its prose; playbook: $pb"
@@ -187,7 +201,7 @@ for pb in $PLAYBOOKS; do
   TOTAL_CHECKS=$((TOTAL_CHECKS + nchecks)); TOTAL_WITNESS=$((TOTAL_WITNESS + nwit))
 
   # ---- 6: the RUNNABILITY ORACLE and its GRADED coverage mode.
-  cov=$(printf '%s\n' "$body" | sed -n 's/^coverage[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  cov=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^coverage[[:space:]]*=[[:space:]]*//p' | head -1)")
   case "$cov" in
     resolvable|probe|dark) ;;
     '') fail 6 "a playbook declares no coverage mode for its leg registry, and a gate that quietly skips what it forgot looks exactly like coverage - declare resolvable, probe or dark; playbook: $pb" ;;
@@ -236,9 +250,8 @@ CANONEOF
   # ---- RUN-INDEPENDENT BY CONSTRUCTION. The scopes are derived from the RECORDS, never from a
   # ---- run-state file: this leg runs on the merge bar where no run exists, and a scope that needed
   # ---- one would be a scope the bar can never evaluate.
-  gr=$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
-  rr=$(printf '%s
-' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
+  gr=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1)")
+  rr=$(declared_scalar "$(printf '%s\n' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1)")
   # THE DECLARED PER-PIECE LEGS. Round-1 blocker: this list had no reader anywhere in the kit while
   # three documents asserted the join, so `verified` meant "the hash matches and nobody wrote FAIL"
   # and a record carrying NO verdict at all counted as verified.

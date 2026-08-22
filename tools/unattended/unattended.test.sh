@@ -1747,8 +1747,12 @@ rm -rf "$gtmp"
 # ---- override. A per-field pin is a list somebody has to remember to extend; the sha is not.
 n=$((n+1)); grep -q 'check-playbook.sh" --counts "$_pb" "$slug" "$(fact "$rel" base)"' "$SCRIPT" \
   || { echo "FAIL the close does not hand --counts the pinned BASE, so the playbook it measures is the one the run can edit"; st=1; }
-n=$((n+1)); [ "$(grep -c 'COUNTS_GRAIN\|COUNTS_RECORDS' "$SCRIPT")" -eq 0 ] \
-  || { echo "FAIL the driver still passes per-field pins, which is the list that was not extended"; st=1; }
+# POINTED AT THE FILE THAT HELD THEM. Round 3, HIGH 5: this grepped the DRIVER, where those names
+# never existed — 0 hits at the pre-fix base too, so it could not fail. They lived in the LEG, six
+# hits there at that same sha. An assertion already true before the change it certifies is not a
+# regression arm; it is decoration shaped like one.
+n=$((n+1)); [ "$(grep -c 'COUNTS_GRAIN\|COUNTS_RECORDS' "$(dirname "$SCRIPT")/check-playbook.sh")" -eq 0 ] \
+  || { echo "FAIL the leg still carries the per-field count pins, which is the list that was not extended"; st=1; }
 
 # ---- HIGH 5 (round-1 diff review): the machine count line is selected by its SHAPE, never by
 # ---- position. `head -1` cannot fail — it just yields the wrong line, and every `${_counts#*x=}`
