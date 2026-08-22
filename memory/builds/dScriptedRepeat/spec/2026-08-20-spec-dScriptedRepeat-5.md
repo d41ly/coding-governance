@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-8 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -164,6 +164,7 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-8 · 2026-08-22 · the round-2 fold. `verified` now parses `piece_checks` through the shared `declared_list`, which is inlined in both scripts and byte-compared by leg check 28 — the round-1 fold wrote a third spelling of that parse without the trailing-comment strip, so the kit's own template line word-split into eight phantom legs. Both record writers lost their last `sed` re-stamp and gained guards over EVERY caller-supplied field: `--set` and `--playbook-sha` each forged a well-formed verdict row through the attended path.
 - rev-5 · 2026-08-21 · BUILT. The records root moved from the build folder to a PLAYBOOK
   declaration: the memory-tree gate's build-folder shape is a closed whitelist and its top level is
   closed too, so F1's answer needed another kit's contract edited. Evidence about content belongs

@@ -2041,15 +2041,15 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="a recipe-mode run records no playbook or no piece count, so there is nothing to measure this item against: playbook '$_pb' count '$_n'"
         return 1
       fi
-      # THE GRAIN AND THE RECORDS ROOT COME FROM THE PINNED FACTS, not from the working-tree
-      # playbook. Round-1 HIGH 4: this arm handed `--counts` a PATH, which the leg read off disk,
-      # while `set-checks-recorded` twenty-seven lines down read the BASE blob — two halves of one
-      # arm reading two different files. An uncommitted one-line grain edit moved the count from 2
-      # to 1, and the run is the actor that can make that edit. Preflight goes to the trouble of
-      # reading both from the blob at BASE precisely so the run cannot supply them.
-      _gr=$(fact "$rel" grain)
-      _rrf=$(fact "$rel" records)
-      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$_gr" "$_rrf" 2>/dev/null \
+      # THE WHOLE PLAYBOOK COMES FROM THE PINNED BASE, not from the working tree. Round-1 HIGH 4
+      # found this arm handing `--counts` a PATH the leg read off disk while `set-checks-recorded`
+      # below it read the BASE blob; the fix pinned `grain` and `records` and LEFT `piece_checks` on
+      # disk, so one uncommitted line still moved a piece from `unchecked` to `verified` — on the
+      # item that takes no override. Round 2 caught that inside the commit that introduced it.
+      #
+      # A SHA, not a field list. A per-field pin is a list somebody has to remember to extend, and
+      # the evidence that nobody does is this arm's own history.
+      _counts=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$(fact "$rel" base)" 2>/dev/null \
                 | grep -m1 '^pieces=')
       # SELECTED BY SHAPE, never by position. `head -1` took whatever the leg printed first, so any
       # note reaching stdout made every field below parse to that line's first word — the parse
@@ -2114,11 +2114,9 @@ dod_met() { # slug · run-state file · item · checker
       # already trimmed; the inconsistency was between two lines of one arm.
       #
       # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
-      _declared=$(printf '%s\n' "$_blob" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
-                  | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r' \
-                  | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+      _declared=$(declared_list "$(printf '%s\n' "$_blob" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
       case "$_declared" in
-        ''|'[]'|'none'*) DOD_OUT=""; return 0 ;;
+        ''|'none'*) DOD_OUT=""; return 0 ;;
       esac
       # M2, second half: with checks DECLARED and no records root, `_rr` was empty and `_set`
       # degenerated to the absolute path `/set-<slug>.md`, so the item red naming a path outside the
@@ -2139,7 +2137,7 @@ dod_met() { # slug · run-state file · item · checker
       # a comment claiming it "reads the VERDICTS and not merely their existence". An explicit NA
       # satisfies a declared check; an absent row does not.
       _smiss=""
-      for _sl in $(printf '%s' "$_declared" | tr -d '[]",'); do
+      for _sl in $_declared; do
         grep -qxF -- "leg $_sl · verdict PASS" "$_set" && continue
         grep -qxF -- "leg $_sl · verdict NA" "$_set" && continue
         _smiss="$_smiss $_sl"
@@ -2311,6 +2309,24 @@ $_bcnon"
 # parked region, and the build method derives the owner's open/parked row from parked entries "plus any
 # recorded DoD override" - so an abort would have arrived in the one turn the owner gets, wearing the
 # label of a Definition-of-Done override that never happened.
+# ---------------------------------------------------------------- the DECLARED-LIST parse, ONCE
+# A TOML list value from the declaration block -> its members, space-separated. THREE call sites had
+# three spellings of this, which is why the trailing-comment strip landed in two of them and not the
+# third: round 1 fixed `set_checks`, the fold added `piece_checks` seventy-five lines away without it,
+# and the kit's OWN template ships `piece_checks = []    # the checks that run over ONE piece.` — a
+# line that word-splits into eight phantom legs and grades every piece `unchecked`.
+#
+# The helper cannot live in a shared file: each kit script is copy-installed standalone. So it is
+# inlined once per script and the two copies are compared against each other by a leg check, which is
+# the only way two inlined copies stay one answer.
+#
+# The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
+declared_list() { # raw value -> members, space-separated
+  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+    | sed 's/^\[//; s/\]$//; s/,/ /g' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
 kinds_re() { # word-list -> word|word|word
   # DERIVED, never typed. A leading, trailing or doubled space in the source set would otherwise mint
   # an EMPTY alternative, and an empty alternative matches every line: the widest possible predicate,
@@ -2509,6 +2525,27 @@ record_path_of() { # records-root · piece-path
 #
 # The `case` pattern below is a QUOTED expansion, which shell treats as a literal even when the value
 # spells a glob, and the single trailing `*` is the only wildcard in it. No escaping to get wrong.
+# HIGH 1 (round-2 diff review) - the FIELD RE-STAMP, and it takes no regex either. Both writers
+# spelled this `sed -i "s|^set: .*|set: $hashes|"`, interpolating a caller value into a sed
+# REPLACEMENT — which is a different injection from the ADDRESS the dropper below fixed, twelve lines
+# away, in the same commit:
+#
+#   * `--set 'AAAA\nleg forged · verdict PASS'` wrote a well-formed verdict row, walking past a
+#     newline guard that counts newline BYTES and therefore never saw the two-character escape;
+#   * `&` in a replacement re-inserts the whole match, corrupting the line;
+#   * `|` closed the delimiter, so sed aborted while the function reported success anyway.
+#
+# Reachable because `--set` and `--playbook-sha` arrive through the records-root branch, which runs
+# BEFORE the slug lookup — the attended path the kit ships and documents.
+set_field() { # record · key · value
+  local rec="$1" key="$2" val="$3" tmp line
+  tmp=$(mktemp) || return 1
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in "$key: "*) printf '%s: %s\n' "$key" "$val" ;; *) printf '%s\n' "$line" ;; esac
+  done < "$rec" > "$tmp"
+  mv "$tmp" "$rec"
+}
+
 drop_leg_row() { # record · leg
   local rec="$1" lg="$2" tmp line
   tmp=$(mktemp) || return 1
@@ -2529,12 +2566,18 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha 
   # verb_park's three guards, REUSED rather than re-argued. Each exists because of a recorded defect:
   # a newline forges a row nothing wrote, the field separator makes a row unparseable by the check
   # that reads it, and the bypass flag reds the bar permanently on a record no verb repairs.
-  if [ "$(printf '%s' "$leg$verdict$piece" | wc -l)" -ne 0 ]; then
+  # EVERY CALLER-SUPPLIED FIELD, not the three that happened to be listed. `$pbsha` and `$runid`
+  # arrive from argv on the attended path and were covered by none of these guards, so
+  # `--playbook-sha "$(printf 'deadbeef\nleg L · verdict PASS')"` forged a PASS on the record's FIRST
+  # write with no sed involved at all. §9's rule is ONE composite write-guard on every path that
+  # stores parseable content; two writers with two different field sets is the bare-sibling-path hole
+  # that rule is written against.
+  if [ "$(printf '%s' "$leg$verdict$piece$pbsha$runid" | wc -l)" -ne 0 ]; then
     fail 47 "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
   fi
-  case "$leg$piece" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $piece"; return 1 ;; esac
-  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s' "$leg" "$piece" | grep -qF -- "$BYPASS_BAN"; then
-    fail 47 "a piece record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows: $BYPASS_BAN"; return 1
+  case "$leg$piece$pbsha$runid" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $piece"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s%s' "$leg" "$piece" "$pbsha" "$runid" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
   rec=$(record_path_of "$root" "$piece")
   mkdir -p "$(dirname "$rec")" || return 1
@@ -2556,14 +2599,19 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha 
   else
     # The hash is RE-STAMPED on every write. A record is a claim about the piece AS IT STANDS, and a
     # stale hash beside a fresh verdict is exactly the `stale` state the reader exists to name.
-    sed -i "s|^hash: .*|hash: $h|" "$rec"
+    set_field "$rec" hash "$h" || return 1
   fi
   want="leg $leg · verdict $verdict"
   # EXACT LINE compare, not a substring search. `verb_park` had to repair precisely this: a prefix
   # match reported success while writing nothing, silently dropping a distinct entry.
   while IFS= read -r line; do
     [ "$line" = "$want" ] || continue
-    echo "unattended: piece verdict already recorded, unchanged — $leg on $piece"
+    # M1 (round-2): STAGE ON THIS PATH TOO. The hash was re-stamped above, so "unchanged" was false
+    # the moment the piece had moved — the file was modified and left unstaged, and `--close` has no
+    # clean-tree guard, so the run reached LANDING and the lander refused it with a message blaming
+    # the operator's tree. This is the one path L1's superseded refusal actively drives runs onto.
+    stage_or_fail "$rec" || return 1
+    echo "unattended: piece verdict unchanged — $leg on $piece (the record's hash was re-stamped)"
     return 0
   done < "$rec"
   # A leg may be RE-recorded with a different verdict and the newest wins: two verdicts for one leg
@@ -2586,12 +2634,15 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
   # reader four functions away greps this file line-wise and saw the PASS. Reproduced against the
   # shipped driver before this landed. Same three refusals, same reasons, same wording as the piece
   # writer's - the point is that a writer of this record has them, not that each argues them again.
+  # `$hashes` joins the separator and bypass guards it was missing. It is DERIVED on the slug path
+  # and CALLER-SUPPLIED on the attended one, and a guard that covers only the derived callers is a
+  # guard against nothing.
   if [ "$(printf '%s' "$leg$verdict$runid$hashes" | wc -l)" -ne 0 ]; then
     fail 47 "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
   fi
-  case "$leg$runid" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $runid"; return 1 ;; esac
-  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s' "$leg" "$runid" | grep -qF -- "$BYPASS_BAN"; then
-    fail 47 "a set record field spells the declared bypass flag, and the gate greps these files whole for it, so recording this would red the bar on a record no verb rewrites - flag follows: $BYPASS_BAN"; return 1
+  case "$leg$runid$hashes" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - field follows: $leg $runid"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s' "$leg" "$runid" "$hashes" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
   rec="$root/set-$runid.md"
   mkdir -p "$(dirname "$rec")" || return 1
@@ -2603,12 +2654,16 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
   else
     # The SET is re-stamped on every write, the way a piece record re-stamps its hash. A set verdict
     # beside a stale member list is a verdict about a different set, which is the `superseded` state.
-    sed -i "s|^set: .*|set: $hashes|" "$rec"
+    set_field "$rec" set "$hashes" || return 1
   fi
   want="leg $leg · verdict $verdict"
   while IFS= read -r line; do
     [ "$line" = "$want" ] || continue
-    echo "unattended: set verdict already recorded, unchanged — $leg"
+    # M1 (round-2), and this is the writer L1's superseded refusal drives a run back to: the member
+    # list was re-stamped above, so leaving it unstaged left the index and the worktree disagreeing
+    # about the very field that refusal compares.
+    stage_or_fail "$rec" || return 1
+    echo "unattended: set verdict unchanged — $leg (the record's member list was re-stamped)"
     return 0
   done < "$rec"
   drop_leg_row "$rec" "$leg" || return 1

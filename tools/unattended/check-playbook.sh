@@ -33,13 +33,18 @@ note() { printf 'playbook: %s\n' "$1"; }
 # checking it, and the two drift on the first edit to either.
 COUNTS_FOR=""
 COUNTS_RUN=""
-# The GRAIN and the RECORDS ROOT may be SUPPLIED, and the driver supplies them from the facts its
-# run-state file pinned at BASE. Parsing them out of the working-tree playbook is right on the
-# merge bar, where no run exists and the tree is all there is; it is wrong at the close, where the
-# run is the actor that can edit the file being parsed. Empty means "parse the file".
-COUNTS_GRAIN=""
-COUNTS_RECORDS=""
-[ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; COUNTS_GRAIN="${4:-}"; COUNTS_RECORDS="${5:-}"; }
+# THE PLAYBOOK MAY BE READ AT A SHA rather than off disk, and the driver passes the BASE its
+# run-state file pinned. Parsing the working tree is right on the merge bar, where no run exists and
+# the tree is all there is; it is wrong at the close, where the run is the actor that can edit the
+# file being parsed.
+#
+# ONE sha, not a field list. The first cut of this passed the pinned `grain` and `records` and left
+# `piece_checks` on disk, so one uncommitted line moved a piece from `unchecked` to `verified` on the
+# item that takes no override — a per-field pin is a list somebody has to remember to extend, and the
+# round-2 review caught it not being extended within the same commit that introduced it. Reading the
+# BLOCK closes the class: no declaration added to it later can be forgotten here.
+COUNTS_AT=""
+[ "${1:-}" = "--counts" ] && { COUNTS_FOR="${2:-}"; COUNTS_RUN="${3:-}"; COUNTS_AT="${4:-}"; }
 
 command -v git >/dev/null 2>&1 || { echo "check-playbook: no git on PATH"; exit 2; }
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-playbook: not a git work tree"; exit 2; }
@@ -90,6 +95,9 @@ fi
 
 # ---------------------------------------------------------------- piece-record helpers
 GITLS() { git ls-files -- "$1" 2>/dev/null; }
+# CR-stripped like the on-disk read it stands in for, so a CRLF-committed playbook parses the same
+# way through both paths — two readers of one file giving two answers is the class this replaces.
+GITSHOW() { git show "$1" 2>/dev/null | tr -d '\r'; }
 # The record is found by its OWN `piece:` field rather than by re-deriving the writer's path rule.
 # Re-deriving would be a second implementation of the writer's naming, which confirms it rather than
 # checks it — and the two would drift the first time either changed.
@@ -102,11 +110,40 @@ record_for() { # records-root · piece-path -> its record, or empty
   return 0
 }
 
+# ---------------------------------------------------------------- the DECLARED-LIST parse, ONCE
+# A TOML list value from the declaration block -> its members, space-separated. THREE call sites had
+# three spellings of this, which is why the trailing-comment strip landed in two of them and not the
+# third: round 1 fixed `set_checks`, the fold added `piece_checks` seventy-five lines away without it,
+# and the kit's OWN template ships `piece_checks = []    # the checks that run over ONE piece.` — a
+# line that word-splits into eight phantom legs and grades every piece `unchecked`.
+#
+# The helper cannot live in a shared file: each kit script is copy-installed standalone. So it is
+# inlined once per script and the two copies are compared against each other by a leg check, which is
+# the only way two inlined copies stay one answer.
+#
+# The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
+declared_list() { # raw value -> members, space-separated
+  printf '%s\n' "$1" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+    | sed 's/^\[//; s/\]$//; s/,/ /g' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
 # ------------------------------------------------------------------------ per playbook
 TOTAL_STEPS=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
 for pb in $PLAYBOOKS; do
   [ -n "$pb" ] || continue
-  body=$(tr -d '\r' < "$pb")
+  if [ -n "$COUNTS_AT" ]; then
+    # A PROBE THAT CANNOT MOVE SAYS SO. An unreadable blob would otherwise yield an empty body, and
+    # every declaration below would parse to nothing — which reads as "declares no checks" and is
+    # exactly the vacuous green this whole leg exists to refuse.
+    body=$(GITSHOW "$COUNTS_AT:$pb")
+    if [ -z "$body" ]; then
+      fail 8 "the playbook does not resolve at the sha this count was asked for, so every declaration it carries would parse to nothing and the census would report a clean run over an unreadable file - sha and playbook follow: $COUNTS_AT and $pb"
+      continue
+    fi
+  else
+    body=$(tr -d '\r' < "$pb")
+  fi
 
   # ---- 2: the FREEZE. `curated` is fork 4's only machine consequence.
   cur=$(printf '%s\n' "$body" | sed -n 's/^curated[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
@@ -200,18 +237,12 @@ CANONEOF
   # ---- run-state file: this leg runs on the merge bar where no run exists, and a scope that needed
   # ---- one would be a scope the bar can never evaluate.
   gr=$(printf '%s\n' "$body" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
-  # SUPPLIED WINS. See the COUNTS_GRAIN note at the top: at the close these come from the BASE
-  # blob through the run-state file's pinned facts, so an uncommitted edit to the playbook cannot
-  # move the population the Definition of Done measures.
-  [ -n "$COUNTS_GRAIN" ] && gr="$COUNTS_GRAIN"
   rr=$(printf '%s
 ' "$body" | sed -n 's/^records[[:space:]]*=[[:space:]]*//p' | head -1 | tr -d '"' | sed 's/[[:space:]]*$//')
-  [ -n "$COUNTS_RECORDS" ] && rr="$COUNTS_RECORDS"
   # THE DECLARED PER-PIECE LEGS. Round-1 blocker: this list had no reader anywhere in the kit while
   # three documents asserted the join, so `verified` meant "the hash matches and nobody wrote FAIL"
   # and a record carrying NO verdict at all counted as verified.
-  pchk=$(printf '%s\n' "$body" | sed -n 's/^piece_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
-         | tr -d '[]",' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  pchk=$(declared_list "$(printf '%s\n' "$body" | sed -n 's/^piece_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
   if [ -n "$gr" ] && [ -z "$rr" ]; then
     fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
   fi
@@ -285,9 +316,11 @@ CANONEOF
     #
     # REPORTED, never redded, for check 8's stated reason: this block classifies and `--close` blocks.
     # The Skill says exactly that now, so the document and the code agree about which is which.
-    schk=$(printf '%s\n' "$body" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1 \
-           | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
-           | sed 's/^\[//; s/\]$//; s/,/ /g')
+    schk=$(declared_list "$(printf '%s\n' "$body" | sed -n 's/^set_checks[[:space:]]*=[[:space:]]*//p' | head -1)")
+    # M2 (round-2): the DECLARED-NULL escape its driver sibling had and this reader did not. A
+    # playbook writing `none — <why>` declares no set checks, and reporting a missing set record for
+    # it is a note the author cannot act on.
+    case "$schk" in none*) schk="" ;; esac
     if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
       # The run ids come from the PIECE records, so this reports on the runs that actually produced
       # something here rather than on a roster no merge-bar run can see.

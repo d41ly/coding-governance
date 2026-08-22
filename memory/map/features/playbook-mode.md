@@ -78,11 +78,11 @@ what the previous fix was and it lasted exactly one verb. `VERBS_SLUG` is now RE
 so a verb missing from it does not read wrong, it does not run; refusal 14 renders from that
 declaration; and the usage text renders from the header docstring, which is the only place a verb's
 ARGUMENTS are spelled. The two carriers in other files — the protocol's verb section and the Skill's
-invocations — are joined to the declaration by leg check 22, because no runtime derivation crosses a
+invocations — are joined to the declaration by leg check 26, because no runtime derivation crosses a
 file boundary.
 
 The same shape one level down: `PARK_KINDS` is the parked-region vocabulary, the `--status`
-alternation is derived from it, and check 23 joins it to the `park()` call sites in BOTH directions.
+alternation is derived from it, and check 27 joins it to the `park()` call sites in BOTH directions.
 The reverse direction is not theoretical — this kit declared a DECISION kind that no verb wrote for
 as long as its contract had instructed runs to park one.
 

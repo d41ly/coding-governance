@@ -1408,4 +1408,50 @@ if [ -f "$tmpl" ]; then
   fi
 fi
 
+# ---- 28: THE INLINED PARSER, one answer in two files. `declared_list` is copy-inlined in the driver
+# ---- and in the playbook leg because each kit script is installed standalone and cannot import — so
+# ---- the only thing keeping two copies one answer is this check.
+# ----
+# ---- It exists because the copies ALREADY desynchronised once, silently and expensively. Round 1
+# ---- found a trailing-comment strip missing from the `set_checks` parse; the fold added it there and
+# ---- wrote a THIRD spelling for `piece_checks` seventy-five lines away without it, and the kit's own
+# ---- template line then graded every piece `unchecked` on an item that takes no override. A byte
+# ---- comparison is the cheapest thing that could have caught that.
+# ----
+# ---- WHAT IT DOES NOT CHECK: whether the shared parse is CORRECT. Two identical wrong copies pass.
+# ---- The template arm below is what checks the answer.
+dl_a=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$DRIVER")
+dl_b=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check-playbook.sh" 2>/dev/null)
+if [ -z "$dl_a" ] || [ -z "$dl_b" ]; then
+  fail 28 "the declared-list parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow: $DRIVER and $HERE/check-playbook.sh"
+elif [ "$dl_a" != "$dl_b" ]; then
+  fail 28 "the two inlined copies of the declared-list parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
+  diff <(printf '%s\n' "$dl_a") <(printf '%s\n' "$dl_b") | head -8 | sed 's/^/    /'
+else
+  # THE ANSWER, not just the agreement. Every `*_checks` key the SHIPPED TEMPLATE declares is fed to
+  # the parser exactly as an adopter would copy it — comment and all — and must come back as the
+  # declared null. The template is the one input every adopter starts from, and no hand-written
+  # fixture keeps carrying its comment.
+  tpl="$HERE/PLAYBOOK-TEMPLATE.template.md"
+  if [ ! -f "$tpl" ]; then
+    fail 28 "the shipped playbook template is missing, so the parser cannot be run over the line every adopter actually copies and this check would grade agreement alone: $tpl"
+  else
+    dlk=0
+    while IFS= read -r tl; do
+      [ -n "$tl" ] || continue
+      dlk=$((dlk + 1))
+      raw=${tl#*=}
+      # THE REAL PARSER, EXECUTED — not a third spelling of it. Writing the pipeline out here is the
+      # exact defect this check exists to catch, one level up: a checker that re-implements its
+      # subject confirms the re-implementation. The extracted function text is defined and called.
+      got=$(bash -c "$dl_a
+declared_list \"\$1\"" _ "$raw" 2>/dev/null)
+      [ -z "$got" ] || fail 28 "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow: ${tl%%=*} yields [$got]"
+    done <<TPLEOF
+$(grep -E '^[a-z_]+_checks[[:space:]]*=' "$tpl" || true)
+TPLEOF
+    [ "$dlk" -gt 0 ] || fail 28 "the shipped template declares no *_checks key this check can read, so the parse assertion above ran over nothing and its green means only that it found no work: $tpl"
+  fi
+fi
+
 exit "$status"

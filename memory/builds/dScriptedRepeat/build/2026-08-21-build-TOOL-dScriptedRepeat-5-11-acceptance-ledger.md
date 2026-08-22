@@ -12,6 +12,12 @@ verdict for an undeclared leg, and `pieces-complete` being overridable when the 
 it had ratified the opposite. A ledger compiled from the specs rather than from observations would
 have recorded all three as met.
 
+**Round 2 re-judged every one of these repairs and blocked on two of them**, both in code written to
+close a round-1 finding: the new `piece_checks` parse had no trailing-comment strip while its sibling
+did, and `--counts` was pinned per-field so one field stayed on the working tree. The criteria below
+still hold — they name observations, and every observation still reproduces — but the mechanism under
+AC1 of unit 5 and AC4 of unit 6 is the round-2 one, not the round-1 one.
+
 Suite counts at the time of writing: driver 656, leg 305, playbook 56, cross-component 13.
 
 ## TOOL-dScriptedRepeat-5 — the per-piece record

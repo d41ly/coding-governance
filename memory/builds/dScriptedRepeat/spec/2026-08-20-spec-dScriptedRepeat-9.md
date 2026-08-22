@@ -140,7 +140,7 @@ none — every fork below is RESOLVED in place.
   header, which is the only place a verb's ARGUMENTS are spelled. (3) The header self-read needed a
   liveness arm — through a copy whose header is stripped the sed matches nothing, and a bare `usage:`
   over an empty list is indistinguishable from a driver with no verbs, so it refuses into the derived
-  set instead. Two new leg checks, 22 and 23, each staged RED before landing. The status-line rev
+  set instead. Two new leg checks — numbered 22 and 23 when written, RENUMBERED to 26 and 27 at the merge because main had independently taken both — each staged RED before landing. The status-line rev
   number said rev-3 against a log at rev-5 and was corrected here.
 - rev-5 · 2026-08-21 · the owner resolved F1: a fifth `park()` kind, not a separate file. The
   built shape is unchanged; what changed is who decided it.

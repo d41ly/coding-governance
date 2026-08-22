@@ -56,6 +56,10 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
 cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
+# check 28 reads the playbook leg and the shipped template: it compares the parser inlined in both
+# scripts and then runs it over the template's own declaration line. Without these two the check
+# takes its "missing from one of the pair" branch and every arm below would grade that instead.
+cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -1418,6 +1422,29 @@ reset_tree; mutate tools/unattended/SKILL.template.md 's/ordinary code build/per
 hit "$(run)" "the Skill's playbook-run path does not say what this mode is NOT for, so the one refusal it is supposed to carry in prose is absent from the prose:"
 reset_tree
 
+# ---- check 28 (round-2 fold): the inlined parser is ONE answer in two files, and the answer is the
+# ---- one an adopter gets. Both branches, because agreement and correctness are different claims and
+# ---- this check makes both.
+reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|; s/,/ /g||'
+hit "$(run)" "the two inlined copies of the declared-list parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
+
+# ...and the MISSING half, which is the branch every arm here would silently take if the scratch tree
+# stopped carrying the leg. A pair check with one file present grades nothing.
+reset_tree; rm -f tools/unattended/check-playbook.sh
+hit "$(run)" "the declared-list parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+
+# ...and the ANSWER, over the line the shipped template actually carries. Agreement alone is
+# satisfied by two identical wrong copies, which is how the defect that produced this check shipped.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md 's/^piece_checks = \[\]/piece_checks = [oops]/'
+hit "$(run)" "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow:"
+
+reset_tree; rm -f tools/unattended/PLAYBOOK-TEMPLATE.template.md
+hit "$(run)" "the shipped playbook template is missing, so the parser cannot be run over the line every adopter actually copies and this check would grade agreement alone:"
+
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^piece_checks /d; /^set_checks /d'
+hit "$(run)" "the shipped template declares no *_checks key this check can read, so the parse assertion above ran over nothing and its green means only that it found no work:"
+reset_tree
+
 # 175 -> 162 is a DELIBERATE lowering and owes its reason here. The 99-commit reconcile adopted
 # main's check-8 redesign — the region holds no COPY, so there is nothing to keep fresh — which
 # retired the staleness arms this branch had written against the old invariant. The
@@ -1790,7 +1817,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ----
 # ---- MEASURED unsharded 271, shard one 84, shard two 187. 84 + 187 = 271 EXACTLY: this file has no prologue arms, so the shards partition the count with nothing paid twice.
 # ---- RE-MEASURED at the playbook-mode merge, 2026-08-21, node d: unsharded 305, shard one 86, shard two 219, so the two regions share no prologue arm here. Main sharded these suites while this branch added arms to them; a floor inherited across a merge is a number and not a floor, so all three were taken again on the merged tree at the ~3% headroom this block argues for.
-FLOOR_ASSERTIONS=295
+FLOOR_ASSERTIONS=303
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -1807,7 +1834,7 @@ FLOOR_ASSERTIONS=295
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=83
-FLOOR_SHARD_2=212
+FLOOR_SHARD_2=220
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

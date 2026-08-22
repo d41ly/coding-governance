@@ -191,6 +191,47 @@ fi
 seed_out=$(run | grep -c 'canon 11 section' || true)
 [ "$seed_out" = 1 ] && ok || bad "the leg did not report the shrunken canon count it derived"
 
+# ---- B2 (round-2 fold): --counts AT A SHA, and the liveness refusal that goes with it. Reading the
+# ---- blob is what stops one uncommitted line moving a piece from `unchecked` to `verified` on the
+# ---- Definition-of-Done item that takes no override — and an unreadable blob must SAY so, because an
+# ---- empty body parses to "declares no checks", which is the vacuous green this leg exists to refuse.
+n=$((n+1))
+# The subshell's own `&&` put a ` && ` on the assertion line, which is exactly the shape
+# `check-arms` reads as a NEGATIVE assertion — so this arm existed and scored as an absence test,
+# which is the "something mentions it" shape that checker exists to refuse. The output is computed
+# on its own line; the assertion line then carries neither the `&&` nor a here-string with one.
+badsha=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' 0000000000000000000000000000000000000000 2>&1 )
+grep -qF -- "the playbook does not resolve at the sha this count was asked for, so every declaration it carries would parse to nothing and the census would report a clean run over an unreadable file - sha and playbook follow" <<<"$badsha" \
+  || bad "--counts at an unresolvable sha did not refuse, so an empty body would parse as declaring no checks"
+# ...and at a REAL sha it reads the blob rather than the tree: the uncommitted edit that used to move
+# the verdict now moves nothing.
+n=$((n+1))
+AT=$( cd "$W" && git rev-parse HEAD )
+C0=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+sed -i '/^piece_checks/d' "$F"
+C1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
+[ "$C0" = "$C1" ] || bad "an UNCOMMITTED piece_checks delete moved the census the close reads — the count is still taken from the file the run can edit: [$C0] then [$C1]"
+cp "$KEEP" "$F"
+
+# ---- B1 (round-2 fold): THE TEMPLATE'S OWN COMMENT. The kit ships
+# ---- `piece_checks = []    # the checks that run over ONE piece.`, and the parser that read it had
+# ---- no comment strip — so the comment word-split into eight phantom legs and graded every piece
+# ---- `unchecked`, on the one Definition-of-Done item that takes no override. Every hand-written
+# ---- fixture drops the comment, which is exactly why no fixture caught it.
+cp "$KEEP" "$F"
+sed -i 's|^piece_checks  = \["fixture-shape"\]|piece_checks  = ["fixture-shape"]    # the checks that run over ONE piece.|' "$F"
+sed -i 's|^set_checks    = \["fixture-distinct"\]|set_checks    = ["fixture-distinct"]  # the checks that run over ALL N.|' "$F"
+n=$((n+1))
+grep -q '#' <<<"$(grep '^piece_checks' "$F")" || bad "the fixture edit did not put a comment on the declaration, so the arm below tests nothing"
+out=$(run)
+n=$((n+1))
+grep -qE 'verified 2 · failed 0 · stale 0 · unrecorded 0 · unchecked 0' <<<"$out" \
+  || bad "a declaration carrying the template's OWN trailing comment did not parse to its declared checks — the comment is being read as check names"
+n=$((n+1))
+grep -qF -- "set checks unrecorded" <<<"$out" \
+  && bad "the set-check declaration carrying a trailing comment was misparsed the same way"
+cp "$KEEP" "$F"
+
 # ---- M4 (round-1 diff review): THE SET RECORD IS READ. Three documents said this leg read it while
 # ---- nothing in it opened one — `record_for` and the orphan sweep both key on a `piece:` line, which
 # ---- a set record does not carry, so both walked past it. On the ATTENDED path, which never calls
@@ -298,7 +339,7 @@ cp "$KEEP" "$F"
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about.
-FLOOR_ASSERTIONS=56
+FLOOR_ASSERTIONS=61
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

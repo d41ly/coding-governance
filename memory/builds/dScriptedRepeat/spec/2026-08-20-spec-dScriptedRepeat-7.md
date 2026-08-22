@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** CLOSED · rev-6 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-8 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,6 +166,7 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-8 · 2026-08-22 · the round-2 fold. The leg's `set_checks` reader gained the declared-null escape and the trim its driver sibling had, so the two readers of one field give one answer; and the idempotent path in both writers now stages what its re-stamp changed.
 - rev-6 · 2026-08-21 · BUILT. The set record and its Definition-of-Done item, with term zero and
   a verdict-reading term 2. `CORE_FLOOR` moved 12:8 to 12:10 once for the co-landing pair, and the
   SLACK arm both CORE halves were missing landed with it.
