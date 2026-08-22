@@ -204,6 +204,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | TOOL-dScriptedRepeat-2 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md) | journal | TOOL-dScriptedRepeat-5 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
@@ -253,6 +254,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md)
+  - [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md)
 - **`reviews/`**
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md)
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)

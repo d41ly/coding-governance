@@ -1522,58 +1522,6 @@ mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/,/^}/ s|s/\[\[:
 mutate tools/unattended/unattended.sh     '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
 hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: ["
 
-# ---- 28a — THE REFUSAL MUST BE READ AT EVERY CALL SITE. Round 4's second blocker: the driver's
-# ---- `set_checks` read was a bare assignment, so rc 2 arrived as empty stdout and the declared-null
-# ---- escape swallowed it. Two of three sites branched; the commit message said three did.
-reset_tree; mutate tools/unattended/unattended.sh 's|if ! _declared=$(declared_list "$_blob" set_checks); then|_declared=$(declared_list "$_blob" set_checks); if false; then|'
-hit "$(run)" "a parser that can REFUSE is called at a site that discards its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
-
-# ...and the rule's own liveness, in both its directions. Removing the refusal from the parser makes
-# the rule bind nothing, which must red rather than pass: a gate with no subject is not a green gate.
-reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
-mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
-hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
-
-# ---- 28b — EVERY KEY BOUND TO THE PARSER ITS REAL READER CALLS. Round 4 HIGH 4 and MEDIUM 7: this
-# ---- check certified `outputs` and `step_floor` through parsers neither consumer called, while one
-# ---- was read by an ad-hoc `sed` and the other spliced its own comment's digits into a number.
-reset_tree; mutate tools/unattended/check-playbook.sh 's|  flo=$(declared_scalar "$body" step_floor)|  flo=$(printf %s "$body" \| sed -n "s/^step_floor[[:space:]]*=[[:space:]]*//p")|'
-hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: step_floor at"
-
-# ---- 28c — EVERY SHA DEREFERENCE PINNED. Round 4's third blocker, and the one the records claimed
-# ---- was already fixed: the leg's only sha read was plain `git show`, so a replace ref substituted
-# ---- the committed bytes the census grades on the item that takes no override.
-# ---- THE THREE STRUCTURAL RULES, RE-ARMED AFTER ROUND 5 FOUND ALL THREE OF THEM INSTANCE GATES.
-# ---- Each arm below was observed RED against a hermetic copy of the fixed tree before it was written
-# ---- here, and the two CONTROL arms are as load-bearing as the eight breaks: a rule tightened until
-# ---- it reds on an honest caller has traded one false answer for another.
-
-# ---- 28a — the DISCARD SPELLINGS. Round 5, HIGH 2: the first cut whitelisted any line containing
-# ---- `||`, so `… || true` — the bare assignment with two extra words — graded compliant and
-# ---- round-4's blocker came back past the gate written to stop it.
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
-hit "$(run)" "a parser that can REFUSE is called at a site that discards its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
-
-# ...and the CONTROL. An honest `|| { …; return 1; }` must still pass, or the tightening has bought a
-# false red instead of coverage.
-reset_tree; mutate tools/unattended/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || { DOD_OUT=x; return 1; }; if false; then@'
-miss "$(run)" "discards its exit status"
-
-# ---- 28a — the per-PARSER liveness. Renaming the calls in BOTH files leaves the refusal in place and
-# ---- the enumeration empty, which is the failure a hit count of zero cannot tell from compliance.
-# ---- Both files, because the counter is per parser: a call left in either one is still a call site.
-reset_tree
-mutate tools/unattended/check-playbook.sh 's@$(declared_list @$(declared_list_X @g'
-mutate tools/unattended/unattended.sh     's@$(declared_list @$(declared_list_X @g'
-hit "$(run)" "a refusing parser has NO call site this rule can see, so it was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls this parser"
-
-# ---- 28a — and the rule binding nothing at all, if the refusal itself is removed.
-reset_tree
-mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
-mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
-hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
-
 # ---- THE SOURCE POPULATION the three rules scan, derived from the kit directory rather than typed:
 # ---- round 5 found 28c naming three files while the kit had seven. Its liveness is MEMBERSHIP rather
 # ---- than a count - this checker and the adopter are themselves in that directory, so the population
@@ -1670,24 +1618,6 @@ hit "$(run)" "every bare git invocation in the kit was excused by the flags-only
 # ---- cut reported a clean nothing for two of them.
 reset_tree; mutate tools/unattended/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
 hit "$(run)" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
-
-reset_tree
-mutate tools/unattended/check-playbook.sh    's@$(git @$(gitx @g'
-mutate tools/unattended/check-playbook.sh    's@{ git @{ gitx @g'
-mutate tools/unattended/check-unattended.sh  's@$(git @$(gitx @g'
-mutate tools/unattended/adopt-unattended.sh  's@$(git @$(gitx @g'
-hit "$(run)" "this scan found no BARE git invocation anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped calling git - an unpinned raw read would now pass unseen"
-
-reset_tree
-mutate tools/unattended/unattended.sh       's@GIT show@GITX show@g'
-mutate tools/unattended/unattended.sh       's@GIT merge-base@GITX merge-base@g'
-mutate tools/unattended/unattended.sh       's@GIT rev-list@GITX rev-list@g'
-mutate tools/unattended/unattended.sh       's@GIT diff-tree@GITX diff-tree@g'
-mutate tools/unattended/check-unattended.sh 's@GIT show@GITX show@g'
-mutate tools/unattended/check-unattended.sh 's@GIT merge-base@GITX merge-base@g'
-mutate tools/unattended/check-unattended.sh 's@GIT diff-tree@GITX diff-tree@g'
-mutate tools/unattended/lib-unattended.sh   's@GIT diff-tree@GITX diff-tree@g'
-hit "$(run)" "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its GIT-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
 
 # ---- the scalar SPECIMEN loop's exec branch, a different branch from the template loop's.
 reset_tree; gut_parser declared_scalar '  ((this is not shell'

@@ -1658,9 +1658,26 @@ done
 # LIVENESS ON EACH SPELLING SEPARATELY, and on the raw arm's GRADED population rather than its
 # candidate one. Round 5's cut counted a candidate it then exempted and called that coverage; a raw
 # arm whose every candidate is excused has reached nothing, and the two states must not look alike.
-[ "$sha_raw" -gt 0 ] || fail 28 "this scan found no BARE git invocation anywhere in the kit, so its lowercase predicate has stopped matching rather than the kit having stopped calling git - an unpinned raw read would now pass unseen"
+# NO ASSERTION ON THE RAW CANDIDATE COUNT, and the reason is reachability rather than confidence.
+# Every kit script bootstraps with `ROOT=$(git rev-parse --show-toplevel)`, which is a bare invocation
+# on this scan's verb list, so `sha_raw` cannot be zero in any run that gets this far - neutralise
+# those and the checker exits at its own root resolution long before check 28. A branch no fixture can
+# reach is the shape round 3 filed against this check and round 5 filed against the count floor that
+# preceded this one, so it is stated here instead of being written as a gate that always passes.
+#
+# The GRADED count below is the live one: it is the candidates that survived the two exemptions, and
+# routing the kit's last real dereference through the wrapper takes it to zero. That arm exists.
 [ "$sha_raw_graded" -gt 0 ] || fail 28 "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
-[ "$sha_wrapped" -gt 0 ] || fail 28 "this scan found no WRAPPER-routed sha dereference anywhere in the kit, so its GIT-spelled predicate has stopped matching rather than the kit having stopped using its own wrapper - the reads that pass through it would now be unexamined"
+# AND NONE ON THE WRAPPED COUNT EITHER, for the same reason and it was measured: renaming every
+# wrapper-routed verb in the kit takes `sha_wrapped` to zero and ALSO stops this checker before it can
+# say so, because the checker is one of the scripts being renamed. There is no fixture that empties
+# the population and still reaches the report.
+#
+# WHAT THIS RULE THEREFORE ASSERTS, stated plainly because a reader will assume more: that every bare
+# invocation naming a revision carries the pin, that the wrapper's own definition carries it, and that
+# at least one bare candidate survived the exemptions to be graded. It does NOT assert that either
+# spelling still appears anywhere - a predicate that silently stopped matching both would pass, and
+# the two deleted branches are where that gap used to be papered over with a check nothing could fail.
 
 if [ -z "$ds_a" ] || [ -z "$ds_b" ]; then
   fail 28 "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow: $DRIVER and $HERE/check-playbook.sh"
