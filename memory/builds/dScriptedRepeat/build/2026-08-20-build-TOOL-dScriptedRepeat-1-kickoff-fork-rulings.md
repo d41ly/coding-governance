@@ -14,6 +14,12 @@ eleven and referenced three it had erased.
 
 ## The rulings
 
+The table below DEFINES **fork 1**, **fork 2**, **fork 3**, **fork 4**, **fork 5**, **fork 6** and
+**fork 7** — the numbers in its first column are those fork numbers. Spelled out here because the rows
+are verbatim and a bare `| 5 |` does not answer a grep for `fork 5`, which is how four citations in the
+build README went dangling in the first place (round 4, MEDIUM 9). Forks 8 through 11 are defined in
+[the owner rulings](2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md).
+
 The owner answered all seven before any design work. Recorded here because they are older than the
 spec set and every spec is measured against them.
 

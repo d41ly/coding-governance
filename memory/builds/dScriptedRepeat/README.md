@@ -66,6 +66,17 @@ rows move rather than compress. Forks 1, 5 and 6 are cited by number further dow
 resolve there; the trim that wrote this paragraph pointed at a "kickoff record" that did not exist,
 which is round 4's MEDIUM 9.
 
+## The owner rulings
+
+Four rounds of them, made 2026-08-20 and 2026-08-21, moved VERBATIM to
+[the owner rulings](build/2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md) when this file hit
+its cap: the four forks the research opened, the three after the spec audit, the ones after the aborted
+run, and the ones after the round-1 diff review. Forks 8 through 11 are defined there; forks 1 through 7
+in [the kickoff fork rulings](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md).
+Both records spell their fork numbers in prose, so a grep for `fork 5` resolves — the table rows are
+verbatim and number their first column bare, which is exactly how four citations went dangling at the
+first move of this kind (round 4, MEDIUM 9). There is no gate for this; it is a documented check.
+
 ## Constraints already measured
 
 Two budgets are nearly spent and both bind this build's design, and neither figure is written here —
@@ -91,87 +102,6 @@ instances of fork 5's own defect, and the two references disagree on what a "ste
 finding is in no fork at all** — every composition failure in the reference corpus was found by
 measuring the SET, never a piece, so a Definition of Done that counts pieces and finds each piece's
 legs green ships N monocultured pieces and reports GREEN. That is unit 7.
-
-## The four forks the research opened, ruled 2026-08-20
-
-The seven kickoff forks were ruled before evidence. These four were ruled after it, and each
-overturns or completes something the first seven left wrong or unsaid.
-
-**Fork 8 — where `outputs:` and `pieces:` are declared: the hybrid nobody had priced.** The build
-README's front matter at BASE names the PLAYBOOK PATH; the gate takes a second `GIT show` of that path
-at BASE and reads the globs from the playbook. The driver's `No second GIT show: one blob, one parse`
-rule bounds ONE front-matter scan and does not forbid reading a second file. This is the only option
-that keeps the playbook self-describing across runs, which is the mode's whole premise.
-
-**Fork 9 — what fork 1's "ONE gate" means for the attended half: the per-piece record is a property of
-the TREE.** Tracked, hash-joined to the piece, readable by a merge-bar leg with no run-state file in
-sight. Both entry points then emit one evidence shape and "ONE gate" is literally true. The research
-proved an attended run cannot close through the driver at all, so the alternative was an honour system
-over half the surface.
-
-**Fork 10 — the mode owns SET-scoped checks.** A playbook declares two check populations: per-piece,
-and set-scoped over all N at close. Without the second, a Definition of Done that counts pieces and
-finds each piece's legs green ships N monocultured pieces and reports GREEN.
-
-**Fork 11 — the CHECK grammar is validated-when-present, with a drain census.** A `CHECK` may carry
-`· witness <field>`; the gate validates every one present and REPORTS the drain rather than redding.
-Measured precedent decides it: the soft rule drained voluntarily in 15 of 33 cases here, the
-hard-equality canon in 0 of 11 — and hard equality FORBIDS a grandfathered file from conforming early,
-which is a wall in front of the mode's second verb.
-
-## The three owner rulings of 2026-08-20, after the audit
-
-**The mode value is `recipe`, and the artifact stays a playbook.** `playbook` collided with the
-`DISCIPLINES` enum, the `PLAY` family and the charter-renderer kit. None was a machine collision and
-all four subjects answered one grep. The mode names the authorization DISCIPLINE, exactly as `slug` and
-`prompt` do without naming any artifact; the playbook names the DOCUMENT. Unit 1 S3b states that once
-so the pair is not read as drift.
-
-**`READ_PATH_CEILING` rises 112987 to 131892**, which is 106292 measured plus the same 25,600 headroom
-every movement uses. The previous allowance is spent — it was consumed from 87387 to 106292, leaving
-6,695 — and this build owes a protocol mode row, two Definition-of-Done table rows, a parked-kind row
-and eleven units' worth of decision appends. Measured BEFORE this build spent any of it, which is
-stricter than the convention rather than looser, and the conf comment says so and tells whoever merges
-to re-derive.
-
-**The playbook directives point at existing build-method sections.** `BUILD-METHOD.md` does not move
-and its stated budget does not rise, so the mode adds nothing to a document M7 re-reads whole at every
-pass boundary. The accepted cost is that "follow a playbook to the letter" is described by the pass
-loop and the wrap-up derivation rather than by prose written for it.
-
-## The owner rulings of 2026-08-21, after the aborted run
-
-The run aborted rather than override `build-complete`, and put its two parked decisions to the owner.
-Both are answered, so both units are unblocked.
-
-**Unit 11 EXISTS, ratified as specced** — including S4's anchor qualification: under `published`,
-which this repo declares, the ordering property has no machine half and unit 8's non-exempt playbook
-is the backstop. Round 1 said this was the owner's call and the run added it anyway; the ruling was
-taken afterwards rather than assumed.
-
-**Fork 6 is a fifth `park()` KIND, not a separate file.** "Distinct region" is satisfied in substance
-— a distinct kind, distinct rows, distinct Definition-of-Done treatment — and not literally.
-
-**Units 1-4 land first**, then 5-8 and 10 are built against a clean base. The four are self-contained
-and reference no unbuilt unit in code.
-
-## The owner rulings of 2026-08-21, after the round-1 diff review
-
-The Tier-2 review returned BLOCKED — 32 confirmed, 16 distinct defects, 2 blockers. Four questions
-went to the owner rather than being decided by the run. The reasoning is in the review record; the
-rulings are here because a ruling is not derivable from the thing it ruled on.
-
-- **Implement the declared-checks JOIN, both halves.** Not strike the promise and ship
-  provenance-only.
-- **`--counts` reads the playbook at the pinned BASE SHA** and stops reading the working tree. The
-  ruling said "stop re-parsing the playbook"; the first implementation pinned `grain` and `records`
-  per-field and left `piece_checks` on disk, and the second replaced the field list with one sha.
-  `grain` and `records` are still written as run-state facts and are read by nothing — provenance of
-  what the run was pinned to, not the mechanism.
-- **All sixteen defects fold before this lands**, in the report's order. The kit is copy-installed
-  into other repos, so a defect shipped here propagates.
-- **The acceptance ledger and units 6/7's missing arms belong to THIS build**, so
-  `TOOL-dScriptedRepeat-12` closes with it rather than outliving it.
 
 ## The unit set
 
@@ -270,6 +200,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md) | journal | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md) | journal | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | TOOL-dScriptedRepeat-2 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
@@ -280,6 +211,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
 
@@ -317,6 +249,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md)
@@ -328,4 +261,5 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md)
+  - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md)
 <!-- /gen:build-docs -->
