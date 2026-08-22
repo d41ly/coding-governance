@@ -42,6 +42,13 @@ normpath() {  # path -> the same path in one spelling
   # somewhere else. Found by the arm written for this function, which is the argument for writing it.
   while :; do case "$_np" in *//*) _np=$(printf '%s' "$_np" | sed 's|//*|/|g') ;; *) break ;; esac; done
   while :; do case "$_np" in ./?*) _np=${_np#./} ;; *) break ;; esac; done
+  # THE DOT SEGMENTS, interior and trailing. `a/./b`, `a/b/.` and `a/b/./` all name what `a/b` names,
+  # and every containment answer in this kit is built on this function — so a declaration spelled with
+  # a dot segment was compared as a different string and the guards judged one path while the leg
+  # graded another. Both spellings are broken by ONE missing step, which is why fixing only the
+  # interior one would have left the class open with an instance closed.
+  while :; do case "$_np" in */./*) _np="${_np%%/./*}/${_np#*/./}" ;; *) break ;; esac; done
+  while :; do case "$_np" in ?*/.) _np=${_np%/.} ;; *) break ;; esac; done
   while :; do case "$_np" in ?*/) _np=${_np%/} ;; *) break ;; esac; done
   printf '%s' "$_np"
 }
@@ -76,10 +83,15 @@ is_repo_root() {
 # The window is `<anchor>..HEAD` and the answer is the FIRST qualifying commit, never a later one: a
 # pass's own review fold or spec bump lands after its group has ended and is not the commit that
 # closed it.
-pass_commit() {  # anchor · unit · run-state-path
-  _pa=$1; _pu=$2; _prel=$3
+#
+# THE UPPER BOUND is optional and defaults to HEAD. A unit legitimately owns several dispatch rows at
+# several anchors — M6 defines five pass kinds — and with an unbounded window row one is graded
+# against row two's commit, which is another pass's work. The bound does not change what counts as a
+# pass commit; it changes which commits are even offered. TOOL-dUnstalledConvoy-23 S3.
+pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEAD]
+  _pa=$1; _pu=$2; _prel=$3; _pto=${4:-HEAD}
   GIT rev-parse --verify --quiet "$_pa^{commit}" >/dev/null 2>&1 || return 1
-  for _pc in $(GIT log --reverse --format=%H "$_pa..HEAD" 2>/dev/null); do
+  for _pc in $(GIT log --reverse --format=%H "$_pa..$_pto" 2>/dev/null); do
     id_in "$(GIT log -1 --format=%s "$_pc" 2>/dev/null)" "$_pu" || continue
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
@@ -87,4 +99,21 @@ pass_commit() {  # anchor · unit · run-state-path
     return 0
   done
   return 1
+}
+
+# THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
+# ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
+# park rows in any order, so file order is not history order. The earliest strict descendant wins,
+# which is the one that closes this row's window.
+next_anchor() {  # anchor · newline-separated candidate anchors
+  _na=$1; _nbest=""
+  for _nc in $2; do
+    [ -n "$_nc" ] || continue
+    [ "$_nc" = "$_na" ] && continue
+    GIT merge-base --is-ancestor "$_na" "$_nc" 2>/dev/null || continue
+    if [ -z "$_nbest" ] || GIT merge-base --is-ancestor "$_nc" "$_nbest" 2>/dev/null; then
+      _nbest=$_nc
+    fi
+  done
+  printf '%s' "$_nbest"
 }

@@ -73,10 +73,6 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
-# The dispatch write-set GRADING is dark by default (TOOL-dUnstalledConvoy-23 owns its
-# redesign). The fixture declares it ON so the grading arms below still exercise the code;
-# a separate arm removes the key and asserts the dark path announces itself.
-DISPATCH_GRADING=1
 EOF
 }
 
@@ -1424,14 +1420,14 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 # ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
 
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
@@ -1451,7 +1447,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 # B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
 # from switching the check off for any pass that ever re-declared, which is a larger hole.
@@ -1459,7 +1455,7 @@ reset_tree
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
 
 # C: THE POST-HOC REWRITE. Narrow row, the offending commit, THEN a widened row at a later anchor.
 # The finding must survive: a declaration cannot be rewritten to cover a write already made. The
@@ -1469,7 +1465,7 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 drow ARCH-tRun-1 "work/one.txt work/stray.txt"
-hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
 
 # D: SEVERAL PASSES OF ONE UNIT are legal — M6 defines five pass kinds and a unit may be dispatched
 # once per kind. Each row governs its own pass. Folding them together graded pass one's commit
@@ -1481,7 +1477,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 # E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
 # pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
@@ -1492,7 +1488,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
 printf 'b\n' > work/build.txt && printf 'x\n' > work/STRAY.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
-hit "$(run)" "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked:"
+hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch:"
 
 # F: BOTH IDS IN ONE DISPATCH GROUP, which is the whole of this arm and is what the first two
 # versions of it missed. The ambiguity loop only pairs siblings sharing an anchor, so a fixture that
@@ -1511,22 +1507,22 @@ gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-10 "work/ten.txt"
 mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
 out=$(run)
-miss "$out" "one commit names two passes of the same dispatch group"
-miss "$out" "check 23 FAILED"
+miss "$out" "unattended: check 23 — one commit names two passes of the same dispatch group"
+miss "$out" "unattended: check 23 —"
 # ...and the positive control, so this arm cannot pass by finding nothing: ONE commit that genuinely
 # names both passes IS ambiguous, and the refusal must fire.
 reset_tree
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
 git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 build together" --no-verify
-hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
+hit "$(run)" "unattended: check 23 — one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this comparison rests on is not available:"
 
 # ...declaring MORE than you use is conservative and fine
 reset_tree
 drow ARCH-tRun-1 "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 # ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
 # ---- the same silence with the declared paths MOVED is the join being dodged.
@@ -1534,13 +1530,13 @@ reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "a commit that names no pass at all" --no-verify
-hit "$(run)" "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
+hit "$(run)" "unattended: check 23 — a declared path of a dispatched pass moved inside its window while no commit names that pass, so the declared work happened and the only join this check has was dodged:"
 
 # ---- AMBIGUOUS ATTRIBUTION is refused rather than guessed: a subset test over a commit that could
 # ---- belong to either of two passes proves nothing about either.
@@ -1557,7 +1553,7 @@ printf '
 git add -A && git commit -q -m "declare both passes of one group" --no-verify
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 and ARCH-tRun-2 in one commit" --no-verify
-hit "$(run)" "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available:"
+hit "$(run)" "unattended: check 23 — one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this comparison rests on is not available:"
 
 # ---- THE WINDOW IS THE FIRST COMMIT AND NOTHING AFTER IT. A pass's later review fold lands outside
 # ---- its group by construction, and grading it would red an ordinary sequential fold with no
@@ -1568,7 +1564,7 @@ mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 printf 'folded\n' > work/later.txt
 git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
-miss "$(run)" "check 23 FAILED"
+miss "$(run)" "unattended: check 23 —"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -1577,7 +1573,7 @@ out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
 out=$(run)
 miss "$out" "check 23 skipped"
-miss "$out" "check 23 FAILED"
+miss "$out" "unattended: check 23 —"
 
 reset_tree
 printf '\n2026-08-21T00:00:00Z dispatch · item deadbeef ARCH-tRun-1 · reason work/one.txt\n' >> memory/builds/tRun/RUN.md
@@ -1586,31 +1582,37 @@ hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the recorded group anchor 
 reset_tree
 
 
-# ---- CHECK 23'S GRADING IS DARK BY DEFAULT, and the dark state ANNOUNCES itself. Four adversarial
-# ---- rounds over this mechanism are recorded under memory/builds/dUnstalledConvoy/reviews/; the last
-# ---- reproduced a driver call retracting a failure this check had already emitted, and the one
-# ---- before it a refusal that ended a unit outright. It ships inert until TOOL-dUnstalledConvoy-23
-# ---- redesigns it. The arms above run with DISPATCH_GRADING declared, so the code stays exercised.
-# ----
-# ---- BOTH HALVES ARE ARMED: the announcement when declarations exist, and the SILENCE when none do,
-# ---- because a leg that narrates a dark check on every run for every project trains people to skip
-# ---- its output.
+
+# ---- THE SUBSET TEST GOES THROUGH `covers`, WHICH NORMALISES (spec 23 S8). Round 4 found this fix
+# ---- shipped with nothing holding it: reverting `covers "$dsp" "$dsq"` to a bare
+# ---- `case "$dsq" in "$dsp"|"$dsp"/*)` left both suites green at byte-identical counts. The
+# ---- discriminator is a RECORD holding an un-normalised spelling, which `drow` can write and the
+# ---- driver no longer can — the driver normalises before parking, so only a hand-written row
+# ---- reaches this. That is exactly why the arm has to be here rather than driver-side.
+reset_tree
+drow ARCH-tRun-1 "work/sub/"
+mkdir -p work/sub && printf 'a\n' > work/sub/x.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "unattended: check 23 —"
+# ...and the positive control on the same shape, so the arm cannot pass by the check being silent:
+# a commit genuinely outside the declared lane still reports.
+reset_tree
+drow ARCH-tRun-1 "work/sub/"
+mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewhere.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside"
+
+# ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
+# ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
+# ---- whole mechanism spent four rounds in. The fixture is the one that produced a finding above.
 reset_tree
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
-sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
-git add -A
-out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
-hit "$out" "check 23 DARK for"
-hit "$out" "a green verdict here is coverage of nothing"
-miss "$(run)" "check 23 FAILED"
-# ...and with NO dispatch rows at all the dark check says nothing, so the announcement stays a signal.
-reset_tree
-sed -i '/^DISPATCH_GRADING=/d' .unattended.conf
-git add -A
-miss "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 DARK for"
-reset_tree
+out=$(run); rc=$?
+same "check 23 reports without failing the leg, exit code" "$rc" "0"
+hit  "$out" "unattended: check 23 — a dispatched pass committed a path outside"
+miss "$out" "FAILED"
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather

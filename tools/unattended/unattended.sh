@@ -1323,7 +1323,27 @@ verb_landed() { # slug
   refuse_if_terminal "$rel" --landed || return 1
   cur=$(fact "$rel" phase)
   if [ "$cur" != LANDING ]; then
-    fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
+    # A LANDING EVALUATED IN ANOTHER TREE DOES NOT TRAVEL. `--close` stages the phase and the RUN
+    # commits it, so a run that closed in a linked worktree and then merged from the primary tree
+    # arrives here carrying the older phase. The refusal was already accurate and named nothing that
+    # helps: the recovery is to commit the phase where it was evaluated, or to re-close here, and a
+    # run cannot choose between those without knowing which tree holds it. TOOL-dUnstalledConvoy-24.
+    _elsewhere=""
+    while IFS= read -r _wl; do
+      case "$_wl" in "worktree "*) _wp=${_wl#worktree } ;; *) continue ;; esac
+      [ "$_wp" = "$ROOT" ] && continue
+      [ -f "$_wp/$rel" ] || continue
+      case "$(sed -n 's/^phase: //p' "$_wp/$rel" 2>/dev/null | head -1)" in
+        LANDING) _elsewhere="$_elsewhere $_wp" ;;
+      esac
+    done <<WTS
+$(GIT worktree list --porcelain 2>/dev/null)
+WTS
+    if [ -n "$_elsewhere" ]; then
+      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur here, and an UNCOMMITTED LANDING is sitting in:$_elsewhere — commit the run-state file there, or re-run --close in this tree"
+    else
+      fail 31 "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time: $cur"
+    fi
     return 1
   fi
   check_clean || return 1
@@ -1873,7 +1893,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
   # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
   stage_or_fail "$rel" || return 1
-  echo "unattended: close OK — every declared DoD item met; phase LANDING. Land with: $LANDER"
+  # THE COMMIT IS NAMED because this verb only STAGES the phase. A run that merges from another
+  # tree without committing carries the older phase into the merge, and `--landed` then refuses a
+  # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
+  echo "unattended: close OK — every declared DoD item met; phase LANDING. COMMIT the run-state file, then land with: $LANDER"
   return 0
 }
 
@@ -2356,7 +2379,15 @@ verb_dispatch() { # slug · unit · writes...
   # success over zero of them, which is byte-indistinguishable from a proof over somebody — and an
   # empty sibling set is exactly what both openness defects produced. A probe that cannot move must
   # announce it (§7), so the run log carries the difference even when the verdict cannot.
-  if [ -z "$(printf '%s' "$sibrows" | tr -d '[:space:]')" ]; then
+  # MEASURED ON CONDITION 1'S OWN POPULATION, not on `sibrows`. The loop below SKIPS this unit's own
+  # rows, so a `sibrows` holding nothing but our own rows is a proof over an empty set that the old
+  # announcement stayed silent about — it measured a set the proof does not use.
+  _sibothers=$(printf '%s\n' "$sibrows" | while IFS= read -r _r; do
+      [ -n "$_r" ] || continue
+      case "$_r" in *" $unit · reason "*) continue ;; esac
+      printf 'x'
+    done)
+  if [ -z "$_sibothers" ]; then
     echo "unattended: dispatch — no sibling pass is open, so condition 1 is a proof over an empty set for $unit" >&2
   fi
   for pair in ${GENERATED_INDEXES:-}; do
@@ -2394,10 +2425,6 @@ verb_dispatch() { # slug · unit · writes...
   done <<SIBS
 $sibrows
 SIBS
-  # THE RE-DECLARATION RULE, keyed on GROUP plus UNIT. Identical is a no-op; a strict SUPERSET
-  # REPLACES, which is the widening repair the leg's own fork resolution commits this build to; a
-  # NARROWING is refused, because narrowing a declaration after the fact is how a pass would hide a
-  # write it had already made.
   # PARKED NORMALISED. Every refusal above asks its question through `normpath`; recording the raw
   # spelling meant the guards judged one path and the leg graded another, and `work/sub/` sailed
   # through the driver and then redded the leg permanently.
@@ -2405,7 +2432,7 @@ SIBS
   for p in "$@"; do want="$want $(normpath "$p")"; done
   want=${want# }
   # THE RE-DECLARATION AND WIDENING MACHINERY IS GONE, and its absence is the fix rather than a gap.
-  # TOOL-dUnstalledConvoy-23 owns its redesign; four adversarial rounds are recorded under
+  # TOOL-dUnstalledConvoy-23 redesigned what replaced it; four adversarial rounds are recorded under
   # `memory/builds/dUnstalledConvoy/reviews/`.
   #
   # WHY IT WAS REMOVED RATHER THAN REPAIRED. The branch existed to let a pass widen a declaration it
