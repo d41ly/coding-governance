@@ -56,6 +56,30 @@ code = 1
 probe = { must_exist = "{memory_root}/guides/UNATTENDED-PROTOCOL.md", must_not_exist = ".claude/skills/unattended/SKILL.md" }
 means = "render-failed-half-stamped"
 
+# ---------------------------------------------------------------------------------------------------
+# THIS KIT'S SELF-TESTS ARE NOT GATE LEGS, and that is an owner ruling rather than an omission.
+# `check-unattended.test.sh`, `unattended.test.sh`, `check-playbook.test.sh`, `cross-component.test.sh`
+# and `adopt-unattended.test.sh` stage breaks into copies of this kit and assert the checkers still
+# catch them. Their subject is the CHECKER, so they have a job only when this kit's source changes and
+# none at all in an adopter's repo that copy-installs the kit and never edits it. Ruled 2026-08-23:
+# they run on the owner's demand, never on the merge bar, here and in every adopter alike.
+#
+# THE THREE LEGS BELOW STAY, and the difference is their subject: they read the REPOSITORY - its
+# run-state records, its playbooks, the shipped skill's wiring - which goes stale with nobody editing
+# this kit. Those are seconds. The self-tests were 3339 s of a 4926 s bar, 68% of all leg-seconds,
+# with the largest putting a 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
+# memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
+#
+# THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
+# `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
+#
+#     bash tools/unattended/run-unattended-gates.sh            # the self-tests
+#     bash tools/unattended/run-unattended-gates.sh --all      # and the three legs beside them
+#
+# There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
+# runs it, and this file is where that trade is recorded as having been made deliberately.
+# ---------------------------------------------------------------------------------------------------
+
 [[gate_leg]]
 name = "unattended kit gate"
 argv = ["bash", "{kit}/check-unattended.sh"]
@@ -70,11 +94,6 @@ name = "playbook validity gate"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
-
-[[gate_leg]]
-name = "playbook validity selftest"
-argv = ["bash", "{kit}/check-playbook.test.sh"]
-guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "unattended skill wiring"
@@ -106,39 +125,6 @@ blocks_gate = true
 why = "undeclared or malformed reds the kit gate. For a faithful copy install the correct value is the driver's own core set sizes, so this is a transcription hole rather than a corpus measurement."
 discharge = { command = ["bash", "-c", "grep -qE '^CORE_FLOOR=\"?[0-9]+:[0-9]+' .unattended.conf"] }
 
-[[gate_leg]]
-name = "unattended cross-component"
-argv = ["bash", "{kit}/cross-component.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "unattended gate selftest"
-argv = ["bash", "{kit}/check-unattended.test.sh", "--shard", "1/2"]
-guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
-
-[[gate_leg]]
-name = "unattended gate selftest shard B"
-argv = ["bash", "{kit}/check-unattended.test.sh", "--shard", "2/2"]
-guard = ["{memory_root}/guides/UNATTENDED-PROTOCOL.md", "{kit}/"]
-
-[[gate_leg]]
-name = "unattended driver selftest"
-argv = ["bash", "{kit}/unattended.test.sh", "--shard", "1/2"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "unattended driver selftest shard B"
-argv = ["bash", "{kit}/unattended.test.sh", "--shard", "2/2"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "unattended adopter e2e"
-argv = ["bash", "{kit}/adopt-unattended.test.sh"]
-guard = ["{kit}/"]
-
-# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
-# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
-# answer about which paths they govern, never these pattern strings.
 [[lf_pin]]
 pattern = ".unattended.conf"
 why = "its values are shell COMMANDS; a CR is executed"

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-23T00:18:37+03:00 @ 747255411f9442234198b9c8d6fe69e0284cc18a
+last-audit: 2026-08-23T01:02:52+03:00 @ 747255411f9442234198b9c8d6fe69e0284cc18a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2f28951450582ab7727cfe35517aed7492785f2f
@@ -137,6 +137,13 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
+  take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
+  adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
+  runner. They were 68 % of leg-seconds and the largest put a 26-minute floor under every full run.
+  Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
+  `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
+  rather than an exception.
 - 2026-08-20 · `AGENTS.md`'s merge-bar section states the bar costs 873 s of wall against a 4018 s
   leg-sum · MEASURED over four `GATE_FULL` width-8 runs on node `a`: spans 925-1058 s, mean 1001.3 s,
   leg-sums 4644-6128 s. The stated wall is 14.7 % low and the leg-sum is low by more. Both are prose
