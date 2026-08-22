@@ -59,18 +59,8 @@ of them was already wrong.
 
 ## The seven forks, resolved at kickoff
 
-The owner answered all seven before any design work. Recorded here because they are older than the
-spec set and every spec is measured against them.
-
-| # | Fork | Ruling |
-|---|---|---|
-| 1 | Home and coupling | **Third mode PLUS an attended path.** `authorized-by: playbook` joins the closed set; a second entry point runs the same checklist discipline with an owner in the loop, no anchor and no push mandate. Two entry points, ONE playbook artifact and ONE gate. |
-| 2 | "Refuses normal builds" | **Gate the paths, document the judgment.** The playbook declares OUTPUT PATHS and a machine check reds a playbook-mode diff touching anything outside them plus its own records; the class that gate cannot see — a code change landing inside a declared output path — is a stated CHECK. |
-| 3 | N pieces vs. the spec set | **The playbook is the spec; pieces are passes.** One unit per playbook RUN, never one per piece. Each piece is a pass with its own commit and reground point. The DoD must count pieces against the requested N rather than counting units. |
-| 4 | Template evidence base | **Corpus-derived plus external research.** Derive from the two reference playbooks, this repo's spec template, hygiene grammar and GATE/CHECK philosophy; challenge that shape against external checklist and instruction-design literature; then freeze it and mark it human-curated. |
-| 5 | When is a piece done | **The playbook declares its own GATE legs.** A playbook is VALID only if every step is tagged `GATE <leg>` or `CHECK <why>` and every named leg is runnable; piece-done is its declared legs green. This forces the adopting repo to own a checker, and that cost is the point. |
-| 6 | The improvement loop | **A separate register, surfaced at close.** A proposal is not a park: a park is what a run refused to decide and blocks the close, a proposal comes from work that succeeded and must not. Distinct verb, distinct region, distinct DoD treatment. |
-| 7 | Producer knowledge | **Agnostic — the playbook carries it.** The kit knows paths, counts, steps, gates and status. How a piece is produced is playbook prose. The kit grows no dependency on any generator. |
+Ruled at kickoff and unchanged since; the reasoning is in the kickoff record and the specs that cite
+them. Kept as a list because a fork's RULING is not derivable from the thing it ruled on.
 
 ## Constraints already measured
 
@@ -279,6 +269,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
 
@@ -323,4 +314,5 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)
   - [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md)
+  - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md)
 <!-- /gen:build-docs -->
