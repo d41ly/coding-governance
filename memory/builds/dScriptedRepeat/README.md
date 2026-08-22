@@ -279,6 +279,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
 
@@ -326,4 +327,5 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md)
+  - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md)
 <!-- /gen:build-docs -->
