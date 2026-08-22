@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.26 -->
+<!-- gov:kit memory-tree@2.28 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -278,6 +278,34 @@ carry it too:
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
   nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
+
+## Acceptance ledger — how a built unit evidences its criteria
+
+Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
+was built. One `**Evidences:**` line per unit, and one line per criterion beneath it:
+
+```
+**Evidences:** <id>
+- AC1 — `<observation token>` — what was observed
+- AC2 — amended rev-<n> — the change, and the section 9 line that logs it
+```
+
+- **TWO forms and no third.** OBSERVED carries a backticked token naming the command, file, flag or
+  test that made the observation. AMENDED names the revision that changed the criterion. There is no
+  "satisfied" without one of them, and no `N/A`: a third form is how a ledger becomes a checkbox
+  exercise, and the resulting green is worth nothing.
+- **The AMENDED form is the more important of the two.** Without it a run that legitimately found a
+  criterion wrong has no legal way to record that, and would either write the observed form untruly
+  or skip the ledger. With it, divergence has a home and becomes visible rather than trusted — which
+  is the whole reason the ledger exists.
+- A record MAY carry several `**Evidences:**` blocks, one per unit it evidences. The block ends at
+  the next `**Evidences:**` line or at the next heading.
+- The ledger is EVIDENCE and belongs in a record, never in the spec. A spec is the design and is
+  written before the code; putting evidence in it would make every build rewrite its own acceptance
+  criteria and fill the revision log with bumps that changed no design.
+- The gate reads SHAPE and COVERAGE only. It asserts every criterion a closed spec numbers has a line
+  in one of the two forms; it does NOT assert the token names anything real, that the observation was
+  actually made, or that an amendment was justified. Its header says so.
 
 ## The harness meta-gate
 

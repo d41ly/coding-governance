@@ -13,6 +13,7 @@ units-at-landing: TOOL-aScannedThrottle-1
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: 44e7f18f87bbf6f445958e2474fe1495c1504117
+landed-anchor: remote
 phase: LANDED
 mode: slug
 anchor-kind: default-branch

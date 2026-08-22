@@ -1651,6 +1651,40 @@ user_skills = "/tmp/gk-fake-skills"
           "got " + repr(got))
     check("resolve_shell_argv is a no-op on an empty argv", govkit.resolve_shell_argv([]) == [], "")
 
+    # ---- THE CLASS, not the three instances. The behavioural arms above prove the resolver works;
+    # ---- they cannot prove every place that executes a leg argv calls it, and that gap is not
+    # ---- theoretical. Two sessions fixed this class independently in the same week and BOTH left a
+    # ---- site unwrapped: one missed the CONFIGURE step, the other the [[hole]] discharge probe,
+    # ---- whose shipped commands are literally ["bash", "-c", ...]. A behavioural arm is green in
+    # ---- both cases, because the function it exercises is fine — it is the caller that is missing.
+    # ----
+    # ---- WHAT THIS DOES NOT CHECK: that the resolver picks the right bash (the arms above do), or
+    # ---- that a target's own scripts are portable (nothing here does). It reads SOURCE and asserts
+    # ---- one thing: no subprocess call in these two files executes an argv that is neither a
+    # ---- literal git invocation nor routed through the resolver.
+    for _src in ("govkit.py", "matrix.py"):
+        _txt = (HERE / _src).read_text(encoding="utf-8")
+        _bad = []
+        for _m in _re.finditer(r"subprocess\.(?:run|Popen)\(\s*([^\n]*)", _txt):
+            _head = _m.group(1)
+            if "resolve_shell_argv" in _head:
+                continue
+            if _head.lstrip().startswith(('["git"', "['git'", "[sys.executable", "[cand,")):
+                continue
+            if _head.lstrip().startswith(")") or _head.strip() == "":
+                continue                      # a multi-line call whose argv is on the next line
+            # ...and not a match INSIDE a string literal. matrix.py builds fixture runner scripts as
+            # text, and one of them contains `subprocess.run(l[argv])` — code it WRITES into a
+            # synthetic target, not code govkit runs. The first draft of this arm redded on it, which
+            # is why a candidate predicate gets run over the real tree before it is wired.
+            _pre = _txt[: _m.start()].rsplit(chr(10), 1)[-1]
+            if _pre.count(chr(34)) % 2 or _pre.count(chr(39)) % 2:
+                continue
+            _line = _txt[: _m.start()].count("\n") + 1
+            _bad.append(f"{_src}:{_line} {_head.strip()[:60]}")
+        check(f"every leg argv in {_src} goes through resolve_shell_argv",
+              not _bad, "unwrapped: " + "; ".join(_bad))
+
     # An override that is SET and unusable must be THIS failure, never a quiet fall-through:
     # the operator would believe they had chosen. The memo is cleared around the arm so it
     # measures the resolver rather than the answer the arms above cached.

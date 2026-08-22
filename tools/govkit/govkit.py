@@ -1698,7 +1698,12 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     cmd = gr.get("command") or []
     if not cmd:
         return {}
-    out = subprocess.run(list(cmd), cwd=str(target), capture_output=True, text=True)
+    # THROUGH THE RESOLVER, like every other leg argv. A [[hole]] discharge command is authored in a
+    # kit descriptor and the shipped ones are `["bash", "-c", ...]` — the exact bare name that sends
+    # this call to the WSL launcher on a Windows python, which is a different filesystem and a
+    # different interpreter. Two sessions fixed this class independently and this was the one site
+    # neither pass wired on its own: main resolved four, the merged branch found the fifth.
+    out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True)
     verdicts: dict[str, str] = {}
     for state, key in (("green", "observed_ran"), ("red", "observed_failed"),
                        ("skipped", "observed_skipped")):

@@ -1,13 +1,17 @@
-<!-- gov:kit memory-tree@2.26 -->
+<!-- gov:kit memory-tree@2.28 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
-**Budget: ≤22 KB, ≤290 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤24 KB, ≤310 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed — an owner call, because the figure is a stated constraint of a
+It rose from ≤20 KB / ≤250 lines when M12 landed — an owner call, because the figure is a stated constraint of a It rose again to ≤24 KB / ≤310 on 2026-08-21, also an owner call:
+two builds added rules to this file concurrently - aBoundedVerdict's M3 veto-collapse, FACT-QUESTION and
+vacuous-selector rules, and dUnstalledConvoy's inlined M12 - and both parents fitted the old cap on their own.
+Nothing was droppable, so the constraint moved rather than the content. No gate enforces this pair, which is why
+exceeding it silently was the one option not taken.
 governance carrier and M3's veto 2 makes changing one an owner turn rather than an agent's.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
@@ -43,7 +47,10 @@ write its own mandate is about AUTHORIZATION — the mandate authorizes, the spe
 `memory/guides/SESSION-KICKOFF.md` assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
 **THIN → fill it as a `rev-N` bump on the existing file** with its §9 line, never a second file for a unit that has
 one — that is how a spec set stops agreeing with itself. **FORKED → M3.** **READY → build what it says**; to
-diverge, change the spec first (rev bump + §9 line), then code.
+diverge, change the spec first (rev bump + §9 line), then code. **AMEND → RETIRE (status `WONTDO`), SUPERSEDE
+(replacement authored, original retired) or ADD**, when building uncovers what speccing could not; each owes a
+recorded amendment. An id in the units region at the pinned BASE may never LEAVE it, so retiring is a status
+flip.
 
 **Hard floor.** Never build a MISSING or THIN unit; "I will spec it afterwards" is the same act with the record
 written last. When ACCEPTANCE or GATES cannot be *derived* from the goal, the code or the prior records, the
@@ -62,9 +69,11 @@ code arbitrate between two specs; a disagreement that is a choice rather than an
 Sweep §8 across the whole set before any code, including forks M2 just created. Resolved mid-build is a rewrite;
 resolved before it, a decision.
 
-**What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only, and
-only for forks the specs already state. It does not delegate SCOPE: a fork whose options differ in *what gets built*
-is not yours — park it. With no mandate, forks go to the owner and this section is preparation.
+**What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
+the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL
+statement is what a run may not amend, and the delegation does not reach veto 2's governance-carrier clause,
+M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
+With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —
 after these vetoes, in order. Discard any option that:
@@ -79,22 +88,18 @@ if nothing had survived. A veto is not a licence to take the vetoed option, and 
 park sentence has been read as though it were. Tie-break: fewer open questions, then reuse of a seam M5 found.
 **No survivors → park**, never the least-bad option.
 
-**A FACT-QUESTION is a fork a stated PROBE decides, and the one kind a run may resolve without an owner even
-where judgment is otherwise reserved.** Mark it with the `FACT-QUESTION · ` label prefix the §8 readers recognise,
-and it is legal only when the spec names the probe, the observation that decides it, and a LIVENESS assertion
-showing that probe can produce a negative result. Take the winner only when it falls out of the observation with no
-further judgment; the moment a preference is needed it is not a fact question and the rule above governs.
+**A FACT-QUESTION is a fork a stated PROBE decides — the one kind a run may resolve without an owner.** Mark it
+with the `FACT-QUESTION · ` prefix the §8 readers recognise; legal only when the spec names the probe, the
+observation that decides it, and a LIVENESS assertion that the probe can produce a negative. Take the winner only
+when it falls out of the observation; the moment a preference is needed the rule above governs.
 
-**A probe READS. It does not build.** It measures over artifacts that already exist, and it may not construct an
-arm of the fork to see how that arm behaves — for two reasons, both structural: building an arm is not one of M6's
-five pass kinds, so it inherits no commit, no regrounding and no gate; and it puts code before the fork is
-resolved, which this file calls a rewrite rather than a decision.
+**A probe READS, it does not build.** It measures existing artifacts and may not construct an arm of the fork to
+watch it behave: building one is not an M6 pass kind, so it inherits no commit, no regrounding and no gate, and it
+puts code before the fork is resolved — a rewrite, not a decision.
 
-**And the counter-rule, because the evidence demands it.** An observation that decides a fork by making some
-signal read ZERO is refused by name: that is the vacuous-selector class, and a probe cannot distinguish "the
-predicate is satisfied" from "the predicate matched nothing". One of this corpus's real forks was deliberately
-resolved AGAINST the better measurement for exactly that reason, so a testing rule without this exception would
-have got it wrong.
+**Counter-rule.** An observation that decides a fork by making a signal read ZERO is refused: that is the
+vacuous-selector class, and a probe cannot tell "satisfied" from "matched nothing". A real fork here was resolved
+AGAINST the better measurement for that reason, so a testing rule without this exception gets it wrong.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
 decision the owner did not make. The mark must be the documented SHAPE — the word, then
@@ -172,12 +177,13 @@ followed by another: fix it, or park it with the reason. A pass that produced no
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the
 turn you did not take.
 
-**Sequence is the default; parallelism is a claim you substantiate.** Two passes run concurrently only if: (1) their
-WRITE sets — actual paths, written down before dispatch — do not intersect; (2) neither writes a file the other
-reads as a contract (conf, template, interface, generator input) or as an acceptance input, and neither depends on
-the other's output either way; (3) neither touches a shared mutable record — `memory/DECISIONS.md`,
-`memory/backlog/*.md`, the run-state file, or a generated index TOGETHER WITH its generator. If you
-cannot write both path lists down, the work is not known to be disjoint — sequence it.
+**Parallelism is REQUIRED where disjointness is PROVEN; sequence is the fallback.** Two passes MUST run
+concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
+not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
+input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
+shared mutable record — `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, or a generated index
+TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
+sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
 The fan-out and concurrency CEILINGS are the review protocol's; this is about WHICH work is parallel, never HOW
 MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in the memory-tree README.
@@ -283,8 +289,21 @@ the passes that set does name — it is what "a spec authored" costs when the sp
 first — and under a mandate the run occupies the `RESEARCHING` and `TESTING` positions while doing it. Commit
 boundaries and reground points stay exactly where M6 and M7 put them.
 
-**The rest of M12 is one hop away**, in the memory-tree kit's `README.md` under the build method's displaced
-sections: finding candidates that differ in MECHANISM, testing what DISCRIMINATES before choosing, choosing by
-M3's rule, and recording the LOSS as well as the win. It is procedure a run reads when it actually reaches this
-section, and this file is re-read WHOLE at every pass boundary — so rarely-needed procedure is exactly what
-displacement is for. The RULES that bind stayed here: no new pass kind, and M3's limit on your authority.
+**Find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
+three differing in MECHANISM is the shape; stop where a further candidate would differ only in detail. "Only one
+mechanism exists here" is a legitimate answer to RECORD, never a quota to fill — and it is a claim, so it owes the
+same evidence a pick does.
+
+**TEST before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
+refute it — a probe, a fixture, a measurement against the real tree — never by argument, and never by a test every
+candidate passes. Write down what would make each candidate LOSE before running anything: a test whose result
+cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar
+is full of gates against, one level up.
+
+**Choose by M3's rule**, which already governs picking among options: the most feature-rich survivor after
+M3's vetoes, tie-broken by fewer open questions and then by reuse of a seam M5 found. M3's limit on your
+authority holds here too, and M3 is the one place it is stated.
+
+**Record the LOSS, not just the win.** §10 already names the seam and the recall terms; this section adds one thing
+to it — for each candidate tested and rejected, the test that rejected it. A rejected candidate with no recorded
+test is indistinguishable from one nobody tried, and the next build pays to re-run it.

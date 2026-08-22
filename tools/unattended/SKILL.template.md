@@ -31,7 +31,7 @@ distinction real.
    | `forks-resolved` | when open questions are settled | M3 | all | D3 |
    | `specs-reviewed` | the spec audit that precedes code | M4 | all | D4 |
    | `reuse-first` | the recall and reuse obligation | M5 | all | D5 |
-   | `parallel-when-disjoint` | the parallelism default under a mandate | M6 | all | D6 |
+   | `parallel-when-disjoint` | the parallelism obligation | M6 | all | D6 |
    | `passes-committed` | the commit boundary | M6 | all | D8 |
    | `diff-reviewed` | the closing review of the cumulative diff | M8 | all | D7 |
    | `land-once-done` | when a build may land | M8 | all | D8 |
@@ -198,6 +198,33 @@ which is where the loop is stated.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
+- **When building uncovers what speccing could not, AMEND — do not stall.** M3 delegates this build's
+  own scope and M2 names the three acts: RETIRE a unit, SUPERSEDE it, or ADD one the build turns out
+  to need. Every amendment owes a row, and this is the verb that writes it:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --rescope <slug> --act retire|supersede|add --item <unit-id> [--successor <unit-id>] --reason "<what building uncovered>"
+  ```
+
+  Two bounds, and they are the whole of your authority here. The build README's GOAL statement is
+  what you may not amend, and the delegation does not reach a governance carrier's own stated
+  constraints. An id already in the units region may never LEAVE it — retiring is a status flip to
+  `WONTDO` with a successor or reason in the header tail, never a deletion, because the
+  authorization compares BASE against HEAD as a subset and refuses a removal.
+- **Before dispatching two passes at once, DECLARE what each will write.** The build method requires
+  both path lists written down first, and this verb is what reads one:
+
+  ```bash
+  bash {{KIT_DIR}}/unattended.sh --dispatch <slug> --pass <unit-id> --writes <path> --writes <path>
+  ```
+
+  `--writes` is REPEATABLE and each occurrence is ONE path. Two of the method's three disjointness
+  clauses are decided here and refused on the spot: two passes claiming one file, and a pass claiming
+  a shared mutable record. A generated index ALONE is fine — every pass changes a spec header it is
+  rendered from — and only the index together with its GENERATOR is refused. The third clause, whether
+  a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
+  pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
+  commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
 
 ## While the work runs
@@ -333,9 +360,17 @@ discards the entire bar the authorization leaned on, and the gate greps your run
 bash {{KIT_DIR}}/unattended.sh --landed <slug>
 ```
 
-**Run this AFTER the lander returns, not before.** It re-observes the remote and refuses unless HEAD
-is an ancestor of the tip the remote advertises, so it is the one phase claim you cannot simply
-assert — which is the point.
+**Run this AFTER the lander returns, not before.** It re-observes the remote and takes the tip the
+remote advertises whenever your work is on it — the one phase claim you cannot simply assert, which
+is the point. **When that fails it falls back to the LOCAL default branch**, so a build you merged
+locally but cannot push still has a terminal to reach instead of an abort. The fallback asserts your
+own BRANCH TIP is an ancestor of local main, never that HEAD is; on the default branch HEAD is that
+ref, and a commit is its own ancestor.
+
+Two facts land in the record and you do not write either: `landed-anchor`, which says `remote` or
+`local`, and `unpushed-at-landing`, which counts what local main carries that the remote does not.
+Read the second before you believe the first — a local landing sits on top of whatever else is on
+that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
 
 **AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
 lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
