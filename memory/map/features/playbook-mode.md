@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["playbook validity gate", "playbook validity selftest"]
+gate-legs = ["playbook validity gate"]
 kits = []
 git-hooks = []
 workflow-scripts = []

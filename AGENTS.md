@@ -515,8 +515,9 @@ with its longest leg at 1565 s, and the unattended and playbook legs alone were 
 A 1565 s leg puts a 26-minute FLOOR under every full run, because wall clock cannot fall below the
 longest leg however wide the pool is. Fifty of the ninety-two legs then present finished in under five
 seconds each, so the distribution was not gradual: it was a handful of suites and a long tail of
-nothing. The record, with the per-leg table and the three levers left on the floor, is
-`memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md`.
+nothing. None of those figures is authored anywhere: `<git-dir>/gate-ledger.tsv` carries one row per
+leg with its own seconds, so the per-leg table is a `sort -rn` away and cannot go stale in prose. Read
+it there. The build record that first measured this is reachable from `memory/LIVE.md` like any other.
 
 The prior reading on node `a` 2026-08-21 — 393 s wall against a 3085 s leg-sum, longest leg 336 s,
 and 432 s for the same bar with the dispatch hint removed — is kept because it is the controlled pair

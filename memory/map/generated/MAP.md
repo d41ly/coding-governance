@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 22 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 22 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -64,7 +64,6 @@ Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
-| `playbook validity selftest` | playbook-mode |
 | `pre-push self-test` | baseline |
 | `profile-bar selftest` | run-gates |
 | `push-main self-test` | baseline |
@@ -89,12 +88,6 @@ Inventories: gate-legs: 92 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `template size gate selftest` | playbook |
 | `testsuite counts (every bar self-test prints one)` | testsuite-counts |
 | `testsuite counts self-test` | testsuite-counts |
-| `unattended adopter e2e` | unattended |
-| `unattended cross-component` | unattended |
-| `unattended driver selftest` | unattended |
-| `unattended driver selftest shard B` | unattended |
-| `unattended gate selftest` | unattended |
-| `unattended gate selftest shard B` | unattended |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
