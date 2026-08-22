@@ -941,7 +941,17 @@ check_authorization() { # slug · base
     fi
     # The declaration block is unit 2's fenced TOML. Read for the two keys THIS unit owns; the rest
     # belong to the units that read them and are parsed there.
-    AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
+    # THROUGH THE SHARED PARSER. The fold moved `grain` and `records` onto it and left this line
+    # alone, and the guard below string-compared the raw text against `[]` - so the kit's OWN template
+    # line, `outputs      = []    # globs. Where pieces land.`, matched neither alternative and
+    # `fail 46` never fired. An adopter who copied the template and never filled `outputs` was
+    # authorized for a recipe-mode run declaring no output globs, which is exactly the state the
+    # refusal's own message says leaves the scope check with nothing to compare against. Round 2's M1,
+    # one key over, on the other member of DOD_NO_OVERRIDE.
+    if ! AUTH_OUTPUTS=$(declared_list "$_pb" outputs); then
+      fail 46 "the playbook at the pinned BASE opens an output-glob list it does not close on the same line, so the globs bounding where a recipe-mode run may write are unreadable and an unarmed parse must red rather than return the declared null: $AUTH_PLAYBOOK"
+      return 1
+    fi
     AUTH_GRAIN=$(declared_scalar "$_pb" grain)
     AUTH_RECORDS=$(declared_scalar "$_pb" records)
     case "$_pb" in
@@ -950,7 +960,7 @@ check_authorization() { # slug · base
          return 1 ;;
     esac
     case "$AUTH_OUTPUTS" in
-      ''|'[]') fail 46 "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against: $AUTH_PLAYBOOK"
+      '') fail 46 "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against: $AUTH_PLAYBOOK"
          return 1 ;;
     esac
     if [ -z "$AUTH_GRAIN" ]; then
@@ -2064,6 +2074,21 @@ dod_met() { # slug · run-state file · item · checker
       # lesson in its own comment: SURFACED, not discarded.
       _raw=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$_at" 2>&1)
       _counts=$(printf '%s\n' "$_raw" | grep -m1 '^pieces=')
+      # THE LEG'S EXIT STATUS IS DELIBERATELY NOT READ HERE, and that is a measurement rather than an
+      # oversight. `--counts` runs the SAME per-playbook validity checks the full leg does, so the leg
+      # exits non-zero for a curator, a step floor or a tag-grammar finding — none of which say
+      # anything about whether the census is trustworthy. Blocking on the status was written, run, and
+      # reverted: it turned nine specific DoD refusals into one generic sentence, because the driver's
+      # own fixture playbook declares a step floor it cannot meet and the leg has always red on it.
+      #
+      # THE TWO REFUSALS THAT DO INVALIDATE A CENSUS ALREADY REACH THIS CALLER, by two different
+      # routes and neither of them the exit status. An unparseable `piece_checks` makes the leg
+      # `continue` past that playbook, so no `pieces=` line is printed at all and the missing-count
+      # branch below fires with the leg's own words attached. An unparseable `set_checks` is refused by
+      # `set-checks-recorded` reading the same blob directly, one item down. Check 28a is what keeps
+      # that second claim true: it enumerates every call site of a parser that can refuse and reds one
+      # that drops the status, which is the rule this item's sibling broke.
+
       # SELECTED BY SHAPE, never by position. `head -1` took whatever the leg printed first, so any
       # note reaching stdout made every field below parse to that line's first word — the parse
       # cannot fail, it just yields nonsense, and the close then blocks on a fabricated count.
@@ -2132,7 +2157,15 @@ dod_met() { # slug · run-state file · item · checker
       # already trimmed; the inconsistency was between two lines of one arm.
       #
       # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
-      _declared=$(declared_list "$_blob" set_checks)
+      # THE REFUSAL IS READ. Round 4's second blocker: this was a bare assignment, so the rc 2 the
+      # round-3 fold added arrived as empty stdout, the `''` alternative below matched it first, and
+      # a declaration the parser could not read returned MET with no record, no verdict and no
+      # override entry. Two of the parser's three call sites branched on the status and the commit
+      # message claimed all three did. Check 28 now counts them.
+      if ! _declared=$(declared_list "$_blob" set_checks); then
+        DOD_OUT="the playbook at the pinned BASE opens a set-scoped check list it does not close on the same line, so this item would read the declared null and certify set coverage over a declaration nothing could parse: $_pb"
+        return 1
+      fi
       # HIGH 3 (round-3): the declared null is the WORD `none`, not any value starting with it. A
       # set check named `nonempty-rows` read as "declares nothing" and this item returned MET with no
       # record, no verdict and no override entry.
@@ -2351,13 +2384,25 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   #
   # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
   # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
+  # THE COMMENT COMES OFF BEFORE THE TERMINATOR TEST, and the order is the whole fix. Round 4's
+  # blocker: this ran the `case` on the RAW line, so a `]` anywhere in a trailing comment satisfied
+  # the closed arm, the strip below then reduced the value to a bare `[`, and a legal multi-line
+  # array parsed to the DECLARED NULL at rc 0 - the round-3 blocker restored by the commit that
+  # fixed it. `piece_checks = [   # one per piece [see section 7]` is ordinary TOML authoring, and
+  # the kit's own template puts a trailing comment on every declaration line.
+  #
+  # THE STRIP REQUIRES WHITESPACE BEFORE THE `#`, so a legal `["a#b"]` survives it. A `#` that IS
+  # preceded by whitespace inside a quoted member (`["a", "b #c"]`) now REFUSES rather than
+  # corrupting silently - the honest outcome for a line-oriented shell parser that cannot tokenise
+  # TOML, and the reason this returns rather than guessing.
   local raw
-  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1)
+  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
+        | sed 's/[[:space:]][[:space:]]*#.*$//')
   case "$raw" in
     *'['*']'*) ;;
     *'['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+  printf '%s\n' "$raw" | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
     | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }

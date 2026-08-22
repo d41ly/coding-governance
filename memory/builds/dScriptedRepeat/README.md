@@ -59,8 +59,12 @@ of them was already wrong.
 
 ## The seven forks, resolved at kickoff
 
-Ruled at kickoff and unchanged since; the reasoning is in the kickoff record and the specs that cite
-them. Kept as a list because a fork's RULING is not derivable from the thing it ruled on.
+Ruled at kickoff and unchanged since. The seven rows moved VERBATIM to
+[the kickoff fork rulings](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md)
+when this file was trimmed to its cap — a ruling is not derivable from the thing it ruled on, so the
+rows move rather than compress. Forks 1, 5 and 6 are cited by number further down this document and
+resolve there; the trim that wrote this paragraph pointed at a "kickoff record" that did not exist,
+which is round 4's MEDIUM 9.
 
 ## Constraints already measured
 
@@ -249,9 +253,9 @@ ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14
 | [TOOL-dScriptedRepeat-2 — the PLAYBOOK TEMPLATE, derived then frozen](spec/2026-08-20-spec-dScriptedRepeat-2.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-3 — the playbook validity gate](spec/2026-08-20-spec-dScriptedRepeat-3.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dScriptedRepeat-4 — the declaration seam: README names the path, playbook holds the globs](spec/2026-08-20-spec-dScriptedRepeat-4.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | CLOSED | rev-9 | 2026-08-22 |
-| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | CLOSED | rev-9 | 2026-08-22 |
-| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-9 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states](spec/2026-08-20-spec-dScriptedRepeat-5.md) | CLOSED | rev-10 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item](spec/2026-08-20-spec-dScriptedRepeat-6.md) | CLOSED | rev-10 | 2026-08-22 |
+| [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-10 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-6 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | CLOSED | rev-6 | 2026-08-21 |
 <!-- /gen:build-units -->
@@ -265,6 +269,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md) | research | TOOL-dScriptedRepeat-1 |
+| [2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md) | journal | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | TOOL-dScriptedRepeat-2 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
@@ -310,6 +315,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-external-instruction-design.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-hard-problems.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-in-repo-prior-art.md)
+  - [2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-kickoff-fork-rulings.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md)
   - [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md)

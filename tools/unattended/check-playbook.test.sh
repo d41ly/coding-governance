@@ -15,6 +15,19 @@ trap 'rm -rf "$TMP"' EXIT
 n=0; st=0
 ok()   { n=$((n+1)); }
 bad()  { n=$((n+1)); st=1; echo "FAIL $1"; }
+# A CAPTURE THAT FEEDS AN ASSERTION IS SHAPE-ASSERTED BEFORE IT IS COMPARED. Round 4, MEDIUM 8: the
+# tree half of the pinned-vs-tree pair below greps free-text prose, and with the capture EMPTY the
+# comparison `[ "${TREE1#*verified }" != 0 ]` yielded `[ "" != 0 ]`, which is true — so the arm went
+# green having compared one number against nothing. Four code paths in the leg suppress that census
+# line, and a wording change empties it silently. This is `fixture-passes-by-finding-nothing` from the
+# project's own checklist, inside the arm rewritten that round to remove it.
+require_shape() { # value · glob · what-it-is
+  n=$((n+1))
+  case "$1" in
+    $2) ;;
+    *) st=1; echo "FAIL the capture for $3 does not have the shape every assertion below reads it as, so those assertions would compare against nothing: [$1]" ;;
+  esac
+}
 
 seed() { # dir
   mkdir -p "$1/tools/unattended"
@@ -227,11 +240,12 @@ n=$((n+1))
 sed -i '/^piece_checks/d' "$F"
 PIN1=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$AT" | head -1 )
 TREE1=$( cd "$W" && bash tools/unattended/check-playbook.sh | grep -oE 'pieces [0-9]+ · verified [0-9]+' | head -1 )
+require_shape "$TREE1" 'pieces * · verified *' "the tree read of the census"
 n=$((n+1))
 [ "$PIN1" = "$PIN0" ] \
   || bad "an UNCOMMITTED piece_checks delete moved the PINNED census, so the close still reads the file the run can edit: [$PIN0] then [$PIN1]"
 n=$((n+1))
-case "$PIN1" in *"verified=0"*) [ "${TREE1#*verified }" != 0 ] || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch" ;; *) bad "the pinned read is not the unchecked one, so the comparison below is not the one this arm makes: [$PIN1]" ;; esac
+case "$PIN1" in *"verified=0"*) [ "${TREE1#*verified }" -ne 0 ] || bad "the tree read and the pinned read agree over a tree where the declaration was deleted, so this arm cannot distinguish them and would pass against the defect it exists to catch" ;; *) bad "the pinned read is not the unchecked one, so the comparison below is not the one this arm makes: [$PIN1]" ;; esac
 ( cd "$W" && git checkout -q -- tools/unattended/playbook.fixture.md 2>/dev/null )
 cp "$KEEP" "$F"
 ( cd "$W" && git add -A >/dev/null && git commit -qm restore-fixture )
@@ -265,6 +279,96 @@ n=$((n+1))
 grep -qF -- "a playbook opens a set-scoped check list and does not close it on the same line, and this parser reads one line - an unarmed parse must red rather than return the declared null; playbook" <<<"$(run)" \
   || bad "a multi-line set_checks declaration was accepted rather than refused"
 cp "$KEEP" "$F"
+
+# ---- BLOCKER (round-4): THE SAME ARRAY, WITH A TRAILING COMMENT. The round-3 refusal ran its
+# ---- terminator test on the RAW line, so a `]` anywhere in a comment satisfied the closed arm, the
+# ---- strip that runs one line later reduced the value to a bare `[`, and the whole defect came back
+# ---- at rc 0. The plain form above still refused — which is precisely why the round-3 arm, check
+# ---- 28's round-3 specimen and 92 gate legs were all green over it. A bracketed cross-reference in a
+# ---- comment is ordinary TOML authoring; no attacker is required, twice over.
+cp "$KEEP" "$F"
+sed -i 's|^piece_checks  = \["fixture-shape"\]|piece_checks  = [   # one per piece [see section 7]\n  "fixture-shape",\n]|' "$F"
+n=$((n+1))
+grep -q '^piece_checks  = \[   # one per piece \[see section 7\]$' "$F" || bad "the bracket-in-comment fixture edit did not take, so the arm below tests the comment-free form the round-3 arm already covers"
+out=$(run)
+n=$((n+1))
+grep -qF -- "a playbook opens a per-piece check list and does not close it on the same line" <<<"$out" \
+  || bad "a multi-line declaration whose opening line carries a bracket in its comment was accepted rather than refused, so it parses to the declared null and every unchecked piece grades verified"
+n=$((n+1))
+grep -qE 'pieces [0-9]+ · verified' <<<"$out" \
+  && bad "the leg printed a census for a playbook whose declaration it could not read, which is a number the caller would trust"
+cp "$KEEP" "$F"
+
+# ---- MEDIUM 7 (round-4): the step floor came off an ad-hoc `tr -dc '0-9'`, which concatenated every
+# ---- digit in the trailing comment into the number — a true refusal for a false reason, naming a
+# ---- floor the author never wrote, and in the other direction a false green that bypassed the
+# ---- no-floor refusal entirely.
+cp "$KEEP" "$F"
+sed -i 's|^step_floor.*$|step_floor    = 1     # at least 1, per section 5 and F2|' "$F"
+n=$((n+1))
+grep -q '^step_floor    = 1     # at least 1, per section 5 and F2$' "$F" || bad "the digit-bearing floor comment edit did not take"
+out=$(run)
+n=$((n+1))
+grep -qE 'check 3 FAILED' <<<"$out" \
+  && bad "a valid playbook whose floor line carries a digit-bearing comment red check 3, so the floor was spliced out of the prose rather than parsed: $(grep -m1 'check 3 FAILED' <<<"$out")"
+n=$((n+1))
+grep -qF -- 'declares a step selector and no floor' <<<"$out" \
+  && bad "a floor that IS declared read as absent once its comment was stripped, which is the opposite failure and the same parser"
+cp "$KEEP" "$F"
+
+# ...and the other half of the same repair: a floor that is not a number at all. The ad-hoc read
+# laundered arbitrary text through `tr -dc` and produced a number nobody wrote; refusing is the only
+# honest answer, and `step_floor = soon` used to parse to the empty string and reach the no-floor
+# refusal instead, which names the wrong cause.
+cp "$KEEP" "$F"
+sed -i 's|^step_floor.*$|step_floor    = soon|' "$F"
+n=$((n+1))
+grep -q '^step_floor    = soon$' "$F" || bad "the non-numeric floor edit did not take"
+n=$((n+1))
+grep -qF -- "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [" <<<"$(run)" \
+  || bad "a non-numeric step floor was accepted rather than refused, so whatever prose follows the equals sign becomes the floor"
+cp "$KEEP" "$F"
+
+# ---- BLOCKER (round-4): THE REPLACE REF. `git replace -f <base> <forged>` rewrites what a sha
+# ---- dereference returns without touching one tracked byte, and ONLY `-c core.useReplaceRefs=false`
+# ---- suppresses it — the exported GIT_GRAFT_FILE a spawned leg inherits does NOT, and a `-c` is
+# ---- per-invocation so nothing propagates it from the driver. This leg's single sha read produces
+# ---- every declaration the `--counts` census grades, and that census is the sole evidence for
+# ---- `pieces-complete`, which takes no override. So an unpinned read hands the run the playbook it
+# ---- is graded against.
+# ----
+# ---- Round 3 filed this. The fold recorded the fix in the commit message, in spec 5 rev-9 and in the
+# ---- acceptance ledger, and the change never reached the file. This arm and check 28c are the two
+# ---- things that would have said so.
+# The HONEST history declares a check nothing recorded, so its census is unchecked. The FORGED one
+# declares the check the records DO satisfy. That direction is the attack: a run substitutes a
+# playbook its own evidence happens to pass, which is why the honest half must be the strict one.
+cp "$KEEP" "$F"
+sed -i 's|^piece_checks  = .*|piece_checks  = ["phantom-leg"]|' "$F"
+( cd "$W" && git add -A >/dev/null && git commit -qm honest-strict )
+HONEST=$( cd "$W" && git rev-parse HEAD )
+PINH=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | head -1 )
+require_shape "$PINH" 'pieces=* verified=*' "the honest pinned census this arm compares against"
+cp "$KEEP" "$F"
+( cd "$W" && git add -A >/dev/null && git commit -qm forged-permissive )
+FORGED=$( cd "$W" && git rev-parse HEAD )
+PINF=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$FORGED" | head -1 )
+n=$((n+1))
+[ "$PINF" != "$PINH" ] \
+  || bad "the forged tree grades identically to the honest one, so this arm cannot detect a substitution and would pass against the defect it exists to catch: [$PINH]"
+n=$((n+1))
+( cd "$W" && git replace -f "$HONEST" "$FORGED" >/dev/null 2>&1 ) \
+  || bad "the replace ref could not be installed, so the lever this arm measures was never armed"
+n=$((n+1))
+[ -n "$( cd "$W" && git for-each-ref refs/replace/ )" ] \
+  || bad "no replace ref exists after installing one, so the read below is unpinned against nothing"
+PINR=$( cd "$W" && bash tools/unattended/check-playbook.sh --counts tools/unattended/playbook.fixture.md '' "$HONEST" | head -1 )
+n=$((n+1))
+[ "$PINR" = "$PINH" ] \
+  || bad "a replace ref moved the PINNED census at an unchanged, honest sha, so the run supplies the playbook it is measured against on the one item that takes no override: honest [$PINH] became [$PINR]"
+( cd "$W" && git replace -d "$HONEST" >/dev/null 2>&1 )
+cp "$KEEP" "$F"
+( cd "$W" && git add -A >/dev/null && git commit -qm restore-after-replace )
 
 # ---- HIGH 2 (round-3): the sha is MANDATORY. Round 2 blocked a per-FIELD pin that silently reverted
 # ---- when a field was missing; the fold replaced it with a per-SHA pin that silently reverted when
@@ -412,8 +516,8 @@ cp "$KEEP" "$F"
 # `check-testsuite-counts.sh` leg requires of every self-test. Without it a block of arms stranded
 # past an exit leaves the suite reporting success over the arms it never reached, which is the same
 # green-by-absence this leg's own subject is about. RE-MEASURED at the round-3 fold: 72 executed,
-# same absolute headroom as the pin it replaces.
-FLOOR_ASSERTIONS=64
+# same absolute headroom as the pin it replaces. RE-MEASURED again at the round-4 fold: 86 executed.
+FLOOR_ASSERTIONS=78
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

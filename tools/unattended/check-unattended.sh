@@ -1424,9 +1424,108 @@ dl_a=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$DRIVER")
 dl_b=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check-playbook.sh" 2>/dev/null)
 # THE SCALAR SIBLING, on the same terms. Round 3, HIGH 6: `declared_list` was consolidated and
 # byte-compared while the FIVE scalar reads stayed ad-hoc, so this check generalised the parse across
-# list keys and the gate across `*_checks` only — two of the block's ten declaration keys.
+# list keys and the gate across `*_checks` only - two of the block's ten declaration keys.
 ds_a=$(awk '/^declared_scalar\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$DRIVER")
 ds_b=$(awk '/^declared_scalar\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check-playbook.sh" 2>/dev/null)
+tpl="$HERE/PLAYBOOK-TEMPLATE.template.md"
+
+# ---- 28a - THE REFUSAL MUST BE READ, AT EVERY CALL SITE. A parser that can refuse and a caller that
+# ---- discards its status are one defect, and this build shipped it twice in two rounds: round 3 gave
+# ---- `declared_list` a `return 2`, round 4 found two of its three call sites branching on it, and the
+# ---- commit message asserted all three did. Nothing COUNTED them, so nothing could disagree - the
+# ---- claim and the code were never compared by anything but a reader.
+# ----
+# ---- The rule binds a parser that CAN refuse, and that property is DERIVED from the parser's own
+# ---- body rather than listed here: a `return <nonzero>` in the extracted text is what makes rc
+# ---- load-bearing. Give `declared_scalar` one tomorrow and its call sites start being policed
+# ---- without a byte of this check changing.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: whether the branch a caller takes is the RIGHT one. It sees that the
+# ---- status is read, never what is done with it.
+rc_refusers=0
+rc_sites=0
+for _p in declared_list declared_scalar; do
+  case "$_p" in declared_list) _body=$dl_a ;; *) _body=$ds_a ;; esac
+  printf '%s\n' "$_body" | grep -qE '(^|[^[:alnum:]_])return[[:space:]]+[1-9]' || continue
+  rc_refusers=$((rc_refusers + 1))
+  for _f in "$DRIVER" "$HERE/check-playbook.sh"; do
+    [ -f "$_f" ] || continue
+    while IFS= read -r _cs; do
+      [ -n "$_cs" ] || continue
+      rc_sites=$((rc_sites + 1))
+      _ln=${_cs%%:*}; _txt=${_cs#*:}
+      case "$_txt" in
+        *'if !'*|*'||'*) continue ;;
+      esac
+      fail 28 "a parser that can REFUSE is called at a site that discards its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: $_p at $_f:$_ln spells [$_txt]"
+    done <<RCEOF
+$(grep -nE '\$\('"$_p"'[[:space:]]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
+RCEOF
+  done
+done
+if [ "$rc_refusers" -eq 0 ]; then
+  fail 28 "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
+elif [ "$rc_sites" -eq 0 ]; then
+  fail 28 "a refusing parser was found and NO call site of it was, so this rule was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls its own parsers"
+fi
+
+# ---- 28b - EVERY DECLARATION KEY IS BOUND TO THE PARSER ITS REAL READER CALLS. This check ran both
+# ---- parsers over every fence key and concluded the kit parses them correctly, while `outputs` was
+# ---- read by an ad-hoc `sed` in the driver and `step_floor` by a `tr -dc` in the leg. Both reads
+# ---- certified here, neither read here - and `step_floor`'s spliced the digits out of its own
+# ---- trailing comment into the number.
+# ----
+# ---- Certifying a key through a parser its consumer does not call is a gate confirming its own
+# ---- re-implementation, which is the shape this whole check exists to refuse, turned on itself.
+kb_keys=0
+if [ -f "$tpl" ]; then
+  while IFS= read -r _k; do
+    [ -n "$_k" ] || continue
+    kb_keys=$((kb_keys + 1))
+    for _f in "$DRIVER" "$HERE/check-playbook.sh"; do
+      [ -f "$_f" ] || continue
+      while IFS= read -r _hit; do
+        [ -n "$_hit" ] || continue
+        fail 28 "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: $_k at $_f:${_hit%%:*} spells [${_hit#*:}]"
+      done <<KBEOF
+$(grep -nF "s/^$_k[[:space:]]*=" "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
+KBEOF
+    done
+  done <<KEYEOF
+$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=/{sub(/[[:space:]]*=.*$/,"");print}' "$tpl" || true)
+KEYEOF
+  [ "$kb_keys" -gt 0 ] || fail 28 "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set: $tpl"
+fi
+
+# ---- 28c - EVERY SHA DEREFERENCE IN THIS KIT GOES THROUGH A PINNED READ. A forced git replace
+# ---- rewrites what a sha dereference returns without touching one tracked byte, and ONLY
+# ---- `-c core.useReplaceRefs=false` suppresses it. The exported `GIT_GRAFT_FILE` a child process
+# ---- inherits does not - the driver's own header records that measurement, and a `-c` is
+# ---- per-invocation, so nothing propagates it to a spawned leg.
+# ----
+# ---- The committed BASE blob is one of exactly two inputs the security model places outside the
+# ---- run's own reach. An unpinned read puts it back inside, on the item that takes no override, and
+# ---- round 4 measured that end to end: one replace ref flipped the census from verified=0 to
+# ---- verified=2 at an unchanged, honest sha.
+# ----
+# ---- Round 3 filed this and the fold RECORDED it as fixed in three documents without the change
+# ---- reaching the file. This is the gate that makes that impossible to repeat.
+sha_reads=0
+for _f in "$DRIVER" "$HERE/check-playbook.sh" "$HERE/lib-unattended.sh"; do
+  [ -f "$_f" ] || continue
+  while IFS= read -r _hit; do
+    [ -n "$_hit" ] || continue
+    sha_reads=$((sha_reads + 1))
+    case "${_hit#*:}" in
+      *'core.useReplaceRefs=false'*) continue ;;
+    esac
+    fail 28 "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow: $_f:${_hit%%:*} spells [${_hit#*:}]"
+  done <<SHEOF
+$(grep -nE '(^|[^-[:alnum:]_])git ([^|;&]*[[:space:]])?(show|cat-file)[[:space:]]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' || true)
+SHEOF
+done
+[ "$sha_reads" -gt 0 ] || fail 28 "this scan found no sha dereference anywhere in a kit whose whole job is reading committed blobs, so its predicate has stopped matching the code rather than the code having stopped dereferencing - an unpinned read would now pass unseen"
+
 if [ -z "$ds_a" ] || [ -z "$ds_b" ]; then
   fail 28 "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow: $DRIVER and $HERE/check-playbook.sh"
 elif [ "$ds_a" != "$ds_b" ]; then
@@ -1439,33 +1538,40 @@ elif [ "$dl_a" != "$dl_b" ]; then
   fail 28 "the two inlined copies of the declared-list parser have drifted, and a declaration parsed two ways is two answers to one question - they are copy-inlined because each kit script installs standalone, so this comparison is the only thing holding them together"
   diff <(printf '%s\n' "$dl_a") <(printf '%s\n' "$dl_b") | head -8 | sed 's/^/    /'
 else
-  # THE ANSWER, not just the agreement. Every `*_checks` key the SHIPPED TEMPLATE declares is fed to
-  # the parser exactly as an adopter would copy it — comment and all — and must come back as the
-  # declared null. The template is the one input every adopter starts from, and no hand-written
-  # fixture keeps carrying its comment.
-  tpl="$HERE/PLAYBOOK-TEMPLATE.template.md"
+  # THE ANSWER, not just the agreement. Every key the SHIPPED TEMPLATE declares is fed to the parser
+  # its reader calls, exactly as an adopter would copy it - comment and all. The template is the one
+  # input every adopter starts from, and no hand-written fixture keeps carrying its comment.
   if [ ! -f "$tpl" ]; then
     fail 28 "the shipped playbook template is missing, so the parser cannot be run over the line every adopter actually copies and this check would grade agreement alone: $tpl"
   else
-    # THE REAL PARSER, EXECUTED — not a third spelling of it. Writing the pipeline out here is the
+    # THE REAL PARSER, EXECUTED - not a third spelling of it. Writing the pipeline out here is the
     # exact defect this check exists to catch, one level up: a checker that re-implements its subject
     # confirms the re-implementation. The extracted function text is defined and called.
     #
     # AND THE EXIT STATUS IS THE FIRST THING ASSERTED. Round 3, HIGH 4: this ran the parser under
-    # `2>/dev/null` and asserted only that the output was EMPTY — so a syntax error, a truncated
+    # `2>/dev/null` and asserted only that the output was EMPTY - so a syntax error, a truncated
     # extraction and a correct parse of `[]` were one observation, and replacing both parser bodies
-    # with `printf ''` left this check silent and green while the census went verified-over-unchecked.
+    # with an empty printf left this check silent and green while the census went verified-over-unchecked.
     # A dead harness must not be byte-indistinguishable from a working one.
-    dl_run() { # body · key -> the parser's answer on stdout; rc is the parser's own
+    dl_run() { # body - key -> the parser's answer on stdout; rc is the parser's own
       bash -c "$dl_a
 declared_list \"\$1\" \"\$2\"" _ "$1" "$2"
     }
+    ds_run() { # body - key -> the scalar parser's answer on stdout; rc is the parser's own
+      bash -c "$ds_a
+declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
+    }
     tpl_block=$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f' "$tpl")
-    dlk=0
-    # THE POSITIVE DIRECTION, FIRST AND FIXED. The template declares every list key as `[]`, so the
-    # template loop below has NO input whose expected parse is non-empty — it is structurally
-    # incapable of telling a working parser from one that answers nothing, which is the answer that
-    # disables both consumers. These specimens are the check's only non-empty expectation.
+    # THE POSITIVE DIRECTION, FIRST AND FIXED, FOR BOTH PARSERS. The template declares every key as a
+    # declared null of its own type, so neither template loop below has an input whose expected parse
+    # is non-empty - each is structurally incapable of telling a working parser from one that answers
+    # nothing, which is the answer that disables every consumer. These specimens are this check's only
+    # non-empty expectation.
+    #
+    # ROUND 4, HIGH 5: the list half got these and the scalar half did not, in the same commit. Gutting
+    # `declared_scalar` to an empty printf visited seven template keys with zero failures, and swapping
+    # its comment strip for a delete-the-whole-line sed - which empties every commented declaration,
+    # the mirror image of the leak this arm exists to catch - left the whole kit green.
     for spec in 'Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX'; do
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
@@ -1475,29 +1581,47 @@ declared_list \"\$1\" \"\$2\"" _ "$1" "$2"
       elif [ "$_got" != "$_want" ]; then
         fail 28 "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: [$_in] wanted [$_want] got [$_got]"
       fi
-      dlk=$((dlk + 1))
     done
-    # THE MULTI-LINE ARRAY, which is round 3's blocker. A legal TOML array spread over lines used to
-    # yield the bare `[`, parse to the declared null, and grade every verdict-less piece `verified` on
-    # the one item that takes no override — and this check CERTIFIED that output, because empty was
-    # all it ever asserted. The parser must REFUSE it, not answer it.
-    _ml=$(printf 'k = [\n  "a",\n]\n')
-    _got=$(dl_run "$_ml" k); _rc=$?
-    [ "$_rc" -eq 2 ] || fail 28 "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - exit status and answer follow: exited $_rc with [$_got]"
-    dlk=$((dlk + 1))
-    # The built-in specimens are done; everything counted past this point came from the template. The
-    # threshold below is therefore DERIVED from where the specimens stopped, not typed — an added
-    # specimen used to silently satisfy the liveness assertion it was supposed to be excluded from.
-    dlk_builtin=$dlk
+    for spec in 'Xk = "v"    # trailing commentX|XvX' 'Xk = 0X|X0X' 'Xk = {}    # noteX|X{}X' 'Xk = memory/records    # where they landX|Xmemory/recordsX'; do
+      _in=${spec%%|*}; _want=${spec#*|}
+      _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
+      _got=$(ds_run "$_in" k); _rc=$?
+      if [ "$_rc" -ne 0 ]; then
+        fail 28 "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: [$_in] exited $_rc"
+      elif [ "$_got" != "$_want" ]; then
+        fail 28 "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: [$_in] wanted [$_want] got [$_got]"
+      fi
+    done
+    # THE MULTI-LINE ARRAY, which is round 3's blocker and round 4's. A legal TOML array spread over
+    # lines used to yield the bare `[`, parse to the declared null, and grade every verdict-less piece
+    # `verified` on the one item that takes no override - and this check CERTIFIED that output, because
+    # empty was all it ever asserted. Round 4 then found the refusal testing the RAW line, so a `]`
+    # inside a trailing comment satisfied the terminator arm and restored the whole defect. BOTH
+    # spellings are specimens here, and the commented one is the reason the first was not enough.
+    for _ml in 'k = [' 'k = [   # one per piece [see section 7]' 'k = [ # note ]'; do
+      _got=$(dl_run "$(printf '%s\n  "a",\n]\n' "$_ml")" k); _rc=$?
+      [ "$_rc" -eq 2 ] || fail 28 "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [$_ml] exited $_rc with [$_got]"
+    done
+    # THE TWO TEMPLATE LOOPS COUNT SEPARATELY. Round 4, MEDIUM 6: one shared counter meant either half
+    # could go dark while the other satisfied the liveness assertion - the list awk matches three keys
+    # and the scalar awk seven, so neutering either left the check green under a message claiming the
+    # template half had covered something. That is round 3's HIGH 6 restored one level up: the
+    # population became derived and the assertion that the derivation found anything stayed blind to
+    # half of it.
+    tpl_list=0
+    tpl_scalar=0
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
-      dlk=$((dlk + 1))
+      tpl_list=$((tpl_list + 1))
       got=$(dl_run "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
-      # NO rc BRANCH HERE, deliberately. The specimens above run the same extracted parser and
-      # assert its exit status, so a parser that cannot execute has already failed by this point —
-      # a branch here could be reached by no fixture, which is the shape round 3 filed against this
-      # very check. The scalar loop below DOES carry one, because it has no specimens of its own.
-      if [ -n "$got" ]; then
+      # THE rc BRANCH IS BACK, and the comment that removed it was wrong. It read: a branch here could
+      # be reached by no fixture, because the specimens above already assert the parser executes. A
+      # template list key written MULTI-LINE reaches it exactly - rc 2, empty stdout, the -n test
+      # false, silent pass. That matters more than it looks: `check-playbook.sh` excludes this template
+      # from its own population, so this loop is the ONLY grader of the shipped template's declarations.
+      if [ "$rc" -ne 0 ]; then
+        fail 28 "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow: ${tl%%=*} exited $rc"
+      elif [ -n "$got" ]; then
         fail 28 "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow: ${tl%%=*} yields [$got]"
       fi
     done <<TPLEOF
@@ -1506,17 +1630,16 @@ TPLEOF
 
     # EVERY OTHER KEY IN THE FENCE, through the scalar parser. The population is DERIVED from the
     # template's own toml block rather than from a hand-typed pattern, so a key added there reds until
-    # a parse assertion claims it. The old pattern matched `*_checks` — two keys of ten — while the
+    # a parse assertion claims it. The old pattern matched `*_checks` - two keys of ten - while the
     # failure text made the key-independent claim "an adopter who copies the template verbatim".
     #
     # WHAT IS ASSERTED is that the COMMENT does not survive the parse. Every value in the shipped
-    # block is a declared null of its own type (`""`, `0`, `[]`, `{}`), so a `#` in the parsed result
-    # is the leak signature and it is the same signature for every key.
+    # block is a declared null of its own type, so a `#` in the parsed result is the leak signature and
+    # it is the same signature for every key.
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
-      dlk=$((dlk + 1))
-      got=$(bash -c "$ds_a
-declared_scalar \"\$1\" \"\$2\"" _ "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
+      tpl_scalar=$((tpl_scalar + 1))
+      got=$(ds_run "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
       if [ "$rc" -ne 0 ]; then
         fail 28 "the extracted declared-scalar parser could not be executed over the shipped template's own line, and an unexecutable parser returns the empty string every assertion here reads as clean - key and exit status follow: ${tl%%=*} exited $rc"
       else
@@ -1528,14 +1651,17 @@ declared_scalar \"\$1\" \"\$2\"" _ "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
 $(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=/ && !/^[a-z_]+[[:space:]]*=[[:space:]]*\[/' "$tpl" || true)
 TPLSEOF
 
-    # LIVENESS, and DELIBERATELY NOT A COUNT COMPARISON. The first cut asserted that the number of
-    # keys parsed equalled the number the fence declares — but both sides are derived from that same
-    # fence by the same awk, so they cannot disagree whatever either does. That is this project's own
-    # `assertion-between-two-derived-values` class, written into the check that exists to stop a
-    # parser going quiet. Every fence key reaches one of the two loops by construction — a value
-    # starting `[` goes to the list parse, everything else to the scalar one — so what is worth
-    # asserting is that the template half RAN, not that two derivations of one number agree.
-    [ "$dlk" -gt "$dlk_builtin" ] || fail 28 "the shipped template's declaration block yielded no key this check could parse, so only the built-in specimens ran and the template half of this assertion covered nothing: $tpl"
+    # LIVENESS, PER LOOP, and DELIBERATELY NOT A COUNT COMPARISON. The first cut asserted that the
+    # number of keys parsed equalled the number the fence declares - but both sides are derived from
+    # that same fence by the same awk, so they cannot disagree whatever either does. That is this
+    # project's own `assertion-between-two-derived-values` class, written into the check that exists to
+    # stop a parser going quiet.
+    #
+    # The second cut asserted the UNION was non-empty, which is true of either half alone. Each half
+    # now answers for itself, and the refusals name which one covered nothing - because "the template
+    # half ran" was never the claim worth making about two independent populations.
+    [ "$tpl_list" -gt 0 ] || fail 28 "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it: $tpl"
+    [ "$tpl_scalar" -gt 0 ] || fail 28 "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it: $tpl"
   fi
 fi
 

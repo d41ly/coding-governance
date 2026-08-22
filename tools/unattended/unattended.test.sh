@@ -194,6 +194,49 @@ outputs = ["content/pieces/**"]
 ```
 PBEOF
 printf '# a playbook with no declaration block at all\n' > content/pb-noblock.md
+# A block whose SET list opens and never closes on that line, with everything else valid. Its own
+# file, because the arm that reads it used to mutate the shared `content/pb.md` and left it mutated
+# for every DoD arm downstream.
+cat > content/pb-setmulti.md <<'PBEOF'
+# a playbook
+
+```toml
+step_selector = "^\\*\\*[A-Z][0-9]+\\."
+step_floor   = 1
+outputs      = ["content/pieces/**"]
+grain        = "content/pieces/*/index.md"
+records      = "content/recs"
+piece_checks = ["shape"]
+set_checks   = [
+  "distinct",
+]
+curated      = "t 2026-08-01"
+```
+PBEOF
+# A block declaring outputs as the EMPTY LIST, carrying the shipped template's own trailing comment.
+# Round 4, HIGH 4: the guard string-compared raw text against `[]`, so this line matched neither
+# alternative and the refusal never fired — the only negative fixture omitted the key entirely, which
+# exercises the `''` half. An adopter who copies the template and never fills `outputs` lands here.
+cat > content/pb-outempty.md <<'PBEOF'
+# a playbook
+
+```toml
+outputs      = []    # globs. Where pieces land. A `recipe`-mode run's diff may touch
+grain        = "content/pieces/*/index.md"
+```
+PBEOF
+# ...and the same key opened across lines, which reached the guard as the bare `[` and evaded it
+# identically. This one must be REFUSED as unparseable rather than read as a declaration.
+cat > content/pb-outmulti.md <<'PBEOF'
+# a playbook
+
+```toml
+outputs      = [
+  "content/pieces/**",
+]
+grain        = "content/pieces/*/index.md"
+```
+PBEOF
 # A block carrying a grain and NO outputs. The refusal order is block, then outputs, then grain, so
 # a fixture missing both would never reach the outputs branch and its arm would prove nothing.
 cat > content/pb-noout.md <<'PBEOF'
@@ -219,6 +262,12 @@ readme tRecipeNoBlock
 mutate memory/builds/tRecipeNoBlock/README.md '/^slug: tRecipeNoBlock$/a authorized-by: recipe\nplaybook: content/pb-noblock.md\npieces: 3'
 readme tRecipeNoOut
 mutate memory/builds/tRecipeNoOut/README.md '/^slug: tRecipeNoOut$/a authorized-by: recipe\nplaybook: content/pb-noout.md\npieces: 3'
+readme tSetMulti
+mutate memory/builds/tSetMulti/README.md '/^slug: tSetMulti$/a authorized-by: recipe\nplaybook: content/pb-setmulti.md\npieces: 2'
+readme tRecipeOutEmpty
+mutate memory/builds/tRecipeOutEmpty/README.md '/^slug: tRecipeOutEmpty$/a authorized-by: recipe\nplaybook: content/pb-outempty.md\npieces: 3'
+readme tRecipeOutMulti
+mutate memory/builds/tRecipeOutMulti/README.md '/^slug: tRecipeOutMulti$/a authorized-by: recipe\nplaybook: content/pb-outmulti.md\npieces: 3'
 readme tRecipeNoGrain
 mutate memory/builds/tRecipeNoGrain/README.md '/^slug: tRecipeNoGrain$/a authorized-by: recipe\nplaybook: content/pb-nograin.md\npieces: 3'
 readme tRecipeNoN
@@ -2624,6 +2673,28 @@ out=$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS
 hit "$out" "set verdict recorded"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS)" "set verdict unchanged"
 
+# ---- BLOCKER (round-4): THE SET-CHECKS REFUSAL IS READ. The round-3 fold gave `declared_list` an
+# ---- rc 2 for an array left open at the end of its line and this call site was a bare assignment, so
+# ---- the refusal arrived as empty stdout, the declared-null escape matched it first, and
+# ---- `set-checks-recorded` returned MET with no set record, no verdict and no override entry. Two of
+# ---- the parser's three call sites branched on the status; the commit message said all three did.
+# ---- Check 28a now COUNTS them, and this arm is the behaviour behind that count.
+# ----
+# ---- ON ITS OWN PLAYBOOK, never the shared one: mutating `content/pb.md` here left it multi-line for
+# ---- the four DoD arms downstream, which is a fixture leaking across arms and the reason this is
+# ---- written the long way.
+# ----
+# ---- BOTH refusals are asserted. The leg reads the same declaration and refuses it too, so
+# ---- `pieces-complete` blocks alongside `set-checks-recorded` - two items, two messages, and the
+# ---- second is the one this arm exists for. Asserting only that the close blocked would pass on
+# ---- either alone.
+reset_tree
+run --preflight tSetMulti --keepalive-id k1 >/dev/null
+out=$(run --close tSetMulti)
+hit "$out" "the playbook at the pinned BASE opens a set-scoped check list it does not close on the same line, so this item would read the declared null and certify set coverage over a declaration nothing could parse"
+hit "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
+reset_tree
+
 # ---- MEDIUM 9 (round-3): the enumerator's OWN refusal survives the caller's pipeline. `fail` prints
 # ---- to stdout and the close piped the leg through `grep -m1 '^pieces='`, so an unresolvable sha, an
 # ---- undeclared records root, a git failure and an unterminated declaration all arrived as the same
@@ -2756,6 +2827,14 @@ hit "$(run --preflight tRecipeNoBlock --keepalive-id k1)" "the playbook at the p
 
 reset_tree
 hit "$(run --preflight tRecipeNoOut --keepalive-id k1)" "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against:"
+# ...and the `[]` HALF, which is the one an adopter reaches. Round 4, HIGH 4: `AUTH_OUTPUTS` came off
+# an ad-hoc `sed` while the two keys below it moved to the shared parser in the same commit, and the
+# guard compared that untrimmed text against the literal `[]` — so the kit's own template line passed
+# a refusal written to stop exactly it. This is round-2's M1 one key over, on the other member of
+# DOD_NO_OVERRIDE.
+hit "$(run --preflight tRecipeOutEmpty --keepalive-id k1)" "the playbook at the pinned BASE declares no output globs"
+# ...and the multi-line spelling, which reached the same guard as a bare `[`. An unarmed parse reds.
+hit "$(run --preflight tRecipeOutMulti --keepalive-id k1)" "the playbook at the pinned BASE opens an output-glob list it does not close on the same line, so the globs bounding where a recipe-mode run may write are unreadable and an unarmed parse must red rather than return the declared null"
 
 reset_tree
 hit "$(run --preflight tRecipeNoGrain --keepalive-id k1)" "the playbook at the pinned BASE declares no piece grain, and a grain is what says whether three changed files are three pieces or one, so refusing beats defaulting a count nobody declared:"
@@ -3409,7 +3488,11 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RE-MEASURED after the ROUND-3 fold, 2026-08-22, node d: unsharded 673, shard one 209, shard two 479, so
 # ---- 209 + 479 - 673 = 15 prologue arms — a third measurement at a third arm count, and the same 15. The six
 # ---- new arms all landed in region two, which is why shard one did not move at all.
-FLOOR_ASSERTIONS=653
+# ---- RE-MEASURED after the ROUND-4 fold, 2026-08-22, node d: unsharded 680, shard one 212, shard two 486,
+# ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
+# ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
+# ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
+FLOOR_ASSERTIONS=659
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -3429,9 +3512,9 @@ FLOOR_ASSERTIONS=653
 #
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
-PROLOGUE_ARMS=15
-FLOOR_SHARD_1=202
-FLOOR_SHARD_2=464
+PROLOGUE_ARMS=18
+FLOOR_SHARD_1=205
+FLOOR_SHARD_2=471
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

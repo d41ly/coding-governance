@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-6 — `pieces-complete`, the ninth core Definition-of-Done item
 
-**Status:** CLOSED · rev-9 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-10 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -180,6 +180,14 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-22 · the round-4 fold. Round 4 asked for the leg's EXIT STATUS to be read here, and
+  the answer is a measured NO recorded at the call site rather than left as a silent discard.
+  `--counts` runs the same per-playbook validity checks the full leg does, so the status reports a
+  curator or a step floor as loudly as a census defect; blocking on it was written and then reverted
+  after it collapsed nine specific DoD refusals into one generic sentence. The two refusals that DO
+  invalidate a census reach this caller by other routes: an unparseable `piece_checks` makes the leg
+  skip that playbook so no count line is printed at all, and an unparseable `set_checks` is refused
+  by `set-checks-recorded` reading the same blob one item down.
 - rev-9 · 2026-08-22 · the round-3 fold. The BASE sha `--counts` reads at is MANDATORY: `fact` returns empty with exit
   0 for an absent key, so the rev-8 pin was advisory in exactly the way the rev-7 per-field pin was — an empty fourth
   positional silently reverted to the working-tree parse, which is the file the run itself can edit. The leg now

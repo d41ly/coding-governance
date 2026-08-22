@@ -1447,7 +1447,16 @@ hit "$(run)" "the extracted declared-list parser does not return the members of 
 # it ever asserted.
 reset_tree; mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
 mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
-hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - exit status and answer follow: exited"
+hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = ["
+
+# ...and the COMMENTED spellings of the same array, which is round 4's blocker: the terminator test
+# ran on the RAW line, so a `]` anywhere in a trailing comment satisfied it and the strip below then
+# reduced the value to a bare `[`. The plain form still refused, which is exactly why the arm above
+# and the fold that wrote it both passed. Moving the strip back after the `case` is the mutation.
+reset_tree
+mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
+hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = [   # one per piece [see section 7]]"
 
 reset_tree; gut_parser declared_list '  ((this is not shell'
 hit "$(run)" "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
@@ -1476,8 +1485,96 @@ hit "$(run)" "the shipped template's own declaration line parses with its COMMEN
 # nothing, which the built-in specimens cannot distinguish from a fence that yielded everything. The
 # keys are INDENTED rather than renamed: the population awk anchors at column 0, and a rename to
 # `x_<key>` still matched it — the first attempt at this arm, caught by the arm staying green.
+# ---- ONE LOOP AT A TIME, because that is the finding. Round 4, MEDIUM 6: both template loops shared
+# ---- one counter, so the list half could go dark while the seven scalar keys satisfied the liveness
+# ---- assertion, or the reverse. The all-keys indent below kills BOTH and cannot tell them apart, so
+# ---- it is kept as the both-dark arm and each half now has its own.
 reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
-hit "$(run)" "the shipped template's declaration block yielded no key this check could parse, so only the built-in specimens ran and the template half of this assertion covered nothing:"
+out=$(run)
+hit "$out" "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it"
+hit "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it"
+
+# ...the LIST half alone. Indenting only the `= [` lines leaves the seven scalar keys reachable, so a
+# shared counter would still be satisfied and the check would stay green over a dead list loop.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[\)|  \1|'
+out=$(run)
+hit "$out" "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it"
+miss "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse"
+
+# ...and the SCALAR half alone, the mirror image. Indent every declaration that is NOT a list.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ { /^[a-z_][a-z_]*[[:space:]]*=[[:space:]]*\[/b; s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|; }'
+out=$(run)
+hit "$out" "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it"
+miss "$out" "the shipped template's declaration block yielded no LIST key this check could parse"
+
+# ---- THE SCALAR PARSER'S POSITIVE DIRECTION. Round 4, HIGH 5: the scalar half asserted only that no
+# ---- `#` survived, so a parser answering NOTHING for every input scored correct — measured, gutting
+# ---- it to an empty printf visited seven template keys with zero failures, and swapping its comment
+# ---- strip for a delete-the-whole-line sed left the whole kit green. The list half got specimens in
+# ---- the same commit; this one got none.
+reset_tree; gut_parser declared_scalar "  printf ''"
+hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: ["
+
+# ...and the subtler mutation the byte-compare cannot see, because two identically dead copies are
+# still identical: a strip that DELETES every commented line rather than trimming the comment off it.
+reset_tree
+mutate tools/unattended/check-playbook.sh '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
+mutate tools/unattended/unattended.sh     '/^declared_scalar() {/,/^}/ s|s/\[\[:space:\]\]\[\[:space:\]\]\*#\.\*\$//|/#/d|'
+hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of a non-empty declaration, which is the only direction that tells a working parser from one answering nothing - a parser that empties every commented line passes every other assertion here. Specimen, wanted and got follow: ["
+
+# ---- 28a — THE REFUSAL MUST BE READ AT EVERY CALL SITE. Round 4's second blocker: the driver's
+# ---- `set_checks` read was a bare assignment, so rc 2 arrived as empty stdout and the declared-null
+# ---- escape swallowed it. Two of three sites branched; the commit message said three did.
+reset_tree; mutate tools/unattended/unattended.sh 's|if ! _declared=$(declared_list "$_blob" set_checks); then|_declared=$(declared_list "$_blob" set_checks); if false; then|'
+hit "$(run)" "a parser that can REFUSE is called at a site that discards its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
+
+# ...and the rule's own liveness, in both its directions. Removing the refusal from the parser makes
+# the rule bind nothing, which must red rather than pass: a gate with no subject is not a green gate.
+reset_tree
+mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
+mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
+hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
+
+# ---- 28b — EVERY KEY BOUND TO THE PARSER ITS REAL READER CALLS. Round 4 HIGH 4 and MEDIUM 7: this
+# ---- check certified `outputs` and `step_floor` through parsers neither consumer called, while one
+# ---- was read by an ad-hoc `sed` and the other spliced its own comment's digits into a number.
+reset_tree; mutate tools/unattended/check-playbook.sh 's|  flo=$(declared_scalar "$body" step_floor)|  flo=$(printf %s "$body" \| sed -n "s/^step_floor[[:space:]]*=[[:space:]]*//p")|'
+hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: step_floor at"
+
+# ---- 28c — EVERY SHA DEREFERENCE PINNED. Round 4's third blocker, and the one the records claimed
+# ---- was already fixed: the leg's only sha read was plain `git show`, so a replace ref substituted
+# ---- the committed bytes the census grades on the item that takes no override.
+# ...and 28c's own LIVENESS. A predicate that stops matching reports the same clean nothing as a kit
+# with no sha reads left, and one of those is a gate and the other is a hole.
+reset_tree; mutate tools/unattended/check-playbook.sh 's|^GITSHOW() { git |GITSHOW() { GIT_NOT_A_COMMAND |'
+mutate tools/unattended/lib-unattended.sh 's|^GIT() { git |GIT() { GIT_NOT_A_COMMAND |'
+hit "$(run)" "this scan found no sha dereference anywhere in a kit whose whole job is reading committed blobs, so its predicate has stopped matching the code rather than the code having stopped dereferencing - an unpinned read would now pass unseen"
+
+# ---- 28a's OTHER liveness arm: a refusing parser whose call sites this check can no longer find.
+# ---- Renaming the calls (not the definition) leaves the refusal in place and the enumeration empty,
+# ---- which is the failure a hit-count of zero cannot distinguish from compliance.
+reset_tree
+mutate tools/unattended/unattended.sh     's|$(declared_list |$(declared_list_RENAMED |g'
+mutate tools/unattended/check-playbook.sh 's|$(declared_list |$(declared_list_RENAMED |g'
+hit "$(run)" "a refusing parser was found and NO call site of it was, so this rule was asserted over an empty population and would stay green with every caller discarding the status - the enumeration pattern has stopped matching the way this kit calls its own parsers"
+
+# ---- 28b's liveness: a template whose fence yields no key to bind.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
+hit "$(run)" "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set"
+
+# ---- the scalar SPECIMEN loop's own exec branch, which is a different branch from the template
+# ---- loop's. Gutting the body to unparseable shell reaches the specimens first.
+reset_tree; gut_parser declared_scalar '  ((this is not shell'
+hit "$(run)" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
+
+# ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
+# ---- `check-playbook.sh` excludes this template from its population, so this loop is its only
+# ---- grader: a template edit the driver would mis-parse into MET is otherwise blessed green.
+reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
+hit "$(run)" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
+
+reset_tree; mutate tools/unattended/check-playbook.sh 's|^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show|GITSHOW() { git show|'
+hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 reset_tree
 
 # ---- check 28 (round-2 fold): the inlined parser is ONE answer in two files, and the answer is the
@@ -1878,7 +1975,10 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- region two, which is why shard one did not move. NOTE for whoever reads the line above: the pin it
 # ---- sat under was 324, which no measurement line here accounts for — it was raised against a 334 that
 # ---- nobody recorded. A floor whose measurement is missing is a number, so this line records all three.
-FLOOR_ASSERTIONS=326
+# ---- RE-MEASURED after the ROUND-4 fold, 2026-08-22, node d: unsharded 379, shard one 86, shard two 293,
+# ---- and 86 + 293 = 379, so this file still has no prologue arm. The twelve new arms cover the three
+# ---- structural rules check 28 grew this round and the two liveness directions of each.
+FLOOR_ASSERTIONS=367
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -1895,7 +1995,7 @@ FLOOR_ASSERTIONS=326
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=83
-FLOOR_SHARD_2=243
+FLOOR_SHARD_2=284
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

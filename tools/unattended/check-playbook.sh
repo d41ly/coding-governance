@@ -105,7 +105,20 @@ fi
 GITLS() { git ls-files -- "$1" 2>/dev/null; }
 # CR-stripped like the on-disk read it stands in for, so a CRLF-committed playbook parses the same
 # way through both paths — two readers of one file giving two answers is the class this replaces.
-GITSHOW() { git show "$1" 2>/dev/null | tr -d '\r'; }
+# THE PINNED READ, and both suppressions, because they are not interchangeable and neither covers
+# both. A forced replace ref rewrites what a sha dereference returns without touching one tracked
+# byte, and ONLY `-c core.useReplaceRefs=false` suppresses that; a graft file needs GIT_GRAFT_FILE,
+# and a `-c` is per-invocation so nothing propagates it to a child. This leg is SPAWNED by the driver
+# and inherits the driver's exported graft pin but not its `-c`, which is why the pin is spelled here
+# and not assumed.
+#
+# This is the single read producing every declaration the `--counts` census grades, and that census
+# is the sole evidence for `pieces-complete`, which takes no override. Round 4 measured the lever end
+# to end: one replace ref flipped the census from verified=0 to verified=2 at an unchanged, honest
+# sha. Round 3 filed it, and the fold recorded the fix in three documents without it reaching this
+# line - check 28c is why that cannot happen again.
+export GIT_GRAFT_FILE=/dev/null
+GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show "$1" 2>/dev/null | tr -d '\r'; }
 # The record is found by its OWN `piece:` field rather than by re-deriving the writer's path rule.
 # Re-deriving would be a second implementation of the writer's naming, which confirms it rather than
 # checks it — and the two would drift the first time either changed.
@@ -139,13 +152,25 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   #
   # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
   # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
+  # THE COMMENT COMES OFF BEFORE THE TERMINATOR TEST, and the order is the whole fix. Round 4's
+  # blocker: this ran the `case` on the RAW line, so a `]` anywhere in a trailing comment satisfied
+  # the closed arm, the strip below then reduced the value to a bare `[`, and a legal multi-line
+  # array parsed to the DECLARED NULL at rc 0 - the round-3 blocker restored by the commit that
+  # fixed it. `piece_checks = [   # one per piece [see section 7]` is ordinary TOML authoring, and
+  # the kit's own template puts a trailing comment on every declaration line.
+  #
+  # THE STRIP REQUIRES WHITESPACE BEFORE THE `#`, so a legal `["a#b"]` survives it. A `#` that IS
+  # preceded by whitespace inside a quoted member (`["a", "b #c"]`) now REFUSES rather than
+  # corrupting silently - the honest outcome for a line-oriented shell parser that cannot tokenise
+  # TOML, and the reason this returns rather than guessing.
   local raw
-  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1)
+  raw=$(printf '%s\n' "$1" | sed -n "s/^$2[[:space:]]*=[[:space:]]*//p" | head -1 \
+        | sed 's/[[:space:]][[:space:]]*#.*$//')
   case "$raw" in
     *'['*']'*) ;;
     *'['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | sed 's/[[:space:]][[:space:]]*#.*$//' | tr -d '\r"' \
+  printf '%s\n' "$raw" | tr -d '\r"' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
     | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
 }
@@ -189,7 +214,15 @@ for pb in $PLAYBOOKS; do
 
   # ---- 3: the declared STEP SELECTOR and its shrink-only floor.
   sel=$(declared_scalar "$body" step_selector)
-  flo=$(printf '%s\n' "$body" | sed -n 's/^step_floor[[:space:]]*=[[:space:]]*//p' | head -1 | tr -dc '0-9')
+  # THROUGH THE SHARED PARSER, like every sibling key. This was the one fence key left on an ad-hoc
+  # pipeline, and `tr -dc '0-9'` concatenated every digit in the trailing comment into the number:
+  # `step_floor = 3     # at least 3, per section 5 and F2` parsed to 3352 and red a valid playbook
+  # naming a floor its author never wrote, while `step_floor =    # TBD 5` parsed to 5 and bypassed
+  # the no-floor refusal below with a number nobody declared.
+  flo=$(declared_scalar "$body" step_floor)
+  case "$flo" in
+    ''|*[!0-9]*) [ -z "$flo" ] || { fail 3 "a playbook declares a step floor that is not a number, and laundering it through a digit filter would invent one out of whatever prose follows - floor and playbook follow: [$flo] in $pb"; flo=""; } ;;
+  esac
   if [ -z "$sel" ]; then
     fail 3 "a playbook declares no step selector, and a kit-fixed one either misses a playbook's steps entirely - reporting every step tagged over an empty set - or selects its prose; playbook: $pb"
     continue

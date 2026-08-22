@@ -28,6 +28,17 @@ observation still reproduces — but three of them were being answered by an arm
 to fail, which is the same green-by-absence the ledger was written to end. The round-3 fold staged a RED
 for each before re-arming it. The mechanism under unit 5's AC1 and unit 6's AC4 is now the round-3 one.
 
+**Round 4 found three blockers in that fold, and one of them is about this ledger rather than the
+code.** Round-3's `GITSHOW` repair NEVER LANDED: the function was byte-identical at both ends of the
+range while the commit message, spec 5 rev-9 and the paragraph above all recorded the pin as shipped.
+Three records, one fix, no fix — and 92 gate legs could not see the difference, because nothing
+compared a claim against a file. The round-4 fold lands the pin and adds check 28c, which enumerates
+every sha dereference in the kit and reds an unpinned one, so that particular divergence now costs a
+red bar rather than a review round. The two structural gates beside it (28a, the refusal must be read
+at every call site; 28b, every template key bound to the parser its real reader calls) were each
+observed RED against the live tree before the fixes went in, which is the discipline this ledger's own
+preamble was written about.
+
 Suite counts at the time of writing: driver 673, leg 337, playbook 72, cross-component 19.
 
 ## TOOL-dScriptedRepeat-5 — the per-piece record

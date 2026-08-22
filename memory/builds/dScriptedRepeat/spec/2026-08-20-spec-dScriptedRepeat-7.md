@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** CLOSED · rev-9 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-10 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,6 +166,12 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-22 · the round-4 fold. `set-checks-recorded` READS the refusal. Rev-9 said
+  `set_checks` inherits the parser refusal because one parser meant one fix; the driver's call site
+  was a bare assignment, so rc 2 arrived as empty stdout, the declared-null escape matched it, and
+  the item returned MET with no record and no override entry. Two of the parser's three call sites
+  branched on the status. Check 28a now enumerates them, which is the part that generalises: the rule
+  binds any parser whose own body carries a nonzero return, derived rather than listed.
 - rev-9 · 2026-08-22 · the round-3 fold. `set_checks` inherits the parser refusal on a multi-line array — one parser
   meant one fix, which is what the rev-8 consolidation bought and what rev-8 itself did not spend. The declared-null
   escape on `set-checks-recorded` is an exact match rather than a prefix match, so a declared check whose name merely
