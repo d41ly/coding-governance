@@ -1519,8 +1519,20 @@ n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
              grep -oE '^CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
-_hy_derived=$(printf '%s
-' "$_hy_ids" | grep -c .)
+_hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
+
+
+# WHAT THIS COUNT CANNOT SEE, stated because the gap is real and was paid for. `sort -u` folds two
+# checks that share an id into ONE, so after a cross-build merge the hygiene engine and the
+# unattended leg each carried two different check 22s and this total still matched the README. A
+# ratchet over a SET is blind to duplication inside it, by construction.
+#
+# NOT GATED, and the candidate predicate is recorded so nobody re-derives it hopefully: flagging an
+# id whose `fail` sites are non-contiguous looks right and REDS CHECKS 5 AND 6 on this tree, because
+# each legitimately has a main call site plus a stale-line guard for its own registry, with other
+# checks in between. Measured before wiring and dropped for that reason. Telling that shape from a
+# real collision needs per-check block declarations the engine does not carry. DOCUMENTED MANUAL
+# CHECK: when adding a check, grep the id first - across BOTH kits, because the collision crossed them.
 # ANCHORED ON THE ROW, NOT ON THE DASH. The first spelling was `the gate . [0-9]+ checks`, and the
 # separator is an EM DASH - three bytes in UTF-8, which a single `.` matches one byte of under this
 # repo's own ambient locale. The read came back EMPTY and the arm refused, which is the behaviour it

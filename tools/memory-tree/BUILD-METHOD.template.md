@@ -7,10 +7,10 @@ Binding for any build of more than one pass, attended or not. Template §1 defin
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
 **Budget: ≤24 KB, ≤310 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed — an owner call, because the figure is a stated constraint of a It rose again to ≤24 KB / ≤310 on 2026-08-21, also an owner call:
-two builds added rules to this file concurrently - aBoundedVerdict's M3 veto-collapse, FACT-QUESTION and
-vacuous-selector rules, and dUnstalledConvoy's inlined M12 - and both parents fitted the old cap on their own.
-Nothing was droppable, so the constraint moved rather than the content. No gate enforces this pair, which is why
+It rose from ≤20 KB / ≤250 lines when M12 landed, and again to ≤24 KB / ≤310 on 2026-08-21 — both owner
+calls, because the figure is a stated constraint of a document rather than a measurement of one. The
+second: two builds added rules here concurrently and both parents fitted the old cap alone, so nothing
+was droppable and the constraint moved instead of the content. No gate enforces this pair, which is why
 exceeding it silently was the one option not taken.
 governance carrier and M3's veto 2 makes changing one an owner turn rather than an agent's.
 

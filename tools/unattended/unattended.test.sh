@@ -3101,9 +3101,14 @@ echo "MARK lander-marker" >&2
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 mkconf; printf 'LANDER_MARKER="tmarker"\n' >> .unattended.conf
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+# THE REMOTE MUST ADVERTISE HEAD, because the marker gate is now scoped to the REMOTE arm. It used to
+# run before anchor selection and fire on any LANDING record; that ordering made main's local-landing
+# fallback unreachable, so the gate moved and these fixtures follow it. Pushing HEAD to the default
+# branch is what puts this run on the remote anchor.
 GCD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
 rm -f "$GCD/tmarker"
 fixture
+git push -q -f origin HEAD:main 2>/dev/null
 hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was ["
 
 # A MARKER VALUE CARRYING A SEPARATOR is refused, because the key is a bare NAME resolved against the
@@ -3113,11 +3118,13 @@ mkconf; printf 'LANDER_MARKER=".git/tmarker"
 ' >> .unattended.conf
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
+git push -q -f origin HEAD:main 2>/dev/null
 hit "$(run --landed tRun)" "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named"
 mkconf; printf 'LANDER_MARKER="tmarker"
 ' >> .unattended.conf
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
+git push -q -f origin HEAD:main 2>/dev/null
 
 # a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
 # shas, because "stale marker" and "HEAD moved since the push" are different faults with different
@@ -3125,27 +3132,30 @@ fixture
 printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
 hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted"
 
-# ...and the marker naming THIS commit PASSES THE MARKER CHECK. Stated exactly that way, because
-# `--landed` does NOT succeed in this fixture and an arm claiming it did would be false: the unit
-# branch is one commit ahead of the anchor by construction, so check 32 refuses on ancestry — the
-# same reason the check-32 arm 1100 lines above uses this identical prep. Two `miss`es alone could
-# not tell "the marker was accepted" from "the marker block never ran", so the POSITIVE assertion
-# here is that execution reached the ancestry check, which sits after the marker block.
-printf 'landed main at %s by push-main\n' "$(git rev-parse HEAD)" > "$GCD/tmarker"
-out=$(run --landed tRun)
-hit "$out" "HEAD is not an ancestor of the tip the remote advertises"
-miss "$out" "the lander marker names a different commit"
-miss "$out" "the lander wrote none"
-
-# ...and the refusal NAMES THE DIRECTORY THIS SIDE RESOLVED, so a local resolution fault is legible
-# in it. The separate refusal that used to cover that case was DELETED: it could not fire, because
-# this driver exits at startup when the repository does not resolve, and an unarmable branch is an
-# assertion about nothing. Measured before deleting: `GIT_COMMON_DIR=/nonexistent` never reaches the
-# marker block at all - the driver refuses as not-a-git-repo first.
-rm -f "$GCD/tmarker"
-hit "$(run --landed tRun)" "looked in the git common dir this side resolved, which was ["
+# ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
+# assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
+# the anchor and `--landed` could never succeed here. Now that the marker gate is scoped to the
+# REMOTE arm the fixture pushes HEAD to the default branch, so the accepting path is reachable and is
+# asserted directly rather than inferred from which refusal came back.
 printf 'landed main at %s by push-main
 ' "$(git rev-parse HEAD)" > "$GCD/tmarker"
+out=$(run --landed tRun)
+miss "$out" "the lander marker names a different commit"
+miss "$out" "the lander wrote none"
+miss "$out" "HEAD is not an ancestor of the tip the remote advertises"
+same "the run reached LANDED with the marker accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
+
+# ...and a MISSING marker on that same accepting path refuses, naming the directory this side
+# resolved so a local resolution fault is legible. Its own setup, because the arm above lands the
+# record and a terminal record refuses this verb for an unrelated reason.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+rm -f "$GCD/tmarker"
+hit "$(run --landed tRun)" "looked in the git common dir this side resolved, which was ["
 
 # an UNDECLARED key does not refuse: an adopter who has not adapted their lander is not wedged by a
 # key they have never heard of. The asymmetry is deliberate and this is the arm that pins it.
@@ -3153,6 +3163,7 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 mkconf
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
+git push -q -f origin HEAD:main 2>/dev/null
 out=$(run --landed tRun)
 miss "$out" "the project declares a lander marker and the lander wrote none"
 rm -f .git/tmarker
@@ -3588,57 +3599,25 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
 FLOOR_ASSERTIONS=500
-# ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
-# ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is
-# ---- recorded here rather than left for the next reader to re-derive from whichever half they open.
+# ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
+# ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
+# ---- mutually exclusive triples as though each described the merged tree, none of them in order and
+# ---- only the last agreeing with the constants in force. A comment that is the sole record of a
+# ---- manual check cannot afford to be a pile of drafts.
 # ----
-# ---- MAIN's argument: discount the floor ~15% so it does not red on the first arm somebody
-# ---- legitimately removes. THIS BRANCH's argument: a 338 floor under a 398 executed count is a
-# ---- SIXTY-ARM SLACK, and that slack is exactly what let two whole blocks be appended past an
-# ---- unconditional `exit` and never run, twice in one session, while the suite reported PASS and
-# ---- `check-arms` text-matched every stranded arm.
+# ---- MEASURED on the integrated tree, 2026-08-22: unsharded 622, shard one 205, shard two 430.
+# ---- Floors carry main's own discount, ~80.5% of observation, applied unchanged rather than
+# ---- re-chosen: 500 / 165 / 346. Not 100% of observation, which would red on the first arm anyone
+# ---- legitimately prunes; not the ~60-arm slack this branch inherited either, which is what let two
+# ---- blocks be appended past an unconditional `exit` and never run while the suite printed PASS.
 # ----
-# ---- Both are right and they pull opposite ways, so the headroom is ~3%: large enough that pruning
-# ---- one arm is not a red, small enough that a stranded BLOCK is. The failure this pin exists to
-# ---- catch is measured in tens of arms, never in ones.
-# ----
-# ---- MEASURED unsharded 519, shard one 205, shard two 327. 205 + 327 - 519 = 13 prologue arms, both regions pay them; unchanged by this merge, which is what says the added arms distributed across both regions rather than piling into one.
-# THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
-# which is the defect the spec audit caught before this was written.
-#
-# The per-shard floors carry the SAME proportional discount the unsharded pin does — ~80.5 % of the
-# measured count — rather than pinning at 100 % of observation, which would red on the first arm
-# anyone legitimately removes. That ratio is main's own: 338/419, 165/205 and 183/227 all sit at
-# 0.805, and it is applied unchanged here rather than re-chosen.
-#
-# RE-MEASURED 2026-08-21 on the merged tree, because a branch adding 690 lines of arms to this file
-# inherited floors computed WITHOUT them. Floors are MINIMUMS, so the stale numbers would have passed
-# — the ratchet would have slackened and no gate could have said so. Measured: unsharded 520,
-# shard one 205, shard two 328. Region ONE is unchanged at 205, which is the check that the new arms
-# all landed in region two where they were put.
-#
-# PROLOGUE_ARMS is the arms BOTH regions pay, and it is DERIVED rather than reasoned about:
-# n(shard 1) + n(shard 2) - n(unsharded). Measured on node a, 2026-08-21: unsharded 419, shard one
-# 205, shard two 227. 205 + 227 - 419 = 13.
-#
-# RE-DERIVED AGAIN after integrating dUnstalledConvoy, which added its own arms to both regions:
-# 205 + 430 - 622 = 13. The identity has now survived two independent sets of additions, which is the
-# only evidence available that each build's arms sit inside ONE region rather than straddling the
-# split - no static predicate over the floors can see it, so this re-derivation IS the check.
-#
-# RE-DERIVED on the merged tree the same day, after 690 lines of arms landed in region two:
-# 205 + 328 - 520 = 13. The identity survives the change, which is the only evidence that the added
-# arms are inside ONE region rather than straddling the split — and per the note below, no static
-# predicate over the FLOORS can see that, so this re-derivation is the check.
-#
-# That relation is a MEASUREMENT recorded in this build's record, NOT a gate. The floors below are
-# discounted, so no static predicate over these three constants can see it — and asserting it over
-# FLOORS rather than over executed counts is arithmetically false, which is exactly how the first
-# draft of this unit's spec shipped an identity wrong by 60. It is a documented manual check, and
-# this comment is where it is documented.
-#
-# The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
-# measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
+# ---- THE PROLOGUE IDENTITY, and this comment IS the check. PROLOGUE_ARMS is the arms both regions
+# ---- pay, DERIVED as n(shard 1) + n(shard 2) - n(unsharded): 205 + 430 - 622 = 13. It has now held
+# ---- across two independent sets of additions, which is the only available evidence that each
+# ---- build's arms sit inside ONE region rather than straddling the split. No static predicate over
+# ---- the FLOORS can see it - they are discounted, so the arithmetic does not close - and asserting
+# ---- it over floors rather than executed counts is how this unit's first draft shipped an identity
+# ---- wrong by 60. Re-derive it by hand when the regions change.
 PROLOGUE_ARMS=13
 FLOOR_SHARD_1=165
 FLOOR_SHARD_2=346

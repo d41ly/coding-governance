@@ -12,9 +12,10 @@
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
-#   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --review <slug> --subject <id> --verdict <TOKEN> --blockers <N>  # a review round
 #   unattended.sh --abort <slug> --reason <text> --code <halt-code>           # end it, with the reason on the record
+#   unattended.sh --attest <slug> --item <item> [--value <text>]   # an agent-attested DoD item
+#   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -1640,31 +1641,6 @@ verb_landed() { # slug
   # way on both sides, and the key is now a bare name.
   local _lm_head _lm_gcd _lm_path
   _lm_head=$(GIT rev-parse HEAD)
-  if [ -n "$LANDER_MARKER" ]; then
-    # A BARE NAME, and the key says so - so a value carrying a separator is REFUSED rather than joined
-    # into a path. Joined, it resolves somewhere the declaration never named, and the lander and this
-    # verb can disagree about where while both look like they are following the conf.
-    case "$LANDER_MARKER" in
-      */*|*"\\"*|.|..) fail 34 "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named: $LANDER_MARKER"
-         return 1 ;;
-    esac
-    _lm_gcd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _lm_gcd=""
-    _lm_path="$_lm_gcd/$LANDER_MARKER"
-    # NO SEPARATE REFUSAL FOR AN UNRESOLVABLE COMMON DIR, and that is a deletion rather than an
-    # oversight. One was written and could never fire: this driver resolves ROOT with `rev-parse
-    # --show-toplevel` at startup and exits when that fails, so by the time this runs the repository
-    # is known good and `--git-common-dir` cannot fail. An unarmable branch is an assertion about
-    # nothing. What the branch was FOR - not blaming the lander for a fault on this side - is kept by
-    # printing the directory this side resolved, so an empty one is visible in the refusal itself.
-    if [ ! -f "$_lm_path" ]; then
-      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was [$_lm_gcd], for: $_lm_path"
-      return 1
-    fi
-    if ! grep -qF -- "$_lm_head" "$_lm_path" 2>/dev/null; then
-      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted $_lm_head, marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
-      return 1
-    fi
-  fi
   # OBSERVE_ANCHOR STAYS MANDATORY ON BOTH ARMS. It is what supplies AREF - the local arm needs the
   # default branch's NAME and takes it from the remote's own advertisement, never from a local ref or
   # from the environment, both of which this kit records as a reproduced bypass. Its checks 22 through
@@ -1728,6 +1704,44 @@ verb_landed() { # slug
   # worktree has moved on since the merge — which is the ordinary case, not a corner one.
   local wit="$head"
   [ "$akind" = local ] && wit="$rbtip"
+
+  # THE MARKER IS A REMOTE-ARM OBLIGATION, and gating it here rather than above the arms is the whole
+  # of this fix. It used to run BEFORE anchor selection and return on a missing marker, so on exactly
+  # the state the local arm exists for - merged into local main, the push did not land HEAD -
+  # push-main has not written a marker (it writes one only inside its rc=0 branch) and the run could
+  # not reach the fallback at all. Two features that each work, deadlocking in composition.
+  #
+  # Compared against the WITNESS the taken arm validated, not against HEAD, for the reason the witness
+  # itself exists: on the local arm HEAD is a commit this verb never examined.
+  if [ "$akind" = remote ] && [ -n "$LANDER_MARKER" ]; then
+    # A BARE NAME, and the key says so - so a value carrying a separator is REFUSED rather than joined
+    # into a path. Joined, it resolves somewhere the declaration never named, and the lander and this
+    # verb can disagree about where while both look like they are following the conf.
+    case "$LANDER_MARKER" in
+      */*|*"\\"*|.|..) fail 34 "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named: $LANDER_MARKER"
+         return 1 ;;
+    esac
+    _lm_gcd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _lm_gcd=""
+    _lm_path="$_lm_gcd/$LANDER_MARKER"
+    # NO SEPARATE REFUSAL FOR AN UNRESOLVABLE COMMON DIR, and that is a deletion rather than an
+    # oversight. One was written and could never fire: this driver resolves ROOT with `rev-parse
+    # --show-toplevel` at startup and exits when that fails, so by the time this runs the repository
+    # is known good and `--git-common-dir` cannot fail. An unarmable branch is an assertion about
+    # nothing. What the branch was FOR - not blaming the lander for a fault on this side - is kept by
+    # printing the directory this side resolved, so an empty one is visible in the refusal itself.
+    if [ ! -f "$_lm_path" ]; then
+      fail 34 "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was [$_lm_gcd], for: $_lm_path"
+      return 1
+    fi
+    # AGAINST THE WITNESS, not HEAD. They are the same commit on this arm, which is exactly why the
+    # distinction is worth writing down: the gate is scoped to `remote` today, and a future arm that
+    # validates something other than HEAD would silently start grading the wrong commit.
+    if ! grep -qF -- "$wit" "$_lm_path" 2>/dev/null; then
+      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted $wit, marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
+      return 1
+    fi
+  fi
+
   set_fact "$rel" witness "$wit" || return 1
   # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
   # later reader, silently promoting a record to the stronger claim.

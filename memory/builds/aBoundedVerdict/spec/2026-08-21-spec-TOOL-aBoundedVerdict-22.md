@@ -56,14 +56,14 @@ red and all twelve are already exempt by `FORK_MARK_CUTOFF`; zero at or after it
 
 ## 6. Acceptance criteria
 
-- `bash tools/memory-tree/check-verdict-epoch.sh` exits 0.
-- `bash tools/memory-tree/check-memory-hygiene.sh` exits 0.
-- `is_published` returns cannot-tell when ANY advertised tip is unreadable, not only when all are —
-  exercised by a fixture advertising one present tip and one absent.
-- A §8 opening with `None of the forks below are resolved.` above an unmarked fork reads FORKED in
-  both readers, and `none - ...` above a marked fork still reads READY.
-- The marker contract carries case, denial and N/A rows.
-- The five suites pass, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
+- AC1 — `bash tools/memory-tree/check-verdict-epoch.sh` exits 0.
+- AC2 — `bash tools/memory-tree/check-memory-hygiene.sh` exits 0.
+- AC3 — `is_published` returns cannot-tell when ANY advertised tip is unreadable, not only when all
+  are — exercised by a fixture advertising one present tip and one absent.
+- AC4 — a §8 opening with `None of the forks below are resolved.` above an unmarked fork reads FORKED
+  in both readers, and `none - ...` above a marked fork still reads READY.
+- AC5 — `tools/memory-tree/marker-contract.test.sh` carries case, denial and N/A rows.
+- AC6 — the five suites pass, and `GATE_FULL=1 bash tools/run-gates/run-gates.sh` is green.
 
 ## 7. Gates
 

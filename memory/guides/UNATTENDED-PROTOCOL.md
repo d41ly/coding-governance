@@ -386,9 +386,6 @@ what preserves the strong claim wherever the strong claim is available.
   names HEAD exactly — equality, not ancestry, so any commit made between the push and this verb is a
   refusal. It does not refuse the default branch, because the mandated lander refuses every other
   one, so landing happens exactly where that guard would otherwise fire.
-- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason and both agent-attested
-  items, and no machine item: an aborted run landed nothing, so the machine items assert obligations
-  it does not have, while the keepalive is still orphaned and the parked decisions still unseen.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the
   unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
   three acts; this verb is the record. It RECORDS rather than acts, because a row derived from the

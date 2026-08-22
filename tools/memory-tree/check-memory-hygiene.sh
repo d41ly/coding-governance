@@ -1121,7 +1121,7 @@ if [ -n "$alcut" ]; then
   # predate the cutoff is a real empty and says so below, but a listing that comes back empty
   # while spec files exist is a broken selector, and it reds. That distinction is the whole
   # difference between an announced skip and a check that is dark and looks identical to green.
-  pop_guard 22 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
+  pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
 ' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
   for sp in $alspecs; do
     case "$(basename "$sp")" in
@@ -1162,10 +1162,10 @@ if [ -n "$alcut" ]; then
       fi
     done
   done
-  [ -z "$algap" ] || fail 22 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
-  [ -z "$albad" ] || fail 22 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
-  [ -z "$alnolab" ] || fail 22 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
-  [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 22 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
+  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
+  [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
+  [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
+  [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
 fi
 
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the

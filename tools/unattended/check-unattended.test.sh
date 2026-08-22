@@ -313,7 +313,7 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
 # case arm, so it never enters the derived population and exempting it removed nothing. The
 # assertion below caught that on its first run, which is the entire reason it exists.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers'
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -324,7 +324,10 @@ done
 # rather than widening the set the join grades.
 _nverbs=$(printf '%s
 ' "$verbs" | grep -c .)
-n=$((n+1)); [ "$_nverbs" -ge 12 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 12, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# FOURTEEN, the verbs this kit actually dispatches. It was 12 against a population of 18 - four of
+# main's flags had not been denied, so the count was inflated and two verbs could have stopped being
+# dispatched with the floor still green. A floor set against a polluted population pins nothing.
+n=$((n+1)); [ "$_nverbs" -ge 14 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 14, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
 # ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
 # population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
 # the cheap proxy is that it must still appear as a case arm in the driver.
@@ -1984,6 +1987,30 @@ land_as() {            # anchor-kind · witness
   [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
   git add -A
 }
+
+# ---- ADV_NAME IS GRADED, and before this nothing distinguished the working parse from an empty one.
+# ---- The local arm reaches `refs/heads/$ADV_NAME`; with ADV_NAME empty the test short-circuits, the
+# ---- run takes the skip line, and every surrounding assertion still passes. The parse is the single
+# ---- most consequential rewrite of the cross-build merge - main added it on an unbounded
+# ---- substitution and it was grafted onto the bounded capture - so it gets an arm that fails when it
+# ---- resolves to nothing.
+reset_tree
+land_as local "$(git rev-parse main)"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch"
+
+# ...and the CONTROL that proves the name came from the ADVERTISEMENT rather than coinciding with
+# `main`. The origin's HEAD is repointed at a branch called `trunk`; a parse that hardcodes or guesses
+# the default name passes the arm above and fails here.
+reset_tree
+git branch -f trunk main >/dev/null 2>&1
+git push -q origin trunk 2>/dev/null
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/trunk
+land_as local "$(git rev-parse trunk)"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+reset_tree
 
 # a REMOTE record whose witness never reached the remote is the claim this half exists to refuse
 reset_tree

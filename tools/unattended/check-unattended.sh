@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. TWENTY-THREE checks over the tree.
-# check-unattended.sh - the merge-bar leg for the unattended-run kit. Its check ids run 1..22; the
-# count is NOT retyped in prose anywhere, because it has now been wrong twice - derive it with
+# check-unattended.sh - the merge-bar leg for the unattended-run kit. The check COUNT is written in no
+# prose here, because it has now been wrong twice and a cross-build merge left this header stating two
+# different totals at once. Derive it with
 # `grep -oE 'fail [0-9]+' tools/unattended/check-unattended.sh | grep -oE '[0-9]+' | sort -un` -
 # the second grep is load-bearing: `sort -un` on `fail 7` sorts the WORD, reads every line as 0, and
 # prints exactly one.
@@ -475,13 +475,18 @@ timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
 # its target variable is assigned from `mktemp` in this same file — a property check rather than a
 # blessed spelling. A parameter would defeat it, and with exactly ONE caller here the parameter bought
 # nothing anyway. `adv_f` is set by that caller before this runs.
+# THE NAMED PINS, sourced from the kit library above. Moving GIT() into that library gave the
+# DRIVER the constants and left these two sites spelling the values literally, which is exactly
+# the drift naming them was meant to prevent: this helper cannot call GIT(), because it needs
+# the pins as argv to `timeout`, so it is the one caller that must spell them and the one that
+# silently goes stale when they change.
 observe_remote() { # <git args…> -> rc (124 = the bound fired); output lands in $adv_f
   local rc
   if [ "$REMOTE_BOUND_LIVE" = 1 ]; then
     timeout -k 5s "$REMOTE_BOUND" \
       env GIT_TERMINAL_PROMPT=0 \
           "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
-      git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
+      git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" \
           -c credential.interactive=never \
           -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
           "$@" >"$adv_f" 2>/dev/null
@@ -489,7 +494,7 @@ observe_remote() { # <git args…> -> rc (124 = the bound fired); output lands i
   else
     env GIT_TERMINAL_PROMPT=0 \
         "GIT_SSH_COMMAND=ssh -o ConnectTimeout=$REMOTE_CONNECT_BOUND -o BatchMode=yes" \
-    git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false \
+    git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" \
         -c credential.interactive=never \
         -c "http.lowSpeedLimit=$REMOTE_LOWSPEED_BYTES" -c "http.lowSpeedTime=$REMOTE_BOUND" \
         "$@" >"$adv_f" 2>/dev/null
@@ -1027,7 +1032,11 @@ elif [ -f "$LIVEDOC" ]; then
   # but declared nowhere" is a checker grading the wrong population, and muting them would take an
   # exclusion list that then hides a real dead key.
   sec8=$(awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f' "$LIVEDOC")
-  doc_keys=$(printf '%s\n' "$sec8" | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
+  # THE FIRST TABLE CELL, not the whole section. The extractor read every backticked ALL-CAPS token in
+  # section 8, so a PROSE mention of a phase name - main's `LANDED` - entered the key set as a phantom
+  # and red this leg on the merged tree. Neither parent had both the prose and the check. Reading the
+  # key column keeps the `·`-joined KEEPALIVE_CREATE/KEEPALIVE_DELETE row, which yields both keys.
+  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
   # THE KIT'S EXAMPLE CONF IS THE REVERSE POPULATION, not the adopting project's. A project declares
   # the keys it needs and leaves the optional ones out, so "documented but not declared here" is the
   # NORMAL state of any real conf - graded against one, this check red six keys on a conforming
@@ -1402,15 +1411,15 @@ for f in $RUNS; do
   rs_cut=${UNITS_REGION_CUTOFF:-}
   rs_date=$(GIT show -s --format=%cs "$rsbase" 2>/dev/null || true)
   if [ -z "$rsb" ]; then
-    report "check 22 skipped for $f — no build README at the baseline commit, so there is no authorized roster to compare against"
+    report "check 24 skipped for $f — no build README at the baseline commit, so there is no authorized roster to compare against"
   elif ! printf '%s\n' "$rsb" | grep -qxF -- '<!-- gen:build-units -->'; then
-    report "check 22 skipped for $f — the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
+    report "check 24 skipped for $f — the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
   elif [ -n "$rs_cut" ] && [ -n "$rs_date" ] && ! printf '%s\n%s\n' "$rs_cut" "$rs_date" | sort -C; then
-    report "check 22 skipped for $f — the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
+    report "check 24 skipped for $f — the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
   elif ! rs_was=$(printf '%s\n' "$rsb" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
-    report "check 22 skipped for $f — the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+    report "check 24 skipped for $f — the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
   elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
-    report "check 22 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
+    report "check 24 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
   elif ! printf '%s
   ' "$rs_was" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+'; then
     # AN EMPTY BASELINE ROSTER IS NOT A COMPARISON, and it is not vacuously TRUE either — it is
@@ -1418,7 +1427,7 @@ for f in $RUNS; do
     # own fixture, whose run carries a live phase from its first commit, so the baseline predates
     # every spec. That is exactly the prompt-authorized shape, where a run legitimately authors
     # its whole roster after preflight. Skipping is the honest answer and it says so out loud.
-    report "check 22 skipped for $f — the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+    report "check 24 skipped for $f — the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
   else
     rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
     # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
@@ -1428,13 +1437,13 @@ for f in $RUNS; do
       id_in "$rs_was" "$rsid" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
-      fail 22 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
+      fail 24 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
     done
     # RETIRED units: a status that is WONTDO now and was not then owes a retire or a supersede.
     for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
       id_rows "$rs_was" "$rsid" | grep -q '| WONTDO |' && continue
       printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
-      fail 22 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
+      fail 24 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
     done
     # A SUPERSESSION THAT NEVER LANDED ITS REPLACEMENT is a retirement wearing a better name.
     # A `for`, never a `| while`: `fail` in a pipeline subshell sets a status the parent never
@@ -1442,7 +1451,7 @@ for f in $RUNS; do
     for rssucc in $(printf '%s\n' "$rs_rows" | grep -oE 'item supersede [A-Za-z0-9-]+ -> [A-Za-z0-9-]+' | awk '{print $NF}' | sort -u); do
         [ -n "$rssucc" ] || continue
         id_in "$rs_now" "$rssucc" && continue
-        fail 22 "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name: $rssucc in $f"
+        fail 24 "a rescope row supersedes into a successor the executing roster does not carry, so the replacement never landed and the row records a retirement wearing a better name: $rssucc in $f"
       done
   fi
 
