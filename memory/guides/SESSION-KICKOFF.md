@@ -5,7 +5,7 @@
 last-audit: 2026-08-22T09:15:00+03:00 @ 64a34e12b8fabaa5991674f5418dec6bf2e69a84
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c1b3734a34e6121e42422eff79c5a58e9819aa41
+last-body-change: cd06e0acade1d969b87bc5545b1ca4e33a4f091b
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -78,6 +78,15 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
+
+- **Before starting work inside a kit, check whether another node is already rewriting it.**
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
+  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
+  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
+  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
+  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
+  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
+  the cheap check is a `git log` at kickoff rather than a merge at landing.
 
 ### Pointer map (load the row(s) the task touches)
 
