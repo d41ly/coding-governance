@@ -1532,7 +1532,11 @@ n=$((n+1))
 [ "$_hy_claimed" = "$_hy_derived" ] || { echo "FAIL the kit README claims $_hy_claimed checks and the engine defines $_hy_derived ($(echo $_hy_ids | tr '
 ' ' ')) - the one figure a reader is told to trust is wrong"; st=1; }
 
-FLOOR_ASSERTIONS=224
+# THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
+# 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
+# shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
+# rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
+FLOOR_ASSERTIONS=235
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -1700,8 +1700,8 @@ n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FA
 # is asserted THERE and the driver is asserted to reach it. Two arms, because either half alone is
 # satisfiable while the pin is absent from the running script: a lib nobody sources pins nothing, and
 # a source line pointing at a lib without the wrapper is a working script with no pin in it.
-n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$(dirname "$SCRIPT")/lib-unattended.sh" \
-  || { echo "FAIL the kit library defines no GIT() wrapper pinning core.useReplaceRefs"; st=1; }
+n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$(dirname "$SCRIPT")/lib-unattended.sh" \
+  || { echo "FAIL the kit library defines no GIT() wrapper expanding the replace-refs pin constant"; st=1; }
 n=$((n+1)); grep -q '^\. "\$_LIB_DIR/lib-unattended.sh"' "$SCRIPT" \
   || { echo "FAIL the driver does not source the kit library, so the GIT() pin defined there never reaches it"; st=1; }
 # The pins moved into NAMED CONSTANTS because a second reader arrived: the bounded remote helper
@@ -1718,7 +1718,9 @@ n=$((n+1)); [ -f "$LIBSH" ] || { echo "FAIL the kit library is not beside the dr
 n=$((n+1)); grep -q '^GIT_PIN_REPLACE=core\.useReplaceRefs=false$' "$LIBSH"   || { echo "FAIL the kit library does not bind the replace-refs pin to a constant with the value that suppresses it"; st=1; }
 n=$((n+1)); grep -q '^GIT_PIN_GRAFTADV=advice\.graftFileDeprecated=false$' "$LIBSH"   || { echo "FAIL the kit library does not bind the graft-advice pin to a constant with the value that suppresses it"; st=1; }
 n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV" "\$@"; }$' "$LIBSH"   || { echo "FAIL the kit library defines no GIT() wrapper expanding both pin constants"; st=1; }
-n=$((n+1)); [ "$(grep -c 'git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$SCRIPT")" -ge 3 ]   || { echo "FAIL the bounded remote helper does not expand both pin constants, so a remote observation dereferences unpinned"; st=1; }
+# TWO, not three: GIT() moved to the kit library, so what remains in the driver is the bounded
+# remote helper's own pair of call sites - which is exactly what this arm is for.
+n=$((n+1)); [ "$(grep -c 'git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$SCRIPT")" -ge 2 ]   || { echo "FAIL the bounded remote helper does not expand both pin constants, so a remote observation dereferences unpinned"; st=1; }
 unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
 
@@ -3585,7 +3587,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=0
+FLOOR_ASSERTIONS=500
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
 # ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is
 # ---- recorded here rather than left for the next reader to re-derive from whichever half they open.
@@ -3619,6 +3621,11 @@ FLOOR_ASSERTIONS=0
 # n(shard 1) + n(shard 2) - n(unsharded). Measured on node a, 2026-08-21: unsharded 419, shard one
 # 205, shard two 227. 205 + 227 - 419 = 13.
 #
+# RE-DERIVED AGAIN after integrating dUnstalledConvoy, which added its own arms to both regions:
+# 205 + 430 - 622 = 13. The identity has now survived two independent sets of additions, which is the
+# only evidence available that each build's arms sit inside ONE region rather than straddling the
+# split - no static predicate over the floors can see it, so this re-derivation IS the check.
+#
 # RE-DERIVED on the merged tree the same day, after 690 lines of arms landed in region two:
 # 205 + 328 - 520 = 13. The identity survives the change, which is the only evidence that the added
 # arms are inside ONE region rather than straddling the split — and per the note below, no static
@@ -3633,8 +3640,8 @@ FLOOR_ASSERTIONS=0
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=13
-FLOOR_SHARD_1=0
-FLOOR_SHARD_2=0
+FLOOR_SHARD_1=165
+FLOOR_SHARD_2=346
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
