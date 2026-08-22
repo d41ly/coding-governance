@@ -163,26 +163,18 @@ and reference no unbuilt unit in code.
 
 ## The owner rulings of 2026-08-21, after the round-1 diff review
 
-The Tier-2 review returned BLOCKED — 32 confirmed findings, 16 distinct defects, 2 blockers. Four
-questions were put to the owner rather than decided by the run, and all four are answered.
+The Tier-2 review returned BLOCKED — 32 confirmed, 16 distinct defects, 2 blockers. Four questions
+went to the owner rather than being decided by the run. The reasoning is in the review record; the
+rulings are here because a ruling is not derivable from the thing it ruled on.
 
-**The declared-checks JOIN is implemented, both halves.** `piece_checks` and `set_checks` had no
-reader while three documents promised the join, so `verified` meant "hash matches and nobody wrote
-FAIL" and `pieces-complete` closed green over pieces nothing checked. Both joins land: a PASS is
-required per declared leg, and a sixth `unchecked` state blocks the close. The alternative — striking
-the promise and shipping provenance-only — was declined.
-
-**`--counts` takes the recorded FACTS, not the working-tree playbook.** The two halves of one
-`dod_met` arm read two different files, and an uncommitted grain edit moved the count from 2 to 1.
-The run-state file already pins `grain` and `records` at BASE; those become the input, which also
-gives the pinned `grain` fact its first reader and closes the dead-field finding with it.
-
-**All sixteen defects are folded before this lands.** The kit is copy-installed into other repos, so
-a defect shipped here propagates; the report's landing order is followed.
-
-**The acceptance ledger and units 6/7's missing arms belong to THIS build.** Those arms are needed by
-the blocker fix anyway, so the ledger is written after the fold and all six units close with it.
-`TOOL-dScriptedRepeat-12` closes with the build rather than outliving it.
+- **Implement the declared-checks JOIN, both halves.** Not strike the promise and ship
+  provenance-only.
+- **`--counts` takes the recorded FACTS** and stops re-parsing the playbook, which also gives the
+  pinned `grain` fact its first reader.
+- **All sixteen defects fold before this lands**, in the report's order. The kit is copy-installed
+  into other repos, so a defect shipped here propagates.
+- **The acceptance ledger and units 6/7's missing arms belong to THIS build**, so
+  `TOOL-dScriptedRepeat-12` closes with it rather than outliving it.
 
 ## The unit set
 
@@ -285,6 +277,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
 
@@ -328,4 +321,5 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md)
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)
   - [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md)
+  - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md)
 <!-- /gen:build-docs -->
