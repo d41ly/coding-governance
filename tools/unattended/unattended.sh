@@ -13,7 +13,7 @@
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
-#   unattended.sh --review <slug> --subject <id> --verdict <TOKEN> --blockers <N>  # a review round
+#   unattended.sh --review <slug> --subject <id> --verdict <verdict> --blockers <N>  # a review round
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
@@ -2248,7 +2248,7 @@ verb_status() { # slug
     local hc; hc=$(fact "$rel" halt-code)
     [ -n "$hc" ] && hc=" · halt-code $hc" || hc=""
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
-' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
+' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
   return 0
 }

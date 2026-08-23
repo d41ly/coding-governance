@@ -80,10 +80,11 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
-# The dispatch write-set GRADING is dark by default (TOOL-dUnstalledConvoy-23 owns its
-# redesign). The fixture declares it ON so the grading arms below still exercise the code;
-# a separate arm removes the key and asserts the dark path announces itself.
-DISPATCH_GRADING=1
+# NO DISPATCH_GRADING. `TOOL-dUnstalledConvoy-23` retired that key when the comparison became a
+# REPORT that always runs: a report has no failure to gate, and a key that only silences output makes
+# a check dark without saying so. Check 22 joins the protocol's key table against the declared conf,
+# so a fixture still setting it declares a key the protocol no longer documents - which is how this
+# surfaced, on a merge where one side removed the key and the other still seeded it.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 EOF
@@ -350,8 +351,13 @@ done
 undoc=""
 for v in $verbs; do
   grep -q -- "$v" "$HERE/SKILL.template.md" 2>/dev/null || undoc="$undoc $v(skill)"
-  awk '/^\[ -n "\$VERB" \]/' "$D" | grep -q -- "$v" || undoc="$undoc $v(usage)"
-  grep -q "the verbs are.*$v" "$D" || undoc="$undoc $v(refusal)"
+  # THE USAGE SURFACE is the driver's own header block, which `usage()` self-reads and prints; the
+  # REFUSAL SURFACE is the verb DECLARATION, which `verb_list()` renders into the refusal text. Both
+  # used to be greps for a literal single-line `echo` and a typed `the verbs are --a, --b` string -
+  # exactly the two hand-maintained lists this kit replaced with derivations, so an arm pinned to
+  # their spelling calls a driver that fixed the drift broken.
+  grep -qE "^#   unattended[.]sh $v( |\$)" "$D" || undoc="$undoc $v(usage)"
+  grep -qE "^VERBS_(SLUG|INLINE)=.*$v( |\")" "$D" || undoc="$undoc $v(refusal)"
 done
 n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a surface an agent reads, so no run can learn it exists:$undoc"; st=1; }
 

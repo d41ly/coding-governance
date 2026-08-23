@@ -64,7 +64,7 @@ DIRECTIVES_EXTRA=""
 # adopter has today. Without it an extra handle is waivable by a verb and invisible to the agent,
 # and a project cannot fix that by editing the Skill, which is rendered from a kit template.
 DIRECTIVES_EXTRA_TABLE=""
-DIRECTIVES_FLOOR="13"
+DIRECTIVES_FLOOR="15"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
 # resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`

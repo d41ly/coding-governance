@@ -1831,8 +1831,13 @@ n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FA
 # a source line pointing at a lib without the wrapper is a working script with no pin in it.
 n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$(dirname "$SCRIPT")/lib-unattended.sh" \
   || { echo "FAIL the kit library defines no GIT() wrapper expanding the replace-refs pin constant"; st=1; }
-n=$((n+1)); grep -q '^\. "\$_LIB_DIR/lib-unattended.sh"' "$SCRIPT" \
-  || { echo "FAIL the driver does not source the kit library, so the GIT() pin defined there never reaches it"; st=1; }
+# THE SOURCING IS ASSERTED BY RESOLUTION, not by the variable's spelling. Both sides of the merge
+# sourced the library and named the directory differently - `$KIT_DIR` here, `$_LIB_DIR` there - and an
+# arm grepping for one spelling calls a working driver broken. What matters is that the sourced path
+# is built from a variable THIS FILE assigns, so the extracted name is checked for an assignment
+# rather than compared to a constant.
+n=$((n+1)); _srcvar=$(grep -oE '^\. "\$\{?[A-Za-z_][A-Za-z0-9_]*' "$SCRIPT" | head -1 | tr -d '. "${')
+n=$((n+1)); { [ -n "$_srcvar" ] && grep -qE "^$_srcvar=" "$SCRIPT" && grep -q "^\. \"\$$_srcvar/lib-unattended.sh\"" "$SCRIPT"; } \
 # The pins moved into NAMED CONSTANTS because a second reader arrived: the bounded remote helper
 # cannot call GIT(), since `timeout` needs an external command and GIT() is a shell function. So this
 # arm now checks the property through the indirection, in THREE parts, because an indirection is a way

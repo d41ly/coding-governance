@@ -470,7 +470,7 @@ not a round cap — over the tracked corpus the clean exit the method names occu
 would only move the stall earlier. Record every round and the verb tells you what the loop is doing:
 
 ```bash
-bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <TOKEN> --blockers <N>
+bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
 ```
 
 `--subject` is the spec document for a spec audit and the BUILD SLUG for the closing diff review.
