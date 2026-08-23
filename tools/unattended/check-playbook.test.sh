@@ -45,6 +45,10 @@ seed() { # dir
   # the defect this whole leg is about, reproduced inside its own test.
   cp -r "$HERE/fixture-pieces" "$1/tools/unattended/"
   cp -r "$HERE/fixture-records" "$1/tools/unattended/"
+  # THE CONF, because check 10 reads BYPASS_BAN from it and a fixture without one exercises the SKIP
+  # path while looking exactly like a clean scan. The playbook fixture already declares its `records`
+  # root, so this is the last thing standing between the scan and a real population.
+  printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > "$1/.unattended.conf"
   ( cd "$1" && git add -A >/dev/null && git commit -qm seed )
 }
 
@@ -342,6 +346,66 @@ grep -qF -- "a playbook declares a step floor that is not a number, and launderi
 n=$((n+1))
 grep -qF -- 'declares a step selector and no floor' <<<"$out" \
   && bad "a non-numeric floor ALSO reported itself absent, which is the wrong-cause message the numeric refusal exists to replace"
+cp "$KEEP" "$F"
+
+# ---- TOOL-dScriptedRepeat-13: THE BYPASS FLAG IN A TRACKED EVIDENCE RECORD. The driver refuses to
+# ---- WRITE one; nothing read them back, so a flag that reached a record by any other route survived
+# ---- every gate. Check 11 in the sibling leg covers run-state files and structurally cannot cover
+# ---- these - it has no GITLS, no declared_scalar and enumerates no playbooks, which is why the spec
+# ---- for this moved the scan here at rev-2 rather than inlining a third parser copy over there.
+
+# AC4 FIRST, because it is the one that decides whether anything below means anything: the scan must
+# say which of the two silences it is in. A skipped scan and a clean one are the same empty output.
+n=$((n+1))
+grep -qF -- "bypass scan - " <<<"$(run)" \
+  || bad "the leg does not report the bypass scan population, so a scan that reached zero records is indistinguishable from one that read many and found nothing"
+
+# AC1 — a PER-PIECE record carrying the flag.
+cp "$KEEP" "$F"
+PREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/tools~*.md' | head -1)
+n=$((n+1))
+[ -n "$PREC" ] || bad "no per-piece record in the fixture, so the arm below would grade an empty population"
+printf '\nlanded with --no-verify\n' >> "$W/$PREC"
+n=$((n+1))
+grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once" <<<"$(run)" \
+  || bad "a per-piece record naming the declared bypass flag did not red check 10"
+( cd "$W" && git checkout -q -- "$PREC" )
+
+# AC2 — a SET-scoped record carrying it, which is a different writer and a different path shape.
+SREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/set-*.md' | head -1)
+n=$((n+1))
+[ -n "$SREC" ] || bad "no set-scoped record in the fixture, so the arm below would grade an empty population"
+printf '\nlanded with --no-verify\n' >> "$W/$SREC"
+n=$((n+1))
+grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once" <<<"$(run)" \
+  || bad "a set-scoped record naming the declared bypass flag did not red check 10"
+( cd "$W" && git checkout -q -- "$SREC" )
+
+# AC4's other half — no declared flag, no scan, and the leg SAYS so rather than going quiet.
+( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\n' > .unattended.conf )
+out=$(run)
+n=$((n+1))
+grep -qF -- "bypass scan SKIPPED" <<<"$out" \
+  || bad "with no BYPASS_BAN declared the leg does not announce the skip, so an unarmed scan reads as a clean one"
+n=$((n+1))
+grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" \
+  && bad "the scan ran with no declared flag, which means it is matching something other than the declaration"
+( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+
+# AC5 — SHARING, not liveness. The roots this scan reads must be the roots the census reads, and the
+# only way to assert that is to move the declaration and watch BOTH follow. A liveness arm would pass
+# over two independent derivations that happen to agree today.
+cp "$KEEP" "$F"
+sed -i 's|^records       = "tools/unattended/fixture-records"|records       = "tools/unattended/moved-records"|' "$F"
+( cd "$W" && git mv tools/unattended/fixture-records tools/unattended/moved-records >/dev/null 2>&1 )
+out=$(run)
+n=$((n+1))
+grep -qE 'pieces [0-9]+ · verified' <<<"$out" \
+  || bad "the census lost its population when the declared root moved, so this arm cannot compare the two readers"
+n=$((n+1))
+grep -qF -- "bypass scan - 0 tracked" <<<"$out" \
+  && bad "the census followed the moved root and the bypass scan did not, so the two readers derive their roots separately - which is the second-copy defect this unit exists to avoid"
+( cd "$W" && git mv tools/unattended/moved-records tools/unattended/fixture-records >/dev/null 2>&1 )
 cp "$KEEP" "$F"
 
 # ---- BLOCKER (round-4): THE REPLACE REF. `git replace -f <base> <forged>` rewrites what a sha

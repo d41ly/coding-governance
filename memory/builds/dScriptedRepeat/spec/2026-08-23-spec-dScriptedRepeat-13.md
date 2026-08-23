@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them
 
-**Status:** SPECCED · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -108,6 +108,11 @@ reader does not mistake the coverage for total.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-23 · BUILT. Check 10 lands in `check-playbook.sh` on the census's own `$rr` and
+  `GITLS`; the real tree reads 3 tracked evidence records and finds nothing, and a flag appended to one
+  of them reds it. AC5 is asserted by MOVING the declared root and watching both readers follow — its
+  own control, a hardcoded root in the scan, reds the arm with the second-copy message. Both write-time
+  refusals cite check 10 now, and an arm reds if that citation names a check the leg does not define.
 - rev-2 · 2026-08-23 · the round-1 spec audit's BLOCKER 1 and three highs. The scan moves to
   `check-playbook.sh` because rev-1 specced it into a file with none of the machinery it claimed to
   reuse: `GITLS`, `declared_scalar` and the playbook enumeration are all zero in

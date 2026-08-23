@@ -73,6 +73,17 @@ CANON_N=$(printf '%s\n' "$CANON" | grep -c . || true)
 # tracked playbook is graded from the moment it is tracked.
 CONF_GLOB=""
 [ -f .unattended.conf ] && CONF_GLOB=$(sed -n 's/^PLAYBOOK_GLOB=//p' .unattended.conf | tr -d '"' | head -1)
+# ---- BYPASS_BAN, the SECOND conf key this leg reads, and check 10 below is why. The driver refuses to
+# ---- WRITE an evidence record naming the declared bypass flag; nothing read those records back, so a
+# ---- flag that reached a tracked record by any other route was invisible after the fact. Check 11 in
+# ---- the sibling leg covers run-state files and cannot cover these: it has no GITLS, no
+# ---- declared_scalar and enumerates no playbooks, so the roots are unreachable from there. Measured
+# ---- before this landed - all three are zero in that file and non-zero in this one, which is why the
+# ---- scan is HERE, and why the alternative would have inlined a third parser copy past a gate that
+# ---- compares exactly two.
+CONF_BYPASS=""
+[ -f .unattended.conf ] && CONF_BYPASS=$(sed -n 's/^BYPASS_BAN=//p' .unattended.conf | tr -d '"' | head -1)
+CONF_BYPASS=${CONF_BYPASS:-}
 PLAYBOOKS=""
 while IFS= read -r f; do
   case "$f" in *.md) ;; *) continue ;; esac
@@ -228,7 +239,8 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
 }
 
 # ------------------------------------------------------------------------ per playbook
-TOTAL_STEPS=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
+TOTAL_STEPS=0
+BYPASS_SEEN=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
 for pb in $PLAYBOOKS; do
   [ -n "$pb" ] || continue
   if [ -n "$COUNTS_AT" ]; then
@@ -474,6 +486,25 @@ CANONEOF
       done
     fi
 
+    # ---- 10: THE BYPASS FLAG, READ BACK OUT OF WHAT LANDED. The driver refuses to write one at
+    # ---- record time and that guard is real; this is the second opinion over what is in the tree,
+    # ---- which is the pair the charter asks for on a guarded surface.
+    # ----
+    # ---- THE POPULATION IS THE CENSUS OWN. Same $rr from the same declared_scalar parse, same GITLS
+    # ---- enumeration - not a second derivation that could disagree with the first.
+    # ----
+    # ---- WHAT THIS DOES NOT REACH: --record-set accepts a caller-supplied records root, so a record
+    # ---- written outside every declared root is invisible here. That is the write-time guard job and
+    # ---- it holds there. Said plainly, because coverage a reader assumes is total is worse than
+    # ---- coverage whose shape they know.
+    if [ -n "$CONF_BYPASS" ]; then
+      for bp_ in $(GITLS "$rr/*.md"); do
+        [ -n "$bp_" ] || continue
+        BYPASS_SEEN=$((BYPASS_SEEN + 1))
+        grep -qF -- "$CONF_BYPASS" "$bp_" \
+          && fail 10 "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once: $CONF_BYPASS in $bp_"
+      done
+    fi
     # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
     # silently reports coverage it no longer has.
     [ -n "$COUNTS_FOR" ] || for rc_ in $(GITLS "$rr/*.md"); do
@@ -489,6 +520,14 @@ done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-pie
 
 # ---- 9: the DERIVED length budget and the drain, PRINTED. No number is written in this file.
 [ -n "$COUNTS_FOR" ] || note "steps $TOTAL_STEPS · CHECK tags $TOTAL_CHECKS · of those carrying a witness $TOTAL_WITNESS"
+# ---- THE BYPASS SCAN POPULATION, printed whether it found anything or not. A scan that reached zero
+# ---- records and a scan that reached many and found nothing are the same silence, and the first is a
+# ---- check that is not running.
+[ -n "$COUNTS_FOR" ] || { if [ -z "$CONF_BYPASS" ]; then
+  note "bypass scan SKIPPED - no BYPASS_BAN declared in .unattended.conf, so tracked evidence records are not read back for it"
+else
+  note "bypass scan - $BYPASS_SEEN tracked evidence record(s) read for the declared flag"
+fi; }
 [ -z "$COUNTS_FOR" ] && [ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
 
 exit "$st"
