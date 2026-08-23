@@ -2,8 +2,17 @@
 # coding-governance pre-commit fast leg. Install once per clone: git config core.hooksPath .githooks
 # Runs only the cheap staged-scoped gates so a scripts-less checkout stays green.
 set -u
-top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-cd "$top" || exit 0
+
+# S2/S5 (TOOL-dScrubbedConduit-1), same two fixes as .githooks/pre-push and for the same reasons.
+# GIT_EXEC_PATH is deliberately kept.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES       GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX
+
+if ! top=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "pre-commit: REFUSING — cannot resolve this repository's work tree, so the staged gates" >&2
+  echo "  cannot run. This used to exit 0 (ALLOW). Override: git commit --no-verify" >&2
+  exit 1
+fi
+cd "$top" || exit 1
 rc=0
 
 # govkit:branch-guard

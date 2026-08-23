@@ -182,4 +182,67 @@ case "$(decide)" in
   *"gate on main push"*) ok "15 the boundary prints its decision and its reason on one line, every time" ;;
   *) bad "15 the boundary made a decision without announcing it" ;;
 esac
+# --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
+# --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
+# --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here
+# --- while an adopter hit it head-on. The fixture had to change for the RED to be observable.
+SCRUB="GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX"
+
+# 16 — the hook still CARRIES the scrub. Asserted against the hook's own bytes so that deleting the
+# unset line reds this arm, rather than the arm silently testing its own inlined copy.
+miss=""
+for v in $SCRUB; do
+  grep -qE "^unset .*\b$v\b|^ +$v\b" "$tmp/hooks/pre-push" || miss="$miss $v"
+done
+if [ -n "$miss" ]; then
+  bad "16 the hook no longer scrubs:$miss — a leg that git-inits a scratch repo can rewrite the shared config"
+else
+  ok "16 the hook scrubs every injected git variable before running anything"
+fi
+# GIT_EXEC_PATH must SURVIVE: it locates git's own helpers and clearing it breaks git rather than
+# protecting it. A scrub that over-reaches is its own defect.
+if grep -qE "^unset .*GIT_EXEC_PATH|^ +GIT_EXEC_PATH\b" "$tmp/hooks/pre-push"; then
+  bad "16b the hook scrubs GIT_EXEC_PATH, which breaks git instead of protecting it"
+else
+  ok "16b the scrub leaves GIT_EXEC_PATH alone"
+fi
+
+# 17 — the MECHANISM, in a real linked worktree: unscrubbed it poisons the shared config, scrubbed it
+# does not. Both directions, because a one-sided arm cannot tell a working scrub from a fixture that
+# never reproduced the bug.
+wt=$(mktemp -d)
+( git init -q "$wt/w" && cd "$wt/w" && git config user.email t@t && git config user.name t \
+    && echo x > a && git add -A && git commit -qm init && git worktree add -q "$wt/lw" -b lw ) >/dev/null 2>&1
+wtcfg="$wt/w/.git/config"
+wtgd="$wt/w/.git/worktrees/lw"
+if [ -d "$wtgd" ]; then
+  git config --file "$wtcfg" core.bare false
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c 'd=$(mktemp -d); cd "$d" && git init -q .' ) >/dev/null 2>&1
+  poisoned=$(git config --file "$wtcfg" --get core.bare)
+  git config --file "$wtcfg" core.bare false
+  ( cd "$wt" && GIT_DIR="$wtgd" sh -c "unset $SCRUB; d=\$(mktemp -d); cd \"\$d\" && git init -q ." ) >/dev/null 2>&1
+  guarded=$(git config --file "$wtcfg" --get core.bare)
+  if [ "$poisoned" != true ]; then
+    bad "17 the fixture did not reproduce the injection, so this arm proves nothing (git behaviour changed?)"
+  elif [ "$guarded" = true ]; then
+    bad "17 the scrub did not stop a scratch-repo leg rewriting the shared config"
+  else
+    ok "17 unscrubbed poisons the shared config and scrubbed does not (linked worktree, no submodule)"
+  fi
+else
+  bad "17 could not build a linked-worktree fixture, so the GIT_DIR-injection class went UNTESTED"
+fi
+
+# 18 — the hook REFUSES when it cannot resolve its repo. This used to `exit 0`, and exit 0 from a
+# pre-push hook means ALLOW: measured end to end, a push landed on the remote with the bar never run.
+nr=$(mktemp -d)
+printf 'main\nrefs/heads/main\n' > "$nr/in"
+( cd "$nr" && bash "$tmp/hooks/pre-push" origin git@example:x.git < "$nr/in" ) >/dev/null 2>&1
+if [ "$?" = 0 ]; then
+  bad "18 the hook ALLOWED a push from a tree whose repo it could not resolve — fail-open"
+else
+  ok "18 the hook refuses when it cannot resolve its repo, instead of failing open"
+fi
+rm -rf "$wt" "$nr"
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

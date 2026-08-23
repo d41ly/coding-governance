@@ -128,6 +128,29 @@ def read_text(path: str) -> str:
         return fh.read().decode("utf-8").replace("\r\n", "\n")
 
 
+def read_text_or_none(path: str) -> tuple[str | None, str]:
+    """(text, "") or (None, why). The ONE reader for scanners that walk ARBITRARY tracked files.
+
+    TOOL-dScrubbedConduit-1 S1. Three scanners — spec_ids, read_bindings and rosters — read whatever
+    `git ls-files` hands them, and each had invented its own guard: two caught `OSError`, one caught
+    `Problem`. None of the three catches `UnicodeDecodeError`, which is what `read_text` actually
+    raises on a tracked binary, so a single PNG under a build's `reviews/` took the whole generator
+    down with a traceback. An adopter hit exactly that: a UI review screenshot is a legitimate record.
+
+    `except Problem` at the third site was DEAD CODE — `read_text` raises `OSError` or
+    `UnicodeDecodeError` and never `Problem`. And the obvious repair, `(Problem, UnicodeDecodeError)`,
+    still dies with `FileNotFoundError` on a tracked-but-missing file, which the two sibling sites
+    already survived. Hence one helper with one named tuple, rather than three near-misses.
+
+    Deliberately NOT a blanket `except Exception`: a caller that cannot read a file must be able to
+    tell "not text" and "not there" from "the reader is broken".
+    """
+    try:
+        return read_text(path), ""
+    except (OSError, UnicodeDecodeError) as exc:
+        return None, f"unreadable: {exc}"
+
+
 def write_text(path: str, text: str) -> None:
     # BYTES, never write_text(): on Windows the text mode would re-expand \n to \r\n and the very
     # next --check would report the file this call just wrote as stale.
@@ -298,14 +321,14 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     for rel in tracked:
         if not sel.match(rel):
             continue
-        try:
-            for line in unfenced(read_text(os.path.join(root, rel))):
-                mm = pat.match(line)
-                if mm:
-                    out.add(mm.group("id"))
-                    break
-        except OSError:
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        if text is None:
             continue
+        for line in unfenced(text):
+            mm = pat.match(line)
+            if mm:
+                out.add(mm.group("id"))
+                break
     return out
 
 
@@ -337,7 +360,11 @@ def _expand_ids(rest: str, alt: str) -> tuple:
 
 
 def read_bindings(root: str, tracked: list, conf: dict) -> dict:
-    """path -> {state, kind, ids, commissions, reason, bad}. Never raises.
+    """path -> {state, kind, ids, commissions, reason, bad}.
+
+    Does not raise for an UNREADABLE file — a decode or IO failure becomes a `state` row carrying
+    `why`. It CAN still raise for a malformed conf. The former docstring said "Never raises."
+    unqualified, which is what let the blanket catch at the caller look reasonable.
 
     state is one of: bound · unbound · malformed · absent.
     """
@@ -349,7 +376,18 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
         try:
             text = read_text(os.path.join(root, rel))
+        except UnicodeDecodeError:
+            # NOT TEXT, so NOT A RECORD (TOOL-dScrubbedConduit-1 S1). A record is prose that carries a
+            # `**Serves:**` line binding it to a spec; a file that does not decode cannot carry one,
+            # and emitting it as an `A` row only moves the failure to hygiene check 21, which would
+            # then demand a Serves line from a PNG. record_paths admits ANY extension by design — a
+            # record's kind comes from its folder, not its suffix — so the exclusion belongs here,
+            # where the bytes are actually read, rather than in a filename guess upstream.
+            #
+            # An adopter carrying a UI review screenshot under `reviews/` is the case this serves.
+            continue
         except OSError as exc:
+            # Present in the index and unreadable from disk is a REAL anomaly and stays a row.
             rec["why"] = f"unreadable: {exc}"
             out[rel] = rec
             continue
@@ -488,9 +526,10 @@ def rosters(root: str, tracked: list, m: str, families: set) -> dict:
     for p in tracked:
         if p == f"{m}/LIVE.md" or p.startswith(f"{m}/ledger/"):
             continue
-        try:
-            text = read_text(os.path.join(root, p))
-        except Problem:
+        text, _why = read_text_or_none(os.path.join(root, p))
+        if text is None:
+            # A roster is built from ids in PROSE, so a file that is not text cannot contribute one
+            # and skipping it changes no output. Verified by artifact equality, not by assertion.
             continue
         for mm in id_re.finditer(text):
             slug = mm.group(1)
@@ -1020,7 +1059,14 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     try:
         tracked_all = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
         binds_all = read_bindings(root, tracked_all, conf)
-    except Exception:  # noqa: BLE001 — the render must not depend on the parse succeeding
+    except Problem as exc:
+        # NARROWED from `except Exception` (TOOL-dScrubbedConduit-1 S1). The render must not depend on
+        # the parse succeeding, but swallowing EVERY exception meant read_bindings could die of a
+        # decode error and the only visible symptom was a silently empty record table on every build
+        # README. A Problem is the parse declining; anything else is this tool being broken, and a
+        # broken tool must not render a plausible-looking artifact over the top of it.
+        print(f"build-index: record scan declined ({exc}); READMEs render without record tables",
+              file=sys.stderr)
         binds_all = {}
     for b in builds:
         pre = f"{m}/builds/{b['slug']}/"
