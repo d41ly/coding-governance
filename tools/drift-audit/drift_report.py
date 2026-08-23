@@ -37,6 +37,7 @@ ponytail: stdlib + git only, no deps, no cache. It runs in seconds; there is not
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import os
 import pathlib
@@ -47,7 +48,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.5"
+KIT_DRIFT_AUDIT_VERSION = "1.6"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -827,10 +828,158 @@ def build_live_backlog_rows(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal 10 - a build README asserting a mechanism its own spec set has since revised
+# (TOOL-dScriptedRepeat-14)
+#
+# A build README and that build's spec set are two records of one build and nothing compared them.
+# Round 3 of `dScriptedRepeat` found the README saying `--counts` takes the recorded FACTS while spec
+# 6 rev-8, written in the same fold, said it takes a pinned BASE sha and re-parses the blob - two
+# answers to one question about the guard on the one Definition-of-Done item that takes no override.
+# The README is the file a session opens first, so it is the copy that misleads. The instance was
+# superseded in place; the CLASS had no reader until this.
+#
+# WHAT IT MATCHES, and it is deliberately narrow. A backticked MECHANISM token in the README's
+# AUTHORED prose, where some entry in that build's spec revision logs is dated LATER than the git
+# author-date of the README line carrying it, and names the same token. That is "the spec revised this
+# mechanism after the README last said anything about it" - a review-me pointer, not a proven
+# contradiction. Proving the contradiction needs a reader who can tell two English sentences apart,
+# which is why this signal REPORTS and never gates.
+#
+# THE THREE NARROWINGS, each of which cut a false-positive population measured on this tree:
+#   - AUTHORED REGION ONLY. Everything from the first `<!-- gen:` marker down is rendered by
+#     gen_build_index.py from the specs themselves and cannot drift away from them.
+#   - MECHANISM SHAPES ONLY: `--flag`, `name()`, `FOO_BAR`, `foo_bar`. The all-caps shape REQUIRES an
+#     underscore, so status vocabulary (ABORTED, LANDED, INPROGRESS) is not a mechanism; the lowercase
+#     shape forbids a dot, so `drift_report.py` is a FILE and not one either. Measured: the wide form
+#     fired on 42% of the corpus, this one on 13%.
+#   - THE README LINE'S OWN CLOCK, from `git blame`, not the file's. A typo fix elsewhere in a 280-line
+#     README must not re-date every claim in it. The spec side uses its revision log read as DATA for
+#     the mirror-image reason: a git mtime on a spec moves when someone fixes a comma.
+#
+# LIVENESS IS OVER THE TOKEN POPULATION, not over "did I find a build". The tree always has builds, so
+# a liveness assertion watching them can never go false and is one in name only. What CAN empty is the
+# set of README lines carrying a mechanism token, and the set of parseable revision entries to compare
+# them against; both are required.
+_MECH_RE = re.compile(r"^(--[a-z][a-z0-9-]{2,}"
+                      r"|[a-z_][a-z0-9_]*\(\)"
+                      r"|[A-Z][A-Z0-9]*_[A-Z0-9_]+"
+                      r"|[a-z][a-z0-9]*_[a-z0-9_]+)$")
+_TICK_RE = re.compile(r"`([^`]{2,60})`")
+_REVLOG_RE = re.compile(r"^- rev-(\d+)\s*[\u00b7|-]\s*(\d{4}-\d{2}-\d{2})")
+_GEN_MARK = "<!-- gen:"
+
+
+def _build_blame_dates(ctx, rel: str, upto: int) -> dict:
+    """line number -> author date. Porcelain emits the header block ONCE per commit; every later line
+    attributed to that commit carries the sha alone, so the date map is keyed on the sha."""
+    out = ctx.git.run("blame", "--porcelain", "-L", f"1,{max(upto, 1)}", "--", rel).stdout
+    dates: dict[int, str] = {}
+    by_sha: dict[str, str] = {}
+    sha = None
+    lineno = None
+    for ln in out.splitlines():
+        m = re.match(r"^([0-9a-f]{40}) \d+ (\d+)", ln)
+        if m:
+            sha, lineno = m.group(1), int(m.group(2))
+            if sha in by_sha:
+                dates[lineno] = by_sha[sha]
+            continue
+        if ln.startswith("author-time ") and sha is not None and lineno is not None:
+            d = datetime.datetime.fromtimestamp(
+                int(ln.split()[1]), datetime.timezone.utc).strftime("%Y-%m-%d")
+            by_sha[sha] = d
+            dates[lineno] = d
+    return dates
+
+
+def _read(ctx, rel: str) -> str:
+    try:
+        return (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+# NAMED `build_`, for the reason spelled above build_live_backlog_rows: `signal` is a noun and not in
+# `.lexicon.conf`'s VERBS table, and a new definition can be named right for free.
+def build_readme_mechanism_drift(ctx) -> dict:
+    """README lines naming a mechanism the build's own spec set revised after that line was written."""
+    readmes = [ln for ln in ctx.git.run(
+        "ls-files", f"{ctx.memory_root}/builds/*/README.md").stdout.splitlines() if ln.strip()]
+    specs_by_build: dict[str, list[str]] = {}
+    for sp in ctx.git.run("ls-files", f"{ctx.memory_root}/builds/*/spec/*.md").stdout.splitlines():
+        if sp.strip():
+            specs_by_build.setdefault(sp.split("/")[2], []).append(sp)
+
+    rows = []
+    tok_pop = 0
+    rev_pop = 0
+    for rel in sorted(readmes):
+        build = rel.split("/")[2]
+        lines = _read(ctx, rel).split("\n")
+        cut = next((i for i, ln in enumerate(lines) if ln.startswith(_GEN_MARK)), len(lines))
+        # THE REVISION ENTRIES, read as data. A continuation line is folded into the entry above it,
+        # because a revision's reason routinely wraps and the token often sits in the wrap.
+        revs = []
+        for sp in specs_by_build.get(build, []):
+            inlog = False
+            for ln in _read(ctx, sp).split("\n"):
+                if ln.startswith("## "):
+                    inlog = "Revision log" in ln
+                    continue
+                if not inlog:
+                    continue
+                m = _REVLOG_RE.match(ln)
+                if m:
+                    revs.append([sp, m.group(2), ln])
+                elif revs and revs[-1][0] == sp and ln.startswith("  "):
+                    revs[-1][2] += " " + ln.strip()
+        rev_pop += len(revs)
+        # THE CANDIDATES FIRST, THE BLAME ONLY IF THERE ARE ANY. `git blame` is a process per README
+        # and this audit is meant to run in seconds; a README whose tokens no revision entry mentions
+        # cannot produce a row whatever its dates are.
+        cand = []
+        for i, ln in enumerate(lines[:cut], start=1):
+            if ln.lstrip().startswith("#"):
+                continue
+            for tok in _TICK_RE.findall(ln):
+                if not _MECH_RE.match(tok):
+                    continue
+                tok_pop += 1
+                named = [r for r in revs if tok in r[2]]
+                if named:
+                    cand.append((i, tok, named))
+        if not cand:
+            continue
+        dates = _build_blame_dates(ctx, rel, cut)
+        for i, tok, named in cand:
+            d = dates.get(i)
+            if d is None:
+                continue
+            later = sorted((r for r in named if r[1] > d), key=lambda r: r[1])
+            if not later:
+                continue
+            sp, rd, _ = later[-1]
+            rows.append({"build": build, "readme": f"{rel}:{i}", "mechanism": tok,
+                         "line_dated": d, "spec": sp, "revised": rd})
+    return {
+        "signal": "readme_mechanism_drift",
+        "value": len(rows),
+        "of": len(readmes),
+        "tolerance": ctx.pins.get("readme_mechanism_drift", 0),
+        # REPORT ONLY. `drift-audit records` is an unguarded merge-bar leg, and this predicate reports
+        # a POINTER rather than a proven contradiction - gating it would red a merge on a README
+        # sentence that may well still be true.
+        "gateable": False,
+        "live": bool(tok_pop and rev_pop),
+        "detail": rows,
+    }
+
+
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
-           build_live_backlog_rows]
+           build_live_backlog_rows, build_readme_mechanism_drift]
 
 
 # --------------------------------------------------------------------------------------------

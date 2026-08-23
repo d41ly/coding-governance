@@ -232,7 +232,11 @@ in for the per-spec pass M4 owns — the two answer different questions and only
 
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
-`memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns. **Landing** —
+`memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
+
+**Re-read the build README against the code before closing** — every owner ruling and every sentence naming a shipped mechanism. `readme_mechanism_drift` reports only the pairs that spell it identically; the fold owns the rest.
+
+**Landing** —
 merge and push authorization, the lander, the bypass ban, conflict reconciliation, when a build may land — is
 template §1 Landing and
 `memory/guides/UNATTENDED-PROTOCOL.md`.

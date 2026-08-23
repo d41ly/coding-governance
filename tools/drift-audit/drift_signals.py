@@ -177,6 +177,12 @@ PINS: dict[str, int] = {
     # signal read 0-of-0 DEAD; the flat glob reads 2-of-9, exactly this pin. The seed was right all
     # along and the instrument was not.
     "non_terminal_specs_cited_by_product_source": 2,
+    # 31 — MEASURED by the first report that carried this signal (TOOL-dScriptedRepeat-14), over
+    # 8 of 60 build READMEs. Report-only, so this pin never blocks a merge; it is here so a
+    # non-zero count does not read "out of tolerance" from day one, which is the failure
+    # `live_backlog_rows_per_shard`’s own comment names and then lives with. Drain it: each row
+    # is one README sentence to re-read against the spec revision beside it.
+    "readme_mechanism_drift": 31,
     # 7 — the number of legs in `tools/gate-legs.json` whose script path the charter's gate-suite
     # section does not cite, measured at 647bfd9. The old seed of 1 was a per-row boolean against a
     # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not

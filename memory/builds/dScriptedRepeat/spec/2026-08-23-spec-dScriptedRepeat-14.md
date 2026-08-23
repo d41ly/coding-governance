@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised
 
-**Status:** SPECCED · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -100,6 +100,45 @@ not survive contact with the corpus.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-23 · CLOSED. The signal ships INSIDE S5's band and **AC3 is unreachable**, so
+  S6's fallback ships beside it rather than instead of it. Both halves, with the numbers.
+
+  **The signal.** `build_readme_mechanism_drift` in `tools/drift-audit/drift_report.py`, report-only
+  on the `live_backlog_rows_per_shard` shape. Named `build_`, not `signal_` as §4 spelled it —
+  `signal` is a noun and absent from `.lexicon.conf`'s VERBS table, so a ninth `signal_` would be a
+  NEW offender against a pin that grandfathers exactly eight. The reason is already written above
+  `build_live_backlog_rows`; §4 simply did not read it.
+
+  **AC5's band, measured:** 31 rows over 8 of 60 build READMEs — **13%**, against a ceiling of 25% —
+  and 7 of those 8 are builds other than `dScriptedRepeat`. Spot-checked: `aTetheredRecord`'s README
+  says unit 2 ships `--print-bindings` while that unit's own revision log says the `--print-bindings`
+  contract was AMENDED by unit 4. That is the class, found in a build nobody was looking at.
+
+  **AC3 IS UNREACHABLE, and the reason is worth more than the criterion.** The motivating instance
+  does not contain the same token twice. Reconstructed at `5b0d73c0`, the README says "**`--counts`
+  takes the recorded FACTS**" and spec 6 contradicts it — while **never spelling `--counts`
+  anywhere in the file**. `git show 5b0d73c0:…spec-dScriptedRepeat-6.md | grep -c -- '--counts'`
+  returns 0. No predicate keyed on token identity can ever see that pair, whatever its clock does.
+  Two variants were run over the whole corpus before concluding this: strict `revised > line_dated`
+  fires on 13% and misses it; same-day-inclusive `>=` fires on **30%** — outside the band — and
+  **still** misses it, because the miss is not about dates at all. Recorded at this length so the
+  next attempt does not spend the corpus run again.
+
+  **AC7's fallback therefore ships**, in `memory/guides/BUILD-METHOD.md` §M8 and its template: the
+  build README is re-read against the code before the build closes, and the guide says in its own
+  words that the signal covers only the token-identical subset and why.
+
+  **AC8 shipped its first clause and not its second.** `readme_mechanism_drift` is declared in
+  `tools/drift-audit/drift_signals.template.py`'s PINS. The second clause — an adopter without the
+  key reading "the declared default rather than 0" — is not implementable and should not have been
+  written: the kit cannot ship a measured number for a corpus it has never seen, and a guessed pin is
+  the one thing that PINS block forbids by name. What ships instead is the key, commented, with the
+  instruction to seed it from the adopter's own first report. This repo pins it at its own measured
+  31.
+
+  **AC6:** `python tools/drift-audit/drift_report.py` ran 4.00 s and 5.16 s before, 6.43 s and 6.50 s
+  after — about +2 s, spent on `git blame` for the 8 READMEs that carry a candidate. No budget is
+  asserted, because none is declared in the tree.
 - rev-2 · 2026-08-23 · the round-1 spec audit's HIGH 5, HIGH 6 and two mediums. F2 now cites the
   report-only precedent it should have cited — rev-1's cited signal was `gateable: True`, which
   contradicted S3's own REPORT ONLY line and would have put this predicate on a merge-bar leg. S5's
