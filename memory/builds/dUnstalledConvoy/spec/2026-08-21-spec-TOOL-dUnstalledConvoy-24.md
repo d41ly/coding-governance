@@ -99,7 +99,7 @@ refusal stays a refusal.
 
 ## 8. Open questions
 
-- **F1 — should `--close` refuse to report success while its write is uncommitted?** RESOLVED: no. It
+- **F1 — should `--close` refuse to report success while its write is uncommitted?** RESOLVED (agent, 2026-08-21, delegated): no. It
 stages, and that is its contract; a verb policing the caller's commit discipline would still be
 defeated by a caller that does not commit. `--landed` is where the missing commit actually matters.
 

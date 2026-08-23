@@ -148,7 +148,7 @@ self-tests as the exercising legs. `GATE_FULL=1` for the Definition of Done.
 
 ## 8. Open questions
 
-- **F1 — gate or report?** RESOLVED by the owner, 2026-08-21: report. The alternatives were a hard gate
+- **F1 — gate or report?** RESOLVED (owner, 2026-08-21): report. The alternatives were a hard gate
 that wedges an unattended run with no in-band exit, staying dark indefinitely, or re-admitting
 retraction. A report is the only one that leaves the mechanism doing something it can actually do.
 

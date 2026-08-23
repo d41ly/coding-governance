@@ -63,7 +63,7 @@ check 18 requires of a class with no machine gate.
 
 ## 8. Open questions
 
-- **F1 — retire, or ship the narrow version anyway?** RESOLVED: retire. The narrow version examines four
+- **F1 — retire, or ship the narrow version anyway?** RESOLVED (agent, 2026-08-21, delegated): retire. The narrow version examines four
 tokens and is blind to the identifier class that caused the incident; shipping it would put a green row
 on the bar that means almost nothing, which is the failure mode this whole build has spent five review
 rounds removing.
