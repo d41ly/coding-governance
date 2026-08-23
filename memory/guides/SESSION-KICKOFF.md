@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-23T20:39:56+03:00 @ abd0f0265357f3f235f17721254b2fef81dc484a
+last-audit: 2026-08-23T21:44:32+03:00 @ 2b69704015b739a1736f79d5c35c661ddd8bb148
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: cd06e0acade1d969b87bc5545b1ca4e33a4f091b
+last-body-change: 2b69704015b739a1736f79d5c35c661ddd8bb148
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -43,8 +43,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md` — the spec set, the fork
-  rule, the pass loop, regrounding, the closing review and the wrap-up derivation. It is rendered by
-  the memory-tree kit and is in `watch:`, so editing it forces this manifest to be re-audited.
+  rule, the pass loop, regrounding, the closing review, the README re-read and the wrap-up
+  derivation. It is rendered by the memory-tree kit and is in `watch:`, so editing it forces this
+  manifest to be re-audited.
 - **A build MAY restructure itself, and MUST parallelise what it can prove disjoint.** Both are
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
@@ -147,6 +148,11 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-23 · `run-unattended-gates.sh` declared the gate selftest at 900 s against ~3200 s measured ·
+  the ceiling is 1800 s and the cost is PROCESS CREATION, not logic: an on-access AV scanner fronts
+  every `exec` on node `d` at ~0.022 s a spawn, and that leg made 469 per invocation across 243. It
+  makes 220 now. **Do not run those suites** — `--checks` yes, `--selftests` only when the owner
+  asks · `TOOL-dScriptedRepeat-15` · prune when a `--selftests` run has been timed end to end.
 - 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
   take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
   adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
@@ -175,7 +181,8 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
 `arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
 runs to the first interpolation, so lengthening a message always strands it and shortening never
-does — hit three times in one file in one session).
+does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
+`trace-profile-measures-itself.md` (a `set -x` line profile ranks call count, not time).
 
 - A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
   `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
