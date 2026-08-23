@@ -6,7 +6,7 @@
 # retrofit — each names the root form as a fallback on purpose. (2) The codebase-map REGEN_CMD
 # legacy, preserved for adopters carrying a pre-1.1 gate file the maintenance rule never overwrites.
 
-.githooks/pre-commit:39                 dual-spelling: the hygiene leg locates its gate at either prefix
+.githooks/pre-commit:48                 dual-spelling: the hygiene leg locates its gate at either prefix
 tools/check-wiring.sh:162               dual-spelling probe: scratch-guard fragment, both layouts
 tools/check-wiring.sh:215               dual-spelling probe: memory-recall fragment, both layouts
 tools/check-wiring.sh:368               dual-spelling probe: the merge driver, both layouts

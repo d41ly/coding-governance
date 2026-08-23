@@ -74,10 +74,26 @@ render() {
 st=0
 for pair in $PAIRS; do
   live=${pair%%:*}; ship=${pair##*:}
-  if [ ! -f "$live" ]; then echo "kit-parity: missing live copy $live"; st=1; continue; fi
+  # S3 (TOOL-dScrubbedConduit-1): --render must be able to CREATE a first render.
+  # This `continue` fired in EVERY mode, including the one whose whole job is to write this file, so
+  # an adopter installing a new template got "missing live copy" from the command documented as the
+  # fix for it, forever. --check keeps the failure: there, an absent live copy IS the finding.
+  if [ ! -f "$live" ] && [ "$MODE" != --render ]; then
+    echo "kit-parity: missing live copy $live"; st=1; continue
+  fi
   if [ ! -f "$ship" ]; then echo "kit-parity: missing shipped copy $ship"; st=1; continue; fi
   case "$MODE" in
-    --render) render "$ship" > "$live"; echo "kit-parity: rendered $live from $ship" ;;
+    --render)
+      # mkdir -p, because a FIRST-time adopter has no memory/guides/ at all. Without it the redirect
+      # failed with "No such file or directory", the success line printed anyway, and the command
+      # exited 0 leaving no file — a write failure reported as a render.
+      if ! mkdir -p "$(dirname "$live")"; then
+        echo "kit-parity: cannot create $(dirname "$live") for $live"; st=1; continue
+      fi
+      if ! render "$ship" > "$live"; then
+        echo "kit-parity: FAILED to write $live"; st=1; continue
+      fi
+      echo "kit-parity: rendered $live from $ship" ;;
     --check)
       # CR is stripped from BOTH sides. The live copy is pinned `eol=lf` and the template now is
       # too, but a gate that byte-compares needs the comparison right as well as the bytes: with
@@ -104,7 +120,9 @@ done
 # The pair list is the population, and an empty one would pass silently — the same green-by-absence
 # shape checked elsewhere in this kit.
 [ -n "$PAIRS" ] || { echo "kit-parity: no document pairs configured — that is not a pass"; exit 1; }
-[ "$MODE" = --render ] && exit 0
+# S3: was `[ "$MODE" = --render ] && exit 0`, which DISCARDED st — so every --render exited 0 even
+# when it had just printed a failure. A mode that cannot report its own failure is not reporting.
+[ "$MODE" = --render ] && exit "$st"
 # The count is DERIVED from the population it reports on. It was a literal `2 pairs`, which is a
 # second hand-kept spelling of PAIRS — the drift class this file exists to catch, sitting in this
 # file's own success line. A third pair landed and the leg still said two.

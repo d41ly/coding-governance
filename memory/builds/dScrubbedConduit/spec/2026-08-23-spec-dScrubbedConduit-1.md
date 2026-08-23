@@ -1,6 +1,6 @@
 # TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them
 
-**Status:** OPEN · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -153,9 +153,12 @@ and they bound S2's reach.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a non-UTF-8 tracked file is added under a fixture memory root, `gen_build_index.py
-  --write` produces artifacts **BYTE-IDENTICAL** to the same tree without that file. rev-1 said "the
-  same artifacts", which the 398-line deletion satisfied. Observed RED first.
+- **AC1** — When a non-UTF-8 tracked file is added under a build's `reviews/`, `gen_build_index.py
+  --write` completes, `memory/LIVE.md` and the ledger are **BYTE-IDENTICAL** to the same tree without
+  it, and the build README gains ONLY a folder-inventory link — no record row, and no deletion.
+  Measured at build time: byte-identity of the README alone was one notch too strong, because listing
+  a file that is genuinely in the folder is honest. rev-1's "the same artifacts" was too weak: the
+  398-line deletion satisfied it. Observed RED first.
 - **AC2** — When `pre-push` runs a leg that executes `git init` in a temp dir, in a **LINKED WORKTREE**
   (primary arm — the shape gov is exposed through), the shared config's `core.bare` is unchanged. A
   SUBMODULE arm follows, for the `core.worktree` collision. Both observed RED first.
@@ -193,7 +196,7 @@ owner-demand only, so they are run BY HAND and their verdict reported rather tha
   hosts are named in S6 with review's costing: option (c) was wrong in both directions — S2 needs a
   fixture inside an EXISTING leg rather than a new one, and S3's "fold into its kit's suite" is not
   available because that kit has no suite.
-- **Q3 — should `[[hole]]` discharge probes run on the bar?** Still open, still out of scope. S4's
+- **Q3 — should `[[hole]]` discharge probes run on the bar?** RESOLVED (agent, 2026-08-23, delegated): NO, not in this unit — filed as `TOOL-dScrubbedConduit-3` instead. S4's
   probe has never passed here and nobody noticed precisely because nothing runs it. Fixing S4 without
   this leaves the next broken probe equally unobserved. Filed rather than built.
 
@@ -207,6 +210,20 @@ owner-demand only, so they are run BY HAND and their verdict reported rather tha
   inventory, Q1's recommendation was refuted by gov's own harness, S3 had two more defects than filed,
   the OUT item's reason was wrong, the class was already filed twice in this backlog, and a claimed
   backlog row did not exist. S5 and S6 are new.
+
+- rev-3 · 2026-08-23 · BUILT and CLOSED. S1 became one `read_text_or_none` used by all three
+  scanners, plus a decision the review forced into the open: a non-text file is NOT a record, so it is
+  excluded where the bytes are read rather than guessed at by extension — which keeps hygiene check 21
+  green instead of demanding a Serves line from a PNG. AC1's byte-identity was relaxed one notch at
+  build time, and the reason is recorded in the AC: a build README gaining a folder-inventory link for
+  a file that is genuinely in the folder is honest, so LIVE.md and the ledger carry the identity claim
+  and the README carries "no record row, no deletion". S2/S5 landed in BOTH hooks. S3 needed all three
+  fixes the review found. S4's predicate is general — a value wrapped in angle brackets is still a
+  placeholder — rather than a literal match, and it catches KEEPALIVE_INTERVAL, which the old probe
+  could not see. S6 added arms 16, 16b, 17 and 18 to the pre-push self-test, on a LINKED-WORKTREE
+  fixture the harness previously had no shape for. Every arm observed RED before landing, twice over:
+  the first attempt at breaking arm 16 was a no-op regex and proved nothing, which is exactly the
+  failure mode the rule exists to catch. Bar GREEN 59/59.
 
 ## 10. Reuse audit
 

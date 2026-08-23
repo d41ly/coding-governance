@@ -1823,6 +1823,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_text_or_none",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
