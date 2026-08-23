@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-11 — authoring a playbook: creation, and owner-instructed amendment
 
-**Status:** SPECCED · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-21
+**Status:** CLOSED · rev-6 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-21
 
 ## 1. Goal
 
@@ -152,6 +152,38 @@ half and unit 8's non-exempt playbook is the backstop.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-21 · BUILT, with TWO acceptance criteria overtaken by unit 8's withdrawal and one
+  defect found by insisting on observation.
+
+  **AC2 and AC5b named a backstop that does not exist.** Both rest on unit 8's output-scope refusal —
+  AC2 on its not applying to a `prompt`-mode run, AC5b on its redding a `recipe`-mode run that edits
+  a playbook. Unit 8 is withdrawn, so neither can be observed and neither was faked.
+
+  **And S4's own statement of the anchor split was wrong, in the direction that matters.** S4 says the
+  ordering property has no machine half under `published`. Measured: `resolve_base` takes the SECOND
+  anchor only when the build README fails to resolve at the merge-base, so a run whose build folder
+  predates it keeps `default-branch` semantics and keeps the refusal whatever the scope declares. The
+  arm asserting the opposite was written, run, and came back red — which is the only reason this is
+  a correction rather than a claim that shipped.
+
+  The state that IS unprotected is narrower and worth naming exactly: a run authoring BOTH halves,
+  its own build folder and its own playbook, under `published`. Its BASE is the tip it pushed and
+  that tip carries the playbook it just wrote. That is the `published` anchor's cost 1 reaching one
+  step past what the protocol spelled out — a run that can author its own authorization can author
+  the instructions it is judged against too — and the protocol now records the reach. The Skill
+  states the CHECK against that state and not against a general one, because a rule aimed at the
+  wrong state teaches the wrong habit.
+
+  **AC6 found a live defect.** The piece-scoped items' term zero is MET for a non-recipe run and sets
+  an announcement, under a comment reading "a silent pass is indistinguishable from coverage" — and
+  `verb_close` printed that announcement under the UNMET arm only. The skip was therefore silent: the
+  exact defect the announcing branch was written to prevent, one level up from where it was written,
+  and invisible to every arm units 6 and 7 shipped because none of them read the close's output.
+  Fixed, plus `DOD_OUT` is now cleared BEFORE each `dod_met` call rather than only after a print, so
+  a MET item with nothing to say cannot inherit the previous item's text.
+
+  **S2 and S6 landed as specced and cost almost nothing**, which was the prediction: this unit adds a
+  Skill section and arms, and no code path of its own beyond the one-line close fix above.
 - rev-5 · 2026-08-21 · the owner RATIFIED this unit's existence, which round 1 of the audit said was
   their call and which the previous revision carried as a park. Header gains the `ratified` pointer
   its ten siblings had; nothing about the mechanism moved.
@@ -168,6 +200,18 @@ half and unit 8's non-exempt playbook is the backstop.
   that the owner's first stated verb had no owning unit in the roster of ten and was structurally
   refused by unit 4's preflight; this unit is that hole closed. It also receives F9's redirect, which
   removes the playbook from unit 8's exemption set by giving amendment a home outside the mode.
+
+### What was built, against what was specced
+
+- The Skill's creation section states the routing, the loop's owner, the gate that grades an unbound
+  playbook, and the ordering property SPLIT BY ANCHOR — including the sentence a reader most needs
+  under `published`: land the playbook first, then start the run that follows it.
+- The amendment path is stated with F2's citation obligation as a CHECK carrying its reason, never as
+  a gate, because no gate can read intent.
+- Arms landed for AC1, AC5, AC5b and AC6, with AC5 now covering BOTH scope values over one tree —
+  the pair is the evidence that the scope does not move this refusal. AC3 was already covered by
+  unit 3's staged-break probes and no new arm was added for it. AC2 and AC4 are not armed: AC2's
+  subject is withdrawn, and AC4's end-to-end join is what the existing `tRecipeOk` pass arm observes.
 
 ## 10. Reuse audit
 

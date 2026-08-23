@@ -14,6 +14,28 @@ merge and a push — it REPLACES it with something a machine can check. If the r
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
 
+## Which path
+
+**Four start paths, and picking the wrong one costs a refusal you cannot answer.** Read the row that
+matches what you were handed. The last cell is the `authorized-by:` value the build folder declares,
+which is the key the merge bar re-derives and the driver records.
+
+| You were handed | Path | Declares |
+|---|---|---|
+| a build folder that already exists and names its units | [Start a run](#start-a-run) | `slug` |
+| prose, plus the authorizing parameter, and no build folder | [Start a run from a PROMPT](#start-a-run-from-a-prompt) | `prompt` |
+| a PLAYBOOK that already exists, and a number of pieces to make from it | [Start a PLAYBOOK run](#start-a-playbook-run) | `recipe` |
+| a topic and no playbook — the playbook is what you are to produce | [Author a PLAYBOOK](#author-a-playbook--creation-and-owner-instructed-amendment) | `prompt` |
+
+**The fourth row is the one a reader gets wrong.** Arriving with a topic and no playbook, the
+playbook-run path is the one that looks right and it is the one that cannot work: preflight refuses a
+`playbook:` that does not resolve at BASE, so a no-playbook start never reaches preflight at all.
+Making a playbook and following one are two acts with two authorizations.
+
+**A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
+playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
+It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
+
 ## Start a run
 
 0. **Read `memory/guides/BUILD-METHOD.md` WHOLE, before anything else.** Not conditionally.
@@ -39,12 +61,22 @@ distinction real.
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
    | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
    | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+   | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
+   | `pieces-recorded` | the wrap-up derivation, over the pieces | M9 | recipe | D11 |
 
-   **`Scope`** is which runs a directive binds. `all` binds every unattended run; `prompt` binds only
-   a run whose build README declared `authorized-by: prompt`, because research and a solution test
-   are obligations of a build whose solution was not given. A waiver of a `prompt`-scoped handle is
-   REFUSED on a slug-authorized run rather than recorded, since it would relax a rule that never
+   **`Scope`** is which runs a directive binds. `all` binds every unattended run; a scope naming a
+   mode binds only a run whose build README declared that `authorized-by:` value. `prompt` scopes
+   research and a solution test, which are obligations of a build whose solution was not given.
+   `recipe` scopes the two rows above, which are obligations of a build whose instructions were
+   given: following them to the letter, and recording what came out. A waiver of a scoped handle is
+   REFUSED on a run of another mode rather than recorded, since it would relax a rule that never
    bound it.
+
+   **Neither `recipe` row states its rule, and that is deliberate.** Following a declared procedure
+   to the letter IS the pass loop and its regrounding rule, and recording what was produced IS the
+   wrap-up derivation. Both sections already exist and both are already re-read; a section written
+   per directive is how a method grows until nobody re-reads it, which is what its own budget exists
+   to prevent.
 
    Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
    against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,
@@ -182,6 +214,173 @@ override available and nobody to interpret it.
 `solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
 which is where the loop is stated.
 
+## Start a PLAYBOOK run
+
+**A playbook already exists and the owner wants N pieces from it.** The run FOLLOWS that playbook to
+the letter and produces the number asked for. It declares `authorized-by: recipe`, and that value is
+what turns on everything below: the playbook resolution at BASE, the two piece-scoped
+Definition-of-Done items, and the two `recipe`-scoped directives in the table above.
+
+**CHECK, and there is no machine half — say it out loud before you start.** This mode is for
+producing DECLARED CONTENT: the pieces a playbook describes, landing where its `outputs` globs say.
+**An ordinary code build uses the slug or the prompt path**, and using this one for code would put a
+diff nothing in this kit is shaped to grade under a mode whose whole vocabulary is about pieces. The
+refusal that was to enforce this was withdrawn unbuilt, so on BOTH entry points — unattended and
+attended — this is prose you keep and not a gate you lean on. A reader who mistakes it for
+enforcement will be wrong in the expensive direction.
+
+The steps are ORDERED and the order is the point, exactly as on the prompt path: everything before
+the push is provably older than the commit that authorizes the run.
+
+0. **Read `memory/guides/BUILD-METHOD.md` WHOLE**, and read the PLAYBOOK whole. Then read it
+   again per piece — it is segmented for that, and a pass that carries the last piece's reading
+   forward is the failure mode segmentation exists to answer.
+
+   **Where you are writing the build folder yourself, this path needs `published`**, for the reason
+   the prompt path states, and this project declares `published`. Where the owner landed the
+   build folder before handing you the run, either anchor works and you skip the push in step 4.
+
+1. **Orient from the playbook.** It answers most of what would otherwise be asked: what one piece IS,
+   where pieces land, which checks run over one and which over all N. What it does not answer is
+   usually just the COUNT and, where its `outputs` globs admit more than one location, which.
+
+2. **Decide whether to ask, ONCE.** Same rule and same limit as the prompt path — one
+   `AskUserQuestion`, every gap in it, and from step 4 onward there is nobody to answer. The field
+   set is narrower here, so the ordinary case is no question at all.
+
+3. **Write the build folder.** `memory/builds/<slug>/README.md`, with the six required keys
+   and the generated-region marker pair, plus THREE more:
+
+   - **`authorized-by: recipe`** — the mode.
+   - **`playbook: <repo-relative path>`** — resolved at the pinned BASE, not at HEAD. A playbook this
+     run wrote is not one anything committed before it can vouch for.
+   - **`pieces: <n>`** — the count the close is measured against. Absent, non-numeric or zero is a
+     refusal, because a defaulted count would put a number nobody wrote into the record.
+
+4. **Commit, then PUSH THE BRANCH**, in that order, where you authored the build folder.
+
+5. **Preflight.** It resolves the playbook at BASE and refuses if the playbook declares no output
+   globs, no piece grain or no declaration block — all three are read from the blob at BASE, so fix
+   them in the playbook and land that, never in the working tree.
+
+6. **The kickoff hand-back**, at the slug path's step 5 and for its reason.
+
+**While the pieces are made, RECORD each one.** A verdict that exists only in the transcript is a
+verdict the merge bar cannot read, and the two piece-scoped Definition-of-Done items read the records
+rather than the transcript:
+
+```bash
+bash tools/unattended/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+bash tools/unattended/unattended.sh --record-set <slug> --leg <name> --verdict PASS
+```
+
+Each piece record is hash-joined to the piece, so editing a piece after recording makes its record
+STALE rather than silently stale-and-passing. The SET record is written once, over all N, and its
+identity is the ordered list of this run's piece hashes — derived, because a caller that named its
+own set could name a set it did not produce.
+
+**What you may NOT do is edit the playbook.** A run that rewrites the checklist it is graded by has
+no rules left. What you would change goes on the record with `--propose`, joined to the step that
+provoked it; the amendment is a separate authoring run.
+
+## Author a PLAYBOOK — creation, and owner-instructed amendment
+
+**A run that MAKES a playbook is not a run that FOLLOWS one, and it uses the PROMPT path above, not
+`recipe`.** It has no playbook to name, so a `recipe`-mode preflight refuses it outright; and its
+whole diff lands outside any declared output glob, which is the shape a content run is scoped to
+avoid. There is no third mode here and no new discipline: the loop a playbook is written by is the
+build method's research-then-test-then-choose section, which this path's two scoped directives
+already bind. What this section adds is the ROUTING and one ordering property.
+
+**Arriving with no playbook and a topic is this path, not an error.** Research the subject and the
+code the pieces must relate to, decide what one piece IS, then write the playbook from
+`memory/guides/PLAYBOOK-TEMPLATE.md` — its canon is closed, and the gate grades against the
+template's own section table rather than a list typed somewhere else.
+
+```bash
+bash tools/unattended/check-playbook.sh
+```
+
+The gate grades **every tracked file carrying a declaration block**, whether or not a build README
+names it. So a playbook you commit is graded from that commit forward, and a playbook that does not
+validate cannot land — which is what lets a later run name it without re-validating anything.
+
+**THE ORDERING PROPERTY: the playbook must be older than the BASE of the run that follows it.** Two
+acts, two authorizations. A single run that authored its own instructions and then followed them has
+no external check on either half, and every gate downstream would be grading a document that run
+wrote for itself.
+
+- **Whenever your build folder was committed before your run**, this has a machine half under either
+  anchor. The BASE is then a merge-base you cannot move, a playbook you committed yourself does not
+  resolve there, and preflight refuses with *a recipe-mode build README names a playbook that does not
+  resolve at the pinned BASE*. The scope value does not change this: the second anchor is reached only
+  when the build folder itself fails to resolve at the merge-base.
+- **The one unprotected state is a run that authors BOTH halves** — its own build folder and its own
+  playbook — under `published`, which this project declares (`published`). Its BASE is the tip
+  it pushed, that tip carries the playbook it just wrote, and nothing refuses it. This is the
+  `published` anchor's declared cost reaching one step further than the protocol spells out: a run
+  that can author its own authorization can author the instructions it is judged against too.
+  So this is a CHECK you keep, stated plainly rather than dressed up as a derivation: **land the
+  playbook in its own earlier run, then start the run that follows it.**
+
+**Amendment rides this same path.** Proposals accumulate on the run-state files of the runs that
+found them, and acting on them is a later, owner-instructed run that reads the surfaced proposals,
+edits the playbook and lands it. That is why a piece-producing run may not edit its own playbook and
+needs no exception to say so.
+
+- CHECK, not a gate: **cite the proposals you acted on**, and say which you declined and why. No gate
+  can check this without reading intent, and a proposal already carries the step it amends, so the
+  join survives even when the citation does not — but the owner reading the amendment is entitled to
+  know which of their run's findings survived it.
+
+## Produce pieces ATTENDED
+
+**Not a run, and this section is here because it shares the RECORDS with the paths above and nothing
+else.** An owner is in the loop, so there is no run to authorize, no run-state file, no phase, no
+keepalive and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
+sees nothing here, and that is what "not the driver" means.
+
+**What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
+tracked files, hash-joined to the pieces, and the playbook leg reads both without knowing who wrote
+them or how. So the honest sentence is this one: **the attended path is gated on what it produced,
+the unattended path on that plus how it ran.**
+
+**And read the split exactly, because it is narrower than it sounds.** The leg CLASSIFIES and reports
+— verified, failed, stale, unrecorded, unchecked, orphan, and whether a declared set check has a
+verdict at all. What BLOCKS on any of it is `--close`, which the attended path never calls. So on this
+path those counts are evidence a human must read, and the only thing that reds the bar for you is a
+record whose shape the leg refuses. An earlier revision of this paragraph said the leg read the set
+record when nothing in it opened one; the reader who believed that stopped looking for a gate that
+was not there.
+
+Both writers take a records ROOT instead of a slug — one function, two callers, never two
+implementations:
+
+```bash
+bash tools/unattended/unattended.sh --record-piece - --records-root <root> --path <piece> --leg <name> --verdict PASS --run <label>
+bash tools/unattended/unattended.sh --record-set - --records-root <root> --leg <name> --verdict PASS --run <label> --set <hash,hash>
+```
+
+The root is the playbook's own `records` declaration — read it from the playbook rather than choosing
+one, or the leg reads a different directory from the one you wrote. `--run` labels the batch so a
+later reader can tell one sitting's pieces from another's; on the unattended path the slug fills that
+in.
+
+**`--set` is WEAKER here than on the unattended path, and the difference is worth knowing.** There
+the set identity is DERIVED from the run's own piece records, because a caller that names its own set
+could name a set it did not produce. Here you name it, so it is a claim rather than a derivation —
+which is the same trade the whole attended path makes, one field further down. Take the hashes from
+the piece records you just wrote, not from memory.
+
+**The CHECK about code builds binds here too, and here it has no machine half at all** — not even a
+withdrawn one. The refusal that was to enforce it reads a recorded mode and a run's commit set, and
+both exist only through the driver. An attended path is outside it by construction, which is the kind
+of thing worth knowing before you rely on a gate to catch you.
+
+**No entry in the kickoff engine's exit list, deliberately.** That list enumerates the interactive
+exits an UNATTENDED run has to resolve with nobody to ask. An attended path has an owner by
+definition, so the absence is a decision and not an oversight.
+
 ## While it runs
 
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
@@ -198,6 +397,23 @@ which is where the loop is stated.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
+- A playbook you are FOLLOWING is not a playbook you may edit. A run that rewrites the checklist it
+  is graded by has no rules left, so what you would change goes on the record joined to the step that
+  provoked it, and the amendment is a separate authoring run the owner starts:
+
+  ```bash
+  bash tools/unattended/unattended.sh --propose <slug> --item "<the amendment>" --step "<the step it applies to>" --reason "<what you saw that provoked it>"
+  ```
+
+  Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
+  costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
+- Record a verdict where a check ran over content rather than over code — one piece at a time, and
+  once over the whole set, which is the population a per-piece pass structurally cannot see:
+
+  ```bash
+  bash tools/unattended/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+  bash tools/unattended/unattended.sh --record-set <slug> --leg <name> --verdict PASS
+  ```
 - **When building uncovers what speccing could not, AMEND — do not stall.** M3 delegates this build's
   own scope and M2 names the three acts: RETIRE a unit, SUPERSEDE it, or ADD one the build turns out
   to need. Every amendment owes a row, and this is the verb that writes it:

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-22T05:15:54+03:00 @ bef3071d209891cc770d6b7d255a0ea689304a9a
+last-audit: 2026-08-23T02:48:09+03:00 @ 747255411f9442234198b9c8d6fe69e0284cc18a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: bef3071d209891cc770d6b7d255a0ea689304a9a
@@ -63,7 +63,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
 - **Remote · default branch:** `origin` · `main`.
 - **Branch conventions:** small units on `main` for a solo tooling repo; `git push` needs an explicit
-  ask, or a build folder committed before the run's branch existed (`memory/guides/UNATTENDED-PROTOCOL.md`).
+  ask, or a committed build folder the run did not create. What "did not create" admits depends on the
+  ANCHOR the project declares, and this file does not paraphrase it — an earlier paraphrase here said
+  "committed before the run's branch existed", which describes one anchor and is false of the other.
+  `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
@@ -73,6 +76,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid.
+
+- **An unattended run declares a MODE, and which one decides what binds it**: the authorization
+  discipline, which scoped directives apply, and whether the piece-scoped Definition-of-Done items
+  evaluate at all or announce a skip. The set is a driver constant, the unattended Skill's routing
+  table names a start path per member, and a leg joins the two in both directions. Neither the
+  members nor their count are written here, for the reason the directives bullet above gives.
 
 - **A CLOSED Tier-2 unit owes an acceptance ledger** — one line per numbered criterion, in a record
   whose `**Serves:**` kind is `journal`, in one of two forms and no third. The grammar is
@@ -129,6 +138,13 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
+  take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
+  adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
+  runner. They were 68 % of leg-seconds and the largest put a 26-minute floor under every full run.
+  Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
+  `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
+  rather than an exception.
 - 2026-08-20 · `AGENTS.md`'s merge-bar section states the bar costs 873 s of wall against a 4018 s
   leg-sum · MEASURED over four `GATE_FULL` width-8 runs on node `a`: spans 925-1058 s, mean 1001.3 s,
   leg-sums 4644-6128 s. The stated wall is 14.7 % low and the leg-sum is low by more. Both are prose

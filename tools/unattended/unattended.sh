@@ -10,9 +10,13 @@
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
+#   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
+#   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
+#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
+#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA>
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
 #
@@ -53,17 +57,60 @@ KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — kit identity; set HERE
 # Every read below that turns a sha into bytes or into ancestry goes through GIT(). Reads of the
 # index, the worktree or the ref NAMESPACE stay plain `git` — they are not dereferences.
 export GIT_GRAFT_FILE=/dev/null
-# THE KIT LIBRARY, sourced before anything reads history. It holds every predicate this script and
+# THE KIT'S OWN DIRECTORY, DERIVED, and the LIBRARY it sources from there. ONE name for one
+# derivation: `KIT_DIR` is what the Skill placeholder, the sibling-script lookup and the header
+# self-read all spell, so this block uses it rather than minting a second name for the same path.
+#
+# The library is sourced before anything reads history. It holds every predicate this script and
 # the gate leg must answer identically — `GIT`, the anchored id tests, path containment, and "has
 # this pass committed yet". Sourced by absolute path derived from THIS file's location, because the
 # `cd` to the repo root happens below and a relative source would resolve against the caller's cwd.
-_LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-[ -f "$_LIB_DIR/lib-unattended.sh" ] || {
-  echo "unattended: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $_LIB_DIR/lib-unattended.sh" >&2
+KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+[ -f "$KIT_DIR/lib-unattended.sh" ] || {
+  echo "unattended: the kit library is missing beside this script, so the predicates it shares with its own gate leg are unavailable and no answer here would be trustworthy: $KIT_DIR/lib-unattended.sh" >&2
   exit 2
 }
 # shellcheck source=lib-unattended.sh
-. "$_LIB_DIR/lib-unattended.sh"
+. "$KIT_DIR/lib-unattended.sh"
+
+# ------------------------------------------------------------------------------ THE VERB SET, ONCE
+# the verb-carrier unit. Four carriers used to type this set independently - the header
+# docstring, the usage line, refusal 14 and the dispatch - and THREE were stale the day this landed:
+# `--record-set` had shipped into the dispatch alone, which is precisely the drift a prior unit's own
+# comment claimed to have fixed. The dispatch now READS this line, so a verb missing from it does not
+# read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
+# place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
+# the gate leg, because no runtime derivation crosses a file boundary.
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch"
+# The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
+# dispatch cannot treat them alike, and merged again for every reader, who does not care.
+VERBS_INLINE="--plan --phase"
+verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
+is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
+verb_list() { # -> "--a, --b and --c", for a human reading a refusal
+  local out="" w n=0 total
+  total=$(set -- $(verbs_all); echo $#)
+  for w in $(verbs_all); do
+    n=$((n+1))
+    if   [ "$n" = 1 ];      then out="$w"
+    elif [ "$n" = "$total" ]; then out="$out and $w"
+    else out="$out, $w"; fi
+  done
+  printf '%s' "$out"
+}
+# The usage text, READ FROM THIS FILE'S OWN HEADER. A second spelling of every verb's arguments is
+# the drift this block removes, and the header is the spelling that documents them. The self-read
+# assumes $0 names this file - which KIT_DIR above already assumes, so it adds no new one.
+SELF="$KIT_DIR/$(basename -- "$0")"
+usage() {
+  local u; u=$(sed -n 's|^#   unattended[.]sh |  unattended.sh |p' "$SELF")
+  # A PROBE THAT CANNOT MOVE SAYS SO. Read through a copy whose header was stripped, or through any
+  # invocation where $0 does not name this file, the sed above matches nothing - and a bare "usage:"
+  # over an empty list is indistinguishable from a driver with no verbs. Refuse into the derived set
+  # instead, which is the one carrier that cannot go missing.
+  [ -n "$u" ] || { echo "usage: cannot read this file's own header at $SELF, so the argument shapes are unavailable; the verbs are $(verb_list)"; return 0; }
+  echo "usage:"; printf '%s\n' "$u"
+}
 
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -86,7 +133,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
-PK_ITEM=""
+PK_ITEM=""; PK_STEP=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -113,7 +160,28 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+
+# the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
+# for the reason those are: a parked row whose kind is outside this set lands in a region every
+# reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
+# when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
+# - one spelling of a vocabulary that two files read.
+PARK_KINDS="decision abort override waiver proposal rescope dispatch"
+# The kinds that are OWED to the owner as an ANSWER. Three are deliberately absent, and they are
+# absent for one reason: each is a DECLARATION the run made, not a question it refused. A proposal is
+# an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
+# dispatch is a claim about what two passes will write. Counting any of them as parked would make a
+# run that recorded six of its own acts look like a run that stalled on six decisions.
+PARK_KINDS_OWED="decision abort override waiver"
+# The Definition-of-Done items an override may NOT buy. A DECLARED set rather than a name hardcoded
+# into a case arm: it WAS one name, and the second arrived as an acceptance criterion this build had
+# ratified and never implemented — found by writing the arms the item never had.
+#
+# `pieces-complete` joins it because it is the item that says the run produced what the owner asked
+# for, over content nothing else in the bar can grade. An override on it is the run certifying its
+# own output, which is the same shape the authorization item is protected from.
+DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 
 # TOOL-cBriefedPilot-2 - the DEFAULT DIRECTIVE SET. Eleven handles, each a NAME and a POINTER into
 # a section of the build method, and NOT ONE of them a restatement of the rule it points at. The
@@ -132,7 +200,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 #
 # The scope is NOT a project knob. A project may EXTEND the set; it may not narrow the core, and a
 # project-selectable scope is narrowing wearing a different name.
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt"
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt playbook-followed:M7:recipe pieces-recorded:M9:recipe"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
@@ -288,6 +356,7 @@ AUTH_PLAYBOOK=""
 AUTH_PIECES=""
 AUTH_OUTPUTS=""
 AUTH_GRAIN=""
+AUTH_RECORDS=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -872,15 +941,26 @@ check_authorization() { # slug · base
     fi
     # The declaration block is unit 2's fenced TOML. Read for the two keys THIS unit owns; the rest
     # belong to the units that read them and are parsed there.
-    AUTH_OUTPUTS=$(printf '%s\n' "$_pb" | sed -n 's/^outputs[[:space:]]*=[[:space:]]*//p' | head -1)
-    AUTH_GRAIN=$(printf '%s\n' "$_pb" | sed -n 's/^grain[[:space:]]*=[[:space:]]*//p' | head -1 | sed 's/^"//; s/"[[:space:]]*$//')
+    # THROUGH THE SHARED PARSER. The fold moved `grain` and `records` onto it and left this line
+    # alone, and the guard below string-compared the raw text against `[]` - so the kit's OWN template
+    # line, `outputs      = []    # globs. Where pieces land.`, matched neither alternative and
+    # `fail 46` never fired. An adopter who copied the template and never filled `outputs` was
+    # authorized for a recipe-mode run declaring no output globs, which is exactly the state the
+    # refusal's own message says leaves the scope check with nothing to compare against. Round 2's M1,
+    # one key over, on the other member of DOD_NO_OVERRIDE.
+    if ! AUTH_OUTPUTS=$(declared_list "$_pb" outputs); then
+      fail 46 "the playbook at the pinned BASE opens an output-glob list it does not close on the same line, so the globs bounding where a recipe-mode run may write are unreadable and an unarmed parse must red rather than return the declared null: $AUTH_PLAYBOOK"
+      return 1
+    fi
+    AUTH_GRAIN=$(declared_scalar "$_pb" grain)
+    AUTH_RECORDS=$(declared_scalar "$_pb" records)
     case "$_pb" in
       *'```toml'*) ;;
       *) fail 46 "the playbook at the pinned BASE carries no declaration block, so its output globs, its piece grain and its gate legs are all unreadable and every check keyed on them would pass over nothing: $AUTH_PLAYBOOK"
          return 1 ;;
     esac
     case "$AUTH_OUTPUTS" in
-      ''|'[]') fail 46 "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against: $AUTH_PLAYBOOK"
+      '') fail 46 "the playbook at the pinned BASE declares no output globs, so a recipe-mode run has nowhere its pieces may legally land and the scope refusal would have nothing to compare against: $AUTH_PLAYBOOK"
          return 1 ;;
     esac
     if [ -z "$AUTH_GRAIN" ]; then
@@ -1688,6 +1768,7 @@ verb_preflight() { # slug · keepalive-id
     [ -n "$(fact "$rel" playbook)" ] || set_fact "$rel" playbook "$AUTH_PLAYBOOK" || return 1
     [ -n "$(fact "$rel" pieces)" ]   || set_fact "$rel" pieces   "$AUTH_PIECES"   || return 1
     [ -n "$(fact "$rel" grain)" ]    || set_fact "$rel" grain    "$AUTH_GRAIN"    || return 1
+    [ -n "$(fact "$rel" records)" ]  || set_fact "$rel" records  "$AUTH_RECORDS"  || return 1
   fi
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
@@ -1738,7 +1819,7 @@ set_fact() { # file · key · value
 }
 
 verb_status() { # slug
-  local slug="$1" rel p w unit nparked parked
+  local slug="$1" rel p w unit nparked parked unowed nnoted
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
@@ -1762,8 +1843,21 @@ verb_status() { # slug
   # PARKED COUNT, when there is one. `--park` writes a decision the owner does not hear until the
   # wrap-up; the verb an agent checks itself with should say something is waiting rather than leave
   # it to a file nobody re-opens. Omitted at zero, so the ordinary line does not grow a `· 0`.
-  nparked=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z (decision|abort|override|waiver) · item ' "$rel" 2>/dev/null || true)
+  # DERIVED alternation. This line typed four kinds, so the fifth was a row --status did not
+  # recognise at all - the silent-skip shape, one verb over from the gate that bans it.
+  nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$PARK_KINDS_OWED")) · item " "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
+  # The rows the owner is TOLD about but owes no answer to, counted apart and printed apart. Folded
+  # into `parked`, a run that recorded six of its own acts would read exactly like a run that stalled
+  # on six decisions, and the owner would open the file to tell them apart. The field is `noted`
+  # rather than any kind's name: the unowed set is DERIVED and holds three kinds, so a label naming
+  # one of them would be wrong about the other two the day a merge added them - which is the day
+  # this line was written.
+  unowed=$(park_kinds_unowed)
+  if [ -n "$unowed" ]; then
+    nnoted=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null || true)
+    [ "${nnoted:-0}" -gt 0 ] 2>/dev/null && parked="$parked · noted $nnoted"
+  fi
   printf 'unattended: %s · phase %s · witness %s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$unit" "$parked"
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
@@ -1799,7 +1893,7 @@ is_overridden() { # item -> 0 when it appears in OV_ITEMS
 }
 
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
-  local slug="$1" rel item ck unmet=0 i=0 n ov reason
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
   n=${#OV_ITEMS[@]}
   check_slug "$slug" || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
@@ -1839,9 +1933,13 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     # override for this one" — and the generic loop happily accepted it, which makes the override on
     # the authorization check the authorization check. Named here so the refusal cites the rule.
     # It fires wherever the item appears in the list, not only first: the loop reaches every pair.
-    case "$ov" in
-      authorization-reachable)
-        fail 21 "the authorization item is NOT overridable; an override on the authorization check IS the authorization check, and the protocol states there is no override for this one"
+    case " $DOD_NO_OVERRIDE " in
+      *" $ov "*)
+        case "$ov" in
+          authorization-reachable) _why="an override on the authorization check IS the authorization check" ;;
+          *) _why="it is the item that says this run made what the owner asked for, so an override on it is the run certifying its own output" ;;
+        esac
+        fail 21 "a Definition-of-Done item in the non-overridable set cannot be bought with --override, and --abort is the honest exit when it cannot be met - item and reason follow: $ov, $_why"
         return 1 ;;
     esac
     i=$((i + 1))
@@ -1849,6 +1947,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
     is_overridden "$item" && continue
+    # CLEARED BEFORE THE CALL, not only after a print. `dod_met` does not clear it on entry, so an
+    # item that says nothing would otherwise inherit whatever the previous item left behind and
+    # attribute one item's explanation to another.
+    DOD_OUT=""
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
@@ -1870,10 +1972,19 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
         # 68 of them "GATE ok" -- which buries the one line the operator needs in the noise the
         # unit exists to remove. Anything that is not an ok/skip line survives, so a FAIL, a
         # summary and any stderr all reach the operator while the roll-call does not.
-        [ -n "${DOD_OUT:-}" ] && printf '%s
-' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
+        [ -n "${DOD_OUT:-}" ] && printf '%s\n' "$DOD_OUT" | grep -vE '^(GATE (ok|skip) )' | sed 's/^/    /'
         DOD_OUT=""
       fi
+    else
+      # the playbook-authoring unit - A MET ITEM WITH SOMETHING TO SAY SAYS IT. The piece-scoped items
+      # carry a term zero that is MET for every non-recipe run and sets DOD_OUT to announce the skip,
+      # under a comment reading "a silent pass is indistinguishable from coverage" - and the print
+      # above reached only the UNMET arm, so the announcement went nowhere and the skip was silent.
+      # The defect the announcing branch exists to prevent, one level up from where it was written,
+      # and found by an acceptance criterion asking to OBSERVE the announcement rather than the code.
+      [ -n "${DOD_OUT:-}" ] && printf 'unattended: %s
+' "$DOD_OUT"
+      DOD_OUT=""
     fi
   done
   [ "$unmet" = 0 ] || return 1
@@ -1943,6 +2054,191 @@ dod_met() { # slug · run-state file · item · checker
       region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1 \
         && [ -z "$(region "$rel" "$GEN_OPEN" "$GEN_CLOSE" 2>/dev/null | tr -d '[:space:]')" ] \
         && region "$(readme_of "$slug")" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1 ;;
+    pieces-complete|set-checks-recorded)
+      # TERM ZERO, and it is first because everything else depends on it. `verb_close` evaluates
+      # DOD_CORE for EVERY run with no mode branch anywhere, so an item only a recipe-mode run can
+      # satisfy would block --close on every slug- and prompt-mode run in the fleet, on an item whose
+      # only exit is --abort. Implemented HERE rather than as a third DOD_CORE field: `checker_of`
+      # uses shortest-prefix removal and would route a three-field entry silently down the machine
+      # path in both consumers.
+      #
+      # MET, and it ANNOUNCES the skip. A silent pass is indistinguishable from coverage.
+      if [ "$(fact "$rel" mode)" != recipe ]; then
+        DOD_OUT="skipped — $item is scoped to recipe-mode runs and this run's recorded mode is $(fact "$rel" mode)"
+        return 0
+      fi
+      _pb=$(fact "$rel" playbook)
+      _n=$(fact "$rel" pieces)
+      if [ -z "$_pb" ] || [ -z "$_n" ]; then
+        DOD_OUT="a recipe-mode run records no playbook or no piece count, so there is nothing to measure this item against: playbook '$_pb' count '$_n'"
+        return 1
+      fi
+      # THE WHOLE PLAYBOOK COMES FROM THE PINNED BASE, not from the working tree. Round-1 HIGH 4
+      # found this arm handing `--counts` a PATH the leg read off disk while `set-checks-recorded`
+      # below it read the BASE blob; the fix pinned `grain` and `records` and LEFT `piece_checks` on
+      # disk, so one uncommitted line still moved a piece from `unchecked` to `verified` — on the
+      # item that takes no override. Round 2 caught that inside the commit that introduced it.
+      #
+      # A SHA, not a field list. A per-field pin is a list somebody has to remember to extend, and
+      # the evidence that nobody does is this arm's own history.
+      # THE PIN IS BOUND AND CHECKED BEFORE THE CALL. `fact` returns empty with exit 0 for an
+      # absent key, so passing it straight through let an absent BASE reach the leg as "no pin" —
+      # which silently read the working tree. The leg refuses that now too; both ends, because this
+      # is the third round in which an optional pin turned out to be the whole defect.
+      _at=$(fact "$rel" base)
+      if [ -z "$_at" ]; then
+        DOD_OUT="this run's record pins no BASE, so the playbook this item measures could only be read from the working tree - the file the run itself can edit: $rel"
+        return 1
+      fi
+      # CAPTURED ONCE, SELECTED FROM. Piping the leg straight into `grep -m1 '^pieces='` threw away
+      # every refusal it prints — an unresolvable sha, an undeclared records root, a git failure and
+      # an unterminated declaration all arrived here as the same empty string, and the generic
+      # sentence below named none of them. The `gates-green` arm eleven lines up carries this exact
+      # lesson in its own comment: SURFACED, not discarded.
+      _raw=$(bash "$KIT_DIR/check-playbook.sh" --counts "$_pb" "$slug" "$_at" 2>&1)
+      _counts=$(printf '%s\n' "$_raw" | grep -m1 '^pieces=')
+      # THE LEG'S EXIT STATUS IS DELIBERATELY NOT READ HERE, and that is a measurement rather than an
+      # oversight. `--counts` runs the SAME per-playbook validity checks the full leg does, so the leg
+      # exits non-zero for a curator, a step floor or a tag-grammar finding — none of which say
+      # anything about whether the census is trustworthy. Blocking on the status was written, run, and
+      # reverted: it turned nine specific DoD refusals into one generic sentence, because the driver's
+      # own fixture playbook declares a step floor it cannot meet and the leg has always red on it.
+      #
+      # THE TWO REFUSALS THAT DO INVALIDATE A CENSUS ALREADY REACH THIS CALLER, by two different
+      # routes and neither of them the exit status. An unparseable `piece_checks` makes the leg
+      # `continue` past that playbook, so no `pieces=` line is printed at all and the missing-count
+      # branch below fires with the leg's own words attached. An unparseable `set_checks` is refused by
+      # `set-checks-recorded` reading the same blob directly, one item down. Check 28a is what keeps
+      # that second claim true: it enumerates every call site of a parser that can refuse and reds one
+      # that drops the status, which is the rule this item's sibling broke.
+
+      # SELECTED BY SHAPE, never by position. `head -1` took whatever the leg printed first, so any
+      # note reaching stdout made every field below parse to that line's first word — the parse
+      # cannot fail, it just yields nonsense, and the close then blocks on a fabricated count.
+      if [ -z "$_counts" ]; then
+        DOD_OUT="the piece enumerator produced no machine-readable count line, so there is no population to measure this item against and a parsed value here would be invented: $_pb"
+        # THE ENUMERATOR'S OWN WORDS, when it had any. Without this the operator learns only THAT the
+        # count is missing and has to re-run the leg by hand to learn why.
+        _why=$(printf '%s\n' "$_raw" | grep -m1 'FAILED' || true)
+        [ -z "$_why" ] || DOD_OUT="$DOD_OUT
+    $_why"
+        return 1
+      fi
+      _pc=${_counts#pieces=}; _pc=${_pc%% *}
+      _vc=${_counts#*verified=}; _vc=${_vc%% *}
+      _fc=${_counts#*failed=}; _fc=${_fc%% *}
+      _sc=${_counts#*stale=}; _sc=${_sc%% *}
+      _uc=${_counts#*unrecorded=}; _uc=${_uc%% *}
+      _xc=${_counts#*unchecked=}; _xc=${_xc%% *}
+      if [ "$item" = pieces-complete ]; then
+        # TERM 1 - the VACUITY GUARD, and it is ordered before term 2 for `build-complete`'s reason:
+        # "every piece is verified" is vacuously true over no pieces at all.
+        if [ "${_pc:-0}" -eq 0 ]; then
+          DOD_OUT="this run produced no piece under the playbook's declared grain, and 'every piece is verified' is vacuously true over none of them, so completeness cannot be read from it: $_pb"
+          return 1
+        fi
+        [ "${_sc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced is STALE - its record describes bytes the piece no longer has, so the verdict on it is about a different file: $_sc stale"; return 1; }
+        # M7 (round-1 diff review): THERE IS NO `unrecorded` TERM, and its absence is the honest
+        # state rather than an omission. `--counts` run-scoped derives membership FROM the records,
+        # so a piece with no record belongs to no run and is excluded before it can be counted — the
+        # enumerator says so in its own comment. This arm therefore read `_uc`, which is structurally
+        # always zero here, under a message that reads as enforcement. Term 3's count comparison
+        # catches the same condition and can actually fire. A branch no fixture can reach is the
+        # shape this kit gates against everywhere else.
+        # TERM 2 - PROVENANCE and DONENESS are two questions. `verified` requires the hash join AND
+        # every declared leg recording PASS, which is what makes "its declared legs green" implemented
+        # rather than merely cited.
+        [ "${_fc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced records a FAILING leg verdict, so its declared checks ran and one of them said no: $_fc failed"; return 1; }
+        # TERM 2b - UNCHECKED. A piece whose record names no verdict for a leg the playbook DECLARES
+        # is not verified and never was: before this term the census tested for the ABSENCE of a FAIL,
+        # so a record carrying no verdict at all counted as verified and this item certified pieces
+        # nothing had checked. An explicit NA satisfies a declared leg; an absent row does not.
+        [ "${_xc:-0}" -eq 0 ] || { DOD_OUT="a piece this run produced records no verdict for a leg its playbook DECLARES, so the check was never run and 'verified' would be a word about provenance alone: $_xc unchecked"; return 1; }
+        # TERM 3 - the COUNT, against the number the owner asked for at BASE.
+        [ "${_vc:-0}" -eq "${_n:-0}" ] || { DOD_OUT="this run's verified piece count is not the count its build README asked for at the pinned BASE - verified against requested: $_vc against $_n"; return 1; }
+        DOD_OUT=""; return 0
+      fi
+      # set-checks-recorded. It reads the VERDICTS and not merely their existence: the sibling item it
+      # was modelled on asserts a bound review EXISTS because a prose verdict grammar cannot be
+      # anchored, and that limit does not transfer here - a set check is a declared leg with a binary
+      # anchored verdict, so declining to read it shipped the exact green this unit exists to prevent.
+      # THE BLOB, READ ONCE AND ASSERTED. M2 (round-1 diff review): both extractions below came from
+      # separate `GIT show` calls with stderr discarded, so a wrong path, a wrong base or a swallowed
+      # failure ALL yielded the empty string — which the `case` immediately read as "declares
+      # nothing" and returned MET. A probe that cannot move must say so, and the sibling arm has
+      # exactly that assertion, so the asymmetry was internal and the coverage accidental.
+      _blob=$(GIT show "$(fact "$rel" base):$_pb" 2>/dev/null)
+      if [ -z "$_blob" ] || ! printf '%s\n' "$_blob" | grep -q '^```toml'; then
+        DOD_OUT="the playbook does not resolve at the pinned BASE or carries no declaration block there, so this item would read an empty set_checks and certify set coverage over a playbook nothing could read: $_pb"
+        return 1
+      fi
+      _rr=$(declared_scalar "$_blob" records)
+      # M1: the escape is matched against a TRIMMED value. It compared RAW text, and the line the
+      # kit's own template ships - `set_checks   = []    # the checks that run over ALL N…` - does not
+      # equal `[]`, so an author who declares none and keeps the template's own comment was told they
+      # declared some, on a run with nobody present to make the call. The `_rr` extraction one line up
+      # already trimmed; the inconsistency was between two lines of one arm.
+      #
+      # The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
+      # THE REFUSAL IS READ. Round 4's second blocker: this was a bare assignment, so the rc 2 the
+      # round-3 fold added arrived as empty stdout, the `''` alternative below matched it first, and
+      # a declaration the parser could not read returned MET with no record, no verdict and no
+      # override entry. Two of the parser's three call sites branched on the status and the commit
+      # message claimed all three did. Check 28 now counts them.
+      if ! _declared=$(declared_list "$_blob" set_checks); then
+        DOD_OUT="the playbook at the pinned BASE opens a set-scoped check list it does not close on the same line, so this item would read the declared null and certify set coverage over a declaration nothing could parse: $_pb"
+        return 1
+      fi
+      # HIGH 3 (round-3): the declared null is the WORD `none`, not any value starting with it. A
+      # set check named `nonempty-rows` read as "declares nothing" and this item returned MET with no
+      # record, no verdict and no override entry.
+      case "$_declared" in
+        ''|none|'none '*|none[!A-Za-z0-9-]*) DOD_OUT=""; return 0 ;;
+      esac
+      # M2, second half: with checks DECLARED and no records root, `_rr` was empty and `_set`
+      # degenerated to the absolute path `/set-<slug>.md`, so the item red naming a path outside the
+      # repository — a true refusal for a false reason, which sends the reader to the wrong file.
+      if [ -z "$_rr" ]; then
+        DOD_OUT="the playbook declares set-scoped checks and no records root at the pinned BASE, so a set verdict has nowhere to be written that this item could read: $_pb"
+        return 1
+      fi
+      _set="$_rr/set-$slug.md"
+      [ -f "$_set" ] || { DOD_OUT="the playbook declares set-scoped checks and this run recorded no set verdict, so the population a per-piece review structurally cannot see went unmeasured: $_set"; return 1; }
+      if grep -q '^leg .* · verdict FAIL$' "$_set"; then
+        DOD_OUT="a set-scoped check recorded a FAILING verdict, and these are the checks that see what a per-piece review cannot - a monoculture passes every piece and fails here: $_set"
+        return 1
+      fi
+      # THE JOIN, against the DECLARED set. Round-1 HIGH 1: this arm required a set record to exist
+      # and to carry no FAIL, so ONE `NA` on a leg the playbook never declared satisfied it while the
+      # declared checks went unrun - the same hole as the per-piece blocker, one population up, under
+      # a comment claiming it "reads the VERDICTS and not merely their existence". An explicit NA
+      # satisfies a declared check; an absent row does not.
+      _smiss=""
+      for _sl in $_declared; do
+        grep -qxF -- "leg $_sl · verdict PASS" "$_set" && continue
+        grep -qxF -- "leg $_sl · verdict NA" "$_set" && continue
+        _smiss="$_smiss $_sl"
+      done
+      if [ -n "$_smiss" ]; then
+        DOD_OUT="the playbook declares a set-scoped check this run's set record carries no verdict for, so the population a per-piece review structurally cannot see went unmeasured under a record that looks complete - declared and unrecorded:$_smiss in $_set"
+        return 1
+      fi
+      # L1 (round-1 diff review): the SET IDENTITY, compared. `record_set` writes the ordered member
+      # hashes and its own comment names a `superseded` state — a set verdict beside a stale member
+      # list is a verdict about a different set — and nothing anywhere read the line. The reachable
+      # path is ordinary: record a set PASS, then re-record any piece, which re-stamps that piece's
+      # hash, and the verdict now describes a set that no longer exists. Derived the same way the
+      # writer derives it, so the two cannot disagree about what the set IS.
+      _live=$(for _r in $(GIT ls-files -- "$_rr/*.md"); do
+                [ "$(sed -n 's/^run: //p' "$_r" | head -1)" = "$slug" ] || continue
+                sed -n 's/^hash: //p' "$_r" | head -1
+              done | LC_ALL=C sort | tr '\n' ',' | sed 's/,$//')
+      _rec=$(sed -n 's/^set: //p' "$_set" | head -1)
+      if [ "$_rec" != "$_live" ]; then
+        DOD_OUT="the set verdict describes a SUPERSEDED set - its recorded member list is not this run's pieces as they now stand, so a passing set check was taken over a population that has since changed: $_set"
+        return 1
+      fi
+      DOD_OUT=""; return 0 ;;
     landed-via-lander)
       [ -n "$LANDER" ] && [ -n "$BYPASS_BAN" ] && ! grep -qF -- "$BYPASS_BAN" "$rel" ;;
     build-complete)
@@ -2090,8 +2386,131 @@ $_bcnon"
 # parked region, and the build method derives the owner's open/parked row from parked entries "plus any
 # recorded DoD override" - so an abort would have arrived in the one turn the owner gets, wearing the
 # label of a Definition-of-Done override that never happened.
-park() { # file · kind · item · reason
-  printf '\n%s %s · item %s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$4" >> "$1"
+# ---------------------------------------------------------------- the DECLARED-LIST parse, ONCE
+# A TOML list value from the declaration block -> its members, space-separated. THREE call sites had
+# three spellings of this, which is why the trailing-comment strip landed in two of them and not the
+# third: round 1 fixed `set_checks`, the fold added `piece_checks` seventy-five lines away without it,
+# and the kit's OWN template ships `piece_checks = []    # the checks that run over ONE piece.` — a
+# line that word-splits into eight phantom legs and grades every piece `unchecked`.
+#
+# The helper cannot live in a shared file: each kit script is copy-installed standalone. So it is
+# inlined once per script and the two copies are compared against each other by a leg check, which is
+# the only way two inlined copies stay one answer.
+#
+# The comment strip requires WHITESPACE before the `#`, so a legal `["a#b"]` survives it.
+declared_list() { # body · key -> members space-separated; rc 2 on an unterminated array
+  # THE LINE SELECTION LIVES HERE, and that is the whole point. Round 3's blocker: all three call
+  # sites did their own `sed … | head -1`, so a LEGAL multi-line TOML array yielded the bare `[`,
+  # parsed to the declared null, and every piece carrying no verdict graded `verified` — on the one
+  # Definition-of-Done item that takes no `--override`. No attacker needed; an author formatting an
+  # array the ordinary way was enough.
+  #
+  # AN UNARMED PARSE REDS RATHER THAN RETURNING THE DECLARED NULL (charter §7). Spanning the value
+  # would be the other honest fix; refusing is cheaper and cannot be wrong about what it did not read.
+  # THE COMMENT COMES OFF BEFORE THE TERMINATOR TEST, and the order is the whole fix. Round 4's
+  # blocker: this ran the `case` on the RAW line, so a `]` anywhere in a trailing comment satisfied
+  # the closed arm, the strip below then reduced the value to a bare `[`, and a legal multi-line
+  # array parsed to the DECLARED NULL at rc 0 - the round-3 blocker restored by the commit that
+  # fixed it. `piece_checks = [   # one per piece [see section 7]` is ordinary TOML authoring, and
+  # the kit's own template puts a trailing comment on every declaration line.
+  #
+  # THE STRIP REQUIRES WHITESPACE BEFORE THE `#`, so a legal `["a#b"]` survives it. A `#` that IS
+  # preceded by whitespace inside a quoted member (`["a", "b #c"]`) now REFUSES rather than
+  # corrupting silently - the honest outcome for a line-oriented shell parser that cannot tokenise
+  # TOML, and the reason this returns rather than guessing.
+  # THE COMMENT COMES OFF THE WHOLE LINE, BEFORE THE KEY IS REMOVED, and the ORDER of those two is
+  # the fix. Round 4 moved the strip in front of the terminator test and left it AFTER the key strip,
+  # which had already eaten the whitespace the strip needs: `outputs = # globs...` lost `outputs =`
+  # first, so the `#` no longer had whitespace before it, survived, and became the VALUE. Measured on
+  # the shipped parser, that returned the comment text at rc 0 for every empty-valued declaration -
+  # and the round-4 fold had just narrowed the outputs guard to the empty string, so a recipe-mode run
+  # declaring no output globs was authorized by the repair.
+  #
+  # Stripping the whole line first cannot have that ordering hazard: the whitespace before a trailing
+  # `#` is still there when the strip runs. A `#` with NO whitespace before it is a member character
+  # (`["a#b"]`) and survives, which is the property the strip was written to keep.
+  # NORMALISE FIRST, CLASSIFY SECOND, and never the other way round. Every round of this build has
+  # broken here and always the same way: a decision taken on the LINE rather than on the TOKEN it is
+  # about. `*'['*']'*` asked whether a `]` appeared anywhere; the comment strip asked for whitespace
+  # the key strip had already eaten; and the positional closer that replaced them ran BEFORE the trims,
+  # so `["a", "b"] ` - one trailing space on a perfectly closed array - was refused at rc 2 and the
+  # driver told the author their bracket was unclosed. Three spellings of one mistake, each introduced
+  # by the commit fixing the last.
+  #
+  # So the pipeline below produces a fully normalised VALUE - comment gone, key gone, CR gone, ends
+  # trimmed - and nothing is asked about it until it is. A `#` at position zero is then unambiguous:
+  # a TOML value cannot begin with one, so it is a comment on a key with no value at all.
+  local raw
+  raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
+        | sed 's/[[:space:]][[:space:]]*#.*$//' \
+        | sed "s/^$2[[:space:]]*=[[:space:]]*//" \
+        | tr -d '\r' \
+        | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  case "$raw" in '#'*) raw='' ;; esac
+  # AND THE CLOSER IS ANCHORED AT BOTH ENDS. A value is an array only if it STARTS with `[`, so
+  # `k = "a[0]"` is not one and is not refused for failing to close; an array that starts is closed
+  # only if it ENDS with `]`, so `["a[0]",` refuses instead of silently dropping the members below it.
+  case "$raw" in
+    '['*']') ;;
+    '['*) return 2 ;;
+  esac
+  printf '%s\n' "$raw" | tr -d '"' \
+    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
+  # THE SIBLING OF `declared_list`, and it selects its own line for that helper's reason: a `head -1`
+  # spelled at each call site is a decision nobody reviews again. Round 3, HIGH 6: the list parse was
+  # consolidated while five scalar reads stayed ad-hoc, so an adopter who filled the shipped template
+  # in place and kept its comments got `grain` parsed WITH the comment — a DEAD PROBE over a tree of
+  # real pieces — while `curated = ""    # who ratified…` satisfied the freeze on an unratified
+  # playbook.
+  #
+  # Same copy-inlined discipline as its sibling: each kit script installs standalone and cannot
+  # import, so both copies are byte-compared by the leg check that compares that one's.
+  # THE COMMENT COMES OFF THE WHOLE LINE FIRST. Same ordering repair as the list parser, same reason:
+  # the key strip consumed the whitespace this strip requires, so `curated = # who ratified...` parsed
+  # to its own comment and the freeze - fork 4's only machine consequence - passed on an unratified
+  # playbook. A `#` with no whitespace before it stays, because that is a value character.
+  # THE `#` AT POSITION ZERO, for its sibling's reason: the trailing-comment strip needs whitespace
+  # before the `#` and a key with no value at all leaves none, so `k =# note` and `k =#note` came back
+  # as their own comment text at rc 0. A TOML value cannot begin with `#`.
+  printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
+    | sed 's/[[:space:]][[:space:]]*#.*$//' \
+    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | sed 's/^#.*$//' | tr -d '\r' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
+    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+kinds_re() { # word-list -> word|word|word
+  # DERIVED, never typed. A leading, trailing or doubled space in the source set would otherwise mint
+  # an EMPTY alternative, and an empty alternative matches every line: the widest possible predicate,
+  # produced by whitespace nobody can see. Unquoted expansion word-splits and drops the empties.
+  local out="" w
+  for w in $1; do out="${out:+$out|}$w"; done
+  printf '%s' "$out"
+}
+park_kinds_unowed() { # -> the kinds the owner is NOT owed an answer to, by DIFFERENCE
+  # A difference rather than a second list, so the two sets cannot disagree. A sixth kind added to
+  # PARK_KINDS and not to the owed set appears in the status split automatically instead of becoming
+  # a row `--status` counts nowhere.
+  local out="" k
+  for k in $PARK_KINDS; do
+    case " $PARK_KINDS_OWED " in *" $k "*) continue ;; esac
+    out="${out:+$out }$k"
+  done
+  printf '%s' "$out"
+}
+
+park() { # file · kind · item · reason · [step]
+  # THE STEP IS OPTIONAL AND IT IS NOT LINE-FINAL. `reason` is, and two live readers depend on
+  # that: `recorded_waivers` takes the handle as the token between ' · item ' and ' · reason ',
+  # and the leg's check 17 recovers an item by stripping a trailing reason. Appending `step`
+  # AFTER `reason` would pull it inside both of those matches, so a proposal row could rename the
+  # handle a waiver row records. It goes BETWEEN the two fields, where no existing reader looks.
+  local step=""
+  [ -n "${5:-}" ] && step=" · step $5"
+  printf '\n%s %s · item %s%s · reason %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$2" "$3" "$step" "$4" >> "$1"
 }
 
 # TOOL-cSettledDocket-1 - the fourth writer of a parked entry, and the first one available MID-RUN.
@@ -2180,6 +2599,286 @@ PARKED
   return 0
 }
 
+# the proposal-kind unit - the FIFTH parked kind, and the only one a pass writes for the OWNER's
+# benefit rather than its own. A `recipe`-mode run follows a playbook to the letter, so the one thing
+# it must not do is improve that playbook mid-run: a run that rewrites the checklist it is graded by
+# has no rules left. What it CAN do is say what it would change, joined to the step that provoked it,
+# and leave the amendment to a separate authoring run.
+#
+# A KIND and not a register, which the owner ratified (spec F1). The close blocks on NO parked kind -
+# measured against `dod_met` and `--abort`, not assumed - so a proposal is non-blocking already and
+# needs no Definition-of-Done item of its own. What surfaces it at the wrap-up is an ATTESTATION,
+# `parked-decisions-surfaced`, and the spec says so plainly rather than calling it a derivation.
+#
+# The guards are verb_park's, REUSED and widened to the new field rather than re-argued. Each exists
+# because of a recorded defect, and the STEP is a third place every one of them can be broken: a
+# newline forges a row, the separator makes the row unparseable by the check that grades it, and the
+# bypass flag reds the bar on a record no verb can rewrite.
+verb_propose() { # slug · item · step · reason
+  local slug="$1" item="$2" step="$3" reason="$4" rel want pl
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to propose a playbook amendment against: $rel"; return 1; }
+  [ -n "$item" ] || { fail 48 "--propose requires --item, because a proposal naming no amendment is the bare 'noticed something' that a wrap-up cannot act on and the next run cannot find"; return 1; }
+  [ -n "$step" ] || { fail 48 "--propose requires --step, because an amendment floating free of the playbook step that provoked it is advice, and the owner would have to re-derive where it applies"; return 1; }
+  [ -n "$reason" ] || { fail 48 "--propose requires --reason, because a proposal recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make"; return 1; }
+  if [ "$(printf '%s' "$reason$item$step" | wc -l)" -ne 0 ]; then
+    fail 48 "a proposed item, step or reason contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  # ITEM AND STEP, not the reason. The reason is the LINE-FINAL field and can hold anything; these
+  # two are read back as the tokens between the separators, so either one spelling a separator makes
+  # its own record unparseable - by the very check that reads it.
+  case "$item$step" in *" · "*) fail 48 "a proposed item or step spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $item at step $step"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s%s' "$item" "$step" "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 48 "a proposed item, step or reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --propose || return 1
+  # EXACT LINE COMPARE, for verb_park's recorded reason: the reason is line-final, so a `grep -qF`
+  # matched any row whose reason merely STARTS with this one, and the verb then reported success
+  # while writing nothing - silently dropping a distinct proposal.
+  want="proposal · item $item · step $step · reason $reason"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: proposal already recorded, unchanged — $item"
+    return 0
+  done <<PROPOSED
+$(grep -F -- ' proposal · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+PROPOSED
+  park "$rel" proposal "$item" "$reason" "$step"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: proposal recorded against step $step — $item"
+  return 0
+}
+
+# ------------------------------------------------------------------- the PER-PIECE RECORD writer
+# The spec's previous revision had four READERS of this record and no writer at all, so the two
+# Definition-of-Done items reading it could only be met by hand — which the same spec forbids.
+#
+# ONE writer, TWO callers. `record_piece` takes an explicit records ROOT rather than a slug, so the
+# attended path — which has no run-state file — reaches this function instead of a second
+# implementation that would confirm this one rather than check it.
+#
+# THE PATH IS DERIVED from the piece's own repo-relative path. The record lives under the BUILD
+# folder and not beside the piece, because the output tree is the DELIVERABLE and a governance
+# artifact sitting in it is the thing an owner deletes.
+record_path_of() { # records-root · piece-path
+  # FLAT under the declared root. The root is the playbook's own `records` declaration, so a `pieces/`
+  # segment underneath it would be a second naming rule the reader has to know - and the reader globs
+  # the root. The driver's self-test caught exactly that split: the writer wrote one place and the
+  # reader read another, and the live leg looked green only because the files had been moved by hand.
+  printf '%s/%s.md' "$1" "$(printf '%s' "$2" | tr '/' '~')"
+}
+# HIGH 2 (round-1 diff review) - the ROW DROPPER, and it takes no regex. Both writers spelled this
+# `sed -i "/^leg $leg · verdict /d"`, interpolating a CALLER-SUPPLIED leg name into a sed ADDRESS,
+# which is a regular expression:
+#
+#   * a leg named `.*` matched EVERY verdict row and deleted them all, silently erasing a recorded
+#     FAIL and flipping the piece back to verified on the next write;
+#   * a leg containing `/` — `tools/lint.sh`, an ordinary thing to call a leg — closed the address
+#     early, so sed aborted while the `printf` that follows still ran, leaving TWO verdict rows for
+#     one leg on a record the reader then cannot decide either way.
+#
+# The `case` pattern below is a QUOTED expansion, which shell treats as a literal even when the value
+# spells a glob, and the single trailing `*` is the only wildcard in it. No escaping to get wrong.
+# HIGH 1 (round-2 diff review) - the FIELD RE-STAMP, and it takes no regex either. Both writers
+# spelled this `sed -i "s|^set: .*|set: $hashes|"`, interpolating a caller value into a sed
+# REPLACEMENT — which is a different injection from the ADDRESS the dropper below fixed, twelve lines
+# away, in the same commit:
+#
+#   * `--set 'AAAA\nleg forged · verdict PASS'` wrote a well-formed verdict row, walking past a
+#     newline guard that counts newline BYTES and therefore never saw the two-character escape;
+#   * `&` in a replacement re-inserts the whole match, corrupting the line;
+#   * `|` closed the delimiter, so sed aborted while the function reported success anyway.
+#
+# Reachable because `--set` and `--playbook-sha` arrive through the records-root branch, which runs
+# BEFORE the slug lookup — the attended path the kit ships and documents.
+set_field() { # record · key · value
+  local rec="$1" key="$2" val="$3" tmp line
+  tmp=$(mktemp) || return 1
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in "$key: "*) printf '%s: %s\n' "$key" "$val" ;; *) printf '%s\n' "$line" ;; esac
+  done < "$rec" > "$tmp"
+  mv "$tmp" "$rec"
+}
+
+drop_leg_row() { # record · leg
+  local rec="$1" lg="$2" tmp line
+  tmp=$(mktemp) || return 1
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in "leg $lg · verdict "*) continue ;; esac
+    printf '%s\n' "$line"
+  done < "$rec" > "$tmp"
+  mv "$tmp" "$rec"
+}
+
+record_piece() { # records-root · piece-path · leg · verdict · playbook-sha · run-id
+  local root="$1" piece="$2" leg="$3" verdict="$4" pbsha="$5" runid="$6" rec want line h
+  [ -f "$piece" ] || { fail 47 "a piece record names a path that is not a file in this tree, so the hash it joins on does not exist and the record would describe nothing - path follows: $piece"; return 1; }
+  case "$verdict" in
+    PASS|FAIL|NA) ;;
+    *) fail 47 "a piece verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given: $verdict"; return 1 ;;
+  esac
+  # verb_park's three guards, REUSED rather than re-argued. Each exists because of a recorded defect:
+  # a newline forges a row nothing wrote, the field separator makes a row unparseable by the check
+  # that reads it, and the bypass flag reds the bar permanently on a record no verb repairs.
+  # EVERY CALLER-SUPPLIED FIELD, not the three that happened to be listed. `$pbsha` and `$runid`
+  # arrive from argv on the attended path and were covered by none of these guards, so
+  # `--playbook-sha "$(printf 'deadbeef\nleg L · verdict PASS')"` forged a PASS on the record's FIRST
+  # write with no sed involved at all. §9's rule is ONE composite write-guard on every path that
+  # stores parseable content; two writers with two different field sets is the bare-sibling-path hole
+  # that rule is written against.
+  if [ "$(printf '%s' "$leg$verdict$piece$pbsha$runid" | wc -l)" -ne 0 ]; then
+    fail 47 "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
+  fi
+  case "$leg$piece$pbsha$runid" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg [$leg] piece [$piece] playbook-sha [$pbsha] run [$runid]"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s%s' "$leg" "$piece" "$pbsha" "$runid" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  rec=$(record_path_of "$root" "$piece")
+  mkdir -p "$(dirname "$rec")" || return 1
+  h=$(GIT hash-object "$piece") || return 1
+  if [ ! -f "$rec" ]; then
+    {
+      printf '# piece record — %s\n\n' "$piece"
+      printf 'piece: %s\n' "$piece"
+      printf 'hash: %s\n' "$h"
+      # The RUN identity, PASSED IN rather than derived from the records root. `enumerate_run` reads
+      # it from the RECORD, so the scope is derivable on the merge bar where no run-state file
+      # exists. Deriving it from `basename "$root"` was the first cut and it named a DIRECTORY: the
+      # root is the playbook's own `records` declaration, so its basename says where records live and
+      # nothing about who wrote them. Wiring the filter is what made that visible.
+      printf 'run: %s\n' "$runid"
+      printf 'playbook-sha: %s\n' "$pbsha"
+      printf '\n## Verdicts\n'
+    } > "$rec"
+  else
+    # The hash is RE-STAMPED on every write. A record is a claim about the piece AS IT STANDS, and a
+    # stale hash beside a fresh verdict is exactly the `stale` state the reader exists to name.
+    set_field "$rec" hash "$h" || return 1
+  fi
+  want="leg $leg · verdict $verdict"
+  # EXACT LINE compare, not a substring search. `verb_park` had to repair precisely this: a prefix
+  # match reported success while writing nothing, silently dropping a distinct entry.
+  while IFS= read -r line; do
+    [ "$line" = "$want" ] || continue
+    # M1 (round-2): STAGE ON THIS PATH TOO. The hash was re-stamped above, so "unchanged" was false
+    # the moment the piece had moved — the file was modified and left unstaged, and `--close` has no
+    # clean-tree guard, so the run reached LANDING and the lander refused it with a message blaming
+    # the operator's tree. This is the one path L1's superseded refusal actively drives runs onto.
+    stage_or_fail "$rec" || return 1
+    echo "unattended: piece verdict unchanged — $leg on $piece (the record's hash was re-stamped)"
+    return 0
+  done < "$rec"
+  # A leg may be RE-recorded with a different verdict and the newest wins: two verdicts for one leg
+  # is a record that cannot be read either way.
+  drop_leg_row "$rec" "$leg" || return 1
+  printf '%s\n' "$want" >> "$rec"
+  stage_or_fail "$rec" || return 1
+  echo "unattended: piece verdict recorded — $leg $verdict on $piece"
+  return 0
+}
+record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
+  local root="$1" runid="$2" leg="$3" verdict="$4" hashes="$5" rec want line
+  case "$verdict" in
+    PASS|FAIL|NA) ;;
+    *) fail 47 "a set verdict is outside the closed set, and a verdict nobody can compare is a record that reads as evidence while carrying an opinion - legal values are PASS FAIL NA, given: $verdict"; return 1 ;;
+  esac
+  # HIGH 3 (round-1 diff review) - THE THREE FIELD GUARDS, which this writer alone did not carry
+  # while its four siblings all did. A newline in `--leg` forged a second verdict row nothing wrote:
+  # the row the run meant to record said FAIL, the forged one said PASS, and the Definition-of-Done
+  # reader four functions away greps this file line-wise and saw the PASS. Reproduced against the
+  # shipped driver before this landed. Same three refusals, same reasons, same wording as the piece
+  # writer's - the point is that a writer of this record has them, not that each argues them again.
+  # `$hashes` joins the separator and bypass guards it was missing. It is DERIVED on the slug path
+  # and CALLER-SUPPLIED on the attended one, and a guard that covers only the derived callers is a
+  # guard against nothing.
+  if [ "$(printf '%s' "$leg$verdict$runid$hashes" | wc -l)" -ne 0 ]; then
+    fail 47 "a set record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"; return 1
+  fi
+  case "$leg$runid$hashes" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the three fields tested follow: leg [$leg] run [$runid] set [$hashes]"; return 1 ;; esac
+  if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s' "$leg" "$runid" "$hashes" | grep -qF -- "$BYPASS_BAN"; then
+    fail 47 "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
+  fi
+  rec="$root/set-$runid.md"
+  mkdir -p "$(dirname "$rec")" || return 1
+  if [ ! -f "$rec" ]; then
+    { printf '# set record — %s\n\n' "$runid"
+      printf 'run: %s\n' "$runid"
+      printf 'set: %s\n' "$hashes"
+      printf '\n## Verdicts\n'; } > "$rec"
+  else
+    # The SET is re-stamped on every write, the way a piece record re-stamps its hash. A set verdict
+    # beside a stale member list is a verdict about a different set, which is the `superseded` state.
+    set_field "$rec" set "$hashes" || return 1
+  fi
+  want="leg $leg · verdict $verdict"
+  while IFS= read -r line; do
+    [ "$line" = "$want" ] || continue
+    # M1 (round-2), and this is the writer L1's superseded refusal drives a run back to: the member
+    # list was re-stamped above, so leaving it unstaged left the index and the worktree disagreeing
+    # about the very field that refusal compares.
+    stage_or_fail "$rec" || return 1
+    echo "unattended: set verdict unchanged — $leg (the record's member list was re-stamped)"
+    return 0
+  done < "$rec"
+  drop_leg_row "$rec" "$leg" || return 1
+  printf '%s\n' "$want" >> "$rec"
+  stage_or_fail "$rec" || return 1
+  echo "unattended: set verdict recorded — $leg $verdict for $runid"
+  return 0
+}
+verb_record_set() { # slug · leg · verdict
+  local slug="$1" leg="$2" verdict="$3" rel rr_root pb hashes
+  [ -n "$leg" ] || { fail 47 "--record-set requires --leg, because a set verdict that names no check cannot be compared against the playbook's declared set"; return 1; }
+  [ -n "$verdict" ] || { fail 47 "--record-set requires --verdict, because an absent one is indistinguishable from a check that never ran"; return 1; }
+  if [ -n "${RP_ROOT:-}" ]; then
+    record_set "$RP_ROOT" "${RP_RUN:-$slug}" "$leg" "$verdict" "${RP_SET:-}"
+    return $?
+  fi
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a set against - the attended path calls the records-root form of this writer instead: $rel"; return 1; }
+  refuse_if_terminal "$rel" --record-set || return 1
+  pb=$(fact "$rel" playbook)
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$pb" 2>/dev/null)" records)
+  [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a set verdict has nowhere to be written that the merge bar will read"; return 1; }
+  # The set IDENTITY is the ORDERED list of this run's piece hashes, DERIVED here rather than
+  # supplied: a caller that names its own set could name a set it did not produce.
+  hashes=$(for r in $(GIT ls-files -- "$rr_root/*.md"); do
+             [ "$(sed -n 's/^run: //p' "$r" | head -1)" = "$slug" ] || continue
+             sed -n 's/^hash: //p' "$r" | head -1
+           done | LC_ALL=C sort | tr '\n' ',' | sed 's/,$//')
+  record_set "$rr_root" "$slug" "$leg" "$verdict" "$hashes"
+}
+verb_record_piece() { # slug · piece · leg · verdict
+  local slug="$1" piece="$2" leg="$3" verdict="$4" rel rr_root
+  # THE THREE FIELD REFUSALS ARE HOISTED, above the caller branch. They were duplicated once per
+  # caller, which is three refusals with two spellings each and six arms to keep in step - the
+  # shape that goes stale on the first edit to either copy.
+  [ -n "$piece" ] || { fail 47 "--record-piece requires --path, because a verdict with no piece to join to is a verdict about nothing"; return 1; }
+  [ -n "$leg" ] || { fail 47 "--record-piece requires --leg, because a verdict that names no check cannot be compared against the playbook's declared set"; return 1; }
+  [ -n "$verdict" ] || { fail 47 "--record-piece requires --verdict, because an absent one is indistinguishable from a check that never ran"; return 1; }
+  # S3 - THE SECOND CALLER. `--records-root` reaches the SAME writer with an explicit root instead of
+  # a slug, which is how the attended path records a piece: it has no run-state file and no run to
+  # name. One function, two callers, never two implementations - the second would confirm the first
+  # rather than check it, and they would drift the first time either changed.
+  if [ -n "${RP_ROOT:-}" ]; then
+    record_piece "$RP_ROOT" "$piece" "$leg" "$verdict" "${RP_PBSHA:-}" "${RP_RUN:-$slug}"
+    return $?
+  fi
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 47 "no run-state file, so there is no run to record a piece against - the attended path calls the records-root form of this writer instead, which is why there is one function and two callers: $rel"; return 1; }
+  refuse_if_terminal "$rel" --record-piece || return 1
+  rr_root=$(declared_scalar "$(GIT show "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null)" records)
+  [ -n "$rr_root" ] || { fail 47 "the playbook this run is bound to declares no records root at the pinned BASE, so a piece verdict has nowhere to be written that the merge bar will read"; return 1; }
+  # M6 (round-1 diff review): the BLOB SHA, not the path. This passed `$(fact "$rel" playbook)` —
+  # the same expression used one line up as the PATH half of a `GIT show` — into a field printed as
+  # `playbook-sha:`. Dead plumbing carrying wrong data is worse than no plumbing: the instant anyone
+  # wires the provenance join it exists for, every unattended-written record fails it.
+  record_piece "$rr_root" "$piece" "$leg" "$verdict" \
+    "$(GIT rev-parse "$(fact "$rel" base):$(fact "$rel" playbook)" 2>/dev/null)" "$slug"
+}
 # TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
 # undocumented; M3 now delegates the build's own scope. An authority with no record is
 # indistinguishable from a run doing whatever it likes, so every amendment leaves a row here.
@@ -2467,6 +3166,7 @@ SIBS
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
+RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -2492,12 +3192,19 @@ refuse_waive_unless_preflight() { # verb
 }
 while [ $# -gt 0 ]; do
   case "$1" in
-    --preflight|--status|--resume|--close|--landed|--abort|--park|--attest|--rescope|--dispatch) VERB="$1"; SLUG="${2:-}"; shift 2 || shift ;;
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
+    --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
+    --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
+    --verdict)      RP_VERDICT="${2:-}"; shift 2 || shift ;;
+    --records-root) RP_ROOT="${2:-}"; shift 2 || shift ;;
+    --playbook-sha) RP_PBSHA="${2:-}"; shift 2 || shift ;;
+    --run)          RP_RUN="${2:-}"; shift 2 || shift ;;
+    --set)          RP_SET="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
     # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
@@ -2517,15 +3224,25 @@ while [ $# -gt 0 ]; do
                     refuse_waive_unless_preflight --phase || exit 1
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; exit $? ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; exit 0 ;;
-    *) arg="$1"; fail 14 "unknown argument; the verbs are --preflight, --plan, --phase, --status, --resume, --close, --landed, --park, --rescope, --dispatch and --abort: $arg"; exit 1 ;;
+    # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
+    # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
+    # falls through to refusal 14 and does not run at all. The arm sits LAST because every flag above
+    # would otherwise be tested against it, and it must not shadow --plan, --phase or --version.
+    *) if is_slug_verb "${1:-}"; then VERB="$1"; SLUG="${2:-}"; shift 2 || shift
+       else arg="$1"; vl=$(verb_list)
+            # THE LIST IN A VARIABLE, not a command substitution inside the message. check-arms reads
+            # a branch's literal signature up to its first interpolation and does not treat $( ) as
+            # one, so the inline form demanded a test arm quoting `$(verb_list)` verbatim - an arm
+            # that would pass while the list it renders was empty.
+            fail 14 "unknown argument; the verbs are $vl: $arg"; exit 1; fi ;;
   esac
 done
-# S10 - THE SAME SET, in all three places the driver spells it. The header docstring, this usage line
-# and the refusal above used to name three DIFFERENT sets: the usage line was already two verbs behind
-# (it omitted --plan and --phase) and the operator who mistypes a verb reads the refusal, not the
-# header. A prior review asked for both to be fixed and only the header landed.
+# S10, and then the verb-carrier unit, because S10's fix did not hold: the three spellings were
+# re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
+# above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
+# left here to re-synchronise.
 case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}" || exit 1 ;; esac
-[ -n "$VERB" ] || { echo "usage: unattended.sh --preflight <slug> --keepalive-id <id> | --plan <slug> | --phase <slug> <phase> --witness <sha> | --status <slug> | --resume <slug> | --close <slug> [--override <item> --reason <text>] | --landed <slug> | --abort <slug> --reason <text> | --park <slug> --item <text> --reason <text> | --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text> | --dispatch <slug> --pass <id> --writes <path> [--writes <path> …] | --attest <slug> --item <item> [--value <text>]"; exit 2; }
+[ -n "$VERB" ] || { usage; exit 2; }
 
 case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
@@ -2535,7 +3252,10 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
+  --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
+  --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$RP_VERDICT" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
 esac

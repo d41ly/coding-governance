@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-5 — the per-piece record: its writer, its reader, and its states
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -164,6 +164,40 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-22 · the round-3 fold. The shared `declared_list` now REFUSES an array left open at the end of its
+  line (rc 2) instead of answering the declared null, and every reader treats that refusal as a red rather than as
+  "declares nothing": a legal multi-line TOML array used to yield the bare `[`, parse to empty, and grade every
+  verdict-less piece `verified` — the rev-8 consolidation to one parser did not close that, because all three call
+  sites still fed it `head -1`. The declared-null escape is an EXACT match on `none` rather than a prefix match, so a
+  check named `nonempty-rows` no longer reads as no declaration at all; `piece_checks` got the `none — <why>` form its
+  sibling had; and `GITSHOW` reads the blob under the same replace-ref and graft pins the driver's header says every
+  such read goes through. **THAT LAST CLAUSE WAS FALSE WHEN WRITTEN.** `GITSHOW` was byte-identical
+  before and after the commit this revision describes; the pin landed at rev-10. Left standing rather
+  than edited away, because a revision log that silently repairs its own false entries is worth less
+  than one that shows where a claim outran the code — see rev-10 and round 4's BLOCKER 3.
+- rev-11 · 2026-08-22 · the round-5 fold. Both parsers take the comment off the WHOLE LINE before the key
+  is removed, and the order is the whole repair: rev-10 moved the strip in front of the terminator test and
+  left it after the key strip, which had already eaten the whitespace the strip needs, so an EMPTY-VALUED
+  declaration carrying a trailing comment parsed to the comment text at rc 0. The closer is tested
+  POSITIONALLY rather than by containment, so `["a[0]",` refuses instead of silently dropping every member on
+  the lines below it. Check 28's three source rules are rewritten from instance gates into class gates over a
+  DERIVED kit-source population: 28a reds the discard spellings it used to whitelist, 28b binds every template
+  key POSITIVELY to a parser read with a resolving exemption list for the one key a bespoke reader owns, and
+  28c matches the wrapper spelling as well as the bare one and proves the wrapper's own pin inside the gate.
+  Every one of the eight breaks and both controls was observed against a hermetic copy before it was written.
+- rev-10 · 2026-08-22 · the round-4 fold. `declared_list` strips the trailing comment BEFORE its
+  terminator test: rev-9's refusal ran the `case` on the RAW line, so a `]` anywhere in a comment
+  satisfied the closed arm and a legal multi-line array parsed to the declared null at rc 0 — the
+  rev-8 defect restored by the revision that closed it, which is the fourth round running. `GITSHOW`
+  is pinned for real this time, and check 28c now enumerates every sha dereference in the kit and
+  reds an unpinned one, so the claim and the code cannot diverge again without a red bar. The step
+  floor comes off `declared_scalar` instead of a `tr -dc` that spliced its own comment's digits into
+  the number, and check 28b binds every template key to the parser its real reader calls.
+- rev-8 · 2026-08-22 · the round-2 fold. `verified` now parses `piece_checks` through the shared `declared_list`, which is inlined in both scripts and byte-compared by leg check 28 — the round-1 fold wrote a third spelling of that parse without the trailing-comment strip, so the kit's own template line word-split into eight phantom legs. Both record writers lost their last `sed` re-stamp and gained guards over EVERY caller-supplied field: `--set` and `--playbook-sha` each forged a well-formed verdict row through the attended path.
+- rev-5 · 2026-08-21 · BUILT. The records root moved from the build folder to a PLAYBOOK
+  declaration: the memory-tree gate's build-folder shape is a closed whitelist and its top level is
+  closed too, so F1's answer needed another kit's contract edited. Evidence about content belongs
+  with the project that owns the content.
 - rev-4 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

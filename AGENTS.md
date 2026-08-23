@@ -498,15 +498,31 @@ heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree.
 scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
-clock only. Measured on node `a` 2026-08-21 in the PRIMARY tree, after the `unattended` selftests
-were sharded: a warm-ledger full bar costs 393 s of wall clock against a 3085 s leg-sum, and its
-longest leg is 336 s. That leg sits BELOW leg-seconds over width (386 s), so the bar is no longer
-FLOOR-bound — throughput binds it, and the next lever is total work rather than any single leg.
-The same bar with the dispatch hint removed costs 432 s, which is the cold half of a controlled
-pair and the reason both numbers are here rather than one average. The earlier reading (873 s
-against 4018 s) predates the sharding and was taken on a busier box, so the gap is not
-attributable to the sharding alone; what IS attributable is the floor, which the shard pair moved
-from ~660 s to 336 s. Every leg's output is persisted
+clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
+`unattended`: a suite that stages breaks into a copy of a checker has a job only when that checker's
+source changes, and none at all in an adopter's repo that copy-installs the kit and never edits it.
+Its seven `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
+stop receiving them too. What stayed are the three legs whose subject is the REPOSITORY — run-state
+records, playbooks, skill wiring — because those go stale with nobody editing the kit. On demand:
+`bash tools/unattended/run-unattended-gates.sh`. The compensating check is written into that kit's
+descriptor, because an exemption is not coverage (§7).
+
+Do not read a leg COUNT out of this paragraph; `tools/gate-legs.json` owns it and prose beside a
+source that owns a number is the rule this file keeps breaking.
+
+Measured on node `d` 2026-08-23, immediately BEFORE that removal: a full bar cost 4926 s of leg-sum
+with its longest leg at 1565 s, and the unattended and playbook legs alone were 3412 s of it — 69%.
+A 1565 s leg puts a 26-minute FLOOR under every full run, because wall clock cannot fall below the
+longest leg however wide the pool is. Fifty of the ninety-two legs then present finished in under five
+seconds each, so the distribution was not gradual: it was a handful of suites and a long tail of
+nothing. None of those figures is authored anywhere: `<git-dir>/gate-ledger.tsv` carries one row per
+leg with its own seconds, so the per-leg table is a `sort -rn` away and cannot go stale in prose. Read
+it there. The build record that first measured this is reachable from `memory/LIVE.md` like any other.
+
+The prior reading on node `a` 2026-08-21 — 393 s wall against a 3085 s leg-sum, longest leg 336 s,
+and 432 s for the same bar with the dispatch hint removed — is kept because it is the controlled pair
+and the only cold/warm comparison on record. It predates both the growth measured above and the
+removal, so it describes a bar that no longer exists. Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
 only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.

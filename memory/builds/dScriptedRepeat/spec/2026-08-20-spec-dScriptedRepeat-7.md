@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run
 
-**Status:** SPECCED · rev-5 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -166,6 +166,25 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-11 · 2026-08-22 · the round-5 fold. `set_checks` inherits the parser ordering repair, and the rule
+  that its refusal must be READ is now enforced against the discard spellings as well as the bare assignment:
+  `|| true` and `|| :` read the status into a no-op, which check 28a used to grade compliant because it
+  whitelisted any line carrying `||`.
+- rev-10 · 2026-08-22 · the round-4 fold. `set-checks-recorded` READS the refusal. Rev-9 said
+  `set_checks` inherits the parser refusal because one parser meant one fix; the driver's call site
+  was a bare assignment, so rc 2 arrived as empty stdout, the declared-null escape matched it, and
+  the item returned MET with no record and no override entry. Two of the parser's three call sites
+  branched on the status. Check 28a now enumerates them, which is the part that generalises: the rule
+  binds any parser whose own body carries a nonzero return, derived rather than listed.
+- rev-9 · 2026-08-22 · the round-3 fold. `set_checks` inherits the parser refusal on a multi-line array — one parser
+  meant one fix, which is what the rev-8 consolidation bought and what rev-8 itself did not spend. The declared-null
+  escape on `set-checks-recorded` is an exact match rather than a prefix match, so a declared check whose name merely
+  begins `none` no longer returns MET with no record; and the set writer's separator refusal names the offending
+  field instead of two it cannot have come from.
+- rev-8 · 2026-08-22 · the round-2 fold. The leg's `set_checks` reader gained the declared-null escape and the trim its driver sibling had, so the two readers of one field give one answer; and the idempotent path in both writers now stages what its re-stamp changed.
+- rev-6 · 2026-08-21 · BUILT. The set record and its Definition-of-Done item, with term zero and
+  a verdict-reading term 2. `CORE_FLOOR` moved 12:8 to 12:10 once for the co-landing pair, and the
+  SLACK arm both CORE halves were missing landed with it.
 - rev-5 · 2026-08-20 · folded the round-2 spec audit, which returned BLOCKED at precision 0.625 over
   the fold range. Every change here repairs a place where two sentences in this build ordered opposite
   implementations and neither was marked the loser.

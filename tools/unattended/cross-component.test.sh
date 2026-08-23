@@ -38,8 +38,14 @@ mkdir -p memory/guides tools/unattended .claude/skills/unattended
 # checks that have nothing to do with the subject, and a naive arm reading "the leg failed" scores
 # that as a correct refusal. This is `fixture-passes-by-finding-nothing` inverted — the fixture fails
 # by finding the WRONG thing — which is why the completeness precondition below runs before any arm.
+# THE LEG'S INPUT SET, and it is five files now rather than three. Check 28 compares the
+# `declared_list` parser inlined in the driver AND in the playbook leg, then runs it over the
+# shipped template's own declaration line — so a scratch tree missing either takes the
+# "missing from one of the pair" branch, and every arm below grades that refusal instead of the
+# thing it was written for. THREE harnesses seed this leg and all three had to learn it; that is
+# what a leg reading a new file costs, and it is cheaper than the leg not reading it.
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
-   "$HERE/SKILL.template.md" tools/unattended/
+   "$HERE/SKILL.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" tools/unattended/
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \

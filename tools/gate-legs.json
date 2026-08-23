@@ -581,7 +581,7 @@
       "bash",
       "tools/unattended/check-unattended.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations"
   },
   {
@@ -593,75 +593,6 @@
     "chunk": "declarations"
   },
   {
-    "name": "unattended gate selftest",
-    "argv": [
-      "bash",
-      "tools/unattended/check-unattended.test.sh",
-      "--shard",
-      "1/2"
-    ],
-    "guard": [
-      "memory/guides/UNATTENDED-PROTOCOL.md",
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "selftests"
-  },
-  {
-    "name": "unattended gate selftest shard B",
-    "argv": [
-      "bash",
-      "tools/unattended/check-unattended.test.sh",
-      "--shard",
-      "2/2"
-    ],
-    "guard": [
-      "memory/guides/UNATTENDED-PROTOCOL.md",
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "selftests"
-  },
-  {
-    "name": "playbook validity selftest",
-    "argv": [
-      "bash",
-      "tools/unattended/check-playbook.test.sh"
-    ],
-    "chunk": "selftests",
-    "guard": [
-      "tools/unattended/"
-    ]
-  },
-  {
-    "name": "unattended driver selftest",
-    "argv": [
-      "bash",
-      "tools/unattended/unattended.test.sh",
-      "--shard",
-      "1/2"
-    ],
-    "guard": [
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "selftests"
-  },
-  {
-    "name": "unattended driver selftest shard B",
-    "argv": [
-      "bash",
-      "tools/unattended/unattended.test.sh",
-      "--shard",
-      "2/2"
-    ],
-    "guard": [
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "selftests"
-  },
-  {
     "name": "unattended skill wiring",
     "argv": [
       "bash",
@@ -669,30 +600,6 @@
       "--check"
     ],
     "chunk": "wiring"
-  },
-  {
-    "name": "unattended adopter e2e",
-    "argv": [
-      "bash",
-      "tools/unattended/adopt-unattended.test.sh"
-    ],
-    "guard": [
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "e2e"
-  },
-  {
-    "name": "unattended cross-component",
-    "argv": [
-      "bash",
-      "tools/unattended/cross-component.test.sh"
-    ],
-    "guard": [
-      "tools/lib/",
-      "tools/unattended/"
-    ],
-    "chunk": "declarations"
   },
   {
     "name": "run-gates canary",

@@ -46,6 +46,12 @@ outputs      = []    # globs. Where pieces land. A `recipe`-mode run's diff may 
                      # these and its own records, and nothing else.
 grain        = ""    # a glob whose every MATCH is exactly ONE piece. Without it a piece
                      # count is unresolvable — three files can be one piece or three.
+records      = ""    # where per-piece evidence records are written. DECLARED, because the
+                     # governance tree's own structure is closed and a piece record is not
+                     # a build record: it is evidence about content, and it belongs with the
+                     # project that owns the content. Found by building — the first design
+                     # put it under the build folder and the memory-tree gate refuses both a
+                     # new subdir there and a new top-level directory.
 piece_checks = []    # the checks that run over ONE piece.
 set_checks   = []    # the checks that run over ALL N. See section 8; this is the one
                      # population a per-piece review structurally cannot see.

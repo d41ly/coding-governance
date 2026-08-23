@@ -167,3 +167,6 @@ tools/unattended/PLAYBOOK-TEMPLATE.template.md eol=lf
 tools/unattended/check-playbook.sh eol=lf
 tools/unattended/check-playbook.test.sh eol=lf
 tools/unattended/playbook.fixture.md eol=lf
+tools/unattended/fixture-pieces/**/*.md eol=lf
+memory/builds/*/pieces/*.md eol=lf
+tools/unattended/fixture-records/*.md eol=lf

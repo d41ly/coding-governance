@@ -92,6 +92,18 @@ hit "$(cat "$SK")" 'bash tools/land.sh | tee log & echo done \ok'
 hit "$(cat "$SK")" 'every 10 min | offset 3 & then \wait'
 # NEGATIVE control: a render that silently drops a substitution leaves the token standing, and would
 # otherwise satisfy every assertion above by writing nothing useful.
+# The SHAPE, not a list. Two named arms follow and both stay — each records a specific break — but a
+# list cannot notice a placeholder nobody added it to, and the render is exactly where an unfilled
+# one survives as literal prose and passes every other check in the kit.
+n=$((n+1)); left=$(grep -oE '[{][{][A-Za-z_]+[}][}]' "$SK" | sort -u | tr '\n' ' ')
+[ -z "$left" ] || { echo "FAIL the render carries a surviving placeholder: $left"; st=1; }
+# ...and the UPPERCASE ANGLE-BRACKET shape, which the renderer does not substitute at all and which
+# a template author reaching for a placeholder writes by accident. The Skill's real argument holes
+# are lowercase (`<slug>`, `<id>`, `<piece>`), so this shape is unused and its presence is a bug.
+# Placeholder completeness and template parity are two different questions; this repo has a recorded
+# failure conflating them, which is why this is its own arm and not part of the byte-compare.
+n=$((n+1)); ang=$(grep -oE '<[A-Z][A-Z_]{2,}>' "$SK" | sort -u | tr '\n' ' ')
+[ -z "$ang" ] || { echo "FAIL the render carries an unsubstituted angle-bracket placeholder: $ang"; st=1; }
 n=$((n+1)); grep -qF '{{LANDER}}' "$SK" && { echo "FAIL a dropped substitution left {{LANDER}} standing"; st=1; }
 n=$((n+1)); grep -qF '{{KEEPALIVE_INTERVAL}}' "$SK" && { echo "FAIL a dropped substitution left {{KEEPALIVE_INTERVAL}} standing"; st=1; }
 # And the gate agrees, rather than comparing one empty file to another.

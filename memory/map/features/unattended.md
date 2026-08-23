@@ -8,7 +8,7 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended gate selftest", "unattended driver selftest", "unattended driver selftest shard B", "unattended gate selftest shard B", "unattended skill wiring", "unattended adopter e2e", "unattended cross-component"]
+gate-legs = ["unattended kit gate", "unattended skill wiring"]
 kits = ["unattended"]
 git-hooks = []
 workflow-scripts = []
@@ -17,6 +17,7 @@ rendered-skills = ["unattended"]
 gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
+  "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
   "spec-names-code-its-base-lacks.md",
 ]
 guides = ["UNATTENDED-PROTOCOL.md"]

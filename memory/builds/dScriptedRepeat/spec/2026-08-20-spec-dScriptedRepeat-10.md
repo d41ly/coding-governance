@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-10 — the two start paths and the playbook-scoped directives
 
-**Status:** SPECCED · rev-4 · 2026-08-20 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
+**Status:** CLOSED · rev-5 · 2026-08-21 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
 ## 1. Goal
 
@@ -148,6 +148,29 @@ none — every fork below is RESOLVED in place.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-21 · BUILT. The routing preamble, the playbook-run path, the attended path, the two
+  `recipe`-scoped directives, and two new leg checks.
+
+  **S5 and AC7 came out weaker than specced and the Skill says so in those words.** Both were written
+  around unit 8's refusal supplying the machine half on the unattended path. Unit 8 is withdrawn, so
+  the content-scope rule now has NO machine half on EITHER entry point, and the path text states that
+  rather than implying a gate. Check 25 exists precisely because prose is the whole enforcement here:
+  it greps the section for the qualifier and for the sentence naming what the mode is not for, in the
+  literal-string manner check 12 uses on the kickoff engine, because a heading survives a gutted body.
+
+  **S0 grew a fifth entry that is deliberately not in the table.** The attended path is not a run and
+  cannot be started like one, so listing it beside four `authorized-by:` values would have taught a
+  reader to look for a mode it does not have. It is named under the table and documented after the
+  unattended paths it shares its records with.
+
+  **AC4 needed no new arm and that is worth recording**, so nobody adds a third. Two arms already
+  join the floors to the driver's own counts — the example conf's `DIRECTIVES_FLOOR` in the driver
+  self-test, the installed conf's slack arm in the leg — and growing `DIRECTIVES_CORE` by two forces
+  both floors to 15 or reds. The pre-existing machinery is the acceptance criterion's enforcement.
+
+  **F1 held under contact.** Neither directive states its rule: `playbook-followed` points at M7's
+  pass loop and regrounding, `pieces-recorded` at M9's wrap-up derivation. The build method does not
+  move and its budget does not rise.
 - rev-4 · 2026-08-20 · pre-code fork sweep under the mandate (M3). Every §8 fork RESOLVED in
   place with its resolver and authority named, and §8's first non-blank line made machine-legal —
   the driver classified nine of eleven specs FORKED on that line alone.
@@ -161,6 +184,20 @@ none — every fork below is RESOLVED in place.
   after the audit found that the owner's FIRST stated verb — create a playbook when none exists — had no
   owning unit anywhere in the roster and was structurally refused by unit 4's own preflight. The path
   itself is unit 11. F10 qualified S5's pairing claim per entry point.
+
+### What was built, against what was specced
+
+- S1's path is the third instance of the ordered start-path shape, exactly as the reuse audit
+  predicted, and the audit's own note stands: a FOURTH should extract the shared shape rather than
+  copy again. Not done here, and named for a successor rather than left implicit.
+- S6 landed as check 24, joining `AUTH_MODES` to the routing table in both directions with two
+  vacuity arms ahead of the comparison — the extraction takes the LAST backticked lowercase cell per
+  row, so the prose columns are free to change and the mode column is not.
+- AC5's arm is a second scope value with its own test, plus the accepting direction on a
+  `recipe`-authorized run. This file's own history is the reason: an arm naming one scoped member
+  twice left a later member unenforced and green.
+- AC1 became two SHAPE arms rather than two more named placeholders. A list cannot notice a
+  placeholder nobody added it to, and the render is where an unfilled one survives as literal prose.
 
 ## 10. Reuse audit
 

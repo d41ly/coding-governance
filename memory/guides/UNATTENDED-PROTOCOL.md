@@ -63,6 +63,15 @@ strict anchor. Both anchors observe the endpoint the landing push goes to.
 
 1. **Self-authorization gets cheaper.** A branch push is not gated by the pre-push hook, so a run can
    authorize ITSELF in two commands, where before it could only authorize its successor (cost 4).
+
+   **It reaches one step further than that sentence suggests, and the reach was measured rather than
+   reasoned.** A `recipe`-mode run names a playbook and the driver resolves it at BASE, so a playbook
+   the run wrote itself does not normally resolve and preflight refuses. But a run that authors its
+   own build folder is exactly the run this anchor moves onto the branch tip — and that tip carries
+   the playbook it just wrote. So a run authoring BOTH halves authors the instructions it is judged
+   against as well as its own authorization, with nothing refusing it. A run whose build folder
+   predates it keeps the strict anchor and keeps that refusal, which is why this is a narrow state
+   and not a general hole.
 2. **The BAR weakens for adopters who never opt in.** The key gates the DRIVER and cannot gate the
    leg: the conf is a working-tree file the run can commit, so a leg reading it would be reading its
    subject's answer. The leg's BASE check therefore asks "published on the remote" in every repo.
@@ -90,6 +99,13 @@ by a set that resolves to nothing.
 
 Absent or unreachable authorization → the run does not start. There is no override for this one: an
 override on the authorization check is the authorization check.
+
+**A SECOND item joined that set**, and the driver holds it as a declared list rather than a name in a
+case arm. `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
+produced what the owner asked for, over content nothing else on the merge bar can grade, so an
+override on it is the run certifying its own output. `--abort` is the honest exit when it cannot be
+met. The build that introduced the item ratified this as an acceptance criterion and then shipped
+without it — found by writing the arms that item had never had.
 
 ## 2. The run-state file
 
@@ -133,13 +149,20 @@ which is the test for belonging here:
 
 1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
 2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
-3. **Parked entries**, of four kinds, which `park()`'s own kind argument already discriminates: a
+3. **Parked entries**, of five kinds, which `park()`'s own kind argument already discriminates: a
    parked DECISION — the question, the options seen, and the reason the run refused, because a bare
-   "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, and an
-   owner directive WAIVER (§10). Each kind names the verb that writes it: `--park`, `--abort`,
-   `--close --override` and `--preflight --waive` respectively. DECISION had no writer for as long as
+   "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, an
+   owner directive WAIVER (§10), and a PROPOSAL. Each kind names the verb that writes it: `--park`,
+   `--abort`, `--close --override`, `--preflight --waive` and `--propose` respectively. DECISION had no writer for as long as
    this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
    with no route is a rule nobody follows, and it took a build hitting it to notice.
+
+   The PROPOSAL is the only kind the owner is owed no ANSWER to, and the only one carrying a further
+   field: the playbook STEP it amends, written between the item and the reason because the reason is
+   line-final and two readers recover a field by matching up to it. A run FOLLOWING a playbook may
+   not edit that playbook — a run that rewrites the checklist it is graded by has no rules left — so
+   what it noticed goes here and the amendment is a separate authoring run. Nothing blocks on a
+   proposal, and `--status` counts them apart from the kinds that are questions.
 4. **The run's BASE sha**, pinned once at run start. It is a runtime observation with no
    re-derivable source: a build with N sub-specs has N per-unit bases, none of which is the run's.
 5. **The anchor ref name**, as the remote advertised it for its own HEAD at pin time.
@@ -240,7 +263,7 @@ deny) or pick one arbitrarily (nondeterminism, which is the worst property a gat
 
 ## 4. The Definition of Done
 
-Eight kit-owned core items. Each names its checker, because an override budget must not be spent on
+Ten kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
@@ -251,6 +274,8 @@ something no machine could have checked:
 | `landed-via-lander` | machine, PRE-LANDING | the run-state record names no bypass flag. It is checked BEFORE the landing it is named for, so it is a record check, not an observation of the push — the honest limit, stated rather than implied by the label |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. Five terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
+| `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
+| `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one |
 
@@ -323,6 +348,29 @@ what preserves the strong claim wherever the strong claim is available.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
   by an agent hand-editing an artifact this kit calls generated.
+- `--park` — writes a decision the run REFUSED to take into the parked region, with the question, the
+  options seen and the reason. Refused on a terminal record and refused with no run-state file at
+  all, because a park minted for a run that never started records nothing about a run.
+- `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
+  joined to the step that provoked it. It is not a question, so nothing blocks on it; it is not an
+  edit, because a run that rewrites the checklist it is graded by has no rules left. It reuses
+  `--park`'s newline, separator, bypass and terminal refusals, widened over the new step field, and
+  its exact-line idempotence — with the step inside the identity, so the same amendment at two steps
+  is two rows.
+- `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
+  so no operator spells one, and REFUSING a machine-checked item by reading that item's declared
+  checker. Before it existed those keys had no writer at all and `--abort`, which requires both, was
+  reachable only by hand-editing a file this kit calls generated.
+- `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
+  piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
+  exact-line idempotence. The writer takes a records ROOT rather than a slug, and `--records-root`
+  reaches it BEFORE the slug and run-state checks — so the attended path calls the same function with
+  no run at all, which is what makes it a second CALLER rather than a second implementation. Without
+  that flag the verb resolves a slug and requires a run-state file. An earlier revision of this line
+  called the verb "unattended-only", which contradicted its own first half and the code.
+- `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
+  that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
+  structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
 - `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
   names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
   against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a
