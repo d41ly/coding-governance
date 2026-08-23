@@ -902,6 +902,97 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     check("AC2: and the probe is still LIVE, so silence is a verdict rather than a blind spot",
           ok["live"] is True)
 
+    # --- ROUND 7, MEDIUM 1: the two sides are dated on DIFFERENT CLOCKS unless the blame side
+    # --- honours `author-tz`. The spec side is a hand-typed LOCAL date; reading `author-time` as UTC
+    # --- backdates every README line written between 00:00 and 03:00 at +0300 and fires on a spec
+    # --- revision made the same local day. On this repo that was 11 of 31 rows, and the shipped pin
+    # --- was seeded through the skew. This arm is the one the existing fixtures could not be: every
+    # --- other GIT_AUTHOR_DATE here is +0000, which is exactly the timezone that cannot show it.
+    r4 = make_repo(tmp, name="rmtz")
+    b4 = (r4 / SPEC_DIR_FOR_FIXTURE).parent
+    (b4 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "The unit ships `--counts`." + NL_,
+        encoding="utf-8", newline="\n")
+    (r4 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aTz-1.md").write_text(
+        NL_.join([
+            "# TOOL-aTz-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-02 - `--counts` revised on the same LOCAL day the README line was",
+            "  written, which is only a hit if the two sides are read on different clocks.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r4)
+    # 01:00 at +0300 is 2026-01-01T22:00Z the day BEFORE. A UTC reader dates this line 2026-01-01 and
+    # the rev-2 entry then compares as later; an author-tz reader dates it 2026-01-02 and it does not.
+    run(["git", "commit", "-q", "-m", "tz", "--no-verify"], r4,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T01:00:00 +0300",
+             "GIT_COMMITTER_DATE": "2026-01-02T01:00:00 +0300"})
+    tz = report(r4)["readme_mechanism_drift"]
+    check("MEDIUM 1: a README line and a spec revision on the same LOCAL day are not a hit",
+          tz["value"] == 0, f"got {tz['value']} rows: {tz['detail'][:1]}")
+    check("MEDIUM 1: and the probe is LIVE, so the zero is a verdict", tz["live"] is True)
+
+    # --- ROUND 7, LOW 1: one row per README CLAIM, never one per backtick occurrence. `value` is
+    # --- what the shipped pin ratchets against, and its comment says each row is one sentence to
+    # --- re-read - which is false the moment a sentence naming a token twice counts twice.
+    r5 = make_repo(tmp, name="rmdup")
+    b5 = (r5 / SPEC_DIR_FOR_FIXTURE).parent
+    (b5 / "README.md").write_text(
+        "# a build" + NL_ + NL_
+        + "It ships `--counts`, and `--counts` is the one that matters." + NL_,
+        encoding="utf-8", newline="\n")
+    (r5 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDup-1.md").write_text(
+        NL_.join([
+            "# TOOL-aDup-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-05 - `--counts` now takes a pinned BASE sha.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r5)
+    run(["git", "commit", "-q", "-m", "dup", "--no-verify"], r5,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    dup = report(r5)["readme_mechanism_drift"]
+    check("LOW 1: a line naming one mechanism twice is ONE row",
+          dup["value"] == 1, f"got {dup['value']}")
+
+    # --- ROUND 7, LOW 3: the build slug comes from the DECLARED root. `MEMORY_ROOT` is not
+    # --- constrained to one path segment and this repo's own manifest records `docs/mem` as a real
+    # --- adopter value; an index-based split lands on the literal `builds` for every path and grades
+    # --- every README against every build's revision log. One arm covers every future signal that
+    # --- reaches for an index.
+    r6 = make_repo(tmp, name="rmnested")
+    (r6 / ".memory-tree.conf").write_text("MEMORY_ROOT=docs/mem" + NL_, encoding="utf-8", newline="\n")
+    for _b in ("one", "two"):
+        _d = r6 / "docs" / "mem" / "builds" / _b / "spec"
+        _d.mkdir(parents=True, exist_ok=True)
+        (_d.parent / "README.md").write_text(
+            "# build " + _b + NL_ + NL_ + "It ships `--" + _b + "-flag`." + NL_,
+            encoding="utf-8", newline="\n")
+        (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
+            NL_.join([
+                "# TOOL-a" + _b + "-1 - a thing",
+                "",
+                "## 9. Revision log",
+                "",
+                "- rev-2 - 2026-01-05 - `--" + _b + "-flag` was revised here.",
+                "",
+            ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r6)
+    run(["git", "commit", "-q", "-m", "nested", "--no-verify"], r6,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    nest = report(r6)["readme_mechanism_drift"]
+    slugs = sorted({d["build"] for d in nest["detail"]})
+    check("LOW 3: a two-segment MEMORY_ROOT still names the BUILD, not the literal `builds`",
+          slugs == ["one", "two"], f"got {slugs}")
+    check("LOW 3: and each README grades against its OWN spec set only",
+          nest["value"] == 2, f"got {nest['value']} rows")
+
     # --- AC4: LIVENESS over the population that CAN empty. Not "did I find a build" - the tree
     # --- always has builds - but "did I find a mechanism token to compare against a revision".
     r3 = make_repo(tmp, name="rmdead")

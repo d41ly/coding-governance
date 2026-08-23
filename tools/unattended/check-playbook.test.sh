@@ -408,6 +408,85 @@ grep -qF -- "bypass scan - 0 tracked" <<<"$out" \
 ( cd "$W" && git mv tools/unattended/moved-records tools/unattended/fixture-records >/dev/null 2>&1 )
 cp "$KEEP" "$F"
 
+# ---- ROUND 7's THREE DEFECTS IN CHECK 10, each with the arm that would have caught it. All three
+# ---- are one class: a guard that reports itself armed while its population, its literal or its count
+# ---- is not what the report claims.
+
+# BLOCKER 2 — the scan used to live inside the `grain && records` block, and grain is an INDEPENDENT
+# declared null. Blanking grain alone took the leg from RC=1 to RC=0 with the whole evidence corpus
+# unread. The arm blanks grain, leaves records, and requires the flag in a record to still red.
+cp "$KEEP" "$F"
+PREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/tools~*.md' | head -1)
+printf '\nlanded with --no-verify\n' >> "$W/$PREC"
+sed -i 's|^grain         = .*|grain         = ""|' "$F"
+out=$(run)
+n=$((n+1))
+grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" \
+  || bad "with grain blanked and records still declared, the bypass scan does not run - it is reachable only through a key it does not read"
+( cd "$W" && git checkout -q -- "$PREC" )
+cp "$KEEP" "$F"
+
+# BLOCKER 3 — `.unattended.conf` is a SHELL file and every other reader sources it. Two legal
+# spellings that a `sed | tr -d '"' | head -1` reader resolves differently, each with a record
+# carrying the flag, each required to red. Without the fix the leg exits 0 AND prints that it read
+# the corpus, which is the worst of the two possible wrong answers.
+for _sp in "BYPASS_BAN='--no-verify'" 'BYPASS_BAN="--no-verify"   # the flag the lander bans'; do
+  cp "$KEEP" "$F"
+  printf '\nlanded with --no-verify\n' >> "$W/$PREC"
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\n%s\n' "$_sp" > .unattended.conf )
+  n=$((n+1))
+  grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$(run)" \
+    || bad "a legal shell spelling of BYPASS_BAN resolves to something no record can contain, and the leg says nothing: $_sp"
+  ( cd "$W" && git checkout -q -- "$PREC" )
+done
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+
+# BLOCKER 3's OTHER HALF — an unarmed predicate must RED rather than print a population count over a
+# literal nothing can match. A resolved value carrying whitespace is a reader that mis-parsed.
+( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify   # trailing prose"\n' > .unattended.conf )
+n=$((n+1))
+grep -qF -- "the declared bypass flag resolves to a value carrying whitespace or a comment character, which no flag does - so this leg would grep the corpus for a literal no record can contain and then report that it read the corpus. Resolved value follows: [" <<<"$(run)" \
+  || bad "a bypass flag resolving to a value with whitespace in it is accepted and greped for, which no record can ever match"
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+
+# BLOCKER 2's TEETH — a declared flag over a declared root that enumerates NOTHING is a scan that
+# cannot move, and a note never reds. This empties the records root and requires a failure.
+cp "$KEEP" "$F"
+sed -i 's|^records       = .*|records       = "tools/unattended/empty-records"|' "$F"
+( cd "$W" && mkdir -p tools/unattended/empty-records && printf 'x\n' > tools/unattended/empty-records/.keep && git add -A >/dev/null 2>&1 )
+n=$((n+1))
+grep -qF -- "playbook records root(s) are declared, and the scan read ZERO tracked records - so this check is asserted over an empty population and would stay green with the flag in every record under them" <<<"$(run)" \
+  || bad "a declared bypass flag over a declared records root holding no records reports a healthy zero instead of redding"
+( cd "$W" && git rm -q -r --cached tools/unattended/empty-records >/dev/null 2>&1; rm -rf tools/unattended/empty-records )
+cp "$KEEP" "$F"
+
+# A TRACKED RECORD THE WORKTREE DOES NOT HAVE. The counter that proves the scan reached the corpus
+# must not count a file nothing opened - the same defect as the word-split one below, one step earlier.
+cp "$KEEP" "$F"
+GHOST="tools/unattended/fixture-records/tools~ghost~x.md"
+( cd "$W" && printf 'piece: nope\n' > "$GHOST" && git add -- "$GHOST" >/dev/null 2>&1 && rm -f "$GHOST" )
+n=$((n+1))
+grep -qF -- "a tracked evidence record is not readable in this worktree, so the bypass scan cannot answer for it and counting it as read would inflate the number that proves the scan reached the corpus" <<<"$(run)" \
+  || bad "a record git tracks and the worktree does not have is counted as read, which inflates the only number that proves the scan reached the corpus"
+( cd "$W" && git rm -q --cached -- "$GHOST" >/dev/null 2>&1 )
+cp "$KEEP" "$F"
+
+# HIGH 1 — `git ls-files` does not quote a path containing a space, so an unquoted `for` split one
+# record into two names that do not exist: the flag went unread AND the liveness counter incremented
+# twice for it. The arm puts the flag in a record whose name has a space and requires the red.
+cp "$KEEP" "$F"
+SPACED="tools/unattended/fixture-records/tools~a b~c.md"
+( cd "$W" && cp "$PREC" "$SPACED" && printf '\nlanded with --no-verify\n' >> "$SPACED" && git add -- "$SPACED" >/dev/null 2>&1 )
+out=$(run)
+n=$((n+1))
+grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" \
+  || bad "a record whose filename contains a space is never opened, so the flag in it is invisible while the scan reports a count that includes it"
+n=$((n+1))
+grep -qF -- "bypass scan - tools/unattended/fixture-records: 4 tracked evidence record(s) read" <<<"$out" \
+  || bad "the per-root count does not equal the tracked record count, so the number that proves the scan reached the corpus is not measuring the corpus"
+( cd "$W" && git rm -q --cached -- "$SPACED" >/dev/null 2>&1; rm -f "$SPACED" )
+cp "$KEEP" "$F"
+
 # ---- BLOCKER (round-4): THE REPLACE REF. `git replace -f <base> <forged>` rewrites what a sha
 # ---- dereference returns without touching one tracked byte, and ONLY `-c core.useReplaceRefs=false`
 # ---- suppresses it — the exported GIT_GRAFT_FILE a spawned leg inherits does NOT, and a `-c` is

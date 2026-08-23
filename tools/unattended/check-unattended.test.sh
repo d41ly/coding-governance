@@ -1813,6 +1813,22 @@ gut_parser() { # fn-name · whole replacement body (one line)
     mutate "$f" "/^$1() {/a\\$2"
   done
 }
+# ---- ROUND 7's BLOCKER 1: A PARSER BROKEN ONLY FOR ONE INPUT SHAPE. `gut_parser` above breaks a
+# ---- parser for EVERY input, which the fixed specimen loops catch on their own. This taints it for
+# ---- the SHIPPED TEMPLATE's block alone - `step_selector` is in that block and in none of the
+# ---- specimens - so the two single-line specimen batches stay aligned and pass while the two
+# ---- template batches misalign. The batched harness used to answer every misaligned slot with the
+# ---- batch's own rc, which is 0 when the batch RAN, and `(rc 0, "")` is the PASSING pair in both
+# ---- template arms: the leg came out at rc 0 with zero output, in the loop that is the shipped
+# ---- template's ONLY grader. A degraded-mode substitute must never be spelled with the value some
+# ---- assertion reads as clean.
+reset_tree
+for _pf in tools/unattended/check-playbook.sh tools/unattended/unattended.sh; do
+  mutate "$_pf" '/^declared_scalar() {/a\  case "$1" in *step_selector*) printf "EXTRA\\n" ;; esac'
+done
+hit "$(run)" "the batched parser harness got a reply it cannot split per specimen, so no assertion below is answering about the input it names - parser, specimens sent and answer lines received follow"
+reset_tree
+
 reset_tree; gut_parser declared_list "  printf ''"
 hit "$(run)" "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: ["
 

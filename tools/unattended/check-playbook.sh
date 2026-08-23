@@ -71,8 +71,20 @@ CANON_N=$(printf '%s\n' "$CANON" | grep -c . || true)
 # project declares. NOT "what the declaration seam names": that excluded the fixture this kit ships,
 # excluded a freshly created playbook no build README names yet, and contradicted the rule that a
 # tracked playbook is graded from the moment it is tracked.
-CONF_GLOB=""
-[ -f .unattended.conf ] && CONF_GLOB=$(sed -n 's/^PLAYBOOK_GLOB=//p' .unattended.conf | tr -d '"' | head -1)
+# ---- THE CONF IS SOURCED, not re-parsed. Round 7's blocker 3: this file was the only reader in the
+# ---- kit resolving a conf key with `sed | tr -d '"' | head -1` while `unattended.sh`, the sibling
+# ---- leg and the adopter all `. "$CONF"`. `.unattended.conf` IS a shell file, so `BYPASS_BAN='x'`
+# ---- kept its single quotes here and lost them everywhere else, a trailing comment survived here and
+# ---- nowhere else, and `head -1` took the FIRST assignment where sourcing takes the last. Each of
+# ---- those makes check 10 grep for a literal no record can contain WHILE STILL PRINTING that it read
+# ---- the corpus - a guard that reports itself armed and is not. Two readers of one config, one of
+# ---- them re-derived, is the same class check 28 exists to close for the parsers, one file over.
+# ---- The subshell is the isolation: nothing the conf sets reaches this leg's own state.
+_conf_key() { # KEY -> the value this file's three siblings would see
+  [ -f .unattended.conf ] || return 0
+  ( . ./.unattended.conf >/dev/null 2>&1; eval "printf '%s' \"\${$1:-}\"" )
+}
+CONF_GLOB=$(_conf_key PLAYBOOK_GLOB)
 # ---- BYPASS_BAN, the SECOND conf key this leg reads, and check 10 below is why. The driver refuses to
 # ---- WRITE an evidence record naming the declared bypass flag; nothing read those records back, so a
 # ---- flag that reached a tracked record by any other route was invisible after the fact. Check 11 in
@@ -81,9 +93,16 @@ CONF_GLOB=""
 # ---- before this landed - all three are zero in that file and non-zero in this one, which is why the
 # ---- scan is HERE, and why the alternative would have inlined a third parser copy past a gate that
 # ---- compares exactly two.
-CONF_BYPASS=""
-[ -f .unattended.conf ] && CONF_BYPASS=$(sed -n 's/^BYPASS_BAN=//p' .unattended.conf | tr -d '"' | head -1)
+CONF_BYPASS=$(_conf_key BYPASS_BAN)
 CONF_BYPASS=${CONF_BYPASS:-}
+# ---- AND THE PARSE IS ARMED. No bypass flag carries whitespace or a `#`; a resolved value that does
+# ---- is a reader that mis-parsed, and an unarmed predicate must RED rather than print a population
+# ---- count over a literal nothing can match.
+case "$CONF_BYPASS" in
+  '') ;;
+  *[[:space:]]*|*'#'*)
+    fail 10 "the declared bypass flag resolves to a value carrying whitespace or a comment character, which no flag does - so this leg would grep the corpus for a literal no record can contain and then report that it read the corpus. Resolved value follows: [$CONF_BYPASS]" ;;
+esac
 PLAYBOOKS=""
 while IFS= read -r f; do
   case "$f" in *.md) ;; *) continue ;; esac
@@ -135,10 +154,15 @@ GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false
 # checks it — and the two would drift the first time either changed.
 record_for() { # records-root · piece-path -> its record, or empty
   local r
-  for r in $(GITLS "$1/*.md"); do
+  # NOT `for r in $(GITLS …)`: `git ls-files` leaves a space-containing path unquoted, so one record
+  # becomes two names that do not exist. Round 7, high 1 - the class, not just the site that was filed.
+  while IFS= read -r r; do
     [ -n "$r" ] || continue
+    [ -f "$r" ] || continue
     [ "$(sed -n 's/^piece: //p' "$r" | head -1)" = "$2" ] && { printf '%s' "$r"; return 0; }
-  done
+  done <<RFEOF
+$(GITLS "$1/*.md")
+RFEOF
   return 0
 }
 
@@ -240,7 +264,7 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
 
 # ------------------------------------------------------------------------ per playbook
 TOTAL_STEPS=0
-BYPASS_SEEN=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
+BYPASS_SEEN=0; BYPASS_ROOTS=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
 for pb in $PLAYBOOKS; do
   [ -n "$pb" ] || continue
   if [ -n "$COUNTS_AT" ]; then
@@ -380,6 +404,48 @@ CANONEOF
   # same fold. A playbook writing `none` declares no per-piece checks, and grading every piece
   # `unchecked` against the word `none` is the declared null misread as a check name.
   case "$pchk" in none|'none '*|none[!A-Za-z0-9-]*) pchk="" ;; esac
+  # ---- 10: THE BYPASS FLAG, READ BACK OUT OF WHAT LANDED. The driver refuses to write one at record
+  # ---- time and that guard is real; this is the second opinion over what is in the tree, which is the
+  # ---- pair the charter asks for on a guarded surface.
+  # ----
+  # ---- IT NEEDS $rr AND NOTHING ELSE, which is why it is HERE. Round 7's blocker 2 found it nested
+  # ---- inside the `grain && records` block below: `grain` and `records` are independent declared
+  # ---- nulls, the only pairing refusal in this leg covers the REVERSE case, and a set-scoped playbook
+  # ---- declaring records with no grain is exactly the shape `set_checks` is for. Blanking grain alone
+  # ---- took the leg from RC=1 to RC=0 with the whole evidence corpus unread and a note saying zero.
+  # ----
+  # ---- THE POPULATION IS THE CENSUS OWN: same $rr from the same declared_scalar parse, same GITLS
+  # ---- enumeration - not a second derivation that could disagree with the first.
+  # ----
+  # ---- WHAT THIS DOES NOT REACH: --record-set accepts a caller-supplied records root, so a record
+  # ---- written outside every declared root is invisible here. That is the write-time guard's job and
+  # ---- it holds there. Said plainly, because coverage a reader assumes is total is worse than
+  # ---- coverage whose shape they know.
+  if [ -n "$rr" ]; then
+    BYPASS_ROOTS=$((BYPASS_ROOTS + 1))
+    if [ -n "$CONF_BYPASS" ]; then
+      _seen_here=0
+      # NOT `for bp_ in $(GITLS …)`. Round 7's high 1: `git ls-files` does not quote a path containing
+      # a space, so one record split into two nonexistent names, `grep -qF` failed on both, and
+      # BYPASS_SEEN incremented TWICE for the record it never opened - the liveness counter inflated by
+      # exactly the file that carried the flag.
+      while IFS= read -r bp_; do
+        [ -n "$bp_" ] || continue
+        if [ ! -f "$bp_" ]; then
+          fail 10 "a tracked evidence record is not readable in this worktree, so the bypass scan cannot answer for it and counting it as read would inflate the number that proves the scan reached the corpus: $bp_"
+          continue
+        fi
+        BYPASS_SEEN=$((BYPASS_SEEN + 1)); _seen_here=$((_seen_here + 1))
+        grep -qF -- "$CONF_BYPASS" "$bp_" \
+          && fail 10 "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once: $CONF_BYPASS in $bp_"
+      done <<BPEOF
+$(GITLS "$rr/*.md")
+BPEOF
+      # PER ROOT, because one repo-wide counter lets a grained playbook's records keep the number
+      # healthy while another root contributes nothing at all.
+      [ -n "$COUNTS_FOR" ] || note "bypass scan - $rr: $_seen_here tracked evidence record(s) read"
+    fi
+  fi
   if [ -n "$gr" ] && [ -z "$rr" ]; then
     fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
   fi
@@ -387,7 +453,7 @@ CANONEOF
     pieces=$(GITLS "$gr")
     npieces=$(printf '%s' "$pieces" | grep -c . || true)
     v=0; f=0; st_=0; un=0; uc=0; inscope=0
-    for pc in $pieces; do
+    while IFS= read -r pc; do
       [ -n "$pc" ] || continue
       rec=$(record_for "$rr" "$pc")
       if [ -z "$rec" ]; then
@@ -431,7 +497,9 @@ CANONEOF
       else
         v=$((v + 1))
       fi
-    done
+    done <<PCEOF
+$pieces
+PCEOF
     # THE LIVENESS ASSERTION, first and unconditional. Every count below can be satisfied by a tree
     # with no pieces in it, and a reader that enumerates zero, joins zero and reports zero failures
     # is indistinguishable from a clean run.
@@ -468,8 +536,19 @@ CANONEOF
     if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
       # The run ids come from the PIECE records, so this reports on the runs that actually produced
       # something here rather than on a roster no merge-bar run can see.
-      for rid_ in $(for r_ in $(GITLS "$rr/*.md"); do sed -n 's/^run: //p' "$r_" | head -1; done \
-                    | grep . | LC_ALL=C sort -u); do
+      # THE INNER ENUMERATION IS SPLIT-SAFE, the outer one does not need to be: run ids are the
+      # payload here and no run id carries whitespace. Round 7, high 1 - the class over every place
+      # this leg walks `git ls-files` output.
+      _rids_=$(while IFS= read -r r_; do
+        [ -n "$r_" ] || continue
+        [ -f "$r_" ] || continue
+        sed -n 's/^run: //p' "$r_" | head -1
+      done <<RIDEOF
+$(GITLS "$rr/*.md")
+RIDEOF
+      )
+      for rid_ in $(printf '%s
+' "$_rids_" | grep . | LC_ALL=C sort -u); do
         srec_="$rr/set-$rid_.md"
         if [ -z "$(GITLS "$srec_")" ]; then
           note "no set record — run $rid_ produced pieces under $pb, which declares set-scoped checks, and nothing records whether they ran; only --close blocks on this"
@@ -497,22 +576,17 @@ CANONEOF
     # ---- written outside every declared root is invisible here. That is the write-time guard job and
     # ---- it holds there. Said plainly, because coverage a reader assumes is total is worse than
     # ---- coverage whose shape they know.
-    if [ -n "$CONF_BYPASS" ]; then
-      for bp_ in $(GITLS "$rr/*.md"); do
-        [ -n "$bp_" ] || continue
-        BYPASS_SEEN=$((BYPASS_SEEN + 1))
-        grep -qF -- "$CONF_BYPASS" "$bp_" \
-          && fail 10 "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once: $CONF_BYPASS in $bp_"
-      done
-    fi
     # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
     # silently reports coverage it no longer has.
-    [ -n "$COUNTS_FOR" ] || for rc_ in $(GITLS "$rr/*.md"); do
+    [ -n "$COUNTS_FOR" ] || while IFS= read -r rc_; do
       [ -n "$rc_" ] || continue
+      [ -f "$rc_" ] || continue
       op=$(sed -n 's/^piece: //p' "$rc_" | head -1)
       [ -n "$op" ] || continue
       [ -e "$op" ] || note "orphan record — $rc_ describes $op, which is not in this tree; the record outlived its piece and is coverage nobody has"
-    done
+    done <<ORPHEOF
+$(GITLS "$rr/*.md")
+ORPHEOF
   fi
 done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-piece
       # ---- reader while that reader stayed indented as its body, so the reader ran ONCE over
@@ -526,8 +600,14 @@ done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-pie
 [ -n "$COUNTS_FOR" ] || { if [ -z "$CONF_BYPASS" ]; then
   note "bypass scan SKIPPED - no BYPASS_BAN declared in .unattended.conf, so tracked evidence records are not read back for it"
 else
-  note "bypass scan - $BYPASS_SEEN tracked evidence record(s) read for the declared flag"
+  note "bypass scan - $BYPASS_SEEN tracked evidence record(s) read across $BYPASS_ROOTS declared records root(s)"
 fi; }
+# ---- AND THE ZERO HAS TEETH. A note never reds, so the previous shape reported a scan that reached
+# ---- nothing in the same voice as one that read the corpus and found it clean. A declared flag, at
+# ---- least one declared root, and nothing read is a check that cannot move.
+if [ -n "$CONF_BYPASS" ] && [ "$BYPASS_ROOTS" -gt 0 ] && [ "$BYPASS_SEEN" -eq 0 ]; then
+  fail 10 "a bypass flag is declared and $BYPASS_ROOTS playbook records root(s) are declared, and the scan read ZERO tracked records - so this check is asserted over an empty population and would stay green with the flag in every record under them"
+fi
 [ -z "$COUNTS_FOR" ] && [ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
 
 exit "$st"

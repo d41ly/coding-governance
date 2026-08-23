@@ -134,6 +134,7 @@
       "bounded-through-a-pipe-is-unbounded.md",
       "concurrency-is-not-a-budget.md",
       "containment-tested-one-way.md",
+      "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
       "fixture-passes-by-finding-nothing.md",
       "gate-green-by-accident-on-generated-bytes.md",
@@ -152,6 +153,7 @@
       "trace-profile-measures-itself.md",
       "trailing-comma-counted-as-an-element.md",
       "two-answers-to-one-question.md",
+      "two-readers-of-one-config-one-re-derived.md",
       "vacuous-selector-empty-population.md"
     ],
     "guides": [

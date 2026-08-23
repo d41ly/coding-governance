@@ -52,3 +52,16 @@ discovered, because coverage a reader assumes is total is worse than coverage wh
 
 `check-playbook.test.sh` 99 assertions, up from 90. `run-unattended-gates.sh --checks` green: kit gate
 28 s, playbook validity gate 12 s, skill wiring 0 s.
+
+## Round 7 changed three of these criteria, and the record says which
+
+AC1, AC2 and AC4 were all satisfied over a population the check could not always reach, and the review
+found three routes to that. **AC4's population line is now per root AND reds at zero** — a `note` never
+failed, so a scan that reached nothing spoke in the same voice as one that read the corpus clean.
+**AC5's sharing claim held**, but the roots it shared were unreachable without a `grain` declaration
+that check 10 never reads; the scan is guarded on `records` alone now. **AC1 and AC2 were both
+answerable with a literal no record could contain**, because this file was the kit's only conf reader
+that re-parsed instead of sourcing.
+
+Seven arms were added for those three defects and every one was observed RED against the pre-fold leg.
+The suite is at 107 assertions, up from 99 at the unit's close.

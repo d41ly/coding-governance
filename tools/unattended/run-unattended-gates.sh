@@ -33,29 +33,6 @@ ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-unattended-gates: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 
-ONLY="${1:---selftests}"
-case "$ONLY" in
-  --all)       ONLY="" ;;
-  --checks)    ONLY=checks ;;
-  --selftests) ONLY=selftests ;;
-  -h|--help)
-    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
-    echo "  --selftests  the five suites that stage breaks into this kit (default), and the only"
-    echo "               thing that exercises them since none is a bar leg."
-    echo "               BUDGET ~60 MINUTES, measured node d 2026-08-23: the gate selftest alone is"
-    echo "               ~38 min because it re-runs a 28-check leg once per arm. Do NOT wrap this in"
-    echo "               a timeout under an hour - a killed suite prints no PASS and no FAIL, and"
-    echo "               greping for a verdict then reads a kill as silence. This script reads the"
-    echo "               EXIT CODE for that reason."
-    echo "  --checks     the three record/wiring checks - about 35 s, and ALSO merge-bar legs"
-    echo "  --all        both"
-    echo ""
-    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
-    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
-    exit 0 ;;
-  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
-esac
-
 # ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
 # ---- check nobody runs, and this kit proved it: its suites were pulled off the merge bar for costing
 # ---- 68% of it, and the compensating check that replaced them then took an hour, so it was re-run
@@ -73,6 +50,33 @@ BUDGET_driver_selftest=900    # measured 841 s
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
+
+ONLY="${1:---selftests}"
+case "$ONLY" in
+  --all)       ONLY="" ;;
+  --checks)    ONLY=checks ;;
+  --selftests) ONLY=selftests ;;
+  -h|--help)
+    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
+    echo "  --selftests  the five suites that stage breaks into this kit (default), and the only"
+    echo "               thing that exercises them since none is a bar leg."
+    # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
+    # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
+    # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
+    echo "               Budget: the sum of the BUDGET_* ceilings this file declares, currently"
+    echo "               $(( (BUDGET_gate_selftest + BUDGET_driver_selftest + BUDGET_playbook_validity_selftest + BUDGET_cross_component + BUDGET_adopter_e2e + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
+    echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
+    echo "               greping for a verdict then reads a kill as silence. This script reads the"
+    echo "               EXIT CODE for that reason."
+    echo "  --checks     the three record/wiring checks - about 35 s, and ALSO merge-bar legs"
+    echo "  --all        both"
+    echo ""
+    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
+    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
+    exit 0 ;;
+  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
+esac
+
 #
 # THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
 # spec named as one of its two acceptable outcomes, and this note is the reason beside the number.

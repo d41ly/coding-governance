@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them
 
-**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -108,6 +108,24 @@ reader does not mistake the coverage for total.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-23 · the round-7 fold. Three of the round's nine defects were this unit's check 10,
+  and all three are one class: a guard reporting itself armed while its population, its literal or its
+  count is not what the report claims.
+  **BLOCKER 2** — the scan sat inside the `grain && records` block, and those are INDEPENDENT declared
+  nulls whose only pairing refusal covers the reverse case. Blanking grain alone took the leg RC=1 ->
+  RC=0 with the whole evidence corpus unread and a note saying zero. The scan is guarded on `records`
+  alone now, one level out, with a PER-ROOT note; and the repo-wide zero reds instead of noting, because
+  a declared flag over declared roots that read nothing is a check that cannot move.
+  **BLOCKER 3** — this file was the kit's only reader resolving a conf key by `sed | tr -d '"' | head -1`
+  while the driver, the sibling leg and the adopter all SOURCE it. `BYPASS_BAN='--no-verify'` kept its
+  quotes here and lost them everywhere else; a trailing comment survived here and nowhere else. Either
+  makes the scan grep for a literal no record can contain while printing that it read the corpus. It
+  sources now, in a subshell, and the resolved value is ARMED — whitespace or a `#` reds.
+  **HIGH 1** — `git ls-files` does not quote a path with a space, so an unquoted `for` split one record
+  into two names that do not exist and `BYPASS_SEEN` incremented TWICE for the record it never opened.
+  Fixed as a CLASS: all five enumerations over `ls-files` output in this leg read without splitting, and
+  a record git tracks but the worktree lacks now reds rather than counting as read.
+  **Seven arms, every one observed RED against the pre-fold leg and green against this one.**
 - rev-3 · 2026-08-23 · BUILT. Check 10 lands in `check-playbook.sh` on the census's own `$rr` and
   `GITLS`; the real tree reads 3 tracked evidence records and finds nothing, and a flag appended to one
   of them reds it. AC5 is asserted by MOVING the declared root and watching both readers follow — its

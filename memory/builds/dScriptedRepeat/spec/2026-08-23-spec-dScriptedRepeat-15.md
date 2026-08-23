@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it
 
-**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -106,6 +106,21 @@ beside it. AC1 accepts either, and refuses silence.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-23 · the round-7 fold. **BLOCKER 1 was in this unit's own batching and it was the
+  serious one.** `_pbatch`'s misaligned-reply fallback filled every slot with the batch's own exit
+  status — correct for a body that will not RUN, which exits nonzero, and wrong for a body that ran and
+  merely misaligned, which exits 0. `(rc 0, "")` is the PASSING pair in both template arms, so a parser
+  broken only for multi-line input left the whole leg at rc 0 with ZERO output, in the loop that is the
+  shipped template's only grader. Reproduced exactly: pre-fold rc 0 / 0 lines, post-fold rc 1 / 8 lines.
+  The two degraded shapes are separate branches now — empty reply keeps the honest substitute, a
+  misaligned one reds once and poisons every slot with 125 so each arm's rc branch fires.
+  **The 19-case equivalence corpus missed it, and that is worth more than the fix.** Gutting a parser
+  for EVERY input makes the fixed specimen arms fail first, and their noise made the output identical
+  either way; the template loop's new silence hid behind it. A staged break must be scoped to the input
+  shape the new code handles differently. The arm now does exactly that.
+  **LOW 2** — `--help` quoted a ~60-minute budget beside the ceiling this unit had just re-declared, in
+  the same file. It DERIVES the figure from the `BUDGET_*` declarations now, so there is no second copy.
+  Minted: `fallback-fabricates-the-passing-value`.
 - rev-3 · 2026-08-23 · CLOSED. S1 ran and named a lever S2 then took alone; S3 and S4 were NOT taken,
   and that is a decision with numbers behind it rather than an omission. **What S1 found:** the leg is
   not compute-bound — `real 14.4s user 0.33s sys 0.62s` — and the wait is process creation, because

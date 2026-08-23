@@ -87,3 +87,24 @@ reason that had nothing to do with the code. A staged break has to be clean of t
 which is precisely the failure its own comment names, three lines above where it happens. Left alone:
 it is another unit's number to measure and drain, and guessing one here would be the thing that
 comment forbids.
+
+## Round 7 found the pin was measured through a broken instrument
+
+**AC5's band and AC6's readings both stand; AC5's NUMBER does not.** The blame side read `author-time`
+as UTC while the spec side is a hand-typed LOCAL date, so at +0300 every README line written between
+00:00 and 03:00 was backdated a day and fired on a same-day revision — 11 of the 31 rows were pure
+timezone artifacts, and one line naming a token twice was counted twice. The band after correcting the
+instrument: **19 rows over 7 of 61 READMEs, 11%**, six of them builds other than this one. Still
+inside S5's band, by a wider margin than before.
+
+The pin moved 31 -> 19 with the reason written beside it, because a pin seeded through a skewed
+instrument makes the later fix read as an improvement.
+
+Two more: the build slug came from `path.split("/")[2]`, which lands on the literal `builds` at a
+two-segment `MEMORY_ROOT` — a value this repo's own manifest records as real for an adopter. And `live`
+was computed from populations gathered BEFORE the blame call, so a blind blame reported a clean `ok`.
+
+**One criterion of the round is OWED and not written**: the arm for the blame-liveness fix. The only
+route that reproduces a blind blame is an unborn HEAD, and the report refuses to run at all on a repo
+with no commits, so no fixture in this harness reaches it. The counter is the fix; the arm is not
+there, and this sentence is the announcement rather than a silence.

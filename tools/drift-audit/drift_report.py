@@ -871,25 +871,43 @@ _GEN_MARK = "<!-- gen:"
 
 
 def _build_blame_dates(ctx, rel: str, upto: int) -> dict:
-    """line number -> author date. Porcelain emits the header block ONCE per commit; every later line
-    attributed to that commit carries the sha alone, so the date map is keyed on the sha."""
+    """line number -> author date, in the AUTHOR'S OWN timezone. Porcelain emits the header block ONCE
+    per commit; every later line attributed to that commit carries the sha alone, so the date map is
+    keyed on the sha.
+
+    THE TIMEZONE IS NOT A DETAIL. The other side of this signal's comparison is a HAND-TYPED local date
+    in a spec revision log, so reading `author-time` as UTC compares two different clocks. Measured on
+    this repo: 11 of 31 rows were pure +0300 artifacts — every README line written between 00:00 and
+    03:00 local was backdated a day, so a spec revision made the SAME day compared as later. This is
+    what `git blame --date=short` prints and what a human types, which is the whole point."""
     out = ctx.git.run("blame", "--porcelain", "-L", f"1,{max(upto, 1)}", "--", rel).stdout
     dates: dict[int, str] = {}
     by_sha: dict[str, str] = {}
     sha = None
     lineno = None
+    epoch = None
     for ln in out.splitlines():
         m = re.match(r"^([0-9a-f]{40}) \d+ (\d+)", ln)
         if m:
             sha, lineno = m.group(1), int(m.group(2))
+            epoch = None
             if sha in by_sha:
                 dates[lineno] = by_sha[sha]
             continue
-        if ln.startswith("author-time ") and sha is not None and lineno is not None:
+        if ln.startswith("author-time ") and sha is not None:
+            epoch = int(ln.split()[1])
+            continue
+        # `author-tz` FOLLOWS `author-time`, so the date is formatted here and not there.
+        if ln.startswith("author-tz ") and epoch is not None and lineno is not None:
+            tz = ln.split()[1]
+            off = 0
+            if len(tz) == 5 and tz[0] in "+-":
+                off = (int(tz[1:3]) * 3600 + int(tz[3:5]) * 60) * (-1 if tz[0] == "-" else 1)
             d = datetime.datetime.fromtimestamp(
-                int(ln.split()[1]), datetime.timezone.utc).strftime("%Y-%m-%d")
+                epoch + off, datetime.timezone.utc).strftime("%Y-%m-%d")
             by_sha[sha] = d
             dates[lineno] = d
+            epoch = None
     return dates
 
 
@@ -908,14 +926,32 @@ def build_readme_mechanism_drift(ctx) -> dict:
         "ls-files", f"{ctx.memory_root}/builds/*/README.md").stdout.splitlines() if ln.strip()]
     specs_by_build: dict[str, list[str]] = {}
     for sp in ctx.git.run("ls-files", f"{ctx.memory_root}/builds/*/spec/*.md").stdout.splitlines():
-        if sp.strip():
-            specs_by_build.setdefault(sp.split("/")[2], []).append(sp)
+        sp = sp.strip()
+        if not sp:
+            continue
+        _pfx = f"{ctx.memory_root}/builds/"
+        if sp.startswith(_pfx):
+            specs_by_build.setdefault(sp[len(_pfx):].split("/")[0], []).append(sp)
 
     rows = []
     tok_pop = 0
     rev_pop = 0
+    blamed = 0
+    blame_blind = 0
+    # NOT `rel.split("/")[2]`. `MEMORY_ROOT` is not constrained to one path segment and this repo's
+    # own kickoff manifest records `docs/mem` as a real adopter value; at two segments the index lands
+    # on the literal `builds` for every path, every README grades against every build's revision log,
+    # and the rows name a build called `builds`. Every sibling signal here addresses the tree by glob
+    # and is depth-agnostic.
+    prefix = f"{ctx.memory_root}/builds/"
+
+    def _extract_slug(path: str) -> str:
+        return path[len(prefix):].split("/")[0] if path.startswith(prefix) else ""
+
     for rel in sorted(readmes):
-        build = rel.split("/")[2]
+        build = _extract_slug(rel)
+        if not build:
+            continue
         lines = _read(ctx, rel).split("\n")
         cut = next((i for i, ln in enumerate(lines) if ln.startswith(_GEN_MARK)), len(lines))
         # THE REVISION ENTRIES, read as data. A continuation line is folded into the entry above it,
@@ -939,6 +975,10 @@ def build_readme_mechanism_drift(ctx) -> dict:
         # and this audit is meant to run in seconds; a README whose tokens no revision entry mentions
         # cannot produce a row whatever its dates are.
         cand = []
+        # ONE CANDIDATE PER (LINE, TOKEN), never one per occurrence. A README sentence naming a
+        # mechanism twice is one sentence to re-read, and `value` is what the shipped pin ratchets
+        # against - counting it twice inflates the drain list for no new work.
+        seen = set()
         for i, ln in enumerate(lines[:cut], start=1):
             if ln.lstrip().startswith("#"):
                 continue
@@ -946,6 +986,9 @@ def build_readme_mechanism_drift(ctx) -> dict:
                 if not _MECH_RE.match(tok):
                     continue
                 tok_pop += 1
+                if (i, tok) in seen:
+                    continue
+                seen.add((i, tok))
                 # THE BACKTICKED FORM, never a bare substring. `--check` is a prefix of
                 # `--check-format` and every id ending in a 1-up sequence is a prefix of nine others -
                 # this repo's own `id-matched-as-a-substring` class, and a revision log spells its
@@ -957,6 +1000,13 @@ def build_readme_mechanism_drift(ctx) -> dict:
         if not cand:
             continue
         dates = _build_blame_dates(ctx, rel, cut)
+        # A BLAME THAT ANSWERED NOTHING IS NOT A BUILD WITH NOTHING TO SAY. `Git.run` never raises and
+        # that helper reads only stdout, so an unborn HEAD or any other blame failure yields {} and the
+        # build contributes zero rows in silence. Counted here so `live` can watch the stage that
+        # actually does the work, rather than only the two populations gathered before it.
+        blamed += 1
+        if not dates:
+            blame_blind += 1
         for i, tok, named in cand:
             d = dates.get(i)
             if d is None:
@@ -976,7 +1026,11 @@ def build_readme_mechanism_drift(ctx) -> dict:
         # a POINTER rather than a proven contradiction - gating it would red a merge on a README
         # sentence that may well still be true.
         "gateable": False,
-        "live": bool(tok_pop and rev_pop),
+        # LIVENESS OVER THE STAGE THAT DOES THE WORK, not only over the two populations gathered
+        # before it. `tok_pop` and `rev_pop` are both accumulated ahead of the blame call, so a signal
+        # whose every blame failed used to report a clean `ok`. If any README reached the blame stage,
+        # at least one of them has to have come back with dates.
+        "live": bool(tok_pop and rev_pop and (blamed == 0 or blamed > blame_blind)),
         "detail": rows,
     }
 

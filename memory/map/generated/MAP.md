@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 27 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 29 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -159,6 +159,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `containment-tested-one-way.md` | unattended |
+| `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
@@ -177,6 +178,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `two-answers-to-one-question.md` | baseline |
+| `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
 
 ## guides

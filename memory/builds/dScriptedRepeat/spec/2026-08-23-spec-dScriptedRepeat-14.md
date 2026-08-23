@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised
 
-**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -100,6 +100,26 @@ not survive contact with the corpus.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-23 · the round-7 fold. Four defects, all in the new signal, none of them able to red
+  a merge — and one of them had already been baked into a shipped pin.
+  **MEDIUM 1** — the two sides were dated on different clocks: `author-time` read as UTC against a
+  hand-typed LOCAL date in the revision log. At +0300 every README line written between 00:00 and 03:00
+  was backdated a day and fired on a same-day revision. 11 of 31 rows were pure artifacts. The blame
+  side honours `author-tz` now and **the pin is re-seeded 31 -> 19**, with the reason beside it, because
+  a pin measured through a broken instrument makes the later fix read as an improvement.
+  **LOW 1** — one row per backtick OCCURRENCE, so a sentence naming a token twice counted twice while
+  the pin's own comment said each row is one sentence to re-read. Deduped on `(line, token)`.
+  **LOW 3** — `path.split("/")[2]` assumes `MEMORY_ROOT` is one segment; this repo's own manifest records
+  `docs/mem` as a real adopter value, where the index lands on the literal `builds` and every README
+  grades against every build. The slug is derived from the declared root now.
+  **LOW 4** — `live` was computed from two populations gathered BEFORE the blame call, so a blind blame
+  reported a clean `ok`. It watches the blame stage now. **Its arm is OWED and says so**: the only
+  reproducing route is an unborn HEAD, and the report refuses to run at all on a repo with no commits,
+  so no fixture in this harness reaches it. The counter is the fix; the arm is not written.
+  Three arms for MEDIUM 1, LOW 1 and LOW 3, each observed RED against the pre-fold signal.
+  Minted: `two-readers-of-one-config-one-re-derived` (from blocker 3, filed under unit 13).
+  Band after the fold: **19 rows over 7 of 61 READMEs, 11%**, still inside S5's band with 6 builds other
+  than this one.
 - rev-3 · 2026-08-23 · CLOSED. The signal ships INSIDE S5's band and **AC3 is unreachable**, so
   S6's fallback ships beside it rather than instead of it. Both halves, with the numbers.
 

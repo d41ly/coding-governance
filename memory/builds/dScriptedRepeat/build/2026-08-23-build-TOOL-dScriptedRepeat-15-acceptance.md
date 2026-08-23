@@ -70,3 +70,21 @@ a call-count profile wearing a time profile's clothes. The per-region timestamps
 18 writes and put 5.02 s of a 10.74 s invocation in the four parser loops, which is where the change
 that mattered was then made. Recorded because the same trap is one command away for anyone profiling
 a shell program.
+
+## Round 7 refuted this record's central claim, and that is the entry worth reading
+
+**AC5 said the batched harness is byte-identical to the per-specimen one in every failure shape. It
+was not.** The 19-case corpus tested parsers broken for EVERY input; the shape that matters is a parser
+broken for ONE input shape. A `declared_scalar` emitting an extra line only for multi-line input —
+which is what the shipped template block is, and what a comment-leak regression looks like — left the
+whole leg at **rc 0 with zero output**, because the misaligned-reply fallback answered every slot with
+`(rc 0, "")` and that is the PASSING pair in both template arms.
+
+Observed, both directions: pre-fold **rc 0, 0 lines**; post-fold **rc 1, 8 lines** naming the harness
+refusal. The corpus missed it because gutting a parser for every input makes the fixed specimen arms
+fail first, and their noise made the two outputs identical while the template loop went quiet behind
+it. **A staged break must be scoped to the input shape the new code handles differently** — that is the
+lesson, and it is minted as `fallback-fabricates-the-passing-value`.
+
+AC1's `--help` text also still quoted the pre-unit cost beside the ceiling this unit re-declared, in
+the same file. It derives the figure from the `BUDGET_*` declarations now.

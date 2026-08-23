@@ -2203,13 +2203,16 @@ else
     # The parser body, the function called and the specimens are unchanged - what changed is that they
     # are fed to one shell instead of one shell each.
     #
-    # THE FALLBACK IS WHAT KEEPS THIS BYTE-IDENTICAL WHEN THE PARSER IS BROKEN, which is the case every
-    # arm here exists for. A body that will not parse makes `bash -c` print nothing and exit nonzero,
-    # so the reply is short; every slot is then filled with THAT exit status and an empty answer, which
-    # is exactly what the per-specimen wrapper handed each caller before. The rc branches below
-    # therefore fire with the same text, the same number of times. A dead harness must not be
-    # byte-indistinguishable from a working one, and it must not be text-distinguishable from the
-    # unbatched one either.
+    # THE FALLBACK KEEPS THIS BYTE-IDENTICAL FOR ONE DEGRADED SHAPE AND REDS ON THE OTHER, and the
+    # distinction is round 7's blocker 1. A body that will not parse makes `bash -c` print nothing and
+    # exit nonzero, so the reply is EMPTY; every slot is filled with that exit status and an empty
+    # answer, which is exactly what the per-specimen wrapper handed each caller before, so the rc
+    # branches below fire with the same text the same number of times. A body that RAN and returned a
+    # reply that will not split per specimen is a different fact and gets its own refusal, because the
+    # value that would otherwise be fabricated - rc 0 and the empty string - is what both template
+    # arms read as a clean parse. A dead harness must not be byte-indistinguishable from a working
+    # one, it must not be text-distinguishable from the unbatched one, and its degraded mode must not
+    # be spelled with the passing value.
     _PB_RC=(); _PB_OUT=()
     _pbatch() { # parser-body - fn - body key [body key ...]  ->  fills _PB_RC / _PB_OUT, one per pair
       local _body=$1 _fn=$2 _pairs _res _rc _line _i
@@ -2232,12 +2235,30 @@ $_res
 PBEOF
       fi
       [ "${#_PB_RC[@]}" -eq "$_pairs" ] && return 0
-      # SHORT OR MISALIGNED REPLY: the harness could not speak for these specimens, so every one of
-      # them is answered with the harness's own exit status and the empty string - the same pair the
-      # unbatched wrapper returned for each specimen when the body would not run.
+      # ---- TWO DEGRADED SHAPES, AND THEY ARE NOT THE SAME SHAPE. Round 7's blocker 1 was one branch
+      # ---- for both, filling every slot with the batch's own `$_rc` - which is 0 when the batch RAN
+      # ---- and merely misaligned, and `(rc 0, "")` is the PASSING pair in both template arms below.
+      # ---- A parser broken only for multi-line input therefore took the leg to rc 0 with no output,
+      # ---- in the loop that is the shipped template's ONLY grader. A degraded-mode substitute must
+      # ---- never be a value some assertion reads as clean.
+      if [ -z "$_res" ]; then
+        # THE BODY DID NOT RUN. `bash -c` printed nothing and exited nonzero, which is byte-for-byte
+        # what the per-specimen wrapper handed each caller before this was batched, so the rc branches
+        # below fire with the same text the same number of times. This is the equivalence the comment
+        # above claims, and it is true of THIS branch only.
+        _PB_RC=(); _PB_OUT=()
+        _i=0
+        while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=("$_rc"); _PB_OUT+=(""); _i=$((_i + 1)); done
+        return 0
+      fi
+      # THE BODY SPOKE AND THE REPLY DOES NOT LINE UP: one answer carried a newline, or the parser
+      # emitted a line of its own. There is no honest per-specimen answer to hand back, so this says
+      # so ONCE and then poisons every slot with a nonzero sentinel, which reaches each arm's rc
+      # branch. 125 is not a status any parser here returns.
+      fail 28 "the batched parser harness got a reply it cannot split per specimen, so no assertion below is answering about the input it names - parser, specimens sent and answer lines received follow: $_fn wanted $_pairs got ${#_PB_RC[@]}"
       _PB_RC=(); _PB_OUT=()
       _i=0
-      while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=("$_rc"); _PB_OUT+=(""); _i=$((_i + 1)); done
+      while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=(125); _PB_OUT+=(""); _i=$((_i + 1)); done
       return 0
     }
     tpl_block=$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f' "$tpl")
