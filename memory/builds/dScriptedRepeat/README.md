@@ -130,6 +130,13 @@ every one of 5, 6, 7 and 8 reads a value unit 4's seam resolves.
 | 10 | all of 1-9, 11 |
 | 11 | 2, 3 · and its EXISTENCE is parked for the owner |
 
+**Units 13, 14 and 15 were added after this table and are not in it.** They came out of the round-3
+through round-6 folds rather than the original decomposition, each of them a finding the fold could not
+close in place: 13 reads the declared bypass flag back out of tracked evidence records, 15 cuts the
+kit gate's process spawns and re-declares its ceiling, and 14 adds a drift signal for the class this
+paragraph is an instance of. None has a predecessor in 1-11 and none blocks another, so the table
+above stays a statement about the original nine plus 10 and 11.
+
 Two co-landing constraints, both from the specs' own reasoning. Units 6 and 8 land together because 6's
 piece count consumes 8's diff population and counts the wrong thing without it. Units 6 and 7 land
 together because `CORE_FLOOR`'s Definition-of-Done half moves ONCE, from eight to ten, rather than
