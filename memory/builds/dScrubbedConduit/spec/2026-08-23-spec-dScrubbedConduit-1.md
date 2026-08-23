@@ -1,167 +1,218 @@
 # TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them
 
-**Status:** OPEN · rev-1 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
 Fix five defects reported from `d41ly/nc`, which re-adopted the whole kit set on 2026-08-23. Each was
-found by an adopter paying for it, not by a gate here. Four of the five are structurally invisible in
-this repo, because gov's own layout is the one layout that does not trigger them.
+found by an adopter paying for it. rev-1 claimed four of the five were invisible here; **a review
+refuted that for the most severe one — gov is exposed to it too, through linked worktrees, and the
+class is already filed twice in gov's own backlog.**
 
 ## 2. Scope (IN)
 
-- **S1 — `rosters()` cannot read a corpus containing a binary.** `tools/memory-tree/gen_build_index.py:492-494`
-  guards `read_text` with `except Problem`, but `read_text` raises `UnicodeDecodeError`, which is not
-  a `Problem`. Any non-UTF-8 tracked file under the memory root crashes the generator with a
-  traceback. nc carries a UI review screenshot at `memory/builds/*/reviews/*/obs-spec/*.png`; that is
-  a legitimate record, and it took the generator down. A roster is built from ids in PROSE, so a file
-  that is not text cannot contribute one and skipping it changes no output. Widen the except.
-- **S2 — the pre-push hook leaks `GIT_DIR` into every leg.** Git EXPORTS `GIT_DIR` (and friends) into
-  hooks. A leg that creates a scratch repo with `git init` inherits it and initialises the SHARED
-  gitdir instead of its temp dir. Where that gitdir has no worktree of its own — a SUBMODULE — `git
-  init` sets `core.bare=true` on a config that also carries a per-worktree `core.worktree`, and every
-  subsequent git call answers `fatal: this operation must be run in a work tree`. Scrub the
-  environment at the boundary that injects it.
-- **S3 — `kit-dogfood-parity.test.sh --render` cannot create a first render.** Line 77 `continue`s
-  past a missing live copy in EVERY mode, including `--render`, whose entire job is to write that
-  file. An adopter installing `BUILD-METHOD.template.md` for the first time gets
-  `kit-parity: missing live copy` from the command documented as the fix for it, forever. Render when
-  the mode is `--render`; keep the failure for `--check`.
-- **S4 — the `keepalive-tool-names` discharge probe can never pass.** `tools/unattended/kit.toml:110`
-  discharges on `! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md`, and
-  `SKILL.template.md` itself contains 25 `<slug>`, 6 `<name>`, 3 `<unit-id>` and more as DOCUMENTED
-  SYNTAX. The probe therefore fails for every adopter no matter how correctly the conf is filled —
-  measured on nc with all four keepalive values correct and 32 matches remaining. A hole that can
-  never be discharged is a hole nobody can close, which is worse than the half-silence it was added
-  to fix. Narrow the probe to the ANGLE-BRACKET VALUES the conf actually substitutes.
-- **S5 — the five defects above get gates, or a recorded reason they cannot.** Per the charter, a
-  finding is not done until it is a gate OR a documented check. S1-S4 are each a one-line fix; the
-  standing risk is that nothing stops them recurring.
+- **S1 — the decode CLASS in `gen_build_index.py`, not one site.** rev-1 proposed widening
+  `except Problem` at `:493`. Measured by review: there are THREE sites reading arbitrary tracked
+  files — `rosters` (`:492`), `read_bindings` (`:352`) and `spec_ids` (`:307`) — and the latter two
+  catch `OSError`, which does not catch `UnicodeDecodeError`. Widening only `:493` makes `--check`
+  call 52 READMEs stale and `--write` produce `53 files changed, 2 insertions(+), 398 deletions(-)`,
+  **deleting the Record/Kind/Serves table from every build README.** Also measured: `read_text`
+  (`:124-128`) raises only `OSError` and `UnicodeDecodeError` and never `Problem`, so the existing
+  `except Problem` is DEAD CODE, and the natural `(Problem, UnicodeDecodeError)` reading still dies
+  with `FileNotFoundError` on a tracked-but-missing file — which both sibling sites already survive.
+  S1 is therefore ONE `read_text_or_none` helper used by all three scanners, catching at least
+  `(OSError, UnicodeDecodeError)`; `read_bindings`' "Never raises." docstring at `:340` corrected; and
+  the blanket `except Exception` at `:1023` narrowed or made loud.
+- **S2 — scrub the injected git environment at the hook boundary.** Corrected mechanism, measured on
+  git 2.54.0.windows.1: **a plain top-level clone exports NO `GIT_DIR` into `pre-push`; a repo reached
+  through a `.git` FILE does** — a linked worktree exports `GIT_DIR=…/.git/worktrees/<wt>`, and a
+  submodule likewise. A leg that then runs `git init` re-initialises THAT gitdir and rewrites its
+  shared config. Review flipped gov's own fixture clone's `core.bare` to `true` by running a real bar
+  leg under a worktree `GIT_DIR`, with no submodule anywhere. Scrub in `.githooks/pre-push` ONLY (see
+  Q1), naming the variables explicitly — **`GIT_EXEC_PATH` must survive.**
+- **S3 — `--render` must be able to create a first render, and must not lie when it cannot.** Three
+  measured facts, two of which rev-1 missed. The `continue` at `:77` skips a missing live copy in every
+  mode. `:107`'s `[ "$MODE" = --render ] && exit 0` DISCARDS `st`, so `--render` already exits 0 today
+  while printing `missing live copy` and writing nothing. And the write at `:80` is a bare
+  `render > "$live"` with no `mkdir -p`, so a first-time adopter — who has no `memory/guides/` at all —
+  gets `No such file or directory`, the line `kit-parity: rendered …`, exit 0, and no file. S3 fixes
+  all three: render on `--render`, `mkdir -p` the parent, a write-failure arm, and stop `:107`
+  swallowing `st`.
+- **S4 — narrow the `keepalive-tool-names` discharge probe, and subject it to the CONF.** The probe
+  greps `<[a-z-]+>` over the rendered `SKILL.md`, whose template ships 25 `<slug>` and more as
+  documented syntax, so it fails for every adopter forever. Review confirmed the narrowing is
+  buildable: the three conf placeholder literals occur ZERO times in `SKILL.template.md`. It also
+  found the probe's subject is wrong — a rendered `SKILL.md` cannot distinguish a conf-injected
+  placeholder from the template's own syntax without matching literals — and that
+  `KEEPALIVE_INTERVAL`'s shipped value `<e.g. every 10 minutes (cron 3-59/10 * * * *)>` does NOT match
+  `<[a-z-]+>` at all, so it is undetectable today. Probe `.unattended.conf`'s resolved values, all
+  three keys.
+- **S5 — the hook must not FAIL OPEN.** New at rev-2, and the most severe item in the unit. Once
+  `core.bare` is flipped, `git rev-parse --show-toplevel` exits 128, so `.githooks/pre-push:11`'s
+  `|| exit 0` fires and **the hook returns success with the merge bar never having run.** Reproduced
+  end to end by review: a push from a bricked primary tree printed `[new branch] main -> main2`,
+  exited 0, never printed the gate's marker, and LANDED ON THE REMOTE. `.githooks/pre-commit:5`
+  carries the same shape. A hook that cannot resolve its repo has not established that the push is
+  safe; it must refuse.
+- **S6 — left-shift, with the hosts named rather than deferred.** rev-1 left the gate shape to an open
+  question, which the charter does not allow a finding to end in. Per-item hosts, costed by review:
+  S1 → the existing `gen_build_index.py --selftest`. S3 → a genuinely new harness or an accepted
+  documented check, because `kit-dogfood-parity.test.sh` is itself a bar leg with no self-test. S2/S5
+  → a LINKED-WORKTREE fixture inside the existing `pre-push self-test` leg, which today builds
+  `git init -q --bare` and `git init -q "$tmp/work"` — the one layout that exports no `GIT_DIR`, so the
+  fixture must change for the RED to be observable. S4 → the only item with no host at all.
 
 ## 3. Non-goals (OUT)
 
-- **`playbook.fixture.md`'s hardcoded `tools/unattended/` is NOT fixed here.** It was the fifth
-  reported ask. Its `outputs`, `grain`, `records` and `legs` all name that literal path under
-  `coverage = "resolvable"`, so the playbook leg exits 1 for any adopter installing the kit at another
-  prefix — nc measured exactly that and moved the kit rather than patch a receipted file. The fix is a
-  path-token substitution across a fixture whose whole purpose is to be byte-stable, and the records
-  under `fixture-records/` literally encode `tools~unattended~…` in their FILENAMES. That is a
-  redesign of the fixture's addressing, not a line change, and it does not belong in a unit whose
-  other four items are one-liners. Filed as its own backlog row.
-- **No adopter-side change.** nc already carries local carve-outs for all five. Those stay until the
-  kit ships fixes and nc re-adopts; this unit does not reach into nc.
-- **No version bumps beyond what the changed kits require**, and no kit re-release process.
-- **`govkit`'s `seed` role is NOT touched.** nc filed it as an ask and then WITHDREW it — the premise
-  was false, `seed` is write-if-absent. Recorded here so the withdrawal travels with the batch.
+- **`playbook.fixture.md`'s hardcoded `tools/unattended/` stays OUT, with rev-1's reason RETRACTED.**
+  rev-1 said the fixture's records "encode the path in their FILENAMES" and called it a redesign of an
+  addressing scheme. Refuted: `check-playbook.sh:125-131` `record_for()` joins on the record's own
+  `piece:` FIELD and explicitly refuses to re-derive the writer's naming, so the filenames are
+  cosmetic to the join. The REAL obstacle, which rev-1 never named, is `kit.toml:9-11` shipping the
+  fixture under `include = "**"` / `role = "engine"` — copied verbatim with no placeholder pass,
+  unlike `SKILL.template.md`'s `role = "rendered"`. Fixing it means making the fixture `rendered` with
+  a `KIT_DIR` placeholder, or making `check-playbook.sh` resolve declared paths relative to the kit
+  dir. Still out — that is a kit-descriptor change with its own blast radius — but out for the true
+  reason. **The backlog row is filed by this unit** (rev-1 claimed it already existed; it did not).
+- **The merge-driver injector stays OPEN after this unit.** `TOOL-aSealedCaravan-5` and
+  `TOOL-aPacedTurnstile-10` record the same `GIT_DIR`-export class reaching a MERGE DRIVER, which
+  `git merge` invokes rather than a hook. S2 scrubs at the hook and does not reach them.
+- **No adopter-side change.** nc carries local carve-outs for all of these; they stay until nc
+  re-adopts.
+- **`govkit`'s `seed` role is NOT touched** — nc filed it and WITHDREW it, the premise was false.
 
 ## 4. Design
 
-### Why four of five are invisible here
+### The mechanism, corrected
 
-| # | needs, to reproduce | gov has it? |
+Git exports `GIT_DIR` into a hook whenever the repository is reached through a `.git` **FILE** rather
+than a `.git` directory. That covers a linked worktree and a submodule alike. `git init` with
+`GIT_DIR` set does not create a repo at the cwd — it re-initialises the repo `GIT_DIR` names and
+re-derives `core.bare` from whether that path has a worktree of its own. For a plain clone the answer
+is yes and nothing changes; for a worktree gitdir or a submodule gitdir the answer is no, `core.bare`
+flips to `true`, and every later git call in the owning tree fails.
+
+### Which of these can this repo reproduce — CORRECTED
+
+| # | needs | gov has it? |
 |---|---|---|
 | S1 | a non-UTF-8 tracked file under the memory root | no — gov's memory tree is all text |
-| S2 | a repo whose `GIT_DIR` has no worktree — i.e. a SUBMODULE | no — gov is a top-level clone |
-| S3 | a first-time render, i.e. an adopter without the live copy yet | no — gov has always had all three |
-| S4 | any adopter at all | **yes** — gov is exposed too, and its own probe has never passed |
+| S2 | a gitdir reached through a `.git` FILE | **YES — every linked worktree; measured here** |
+| S3 | a first-time render | no — gov has always had all three live copies |
+| S4 | any adopter | **YES — gov's own probe has never passed** |
+| S5 | a tree whose repo resolution fails | **YES — reachable from S2** |
 
-S4 is the interesting row. It is not adopter-specific; it fails here as well, and the reason nobody
-noticed is that a `[[hole]]` probe is not a gate leg — nothing on the merge bar runs it.
+rev-1's table claimed four of five were invisible here. Three of the five are in fact reproducible in
+gov, and two of those are the severe ones. The reason nobody noticed is not exotic: S4's probe is a
+`[[hole]]`, which no bar leg runs, and S2/S5 need a worktree fixture where every existing fixture is a
+plain `git init`.
 
-### The mechanism behind S2, stated once
+### Prior art in this repo's own backlog
 
-`git init` with `GIT_DIR` set does not create a repo at the cwd. It re-initialises the repo `GIT_DIR`
-names, and re-derives `core.bare` from whether that path has a worktree. For a normal clone the
-answer is "yes, it does" and nothing changes — which is why gov, and every non-submodule adopter,
-sees nothing. For a submodule gitdir the answer is "no", so `core.bare` flips to `true` and collides
-with the `core.worktree` the submodule needs. The value reverts later, which makes it present as a
-race with another session; nc reported it as one twice before bisecting it.
+`TOOL-aSealedCaravan-5` records the merge driver going inert in a linked worktree under an absolute
+`GIT_DIR`, and notes its e2e fixture is a normal repo and cannot see it — the same fixture-blindness
+S6 has to fix. `TOOL-aPacedTurnstile-10` records that git exports `GIT_DIR` to a merge driver,
+reproduced with one variable. Both are OPEN. They are the strongest evidence against rev-1's premise
+and they bound S2's reach.
 
 ### Files touched (estimate)
 
-`tools/memory-tree/gen_build_index.py` · `.githooks/pre-push` · `tools/memory-tree/kit-dogfood-parity.test.sh` ·
-`tools/unattended/kit.toml` · the test files for each · `tools/gate-legs.json` if S5 adds a leg.
+`tools/memory-tree/gen_build_index.py` · `.githooks/pre-push` · `.githooks/pre-commit` ·
+`tools/memory-tree/kit-dogfood-parity.test.sh` · `tools/unattended/kit.toml` ·
+`.githooks/pre-push.test.sh` · `tools/memory-tree/gen_build_index.py`'s selftest · `memory/backlog/TOOL.md`.
 
 ### Alternatives rejected
 
-- **S2 in `run-gates.sh` instead of the hook.** The runner is not the only thing a hook invokes, and
-  the pollution is injected by the hook boundary. Fixing it at the runner leaves every other
-  hook-invoked path exposed. REJECTED in favour of the hook — but see Q1: doing BOTH may be right.
-- **S4 by dropping the probe.** It exists because the hole is genuinely half-silent: a verbatim
-  example conf renders placeholder prose and passes every check. Deleting the probe restores that
-  silence. REJECTED; narrow it instead.
+- **Scrubbing in `run-gates.sh` too** (rev-1's Q1 recommendation). REFUTED by a live failure in gov's
+  own harness — see Q1.
+- **Deleting S4's probe.** It exists because the hole is genuinely half-silent. Narrow, don't delete.
 
 ## 5. Production-readiness checklist
 
-- **security** — S2 is the only item with a blast radius beyond a red gate: a leaked `GIT_DIR` lets a
-  leg write to a repo it was never pointed at. The fix removes an ambient capability rather than
-  adding one.
-- **perf / scale** — N/A. Four one-line changes.
+- **security** — S5 is the real security row, and rev-1 understated it badly. The failure is not "a
+  leg writes to the wrong repo"; it is **the authoritative merge bar silently not running while the
+  push succeeds.** Measured end to end. S2 removes the cause, S5 removes the fail-open.
+- **perf / scale** — N/A.
 - **a11y / i18n** — N/A.
-- **error / empty / loading states** — S3 IS an empty-state defect: the tool's behaviour when its
-  output does not exist yet.
-- **observability** — S2's failure mode is actively misleading, not merely silent: it presents as a
-  concurrent-session race. Whatever gate S5 adds should name the mechanism, so the next person does
-  not spend three blocked pushes on it.
-- **risks** — widening an `except` (S1) can mask a real decode failure elsewhere; the mitigation is
-  that this catch is scoped to one read whose result is optional. Changing `--render` semantics (S3)
-  could mask a genuinely missing TEMPLATE; keep that arm failing.
-- **testing + left-shift gates** — each kit already ships a self-test; S1-S4 extend those rather than
-  adding new harnesses. Every new arm must be observed RED before it is called landed.
-- **migration / rollback** — none needed. No stored data, no generated artifact changes shape.
-- **user docs** — N/A. Kit-internal.
+- **error / empty / loading states** — S3 IS an empty-state defect, and its current behaviour is
+  invisible to any caller checking `rc`.
+- **observability** — S2's failure presents as a concurrent-session race; the adopter reported it as
+  one twice. Whatever S6 lands must name the mechanism.
+- **risks** — (a) widening a decode catch can mask a real failure: mitigated by one shared helper with
+  a named exception tuple, not a blanket. (b) **A COMPLETE S1 turns hygiene check 21 RED**, measured:
+  `record_paths` admits any extension, so the binary becomes an `A` row and
+  `check-memory-hygiene.sh:659-666` fails — and today's crash makes that check VACUOUSLY GREEN because
+  `:663` runs under `2>/dev/null || true`. Budgeted here, not discovered later. (c) **S4 removes a
+  standing exemption**: `govkit.py:1741` `exempt_leg` suppresses the "red after install" criterion
+  whenever any `blocks_gate` hole's probe exits non-zero, and this probe always does — so all three
+  unattended gate legs are permanently exempt in every adopter today. Narrowing may surface genuinely
+  red legs. (d) changing `--render` semantics could mask a missing TEMPLATE; keep that arm failing.
+- **testing + left-shift gates** — S6 names a host per item. Every new arm observed RED before landing.
+- **migration / rollback** — none. No stored data, no artifact shape change.
+- **user docs** — N/A, kit-internal.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a non-UTF-8 tracked file is placed under a fixture memory root and `gen_build_index.py`
-  runs, it completes and reports the same artifacts as without that file. Observed RED first: the
-  same fixture on the unfixed code raises `UnicodeDecodeError`.
-- **AC2** — When `.githooks/pre-push` runs a leg that executes `git init` in a temp dir with `GIT_DIR`
-  exported, the shared config's `core.bare` is unchanged. Observed RED first, in a SUBMODULE fixture,
-  where the unfixed hook flips it to `true`.
-- **AC3** — When `kit-dogfood-parity.test.sh --render` runs against a tree missing one live copy, it
-  WRITES that copy and exits 0; and `--check` against the same missing copy still exits non-zero.
-  Both arms observed.
-- **AC4** — When the `keepalive-tool-names` discharge probe runs against a correctly-filled SKILL.md
-  it passes, and against one carrying an unsubstituted conf value it fails. The second arm is what
-  the hole exists for and is the one to observe.
-- **AC5** — When `bash tools/run-gates/run-gates.sh` runs, it is green, and every leg this unit
-  touched ran rather than skipped.
+- **AC1** — When a non-UTF-8 tracked file is added under a fixture memory root, `gen_build_index.py
+  --write` produces artifacts **BYTE-IDENTICAL** to the same tree without that file. rev-1 said "the
+  same artifacts", which the 398-line deletion satisfied. Observed RED first.
+- **AC2** — When `pre-push` runs a leg that executes `git init` in a temp dir, in a **LINKED WORKTREE**
+  (primary arm — the shape gov is exposed through), the shared config's `core.bare` is unchanged. A
+  SUBMODULE arm follows, for the `core.worktree` collision. Both observed RED first.
+- **AC3** — When `kit-dogfood-parity.test.sh --render` runs against a tree where a live copy AND ITS
+  PARENT DIRECTORY are absent, the file exists afterwards with correct content. And `--check` against
+  the same absent copy exits non-zero. The exit-0 clause rev-1 attached to the first arm is dropped:
+  `--render` already exits 0 today, so it could not fail.
+- **AC4** — Three arms, one per conf key, `KEEPALIVE_CREATE`, `KEEPALIVE_DELETE` and
+  `KEEPALIVE_INTERVAL`: with the key unsubstituted the probe FAILS; with all three filled it passes.
+  `KEEPALIVE_INTERVAL` is the arm that matters, being undetectable under today's predicate.
+- **AC5** — When `pre-push` cannot resolve its repository, it exits NON-ZERO and the push is refused.
+  Observed against the bricked-tree fixture that currently lands a branch at rc=0.
+- **AC6** — After S4 lands, `bash tools/unattended/check-unattended.sh`,
+  `bash tools/unattended/check-playbook.sh` and `bash tools/unattended/adopt-unattended.sh --check`
+  each exit 0 in an adopter-shaped target, rather than passing via the `exempt_leg` blanket that S4
+  removes.
+- **AC7** — `bash tools/run-gates/run-gates.sh` is green and every leg this unit touched RAN.
 
 ## 7. Gates
 
-The full bar, `bash tools/run-gates/run-gates.sh`. The legs this unit can move: the memory-tree kit
-self-tests, the unattended kit self-tests (owner-demand, not on the bar — so they must be run by hand
-and their verdict reported), `check-kit-versions.sh` if any version constant moves, and
-`govkit selfcheck` if `kit.toml` changes shape.
-
-New gates: S5's, whose form is Q2.
+The full bar, `bash tools/run-gates/run-gates.sh`. Legs this unit can move: the memory-tree self-tests,
+`pre-push self-test`, `kit-dogfood-parity` (itself a leg), `check-kit-versions.sh` if a version
+constant moves, `govkit selfcheck` for the `kit.toml` change, and the unattended suites — which are
+owner-demand only, so they are run BY HAND and their verdict reported rather than assumed.
 
 ## 8. Open questions
 
-- **Q1 — does S2 belong in the hook, the runner, or both?** RECOMMENDATION: both. The hook is where
-  git injects the variables, so it is the correct single point; but `run-gates.sh` is invoked directly
-  by sessions too, and a leg that `git init`s is a hazard whenever any ambient `GIT_DIR` is set,
-  hook or not. Scrubbing twice costs one line and closes the path the hook does not cover.
-- **Q2 — what shape should S5's gate take?** Options: (a) a self-test arm per fix, in each kit's own
-  suite — cheap, but the unattended suites are owner-demand only, so S2 and S4 would land behind a
-  gate nothing runs; (b) one new bar leg that asserts the four behaviours from a fixture — visible,
-  but a fifth harness to maintain; (c) fold S1/S3 into their kits' suites and give S2/S4 a bar leg,
-  since those two are the ones no suite on the bar covers. RECOMMENDATION: (c).
-- **Q3 — should the `[[hole]]` discharge probes run on the bar at all?** S4 has never passed here and
-  nobody noticed, because a hole probe is not a leg. That is a general gap, not specific to this
-  hole. RECOMMENDATION: out of scope for this unit; file it, because fixing S4's probe without this
-  leaves the next broken probe equally unobserved.
+- **Q1 — RESOLVED by measurement: hook ONLY.** rev-1 recommended scrubbing in `run-gates.sh` as well.
+  Refuted: `run-gates.sh:92` resolves `LOGDIR` from `git rev-parse --git-dir`, and
+  `run-gates.evidence.test.sh` deliberately drives the runner with an explicit per-case `GIT_DIR` so
+  cases cannot clobber the live summary. With the scrub added, the harness's absent-`GIT_DIR` case
+  flips from `rc=2 / refused / 0 files` to `rc=0`, writing into the REAL `.git`. If an ambient
+  `GIT_DIR` outside a hook is still a worry, add a REFUSAL rather than a scrub.
+- **Q2 — RESOLVED into S6.** rev-1 deferred the gate shape, which the charter does not permit. The
+  hosts are named in S6 with review's costing: option (c) was wrong in both directions — S2 needs a
+  fixture inside an EXISTING leg rather than a new one, and S3's "fold into its kit's suite" is not
+  available because that kit has no suite.
+- **Q3 — should `[[hole]]` discharge probes run on the bar?** Still open, still out of scope. S4's
+  probe has never passed here and nobody noticed precisely because nothing runs it. Fixing S4 without
+  this leaves the next broken probe equally unobserved. Filed rather than built.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-23 · initial draft. Five asks in, one moved to non-goals as a redesign rather than
-  a fix.
+- rev-1 · 2026-08-23 · initial draft. Five asks in, one moved to non-goals.
+- rev-2 · 2026-08-23 · folded a three-lens adversarial review with a batched skeptic: 31 raw findings,
+  9 refuted, 12 confirmed, 5 of them high. The mechanism was wrong (linked worktrees, not just
+  submodules — and gov IS exposed), the blast radius was understated (the hook FAILS OPEN and a push
+  landed with no bar), S1 was scoped to one of three sites and would have deleted 398 lines of record
+  inventory, Q1's recommendation was refuted by gov's own harness, S3 had two more defects than filed,
+  the OUT item's reason was wrong, the class was already filed twice in this backlog, and a claimed
+  backlog row did not exist. S5 and S6 are new.
 
 ## 10. Reuse audit
 
-No new machinery. S1, S3 and S4 are edits to existing kit files and their existing self-tests. S2
-adds one `unset` line at a boundary that already exists. The only candidate for new surface is S5's
-gate, and Q2 recommends folding two of the four into suites that already run rather than building a
-fifth harness. The seam for S2 is `.githooks/pre-push`, which nc has already carved locally — the
-adopter's carve-out is the prototype this unit upstreams.
+Still no new machinery for S1/S3/S4 — edits to existing kit files. S1 CONSOLIDATES three ad-hoc
+decode sites into one helper, which is the reuse move the charter asks for and which rev-1 missed by
+scoping to a single line. S2/S5 edit an existing hook. The only genuinely new surface is S6's fixture
+work, and review costed it: S2/S5 extend the EXISTING `pre-push self-test` leg rather than adding one,
+and S3 is the single item that needs a new harness or an accepted documented check. The adopter's
+local carve-out in nc's `.githooks/pre-push` is the prototype S2 upstreams.

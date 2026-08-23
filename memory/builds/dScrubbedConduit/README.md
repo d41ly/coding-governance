@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-23
 streams: tooling
 roster: TOOL
-ids: TOOL-dScrubbedConduit-1
+ids: TOOL-dScrubbedConduit-1 TOOL-dScrubbedConduit-2 TOOL-dScrubbedConduit-3
 ---
 
 # dScrubbedConduit — five defects an adopter found by hitting them
@@ -15,15 +15,22 @@ suspicion, and four of the five are invisible in this repo because gov's own lay
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 1 unit(s) · node d · opened 2026-08-23 · streams tooling
-ids TOOL-dScrubbedConduit-1
+ids TOOL-dScrubbedConduit-1 TOOL-dScrubbedConduit-2 TOOL-dScrubbedConduit-3
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them](spec/2026-08-23-spec-dScrubbedConduit-1.md) | OPEN | rev-1 | 2026-08-23 |
+| [TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them](spec/2026-08-23-spec-dScrubbedConduit-1.md) | OPEN | rev-2 | 2026-08-23 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records live under `spec/` and `reviews/`.
+
+| Record | Kind | Serves |
+|---|---|---|
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md) | spec-audit | TOOL-dScrubbedConduit-1 |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md) | spec-audit | TOOL-dScrubbedConduit-1 |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md) | spec-audit | TOOL-dScrubbedConduit-1 |
+| [2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md) | spec-audit | TOOL-dScrubbedConduit-1 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -40,4 +47,9 @@ Records live under `spec/`.
 
 - **`spec/`**
   - [2026-08-23-spec-dScrubbedConduit-1.md](spec/2026-08-23-spec-dScrubbedConduit-1.md)
+- **`reviews/`**
+  - [2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-claims.md)
+  - [2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-fixes.md)
+  - [2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-specdoc.md)
+  - [2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md](reviews/2026-08-23-review-TOOL-dScrubbedConduit-1-verdicts.md)
 <!-- /gen:build-docs -->
