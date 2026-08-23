@@ -760,6 +760,10 @@ out=$(run --close tRun --override closing-review-recorded --reason "fixture buil
 miss "$out" "the recorded BASE equals HEAD"
 miss "$out" "an absent discriminator is a refusal"
 hit "$out" "close OK"
+# ...and that success names the COMMIT, not only the lander. `--close` STAGES the phase; a run
+# that merges from another tree without committing carries the older phase into the merge and is
+# then refused by a check 31 that was right. TOOL-dUnstalledConvoy-24.
+hit "$out" "COMMIT the run-state file"
 same "the landed run reached LANDING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "LANDING"
 git push -q -f origin "$BASE":main
 
@@ -2029,8 +2033,36 @@ printf '%s\n' "$sbody" | grep -qE 'DOD_OUT=("[^"]|[^"])' \
 # ---- and anchor checks, so no fixture commit is needed to reach it.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 before=$(sum)
+
 hit "$(run --landed tRun)" "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time"
 same "the refused --landed wrote nothing" "$(sum)" "$before"
+
+# ---- TOOL-dUnstalledConvoy-24. A LANDING evaluated in one tree has to TRAVEL. `--close` writes the
+# ---- phase and STAGES it; nothing commits it, so a run that merges from another tree carries the
+# ---- older phase into the merge and check 31 refuses — accurately, and while naming nothing that
+# ---- helps. This build's own landing hit it and paid a full bar to re-close on the merged tree.
+# ----
+
+# ---- S2: the refusal names the OTHER TREE holding the uncommitted LANDING. The fixture is a real
+# ---- second worktree, because the whole class is that a phase does not cross trees; the precedent
+# ---- for building one in a fixture is tools/memory-recall/recall-opened.test.sh.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+git add -A && git commit -q -m runstate --no-verify
+OTHER=$(mktemp -d)/wt
+git worktree add -q -b other-tree "$OTHER" HEAD 2>/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' "$OTHER/memory/builds/tRun/RUN.md"
+out=$(run --landed tRun 2>&1)
+hit "$out" "a run reaches LANDED only from LANDING"
+hit "$out" "an UNCOMMITTED LANDING is sitting in:"
+# ...and the NEGATIVE control on the SAME fixture, differing only in the other tree's phase. Without
+# it the arm above passes for any message that mentions a tree at all.
+sed -i 's/^phase: .*/phase: BUILDING/' "$OTHER/memory/builds/tRun/RUN.md"
+out=$(run --landed tRun 2>&1)
+hit  "$out" "a run reaches LANDED only from LANDING"
+miss "$out" "an UNCOMMITTED LANDING is sitting in:"
+git worktree remove --force "$OTHER" 2>/dev/null; git branch -q -D other-tree 2>/dev/null
+reset_tree
+
 hit "$(run --landed tBare)" "no run-state file, so there is no run to mark landed"
 
 # ---- 32: the OBSERVATION. The fixture's unit branch is one commit AHEAD of the anchor, which is
@@ -3134,7 +3166,7 @@ same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md
 # gone with the branch that implemented it: every version of that branch was wrong in a different
 # direction, and its last one let a pass that had already written outside its lane re-park a widened
 # row at the original anchor and RETRACT a check-23 failure the leg had emitted. The record is
-# append-only now and TOOL-dUnstalledConvoy-23 owns the redesign.
+# append-only now, and TOOL-dUnstalledConvoy-23 built the comparison that reads it.
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
 hit "$out" "dispatch declared"
 same "the repeat parked its own row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "2"
@@ -3220,6 +3252,28 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes 'tools/*.sh')" "--dispatc
 # ---- disjoint. The pair below is exactly that shape.
 run --dispatch tRun --pass ARCH-tRun-3 --writes tools/beta >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-4 --writes tools/beta/one.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+
+# ---- `normpath` AND THE DOT SPELLINGS (spec 23 S5 / AC7). A trailing `/.` and an interior `/./` name
+# ---- the same directory as the plain path, and every containment answer is built on normpath, so a
+# ---- declaration spelled either way was compared as a different string. Round 4 found the interior
+# ---- case; the trailing one is broken by the same missing step, which is why fixing one is how a
+# ---- class becomes an instance.
+np_is() {   # input · expected
+  n=$((n+1))
+  got=$(bash -c ". \"$HERE/lib-unattended.sh\"; normpath '$1'")
+  [ "$got" = "$2" ] || { echo "FAIL normpath '$1': expected [$2], got [$got]"; st=1; }
+}
+np_is 'a/./b'      'a/b'
+np_is 'a/b/.'      'a/b'
+np_is 'a/b/./'     'a/b'
+np_is './a/./b/.'  'a/b'
+np_is 'a//./b'     'a/b'
+np_is 'a/././b'    'a/b'
+# ...and the spellings that must NOT move, or the fix has eaten the repository-root case the
+# `--writes` boundary depends on.
+np_is 'a/b'        'a/b'
+np_is '.'          '.'
+np_is './'         '.'
 
 # ---- ONE TRAILING SLASH USED TO TURN EVERY CONTAINMENT REFUSAL OFF (closing review F2). `memory`,
 # ---- `memory/` and `./memory` are one path; compared as raw strings they are three, and the

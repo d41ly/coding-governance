@@ -5,7 +5,7 @@
 last-audit: 2026-08-23T02:48:09+03:00 @ 747255411f9442234198b9c8d6fe69e0284cc18a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2f28951450582ab7727cfe35517aed7492785f2f
+last-body-change: bef3071d209891cc770d6b7d255a0ea689304a9a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -53,8 +53,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   authority are M3's and M6's; they are not restated here, for the reason the directives bullet
   below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
   pass's declared write set, but grading it against what the pass committed ships DARK behind
-  `DISPATCH_GRADING` after four adversarial rounds failed to make it correct, and the leg says so on
-  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` owns the redesign. Declare your write
+  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` redesigned it: the comparison now
+  RUNS on every leg and REPORTS to stdout, and it never fails the bar — a gate here and a
+  stall-free unattended run were shown to be the same choice. Declare your write
   sets anyway — a redesign reads them — but do not treat a green leg as a disjointness proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit

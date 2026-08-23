@@ -122,6 +122,13 @@ n=$((n+1))
 [ "$(grep -c ' dispatch · item .* ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md)" = 2 ] \
   || { echo "FAIL the driver did not park a second row, so the leg has one declaration for two passes"; st=1; }
 git add -A >/dev/null && git commit -q -m "ARCH-tRun-1 declare second dispatch" --no-verify
+# ...AND THE SECOND PASS ACTUALLY COMMITS. Round 4 found this arm never let either pass commit, so
+# the leg's window never opened and the driver/leg seam the arm is named for was never entered — a
+# fixture passing by containing no instance of what it names. The commit is inside the declared lane,
+# so the leg must still be silent; that silence is now evidence rather than an artefact of an empty
+# window.
+mkdir -p work && printf 'b\n' > work/build
+git add -A >/dev/null && git commit -q -m "ARCH-tRun-1 builds its unit" --no-verify
 git push -qf origin unit
 out=$(leg); rc=$?
 same "arm 3b: the leg is silent over what the driver produced, exit code" "$rc" "0"

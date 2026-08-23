@@ -18,6 +18,7 @@ gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementat
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
   "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
+  "spec-names-code-its-base-lacks.md",
 ]
 guides = ["UNATTENDED-PROTOCOL.md"]
 backlog-shards = []

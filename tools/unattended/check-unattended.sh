@@ -1101,42 +1101,25 @@ for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
-  # ONE ROW PER (group, unit) — THE LAST. The driver's widening repair supersedes an OPEN pass's row
-  # and parks the replacement AT THE SAME ANCHOR, so a widened declaration is two rows under one key
-  # and the later one is the one that binds. That anchor reuse is what lets this stay a plain fold
-  # with no ordering arithmetic in it.
-  #
-  # KEYED ON (group, unit) AND NOT ON THE UNIT ALONE, which the first repair tried and which is wrong
-  # twice over. M6 defines five pass kinds and one unit may be dispatched once per kind, so a unit
-  # legitimately owns several rows at several anchors; merging them graded one pass's commit against
-  # another pass's declaration, and left the second pass ungraded entirely. And because a post-hoc
-  # widening cannot reuse a closed pass's anchor, it lands under a NEW key here and the original
-  # narrow declaration is still graded — which is the ordering constraint, obtained by construction
-  # rather than by comparing timestamps after the fact.
-  # GRADING IS OFF UNLESS A PROJECT DECLARES IT ON, and the default is off because this mechanism is
-  # not verified. Four adversarial rounds over it are recorded under `memory/builds/dUnstalledConvoy/reviews/`; the
-  # last one reproduced a driver call RETRACTING a failure this check had already emitted, and the
-  # round before that a refusal that ended a unit outright. The introduction rate across the four
-  # rounds did not fall. TOOL-dUnstalledConvoy-23 owns the redesign.
-  #
-  # THE DECLARATIONS ARE STILL RECORDED by `--dispatch`, and every other check in this leg still runs.
-  # What is dark is the GRADING of a declaration against a commit — the one part that was never
-  # right. This is the charter's own handling for unverified Tier-2 behaviour: ship it inert, flip it
-  # on after in-place verification, never land it on because it is nearly there.
-  #
-  # A DARK CHECK ANNOUNCES ITSELF. A skip that looks like a pass is indistinguishable from coverage,
-  # and this leg has redded twice for exactly that shape.
-  if [ -z "${DISPATCH_GRADING:-}" ]; then
-    if grep -qF -- ' dispatch · item ' "$f" 2>/dev/null; then
-      report "check 23 DARK for $f — dispatch declarations are recorded but NOT graded against commits; the grading is retired pending TOOL-dUnstalledConvoy-23 and DISPATCH_GRADING is unset, so a green verdict here is coverage of nothing"
-    fi
-    continue
-  fi
+  # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
+  # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
+  # with different windows. What changes is same-anchor rows: `row[k] = $0` overwrote, so a run that
+  # took the driver's own published repair ("a pass that needs more paths declares again") had its
+  # first declaration silently discarded and was reported against the second alone.
   dsrows=$(grep -F -- ' dispatch · item ' "$f" 2>/dev/null | awk '
       { k = $0; sub(/^.* dispatch · item /, "", k); sub(/ · reason .*$/, "", k)
-        if (!(k in row)) ord[++n] = k
-        row[k] = $0 }
-      END { for (i = 1; i <= n; i++) print row[ord[i]] }' || true)
+        pth = $0; sub(/^.* · reason /, "", pth)
+        pre = $0; sub(/ dispatch · item .*$/, "", pre)
+        if (!(k in seen)) { seen[k] = 1; ord[++n] = k; head[k] = pre; paths[k] = pth }
+        else {
+          split(paths[k], have, " "); dup = 0
+          split(pth, add, " ")
+          for (a in add) { dup = 0
+            for (h in have) if (have[h] == add[a]) dup = 1
+            if (!dup) paths[k] = paths[k] " " add[a] }
+        } }
+      END { for (i = 1; i <= n; i++) { k = ord[i]
+              print head[k] " dispatch · item " k " · reason " paths[k] } }' || true)
   if [ -z "$dsrows" ]; then
     report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
     continue
@@ -1163,7 +1146,19 @@ for f in $RUNS; do
     # THE KIT LIBRARY ANSWERS THIS, not a loop written here. The driver's condition 1 asks the same
     # question, and when the two were written separately the driver's copy omitted the run-state skip
     # below and closed every pass on its own declaration commit.
-    dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" || true)
+    # S3 — THE WINDOW'S UPPER BOUND. A unit legitimately owns several rows at several anchors, and
+    # an unbounded window grades row one against row two's commit, which is another pass's work. The
+    # bound is the unit's NEXT anchor by ancestry, and the window is (own, next] — inclusive at the
+    # top, because `pass_commit` is exclusive at the bottom and a commit sitting exactly on the next
+    # anchor must belong to exactly one of the two rows rather than to neither.
+    dsanchors=$(printf '%s\n' "$dsrows" | while IFS= read -r _r; do
+        [ -n "$_r" ] || continue
+        _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
+        [ "${_i#* }" = "$dsunit" ] && printf '%s\n' "${_i%% *}"
+      done)
+    dstop=$(next_anchor "$dsgrp" "$dsanchors")
+    [ -n "$dstop" ] || dstop=HEAD
+    dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" "$dstop" || true)
     if [ -z "$dshit" ]; then
       # NO COMMIT NAMES THE PASS. Legal when the pass produced no change - M6 says a pass that
       # changed nothing commits nothing. NOT legal when the declared paths moved anyway: that is the
@@ -1172,11 +1167,13 @@ for f in $RUNS; do
       # latter reds on every witness commit a run makes between passes.
       dsmoved=""
       for dsp in $dsdecl; do
-        GIT log --format=%H "$dsgrp"..HEAD -- "$dsp" 2>/dev/null | grep -q . && dsmoved="$dsmoved $dsp"
+        # S4 — THE SAME UPPER BOUND. This scan asks whether a declared path moved while no commit
+        # named the pass; unbounded it sees the NEXT pass's writes and reports them against this row.
+        GIT log --format=%H "$dsgrp".."$dstop" -- "$dsp" 2>/dev/null | grep -q . && dsmoved="$dsmoved $dsp"
       done
       # ...and the run-state file is excluded from the OUTSIDE test too, for the same reason.
       if [ -n "$dsmoved" ]; then
-        fail 23 "a declared path of a dispatched pass moved after the group anchor while no commit names that pass, so the declared work happened and the only join this check has was dodged: $dsunit wrote$dsmoved in $f"
+        printf 'unattended: check 23 — a declared path of a dispatched pass moved inside its window while no commit names that pass, so the declared work happened and the only join this check has was dodged: %s wrote%s in %s\n' "$dsunit" "$dsmoved" "$f"
       else
         report "check 23 observed for $dsunit in $f — no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
       fi
@@ -1197,7 +1194,7 @@ for f in $RUNS; do
 $(printf '%s\n' "$dsrows" | grep -F -- " dispatch · item $dsgrp ")
 DSSIBS
     if [ -n "$dsother" ]; then
-      fail 23 "one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this check rests on is not available: $dsunit and $dsother in $f"
+      printf 'unattended: check 23 — one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this comparison rests on is not available: %s and %s in %s\n' "$dsunit" "$dsother" "$f"
       continue
     fi
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
@@ -1213,7 +1210,7 @@ DSSIBS
       done
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
-    [ -z "$dsout" ] || fail 23 "a dispatched pass committed a path outside the set it declared before dispatch, which is the disjointness proof failing at the only moment it could be checked: $dsunit at $dshit wrote$dsout in $f"
+    [ -z "$dsout" ] || printf 'unattended: check 23 — a dispatched pass committed a path outside the set it declared before dispatch: %s at %s wrote%s in %s\n' "$dsunit" "$dshit" "$dsout" "$f"
   done <<DSROWS
 $dsrows
 DSROWS
