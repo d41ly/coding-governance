@@ -170,7 +170,7 @@ Named here because the research raised each one and an unstated exclusion reads 
 
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 11 unit(s) · node d · opened 2026-08-20 · streams tooling
+**Build status:** SPECCED · 14 unit(s) · node d · opened 2026-08-20 · streams tooling
 ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-12
 ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15
 
@@ -188,6 +188,9 @@ ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15
 | [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-11 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-6 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | CLOSED | rev-6 | 2026-08-21 |
+| [TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, not just the run-state file](spec/2026-08-23-spec-dScriptedRepeat-13.md) | SPECCED | rev-1 | 2026-08-23 |
+| [TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised](spec/2026-08-23-spec-dScriptedRepeat-14.md) | SPECCED | rev-1 | 2026-08-23 |
+| [TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and the number that says so is measured rather than argued](spec/2026-08-23-spec-dScriptedRepeat-15.md) | SPECCED | rev-1 | 2026-08-23 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -214,9 +217,9 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 
-Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
+Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15.
 
-Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9.
+Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -243,6 +246,9 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-20-spec-dScriptedRepeat-7.md](spec/2026-08-20-spec-dScriptedRepeat-7.md)
   - [2026-08-20-spec-dScriptedRepeat-8.md](spec/2026-08-20-spec-dScriptedRepeat-8.md)
   - [2026-08-20-spec-dScriptedRepeat-9.md](spec/2026-08-20-spec-dScriptedRepeat-9.md)
+  - [2026-08-23-spec-dScriptedRepeat-13.md](spec/2026-08-23-spec-dScriptedRepeat-13.md)
+  - [2026-08-23-spec-dScriptedRepeat-14.md](spec/2026-08-23-spec-dScriptedRepeat-14.md)
+  - [2026-08-23-spec-dScriptedRepeat-15.md](spec/2026-08-23-spec-dScriptedRepeat-15.md)
 - **`build/`**
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-corpus-anatomy.md)
   - [2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-extension-seams.md)
