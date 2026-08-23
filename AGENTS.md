@@ -265,6 +265,10 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - Codebase map adopted (§5)? Its coverage + freshness tests are merge-bar legs like any other — never exempt them to "unblock" a landing (claiming the key IS the unblock).
 - Classify special-execution tests STRUCTURALLY: a collection hook auto-marks by fixture/dependency so a new test can't forget its class, and the default environment can't silently switch engines.
 - Parallel test runs preserve per-file isolation (file-level distribution, not per-test); parallelism is opt-in; small selections run serially (worker startup makes them a net loss).
+- A check nobody can afford to run is a check nobody runs, so COST IS A VERDICT: every suite declares a wall-clock
+  ceiling, a runner REDS on breach, and one arriving without a ceiling reds by that fact. Slowness that annoys is
+  never fixed; slowness that fails is fixed or re-declared with a reason. Give a checker a way to run the ONE
+  question an arm asks: paying for the whole subject per arm is a gate that cannot fail, spent in wall clock.
 - Document deliberate gate exemptions together with their compensating manual check — an exemption is not coverage.
 - Concurrent migration forks (two branches, same parent) reconcile via a merge revision, never a rebase; know whether the local harness can even see a fork (often only the head-count gate does).
 - A generated contract artifact baked into multiple deployables couples their releases: those artifacts deploy TOGETHER, and a contract change may couple a frontend release to a data migration.

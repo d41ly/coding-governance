@@ -207,13 +207,22 @@ if [ ! -f "$CHARTER" ]; then
   echo "gov-canary: $CHARTER is absent, so the charter arms would pass by finding nothing — this is a refusal"
   fail=1
 else
-  # G4 — the stale MEASUREMENT. The pair that replaced it is a real reading of the current bar.
+  # G4 — THE MEASUREMENT, AND THIS ARM STOPPED PINNING ONE. It used to require the charter to state a
+  # specific wall/leg-sum pair, and that pair went stale three times in two days: 335s/95s, then
+  # 393s/3085s, then 4926 s of leg-sum with a 1565 s floor, then ~265 s once seven legs left the bar.
+  # Each time the charter was CORRECTED and this canary red on the correction — a gate demanding that
+  # a document keep a number no document can keep.
+  #
+  # The rule the charter itself states is "point at the source, or gate the pair". `<git-dir>/gate-ledger.tsv`
+  # carries one row per leg with its own seconds and cannot go stale, so what is worth pinning is that
+  # the charter SENDS a reader there. The retired-figures arm below stays and grows: a figure quoted as
+  # current is the defect, whichever figure it is.
   a=$((a+1))
-  if grep -qE '335s|~?95s' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still carries the retired timing figures (335s / 95s); the measured pair for the current bar is 393 s wall against a 3085 s leg-sum"; fail=1
+  if grep -qE '335s|~?95s|3085 s|393 s wall' "$CHARTER"; then
+    echo "gov-canary: $CHARTER quotes a retired bar timing as if it were current (335s / 95s / 3085 s / 393 s wall); the bar's per-leg seconds live in <git-dir>/gate-ledger.tsv and prose beside a source that owns a number is the rule this arm exists to hold"; fail=1
   fi
   a=$((a+1))
-  { grep -q '393 s' "$CHARTER" && grep -q '3085 s' "$CHARTER"; }     || { echo "gov-canary: $CHARTER no longer states the measured pair (393 s wall against a 3085 s leg-sum), so the negative half above would pass on a DELETED sentence"; fail=1; }
+  grep -q 'gate-ledger.tsv' "$CHARTER" || { echo "gov-canary: $CHARTER no longer sends a reader to <git-dir>/gate-ledger.tsv for the bar's per-leg seconds, so the negative half above would pass on a charter that says nothing about cost at all — silence and a correct pointer are not the same answer"; fail=1; }
   # G5 — the stale WIDTH FORMULA, in the backticked spelling the file actually uses. The runner reads
   # its width from a declared table now, so a charter naming a formula is telling a session something
   # it cannot verify anywhere in the tree.
