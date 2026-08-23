@@ -37,6 +37,7 @@ ponytail: stdlib + git only, no deps, no cache. It runs in seconds; there is not
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import os
 import pathlib
@@ -47,7 +48,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.5"
+KIT_DRIFT_AUDIT_VERSION = "1.6"
 
 CONF_NAME = ".memory-tree.conf"
 
@@ -827,10 +828,217 @@ def build_live_backlog_rows(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal 10 - a build README asserting a mechanism its own spec set has since revised
+# (TOOL-dScriptedRepeat-14)
+#
+# A build README and that build's spec set are two records of one build and nothing compared them.
+# Round 3 of `dScriptedRepeat` found the README saying `--counts` takes the recorded FACTS while spec
+# 6 rev-8, written in the same fold, said it takes a pinned BASE sha and re-parses the blob - two
+# answers to one question about the guard on the one Definition-of-Done item that takes no override.
+# The README is the file a session opens first, so it is the copy that misleads. The instance was
+# superseded in place; the CLASS had no reader until this.
+#
+# WHAT IT MATCHES, and it is deliberately narrow. A backticked MECHANISM token in the README's
+# AUTHORED prose, where some entry in that build's spec revision logs is dated LATER than the git
+# author-date of the README line carrying it, and names the same token. That is "the spec revised this
+# mechanism after the README last said anything about it" - a review-me pointer, not a proven
+# contradiction. Proving the contradiction needs a reader who can tell two English sentences apart,
+# which is why this signal REPORTS and never gates.
+#
+# THE THREE NARROWINGS, each of which cut a false-positive population measured on this tree:
+#   - AUTHORED REGION ONLY. Everything from the first `<!-- gen:` marker down is rendered by
+#     gen_build_index.py from the specs themselves and cannot drift away from them.
+#   - MECHANISM SHAPES ONLY: `--flag`, `name()`, `FOO_BAR`, `foo_bar`. The all-caps shape REQUIRES an
+#     underscore, so status vocabulary (ABORTED, LANDED, INPROGRESS) is not a mechanism; the lowercase
+#     shape forbids a dot, so `drift_report.py` is a FILE and not one either. Measured: the wide form
+#     fired on 42% of the corpus, this one on 13%.
+#   - THE README LINE'S OWN CLOCK, from `git blame`, not the file's. A typo fix elsewhere in a 280-line
+#     README must not re-date every claim in it. The spec side uses its revision log read as DATA for
+#     the mirror-image reason: a git mtime on a spec moves when someone fixes a comma.
+#
+# LIVENESS IS OVER THE TOKEN POPULATION, not over "did I find a build". The tree always has builds, so
+# a liveness assertion watching them can never go false and is one in name only. What CAN empty is the
+# set of README lines carrying a mechanism token, and the set of parseable revision entries to compare
+# them against; both are required.
+_MECH_RE = re.compile(r"^(--[a-z][a-z0-9-]{2,}"
+                      r"|[a-z_][a-z0-9_]*\(\)"
+                      r"|[A-Z][A-Z0-9]*_[A-Z0-9_]+"
+                      r"|[a-z][a-z0-9]*_[a-z0-9_]+)$")
+_TICK_RE = re.compile(r"`([^`]{2,60})`")
+_REVLOG_RE = re.compile(r"^- rev-(\d+)\s*[\u00b7|-]\s*(\d{4}-\d{2}-\d{2})")
+_GEN_MARK = "<!-- gen:"
+
+
+def _build_blame_dates(ctx, rel: str, upto: int) -> dict:
+    """line number -> author date, in the AUTHOR'S OWN timezone. Porcelain emits the header block ONCE
+    per commit; every later line attributed to that commit carries the sha alone, so the date map is
+    keyed on the sha.
+
+    THE TIMEZONE IS NOT A DETAIL. The other side of this signal's comparison is a HAND-TYPED local date
+    in a spec revision log, so reading `author-time` as UTC compares two different clocks. Measured on
+    this repo: 11 of 31 rows were pure +0300 artifacts — every README line written between 00:00 and
+    03:00 local was backdated a day, so a spec revision made the SAME day compared as later. This is
+    what `git blame --date=short` prints and what a human types, which is the whole point."""
+    out = ctx.git.run("blame", "--porcelain", "-L", f"1,{max(upto, 1)}", "--", rel).stdout
+    dates: dict[int, str] = {}
+    by_sha: dict[str, str] = {}
+    sha = None
+    lineno = None
+    epoch = None
+    for ln in out.splitlines():
+        m = re.match(r"^([0-9a-f]{40}) \d+ (\d+)", ln)
+        if m:
+            sha, lineno = m.group(1), int(m.group(2))
+            epoch = None
+            if sha in by_sha:
+                dates[lineno] = by_sha[sha]
+            continue
+        if ln.startswith("author-time ") and sha is not None:
+            epoch = int(ln.split()[1])
+            continue
+        # `author-tz` FOLLOWS `author-time`, so the date is formatted here and not there.
+        if ln.startswith("author-tz ") and epoch is not None and lineno is not None:
+            tz = ln.split()[1]
+            off = 0
+            if len(tz) == 5 and tz[0] in "+-":
+                off = (int(tz[1:3]) * 3600 + int(tz[3:5]) * 60) * (-1 if tz[0] == "-" else 1)
+            d = datetime.datetime.fromtimestamp(
+                epoch + off, datetime.timezone.utc).strftime("%Y-%m-%d")
+            by_sha[sha] = d
+            dates[lineno] = d
+            epoch = None
+    return dates
+
+
+def _read(ctx, rel: str) -> str:
+    try:
+        return (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+# NAMED `build_`, for the reason spelled above build_live_backlog_rows: `signal` is a noun and not in
+# `.lexicon.conf`'s VERBS table, and a new definition can be named right for free.
+def build_readme_mechanism_drift(ctx) -> dict:
+    """README lines naming a mechanism the build's own spec set revised after that line was written."""
+    readmes = [ln for ln in ctx.git.run(
+        "ls-files", f"{ctx.memory_root}/builds/*/README.md").stdout.splitlines() if ln.strip()]
+    specs_by_build: dict[str, list[str]] = {}
+    for sp in ctx.git.run("ls-files", f"{ctx.memory_root}/builds/*/spec/*.md").stdout.splitlines():
+        sp = sp.strip()
+        if not sp:
+            continue
+        _pfx = f"{ctx.memory_root}/builds/"
+        if sp.startswith(_pfx):
+            specs_by_build.setdefault(sp[len(_pfx):].split("/")[0], []).append(sp)
+
+    rows = []
+    tok_pop = 0
+    rev_pop = 0
+    blamed = 0
+    blame_blind = 0
+    # NOT `rel.split("/")[2]`. `MEMORY_ROOT` is not constrained to one path segment and this repo's
+    # own kickoff manifest records `docs/mem` as a real adopter value; at two segments the index lands
+    # on the literal `builds` for every path, every README grades against every build's revision log,
+    # and the rows name a build called `builds`. Every sibling signal here addresses the tree by glob
+    # and is depth-agnostic.
+    prefix = f"{ctx.memory_root}/builds/"
+
+    def _extract_slug(path: str) -> str:
+        return path[len(prefix):].split("/")[0] if path.startswith(prefix) else ""
+
+    for rel in sorted(readmes):
+        build = _extract_slug(rel)
+        if not build:
+            continue
+        lines = _read(ctx, rel).split("\n")
+        cut = next((i for i, ln in enumerate(lines) if ln.startswith(_GEN_MARK)), len(lines))
+        # THE REVISION ENTRIES, read as data. A continuation line is folded into the entry above it,
+        # because a revision's reason routinely wraps and the token often sits in the wrap.
+        revs = []
+        for sp in specs_by_build.get(build, []):
+            inlog = False
+            for ln in _read(ctx, sp).split("\n"):
+                if ln.startswith("## "):
+                    inlog = "Revision log" in ln
+                    continue
+                if not inlog:
+                    continue
+                m = _REVLOG_RE.match(ln)
+                if m:
+                    revs.append([sp, m.group(2), ln])
+                elif revs and revs[-1][0] == sp and ln.startswith("  "):
+                    revs[-1][2] += " " + ln.strip()
+        rev_pop += len(revs)
+        # THE CANDIDATES FIRST, THE BLAME ONLY IF THERE ARE ANY. `git blame` is a process per README
+        # and this audit is meant to run in seconds; a README whose tokens no revision entry mentions
+        # cannot produce a row whatever its dates are.
+        cand = []
+        # ONE CANDIDATE PER (LINE, TOKEN), never one per occurrence. A README sentence naming a
+        # mechanism twice is one sentence to re-read, and `value` is what the shipped pin ratchets
+        # against - counting it twice inflates the drain list for no new work.
+        seen = set()
+        for i, ln in enumerate(lines[:cut], start=1):
+            if ln.lstrip().startswith("#"):
+                continue
+            for tok in _TICK_RE.findall(ln):
+                if not _MECH_RE.match(tok):
+                    continue
+                tok_pop += 1
+                if (i, tok) in seen:
+                    continue
+                seen.add((i, tok))
+                # THE BACKTICKED FORM, never a bare substring. `--check` is a prefix of
+                # `--check-format` and every id ending in a 1-up sequence is a prefix of nine others -
+                # this repo's own `id-matched-as-a-substring` class, and a revision log spells its
+                # mechanisms in backticks anyway. Measured: identical rows on this corpus either way,
+                # which is luck rather than equivalence.
+                named = [r for r in revs if ("`" + tok + "`") in r[2]]
+                if named:
+                    cand.append((i, tok, named))
+        if not cand:
+            continue
+        dates = _build_blame_dates(ctx, rel, cut)
+        # A BLAME THAT ANSWERED NOTHING IS NOT A BUILD WITH NOTHING TO SAY. `Git.run` never raises and
+        # that helper reads only stdout, so an unborn HEAD or any other blame failure yields {} and the
+        # build contributes zero rows in silence. Counted here so `live` can watch the stage that
+        # actually does the work, rather than only the two populations gathered before it.
+        blamed += 1
+        if not dates:
+            blame_blind += 1
+        for i, tok, named in cand:
+            d = dates.get(i)
+            if d is None:
+                continue
+            later = sorted((r for r in named if r[1] > d), key=lambda r: r[1])
+            if not later:
+                continue
+            sp, rd, _ = later[-1]
+            rows.append({"build": build, "readme": f"{rel}:{i}", "mechanism": tok,
+                         "line_dated": d, "spec": sp, "revised": rd})
+    return {
+        "signal": "readme_mechanism_drift",
+        "value": len(rows),
+        "of": len(readmes),
+        "tolerance": ctx.pins.get("readme_mechanism_drift", 0),
+        # REPORT ONLY. `drift-audit records` is an unguarded merge-bar leg, and this predicate reports
+        # a POINTER rather than a proven contradiction - gating it would red a merge on a README
+        # sentence that may well still be true.
+        "gateable": False,
+        # LIVENESS OVER THE STAGE THAT DOES THE WORK, not only over the two populations gathered
+        # before it. `tok_pop` and `rev_pop` are both accumulated ahead of the blame call, so a signal
+        # whose every blame failed used to report a clean `ok`. If any README reached the blame stage,
+        # at least one of them has to have come back with dates.
+        "live": bool(tok_pop and rev_pop and (blamed == 0 or blamed > blame_blind)),
+        "detail": rows,
+    }
+
+
 SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
-           build_live_backlog_rows]
+           build_live_backlog_rows, build_readme_mechanism_drift]
 
 
 # --------------------------------------------------------------------------------------------

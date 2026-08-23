@@ -3303,7 +3303,7 @@ record_piece() { # records-root · piece-path · leg · verdict · playbook-sha 
   fi
   case "$leg$piece$pbsha$runid" in *" · "*) fail 47 "a piece record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the four fields tested follow: leg [$leg] piece [$piece] playbook-sha [$pbsha] run [$runid]"; return 1 ;; esac
   if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s%s' "$leg" "$piece" "$pbsha" "$runid" | grep -qF -- "$BYPASS_BAN"; then
-    fail 47 "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
+    fail 47 "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
   rec=$(record_path_of "$root" "$piece")
   mkdir -p "$(dirname "$rec")" || return 1
@@ -3368,7 +3368,7 @@ record_set() { # records-root · run-id · leg · verdict · ordered-hash-list
   fi
   case "$leg$runid$hashes" in *" · "*) fail 47 "a set record field spells the record's own field separator, which makes the row unparseable by the check that grades it - the three fields tested follow: leg [$leg] run [$runid] set [$hashes]"; return 1 ;; esac
   if [ -n "${BYPASS_BAN:-}" ] && printf '%s%s%s' "$leg" "$runid" "$hashes" | grep -qF -- "$BYPASS_BAN"; then
-    fail 47 "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag: $BYPASS_BAN"; return 1
+    fail 47 "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag: $BYPASS_BAN"; return 1
   fi
   rec="$root/set-$runid.md"
   mkdir -p "$(dirname "$rec")" || return 1

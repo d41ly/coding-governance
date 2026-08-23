@@ -2761,6 +2761,21 @@ hit "$out" "the playbook at the pinned BASE opens a set-scoped check list it doe
 hit "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
 reset_tree
 
+# ---- ...and both writers REFUSE the flag at write time, which is the guard the citation above points
+# ---- at. The pair matters: the driver prevents, check 10 detects what landed anyway, and neither
+# ---- alone is the both-ends coverage the charter asks for on a guarded surface.
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a --no-verify b' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a --no-verify b' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
+
+# ---- TOOL-dScriptedRepeat-13's AC7: the writers' refusal CITES a gate, and the gate has to exist.
+# ---- Round 2 found this message citing check 11, which covers run-state files and structurally
+# ---- cannot cover evidence records - a true refusal for a false reason, this kit's own recorded
+# ---- class. The citation was removed rather than made true, and rev-2 of that unit made it true.
+# ---- This arm is the pair: if the sentence names a check, the leg it names must carry that check.
+n=$((n+1)); _cited=$(grep -oE 'check [0-9]+ of the playbook leg' "$SCRIPT" | head -1 | grep -oE '[0-9]+')
+n=$((n+1)); { [ -n "$_cited" ] && grep -qE "fail $_cited " "$(dirname "$SCRIPT")/check-playbook.sh"; } \
+  || { echo "FAIL the record writers cite a playbook-leg check that leg does not define, which is a refusal pointing at a gate nobody wrote - the exact shape round 2 filed and this arm exists to stop returning"; st=1; }
+
 # ---- MEDIUM 9 (round-3): the enumerator's OWN refusal survives the caller's pipeline. `fail` prints
 # ---- to stdout and the close piped the leg through `grep -m1 '^pieces='`, so an unresolvable sha, an
 # ---- undeclared records root, a git failure and an unterminated declaration all arrived as the same

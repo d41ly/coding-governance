@@ -368,6 +368,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "build_readme_mechanism_drift",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_reference_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2914,6 +2919,11 @@
     },
     {
       "id": "test_ratchet_message_states_its_window",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_readme_mechanism_drift",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },

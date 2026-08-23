@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-23T17:45:00+03:00 @ 4fc7a0d47ccd48fcfde21a1dc272ec6f2d64443b
+last-audit: 2026-08-23T23:18:23+03:00 @ 2b69704015b739a1736f79d5c35c661ddd8bb148
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: cd06e0acade1d969b87bc5545b1ca4e33a4f091b
+last-body-change: 2b69704015b739a1736f79d5c35c661ddd8bb148
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -43,8 +43,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 ## §B — Orientation (derived at instantiation; re-audited every kickoff; accretes)
 
 - A build of more than one pass runs on `memory/guides/BUILD-METHOD.md` — the spec set, the fork
-  rule, the pass loop, regrounding, the closing review and the wrap-up derivation. It is rendered by
-  the memory-tree kit and is in `watch:`, so editing it forces this manifest to be re-audited.
+  rule, the pass loop, regrounding, the closing review, the README re-read and the wrap-up
+  derivation. It is rendered by the memory-tree kit and is in `watch:`, so editing it forces this
+  manifest to be re-audited.
 - **A build MAY restructure itself, and MUST parallelise what it can prove disjoint.** Both are
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
@@ -147,6 +148,11 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
+- 2026-08-23 · the gate selftest's ceiling, and the standing instruction about running it · the
+  ceiling is 1800 s and the cost is process creation rather than logic, per
+  `memory/gotchas/process-creation-is-the-suite-cost.md`. **The owner's standing instruction is
+  not to run those suites**: `--checks` yes, `--selftests` only when they ask ·
+  `TOOL-dScriptedRepeat-15` · prune when a `--selftests` run has been timed end to end.
 - 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
   take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
   adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
@@ -154,11 +160,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
   `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
   rather than an exception.
-- 2026-08-20 · `AGENTS.md`'s merge-bar section states the bar costs 873 s of wall against a 4018 s
-  leg-sum · MEASURED over four `GATE_FULL` width-8 runs on node `a`: spans 925-1058 s, mean 1001.3 s,
-  leg-sums 4644-6128 s. The stated wall is 14.7 % low and the leg-sum is low by more. Both are prose
-  beside a source that owns them, which is the rule that line breaks. `TOOL-aMeteredTurnstile-4` ·
-  prune when the charter stops stating either number.
 
 
 ### Environment traps worth front-loading
@@ -175,7 +176,9 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
 `arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
 runs to the first interpolation, so lengthening a message always strands it and shortening never
-does — hit three times in one file in one session).
+does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
+`trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
+`two-readers-of-one-config-one-re-derived.md`.
 
 - A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
   `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both

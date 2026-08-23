@@ -33,29 +33,6 @@ ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-unattended-gates: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
 
-ONLY="${1:---selftests}"
-case "$ONLY" in
-  --all)       ONLY="" ;;
-  --checks)    ONLY=checks ;;
-  --selftests) ONLY=selftests ;;
-  -h|--help)
-    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
-    echo "  --selftests  the five suites that stage breaks into this kit (default), and the only"
-    echo "               thing that exercises them since none is a bar leg."
-    echo "               BUDGET ~60 MINUTES, measured node d 2026-08-23: the gate selftest alone is"
-    echo "               ~38 min because it re-runs a 28-check leg once per arm. Do NOT wrap this in"
-    echo "               a timeout under an hour - a killed suite prints no PASS and no FAIL, and"
-    echo "               greping for a verdict then reads a kill as silence. This script reads the"
-    echo "               EXIT CODE for that reason."
-    echo "  --checks     the three record/wiring checks - about 35 s, and ALSO merge-bar legs"
-    echo "  --all        both"
-    echo ""
-    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
-    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
-    exit 0 ;;
-  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
-esac
-
 # ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
 # ---- check nobody runs, and this kit proved it: its suites were pulled off the merge bar for costing
 # ---- 68% of it, and the compensating check that replaced them then took an hour, so it was re-run
@@ -68,17 +45,83 @@ esac
 BUDGET_kit_gate=120           # measured 28 s
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
-BUDGET_gate_selftest=900      # measured ~3200 s — OVER, deliberately: see the note below
+BUDGET_gate_selftest=1800     # derived 1342 s after TOOL-dScriptedRepeat-15 — see the note below
 BUDGET_driver_selftest=900    # measured 841 s
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
+
+ONLY="${1:---selftests}"
+case "$ONLY" in
+  --all)       ONLY="" ;;
+  --checks)    ONLY=checks ;;
+  --selftests) ONLY=selftests ;;
+  -h|--help)
+    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
+    echo "  --selftests  the five suites that stage breaks into this kit (default), and the only"
+    echo "               thing that exercises them since none is a bar leg."
+    # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
+    # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
+    # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
+    # ---- SUMMED OVER THE DECLARED SET, never over a hand-typed list of names. Round 8's low 4: the
+    # ---- first cut derived the number but spelled five of the eight `BUDGET_*` identifiers by hand,
+    # ---- so a ninth suite would have been silently outside the figure - a hand-kept inventory of a
+    # ---- machine-enumerable set, which is the class this repo gates elsewhere.
+    # ONLY THE NAMES THIS FILE DECLARES. Round 9's low 10: `${!BUDGET_@}` enumerates every
+    # BUDGET_-prefixed variable in the ENVIRONMENT too, so an exported `BUDGET_FOO` from the
+    # caller joined the sum - and its contents were evaluated by the arithmetic. The declared
+    # set is read from this file's own text, and a value that is not a plain integer is skipped.
+    _bsum=0
+    for _bk in $(sed -n 's/^\(BUDGET_[A-Za-z0-9_]*\)=.*/\1/p' "$0"); do
+      _bv=${!_bk}
+      case "$_bv" in *[!0-9]*|"") continue ;; esac
+      _bsum=$(( _bsum + _bv ))
+    done
+    echo "               Budget: every BUDGET_* ceiling this file declares, summed - currently"
+    echo "               $(( (_bsum + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
+    echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
+    echo "               greping for a verdict then reads a kill as silence. This script reads the"
+    echo "               EXIT CODE for that reason."
+    echo "  --checks     the three record/wiring checks, which are ALSO merge-bar legs. Their own"
+    echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
+    echo "               because the one that was is what round 8 filed."
+    echo "  --all        both"
+    echo ""
+    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
+    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
+    exit 0 ;;
+  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
+esac
+
 #
-# THE GATE SELFTEST IS OVER ITS BUDGET ON PURPOSE, and this line is the only reason that is not a lie
-# by omission: it takes roughly 3200 s against a 900 s ceiling, because each of its ~80 arms stages a
-# break and re-runs the whole 23 s leg to ask about one check. `--only 28` and `--skip 28` now exist
-# on that leg and halve the per-arm cost; converting the arms to use them is TOOL-dScriptedRepeat-15
-# and is NOT done. Until it is, this runner reds on that suite by design, and the red says which.
+# THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
+# spec named as one of its two acceptable outcomes, and this note is the reason beside the number.
+#
+# WHAT THE COST ACTUALLY IS, measured on node d 2026-08-23 rather than reasoned about. The leg is not
+# compute-bound and never was: one invocation inside the suite's own fixture reported `real 14.4s
+# user 0.33s sys 0.62s`, so 93% of it is spent waiting rather than working. What it waits on is
+# PROCESS CREATION - an on-access antivirus scanner sits in front of every exec on this node, and one
+# spawn costs 0.019-0.039 s here against roughly a millisecond on a machine without one. The leg made
+# 469 of them per invocation and the suite invokes it 243 times, so the suite's real unit of cost is
+# about 114,000 process creations. 469 x 0.022 s = 10.3 s against a 10.7 s measured invocation, which
+# is the whole of it.
+#
+# WHAT THE UNIT DID: cut the spawns, which is the only term in that product this repo owns. Three
+# loops that ran a grep or a `bash -c` per (item, file) now read each file once - 469 spawns per
+# invocation became 220, counted both ways from an execution trace rather than estimated. The suite's
+# last recorded sharded pair was 846.0 + 2013.7 = 2859.7 s; scaled by 220/469 that is 1342 s, and
+# 243 x 5.2 s + fixture overhead lands in the same place from the other direction.
+#
+# WHY 1800 AND NOT 1342: the same reading taken under ambient load on this node ran 2.4x slower, and a
+# ceiling that reds on someone else's antivirus scan is a ceiling that gets ignored. 1800 has headroom
+# for that and still reds long before the 3200 s this suite used to cost.
+#
+# WHAT IS NOT OBSERVED, said plainly: nobody has run the suite end to end at this commit. The owner
+# stopped these suites after two days of re-runs and the instruction stands, so the 1342 s is DERIVED
+# from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
+# The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
+# are byte-identical before and after the unit. To settle it, one command:
+#   bash tools/unattended/run-unattended-gates.sh --selftests
 
 st=0
 ran=0

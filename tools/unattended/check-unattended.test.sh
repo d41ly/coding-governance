@@ -234,6 +234,31 @@ same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
+# ---- ROUND 9's BLOCKER: the conf could no longer END this leg and could still HIJACK it, because the
+# ---- real source ran in the MAIN shell below `status=0` and below `fail()`. Two shapes, and both are
+# ---- graded on the EXIT CODE rather than on output text - shape B produces no output at all, so an
+# ---- output-only assertion cannot see it. The conf is imported through a subshell now, so nothing it
+# ---- defines, traps or exits crosses into this process.
+for _hijack in "trap 'exit 0' EXIT" 'fail() { :; }'; do
+  reset_tree
+  sed -i 's/^LANDER=.*/LANDER=""/' .unattended.conf
+  printf '%s
+' "$_hijack" >> .unattended.conf
+  out=$(run); rc=$?
+  same "a conf that takes over the shell does not take over the verdict: $_hijack" "$rc" "1"
+done
+reset_tree
+
+# ---- ROUND 8's BLOCKER 1, OTHER HALF: this leg SOURCES the conf in its main shell, so one appended
+# ---- `exit 0` in a tracked file the graded run can commit itself ends the leg at status 0 - which
+# ---- `run-gates` reads as GATE ok, with every check below unrun and nothing saying so. The probe that
+# ---- guards it is a subshell, so an abort inside it is a status rather than an exit of this process.
+reset_tree; ( printf 'exit 0
+'; cat .unattended.conf ) > .unattended.conf.new && mv .unattended.conf.new .unattended.conf
+out=$(run); rc=$?
+same "a conf that ends the shell does not end the leg at 0" "$rc" "1"
+hit "$out" "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in this shell would let that file end or take over the leg rather than be graded by it"
+
 reset_tree; rm -f .unattended.conf
 hit "$(run)" "no .unattended.conf at the repo root, and every value this leg checks is declared there"
 
@@ -1813,6 +1838,22 @@ gut_parser() { # fn-name · whole replacement body (one line)
     mutate "$f" "/^$1() {/a\\$2"
   done
 }
+# ---- ROUND 7's BLOCKER 1: A PARSER BROKEN ONLY FOR ONE INPUT SHAPE. `gut_parser` above breaks a
+# ---- parser for EVERY input, which the fixed specimen loops catch on their own. This taints it for
+# ---- the SHIPPED TEMPLATE's block alone - `step_selector` is in that block and in none of the
+# ---- specimens - so the two single-line specimen batches stay aligned and pass while the two
+# ---- template batches misalign. The batched harness used to answer every misaligned slot with the
+# ---- batch's own rc, which is 0 when the batch RAN, and `(rc 0, "")` is the PASSING pair in both
+# ---- template arms: the leg came out at rc 0 with zero output, in the loop that is the shipped
+# ---- template's ONLY grader. A degraded-mode substitute must never be spelled with the value some
+# ---- assertion reads as clean.
+reset_tree
+for _pf in tools/unattended/check-playbook.sh tools/unattended/unattended.sh; do
+  mutate "$_pf" '/^declared_scalar() {/a\  case "$1" in *step_selector*) printf "EXTRA\\n" ;; esac'
+done
+hit "$(run)" "the batched parser harness got a reply it cannot split per specimen, so no assertion below is answering about the input it names - parser, specimens sent and answer lines received follow"
+reset_tree
+
 reset_tree; gut_parser declared_list "  printf ''"
 hit "$(run)" "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: ["
 
@@ -1832,6 +1873,12 @@ mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*]
 mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
 hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = [   # one per piece [see section 7]]"
 
+# ---- ROUND 8's LOW 2: a SYNTAX error makes `bash -c` exit 2, the empty-reply branch faithfully
+# ---- fills every slot with that 2, and 2 is exactly the value the multi-line REFUSAL arm
+# ---- asserts - so a harness that ran nothing reported a correct refusal. It grades the harness
+# ---- first now, and this is the arm for that.
+reset_tree; gut_parser declared_list '  ((this is not shell'
+hit "$(run)" "the multi-line refusal is graded against a harness that answered nothing, so a parser that will not parse would report the refusal this arm is looking for: specimen ["
 reset_tree; gut_parser declared_list '  ((this is not shell'
 hit "$(run)" "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 

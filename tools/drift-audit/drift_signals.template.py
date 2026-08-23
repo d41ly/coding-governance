@@ -107,6 +107,10 @@ PINS: dict[str, int] = {
     # "ledger_rows_contradicting_git": 0,
     # "non_terminal_specs_cited_by_product_source": 0,
     # "handkept_inventories_disagreeing_with_source": 0,
+    # "readme_mechanism_drift": 0,   # REPORT-ONLY: seed it at what your first report MEASURES.
+    #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
+    #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
+    #   guessed pin is the one thing this block forbids.
 }
 
 # --------------------------------------------------------------------------------------------

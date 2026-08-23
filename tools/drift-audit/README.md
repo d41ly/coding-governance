@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.5` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.6` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -86,6 +86,10 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
 | `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? | no |
 | `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
+| `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
+| `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
+| `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? | no |
+| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's

@@ -107,8 +107,49 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
-# shellcheck disable=SC1090
-. "$CONF"
+# ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
+# ---- and the second is why the guard is now structural rather than a probe.
+# ----
+# ---- Round 8: `. "$CONF"` in the main shell meant one appended `exit 0` in a tracked file - a file
+# ---- the graded run can commit itself - ended the leg at status 0, which `run-gates` reads as
+# ---- GATE ok. A sentinel probe was added for it.
+# ----
+# ---- Round 9: the probe stopped the conf ENDING the leg and not HIJACKING it, because the real
+# ---- source still ran here, below `status=0` and below `fail()`. `trap 'exit 0' EXIT` satisfies the
+# ---- probe - the trap fires only when the probe subshell exits, AFTER its sentinel is written - and
+# ---- then fires again on this script's own `exit "$status"`: rc 0 with the FAILED line still
+# ---- printed. An appended no-op `fail()` is worse: it replaces the verdict recorder itself, rc 0
+# ---- with zero bytes of output, byte-indistinguishable from a clean tree.
+# ----
+# ---- So nothing from that file executes in this shell at all. It is sourced inside a subshell, and
+# ---- the DECLARED KEYS come back as a NUL-delimited name/value stream terminated by a sentinel. A
+# ---- trap, a redefined function, an `exit`, a `set -x` - none of it crosses the boundary; the worst
+# ---- a hostile conf can now do is fail to deliver the sentinel, which is a refusal.
+# ----
+# ---- THE NAMES ARE READ AS TEXT AND VALIDATED, never taken from the file's own output: only
+# ---- `[A-Z][A-Z0-9_]*` is assignable, so the stream cannot introduce a name this leg does not expect.
+# ---- A key the file spells in some other shape keeps the default initialised above, which is exactly
+# ---- what a `sed`-based reader would have done with it.
+_conf_names=$(sed -n 's/^[[:space:]]*\(export[[:space:]][[:space:]]*\)\{0,1\}\([A-Z][A-Z0-9_]*\)=.*/\2/p' "$CONF" | sort -u)
+_conf_ok=0
+while IFS= read -r -d '' _ck; do
+  IFS= read -r -d '' _cv || break
+  case "$_ck" in
+    __CONF_IMPORT_OK__) _conf_ok=1 ;;
+    [A-Z][A-Z0-9_]*) eval "$_ck=\$_cv" ;;
+  esac
+done < <( . "$CONF" >/dev/null 2>&1 || exit 9
+          for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
+          printf '__CONF_IMPORT_OK__\0\0' )
+# THE SENTINEL IS THE WHOLE VERDICT. `|| exit 9` catches a parse error and a `return 0`, both of which
+# abort the file and RETURN rather than ending the subshell - round 9's high 2, where the probe's
+# missing `|| exit 9` let a malformed `if` load only the lines above the break and hand back an empty
+# `LANDED_ANCHOR_CUTOFF`, which this leg reads as "grandfather every anchor". Its absence catches the
+# `exit` and `set -u` shapes, which end the subshell before the sentinel is written.
+if [ "$_conf_ok" != 1 ]; then
+  fail 1 "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in this shell would let that file end or take over the leg rather than be graded by it: $CONF"
+  exit "$status"
+fi
 M="$MEMORY_ROOT"
 for k in LANDER BYPASS_BAN GATE_CMD WIRING_CHECK KEEPALIVE_CREATE KEEPALIVE_DELETE; do
   eval "v=\${$k}"
@@ -1708,14 +1749,40 @@ nverbs=$(printf '%s\n' $VERBS_ALL | grep -c . || true)
 if [ "$nverbs" -lt 10 ]; then
   fail 26 "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing: $DRIVER"
 else
+  # ---- THE THREE CARRIERS ARE READ ONCE, not re-grepped once per verb. Same reason `core_of` above
+  # ---- is pure bash: a grep per (verb, carrier) is three processes per verb and the verb set is the
+  # ---- driver's whole vocabulary, so this one loop was 51 of this leg's 469 process spawns. The
+  # ---- predicates below are the same predicates - `( |$)` becomes the two line-terminator cases, the
+  # ---- protocol's `^- .VERB. — ` keeps its one-character sentinels as `?`, and the Skill's is still a
+  # ---- fixed substring. A quoted expansion inside a `case` pattern is literal, so a verb is never
+  # ---- read as a glob.
+  _c26_drv=$'
+'$(cat "$DRIVER")$'
+'
+  _c26_ship=""; [ -f "$SHIP" ] && _c26_ship=$'
+'$(cat "$SHIP")$'
+'
+  _c26_tmpl=""; [ -f "$tmpl" ] && _c26_tmpl=$(cat "$tmpl")
   for v in $VERBS_ALL; do
-    grep -qE "^#   unattended[.]sh $v( |\$)" "$DRIVER" \
-      || fail 26 "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks: $v in $DRIVER"
-    if [ -f "$SHIP" ] && ! grep -qE "^- .$v. — " "$SHIP"; then
-      fail 26 "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call: $v in $SHIP"
+    case "$_c26_drv" in
+      *$'
+'"#   unattended.sh $v "*|*$'
+'"#   unattended.sh $v"$'
+'*) : ;;
+      *) fail 26 "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks: $v in $DRIVER" ;;
+    esac
+    if [ -f "$SHIP" ]; then
+      case "$_c26_ship" in
+        *$'
+'"- "?"$v"?" — "*) : ;;
+        *) fail 26 "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call: $v in $SHIP" ;;
+      esac
     fi
-    if [ -f "$tmpl" ] && ! grep -qF -- "unattended.sh $v " "$tmpl"; then
-      fail 26 "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it: $v in $tmpl"
+    if [ -f "$tmpl" ]; then
+      case "$_c26_tmpl" in
+        *"unattended.sh $v "*) : ;;
+        *) fail 26 "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it: $v in $tmpl" ;;
+      esac
     fi
   done
 fi
@@ -1946,19 +2013,59 @@ EXEMPTEOF
 )
 kb_keys=0
 if [ -f "$tpl" ]; then
+  # ---- THE TWO CORPORA THE KEY LOOP READS, one pass per file instead of one per (key, file). Each
+  # ---- record is `<file>TAB<lineno>:<text>`, split on its FIRST tab so a tab inside the text is
+  # ---- carried through untouched. The comment filter is the one the two greps used to apply, moved
+  # ---- one level out; `grep -q` lines are still dropped from the caret corpus, for the reason the
+  # ---- original filter names.
+  KB_CALLS=""
+  KB_CARETS=""
+  for _f in $KIT_SH; do
+    KB_CALLS="$KB_CALLS$(grep -nE 'declared_(list|scalar) ' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | sed "s|^|$_f	|" || true)
+"
+    KB_CARETS="$KB_CARETS$(grep -nE '\^[A-Za-z_]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v 'grep -q' | sed "s|^|$_f	|" || true)
+"
+  done
   while IFS= read -r _k; do
     [ -n "$_k" ] || continue
     kb_keys=$((kb_keys + 1))
     _reads=0
     for _f in $KIT_SH; do
       # THE COMMENT FILTER ON THE POSITIVE HALF TOO. Its negative half has had one since round 5, and
-      # a key whose only "read" is a commented-out call is a key nothing reads.
-      grep -nE "declared_(list|scalar) .* $_k\)" "$_f" | grep -qvE '^[0-9]+:[[:space:]]*#' && _reads=$((_reads + 1))
-      while IFS= read -r _hit; do
-        [ -n "$_hit" ] || continue
+      # a key whose only "read" is a commented-out call is a key nothing reads. It is applied in the
+      # per-file corpora above, before either key test, which is where the two greps used to apply it.
+      #
+      # THE GREPS MOVED OUT OF THIS LOOP AND NOTHING ELSE MOVED. They ran once per (key, file) - 200 of
+      # this leg's 469 process spawns, the single largest population in it - and their patterns are
+      # key-specific only in the tail, so the file half is now read once and the key half is matched
+      # here. The corpora are SUPERSETS by construction: a line matching `declared_(list|scalar) .*
+      # KEY)` contains `declared_list ` or `declared_scalar `, and a line matching `\^KEY(...)` contains
+      # a caret followed by a letter or underscore, because every key the template declares starts with
+      # one. The exact predicate is re-applied per key below, so the prefilter can only ever be wider.
+      while IFS= read -r _rec; do
+        [ -n "$_rec" ] || continue
+        [ "${_rec%%	*}" = "$_f" ] || continue
+        _hit=${_rec#*	}
+        case "$_hit" in
+          *"declared_list "*" $_k)"*|*"declared_scalar "*" $_k)"*) _reads=$((_reads + 1)); break ;;
+        esac
+      done <<KBCEOF
+$KB_CALLS
+KBCEOF
+      while IFS= read -r _rec; do
+        [ -n "$_rec" ] || continue
+        [ "${_rec%%	*}" = "$_f" ] || continue
+        _hit=${_rec#*	}
+        # `( |$)` in the original ERE, as its two cases: a non-word character after the key, or the
+        # end of the line. Anything else is a longer identifier that merely starts with the key.
+        case "$_hit" in
+          *"^$_k") : ;;
+          *"^$_k"[!A-Za-z_]*) : ;;
+          *) continue ;;
+        esac
         fail 28 "a declaration key the shipped template ships is read by an ad-hoc pipeline rather than by the parser this check certifies it through, so the answer this gate blesses and the answer its consumer actually gets are two answers to one question - key, site and read follow: $_k at $_f:${_hit%%:*} spells [${_hit#*:}]"
       done <<KBEOF
-$(grep -nE "\^$_k([^A-Za-z_]|$)" "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v 'grep -q' || true)
+$KB_CARETS
 KBEOF
     done
     [ "$_reads" -gt 0 ] && continue
@@ -2131,13 +2238,75 @@ else
     # extraction and a correct parse of `[]` were one observation, and replacing both parser bodies
     # with an empty printf left this check silent and green while the census went verified-over-unchecked.
     # A dead harness must not be byte-indistinguishable from a working one.
-    dl_run() { # body - key -> the parser's answer on stdout; rc is the parser's own
-      bash -c "$dl_a
-declared_list \"\$1\" \"\$2\"" _ "$1" "$2"
-    }
-    ds_run() { # body - key -> the scalar parser's answer on stdout; rc is the parser's own
-      bash -c "$ds_a
-declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
+    # ONE PROCESS PER PARSER PER LOOP, not one per specimen. Measured on node d, 2026-08-23, with
+    # per-region timestamps taken inside the suite's own fixture: the 34 `bash -c` spawns this block
+    # used to make were 5.0 s of a 10.7 s invocation, and the fixture suite runs this leg 243 times.
+    # The parser body, the function called and the specimens are unchanged - what changed is that they
+    # are fed to one shell instead of one shell each.
+    #
+    # THE FALLBACK KEEPS THIS BYTE-IDENTICAL FOR ONE DEGRADED SHAPE AND REDS ON THE OTHER, and the
+    # distinction is round 7's blocker 1. A body that will not parse makes `bash -c` print nothing and
+    # exit nonzero, so the reply is EMPTY; every slot is filled with that exit status and an empty
+    # answer, which is exactly what the per-specimen wrapper handed each caller before, so the rc
+    # branches below fire with the same text the same number of times. A body that RAN and returned a
+    # reply that will not split per specimen is a different fact and gets its own refusal, because the
+    # value that would otherwise be fabricated - rc 0 and the empty string - is what both template
+    # arms read as a clean parse. A dead harness must not be byte-indistinguishable from a working
+    # one, it must not be text-distinguishable from the unbatched one, and its degraded mode must not
+    # be spelled with the passing value.
+    # _PB_DEAD says the harness answered NOTHING, which the fill alone cannot say. Round 8's low 2:
+    # `bash -c` exits 2 on a syntax error, the empty-reply branch faithfully fills every slot with
+    # that 2 - and 2 is exactly the value the multi-line REFUSAL arm asserts, so a parser that will
+    # not parse reported a correct refusal from a harness that ran nothing. The equivalence with the
+    # old per-specimen wrapper is worth keeping; the arm reading it as an answer is not.
+    _PB_RC=(); _PB_OUT=(); _PB_DEAD=0
+    _pbatch() { # parser-body - fn - body key [body key ...]  ->  fills _PB_RC / _PB_OUT, one per pair
+      local _body=$1 _fn=$2 _pairs _res _rc _line _i
+      shift 2
+      _PB_DEAD=0
+      _pairs=$(( $# / 2 ))
+      _PB_RC=(); _PB_OUT=()
+      _res=$(bash -c "$_body
+while [ \$# -gt 0 ]; do
+  _pb_o=\$($_fn \"\$1\" \"\$2\"); _pb_r=\$?
+  printf '%s\t%s\n' \"\$_pb_r\" \"\$_pb_o\"
+  shift 2
+done" _ "$@")
+      _rc=$?
+      if [ -n "$_res" ]; then
+        while IFS= read -r _line; do
+          _PB_RC+=("${_line%%$'\t'*}")
+          _PB_OUT+=("${_line#*$'\t'}")
+        done <<PBEOF
+$_res
+PBEOF
+      fi
+      [ "${#_PB_RC[@]}" -eq "$_pairs" ] && return 0
+      # ---- TWO DEGRADED SHAPES, AND THEY ARE NOT THE SAME SHAPE. Round 7's blocker 1 was one branch
+      # ---- for both, filling every slot with the batch's own `$_rc` - which is 0 when the batch RAN
+      # ---- and merely misaligned, and `(rc 0, "")` is the PASSING pair in both template arms below.
+      # ---- A parser broken only for multi-line input therefore took the leg to rc 0 with no output,
+      # ---- in the loop that is the shipped template's ONLY grader. A degraded-mode substitute must
+      # ---- never be a value some assertion reads as clean.
+      if [ -z "$_res" ]; then
+        # THE BODY DID NOT RUN. `bash -c` printed nothing and exited nonzero, which is byte-for-byte
+        # what the per-specimen wrapper handed each caller before this was batched, so the rc branches
+        # below fire with the same text the same number of times. This is the equivalence the comment
+        # above claims, and it is true of THIS branch only.
+        _PB_RC=(); _PB_OUT=(); _PB_DEAD=1
+        _i=0
+        while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=("$_rc"); _PB_OUT+=(""); _i=$((_i + 1)); done
+        return 0
+      fi
+      # THE BODY SPOKE AND THE REPLY DOES NOT LINE UP: one answer carried a newline, or the parser
+      # emitted a line of its own. There is no honest per-specimen answer to hand back, so this says
+      # so ONCE and then poisons every slot with a nonzero sentinel, which reaches each arm's rc
+      # branch. 125 is not a status any parser here returns.
+      fail 28 "the batched parser harness got a reply it cannot split per specimen, so no assertion below is answering about the input it names - parser, specimens sent and answer lines received follow: $_fn wanted $_pairs got ${#_PB_RC[@]}"
+      _PB_RC=(); _PB_OUT=()
+      _i=0
+      while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=(125); _PB_OUT+=(""); _i=$((_i + 1)); done
+      return 0
     }
     tpl_block=$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f' "$tpl")
     # THE POSITIVE DIRECTION, FIRST AND FIXED, FOR BOTH PARSERS. The template declares every key as a
@@ -2150,20 +2319,38 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
     # `declared_scalar` to an empty printf visited seven template keys with zero failures, and swapping
     # its comment strip for a delete-the-whole-line sed - which empties every commented declaration,
     # the mirror image of the leak this arm exists to catch - left the whole kit green.
-    for spec in 'Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX' 'Xk = # globs. Where pieces land [see 7]X|XX' 'Xk =X|XX' 'Xk = ["a", "b"] X|Xa bX' 'Xk = ["a"]	X|XaX' 'Xk =# globsX|XX' 'Xk =#globsX|XX' 'Xk = [ ]X|XX'; do
+    _dl_specs=('Xk = ["a", "b#c"]    # trailing commentX|Xa b#cX' 'Xk = [ "solo" ]X|XsoloX' 'Xk = []X|XX' 'Xk = # globs. Where pieces land [see 7]X|XX' 'Xk =X|XX' 'Xk = ["a", "b"] X|Xa bX' 'Xk = ["a"]	X|XaX' 'Xk =# globsX|XX' 'Xk =#globsX|XX' 'Xk = [ ]X|XX')
+    _argv=()
+    for spec in "${_dl_specs[@]}"; do
+      _in=${spec%%|*}; _in=${_in#X}; _in=${_in%X}
+      _argv+=("$_in" k)
+    done
+    _pbatch "$dl_a" declared_list "${_argv[@]}"
+    _ix=-1
+    for spec in "${_dl_specs[@]}"; do
+      _ix=$((_ix + 1))
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
-      _got=$(dl_run "$_in" k); _rc=$?
+      _got=${_PB_OUT[$_ix]}; _rc=${_PB_RC[$_ix]}
       if [ "$_rc" -ne 0 ]; then
         fail 28 "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: [$_in] exited $_rc"
       elif [ "$_got" != "$_want" ]; then
         fail 28 "the extracted declared-list parser does not return the members of a NON-EMPTY declaration, which is the only direction that tells a working parser from one answering nothing - specimen, wanted and got follow: [$_in] wanted [$_want] got [$_got]"
       fi
     done
-    for spec in 'Xk = "v"    # trailing commentX|XvX' 'Xk = 0X|X0X' 'Xk = {}    # noteX|X{}X' 'Xk = memory/records    # where they landX|Xmemory/recordsX' 'Xk = # who ratified and whenX|XX' 'Xk =    # TBDX|XX' 'Xk =# who ratifiedX|XX' 'Xk =#whoX|XX' 'Xk = "v" X|XvX'; do
+    _ds_specs=('Xk = "v"    # trailing commentX|XvX' 'Xk = 0X|X0X' 'Xk = {}    # noteX|X{}X' 'Xk = memory/records    # where they landX|Xmemory/recordsX' 'Xk = # who ratified and whenX|XX' 'Xk =    # TBDX|XX' 'Xk =# who ratifiedX|XX' 'Xk =#whoX|XX' 'Xk = "v" X|XvX')
+    _argv=()
+    for spec in "${_ds_specs[@]}"; do
+      _in=${spec%%|*}; _in=${_in#X}; _in=${_in%X}
+      _argv+=("$_in" k)
+    done
+    _pbatch "$ds_a" declared_scalar "${_argv[@]}"
+    _ix=-1
+    for spec in "${_ds_specs[@]}"; do
+      _ix=$((_ix + 1))
       _in=${spec%%|*}; _want=${spec#*|}
       _in=${_in#X}; _in=${_in%X}; _want=${_want#X}; _want=${_want%X}
-      _got=$(ds_run "$_in" k); _rc=$?
+      _got=${_PB_OUT[$_ix]}; _rc=${_PB_RC[$_ix]}
       if [ "$_rc" -ne 0 ]; then
         fail 28 "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: [$_in] exited $_rc"
       elif [ "$_got" != "$_want" ]; then
@@ -2176,8 +2363,19 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
     # empty was all it ever asserted. Round 4 then found the refusal testing the RAW line, so a `]`
     # inside a trailing comment satisfied the terminator arm and restored the whole defect. BOTH
     # spellings are specimens here, and the commented one is the reason the first was not enough.
-    for _ml in 'k = [' 'k = [   # one per piece [see section 7]' 'k = [ # note ]' 'k = ["a[0]",' 'k = ["content/pieces/[0-9]*/**",'; do
-      _got=$(dl_run "$(printf '%s\n  "a",\n]\n' "$_ml")" k); _rc=$?
+    _ml_specs=('k = [' 'k = [   # one per piece [see section 7]' 'k = [ # note ]' 'k = ["a[0]",' 'k = ["content/pieces/[0-9]*/**",')
+    _argv=()
+    for _ml in "${_ml_specs[@]}"; do
+      _argv+=("$(printf '%s\n  "a",\n]\n' "$_ml")" k)
+    done
+    _pbatch "$dl_a" declared_list "${_argv[@]}"
+    _ix=-1
+    for _ml in "${_ml_specs[@]}"; do
+      _ix=$((_ix + 1))
+      _got=${_PB_OUT[$_ix]}; _rc=${_PB_RC[$_ix]}
+      # THE ONLY ARM HERE WHOSE EXPECTED VALUE IS A NONZERO STATUS, so it is the only one a dead
+      # harness can satisfy by accident. It grades the harness first.
+      [ "$_PB_DEAD" -eq 0 ] || { fail 28 "the multi-line refusal is graded against a harness that answered nothing, so a parser that will not parse would report the refusal this arm is looking for: specimen [$_ml]"; continue; }
       [ "$_rc" -eq 2 ] || fail 28 "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [$_ml] exited $_rc with [$_got]"
     done
     # THE TWO TEMPLATE LOOPS COUNT SEPARATELY. Round 4, MEDIUM 6: one shared counter meant either half
@@ -2188,10 +2386,19 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
     # half of it.
     tpl_list=0
     tpl_scalar=0
+    _tl_rows=(); _argv=()
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
+      _tl_rows+=("$tl"); _argv+=("$tpl_block" "${tl%%[[:space:]]*}")
+    done <<TPLKEOF
+$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=[[:space:]]*\[/' "$tpl" || true)
+TPLKEOF
+    [ "${#_tl_rows[@]}" -eq 0 ] || _pbatch "$dl_a" declared_list "${_argv[@]}"
+    _ix=-1
+    for tl in ${_tl_rows[@]+"${_tl_rows[@]}"}; do
+      _ix=$((_ix + 1))
       tpl_list=$((tpl_list + 1))
-      got=$(dl_run "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
+      got=${_PB_OUT[$_ix]}; rc=${_PB_RC[$_ix]}
       # THE rc BRANCH IS BACK, and the comment that removed it was wrong. It read: a branch here could
       # be reached by no fixture, because the specimens above already assert the parser executes. A
       # template list key written MULTI-LINE reaches it exactly - rc 2, empty stdout, the -n test
@@ -2202,9 +2409,7 @@ declared_scalar \"\$1\" \"\$2\"" _ "$1" "$2"
       elif [ -n "$got" ]; then
         fail 28 "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow: ${tl%%=*} yields [$got]"
       fi
-    done <<TPLEOF
-$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=[[:space:]]*\[/' "$tpl" || true)
-TPLEOF
+    done
 
     # EVERY OTHER KEY IN THE FENCE, through the scalar parser. The population is DERIVED from the
     # template's own toml block rather than from a hand-typed pattern, so a key added there reds until
@@ -2214,10 +2419,19 @@ TPLEOF
     # WHAT IS ASSERTED is that the COMMENT does not survive the parse. Every value in the shipped
     # block is a declared null of its own type, so a `#` in the parsed result is the leak signature and
     # it is the same signature for every key.
+    _ts_rows=(); _argv=()
     while IFS= read -r tl; do
       [ -n "$tl" ] || continue
+      _ts_rows+=("$tl"); _argv+=("$tpl_block" "${tl%%[[:space:]]*}")
+    done <<TPLSKEOF
+$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=/ && !/^[a-z_]+[[:space:]]*=[[:space:]]*\[/' "$tpl" || true)
+TPLSKEOF
+    [ "${#_ts_rows[@]}" -eq 0 ] || _pbatch "$ds_a" declared_scalar "${_argv[@]}"
+    _ix=-1
+    for tl in ${_ts_rows[@]+"${_ts_rows[@]}"}; do
+      _ix=$((_ix + 1))
       tpl_scalar=$((tpl_scalar + 1))
-      got=$(ds_run "$tpl_block" "${tl%%[[:space:]]*}"); rc=$?
+      got=${_PB_OUT[$_ix]}; rc=${_PB_RC[$_ix]}
       if [ "$rc" -ne 0 ]; then
         fail 28 "the extracted declared-scalar parser could not be executed over the shipped template's own line, and an unexecutable parser returns the empty string every assertion here reads as clean - key and exit status follow: ${tl%%=*} exited $rc"
       else
@@ -2225,9 +2439,7 @@ TPLEOF
           *'#'*) fail 28 "the shipped template's own declaration line parses with its COMMENT still attached, so an adopter who fills the template in place and keeps the comments gets that prose as the value - key and parse follow: ${tl%%=*} yields [$got]" ;;
         esac
       fi
-    done <<TPLSEOF
-$(awk '/^```toml/{f=1;next} f&&/^```/{exit} f&&/^[a-z_]+[[:space:]]*=/ && !/^[a-z_]+[[:space:]]*=[[:space:]]*\[/' "$tpl" || true)
-TPLSEOF
+    done
 
     # LIVENESS, PER LOOP, and DELIBERATELY NOT A COUNT COMPARISON. The first cut asserted that the
     # number of keys parsed equalled the number the fence declares - but both sides are derived from

@@ -793,6 +793,230 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
 
+NL_ = chr(10)
+
+
+def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
+    """TOOL-dScriptedRepeat-14: a build README asserting a mechanism its own spec set has revised.
+
+    Every arm here fixes the CLOCKS, because the predicate is entirely about which of two records
+    spoke last. `GIT_AUTHOR_DATE` on the README commit sets the blame side; the revision log's own
+    dates set the spec side. A fixture that let either float would be asserting over today's date."""
+    print("readme mechanism drift")
+    r = make_repo(tmp, name="rmdrift")
+    bdir = (r / SPEC_DIR_FOR_FIXTURE).parent
+
+    # THE README. Four authored claims and one generated one, chosen so each arm below has both
+    # directions present in the SAME fixture — a corpus that only carries violations cannot tell a
+    # working predicate from one that matches everything.
+    readme = [
+        "---",
+        "slug: x",
+        "---",
+        "",
+        "# a build",
+        "",
+        "The unit ships `--counts`, which takes the recorded FACTS.",
+        "It also ships `--stable`, and nothing has moved it since.",
+        "The run reaches `LANDED` at the end, which is a status and not a mechanism.",
+        "Its entry point is `drift_report.py`, which is a file and not a mechanism.",
+        "",
+        "<!-- gen:build-units -->",
+        "Rendered below this marker: `--generated-only` is not authored prose.",
+        "<!-- /gen:build-units -->",
+        "",
+    ]
+    (bdir / "README.md").write_text(NL_.join(readme) + NL_, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "readme", "--no-verify"], r,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+
+    # THE SPEC SET. One revision AFTER the README line's date and three that are not, so the
+    # `rd > d` comparison has a failing input as well as a passing one.
+    spec = [
+        "# TOOL-aDrift-1 - a drifting thing",
+        "",
+        "**Status:** CLOSED - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
+        "",
+        "## 9. Revision log",
+        "",
+        "- rev-2 - 2026-01-05 - `--counts` now takes a pinned BASE sha and re-parses the blob,",
+        "  which is not what it did.",
+        "- rev-1 - 2025-12-01 - `--stable` introduced, and `LANDED` and `drift_report.py` named here",
+        "  so the shape filters below have an input rather than an absence to pass over.",
+        "- rev-3 - 2026-01-09 - `--counts-format` is a DIFFERENT flag that merely STARTS WITH one the",
+        "  README names. It is the latest entry here, so a bare-substring match would make it the",
+        "  revision this row cites - and the row must cite rev-2 instead. This wording deliberately",
+        "  never spells the shorter flag, because a fixture that mentions it grades its own prose.",
+        "",
+    ]
+    (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDrift-1.md").write_text(
+        NL_.join(spec) + NL_, encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "spec", "--no-verify"], r)
+
+    got = report(r)["readme_mechanism_drift"]
+    toks = sorted(d["mechanism"] for d in got["detail"])
+    check("AC1: the README claim its own spec later revised is reported",
+          toks == ["--counts"], f"got {toks}")
+    check("AC1: the row names both records",
+          bool(got["detail"]) and got["detail"][0]["spec"].endswith("2026-01-01-spec-aDrift-1.md")
+          and got["detail"][0]["readme"].endswith(":7"), f"got {got['detail'][:1]}")
+    check("a revision EARLIER than the README line is not a hit", "--stable" not in toks)
+    check("a status word is not a mechanism, so LANDED is not a hit", "LANDED" not in toks)
+    check("a filename is not a mechanism, so drift_report.py is not a hit",
+          "drift_report.py" not in toks)
+    check("the generated region is not authored prose", "--generated-only" not in toks)
+    # `--counts-format` is dated LATEST, so a bare-substring match would name rev-3 as the revision.
+    # The row must still cite rev-2, which is the only entry that names `--counts` itself.
+    check("a longer flag that merely starts with the token is not a match",
+          bool(got["detail"]) and got["detail"][0]["revised"] == "2026-01-05",
+          f"got {got['detail'][:1]}")
+    check("the probe is LIVE with tokens and revisions present", got["live"] is True)
+    # REPORT ONLY, for the reason F2 settled: `drift-audit records` is an unguarded merge-bar leg and
+    # this predicate reports a POINTER, not a proven contradiction.
+    check("the signal is not gateable", got["gateable"] is False)
+
+    # --- AC2: a README and spec set that AGREE are silent, and the probe stays live -----------
+    r2 = make_repo(tmp, name="rmagree")
+    b2 = (r2 / SPEC_DIR_FOR_FIXTURE).parent
+    (b2 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "The unit ships `--counts`." + NL_,
+        encoding="utf-8", newline="\n")
+    (r2 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aAgree-1.md").write_text(
+        NL_.join([
+            "# TOOL-aAgree-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-1 - 2025-12-01 - `--counts` introduced.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r2)
+    run(["git", "commit", "-q", "-m", "agree", "--no-verify"], r2,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    ok = report(r2)["readme_mechanism_drift"]
+    check("AC2: an agreeing pair reports nothing", ok["value"] == 0, f"got {ok['value']}")
+    check("AC2: and the probe is still LIVE, so silence is a verdict rather than a blind spot",
+          ok["live"] is True)
+
+    # --- ROUND 7, MEDIUM 1: the two sides are dated on DIFFERENT CLOCKS unless the blame side
+    # --- honours `author-tz`. The spec side is a hand-typed LOCAL date; reading `author-time` as UTC
+    # --- backdates every README line written between 00:00 and 03:00 at +0300 and fires on a spec
+    # --- revision made the same local day. On this repo that was 11 of 31 rows, and the shipped pin
+    # --- was seeded through the skew. This arm is the one the existing fixtures could not be: every
+    # --- other GIT_AUTHOR_DATE here is +0000, which is exactly the timezone that cannot show it.
+    r4 = make_repo(tmp, name="rmtz")
+    b4 = (r4 / SPEC_DIR_FOR_FIXTURE).parent
+    (b4 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "The unit ships `--counts`." + NL_,
+        encoding="utf-8", newline="\n")
+    (r4 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aTz-1.md").write_text(
+        NL_.join([
+            "# TOOL-aTz-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-02 - `--counts` revised on the same LOCAL day the README line was",
+            "  written, which is only a hit if the two sides are read on different clocks.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r4)
+    # 01:00 at +0300 is 2026-01-01T22:00Z the day BEFORE. A UTC reader dates this line 2026-01-01 and
+    # the rev-2 entry then compares as later; an author-tz reader dates it 2026-01-02 and it does not.
+    run(["git", "commit", "-q", "-m", "tz", "--no-verify"], r4,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T01:00:00 +0300",
+             "GIT_COMMITTER_DATE": "2026-01-02T01:00:00 +0300"})
+    tz = report(r4)["readme_mechanism_drift"]
+    check("MEDIUM 1: a README line and a spec revision on the same LOCAL day are not a hit",
+          tz["value"] == 0, f"got {tz['value']} rows: {tz['detail'][:1]}")
+    check("MEDIUM 1: and the probe is LIVE, so the zero is a verdict", tz["live"] is True)
+
+    # --- ROUND 7, LOW 1: one row per README CLAIM, never one per backtick occurrence. `value` is
+    # --- what the shipped pin ratchets against, and its comment says each row is one sentence to
+    # --- re-read - which is false the moment a sentence naming a token twice counts twice.
+    r5 = make_repo(tmp, name="rmdup")
+    b5 = (r5 / SPEC_DIR_FOR_FIXTURE).parent
+    (b5 / "README.md").write_text(
+        "# a build" + NL_ + NL_
+        + "It ships `--counts`, and `--counts` is the one that matters." + NL_,
+        encoding="utf-8", newline="\n")
+    (r5 / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDup-1.md").write_text(
+        NL_.join([
+            "# TOOL-aDup-1 - a thing",
+            "",
+            "## 9. Revision log",
+            "",
+            "- rev-2 - 2026-01-05 - `--counts` now takes a pinned BASE sha.",
+            "",
+        ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r5)
+    run(["git", "commit", "-q", "-m", "dup", "--no-verify"], r5,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    dup = report(r5)["readme_mechanism_drift"]
+    check("LOW 1: a line naming one mechanism twice is ONE row",
+          dup["value"] == 1, f"got {dup['value']}")
+
+    # --- ROUND 7, LOW 3: the build slug comes from the DECLARED root. `MEMORY_ROOT` is not
+    # --- constrained to one path segment and this repo's own manifest records `docs/mem` as a real
+    # --- adopter value; an index-based split lands on the literal `builds` for every path and grades
+    # --- every README against every build's revision log. One arm covers every future signal that
+    # --- reaches for an index.
+    r6 = make_repo(tmp, name="rmnested")
+    (r6 / ".memory-tree.conf").write_text("MEMORY_ROOT=docs/mem" + NL_, encoding="utf-8", newline="\n")
+    for _b in ("one", "two"):
+        _d = r6 / "docs" / "mem" / "builds" / _b / "spec"
+        _d.mkdir(parents=True, exist_ok=True)
+        # THE TOKENS CROSS. Round 8's low 6: with each README naming its OWN build's token, a
+        # slug collapse merges the spec sets and still yields the same row count as the correct
+        # per-build grouping, so the count assertion passed with the fix reverted and only the
+        # slug assertion discriminated. Build `one`'s README names `--two-flag`, which ONLY
+        # build two's spec revises: a collapse produces rows here, correct grouping produces none.
+        # Build `one` names BOTH tokens, build `two` names only its own. Correct grouping: one
+        # row per build, two in total. A slug collapse grades every README against the merged
+        # spec set and yields THREE, because one's `--two-flag` line then matches too. Both
+        # assertions below discriminate; with each README naming only its own token neither did.
+        _extra = (NL_ + "It also mentions `--two-flag`." + NL_) if _b == "one" else NL_
+        (_d.parent / "README.md").write_text(
+            "# build " + _b + NL_ + NL_ + "It ships `--" + _b + "-flag`." + _extra,
+            encoding="utf-8", newline="\n")
+        (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
+            NL_.join([
+                "# TOOL-a" + _b + "-1 - a thing",
+                "",
+                "## 9. Revision log",
+                "",
+                "- rev-2 - 2026-01-05 - `--" + _b + "-flag` was revised here.",
+                "",
+            ]), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r6)
+    run(["git", "commit", "-q", "-m", "nested", "--no-verify"], r6,
+        env={"GIT_AUTHOR_DATE": "2026-01-02T00:00:00 +0000",
+             "GIT_COMMITTER_DATE": "2026-01-02T00:00:00 +0000"})
+    nest = report(r6)["readme_mechanism_drift"]
+    slugs = sorted({d["build"] for d in nest["detail"]})
+    check("LOW 3: a two-segment MEMORY_ROOT still names the BUILD, not the literal `builds`",
+          slugs == ["one", "two"], f"got {slugs}")
+    check("LOW 3: and each README grades against its OWN spec set only",
+          nest["value"] == 2, f"got {nest['value']} rows: {nest['detail'][:3]}")
+
+    # --- AC4: LIVENESS over the population that CAN empty. Not "did I find a build" - the tree
+    # --- always has builds - but "did I find a mechanism token to compare against a revision".
+    r3 = make_repo(tmp, name="rmdead")
+    b3 = (r3 / SPEC_DIR_FOR_FIXTURE).parent
+    (b3 / "README.md").write_text(
+        "# a build" + NL_ + NL_ + "Prose with no backticked mechanism in it." + NL_,
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r3)
+    run(["git", "commit", "-q", "-m", "no tokens", "--no-verify"], r3)
+    dead = report(r3)["readme_mechanism_drift"]
+    check("AC4: a corpus with no mechanism token reports DEAD rather than a reassuring 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
 def test_declared_empty(tmp: pathlib.Path) -> None:
     """A declaration must stay LIFTABLE, or it is the DEAD PROBE defect wearing a nicer label.
 
@@ -1098,6 +1322,7 @@ def main() -> int:
         test_lexicon_signals(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
         test_ratchet_lookback(tmp)
