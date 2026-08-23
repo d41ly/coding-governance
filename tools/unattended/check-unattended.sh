@@ -107,6 +107,20 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
+# ---- THE CONF CANNOT END THIS LEG. Round 8, blocker 1: `. "$CONF"` in the MAIN shell means one
+# ---- appended `exit 0` in a tracked file - a file the graded run can commit itself - terminates this
+# ---- leg at status 0, which `run-gates` reads as GATE ok. Every check below goes unrun and nothing
+# ---- says so. The probe is a subshell, so an abort inside it is a status rather than an exit, and it
+# ---- runs BEFORE the real source. `set -e` is off here, so the `||` is the whole guard.
+# A SENTINEL THE SOURCE HAS TO SURVIVE TO PRINT. `( . "$CONF" ) || fail` does NOT catch an `exit`
+# inside the sourced file: the subshell ends at the status the FILE chose, and `exit 0` therefore
+# looks like a clean source. The `OK` is emitted after the source and nowhere else. And the leg STOPS
+# here rather than falling through, because the real source two lines down would be ended by the same
+# line and the verdict would never be printed.
+if [ "$( . "$CONF" >/dev/null 2>&1; printf OK )" != OK ]; then
+  fail 1 "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in the main shell would end the leg at whatever status the file chose rather than at a verdict: $CONF"
+  exit "$status"
+fi
 # shellcheck disable=SC1090
 . "$CONF"
 M="$MEMORY_ROOT"
@@ -2213,10 +2227,16 @@ else
     # arms read as a clean parse. A dead harness must not be byte-indistinguishable from a working
     # one, it must not be text-distinguishable from the unbatched one, and its degraded mode must not
     # be spelled with the passing value.
-    _PB_RC=(); _PB_OUT=()
+    # _PB_DEAD says the harness answered NOTHING, which the fill alone cannot say. Round 8's low 2:
+    # `bash -c` exits 2 on a syntax error, the empty-reply branch faithfully fills every slot with
+    # that 2 - and 2 is exactly the value the multi-line REFUSAL arm asserts, so a parser that will
+    # not parse reported a correct refusal from a harness that ran nothing. The equivalence with the
+    # old per-specimen wrapper is worth keeping; the arm reading it as an answer is not.
+    _PB_RC=(); _PB_OUT=(); _PB_DEAD=0
     _pbatch() { # parser-body - fn - body key [body key ...]  ->  fills _PB_RC / _PB_OUT, one per pair
       local _body=$1 _fn=$2 _pairs _res _rc _line _i
       shift 2
+      _PB_DEAD=0
       _pairs=$(( $# / 2 ))
       _PB_RC=(); _PB_OUT=()
       _res=$(bash -c "$_body
@@ -2246,7 +2266,7 @@ PBEOF
         # what the per-specimen wrapper handed each caller before this was batched, so the rc branches
         # below fire with the same text the same number of times. This is the equivalence the comment
         # above claims, and it is true of THIS branch only.
-        _PB_RC=(); _PB_OUT=()
+        _PB_RC=(); _PB_OUT=(); _PB_DEAD=1
         _i=0
         while [ "$_i" -lt "$_pairs" ]; do _PB_RC+=("$_rc"); _PB_OUT+=(""); _i=$((_i + 1)); done
         return 0
@@ -2326,6 +2346,9 @@ PBEOF
     for _ml in "${_ml_specs[@]}"; do
       _ix=$((_ix + 1))
       _got=${_PB_OUT[$_ix]}; _rc=${_PB_RC[$_ix]}
+      # THE ONLY ARM HERE WHOSE EXPECTED VALUE IS A NONZERO STATUS, so it is the only one a dead
+      # harness can satisfy by accident. It grades the harness first.
+      [ "$_PB_DEAD" -eq 0 ] || { fail 28 "the multi-line refusal is graded against a harness that answered nothing, so a parser that will not parse would report the refusal this arm is looking for: specimen [$_ml]"; continue; }
       [ "$_rc" -eq 2 ] || fail 28 "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [$_ml] exited $_rc with [$_got]"
     done
     # THE TWO TEMPLATE LOOPS COUNT SEPARATELY. Round 4, MEDIUM 6: one shared counter meant either half

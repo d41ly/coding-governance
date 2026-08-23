@@ -80,11 +80,37 @@ CANON_N=$(printf '%s\n' "$CANON" | grep -c . || true)
 # ---- the corpus - a guard that reports itself armed and is not. Two readers of one config, one of
 # ---- them re-derived, is the same class check 28 exists to close for the parsers, one file over.
 # ---- The subshell is the isolation: nothing the conf sets reaches this leg's own state.
-_conf_key() { # KEY -> the value this file's three siblings would see
+# ---- AND THE READ'S OWN LIVENESS IS A VERDICT. Round 8's blocker 1: the first cut discarded the
+# ---- subshell's status, so "the key is undeclared" and "the conf aborted before the assignment" were
+# ---- the same empty string - and the leg then printed `bypass scan SKIPPED - no BYPASS_BAN declared`,
+# ---- which is FALSE. Four of five abort shapes reach it (`exit 0`, `return 0`, a syntax error above
+# ---- the assignment, an unbound reference under the inherited `set -u`), each a ONE-LINE append to a
+# ---- tracked file the graded run can commit itself. rc 9 is that state and the caller reds on it.
+# ---- `unset -v` first, because the subshell inherits the process environment and an EXPORTED
+# ---- variable of the same name would otherwise answer for a key the conf never declares.
+_conf_key() { # KEY -> the value this file's three siblings would see; rc 9 = the conf did not source
   [ -f .unattended.conf ] || return 0
-  ( . ./.unattended.conf >/dev/null 2>&1; eval "printf '%s' \"\${$1:-}\"" )
+  # A SENTINEL THE SOURCE HAS TO SURVIVE TO PRINT. `. file || exit 9` does NOT catch an `exit` inside
+  # the sourced file - that ends the subshell at the status the FILE chose, which is exactly the
+  # `exit 0` shape, and the caller then reads an empty answer as "the key is undeclared". The `OK`
+  # prefix is emitted after the source and nowhere else, so its absence is the abort.
+  _CK_OUT=$( unset -v "$1" 2>/dev/null
+             . ./.unattended.conf >/dev/null 2>&1 || exit 9
+             eval "printf 'OK%s' \"\${$1:-}\"" )
+  case "$_CK_OUT" in
+    OK*) _CK_VAL=${_CK_OUT#OK} ;;
+    *) return 9 ;;
+  esac
+  # AND A CROSS-CHECK, which is never the answer and only ever a liveness verdict. `return 0` above an
+  # assignment ends the SOURCE without ending the subshell, so the sentinel prints and the value is
+  # still empty. If the file spells the key and the sourced view says nothing, the source did not
+  # reach the assignment. This is the shape the round-7 gotcha prescribes for a second reader: keep it,
+  # and red on disagreement rather than answering from it.
+  if [ -z "$_CK_VAL" ] && grep -qE "^[[:space:]]*$1=" .unattended.conf; then return 9; fi
+  printf '%s' "$_CK_VAL"
 }
-CONF_GLOB=$(_conf_key PLAYBOOK_GLOB)
+CONF_GLOB=$(_conf_key PLAYBOOK_GLOB); _ck=$?
+[ "$_ck" -eq 9 ] && fail 10 "the project conf could not be sourced, so every key this leg reads resolves to the empty string and the checks that depend on them announce a cause they never verified - an abort above an assignment in .unattended.conf disarms this leg while it prints that the key is undeclared"
 # ---- BYPASS_BAN, the SECOND conf key this leg reads, and check 10 below is why. The driver refuses to
 # ---- WRITE an evidence record naming the declared bypass flag; nothing read those records back, so a
 # ---- flag that reached a tracked record by any other route was invisible after the fact. Check 11 in
@@ -93,8 +119,12 @@ CONF_GLOB=$(_conf_key PLAYBOOK_GLOB)
 # ---- before this landed - all three are zero in that file and non-zero in this one, which is why the
 # ---- scan is HERE, and why the alternative would have inlined a third parser copy past a gate that
 # ---- compares exactly two.
-CONF_BYPASS=$(_conf_key BYPASS_BAN)
+CONF_BYPASS=$(_conf_key BYPASS_BAN); _ck=$?
 CONF_BYPASS=${CONF_BYPASS:-}
+CONF_SOURCE_OK=1; [ "$_ck" -eq 9 ] && CONF_SOURCE_OK=0
+# The same refusal for the key check 10 actually reads. It is spelled twice rather than folded into
+# the helper because `fail` must run in THIS shell, and the helper's answer is its stdout.
+[ "$_ck" -eq 9 ] && fail 10 "the project conf could not be sourced, so the declared bypass flag resolves to the empty string and this leg would announce a skip it never verified - the corpus goes unread while the report says no flag is declared"
 # ---- AND THE PARSE IS ARMED. No bypass flag carries whitespace or a `#`; a resolved value that does
 # ---- is a reader that mis-parsed, and an unarmed predicate must RED rather than print a population
 # ---- count over a literal nothing can match.
@@ -115,7 +145,7 @@ while IFS= read -r f; do
 "
   fi
 done <<EOF
-$(git ls-files -- '*.md')
+$(git -c core.quotePath=false ls-files -- '*.md')
 EOF
 POP=$(printf '%s' "$PLAYBOOKS" | grep -c . || true)
 
@@ -132,7 +162,15 @@ if [ "${POP:-0}" -eq 0 ]; then
 fi
 
 # ---------------------------------------------------------------- piece-record helpers
-GITLS() { git ls-files -- "$1" 2>/dev/null; }
+# ---- BYTE-FAITHFUL, AT THE SOURCE. Round 8's blocker 2: round 7 closed word-splitting and left
+# ---- C-QUOTING. With the default `core.quotePath`, `git ls-files` emits a non-ASCII name as a
+# ---- QUOTED, octal-escaped literal - so the reader gets a path that does not exist, the bypass grep
+# ---- never opens that record, the tracked-but-absent refusal reds the merge bar on a legitimate
+# ---- tree with a false cause, and the census silently grades the piece unrecorded. Record names
+# ---- derive from piece paths, so any adopter with one non-Latin character in a deliverable reaches
+# ---- all of it. `core.quotePath=false` alone still splits on a path containing a newline, which is
+# ---- why `-z` is not optional and every consumer reads with `-d ''`.
+GITLS() { git -c core.quotePath=false ls-files -z -- "$1" 2>/dev/null; }
 # CR-stripped like the on-disk read it stands in for, so a CRLF-committed playbook parses the same
 # way through both paths — two readers of one file giving two answers is the class this replaces.
 # THE PINNED READ, and both suppressions, because they are not interchangeable and neither covers
@@ -156,13 +194,15 @@ record_for() { # records-root · piece-path -> its record, or empty
   local r
   # NOT `for r in $(GITLS …)`: `git ls-files` leaves a space-containing path unquoted, so one record
   # becomes two names that do not exist. Round 7, high 1 - the class, not just the site that was filed.
-  while IFS= read -r r; do
+  # PROCESS SUBSTITUTION, NOT A HEREDOC. `$(GITLS …)` inside a heredoc drops the NUL separators -
+  # command substitution strips them, with a warning - so the whole stream arrives as one record. And
+  # a PIPE would put this loop in a subshell, where every counter it increments dies at the `done`.
+  # `< <(…)` is the one form that carries the bytes AND keeps the loop in this shell.
+  while IFS= read -r -d '' r; do
     [ -n "$r" ] || continue
     [ -f "$r" ] || continue
     [ "$(sed -n 's/^piece: //p' "$r" | head -1)" = "$2" ] && { printf '%s' "$r"; return 0; }
-  done <<RFEOF
-$(GITLS "$1/*.md")
-RFEOF
+  done < <(GITLS "$1/*.md")
   return 0
 }
 
@@ -264,8 +304,12 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
 
 # ------------------------------------------------------------------------ per playbook
 TOTAL_STEPS=0
-BYPASS_SEEN=0; BYPASS_ROOTS=0; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
-for pb in $PLAYBOOKS; do
+BYPASS_SEEN=0; BYPASS_ROOTS=0; BYPASS_ROOT_LIST="|"; TOTAL_TAGGED=0; TOTAL_WITNESS=0; TOTAL_CHECKS=0
+# ---- THE SIXTH ENUMERATION, and round 8's high 2. The class fix converted five and the comment
+# ---- claimed it covered "every place this leg walks git ls-files output" - this one was left,
+# ---- and it is the worst of the six: a playbook whose path splits is never graded AT ALL, and
+# ---- BYPASS_ROOTS then drops to zero, which disarms the liveness refusal added in the same fold.
+while IFS= read -r pb; do
   [ -n "$pb" ] || continue
   if [ -n "$COUNTS_AT" ]; then
     # A PROBE THAT CANNOT MOVE SAYS SO. An unreadable blob would otherwise yield an empty body, and
@@ -422,14 +466,19 @@ CANONEOF
   # ---- it holds there. Said plainly, because coverage a reader assumes is total is worse than
   # ---- coverage whose shape they know.
   if [ -n "$rr" ]; then
-    BYPASS_ROOTS=$((BYPASS_ROOTS + 1))
+    # DISTINCT roots, not playbooks-that-declare-one. Round 8's low 3: two playbooks sharing a root
+    # counted it twice, so the number beside the record count described a different population.
+    case "$BYPASS_ROOT_LIST" in
+      *"|$rr|"*) ;;
+      *) BYPASS_ROOTS=$((BYPASS_ROOTS + 1)); BYPASS_ROOT_LIST="$BYPASS_ROOT_LIST$rr|" ;;
+    esac
     if [ -n "$CONF_BYPASS" ]; then
       _seen_here=0
       # NOT `for bp_ in $(GITLS …)`. Round 7's high 1: `git ls-files` does not quote a path containing
       # a space, so one record split into two nonexistent names, `grep -qF` failed on both, and
       # BYPASS_SEEN incremented TWICE for the record it never opened - the liveness counter inflated by
       # exactly the file that carried the flag.
-      while IFS= read -r bp_; do
+      while IFS= read -r -d '' bp_; do
         [ -n "$bp_" ] || continue
         if [ ! -f "$bp_" ]; then
           fail 10 "a tracked evidence record is not readable in this worktree, so the bypass scan cannot answer for it and counting it as read would inflate the number that proves the scan reached the corpus: $bp_"
@@ -438,23 +487,32 @@ CANONEOF
         BYPASS_SEEN=$((BYPASS_SEEN + 1)); _seen_here=$((_seen_here + 1))
         grep -qF -- "$CONF_BYPASS" "$bp_" \
           && fail 10 "a tracked EVIDENCE RECORD names the declared bypass flag, and bypassing the lander discards the whole bar the run mandate leaned on - this is the record a reviewer reads to believe the run, so the flag being in it is the claim and the confession at once: $CONF_BYPASS in $bp_"
-      done <<BPEOF
-$(GITLS "$rr/*.md")
-BPEOF
-      # PER ROOT, because one repo-wide counter lets a grained playbook's records keep the number
-      # healthy while another root contributes nothing at all.
+      done < <(GITLS "$rr/*.md")
+      # PER ROOT, AND THE ZERO REDS HERE rather than on the aggregate. Round 8's high 1: the
+      # repo-wide refusal could only fire in a tree where the kit's own shipped fixture root was
+      # repointed at an empty directory, because `kit.toml` ships that fixture to every adopter and
+      # check 1 reds on an empty playbook population - so `BYPASS_SEEN >= 3` was effectively
+      # unconditional and the multi-root shape the comment described was unreachable. A declared root
+      # that enumerates nothing is a scan that cannot move, and it is THIS root's fact.
       [ -n "$COUNTS_FOR" ] || note "bypass scan - $rr: $_seen_here tracked evidence record(s) read"
+      [ "$_seen_here" -eq 0 ] && fail 10 "a playbook declares a records root and a bypass flag is declared, and that root enumerates ZERO tracked records - so the readback is asserted over an empty population under this playbook and would stay green with the flag in every record somebody later puts there: $rr in $pb"
     fi
   fi
   if [ -n "$gr" ] && [ -z "$rr" ]; then
     fail 8 "a playbook declares a piece grain and no records root, so its pieces enumerate and none of them joins to evidence - every per-piece state would read as unrecorded and the count that means the build made what was asked would have nothing to compare; playbook: $pb"
   fi
   if [ -n "$gr" ] && [ -n "$rr" ]; then
-    pieces=$(GITLS "$gr")
-    npieces=$(printf '%s' "$pieces" | grep -c . || true)
+    # COUNTED BY THE LOOP, not by a second pass over a variable: `pieces=$(GITLS …)` would drop the
+    # NUL separators the enumeration now carries, which is the same defect one level up.
+    npieces=0
     v=0; f=0; st_=0; un=0; uc=0; inscope=0
-    while IFS= read -r pc; do
+  # PROCESS SUBSTITUTION, NOT A HEREDOC. `$(GITLS …)` inside a heredoc drops the NUL separators -
+  # command substitution strips them, with a warning - so the whole stream arrives as one record. And
+  # a PIPE would put this loop in a subshell, where every counter it increments dies at the `done`.
+  # `< <(…)` is the one form that carries the bytes AND keeps the loop in this shell.
+    while IFS= read -r -d '' pc; do
       [ -n "$pc" ] || continue
+      npieces=$((npieces + 1))
       rec=$(record_for "$rr" "$pc")
       if [ -z "$rec" ]; then
         # A piece with NO record belongs to no run, so it is outside `enumerate_run` entirely rather
@@ -497,9 +555,7 @@ BPEOF
       else
         v=$((v + 1))
       fi
-    done <<PCEOF
-$pieces
-PCEOF
+    done < <(GITLS "$gr")
     # THE LIVENESS ASSERTION, first and unconditional. Every count below can be satisfied by a tree
     # with no pieces in it, and a reader that enumerates zero, joins zero and reports zero failures
     # is indistinguishable from a clean run.
@@ -539,18 +595,15 @@ PCEOF
       # THE INNER ENUMERATION IS SPLIT-SAFE, the outer one does not need to be: run ids are the
       # payload here and no run id carries whitespace. Round 7, high 1 - the class over every place
       # this leg walks `git ls-files` output.
-      _rids_=$(while IFS= read -r r_; do
+      _rids_=$(while IFS= read -r -d '' r_; do
         [ -n "$r_" ] || continue
         [ -f "$r_" ] || continue
         sed -n 's/^run: //p' "$r_" | head -1
-      done <<RIDEOF
-$(GITLS "$rr/*.md")
-RIDEOF
-      )
+      done < <(GITLS "$rr/*.md"))
       for rid_ in $(printf '%s
 ' "$_rids_" | grep . | LC_ALL=C sort -u); do
         srec_="$rr/set-$rid_.md"
-        if [ -z "$(GITLS "$srec_")" ]; then
+        if [ -z "$(GITLS "$srec_" | tr -d '\0')" ]; then
           note "no set record — run $rid_ produced pieces under $pb, which declares set-scoped checks, and nothing records whether they ran; only --close blocks on this"
           continue
         fi
@@ -565,30 +618,20 @@ RIDEOF
       done
     fi
 
-    # ---- 10: THE BYPASS FLAG, READ BACK OUT OF WHAT LANDED. The driver refuses to write one at
-    # ---- record time and that guard is real; this is the second opinion over what is in the tree,
-    # ---- which is the pair the charter asks for on a guarded surface.
-    # ----
-    # ---- THE POPULATION IS THE CENSUS OWN. Same $rr from the same declared_scalar parse, same GITLS
-    # ---- enumeration - not a second derivation that could disagree with the first.
-    # ----
-    # ---- WHAT THIS DOES NOT REACH: --record-set accepts a caller-supplied records root, so a record
-    # ---- written outside every declared root is invisible here. That is the write-time guard job and
-    # ---- it holds there. Said plainly, because coverage a reader assumes is total is worse than
-    # ---- coverage whose shape they know.
     # ORPHAN RECORDS: a record whose piece is gone. The reverse direction, and without it a corpus
     # silently reports coverage it no longer has.
-    [ -n "$COUNTS_FOR" ] || while IFS= read -r rc_; do
+    [ -n "$COUNTS_FOR" ] || while IFS= read -r -d '' rc_; do
       [ -n "$rc_" ] || continue
       [ -f "$rc_" ] || continue
       op=$(sed -n 's/^piece: //p' "$rc_" | head -1)
       [ -n "$op" ] || continue
       [ -e "$op" ] || note "orphan record — $rc_ describes $op, which is not in this tree; the record outlived its piece and is coverage nobody has"
-    done <<ORPHEOF
-$(GITLS "$rr/*.md")
-ORPHEOF
+    done < <(GITLS "$rr/*.md")
   fi
-done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-piece
+done <<PBLIST
+$PLAYBOOKS
+PBLIST
+# ---- the population loop CLOSES HERE. It used to close ABOVE the per-piece
       # ---- reader while that reader stayed indented as its body, so the reader ran ONCE over
       # ---- the last iteration's leftover $pb and $body. Latent while the population was one.
 
@@ -597,17 +640,16 @@ done  # ---- the population loop CLOSES HERE. It used to close ABOVE the per-pie
 # ---- THE BYPASS SCAN POPULATION, printed whether it found anything or not. A scan that reached zero
 # ---- records and a scan that reached many and found nothing are the same silence, and the first is a
 # ---- check that is not running.
-[ -n "$COUNTS_FOR" ] || { if [ -z "$CONF_BYPASS" ]; then
+[ -n "$COUNTS_FOR" ] || { if [ "$CONF_SOURCE_OK" != 1 ]; then
+  note "bypass scan NOT RUN - the project conf did not source, so no declared value could be read; the refusal above is the verdict and this line is not a skip"
+elif [ -z "$CONF_BYPASS" ]; then
   note "bypass scan SKIPPED - no BYPASS_BAN declared in .unattended.conf, so tracked evidence records are not read back for it"
 else
   note "bypass scan - $BYPASS_SEEN tracked evidence record(s) read across $BYPASS_ROOTS declared records root(s)"
 fi; }
-# ---- AND THE ZERO HAS TEETH. A note never reds, so the previous shape reported a scan that reached
-# ---- nothing in the same voice as one that read the corpus and found it clean. A declared flag, at
-# ---- least one declared root, and nothing read is a check that cannot move.
-if [ -n "$CONF_BYPASS" ] && [ "$BYPASS_ROOTS" -gt 0 ] && [ "$BYPASS_SEEN" -eq 0 ]; then
-  fail 10 "a bypass flag is declared and $BYPASS_ROOTS playbook records root(s) are declared, and the scan read ZERO tracked records - so this check is asserted over an empty population and would stay green with the flag in every record under them"
-fi
+# ---- THE AGGREGATE IS A NOTE AND NOTHING ELSE. Its refusal moved per-root, where `_seen_here`
+# ---- lives: a repo-wide zero can be held above zero by any one root, which is exactly how the first
+# ---- cut became a check whose only reachable failing case was its own fixture.
 [ -z "$COUNTS_FOR" ] && [ "$TOTAL_CHECKS" -gt 0 ] && note "witness drain $((TOTAL_WITNESS * 100 / TOTAL_CHECKS))% — reported, never redded, so a playbook adopts the witness a step at a time"
 
 exit "$st"

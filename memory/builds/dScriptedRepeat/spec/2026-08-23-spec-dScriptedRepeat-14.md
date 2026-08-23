@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised
 
-**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -100,6 +100,13 @@ not survive contact with the corpus.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-24 · the round-8 fold. The LOW-3 arm this unit added in round 7 **passed with its
+  own fix reverted**: both fixture builds named only their own token, so a slug collapse produced the
+  same row count as the correct grouping and only the sibling assertion discriminated. The tokens
+  cross now — build `one`'s README names `--two-flag` — so a collapse yields three rows where correct
+  grouping yields two, and both assertions were observed RED against the reverted fix. An arm added to
+  close a review finding is not landed until it has been seen to fail, per assertion and not per test
+  function. Full detail: `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md`.
 - rev-4 · 2026-08-23 · the round-7 fold. Four defects, all in the new signal, none of them able to red
   a merge — and one of them had already been baked into a shipped pin.
   **MEDIUM 1** — the two sides were dated on different clocks: `author-time` read as UTC against a

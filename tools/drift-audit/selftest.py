@@ -970,8 +970,18 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     for _b in ("one", "two"):
         _d = r6 / "docs" / "mem" / "builds" / _b / "spec"
         _d.mkdir(parents=True, exist_ok=True)
+        # THE TOKENS CROSS. Round 8's low 6: with each README naming its OWN build's token, a
+        # slug collapse merges the spec sets and still yields the same row count as the correct
+        # per-build grouping, so the count assertion passed with the fix reverted and only the
+        # slug assertion discriminated. Build `one`'s README names `--two-flag`, which ONLY
+        # build two's spec revises: a collapse produces rows here, correct grouping produces none.
+        # Build `one` names BOTH tokens, build `two` names only its own. Correct grouping: one
+        # row per build, two in total. A slug collapse grades every README against the merged
+        # spec set and yields THREE, because one's `--two-flag` line then matches too. Both
+        # assertions below discriminate; with each README naming only its own token neither did.
+        _extra = (NL_ + "It also mentions `--two-flag`." + NL_) if _b == "one" else NL_
         (_d.parent / "README.md").write_text(
-            "# build " + _b + NL_ + NL_ + "It ships `--" + _b + "-flag`." + NL_,
+            "# build " + _b + NL_ + NL_ + "It ships `--" + _b + "-flag`." + _extra,
             encoding="utf-8", newline="\n")
         (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
             NL_.join([
@@ -991,7 +1001,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     check("LOW 3: a two-segment MEMORY_ROOT still names the BUILD, not the literal `builds`",
           slugs == ["one", "two"], f"got {slugs}")
     check("LOW 3: and each README grades against its OWN spec set only",
-          nest["value"] == 2, f"got {nest['value']} rows")
+          nest["value"] == 2, f"got {nest['value']} rows: {nest['detail'][:3]}")
 
     # --- AC4: LIVENESS over the population that CAN empty. Not "did I find a build" - the tree
     # --- always has builds - but "did I find a mechanism token to compare against a revision".

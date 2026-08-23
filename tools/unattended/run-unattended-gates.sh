@@ -63,12 +63,19 @@ case "$ONLY" in
     # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
     # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
     # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
-    echo "               Budget: the sum of the BUDGET_* ceilings this file declares, currently"
-    echo "               $(( (BUDGET_gate_selftest + BUDGET_driver_selftest + BUDGET_playbook_validity_selftest + BUDGET_cross_component + BUDGET_adopter_e2e + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
+    # ---- SUMMED OVER THE DECLARED SET, never over a hand-typed list of names. Round 8's low 4: the
+    # ---- first cut derived the number but spelled five of the eight `BUDGET_*` identifiers by hand,
+    # ---- so a ninth suite would have been silently outside the figure - a hand-kept inventory of a
+    # ---- machine-enumerable set, which is the class this repo gates elsewhere.
+    _bsum=0; for _bk in ${!BUDGET_@}; do _bsum=$(( _bsum + ${!_bk} )); done
+    echo "               Budget: every BUDGET_* ceiling this file declares, summed - currently"
+    echo "               $(( (_bsum + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
     echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
     echo "               greping for a verdict then reads a kill as silence. This script reads the"
     echo "               EXIT CODE for that reason."
-    echo "  --checks     the three record/wiring checks - about 35 s, and ALSO merge-bar legs"
+    echo "  --checks     the three record/wiring checks, which are ALSO merge-bar legs. Their own"
+    echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
+    echo "               because the one that was is what round 8 filed."
     echo "  --all        both"
     echo ""
     echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"

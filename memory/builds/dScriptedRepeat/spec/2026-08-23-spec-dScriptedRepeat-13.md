@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them
 
-**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -108,6 +108,17 @@ reader does not mistake the coverage for total.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-24 · the round-8 fold. Round 7's repair of blocker 3 traded a parse defect for a
+  LIVENESS one: `_conf_key` sourced the file and then could not tell an undeclared key from a conf
+  that aborted above the assignment, and `. file || exit 9` does not catch an `exit` inside the
+  sourced file. It carries a sentinel the source must survive to print, plus a cross-check against the
+  file's own text for the `return 0` shape. The sibling leg sourced the same file in its MAIN shell,
+  so one `exit 0` ended it at rc 0 and run-gates read GATE ok — observed, and now it stops on a
+  verdict. Round 7's class fix closed word-splitting and left C-QUOTING; `GITLS` pins
+  `core.quotePath=false -z` and every consumer reads from a process substitution, because a NUL
+  stream cannot ride a heredoc. The zero-teeth refusal moved per-root, its first cut being reachable
+  only inside the kit's own fixture. Eleven arms, ten observed RED against the pre-fold code and one
+  verified by probe. Full detail: `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md`.
 - rev-4 · 2026-08-23 · the round-7 fold. Three of the round's nine defects were this unit's check 10,
   and all three are one class: a guard reporting itself armed while its population, its literal or its
   count is not what the report claims.

@@ -234,6 +234,16 @@ same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
+# ---- ROUND 8's BLOCKER 1, OTHER HALF: this leg SOURCES the conf in its main shell, so one appended
+# ---- `exit 0` in a tracked file the graded run can commit itself ends the leg at status 0 - which
+# ---- `run-gates` reads as GATE ok, with every check below unrun and nothing saying so. The probe that
+# ---- guards it is a subshell, so an abort inside it is a status rather than an exit of this process.
+reset_tree; ( printf 'exit 0
+'; cat .unattended.conf ) > .unattended.conf.new && mv .unattended.conf.new .unattended.conf
+out=$(run); rc=$?
+same "a conf that ends the shell does not end the leg at 0" "$rc" "1"
+hit "$out" "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in the main shell would end the leg at whatever status the file chose rather than at a verdict"
+
 reset_tree; rm -f .unattended.conf
 hit "$(run)" "no .unattended.conf at the repo root, and every value this leg checks is declared there"
 
@@ -1848,6 +1858,12 @@ mutate tools/unattended/check-playbook.sh '/^declared_list() {/,/^}/ s|[#][.][*]
 mutate tools/unattended/unattended.sh     '/^declared_list() {/,/^}/ s|[#][.][*][$]|ZZZZ|'
 hit "$(run)" "the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [k = [   # one per piece [see section 7]]"
 
+# ---- ROUND 8's LOW 2: a SYNTAX error makes `bash -c` exit 2, the empty-reply branch faithfully
+# ---- fills every slot with that 2, and 2 is exactly the value the multi-line REFUSAL arm
+# ---- asserts - so a harness that ran nothing reported a correct refusal. It grades the harness
+# ---- first now, and this is the arm for that.
+reset_tree; gut_parser declared_list '  ((this is not shell'
+hit "$(run)" "the multi-line refusal is graded against a harness that answered nothing, so a parser that will not parse would report the refusal this arm is looking for: specimen ["
 reset_tree; gut_parser declared_list '  ((this is not shell'
 hit "$(run)" "the extracted declared-list parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 

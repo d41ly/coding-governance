@@ -130,12 +130,10 @@ every one of 5, 6, 7 and 8 reads a value unit 4's seam resolves.
 | 10 | all of 1-9, 11 |
 | 11 | 2, 3 · and its EXISTENCE is parked for the owner |
 
-**Units 13, 14 and 15 were added after this table and are not in it.** They came out of the round-3
-through round-6 folds rather than the original decomposition, each of them a finding the fold could not
-close in place: 13 reads the declared bypass flag back out of tracked evidence records, 15 cuts the
-kit gate's process spawns and re-declares its ceiling, and 14 adds a drift signal for the class this
-paragraph is an instance of. None has a predecessor in 1-11 and none blocks another, so the table
-above stays a statement about the original nine plus 10 and 11.
+**Units 13, 14 and 15 are not in this table.** They came out of the round-3 to round-6 folds rather
+than the original decomposition, none has a predecessor in 1-11, and none blocks another — so the
+table stays a statement about the original set. 14 exists for the class this paragraph is an
+instance of.
 
 Two co-landing constraints, both from the specs' own reasoning. Units 6 and 8 land together because 6's
 piece count consumes 8's diff population and counts the wrong thing without it. Units 6 and 7 land
@@ -195,9 +193,9 @@ ids TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15
 | [TOOL-dScriptedRepeat-7 — SET-scoped checks, and where they run](spec/2026-08-20-spec-dScriptedRepeat-7.md) | CLOSED | rev-11 | 2026-08-22 |
 | [TOOL-dScriptedRepeat-8 — the output-scope refusal, and what it cannot see](spec/2026-08-20-spec-dScriptedRepeat-8.md) | SPECCED | rev-6 | 2026-08-20 |
 | [TOOL-dScriptedRepeat-9 — the `proposal` park kind and the `--propose` verb](spec/2026-08-20-spec-dScriptedRepeat-9.md) | CLOSED | rev-6 | 2026-08-21 |
-| [TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them](spec/2026-08-23-spec-dScriptedRepeat-13.md) | CLOSED | rev-4 | 2026-08-23 |
-| [TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised](spec/2026-08-23-spec-dScriptedRepeat-14.md) | CLOSED | rev-4 | 2026-08-23 |
-| [TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it](spec/2026-08-23-spec-dScriptedRepeat-15.md) | CLOSED | rev-4 | 2026-08-23 |
+| [TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them](spec/2026-08-23-spec-dScriptedRepeat-13.md) | CLOSED | rev-5 | 2026-08-23 |
+| [TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised](spec/2026-08-23-spec-dScriptedRepeat-14.md) | CLOSED | rev-5 | 2026-08-23 |
+| [TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it](spec/2026-08-23-spec-dScriptedRepeat-15.md) | CLOSED | rev-5 | 2026-08-23 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -218,6 +216,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md) | journal | TOOL-dScriptedRepeat-14 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md) | journal | TOOL-dScriptedRepeat-15 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md) | journal | TOOL-dScriptedRepeat-5 |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md) | journal | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
@@ -227,6 +226,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
 | [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
 | [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
@@ -276,6 +276,7 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md)
   - [2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md)
   - [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md)
+  - [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md)
 - **`reviews/`**
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md)
   - [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md)
@@ -286,5 +287,6 @@ Ids no `spec-audit` record has ever named: TOOL-dScriptedRepeat-10 TOOL-dScripte
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md)
   - [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md)
   - [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md)
+  - [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md)
   - [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md)
 <!-- /gen:build-docs -->

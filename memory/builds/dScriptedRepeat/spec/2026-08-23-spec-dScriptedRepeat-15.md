@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it
 
-**Status:** CLOSED · rev-4 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -106,6 +106,13 @@ beside it. AC1 accepts either, and refuses silence.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-24 · the round-8 fold. `_pbatch`'s empty-reply fill spells the batch's own rc, and
+  `bash -c` exits 2 on a syntax error — exactly the value the multi-line refusal arm asserts, so a
+  harness that ran nothing reported a correct refusal. A `_PB_DEAD` flag now carries what the fill
+  cannot express, and the arm grades the harness before the answer. `--help` summed a hand-typed list
+  of five `BUDGET_*` identifiers out of eight; it sums the declared set now, and the `--checks` wall
+  figure was dropped rather than retyped. Full detail:
+  `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md`.
 - rev-4 · 2026-08-23 · the round-7 fold. **BLOCKER 1 was in this unit's own batching and it was the
   serious one.** `_pbatch`'s misaligned-reply fallback filled every slot with the batch's own exit
   status — correct for a body that will not RUN, which exits nonzero, and wrong for a body that ran and
