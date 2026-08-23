@@ -67,7 +67,16 @@ case "$ONLY" in
     # ---- first cut derived the number but spelled five of the eight `BUDGET_*` identifiers by hand,
     # ---- so a ninth suite would have been silently outside the figure - a hand-kept inventory of a
     # ---- machine-enumerable set, which is the class this repo gates elsewhere.
-    _bsum=0; for _bk in ${!BUDGET_@}; do _bsum=$(( _bsum + ${!_bk} )); done
+    # ONLY THE NAMES THIS FILE DECLARES. Round 9's low 10: `${!BUDGET_@}` enumerates every
+    # BUDGET_-prefixed variable in the ENVIRONMENT too, so an exported `BUDGET_FOO` from the
+    # caller joined the sum - and its contents were evaluated by the arithmetic. The declared
+    # set is read from this file's own text, and a value that is not a plain integer is skipped.
+    _bsum=0
+    for _bk in $(sed -n 's/^\(BUDGET_[A-Za-z0-9_]*\)=.*/\1/p' "$0"); do
+      _bv=${!_bk}
+      case "$_bv" in *[!0-9]*|"") continue ;; esac
+      _bsum=$(( _bsum + _bv ))
+    done
     echo "               Budget: every BUDGET_* ceiling this file declares, summed - currently"
     echo "               $(( (_bsum + 59) / 60 )) minutes, dominated by the gate selftest. Do NOT wrap this"
     echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"

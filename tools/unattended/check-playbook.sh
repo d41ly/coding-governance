@@ -94,22 +94,36 @@ _conf_key() { # KEY -> the value this file's three siblings would see; rc 9 = th
   # the sourced file - that ends the subshell at the status the FILE chose, which is exactly the
   # `exit 0` shape, and the caller then reads an empty answer as "the key is undeclared". The `OK`
   # prefix is emitted after the source and nowhere else, so its absence is the abort.
+  # THE SENTINEL CARRIES SET-NESS, not just the value. Round 9's high 3: the text cross-check below
+  # read "the file spells the key and the sourced view is empty" as "the source never got there" -
+  # which is false for a key DELIBERATELY declared empty, and this kit's own shipped example declares
+  # eleven of them that way with comments reading "BLANK turns that check off". The shell already
+  # knows the difference; `${VAR+SET}` is it, and reading the file's text to guess at it was the
+  # mistake. \001 separates the marker from the value because no conf value contains it.
+  #
+  # AND THE SOURCE'S EXIT STATUS IS NOT A VERDICT - round 9's medium 4. A conf whose last line is a
+  # false `[ ... ]` or a `grep` that matched nothing returns non-zero having assigned everything
+  # correctly, and `|| exit 9` refused it. The sentinel catches the shapes that matter: `exit` and an
+  # unbound reference under `set -u` end the subshell before it is written, and a parse error or a
+  # `return 0` above the assignment leave the marker absent while the file still spells the key.
   _CK_OUT=$( unset -v "$1" 2>/dev/null
-             . ./.unattended.conf >/dev/null 2>&1 || exit 9
-             eval "printf 'OK%s' \"\${$1:-}\"" )
+             . ./.unattended.conf >/dev/null 2>&1
+             eval "printf 'OK%s\001%s' \"\${$1+SET}\" \"\${$1:-}\"" )
   case "$_CK_OUT" in
-    OK*) _CK_VAL=${_CK_OUT#OK} ;;
+    OK*) _CK_REST=${_CK_OUT#OK} ;;
     *) return 9 ;;
   esac
+  _CK_SET=${_CK_REST%%$'\001'*}
+  _CK_VAL=${_CK_REST#*$'\001'}
   # AND A CROSS-CHECK, which is never the answer and only ever a liveness verdict. `return 0` above an
   # assignment ends the SOURCE without ending the subshell, so the sentinel prints and the value is
   # still empty. If the file spells the key and the sourced view says nothing, the source did not
   # reach the assignment. This is the shape the round-7 gotcha prescribes for a second reader: keep it,
   # and red on disagreement rather than answering from it.
-  if [ -z "$_CK_VAL" ] && grep -qE "^[[:space:]]*$1=" .unattended.conf; then return 9; fi
+  if [ "$_CK_SET" != SET ] && grep -qE "^[[:space:]]*$1=" .unattended.conf; then return 9; fi
   printf '%s' "$_CK_VAL"
 }
-CONF_GLOB=$(_conf_key PLAYBOOK_GLOB); _ck=$?
+CONF_GLOB=$(_conf_key PLAYBOOK_GLOB); _ck_glob=$?; _ck=$_ck_glob
 [ "$_ck" -eq 9 ] && fail 10 "the project conf could not be sourced, so every key this leg reads resolves to the empty string and the checks that depend on them announce a cause they never verified - an abort above an assignment in .unattended.conf disarms this leg while it prints that the key is undeclared"
 # ---- BYPASS_BAN, the SECOND conf key this leg reads, and check 10 below is why. The driver refuses to
 # ---- WRITE an evidence record naming the declared bypass flag; nothing read those records back, so a
@@ -121,7 +135,12 @@ CONF_GLOB=$(_conf_key PLAYBOOK_GLOB); _ck=$?
 # ---- compares exactly two.
 CONF_BYPASS=$(_conf_key BYPASS_BAN); _ck=$?
 CONF_BYPASS=${CONF_BYPASS:-}
-CONF_SOURCE_OK=1; [ "$_ck" -eq 9 ] && CONF_SOURCE_OK=0
+# BOTH READS, not one. Round 9's low 6: this was assigned from the BYPASS_BAN read alone, so a
+# glob read that failed while the flag read succeeded left the leg printing a refusal about a conf it
+# then reported as sourced.
+CONF_SOURCE_OK=1
+[ "$_ck" -eq 9 ] && CONF_SOURCE_OK=0
+[ "$_ck_glob" -eq 9 ] && CONF_SOURCE_OK=0
 # The same refusal for the key check 10 actually reads. It is spelled twice rather than folded into
 # the helper because `fail` must run in THIS shell, and the helper's answer is its stdout.
 [ "$_ck" -eq 9 ] && fail 10 "the project conf could not be sourced, so the declared bypass flag resolves to the empty string and this leg would announce a skip it never verified - the corpus goes unread while the report says no flag is declared"
@@ -495,7 +514,16 @@ CANONEOF
       # unconditional and the multi-root shape the comment described was unreachable. A declared root
       # that enumerates nothing is a scan that cannot move, and it is THIS root's fact.
       [ -n "$COUNTS_FOR" ] || note "bypass scan - $rr: $_seen_here tracked evidence record(s) read"
-      [ "$_seen_here" -eq 0 ] && fail 10 "a playbook declares a records root and a bypass flag is declared, and that root enumerates ZERO tracked records - so the readback is asserted over an empty population under this playbook and would stay green with the flag in every record somebody later puts there: $rr in $pb"
+      # RED ONLY WHERE THE EMPTINESS IS NOT EXPLAINED BY "NOTHING HAS RUN YET". Round 9's medium 5:
+      # the first cut fired on every freshly authored playbook, because a declared records root holds
+      # nothing until a run writes into it and `BYPASS_BAN` is a required key in every adopter tree.
+      # A grain that enumerates PIECES with a root that enumerates nothing is the real defect - work
+      # exists and no evidence does - and that is the fixture-shaped case the arm actually tests.
+      # LOW 8's wording too: `_seen_here` counts records this leg could READ, so a root whose records
+      # are all unreadable reaches zero here having enumerated plenty. The message says which.
+      if [ "$_seen_here" -eq 0 ] && [ -n "$gr" ] && [ -n "$(GITLS "$gr" | tr -d '\0')" ]; then
+        fail 10 "a playbook enumerates pieces from its declared grain and NO readable record under its declared records root, with a bypass flag declared - so the readback is asserted over an empty population while the work it should cover exists: $rr in $pb"
+      fi
     fi
   fi
   if [ -n "$gr" ] && [ -z "$rr" ]; then
@@ -645,7 +673,10 @@ PBLIST
 elif [ -z "$CONF_BYPASS" ]; then
   note "bypass scan SKIPPED - no BYPASS_BAN declared in .unattended.conf, so tracked evidence records are not read back for it"
 else
-  note "bypass scan - $BYPASS_SEEN tracked evidence record(s) read across $BYPASS_ROOTS declared records root(s)"
+  # THE TWO NUMBERS COUNT DIFFERENT POPULATIONS and the line now says so: records READ is the
+  # per-root scan's total, roots DECLARED counts every distinct root including the ones no bypass
+  # flag was declared for. Round 9's low 7 - reading them as a ratio was the invited mistake.
+  note "bypass scan - $BYPASS_SEEN readable evidence record(s) read; $BYPASS_ROOTS distinct records root(s) declared across all playbooks"
 fi; }
 # ---- THE AGGREGATE IS A NOTE AND NOTHING ELSE. Its refusal moved per-root, where `_seen_here`
 # ---- lives: a repo-wide zero can be held above zero by any one root, which is exactly how the first

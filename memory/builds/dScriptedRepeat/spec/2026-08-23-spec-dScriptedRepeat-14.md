@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-14 — a build README asserting a mechanism its own spec set has since revised
 
-**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -100,6 +100,9 @@ not survive contact with the corpus.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-24 · the round-9 fold. Nothing in this unit's own surface was found. Its header date
+  was one of three left at the previous day while the rev-5 entry said otherwise — corrected. Full
+  detail: `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md`.
 - rev-5 · 2026-08-24 · the round-8 fold. The LOW-3 arm this unit added in round 7 **passed with its
   own fix reverted**: both fixture builds named only their own token, so a slug collapse produced the
   same row count as the correct grouping and only the sibling assertion discriminated. The tokens

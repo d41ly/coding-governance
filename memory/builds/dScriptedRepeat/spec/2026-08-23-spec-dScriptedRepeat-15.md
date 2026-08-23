@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it
 
-**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -106,6 +106,10 @@ beside it. AC1 accepts either, and refuses silence.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-24 · the round-9 fold. The `--help` budget summed every `BUDGET_`-prefixed variable
+  in the ENVIRONMENT, not just this file's declarations, and evaluated their contents in arithmetic.
+  It reads the names from the file's own text now and skips a non-integer. Full detail:
+  `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md`.
 - rev-5 · 2026-08-24 · the round-8 fold. `_pbatch`'s empty-reply fill spells the batch's own rc, and
   `bash -c` exits 2 on a syntax error — exactly the value the multi-line refusal arm asserts, so a
   harness that ran nothing reported a correct refusal. A `_PB_DEAD` flag now carries what the fill

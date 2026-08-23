@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them
 
-**Status:** CLOSED · rev-5 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -108,6 +108,17 @@ reader does not mistake the coverage for total.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-24 · the round-9 fold, and the LAST round. Round 8's sentinel probe stopped the
+  conf ENDING the leg and not HIJACKING it: `trap 'exit 0' EXIT` satisfies the probe and then fires
+  on the script's own exit (rc 0 with the FAILED line printed), and an appended no-op `fail()`
+  replaces the verdict recorder (rc 0, zero output). Both measured. The conf is IMPORTED through a
+  subshell now — declared keys come back as a validated NUL-delimited stream with a sentinel — so
+  nothing it defines, traps or exits crosses into the leg, which also closed the probe's missing
+  `|| exit 9` by construction. Three over-refusals the arm set could not see, because every arm staged
+  a break and none staged a legal shape: the kit's own `KEY=""` idiom read as an abort, a false
+  conditional tail read as an abort, and the zero-records refusal firing on every freshly authored
+  playbook. All three fixed, both directions re-verified, three legal-shape arms added. Full detail:
+  `build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md`.
 - rev-5 · 2026-08-24 · the round-8 fold. Round 7's repair of blocker 3 traded a parse defect for a
   LIVENESS one: `_conf_key` sourced the file and then could not tell an undeclared key from a conf
   that aborted above the assignment, and `. file || exit 9` does not catch an `exit` inside the

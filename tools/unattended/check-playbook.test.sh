@@ -408,6 +408,38 @@ grep -qF -- "bypass scan - 0 tracked" <<<"$out" \
 ( cd "$W" && git mv tools/unattended/moved-records tools/unattended/fixture-records >/dev/null 2>&1 )
 cp "$KEEP" "$F"
 
+# ---- ROUND 9: THE LEGAL SHAPES. Every arm above this line stages a BREAK, and an arm set that only
+# ---- ever stages breaks cannot see an OVER-refusal - which is how the round-8 fold shipped a leg that
+# ---- red on the kit's own documented `KEY=""` idiom and on a conf whose last line is a false test.
+# ---- These two assert GREEN, and they are the half that was missing.
+cp "$KEEP" "$F"
+( cd "$W" && printf 'PLAYBOOK_GLOB=""
+BYPASS_BAN="--no-verify"
+' > .unattended.conf )
+out=$(run)
+n=$((n+1))
+grep -qF -- "could not be sourced" <<<"$out"   && bad "a key DELIBERATELY declared empty is read as a conf that never sourced - the kit's own shipped example declares eleven keys that way"
+( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"
+BYPASS_BAN="--no-verify"
+[ 1 -eq 2 ]
+' > .unattended.conf )
+out=$(run)
+n=$((n+1))
+grep -qF -- "could not be sourced" <<<"$out"   && bad "a conf whose last line is a false conditional returns non-zero having assigned everything, and is read as an abort"
+( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"
+BYPASS_BAN="--no-verify"
+' > .unattended.conf )
+
+# ---- AND THE OTHER HALF OF MEDIUM 5's RULE: a playbook with no grain and an empty records root is a
+# ---- freshly authored one, not a defect. The arm below asserts the RED for a full grain; this one
+# ---- asserts the GREEN, and only the pair states the rule.
+cp "$KEEP" "$F"
+( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|'       -e 's|^grain         = .*|grain         = ""|' tools/unattended/playbook.fixture.md > tools/unattended/playbook.third.md    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
+n=$((n+1))
+grep -qF -- "NO readable record under its declared records root" <<<"$(run)"   && bad "a playbook whose grain enumerates nothing reds for having no evidence yet, which is the ordinary state of one nobody has run"
+( cd "$W" && git rm -q --cached -- tools/unattended/playbook.third.md >/dev/null 2>&1; rm -f tools/unattended/playbook.third.md; rmdir tools/unattended/empty-records 2>/dev/null )
+cp "$KEEP" "$F"
+
 # ---- ROUND 8's BLOCKERS, EACH WITH THE ARM THAT WOULD HAVE CAUGHT IT.
 
 # BLOCKER 1 — the conf is SOURCED now, and a source that ABORTS resolves every key to the empty
@@ -461,15 +493,21 @@ cp "$KEEP" "$F"
 # was a fixture that repointed that one root. This arm is the shape the comment always described: a
 # SECOND playbook whose declared root is empty, beside a fixture whose root is full.
 cp "$KEEP" "$F"
+# ITS GRAIN STAYS FULL. Round 9's medium 5: an empty grain beside an empty root is the ordinary
+# state of a freshly authored playbook and is a note now, not a refusal. The defect is work with
+# no evidence, which is a full grain and an empty root - and that is what this arm stages.
 ( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|' \
-      -e 's|^grain         = .*|grain         = ""|' tools/unattended/playbook.fixture.md > tools/unattended/playbook.second.md \
+      tools/unattended/playbook.fixture.md > tools/unattended/playbook.second.md \
    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
-grep -qF -- "a playbook declares a records root and a bypass flag is declared, and that root enumerates ZERO tracked records - so the readback is asserted over an empty population under this playbook and would stay green with the flag in every record somebody later puts there" <<<"$out" \
+grep -qF -- "a playbook enumerates pieces from its declared grain and NO readable record under its declared records root, with a bypass flag declared - so the readback is asserted over an empty population while the work it should cover exists" <<<"$out" \
   || bad "a second playbook whose declared records root enumerates nothing stays green, because the refusal reads an aggregate another playbook's records hold up"
+# ON THE FAILED LINE, not anywhere in the output. Round 9's low 9: the root name also appears in
+# the per-root note this same run prints, so grepping the whole output could not fail whatever
+# the refusal said - an assertion that cannot fail is not an assertion.
 n=$((n+1))
-grep -qF -- "tools/unattended/empty-records" <<<"$out" \
+grep -E "FAILED.*a playbook enumerates pieces from its de" <<<"$out" | grep -qF -- "tools/unattended/empty-records" \
   || bad "the refusal does not name the root that contributed nothing, so a reader cannot tell which of them is empty"
 ( cd "$W" && git rm -q --cached -- tools/unattended/playbook.second.md >/dev/null 2>&1; rm -f tools/unattended/playbook.second.md; rmdir tools/unattended/empty-records 2>/dev/null )
 cp "$KEEP" "$F"
@@ -521,7 +559,7 @@ cp "$KEEP" "$F"
 sed -i 's|^records       = .*|records       = "tools/unattended/empty-records"|' "$F"
 ( cd "$W" && mkdir -p tools/unattended/empty-records && printf 'x\n' > tools/unattended/empty-records/.keep && git add -A >/dev/null 2>&1 )
 n=$((n+1))
-grep -qF -- "a playbook declares a records root and a bypass flag is declared, and that root enumerates ZERO tracked records - so the readback is asserted over an empty population under this playbook and would stay green with the flag in every record somebody later puts there" <<<"$(run)" \
+grep -qF -- "a playbook enumerates pieces from its declared grain and NO readable record under its declared records root, with a bypass flag declared - so the readback is asserted over an empty population while the work it should cover exists" <<<"$(run)" \
   || bad "a declared bypass flag over a declared records root holding no records reports a healthy zero instead of redding"
 ( cd "$W" && git rm -q -r --cached tools/unattended/empty-records >/dev/null 2>&1; rm -rf tools/unattended/empty-records )
 cp "$KEEP" "$F"

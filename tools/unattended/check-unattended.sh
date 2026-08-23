@@ -107,22 +107,49 @@ MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
-# ---- THE CONF CANNOT END THIS LEG. Round 8, blocker 1: `. "$CONF"` in the MAIN shell means one
-# ---- appended `exit 0` in a tracked file - a file the graded run can commit itself - terminates this
-# ---- leg at status 0, which `run-gates` reads as GATE ok. Every check below goes unrun and nothing
-# ---- says so. The probe is a subshell, so an abort inside it is a status rather than an exit, and it
-# ---- runs BEFORE the real source. `set -e` is off here, so the `||` is the whole guard.
-# A SENTINEL THE SOURCE HAS TO SURVIVE TO PRINT. `( . "$CONF" ) || fail` does NOT catch an `exit`
-# inside the sourced file: the subshell ends at the status the FILE chose, and `exit 0` therefore
-# looks like a clean source. The `OK` is emitted after the source and nowhere else. And the leg STOPS
-# here rather than falling through, because the real source two lines down would be ended by the same
-# line and the verdict would never be printed.
-if [ "$( . "$CONF" >/dev/null 2>&1; printf OK )" != OK ]; then
-  fail 1 "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in the main shell would end the leg at whatever status the file chose rather than at a verdict: $CONF"
+# ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
+# ---- and the second is why the guard is now structural rather than a probe.
+# ----
+# ---- Round 8: `. "$CONF"` in the main shell meant one appended `exit 0` in a tracked file - a file
+# ---- the graded run can commit itself - ended the leg at status 0, which `run-gates` reads as
+# ---- GATE ok. A sentinel probe was added for it.
+# ----
+# ---- Round 9: the probe stopped the conf ENDING the leg and not HIJACKING it, because the real
+# ---- source still ran here, below `status=0` and below `fail()`. `trap 'exit 0' EXIT` satisfies the
+# ---- probe - the trap fires only when the probe subshell exits, AFTER its sentinel is written - and
+# ---- then fires again on this script's own `exit "$status"`: rc 0 with the FAILED line still
+# ---- printed. An appended no-op `fail()` is worse: it replaces the verdict recorder itself, rc 0
+# ---- with zero bytes of output, byte-indistinguishable from a clean tree.
+# ----
+# ---- So nothing from that file executes in this shell at all. It is sourced inside a subshell, and
+# ---- the DECLARED KEYS come back as a NUL-delimited name/value stream terminated by a sentinel. A
+# ---- trap, a redefined function, an `exit`, a `set -x` - none of it crosses the boundary; the worst
+# ---- a hostile conf can now do is fail to deliver the sentinel, which is a refusal.
+# ----
+# ---- THE NAMES ARE READ AS TEXT AND VALIDATED, never taken from the file's own output: only
+# ---- `[A-Z][A-Z0-9_]*` is assignable, so the stream cannot introduce a name this leg does not expect.
+# ---- A key the file spells in some other shape keeps the default initialised above, which is exactly
+# ---- what a `sed`-based reader would have done with it.
+_conf_names=$(sed -n 's/^[[:space:]]*\(export[[:space:]][[:space:]]*\)\{0,1\}\([A-Z][A-Z0-9_]*\)=.*/\2/p' "$CONF" | sort -u)
+_conf_ok=0
+while IFS= read -r -d '' _ck; do
+  IFS= read -r -d '' _cv || break
+  case "$_ck" in
+    __CONF_IMPORT_OK__) _conf_ok=1 ;;
+    [A-Z][A-Z0-9_]*) eval "$_ck=\$_cv" ;;
+  esac
+done < <( . "$CONF" >/dev/null 2>&1 || exit 9
+          for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
+          printf '__CONF_IMPORT_OK__\0\0' )
+# THE SENTINEL IS THE WHOLE VERDICT. `|| exit 9` catches a parse error and a `return 0`, both of which
+# abort the file and RETURN rather than ending the subshell - round 9's high 2, where the probe's
+# missing `|| exit 9` let a malformed `if` load only the lines above the break and hand back an empty
+# `LANDED_ANCHOR_CUTOFF`, which this leg reads as "grandfather every anchor". Its absence catches the
+# `exit` and `set -u` shapes, which end the subshell before the sentinel is written.
+if [ "$_conf_ok" != 1 ]; then
+  fail 1 "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in this shell would let that file end or take over the leg rather than be graded by it: $CONF"
   exit "$status"
 fi
-# shellcheck disable=SC1090
-. "$CONF"
 M="$MEMORY_ROOT"
 for k in LANDER BYPASS_BAN GATE_CMD WIRING_CHECK KEEPALIVE_CREATE KEEPALIVE_DELETE; do
   eval "v=\${$k}"

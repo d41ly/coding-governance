@@ -234,6 +234,21 @@ same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
+# ---- ROUND 9's BLOCKER: the conf could no longer END this leg and could still HIJACK it, because the
+# ---- real source ran in the MAIN shell below `status=0` and below `fail()`. Two shapes, and both are
+# ---- graded on the EXIT CODE rather than on output text - shape B produces no output at all, so an
+# ---- output-only assertion cannot see it. The conf is imported through a subshell now, so nothing it
+# ---- defines, traps or exits crosses into this process.
+for _hijack in "trap 'exit 0' EXIT" 'fail() { :; }'; do
+  reset_tree
+  sed -i 's/^LANDER=.*/LANDER=""/' .unattended.conf
+  printf '%s
+' "$_hijack" >> .unattended.conf
+  out=$(run); rc=$?
+  same "a conf that takes over the shell does not take over the verdict: $_hijack" "$rc" "1"
+done
+reset_tree
+
 # ---- ROUND 8's BLOCKER 1, OTHER HALF: this leg SOURCES the conf in its main shell, so one appended
 # ---- `exit 0` in a tracked file the graded run can commit itself ends the leg at status 0 - which
 # ---- `run-gates` reads as GATE ok, with every check below unrun and nothing saying so. The probe that
@@ -242,7 +257,7 @@ reset_tree; ( printf 'exit 0
 '; cat .unattended.conf ) > .unattended.conf.new && mv .unattended.conf.new .unattended.conf
 out=$(run); rc=$?
 same "a conf that ends the shell does not end the leg at 0" "$rc" "1"
-hit "$out" "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in the main shell would end the leg at whatever status the file chose rather than at a verdict"
+hit "$out" "the project conf does not source cleanly, so this leg cannot read a single declared value - and sourcing it in this shell would let that file end or take over the leg rather than be graded by it"
 
 reset_tree; rm -f .unattended.conf
 hit "$(run)" "no .unattended.conf at the repo root, and every value this leg checks is declared there"
