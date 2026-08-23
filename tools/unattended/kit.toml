@@ -107,7 +107,20 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
 why = "a key ABSENT from the conf reds both the adopter check arm and the kit gate leg. But the shipped conf example copied verbatim renders its angle-bracket placeholder text as literal prose and passes EVERY check, because the placeholder detector greps the brace shape only — so this hole is half-silent and the probe is the only thing that sees that half."
-discharge = { command = ["bash", "-c", "! grep -qE '<[a-z-]+>' .claude/skills/unattended/SKILL.md"] }
+# NARROWED, and re-SUBJECTED, by TOOL-dScrubbedConduit-1 S4. The old probe grepped `<[a-z-]+>` over
+# the RENDERED SKILL.md — a file whose own template ships 25 `<slug>`, 6 `<name>` and more as
+# DOCUMENTED SYNTAX. It therefore failed for every adopter no matter how correctly the conf was
+# filled, including in this repo, where it has never passed. A hole nobody can discharge is worse
+# than the half-silence it was added to catch, and because `exempt_leg` suppresses the
+# red-after-install criterion for any entry with an undischarged blocks_gate hole, it was also
+# silently exempting all three unattended gate legs in every adopter tree.
+#
+# The subject is now the CONF, not the render: a rendered SKILL.md cannot tell a conf-injected
+# placeholder from the template's own syntax without matching literals. The predicate is "a value
+# wrapped in angle brackets is still a placeholder", which is general rather than a literal match —
+# and it catches KEEPALIVE_INTERVAL, whose shipped value `<e.g. every 10 minutes (…)>` does NOT match
+# `<[a-z-]+>` and was undetectable under the old probe.
+discharge = { command = ["bash", "-c", "! grep -qE '^KEEPALIVE_(CREATE|DELETE|INTERVAL)=\"<.*>\"' .unattended.conf"] }
 
 [[hole]]
 id = "directives-floor"

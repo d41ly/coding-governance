@@ -8,8 +8,40 @@
 # auto-wires an unset core.hooksPath. (The WIRE-INTO-PROJECT.md copy-install path DOES reintroduce the
 # drift; a hash-of-tracked-vs-installed signal there is a scoped follow-up, not handled here.)
 set -u
-top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-cd "$top" || exit 0
+
+# ---- S2 (TOOL-dScrubbedConduit-1): SCRUB THE ENVIRONMENT GIT INJECTS INTO THIS HOOK ---------------
+# Git exports GIT_DIR whenever the repository is reached through a `.git` FILE rather than a `.git`
+# directory — a LINKED WORKTREE as much as a submodule. A plain top-level clone exports nothing, which
+# is why this went unseen here for so long while an adopter hit it head-on.
+#
+# The damage is done by any leg that creates a scratch repo: `git init` with GIT_DIR set does not make
+# a repo at the cwd, it RE-INITIALISES the repo GIT_DIR names and re-derives core.bare from whether
+# that path has a worktree of its own. For a worktree or submodule gitdir the answer is no, core.bare
+# flips to true, and every later git call in the owning tree answers "must be run in a work tree".
+# Two of this repo's own bar legs `git init` a scratch repo.
+#
+# GIT_EXEC_PATH is deliberately NOT scrubbed: it locates git's own helpers, and clearing it breaks git
+# rather than protecting it.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES       GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX
+
+# ---- S5: A HOOK THAT CANNOT RESOLVE ITS REPO HAS NOT ESTABLISHED THAT THE PUSH IS SAFE -----------
+# This was `|| exit 0`, and exit 0 from a pre-push hook means ALLOW. Measured end to end: with
+# core.bare flipped, `git rev-parse --show-toplevel` exits 128, the early-exit fired, and a push
+# LANDED ON THE REMOTE at rc=0 with the merge bar never having run. A gate that fails open is worse
+# than no gate, because the green is reported.
+if ! top=$(git rev-parse --show-toplevel 2>/dev/null); then
+  echo "pre-push: REFUSING — cannot resolve this repository's work tree, so the merge bar cannot run" >&2
+  echo "  and this hook cannot establish that the push is safe. This used to exit 0 (ALLOW)." >&2
+  echo "  Most likely cause: core.bare=true in the shared config, which a leg that ran 'git init'" >&2
+  echo "  under an inherited GIT_DIR can set. Check:" >&2
+  echo "    git config --file \"\$(git rev-parse --git-common-dir)/config\" --get core.bare" >&2
+  echo "  Deliberate override, as always: git push --no-verify" >&2
+  exit 1
+fi
+if ! cd "$top"; then
+  echo "pre-push: REFUSING — cannot enter the work tree at '$top'." >&2
+  exit 1
+fi
 
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
