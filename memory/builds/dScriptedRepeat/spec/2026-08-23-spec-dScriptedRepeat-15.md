@@ -1,6 +1,6 @@
 # TOOL-dScriptedRepeat-15 — the kit's self-test suite becomes affordable, and every number here carries the command that produced it
 
-**Status:** SPECCED · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -106,6 +106,24 @@ beside it. AC1 accepts either, and refuses silence.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-23 · CLOSED. S1 ran and named a lever S2 then took alone; S3 and S4 were NOT taken,
+  and that is a decision with numbers behind it rather than an omission. **What S1 found:** the leg is
+  not compute-bound — `real 14.4s user 0.33s sys 0.62s` — and the wait is process creation, because
+  an on-access antivirus scanner fronts every `exec` on this node at 0.019-0.039 s per spawn. The leg
+  made 469 spawns per invocation and the suite makes 243 invocations, so the suite's unit of cost is
+  ~114,000 process creations. **What S2 took:** the spawn count, 469 → 220, counted from an execution
+  trace in both directions. Three loops that ran a grep or a `bash -c` per (item, file) now read each
+  file once. **Why S3/S4 were declined:** with the invocation at ~5.2 s, scoping the arms that qualify
+  saves ~320 s more, needs 243 call-site edits, and carries exactly the vacuity risk AC6 was written
+  for — and it does not change the outcome, because §4's arithmetic already put AC1 on the re-declare
+  branch either way. S2 says "the lever the profile names, and only that one"; the profile named
+  subprocess count. **AC6 is therefore moot** and is recorded as not-run rather than as passed, since
+  the classification it tests is not applied anywhere. **AC1 took its second branch:** the ceiling is
+  re-declared at 1800 s in `tools/unattended/run-unattended-gates.sh` with the derivation beside it.
+  **AC5 was met over a 17-case corpus, 16 of them red**, byte-identical in output and exit status.
+  **What is NOT observed and is written here rather than left to be discovered:** the suite has not
+  been run end to end at this commit, because the owner stopped these suites and that instruction
+  stands. The 1342 s figure is derived from two measured terms, not timed.
 - rev-2 · 2026-08-23 · the round-1 spec audit's BLOCKER 2, BLOCKER 3 and three highs. The scoping rule
   is rewritten to classify on ABSENCE rather than on the message an arm names, because 109 of the
   suite's arms assert absence and every one of them passes vacuously when its region is scoped away.

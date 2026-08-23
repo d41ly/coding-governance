@@ -68,17 +68,40 @@ esac
 BUDGET_kit_gate=120           # measured 28 s
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
-BUDGET_gate_selftest=900      # measured ~3200 s — OVER, deliberately: see the note below
+BUDGET_gate_selftest=1800     # derived 1342 s after TOOL-dScriptedRepeat-15 — see the note below
 BUDGET_driver_selftest=900    # measured 841 s
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
 #
-# THE GATE SELFTEST IS OVER ITS BUDGET ON PURPOSE, and this line is the only reason that is not a lie
-# by omission: it takes roughly 3200 s against a 900 s ceiling, because each of its ~80 arms stages a
-# break and re-runs the whole 23 s leg to ask about one check. `--only 28` and `--skip 28` now exist
-# on that leg and halve the per-arm cost; converting the arms to use them is TOOL-dScriptedRepeat-15
-# and is NOT done. Until it is, this runner reds on that suite by design, and the red says which.
+# THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
+# spec named as one of its two acceptable outcomes, and this note is the reason beside the number.
+#
+# WHAT THE COST ACTUALLY IS, measured on node d 2026-08-23 rather than reasoned about. The leg is not
+# compute-bound and never was: one invocation inside the suite's own fixture reported `real 14.4s
+# user 0.33s sys 0.62s`, so 93% of it is spent waiting rather than working. What it waits on is
+# PROCESS CREATION - an on-access antivirus scanner sits in front of every exec on this node, and one
+# spawn costs 0.019-0.039 s here against roughly a millisecond on a machine without one. The leg made
+# 469 of them per invocation and the suite invokes it 243 times, so the suite's real unit of cost is
+# about 114,000 process creations. 469 x 0.022 s = 10.3 s against a 10.7 s measured invocation, which
+# is the whole of it.
+#
+# WHAT THE UNIT DID: cut the spawns, which is the only term in that product this repo owns. Three
+# loops that ran a grep or a `bash -c` per (item, file) now read each file once - 469 spawns per
+# invocation became 220, counted both ways from an execution trace rather than estimated. The suite's
+# last recorded sharded pair was 846.0 + 2013.7 = 2859.7 s; scaled by 220/469 that is 1342 s, and
+# 243 x 5.2 s + fixture overhead lands in the same place from the other direction.
+#
+# WHY 1800 AND NOT 1342: the same reading taken under ambient load on this node ran 2.4x slower, and a
+# ceiling that reds on someone else's antivirus scan is a ceiling that gets ignored. 1800 has headroom
+# for that and still reds long before the 3200 s this suite used to cost.
+#
+# WHAT IS NOT OBSERVED, said plainly: nobody has run the suite end to end at this commit. The owner
+# stopped these suites after two days of re-runs and the instruction stands, so the 1342 s is DERIVED
+# from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
+# The equivalence that replaces it is 17 staged breaks, 16 of them red, whose output and exit status
+# are byte-identical before and after the unit. To settle it, one command:
+#   bash tools/unattended/run-unattended-gates.sh --selftests
 
 st=0
 ran=0
