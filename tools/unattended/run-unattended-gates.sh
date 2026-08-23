@@ -99,7 +99,7 @@ BUDGET_adopter_e2e=120        # measured 7 s
 # WHAT IS NOT OBSERVED, said plainly: nobody has run the suite end to end at this commit. The owner
 # stopped these suites after two days of re-runs and the instruction stands, so the 1342 s is DERIVED
 # from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
-# The equivalence that replaces it is 17 staged breaks, 16 of them red, whose output and exit status
+# The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
 # are byte-identical before and after the unit. To settle it, one command:
 #   bash tools/unattended/run-unattended-gates.sh --selftests
 

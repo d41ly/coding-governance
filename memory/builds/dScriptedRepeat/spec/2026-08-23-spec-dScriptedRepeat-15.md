@@ -120,7 +120,7 @@ beside it. AC1 accepts either, and refuses silence.
   subprocess count. **AC6 is therefore moot** and is recorded as not-run rather than as passed, since
   the classification it tests is not applied anywhere. **AC1 took its second branch:** the ceiling is
   re-declared at 1800 s in `tools/unattended/run-unattended-gates.sh` with the derivation beside it.
-  **AC5 was met over a 17-case corpus, 16 of them red**, byte-identical in output and exit status.
+  **AC5 was met over a 19-case corpus, 18 of them red**, byte-identical in output and exit status.
   **What is NOT observed and is written here rather than left to be discovered:** the suite has not
   been run end to end at this commit, because the owner stopped these suites and that instruction
   stands. The 1342 s figure is derived from two measured terms, not timed.

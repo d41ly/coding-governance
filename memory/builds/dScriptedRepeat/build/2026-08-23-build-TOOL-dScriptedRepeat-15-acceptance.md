@@ -29,14 +29,15 @@ cut and the per-arm scoping was declined, with the arithmetic for declining it r
 - **AC4** — observed, both directions. With `declared_list` gutted, `--only 28` exits 1 with 10 lines
   and `--skip 28` exits 0 with none; with the driver's `--plan` header renamed, `--only 28` exits 0
   and `--skip 28` exits 1. Each scope reds on its own region's break and is blind to the other's.
-- **AC5** — `tools/unattended/check-unattended.sh` at HEAD against this working copy: **17 staged
-  breaks, 16 of them RED**, each run through the pre-unit checker and the
+- **AC5** — `tools/unattended/check-unattended.sh` at HEAD against this working copy: **19 staged
+  breaks, 18 of them RED**, each run through the pre-unit checker and the
   post-unit checker over the same fixture tree: stdout+stderr and exit status byte-identical in every
-  case. The corpus covers both shapes of broken parser (an emptied body and a syntax error — the two
-  the batched harness had to keep indistinguishable from the unbatched one), a drifted parser pair, a
-  removed refusal, a lost comment strip, a lost comma strip, an emptied verb set, a renamed verb
-  header, a commented-out key reader, an ad-hoc key pipeline, a flipped sha pin, an unpinned wrapper,
-  a dropped call-site status, and an unenumerable call site.
+  case. It covers all THREE shapes of broken parser — an emptied body, a syntax error, and one
+  returning a MULTI-LINE answer, which is what misaligns a record-per-specimen protocol and is the
+  shape the batching had to keep indistinguishable from the unbatched form. Also: a drifted parser
+  pair, a removed refusal, a lost comment strip, a lost comma strip, an emptied verb set, a renamed
+  verb header, a commented-out key reader, an ad-hoc key pipeline, a flipped sha pin, an unpinned
+  wrapper, a dropped call-site status, and an unenumerable call site.
 - **AC6** — **NOT RUN, and not passed.** It tests that a deliberately wrong scope on a `miss` or
   `same` arm still reds. No arm carries a scope, because S3 and S4 were declined, so there is no
   classification to mis-apply and the criterion has no subject. Recorded as moot in the spec's rev-3
