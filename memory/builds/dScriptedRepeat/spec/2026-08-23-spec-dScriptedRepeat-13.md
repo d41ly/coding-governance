@@ -1,6 +1,6 @@
-# TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, not just the run-state file
+# TOOL-dScriptedRepeat-13 — the bypass-flag guard covers the evidence records too, in the leg that can see them
 
-**Status:** SPECCED · rev-1 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-23 · node d · Tier-2 · base abd0f026 · streams tooling
 
 ## 1. Goal
 
@@ -15,64 +15,81 @@ gate that did not cover it. That was honest and it is not the fix.
 
 ## 2. Scope (IN)
 
-- **S1 — check 11's population widens to the declared `records` roots.** The leg already parses every
-  tracked playbook's declaration block, so the roots are derivable where it stands; nothing new is
-  declared and no conf key is added.
-- **S2 — the refusal names which KIND of file it found the flag in.** A run-state file and an evidence
-  record are different states with different remedies, and one message for both sends a reader to the
-  wrong file — this kit's own recorded class.
-- **S3 — the derivation is LIVE, not a second copy.** The roots come from the same parse the census
-  uses. A hand-kept second list of records roots would be the two-answers-to-one-question class in the
-  gate written to close a hole.
-- **S4 — the message that was softened in round 2 goes back to citing the gate**, because after this
-  unit the gate covers what it claims. That sentence is currently true only because it stopped making
-  the claim.
+- **S1 — THE SCAN LANDS IN `check-playbook.sh`, not in check 11.** Rev-1 specced it into
+  `check-unattended.sh`, which has no `GITLS`, no `declared_scalar` and enumerates no playbooks —
+  measured, all three are zero there and non-zero in `check-playbook.sh`. Building rev-1 would have
+  inlined a THIRD copy of the parser, which check 28 compares pairwise and structurally cannot police.
+  The evidence-record scan is a NEW check in the leg that already enumerates playbooks, parses their
+  `records` root and lists the records under it.
+- **S2 — check 11 is untouched.** Two populations, two checks, each where its machinery already is.
+  Run-state files stay with check 11 in `check-unattended.sh`; evidence records get the new check.
+- **S3 — `check-playbook.sh` learns `BYPASS_BAN`.** It reads `.unattended.conf` for `PLAYBOOK_GLOB`
+  only today, so this is a real new read and it is declared here rather than discovered in the diff.
+  Absent or empty means the scan does not run, which is the existing convention.
+- **S4 — the population is the one the census already built.** The roots come from the same parse the
+  census uses and the records from the same `GITLS`. Not a second enumeration.
+- **S5 — the widened pass reports its GRADED population**, in the shape `check-playbook.sh` already
+  uses for its census note, so a scan that reached zero records says so instead of printing nothing.
+- **S6 — the message softened in round 2 goes back to citing a gate**, now naming the new check rather
+  than check 11. That sentence is currently true only because it stopped making a claim.
 
 ## 3. Non-goals (OUT)
 
 - **Not widening to arbitrary tracked files.** The population is the DECLARED roots. A check that
-  greps the tree for a flag string would red on this spec, on the backlog row, and on the driver's own
+  greps the tree for a flag string would red on this spec, on the backlog row and on the driver's own
   guard — the containment-tested-one-way shape, inverted.
-- **Not checking untracked records.** Check 11 is about what LANDED. An untracked file is not evidence
-  and is not covered, and the check's header says so.
-- **Not touching the driver's write-time guard.** It is real, it is armed, and it is the reason a
-  landed record with the flag in it should be impossible rather than merely detected.
+- **Not checking untracked records.** This is about what LANDED.
+- **Not touching the driver's write-time guard**, which is real and armed.
+- **Not reading the records at a pinned BASE.** The driver derives its population from the run's BASE;
+  this check derives from HEAD, because its question is what is in the tree NOW rather than what that
+  run was authorized against. Stated because the two populations differ and a reader will assume they
+  do not.
 
 ## 4. Design
 
-Check 11 runs per run-state file today. It gains a second pass over `GITLS "$rr/*.md"` for each
-declared root `$rr`, which is the same enumeration the census reader already performs — so the cost is
-one more grep per record on a population the leg has already listed.
+A new check in `check-playbook.sh`, inside the existing per-playbook loop where `$rr` (the declared
+records root) is already in scope. For each tracked record under `$rr`, grep for `BYPASS_BAN`. The
+enumeration is the census's own `GITLS "$rr/*.md"`.
 
-`BYPASS_BAN` is a declared conf value and may be empty; the existing `[ -n "$BYPASS_BAN" ]` guard
-covers the new pass unchanged, so a project that declares no flag gets no new work and no new red.
+`BYPASS_BAN` comes from `.unattended.conf` through the same reader that already resolves
+`PLAYBOOK_GLOB`; the new key is optional and its absence disables the scan.
+
+**KNOWN GAP, stated rather than discovered.** `--record-set` takes a caller-supplied records root, so
+a record written outside any declared root is unreachable by this check. That is the write-time
+guard's job and it holds there; this check covers what a declared root contains. Recorded so the next
+reader does not mistake the coverage for total.
 
 ## 5. Production-readiness checklist
 
-- **Security** — this is a security check being widened. The threat is a landed record advertising a
-  bypass that discarded the bar; the write-time guard prevents it and this detects it after the fact,
-  which is the pair the charter asks for.
-- **Observability** — the refusal names the file and the kind. Nothing else changes.
-- **Perf** — one grep per tracked evidence record, over a list the leg already builds. Measured before
-  landing; if it moves the leg's 13 s reading at all, that is reported rather than absorbed.
-- **Migration** — none. A repo with no `recipe` playbooks has no declared roots and sees no change.
+- **Security** — a security check being widened. The write-time guard prevents; this detects what
+  landed. Neither alone is the pair the charter asks for.
+- **Observability** — S5's graded-population line, and a refusal naming the file.
+- **Perf** — one grep per tracked evidence record over a list the leg already builds. Measured against
+  `check-playbook.sh`'s own reading, not the sibling leg's, and reported whatever it is.
+- **Migration** — none. No declared roots, no new work.
 
 ## 6. Acceptance criteria
 
-- **AC1** — a tracked per-piece record containing the declared bypass flag reds check 11 under
-  `bash tools/unattended/check-unattended.sh`, and the refusal names that file and says it is an
-  evidence record. Armed in `tools/unattended/check-unattended.test.sh`.
+- **AC1** — a tracked per-piece record containing the declared bypass flag reds under
+  `bash tools/unattended/check-playbook.sh`, and the refusal names that file and calls it an evidence
+  record. Armed in `tools/unattended/check-playbook.test.sh`.
 - **AC2** — a tracked set-scoped record containing it reds the same way, armed in
-  `tools/unattended/check-unattended.test.sh`.
-- **AC3** — a run-state file containing it still reds with the ORIGINAL message, unchanged; the
-  existing arm in `tools/unattended/check-unattended.test.sh` passes untouched.
-- **AC4** — a repo declaring no `BYPASS_BAN` in `.unattended.conf` reds nothing new, and a playbook
-  declaring no `records` root contributes no population.
-- **AC5** — the roots the check reads are the ones the census reads: a fixture whose playbook declares
-  a root reachable only through the declaration block is covered by `check-unattended.sh`, proving the
-  derivation is live rather than a path convention re-implemented.
-- **AC6** — the round-2 softening is reverted in `tools/unattended/unattended.sh` and the message
-  cites check 11 again, with an arm that reds if the citation returns while the coverage does not.
+  `tools/unattended/check-playbook.test.sh`.
+- **AC3** — a run-state file containing it still reds through check 11 in
+  `bash tools/unattended/check-unattended.sh` with its ORIGINAL message, and that leg's arms pass
+  untouched.
+- **AC4** — with `BYPASS_BAN` absent from `.unattended.conf` the scan does not run AND says so, so an
+  empty population is distinguishable from a clean one. The `run-unattended-gates.sh --checks` output
+  carries the graded count either way.
+- **AC5** — the roots this check reads are the ones the census reads: an arm in
+  `tools/unattended/check-playbook.test.sh` feeds one fixture playbook to both and reds unless the two
+  return an IDENTICAL root list. Sharing is asserted, not liveness.
+- **AC6** — the `seed()` fixture in `tools/unattended/check-playbook.test.sh` carries a tracked
+  playbook with a declaration block AND a tracked evidence record under its declared root, committed
+  into the scratch repo. Without this AC1/AC2/AC5 grade an empty population.
+- **AC7** — the round-2 softening is reverted in `tools/unattended/unattended.sh` and the message
+  cites the new check, with an arm in `tools/unattended/unattended.test.sh` that reds if the citation
+  returns while the coverage does not.
 
 ## 7. Gates
 
@@ -80,18 +97,32 @@ covers the new pass unchanged, so a project that declares no flag gets no new wo
 
 ## 8. Open questions
 
-- **F1 — should the widened check also cover a records root declared by an ABORTED run's playbook?**
-  RESOLVED (agent, 2026-08-23, delegated): yes. The flag is about what landed in the tree, and an
-  aborted run's records are still tracked files. Scoping to live runs would make the check's coverage
-  depend on a phase the flag has nothing to do with.
+- **F1 — should this cover a records root declared by an ABORTED run's playbook?** RESOLVED (agent,
+  2026-08-23, delegated): yes. The flag is about what landed; an aborted run's records are still
+  tracked files, and scoping to live runs would make coverage depend on a phase the flag is unrelated
+  to.
+- **F2 — a new check number in `check-playbook.sh`, or an arm inside an existing one?** RESOLVED
+  (agent, 2026-08-23, delegated): a new number. Its refusal is about a different subject than any
+  existing check there, and folding it into one would make a single check's message ambiguous about
+  which population failed — the class round 4 filed against the separator guards.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-23 · the round-1 spec audit's BLOCKER 1 and three highs. The scan moves to
+  `check-playbook.sh` because rev-1 specced it into a file with none of the machinery it claimed to
+  reuse: `GITLS`, `declared_scalar` and the playbook enumeration are all zero in
+  `check-unattended.sh` and non-zero in `check-playbook.sh`, so rev-1's §10 "Nothing new is
+  introduced" was false and building it would have inlined a third parser copy past a pairwise gate.
+  S3 now declares the new conf read. AC5 asserts SHARING rather than liveness, AC6 gives the fixture
+  a playbook to find, and AC4 refuses an empty population silently passing. The HEAD-versus-BASE
+  population difference and the caller-supplied-root gap are both stated rather than left to be
+  discovered.
 - rev-1 · 2026-08-23 · drafted, from round 2's better repair which this build deferred as another
-  build's check with its own arms. That reason expires now: the check and the arms are both in this
-  kit and this session has been editing them all day.
+  build's check with its own arms.
 
 ## 10. Reuse audit
 
-`GITLS` and the declaration parse both exist and are used by the census. The bypass guard's message
-grammar exists in the driver. Nothing new is introduced.
+`GITLS`, the declaration parse and `$PLAYBOOKS` all exist in `check-playbook.sh` and are used by the
+census; this check reuses them in place. The conf reader there exists and gains one key. The bypass
+guard's message grammar exists in the driver. Verified by counting each in both legs rather than
+assumed — which is what rev-1 got wrong.
