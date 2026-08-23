@@ -136,6 +136,11 @@ not survive contact with the corpus.
   instruction to seed it from the adopter's own first report. This repo pins it at its own measured
   31.
 
+  **Left-shifted after the build, from M8's own checklist:** the token join was a bare substring, so
+  `--check` matched a revision naming only `--check-format` — this repo's `id-matched-as-a-substring`
+  class. It requires the backticked form now, with an arm and an observed staged RED. The corpus reads
+  identically either way, which is luck rather than equivalence.
+
   **AC6:** `python tools/drift-audit/drift_report.py` ran 4.00 s and 5.16 s before, 6.43 s and 6.50 s
   after — about +2 s, spent on `git blame` for the 8 READMEs that carry a candidate. No budget is
   asserted, because none is declared in the tree.

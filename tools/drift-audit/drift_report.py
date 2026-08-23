@@ -946,7 +946,12 @@ def build_readme_mechanism_drift(ctx) -> dict:
                 if not _MECH_RE.match(tok):
                     continue
                 tok_pop += 1
-                named = [r for r in revs if tok in r[2]]
+                # THE BACKTICKED FORM, never a bare substring. `--check` is a prefix of
+                # `--check-format` and every id ending in a 1-up sequence is a prefix of nine others -
+                # this repo's own `id-matched-as-a-substring` class, and a revision log spells its
+                # mechanisms in backticks anyway. Measured: identical rows on this corpus either way,
+                # which is luck rather than equivalence.
+                named = [r for r in revs if ("`" + tok + "`") in r[2]]
                 if named:
                     cand.append((i, tok, named))
         if not cand:

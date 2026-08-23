@@ -63,6 +63,24 @@ review-me pointer, never a proven contradiction. Three narrowings took it from 4
 `LANDED` is vocabulary; the lowercase form forbids a dot so `drift_report.py` is a file), and the
 line's own blame clock rather than the file's.
 
+## What M8's bug-class checklist found in this unit's own diff
+
+`python tools/memory-tree/gotchas.py --for-diff abd0f026..HEAD` selected 16 classes. One of them was
+live here: **`id-matched-as-a-substring`**. The predicate joined a README token to a revision entry
+with `tok in rtext`, so `--check` matches a revision naming only `--check-format`, and every id ending
+in a 1-up sequence is a prefix of nine others. It now requires the BACKTICKED form, which is how a
+revision log spells a mechanism anyway.
+
+Measured before and after over the whole corpus: **identical, 31 rows over 8 builds either way**. That
+is luck rather than equivalence, and the class is left-shifted into an arm rather than into this
+sentence — a fixture revision log whose LATEST entry names `--counts-format` while an earlier one
+names `--counts`, asserting the row cites the earlier. **Staged RED observed:** restoring the bare
+substring makes it fail and name `2026-01-09`; the backticked form makes it cite `2026-01-05`.
+
+Writing that arm also caught a fixture defect worth naming: the first draft's rev-3 prose spelled
+`` `--counts` `` inside its own explanation, so the fixture matched itself and the arm failed for a
+reason that had nothing to do with the code. A staged break has to be clean of the thing it stages.
+
 ## One thing found in passing and not fixed
 
 `live_backlog_rows_per_shard` carries no pin, so it reads `out of tolerance (report only)` at 140 —

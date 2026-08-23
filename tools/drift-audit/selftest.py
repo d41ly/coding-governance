@@ -845,6 +845,10 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
         "  which is not what it did.",
         "- rev-1 - 2025-12-01 - `--stable` introduced, and `LANDED` and `drift_report.py` named here",
         "  so the shape filters below have an input rather than an absence to pass over.",
+        "- rev-3 - 2026-01-09 - `--counts-format` is a DIFFERENT flag that merely STARTS WITH one the",
+        "  README names. It is the latest entry here, so a bare-substring match would make it the",
+        "  revision this row cites - and the row must cite rev-2 instead. This wording deliberately",
+        "  never spells the shorter flag, because a fixture that mentions it grades its own prose.",
         "",
     ]
     (r / SPEC_DIR_FOR_FIXTURE / "2026-01-01-spec-aDrift-1.md").write_text(
@@ -864,6 +868,11 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     check("a filename is not a mechanism, so drift_report.py is not a hit",
           "drift_report.py" not in toks)
     check("the generated region is not authored prose", "--generated-only" not in toks)
+    # `--counts-format` is dated LATEST, so a bare-substring match would name rev-3 as the revision.
+    # The row must still cite rev-2, which is the only entry that names `--counts` itself.
+    check("a longer flag that merely starts with the token is not a match",
+          bool(got["detail"]) and got["detail"][0]["revised"] == "2026-01-05",
+          f"got {got['detail'][:1]}")
     check("the probe is LIVE with tokens and revisions present", got["live"] is True)
     # REPORT ONLY, for the reason F2 settled: `drift-audit records` is an unguarded merge-bar leg and
     # this predicate reports a POINTER, not a proven contradiction.
