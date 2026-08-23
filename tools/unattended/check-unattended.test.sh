@@ -80,11 +80,15 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
-# NO DISPATCH_GRADING. `TOOL-dUnstalledConvoy-23` retired that key when the comparison became a
+# NO DISPATCH_GRADING. TOOL-dUnstalledConvoy-23 retired that key when the comparison became a
 # REPORT that always runs: a report has no failure to gate, and a key that only silences output makes
-# a check dark without saying so. Check 22 joins the protocol's key table against the declared conf,
-# so a fixture still setting it declares a key the protocol no longer documents - which is how this
+# a check dark without saying so. Check 22 joins the protocol key table against the declared conf, so
+# a fixture still setting it declares a key the protocol no longer documents - which is how this
 # surfaced, on a merge where one side removed the key and the other still seeded it.
+#
+# NO BACKTICKS IN THIS BLOCK. It sits inside an UNQUOTED heredoc, so a backticked identifier is
+# COMMAND SUBSTITUTION and the fixture writes a conf with a shell error in it. This comment cost a
+# 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 EOF
@@ -327,7 +331,7 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
 # case arm, so it never enters the derived population and exempting it removed nothing. The
 # assertion below caught that on its first run, which is the entire reason it exists.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes'
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -1966,7 +1970,10 @@ reset_tree; mutate tools/unattended/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^
 hit "$(run)" "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set"
 
 # ---- 28c. The WRAPPER's own pin first, which round 5's cut could not see at all.
-reset_tree; mutate tools/unattended/lib-unattended.sh 's|^GIT() { git -c core.useReplaceRefs=false|GIT() { git|'
+# THE CONSTANT, not the wrapper line. The merged library spells the pin as `-c "$GIT_PIN_REPLACE"`,
+# so a break aimed at the old literal no-ops - and it is the constant that check 28c now follows, so
+# breaking it is both the reachable mutation and the one that exercises the indirection.
+reset_tree; mutate tools/unattended/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REPLACE=core.useReplaceRefs=true|'
 hit "$(run)" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
 
 # ...a bare unpinned read on a verb the first widening did not carry.

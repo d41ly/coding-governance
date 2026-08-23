@@ -58,6 +58,26 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 DRIVER="$HERE/unattended.sh"
 CONF="$ROOT/.unattended.conf"
 
+# ---- SCOPE, so a caller can pay for the question it is asking. This leg is ~23 s and check 28 is
+# ---- half of that, measured on node d 2026-08-23: 22.7 s whole, 11.7 s with the 28 region cut off.
+# ---- The self-test stages a break and re-runs this script ONCE PER ARM - eighty times - and most
+# ---- of those arms are asking about one check while paying for twenty-eight.
+# ----
+# ---- TWO DIRECTIONS, because the arms need both: `--only 28` runs the shared setup and the 28
+# ---- region alone, `--skip 28` runs everything else. Anything else is REFUSED rather than
+# ---- silently ignored - a scope argument nobody honours is a caller who thinks they scoped.
+# ----
+# ---- WHAT THIS DOES NOT DO: scope to an arbitrary check. The checks between 1 and 27 share state
+# ---- freely - a later one reads a count an earlier one computed - so they are one unit until that
+# ---- is untangled, and pretending otherwise would hand back wrong verdicts rather than slow ones.
+SCOPE=""
+case "${1:-}" in
+  "")            ;;
+  --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
+  --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
+esac
+
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
 
@@ -76,6 +96,7 @@ region()   { awk -v o="$2" -v c="$3" '
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 # <<< kickoff_region
 
+if [ "$SCOPE" != only28 ]; then
 # ---------------------------------------------------------------------------------- 1: the conf
 if [ ! -f "$CONF" ]; then
   fail 1 "no .unattended.conf at the repo root, and every value this leg checks is declared there"
@@ -1809,6 +1830,9 @@ fi
 # ----
 # ---- WHAT IT DOES NOT CHECK: whether the shared parse is CORRECT. Two identical wrong copies pass.
 # ---- The template arm below is what checks the answer.
+fi
+
+if [ "$SCOPE" != skip28 ]; then
 dl_a=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$DRIVER")
 dl_b=$(awk '/^declared_list\(\) \{/{f=1} f{print} f&&/^\}/{exit}' "$HERE/check-playbook.sh" 2>/dev/null)
 # THE SCALAR SIBLING, on the same terms. Round 3, HIGH 6: `declared_list` was consolidated and
@@ -2217,6 +2241,8 @@ TPLSEOF
     [ "$tpl_list" -gt 0 ] || fail 28 "the shipped template's declaration block yielded no LIST key this check could parse, so the list half of the template assertion covered nothing and a parser that answers nothing for every array would pass it: $tpl"
     [ "$tpl_scalar" -gt 0 ] || fail 28 "the shipped template's declaration block yielded no SCALAR key this check could parse, so the scalar half of the template assertion covered nothing and a comment leak on every scalar key would pass it: $tpl"
   fi
+fi
+
 fi
 
 exit "$status"

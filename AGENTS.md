@@ -519,10 +519,8 @@ nothing. None of those figures is authored anywhere: `<git-dir>/gate-ledger.tsv`
 leg with its own seconds, so the per-leg table is a `sort -rn` away and cannot go stale in prose. Read
 it there. The build record that first measured this is reachable from `memory/LIVE.md` like any other.
 
-The prior reading on node `a` 2026-08-21 — 393 s wall against a 3085 s leg-sum, longest leg 336 s,
-and 432 s for the same bar with the dispatch hint removed — is kept because it is the controlled pair
-and the only cold/warm comparison on record. It predates both the growth measured above and the
-removal, so it describes a bar that no longer exists. Every leg's output is persisted
+The only cold/warm pair on record is node `a`, 2026-08-21: 393 s warm against 432 s with the dispatch
+hint removed. It describes a bar that no longer exists. Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
 only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.

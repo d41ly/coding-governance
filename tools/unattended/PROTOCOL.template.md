@@ -462,6 +462,11 @@ what preserves the strong claim wherever the strong claim is available.
   round before; at the exit every blocker still standing is promoted to a unit rather than parked. It
   refuses a verdict outside the closed set, a missing subject or count, and a round on a subject whose
   loop has already ended.
+- `--version` — prints the kit's own version and exits, touching no record. It is here because it is
+  DECLARED, and a declared verb an agent cannot find described is a verb they will not use to answer
+  the one question this kit cannot answer for them: which build of it they are talking to. It takes
+  no slug and no run, so it is the one verb safe to call before a run exists.
+
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the keepalive is still

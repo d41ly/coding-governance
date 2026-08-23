@@ -56,22 +56,59 @@ case "$ONLY" in
   *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
 esac
 
+# ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
+# ---- check nobody runs, and this kit proved it: its suites were pulled off the merge bar for costing
+# ---- 68% of it, and the compensating check that replaced them then took an hour, so it was re-run
+# ---- across two days and repeatedly abandoned. Slowness that only annoys never gets fixed. Slowness
+# ---- that REDS gets either fixed or re-declared with a reason, and both of those are progress.
+# ----
+# ---- These are CEILINGS in seconds, generous against the 2026-08-23 readings on node d and paired
+# ---- with them so a raise is visibly a raise. Raising one is fine; raising one silently is not, which
+# ---- is the same rule this repo applies to every other pin it owns.
+BUDGET_kit_gate=120           # measured 28 s
+BUDGET_playbook_validity_gate=120   # measured 13 s
+BUDGET_skill_wiring=60        # measured 0 s
+BUDGET_gate_selftest=900      # measured ~3200 s — OVER, deliberately: see the note below
+BUDGET_driver_selftest=900    # measured 841 s
+BUDGET_playbook_validity_selftest=300  # measured 140 s
+BUDGET_cross_component=300    # measured 92 s
+BUDGET_adopter_e2e=120        # measured 7 s
+#
+# THE GATE SELFTEST IS OVER ITS BUDGET ON PURPOSE, and this line is the only reason that is not a lie
+# by omission: it takes roughly 3200 s against a 900 s ceiling, because each of its ~80 arms stages a
+# break and re-runs the whole 23 s leg to ask about one check. `--only 28` and `--skip 28` now exist
+# on that leg and halve the per-arm cost; converting the arms to use them is TOOL-dScriptedRepeat-15
+# and is NOT done. Until it is, this runner reds on that suite by design, and the red says which.
+
 st=0
 ran=0
+over=0
 run_one() { # label · kind · argv...
   local label=$1 kind=$2; shift 2
   case "$ONLY" in ''|"$kind") ;; *) return 0 ;; esac
   ran=$((ran + 1))
-  local s e out rc
+  local s e out rc took bkey budget
   s=$(date +%s)
   out=$("$@" 2>&1); rc=$?
   e=$(date +%s)
+  took=$((e - s))
+  bkey="BUDGET_$(printf '%s' "$label" | tr ' -' '__')"
+  eval "budget=\${$bkey:-}"
   if [ "$rc" -eq 0 ]; then
-    printf 'ok    %-30s %5ss  %s\n' "$label" "$((e - s))" "$(printf '%s\n' "$out" | grep -E '^PASS' | tail -1)"
+    printf 'ok    %-30s %5ss  %s\n' "$label" "$took" "$(printf '%s\n' "$out" | grep -E '^PASS' | tail -1)"
   else
     st=1
-    printf 'FAIL  %-30s %5ss  (exit %s)\n' "$label" "$((e - s))" "$rc"
+    printf 'FAIL  %-30s %5ss  (exit %s)\n' "$label" "$took" "$rc"
     printf '%s\n' "$out" | grep -E '^FAIL|FAILED' | head -6 | sed 's/^/        /'
+  fi
+  # A MISSING BUDGET IS ITSELF A FAILURE. A suite added here without one would be exempt from the rule
+  # by the act of arriving, which is how every population in this repo has previously gone quiet.
+  if [ -z "$budget" ]; then
+    st=1; over=$((over + 1))
+    printf '      OVER BUDGET  %s declares no ceiling, so its cost is unbounded by construction\n' "$label"
+  elif [ "$took" -gt "$budget" ]; then
+    st=1; over=$((over + 1))
+    printf '      OVER BUDGET  %s took %ss against a declared %ss ceiling — fix it or raise the ceiling with a reason beside it\n' "$label" "$took" "$budget"
   fi
 }
 
@@ -95,6 +132,8 @@ fi
 echo "----"
 if [ "$st" -eq 0 ]; then
   echo "unattended gates GREEN — $ran ran on demand; no self-test here runs on the merge bar"
+elif [ "$over" -gt 0 ]; then
+  echo "unattended gates RED — $ran ran on demand, $over over budget"
 else
   echo "unattended gates RED — $ran ran on demand"
 fi

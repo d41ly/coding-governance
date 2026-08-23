@@ -573,6 +573,7 @@ discards the entire bar the authorization leaned on, and the gate greps your run
 ## Mark it landed — the run is not finished until you do
 
 ```bash
+bash {{KIT_DIR}}/unattended.sh --version   # which build of this kit am I talking to
 bash {{KIT_DIR}}/unattended.sh --landed <slug>
 ```
 

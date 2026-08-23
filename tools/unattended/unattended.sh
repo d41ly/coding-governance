@@ -83,10 +83,10 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch"
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase"
+VERBS_INLINE="--plan --phase --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -219,7 +219,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 HALT_CODE=""
-RV_SUBJECT=""; RV_VERDICT=""; RV_BLOCKERS=""
+RV_SUBJECT=""; RV_BLOCKERS=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -3737,7 +3737,7 @@ SIBS
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
-RP_PATH=""; RP_LEG=""; RP_VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
+RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -3771,7 +3771,11 @@ while [ $# -gt 0 ]; do
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
-    --verdict)      RP_VERDICT="${2:-}"; shift 2 || shift ;;
+    # ONE ARM FOR ONE FLAG. Both sides of the merge added a `--verdict` case arm - one for the record
+    # verbs, one for `--review` - and a `case` takes the first match, so the second was dead and the
+    # review verb received an empty verdict from a flag the operator had spelled correctly. A flag is
+    # a name; a name gets one variable, and the verbs that read it read the same one.
+    --verdict)      VERDICT="${2:-}"; shift 2 || shift ;;
     --records-root) RP_ROOT="${2:-}"; shift 2 || shift ;;
     --playbook-sha) RP_PBSHA="${2:-}"; shift 2 || shift ;;
     --run)          RP_RUN="${2:-}"; shift 2 || shift ;;
@@ -3791,7 +3795,6 @@ while [ $# -gt 0 ]; do
     --code)         HALT_CODE="${2:-}"; shift 2 || shift ;;
     --review)       VERB=--review; SLUG="${2:-}"; shift 2 || shift ;;
     --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
-    --verdict)      RV_VERDICT="${2:-}"; shift 2 || shift ;;
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
@@ -3829,10 +3832,10 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$RV_VERDICT" "$RV_BLOCKERS" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
-  --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$RP_VERDICT" ;;
-  --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$RP_VERDICT" ;;
+  --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
+  --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
 esac
