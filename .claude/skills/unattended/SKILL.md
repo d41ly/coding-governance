@@ -463,6 +463,43 @@ the build README's roster region against the tracked specs, so a planned unit no
 is reported as MISSING rather than silently omitted — and a roster whose markers are malformed is
 a named refusal rather than a complete-looking list.
 
+## Record each review round, and let the loop end itself
+
+A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
+not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
+would only move the stall earlier. Record every round and the verb tells you what the loop is doing:
+
+```bash
+bash tools/unattended/unattended.sh --review <slug> --subject <id-or-slug> --verdict <TOKEN> --blockers <N>
+```
+
+`--subject` is the spec document for a spec audit and the BUILD SLUG for the closing diff review.
+`--verdict` is one of exactly three: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`. `--blockers` is the
+confirmed-blocker count for THIS round, as a plain integer.
+
+It answers with one of four states, and the state is what you act on:
+
+- **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
+- **CONVERGED** — zero blockers. The loop is done for that subject.
+- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
+  becomes a UNIT of this build: specced at its tier, built, closed. Not parked, not waived, and not
+  re-reviewed — a promoted unit is audited as a SPEC, which is what makes promotion terminate.
+- **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
+  That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
+  record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
+
+Strictly smaller, not merely different: a sequence that oscillates 2, 1, 2 satisfies "the count
+changed" forever. A subject whose loop already ended does not take another round.
+
+## Which kit version is installed
+
+```bash
+bash tools/unattended/unattended.sh --version
+```
+
+It prints the engine identity and exits. Worth one line here because it is a dispatched entry point
+like any other, and a verb no surface names is a verb the documentation join treats as missing.
+
 ## Resume
 
 ```bash
@@ -483,12 +520,27 @@ can observe them: that you reaped the keepalive (`CronDelete`), and that every p
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
 gate says so wherever it reports them.
 
+**One item has NO override, and this is where you will meet it.** `authorization-reachable` cannot be
+overridden, waived or attested around: an override on the authorization check IS the authorization
+check, so the verb refuses the pair rather than recording it. If a close blocks on that item, the
+answer is never a flag — it is that this run cannot show what authorized it, and the remedy is
+outside the close.
+
 Write each with the VERB, never by editing the record:
 
 ```bash
 bash tools/unattended/unattended.sh --attest <slug> --item keepalive-reaped
 bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced
+bash tools/unattended/unattended.sh --attest <slug> --item parked-decisions-surfaced --value "yes, <n> surfaced"
 ```
+
+**The parked-decisions attestation may carry a COUNT, and if you give one it is CHECKED.** `--close`
+refuses unless that integer equals the number of `surfaced`-class parked lines in the record, so the
+claim stops being unfalsifiable — "I surfaced them" becomes "I surfaced four, and the record holds
+four". Omit the number and the older, weaker form still stands; it is not a machine verdict either
+way, and the gate says so wherever it reports it. Two things the count does NOT include: a `history`
+kind, which the owner need not adjudicate, and the overrides this same `--close` is about to write,
+because the Definition of Done is evaluated before they land.
 
 It derives the record KEY, which is not always the item name, and stages what it wrote. It refuses a
 machine-checked item, so it cannot be used to certify anything the driver checks itself.
@@ -534,7 +586,13 @@ ref, and a commit is its own ancestor.
 Two facts land in the record and you do not write either: `landed-anchor`, which says `remote` or
 `local`, and `unpushed-at-landing`, which counts what local main carries that the remote does not.
 Read the second before you believe the first — a local landing sits on top of whatever else is on
-that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here. Then commit the record it writes and land that commit too; until it is
+that branch. What the weaker anchor does not buy is protocol section 9, and it is not repeated here.
+
+**AND DO NOT COMMIT BETWEEN THE PUSH AND THIS VERB.** Where the project declares a lander marker, the
+lander writes the commit it pushed and this verb requires the marker to name HEAD **exactly**. That is
+equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
+refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
+marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
 committed, every later run still counts yours as live and the bar reds on the second one.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
@@ -543,11 +601,17 @@ Definition of Done was evaluated without evaluating it.
 ## If it cannot finish
 
 ```bash
-bash tools/unattended/unattended.sh --abort <slug> --reason "<what stopped it, and what you refused to decide>"
+bash tools/unattended/unattended.sh --abort <slug> --code <halt-code> --reason "<what stopped it, and what you refused to decide>"
 ```
 
-The reason is required and lands in the parked region, because an abort with no recorded reason is
-indistinguishable from a run that simply stopped. You still owe both attestations first — reap the
+**Both are required, and they are for different readers.** The reason is prose for the owner and
+lands in the parked region, because an abort with no recorded reason is indistinguishable from a run
+that simply stopped. The CODE is the field everything else joins on — the status line, the resume
+path and the gate leg all read it by key — because a single `ABORTED` terminal says a run stopped and
+never says why. It is validated against a closed vocabulary, and the refusal names the legal set, so
+you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
+closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
+better than a vocabulary with a hole in it. You still owe both attestations first — reap the
 keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
 leaves exactly the same decisions unseen. An abort does not merge and does not push.
 

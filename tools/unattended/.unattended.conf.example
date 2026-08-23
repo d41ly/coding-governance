@@ -59,7 +59,12 @@ KICKOFF_EXITS=""
 # that key has a recorded failure where ONE malformed spelling disarms BOTH its pins while the
 # conf still looks configured, and a third field would make one typo disarm three.
 DIRECTIVES_EXTRA=""
-DIRECTIVES_FLOOR="15"
+# The project-owned ROW SOURCE for anything DIRECTIVES_EXTRA declares: a repo-relative markdown
+# file carrying rows in the Skill table shape. Undeclared is the EMPTY SET, which is what every
+# adopter has today. Without it an extra handle is waivable by a verb and invisible to the agent,
+# and a project cannot fix that by editing the Skill, which is rendered from a kit template.
+DIRECTIVES_EXTRA_TABLE=""
+DIRECTIVES_FLOOR="13"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
 # resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`
@@ -98,6 +103,22 @@ UNITS_REGION_CUTOFF=""
 PHASES_EXTRA=""
 DOD_EXTRA=""
 
+# The HALT VOCABULARY. A run that stops records WHY in a token,
+# validated against the kit core set plus whatever a project appends here. The floor is
+# shrink-only and REQUIRED: undeclared or malformed is a refusal, not a defaulted value,
+# because a pin that quietly defaults is a pin nobody set.
+HALT_CODES_EXTRA=""
+HALT_FLOOR="7"
+
+# The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
+# `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in
+# each half and cannot be written at all from a linked worktree, where `.git` is a FILE. When
+# declared, the lander writes it on a successful push and `--landed` reads it — the only verb that
+# runs after the push, so the only one that can observe it. What a COMPLIANT LANDER must write: a line naming the commit it pushed. Identity,
+# not existence — a bare touched file is satisfied by any previous landing. Leave it EMPTY and
+# the observation is simply not asked for; an adopter who has not adapted their lander is not
+# wedged by a key they have never heard of.
+LANDER_MARKER=""
 # The two halves of the build method's condition 3, for a concurrently dispatched pass. A pass may not
 # declare a write under SHARED_RECORDS; a GENERATED_INDEXES entry is refused only TOGETHER WITH its
 # generator, because a generated index alone is what every ordinary pass touches. The run-state file

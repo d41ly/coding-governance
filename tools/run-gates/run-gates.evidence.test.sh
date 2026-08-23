@@ -178,7 +178,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
       && git config user.name rec-test ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho hello\nexit 0\n' > "$REC_T/fx/a.sh"
   printf '#!/usr/bin/env bash\necho boom\nexit 3\n'  > "$REC_T/fx/red.sh"
-  printf '#!/usr/bin/env bash\nsleep 6\nexit 0\n'    > "$REC_T/fx/slow.sh"
+  printf '#!/usr/bin/env bash\nsleep 60\nexit 0\n'    > "$REC_T/fx/slow.sh"
   printf '#!/usr/bin/env bash\necho "https://u:p@example.com"\nexit 0\n' > "$REC_T/fx/leak.sh"
   printf '%s\n' '[' \
     '  {"name": "one", "argv": ["bash", "fx/a.sh"]},' \
@@ -224,14 +224,22 @@ fi
 rec_done
 
 # --- a hard kill leaves a header and NO verdict ---------------------------------------------------
-# THE KILL LANDS AT 5s AGAINST A 6s LEG, and the margin is deliberate on both sides. It was 2s,
-# which measured 2136 ms to write the header on this platform — so the arm was grading the
-# runner's STARTUP BUDGET, and reported the crash case as unreadable whenever startup lost a
-# race it was never meant to be in. Too wide and the leg finishes first and there is no crash to
-# observe; the leg sleeps 6s, so 5s is mid-run with room on both sides.
+# THE KILL LANDS AT 20s AGAINST A 60s LEG, and the margin is wide on purpose. It was 2s, which
+# measured 2136 ms to write the header on this platform, so the arm was grading the runner's STARTUP
+# BUDGET; widening to 5s against a 6s leg fixed that STANDALONE and left a one-second window that
+# ambient load closes. Measured 2026-08-21: this arm passed alone and failed inside the concurrent
+# 90-leg bar on the same tree, twice, because startup under that load exceeds 5s — the same defect
+# the 2s note describes, one order of magnitude up.
+#
+# Widening the KILL alone would let the leg finish first and leave no crash to observe, so the leg
+# sleeps 60s and the kill lands at 20s: any startup under 20s is mid-run with room on both sides.
+# The file's own better idiom is at the sweep arm below — "THE EDIT WAITS FOR A FACT, NOT A CLOCK" —
+# and it is not used here because `timeout -s KILL` is what makes the descendants die; polling for
+# the header and then killing a backgrounded pipeline leaks the nested legs, which is the orphan
+# class this repo catalogues under bounded-through-a-pipe-is-unbounded.
 rec_repo
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 5 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL 20 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
 d=$(rec_dir)
 [ -f "$d/header" ] && ok "the header survived a hard kill" \
                    || nope "no header after a hard kill — the crash case is unreadable"
@@ -366,7 +374,7 @@ rec_done
 rec_repo
 for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; done
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 5 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL 20 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
 left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
 [ "$left" -ge 9 ] && ok "a run KILLED before its verdict swept nothing (the sweep is after the verdict)" \
                   || nope "a killed run swept $((9-left)) record(s) — the sweep is running before the verdict"

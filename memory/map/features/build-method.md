@@ -70,10 +70,11 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 
 ## Gaps
 
-- **Eleven lines of headroom** (239 of 250; 16,680 of 20,480 B), re-measured after units 15 and 16
-  spent three. The earlier fourteen came after the displacement moved M5's taxonomy, M11's list, three
-  judgment asides and M4's lens catalogue into `tools/memory-tree/README.md`. The line axis still
-  binds before the byte axis, so M1's displacement rule stays load-bearing.
+- **Headroom is MEASURED, not recorded here.** The pair that used to sit in this bullet was wrong in
+  the measurement and in the caps it named, because both move and a number typed beside them does
+  not. The caps are declared on the method's own line 8; compare with
+  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. The line axis binds before the
+  byte axis, so M1's displacement rule stays load-bearing.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
@@ -83,9 +84,11 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   `verb_resume`'s echo, still guarded by `[ -f "$M/guides/BUILD-METHOD.md" ]`, and leg check 16's
   arm B, which stays silent when the carrier is absent BY DESIGN: the leg grades the tree, the driver
   grades the run.
-- **`M4` has no harness.** `tier2-review.js` reviews DIFFS and cannot be pointed at a document, so
-  the spec audit is hand-run under the review protocol's caps. The most token-expensive obligation
-  the method names is its least instrumented step.
+- **`M4` has no harness, and the method says so again.** `tier2-review.js` reviews DIFFS and cannot
+  be pointed at a document, so the spec audit is hand-run under the review protocol's caps. The rule
+  was briefly deleted from M4 rather than displaced, leaving this bullet describing a line that was
+  not there; it is restored in the method. The most token-expensive obligation the method names is
+  its least instrumented step.
 
 ## Reuse affordance
 

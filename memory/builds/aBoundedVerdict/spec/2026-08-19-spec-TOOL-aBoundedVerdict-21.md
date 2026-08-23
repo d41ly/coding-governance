@@ -1,6 +1,6 @@
 # TOOL-aBoundedVerdict-21 — the landing push is bounded too
 
-**Status:** SPECCED · rev-1 · 2026-08-19 · node c · Tier-2 · base 098bebd9 · streams tooling
+**Status:** WONTDO · rev-3 · 2026-08-21 · node c · Tier-2 · base 098bebd9 · streams tooling
 
 ## 1. Goal
 
@@ -168,6 +168,9 @@ path this unit wraps) · `python tools/memory-tree/check-arms.py` ·
 
 ## 8. Open questions
 
+none - every fork below is RESOLVED in place, each naming the resolver and the authority.
+This line is the machine-read one; the bullets carry the reasoning.
+
 - **F1 — what is the push bound, in seconds?** It must exceed a full bar run plus an object transfer:
   measured 335s serial and ~95s at width 8 on node `a`, with a recorded timeout case above ten
   minutes on a polluted `TMPDIR`. **Recommendation: 900s**, generous by design, on the reasoning
@@ -181,6 +184,15 @@ path this unit wraps) · `python tools/memory-tree/check-arms.py` ·
   history. **Recommendation: a FACT**, on the same shape argument `TOOL-aBoundedVerdict-2` used for the
   halt code — and it moves whatever ordinal the region's pin currently states, read at build time
   rather than spelled here, for the reason that spec's rev-6 records.
+  RESOLVED (agent, 2026-08-20, delegated): a FACT. Mechanism-only on its own terms, and the
+  feature-rich survivor: S5's resume path must READ "did I attempt the push" by key, and a parked
+  line is append-only prose no reader can join on — the same argument `TOOL-aBoundedVerdict-5` F1
+  used to keep an id OUT of a parked line. The build README's cross-unit rule said the authored
+  region's fact pin moves EXACTLY ONCE in this build; that rule predates this unit, which the
+  owner's resolution of `TOOL-aBoundedVerdict-13` F3 created, and the README is corrected in the
+  same commit rather than left disagreeing with a spec. The rule's real content — a fact is added
+  only for a per-run SINGLETON, and whoever moves the pin moves every spelling of it — is unchanged
+  and this unit is bound by it. The pin is READ at build time, never spelled here.
 
 - **F3 — OWNER, not delegated. Should a bounded-out push with an unknown outcome be surfaced
   immediately rather than left for the resume path?** S5 makes a resumed run safe, but an unattended
@@ -188,6 +200,12 @@ path this unit wraps) · `python tools/memory-tree/check-arms.py` ·
   the one state worth waking someone for. Options: leave it to resume, as specced; or treat it as a
   notify-and-stop. The options differ in whether this unit gains an owner-notification mechanism at
   all, so it goes up.
+  RESOLVED (agent, 2026-08-20, delegated): left to the resume path, AS SPECCED — and by VETO
+  rather than by choice. Only one option survives M3's vetoes — notify-and-stop needs an owner-notification
+  mechanism this kit does not have, which is veto 2, a new public surface. Declining to WIDEN scope
+  is not exercising the scope authority a run does not hold; taking the notify option would have
+  been. **The vetoed option is PARKED to the owner** in this run's run-state file and reaches them
+  at the wrap-up, so a fork answered by a veto is not a fork quietly dropped.
 
 ## 9. Revision log
 
@@ -198,6 +216,28 @@ path this unit wraps) · `python tools/memory-tree/check-arms.py` ·
   deadline creates, which the run-state file cannot express today and which makes the naive one-line
   version strictly worse than the hang it replaces. F1 and F2 resolved under the delegated fork rule;
   F3 raised to the owner because it would add an owner-notification mechanism this kit does not have.
+
+- rev-2 · 2026-08-20 · M3 fork sweep, before any code. F2 RESOLVED as recommended, a FACT, on S5's
+  grounds rather than on shape alone — the resume path READS it by key and a parked line cannot be
+  joined on. That resolution contradicts the build README's "the fact pin moves exactly once" rule,
+  which was written before this unit existed; the README is corrected in the same commit and the
+  rule's real content is kept. **F3 was the owner's and is resolved by VETO, not by an agent picking
+  between the owner's options:** notify-and-stop adds an owner-notification mechanism this kit does
+  not have, veto 2 discards it, and one option survives. The vetoed option is parked to the owner so
+  the turn this run did not take is still theirs. §8's first non-blank line is now the machine-legal
+  `none` form, which is what lets this unit reach terminal at all.
+
+- rev-3 · 2026-08-21 · **WONTDO, and the reason is an M3 veto rather than a judgement about
+  value.** This unit would bound the landing push the way `TOOL-aBoundedVerdict-13` bounds every
+  observation. The mechanism fork has no survivor the run may pick: the lander is MANDATED and
+  project-declared, so bounding its push means either editing a command the project owns or
+  wrapping it in the kit, and choosing between those changes what an adopter's `LANDER` means.
+  M3 reserves that to the owner, and an unattended run may not resolve a fork by preferring one
+  option. Parked with both options and this reason; the spec stays for whoever answers it.
+
+  Recorded as WONTDO rather than left SPECCED because a non-terminal unit blocks `build-complete`,
+  and blocking the close on a question nobody is present to answer is the stall this whole build
+  exists to remove. WONTDO says the run declined it; it does not say the idea was rejected.
 
 ## 10. Reuse audit
 

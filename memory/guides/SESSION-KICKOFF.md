@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-23T03:12:18+03:00 @ 5f9968b3c2aff125579316fd276a4e0e99e4f7f9
+last-audit: 2026-08-22T09:15:00+03:00 @ 64a34e12b8fabaa5991674f5418dec6bf2e69a84
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: bef3071d209891cc770d6b7d255a0ea689304a9a
+last-body-change: cd06e0acade1d969b87bc5545b1ca4e33a4f091b
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -89,6 +89,15 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
 
+- **Before starting work inside a kit, check whether another node is already rewriting it.**
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
+  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
+  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
+  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
+  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
+  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
+  the cheap check is a `git log` at kickoff rather than a merge at landing.
+
 ### Pointer map (load the row(s) the task touches)
 
 | Area / stream | Governing memory | First code entrypoints |
@@ -163,7 +172,10 @@ Evicted to the catalogue, and reachable from it: `gate-green-by-accident-on-gene
 path) · `absence-assertion-over-whole-file-text.md` (a new gate predicate run for the first time
 against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc-escape-reaches-the-regex.md`
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
-composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs).
+composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
+`arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
+runs to the first interpolation, so lengthening a message always strands it and shortening never
+does — hit three times in one file in one session).
 
 - A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
   `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both

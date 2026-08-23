@@ -15,7 +15,7 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 22 checks (1-12, 21 and 22 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 23 checks (1-12, 21 and 22 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; blank pins turn the unit off. |
@@ -135,10 +135,12 @@ see the "Codebase-map interop" section the HYGIENE template ships. No conf keys 
 
 ## The build method's displaced sections
 
-`memory/guides/BUILD-METHOD.md` holds itself to ≤20 KB and ≤250 lines — a LOCAL constraint and NOT rule 6's,
-which gives a guide far more and no longer caps lines outside `guides/` at all. It is re-read WHOLE at every
-pass boundary, so it grows only by displacement. These two sections live here because they are EXPLANATION: nothing
-below changes what an agent does next, and the rules that do stayed in the method.
+`memory/guides/BUILD-METHOD.md` holds itself to a budget DECLARED ON ITS OWN LINE 8 - a LOCAL constraint and NOT
+rule 6's, which gives a guide far more and no longer caps lines outside `guides/` at all. Read the pair there;
+both figures were retyped here once and both were stale within a build, which is the argument against retyping
+them. It is re-read WHOLE at every pass boundary, so it grows only by displacement. The sections below live here
+because they are EXPLANATION: nothing below changes what an agent does next, and the rules that do stayed in the
+method.
 
 ### M5 — the probe-failure taxonomy
 
@@ -158,6 +160,21 @@ did instead.
 against source before building on it, and say in §10 where a record and the source disagreed. This one is not
 theoretical: a recall pass during `TOOL-aWrittenMethod-1` returned four hits asserting the parity render runs
 LIVE to SHIPPED, which the source contradicts.
+
+### M6 — why the disjointness clause 3 is worded as it is
+
+The method's parallelism test names `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, and a
+generated index TOGETHER WITH its generator. That last pairing is the whole point of the clause, and it replaced a
+form that could not fail.
+
+The vacuous form was "neither touches a shared mutable record". Every pass touches some shared record, so read
+strictly it forbade all parallelism and read loosely it forbade none — and which reading applied was decided by
+whoever wanted an answer. A test whose verdict depends on how generously you read it is not a test.
+
+Naming the files fixes the first half. The generator pairing fixes the second, which is the case nobody predicts:
+two passes can write provably disjoint paths and still collide, because one edits a generated index while the
+other edits the generator that renders it. The second pass regenerates and silently reverts the first. Neither
+wrote the other's path, so clauses 1 and 2 both pass, and the loss surfaces later as a mystery diff.
 
 ### The method's pointer table
 

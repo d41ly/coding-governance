@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.27   # gov:kit memory-tree@2.27 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.29   # gov:kit memory-tree@2.29 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -24,6 +24,8 @@ TOMBSTONE_ROOTS=""     # old tree root(s) a migrated project must keep empty (e.
 SPEC_FORMAT_CUTOFF=""  # date; specs whose filename date >= this must follow TEMPLATE-SPEC.md (check 12); blank = skip
 STREAMS_CUTOFF=""      # date; specs whose filename date >= this MUST carry `· streams <value>` (check 12); blank = never required
 SPEC_WITNESS_CUTOFF="" # date; specs whose filename date >= this MUST give every acceptance bullet a backticked witness (check 12); blank = never required
+FORK_MARK_CUTOFF=""   # date; at/after it a terminal spec's §8 SECTION must carry the SHAPED resolution mark somewhere (check 12) - not per ITEM, see TEMPLATE-SPEC; blank = never required
+REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST carry one `## Verdict: <member>` line from the closed set (check 22); blank = never required
 # The FOURTH cutoff, and the only one that ships WITH a value. Its three siblings above are rules
 # that can be absent, so blank turns each of them off; this one SELECTS between two section canons
 # and check 12 must pick one for every spec it grades. An empty string compares earlier than every
@@ -594,6 +596,62 @@ if [ "$STAGED" = 0 ] || printf '%s\n' "$STAGED_MD" | grep -q .; then
 $drift"; fi
 fi
 
+# 22 — THE REVIEW VERDICT VOCABULARY. A review record has to say what it concluded, in a token
+# something can read, and until this check existed it did not have to say anything at all.
+#
+# MEASURED over the tracked corpus when this landed: 111 review records, 66 carrying a `## Verdict:`
+# line and 45 carrying none, across 17 DISTINCT values — of which only `BLOCKED` and
+# `CLEAN WITH FIXES` are in the closed set, and `CLEAN`, the one token the build method names as the
+# review loop's only exit, occurs ZERO times. The rest are free prose: "FIX THE BLOCKER BEFORE
+# LANDING", "SHIP WITH FIXES", "CHANGES REQUESTED". So the vocabulary the method states in prose was
+# written consistently by nobody and read by nothing.
+#
+# WHY THIS IS ITS OWN CHECK NUMBER. Check 5 is a recording-FILENAME grammar and check 21 asks which
+# spec a record is evidence ABOUT; hanging a verdict assertion off either would make a structural
+# check read as a semantic one to everybody who did not write it. A new CHECK is the cheap option
+# here — the leg's name carries no count and `tools/gate-legs.json` does not move — so the honest
+# home costs an arms floor and an entry in the hygiene doc.
+#
+# FORWARD-ONLY, by a dated cutoff set strictly ahead of every committed record. 45 records carry no
+# verdict at all and rewriting a landed review is against this tree's own rule, so the cutoff carries
+# the corpus rather than a retrofit. Same instrument, and the same reason, as check 12's fork mark.
+if [ -n "$REVIEW_VERDICT_CUTOFF" ]; then
+  c22_sel=$(printf '%s
+' "$FILES" | grep -E "^$M/builds/[^/]+/reviews/" || true)
+  pop_guard 22 "no review record under $M/builds/*/reviews/" \
+    "$(printf '%s
+' "$c22_sel" | grep -c . || true)" "$PRE_BINDABLE"
+  bad22=$(printf '%s
+' "$c22_sel" | awk -v cut="$REVIEW_VERDICT_CUTOFF" '
+    $0 == "" { next }
+    {
+      f = $0
+      fbase = f; sub(/^.*\//, "", fbase)
+      fdate = ""
+      if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH)
+      if (fdate == "" || fdate < cut) next
+      nv = 0; bad = ""
+      while ((getline line < f) > 0) {
+        sub(/\r$/, "", line)
+        if (line ~ /^## Verdict:/) {
+          nv++
+          v = line; sub(/^## Verdict:[[:space:]]*/, "", v)
+          gsub(/[[:space:]]+$/, "", v)
+          # The CLOSED set, and nothing outside it. A trailing tally is not a member: the whole point
+          # is a token a machine can compare, and "BLOCKED - 2 blockers, 2 highs" is prose wearing a
+          # token as a prefix. Counts belong in the body, where 17 spellings do no harm.
+          if (v != "CLEAN" && v != "CLEAN WITH FIXES" && v != "BLOCKED") bad = v
+        }
+      }
+      close(f)
+      if (nv == 0) print "  " f " (no `## Verdict:` line, so the record states no conclusion anything can read)"
+      else if (nv > 1) print "  " f " (" nv " `## Verdict:` lines, so which one is the record\047s conclusion is a guess)"
+      else if (bad != "") print "  " f " (verdict outside the closed set CLEAN / CLEAN WITH FIXES / BLOCKED: " bad ")"
+    }')
+  [ -n "$bad22" ] && fail 22 "review records at/after REVIEW_VERDICT_CUTOFF whose verdict line is missing, duplicated, or outside the closed set:
+$bad22"
+fi
+
 # 21 — every record names the spec it is evidence about. Delegates the
 # PARSE to the sibling generator, which already reads every record's bytes; the shell owns the four
 # fail branches, because `check-arms.py` discovers its population from tracked shell and cannot see a
@@ -710,7 +768,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -849,7 +907,10 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       q8 = ""; items = 0; resolved = 0
       for (i = 2; i <= q - 1; i++) {
         if (rng[i] ~ /^[[:space:]]*$/) continue
-        if (q8 == "") q8 = rng[i]
+        if (q8 == "") { q8 = rng[i]; gsub(/^[[:space:]]+|[[:space:]]+$/, "", q8); q8 = tolower(q8) }  # TRIMMED AND LOWERCASED, matching the sibling reader byte for byte: it lowercases
+        # its own opening line, so testing the RAW line here made `None`, `NONE` and a lowercase
+        # `n/a` a none-form to one reader and not to the other - and the planning verb then routed
+        # a run at READY on a spec this gate reds.
         # An ITEM is a list bullet OR a `###` sub-head; prose between items is commentary and is not
         # graded. TEMPLATE-SPEC sanctions both forms in as many words — "One fork per bullet or ###
         # sub-head" — and only the bullet was ever counted, so a spec that used sub-heads scored zero
@@ -861,9 +922,65 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
           if (rng[i] ~ /RESOLVED/) resolved++
         }
       }
+      # ---- THE TIGHTENED READER, gated by FORK_MARK_CUTOFF. Two defects in the loose form above,
+      # ---- both live when this was written. First, `rng[i] ~ /RESOLVED/` grades only the line an
+      # ---- item OPENS with, and in this corpus the mark almost never sits there — measured over the
+      # ---- tracked specs, 246 of 339 items carry a conforming mark and nearly all of them carry it on
+      # ---- a continuation line — so `items == resolved` was reachable mainly through the first-line
+      # ---- escape beside it. Second, ANY first line starting `none` ended the question, so an
+      # ---- unresolved bullet below a none form was invisible; and any prose containing the word
+      # ---- resolved the section, including a sentence saying a fork was NOT resolved.
+      # ---- So the walk is per ITEM, an item being its opening line PLUS its continuation lines, and
+      # ---- the mark is the DOCUMENTED shape: the word, then a parenthesised attribution whose first
+      # ---- field is the resolver class, whose second is a date, and whose optional third is the
+      # ---- delegation qualifier. The regex is a `/.../` LITERAL rather than a -v string on purpose:
+      # ---- awk processes escapes in a -v assignment, which turned `\(` into a group and made the
+      # ---- sibling reader match nothing at all when it was written that way first.
+      # ONE STRING for the mark, so a WRAPPED mark still matches — twelve tracked specs wrap one,
+      # which is the house style of this corpus at its line width, and a line-by-line match called every
+      # one of them unresolved.
+      #
+      # AND NOT A PER-ITEM WALK, which is the harder half and was measured wrong before it was
+      # measured right. A per-item walk has to tell a FORK bullet from an OPTION bullet, and this
+      # corpus does not distinguish them: of 287 section-8 bullets, 69 carry descriptive labels, and
+      # among those are both resolved forks and genuinely OPEN ones. So a label-shape discriminator
+      # UNDER-counts and lets a real open fork pass, which is worse than the over-counting it would
+      # replace — and the over-counting was not theoretical either: a per-item walk called a RESOLVED
+      # fork unresolved on a live tracked spec whose three option bullets each demanded a mark.
+      #
+      # What is graded is therefore what can be: a section with items and NO conforming mark
+      # anywhere. An unresolved fork below a none line that looks honest is NOT detectable here and
+      # is parked rather than implied away.
+      bblob = ""; bitems = 0
+      for (i = 2; i <= q - 1; i++) {
+        L = rng[i]
+        if (L ~ /^[[:space:]]*$/) continue
+        bblob = bblob " " L
+        if (L ~ /^[[:space:]]*[-*][[:space:]]/ || L ~ /^###[[:space:]]/) bitems++
+      }
+      # WHITESPACE SQUEEZED FIRST. Marks wrap INSIDE the parenthesis in this corpus - `RESOLVED
+      # (owner,` then a 2-space-indented continuation - so a raw join yields three spaces where the
+      # grammar wants one, and all fourteen wrapped marks still missed. The sibling reader trims
+      # every line as it reads, which is why it did not need this; squeezing here makes the two
+      # provably agree instead of agreeing by coincidence.
+      gsub(/[[:space:]]+/, " ", bblob)
+      bmark = (bblob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
       if (q == 0)
         print f " (terminal Status and no Open questions section found — silence and a resolved fork are the same byte without this)"
-      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^N\/A/ && !(items > 0 && items == resolved))
+      else if (fcut != "" && fdate != "" && fdate >= fcut) {
+        # ---- A §8 with NO items and NO none form REFUSES, which the owner ratified: it is the only
+        # ---- genuinely undecided population, it is reached through the empty-first-line branch, and
+        # ---- an empty population passing is the shape this repo refuses by name everywhere else.
+        if (bitems == 0) {
+          if (q8 !~ /^none/ && q8 !~ /^n\/a/)
+            print f " (terminal Status and a §8 carrying neither an item nor a none form, at/after FORK_MARK_CUTOFF " fcut "; a hollow section and a resolved one are the same byte)"
+        # SAME RULE AS THE SIBLING READER: with items present, only a MARK resolves the section. The
+        # opening line used to vote here too, and `/^none/` matches "none of the forks below are
+        # resolved" - a denial - once the line is lowercased.
+        } else if (!bmark)
+          print f " (terminal Status, §8 carries items and no conforming resolution mark anywhere, at/after FORK_MARK_CUTOFF " fcut ")"
+      }
+      else if (q8 != "" && q8 !~ /^none/ && q8 !~ /^n\/a/ && !(items > 0 && items == resolved))
         print f " (terminal Status with unresolved §8 Open questions)"
     }
 
@@ -1004,7 +1121,7 @@ if [ -n "$alcut" ]; then
   # predate the cutoff is a real empty and says so below, but a listing that comes back empty
   # while spec files exist is a broken selector, and it reds. That distinction is the whole
   # difference between an announced skip and a check that is dark and looks identical to green.
-  pop_guard 22 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
+  pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
 ' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
   for sp in $alspecs; do
     case "$(basename "$sp")" in
@@ -1045,10 +1162,10 @@ if [ -n "$alcut" ]; then
       fi
     done
   done
-  [ -z "$algap" ] || fail 22 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
-  [ -z "$albad" ] || fail 22 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
-  [ -z "$alnolab" ] || fail 22 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
-  [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 22 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
+  [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
+  [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
+  [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
+  [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
 fi
 
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the

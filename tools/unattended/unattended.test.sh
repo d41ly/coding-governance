@@ -1351,7 +1351,12 @@ same "the example CORE_FLOOR equals the driver phase and DoD set sizes" \
   "$(sed -n 's/^CORE_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw PHASES_CORE):$(wcw DOD_CORE)"
 same "the example DIRECTIVES_FLOOR equals the driver directive count" \
   "$(sed -n 's/^DIRECTIVES_FLOOR="\(.*\)"/\1/p' "$example" | head -1)" "$(wcw DIRECTIVES_CORE)"
-initblock=$(grep -A1 '^MEMORY_ROOT=memory; ' "$SCRIPT")
+# THE WHOLE CONTIGUOUS BLOCK, derived rather than a fixed window. This read `grep -A1`, so the block
+# was whatever two lines happened to be there — and it silently stopped covering the block the moment
+# a third line of defaults was added, reporting the new keys as undefaulted when they were defaulted
+# one line below the window. A hardcoded window over a growing list is the same class as a count
+# written in prose.
+initblock=$(awk '/^MEMORY_ROOT=memory; /{f=1} f{ if ($0 ~ /^[A-Za-z_][A-Za-z_0-9]*=/) print; else exit }' "$SCRIPT")
 undefaulted=""
 checked=0
 for k in $(sed -n 's/^\([A-Z_][A-Z_]*\)=.*/\1/p' "$example"); do
@@ -1824,10 +1829,27 @@ n=$((n+1)); grep -q '^export GIT_GRAFT_FILE=/dev/null' "$SCRIPT"   || { echo "FA
 # is asserted THERE and the driver is asserted to reach it. Two arms, because either half alone is
 # satisfiable while the pin is absent from the running script: a lib nobody sources pins nothing, and
 # a source line pointing at a lib without the wrapper is a working script with no pin in it.
-n=$((n+1)); grep -q '^GIT() { git -c core.useReplaceRefs=false' "$(dirname "$SCRIPT")/lib-unattended.sh" \
-  || { echo "FAIL the kit library defines no GIT() wrapper pinning core.useReplaceRefs"; st=1; }
-n=$((n+1)); grep -q '^\. "\$KIT_DIR/lib-unattended.sh"' "$SCRIPT" \
+n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$(dirname "$SCRIPT")/lib-unattended.sh" \
+  || { echo "FAIL the kit library defines no GIT() wrapper expanding the replace-refs pin constant"; st=1; }
+n=$((n+1)); grep -q '^\. "\$_LIB_DIR/lib-unattended.sh"' "$SCRIPT" \
   || { echo "FAIL the driver does not source the kit library, so the GIT() pin defined there never reaches it"; st=1; }
+# The pins moved into NAMED CONSTANTS because a second reader arrived: the bounded remote helper
+# cannot call GIT(), since `timeout` needs an external command and GIT() is a shell function. So this
+# arm now checks the property through the indirection, in THREE parts, because an indirection is a way
+# to weaken a pin while a one-line grep stays green: the constants hold the right values, GIT()
+# expands both of them, and the bounded helper expands both of them too. Dropping any part leaves a
+# hole exactly the size of the call site that skips it, which is the whole attack surface here.
+# THE PINS MOVED TO THE LIBRARY when the driver and the gate leg started sharing it, so these three
+# arms follow them. The fourth still reads the DRIVER, because the bounded remote helper lives there
+# and it is the helper's own expansion of both pins that this counts.
+LIBSH="$(dirname "$SCRIPT")/lib-unattended.sh"
+n=$((n+1)); [ -f "$LIBSH" ] || { echo "FAIL the kit library is not beside the driver, so the three pin arms below would grade a file that does not exist"; st=1; }
+n=$((n+1)); grep -q '^GIT_PIN_REPLACE=core\.useReplaceRefs=false$' "$LIBSH"   || { echo "FAIL the kit library does not bind the replace-refs pin to a constant with the value that suppresses it"; st=1; }
+n=$((n+1)); grep -q '^GIT_PIN_GRAFTADV=advice\.graftFileDeprecated=false$' "$LIBSH"   || { echo "FAIL the kit library does not bind the graft-advice pin to a constant with the value that suppresses it"; st=1; }
+n=$((n+1)); grep -q '^GIT() { git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV" "\$@"; }$' "$LIBSH"   || { echo "FAIL the kit library defines no GIT() wrapper expanding both pin constants"; st=1; }
+# TWO, not three: GIT() moved to the kit library, so what remains in the driver is the bounded
+# remote helper's own pair of call sites - which is exactly what this arm is for.
+n=$((n+1)); [ "$(grep -c 'git -c "\$GIT_PIN_REPLACE" -c "\$GIT_PIN_GRAFTADV"' "$SCRIPT")" -ge 2 ]   || { echo "FAIL the bounded remote helper does not expand both pin constants, so a remote observation dereferences unpinned"; st=1; }
 unpinned=$(grep -nE '\$\(git (show|merge-base) |[^A-Z]git show "\$(base|rb):' "$SCRIPT" | grep -v '^[0-9]*: *#' || true)
 n=$((n+1)); [ -z "$unpinned" ] || { echo "FAIL a dereference on the authorization path bypasses the GIT() pin: $unpinned"; st=1; }
 
@@ -1895,7 +1917,10 @@ n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)"
 bcopen
 run --attest tRun --item keepalive-reaped >/dev/null
 run --attest tRun --item parked-decisions-surfaced >/dev/null
-hit "$(run --abort tRun --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
+# a legal code rides along: the code is required now, and this arm is about something else.
+# `--code` is REQUIRED since TOOL-aBoundedVerdict-2: an abort with no halt code says a run stopped and
+# never says why. This fixture only needs a TERMINAL record, so any legal member does.
+hit "$(run --abort tRun --code fork-unresolvable --reason "the arm that proves the documented exit needs no hand edit")" "phase ABORTED"
 
 # ---- S3: the override park is the FOURTH caller of a guard that existed in triplicate. A truthful
 # ---- reason -- one that says why the flag matters -- used to red leg check 11 permanently on a record
@@ -2225,16 +2250,19 @@ hit "$(run --abort tRun --reason "second thoughts")" "the run is already finishe
 # ...both attestations, one at a time, so the arm distinguishes them. Attesting only the keepalive
 # still refuses, which is the half a first cut of this unit let through.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
+# a legal code rides along: the code is required now, and this arm is about something else.
+hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: keepalive-reaped via keepalive-reaped"
 printf 'keepalive-reaped: yes\n' >> memory/builds/tRun/RUN.md
-hit "$(run --abort tRun --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
+# a legal code rides along: the code is required now, and this arm is about something else.
+hit "$(run --abort tRun --code fork-unresolvable --reason "no anchor")" "an agent-attested item is unmet and an abort still owes both; the driver can only read back what the agent recorded, so this is an attestation and not a machine verdict. Write the RECORD KEY, which is not always the item name: parked-decisions-surfaced via parked-surfaced"
 
 # ...and the success path. AC19: the parked entry names itself an ABORT. Routed through the old
 # hardcoded `park` it would have read "override · item …", and the build method derives the owner's
 # open/parked row from parked entries "plus any recorded DoD override" — so an abort would have
 # arrived in the one turn the owner gets wearing the label of an override that never happened.
 printf 'parked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
-out=$(run --abort tRun --reason "the remote never answered")
+# a legal code rides along: the code is required now, and this arm is about something else.
+out=$(run --abort tRun --code fork-unresolvable --reason "the remote never answered")
 hit "$out" "phase ABORTED"
 same "--abort wrote the terminal phase" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "ABORTED"
 same "--abort witnessed HEAD" "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$(git rev-parse HEAD)"
@@ -2473,7 +2501,8 @@ parked-surfaced: yes
 before=$(sum)
 hit "$(run --abort tRun --reason "the lander refused and I would not reach for --no-verify")" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar on a terminal record nothing can rewrite; say it without the literal flag"
 same "the refused abort wrote nothing" "$(sum)" "$before"
-out=$(run --abort tRun --reason "the lander refused and I would not bypass it")
+# a legal code rides along: the code is required now, and this arm is about something else.
+out=$(run --abort tRun --code fork-unresolvable --reason "the lander refused and I would not bypass it")
 hit "$out" "phase ABORTED"
 miss "$(cat memory/builds/tRun/RUN.md)" "--no-verify"
 
@@ -3147,6 +3176,706 @@ hit "$out" "the build README's generated markers are malformed, and the unit lis
 same "a malformed README leaves no orphan run-state file" "$([ -f memory/builds/tUnpaired/RUN.md ] && echo yes || echo no)" "no"
 reset_tree
 
+
+# ---------------------------------------------------------------------------------------------
+# ---- THE BOUNDED REMOTE OBSERVATION. Every arm below grades the unit whose whole claim is that a
+# ---- remote round-trip terminates. The claim is worth exactly as much as the mechanism under it, so
+# ---- the mechanism is measured on THIS node first and the wiring is read at source afterwards.
+# ---------------------------------------------------------------------------------------------
+
+# PROGRESS MARKERS, on stderr, unconditional, and deliberate rather than debug residue. This
+# leg's tracked incident is a 240s SILENT hang that wedged the whole bar, and on a contended
+# node a hang and mere slowness are indistinguishable from a wall clock alone — measured while
+# arming this block, which failed to finish inside 1200s once and printed nothing inside 900s
+# another time, both while a second session held the box. A marker per arm turns "the leg is
+# stuck" into "the leg is stuck HERE", which is the difference between a bisect and a guess.
+echo "MARK mechanism" >&2
+# ---- AC1a, THE MECHANISM ARM, and the reason it leads: `out=$(timeout N cmd)` does NOT bound the
+# ---- clock. The substitution reads until EOF, EOF arrives when the last inherited write end closes,
+# ---- and a surviving descendant holds the pipe while `timeout` reports 124 on schedule. A sibling
+# ---- build measured the same defect in the gate runner and its fix landed there hours before this
+# ---- helper was written. Measured here rather than trusted, because a bound nobody has watched fire
+# ---- is an assertion about nothing.
+# ---- The FILE form is ASSERTED. The substitution form is measured and REPORTED without asserting,
+# ---- because it is a property of this platform's coreutils and process groups, not of this kit —
+# ---- arming it would make the suite red on a platform where the pipe closes early, which is a
+# ---- different fact and not a defect here.
+mech_t0=$(date +%s)
+timeout -k 2s 1 bash -c 'sleep 8 & exit 0' >/dev/null 2>&1
+mech_file=$(( $(date +%s) - mech_t0 ))
+mech_t0=$(date +%s)
+mech_out=$(timeout -k 2s 1 bash -c 'sleep 8 & exit 0' 2>&1)
+mech_pipe=$(( $(date +%s) - mech_t0 ))
+echo "bounded-observation mechanism on this node: file-captured ${mech_file}s, substitution-captured ${mech_pipe}s, declared bound 1s"
+n=$((n+1)); [ "$mech_file" -le 4 ] || { echo "FAIL a wall-clock bound does not bound the clock on this node even when captured through a file (${mech_file}s against a declared 1s), so the driver's remote bound is INERT here and every arm below it grades a decoration"; st=1; }
+if [ "$mech_pipe" -le 4 ]; then
+  echo "bounded-observation note: a command substitution ALSO bounded the clock on this node (${mech_pipe}s) - the file capture is still required, because the platform where it does not is the one this kit shipped a fix for"
+fi
+
+echo "MARK ac5-source" >&2
+# ---- AC5: no `ls-remote` escapes the helper. A LOCATION property, so it is read from `grep -n` and
+# ---- never from `grep -c` — a count already includes the prose hits, so no value of it distinguishes
+# ---- a call site from a sentence, which is the absence-assertion-over-whole-file-text class. Comment
+# ---- lines are excluded BY THEIR LEADING `#`, deliberately and not by luck: the helper's own
+# ---- documentation names `ls-remote`, and a predicate that redded on the comment explaining it is
+# ---- the recorded shape this repo refuses.
+lsr_bad=""
+while IFS= read -r hit; do
+  # TWO fields to strip, not one: `grep -n` over MORE THAN ONE file prints `file:line:body`, and
+  # leaving the line number in front of the body made the comment test read "83:" as code before the
+  # `#` and keep a comment line. Measured while arming this: it reported an offender with an empty
+  # name, because the offending "line" was a comment about the helper.
+  body=${hit#*:}; body=${body#*:}
+  case "$body" in
+    *'#'*) case "${body%%\#*}" in *[!\ ]*) ;; *) continue ;; esac ;;
+  esac
+  case "$body" in
+    *'observe_remote '*'ls-remote'*) continue ;;
+    *'ls-remote --get-url'*)         continue ;;
+  esac
+  lsr_bad="$lsr_bad
+$hit"
+done <<EOF
+$(grep -n 'ls-remote' "$SCRIPT" "$HERE/check-unattended.sh" 2>/dev/null)
+EOF
+n=$((n+1)); [ -z "$(printf '%s' "$lsr_bad" | tr -d '[:space:]')" ] || { echo "FAIL an ls-remote call site sits outside the bounded helper, so a remote observation on that path is unbounded: $lsr_bad"; st=1; }
+
+echo "MARK ac6-source" >&2
+# ---- AC6 and the three options no fixture can reach. `credential.interactive=never` is what a
+# ---- credential HELPER reads; GIT_TERMINAL_PROMPT=0 bounds git's own prompt and never reaches a
+# ---- helper process, which is the correction this unit also makes to the leg's comment. Passed with
+# ---- `-c` so it is scoped to the observation and cannot disable credentials for the landing push,
+# ---- which is a different process and must still authenticate.
+# ---- Source-level is the HONEST home for all four: a fixture that exercised them would need a server
+# ---- that authenticates, stalls mid-transfer, and speaks ssh. Their runtime effect is untested and
+# ---- the spec says so, so a green arm here is never coverage of a stalling server.
+for opt in 'credential.interactive=never' 'http.lowSpeedLimit=' 'http.lowSpeedTime=' 'ConnectTimeout='; do
+  n=$((n+1)); grep -qF -- "$opt" "$SCRIPT"   || { echo "FAIL the bounded remote helper does not carry a transport or credential option the spec requires by inspection: $opt"; st=1; }
+  n=$((n+1)); grep -qF -- "$opt" "$HERE/check-unattended.sh"   || { echo "FAIL the leg's bounded remote helper does not carry a transport or credential option the spec requires by inspection: $opt"; st=1; }
+done
+# ---- and the two halves that make it a bound rather than a decoration, at source: `-k` for the child
+# ---- that ignores SIGTERM, and a redirect rather than a substitution.
+n=$((n+1)); grep -q 'timeout -k 5s "\$REMOTE_BOUND"' "$SCRIPT"   || { echo "FAIL the driver's bounded helper does not wrap the observation in timeout with a kill-after, so a child ignoring SIGTERM outlives the bound"; st=1; }
+# CODE LINES ONLY. The first cut of this arm grepped whole file text and redded on the COMMENT that
+# documents this very fix, which is memory/gotchas/absence-assertion-over-whole-file-text.md happening
+# inside the arm written to prevent its cousin. The comment has to be able to name the defect it warns
+# about, so the predicate reads code and the comment stays.
+subst_bad=$(grep -nE '^[^#]*out=\$\(timeout' "$SCRIPT" "$HERE/check-unattended.sh" 2>/dev/null | grep -v '^[^:]*:[0-9]*: *#' || true)
+n=$((n+1)); [ -z "$subst_bad" ] || { echo "FAIL a bounded observation is captured through a command substitution, which reads until EOF and makes the bound a decoration - the measured defect this helper exists to avoid: $subst_bad"; st=1; }
+
+echo "MARK ac1-refused" >&2
+# ---- AC1: an endpoint that REFUSES. Fast by construction, and that is stated rather than implied:
+# ---- a refused connection returns without the deadline being consulted, so this arm grades the
+# ---- refusal PATH and not the wall clock. The wall clock is AC1a's, above.
+reset_tree; readme tRef; scope published
+git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+ref_t0=$(date +%s)
+out=$(run --preflight tRef --keepalive-id k1)
+ref_el=$(( $(date +%s) - ref_t0 ))
+hit "$out" "the remote did not answer, and the anchor is an observation of it rather than of any local ref"
+n=$((n+1)); [ "$ref_el" -le 30 ] || { echo "FAIL a refused endpoint took ${ref_el}s to refuse, so the observation is not returning promptly on the one failure that needs no waiting at all"; st=1; }
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac3-terminal" >&2
+# ---- AC3: the FREE refusals come first. A close against an already-terminal record must spend NO
+# ---- round-trip, and the arm proves it the only way that cannot be faked: by pointing the remote at
+# ---- an address that would cost the entire declared bound, and asserting the refusal returns anyway.
+# ---- If the ordering regresses, this arm does not merely fail - it takes the whole bound to fail,
+# ---- which is the elapsed assertion below.
+bcopen
+# REPLACED, not appended. `fact()` returns the FIRST matching line, so a second `phase:` at the end of
+# the file is dead text — the fixture read RUNNING, the record was never terminal, and the arm dutifully
+# measured 24s of real network before reporting the ordering as broken. A fixture edit that changes
+# nothing is a fixture that tests nothing, which is why this suite has `mutate` at all.
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+git remote set-url origin "http://192.0.2.1:9418/blackhole.git" 2>/dev/null
+git remote set-url --push origin "http://192.0.2.1:9418/blackhole.git" 2>/dev/null
+term_t0=$(date +%s)
+out=$(run --close tRun)
+term_el=$(( $(date +%s) - term_t0 ))
+hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+miss "$out" "observing the anchor, then evaluating the Definition of Done"
+n=$((n+1)); [ "$term_el" -le 20 ] || { echo "FAIL a close against a terminal record paid a remote observation before refusing (${term_el}s against an unroutable endpoint), so the free refusal is still sequenced behind the expensive one"; st=1; }
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac4-transport" >&2
+# ---- AC4: a transport failure is not a semantic answer. The collapsed form returned the same status
+# ---- for "the remote advertises no tip" and "the remote could not be reached", so a network fault
+# ---- told the operator to push a branch that is already pushed - advice that is not merely useless
+# ---- but wrong, and acting on it changes nothing. The arm asserts BOTH halves: the new message
+# ---- appears, and the misleading one does not.
+reset_tree; readme tBr2; scope published; git add -A >/dev/null && git commit -q -m br2 --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+git remote set-url --push origin "http://127.0.0.1:1/nope.git" 2>/dev/null
+out=$(run --preflight tBr2 --keepalive-id k1)
+miss "$out" "push the branch first"
+git remote set-url origin "$ORIGIN" 2>/dev/null
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+
+echo "MARK ac8-slowstub" >&2
+# ---- AC8, THE FALSE-POSITIVE ARM, and the only one proving the cap is not merely tight enough to
+# ---- pass the arms above. A stub `git` ahead of the real one on PATH sleeps UNDER the bound on
+# ---- ls-remote and forwards every other subcommand to the real binary. Wall clock only: no network,
+# ---- no git transport, no remote. An unroutable address cannot do this job - it transfers nothing,
+# ---- so it can never present a slow-but-working transfer.
+stubdir=$(mktemp -d)
+real_git=$(command -v git)
+cat > "$stubdir/git" <<STUB
+#!/usr/bin/env bash
+for a in "\$@"; do
+  if [ "\$a" = "ls-remote" ]; then sleep 3; break; fi
+done
+exec "$real_git" "\$@"
+STUB
+chmod +x "$stubdir/git"
+bcopen
+slow_t0=$(date +%s)
+out=$(PATH="$stubdir:$PATH" bash "$SCRIPT" --close tRun 2>&1)
+slow_el=$(( $(date +%s) - slow_t0 ))
+n=$((n+1)); [ "$slow_el" -ge 3 ] || { echo "FAIL the slow-but-working stub was never reached (${slow_el}s), so this arm proves nothing about a false positive - the fixture did not intercept the observation"; st=1; }
+miss "$out" "was KILLED by this kit"
+rm -rf "$stubdir"
+
+
+
+# ---- THE THREE NEW REFUSALS, each armed by a POSITIVE assertion naming its own failure text. All
+# ---- three are REACHABLE, which is why none of them is pinned: the registry's contract is that a pin
+# ---- means no fixture CAN reach a branch, and "chose not to" is a different fact wearing the same
+# ---- row. Two of them are reached by a stub `git` ahead of the real one on PATH, which is the only
+# ---- fixture that can make a remote observation fail in a chosen WAY rather than merely fail.
+
+echo "MARK arm-mktemp" >&2
+# ---- the scratch file the bound needs. Without a file to capture into there is no bound, so the
+# ---- observation is refused rather than run unbounded — the one case where failing to allocate is
+# ---- safer than proceeding. Reached with a TMPDIR that does not exist, which is what mktemp reads.
+bcopen
+out=$(TMPDIR="$TMP/no-such-dir-for-mktemp" bash "$SCRIPT" --close tRun 2>&1)
+hit "$out" "cannot create a scratch file to capture the remote advertisement, so the observation cannot be bounded and an unbounded one is what this refuses"
+
+echo "MARK arm-timeout" >&2
+# ---- the TIMEOUT refusal, and it says timeout rather than failure on purpose: "the remote did not
+# ---- answer" and "the remote was not waited for" are different facts, and an unattended run's record
+# ---- has to carry the second one as itself rather than as the first.
+# ---- The stub EXITS 124 directly, which is the status `timeout` returns when it kills a child. So
+# ---- this arm grades the refusal PATH — the message, the endpoint, the stated bound — without
+# ---- spending the declared bound in the slowest leg on the bar. WHAT IT DOES NOT COVER, said plainly:
+# ---- that the kill itself happens. That is AC1a's mechanism arm, above, which measures the platform.
+stub124=$(mktemp -d); real_git_124=$(command -v git)
+cat > "$stub124/git" <<STUB124
+#!/usr/bin/env bash
+for a in "\$@"; do
+  if [ "\$a" = "ls-remote" ]; then
+    case " \$* " in *" --get-url "*) exec "$real_git_124" "\$@" ;; esac
+    exit 124
+  fi
+done
+exec "$real_git_124" "\$@"
+STUB124
+chmod +x "$stub124/git"
+bcopen
+out=$(PATH="$stub124:$PATH" bash "$SCRIPT" --close tRun 2>&1)
+hit "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so nothing was learned about the endpoint and this is a timeout and not a refusal by the remote"
+rm -rf "$stub124"
+
+echo "MARK arm-transport" >&2
+# ---- the TRANSPORT split, which is the defect this unit came for at the second call site. The
+# ---- collapsed form returned one status for "the remote advertises no tip" and "the remote could not
+# ---- be reached", so a network fault told the operator to PUSH A BRANCH THAT IS ALREADY PUSHED.
+# ---- Reaching it needs the first anchor to SUCCEED and the branch query to FAIL, which no endpoint
+# ---- can do — one endpoint answers both — so the stub answers the HEAD advertisement from the real
+# ---- git and fails only the per-branch query, with 128, which is git's own "could not connect".
+reset_tree; readme tBrT; scope published; git add -A >/dev/null && git commit -q -m brt --no-verify
+git push -q -f origin unit 2>/dev/null
+stub128=$(mktemp -d); real_git_128=$(command -v git)
+cat > "$stub128/git" <<STUB128
+#!/usr/bin/env bash
+case " \$* " in
+  *" ls-remote "*" refs/heads/"*) exit 128 ;;
+esac
+exec "$real_git_128" "\$@"
+STUB128
+chmod +x "$stub128/git"
+out=$(PATH="$stub128:$PATH" bash "$SCRIPT" --preflight tBrT --keepalive-id k1 2>&1)
+hit "$out" "the remote could not be reached for this run's branch, the wall-clock bound fired, or this side could not create the scratch file the observation needs, so whether the branch is published is UNKNOWN rather than answered no; pushing it is not the remedy, and the endpoint and the local scratch dir are: refs/heads/"
+miss "$out" "push the branch first"
+rm -rf "$stub128"
+reset_tree
+
+
+
+echo "MARK fork-mark" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- THE SECTION-8 RESOLUTION MARK. Both machine readers used to decide on the section's FIRST
+# ---- NON-BLANK LINE with an unanchored case-sensitive substring, and the two failure modes that
+# ---- bought were not hypothetical: a section whose opening sentence announced a fork was NOT
+# ---- resolved classified as RESOLVED, because the word appeared in the sentence denying it; and any
+# ---- unresolved item BELOW a `none` first line was invisible, because nothing past that line was
+# ---- read. Every rule this build writes about forks was therefore unenforceable.
+# ----
+# ---- EACH ARM CARRIES THE OLD PREDICATE AS A CONTROL. Asserting only the new verdict proves the
+# ---- reader is strict, never that it CHANGED anything — and a fixture that the old reader also
+# ---- rejected would pass this suite while demonstrating nothing. The control is the old one-line
+# ---- test, spelled here, run over the same bytes.
+old_reader() { # spec file -> what the FIRST-LINE reader would have said
+  awk '
+    /^## / { cur = ($0 ~ /^## 8\./) ? "forks" : ""; next }
+    cur == "" { next }
+    { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+    line == "" { next }
+    { if (fkl == "") fkl = line }
+    END { if (fkl ~ /RESOLVED/) print "READY"; else print "FORKED" }' "$1"
+}
+fkspec() { # section-8 body -> a live-status spec at $TMP/fk.md
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node c · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- a\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\n%s\n\n## 9. Revision log\n\n- r\n' "$1" > "$TMP/fk.md"
+}
+# THE SLICE END IS DERIVED, NEVER COUNTED. Both sites below were `start + N` and both had silently
+# begun truncating the function they grade as comments grew it - the same defect the sibling
+# marker-contract harness carried with `+ 45`. The failure is quiet in the worst way: a truncated
+# body still defines the function, so the `declare -F` liveness arm PASSES and every verdict then
+# comes back empty, which reads as the code under test returning nothing.
+slice_fn() { # <name> -> eval that function out of the SHIPPED driver bytes
+  local s e
+  s=$(grep -n "^$1()" "$SCRIPT" | cut -d: -f1)
+  [ -n "$s" ] || { echo "FAIL cannot find $1() in the driver, so every arm that grades it would grade nothing"; st=1; return 1; }
+  e=$(awk -v s="$s" 'NR>s && /^}/ {print NR; exit}' "$SCRIPT")
+  [ -n "$e" ] || { echo "FAIL cannot find the closing brace of $1() in the driver, so the slice below would be a fragment"; st=1; return 1; }
+  eval "$(sed -n "${s},${e}p" "$SCRIPT")"
+}
+slice_fn plan_state
+n=$((n+1)); declare -F plan_state >/dev/null || { echo "FAIL plan_state was not sliced out of the driver, so every fork-mark arm below graded nothing"; st=1; }
+
+# a section whose FIRST LINE denies the resolution, and whose item is genuinely unmarked
+fkspec 'F1 below is NOT RESOLVED and needs the owner.
+
+- **F1 — a real question?** options, and no mark anywhere.'
+same "fork-mark: a first line DENYING resolution no longer resolves the section" "$(plan_state "$TMP/fk.md")" "FORKED"
+same "fork-mark control: the old first-line reader called those same bytes ready"  "$(old_reader "$TMP/fk.md")" "READY"
+
+# a none first line with an unresolved item BELOW it
+fkspec 'none - every fork below is RESOLVED in place.
+
+- **F1 — answered?** yes.
+  RESOLVED (agent, 2026-08-20, delegated): picked.
+
+- **F2 — not answered?** still open, and carrying no mark.'
+# THE PARKED GAP, PINNED AS A GAP. An unresolved fork BELOW a `none` opening line is not detectable
+# by either reader, and this row records that rather than leaving the case unmentioned. The per-item
+# walk that would catch it was withdrawn on measurement: of 287 section-8 bullets, 69 carry
+# descriptive labels and among those are both resolved forks and genuinely open ones, so a
+# label-shape discriminator UNDER-counts - worse than the over-counting it replaces, which was
+# itself measured calling a RESOLVED fork FORKED on a live tracked spec. Closing it needs section 8
+# to have a regular shape, which M3 reserves to the owner.
+same "fork-mark: an unresolved item below a none first line is the PARKED gap, not a catch" "$(plan_state "$TMP/fk.md")" "READY"
+same "fork-mark control: the old reader stopped at the none line and called it ready" "$(old_reader "$TMP/fk.md")" "READY"
+
+# and the case that must NOT have changed: the mark on a CONTINUATION line, which is where this
+# corpus actually puts it. A tightening that broke this would have called the whole tree unresolved.
+fkspec '- **F1 — a question?** options and a recommendation.
+  RESOLVED (owner, 2026-08-20): picked, on the stated grounds.'
+same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
+
+
+
+echo "MARK park-taxonomy" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- THE PARKED-KIND TAXONOMY AND THE COUNTABLE ATTESTATION.
+# ----
+# ---- `parked-decisions-surfaced` stays AGENT-ATTESTED, because no machine can observe a wrap-up.
+# ---- What changes is that "I surfaced them" can become "I surfaced N, and the record holds N" —
+# ---- and the count ranges over the SURFACED class only, which is the qualifier the whole taxonomy
+# ---- exists to make expressible.
+
+# ---- the count is OPTIONAL, and omitting it must behave exactly as it always did. Without this arm
+# ---- the change is a silent breakage of every record that attested before it landed.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- a count that DISAGREES with the record refuses, and names both numbers. The fixture parks two
+# ---- decisions and attests four, which is the honest mistake this exists to catch: an agent that
+# ---- surfaced some of them and rounded up.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 4 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- and the count that AGREES passes. Paired with the arm above so "it refused" and "it refused for
+# ---- the reason we think" are two claims rather than one.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+run --park tRun --item "q two" --reason "opts two, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 2 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+hit  "$out" "close OK"
+
+# ---- THE OVERRIDE EXCLUSION, and it needs a fixture CARRYING an override or it passes either way.
+# ---- The close evaluates the Definition of Done and only THEN appends its override lines, so a close
+# ---- with two overrides validates against N and leaves N+2 on disk. A count that included them could
+# ---- never be satisfied by any honest agent. The arm above already carries two overrides and attests
+# ---- the pre-override number, so this asserts the property the other way: attesting the POST-override
+# ---- total must refuse.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 3 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+
+# ---- S7b: A `history`-KIND LINE MUST NOT BE COUNTED, and this is the arm that can fail. At this
+# ---- unit's landing every LIVE kind is `surfaced`, so an implementation that counted every parked
+# ---- line would satisfy any fixture built only from today's kinds — the fixture has to carry a kind
+# ---- outside the taxonomy on purpose. `history` is the COMPLEMENT and is declared nowhere, so a kind
+# ---- absent from the constant is history by construction, which is exactly what this writes.
+bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
+run --park tRun --item "q one" --reason "opts one, refused because" >/dev/null
+printf '\n2026-08-20T00:00:00Z review · item some subject · reason round 1 of a review, which the owner need not adjudicate\n' >> memory/builds/tRun/RUN.md
+printf 'keepalive-reaped: yes\nparked-surfaced: yes, 1 surfaced\n' >> memory/builds/tRun/RUN.md
+fixture
+# --status BEFORE the close, and the ordering is the whole point of putting it here. The close
+# appends one parked line per override, and those lines are `override` kind, which IS surfaced — so
+# after a close carrying two overrides the honest count is three. Asserting afterwards measured
+# that instead and read as the taxonomy leaking, when what leaked was the arm.
+same "a history-kind parked line is not counted by --status" "$(run --status tRun | grep -c 'parked 1')" "1"
+out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
+miss "$out" "the attested count of surfaced parked decisions does not match the record"
+# ...and the override parks DO join the count once WRITTEN, which is the same fact from the other
+# side: the exclusion is about evaluation ORDER, never about override lines being unsurfaced.
+same "an override park joins the surfaced count once the close has written it" "$(run --status tRun | grep -c 'parked 3')" "1"
+
+# ---- SOURCE level: the counter is DERIVED from the taxonomy, not spelled a second time. A second
+# ---- spelling is correct today and silently wrong the moment a kind is added, and no runtime arm can
+# ---- see the difference while every live kind is surfaced.
+n=$((n+1)); grep -q '^PARK_KINDS_OWED="' "$SCRIPT"   || { echo "FAIL the driver declares no parked-kind taxonomy constant, so the surfaced count has no single home"; st=1; }
+n=$((n+1)); [ -z "$(grep -n 'decision|abort|override|waiver' "$SCRIPT")" ]   || { echo "FAIL the four parked kinds are spelled as an alternation somewhere in the driver, which is a second spelling of the taxonomy and goes wrong the moment a kind is added: $(grep -n 'decision|abort|override|waiver' "$SCRIPT")"; st=1; }
+
+
+
+echo "MARK halt-code" >&2
+# ---- THE HALT CODE ON --abort. A single ABORTED terminal said a run stopped and never said why: the
+# ---- reason was free prose in a parked entry, which the owner reads and no check does. The code is
+# ---- REQUIRED and VALIDATED, and both refusals name the legal set — a validated vocabulary whose
+# ---- refusal does not say what is legal costs the operator a source read.
+bcopen
+out=$(run --abort tRun --reason "stopped for a stated reason")
+hit "$out" "--abort requires --code, because a single ABORTED terminal says a run stopped and never says why; the reason is prose for the owner and the code is the field every reader joins on"
+same "a refused abort wrote nothing" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
+
+bcopen
+out=$(run --abort tRun --reason "stopped for a stated reason" --code not-a-real-code)
+hit "$out" "--abort names a halt code that is not in the effective vocabulary, and an unvalidated code is free text wearing a field name; declare it in HALT_CODES_EXTRA or use one of these"
+same "a refused code wrote nothing either" "$(grep -c '^halt-code: ' memory/builds/tRun/RUN.md)" "0"
+
+# ...and the accepted path, which is what makes the two refusals mean something. Both agent-attested
+# items are written first, because an abort owes both and would otherwise refuse for a different reason.
+bcopen
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+out=$(run --abort tRun --reason "stopped for a stated reason" --code gate-red-out-of-scope)
+hit "$out" "halt-code gate-red-out-of-scope"
+same "the code is an authored FACT, not a substring of the reason" "$(grep -c '^halt-code: gate-red-out-of-scope' memory/builds/tRun/RUN.md)" "1"
+# the two readers: --status names it, and --resume says the run FINISHED rather than paused.
+hit "$(run --status tRun)" "halt-code gate-red-out-of-scope"
+hit "$(run --resume tRun)" "this run FINISHED rather than paused: halt-code gate-red-out-of-scope"
+# a PROJECT extra is accepted, which is the half that proves the set is effective and not core-only.
+bcopen; mkconf; printf 'HALT_CODES_EXTRA="site-specific-halt"
+HALT_FLOOR="7"
+' >> .unattended.conf
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> memory/builds/tRun/RUN.md
+out=$(run --abort tRun --reason "stopped for a stated reason" --code site-specific-halt)
+miss "$out" "not in the effective vocabulary"
+reset_tree
+
+
+
+# ---- AC7: EVERY DOCUMENTED ABORT INVOCATION SPELLS THE CODE. Three call sites — the Skill template,
+# ---- its render, and the protocol pair's verb row — and no gate joined a documented invocation to the
+# ---- driver's argument set before this, so the full bar stayed green while every documented call was
+# ---- missing a required argument. The render is regenerated from the template, so a drift between
+# ---- them is the adopter check's business; what this arm owns is that none of them loses the code.
+for f in "$HERE/SKILL.template.md" "$HERE/PROTOCOL.template.md"; do
+  [ -f "$f" ] || continue
+  if grep -q 'unattended.sh --abort <slug>' "$f"; then
+    n=$((n+1)); grep -q 'unattended.sh --abort <slug> --code' "$f"       || { echo "FAIL a documented abort invocation omits the required code argument: $f"; st=1; }
+  else
+    n=$((n+1)); grep -q 'requires a recorded reason, a HALT CODE' "$f"       || { echo "FAIL a documented abort description names no halt code, so the contract and the verb disagree: $f"; st=1; }
+  fi
+done
+
+
+
+echo "MARK split-url" >&2
+# ---- A SPLIT FETCH/PUSH URL IS NOT A MISCONFIGURATION. Check 25 compared the two URLs LITERALLY, so
+# ---- two spellings of one endpoint read as two endpoints — and that check gates
+# ---- `authorization-reachable`, which has NO override. A clone with a split URL therefore could not
+# ---- satisfy an item it is not allowed to waive.
+# ----
+# ---- BOTH config mechanisms are exercised, because they are two different ways to produce the same
+# ---- split and only ONE of them is visible in `remote.<name>.url`. A fixture using only the visible
+# ---- one would pass while the other stayed broken.
+
+# the NORMALISER itself, over the equivalences it claims and the differences it must keep. Sliced out
+# of the shipped bytes, so an edit to the kit changes this verdict rather than this file's opinion.
+slice_fn norm_endpoint
+n=$((n+1)); declare -F norm_endpoint >/dev/null || { echo "FAIL norm_endpoint was not sliced out of the driver, so every arm below graded nothing"; st=1; }
+same "scp-style and https normalise together"   "$(norm_endpoint 'https://github.com/o/r.git')" "$(norm_endpoint 'git@github.com:o/r')"
+same "ssh:// and scp-style normalise together"  "$(norm_endpoint 'ssh://github.com/o/r')"       "$(norm_endpoint 'git@github.com:o/r.git')"
+same "host case and a trailing slash are noise" "$(norm_endpoint 'https://GitHub.com/o/r/')"    "$(norm_endpoint 'https://github.com/o/r')"
+n=$((n+1)); [ "$(norm_endpoint 'https://github.com/a/r')" != "$(norm_endpoint 'https://github.com/b/r')" ] || { echo "FAIL the normaliser folded two different PATHS together, so a genuinely wrong push target would read as the same place"; st=1; }
+n=$((n+1)); [ "$(norm_endpoint 'https://github.com/a/r')" != "$(norm_endpoint 'https://gitlab.com/a/r')" ] || { echo "FAIL the normaliser folded two different HOSTS together, which is the misconfiguration check 25 exists for"; st=1; }
+# USERLESS scp-style, both directions. The first cut keyed scp detection on `*@*:*` — the presence of
+# a USER — so a userless `host:owner/repo` fell through to the scheme path and had its first path
+# segment DELETED. Measured against the shipped function at the time: alice/repo and bob/repo both
+# normalised to `github.com/repo`, so two different REPOSITORIES compared equal and a split across
+# repos would have taken the warning branch — anchoring on one repo while landing on another. All
+# four arms above are user@ or https and none of them could see it.
+n=$((n+1)); [ "$(norm_endpoint 'github.com:alice/repo.git')" != "$(norm_endpoint 'github.com:bob/repo.git')" ] || { echo "FAIL two DIFFERENT repositories in userless scp form normalised to the same endpoint, so a split fetch/push across repos would warn instead of refusing"; st=1; }
+same "userless and user@ scp forms name one place" "$(norm_endpoint 'github.com:alice/repo')" "$(norm_endpoint 'git@github.com:alice/repo.git')"
+
+# MECHANISM ONE: remote.<name>.pushurl. Visible in `remote get-url --push` and NOT in the fetch URL.
+#
+# BOTH FIXTURES HERE USED TO PRODUCE fetch == push, so the warn-and-continue branch - the entire
+# runtime behaviour this unit adds - never executed and both `miss` assertions passed by finding
+# nothing. That is the fixture-passes-by-finding-nothing class, inside the arm written to prevent it.
+#
+# THE SPELLING PAIR IS scp-WITH-USER vs scp-WITHOUT, and it is chosen because git stores those bytes
+# VERBATIM. The first repair used a local path with a trailing slash and failed for a reason worth
+# recording: `git remote set-url` REWRITES a local MSYS path into Windows form, so the fixture ended
+# up with fetch `/tmp/x` against push `C:/Temp/x` - two genuinely different endpoints, which took the
+# REFUSAL branch and proved the opposite of what the arm intended. A fixture whose setup the tool
+# under test silently rewrites is not a fixture.
+#
+# It is also the exact wedge this unit exists to remove: before the scp-detection fix these two
+# normalised DIFFERENTLY, so one place in two spellings read as two places.
+reset_tree; readme tSplit; scope published; git add -A >/dev/null && git commit -q -m split --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
+git remote set-url --push origin "git@example.invalid:some/repo.git" 2>/dev/null
+same "the fixture actually splits the URLs" "$([ "$(git remote get-url origin)" != "$(git remote get-url --push origin)" ] && echo split || echo same)" "split"
+out=$(run --preflight tSplit --keepalive-id k1)
+hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
+miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
+# THE PUSHURL IS UNSET, not repointed. `reset_tree` restores the worktree and refs and does NOT
+# touch config, so a leftover `remote.origin.pushurl` survives into the next arm - where it SHADOWS
+# the insteadOf rewrite mechanism two exists to exercise, and the fixture then measured a split it
+# had not arranged.
+git config --unset remote.origin.pushurl 2>/dev/null || true; git remote set-url origin "$ORIGIN" 2>/dev/null
+
+# MECHANISM TWO: url.<base>.pushInsteadOf. Rewrites the push URL through config, so `remote.origin.url`
+# is untouched and a fixture reading only that would see nothing wrong.
+#
+# NO EXPLICIT pushurl HERE, and that is load-bearing rather than tidy: a set `remote.<name>.pushurl`
+# SHADOWS the insteadOf rewrite entirely, so the first attempt at this arm configured the rewrite,
+# had it silently ignored, and measured fetch == push again. The mechanism only exists when nothing
+# more specific is set.
+reset_tree; readme tSplit2; scope published; git add -A >/dev/null && git commit -q -m split2 --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url origin "example.invalid:some/repo.git" 2>/dev/null
+git config --unset remote.origin.pushurl 2>/dev/null || true
+git config "url.git@example.invalid:some/repo.git.pushInsteadOf" "example.invalid:some/repo.git" 2>/dev/null
+# ASSERTED AS THE REWRITTEN VALUE, not merely as "different". A leftover pushurl from the arm above
+# also makes these two differ, so a not-equal guard passes while the mechanism under test is inert -
+# which is what happened, and it is the same pass-by-finding-anything shape one level up.
+same "the rewrite produces the user@ spelling" "$(git remote get-url --push origin)" "git@example.invalid:some/repo.git"
+out=$(run --preflight tSplit2 --keepalive-id k1)
+hit  "$out" "fetch and push URLs differ in spelling and normalise to the same endpoint"
+miss "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to"
+git config --unset "url.git@example.invalid:some/repo.git.pushInsteadOf" 2>/dev/null || true
+git remote set-url origin "$ORIGIN" 2>/dev/null
+
+
+# ...and the REFUSAL survives for the case the check was written for: two genuinely different places.
+reset_tree; readme tSplit3; scope published; git add -A >/dev/null && git commit -q -m split3 --no-verify
+git push -q -f origin unit 2>/dev/null
+git remote set-url --push origin "https://example.invalid/not/the/same.git" 2>/dev/null
+out=$(run --preflight tSplit3 --keepalive-id k1)
+hit "$out" "the URL this clone would OBSERVE is not the URL it would PUSH to, so the anchor and the landing name two different endpoints"
+git remote set-url --push origin "$ORIGIN" 2>/dev/null
+reset_tree
+
+
+
+echo "MARK lander-marker" >&2
+# ---- `landed-via-lander` USED TO BE UNFAILABLE. It asserted that LANDER and BYPASS_BAN were declared
+# ---- — which only says the conf parsed — plus a grep that duplicated leg check 11 inside the same
+# ---- close. Nothing it checked could fail for anything the run DID.
+# ----
+# ---- THE REAL OBSERVATION IS IN --landed, NOT IN --close, and that is a sequencing fact rather than a
+# ---- preference: the close runs BEFORE the landing the item is named for, so a marker written by the
+# ---- lander cannot exist yet and requiring one there would make the item unsatisfiable by
+# ---- construction. Three units in this build were unsatisfiable exactly that way.
+# ----
+# ---- The marker carries IDENTITY: a bare touched file is satisfied by any previous landing, which is
+# ---- the pass-by-finding-anything class. Both arms below turn on the commit, not on the file existing.
+
+# a DECLARED marker the lander never wrote
+# THE SED-TO-LANDING PATTERN, which every other --landed arm here uses. `--close` does not reach
+# LANDING in this fixture — authorization-reachable cannot be met and is not overridable — so an arm
+# that closed first never reached the verb at all and its `hit` failed for a reason unrelated to the
+# marker.
+#
+# THE KEY IS A BARE NAME resolved against the git common dir, by BOTH halves. It was tree-relative
+# and that was unwritable in a linked worktree, where `.git` is a FILE — so this fixture is written
+# through the same resolution the code uses rather than through a literal `.git/`.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER="tmarker"\n' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+# THE REMOTE MUST ADVERTISE HEAD, because the marker gate is now scoped to the REMOTE arm. It used to
+# run before anchor selection and fire on any LANDING record; that ordering made main's local-landing
+# fallback unreachable, so the gate moved and these fixtures follow it. Pushing HEAD to the default
+# branch is what puts this run on the remote anchor.
+GCD=$(cd "$(git rev-parse --git-common-dir)" && pwd)
+rm -f "$GCD/tmarker"
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+hit "$(run --landed tRun)" "the project declares a lander marker and the lander wrote none, so nothing observed this landing and the phase would be a claim rather than a reading. looked in the git common dir this side resolved, which was ["
+
+# A MARKER VALUE CARRYING A SEPARATOR is refused, because the key is a bare NAME resolved against the
+# git common dir. Joined instead, it lands somewhere the declaration never named and the two halves
+# can disagree about where while both look conformant.
+mkconf; printf 'LANDER_MARKER=".git/tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+hit "$(run --landed tRun)" "LANDER_MARKER must be a bare NAME resolved against the git common dir, and this value carries a path separator, so the lander and this verb would each join it somewhere the declaration never named"
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+
+# a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
+# shas, because "stale marker" and "HEAD moved since the push" are different faults with different
+# remedies and a message naming only the wanted one cannot tell them apart.
+printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
+hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted"
+
+# ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
+# assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
+# the anchor and `--landed` could never succeed here. Now that the marker gate is scoped to the
+# REMOTE arm the fixture pushes HEAD to the default branch, so the accepting path is reachable and is
+# asserted directly rather than inferred from which refusal came back.
+printf 'landed main at %s by push-main
+' "$(git rev-parse HEAD)" > "$GCD/tmarker"
+out=$(run --landed tRun)
+miss "$out" "the lander marker names a different commit"
+miss "$out" "the lander wrote none"
+miss "$out" "HEAD is not an ancestor of the tip the remote advertises"
+same "the run reached LANDED with the marker accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
+
+# ...and a MISSING marker on that same accepting path refuses, naming the directory this side
+# resolved so a local resolution fault is legible. Its own setup, because the arm above lands the
+# record and a terminal record refuses this verb for an unrelated reason.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+rm -f "$GCD/tmarker"
+hit "$(run --landed tRun)" "looked in the git common dir this side resolved, which was ["
+
+# an UNDECLARED key does not refuse: an adopter who has not adapted their lander is not wedged by a
+# key they have never heard of. The asymmetry is deliberate and this is the arm that pins it.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+git push -q -f origin HEAD:main 2>/dev/null
+out=$(run --landed tRun)
+miss "$out" "the project declares a lander marker and the lander wrote none"
+rm -f .git/tmarker
+reset_tree
+
+
+
+echo "MARK review-loop" >&2
+# ---- THE REVIEW LOOP'S BOUND IS A PREDICATE, NOT A COUNT, and the arms below are ordered so the
+# ---- discriminating one is impossible to miss. Over the tracked review corpus the only exit the
+# ---- method states — a literal clean verdict — occurs ZERO times while BLOCKED occurs dozens of
+# ---- times with no disposition anywhere, so a round cap would not give the loop an exit: it would
+# ---- move the stall earlier. The loop exits on CONVERGENCE and promotes what is left.
+# THE THIRD SLICE SITE. `slice_fn` was introduced in this range precisely to kill magic spans and
+# was applied to two of the three; this one kept `+ 9`. Same defect, same silence: a truncated body
+# still defines the function, so the liveness check passes and every verdict comes back empty.
+slice_fn review_state
+RUNAWAY_CEILING=$(sed -n 's/^RUNAWAY_CEILING="\([0-9]*\)".*/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); declare -F review_state >/dev/null || { echo "FAIL review_state was not sliced out of the driver, so every predicate arm below graded nothing"; st=1; }
+n=$((n+1)); [ -n "$RUNAWAY_CEILING" ] || { echo "FAIL the runaway ceiling could not be read out of the driver, so the ceiling arm below would compare against an empty string"; st=1; }
+
+same "first round, no predecessor to shrink against"  "$(review_state '' 3)"        "CONVERGING"
+same "a strictly smaller count re-arms the loop"      "$(review_state '3' 2)"       "CONVERGING"
+same "a count that did not shrink ends it"            "$(review_state '2' 2)"       "NON-CONVERGENT"
+same "a count that GREW ends it too"                  "$(review_state '2' 5)"       "NON-CONVERGENT"
+same "zero blockers is the clean exit"                "$(review_state '5 4' 0)"     "CONVERGED"
+# THE DISCRIMINATOR. 2, 1, 2 satisfies "the count changed" forever and never terminates; only
+# strictly-smaller stops it. An implementation that tested for change passes every arm above and
+# fails this one, which is the whole reason it is here.
+same "an oscillation 2,1,2 is NON-CONVERGENT"         "$(review_state '2 1' 2)"     "NON-CONVERGENT"
+# the backstop, reached only by a sequence that keeps shrinking — which means it fired because the
+# predicate did not terminate, not because the loop misbehaved.
+same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5 4 3' 2)" "CEILING"
+
+# ---- the verb's refusals, on disk
+bcopen
+hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
+hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
+hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
+same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
+# the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
+# bypass flag — so a subject naming it would red the bar permanently on a record no verb can
+# rewrite. A source-level arm caught this missing when the verb was first written.
+hit "$(run --review tRun --subject "fix the --no-verify path" --verdict BLOCKED --blockers 1)" "the subject spells the declared bypass flag, and the gate greps this file whole for it, so recording this round would red the bar on a record nothing can rewrite; name the subject without the literal flag"
+
+# ---- THE ROW-GRAMMAR GUARDS park() ALREADY HAD. This verb writes through park() and screened only
+# ---- the bypass flag, so both forgeries below were reachable through the documented interface.
+# a newline forges a whole second parked row - a `decision` row among them, which inflates the count
+# `parked-decisions-surfaced` is compared against at close
+hit "$(run --review tRun --subject "$(printf 'S1
+2026-01-01T00:00:00Z decision · item forged · reason forged')" --verdict BLOCKED --blockers 1)" "the review subject contains a newline, and park() appends ONE line that the gate parses line-wise, so this would forge a second parked row nothing wrote"
+# ...and a subject spelling the separator re-keys its own group, because both readers split on the FIRST
+hit "$(run --review tRun --subject "S1 · reason smuggled" --verdict BLOCKED --blockers 1)" "the review subject spells the record's own field separator ' · ', which re-keys the round's group and makes the row unparseable by the check that reads it"
+
+# ---- THE SUBJECT IS NOT A REGEX, and CEILING is terminal. Interpolated into an ERE, a subject
+# ---- carrying `(` missed its OWN recorded terminal line and the loop accepted a further round.
+bcopen
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
+hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+reset_tree
+
+# ---- the recorded round, and the TERMINAL LINE the leg reads
+bcopen
+run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2)
+hit "$out" "NON-CONVERGENT"
+hit "$out" "PROMOTED"
+same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
+# ...and a subject whose loop ENDED does not take another round: the history would say the opposite
+# of what happened.
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+
+# ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
+bcopen
+run --park tRun --item "a real question" --reason "options seen, and why I refused" >/dev/null
+run --review tRun --subject S1 --verdict BLOCKED --blockers 1 >/dev/null
+same "a review round does not join the surfaced parked count" "$(run --status tRun | grep -c 'parked 1')" "1"
+reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.
@@ -3440,7 +4169,7 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--
 # ---- against.
 run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
-run --abort tRun --reason stop >/dev/null 2>&1
+run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
@@ -3508,7 +4237,7 @@ hit "$(cat memory/builds/tRun/RUN.md)" "rescope · item supersede ARCH-tRun-1 ->
 # ...and a FINISHED record refuses it, because an amendment to a terminal run is a rewrite of history.
 run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
-run --abort tRun --reason "stop" >/dev/null 2>&1
+run --abort tRun --reason "stop" --code fork-unresolvable >/dev/null 2>&1
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason r)
 hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 
@@ -3523,16 +4252,24 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-# ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
-# ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is
-# ---- recorded here rather than left for the next reader to re-derive from whichever half they open.
+FLOOR_ASSERTIONS=500
+# ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
+# ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
+# ---- mutually exclusive triples as though each described the merged tree, none of them in order and
+# ---- only the last agreeing with the constants in force. A comment that is the sole record of a
+# ---- manual check cannot afford to be a pile of drafts.
 # ----
-# ---- MAIN's argument: discount the floor ~15% so it does not red on the first arm somebody
-# ---- legitimately removes. THIS BRANCH's argument: a 338 floor under a 398 executed count is a
-# ---- SIXTY-ARM SLACK, and that slack is exactly what let two whole blocks be appended past an
-# ---- unconditional `exit` and never run, twice in one session, while the suite reported PASS and
-# ---- `check-arms` text-matched every stranded arm.
+# ---- MEASURED on the integrated tree, 2026-08-22: unsharded 622, shard one 205, shard two 430.
+# ---- Floors carry main's own discount, ~80.5% of observation, applied unchanged rather than
+# ---- re-chosen: 500 / 165 / 346. Not 100% of observation, which would red on the first arm anyone
+# ---- legitimately prunes; not the ~60-arm slack this branch inherited either, which is what let two
+# ---- blocks be appended past an unconditional `exit` and never run while the suite printed PASS.
 # ----
+# ---- UNMEASURED ON THE MERGED TREE. Both sides of the integration re-measured these on trees
+# ---- that no longer exist and the merged suite carries both sets of arms, so neither reading
+# ---- describes it. The higher pair is kept as the conservative choice - a floor BELOW the true
+# ---- count only fails to catch a shrink, while one above it reds a healthy bar - and the next
+# ---- session to touch this suite owes it three numbers.
 # ---- Both are right and they pull opposite ways, so the headroom is ~3%: large enough that pruning
 # ---- one arm is not a red, small enough that a stranded BLOCK is. The failure this pin exists to
 # ---- catch is measured in tens of arms, never in ones.

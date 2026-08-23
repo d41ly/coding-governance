@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["arm-literal-strands-on-message-edit.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -27,6 +27,11 @@ globs = [
 ```
 
 ## Constraints & why
+
+The failure mode of a TEXT join is that the text moves. Editing a `fail` message strands its arm
+silently: the signature runs to the FIRST interpolation, so lengthening a message always strands
+it while shortening never does, and the sibling test still quotes enough of the old sentence to
+look correct. Caught three times in one file in one session — `arm-literal-strands-on-message-edit`.
 
 `check-arms.py` grades TEXT: it joins each `fail` branch to an assertion string somewhere in the
 matching self-test. It cannot see whether that assertion ever RUNS. Build cBriefedPilot shipped nine

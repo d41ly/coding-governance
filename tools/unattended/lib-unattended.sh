@@ -17,7 +17,14 @@
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
 # there, and a repo-local replace ref would silently rewrite what every predicate below answers.
-GIT() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false "$@"; }
+# NAMED, so `GIT` and the bounded remote observation cannot drift apart. The observation cannot call
+# GIT - it wraps git in `timeout` and needs the pins as argv - so the two spelled the same two
+# options independently until one of them was named. The pins live HERE rather than in either
+# caller, because the driver and the gate leg both source this file and a pin in one of them is a
+# pin the other does not have.
+GIT_PIN_REPLACE=core.useReplaceRefs=false
+GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
+GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 
 # ------------------------------------------------------------------------------- ids, anchored
 # An id compared as a SUBSTRING joins `-1` to `-10`, and the joined pair is always the wrong one:

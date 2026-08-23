@@ -106,6 +106,12 @@ def signature(message: str) -> str:
 
     Interpolations are dropped rather than guessed at, and the longest surviving literal run is the
     signature — short runs like ':' or ' — ' appear in every message and would arm every branch.
+
+    FOR THE ARM AUTHOR: the run does not stop where the sentence does. A message ending
+    `"... is not the remedy: refs/heads/$cur"` has the signature `... is not the remedy: refs/heads/`,
+    trailing path fragment and all, because that text precedes the first interpolation. Only ':', '"'
+    and spaces are trimmed. An arm that stops at the last WORD reads as unarmed with no hint why;
+    run --report and copy the row it prints.
     """
     parts = [p.strip() for p in INTERP_RE.split(message)]
     parts = [p.rstrip(':" ').strip() for p in parts]

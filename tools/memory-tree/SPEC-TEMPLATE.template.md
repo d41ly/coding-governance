@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.27 -->
+<!-- gov:kit memory-tree@2.29 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -168,6 +168,32 @@ One fork per bullet or ### sub-head; options and tradeoffs may span lines. Each 
 recommendation. When resolved, mark it in place: RESOLVED (owner, <date>): <pick>, or
 RESOLVED (agent, <date>, delegated): <pick> under a mandate. Write `none`
 when clear.
+
+**The mark is a SHAPE a machine reads.** Two readers grade it — the
+hygiene gate for a spec at a terminal status, and the planning verb for a live build — and both
+require the word followed by a parenthesised attribution whose first field is `owner` or `agent`,
+whose second is a date, and whose optional third is `delegated`. Anything else is prose: a bare
+`RESOLVED:` resolves nothing, and neither does a resolver name outside that pair.
+
+The mark may sit ANYWHERE in the section — an item's opening line or any continuation line, and it
+may WRAP across a line break, which is this corpus's house style at its width. What the readers grade
+is the section as one whitespace-squeezed string: a section carrying items and no conforming mark
+anywhere is unresolved, and a first line that merely CONTAINS the word no longer resolves it. A §8
+with neither an item nor a `none` form is a refusal, not a pass.
+
+**What they do NOT grade, stated because the obvious tightening is wrong here.** They do not grade
+PER ITEM. That needs a fork bullet to be distinguishable from an OPTION bullet, and this corpus does
+not distinguish them — measured: of 287 §8 bullets, 69 carry descriptive labels, and among those are
+both resolved forks and genuinely open ones. So a label-shape discriminator UNDER-counts and lets a
+real open fork pass, which is worse than the over-counting it would replace; the over-counting was
+measured too, calling a RESOLVED fork unresolved on a live tracked spec whose three option bullets
+each demanded their own mark. The consequence to know: an unresolved fork sitting below an honest
+`none` opening line is NOT detectable, and is pinned as a gap in both readers' fixtures rather than
+implied away. Closing it needs §8 to have a regular shape, which is a scope change.
+
+A fork that a stated PROBE decides, rather than a judgment call, may carry `FACT-QUESTION · ` at the
+head of its bolded label, before the fork id. The prefix is transparent to resolution: it never marks
+an item resolved and never suppresses a mark on the same item.
 
 ## 9. Revision log
 

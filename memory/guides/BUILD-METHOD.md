@@ -1,13 +1,17 @@
-<!-- gov:kit memory-tree@2.27 -->
+<!-- gov:kit memory-tree@2.29 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `tools/run-gates/run-gates.sh`.
-**Budget: ≤22 KB, ≤290 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤24 KB, ≤310 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed — an owner call, because the figure is a stated constraint of a
+It rose from ≤20 KB / ≤250 lines when M12 landed, and again to ≤24 KB / ≤310 on 2026-08-21 — both owner
+calls, because the figure is a stated constraint of a document rather than a measurement of one. The
+second: two builds added rules here concurrently and both parents fitted the old cap alone, so nothing
+was droppable and the constraint moved instead of the content. No gate enforces this pair, which is why
+exceeding it silently was the one option not taken.
 governance carrier and M3's veto 2 makes changing one an owner turn rather than an agent's.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
@@ -78,21 +82,36 @@ after these vetoes, in order. Discard any option that:
 2. needs a new external dependency, install location, public surface, or a change to a governance carrier;
 3. widens a security, data or write surface beyond what the unit's risk tier priced.
 
-Vetoes 2 and 3 are owner turns. Tie-break: fewer open questions, then reuse of a seam M5 found. **No survivors →
-park**, never the least-bad option.
+Vetoes 2 and 3 are owner turns, **and that COLLAPSES onto the park rule rather than sitting beside it**: if the
+only surviving option trips one of them, no resolver the mandate delegates exists, so the fork is parked exactly as
+if nothing had survived. A veto is not a licence to take the vetoed option, and "owner turn" three lines above the
+park sentence has been read as though it were. Tie-break: fewer open questions, then reuse of a seam M5 found.
+**No survivors → park**, never the least-bad option.
+
+**A FACT-QUESTION is a fork a stated PROBE decides — the one kind a run may resolve without an owner.** Mark it
+with the `FACT-QUESTION · ` prefix the §8 readers recognise; legal only when the spec names the probe, the
+observation that decides it, and a LIVENESS assertion that the probe can produce a negative. Take the winner only
+when it falls out of the observation; the moment a preference is needed the rule above governs.
+
+**A probe READS, it does not build.** It measures existing artifacts and may not construct an arm of the fork to
+watch it behave: building one is not an M6 pass kind, so it inherits no commit, no regrounding and no gate, and it
+puts code before the fork is resolved — a rewrite, not a decision.
+
+**Counter-rule.** An observation that decides a fork by making a signal read ZERO is refused: that is the
+vacuous-selector class, and a probe cannot tell "satisfied" from "matched nothing". A real fork here was resolved
+AGAINST the better measurement for that reason, so a testing rule without this exception gets it wrong.
 
 **Mark it in place** per `memory/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. **Keep §8's first non-blank line machine-legal** (`none — the forks below are
-RESOLVED …`): the hygiene gate reads that line and nothing else, so without it the spec reds the moment its status
-goes CLOSED.
+decision the owner did not make. The mark must be the documented SHAPE — the word, then
+`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
+item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 
 **Which.** Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
 authored this run, is unreviewed.
 
-**Not the harness.** `tools/workflows/tier2-review.js` reviews DIFFS with code-shaped lenses. It cannot be
-pointed at a document, and calling a spec "reviewed" by it is false.
+**Not the harness.** `tier2-review.js` reviews DIFFS; a spec is not code, so calling one reviewed by it is false.
 
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next user prompt to reset it: three specs audited by direct spawns exhaust it mid-set,
@@ -110,6 +129,8 @@ verdict line; write it anyway, because M9 derives from these records. **Carry th
 `**Serves:** spec-audit <the ids you reviewed>` — which is what makes "every spec with no review record naming it"
 answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
+
+**A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is PROMOTED** to a unit of this build, specced at its tier and built; not parked, not waived, not re-reviewed, and audited as a SPEC, which is what makes promotion terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README.
 
 ## M5 — Recall and reuse
 
@@ -164,9 +185,8 @@ shared mutable record — `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-
 TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
 sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
-Clause 3 once named the build README outright, which was VACUOUS not strict: every pass changes a spec header it
-is regenerated from. What collides is two passes RENDERING one artifact, or one editing a generator another runs. The fan-out and concurrency
-CEILINGS are `memory/guides/REVIEW-PROTOCOL.md`'s; this is about WHICH work is parallel, never HOW MUCH.
+The fan-out and concurrency CEILINGS are the review protocol's; this is about WHICH work is parallel, never HOW
+MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in the memory-tree README.
 
 ## M7 — Regrounding
 
@@ -227,7 +247,7 @@ from, the line does not go in.**
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
-| open / parked | every parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver |
+| open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
 
 **Completeness test, the only one that matters:** every row has a source on disk. A field you cannot cite a source

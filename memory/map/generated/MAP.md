@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 23 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
+Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 3 · gotcha-classes: 25 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 22
 
 ## gate-legs
 
@@ -48,7 +48,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 | `line length` | playbook |
 | `line-length gate selftest` | playbook |
 | `manifest-check self-test` | baseline |
-| `marker contract` | row-grammar |
+| `marker contracts` | row-grammar |
 | `memory hygiene` | memory-tree-hygiene |
 | `memory-hygiene self-test` | memory-tree-hygiene |
 | `memory-recall kit selftest` | memory-recall |
@@ -153,8 +153,10 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 2 · workflow-scripts: 4 ·
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
+| `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
+| `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `containment-tested-one-way.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |

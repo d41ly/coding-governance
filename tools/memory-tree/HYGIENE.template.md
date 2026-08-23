@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.27 -->
+<!-- gov:kit memory-tree@2.29 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -239,6 +239,18 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     grammar and the escape are below under "Record bindings". Delegated to `gen_build_index.py`,
     which already reads every record's bytes; the parse RAISES nothing, so an unannotated record can
     never refuse the render.
+
+22. **review verdict vocabulary** — a review record whose filename date reaches
+    `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
+    closed set `CLEAN` / `CLEAN WITH FIXES` / `BLOCKED`. A trailing tally is not a member: the point is
+    a token a machine can compare, and counts belong in the body. Deliberately NOT check 5, which is a
+    recording FILENAME grammar, and NOT check 21, which asks which spec a record is evidence about — a
+    verdict assertion under either number would make a structural check read as a semantic one to
+    everybody who did not write it. Forward-only by the cutoff, because 45 of 111 tracked records
+    carried no verdict at all when this landed and a landed review is not rewritten.
+    **What it does NOT check:** whether the verdict is TRUE. It grades the token and never the
+    judgement behind it, exactly as the acceptance-witness rule grades a backticked name and never the
+    thing that name points at.
 
 ## Record bindings — how a record names its spec
 

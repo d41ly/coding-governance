@@ -56,10 +56,13 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
   && git config core.autocrlf false
 mkdir -p tools/unattended memory/guides
 cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" tools/unattended/
-# check 28 reads the playbook leg and the shipped template: it compares the parser inlined in both
-# scripts and then runs it over the template's own declaration line. Without these two the check
-# takes its "missing from one of the pair" branch and every arm below would grade that instead.
-cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" tools/unattended/
+# BOTH SIDES OF THE MERGE ADDED A SEED HERE, for different checks, and both are needed.
+# Check 28 compares the parser inlined in the driver AND the playbook leg and then runs it
+# over the shipped template, so a tree missing either takes the missing-from-the-pair branch
+# and every arm below grades that refusal. Check 22 joins the protocol key table against the
+# EXAMPLE CONF and refuses when it is absent. A fixture that drops either models a broken
+# install rather than a repo.
+cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/.unattended.conf.example" tools/unattended/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 SCRIPT="$TMP/tools/unattended/check-unattended.sh"
 
@@ -77,6 +80,12 @@ DOD_EXTRA="${2-}"
 DIRECTIVES_EXTRA=""
 DIRECTIVES_FLOOR="${DFLOOR_OVERRIDE:-$DIRECTIVES_FLOOR_DERIVED}"
 DIRECTIVES_EXTRA_TABLE=""
+# The dispatch write-set GRADING is dark by default (TOOL-dUnstalledConvoy-23 owns its
+# redesign). The fixture declares it ON so the grading arms below still exercise the code;
+# a separate arm removes the key and asserts the dark path announces itself.
+DISPATCH_GRADING=1
+HALT_CODES_EXTRA=""
+HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
 EOF
 }
 
@@ -119,6 +128,7 @@ EOF
 }
 
 DIRECTIVES_FLOOR_DERIVED="$(grep '^DIRECTIVES_CORE=' "$HERE/unattended.sh" | sed 's/^DIRECTIVES_CORE="//; s/"$//' | wc -w)"
+HALT_FLOOR_DERIVED="$(grep '^HALT_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HALT_CODES_CORE="//; s/"$//' | wc -w)"
 CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
@@ -161,6 +171,14 @@ reset_tree() {
   } | git update-ref --stdin --no-deref
 }
 run() { bash "$SCRIPT" 2>&1; }
+# A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
+# code path whose real trigger is a network partition, which no fixture can arrange.
+# ITS PARENT IS TRAPPED, not just the stub inside it. `$(mktemp -d)/bin` leaked one scratch directory
+# per invocation, and the EXIT trap above never learned the parent. Orphaned scratch dirs are not
+# cosmetic here: 99 of them accumulated in one session and the next suite aborted at startup with
+# `Device or resource busy` - see memory/gotchas/bounded-through-a-pipe-is-unbounded.md.
+TMPBIN_PARENT=$(mktemp -d); TMPBIN="$TMPBIN_PARENT/bin"
+trap 'rm -rf "$TMP" "${ORIGIN_DIR:-}" "${TMPBIN_PARENT:-}"' EXIT
 
 # A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
 # real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
@@ -263,6 +281,201 @@ hit "$out" "$((ncore-1)) against $ncore"
 # ...the member deleted was a TERMINAL one, so the independent terminal-membership check fires too.
 # Two sets declared separately, so THAT one is falsifiable where the subset form was not.
 hit "$out" "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it"
+
+
+
+
+# ---- CHECK 8's MARKER-SHAPE BRANCH, on a TERMINAL record. The exemption used to clear `rd` for any
+# ---- terminal phase, which skipped this refusal as well as the emptiness one — so a finished record
+# ---- with malformed generated markers was exempt from a shape check that has nothing to do with why
+# ---- the exemption exists. Measured when it was scoped: unexempting this branch reds nothing in the
+# ---- corpus, which is exactly why it needs a fixture. A check whose only evidence is a corpus that
+# ---- cannot trigger it is the fixture-passes-by-finding-nothing class.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p memory/builds/tMarker
+printf '# tMarker - run state\n\n<!-- run:generated -->\n\n## Run facts\nphase: LANDED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\nunits-at-landing: ARCH-tMarker-1\n' > memory/builds/tMarker/RUN.md
+printf 'readme\n' > memory/builds/tMarker/README.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m marker --no-verify >/dev/null 2>&1
+hit "$(run)" "a run-state file's generated markers are malformed"
+# ...and the EMPTINESS refusal keeps its terminal exemption, which is the half the exemption is for:
+# a finished record legitimately carries a frozen roster in that region.
+printf '# tMarker - run state\n\n<!-- run:generated -->\nunits-at-landing frozen here\n<!-- /run:generated -->\n\n## Run facts\nphase: LANDED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\n' > memory/builds/tMarker/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m marker2 --no-verify >/dev/null 2>&1
+out=$(run)
+miss "$out" "a run-state file's generated markers are malformed"
+reset_tree
+
+
+
+
+# ---- EVERY DISPATCHED VERB IS DOCUMENTED, joined from the driver's own `case "$VERB"` arms to the
+# ---- three synopsis strings and the Skill template. `--review` shipped reachable and named NOWHERE:
+# ---- not in the Skill, not in the protocol's verb list, and missing from all three driver strings —
+# ---- directly under a comment claiming "THE SAME SET, in all three places". A verb no procedure
+# ---- mentions is a verb no run uses, and its gate check then grades a population nothing creates.
+D="$HERE/unattended.sh"
+# THE POPULATION IS BOTH DISPATCH SITES, not one. The first cut scanned only `case "$VERB" in` for
+# 2-space-indented arms and found nine verbs; `--plan` and `--phase` are dispatched from the ARGV
+# loop at a different indent and were invisible to it. An arm that grades nine of eleven verbs
+# reports full coverage of a set it never saw - the same could-not-fail shape one level up, and the
+# reason this derives the set from every `--verb)` case arm in the file rather than from one block.
+verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
+# ...minus the FLAGS, which are arguments rather than verbs and are documented by the verb they
+# belong to. Named explicitly, because a flag silently treated as a verb would demand a Skill
+# section nobody should write.
+# `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
+# case arm, so it never enters the derived population and exempting it removed nothing. The
+# assertion below caught that on its first run, which is the entire reason it exists.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes'
+for _f in $_denied; do
+  verbs=$(printf '%s
+' "$verbs" | grep -vxF -- "$_f" || true)
+done
+# A FLOOR, NOT A NON-EMPTINESS TEST. The old guard refused only an EMPTY population, which is exactly
+# how a nine-of-eleven population passed while reporting full coverage. The floor is shrink-only and
+# is the number of verbs this kit dispatches; adding one and forgetting to document it now reds here
+# rather than widening the set the join grades.
+_nverbs=$(printf '%s
+' "$verbs" | grep -c .)
+# FOURTEEN, the verbs this kit actually dispatches. It was 12 against a population of 18 - four of
+# main's flags had not been denied, so the count was inflated and two verbs could have stopped being
+# dispatched with the floor still green. A floor set against a polluted population pins nothing.
+n=$((n+1)); [ "$_nverbs" -ge 14 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 14, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
+# population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
+# the cheap proxy is that it must still appear as a case arm in the driver.
+for _f in $_denied; do
+  n=$((n+1)); grep -qE "^ +\Q$_f\E\)" "$D" 2>/dev/null || grep -qE "^ +$_f\)" "$D" || { echo "FAIL the flag denylist exempts $_f, which the driver no longer dispatches - a stale exemption narrows the verb set this join grades and nothing else would notice"; st=1; }
+done
+undoc=""
+for v in $verbs; do
+  grep -q -- "$v" "$HERE/SKILL.template.md" 2>/dev/null || undoc="$undoc $v(skill)"
+  awk '/^\[ -n "\$VERB" \]/' "$D" | grep -q -- "$v" || undoc="$undoc $v(usage)"
+  grep -q "the verbs are.*$v" "$D" || undoc="$undoc $v(refusal)"
+done
+n=$((n+1)); [ -z "$undoc" ] || { echo "FAIL a dispatched verb is absent from a surface an agent reads, so no run can learn it exists:$undoc"; st=1; }
+
+
+# ---- THE REVIEW-LOOP CHECK. Its three clauses cannot be exercised by the corpus, which is exactly why
+# ---- they need fixtures — and the FIRST arm is about the check being able to run at all. It reads the
+# ---- ceiling from the driver through `core_of`, which parses only a DOUBLE-QUOTED value; when that
+# ---- read came back empty the whole three-clause check was skipped and said nothing, which is
+# ---- indistinguishable from a clean corpus. An unreadable ceiling is a refusal now.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+sed -i 's/^RUNAWAY_CEILING=.*/RUNAWAY_CEILING=8/' tools/unattended/unattended.sh
+
+
+hit "$(run)" "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
+
+# ---- AND THE SAME SHAPE FOR THE THREE REMOTE BOUNDS, which is where this class was actually LIVE:
+# ---- all three were declared unquoted in the driver, so every core_of read returned empty and a
+# ---- `${x:-60}` fallback restated the numbers from memory. The leg then observed the remote under
+# ---- bounds it invented while a comment above claimed a single source, and tuning the driver moved
+# ---- nothing. Unquoting one here reproduces exactly that read.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+sed -i 's/^REMOTE_CONNECT_BOUND=.*/REMOTE_CONNECT_BOUND=20/' tools/unattended/unattended.sh
+hit "$(run)" "the driver declares no readable REMOTE_BOUND, REMOTE_CONNECT_BOUND or REMOTE_LOWSPEED_BYTES, so this leg would observe the remote under bounds it invented rather than the ones the driver uses; core_of reads a double-quoted value only, so an unquoted constant reads as absent"
+
+# a group whose counts do not shrink and which records no exit
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p memory/builds/tRev
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
+out=$(run)
+hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without promoting"
+hit "$out" "blocker counts did not shrink across consecutive rounds and no round carries an exit token"
+
+# ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
+# passing because the check reds on any review group at all.
+printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' > memory/builds/tRev/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev2 --no-verify >/dev/null 2>&1
+miss "$(run)" "blocker counts did not shrink across consecutive rounds"
+reset_tree
+
+
+# ---- THE HALT VOCABULARY: six refusals, each armed by a POSITIVE assertion naming its own text. All
+# ---- six were OBSERVED against the real tree before they were armed here, which is the order this
+# ---- repo asks for — a gate whose failing case has only ever been imagined is an assertion about
+# ---- nothing. The driver-editing arms re-stage the kit copy first: reset_tree's `git clean -qfd`
+# ---- removes it, and without the re-stage the sed edits nothing and the arm passes by finding nothing.
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_FLOOR=.*/HALT_FLOOR=""/' .unattended.conf
+# SED, not the override channel: `${HFLOOR_OVERRIDE:-$DERIVED}` substitutes the default when the
+# override is empty, so an empty override declares the key rather than clearing it — the arm passed
+# by testing the opposite of what it says.
+hit "$(run)" "HALT_FLOOR is undeclared in .unattended.conf, and with no floor a deleted halt code is indistinguishable from a vocabulary that never had one"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+HFLOOR_OVERRIDE="seven" mkconf
+# A WORD, not a numeral. The shrink-only comparison below it is `-ge`, which on a non-numeric operand
+# is a shell error rather than a verdict — so a floor that reads as English disarms the pin while
+# looking set, which is worse than one left blank.
+hit "$(run)" "HALT_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE="[a-z-]* /HALT_CODES_CORE="/' tools/unattended/unattended.sh
+hit "$(run)" "the kit's CORE halt vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record that cited it"
+
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+mkconf; sed -i 's/^HALT_CODES_CORE=.*/HALT_CODES_CORE=""/' tools/unattended/unattended.sh
+hit "$(run)" "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything"
+
+# ---- and the two record-level refusals. The population is every TRACKED run-state file, archived ones
+# ---- included, so the fixture has to be committed for the check to see it at all.
+reset_tree; mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh; mkconf
+mkdir -p "memory/builds/tHalt"
+printf '# tHalt - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: ABORTED\nwitness: 0123456789abcdef0123456789abcdef01234567\nbase: 0123456789abcdef0123456789abcdef01234567\n' > memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt --no-verify >/dev/null 2>&1
+out=$(run)
+# the check's own header, which is what the arms gate signs the branch with; the per-record line
+# below says WHICH record.
+hit "$out" "aborted run-state records whose halt code is missing or outside the effective vocabulary"
+hit "$out" "phase ABORTED and no halt-code fact, so the record says a run stopped and never says why"
+
+sed -i 's/^phase: ABORTED/halt-code: not-a-real-code\nphase: ABORTED/' memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt2 --no-verify >/dev/null 2>&1
+hit "$(run)" "halt-code outside the effective vocabulary: not-a-real-code"
+
+# ...and the CONTROL: a legal code is silent. Without it every arm above could be passing because the
+# check reds on any aborted record at all, which is the shape that would also red the whole corpus.
+sed -i 's/^halt-code: not-a-real-code/halt-code: fork-unresolvable/' memory/builds/tHalt/RUN.md
+git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m halt3 --no-verify >/dev/null 2>&1
+out=$(run)
+miss "$out" "phase ABORTED and no halt-code fact"
+miss "$out" "halt-code outside the effective vocabulary"
+reset_tree
+
+
+# ---- THE PARKED-KIND TAXONOMY, both refusals, driven the way every other core-set arm here is: by
+# ---- editing the DRIVER COPY, which is the only place the set lives. The re-stage before each edit
+# ---- is load-bearing — reset_tree's `git clean -qfd` removes the copied kit, and without it the sed
+# ---- edits nothing, the grep finds nothing, and the arm passes by finding nothing.
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# a STALE MEMBER: a kind in the taxonomy that no park call site writes. This is the direction the
+# join asserts, and the failure it exists for — a count that exists to be narrow, silently wider.
+sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED="decision abort override waiver ghostkind"|' tools/unattended/unattended.sh
+out=$(run)
+hit "$out" "the parked-kind taxonomy names a kind no park call site in the driver writes, so a count that exists to be narrow is silently wider than the code it measures"
+
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# ...and the VACUITY arm. An empty set would make the surfaced count and the parked-decisions
+# Definition-of-Done item both range over nothing, which is the empty-population shape this kit
+# refuses by name everywhere else.
+sed -i 's|^PARK_KINDS_OWED=.*|PARK_KINDS_OWED=""|' tools/unattended/unattended.sh
+out=$(run)
+hit "$out" "the driver declares no PARK_KINDS_OWED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read"
+
+reset_tree
+mkdir -p tools/unattended && cp "$HERE/unattended.sh" tools/unattended/unattended.sh
+# ...and the CONTROL: the shipped set is green. Without it both arms above could be passing because
+# the check reds on everything.
+out=$(run)
+miss "$out" "the parked-kind taxonomy names a kind no park call site in the driver writes"
+miss "$out" "the driver declares no PARK_KINDS_OWED taxonomy"
+
 
 reset_tree; mkconf "PARKED" ""
 out=$(run)
@@ -378,6 +591,110 @@ hit "$(run)" "the installed protocol does not spell the archive filename grammar
 reset_tree
 miss "$(run)" "the installed protocol does not spell the archive filename grammar"
 
+# ---- check 9: THE REMOTE COUNT IS ITS OWN FAULT, not an answer about the remote. Zero remotes and
+# ---- two-plus remotes both used to arrive downstream as an empty advertisement and print 'the
+# ---- remote advertised no tips' - a sentence about the REMOTE for a misconfiguration in this
+# ---- clone. The split existed above; only the reporting did not.
+reset_tree; mkconf
+git remote remove origin
+out=$(run)
+hit  "$out" "this clone declares NO remote, so there is no endpoint to observe and whether a recorded BASE is published was never asked; that is a fault in this clone rather than an answer about any remote: recorded"
+miss "$out" "the remote advertised no tips"
+git remote add origin "$ORIGIN"
+
+reset_tree; mkconf
+git remote add second "$ORIGIN"
+out=$(run)
+hit  "$out" "this clone declares more than one remote, so which endpoint published would even mean is a guess; the leg refuses to pick one rather than measuring the BASE against whichever name sorts first: recorded"
+miss "$out" "the remote advertised no tips"
+git remote remove second
+reset_tree
+
+# ---- THE PROMOTION CLAUSE, which had NO arm at all - neither of its two messages was assertedanywhere, so the rewrite that made it count across subjects was landed unobserved. Two subjects both
+# ---- exit NON-CONVERGENT and the region gains exactly ONE id since the run BASE, so the count is
+# ---- short by one and the clause must say so. A per-subject reading would have passed this.
+reset_tree; mkconf
+mkdir -p memory/builds/tProm
+printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
+git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m promobase --no-verify
+PROMBASE=$(git rev-parse HEAD)
+printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n| TOOL-tProm-2 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
+printf '# tProm\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n\n2026-08-20T02:00:00Z review · item S2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' "$PROMBASE" > memory/builds/tProm/RUN.md
+git add -A >/dev/null 2>&1
+hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+reset_tree
+
+# ---- check 9: A TRANSPORT FAILURE IS NOT AN ANSWER EITHER. Splitting the wall-clock bound out left
+# ---- every OTHER non-zero - auth refused, DNS gone, a 404 endpoint - reporting as a statement about
+# ---- what the remote advertised, which is a claim the leg never got close enough to make.
+reset_tree; mkconf
+git remote set-url origin "https://nonexistent.invalid/no/such.git"
+out=$(run)
+hit  "$out" "the remote could not be reached to observe its tips, so whether a recorded BASE is published is UNKNOWN rather than answered no; that is a transport or credential fault and not a statement about what the remote holds: recorded"
+miss "$out" "the remote advertised no tips"
+git remote set-url origin "$ORIGIN"
+reset_tree
+
+# ---- check 9: A TIP THIS CLONE DOES NOT HAVE IS NOT AN ANSWER. `merge-base --is-ancestor` fails
+# ---- both when the commit is not an ancestor AND when the tip object is missing, and is_published
+# ---- used to collapse those into 'not published'. Cost a red bar for real on 2026-08-21: the
+# ---- remote advanced, this clone had not fetched, and all SIXTEEN honest run records reported as
+# ---- naming commits that exist only locally - then the same leg went green minutes later once the
+# ---- tip arrived. A bar that reds on network timing rather than on the tree teaches people to
+# ---- re-run instead of to read.
+# ---- The fixture advertises a tip built INSIDE the bare origin, so the clone cannot have it.
+reset_tree; mkconf
+ghost=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" rev-parse HEAD^{tree})" -m ghost -p "$(git --git-dir="$ORIGIN" rev-parse HEAD)")
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$ghost"
+n=$((n+1)); git cat-file -e "$ghost^{commit}" 2>/dev/null && { echo "FAIL the ghost tip IS present in this clone, so the arm below would grade the ordinary published path instead of the unobservable one"; st=1; }
+out=$(run)
+hit  "$out" "the remote advertised tips this clone does not have, so whether a recorded BASE is published CANNOT BE OBSERVED and this leg will not answer a question it could not ask; fetch and re-run: recorded"
+miss "$out" "is an ancestor of no tip the remote advertises"
+git --git-dir="$ORIGIN" update-ref refs/heads/main "$ANCHOR0"
+reset_tree
+
+# ---- check 22: the section-8 key table and the KIT'S EXAMPLE conf, joined both ways, plus a
+# ---- one-way check that this project sets nothing undocumented. Three keys reached
+# ---- the tree undocumented and one of them REDS this leg when undeclared, so an adopter configuring
+# ---- from the contract got a refusal naming a key the contract never mentioned. Check 10 is a
+# ---- byte-diff of the pair and both copies were identically incomplete, which is the limitation its
+# ---- own header states. Misspelling ONE row fires both directions at once, which is the arm.
+# ...and the check REFUSES when it cannot read its own reverse population, rather than skipping. A
+# `[ -f ]` guard around the whole thing made it vanish silently exactly where a documentation join is
+# worth most, and a check that says nothing reads identically to one that passed.
+reset_tree
+rm -f tools/unattended/.unattended.conf.example
+hit "$(run)" "the kit ships no .unattended.conf.example, so the key table below can be joined against nothing and this check would pass by grading an empty set"
+reset_tree
+
+reset_tree
+sed -i 's/| `HALT_FLOOR` |/| `HALT_FLOOOR` |/' memory/guides/UNATTENDED-PROTOCOL.md
+out=$(run)
+hit "$out" "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:"
+hit "$out" "undocumented in the protocol: HALT_FLOOR"
+hit "$out" "documented but in no example: HALT_FLOOOR"
+reset_tree
+miss "$(run)" "the protocol's binding key table and the declared conf disagree"
+
+# ---- check 9: THE THREE OBSERVATION OUTCOMES, KEPT APART. One message covered all three, so a dead
+# ---- scratch dir and a fired wall-clock bound both reported as "the remote advertised no tips" and
+# ---- sent the reader at the network. The driver had already split these one file over.
+# the wall-clock bound FIRING, stubbed at `timeout` so the run does not actually wait it out
+reset_tree
+mkdir -p "$TMPBIN"; printf '#!/bin/sh\ncase "$*" in *"1 true") exit 0 ;; esac\nexit 124\n' > "$TMPBIN/timeout"; chmod +x "$TMPBIN/timeout"
+out=$(PATH="$TMPBIN:$PATH" run)
+hit  "$out" "the remote observation was KILLED by this kit's own wall-clock bound rather than answered, so the recorded BASE could not be checked; that is a partition or a stalled server, not a remote that advertises nothing"
+miss "$out" "the remote advertised no tips"
+rm -f "$TMPBIN/timeout"
+
+# a scratch file that cannot be created: a fault on THIS side, and it used to skip both observations
+# in silence, which read downstream as a remote answering nothing
+reset_tree
+out=$(TMPDIR=/nonexistent-scratch-dir run)
+hit  "$out" "cannot create a scratch file to capture the remote advertisement, so this leg observed NOTHING and the BASE predicates below would be graded against an empty answer; this is a fault on THIS side, not the remote's"
+miss "$out" "the remote advertised no tips"
+reset_tree
+
 # ---- check 8: the region holds NO COPY. It used to assert the region EQUALLED the README slice,
 # ---- which was unmaintainable in the ordinary case — a spec rev bump moves the build index and the
 # ---- only writer refuses once a run is live. Asserting EMPTINESS is the same invariant with the
@@ -402,7 +719,10 @@ hit "$(run)" "a run-state file's generated region carries a COPY of the unit lis
 # property rather than as two arms about one past bug.
 reset_tree
 mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
 mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
 same "a terminal record carrying a copy leaves the leg green" "$(run; echo $?)" "0"
@@ -504,7 +824,10 @@ miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was don
 # aborted before its first commit — base pinned at HEAD through preflight's degenerate path — red the
 # bar with its own abort record, on the one exit that exists for a run which cannot meet its
 # obligations. The three that remain are the control: dropping ABORTED must not drop them too.
-sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; git add -A
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
+sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; git add -A
 miss "$(run)" "the recorded BASE equals HEAD at a phase that claims work was done"
 for ph in LANDING LANDED VERIFYING; do
   sed -i "s/^phase: .*/phase: $ph/" memory/builds/tRun/RUN.md; git add -A
@@ -592,8 +915,12 @@ anchor_restore
 # ---- the whole block was skipped, so every BASE predicate, check 15's second half and the check-13
 # ---- mandate assertion went silently absent on an unreachable remote — fail-OPEN under a comment
 # ---- promising the opposite. The control is the arms above, which pass with the remote reachable.
+# AN EMPTY BARE REPO, not a missing one. A path that does not exist is a TRANSPORT fault and reports
+# as one since the five-cause split; "advertised no tips" is reserved for a remote that answered and
+# had nothing to say, which is what an initialised-but-empty bare repo produces.
 reset_tree
-git remote set-url origin "$ORIGIN_DIR/gone.git"
+git init -q --bare "$ORIGIN_DIR/empty.git"
+git remote set-url origin "$ORIGIN_DIR/empty.git"
 hit "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published and this leg will not pass a run it could not check; the bar's authoritative run is the pre-push hook, which has the network by construction"
 git remote set-url origin "$ORIGIN"
 miss "$(run)" "the remote advertised no tips, so the recorded BASE cannot be shown to be published"
@@ -720,10 +1047,47 @@ reset_tree
 
 # ---- SOURCE-level: the leg must stay READ-ONLY. It runs on the merge bar, where a gate that writes
 # ---- is a gate that can make the tree it is judging pass.
+# ----
+# ---- THE PROPERTY IS "NO WRITE INTO THE TREE IT JUDGES", not "no redirect anywhere", and the two
+# ---- stopped being the same thing when the leg's remote observations became BOUNDED. A wall-clock
+# ---- bound has to capture through a FILE — `out=$(timeout N cmd)` reads until EOF and a surviving
+# ---- descendant holds the pipe, so the verdict is bounded while the clock is not — and that file is a
+# ---- `mktemp` scratch path outside the repository.
+# ----
+# ---- So the exemption checks a PROPERTY rather than blessing a line: a redirect is allowed only when
+# ---- its target variable is assigned from `mktemp` somewhere in this same file. Blessing the spelling
+# ---- `>"$out"` would let any future variable called `out` write anywhere; deriving the allowed names
+# ---- from the mktemp assignments means the exemption shrinks and grows with the code it describes.
 reset_tree
-w=$(grep -nE '(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)' "$HERE/check-unattended.sh" \
+# the variables this file assigns from mktemp — the only legal redirect targets
+mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE/check-unattended.sh" \
+      | sed -E 's/^[[:space:]]*(local +)?//; s/=\$\(mktemp$//' | sort -u)
+# ONE PATTERN VARIABLE, shared by this arm and by the BOUND on its exemption below. They used to
+# carry two different regexes: this one ends with a LITERAL dollar, matching a redirect into a
+# variable; the bound ended with a bare dollar, an end-of-line anchor, and dropped the leading
+# word-boundary group as well. So every redirect the exemption removes sat OUTSIDE the bound's
+# population and the stated bound did not hold over redirects at all - it still fired on mv, rm and
+# cp, which is why it read as armed.
+WRITE_RE='(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
+w=$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
-n=$((n+1)); [ -z "$w" ] || { echo "FAIL the leg contains a write: $w"; st=1; }
+# A line is exempt when its write touches a SCRATCH variable and the line names no path in the
+# tree under judgement. That is the property spelled directly rather than a verb-by-verb chase:
+# a redirect into the scratch file and the cleanup that removes it are both fine, and either
+# would stop being fine the moment the same line also named the memory root.
+if [ -n "$w" ] && [ -n "$mkt" ]; then
+  for v in $mkt; do
+    w=$(printf '%s\n' "$w" | grep -vF -- "$v" || true)
+  done
+  w=$(printf '%s\n' "$w" | grep -v '^[[:space:]]*$' || true)
+fi
+n=$((n+1)); [ -z "$(printf '%s' "$w" | tr -d '[:space:]')" ] || { echo "FAIL the leg contains a write into the tree it judges: $w"; st=1; }
+# ...and the exemption is not vacuous: this file MUST actually declare a mktemp scratch variable, or
+# the loop above filtered nothing and the arm is the old one wearing a new comment.
+n=$((n+1)); [ -n "$mkt" ] || { echo "FAIL the read-only arm derived no mktemp scratch variable, so its exemption filtered nothing and the property it claims to check is not the one it checks"; st=1; }
+# THE EXEMPTION IS BOUNDED: no line it removed may also name the memory root, or the property
+# check would be exempting a real write to the tree under judgement.
+n=$((n+1)); [ -z "$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" | grep -v '^[0-9]*: *#' | grep -F -- "$mkt" | grep -E '($M|memory)/' || true)" ] || { echo "FAIL a line exempted as scratch also names the tree under judgement, so the read-only exemption is covering a real write"; st=1; }
 
 # ---- SOURCE-level: the hot accessors must not fork. `fact_of`, `phase_of` and `core_of` run per
 # ---- run-state file per check, and as `sed | head | tr` they cost three processes each — measured
@@ -852,7 +1216,10 @@ RM
 # tRun's record is RUNNING, and a second live run trips check 7 — 'the run' stops being well
 # defined for anything keyed on it. Retire it in the same commit so this block's green control
 # measures check 17 rather than a collision this fixture created.
+# a LEGAL halt code rides along: the aborted population is graded for one now, and without it
+# this fixture would red on a check that has nothing to do with what it tests.
 sed -i 's/^phase: RUNNING$/phase: ABORTED/' memory/builds/tRun/RUN.md
+sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
 # A FAST-FORWARD, and the region-two opener above is what keeps it one. A real merge here conflicts
 # on tRun/RUN.md and this redirection swallows it whole — measured, and the reason that opener exists.
@@ -1111,7 +1478,8 @@ reset_tree
 # ---- silence: widening DIRECTIVES_CORE reds check 16 by construction, and a builder chasing total
 # ---- silence would exempt check 16 on terminal records — the over-wide exemption this build has
 # ---- already committed once.
-frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; }
+frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+           sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; }
 
 # MOVE 1 — a COPY appears in the run-state region, which is what every pre-redesign record holds.
 # Collides with check 8. On a TERMINAL record it must be silent: no verb can empty that region once
@@ -1946,6 +2314,30 @@ land_as() {            # anchor-kind · witness
   [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
   git add -A
 }
+
+# ---- ADV_NAME IS GRADED, and before this nothing distinguished the working parse from an empty one.
+# ---- The local arm reaches `refs/heads/$ADV_NAME`; with ADV_NAME empty the test short-circuits, the
+# ---- run takes the skip line, and every surrounding assertion still passes. The parse is the single
+# ---- most consequential rewrite of the cross-build merge - main added it on an unbounded
+# ---- substitution and it was grafted onto the bounded capture - so it gets an arm that fails when it
+# ---- resolves to nothing.
+reset_tree
+land_as local "$(git rev-parse main)"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch"
+
+# ...and the CONTROL that proves the name came from the ADVERTISEMENT rather than coinciding with
+# `main`. The origin's HEAD is repointed at a branch called `trunk`; a parse that hardcodes or guesses
+# the default name passes the arm above and fails here.
+reset_tree
+git branch -f trunk main >/dev/null 2>&1
+git push -q origin trunk 2>/dev/null
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/trunk
+land_as local "$(git rev-parse trunk)"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "a local-anchored LANDED names a witness this clone does not carry on its own default branch"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+reset_tree
 
 # a REMOTE record whose witness never reached the remote is the claim this half exists to refuse
 reset_tree
