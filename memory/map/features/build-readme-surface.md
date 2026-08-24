@@ -76,6 +76,42 @@ leaves `LIVE.md` and both ledger shards byte-neutral. The child set is derived b
 declaration: authoring both directions would be two answers to one question, which is the shape
 `TOOL-aMouldedFolio-1` refused when it declined a front-matter schema.
 
+**The authored half is a CLOSED HEADING CANON, and it is OPT-IN per file.** `SLOT_CANON` declares
+five slots in order — the immutable description (which IS the goal bound M3's rescope rule reads),
+expected improvements, detriments if not built, build-level rules, parked decisions — with per-slot
+`empty_ok` and `bullets` flags. `slot_violations` grades the canon only when its caller passes
+`canon=True`, which `do_check_format` does for a path
+`memory/project/readme-contract.txt` declares BOUND. That registry is asserted in BOTH directions and
+its exempt pin is an EQUALITY, so a pin left high after a drain reds rather than going slack. One
+README is bound today and the leg names its own reach on every run; `--survey` grades every README
+regardless, and `--report` prints each slot's bytes against its declared ceiling and its recorded
+high-water. Ceilings live in `build-readme-slot-limits.txt` and high-waters in a separate file,
+because `--bump` writes the second and must never touch the first. Adopters receive the rows with no
+ceiling values, which is the announced UNARMED state; a MISSING row is a refusal.
+
+**Position is still the mechanism.** No slot has a marker pair. `TOOL-aRuledFrontispiece-1` refused
+per-slot markers for a reason that still holds — two more lines per README to solve what position
+already solves — and refused heading-DETECTION for a second reason that expired at
+`TOOL-aBoundedVerdict-11`. Reading those two refusals as one is how the live rule gets deleted with
+its dead neighbour.
+
+**The no-markers hole.** `slot_violations` returned `[]` unconditionally when it found no generated
+pair, so a README with no markers passed every trigger however much prose it held — measured on a
+45,185-byte fixture that reported clean. It is now a violation. No live file reaches it, which is why
+it went unseen.
+
+**Order is authored on the SPECS and computed here.** `· order <n>` in a status header is a positive
+integer, at most once; ties are the parallel group, gaps are permitted so a retired unit needs no
+renumber, and a malformed value REFUSES rather than rendering a plausible step. The roster carries
+Order and Tier and sorts by build order; the link cell stays first and status stays a whole delimited
+cell, because the unattended driver selects on both.
+
+**Records render in the SPEC they serve.** A `gen:spec-records` pair sits between the status header
+and `## 1. Goal` — the one place check 12 does not look, so no eleventh section and no cutoff. The
+build README's document inventory and its records table are GONE; the two coverage joins survive
+there and now render UNCONDITIONALLY, because each used to hide behind its own non-empty test and a
+fully-covered build rendered nothing at all.
+
 ## Shared seams
 
 `apply_region` takes its marker pair as an argument and DEFAULTS to the build-index constants. The

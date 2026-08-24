@@ -147,33 +147,29 @@ if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
 fi
 
 # readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
-# registry is a refusal and an empty one would red the adopter's first run on the FORWARD assertion.
-# Every row carries its reason inline, and the pin equals the count, so the file the adopter receives
+# registry is a refusal and an empty one reds the adopter's first run on the FORWARD assertion.
+# Every row carries its reason inline and the pin equals the count, so the file the adopter receives
 # already satisfies both directions and the equality.
+#
+# EVERY PROBE HERE IS TERMINATED. A no-match `grep` exits 1, and under `set -eu` that aborts the whole
+# scaffold silently — which is exactly what happened: this block landed unterminated, the script died
+# before rendering LIVE.md, and the adopter self-test caught it as a broken relative link rather than
+# as a dead scaffolder. The charter names this class; the fix is `|| true`, not a cleverer pipeline.
+_rc=$({ git ls-files 2>/dev/null || true; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||' || true; } \
+      | sort -u | grep -E "^$M/builds/[^/]+/README\.md$" || true)
+_rn=$(printf '%s\n' "$_rc" | grep -c . || true)
 {
-  printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.
-'
-  printf '# Asserted BOTH ways: an unnamed tracked README refuses, and a row naming a path that is not
-'
-  printf '# one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and carries its reason
-'
-  printf '# after " - ". `exempt-pin:` is an EQUALITY with the measured exempt count.
-'
-  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds nothing
-'
-  printf '# on day one and says so on every run. Convert a row to bound when you conform that README.
-
-'
-  _rc=$({ git ls-files 2>/dev/null; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||'; }         | sort -u | grep -E "^$M/builds/[^/]+/README\.md$")
-  printf 'exempt-pin: %s
-
-' "$(printf '%s
-' "$_rc" | grep -c . )"
-  printf '%s
-' "$_rc" | grep . | while IFS= read -r f; do
-    printf '!%s - predates the contract in this tree; drains when its build is conformed
-' "$f"
-  done
+  printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.\n'
+  printf '# Asserted BOTH ways: a tracked build README named by no row refuses, and a row naming a\n'
+  printf '# path that is not one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and\n'
+  printf '# carries its reason after " - ". `exempt-pin:` is an EQUALITY with the measured count.\n'
+  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds\n'
+  printf '# nothing on day one and the leg says so on every run. Convert a row to bound when you\n'
+  printf '# conform that README.\n\n'
+  printf 'exempt-pin: %s\n\n' "$_rn"
+  printf '%s\n' "$_rc" | grep . | while IFS= read -r f; do
+    printf '!%s - predates the contract in this tree; drains when its build is conformed\n' "$f"
+  done || true
 } > "$M/project/readme-contract.txt"
 
 # method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
