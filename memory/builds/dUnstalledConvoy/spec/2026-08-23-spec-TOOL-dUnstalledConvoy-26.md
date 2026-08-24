@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 
@@ -153,19 +153,30 @@ says so where an adopter sees it.
 
 ## 8. Open questions
 
-- **F1 — one repo-wide switch, or per-kit?** RESOLVED: one. A matrix is a surface nobody audits and
-  its failure mode is a kit silently exempt from its own tests.
-- **F2 — should `GATE_FULL` unlock them?** RESOLVED: no, and S5 is why it is safe to say so — the
-  stamp records the switch, so a full run without self-tests is legible rather than indistinguishable.
-- **F3 — which legs are `kit` and which are `repo`?** RESOLVED by S1's criterion rather than by a
-  list: a leg whose subject is the kit's own source is `kit`, one that reads the repository is `repo`.
-  rev-1 had no criterion, which is how four repo-subject legs were about to be swept off the bar.
-- **F4 — does the switch default on or off for THIS repo?** RESOLVED: off, like every adopter, with
-  the switch set in this repo's own pre-push and DoD invocation. A default that differs between the
-  source repo and its targets is two behaviours for one mechanism.
+- **F1 — one repo-wide switch, or per-kit?** RESOLVED (agent, 2026-08-24): one. A matrix is a surface
+  nobody audits and its failure mode is a kit silently exempt from its own tests.
+- **F2 — should `GATE_FULL` unlock them?** RESOLVED (agent, 2026-08-24, delegated): no. rev-2 argued
+  this was safe because the stamp records the switch — and round 2 established the stamp's field is
+  INERT, since `.githooks/pre-push` parses only sha, fingerprint and manifest_blob. The safety
+  argument therefore belongs to `TOOL-dUnstalledConvoy-27`, which makes the hook read it. Until that
+  lands, this resolution has no support and this unit must not be closed ahead of it.
+- **F3 — which legs are `kit` and which are `repo`?** RESOLVED (agent, 2026-08-24, delegated): by S1's
+  criterion rather than a list. Round 2 showed the criterion read literally puts gov's push- and
+  commit-boundary self-tests on the on-demand side, which is wrong; that assignment is
+  `TOOL-dUnstalledConvoy-30`.
+- **F4 — where does THIS repo set the switch?** RESOLVED (agent, 2026-08-24, delegated): NOT in
+  `.githooks/pre-push`, which rev-2 chose and which govkit ships verbatim as engine payload to every
+  push-main adopter — turning the switch on for exactly the adopters this unit exists to spare. Where
+  it goes instead is `TOOL-dUnstalledConvoy-28`.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-24 · round 2 returned BLOCKED at six blockers against round 1's three, so the
+  loop was NON-CONVERGENT and the standing blockers were promoted to units. Three of this
+  spec's own resolutions were falsified by that audit and now DELEGATE to the units that
+  carry them: F2 to -27, F3 to -30, F4 to -28. The marks also take the house form the
+  classifier reads, which rev-2's did not — it read FORKED on a spec whose forks were all
+  answered.
 - rev-2 · 2026-08-24 · spec audit returned BLOCKED with three blockers, all reproduced at base before
   folding. The `gate-full-green` stamp conjoins `skips = 0`, so rev-1's skip would have silenced it
   and pinned pre-push into forcing a full run forever — unmentioned in rev-1 and the reason its
