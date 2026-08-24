@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 0431c44027fd3aeefe5a9fbee491516252d41a95
+witness: bb76d629678c26b388882eed728678f706080204
 phase: BUILDING
 branch-sha: 500a5db6b8e056c11bbe1c3cd82a16bc186ada5a
 branch-ref: refs/heads/branch/lexicon-kit-overview-00de02
