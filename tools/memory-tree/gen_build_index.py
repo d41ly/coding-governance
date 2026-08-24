@@ -974,13 +974,13 @@ SLOT_LIMITS = "build-readme-slot-limits.txt"
 SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
 
 
-def _read_slot_table(path: str) -> dict:
+def read_slot_table(path: str) -> dict:
     """`heading -> int | None` from a tab-separated declaration file. None is the UNARMED state.
 
     A COMMENT IS A LINE WITH NO TAB, never a line starting with `#`. Every canonical slot heading
     starts with `#`, so the obvious comment predicate ate every data row: the table parsed to empty
     and the leg reported five slots UNARMED, which reads exactly like a deliberate configuration.
-    Found by running the verb, and it is the reason `_assert_slot_table` below exists — a data file
+    Found by running the verb, and it is the reason `check_slot_table` below exists — a data file
     that parses to nothing must be a refusal, not a plausible state.
     """
     out = {}
@@ -995,7 +995,7 @@ def _read_slot_table(path: str) -> dict:
     return out
 
 
-def _assert_slot_table(limits: dict, where: str) -> None:
+def check_slot_table(limits: dict, where: str) -> None:
     """Both directions over the declared ceilings. Runs whether or not any README is BOUND.
 
     An earlier cut checked this only while grading a bound file, so with an empty population a
@@ -1014,7 +1014,7 @@ def _assert_slot_table(limits: dict, where: str) -> None:
                           f"ceiling outliving its slot silently widens what it was written to bound")
 
 
-def slot_sizes(readme_text: str) -> list:
+def measure_slot_sizes(readme_text: str) -> list:
     """`[(heading, bytes)]` over the AUTHORED slice of each canonical slot, in canon order.
 
     A slot runs from its heading line to the line before the next canonical heading; the LAST slot
@@ -1048,18 +1048,18 @@ def slot_sizes(readme_text: str) -> list:
     return out
 
 
-def budget_findings(root: str, conf: dict, rel: str) -> tuple:
+def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
     here = pathlib.Path(__file__).resolve().parent
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
         raise Problem(f"{SLOT_LIMITS} is absent at {limits_p}; a slot budget with no declared "
                       f"ceilings would grade nothing and report clean")
-    limits = _read_slot_table(limits_p)
-    highs = _read_slot_table(hw_p) if os.path.exists(hw_p) else {}
-    _assert_slot_table(limits, SLOT_LIMITS)
+    limits = read_slot_table(limits_p)
+    highs = read_slot_table(hw_p) if os.path.exists(hw_p) else {}
+    check_slot_table(limits, SLOT_LIMITS)
     hard, adv = [], []
-    for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+    for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
         cap, hw = limits.get(head), highs.get(head)
         if cap is not None and size > cap:
             hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B")
@@ -1069,13 +1069,13 @@ def budget_findings(root: str, conf: dict, rel: str) -> tuple:
     return hard, adv
 
 
-def unarmed_slots() -> list:
+def scan_unarmed_slots() -> list:
     """Canonical slots whose declared ceiling is blank — the ANNOUNCED unarmed state."""
     here = pathlib.Path(__file__).resolve().parent
     p = str(here / SLOT_LIMITS)
     if not os.path.exists(p):
         return []
-    limits = _read_slot_table(p)
+    limits = read_slot_table(p)
     return [h for h, _e, _b in SLOT_CANON if limits.get(h) is None]
 
 
@@ -1127,7 +1127,7 @@ def read_contract_rows(root: str, conf: dict) -> tuple:
     return bound, exempt, pin
 
 
-def assert_contract_registry(root: str, conf: dict, tracked: list) -> None:
+def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
     """Both directions, plus the equality pin. Every failure names the row or the path."""
     rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
     bound, exempt, pin = read_contract_rows(root, conf)
@@ -1147,7 +1147,7 @@ def assert_contract_registry(root: str, conf: dict, tracked: list) -> None:
                       f"slack nothing reports")
 
 
-def _canon_violations(lines: list, first_open: int) -> list:
+def scan_canon(lines: list, first_open: int) -> list:
     """The CLOSED heading canon over the authored half. Trigger 3 (TOOL-dFramedEntrypoint-1 S1).
 
     The authored half runs from the title to whichever comes first: the authored plan pair's opening
@@ -1240,7 +1240,7 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
                 out.append((i + 1, "authored content between the plan pair and the generated region"))
     # Trigger 3 — the closed heading canon, only over a file the registry BINDS.
     if canon:
-        out += _canon_violations(lines, first_open)
+        out += scan_canon(lines, first_open)
     return sorted(set(out))
 
 
@@ -1295,7 +1295,7 @@ def render_spec_records(spec_id: str, recs: list, spec_rel: str) -> str:
     return "\n".join(out)
 
 
-def invert_bindings(builds: list) -> dict:
+def build_spec_record_index(builds: list) -> dict:
     """`spec id -> [record]`, inverted from the bindings every build already carries.
 
     A record filed under one build folder may name a spec in ANOTHER; keying on the id rather than on
@@ -1309,7 +1309,7 @@ def invert_bindings(builds: list) -> dict:
     return out
 
 
-def insert_spec_records(spec_text: str) -> str:
+def add_spec_records_region(spec_text: str) -> str:
     """Create the pair between the status header and the first `## ` section. Nothing else moves."""
     lines = spec_text.split("\n")
     at = next((i for i, l in enumerate(lines) if l.startswith("## ")), None)
@@ -1417,7 +1417,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     # renders an EXPLICIT empty case, because an absent region cannot be told from a spec nobody has
     # recorded against. `--write` creates the pair, `--check` never demands one — the same asymmetry
     # the build-README regions rely on, so this ships without demanding a corpus-wide render.
-    inverted = invert_bindings(builds)
+    inverted = build_spec_record_index(builds)
     for b in builds:
         base = b["readme"].rsplit("/", 1)[0]
         for u in b["units"]:
@@ -1434,7 +1434,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
             if not has and not create_missing:
                 continue
             if not has:
-                stext = insert_spec_records(stext)
+                stext = add_spec_records_region(stext)
             artifacts[rel] = apply_region(
                 stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
                 SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
@@ -1492,7 +1492,7 @@ def do_check_format(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
                if p.endswith("/README.md")]
-    assert_contract_registry(root, conf, tracked)
+    check_contract_registry(root, conf, tracked)
     bound = read_contract_registry(root, conf)
     # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
     # conditional on anything using it.
@@ -1500,13 +1500,13 @@ def do_check_format(root: str, conf: dict) -> int:
     if not (_here / SLOT_LIMITS).exists():
         raise Problem(f"{SLOT_LIMITS} is absent at {_here / SLOT_LIMITS}; a slot budget with no "
                       f"declared ceilings would grade nothing and report clean")
-    _assert_slot_table(_read_slot_table(str(_here / SLOT_LIMITS)), SLOT_LIMITS)
+    check_slot_table(read_slot_table(str(_here / SLOT_LIMITS)), SLOT_LIMITS)
     bad, adv = [], []
     for rel in sorted(tracked):
         for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
             bad.append(f"    {rel}:{line} — {why}")
         if rel in bound:
-            h, a = budget_findings(root, conf, rel)
+            h, a = scan_slot_budget(root, conf, rel)
             bad += h
             adv += a
     # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
@@ -1520,7 +1520,7 @@ def do_check_format(root: str, conf: dict) -> int:
             print(line)
         return 1
     graded = len([r for r in tracked if r in bound])
-    unarmed = unarmed_slots()
+    unarmed = scan_unarmed_slots()
     if unarmed:
         print(f"build-index: NOTE {len(unarmed)} canonical slot(s) ship UNARMED — no declared "
               f"ceiling: {', '.join(unarmed)}")
@@ -1544,8 +1544,8 @@ def do_report(root: str, conf: dict) -> int:
     """
     m = conf["MEMORY_ROOT"]
     here = pathlib.Path(__file__).resolve().parent
-    limits = _read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
-    highs = _read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
+    limits = read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
+    highs = read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
     bound = sorted(read_contract_registry(root, conf))
     if not bound:
         print(f"build-index: no build README is BOUND — {m}/{CONTRACT_REGISTRY} declares none, so "
@@ -1555,7 +1555,7 @@ def do_report(root: str, conf: dict) -> int:
             print(f"    {h} — ceiling {c if c is not None else 'UNARMED'}")
         return 0
     for rel in bound:
-        for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+        for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
             c, hw = limits.get(head), highs.get(head)
             print(f"    {rel} · {head} — {size} B · high-water {hw if hw is not None else '-'} · "
                   f"ceiling {c if c is not None else 'UNARMED'}")
@@ -1568,7 +1568,7 @@ def do_bump(root: str, conf: dict) -> int:
     bound = sorted(read_contract_registry(root, conf))
     peak = {h: 0 for h, _e, _b in SLOT_CANON}
     for rel in bound:
-        for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+        for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
             peak[head] = max(peak.get(head, 0), size)
     p = str(here / SLOT_HIGHWATER)
     keep = [l for l in read_text(p).split("\n") if not l.strip() or l.lstrip().startswith("#")] \
@@ -1846,7 +1846,7 @@ def do_selftest() -> int:
         arm("the no-pair violation fires even with canon off", "1",
             lambda: str(len(slot_violations("# x\n\nprose\n", "x", canon=False))))
 
-        def _canon_readme(slots):
+        def build_canon_readme(slots):
             """A build README whose authored half is `slots`, plus a valid generated pair."""
             head = ["---", "slug: tOne", "node: t", "opened: 2026-01-01", "streams: s",
                     "roster: ARCH", "ids: ARCH-tOne-1", "---", "", "# tOne", ""]
@@ -1858,28 +1858,28 @@ def do_selftest() -> int:
                 "## Build-level rules", "",
                 "## Parked decisions", ""]
         arm("a canon-conforming README trips trigger 3 not at all", "[]",
-            lambda: str(slot_violations(_canon_readme(GOOD), "x", canon=True)))
+            lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
         arm("the canon is OPT-IN — an unbound file is graded on position alone", "[]",
-            lambda: str(slot_violations(_canon_readme(
+            lambda: str(slot_violations(build_canon_readme(
                 GOOD + ["", "## Afterword", "", "anything at all"]), "x", canon=False)))
         arm("a heading outside the canon is named", "heading outside the canon: ## Afterword",
-            lambda: str(slot_violations(_canon_readme(
+            lambda: str(slot_violations(build_canon_readme(
                 GOOD + ["", "## Afterword", "", "prose"]), "x", canon=True)))
         arm("canonical slots out of order are named", "out of order",
-            lambda: str(slot_violations(_canon_readme(
+            lambda: str(slot_violations(build_canon_readme(
                 GOOD[4:] + GOOD[:4]), "x", canon=True)))
         arm("prose above the first canonical heading is named",
             "authored content between the title and the first canonical heading",
-            lambda: str(slot_violations(_canon_readme(["stray sentence.", ""] + GOOD),
+            lambda: str(slot_violations(build_canon_readme(["stray sentence.", ""] + GOOD),
                                         "x", canon=True)))
         arm("a required slot with an empty body is named",
             "empty body and may not: ## The problem this build exists to solve",
-            lambda: str(slot_violations(_canon_readme(
+            lambda: str(slot_violations(build_canon_readme(
                 ["## The problem this build exists to solve", ""] + GOOD[3:]), "x", canon=True)))
         arm("an OPTIONAL slot with an empty body is legal", "[]",
-            lambda: str(slot_violations(_canon_readme(GOOD), "x", canon=True)))
+            lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
         arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
-            lambda: str(slot_violations(_canon_readme(
+            lambda: str(slot_violations(build_canon_readme(
                 GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))
         # The plan pair belongs to NO slot: the authored half must STOP at it, or its table is read
         # as body content of the last canonical slot.
@@ -1922,12 +1922,12 @@ def do_selftest() -> int:
         arm("a spec no record names renders the EXPLICIT empty case", "*No record names this unit.*",
             lambda: render_spec_records("ARCH-tOne-1", [], "memory/builds/tOne/spec/x.md"))
         arm("the pair is created ABOVE the first numbered section, never inside one", "True",
-            lambda: str(insert_spec_records("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+            lambda: str(add_spec_records_region("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
                         .index(SPEC_RECORDS_OPEN) <
-                        insert_spec_records("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+                        add_spec_records_region("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
                         .index("## 1. Goal")))
         arm("the inversion keys a record on every id it names, not on its folder", "2",
-            lambda: str(len(invert_bindings([{"records": [_R]}]))))
+            lambda: str(len(build_spec_record_index([{"records": [_R]}]))))
 
         # -------------------------------------------- TOOL-dFramedEntrypoint-3, the contract registry
         t18 = os.path.join(base, "contract"); os.makedirs(t18)
@@ -1936,27 +1936,27 @@ def do_selftest() -> int:
         os.makedirs(os.path.dirname(reg18), exist_ok=True)
         trk18 = ["memory/builds/tOne/README.md"]
 
-        def _reg(body):
+        def build_reg_check(body):
             write_text(reg18, body)
-            return lambda: assert_contract_registry(t18, conf18, trk18)
+            return lambda: check_contract_registry(t18, conf18, trk18)
 
         # An ABSENT registry is a REFUSAL here — the behaviour unit 1 shipped as the empty set, and
         # this unit REPLACES it. Stated in both specs rather than left as two specs disagreeing.
         os.path.exists(reg18) and os.remove(reg18)
         arm("an absent registry refuses, replacing unit 1's empty set", "is absent",
-            lambda: assert_contract_registry(t18, conf18, trk18))
+            lambda: check_contract_registry(t18, conf18, trk18))
         arm("a registry with no pin refuses", "no `exempt-pin:` line",
-            _reg("memory/builds/tOne/README.md\n"))
+            build_reg_check("memory/builds/tOne/README.md\n"))
         arm("a tracked README named by no row refuses", "names neither a bound nor an exempt row",
-            _reg("exempt-pin: 0\n"))
+            build_reg_check("exempt-pin: 0\n"))
         arm("a row naming a path that is not a tracked README refuses", "stale row silently widens",
-            _reg("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
+            build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
         arm("an exempt row with no reason refuses", "carries no reason",
-            _reg("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
+            build_reg_check("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
         arm("the pin ABOVE the measured count refuses, not only below", "the pin is an equality",
-            _reg("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
+            build_reg_check("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
         arm("a bound row and a matching pin pass", "None",
-            lambda: str(_reg("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
         arm("a bound row is BOUND and an exempt row is not",
             "{'memory/builds/tOne/README.md'}",
             lambda: str(read_contract_rows(t18, conf18)[0]))
@@ -1970,18 +1970,18 @@ def do_selftest() -> int:
                          "## The problem this build exists to solve\t900\n"
                          "## Expected improvements\t\n")
         arm("a heading row is DATA even though it starts with a hash", "900",
-            lambda: str(_read_slot_table(_tbl).get("## The problem this build exists to solve")))
+            lambda: str(read_slot_table(_tbl).get("## The problem this build exists to solve")))
         arm("a line with no tab is the comment, and is skipped", "1",
-            lambda: str(sum(1 for k in _read_slot_table(_tbl) if "real comment" in k) + 1))
+            lambda: str(sum(1 for k in read_slot_table(_tbl) if "real comment" in k) + 1))
         arm("a row with no value is the ANNOUNCED unarmed state, not a missing row", "None",
-            lambda: str(_read_slot_table(_tbl)["## Expected improvements"]))
+            lambda: str(read_slot_table(_tbl)["## Expected improvements"]))
         # Both directions over the declaration, asserted whether or not anything is BOUND.
         arm("a limits table missing a canonical slot is a refusal", "has NO ROW for the canonical slot",
-            lambda: _assert_slot_table({"## Expected improvements": 1}, "t.txt"))
+            lambda: check_slot_table({"## Expected improvements": 1}, "t.txt"))
         arm("a limits row for an unknown slot is a refusal", "which SLOT_CANON does not declare",
-            lambda: _assert_slot_table({h: 1 for h, _e, _b in SLOT_CANON} | {"## Nope": 1}, "t.txt"))
+            lambda: check_slot_table({h: 1 for h, _e, _b in SLOT_CANON} | {"## Nope": 1}, "t.txt"))
         # The measured slice: authored only, and it STOPS at the roster pair.
-        _sz = dict(slot_sizes("\n".join(
+        _sz = dict(measure_slot_sizes("\n".join(
             ["# t", ""] + GOOD + ["", PLAN_OPEN, "| # | a very wide authored roster row |", PLAN_CLOSE,
              "", MARK_OPEN, "generated bytes that must not be billed to a slot", MARK_CLOSE, ""])))
         arm("the last slot's slice stops at the roster pair, not the generated marker", "0",
