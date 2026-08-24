@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: deployer
 roster: DEPL
-ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15
+ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16
 ---
 
 # dCarriedReceipt — a receipt that carries provenance, and an update that can be trusted with it
@@ -105,26 +105,37 @@ The audit that grounds every number here, with its method and its own instrument
 `aFerriedDossier` carried its dossier).
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node d · opened 2026-08-24 · streams deployer
+**Build status:** SPECCED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer
 ids DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12
-ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15
+ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-10 — role `forked`, report-only](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | SPECCED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-14 — post-write verification, with index rollback](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-15 — gov stops shipping its own prefix inside kit bodies](spec/2026-08-24-spec-DEPL-dCarriedReceipt-15.md) | SPECCED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm](spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md) | SPECCED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-3 — `intake` honours `--answer prefix=`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-3.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md) | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | SPECCED | rev-1 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md](build/2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md) | research | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-12 |
-
-Ids no `spec-audit` record has ever named: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3.
+| [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -141,9 +152,23 @@ Ids no `spec-audit` record has ever named: DEPL-dCarriedReceipt-1 DEPL-dCarriedR
 
 - **`spec/`**
   - [2026-08-24-spec-DEPL-dCarriedReceipt-1.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-10.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-11.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md)
   - [2026-08-24-spec-DEPL-dCarriedReceipt-12.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-13.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-14.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-15.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-15.md)
   - [2026-08-24-spec-DEPL-dCarriedReceipt-2.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md)
   - [2026-08-24-spec-DEPL-dCarriedReceipt-3.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-3.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-4.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-5.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-6.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-7.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-8.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md)
+  - [2026-08-24-spec-DEPL-dCarriedReceipt-9.md](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md)
 - **`build/`**
   - [2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md](build/2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md)
+- **`reviews/`**
+  - [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md)
+  - [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md)
 <!-- /gen:build-docs -->

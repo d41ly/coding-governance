@@ -17,5 +17,5 @@ terminal status. Nothing here is edited by hand.
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
-| [dCarriedReceipt](builds/dCarriedReceipt/README.md) | SPECCED | d | 2026-08-24 | deployer | 15 |
+| [dCarriedReceipt](builds/dCarriedReceipt/README.md) | SPECCED | d | 2026-08-24 | deployer | 16 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |
