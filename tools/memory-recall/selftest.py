@@ -100,11 +100,14 @@ def resolve_memory_root() -> str:
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
 SELFTEST_ARMS = 58
-# 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): the twenty-four arms ported from inCMS's
-#   scripts/recall/selftest.py — ten over `bench.py`/`union.py`, which `verbatim.json` pinned by
-#   digest and nothing exercised; eleven over the half of `query.py` that diffs to zero changed
-#   lines against inCMS's copy; and three over the alias join, one of which covers the query-side
-#   call site a recall floor structurally cannot see.
+# 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): twenty-four arms — twenty-three ported from
+#   inCMS's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
+#   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
+#   `query.py` that diffs to zero changed lines against inCMS's copy; THREE over the alias join,
+#   one of which covers the query-side call site a recall floor structurally cannot see; and ONE
+#   that is this pin's own arm, `test_the_selftest_pin_carries_an_unbroken_provenance_chain`.
+#   The first draft of this line read "ten / eleven / three" and omitted the fourth term — which
+#   is the exact defect this comment exists to prevent, found by review before it landed.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -1390,13 +1393,25 @@ def test_one_walk_two_callers():
 # weakened and no measurement re-derived — the figures quoted in these docstrings were measured on
 # inCMS's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
 #
+# ONE EDIT THAT IS NOT A REPATH, disclosed because the sentence above would otherwise hide it:
+# `test_rrf_is_rank_based_not_score_based`'s docstring is REWRITTEN, not repathed. inCMS's reads
+# "a document ranked 1 by the small set and absent from the large one must beat one ranked 3 by
+# both", which is the opposite of what its own assertions check. Gov's wording matches the arm.
+# The upstream copy is the one to fix; this is noted rather than silently carried.
+#
+# AND ONE PRECISION ON "BYTE-IDENTICAL": `bench.py` and `union.py` are identical after CRLF
+# normalisation, not raw. Gov's worktree copies are CRLF and inCMS's are LF, so their raw sha256
+# differs; `diff --strip-trailing-cr` reports zero in both directions, and `t_verbatim_files`
+# strips CRLF before hashing, so the kit's own arm and this claim agree. A reader who checks with
+# `sha256sum` alone will not reproduce it, which is why the qualifier is here.
+#
 # `query` is bound to `QRY` and never to `Q`, in every arm below: `Q` is this file's standard query
 # argv tuple, and shadowing it turned `run(root, kitdir, *Q)` into "Value after * must be an
 # iterable, not module" across twelve unrelated arms before the alias was changed.
 #
 # WHAT WAS DELIBERATELY LEFT UPSTREAM: the id-grammar and anchor-shape arms. Those are precisely the
 # arms this kit's four anchor regexes and its H1-is-not-an-anchor rule still lack — but every one of
-# their sixteen fixtures is an inCMS id embedded in an inCMS row shape, and rewriting them in this
+# their fixtures is an inCMS id embedded in an inCMS row shape, and rewriting them in this
 # conf's vocabulary is authoring a new arm rather than moving one. They are worth purpose-writing
 # here as separate work.
 #
