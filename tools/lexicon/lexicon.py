@@ -615,11 +615,33 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # the only way to re-measure after curating was to read the failure output of a red gate. That is
     # how a pin ends up asserted rather than measured — and two of these three shipped as a hardcoded
     # `"0"` under a comment that called them MEASURED.
+    # HOISTED ABOVE `--measure`, and H1 of the closing review is why. The waiver load, the STALE
+    # detection and the pin parse used to live BELOW the `measure_mode` return, so two of the four
+    # conditions the comment there names could never reach `problems` on that path: `--measure`
+    # printed three pins and exited 0 over a tree carrying dead waivers, while `--check` on the same
+    # tree exited 1 naming them. An operator re-measuring after curation pasted a pin derived from a
+    # corpus whose silencers no longer matched anything. Same armed-but-unreachable shape as the
+    # DEAD SNIFFER defect, in the commit whose own comment claimed the opposite.
+    waived_by: dict[str, dict] = {}
+    unwaived_by: dict[str, list] = {}
+    for kind in ("verb", "suffix", "layer"):
+        waivers = load_waivers(kit, kind)
+        found = offenders[kind]
+        waived_by[kind] = waivers
+        unwaived_by[kind] = [o for o in found if o.text not in waivers]
+        stale = [w for w in waivers if w not in {o.text for o in found}]
+        if stale:
+            problems.append(f"STALE WAIVERS in {WAIVER_FILES[kind]} (the matched text is gone; "
+                            f"delete the row): {', '.join(sorted(stale))}")
+        pin_raw = conf.get(PIN_KEYS[kind], "")
+        try:
+            int(pin_raw) if str(pin_raw).strip() else 0
+        except ValueError:
+            problems.append(f"{PIN_KEYS[kind]}={pin_raw!r} is not an integer")
+
     if measure_mode:
         for kind in ("verb", "suffix", "layer"):
-            waivers = load_waivers(kit, kind)
-            unwaived = [o for o in offenders[kind] if o.text not in waivers]
-            print(f'{PIN_KEYS[kind]}="{len(unwaived)}"')
+            print(f'{PIN_KEYS[kind]}="{len(unwaived_by[kind])}"')
         if problems:
             print("# NOTE: the run also reported problems that are not pin-counted:")
             for p in problems:
@@ -634,19 +656,13 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     exit_code = 0
     tally: dict[str, tuple[int, int, int]] = {}
     for kind in ("verb", "suffix", "layer"):
-        waivers = load_waivers(kit, kind)
+        waivers = waived_by[kind]
         found = offenders[kind]
-        seen_texts = {o.text for o in found}
-        unwaived = [o for o in found if o.text not in waivers]
-        stale = [w for w in waivers if w not in seen_texts]
+        unwaived = unwaived_by[kind]
 
         if list_mode:
             for o in found:
                 print(("  waived " if o.text in waivers else "  ") + str(o))
-
-        if stale:
-            problems.append(f"STALE WAIVERS in {WAIVER_FILES[kind]} (the matched text is gone; "
-                            f"delete the row): {', '.join(sorted(stale))}")
 
         tally[kind] = (sum(v for (_e, k), v in graded.items() if k == kind),
                        len(unwaived), len(found) - len(unwaived))
@@ -654,7 +670,6 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         try:
             pin = int(pin_raw) if str(pin_raw).strip() else 0
         except ValueError:
-            problems.append(f"{PIN_KEYS[kind]}={pin_raw!r} is not an integer")
             pin = 0
         if len(unwaived) > pin:
             exit_code = 1

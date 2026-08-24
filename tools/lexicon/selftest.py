@@ -740,6 +740,54 @@ with build_tempdir() as _td:
     check("S8: all three pins are emitted, each on a line carrying no trailing comment",
           len(_pin_lines) == 3 and not any("#" in l for l in _pin_lines), str(_pin_lines))
 
+# ---- closing-review left-shifts (round 1) --------------------------------------------------------
+#
+# Both arms below gate a CLASS. The review's own words on why: "a single-site fix certifies coverage
+# the script does not have, and the shape will recur the next time a mode is added."
+
+# H1 — `--measure` and `--check` must AGREE on the exit code over one tree. The four conditions the
+# `--measure` comment names all reached `problems` AFTER the measure-mode return, so two of them
+# could never fire there: `--measure` printed pins and exited 0 over a corpus carrying dead waivers
+# while `--check` exited 1 naming them. Asserting AGREEMENT gates every such condition at once,
+# including any added later, and would have caught the DEAD SNIFFER defect as well.
+ZZZ_STALE = "zzz_gone_symbol  a waiver whose target text is gone\n"
+_AGREE = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
+for _label, _files, _waiv in (
+        ("a clean tree", _AGREE, None),
+        ("a STALE waiver", _AGREE, {"lexicon-verb-waivers.txt": "zzz_gone_symbol  dead\n"}),
+        ("an UNDECLARED extension", {**_AGREE, "notes.R": "x <- 1\n"}, None),
+):
+    _c, _co = run_case(_files, BASE_CONF, _waiv)
+    _m, _mo = run_case(_files, BASE_CONF, _waiv, args=("--measure",))
+    check(f"--measure and --check agree on the exit code over {_label}",
+          (_c == 0) == (_m == 0), f"check={_c} measure={_m} | {_mo[:200]}")
+
+# ...and the agreement arm is only worth anything if one of its cases is NON-trivial: a tree where
+# both exit non-zero. Without this, three green rows could all be the clean case.
+_c, _ = run_case(_AGREE, BASE_CONF, {"lexicon-verb-waivers.txt": ZZZ_STALE})
+_m, _ = run_case(_AGREE, BASE_CONF, {"lexicon-verb-waivers.txt": ZZZ_STALE},
+                 args=("--measure",))
+check("...and the stale-waiver case is a NON-trivial agreement (both non-zero)",
+      _c != 0 and _m != 0, f"check={_c} measure={_m}")
+
+# H3 — every call of a function that can fail must be checked. `adopt-lexicon.sh` runs under `set -u`
+# and NOT `-e`, so a bare call takes the next command's status: the --scaffold path printed
+# "wrote .lexicon.conf" and exited 0 with no Skill on disk. Grepping the CALL SITES gates the shape
+# for any mode added later, which a single-site fix does not.
+_sh = (KIT / "adopt-lexicon.sh").read_text(encoding="utf-8")
+_unchecked = []
+for _i, _line in enumerate(_sh.splitlines(), 1):
+    _t = _line.strip()
+    if _t.startswith("#") or "()" in _t:
+        continue
+    for _fn in ("write_skill", "render_skill"):
+        if _t.startswith(_fn) and "||" not in _t and "$(" not in _t and "=" not in _t:
+            _unchecked.append(f"{_i}: {_t}")
+check("every write_skill/render_skill CALL is status-checked (set -u, no -e)",
+      not _unchecked, "; ".join(_unchecked))
+check("...and the arm sees the real call sites (or it proves nothing)",
+      _sh.count("write_skill") >= 3, f"only {_sh.count('write_skill')} mentions")
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

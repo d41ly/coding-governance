@@ -48,9 +48,13 @@ mutates_index = false
 [check]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 
+# THE PROBE NAMES WHAT THE ADOPTER PRODUCES, not what the WRITE phase copied. `{kit}/lexicon.py` is
+# satisfied by the `include = "**"` rule above before `[adopt]` ever runs, so it was a liveness
+# assertion true by construction -- govkit classified any rc-0 run as adopted even when no Skill had
+# been rendered. Closing review M1; `tools/memory-recall/kit.toml` already has the right shape.
 [[outcome]]
 code = 0
-probe = { must_exist = "{kit}/lexicon.py" }
+probe = { must_exist = ".claude/skills/lexicon/SKILL.md" }
 means = "adopted"
 
 # The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
@@ -71,11 +75,21 @@ subject = "kit"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
 
+# NO GUARD, and it is the only leg in this kit without one. `--check` now verifies BOTH the
+# declaration and the rendered Skill, and the Skill drifts when `.lexicon.conf` moves -- a file that
+# is not a guard pathspec govkit can express. A kit-dir guard would leave a conf-only edit unchecked,
+# which is exactly the drift this leg exists to catch.
+#
+# ONE LEG, NOT TWO. TOOL-dScaffoldedMirror-10 first added a SECOND leg for the Skill with the same
+# argv as this one, guarded differently -- so the bar ran `adopt-lexicon.sh --check` twice, and the
+# guarded copy could never say anything the unguarded copy had not already said. Found by the closing
+# review; the map's gate-legs inventory had also gained an unclaimed key for the redundant leg, which
+# disappeared with it.
 [[gate_leg]]
 name = "lexicon wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
-guard = ["{kit}/"]
+guard = []
 
 [[hole]]
 id = "lexicon-ratified"
@@ -101,19 +115,6 @@ blocks_gate = true
 why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
 discharge = { command = ["python", "{kit}/lexicon.py"] }
 
-# NO GUARD, deliberately, and it is the only leg in this kit without one. Every other leg here is
-# scoped to a path whose movement could change its answer; this one's answer changes when
-# `.lexicon.conf` moves, and that file is not a guard pathspec govkit can express (the descriptor
-# says why, above). A guard naming the kit dir would leave a conf-only edit unchecked, which is
-# exactly the drift this leg exists to catch.
-[[gate_leg]]
-name = "lexicon skill wiring"
-subject = "repo"
-argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
-guard = []
-
-# Line-ending pin for the target: a rendered artifact its own gate byte-compares. A CR that git
-# introduces on checkout would read as DRIFT on every run.
 [[lf_pin]]
 pattern = ".claude/skills/lexicon/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

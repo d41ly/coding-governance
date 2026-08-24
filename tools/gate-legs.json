@@ -862,19 +862,6 @@
       "tools/lexicon/adopt-lexicon.sh",
       "--check"
     ],
-    "guard": [
-      "tools/lexicon/"
-    ],
-    "chunk": "wiring",
-    "subject": "repo"
-  },
-  {
-    "name": "lexicon skill wiring",
-    "argv": [
-      "bash",
-      "tools/lexicon/adopt-lexicon.sh",
-      "--check"
-    ],
     "guard": [],
     "chunk": "wiring",
     "subject": "repo"

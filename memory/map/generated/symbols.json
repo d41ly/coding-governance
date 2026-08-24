@@ -323,6 +323,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_banned_index",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "build_base_dir",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -353,6 +358,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "build_form_index",
+      "kind": "function",
+      "file": "tools/lexicon/canon.py"
+    },
+    {
       "id": "build_index",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -376,6 +386,11 @@
       "id": "build_module_index",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "build_negatives",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
     },
     {
       "id": "build_readme_mechanism_drift",
@@ -1823,6 +1838,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_gloss",
+      "kind": "function",
+      "file": "tools/lexicon/canon.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1846,6 +1866,11 @@
       "id": "read_manifest",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_object",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_set",
@@ -1971,6 +1996,11 @@
       "id": "render_map_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_negative",
+      "kind": "function",
+      "file": "tools/lexicon/canon.py"
     },
     {
       "id": "render_order",
@@ -2233,6 +2263,11 @@
       "file": "tools/settings-merge.py"
     },
     {
+      "id": "run_brief",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -2263,6 +2298,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_probe",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "run_rm3",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -2276,6 +2316,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_suggest",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan",

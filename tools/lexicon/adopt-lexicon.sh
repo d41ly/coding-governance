@@ -81,25 +81,12 @@ KIT_VERSION="$(grep -oE 'KIT_LEXICON_VERSION = "[0-9.]+"' "$KIT_DIR/lexicon.py" 
 render_skill() { # -> stdout
   local out verbs
   # The table, rendered from the declaration rather than retyped. Every row, in declaration order.
-  verbs=$("$PY" - "$CONF" <<'PYEOF'
-import io, re, sys
-src = io.open(sys.argv[1], encoding="utf-8", errors="replace").read().replace("\r", "")
-rows, inblock = [], False
-for line in src.split("\n"):
-    if line.startswith("VERBS:"):
-        inblock = True
-        continue
-    if inblock:
-        if not line.strip():
-            continue
-        if not line.startswith(" "):
-            break
-        m = re.match(r"\s+(\S+)\s+(.*)$", line)
-        if m:
-            rows.append("- `%s` — %s" % (m.group(1), m.group(2).strip()))
-print("\n".join(rows))
-PYEOF
-) || return 1
+  # THROUGH THE ONE READER, not a second parser. This block used to carry its own inline grammar
+  # for the VERBS: section, so `lexicon_conf.py` and the render disagreed on shapes both accept --
+  # and the drift gate could not see it, because it compares two outputs of THIS renderer. Closing
+  # review H2. `--print-rows` is that reader's own row form.
+  verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows "$CONF"           | while IFS=$'	' read -r v g; do [ -n "$v" ] && printf -- '- `%s` — %s
+' "$v" "$g"; done) || return 1
   [ -n "$verbs" ] || return 1
   out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
   out=${out%X}
@@ -248,5 +235,14 @@ if [ -f "$CONF" ]; then
   exit 1
 fi
 "$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1
-write_skill
+# `|| exit 1`, matching the --render branch. Without it this script -- which runs under `set -u` and
+# NOT `-e` -- took the echo's status, so a failed render printed "wrote .lexicon.conf" and exited 0
+# with no Skill on disk. The adopter was then wedged: --check reds, --scaffold refuses because the
+# conf now exists, and --render is named only in the usage line. Closing review H3.
+write_skill || {
+  echo "lexicon-adopt: the declaration was written but the Skill was NOT rendered."
+  echo "lexicon-adopt: curate the VERBS: block in .lexicon.conf, then run:"
+  echo "lexicon-adopt:   bash $KITREL/adopt-lexicon.sh --render"
+  exit 1
+}
 echo "lexicon-adopt: wrote .lexicon.conf marked PROPOSED — curate the table, then stamp \`ratified=\`."

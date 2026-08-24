@@ -155,7 +155,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 | [TOOL-dScaffoldedMirror-9 — the grandfather set with a provenance assert, replacing all three pins](spec/2026-08-24-spec-dScaffoldedMirror-9.md) | DEFERRED | rev-1 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
@@ -167,6 +167,7 @@ Records live under `spec/` and `build/`.
 | [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md) | journal | TOOL-dScaffoldedMirror-6 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md) | journal | TOOL-dScaffoldedMirror-7 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md) | journal | TOOL-dScaffoldedMirror-8 |
+| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md) | diff-review | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-6..8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -205,4 +206,6 @@ Records live under `spec/` and `build/`.
   - [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md)
+- **`reviews/`**
+  - [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md)
 <!-- /gen:build-docs -->

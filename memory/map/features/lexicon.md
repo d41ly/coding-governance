@@ -19,12 +19,13 @@ kits = ["lexicon"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
-rendered-skills = []
+rendered-skills = ["lexicon"]
 gotcha-classes = ["armed-but-unreachable-rule.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = [
   "add",
+  "cmd",
   "arm",
   "build",
   "check",
@@ -60,9 +61,12 @@ globs = [
 
 **The verb table is a SCOPING instrument, not a spelling one.** "Which verb is this?" is answerable
 only when a function does one thing, so a name that will not fit is reporting an unclear
-responsibility or a seam in the wrong place. That is the whole value and it is not measurable, which
-is exactly why the kit is OPT-IN rather than required — the engine reports `NOT ADOPTED` and exits 0
-with no `.lexicon.conf` present.
+responsibility or a seam in the wrong place. That is the whole value. The kit is OPT-IN — the engine
+reports `NOT ADOPTED` and exits 0 with no `.lexicon.conf` present — but NOT because the value is
+unmeasurable: `TOOL-dScaffoldedMirror-17` superseded that premise and `drift-audit`'s
+`lexicon_marginal_offense_rate` measures it. This file carried the dead claim TWICE and `-7`
+superseded only the copy in Gaps, which is this repo's own "a fix naming more than one carrier lands
+in only one" class, inside the fix for it.
 
 **The seed is DERIVED and then FROZEN, and the freeze is checkable.** Companion §12 bans a gate whose
 vocabulary is a hand-kept mirror of the codebase's own identifiers. A prescriptive verb table is the
