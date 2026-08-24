@@ -141,6 +141,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
+      "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
       "inputs-inside-the-subjects-reach.md",
       "pin-copied-from-another-corpus.md",
