@@ -64,6 +64,27 @@ discharge but declaring the whole extension dark, which buys a green bar by dele
 The inert case is owned by the frozen sentinels below, which CAN tell the two apart. What this line
 buys is that the zero is visible rather than folded away.
 
+Every run also prints the COVERAGE FRACTION — the armed share of the tracked files that carry a
+definition at all:
+
+```
+lexicon: coverage — armed 54 of 128 definition-carrying file(s) (42.2%)
+```
+
+**What it does NOT measure is extraction QUALITY.** It answers "is this file's language graded by
+anything", not "is it graded well". A `probe` extension counts as armed on exactly the same terms as
+a `parser` one, while the modes table above says a probe is incomplete by construction — so a repo
+can raise this number by declaring a regex set and grade no better than before. The fraction exists
+to make one specific move visible: flipping an armed extension to `dark` is a one-string edit that
+empties a graded population, and before this line nothing in the output moved when it happened.
+
+The denominator comes from a deliberately BROAD, deliberately INCOMPLETE sniffer that reads every
+tracked file regardless of its declaration — it has to, since a denominator built from the armed
+extractors would be the numerator. It answers one boolean per file and feeds one printed line; no
+predicate reads it. Prose and data formats are excluded, because a fenced code block in a tutorial is
+an example rather than a definition, and counting those made a number that moved when somebody wrote
+documentation.
+
 ## Vacuity is armed on BOTH sides
 
 A predicate that selects an empty population passes green forever and tells you nothing. The

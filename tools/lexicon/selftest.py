@@ -522,6 +522,58 @@ check("--measure exits NON-ZERO over an undeclared extension", code != 0, out)
 check("--measure still prints the pins it was asked for", "VERB_OFFENDER_PIN" in out, out)
 check("--measure names the undeclared extension", "UNDECLARED EXTENSIONS" in out and "R" in out, out)
 
+# ---- TOOL-dScaffoldedMirror-6: the coverage sniffer, its fraction, and its liveness --------------
+
+_U6 = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
+
+code, out = run_case(_U6, BASE_CONF)
+check("coverage: the fraction prints on a GREEN run",
+      code == 0 and "coverage - armed" in out.replace("\u2014", "-").replace(chr(8212), "-")
+      and "definition-carrying file(s)" in out, out)
+
+# DERIVED, not a constant: an unarmed shell file joins the denominator and the fraction falls.
+_SH_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                             'LANGS="py:python-ast:parser conf::dark sh::dark"')
+code, out2 = run_case({**_U6, "scripts/go.sh": "build_it() {\n  :\n}\n"}, _SH_CONF)
+check("coverage: an unarmed definition-carrying file LOWERS the fraction",
+      code == 0 and "armed 3 of 4" in out2, out2)
+
+# The PROSE judgement, armed. A fenced example inside documentation is not a definition, and counting
+# it made a number that moves when somebody writes a tutorial. Measured on the real tree: including
+# `.md` reported 25.7% against 42.2%.
+_MD = "Example:\n\n```python\ndef build_thing():\n    pass\n```\n"
+_MD_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                             'LANGS="py:python-ast:parser conf::dark md::dark"')
+code, out3 = run_case({**_U6, "docs/guide.md": _MD}, _MD_CONF)
+check("coverage: a fenced code block in PROSE does not join the denominator",
+      code == 0 and "armed 3 of 3" in out3, out3)
+
+# S6 — the liveness. What it asserts is AGREEMENT: every file an armed extractor found a definition
+# in must also sniff positive. Staged by blinding the sniffer inside a fixture copy of the kit.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    _eng = _r / "tools" / "lexicon" / "lexicon.py"
+    _src = _eng.read_text(encoding="utf-8")
+    _i = _src.index("DEFINITION_SNIFF = re.compile(")
+    _j = _src.index("re.M | re.X,", _i)
+    _eng.write_text(_src[:_i] + 'DEFINITION_SNIFF = re.compile(\n    "ZZZ_NO_MATCH",\n    ' + _src[_j:],
+                    encoding="utf-8", newline="\n")
+    for _rel, _body in _U6.items():
+        _p = _r / _rel
+        _p.parent.mkdir(parents=True, exist_ok=True)
+        _p.write_text(_body, encoding="utf-8")
+    (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", *_U6, ".lexicon.conf"], cwd=_r, check=True, capture_output=True)
+    _got = subprocess.run([sys.executable, "tools/lexicon/lexicon.py"], cwd=_r,
+                          capture_output=True, text=True)
+    _all = _got.stdout + _got.stderr
+    check("S6: a BLIND sniffer reds as DEAD SNIFFER rather than reporting perfect coverage",
+          _got.returncode != 0 and "DEAD SNIFFER" in _all, _all[-300:])
+    check("S6: ...and it names the reading it contradicts",
+          "ARMED extractor did" in _all, _all[-300:])
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -15,22 +15,29 @@ written in place. This is the largest unclosed hole the review found and no desi
 ## 2. Scope (IN)
 
 - **S1** — every run prints the coverage line, on green as well as on red:
-  `coverage — armed N of M definition-carrying file(s) (P%) · floor F%`. Measured today: `54 of 126
-  (42.9%)`.
+  `coverage — armed N of M definition-carrying file(s) (P%)`. Measured today: `54 of 126 (42.9%)`.
+  The `· floor F%` suffix rev-1 specified is gone with S3.
 - **S2** — the denominator is derived by a kit-owned COVERAGE SNIFFER that runs over every tracked
   text file regardless of its `LANGS` declaration. §4 states why the denominator cannot come from
   the armed extractors, and what structurally stops the sniffer from becoming a second vocabulary.
-- **S3** — `COVERAGE_FLOOR` enters `.lexicon.conf` at `35`, and a run below it REDS naming the
-  measured fraction and the floor. §4 derives the number.
-- **S4** — the floor is a scalar and therefore a pin with its sign flipped, so it lands with a
-  `RATCHETS` row `{"file": ".lexicon.conf", "key": "COVERAGE_FLOOR", "weakens": "down"}` in the same
-  commit. The row uses the mechanism `TOOL-dScaffoldedMirror-5` owns; this unit does not restate it.
+- **S3 — CUT by the owner ruling of 2026-08-24.** `COVERAGE_FLOOR` was a conf scalar, which §4 of
+  this same spec calls a pin with the sign flipped, in a build whose thesis is that the raisable
+  ceiling is the defect. What survives is the NUMBER, printed every run by S1; what goes is the
+  VERDICT built on it. `TOOL-dScaffoldedMirror-11` §4 forbids this shape in principle and rev-1 did
+  not cite it — two units arguing the same question oppositely, neither reading the other.
+- **S4 — CUT with S3.** It existed only to ratchet the floor, and it named
+  `TOOL-dScaffoldedMirror-5` as the owner of its mechanism; that unit is WONTDO as of 2026-08-24,
+  so the row would have pointed at a cut unit even if the floor had survived.
 - **S5** — the `LANGS` mode ratchet. Ranks are `parser` 2, `probe` 1, `dark` 0, absent −1. An
   extension whose rank FALLS between the base and HEAD is a finding unless a comment within
   `RATCHET_LOOKBACK` lines above the `LANGS` declaration names the move as `<ext>: <old> -> <new>`.
-- **S6** — the sniffer's own liveness assertion: when at least one extension is declared `dark` and
-  present in the corpus, the sniffer must find at least one definition-carrying file among them, or
-  the run prints `DEAD SNIFFER` and REDS. Without it a broken denominator reports 100% coverage.
+- **S6 — the sniffer's liveness, and rev-3 changes WHAT it asserts.** rev-1 wanted "some dark
+  extension carries a definition", which reds an honest adopter whose dark extensions are all data
+  files — the same defect `TOOL-dScaffoldedMirror-2` had to fix in `DEAD PREDICATE`, met a second
+  time. What is falsifiable without it is AGREEMENT: every file an ARMED extractor found a
+  definition in must also sniff positive. Two independent readings of one population, so a blind
+  sniffer CONTRADICTS the extractors rather than merely reporting zero. Prints `DEAD SNIFFER` and
+  REDS.
 - **S7** — `tools/lexicon/README.md` states what the fraction does NOT measure: extraction quality.
 
 ## 3. Non-goals (OUT)
@@ -101,13 +108,14 @@ may grow to 154 before 54/154 = 35.06% reds — 28 dark definition-carrying file
 floor bites. The largest single-commit `.sh` arrival on record in this repo is **3 files**, measured
 across the 56 commits since 2026-06-01 that add one, so the headroom is nine times the largest
 observed honest move. And the move this unit exists to catch lands at 7.9%, twenty-seven points
-under the floor rather than two.
+under where rev-1's floor sat, rather than two.
 
-The floor is a scalar in a conf, which is a pin with the sign flipped, and this build's whole thesis
-is that a raisable scalar is not pressure. S4 is what stops it being one: lowering `COVERAGE_FLOOR`
-is a weakening move that lands in `RATCHETS` and needs its reason written beside it. This is the
-first row in that list whose `weakens` is `down`, and the direction is declared per entry precisely
-so it can be.
+**rev-1 answered that with S4 and rev-2 cut both.** Its argument was that the floor is a scalar in a
+conf — a pin with the sign flipped — and that a `RATCHETS` row lowering it would make the weakening
+visible. That is a ratchet defending a scalar the build is trying to delete, and it buys visibility
+for a number nobody needed: the FRACTION is the fact, and S1 prints it every run whether or not a
+verdict hangs off it. Catching the weakening MOVE is S5's job, and S5 is derived from two trees
+rather than from an authored integer, which is the difference that matters.
 
 ### The mode ratchet, and the move it cannot see
 
@@ -179,17 +187,19 @@ the piece that makes every later measurement in this build readable.
   and the coverage line says so.
 - **observability** — the coverage line is the observability change, and it prints on green. It is
   also the operand every later unit in this build reads when it claims coverage moved.
-- **risks** — two. First, the sniffer is a heuristic in a kit whose thesis is that derived standards
-  are untrustworthy; the containment is that it produces a single integer and feeds exactly one
-  consumer, stated in §4 as structure rather than as a promise. Second, `COVERAGE_FLOOR` is a new
-  scalar in a build that is deleting scalars, and S4 is the answer.
-- **testing + left-shift gates** — six arms in `tools/lexicon/selftest.py` and one in
-  `tools/drift-audit/selftest.py` (§6). The classes are
+- **risks** — one, rev-1 having listed two. The sniffer is a heuristic in a kit whose thesis is that
+  derived standards are untrustworthy; the containment is that it produces a single integer and
+  feeds exactly one consumer — a printed line — stated in §4 as structure rather than as a promise.
+  rev-1's second risk was that `COVERAGE_FLOOR` is a new scalar in a build deleting scalars; that
+  risk is retired by cutting the scalar rather than by defending it.
+- **testing + left-shift gates** — arms in `tools/lexicon/selftest.py` for the fraction and the
+  sniffer's liveness, and one in `tools/drift-audit/selftest.py` for the mode ratchet (§6). rev-1
+  said six and one; the count is not restated here, because two of its arms tested the cut floor. The classes are
   `memory/gotchas/vacuous-selector-empty-population.md` for S6 and
   `memory/gotchas/fixture-passes-by-finding-nothing.md` for the sniffer fixtures.
-- **migration / rollback** — `COVERAGE_FLOOR` is a new key; a conf without it takes the kit's
-  shipped default rather than 0, because an absent floor reading as 0 would be a silently disabled
-  gate. Rollback is deleting the key and the row.
+- **migration / rollback** — NONE, since rev-2 cut the only new conf key. The coverage line is
+  output and the mode ratchet reads two committed trees, so nothing persists that a rollback would
+  have to migrate; reverting the commits removes both.
 - **user docs** — S7, plus the `.lexicon.conf` comment block above the new key, which is where the
   floor's derivation must live so a later session raising or lowering it reads §4's arithmetic
   instead of re-deriving it.
@@ -197,20 +207,15 @@ the piece that makes every later measurement in this build readable.
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/lexicon/lexicon.py` runs on this worktree unchanged, it prints
-  `coverage — armed 54 of 126 definition-carrying file(s) (42.9%) · floor 35%` and exits 0. Observed
-  with no staged break.
+  `coverage — armed N of M definition-carrying file(s) (P%)` and exits 0, with the pair matching a
+  hand count of files carrying a definition. Observed with no staged break.
 - **AC2** — When `LANGS` is edited so `py` reads `py:python-ast:dark` and nothing else changes, the
-  same command reports the fraction as `7.9%`, names `COVERAGE_FLOOR`, and exits 1. Today that edit
-  prints `lexicon OK` and exits 0; the arm is staged from this tree.
-- **AC3** — When a fixture repo declares a new extension as `dark` and that extension carries enough
-  definition-carrying files to push the fraction below the floor, the run exits 1 — even though no
-  existing `LANGS` row changed. This is the arriving-dark move, which S5 cannot see.
+  printed fraction COLLAPSES — measured 42.9% to 7.9% — proving the number is derived rather than
+  a constant. The run's exit code is unchanged: with S3 cut, catching that MOVE is S5's job and
+  not a scalar's, which is AC4.
 - **AC4** — When `py` is flipped from `parser` to `dark` with no `py: parser -> dark` marker within
   14 lines above the `LANGS` declaration, `python tools/drift-audit/drift_report.py` reports the
   weakening move; with the marker present it reports nothing.
-- **AC5** — When `COVERAGE_FLOOR` is lowered from `35` with no `35 -> N` marker beside it, `python
-  tools/drift-audit/drift_report.py` reports it, by the same `RATCHETS` row shape every other pin in
-  that list uses.
 - **AC6** — When the coverage sniffer is broken so it reports no definition-carrying file in any
   dark extension, `python tools/lexicon/lexicon.py` prints `DEAD SNIFFER` and exits 1 rather than
   reporting `100.0%`. Staged by replacing the sniffer's pattern with one that cannot match.
@@ -221,8 +226,7 @@ the piece that makes every later measurement in this build readable.
 ## 7. Gates
 
 Keeps green: `lexicon naming predicates`, `lexicon selftest`, `lexicon wiring`, `drift-audit
-selftest`, `drift-audit records`, `memory hygiene`. Adds no new gate leg — S1, S3 and S6 are new
-refusals inside `lexicon naming predicates`, S5 rides `drift-audit records`, and the arms ride the
+selftest`, `drift-audit records`, `memory hygiene`. Adds no new gate leg — S6 is a new refusal inside `lexicon naming predicates`, S1 a new report there, S5 rides `drift-audit records`, and the arms ride the
 two selftest legs. The leg count is not the coverage, and in a unit whose subject is coverage that
 is worth saying twice.
 
@@ -252,6 +256,24 @@ is worth saying twice.
   at 35 and derives the number from this repo's own largest observed dark arrival rather than from
   taste.
 - rev-1 status 2026-08-24 · KEPT in the six-unit build, S3/S4 CUT by the owner ruling: the coverage floor is a conf scalar this spec's own S4 calls a pin with the sign flipped, and it is defended by a ratchet row `-9` deletes. S1/S2/S5/S6 survive - the printed fraction, its liveness assertion and the mode ratchet are the only control that makes `-2`'s cheap js-dark escape visible. Needs a rev-2 scope pass before building.
+
+- rev-2 · 2026-08-25 · S3 and S4 CUT by the owner's six-unit ruling. The floor was a conf scalar —
+  this spec's own §4 calls it a pin with the sign flipped — landing in a build whose thesis is that
+  the raisable ceiling is the defect, and `TOOL-dScaffoldedMirror-11` §4 forbids the shape in
+  principle without rev-1 citing it. The NUMBER survives and is printed every run; the VERDICT built
+  on it does not. S4 went with it, and would have pointed at `TOOL-dScaffoldedMirror-5` (WONTDO)
+  regardless. AC1 and AC2 drop their floor clauses, AC3 and AC5 are deleted with the mechanism they
+  tested, and catching a weakening move is S5's derived ratchet rather than a scalar's.
+
+- rev-3 · 2026-08-25 · S1, S2, S6 and S7 BUILT; S5 remains. Three corrections, all measured.
+  (1) S6's liveness is now AGREEMENT between the sniffer and the armed extractors, because rev-1's
+  form reds an adopter whose dark extensions are all data — the second time this build has met that
+  class. (2) The sniffer EXCLUDES prose and data formats: counting fenced code blocks in `.md` put
+  82 documentation files in the denominator and reported 25.7% against a true 42.2%, so the number
+  moved when somebody wrote a tutorial. (3) A staged break caught the `DEAD SNIFFER` refusal
+  registering itself into `problems` AFTER that list is printed and folded into the exit code, so
+  it could never fire — armed-but-unreachable, found only by observing the break. AC1 reads 54 of
+  128 (42.2%) against rev-1's predicted 54 of 126 (42.9%).
 
 ## 10. Reuse audit
 

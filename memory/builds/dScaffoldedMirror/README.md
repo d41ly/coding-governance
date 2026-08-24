@@ -112,7 +112,7 @@ because nobody adopts it. That last one is the largest unaddressed risk in the s
 owner yet.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 14 unit(s) · node d · opened 2026-08-24 · streams tooling
+**Build status:** INPROGRESS · 14 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dScaffoldedMirror-1 TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11
 ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 TOOL-dScaffoldedMirror-16 TOOL-dScaffoldedMirror-17 TOOL-dScaffoldedMirror-18 TOOL-dScaffoldedMirror-19
 
@@ -129,7 +129,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 | [TOOL-dScaffoldedMirror-3 — corpus scoping derived from the install receipt](spec/2026-08-24-spec-dScaffoldedMirror-3.md) | WONTDO | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-4 — waiver keying and the mandatory reason](spec/2026-08-24-spec-dScaffoldedMirror-4.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-5 — the three RATCHETS rows and the delete-then-re-add repair](spec/2026-08-24-spec-dScaffoldedMirror-5.md) | WONTDO | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet](spec/2026-08-24-spec-dScaffoldedMirror-6.md) | SPECCED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet](spec/2026-08-24-spec-dScaffoldedMirror-6.md) | INPROGRESS | rev-3 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal](spec/2026-08-24-spec-dScaffoldedMirror-7.md) | CLOSED | rev-4 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-8 — the shipped frozen canon, and `--probe`](spec/2026-08-24-spec-dScaffoldedMirror-8.md) | SPECCED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-9 — the grandfather set with a provenance assert, replacing all three pins](spec/2026-08-24-spec-dScaffoldedMirror-9.md) | DEFERRED | rev-1 | 2026-08-24 |

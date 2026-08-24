@@ -108,6 +108,65 @@ PATTERN_SETS = {
 }
 
 
+#: S2 — the COVERAGE SNIFFER. A deliberately BROAD, deliberately INCOMPLETE probe for "does this file
+#: define anything at all", run over every tracked text file regardless of its `LANGS` declaration.
+#:
+#: WHY IT CANNOT REUSE THE ARMED EXTRACTORS: they only run on declared-armed extensions, so a
+#: denominator built from them is the numerator. Measuring coverage needs a reading of the files the
+#: kit does NOT grade, which is exactly the population no armed extractor may touch.
+#:
+#: WHAT STOPS IT BECOMING A SECOND VOCABULARY: it answers ONE boolean per file and feeds ONE consumer,
+#: a printed fraction. It names nothing, grades nothing, and no predicate reads it. A regex here that
+#: is wrong costs an inaccurate percentage; a regex in `PATTERN_SETS` that is wrong costs a verdict.
+#: That asymmetry is the whole containment and it is structural rather than promised.
+#:
+#: It is a HEURISTIC and the README says so. It is not a lexer, it is not a step toward one, and
+#: `TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question.
+DEFINITION_SNIFF = re.compile(
+    r"""^[ \t]*(?:
+          (?:async[ \t]+)?def[ \t]+\w                     # python, ruby
+        | (?:export[ \t]+)?(?:async[ \t]+)?function[ \t]+\w   # js, ts, php, shell `function f`
+        | (?:export[ \t]+)?(?:abstract[ \t]+)?class[ \t]+\w   # js, ts, php, java, kotlin
+        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*[ \t]*=[ \t]*(?:async[ \t]*)?\(  # js arrow
+        | func[ \t]+\w                                    # go, swift
+        | fn[ \t]+\w                                      # rust
+        | (?:public|private|protected)[ \t]+[\w<>\[\]]+[ \t]+\w+[ \t]*\(   # java, c#
+        | \w[\w-]*[ \t]*\([ \t]*\)[ \t]*\{                # shell `f() {`
+        )""",
+    re.M | re.X,
+)
+
+#: Extensions the sniffer never opens. Not a vocabulary — a read-cost bound. A binary or a lockfile
+#: cannot carry a definition and reading it is wasted I/O; being wrong here can only UNDERCOUNT the
+#: denominator, which reports coverage as better than it is, so the list is kept short deliberately.
+SNIFF_SKIP = {
+    # Binary or generated: cannot carry a definition, and reading one is wasted I/O.
+    "png", "jpg", "jpeg", "gif", "ico", "pdf", "zip", "gz", "wasm", "lock", "svg",
+    # PROSE AND DATA, and this half is a judgement rather than a fact about bytes, so it is argued.
+    # A fenced code block inside documentation is an EXAMPLE, not a definition this kit could grade
+    # even if the extension were armed. Measured on this repo: including `.md` put 82 documentation
+    # files into the denominator and reported coverage as 25.7% against 42.9% — a number that moves
+    # when somebody writes a tutorial is not measuring coverage. Data formats are here for the same
+    # reason one step simpler: they declare no functions at all.
+    "md", "rst", "txt", "json", "toml", "yaml", "yml", "tsv", "csv", "ini", "cfg",
+}
+
+
+def scan_definition_carriers(root: Path, files: list[str]) -> set[str]:
+    """Tracked files the sniffer believes define something. S2."""
+    out = set()
+    for rel in files:
+        if ext_of(rel) in SNIFF_SKIP:
+            continue
+        try:
+            src = (root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if DEFINITION_SNIFF.search(src):
+            out.add(rel)
+    return out
+
+
 class Offender:
     """One finding. `text` is the WAIVER KEY, and it is the matched text rather than
     `<path>:<line>` on purpose: `install-prefix-waivers.txt` keys on position and any edit ABOVE a
@@ -450,6 +509,7 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # ZERO JavaScript classes and nothing could say so. A population is per-predicate or it is
     # not a population — the predicate is what decides which definitions were even eligible.
     graded: dict[tuple[str, str], int] = {}
+    extractor_carriers: set[str] = set()   # files an ARMED extractor found a definition in
 
     for rel in files:
         ext = ext_of(rel)
@@ -472,6 +532,8 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         graded[(ext, "verb")] = graded.get((ext, "verb"), 0) + len(funcs)
         graded[(ext, "suffix")] = graded.get((ext, "suffix"), 0) + len(types_)
         graded[(ext, "layer")] = graded.get((ext, "layer"), 0) + len(imports)
+        if funcs or types_:
+            extractor_carriers.add(rel)
 
         for name, lineno in funcs:
             verb = leading_verb(name)
@@ -590,6 +652,34 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # that does not write JavaScript classes rather than an extractor that went inert — and the
     # inert case is owned by the frozen SENTINELS fixture in this kit's own selftest, which can
     # tell the two apart where a single tree cannot. See the spec's section 4.
+    # S1/S2 — the coverage fraction, on every run. The armed share of the files that actually
+    # carry a definition, which is the number a `LANGS` edit moves and nothing else reported.
+    carriers = scan_definition_carriers(root, files)
+    armed_exts = {e for e, (ps, m) in declared.items()
+                  if m == "parser" or (m == "probe" and ps in PATTERN_SETS)}
+    armed_carriers = {f for f in carriers if ext_of(f) in armed_exts}
+    pct = (100.0 * len(armed_carriers) / len(carriers)) if carriers else 0.0
+    print(f"lexicon: coverage — armed {len(armed_carriers)} of {len(carriers)} "
+          f"definition-carrying file(s) ({pct:.1f}%)")
+
+    # S6 — the sniffer's liveness, and rev-3 corrects rev-1 on WHAT it asserts. rev-1 wanted "some
+    # dark extension carries a definition", which reds an honest adopter whose dark extensions are
+    # all data files — the same defect `TOOL-dScaffoldedMirror-2` had to fix in DEAD PREDICATE.
+    # What is falsifiable without that flaw is AGREEMENT: every file an ARMED extractor found a
+    # definition in must also sniff positive. Two independent readings of one population, and a
+    # sniffer that has gone blind contradicts the extractors rather than merely reporting zero.
+    # PRINTS AND SETS THE CODE HERE, not via `problems`. The first cut appended to that list, which
+    # is already printed and already folded into `exit_code` forty lines above — so this refusal could
+    # never fire and a staged break proved it: blinding the sniffer left the run at exit 0. A refusal
+    # registered after its own reader has run is the armed-but-unreachable class, and the only thing
+    # that caught it was observing the break rather than reasoning about it.
+    blind = sorted(extractor_carriers - carriers)
+    if blind:
+        exit_code = 1
+        print(f"lexicon: DEAD SNIFFER — the coverage sniffer found no definition in {len(blind)} "
+              f"file(s) where an ARMED extractor did (e.g. {blind[0]}). The denominator is "
+              f"undercounting, which reports coverage as BETTER than it is.")
+
     empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
     if empty:
         print("lexicon: armed but grading nothing (reported, not a refusal): " + ", ".join(empty))
