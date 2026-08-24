@@ -19,7 +19,7 @@ gotcha-classes = ["assertion-between-two-derived-values.md", "second-implementat
   "bounded-through-a-pipe-is-unbounded.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
   "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
-  "spec-names-code-its-base-lacks.md",
+  "spec-names-code-its-base-lacks.md", "two-guards-one-question-two-answers.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
 ]

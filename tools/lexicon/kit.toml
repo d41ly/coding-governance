@@ -51,16 +51,19 @@ means = "adopted"
 # which bypasses every guard, so the authoritative run stays total.
 [[gate_leg]]
 name = "lexicon naming predicates"
+subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
 guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
 
 [[gate_leg]]
 name = "lexicon selftest"
+subject = "kit"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "lexicon wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 guard = ["{kit}/"]
 

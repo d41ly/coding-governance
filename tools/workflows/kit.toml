@@ -24,11 +24,13 @@ why_no_adopter = "the harness is copied and its protocol rendered; the render is
 
 [[gate_leg]]
 name = "verifier fan-out"
+subject = "repo"
 argv = ["bash", "{kit}/check-verifier-fanout.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "review-protocol parity (kit vs dogfood)"
+subject = "repo"
 argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
 
@@ -41,21 +43,25 @@ the parity gate is this entry's leg and it performs its own render comparison; t
 
 [[gate_leg]]
 name = "verifier fan-out self-test"
+subject = "kit"
 argv = ["bash", "{kit}/check-verifier-fanout.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "review-join ban (no ref-keyed join)"
+subject = "repo"
 argv = ["bash", "{kit}/check-review-join.sh"]
 guard = []
 
 [[gate_leg]]
 name = "workflow script syntax"
+subject = "repo"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 
 [[gate_leg]]
 name = "review-join self-test"
+subject = "kit"
 argv = ["bash", "{kit}/check-review-join.test.sh"]
 guard = ["{kit}/"]
 

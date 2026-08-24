@@ -128,15 +128,27 @@ fi
 # later needs no code.
 GATE_FULL_MAX_LAG=10
 
+# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
+# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
+# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
+# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
+_gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
+# shellcheck source=/dev/null
+[ -f "$_gate_env" ] && . "$_gate_env"
+
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp="$(git rev-parse --show-toplevel)/tools/run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
 force=""
-rec_sha=""; rec_fp=""; rec_blob=""
+rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
 if [ -f "$rec" ]; then
   rec_sha=$(awk -F'\t' '$1=="sha"{print $2}' "$rec" 2>/dev/null)
   rec_fp=$(awk -F'\t' '$1=="fingerprint"{print $2}' "$rec" 2>/dev/null)
   rec_blob=$(awk -F'\t' '$1=="manifest_blob"{print $2}' "$rec" 2>/dev/null)
+  # WHAT THE RECORDED GREEN COVERED. Absent reads as OFF, and that default is the migration: every
+  # stamp written before TOOL-dUnstalledConvoy-26 lacks this key, and defaulting the missing case to
+  # "covered everything" would make each of them certify legs it never ran.
+  rec_st=$(awk -F'\t' '$1=="selftests"{print $2}' "$rec" 2>/dev/null)
 fi
 
 # 1. no record at all — nothing has ever proven this bar here.
@@ -191,6 +203,17 @@ if [ -z "$force" ] && [ -n "$rec_blob" ]; then
   now_blob=$(git hash-object -- tools/gate-legs.json 2>/dev/null)
   [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
     && force="the leg manifest differs from the one the recorded green was earned on"
+fi
+
+# 8. the recorded green was earned with the KIT-SUBJECT legs HELD, and this push would run them.
+#    COVERAGE, not equality. A record earned with the self-tests ON is strictly stronger evidence
+#    than a switch-off push needs, so it satisfies one — forcing there would cost every adopter the
+#    whole saving TOOL-dUnstalledConvoy-26 exists to give, at the one boundary it was measured for.
+#    The relation only bites in the other direction: a weaker record offered for a stronger push.
+#    Without this predicate the `selftests` field the stamp writes is a byte nobody consults, and
+#    the boundary trusts a partial bar as a whole one. TOOL-dUnstalledConvoy-27.
+if [ -z "$force" ] && [ -n "${GATE_SELFTESTS:-}" ] && [ "$rec_st" != "1" ]; then
+  force="this push runs the kit self-tests and the recorded full green was earned with them HELD"
 fi
 
 # THE DECISION AND ITS REASON, on one line, always. A boundary that silently chooses the cheap path

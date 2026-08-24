@@ -82,6 +82,7 @@ means = "render-failed-half-stamped"
 
 [[gate_leg]]
 name = "unattended kit gate"
+subject = "repo"
 argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
 red_after_land = true
@@ -91,12 +92,14 @@ red_after_land = true
 # change a playbook.
 [[gate_leg]]
 name = "playbook validity gate"
+subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
 
 [[gate_leg]]
 name = "unattended skill wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true

@@ -33,6 +33,7 @@ why_no_adopter = "installation is a copy plus a per-machine link; the manifest's
 
 [[gate_leg]]
 name = "kickoff-manifest ratchet"
+subject = "repo"
 argv = ["bash", "{prefix}/manifest-check.sh"]
 guard = []
 history_depth = "full"
@@ -55,6 +56,7 @@ installation is a copy. The ratchet is this entry's gate LEG and grading it from
 
 [[gate_leg]]
 name = "kickoff engine size <=18KiB"
+subject = "repo"
 argv = ["bash", "{prefix}/check-template-size.sh", "skills/session-kickoff/SKILL.md", "18432"]
 guard = []
 

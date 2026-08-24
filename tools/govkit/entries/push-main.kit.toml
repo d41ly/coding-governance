@@ -46,6 +46,7 @@ why_no_adopter = "the hook is inert until the target points core.hooksPath at it
 
 [[gate_leg]]
 name = "push-main self-test"
+subject = "repo"
 argv = ["bash", "{prefix}/push-main.test.sh"]
 guard = ["{prefix}/push-main.sh", ".githooks/"]
 
@@ -58,6 +59,7 @@ the self-test is this entry's gate leg and there is no rendered artifact to comp
 
 [[gate_leg]]
 name = "pre-push self-test"
+subject = "repo"
 argv = ["bash", ".githooks/pre-push.test.sh"]
 guard = [".githooks/"]
 

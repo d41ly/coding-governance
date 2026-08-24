@@ -3524,7 +3524,25 @@ RESCOPED
     retire|supersede)
       printf '%s\n' "$ids" | grep -qxF -- "$unit" || { fail 48 "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held: $unit"; return 1; } ;;
     add)
-      printf '%s\n' "$ids" | grep -qxF -- "$unit" && { fail 48 "a rescope adds a unit the generated units region already carries and no matching row explains it, so this records a transition that did not happen: $unit"; return 1; } ;;
+      # THE QUESTION IS NOT "is it in the region NOW". It is "was it in the roster this run STARTED
+      # with", which is the question check 24 asks and the only one that separates a fabricated row
+      # from a late one. Asking the current region instead made the two checks unsatisfiable
+      # together: check 24 demands a row for every unit added after the run went live, and by the
+      # time anybody writes one the spec exists and the region carries the id, so the row is
+      # refused forever. Measured on this build — four units, all added by explicit owner turns
+      # mid-run, all unrecordable. TOOL-dUnstalledConvoy-33.
+      #
+      # NO FALLBACK COMMIT is handed to `baseline_units` here, deliberately. The checker passes its
+      # pinned BASE because a comparison it cannot make is a comparison it should SKIP; this caller
+      # would be writing a permanent record, so a baseline it could not derive means it refuses.
+      if printf '%s\n' "$ids" | grep -qxF -- "$unit"; then
+        _rs_base=$(baseline_units "$rel" "$(readme_of "$slug")" "${UNITS_REGION_CUTOFF:-}") || {
+          fail 48 "a rescope adds a unit the generated units region already carries, and the roster this run entered its live phase with cannot be derived, so there is no way to tell a late record from a transition that did not happen: $unit ($_rs_base)"; return 1; }
+        if id_in "$_rs_base" "$unit"; then
+          fail 48 "a rescope adds a unit that was already in the roster this run entered its live phase with, so this records a transition that did not happen: $unit"; return 1
+        fi
+        echo "unattended: LATE record — $unit entered the roster after this run went live and is only being recorded now"
+      fi ;;
   esac
   park "$rel" rescope "$act $unit${succ:+ -> $succ}" "$reason"
   stage_or_fail "$rel" || return 1

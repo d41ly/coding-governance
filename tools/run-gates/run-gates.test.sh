@@ -42,7 +42,7 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=102
+FLOOR_ASSERTIONS=129
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -93,7 +93,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -122,7 +122,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -513,6 +513,246 @@ done
 n=$((n+1))
 grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
+
+# 3h2. SUBJECT: a kit-subject leg is HELD unless asked, and GATE_FULL does not ask.
+#     TOOL-dUnstalledConvoy-26. A kit self-test stages a break into a copy of a checker and asserts
+#     the checker still catches it — a job that exists when the kit's source changes and not at all
+#     in a repo that copy-installs the kit and never edits it. The `guard = ["{kit}/"]` those legs
+#     used to lean on does NOT do that job: `changed()` returns 0 the instant GATE_FULL is set, and
+#     .githooks/pre-push sets it whenever it decides a full run is owed, which is the one boundary an
+#     adopter actually feels. So the decision is a declared subject, not a guard.
+S="$SCRATCH/subject"
+mkdir -p "$S/tools/run-gates" "$S/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S/tools/run-gates/run-gates.sh"
+# The FINGERPRINT script too: `gate-full-green` is written only when FPRINT_START is non-empty, and
+# without this file the fingerprint is the empty string, so the stamp arm below would assert against
+# a stamp no fixture can produce — passing for the wrong reason or failing for one.
+cp "$KITDIR/gate-fingerprint.sh" "$S/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S/fx/a.sh"
+cat > "$S/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "a repo leg",        "argv": ["bash", "fx/a.sh"], "subject": "repo"},
+  {"name": "a kit self-test",   "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "an undeclared leg", "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+( cd "$S" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+# OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
+# `unchanged vs <branch>` — false here, since the leg is not unchanged, it is out of subject.
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
+  || { echo "canary: a kit-subject leg was not HELD with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  (unchanged vs' \
+  && { echo "canary: the held leg reused the guard verb's tail, which claims it was unchanged"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    a repo leg$' \
+  || { echo "canary: a repo-subject leg did not run with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# An UNDECLARED leg defaults to `repo` and RUNS. The other default would silently remove from every
+# bar a leg whose descriptor never spoke about subjects at all.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    an undeclared leg$' \
+  || { echo "canary: an undeclared leg did not default to repo and run"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+# GATE_FULL DOES NOT ASK. This is the arm the whole unit rests on: GATE_FULL means "ignore every
+# guard", and a kit's own self-tests are not a guard. If this ever passes, every adopter is back to
+# running them at the push boundary.
+o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
+  || { echo "canary: GATE_FULL unlocked the kit-subject legs, which is the bypass this replaced"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+# ON: the switch is the only thing that asks, and it asks for all of them.
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    a kit self-test$' \
+  || { echo "canary: GATE_SELFTESTS=1 did not run the kit-subject leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held' \
+  && { echo "canary: something was still held with the switch on"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# ...and the switch state reaches the stamp, or a green cannot say what it covered and the push
+# boundary has nothing to read. TOOL-dUnstalledConvoy-27 is the reader.
+n=$((n+1))
+grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
+  || { echo "canary: a switch-ON green did not record the switch in its stamp"; fail=1; }
+# ITS NEGATIVE CONTROL, and without it the field is unfalsifiable: an implementation that wrote an
+# unconditional `1` passes every other arm in this file, and the push boundary's coverage predicate
+# then reads every partial bar as a complete one. The row must be present and EMPTY, never absent —
+# absent and empty read the same to a grep, and TOOL-dUnstalledConvoy-27 defaults a missing key to
+# HELD, so the two agree; what must not happen is a `1`.
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
+  && { echo "canary: a switch-OFF green recorded selftests=1 — the stamp claims a coverage the run did not have"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
+# 3h3. THE HELD LEGS REACH THE ARITHMETIC: the run total, the recorded figure, and the chunk close.
+#     TOOL-dUnstalledConvoy-31 and -32. Its parent gave the on-demand hold its own counter so it
+#     would stay out of `skips`, which the full-green stamp conjoins. Kept out of `skips`, it was
+#     also kept out of every figure `skips` feeds — so a bar that ran 43 of 85 legs printed
+#     `85/85 legs passed`, and the chunk holding nothing but kit self-tests closed GREEN. Both
+#     numbers are what a reader quotes, which is what makes this arithmetic worth an arm.
+S2="$SCRATCH/heldmath"
+mkdir -p "$S2/tools/run-gates" "$S2/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S2/tools/run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S2/fx/a.sh"
+# TWO CHUNKS, ONE OF EACH SHAPE. `mixed` proves the tally is per-chunk and does not swallow the
+# chunk it appears in; `held` proves the all-held chunk changes verdict. A fixture with only the
+# second would pass on a runner that called every chunk skipped.
+cat > "$S2/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "m repo one", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
+  {"name": "m repo two", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
+  {"name": "m kit one",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "mixed"},
+  {"name": "h kit one",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"},
+  {"name": "h kit two",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"}
+]
+JSON
+( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+# -31 AC1: the total is the count that RAN. Two repo legs ran, so the total is 2 and not 5.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
+  || { echo "canary: the run total counted legs that were held rather than run"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
+# shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: kit self-tests, GATE_SELFTESTS=1 runs them)$' \
+  || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
+# come to disagree, and the record is what a later run and the push boundary read instead of stdout.
+n=$((n+1))
+vf="$S2/.git/gate-run/$(cat "$S2/.git/gate-run/current" 2>/dev/null)/verdict"
+if [ -f "$vf" ]; then
+  awk -F'\t' '$1=="ran" && $2==2 {ok=1} END{exit !ok}' "$vf" \
+    || { echo "canary: the recorded run figure disagrees with the printed total"; awk -F'\t' '$1=="ran"||$1=="held"||$1=="skipped"' "$vf" | sed 's/^/    /'; fail=1; }
+  n=$((n+1))
+  awk -F'\t' '$1=="held" && $2==3 {ok=1} END{exit !ok}' "$vf" \
+    || { echo "canary: the held count is not on the run record at all"; fail=1; }
+else
+  echo "canary: no verdict record was written, so the recorded-figure arms prove nothing"; fail=1
+fi
+# -32 AC1: an all-held chunk closes SKIPPED. The runner already had this rule for guard-skips and
+# already asserted it in a comment; what it lacked was reachability from the newer skip kind.
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE '^---- chunk held: skipped  \(0 ran, 0 failed, 0 skipped, 0 reused, 2 held\)$' \
+  || { echo "canary: a chunk whose every leg was held closed green-by-absence"; printf '%s\n' "$o" | grep -- '---- chunk' | sed 's/^/    /'; fail=1; }
+# -32 AC2: its control — a chunk that DID run stays green, and carries its own held tally. Without
+# this a runner that called every chunk skipped would pass the arm above.
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE '^---- chunk mixed: green  \(2 ran, 0 failed, 0 skipped, 0 reused, 1 held\)$' \
+  || { echo "canary: a mixed chunk lost its held tally or changed verdict"; printf '%s\n' "$o" | grep -- '---- chunk' | sed 's/^/    /'; fail=1; }
+
+# -31 AC4: with the switch ON nothing is held, so the total is the whole manifest and the note is
+# gone. A note that survives a run with nothing to report is the same defect pointing the other way.
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
+# 3h4. AN ALL-HELD RUN REFUSES. TOOL-dUnstalledConvoy-26 AC10. A repository whose whole manifest is
+#      kit-subject would otherwise print `gates GREEN — 0/0 legs passed` on every run forever while
+#      executing not one leg, and stamp a record saying so. Measured before the fix: exit 0 and
+#      exactly that line.
+S3="$SCRATCH/allheld"
+mkdir -p "$S3/tools/run-gates" "$S3/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S3/tools/run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S3/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S3/fx/a.sh"
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
+]
+JSON
+( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+[ "$rc" = 2 ] \
+  || { echo "canary: an all-held run exited $rc, not the configuration-refusal code 2"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'executed NOTHING' \
+  || { echo "canary: an all-held run did not say it executed nothing"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'GATE_SELFTESTS=1' \
+  || { echo "canary: the refusal did not name the switch that would fix it"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN' \
+  && { echo "canary: an all-held run reported a GREEN over an empty population"; fail=1; }
+
+# ITS CONTROL, and it is what keeps the refusal narrow. The SAME manifest with one repo-subject leg
+# added is an ordinary partial bar and must stay green — a refusal that fired here would red every
+# adopter whose kits are all held, which is every adopter.
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "r one", "argv": ["bash", "fx/a.sh"], "subject": "repo"}
+]
+JSON
+( cd "$S3" && git add -A && git commit -qm two ) >/dev/null 2>&1
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 1/1 legs passed'; } \
+  || { echo "canary: CONTROL — one repo-subject leg beside two held ones must still be a green partial bar, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# ...and with the switch ON the all-held manifest is an ordinary full bar, not a refusal. The
+# refusal is about a run that executed nothing, never about the subject values themselves.
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$'; } \
+  || { echo "canary: CONTROL — with the switch on, the same manifest must run every leg, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
+# M4 — THE REFUSAL LEAVES A RECORD. This runner's crash signal is a run directory with a header and
+# NO verdict, so exiting between the two manufactures that signature for a deliberate refusal; and
+# the durable summary would otherwise still carry the PREVIOUS run's `gates GREEN` for anyone who
+# reads the file instead of the terminal.
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
+]
+JSON
+( cd "$S3" && git add -A && git commit -qm allheld ) >/dev/null 2>&1
+( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 )
+n=$((n+1))
+vf3="$S3/.git/gate-run/$(cat "$S3/.git/gate-run/current" 2>/dev/null)/verdict"
+awk -F'\t' '$1=="verdict" && $2=="REFUSED"{ok=1} END{exit !ok}' "$vf3" 2>/dev/null \
+  || { echo "canary: the all-held refusal left NO verdict record, which is this runner's crash signature"; fail=1; }
+n=$((n+1))
+grep -q 'gates REFUSED' "$S3/.git/gate-last-summary.txt" 2>/dev/null \
+  || { echo "canary: the durable summary does not say the run was refused"; sed -n '$p' "$S3/.git/gate-last-summary.txt" 2>/dev/null | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+grep -q 'gates GREEN' "$S3/.git/gate-last-summary.txt" 2>/dev/null \
+  && { echo "canary: a refused run left a GREEN standing in the durable summary"; fail=1; }
+
+# H5 — THE RED LINE'S DENOMINATOR IS WHAT RAN, the same figure the green line uses. `$n` is the whole
+# manifest, so a red bar that held 42 legs reported `1/85 legs failed` — a ratio against a
+# population it never ran, in the one line a reader looks at when something is broken.
+mkdir -p "$S3/fx"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$S3/fx/red.sh"
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "r ok",  "argv": ["bash", "fx/a.sh"], "subject": "repo"},
+  {"name": "r bad", "argv": ["bash", "fx/red.sh"], "subject": "repo"}
+]
+JSON
+( cd "$S3" && git add -A && git commit -qm redbar ) >/dev/null 2>&1
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates RED — 1/2 legs failed' \
+  || { echo "canary: the RED line's denominator is not the count that ran"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+grep -q 'gates RED — 1/2 legs failed' "$S3/.git/gate-last-summary.txt" 2>/dev/null \
+  || { echo "canary: the durable RED summary disagrees with stdout about the denominator"; fail=1; }
 
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
 #     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
@@ -1048,7 +1288,7 @@ case "$order" in
   *) echo "canary: chunked reporting did not group an interleaved manifest — legs reported as: $order"; fail=1 ;;
 esac
 n=$((n+1))
-printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused\)$' \
+printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused, 0 held\)$' \
   || { echo "canary: the per-chunk verdict line is missing or off-grammar"; printf '%s\n' "$cout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
 n=$((n+1))
 # A LEG WITH NO KEY falls into `default` rather than being dropped — a leg that vanishes from the

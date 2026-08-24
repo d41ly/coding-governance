@@ -124,3 +124,84 @@ next_anchor() {  # anchor · newline-separated candidate anchors
   done
   printf '%s' "$_nbest"
 }
+# THE ROSTER A RUN ENTERED ITS LIVE PHASE WITH — the single answer to "what units did this run start
+# with", called by BOTH the checker (check 24, which compares) and the driver (check 48, which
+# decides whether an `add` row is late-but-true or a fabrication). TOOL-dUnstalledConvoy-33.
+#
+# It lived only in the checker, and the driver decided the same question a different way — "is the
+# unit in the units region NOW" — which is a different question with a different answer. The two
+# together were unsatisfiable: a run whose roster grew before anybody recorded it could never record
+# it, because by then the spec existed and the region carried the id. That is the owner's first
+# observation, builds refuse to rescope, living in the driver written to let them.
+#
+# CONTRACT. Prints the baseline units REGION, verbatim, and exits 0 ONLY when it derived a region
+# carrying at least one id.
+#
+# THE REGION TEXT, NOT A LIST OF IDS, and the closing review's blocker is why. The first draft
+# printed bare ids; check 24's second loop then asked `id_rows "$rs_was" "$rsid" | grep -q
+# "| WONTDO |"`, which can never match a bare id — so its "was it ALREADY retired at the baseline"
+# exemption went dead and every build carrying a WONTDO unit from before its run would have redded
+# for a retirement nobody performed. The callers want membership and STATUS, and only the region
+# carries both. Membership still works: `id_in` matches a whole token anywhere in the text. Exits 1 otherwise, with the reason as its ONLY output — one line, no prefix, so a caller
+# can drop it straight into its own message. The reason goes to STDOUT and not stderr, so one
+# capture gets either the ids or the reason and the exit code says which; a caller juggling two
+# streams for one answer is a caller that will drop one. Empty is a FAILURE and not an empty success: an empty baseline
+# makes every unit read as added, which is vacuously accusatory rather than vacuously true.
+#
+# THE BASELINE IS THE COMMIT THE RUN ENTERED ITS LIVE PHASE AT, never the pinned BASE. A run that
+# classifies a unit MISSING and authors its spec is obeying the build method, and every such spec is
+# absent at BASE — keying on BASE would red a run for following the method.
+baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [fallback-commit]
+  _bu_rel=$1; _bu_bre=$2; _bu_cut=${3:-}; _bu_fb=${4:-}
+  # IT CALLS `region`, WHICH THIS LIBRARY DOES NOT DEFINE. Both current callers define their own —
+  # two spellings, in the driver and in the checker, and the legs that compare them are the marker
+  # contract's, which this build moved off and back onto the automatic bar. A third caller that
+  # forgot would get `region: command not found` on stderr and an EMPTY region, which this function
+  # would then report as an empty roster: a wrong answer wearing a legitimate refusal. Named and
+  # checked rather than assumed, because a dependency a file does not state is one nobody maintains.
+  command -v region >/dev/null 2>&1 || {
+    echo "baseline_units needs a region() in the calling shell and this one has none, so the units region would read as empty and be reported as an empty roster"
+    return 1
+  }
+  _bu_base=""
+  for _bu_c in $(GIT log --reverse --format=%H -- "$_bu_rel" 2>/dev/null); do
+    case "$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null | grep -m1 '^phase:')" in
+      *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) _bu_base="$_bu_c"; break ;;
+    esac
+  done
+  # THE FALLBACK IS THE CALLER'S, passed in rather than assumed. The checker hands its pinned BASE
+  # so a run-state file with no live-phase commit still gets compared; the driver hands nothing, so
+  # the same case refuses an `add` rather than deciding on a baseline it did not derive.
+  [ -n "$_bu_base" ] || _bu_base=$_bu_fb
+  if [ -z "$_bu_base" ]; then
+    echo "the run-state file has no commit carrying a live phase and no fallback was given, so there is no baseline commit"
+    return 1
+  fi
+  _bu_blob=$(GIT show "$_bu_base:$_bu_bre" 2>/dev/null || true)
+  _bu_date=$(GIT show -s --format=%cs "$_bu_base" 2>/dev/null || true)
+  if [ -z "$_bu_blob" ]; then
+    echo "no build README at the baseline commit, so there is no authorized roster to compare against"
+    return 1
+  fi
+  if ! printf '%s\n' "$_bu_blob" | grep -qxF -- '<!-- gen:build-units -->'; then
+    echo "the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
+    return 1
+  fi
+  if [ -n "$_bu_cut" ] && [ -n "$_bu_date" ] && ! printf '%s\n%s\n' "$_bu_cut" "$_bu_date" | sort -C; then
+    echo "the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
+    return 1
+  fi
+  if ! _bu_was=$(printf '%s\n' "$_bu_blob" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    echo "the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+    return 1
+  fi
+  # The ids are derived only to decide EMPTINESS. An empty baseline is not a comparison and is not
+  # vacuously true either — it is vacuously accusatory, because every unit the build has would read
+  # as added.
+  _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
+  if [ -z "$_bu_ids" ]; then
+    echo "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+    return 1
+  fi
+  printf '%s\n' "$_bu_was"
+}

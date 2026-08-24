@@ -38,7 +38,13 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 141    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 161    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 141 -> 161 (TOOL-dUnstalledConvoy-26). The pin had fallen 19 behind the population before
+# this build and 20 by the end of it, which is the state this file's own convention forbids:
+# `a floor that trails the population stops catching the matcher going blind`. Raised to the
+# live count so the next blind matcher reds. NOTE what this does NOT buy: the JOIN half has
+# never executed, because nothing in the tree passes a reached-set, so `enumeration only` is
+# the whole of what runs. That is TOOL-dUnstalledConvoy-36, not this raise.
                     # 135 -> 141 at the origin/main reconcile: upstream's one plan/apply classifier
                     # adds refusal branches of its own. Raised rather than left slack, because a
                     # floor that trails the population stops catching the matcher going blind.

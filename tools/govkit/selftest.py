@@ -576,8 +576,14 @@ def main() -> int:
             (g / "tools" / "gate-legs.json").write_text(
                 json.dumps([{"name": "demo leg",
                              "argv": ["bash", "tools/memory-tree/engine.sh"],
-                             "guard": []}], indent=2) + NL,
+                             "guard": [], "subject": "repo"}], indent=2) + NL,
                 encoding="utf-8", newline=NL)
+            # `shutil.copytree(HERE, ...)` above brings gov's own subject pin with it, and this
+            # tree has one leg rather than gov's whole manifest. Overwritten with a pin for THIS
+            # fixture, because a pin naming legs the tree does not have is exactly the stale-pin
+            # refusal the ratchet exists to raise. TOOL-dUnstalledConvoy-29.
+            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+                "# fixture pin" + NL + "demo leg\trepo" + NL, encoding="utf-8", newline=NL)
             (mt / "kit.toml").write_text(kit_toml, encoding="utf-8", newline=NL)
             (g / "tools" / "govkit" / "registry.toml").write_text(NL.join([
                 "version = 1",
@@ -615,7 +621,10 @@ def main() -> int:
                          else 'include = ["engine.sh", "kit.toml"]')
             lines.append('role = "engine"')
             if leg_name is not None:
-                lines += ["[[gate_leg]]", 'name = "%s"' % leg_name,
+                # The fixture declares `subject`, because govkit now refuses a descriptor leg without
+                # one — a leg that does not say whose subject it is cannot be held or run
+                # deliberately. TOOL-dUnstalledConvoy-26.
+                lines += ["[[gate_leg]]", 'name = "%s"' % leg_name, 'subject = "repo"',
                           'argv = ["bash", "{kit}/engine.sh"]', "guard = []"]
             return NL.join(lines) + NL
 
@@ -875,6 +884,30 @@ user_skills = "/tmp/gk-fake-skills"
         check("apply probes the target's pre-commit hook without committing",
               "/HOOKPROBE]" in pa.stdout, pa.stdout)
         check("apply emits the leg as the LEGS step", "gate legs: emitted" in pa.stdout, pa.stdout)
+
+        # ---- AC11 (TOOL-dUnstalledConvoy-26): the install summary tells the adopter about the
+        # ---- legs it just made INVISIBLE. A kit-subject leg is held by default, so an adopter who
+        # ---- is not told at install has a self-test they will never run and no way to learn it
+        # ---- exists — the removal would read to them as the kit shipping no tests at all.
+        # ---- The check-wiring entry emits exactly one leg and it is subject = "kit", so this
+        # ---- fixture is the right shape for the arm rather than an accident of it.
+        _kits_in = [r for r in json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+                    if (r.get("subject") or "repo") == "kit"]
+        check("LIVENESS: the fixture actually emitted a kit-subject leg, or the AC11 arms below "
+              "would be asserting about a summary with nothing to summarise",
+              len(_kits_in) == 1, str(_kits_in))
+        check("AC11: the install summary states how many emitted legs are HELD kit self-tests",
+              f"govkit apply — {len(_kits_in)} of those are kit SELF-TESTS and are HELD by default"
+              in pa.stdout, pa.stdout)
+        # The invocation is the TARGET's declared runner command, not this repo's path — an adopter
+        # pointed at a script absent from their tree has been told nothing.
+        check("AC11: and names the once-and-on-demand invocation against the target's own runner",
+              "govkit apply —   GATE_SELFTESTS=1 bash tools/runner.sh" in pa.stdout, pa.stdout)
+        # The GATE_FULL sentence is not decoration: `guard = ["{kit}/"]` was the mechanism this
+        # replaced, and it failed precisely because GATE_FULL ignores guards. An adopter who reads
+        # `GATE_FULL=1` as "everything" will believe a green bar covered the kits.
+        check("AC11: and says plainly that GATE_FULL does NOT run them",
+              "GATE_FULL=1 does NOT run them" in pa.stdout, pa.stdout)
         check("and re-reads the runner afterwards", "/AFTER]" in pa.stdout, pa.stdout)
         after_out = run_runner(gt)
         # EXECUTION, not success: a leg that fails has still executed, and `observed_failed` is a
@@ -1197,8 +1230,11 @@ user_skills = "/tmp/gk-fake-skills"
         # find anything. These arms build a scratch gov tree — a copy of the engine plus a minimal
         # registry — and feed it input that MUST red. Without them, the two arms below would be the
         # repo's own `fixture-passes-by-finding-nothing` class living inside the tool that gates it.
-        def scratch_gov(mutates: str, guard: str) -> pathlib.Path:
-            g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}"
+        def scratch_gov(mutates: str, guard: str, tag: str = "") -> pathlib.Path:
+            # `tag` disambiguates two fixtures built from the SAME pair. The name was derived from
+            # the arguments alone, so a second call with identical ones met a directory that already
+            # existed and died with FileExistsError rather than reusing or refusing.
+            g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}{tag}"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
@@ -1218,7 +1254,7 @@ user_skills = "/tmp/gk-fake-skills"
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                 f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n\n'
-                '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n',
+                '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\nsubject = "repo"\n',
                 encoding="utf-8", newline="\n")
             # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
             # the distinction that made this assertion necessary in the first place.
@@ -1226,8 +1262,18 @@ user_skills = "/tmp/gk-fake-skills"
                 '#!/usr/bin/env bash\necho "  1. git add something && commit."\ngit add .\n',
                 encoding="utf-8", newline="\n")
             (g / "tools" / "gate-legs.json").write_text(
-                json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard]}], indent=2) + "\n",
+                # THE MANIFEST DECLARES ITS SUBJECT, like the descriptor beside it. An
+                # omission here is the M1 case: the descriptor says one thing and the
+                # manifest says nothing, which every reader defaults to `repo` — a silent
+                # disagreement, and selfcheck refuses it now.
+                json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard],
+                             "subject": "repo"}], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
+            # Only govkit.py was copied, so this tree arrives with no subject pin and the ratchet
+            # reds on its absence — correctly, and this fixture's premise is a tree where every
+            # declared fact agrees. The manifest leg declares no subject, so it derives to `repo`.
+            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+                "# fixture pin\ndemo\trepo\n", encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -1305,6 +1351,287 @@ user_skills = "/tmp/gk-fake-skills"
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
+
+        # ---- A REPO-LOCAL GATE POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD ------------------------
+        # TOOL-dUnstalledConvoy-28. `.githooks/pre-push` ships verbatim to every push-main adopter,
+        # so a GATE_SELFTESTS assignment written into it turns the kit self-tests back on for
+        # exactly the repositories TOOL-dUnstalledConvoy-26 exists to spare. The mechanism that
+        # READS the choice may travel; the file that MAKES it may not. Armed on a fixture rather
+        # than on this tree alone, because gating the instance certifies coverage nobody has.
+        pg = scratch_gov("true", "tools/demo/", tag="-policy")
+        # `tools/demo/` is claimed by an `include = "**"` engine rule, so anything dropped in it is
+        # payload. That is the case a claims-only derivation missed: 13 of 58 file rules in gov's
+        # own tree declare `claims` at all.
+        (pg / "tools" / "demo" / "policy.sh").write_text(
+            "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "policy in the payload")
+        _pol = run_in(pg)
+        check("AC2: a bare GATE_SELFTESTS assignment inside a kit's payload REDS",
+              _pol.returncode == 1 and "carries a bare GATE_SELFTESTS assignment AND is shipped"
+              in _pol.stdout, _pol.stdout + _pol.stderr)
+        check("AC2: and the refusal names the file and the kit that would ship it",
+              "'tools/demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
+
+        # ITS CONTROL, and it is the arm that stops this being a ban on the variable. The same line
+        # in a path no kit claims is the SANCTIONED shape — that is where gov keeps its own — and a
+        # check that redded on it would have no place left to put the policy.
+        (pg / "tools" / "demo" / "policy.sh").unlink()
+        (pg / ".githooks").mkdir(parents=True, exist_ok=True)
+        (pg / ".githooks" / "gate-env.sh").write_text(
+            "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "policy outside the payload")
+        _ok = run_in(pg)
+        check("CONTROL: the same assignment in a path no kit ships is GREEN",
+              _ok.returncode == 0, _ok.stdout + _ok.stderr)
+
+        # An INVOCATION is not a policy. `GATE_SELFTESTS=1 bash ...` appears in docs, arms and
+        # refusal strings all over gov's tree — 54 such lines when the predicate was run over it —
+        # and a check that called those policies would be permanently red on its own source.
+        (pg / "tools" / "demo" / "invoke.sh").write_text(
+            "#!/usr/bin/env sh\nGATE_SELFTESTS=1 bash run-gates.sh\n",
+            encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "an invocation, not a policy")
+        _inv = run_in(pg)
+        check("an INVOCATION inside the payload is not a policy and stays GREEN",
+              _inv.returncode == 0, _inv.stdout + _inv.stderr)
+
+        # ---- THE SUBJECT RATCHET (TOOL-dUnstalledConvoy-29) --------------------------------------
+        # A leg's subject decides whether it runs on every bar or waits for GATE_SELFTESTS=1, and no
+        # predicate over a descriptor can decide whether a given value is RIGHT — that needs to know
+        # what the leg's failure MEANS. So the value is ratcheted instead: it cannot move without the
+        # move appearing in a diff. These arms grade the ratchet, and none of them grades correctness.
+        rg = scratch_gov("true", "tools/demo/", tag="-ratchet")
+        pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
+        legsf = rg / "tools" / "gate-legs.json"
+        kitf = rg / "tools" / "demo" / "kit.toml"
+
+        def _write_legs(subject: str, extra: bool = False) -> None:
+            rows = [{"name": "demo", "argv": ["true"], "guard": ["tools/demo/"],
+                     "subject": subject}]
+            if extra:
+                rows.append({"name": "demo two", "argv": ["true"], "guard": [], "subject": "repo"})
+            legsf.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
+            # The DESCRIPTOR moves with it. Leaving it behind reds on the 7h agreement check, and
+            # the arm would then be green for a reason that has nothing to do with the ratchet.
+            body = ('id = "demo"\nhome = "tools/demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                    f'[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n'
+                    f'subject = "{subject}"\n')
+            if extra:
+                body += ('\n[[gate_leg]]\nname = "demo two"\nargv = ["true"]\nguard = []\n'
+                         'subject = "repo"\n')
+            kitf.write_text(body, encoding="utf-8", newline="\n")
+
+        # AC4 — the pin is DERIVED, not hand-listed: regenerating it over this tree produces exactly
+        # the tree's own population, and the tree is green afterwards.
+        #
+        # The pin is CORRUPTED first, on purpose. With a fixture pin that already matched, the two
+        # arms below passed against a build with no ratchet in it at all — the generated content was
+        # the content that was already there, and a tree nothing checks is green for free. Starting
+        # wrong is what makes regeneration the thing being measured.
+        pinf.write_text("# fixture pin\ndemo\tkit\nzzz gone\trepo\n", encoding="utf-8", newline="\n")
+        _liv = run_in(rg)
+        check("LIVENESS: a pin that disagrees with the manifest REDS, so the arms below are not "
+              "measuring a tree that was already correct",
+              _liv.returncode == 1 and "is subject 'repo' and pinned 'kit'" in _liv.stdout,
+              _liv.stdout + _liv.stderr)
+        _w = run_in_gov(rg, "selfcheck", "--write")
+        check("AC4: selfcheck --write regenerates the subject pin",
+              _w.returncode == 0 and "wrote 1 subject pin" in _w.stdout, _w.stdout + _w.stderr)
+        _rows = [l for l in pinf.read_text(encoding="utf-8").split("\n")
+                 if l.strip() and not l.startswith("#")]
+        check("AC4: and the generated pin is exactly the derived population",
+              _rows == ["demo\trepo"], str(_rows))
+        _g0 = run_in(rg)
+        # A CONTROL, not a discriminating arm: an assertion that something is green cannot fail when
+        # the mechanism is absent, and this one passed in the red-first run for exactly that reason.
+        # It is kept because a ratchet that reds on a correct tree is the other way this fails.
+        check("CONTROL: a tree whose pin was just regenerated is GREEN",
+              _g0.returncode == 0, _g0.stdout + _g0.stderr)
+
+        # AC1 — a flip with the pin left behind REDS, and the refusal names the leg, both values,
+        # and what the move actually does. "subject changed" would tell a reader nothing.
+        _write_legs("kit")
+        _r1 = run_in(rg)
+        check("AC1: flipping a subject without moving its pin REDS",
+              _r1.returncode == 1, _r1.stdout + _r1.stderr)
+        check("AC1: and the refusal names the leg and BOTH values",
+              "gate leg 'demo' is subject 'kit' and pinned 'repo'" in _r1.stdout, _r1.stdout)
+        check("AC1: and says what the move does — leaving the automatic bar",
+              "OFF the automatic bar" in _r1.stdout, _r1.stdout)
+        check("AC1: and says it grades the change rather than the value",
+              "never whether the value is right" in _r1.stdout, _r1.stdout)
+
+        # AC2 — moving the pin in the same commit is the sanctioned path, and it passes. Without
+        # this arm the ratchet could be a check that reds on everything forever.
+        _w2 = run_in_gov(rg, "selfcheck", "--write")
+        check("AC2: moving the pin in the same commit passes",
+              _w2.returncode == 0, _w2.stdout + _w2.stderr)
+        _rows2 = [l for l in pinf.read_text(encoding="utf-8").split("\n")
+                  if l.strip() and not l.startswith("#")]
+        # EXACTLY the new population, which is what makes this arm discriminating: the stale row
+        # planted in the corruption above must be GONE, and only a real regeneration removes it.
+        check("AC2: and the moved pin records the new value and drops the stale row",
+              _rows2 == ["demo\tkit"], str(_rows2))
+
+        # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
+        # it would let a leg arrive already held, on nobody's decision.
+        _write_legs("kit", extra=True)
+        _r3 = run_in(rg)
+        check("AC3: a NEW leg with no pin row REDS rather than passing",
+              _r3.returncode == 1 and "gate leg 'demo two' has no row in" in _r3.stdout,
+              _r3.stdout + _r3.stderr)
+
+        # ...and its mirror: a pin naming a leg that is gone. A stale row is a pin for nothing, and
+        # it silently adopts the next leg that arrives under that name.
+        run_in_gov(rg, "selfcheck", "--write")
+        _write_legs("kit")
+        _r4 = run_in(rg)
+        check("a pin row naming a leg the manifest no longer declares REDS",
+              _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
+
+        sys.path.insert(0, str(HERE))
+        import govkit  # noqa: E402
+
+        # ---- L1: THE REFUSAL BRANCHES THIS BUILD ADDED, each reached by an arm ----------------
+        # Six of twelve were unverified text — any of them could be misspelled, unreachable, or emit
+        # the wrong operator instruction with nothing reporting it, and M1 above is the live proof
+        # that "unarmed" and "wrong" arrive together. `refusal_join.py` is the mechanism meant to
+        # catch this and its JOIN half has never executed, so these are hand-written.
+        def _write_desc(subject_line: str, extra: str = "") -> None:
+            kitf.write_text(
+                'id = "demo"\nhome = "tools/demo"\n'
+                'version_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                '[[gate_leg]]\nname = "demo"\n' + subject_line +
+                'argv = ["true"]\nguard = []\n' + extra,
+                encoding="utf-8", newline="\n")
+
+        _write_legs("repo")
+        run_in_gov(rg, "selfcheck", "--write")
+        _write_desc("")                       # the descriptor declares no subject at all
+        _r = run_in(rg)
+        check("L1: a descriptor gate leg with NO subject REDS",
+              _r.returncode == 1 and "with no `subject`" in _r.stdout, _r.stdout + _r.stderr)
+        check("L1: and the refusal points at where the criterion is stated",
+              "ask what a FAILURE of this leg MEANS" in _r.stdout, _r.stdout)
+
+        _write_desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
+        _r = run_in(rg)
+        check("L1: a descriptor subject outside the closed set kit|repo REDS",
+              _r.returncode == 1 and "outside the closed set kit|repo" in _r.stdout,
+              _r.stdout + _r.stderr)
+
+        _write_desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
+        _r = run_in(rg)
+        check("L1: a descriptor and manifest that DISAGREE about subject RED",
+              _r.returncode == 1 and "disagree about whether this leg runs by default" in _r.stdout,
+              _r.stdout + _r.stderr)
+
+        # ...back to agreement, then the PIN's own two refusals.
+        _write_desc('subject = "repo"\n')
+        run_in_gov(rg, "selfcheck", "--write")
+        check("L1 control: the fixture is GREEN again before the pin arms below",
+              run_in(rg).returncode == 0, "")
+        _pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
+        _pinf.write_text("# fixture pin\ndemo repo\n", encoding="utf-8", newline="\n")
+        _r = run_in(rg)
+        check("L1: a pin row with no TAB REDS rather than being skipped as unparseable",
+              _r.returncode == 1 and "has a row with no tab" in _r.stdout, _r.stdout + _r.stderr)
+        _pinf.unlink()
+        _r = run_in(rg)
+        check("L1: a MISSING pin file REDS — the ratchet with no pin compares against nothing",
+              _r.returncode == 1 and "has no pin to compare against" in _r.stdout,
+              _r.stdout + _r.stderr)
+        run_in_gov(rg, "selfcheck", "--write")
+
+        # ---- M1: AN ABSENT MANIFEST SUBJECT IS A DISAGREEMENT, not an exemption ---------------
+        # The first draft guarded the comparison on `m_sub is not None`, so a manifest row with no
+        # key never disagreed with anything — while the runner defaults it to `repo` and the emitter
+        # ships the DESCRIPTOR's value to every adopter. Reproduced end to end on the live tree by
+        # the closing review: gov runs the leg and every adopter holds it, with this check green,
+        # and -29's own remediation then pins the derived default and makes it permanent.
+        _write_legs("kit")
+        _mf = json.loads(legsf.read_text(encoding="utf-8"))
+        for _r in _mf:
+            _r.pop("subject", None)
+        legsf.write_text(json.dumps(_mf, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _m1 = run_in(rg)
+        check("M1: a descriptor subject against a manifest row that declares none REDS",
+              _m1.returncode == 1 and "declares none" in _m1.stdout, _m1.stdout + _m1.stderr)
+        check("M1: and the refusal says every reader defaults the missing key to repo",
+              "defaults a missing key to 'repo'" in _m1.stdout, _m1.stdout)
+        # ITS CONTROL: put the key back and the same tree is green again, so the arm is about the
+        # omission and not about the fixture being broken in some other way.
+        _write_legs("kit")
+        run_in_gov(rg, "selfcheck", "--write")
+        _m1c = run_in(rg)
+        check("M1 control: with the manifest key present the same tree is GREEN",
+              _m1c.returncode == 0, _m1c.stdout + _m1c.stderr)
+
+        # ---- M5: the gate-policy predicate's two evasions -------------------------------------
+        # Both are things a person writes without thinking: a trailing comment, and the shell
+        # default form, which assigns exactly as hard as `=`. The INVOCATION control is the half
+        # that keeps the predicate from redding on its own source — `GATE_SELFTESTS=1 bash ...`
+        # appears dozens of times across this tree in docs, arms and refusal strings.
+        _pol_re = _re.compile(
+            r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
+            r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+            r"[ \t]*(?:#.*)?$")
+        _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("M5: the predicate this arm grades is the one govkit.py actually compiles",
+              "GATE_SELFTESTS=\\S*|" in _gk_src or "GATE_SELFTESTS=" in _gk_src, "")
+        for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
+                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}"):
+            check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
+        for _s in ("GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh",
+                   'if [ -n "${GATE_SELFTESTS:-}" ]; then',
+                   'echo "set GATE_SELFTESTS=1 to run"'):
+            check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
+                  not _pol_re.match(_s), _s)
+
+        # ---- M6: `subject` is emitted only where the target can READ it -----------------------
+        # The manifest's key set is PINNED by the `run-gates canary`, a leg the run-gates kit ships
+        # and that runs on every adopter's bar. Writing the key into a tree whose run-gates predates
+        # it reds their canary as a side effect of an apply that was installing something else.
+        with tempfile.TemporaryDirectory() as _vd:
+            _vp = pathlib.Path(_vd)
+            check("M6: a target with no run-gates at all still gets the key — there is no canary "
+                  "to red, and withholding it would deny the feature silently",
+                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "")
+            (_vp / "tools" / "run-gates").mkdir(parents=True)
+            _rgs = _vp / "tools" / "run-gates" / "run-gates.sh"
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.0\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: a target BELOW the floor does not get the key",
+                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.0 accepted")
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.1\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: a target AT the floor does",
+                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.1 refused")
+            _rgs.write_text("#!/usr/bin/env bash\n# no version constant here\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: an UNREADABLE version is treated as below the floor — the direction that "
+                  "costs a feature is recoverable, the one that reds somebody else's bar is not",
+                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "unreadable accepted")
+            check("M6: the floor is the version the canary's key set moved in",
+                  govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
+                  str(govkit.SUBJECT_FLOOR_RUN_GATES))
+
+        # AC5 — the header says what the check does NOT decide, in the generated file itself, where
+        # a reader who found the pin will actually be looking.
+        run_in_gov(rg, "selfcheck", "--write")
+        check("AC5: the generated pin's own header states it grades change and not correctness",
+              "GRADES CHANGE, NOT CORRECTNESS" in pinf.read_text(encoding="utf-8"),
+              pinf.read_text(encoding="utf-8"))
 
         # ---- a `**` rule must not claim what another rule owns (TOOL-dClosedLexicon-4) ----------
         # REPRODUCED before it was fixed: `apply` iterated file rules in order, and an
@@ -1587,6 +1914,55 @@ user_skills = "/tmp/gk-fake-skills"
         return subprocess.run([sys.executable, str(_gov / "tools" / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True)
 
+    # ---- THE OBSERVED-STATE TABLE IS THE ONE SPELLING OF IT ---------------------------------
+    # Three copies existed and they disagreed: the reader's state tuple, the validator's
+    # string-check tuple, and the seed writer's hardcoded key list. `observed_reused` reached one of
+    # the three; `observed_held` (TOOL-dUnstalledConvoy-26) reached none — which made every
+    # kit-subject leg invisible to `read_gate_verdicts`, so an upgrading adopter's apply saw a leg
+    # that was green before, holding NO state after, and tripped "a leg that vanished is not a leg
+    # that passed" on every one of them.
+    sys.path.insert(0, str(HERE))
+    import govkit as _GK
+    _OBS_KEYS = _GK.OBSERVED_KEYS
+    check("OBSERVED_KEYS is derived from OBSERVED_STATES rather than re-typed",
+          _OBS_KEYS == tuple(k for _s, k in _GK.OBSERVED_STATES), str(_OBS_KEYS))
+    check("the table carries the held verb, or the fifth verb is invisible to the deployer",
+          "observed_held" in _OBS_KEYS, str(_OBS_KEYS))
+    check("and the reused verb, which was declared by a kit and read by nobody",
+          "observed_reused" in _OBS_KEYS, str(_OBS_KEYS))
+    check("held is a not-executed state beside skipped, so an all-held baseline carries no "
+          "information and the dead-probe refusal can see that",
+          set(_GK.NOT_EXECUTED) == {"skipped", "held"}, str(_GK.NOT_EXECUTED))
+
+    # BEHAVIOURAL: drive the reader over a runner that prints one line per verb and assert every
+    # bare leg name comes back under the right state. A synthetic runner, because the subject is the
+    # PARSE and a real bar takes minutes to say the same thing.
+    with tempfile.TemporaryDirectory() as _rd:
+        _rp = pathlib.Path(_rd)
+        (_rp / "echo_verbs.py").write_text(
+            "print('GATE ok    a repo leg')\n"
+            "print('GATE FAIL  a red leg  (exit 1)')\n"
+            "print('GATE skip  a guarded leg  (unchanged vs main)')\n"
+            "print('GATE reuse a reused leg  (proven green, inputs unchanged)')\n"
+            "print('GATE held  a kit self-test  (kit self-test, set GATE_SELFTESTS=1 to run)')\n",
+            encoding="utf-8", newline="\n")
+        _verbs = {"green": "GATE ok    ", "red": "GATE FAIL  ", "skipped": "GATE skip  ",
+                  "reused": "GATE reuse ", "held": "GATE held  "}
+        _gr = {"command": [sys.executable, "echo_verbs.py"]}
+        for _st, _key in _GK.OBSERVED_STATES:
+            _gr[_key] = [_verbs[_st] + "{name}"]
+        _got = _GK.read_gate_verdicts(_rp, _gr)
+        check("the reader classifies all five verbs, by name and by state",
+              _got == {"a repo leg": "green", "a red leg": "red", "a guarded leg": "skipped",
+                       "a reused leg": "reused", "a kit self-test": "held"}, str(_got))
+        # ITS LIVENESS HALF: with the held template removed that leg holds NO state at all, which is
+        # the exact shape that made an upgrading adopter's apply refuse.
+        _gr2 = dict(_gr)
+        del _gr2["observed_held"]
+        _got2 = _GK.read_gate_verdicts(_rp, _gr2)
+        check("LIVENESS: without the held template that leg holds no state at all",
+              "a kit self-test" not in _got2, str(_got2))
+
     reg = load_seed_toml(_gov / "tools" / "govkit" / "registry.toml")
     seeded = []
     for e in reg.get("entry", []):
@@ -1595,6 +1971,13 @@ user_skills = "/tmp/gk-fake-skills"
             seeded.append((e["id"], d["gate_runner_seed"]))
     check("at least one registry entry declares a [gate_runner_seed] to round-trip",
           bool(seeded), "no entry declares one — this arm would pass by finding nothing")
+    # A SHIPPED seed must declare the verb its own runner prints, or the emission arms above
+    # quantify over a set that never contains it and pass by finding nothing.
+    check("a shipped [gate_runner_seed] declares observed_held",
+          any("observed_held" in s for _e, s in seeded),
+          "no seed declares it, so every held leg is invisible to every adopter's deployer")
+    check("...and observed_reused",
+          any("observed_reused" in s for _e, s in seeded), "no seed declares it")
     for eid, seed in seeded:
         with tempfile.TemporaryDirectory() as td:
             tgt = pathlib.Path(td) / "t"
@@ -1608,6 +1991,20 @@ user_skills = "/tmp/gk-fake-skills"
                 check(f"[{eid}] the emitted {key} is a LIST, which is what the reader iterates",
                       isinstance(v, list) and bool(v),
                       f"{key} = {v!r} — a string here is walked character by character")
+            # EVERY key the SEED declares must reach the emitted deploy.toml — not the two a
+            # previous pass remembered. The emitter's key list was hand-written and dropped
+            # `observed_reused` from every target since the day the run-gates kit declared it: a
+            # template that shipped, that no adopter ever received and no reader ever read. The
+            # population is the seed's own keys, so a verb added to a kit is covered here on the
+            # commit that adds it. TOOL-dUnstalledConvoy-26.
+            # DERIVED FROM THE SEED, never from OBSERVED_KEYS. Quantifying over the table
+            # would make this arm stop checking a verb on the same edit that drops it from
+            # the table — a predicate derived from the thing it grades. Measured: removing
+            # `held` from OBSERVED_STATES left this loop silently green about it.
+            for key in sorted(k for k in seed if k.startswith("observed_")):
+                check(f"[{eid}] the seed declares {key} and the emitted deploy.toml carries it",
+                      isinstance(decl.get(key), list) and bool(decl.get(key)),
+                      f"the seed declares {key} and the emission produced {decl.get(key)!r}")
             # The round trip that matters: feed a line the runner really prints back through the
             # reader's own head-extraction and assert the BARE LEG NAME comes back.
             for key, sample in (("observed_ran", "GATE ok    memory hygiene"),

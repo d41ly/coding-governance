@@ -205,6 +205,25 @@ def main() -> int:
                 check("pre-existing-red repo: the install completes and REPORTS the red leg",
                       (g / ".governance" / "install.json").is_file()
                       and "ALREADY red" in p.stdout, p.stdout + p.stderr)
+                # TOOL-dUnstalledConvoy-26 AC9: SUBJECT REACHES THE TARGET. Graded here rather than
+                # in the selftest because this is the shape that matters — a real `apply` into a
+                # real target, read back off the target's own manifest. Without the field the leg
+                # arrives as an ordinary bar leg and the adopter runs the kit's self-test on every
+                # push, which is the whole defect the unit exists to remove.
+                _emitted = json.loads(
+                    (g / "tools" / "legs.json").read_text(encoding="utf-8"))
+                _by = {l.get("name"): l for l in _emitted}
+                _wiring = _by.get("check-wiring self-test")
+                check("AC9: the emitted leg reached the target's manifest at all",
+                      _wiring is not None, str(sorted(_by)))
+                check("AC9: and it carries subject = 'kit', so the target HOLDS it by default",
+                      (_wiring or {}).get("subject") == "kit", str(_wiring))
+                # ITS CONTROL: the target's OWN leg is untouched. govkit owning a NAME is not govkit
+                # owning the ROW, and a deployer that stamped a subject onto a leg the target wrote
+                # would be deciding that repository's bar for it.
+                check("AC9 control: the target's own pre-existing leg gains no subject",
+                      "subject" not in (_by.get("theirs") or {"subject": "leaked"}),
+                      str(_by.get("theirs")))
             else:
                 check("pre-existing-red repo, policy=refuse: apply refuses NAMING the leg",
                       "theirs" in p.stderr, p.stdout + p.stderr)

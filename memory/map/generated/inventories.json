@@ -107,6 +107,7 @@
       "workflows"
     ],
     "git-hooks": [
+      "gate-env.sh",
       "pre-commit",
       "pre-push"
     ],
@@ -140,6 +141,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
+      "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
       "inputs-inside-the-subjects-reach.md",
       "pin-copied-from-another-corpus.md",
@@ -153,6 +155,7 @@
       "trace-profile-measures-itself.md",
       "trailing-comma-counted-as-an-element.md",
       "two-answers-to-one-question.md",
+      "two-guards-one-question-two-answers.md",
       "two-readers-of-one-config-one-re-derived.md",
       "vacuous-selector-empty-population.md"
     ],
