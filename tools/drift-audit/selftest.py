@@ -732,6 +732,92 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
           stale["live"] is True, f"{stale}")
 
 
+def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
+    """The marginal-offense-rate signal: four states, and each one must be distinguishable.
+
+    THE ARM THAT MATTERS IS THE EMPTY WINDOW. A stretch in which nobody added a definition is a real
+    and common state — a records-only week — and reporting it as a rate of 0 is byte-identical to
+    reporting a clean one. Only the NOT ASKED arm separates them, and a version that returned 0 there
+    would pass every other check here.
+
+    THE SHALLOW ARM IS THE ONE THIS SIGNAL'S SPEC GOT WRONG. rev-2 asserted a `--depth 1` clone makes
+    the derived base unresolvable; measured, `git log --diff-filter=A` there returns the SHALLOW ROOT
+    as the adding commit and it resolves fine, so a resolves-check is armed against a case it cannot
+    see and the signal would report a rate over a one-commit window. The assertion that fires asks
+    whether the repository is truncated at all.
+    """
+    print("lexicon marginal-offense-rate (four states, each distinguishable)")
+    r = make_repo(tmp / "lexrate")
+    name = "lexicon_marginal_offense_rate"
+
+    absent = report(r)[name]
+    check("no .lexicon.conf: the rate is NOT ASKED, not a clean zero",
+          absent["gateable"] is False and absent["value"] == 0, f"{absent}")
+    check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
+
+    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
+    shutil.copytree(kit_src, r / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (r / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
+
+    # The adoption commit IS the derived base, so HEAD == base and the window is empty BY
+    # CONSTRUCTION. This is the state a rate of 0 would misreport as clean.
+    empty = report(r)[name]
+    # ASSERTS `not_asked`, not `value == 0`. A rate of 0 ALSO has value 0 and gateable False, so the
+    # obvious spelling of this arm stays green under exactly the break it exists to catch -- observed
+    # 2026-08-25 by staging that break and watching this line pass. `not_asked` is the field the
+    # renderer branches on to keep the three states three, so it is the field the arm must read.
+    check("empty window: NOT ASKED rather than a rate of 0",
+          empty.get("not_asked") is True, f"{empty}")
+    check("empty window: it names the reason, so 0 is never mistaken for clean",
+          "no definition was added" in str(empty["detail"]), f"{empty['detail']}")
+
+    # Two definitions added, exactly one of them off-table.
+    (r / "src" / "later.py").write_text(
+        "def build_ok():\n    pass\n\n\ndef frobnicate_bad():\n    pass\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "add two definitions, one off-table", "--no-verify"], r)
+    fired = report(r)[name]
+    check("a window with definitions added reports offenders over that population",
+          fired["value"] == 1 and fired["of"] == 2, f"{fired}")
+    check("...and is LIVE by derivation over a non-empty population",
+          fired["live"] is True, f"{fired}")
+    check("...and carries the fresh-versus-pre-existing split the kill-rule reads",
+          any("FRESH" in str(d.get("note", "")) for d in fired["detail"]), f"{fired['detail']}")
+
+    # ADMITTING the verb must move the rate. Without this the offender test could be reading a
+    # frozen table and nothing here would notice.
+    conf = r / ".lexicon.conf"
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        "VERBS:\n  build  make a thing\n", "VERBS:\n  build  make a thing\n  frobnicate  do the thing\n"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "admit the verb", "--no-verify"], r)
+    admitted = report(r)[name]
+    check("admitting a verb lowers the rate, so the table is read at HEAD and not frozen",
+          admitted["value"] == 0 and admitted["of"] >= 2, f"{admitted}")
+
+    # THE SHALLOW ARM. A `--depth 1` clone still DERIVES a base — the shallow root — and it resolves,
+    # so only a truncation check can refuse it.
+    shallow = tmp / "lexrate-shallow"
+    run(["git", "clone", "-q", "--depth", "1", "file://" + str(r).replace("\\", "/"), str(shallow)], tmp)
+    if (shallow / ".git").exists():
+        deep = run(["git", "rev-parse", "--is-shallow-repository"], shallow).stdout.strip()
+        check("the fixture clone really is shallow (or this arm proves nothing)", deep == "true", deep)
+        got = report(shallow)[name]
+        check("shallow clone: DEAD PROBE rather than a rate over a one-commit window",
+              got["live"] is False and "shallow" in str(got["detail"]).lower(), f"{got}")
+    else:
+        skip("shallow-clone arm", "the fixture clone did not materialise on this platform")
+
+
 # ---------------------------------------------------------------------------------------------
 # 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (three directions)
 # ---------------------------------------------------------------------------------------------
@@ -1320,6 +1406,7 @@ def main() -> int:
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
+        test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
         test_readme_mechanism_drift(tmp)

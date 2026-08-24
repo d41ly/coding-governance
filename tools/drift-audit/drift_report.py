@@ -38,7 +38,6 @@ from __future__ import annotations
 
 import argparse
 import datetime
-import hashlib
 import json
 import os
 import pathlib
@@ -762,9 +761,6 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
             "langs_commit": langs_sha}
 
 
-_LEX_RATE_CACHE: dict = {}
-
-
 def _build_armed_exts(langs_value, lex, _langs):
     """`{ext: (pset, mode)}` for the extensions an extractor can actually READ. Dark and
     unknown-pattern-set extensions are dropped here, so both operands are derived over the same
@@ -907,16 +903,14 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
                                     "resolve in this object store (a shallow or grafted clone); "
                                     "no rate is derived"}]}
 
+    # NO CACHE, and that is a rev-4 cut with a measurement behind it. The spec asked for a per-sha
+    # cache keyed on the table digest, sized against a per-file read costing 2.774 s for both shas.
+    # The batched read below already costs 0.957 s cold inside a 3.7 s report that is not on the
+    # merge bar, so the cache was specced against a cost that no longer exists — and an in-process
+    # dict never survives to a second run anyway, which is a moving part with no consumer.
     armed = _build_armed_exts(langs_value, lex, _langs)
-    key_digest = hashlib.sha256(" ".join(sorted(verbs)).encode()).hexdigest()[:16]
-    both = {}
-    for sha in (base, head):
-        ck = (sha, key_digest)
-        if ck not in _LEX_RATE_CACHE:
-            _LEX_RATE_CACHE[ck] = _read_defs_at_sha(ctx, sha, armed, lex)
-        both[sha] = _LEX_RATE_CACHE[ck]
-
-    at_base, at_head = both[base], both[head]
+    at_base = _read_defs_at_sha(ctx, base, armed, lex)
+    at_head = _read_defs_at_sha(ctx, head, armed, lex)
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:

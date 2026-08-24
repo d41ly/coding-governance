@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal
 
-**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -36,8 +36,11 @@ who writes it.
   rev-3 correction and §4 records the measurement that forced it.
 - **S6** — a window with zero definitions ADDED is NOT ASKED, not a rate of 0, routed through the
   existing `_build_not_asked` renderer so the three states stay three.
-- **S7** — a per-sha cache keyed on `(sha, digest of the VERBS table)`, because a commit's tree is
-  immutable but the table that grades it is not.
+- **S7 — CUT at rev-4, on a measurement.** It asked for a per-sha cache keyed on the table digest,
+  sized against a per-file read costing 2.774 s for both shas. The batched read costs **0.957 s
+  cold** inside a 3.7 s report that is not on the merge bar, so the cache was specced against a cost
+  the implementation removed — and an in-process dict never survives to a second run, which is a
+  moving part with no consumer.
 
 ## 3. Non-goals (OUT)
 
@@ -250,7 +253,11 @@ decision is a reading rather than an argument, which is what the plan lacked.
   against 37.8% in files that predate the table, and a trend signal's first reading is a baseline
   rather than a verdict. The mitigation is that the signal ships with §4's table cited in its
   docstring, so the first reader gets the decomposition and not just the number.
-- **testing + left-shift gates** — five arms in `tools/drift-audit/selftest.py` (§6). The classes
+- **testing + left-shift gates** — TEN arms in `tools/drift-audit/selftest.py`, in
+  `test_lexicon_marginal_rate`. ONE of them was measured vacuous and rewritten: the empty-window arm
+  first read `value == 0 and gateable is False`, and a staged break returning a RATE of 0 satisfies
+  both — it stayed green under exactly the break it exists to catch. It now reads `not_asked`, the
+  field the renderer branches on, and both empty-window arms red under that break. The classes
   are `assertion-between-two-derived-values.md` (answered in §4),
   `vacuous-selector-empty-population.md` (L2, L3) and `process-creation-is-the-suite-cost.md` (the
   batched read).
@@ -271,8 +278,10 @@ decision is a reading rather than an argument, which is what the plan lacked.
   at the same sha.
 - **AC4** — When `.lexicon.conf` is absent from the tree, the signal reports NOT ASKED and the
   report exits with its existing code, so an adopter without the kit is unaffected.
-- **AC5** — When a verb is added to `VERBS` and nothing else changes, the second run recomputes
-  rather than serving the cached rate, proving the S7 cache key includes the table digest.
+- **AC5** — When a verb is admitted to `VERBS` and nothing else changes, the rate FALLS, proving
+  the offender test reads the table at HEAD rather than a frozen one (F2). rev-1 framed this as a
+  cache-key assertion; S7 is cut, and the property worth asserting is the one F2 resolved. Armed as
+  `admitting a verb lowers the rate` in `tools/drift-audit/selftest.py`.
 - **AC6** — When `bash tools/run-gates/run-gates.sh` runs after the change, `drift-audit selftest`,
   `drift-audit records`, `lexicon naming predicates`, `lexicon selftest` and `lexicon wiring` are
   green, and `VERB_OFFENDER_PIN` is UNCHANGED at `463` — the rev-1 move to `464` was owed to a
@@ -346,6 +355,15 @@ records` leg and its arms ride `drift-audit selftest`. The leg count is not the 
   exits 0 without one for a non-gateable signal, and §3 already forbids a threshold here, so a pin
   would be the raisable integer this build exists to delete wearing a percentage sign. rev-1's
   Files-touched line named one; that line is the departure, not §3.
+
+- rev-4 · 2026-08-25 · S7 CUT with the measurement that killed it (0.957 s cold against the 2.774 s
+  the cache was sized for), and AC5 re-pointed from the cache key to the property F2 actually
+  resolved. The arms landed and ONE was measured vacuous before it shipped: the empty-window check
+  read `value == 0 and gateable is False`, which a rate of 0 also satisfies, so it passed under the
+  staged break it existed to catch. Rewritten to read `not_asked`. Also recorded: `git checkout --`
+  restores `tools/drift-audit/*.py` as CRLF on this node, because `.gitattributes` pins `eol=lf`
+  only for `tools/govkit/*.py` and `tools/run-gates/*.py` — a newline-naive edit script silently
+  matches nothing there, which cost one round of a break that never applied.
 
 ## 10. Reuse audit
 
