@@ -135,8 +135,8 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
-| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1..3 |
+| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-1..3 |
 
 Ids no record names: TOOL-aLoosenedCeiling-4.
 

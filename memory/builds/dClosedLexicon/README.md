@@ -97,16 +97,16 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1..2 |
 | [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md) | spec-audit | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-1..2 |
 | [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md) | diff-review | TOOL-dClosedLexicon-1 |
 | [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md) | diff-review | TOOL-dClosedLexicon-1 |
 | [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md) | diff-review | TOOL-dClosedLexicon-1 |
 | [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md) | diff-review | TOOL-dClosedLexicon-1 |
 | [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md) | diff-review | TOOL-dClosedLexicon-4 |
 | [2026-08-17-review-TOOL-dClosedLexicon-11-10.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-10.md) | spec-audit | TOOL-dClosedLexicon-11 |
-| [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md) | spec-audit | TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13 |
+| [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md) | spec-audit | TOOL-dClosedLexicon-11..13 |
 
 Ids no `spec-audit` record has ever named: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-4.
 <!-- /gen:build-index -->

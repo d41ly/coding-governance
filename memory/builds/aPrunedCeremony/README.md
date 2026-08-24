@@ -130,9 +130,9 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md) | journal | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
-| [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md) | spec-audit | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
-| [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md) | diff-review | PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2 |
+| [2026-07-19-build-PLAY-aPrunedCeremony-1-1.md](build/2026-07-19-build-PLAY-aPrunedCeremony-1-1.md) | journal | PLAY-aPrunedCeremony-1..4 TOOL-aPrunedCeremony-1..2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-1.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-1.md) | spec-audit | PLAY-aPrunedCeremony-1..4 TOOL-aPrunedCeremony-1..2 |
+| [2026-07-19-review-PLAY-aPrunedCeremony-1-2.md](reviews/2026-07-19-review-PLAY-aPrunedCeremony-1-2.md) | diff-review | PLAY-aPrunedCeremony-1..4 TOOL-aPrunedCeremony-1..2 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

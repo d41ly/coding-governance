@@ -164,7 +164,7 @@ Records live under `spec/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-10-review-TOOL-aUnmannedHelm-1-1.md](reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-1.md) | spec-audit | TOOL-aUnmannedHelm-1 |
-| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 |
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4..9 |
 
 Ids no `spec-audit` record has ever named: TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9.
 <!-- /gen:build-index -->

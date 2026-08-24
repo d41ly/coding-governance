@@ -83,7 +83,7 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 |
+| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-1..2 |
 | [2026-08-17-review-TOOL-aWalkedCorpus-3-2.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-2.md) | spec-audit | TOOL-aWalkedCorpus-3 |
 | [2026-08-17-review-TOOL-aWalkedCorpus-3-3.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-3.md) | spec-audit | TOOL-aWalkedCorpus-3 |
 | [2026-08-17-review-TOOL-aWalkedCorpus-3-4.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-4.md) | diff-review | TOOL-aWalkedCorpus-3 |

@@ -94,7 +94,7 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-20-review-TOOL-aTetheredScratch-1-2.md](reviews/2026-08-20-review-TOOL-aTetheredScratch-1-2.md) | spec-audit | TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 |
+| [2026-08-20-review-TOOL-aTetheredScratch-1-2.md](reviews/2026-08-20-review-TOOL-aTetheredScratch-1-2.md) | spec-audit | TOOL-aTetheredScratch-1..2 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

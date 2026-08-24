@@ -106,10 +106,10 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md) | journal | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md) | diff-review | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+| [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md) | journal | DEPL-aTetheredConvoy-1..7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md) | spec-audit | DEPL-aTetheredConvoy-1..7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md) | spec-audit | DEPL-aTetheredConvoy-1..7 |
+| [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md) | diff-review | DEPL-aTetheredConvoy-1..7 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

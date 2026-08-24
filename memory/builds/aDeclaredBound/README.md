@@ -139,10 +139,10 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md) | research | TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-2.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-2.md) | spec-audit | TOOL-aDeclaredBound-1..5 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md) | diff-review | TOOL-aDeclaredBound-1..5 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md) | diff-review | TOOL-aDeclaredBound-1..5 |
+| [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1..5 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

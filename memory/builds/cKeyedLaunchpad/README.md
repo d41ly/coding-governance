@@ -237,7 +237,7 @@ Records live under `spec/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md](reviews/2026-08-13-review-KICK-cKeyedLaunchpad-3-1.md) | spec-audit | KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-6 |
-| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5 |
+| [2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md](reviews/2026-08-14-review-KICK-cKeyedLaunchpad-1-2.md) | spec-audit | KICK-cKeyedLaunchpad-1..4 KICK-cKeyedLaunchpad-6..7 TOOL-cKeyedLaunchpad-5 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

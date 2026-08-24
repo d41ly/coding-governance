@@ -294,10 +294,10 @@ Records live under `spec/`, `build/` and `reviews/`.
 |---|---|---|
 | [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
 | [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
-| [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md) | journal | TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13 |
+| [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md) | journal | TOOL-aBranchedMandate-12..13 |
 | [2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md](build/2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md) | — | *none — a handoff for a SEPARATE session; the six rows it details are OPEN backlog rows this build never specced, so it holds no spec to serve* |
-| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
-| [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 |
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1..3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-1..2 |
 | [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md) | diff-review | TOOL-aBranchedMandate-3 |
 | [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
 

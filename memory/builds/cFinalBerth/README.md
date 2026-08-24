@@ -125,8 +125,8 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-13-review-TOOL-cFinalBerth-1-1.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-1.md) | spec-audit | TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 |
-| [2026-08-13-review-TOOL-cFinalBerth-1-2.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-2.md) | diff-review | TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 |
+| [2026-08-13-review-TOOL-cFinalBerth-1-1.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-1.md) | spec-audit | TOOL-cFinalBerth-1..2 |
+| [2026-08-13-review-TOOL-cFinalBerth-1-2.md](reviews/2026-08-13-review-TOOL-cFinalBerth-1-2.md) | diff-review | TOOL-cFinalBerth-1..2 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

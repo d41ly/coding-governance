@@ -186,25 +186,25 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-owner-rulings.md) | journal | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md](build/2026-08-20-build-TOOL-dScriptedRepeat-1-research-contradictions.md) | research | TOOL-dScriptedRepeat-1 |
 | [2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md](build/2026-08-21-build-TOOL-dScriptedRepeat-2-canon-derivation.md) | research | TOOL-dScriptedRepeat-2 |
-| [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-13-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-13-acceptance.md) | journal | TOOL-dScriptedRepeat-13 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-14-acceptance.md) | journal | TOOL-dScriptedRepeat-14 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md](build/2026-08-23-build-TOOL-dScriptedRepeat-15-acceptance.md) | journal | TOOL-dScriptedRepeat-15 |
 | [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md) | journal | TOOL-dScriptedRepeat-5 |
-| [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md) | journal | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
-| [2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md) | journal | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md) | journal | TOOL-dScriptedRepeat-13..15 |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md](build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md) | journal | TOOL-dScriptedRepeat-13..15 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit-round2.md) | spec-audit | TOOL-dScriptedRepeat-1 |
 | [2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md](reviews/2026-08-20-review-TOOL-dScriptedRepeat-1-spec-audit.md) | spec-audit | TOOL-dScriptedRepeat-1 |
-| [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
-| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
-| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
-| [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
-| [2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md](reviews/2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md) | diff-review | TOOL-dScriptedRepeat-13 TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-5..7 TOOL-dScriptedRepeat-9..11 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md) | diff-review | TOOL-dScriptedRepeat-13..15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md) | diff-review | TOOL-dScriptedRepeat-13..15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md) | diff-review | TOOL-dScriptedRepeat-13..15 |
+| [2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md](reviews/2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md) | diff-review | TOOL-dScriptedRepeat-13..15 |
 
 Ids no record names: TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-8.
 

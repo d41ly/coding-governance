@@ -106,9 +106,9 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+| [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-1..4 |
 | [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md) | journal | TOOL-aShardedFloor-4 |
-| [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+| [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-1..4 |
 <!-- /gen:build-index -->
 
 

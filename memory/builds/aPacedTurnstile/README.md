@@ -282,11 +282,11 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
-| [2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
-| [2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
-| [2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md) | diff-review | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
-| [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round2.md) | spec-audit | TOOL-aPacedTurnstile-1..7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round3.md) | spec-audit | TOOL-aPacedTurnstile-1..7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-round4.md) | spec-audit | TOOL-aPacedTurnstile-1..7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1-run-cumulative.md) | diff-review | TOOL-aPacedTurnstile-1..7 |
+| [2026-08-18-review-TOOL-aPacedTurnstile-1.md](reviews/2026-08-18-review-TOOL-aPacedTurnstile-1.md) | spec-audit | TOOL-aPacedTurnstile-1..7 |
 | [2026-08-20-review-TOOL-aPacedTurnstile-14.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-14.md) | spec-audit | TOOL-aPacedTurnstile-14 |
 | [2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2-round2.md) | diff-review | TOOL-aPacedTurnstile-2 |
 | [2026-08-20-review-TOOL-aPacedTurnstile-2.md](reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md) | diff-review | TOOL-aPacedTurnstile-2 |

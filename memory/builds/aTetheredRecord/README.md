@@ -141,7 +141,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-16-build-aTetheredRecord-1-design-pass.md](build/2026-08-16-build-aTetheredRecord-1-design-pass.md) | — | *none — this record PRECEDES the spec set and commissioned it; it is the class-4 case the* |
-| [2026-08-17-review-TOOL-aTetheredRecord-1-1.md](reviews/2026-08-17-review-TOOL-aTetheredRecord-1-1.md) | spec-audit | TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7 |
+| [2026-08-17-review-TOOL-aTetheredRecord-1-1.md](reviews/2026-08-17-review-TOOL-aTetheredRecord-1-1.md) | spec-audit | TOOL-aTetheredRecord-1..7 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -663,7 +663,7 @@ def render_region(build: dict) -> str:
             if r["state"] == "unbound":
                 out.append(f"| [{label}]({rel}) | — | *none — {r['reason']}* |")
             else:
-                out.append(f"| [{label}]({rel}) | {r['kind']} | {' '.join(r['ids'])} |")
+                out.append(f"| [{label}]({rel}) | {r['kind']} | {_collapse_ids(r['ids'])} |")
         named = {i for r in recs for i in r.get("ids", [])}
         audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
         own = [u["id"] for u in build["units"]]
@@ -681,6 +681,42 @@ def render_region(build: dict) -> str:
 
 
 IDS_WRAP = 300
+
+
+def _collapse_ids(ids: list) -> str:
+    """`FAMILY-slug-2 … FAMILY-slug-15` as `FAMILY-slug-2..15`, contiguous runs only.
+
+    A TABLE cell cannot wrap the way `_wrap_prose_ids` wraps a paragraph, so the bindings row needs
+    a shorter spelling rather than more lines. This is `TOOL-dUnstalledConvoy-13`: a record serving
+    a build past about eleven units cannot fit the row under the entry cap BY CONSTRUCTION, because
+    the row carries the filename, the path AND every id it serves. Measured at 505 characters for a
+    fourteen-unit spec audit, against a 350 ceiling.
+
+    The range spelling is not invented here — it is the one the AUTHORING grammar already accepts and
+    expands, so a reader of the generated row and a reader of a hand-written `Serves:` line are
+    reading the same notation. Only a run of consecutive ordinals sharing a family and slug collapses;
+    anything else is emitted verbatim, so a gap can never be swallowed by the abbreviation.
+    """
+    if not ids:
+        return ""
+    out, i = [], 0
+    while i < len(ids):
+        head = ids[i]
+        stem, _, num = head.rpartition("-")
+        if not num.isdigit():
+            out.append(head)
+            i += 1
+            continue
+        j, last = i, int(num)
+        while j + 1 < len(ids):
+            nstem, _, nnum = ids[j + 1].rpartition("-")
+            if nstem != stem or not nnum.isdigit() or int(nnum) != last + 1:
+                break
+            j += 1
+            last = int(nnum)
+        out.append(head if j == i else f"{stem}-{int(num)}..{last}")
+        i = j + 1
+    return " ".join(out)
 
 
 def _wrap_prose_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:

@@ -108,7 +108,7 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3 |
+| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1..3 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -102,8 +102,8 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
-| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-5 TOOL-cSettledDocket-6 |
+| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1..6 |
+| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1..6 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

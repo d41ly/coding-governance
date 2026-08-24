@@ -140,13 +140,7 @@ Records live under `spec/` and `build/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md) | research | TOOL-dScaffoldedMirror-2 |
-| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2 |
-
-Ids no record names: TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6
-TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9.
-
-Ids no `spec-audit` record has ever named: TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6
-TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9.
+| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2..15 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

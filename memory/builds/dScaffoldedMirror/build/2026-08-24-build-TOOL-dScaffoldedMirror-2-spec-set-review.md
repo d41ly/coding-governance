@@ -1,7 +1,6 @@
 # dScaffoldedMirror spec set — synthesis review
 
-**Serves:** spec-audit TOOL-dScaffoldedMirror-2
-**Commissions:** TOOL-dScaffoldedMirror-2
+**Serves:** spec-audit TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15
 
 Fourteen specs (`-2` through `-15`), two convergence passes, four refutation lenses, one synthesis.
 Spec dir: `memory/builds/dScaffoldedMirror/spec/`. Tree read at `af4de2d5` (899 tracked files);

@@ -59,9 +59,9 @@ Records live under `spec/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
-| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
-| [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md) | spec-audit | TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 |
-| [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md) | spec-audit | TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 |
+| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1..9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+| [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md) | spec-audit | TOOL-aDrainedSluice-2..4 |
+| [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md) | spec-audit | TOOL-aDrainedSluice-5..9 |
 
 Ids no `spec-audit` record has ever named: TOOL-aDrainedSluice-1.
 <!-- /gen:build-index -->

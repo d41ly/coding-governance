@@ -212,11 +212,11 @@ Records live under `spec/`, `build/` and `reviews/`.
 | Record | Kind | Serves |
 |---|---|---|
 | [2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md](build/2026-08-16-build-aSiftedPlaybook-1-playbook-audit.md) | — | *none — the commissioning input: it PRECEDES the spec set and warranted it* |
-| [2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
-| [2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
-| [2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md) | spec-audit | PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
-| [2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md) | spec-audit | PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 |
-| [2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md) | spec-audit | TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-4 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-1.md) | spec-audit | PLAY-aSiftedPlaybook-1..4 TOOL-aSiftedPlaybook-1..3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md) | spec-audit | PLAY-aSiftedPlaybook-1..4 TOOL-aSiftedPlaybook-1..3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-3.md) | spec-audit | PLAY-aSiftedPlaybook-3 TOOL-aSiftedPlaybook-1..2 PLAY-aSiftedPlaybook-1..2 TOOL-aSiftedPlaybook-3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-4.md) | spec-audit | PLAY-aSiftedPlaybook-1..4 TOOL-aSiftedPlaybook-1..3 |
+| [2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-5.md) | spec-audit | TOOL-aSiftedPlaybook-1..3 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-1..2 PLAY-aSiftedPlaybook-4 |
 | [2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md](reviews/2026-08-16-review-PLAY-aSiftedPlaybook-2-6.md) | diff-review | PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-2 |
 <!-- /gen:build-index -->
 
