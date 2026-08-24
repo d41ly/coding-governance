@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -154,6 +154,7 @@ row-grammar merge driver over the backlog shard.
   stale plan-pair comment is named as a stale RATIONALE under a rule that still holds, rather than
   folded into the dossier's factual errors.
 - rev-4 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-5 · 2026-08-24 · BUILT and CLOSED. Four records corrected, the superseding decision landed, the read-path ceiling raised minimally with its reason. Two things changed during the build: the decision row was rewritten from 482 to 274 characters to fit check 7's entry cap, and the curation-debt correction was reworded so AC4's own grep could tell a claim from its denial. Ledger: `build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md`.
 
 ## 10. Reuse audit
 

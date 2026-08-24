@@ -43,7 +43,7 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 | [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | SPECCED | rev-5 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | SPECCED | rev-4 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | SPECCED | rev-3 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | SPECCED | rev-4 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | CLOSED | rev-5 | 2026-08-24 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -56,6 +56,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md) | journal | TOOL-dFramedEntrypoint-1 |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md) | journal | TOOL-dFramedEntrypoint-8 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md) | spec-audit | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
@@ -89,6 +90,7 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md)
+  - [2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md)
 - **`reviews/`**
   - [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md)
   - [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md)

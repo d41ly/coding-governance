@@ -52,14 +52,18 @@ enclosing region's extent is byte-unchanged and the driver gets a name to read i
 guess. Consumers address it with `region()` like any other pair; it is not in `GEN_REGIONS` and must
 not be added there.
 
-**The `roster:units` pair is authored, this generator never writes into it, and it is being RETIRED.**
-`check_authorization` byte-compared that slice across a run's pinned BASE, so a renderer touching it
-would have invalidated every run authorized against the file — which is why it appears in the module
-only so the slot walk can find it. `TOOL-aBoundedVerdict-11` moves the frozen authorization scope to
-the GENERATED region's unit-ID SET (BASE ⊆ HEAD, never row bytes, because those carry status and rev
-and would refuse every run that built anything), and retires the authored pair by removing its
-readers rather than by editing the four build READMEs that carry one. A region nothing reads is
-inert.
+**The `roster:units` pair is authored, this generator never writes into it, and it is NARROWED — not
+retired.** `check_authorization` byte-compared that slice across a run's pinned BASE, so a renderer
+touching it would have invalidated every run authorized against the file, which is why it appears in
+the module only so the slot walk can find it. `TOOL-aBoundedVerdict-11` moves the frozen
+authorization scope to the GENERATED region's unit-ID SET (BASE ⊆ HEAD, never row bytes, because
+those carry status and rev and would refuse every run that built anything), and it moved FOUR of the
+pair's five readers. **The fifth is live and deliberate**: `roster_ids` in the unattended driver
+still reads the authored pair, because it answers a question the generated region cannot — which
+units are PLANNED but unspecced — and pointing it at the generated region was tried inside that same
+unit and reverted as a tautology. That spec was corrected at rev-8 to say so. Eleven build READMEs
+carry the pair, measured with `git ls-files 'memory/builds/*/README.md' | xargs grep -lF`; whether it
+becomes mandatory or its readers are deleted together is an open owner decision.
 
 **The roster is wrapped, never counted.** `TOOL-aMouldedFolio-2` renders the full roster here and only
 its count in `LIVE.md` and the ledger, and `render_region`'s own comment states that `unit(s)` and
@@ -99,8 +103,8 @@ creation and rendering.
 - The roster-wrapping half of the corpus surgery never fired, and it is now MOOT rather than pending:
   `--check-format` cannot identify an authored plan that is not already wrapped, an unwrapped plan is
   legal, and twelve build READMEs carrying a roster table have no `roster:units` pair — but
-  `TOOL-aBoundedVerdict-11` retires that pair's readers instead of wrapping the corpus, so the
-  population stops mattering. **The deferral this bullet used to carry was stale**: it named
+  `TOOL-aBoundedVerdict-11` moved four of that pair's five readers instead of wrapping the corpus,
+  and the population still matters to the fifth. **The deferral this bullet used to carry was stale**: it named
   `TOOL-cBriefedPilot-18` as the owner of making the pair mandatory, and that unit is CLOSED with its
   own AC9 asserting a grep returns zero where it returns two — the requirement was never established.
   `TOOL-aPacedTurnstile-14` then hit the same gap from another node's live run and is closed by

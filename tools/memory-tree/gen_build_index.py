@@ -46,10 +46,15 @@ RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 
-# The AUTHORED plan region. This generator NEVER writes between these two markers: the unattended
-# kit's check_authorization byte-compares that slice across a run's pinned BASE, so a renderer that
-# touched it would silently invalidate every run authorized against the file. It is listed here so
-# the slot walk can FIND it, not so anything can render into it.
+# The AUTHORED plan region. This generator NEVER writes between these two markers. The RULE still
+# holds; the reason it was first given has EXPIRED, and the pair is recorded here so the next reader
+# does not delete a live rule along with its dead justification. It WAS that check_authorization
+# byte-compared this slice across a run's pinned BASE. TOOL-aBoundedVerdict-11 moved that comparison
+# to the generated unit-ID set, so no byte-compare reaches here any more. What still reads the pair
+# is the unattended driver's roster_ids, which answers which units are PLANNED but unspecced — a
+# question the generated region cannot answer, because it is rendered from the specs that exist. A
+# renderer writing here would therefore corrupt a plan rather than invalidate an authorization. It is
+# listed so the slot walk can FIND it, not so anything can render into it.
 PLAN_OPEN = "<!-- roster:units -->"
 PLAN_CLOSE = "<!-- /roster:units -->"
 
