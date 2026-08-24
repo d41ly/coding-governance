@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal
 
-**Status:** INPROGRESS · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
