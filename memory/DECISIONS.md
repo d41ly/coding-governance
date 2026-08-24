@@ -84,6 +84,10 @@
 - TOOL-aPacedTurnstile-16 · the bar is FLOOR-bound (one leg is 836.5 s of a 1033.2 s wall at 86 legs), so scheduling cannot move it: `-3` loses its reorder and its chunk-major dispatch and keeps reporting only. Order becomes -5 -> -4 -> -6 -> -7 -> -3
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
+- TOOL-dScaffoldedMirror-16 · F4 (retire P1 if unused across two adopters) SUPERSEDED: 136 definitions and ZERO offenders since the conf landed, and `incms/main` is 55.2% verb-led against a table it never saw. The declaration works; the enforcement is the zero → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-17 · F-A5 (opt-in BECAUSE unmeasurable) and its non-goal SUPERSEDED in writing BEFORE the pressure unit lands. Opt-in survives; the REASON does not — a mechanism resting on a premise its own records deny is two-answers-to-one-question → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-18 · gov TAKES the pressure it ships: the grandfather set is adopted here with a 459-row backfill. It buys this repo almost nothing (new code is at 0% marginal offense) and lands anyway: shipping an unexercised gate is how this kit got here → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-19 · a NOUN-LED definition is legal only for `@property`, `@cached_property` and a zero-arg accessor — all detectable in `ast`, so it is a kit-owned structural exemption, never a waiver pile. ~288 of 463 offenders (62% of debt) were unruled → `builds/dScaffoldedMirror/`
 
 ## DEPL — deployer
 
