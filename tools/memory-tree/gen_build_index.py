@@ -440,7 +440,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     return out
 
 
-def do_print_bindings(root: str, conf: dict) -> int:
+def cmd_print_bindings(root: str, conf: dict) -> int:
     """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
 
     It is the retrofit's own checklist AND the predicate the gate reads, so a seed list and a gate
@@ -1170,7 +1170,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
 
 
 # -------------------------------------------------------------------------------------------- modes
-def do_check(root: str, conf: dict) -> int:
+def cmd_check(root: str, conf: dict) -> int:
     artifacts, orphans, unmanaged = plan(root, conf)
     bad = []
     for rel, want in sorted(artifacts.items()):
@@ -1192,7 +1192,7 @@ def do_check(root: str, conf: dict) -> int:
     return 0
 
 
-def do_check_format(root: str, conf: dict) -> int:
+def cmd_check_format(root: str, conf: dict) -> int:
     """The SLOT CONTRACT verb — deliberately NOT reachable from plan(), --write or --check (S1a).
 
     Build READMEs violate the sequence at this unit's base, so a refusal on the render path would red
@@ -1215,7 +1215,7 @@ def do_check_format(root: str, conf: dict) -> int:
     return 0
 
 
-def do_write(root: str, conf: dict) -> int:
+def cmd_write(root: str, conf: dict) -> int:
     artifacts, orphans, unmanaged = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
@@ -1260,7 +1260,7 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     return load_conf(tmp)
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     fails = []
 
     def arm(label, want, fn):
@@ -1478,7 +1478,7 @@ def do_selftest() -> int:
             lambda: str(plan(t8, conf8)[1]))
         arm("a non-shard file under ledger/ is NOT deletable", "memory/ledger/notes.md",
             lambda: str(plan(t8, conf8)[2]))
-        do_write(t8, conf8)
+        cmd_write(t8, conf8)
         arm("--write removed the orphan", "False",
             lambda: str(os.path.exists(os.path.join(t8, "memory", "ledger", "1999-01.md"))))
         arm("--write kept the unmanaged file", "True",
@@ -1501,8 +1501,8 @@ def do_selftest() -> int:
         # and red forever after.
         t11 = os.path.join(base, "roundtrip"); os.makedirs(t11)
         conf11 = _fixture(t11, spec_status="OPEN")
-        do_write(t11, conf11)
-        arm("write then check is a fixed point", "0", lambda: str(do_check(t11, conf11)))
+        cmd_write(t11, conf11)
+        arm("write then check is a fixed point", "0", lambda: str(cmd_check(t11, conf11)))
 
         # ---- TOOL-aRuledFrontispiece-1: the slot contract, region creation, and the ASYMMETRY.
         # A fixture whose README carries ONLY the build-index pair: the other three are absent.
@@ -1512,19 +1512,19 @@ def do_selftest() -> int:
 
         # S1c — the ASYMMETRY. --check must be SILENT about the three absent pairs.
         #
-        # ORDER IS THE WHOLE ARM. This ran AFTER do_write, which had just created the three pairs, so
+        # ORDER IS THE WHOLE ARM. This ran AFTER cmd_write, which had just created the three pairs, so
         # there was no absent pair left to be silent about and the arm could not fail: mutation-proved
-        # by patching do_check to pass create_missing=True — the exact regression it claims to catch —
+        # by patching cmd_check to pass create_missing=True — the exact regression it claims to catch —
         # and watching the suite still report PASS. It runs BEFORE the write now, on a fixture that
         # genuinely lacks the pairs, and asserts the render directly rather than an exit code.
-        # THE ARM MUST RUN THROUGH do_check, not through plan(). Two earlier spellings did not, and
-        # both were mutation-proved useless: one ran after do_write so no pair was absent, and one
-        # called plan() directly so patching do_check — the site that actually carries the defect —
+        # THE ARM MUST RUN THROUGH cmd_check, not through plan(). Two earlier spellings did not, and
+        # both were mutation-proved useless: one ran after cmd_write so no pair was absent, and one
+        # called plan() directly so patching cmd_check — the site that actually carries the defect —
         # left the suite green. The fixture is rendered FIRST so the build-index region is fresh, then
-        # the three other pairs are removed. Now the only thing that can make do_check report stale is
+        # the three other pairs are removed. Now the only thing that can make cmd_check report stale is
         # create_missing leaking into it, which is exactly S1c.
         rd12 = os.path.join(t12, "memory", "builds", "tOne", "README.md")
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         # WHOLE regions, markers and body together. Stripping only the marker lines orphans the
         # rendered body as loose authored text, which makes the fixture genuinely non-conforming and
         # reds a later arm for a reason that has nothing to do with what this one tests.
@@ -1534,10 +1534,10 @@ def do_selftest() -> int:
             if _o is not None and _c is not None:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
-        arm("check does not CREATE an absent pair", "0", lambda: str(do_check(t12, conf12)))
+        arm("check does not CREATE an absent pair", "0", lambda: str(cmd_check(t12, conf12)))
         arm("the three pairs really are absent for that arm", "3",
             lambda: str(sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
             sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
         arm("write CREATED the three absent pairs", "3",
@@ -1553,7 +1553,7 @@ def do_selftest() -> int:
         conf13 = _fixture(t13, spec_status="OPEN")
         rd13 = os.path.join(t13, "memory", "builds", "tOne", "README.md")
         write_text(rd13, read_text(rd13) + "\n## Afterword\n\nauthored prose below the region.\n")
-        do_write(t13, conf13)
+        cmd_write(t13, conf13)
         arm("a violating README keeps its authored tail", "authored prose below the region.",
             lambda: read_text(rd13))
         arm("a violating README still gains its pairs", "True",
@@ -1573,7 +1573,7 @@ def do_selftest() -> int:
             "authored content between the plan pair and the generated region",
             lambda: str(slot_violations(read_text(rd14), "x")))
         # S2 — the generator NEVER writes between the plan markers.
-        do_write(t14, conf14)
+        cmd_write(t14, conf14)
         arm("the authored plan region survives a write verbatim", "| # | unit |",
             lambda: read_text(rd14))
 
@@ -1673,10 +1673,10 @@ def do_selftest() -> int:
         # read-only verb that writes is the whole risk of that verb.
         t12 = os.path.join(base, "ro"); os.makedirs(t12)
         conf12 = _fixture(t12)
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         _before = {p: read_text(os.path.join(t12, p)) for p in
                    ("memory/LIVE.md", "memory/builds/tOne/README.md")}
-        do_print_bindings(t12, conf12)
+        cmd_print_bindings(t12, conf12)
         arm("--print-bindings leaves every generated artifact byte-identical", "True",
             lambda: str(all(read_text(os.path.join(t12, p)) == v for p, v in _before.items())))
 
@@ -1686,7 +1686,7 @@ def do_selftest() -> int:
             import io as _io, contextlib as _cl
             buf = _io.StringIO()
             with _cl.redirect_stdout(buf):
-                do_print_bindings(tree, cf)
+                cmd_print_bindings(tree, cf)
             return buf.getvalue()
 
         t13 = os.path.join(base, "srow"); os.makedirs(t13)
@@ -1699,7 +1699,7 @@ def do_selftest() -> int:
             "S\tmemory/builds/tOne/reviews/2026-08-01-review-tOne-1.md\tspec-audit\tARCH-tOne-1",
             lambda: _rows(t13, conf13))
         arm("--print-bindings still exits 0 with an S row present", "0",
-            lambda: str(do_print_bindings(t13, conf13)))
+            lambda: str(cmd_print_bindings(t13, conf13)))
 
         # ---- the rendered Records table and the two coverage joins.
         arm("a build with a record renders it in the Records table",
@@ -1740,7 +1740,7 @@ def do_selftest() -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings"):
         print("usage: gen_build_index.py [--check|--write|--check-format|--print-bindings|--selftest]")
         return 2
@@ -1751,11 +1751,11 @@ def main(argv: list) -> int:
         return 2
     conf = load_conf(root)
     if mode == "--print-bindings":
-        return do_print_bindings(root, conf)
+        return cmd_print_bindings(root, conf)
     try:
         if mode == "--check-format":
-            return do_check_format(root, conf)
-        return do_check(root, conf) if mode == "--check" else do_write(root, conf)
+            return cmd_check_format(root, conf)
+        return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")
         return 1

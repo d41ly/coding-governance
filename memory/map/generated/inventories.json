@@ -177,6 +177,7 @@
       "arm",
       "build",
       "check",
+      "cmd",
       "derive",
       "extract",
       "init",

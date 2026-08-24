@@ -200,7 +200,7 @@ def pin_of(conf):
     return int(raw)
 
 
-def do_check(root, conf):
+def cmd_check(root, conf):
     rows, unkeyed, dupes, loose, open_fences = scan(root, conf)
     pin = pin_of(conf)
     bad = []
@@ -243,7 +243,7 @@ def do_check(root, conf):
     return 0
 
 
-def do_report(root, conf):
+def cmd_report(root, conf):
     rows, unkeyed, dupes, loose, open_fences = scan(root, conf)
     print(f"rows keyed   : {rows}")
     print(f"unkeyed rows : {len(unkeyed)}")
@@ -258,7 +258,7 @@ def do_report(root, conf):
     return 0
 
 
-def do_emit_pin(root, conf):
+def cmd_emit_pin(root, conf):
     _rows, _unkeyed, dupes, _loose, open_fences = scan(root, conf)
     # A pin emitted from a partial read is worse than no pin: it is a NUMBER an operator will
     # paste into the conf, derived from a corpus the scanner could not finish reading.
@@ -286,7 +286,7 @@ def _tree(tmp, decisions, *, families="arch:ARCH", pin="0"):
     return load_conf(tmp)
 
 
-def do_selftest():
+def cmd_selftest():
     import tempfile
     fails = []
 
@@ -303,7 +303,7 @@ def do_selftest():
             fails.append(label)
             print(f"arm FAIL  {label} — expected to see: {want}\n      got: {got}")
 
-    def cap(root, conf, fn=do_check):
+    def cap(root, conf, fn=cmd_check):
         import io
         from contextlib import redirect_stdout
         buf = io.StringIO()
@@ -380,7 +380,7 @@ def do_selftest():
         arm("an open fence stops --check before any pin comparison", "TERMINAL",
             lambda: "LEAKED" if "lower it to" in cap(t7e, c7e) else "TERMINAL")
         arm("--emit-pin refuses on a partial read instead of printing a number",
-            "no pin is emitted", lambda: cap(t7d, c7d, do_emit_pin))
+            "no pin is emitted", lambda: cap(t7d, c7d, cmd_emit_pin))
         # A dash-led line holding an id the grammar cannot KEY is counted, not ignored.
         t8 = os.path.join(base, "unkeyed"); os.makedirs(t8)
         c8 = _tree(t8, "- ARCH-tOne-1 · one\n- see ARCH-tOne-9 for the rationale\n")
@@ -390,9 +390,9 @@ def do_selftest():
             "memory/DECISIONS.md:2", lambda: cap(t8, c8))
         # AC5: --report and --emit-pin unpack scan() too; rev-1 named neither as a consumer.
         arm("--report survives the return-shape change", "open fences  : 0",
-            lambda: cap(t, c, do_report))
+            lambda: cap(t, c, cmd_report))
         arm("--emit-pin survives the return-shape change", f'{PIN_KEY}="0"',
-            lambda: cap(t, c, do_emit_pin))
+            lambda: cap(t, c, cmd_emit_pin))
 
         # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
         # them executes the resolver — which is exactly how this module shipped a review blocker:
@@ -419,7 +419,7 @@ def do_selftest():
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     try:
         root = tree_root()
     except Problem:
@@ -427,11 +427,11 @@ def main(argv):
         return 2
     conf = load_conf(root)
     if mode == "--check":
-        return do_check(root, conf)
+        return cmd_check(root, conf)
     if mode == "--report":
-        return do_report(root, conf)
+        return cmd_report(root, conf)
     if mode == "--emit-pin":
-        return do_emit_pin(root, conf)
+        return cmd_emit_pin(root, conf)
     print(f"row-grammar: unknown argument '{mode}'; the modes are --check, --report, --emit-pin "
           f"and --selftest")
     return 2

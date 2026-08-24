@@ -253,7 +253,7 @@ def _cell(s: str) -> str:
 
 
 # ------------------------------------------------------------------------------------------- checks
-def do_check(root: str, conf: dict) -> int:
+def cmd_check(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     bad = []
@@ -293,7 +293,7 @@ def do_check(root: str, conf: dict) -> int:
     return 1 if bad else 0
 
 
-def do_write(root: str, conf: dict) -> int:
+def cmd_write(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     idx = os.path.join(root, m, "gotchas", "INDEX.md")
@@ -305,7 +305,7 @@ def do_write(root: str, conf: dict) -> int:
     return 0
 
 
-def do_report(root: str, conf: dict) -> int:
+def cmd_report(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     classes = [r for r in recs if r["kind"] == "class"]
@@ -358,8 +358,8 @@ def normalise_paths(root: str, paths) -> list:
     return out
 
 
-def do_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "file") -> int:
-    """STDOUT IS THE CHECKLIST. The ONE selection path; `do_for_diff` delegates into it."""
+def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "file") -> int:
+    """STDOUT IS THE CHECKLIST. The ONE selection path; `cmd_for_diff` delegates into it."""
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
     paths = normalise_paths(root, paths)
@@ -384,7 +384,7 @@ def do_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "f
     return 0
 
 
-def do_for_diff(root: str, conf: dict, rng: str) -> int:
+def cmd_for_diff(root: str, conf: dict, rng: str) -> int:
     """STDOUT IS THE CHECKLIST. Derives the paths from git, then delegates.
 
     `noun` keeps this caller's header BYTE-IDENTICAL to what it printed before the split. A refactor
@@ -394,7 +394,7 @@ def do_for_diff(root: str, conf: dict, rng: str) -> int:
     if not changed:
         print(f"gotchas: {rng} touches no file — nothing to check")
         return 0
-    return do_for_paths(root, conf, changed, label=rng, noun="changed file")
+    return cmd_for_paths(root, conf, changed, label=rng, noun="changed file")
 
 
 # ----------------------------------------------------------------------------------------- selftest
@@ -432,7 +432,7 @@ def _scratch(tmp: str, recs: dict, extra=None):
     return load_conf(tmp)
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     import io
     import contextlib
 
@@ -457,20 +457,20 @@ def do_selftest() -> int:
     with tempfile.TemporaryDirectory() as base:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t, {"good-class.md": GOOD})
-        do_write(t, c)
+        cmd_write(t, c)
         run("git", "add", "-A", cwd=t); run("git", "commit", "-q", "-m", "idx", "--no-verify", cwd=t)
-        arm("a rendered catalogue is clean", None, lambda: do_check(t, c))
+        arm("a rendered catalogue is clean", None, lambda: cmd_check(t, c))
 
         # 17 — freshness.
         write(os.path.join(t, "memory", "gotchas", "INDEX.md"), "hand-edited\n")
-        arm("check 17 catches a stale INDEX", "INDEX.md is stale", lambda: do_check(t, c))
+        arm("check 17 catches a stale INDEX", "INDEX.md is stale", lambda: cmd_check(t, c))
 
         # 18 — declares.
         t2 = os.path.join(base, "nogate"); os.makedirs(t2)
         c2 = _scratch(t2, {"x.md": _rec("x", "d", "Fires on `tools/some-gate.sh`. Nothing said about a gate.\n")})
-        do_write(t2, c2); run("git", "add", "-A", cwd=t2); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t2)
+        cmd_write(t2, c2); run("git", "add", "-A", cwd=t2); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t2)
         arm("check 18 catches a record that names no gate", "names no gate and does not say it has none",
-            lambda: do_check(t2, c2))
+            lambda: cmd_check(t2, c2))
         arm("--declares is the one predicate: 'no machine gate' declares", "[rc=0]",
             lambda: 0 if declares(_rec("x", "d", "There is no machine gate for this.\n")) else 1)
         arm("--declares reads the BODY, not the front matter", "[rc=0]",
@@ -479,30 +479,30 @@ def do_selftest() -> int:
         # 19 — inert anchors, and the unanchored case.
         t3 = os.path.join(base, "inert"); os.makedirs(t3)
         c3 = _scratch(t3, {"i.md": _rec("i", "d", "Only ever touches `memory/archive/OLD.2026-01-01.md`. Gated by nothing.\n")})
-        do_write(t3, c3); run("git", "add", "-A", cwd=t3); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t3)
-        arm("check 19 catches INERT anchors", "has INERT anchors", lambda: do_check(t3, c3))
+        cmd_write(t3, c3); run("git", "add", "-A", cwd=t3); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t3)
+        arm("check 19 catches INERT anchors", "has INERT anchors", lambda: cmd_check(t3, c3))
         t4 = os.path.join(base, "unanch"); os.makedirs(t4)
         c4 = _scratch(t4, {"u.md": _rec("u", "d", "Applies everywhere. No machine gate.\n")})
-        do_write(t4, c4); run("git", "add", "-A", cwd=t4); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t4)
+        cmd_write(t4, c4); run("git", "add", "-A", cwd=t4); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t4)
         arm("check 19 catches an unanchored non-universal record", "derives no anchor",
-            lambda: do_check(t4, c4))
+            lambda: cmd_check(t4, c4))
         t5 = os.path.join(base, "uni"); os.makedirs(t5)
         c5 = _scratch(t5, {"u.md": _rec("u", "d", "Applies everywhere. No machine gate.\n", universal=True)})
-        do_write(t5, c5); run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t5)
-        arm("a universal record needs no anchor", None, lambda: do_check(t5, c5))
+        cmd_write(t5, c5); run("git", "add", "-A", cwd=t5); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t5)
+        arm("a universal record needs no anchor", None, lambda: cmd_check(t5, c5))
 
         # the universal BUDGET.
         t6 = os.path.join(base, "budget"); os.makedirs(t6)
         c6 = _scratch(t6, {
             "u1.md": _rec("u1", "d", "Everywhere. No machine gate.\n", universal=True),
             "u2.md": _rec("u2", "d", "Everywhere too. No machine gate.\n", universal=True)})
-        do_write(t6, c6); run("git", "add", "-A", cwd=t6); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t6)
-        arm("the universal budget is enforced", "against a budget of 1", lambda: do_check(t6, c6))
+        cmd_write(t6, c6); run("git", "add", "-A", cwd=t6); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t6)
+        arm("the universal budget is enforced", "against a budget of 1", lambda: cmd_check(t6, c6))
 
         # front matter: an indented key is NAMED, not dropped.
         t7 = os.path.join(base, "indent"); os.makedirs(t7)
         c7 = _scratch(t7, {"n.md": _rec("n", "d", "Body cites `tools/some-gate.sh`. No machine gate.\n", indent=True)})
-        arm("an indented front-matter key is named", "keys live at COLUMN 0", lambda: do_check(t7, c7))
+        arm("an indented front-matter key is named", "keys live at COLUMN 0", lambda: cmd_check(t7, c7))
 
         # ---- the THREE CARRIED HARVEST DEFECTS. Each is asserted as OBSERVED behaviour so that a
         # ---- future "fix" fails loudly and has to be made deliberately.
@@ -534,12 +534,12 @@ def do_selftest() -> int:
         # of a hygiene gate.
         t9 = os.path.join(base, "boundary"); os.makedirs(t9)
         c9 = _scratch(t9, {"g.md": GOOD})
-        do_write(t9, c9); run("git", "add", "-A", cwd=t9); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t9)
+        cmd_write(t9, c9); run("git", "add", "-A", cwd=t9); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t9)
         old_bash = os.environ.get("GOV_BASH")
         os.environ["GOV_BASH"] = os.path.join(base, "no-such-bash")
         try:
             arm("a failure crossing the corpus_ids boundary is named, not a traceback",
-                "could not ask corpus_ids", lambda: do_check(t9, c9))
+                "could not ask corpus_ids", lambda: cmd_check(t9, c9))
         finally:
             if old_bash is None:
                 del os.environ["GOV_BASH"]
@@ -553,12 +553,12 @@ def do_selftest() -> int:
             "miss.md": _rec("miss", "d", "Fires on `memory/README.md`. Gated by the hygiene gate.\n"),
             "uni.md": _rec("uni", "d", "Everywhere. No machine gate.\n", universal=True),
             "note.md": _rec("note", "d", "A policy, not a class. Touches `tools/some-gate.sh`. No machine gate.\n", kind="note")})
-        do_write(t8, c8); run("git", "add", "-A", cwd=t8); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t8)
+        cmd_write(t8, c8); run("git", "add", "-A", cwd=t8); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t8)
         write(os.path.join(t8, "tools", "some-gate.sh"), "#!/usr/bin/env bash\n# edited\n")
         run("git", "add", "-A", cwd=t8); run("git", "commit", "-q", "-m", "edit", "--no-verify", cwd=t8)
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            do_for_diff(t8, c8, "HEAD~1..HEAD")
+            cmd_for_diff(t8, c8, "HEAD~1..HEAD")
         text = out.getvalue()
         arm("--for-diff emits the anchored hit", "[rc=0]", lambda: 0 if "- [ ] hit" in text else 1)
         arm("--for-diff emits every universal record", "[rc=0]", lambda: 0 if "- [ ] uni (universal)" in text else 1)
@@ -567,7 +567,7 @@ def do_selftest() -> int:
         # ---- --for-paths: the same predicate, reached without a diff --------------------------------
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            do_for_paths(t8, c8, ["tools/some-gate.sh"])
+            cmd_for_paths(t8, c8, ["tools/some-gate.sh"])
         ptext = out.getvalue()
         arm("--for-paths emits the anchored hit", "[rc=0]", lambda: 0 if "- [ ] hit" in ptext else 1)
         arm("--for-paths omits a record whose anchors miss", "[rc=0]",
@@ -579,7 +579,7 @@ def do_selftest() -> int:
         # is reachable at all, and CI is the side that would have been silently wrong.
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            do_for_paths(t8, c8, ["tools\\some-gate.sh"])
+            cmd_for_paths(t8, c8, ["tools\\some-gate.sh"])
         btext = out.getvalue()
         arm("--for-paths reads a backslash path identically to a forward-slash one", "[rc=0]",
             lambda: 0 if btext == ptext else 1)
@@ -588,13 +588,13 @@ def do_selftest() -> int:
         # repo-relative prefix test: without normalisation the catalogue starts selecting itself.
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            do_for_paths(t8, c8, [os.path.join(t8, "memory", "gotchas", "INDEX.md")])
+            cmd_for_paths(t8, c8, [os.path.join(t8, "memory", "gotchas", "INDEX.md")])
         atext = out.getvalue()
         arm("--for-paths: an absolute catalogue path does not select the catalogue", "[rc=0]",
             lambda: 0 if "- [ ] hit" not in atext and "- [ ] miss" not in atext else 1)
 
         arm("--for-paths refuses a path that selects the whole tree", "selects the whole tree",
-            lambda: do_for_paths(t8, c8, ["."]))
+            lambda: cmd_for_paths(t8, c8, ["."]))
         arm("--for-diff omits a non-class record", "[rc=0]", lambda: 0 if "- [ ] note" not in text else 1)
 
     if fails:
@@ -607,7 +607,7 @@ def do_selftest() -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     if mode == "--declares":
         return 0 if declares(sys.stdin.read()) else 1
     try:
@@ -618,21 +618,21 @@ def main(argv: list) -> int:
     conf = load_conf(root)
     try:
         if mode == "--check":
-            return do_check(root, conf)
+            return cmd_check(root, conf)
         if mode == "--write":
-            return do_write(root, conf)
+            return cmd_write(root, conf)
         if mode == "--report":
-            return do_report(root, conf)
+            return cmd_report(root, conf)
         if mode == "--for-diff":
             if len(argv) < 3:
                 print("usage: gotchas.py --for-diff <base>..<head>")
                 return 2
-            return do_for_diff(root, conf, argv[2])
+            return cmd_for_diff(root, conf, argv[2])
         if mode == "--for-paths":
             if len(argv) < 3:
                 print("usage: gotchas.py --for-paths <path>...")
                 return 2
-            return do_for_paths(root, conf, argv[2:])
+            return cmd_for_paths(root, conf, argv[2:])
         print("usage: gotchas.py [--check|--write|--report|--for-diff <range>|"
               "--for-paths <path>...|--declares|--selftest]")
         return 2

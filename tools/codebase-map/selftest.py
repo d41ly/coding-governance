@@ -68,7 +68,7 @@ def expect_maperror(text_mutation, needle):
     raise AssertionError(f"parsed but should have failed ({needle!r})")
 
 
-def t_install_prefix_resolution(tmp: Path):
+def test_install_prefix_resolution(tmp: Path):
     """S1/AC1: the root is resolved from the KIT DIR, so both install shapes work. resolve_root is
     a pure function of that dir precisely so this can drive every shape without relocating map_lib.
 
@@ -131,7 +131,7 @@ def t_install_prefix_resolution(tmp: Path):
     assert m.repo_root() == m.resolve_root(Path(os.path.abspath(m.__file__)).parent)
 
 
-def t_require_adopted_root_refuses(tmp: Path):
+def test_require_adopted_root_refuses(tmp: Path):
     """AC2 (helper half): resolution answers WHERE the root is; this answers WHETHER anything was
     adopted there. The refusal must name the resolved root, the kit dir and where the root came
     from — 'wrong install prefix' and 'not adopted yet' are otherwise the same message."""
@@ -156,7 +156,7 @@ def t_require_adopted_root_refuses(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
-def t_clis_refuse_an_unadopted_root(tmp: Path):
+def test_clis_refuse_an_unadopted_root(tmp: Path):
     """AC2: BOTH CLIs refuse through their OWN main(). The helper being correct is not the same
     claim as the CLIs calling it — that gap is the whole defect, since neither imports the project
     layer that would otherwise fail closed for them. Each must exit 2 AND print no result: a
@@ -192,7 +192,7 @@ def t_clis_refuse_an_unadopted_root(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
-def t_gate_template_finds_the_kit(tmp: Path):
+def test_gate_template_finds_the_kit(tmp: Path):
     """S5/AC5: GATE_FILE points wherever the project's suite collects, which is independent of the
     kit's install prefix, so the gate's own walk must handle both. Driven in a SUBPROCESS: importing
     the template in-process would leave stub `map_lib`/`map_extractors` entries in sys.modules and
@@ -259,7 +259,7 @@ def t_gate_template_finds_the_kit(tmp: Path):
     assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
 
 
-def t_kit_commits_to_abspath():
+def test_kit_commits_to_abspath():
     """B2: the kit has committed IN PROSE, three times, to `abspath` and never `resolve()` — a
     junctioned kit dir must anchor to the ADOPTING repo, not the link target. Since the renderers
     embed kit_rel()/regen_cmd() into the BYTE-COMPARED artifacts, one entrypoint resolving the other
@@ -285,7 +285,7 @@ def t_kit_commits_to_abspath():
     )
 
 
-def t_gate_template_boundary(tmp: Path):
+def test_gate_template_boundary(tmp: Path):
     """M1: the gate's kit search must not leave the PROJECT, and `.git` alone is not the project
     boundary — a `git archive` tarball, a docker build whose `.dockerignore` drops `.git`, a vendored
     source drop all have none. The `*/codebase-map` glob then reaches every immediate subdirectory
@@ -335,7 +335,7 @@ def t_gate_template_boundary(tmp: Path):
     assert "not found above" in got.stderr and "Probed:" in got.stderr, got.stderr
 
 
-def t_remedy_paths_are_real(tmp: Path):
+def test_remedy_paths_are_real(tmp: Path):
     """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
     naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the
     moment someone is stuck.
@@ -436,7 +436,7 @@ def t_remedy_paths_are_real(tmp: Path):
     assert "tools/codebase-map/gen_map.py" in inv, inv[:400]
 
 
-def t_coverage_directions():
+def test_coverage_directions():
     cov = m.compute_coverage(INV, {"x": claims(flags=("a_flag",))}, EMPTY_BASE)
     assert cov.unclaimed == {"flags": ["b_flag"], "routes": ["api/x/route.ts"]}
     cov = m.compute_coverage(
@@ -460,7 +460,7 @@ def t_coverage_directions():
     assert cov.clean  # multi-claim legal
 
 
-def t_parse_contract():
+def test_parse_contract():
     d = m.parse_dossier(DOSSIER, IDS, source="t")
     assert d.feature == "x" and d.claims["flags"] == ("a_flag",)
     expect_maperror(DOSSIER.replace("```toml", "```"), "no ```toml fence")
@@ -472,7 +472,7 @@ def t_parse_contract():
     expect_maperror(DOSSIER.replace("src/x/**", "src\\\\x"), "forward-slash")
 
 
-def t_attribution():
+def test_attribution():
     d = m.parse_dossier(DOSSIER, IDS, source="t")
     f = m.parse_dossier(
         DOSSIER.replace('feature = "x"', 'feature = "foundation"').replace("src/x/**", "lib/**"),
@@ -493,7 +493,7 @@ def t_attribution():
     assert out2["x"] == ["db/migrations/abc123_add.sql"]  # keyed attribution wins
 
 
-def t_renders_round_trip_and_determinism():
+def test_renders_round_trip_and_determinism():
     text = m.render_baseline({"flags": ["b", "a"]}, IDS)
     parsed = m.parse_baseline(text, IDS)
     assert parsed["flags"] == ("a", "b") and parsed["routes"] == ()
@@ -513,7 +513,7 @@ def t_renders_round_trip_and_determinism():
     assert marker in one and marker in j
 
 
-def t_conf_grammar(tmp: Path):
+def test_conf_grammar(tmp: Path):
     (tmp / ".codebase-map.conf").write_text(
         '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
         "export MAP_DIFF_CMD=python\nBAD=docs/map # inline\n",
@@ -526,7 +526,7 @@ def t_conf_grammar(tmp: Path):
     assert conf["BAD"] == "docs/map"  # unquoted value ends at whitespace, comment can't leak
 
 
-def t_glob_brackets_fail_loud_and_escape_works():
+def test_glob_brackets_fail_loud_and_escape_works():
     bad = DOSSIER.replace("src/x/**", "src/app/[id]/**")
     try:
         m.parse_dossier(bad, IDS, source="t")
@@ -540,7 +540,7 @@ def t_glob_brackets_fail_loud_and_escape_works():
     assert out["x"] == ["src/app/[id]/page.tsx"]  # the escape matches the literal segment
 
 
-def t_extractor_helpers_fail_closed(tmp: Path):
+def test_extractor_helpers_fail_closed(tmp: Path):
     (tmp / "flat").mkdir(parents=True)
     (tmp / "flat" / "a.py").write_text("x", encoding="utf-8")
     assert m.module_inventory(tmp / "flat", "t") == ["a"]
@@ -567,7 +567,7 @@ def t_extractor_helpers_fail_closed(tmp: Path):
         assert "\\" not in key  # POSIX keys on every platform
 
 
-def t_symbols_render_deterministic_and_fail_closed():
+def test_symbols_render_deterministic_and_fail_closed():
     syms = [
         {"id": "slugify", "kind": "function", "file": "src/text.ts"},
         {"id": "Button", "kind": "component", "file": "web/Button.tsx"},
@@ -596,7 +596,7 @@ def t_symbols_render_deterministic_and_fail_closed():
             assert needle in str(exc), f"wrong error: {exc}"
 
 
-def t_symbol_extractors_fail_closed(tmp: Path):
+def test_symbol_extractors_fail_closed(tmp: Path):
     # --- python_symbols: real parser captures def/class/async/decorated + __all__ ----------
     pkg = tmp / "pkg"
     (pkg / "sub").mkdir(parents=True)
@@ -719,7 +719,7 @@ def t_symbol_extractors_fail_closed(tmp: Path):
         assert "yielded NO definition" in str(exc) and "empty.js" in str(exc), str(exc)
 
 
-def t_affordance_graced_presence(tmp: Path):
+def test_affordance_graced_presence(tmp: Path):
     # --- parse_affordance: leading seam block, none decl, delimiter-agnostic, presence-only ----
     seams = m.parse_affordance(
         "## Reuse affordance\n"
@@ -775,7 +775,7 @@ def t_affordance_graced_presence(tmp: Path):
             assert needle in str(exc), f"wrong error: {exc}"
 
 
-def t_affordance_exemption_drop():
+def test_affordance_exemption_drop():
     """AC1 (U4 half): a dossier's affordance grace is dropped MECHANICALLY when a map_diff range
     touches its files (attribution owner), and it then fails the graced check until it carries a
     `seam:`/`none` block. An untouched graced dossier keeps its grace — no retro-red."""
@@ -812,7 +812,7 @@ def t_affordance_exemption_drop():
     assert m.affordance_offenders(texts, kept) == []            # clears once it carries a seam:/none block
 
 
-def t_seed_affordances(tmp: Path):
+def test_seed_affordances(tmp: Path):
     """AC5: gen_map --seed-affordances --top N lists the N highest-fan-in seams no dossier yet
     declares, and NOTHING already declared. Pure core tested on a fixture repo (the CLI is thin
     glue over this + build_reference_index); ordering by fan-in desc and the --top cap verified."""
@@ -875,7 +875,7 @@ def t_seed_affordances(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
-def t_reuse_shared_primitives(tmp: Path):
+def test_reuse_shared_primitives(tmp: Path):
     # --- tokenizer + crude stemmer: the one "shares a token stem" definition (S3 recall / S5 collision)
     assert m.subtokens("getUserID") == ["get", "user", "id"]
     assert m.subtokens("api/x/route.ts") == ["api", "x", "route", "ts"]
@@ -910,7 +910,7 @@ def t_reuse_shared_primitives(tmp: Path):
         pass
 
 
-def t_reuse_lookup(tmp: Path):
+def test_reuse_lookup(tmp: Path):
     """AC3 on a portable FIXTURE repo (no host-repo paths): a planted `slugify` seam is ranked
     above unrelated symbols for a behaviour query; a no-home query returns 'no seam fits'; and a
     recall-dark layer prints the partial-recall notice so an empty result is never falsely sure."""
@@ -993,7 +993,7 @@ def t_reuse_lookup(tmp: Path):
         del os.environ["CODEBASE_MAP_ROOT"]
 
 
-def t_detect_collisions_and_backlog(tmp: Path):
+def test_detect_collisions_and_backlog(tmp: Path):
     """AC4: on a range that adds `slugify2` (stem-colliding with the high-fan-in `slugify` seam,
     no new edge to it) the closing loop emits ONE collision_flag; a symbol that WIRES THROUGH its
     seam, one whose seam is below threshold, one of a different kind, and one unrelated do NOT
@@ -1001,7 +1001,7 @@ def t_detect_collisions_and_backlog(tmp: Path):
     dead_exports/affordance_coverage_%. Pure core — the git-range extraction is thin glue tested
     by the scratchpad fixture in the build report."""
     # base seams (present at range base). Constructed reference index -> exact fan-in per seam
-    # (the fan_in math itself is proven in t_reuse_shared_primitives; this pins collision logic).
+    # (the fan_in math itself is proven in test_reuse_shared_primitives; this pins collision logic).
     base = [
         {"id": "slugify", "kind": "function", "file": "src/text.py"},        # reinvented (fan-in 3)
         {"id": "fetchGateway", "kind": "function", "file": "src/gw.py"},     # wired-through (fan-in 3)
@@ -1072,7 +1072,7 @@ def t_detect_collisions_and_backlog(tmp: Path):
     assert m.backlog_keys(text2) == {("slugify2", "slugify"), ("slugify3", "slugify")}
 
 
-def t_new_clones_reader(tmp: Path):
+def test_new_clones_reader(tmp: Path):
     """new_clones is the adopted clone-ratchet's count (int), null when no clone kit is wired, and
     folding a duplicate drops it — NEVER dead_exports/affordance_coverage_% (the demoted hints)."""
     import map_diff as md
@@ -1144,73 +1144,73 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "root resolution: both install shapes + git boundary (S1/AC1)",
-            lambda: t_install_prefix_resolution(Path(td)),
+            lambda: test_install_prefix_resolution(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "unadopted root refuses, naming root + kit dir (AC2)",
-            lambda: t_require_adopted_root_refuses(Path(td)),
+            lambda: test_require_adopted_root_refuses(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "both CLIs refuse through main(), printing no result (AC2)",
-            lambda: t_clis_refuse_an_unadopted_root(Path(td)),
+            lambda: test_clis_refuse_an_unadopted_root(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "gate template finds the kit at any prefix (S5/AC5)",
-            lambda: t_gate_template_finds_the_kit(Path(td)),
+            lambda: test_gate_template_finds_the_kit(Path(td)),
         )
-    failures += check("kit commits to abspath, never resolve() (review B2)", t_kit_commits_to_abspath)
+    failures += check("kit commits to abspath, never resolve() (review B2)", test_kit_commits_to_abspath)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "gate kit-search stops at the project boundary (review M1)",
-            lambda: t_gate_template_boundary(Path(td)),
+            lambda: test_gate_template_boundary(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "printed remedies name real paths; the remedy runs (TOOL-aRootedPrefix-2)",
-            lambda: t_remedy_paths_are_real(Path(td)),
+            lambda: test_remedy_paths_are_real(Path(td)),
         )
     failures += check("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
                       test_js_probe_against_the_lexicon)
-    failures += check("coverage both directions + ratchet guards", t_coverage_directions)
-    failures += check("dossier contract fails loud", t_parse_contract)
-    failures += check("attribution: keyed > globs, posix, case-sensitive", t_attribution)
-    failures += check("renders deterministic + keys-only + round-trip", t_renders_round_trip_and_determinism)
-    failures += check("glob brackets fail loud; [[]-escape matches", t_glob_brackets_fail_loud_and_escape_works)
+    failures += check("coverage both directions + ratchet guards", test_coverage_directions)
+    failures += check("dossier contract fails loud", test_parse_contract)
+    failures += check("attribution: keyed > globs, posix, case-sensitive", test_attribution)
+    failures += check("renders deterministic + keys-only + round-trip", test_renders_round_trip_and_determinism)
+    failures += check("glob brackets fail loud; [[]-escape matches", test_glob_brackets_fail_loud_and_escape_works)
     failures += check(
-        "symbols.json deterministic + fail-closed render", t_symbols_render_deterministic_and_fail_closed
+        "symbols.json deterministic + fail-closed render", test_symbols_render_deterministic_and_fail_closed
     )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "extractor helpers fail closed", lambda: t_extractor_helpers_fail_closed(Path(td))
+            "extractor helpers fail closed", lambda: test_extractor_helpers_fail_closed(Path(td))
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "symbol extractors fail closed (ast + enum floor)", lambda: t_symbol_extractors_fail_closed(Path(td))
+            "symbol extractors fail closed (ast + enum floor)", lambda: test_symbol_extractors_fail_closed(Path(td))
         )
     with tempfile.TemporaryDirectory() as td:
-        failures += check("conf restricted grammar", lambda: t_conf_grammar(Path(td)))
+        failures += check("conf restricted grammar", lambda: test_conf_grammar(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "affordance graced presence + shrink-only exempt", lambda: t_affordance_graced_presence(Path(td))
+            "affordance graced presence + shrink-only exempt", lambda: test_affordance_graced_presence(Path(td))
         )
-    failures += check("affordance exemption drop on touch (S4a / AC1)", t_affordance_exemption_drop)
+    failures += check("affordance exemption drop on touch (S4a / AC1)", test_affordance_exemption_drop)
     with tempfile.TemporaryDirectory() as td:
-        failures += check("seed-affordances worklist (S4b / AC5)", lambda: t_seed_affordances(Path(td)))
+        failures += check("seed-affordances worklist (S4b / AC5)", lambda: test_seed_affordances(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "reuse-lookup shared primitives (stems + fan-in + threshold)", lambda: t_reuse_shared_primitives(Path(td))
+            "reuse-lookup shared primitives (stems + fan-in + threshold)", lambda: test_reuse_shared_primitives(Path(td))
         )
     with tempfile.TemporaryDirectory() as td:
-        failures += check("reuse-lookup shortlist (AC3 fixture)", lambda: t_reuse_lookup(Path(td)))
+        failures += check("reuse-lookup shortlist (AC3 fixture)", lambda: test_reuse_lookup(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
-            "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: t_detect_collisions_and_backlog(Path(td))
+            "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: test_detect_collisions_and_backlog(Path(td))
         )
     with tempfile.TemporaryDirectory() as td:
-        failures += check("new_clones reader (S5 / AC4)", lambda: t_new_clones_reader(Path(td)))
+        failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

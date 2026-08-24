@@ -358,6 +358,16 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_lang_mode_findings",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_lexicon_marginal_offense_rate",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -563,9 +573,59 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_check_format",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_emit_pin",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "cmd_emit_pin",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_for_diff",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_for_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "cmd_intake",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_measure",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "cmd_plan",
@@ -573,9 +633,69 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_print_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "collect",
@@ -733,116 +853,6 @@
       "file": "tools/workflows/check-workflow-syntax.js"
     },
     {
-      "id": "do_check",
-      "kind": "function",
-      "file": "tools/memory-tree/check-arms.py"
-    },
-    {
-      "id": "do_check",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "do_check",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "do_check",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
-      "id": "do_check_format",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "do_emit_pin",
-      "kind": "function",
-      "file": "tools/memory-tree/check-arms.py"
-    },
-    {
-      "id": "do_emit_pin",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
-      "id": "do_for_diff",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "do_for_paths",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "do_measure",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "do_print_bindings",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "do_report",
-      "kind": "function",
-      "file": "tools/memory-tree/check-arms.py"
-    },
-    {
-      "id": "do_report",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "do_report",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "do_report",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
-      "id": "do_selftest",
-      "kind": "function",
-      "file": "tools/memory-tree/check-arms.py"
-    },
-    {
-      "id": "do_selftest",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "do_selftest",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "do_selftest",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "do_selftest",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
-      "id": "do_write",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "do_write",
-      "kind": "function",
-      "file": "tools/memory-tree/gotchas.py"
-    },
-    {
       "id": "drop_touched_exemptions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -956,6 +966,11 @@
       "id": "extract_records",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "extract_text",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "fan_in",
@@ -1813,6 +1828,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_lang_modes",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2283,6 +2303,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_definition_carriers",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_js_definitions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2473,266 +2498,6 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
-      "id": "t_adopter_layout",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_affordance_exemption_drop",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_affordance_graced_presence",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_alias_rebuild",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_attribution",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_budget_blank",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_build_in_flight",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_cannot_satisfy",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_lru",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_marker_ttl",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_protections",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_budget_recheck_before_delete",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_build_marker_lifecycle",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_clis_refuse_an_unadopted_root",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_conf_digest_both_directions",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_conf_grammar",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_coverage_directions",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_dead_alias_is_loud",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_detect_collisions_and_backlog",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_digest_covers_kit_version",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_empty_alias",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_empty_corpus_names_memory_root",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_eviction",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_extractor_helpers_fail_closed",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_gate_template_boundary",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_gate_template_finds_the_kit",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_glob_brackets_fail_loud_and_escape_works",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_hook_test",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_install_prefix_resolution",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_kit_commits_to_abspath",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_new_clones_reader",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_no_conf_adopt",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_no_conf_query",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_parse_contract",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_parser_vs_bash",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_printed_invocations_resolve",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_python3_only",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_remedy_paths_are_real",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_renders_round_trip_and_determinism",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_require_adopted_root_refuses",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_reuse_lookup",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_reuse_shared_primitives",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_scaffold_converges",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_seed_affordances",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_skill_description_invariants",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_skill_drift_reds",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_symbol_extractors_fail_closed",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_symbols_render_deterministic_and_fail_closed",
-      "kind": "function",
-      "file": "tools/codebase-map/selftest.py"
-    },
-    {
-      "id": "t_verbatim_files",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_version_marker",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_writes_nothing_in_worktree",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "t_zero_records_is_loud",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
       "id": "target_context",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2753,9 +2518,34 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_adopter_layout",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_affordance_exemption_drop",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_affordance_graced_presence",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_alias_rebuild",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_all_miss_fixture",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_attribution",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_audit_green",
@@ -2783,12 +2573,77 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_budget_blank",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_build_in_flight",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_cannot_satisfy",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_lru",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_marker_ttl",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_protections",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_recheck_before_delete",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_build_marker_lifecycle",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_clis_refuse_an_unadopted_root",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_conf_digest_both_directions",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_conf_grammar",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_conf_parser_matches_bash",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_coverage_directions",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_crlf_working_copy_is_not_drift",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_dead_alias_is_loud",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -2808,6 +2663,16 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_detect_collisions_and_backlog",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_digest_covers_kit_version",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_dossier_affordance_present_or_graced",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -2816,6 +2681,16 @@
       "id": "test_dossier_prose_headings_pinned",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_empty_alias",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_empty_corpus_names_memory_root",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_empty_fixture_reds",
@@ -2833,9 +2708,19 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_eviction",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_extractor_helpers_fail_closed",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_floor_reds_alone",
@@ -2843,9 +2728,24 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_gate_template_boundary",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_template_finds_the_kit",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_generated_artifacts_are_fresh",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_glob_brackets_fail_loud_and_escape_works",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_hits_disagreement_reds",
@@ -2853,7 +2753,22 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_hook_test",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_install_prefix_resolution",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_js_probe_against_the_lexicon",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_kit_commits_to_abspath",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -2861,6 +2776,16 @@
       "id": "test_kit_payload_withholds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_lang_mode_ratchet",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_lexicon_marginal_rate",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_lexicon_signals",
@@ -2883,6 +2808,21 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_new_clones_reader",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_no_conf_adopt",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_no_conf_query",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_no_signal_hardcodes_live",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -2903,6 +2843,16 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_parse_contract",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_parser_vs_bash",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_patch_is_installed",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
@@ -2916,6 +2866,16 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_printed_invocations_resolve",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_python3_only",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_ratchet_guard",
@@ -2938,9 +2898,64 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_remedy_paths_are_real",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_renders_round_trip_and_determinism",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_require_adopted_root_refuses",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_reuse_lookup",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_reuse_shared_primitives",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_scaffold_converges",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_seed_affordances",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_skill_description_invariants",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_skill_drift_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_symbol_extractors_fail_closed",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_symbols_render_deterministic_and_fail_closed",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_tautological_fixture_reds",
@@ -2953,9 +2968,29 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_verbatim_files",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_version_marker",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
+    },
+    {
+      "id": "test_writes_nothing_in_worktree",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_zero_records_is_loud",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "text_merge",

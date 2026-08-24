@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-14 — the `t_` and `do_` renames, and `cmd` as a reserved row
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -247,6 +247,15 @@ and reviewable as one diff, which is a documented check and not a machine one.
   Q4 and its agent default) and on the read-only probe of `incms/main` taken the same day. Call-site
   and collision inventories re-verified against this worktree at writing time.
 - rev-1 status 2026-08-24 · KEPT whole. The review rates this the second-most valuable unit in the set: it is the only one that makes this repo's NAMES better rather than making the machinery that judges them bigger, and it drops the offender count 463 -> 384 by doing the work rather than by moving a number.
+
+- rev-2 · 2026-08-25 · built and CLOSED. The pin lands at 384, not rev-1's predicted 380: rev-1
+  measured from a 459 baseline and the live one was 463, so 79 keys left the set exactly as stated
+  and the four-point gap is the baseline rather than the work. ONE DEFECT FOUND WHILE BUILDING and
+  it is the one this unit is about: the `cmd` row was first written across TWO indented lines, and
+  the block grammar reads every indented line as a row — so a phantom verb `down` entered the table
+  and the pin still read 384, because `down` leads no identifier anywhere. A table that grows a verb
+  by accident is worse than one that grows by argument. `lexicon_verbs_declared_but_unused` DID see
+  it (1 of 24) and sits at pin 3, so it would have reported the phantom and refused nothing.
 
 ## 10. Reuse audit
 
