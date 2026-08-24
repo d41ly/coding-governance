@@ -75,7 +75,7 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 | [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | 8 | 2 | CLOSED | rev-4 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 3 record folder(s).
+Records: 21 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

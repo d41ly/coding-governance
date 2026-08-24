@@ -973,6 +973,20 @@ def _marker_index(lines: list, mark: str):
 SLOT_LIMITS = "build-readme-slot-limits.txt"
 SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
 
+# TOOL-dFramedEntrypoint, round-3 HIGH. Every reader of the two files above resolved them from
+# `__file__`, so nothing could point them at a fixture — and that is exactly why the arms covering
+# `do_bump` twice ended up RESTATING its filter inline instead of calling it: the verb writes into
+# the installed kit directory, so an arm that called it would have rewritten this repo's own
+# high-water file. One seam fixes the class. Production resolves from `__file__` as before; the
+# selftest sets the override, calls the real verb, and asserts on real bytes.
+_SLOT_DATA_DIR = None
+
+
+def slot_data_dir():
+    """Where the two slot declaration files live. Overridable ONLY so an arm can call the verbs."""
+    return pathlib.Path(_SLOT_DATA_DIR) if _SLOT_DATA_DIR \
+        else pathlib.Path(__file__).resolve().parent
+
 
 def read_slot_table(path: str) -> dict:
     """`heading -> int | None` from a tab-separated declaration file. None is the UNARMED state.
@@ -1050,7 +1064,7 @@ def measure_slot_sizes(readme_text: str) -> list:
 
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
-    here = pathlib.Path(__file__).resolve().parent
+    here = slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
         raise Problem(f"{SLOT_LIMITS} is absent at {limits_p}; a slot budget with no declared "
@@ -1071,7 +1085,7 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
 
 def scan_unarmed_slots() -> list:
     """Canonical slots whose declared ceiling is blank — the ANNOUNCED unarmed state."""
-    here = pathlib.Path(__file__).resolve().parent
+    here = slot_data_dir()
     p = str(here / SLOT_LIMITS)
     if not os.path.exists(p):
         return []
@@ -1509,7 +1523,7 @@ def do_check_format(root: str, conf: dict) -> int:
     bound = read_contract_registry(root, conf)
     # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
     # conditional on anything using it.
-    _here = pathlib.Path(__file__).resolve().parent
+    _here = slot_data_dir()
     if not (_here / SLOT_LIMITS).exists():
         raise Problem(f"{SLOT_LIMITS} is absent at {_here / SLOT_LIMITS}; a slot budget with no "
                       f"declared ceilings would grade nothing and report clean")
@@ -1556,7 +1570,7 @@ def do_report(root: str, conf: dict) -> int:
     nobody runs.
     """
     m = conf["MEMORY_ROOT"]
-    here = pathlib.Path(__file__).resolve().parent
+    here = slot_data_dir()
     limits = read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
     highs = read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
     bound = sorted(read_contract_registry(root, conf))
@@ -1577,7 +1591,7 @@ def do_report(root: str, conf: dict) -> int:
 
 def do_bump(root: str, conf: dict) -> int:
     """Rewrite the HIGH-WATER file from the measured tree. It never writes the ceiling file."""
-    here = pathlib.Path(__file__).resolve().parent
+    here = slot_data_dir()
     bound = sorted(read_contract_registry(root, conf))
     peak = {h: 0 for h, _e, _b in SLOT_CANON}
     for rel in bound:
@@ -1895,28 +1909,55 @@ def do_selftest() -> int:
             lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
         # D2 — a DUPLICATED heading made the sequence compare return before any body check ran, so
         # one appended line disabled the entire canon while the leg printed clean.
+        # M3's SCOPING, which shipped with no arm: with `h in canon_heads and` deleted, a repeated
+        # NON-canonical heading is misreported as a duplicated canonical slot AND the accurate
+        # message is suppressed by the early return. This arm reaches that guard; the duplicate arm
+        # below does not, because a repeated CANONICAL heading trips both spellings identically.
+        arm("a repeated NON-canonical heading says `outside the canon`, not `more than once`",
+            "heading outside the canon: ## Notes",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p", "", "## Notes", "", "q"]), "x", canon=True)))
+        arm("...and does NOT claim a canonical slot was duplicated", "False",
+            lambda: str("more than once" in str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p", "", "## Notes", "", "q"]), "x", canon=True))))
         arm("a canonical heading repeated is named, not silently disabling the body checks",
             "appears more than once",
             lambda: str(slot_violations(build_canon_readme(GOOD + ["", "## Build-level rules", ""]),
                                         "x", canon=True)))
         # D4 — --bump duplicated all five rows per run because its keep-filter read `## ` as a
         # comment. The two functions parse ONE grammar and must AGREE about it; that is the arm.
-        # CALLS BOTH PARSERS over ONE real file. The first spelling was a closed boolean over four
-        # hardcoded literals and touched neither `read_slot_table` nor `do_bump` — it could not
-        # fail, which is the could-not-fail class this entire build is about, written into the build
-        # that is about it. D4's corruption duplicated rows because the two functions disagreed on
-        # what a comment is, so the arm has to exercise that disagreement, not restate it.
-        _bhw = os.path.join(base, "bump-hw.txt")
-        write_text(_bhw, "# a comment carrying no tab\n"
-                         "## The problem this build exists to solve\t1\n")
-        arm("do_bump's keep-filter drops the DATA row and keeps only the comment", "1",
-            lambda: str(len([l for l in read_text(_bhw).split("\n")
-                             if "\t" not in l and l.strip()])))
-        arm("read_slot_table reads the row do_bump's filter dropped", "1",
-            lambda: str(len(read_slot_table(_bhw))))
-        arm("the two parsers PARTITION the file, so a --bump round-trip cannot duplicate a row", "2",
-            lambda: str(len([l for l in read_text(_bhw).split("\n")
-                             if "\t" not in l and l.strip()]) + len(read_slot_table(_bhw))))
+        # CALLS `do_bump` FOR REAL, twice, and asserts the row count is STABLE. Three rounds of
+        # review went by with this uncovered because every earlier attempt RESTATED do_bump's filter
+        # inline rather than running it — the verb wrote into the installed kit directory, so an arm
+        # that called it would have rewritten this repo's own high-water file. `_SLOT_DATA_DIR` is
+        # the seam that makes the real call possible; without it the only honest options were a
+        # copy (which drifts, and had already drifted) or no arm at all.
+        _bt = os.path.join(base, "bumpreal"); os.makedirs(_bt)
+        _bconf = _fixture(_bt, spec_status="OPEN")
+        _brd = "memory/builds/tOne/README.md"
+        write_text(os.path.join(_bt, "memory", CONTRACT_REGISTRY),
+                   "exempt-pin: 0\n" + _brd + "\n")
+        _bdir = os.path.join(base, "bumpdata"); os.makedirs(_bdir)
+        write_text(os.path.join(_bdir, SLOT_LIMITS),
+                   "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
+        write_text(os.path.join(_bdir, SLOT_HIGHWATER), "# high-water, seeded empty\n")
+
+        def _bump_rows():
+            global _SLOT_DATA_DIR
+            _SLOT_DATA_DIR = _bdir
+            try:
+                do_bump(_bt, _bconf)
+                do_bump(_bt, _bconf)
+                return sum(1 for l in read_text(os.path.join(_bdir, SLOT_HIGHWATER)).split("\n")
+                           if "\t" in l)
+            finally:
+                _SLOT_DATA_DIR = None
+
+        arm("two --bump runs leave exactly one row per canonical slot, not two",
+            str(len(SLOT_CANON)), lambda: str(_bump_rows()))
+        arm("--bump keeps the file's comment lines across a round-trip", "high-water, seeded empty",
+            lambda: read_text(os.path.join(_bdir, SLOT_HIGHWATER)))
+
         arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
             lambda: str(slot_violations(build_canon_readme(
                 GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))
