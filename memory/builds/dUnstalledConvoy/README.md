@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -216,13 +216,20 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 | `TOOL-dUnstalledConvoy-10` | 2 | the leg compares declared write sets against the paths the commits touched |
 | `TOOL-dUnstalledConvoy-11` | 2 | the acceptance-ledger record grammar |
 | `TOOL-dUnstalledConvoy-12` | 2 | a hygiene check asserting every AC of a CLOSED spec is evidenced |
+| `TOOL-dUnstalledConvoy-26` | 2 | a gate leg declares `subject`, and a kit's own self-tests become owner-adjustable |
+| `TOOL-dUnstalledConvoy-27` | 2 | `.githooks/pre-push` READS the stamp's switch field instead of trusting around it |
+| `TOOL-dUnstalledConvoy-28` | 2 | gov sets `GATE_SELFTESTS` where govkit does not ship it verbatim to every adopter |
+| `TOOL-dUnstalledConvoy-29` | 2 | the subject cross-check grades the VALUE, not its presence and self-agreement |
+| `TOOL-dUnstalledConvoy-30` | 1 | gov's push- and commit-boundary self-tests get a subject the criterion decides |
+| `TOOL-dUnstalledConvoy-31` | 1 | an on-demand skip reaches the run total, so a switch-off bar cannot print 85/85 |
+| `TOOL-dUnstalledConvoy-32` | 1 | an on-demand skip reaches `chunk_close`, so a skipped chunk cannot close green |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 17 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
-ids TOOL-dUnstalledConvoy-26
+ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
@@ -263,6 +270,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 | [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 
 Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26.
@@ -313,5 +321,6 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
   - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md)
+  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md)
   - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md)
 <!-- /gen:build-docs -->
