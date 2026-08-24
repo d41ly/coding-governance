@@ -514,6 +514,71 @@ n=$((n+1))
 grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
   || { echo "canary: the skipped leg's cached row was dropped by the ledger rewrite"; fail=1; }
 
+# 3h2. SUBJECT: a kit-subject leg is HELD unless asked, and GATE_FULL does not ask.
+#     TOOL-dUnstalledConvoy-26. A kit self-test stages a break into a copy of a checker and asserts
+#     the checker still catches it — a job that exists when the kit's source changes and not at all
+#     in a repo that copy-installs the kit and never edits it. The `guard = ["{kit}/"]` those legs
+#     used to lean on does NOT do that job: `changed()` returns 0 the instant GATE_FULL is set, and
+#     .githooks/pre-push sets it whenever it decides a full run is owed, which is the one boundary an
+#     adopter actually feels. So the decision is a declared subject, not a guard.
+S="$SCRATCH/subject"
+mkdir -p "$S/tools/run-gates" "$S/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S/tools/run-gates/run-gates.sh"
+# The FINGERPRINT script too: `gate-full-green` is written only when FPRINT_START is non-empty, and
+# without this file the fingerprint is the empty string, so the stamp arm below would assert against
+# a stamp no fixture can produce — passing for the wrong reason or failing for one.
+cp "$KITDIR/gate-fingerprint.sh" "$S/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S/fx/a.sh"
+cat > "$S/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "a repo leg",        "argv": ["bash", "fx/a.sh"], "subject": "repo"},
+  {"name": "a kit self-test",   "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "an undeclared leg", "argv": ["bash", "fx/a.sh"]}
+]
+JSON
+( cd "$S" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+# OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
+# `unchanged vs <branch>` — false here, since the leg is not unchanged, it is out of subject.
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
+  || { echo "canary: a kit-subject leg was not HELD with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  (unchanged vs' \
+  && { echo "canary: the held leg reused the guard verb's tail, which claims it was unchanged"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    a repo leg$' \
+  || { echo "canary: a repo-subject leg did not run with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# An UNDECLARED leg defaults to `repo` and RUNS. The other default would silently remove from every
+# bar a leg whose descriptor never spoke about subjects at all.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    an undeclared leg$' \
+  || { echo "canary: an undeclared leg did not default to repo and run"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+# GATE_FULL DOES NOT ASK. This is the arm the whole unit rests on: GATE_FULL means "ignore every
+# guard", and a kit's own self-tests are not a guard. If this ever passes, every adopter is back to
+# running them at the push boundary.
+o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
+  || { echo "canary: GATE_FULL unlocked the kit-subject legs, which is the bypass this replaced"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+# ON: the switch is the only thing that asks, and it asks for all of them.
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE ok    a kit self-test$' \
+  || { echo "canary: GATE_SELFTESTS=1 did not run the kit-subject leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^GATE held' \
+  && { echo "canary: something was still held with the switch on"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+# ...and the switch state reaches the stamp, or a green cannot say what it covered and the push
+# boundary has nothing to read. TOOL-dUnstalledConvoy-27 is the reader.
+n=$((n+1))
+grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
+  || { echo "canary: a switch-ON green did not record the switch in its stamp"; fail=1; }
+
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
 #     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
 #     when no recorded full green covers the pushed tip. So a guard can now scope the
