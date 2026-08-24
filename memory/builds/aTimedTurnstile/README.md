@@ -48,11 +48,7 @@ ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aT
 | [TOOL-aTimedTurnstile-5 — run the merge bar's legs concurrently](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
-
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md) | spec-audit | TOOL-aTimedTurnstile-5 |
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aTimedTurnstile-2.
 
@@ -68,12 +64,3 @@ Ids no `spec-audit` record has ever named: TOOL-aTimedTurnstile-2.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-TOOL-aTimedTurnstile-2.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-2.md)
-  - [2026-08-11-spec-TOOL-aTimedTurnstile-5.md](spec/2026-08-11-spec-TOOL-aTimedTurnstile-5.md)
-- **`reviews/`**
-  - [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md)
-<!-- /gen:build-docs -->

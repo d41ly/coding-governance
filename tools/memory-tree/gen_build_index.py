@@ -84,8 +84,14 @@ GEN_REGIONS = (
     ("build-index", MARK_OPEN, MARK_CLOSE),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
-    ("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),
 )
+# TOOL-dFramedEntrypoint-5 — `build-docs` was the LAST entry and is gone. Removing the last entry
+# shifts no surviving index, which is why no sibling region moved; the selftest arms that addressed
+# it BY TUPLE INDEX did have to move, and a grep for the marker name could not have found them.
+# The orphaned marker pair is removed from every tracked build README in the SAME commit: a region
+# whose registration is gone but whose pair remains becomes authored content sitting after the first
+# generated marker, which is trigger 1 of the slot contract, measured at 750 violation lines.
+DEAD_REGIONS = (("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),)
 
 # TOOL-dFramedEntrypoint-1 — the CLOSED heading canon for a build README's authored half. The slot
 # contract above constrains only WHERE authored content sits; this constrains WHAT it is. Position
@@ -731,35 +737,36 @@ def render_region(build: dict) -> str:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
     out.append(UNITS_CLOSE)
-    if build["kinds"]:
-        ks = [f"`{k}/`" for k in build["kinds"]]
-        joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]
-        out += ["", f"Records live under {joined}."]
-    # The records table and the two coverage joins. The sentence above is KEPT rather than replaced:
-    # `strip_records_sentence` manages it and several arms detect a mis-segmented record selector by
-    # noticing the sentence went missing, so replacing it would remove the thing they watch.
+    # TOOL-dFramedEntrypoint-5 S4b — the derived folder sentence is GONE, and it was the record
+    # selector's liveness assertion: nine arms detected a mis-segmented selector by noticing the
+    # sentence went missing. What replaces it is an explicit NON-EMPTY assertion over the selector,
+    # stated as a rendered fact rather than inferred from a sentence's presence. A build that holds
+    # records and shows a zero here is a mis-segmented selector, which is exactly what the sentence
+    # used to reveal by vanishing.
     recs = build.get("records") or []
-    if recs:
-        out += ["", "| Record | Kind | Serves |", "|---|---|---|"]
-        for r in sorted(recs, key=lambda x: x["path"]):
-            rel = r["path"].split(f"/builds/{build['slug']}/", 1)[1]
-            label = rel.rsplit("/", 1)[-1]
-            if r["state"] == "unbound":
-                out.append(f"| [{label}]({rel}) | — | *none — {r['reason']}* |")
-            else:
-                out.append(f"| [{label}]({rel}) | {r['kind']} | {' '.join(r['ids'])} |")
-        named = {i for r in recs for i in r.get("ids", [])}
-        audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
-        own = [u["id"] for u in build["units"]]
-        gap = [i for i in own if i not in named]
-        agap = [i for i in own if i not in audited]
-        if gap:
-            out += ["", f"Ids no record names: {' '.join(gap)}."]
-        if agap:
-            # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit
-            # record names EVER — a spec audited at rev-1 and since bumped does not appear here.
-            # An "unreviewed" label would be a coverage claim the data cannot support.
-            out += ["", f"Ids no `spec-audit` record has ever named: {' '.join(agap)}."]
+    out += ["", f"Records: {len(recs)} bound to this build, across "
+                f"{len(build['kinds'])} record folder(s)."]
+    # THE TABLE IS GONE — the owner ruled records belong in the specs they serve, and unit 6 renders
+    # them there. THE TWO COVERAGE JOINS STAY, and they are the only spec-to-record coverage signal in
+    # this repo: hygiene check 21 grades record-to-spec and does not cover this direction. They are
+    # COMPUTED from the build's records and units, never parsed from the table, so the data survived
+    # the deletion — but the emitting branch did not, and re-emitting it is the point of S3.
+    #
+    # UNCONDITIONAL. Each join used to hide behind its own non-empty test, so a build with FULL
+    # coverage rendered NOTHING and was indistinguishable from a build whose joins were never
+    # computed. That is the absence-reads-as-coverage class, and full coverage is the COMMON case,
+    # not the rare one.
+    named = {i for r in recs for i in r.get("ids", [])}
+    audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
+    own = [u["id"] for u in build["units"]]
+    gap = [i for i in own if i not in named]
+    agap = [i for i in own if i not in audited]
+    out += ["", f"Ids no record names: {' '.join(gap) if gap else 'none — every unit id is named by a record'}."]
+    # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit record names
+    # EVER — a spec audited at rev-1 and since bumped does not appear here. An "unreviewed" label
+    # would be a coverage claim the data cannot support.
+    out += ["", f"Ids no `spec-audit` record has ever named: "
+                f"{' '.join(agap) if agap else 'none — every unit id has one'}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
@@ -828,124 +835,19 @@ def render_edges(build: dict) -> str:
     return "\n".join(out)
 
 
-def render_docs(build: dict) -> str:
-    """The DOCUMENT INVENTORY region: every tracked record the build holds, linked."""
-    mo, mc = GEN_REGIONS[3][1], GEN_REGIONS[3][2]
-    out = [mo, ""]
-    if not build["docs"]:
-        out.append("*This build holds no records yet.*")
-    else:
-        by_kind = {}
-        for p in build["docs"]:
-            # index 3, not 4: memory / builds / <slug> / <kind> / <file>. Bucketing on 4 keyed every
-            # record by its own FILENAME, so no kind ever matched and the region rendered empty —
-            # between two markers, which reads as "this build holds nothing" rather than as a fault.
-            by_kind.setdefault(p.split("/")[3], []).append(p)
-        for kind in RECORD_KINDS:
-            if kind not in by_kind:
-                continue
-            out.append(f"- **`{kind}/`**")
-            for p in by_kind[kind]:
-                rel = p.split(f"/builds/{build['slug']}/", 1)[1]
-                out.append(f"  - [{os.path.basename(p)}]({rel})")
-    out.append(mc)
-    return "\n".join(out)
-
-
 REGION_RENDERERS = {
     "build-index": render_region,
     "build-order": render_order,
     "build-edges": render_edges,
-    "build-docs": render_docs,
 }
 
-
-# A period ends the sentence only when whitespace or end-of-line follows it. A dot INSIDE the claim
-# — `notes.md`, `(see AGENTS.md)` — is content. The first cut used `[^.]*` and stopped at the first
-# dot, deleting `Records live under `spec/` and `notes.` mid-token and writing the fragment back as
-# prose: the exact corruption this unit exists to prevent, one class narrower than the line-scoped
-# removal the review had already rejected.
-RECORDS_SENTENCE = re.compile(r"Records live under (?:[^.]|\.(?!\s|$))*\.[ ]?")
-RECORDS_ANCHOR = "Records live under"
-
-
-def strip_records_sentence(readme_text: str, readme: str) -> str:
-    """Remove the AUTHORED folder-claim sentence from the body, OUTSIDE the marker pair.
-
-    SENTENCE-scoped, never line-scoped: measured over the corpus, in 17 of 17 carriers the sentence
-    ENDS mid-line and the next sentence begins on the same line, so deleting the LINE destroys
-    unrelated prose in every file.
-
-    FENCE-AWARE, because a README documenting this very migration quotes the retired boilerplate
-    inside a code block — and the first cut rewrote that block. Unit 5 of this same build added the
-    fence reader precisely because a scanner that ignores fences is wrong by construction; the writer
-    has no excuse the reader did not.
-
-    THE WHOLE DOCUMENT outside the marked slice is in scope, not merely the text above it. Bounding
-    the scan at the opening marker left an authored claim below the close marker neither removed nor
-    refused, so the file shipped two contradicting sentences and `--check` was a stable fixed point
-    on that state.
-
-    TWO REFUSALS, not one. More than one match is a refusal, as before. And a line carrying the
-    anchor that the SENTENCE pattern does not match is also a refusal — a claim wrapped across lines
-    is exactly the case where the anchor is not identifying what it was reasoned about, and silently
-    leaving it produces the same two-answers state by a different route.
-    """
-    lines = readme_text.split("\n")
-    opens = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_OPEN]
-    closes = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_CLOSE]
-    inside = range(opens[0], closes[0] + 1) if opens and closes and closes[0] >= opens[0] else range(0)
-    unfenced_no = {n for n, line in unfenced_lines(readme_text) if line is not None}
-    # FRONT MATTER IS NOT PROSE and is never edited here. `parse_front_matter` has already proved the
-    # block opens at line 1 and closes, so the index is available — and a key whose VALUE carries the
-    # anchor is legal input (the parser accepts arbitrary keys). Editing there would blank a
-    # structured value silently, and `--check` would then agree with the blanked file forever. A
-    # match inside the block is a refusal instead, because it means the anchor found something this
-    # remover was never reasoned about.
-    fm_end = 0
-    if lines and lines[0].rstrip("\r") == "---":
-        for i, l in enumerate(lines[1:], start=1):
-            if l.rstrip("\r") == "---":
-                fm_end = i
-                break
-
-    hits, anchored = [], []
-    for i, line in enumerate(lines):
-        if i <= fm_end and fm_end:
-            if RECORDS_ANCHOR in line:
-                raise Problem(f"{readme}:{i + 1}: the folder-claim anchor appears inside the front "
-                              f"matter, which this remover never edits — a structured value is not "
-                              f"prose, and blanking one silently is not a repair")
-            continue
-        if i in inside or (i + 1) not in unfenced_no:
-            continue
-        if RECORDS_SENTENCE.search(line):
-            hits.append(i)
-        elif RECORDS_ANCHOR in line:
-            anchored.append(i)
-    if anchored:
-        where = ", ".join(str(i + 1) for i in anchored)
-        raise Problem(f"{readme}: line(s) {where} carry the folder-claim anchor but no complete "
-                      f"sentence — a claim wrapped across lines is not identifying what this remover "
-                      f"was reasoned about, so nothing is removed")
-    if not hits:
-        return readme_text
-    if len(hits) > 1:
-        where = ", ".join(str(i + 1) for i in hits)
-        raise Problem(f"{readme}: the folder-claim sentence appears {len(hits)} times outside the "
-                      f"generated region, at lines {where} — the anchor is not identifying one "
-                      f"sentence, so nothing is removed")
-    i = hits[0]
-    rest = RECORDS_SENTENCE.sub("", lines[i], count=1)
-    # Only drop the physical line when the sentence WAS the whole of it; otherwise the surviving
-    # text stays exactly where the author put it.
-    if rest.strip():
-        lines[i] = rest
-    else:
-        del lines[i]
-    return "\n".join(lines)
-
-
+# TOOL-dFramedEntrypoint-5 S4c — `strip_records_sentence`, `RECORDS_SENTENCE` and `RECORDS_ANCHOR`
+# were RETIRED here. They existed to remove an AUTHORED copy of a sentence this generator also
+# rendered, so the tree carried one and not two. This unit stops rendering that sentence, and a
+# remover whose subject is no longer generated is not inert: it deletes an author's sentence and
+# writes nothing in its place, which is the prose-eating class the module's own `apply_region`
+# warning names. Retired in the same commit that removes its subject rather than left to be
+# rediscovered by whoever next writes the words "Records live under" in a build README.
 def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
     """Rewrite the front matter's `ids:` line from the roster, in place.
 
@@ -1356,6 +1258,29 @@ def insert_region(readme_text: str, mark_open: str, mark_close: str) -> str:
     return "\n".join(tail + ["", mark_open, mark_close, ""])
 
 
+def remove_dead_regions(readme_text: str) -> str:
+    """Delete a RETIRED region's marker pair and everything between it, leaving no authored byte.
+
+    A region whose registration is gone but whose pair remains is not inert: `slot_violations` counts
+    the orphaned markers and their content as authored material after the first generated marker,
+    which is trigger 1. Measured at 750 violation lines across the corpus if the surgery is split
+    from the tuple change, which is why they are one commit.
+    """
+    for _name, mo, mc in DEAD_REGIONS:
+        lines = readme_text.split("\n")
+        o, c = _marker_index(lines, mo), _marker_index(lines, mc)
+        if o is None or c is None or c < o:
+            continue
+        end = c + 1
+        while end < len(lines) and not lines[end].strip():
+            end += 1
+        start = o
+        while start > 0 and not lines[start - 1].strip():
+            start -= 1
+        readme_text = "\n".join(lines[:start] + lines[end:])
+    return readme_text
+
+
 def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     """Return (artifacts, orphans, unmanaged) — the whole render, computed without touching disk.
 
@@ -1402,7 +1327,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
-        text = strip_records_sentence(read_text(path), b["readme"])
+        text = remove_dead_regions(read_text(path))
         text = apply_front_matter_ids(text, b["roster"], b["readme"])
         if create_missing:
             for _name, mo, mc in GEN_REGIONS:
@@ -1672,141 +1597,17 @@ def do_selftest() -> int:
             lambda: plan(t2, conf2)[0]["memory/ledger/2026-08.md"])
 
         # AC2 — an unpaired marker is a NAMED error, not a silent departure.
-        t3 = os.path.join(base, "nomark"); os.makedirs(t3)
-        conf3 = _fixture(t3, marker=False)
-        # The message now NAMES the pair. With four registered regions, "expected exactly one marker
-        # pair" was no longer actionable — an operator could not tell which region was malformed.
-        arm("unpaired marker is named",
-            "expected exactly one '<!-- gen:build-index -->' marker pair, found 1 open and 0 close",
-            lambda: plan(t3, conf3))
-
-        # The derived roster. Each arm names one branch of `rosters()`. (The owning spec is
-        # deliberately NOT cited by id: a drift signal counts a non-terminal spec id appearing in
-        # product source, and it sits at its pin.)
-        def _roster_tree(name, extra=None, ids_line=None):
-            """A fixture whose spec defines ARCH-tOne-1, plus whatever `extra` writes."""
-            d = os.path.join(base, name); os.makedirs(d)
-            c = _fixture(d, spec_status="INPROGRESS")
-            if ids_line is not None:
-                p = os.path.join(d, "memory", "builds", "tOne", "README.md")
-                write_text(p, read_text(p).replace("ids: ARCH-tOne-1", ids_line))
-            for rel, text in (extra or {}).items():
-                full = os.path.join(d, rel.replace("/", os.sep))
-                os.makedirs(os.path.dirname(full), exist_ok=True)
-                write_text(full, text)
-            run("git", "add", "-A", cwd=d)
-            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=d)
-            return d, c
-
-        d1, c1 = _roster_tree("rosterbase", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"})
-        arm("the roster is DERIVED, not read from front matter", "ids ARCH-tOne-1 ARCH-tOne-4",
-            lambda: plan(d1, c1)[0]["memory/builds/tOne/README.md"])
-        arm("the roster sorts by NUMERIC sequence, not lexically",
-            "ARCH-tOne-2 ARCH-tOne-10",
-            lambda: plan(*_roster_tree("rostersort",
-                                       {"memory/DECISIONS.md": "- ARCH-tOne-10 · ten\n- ARCH-tOne-2 · two\n"}))[0]
-            ["memory/builds/tOne/README.md"])
-        # SELF-REFERENCE: the field must never be an input to itself, or a wrong value survives every
-        # regeneration and every gate agrees, because a fresh render reproduces it exactly.
-        d3, c3 = _roster_tree("rosterself", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"},
-                              ids_line="ids: ARCH-tOne-1 ARCH-tOne-99")
-        arm("an id present ONLY in the build's own front matter is dropped",
-            "ids: ARCH-tOne-1 ARCH-tOne-4\n",
-            lambda: plan(d3, c3)[0]["memory/builds/tOne/README.md"])
-        # A revision-suffixed anchor amends a decision; it is not an id of its own. Admitting them
-        # multiplied one real build's roster from 8 to 38.
-        d4, c4 = _roster_tree("rosterrev", {"memory/DECISIONS.md": "- ARCH-tOne-4b · an amendment\n"})
-        arm("a revision-suffixed anchor never joins a roster", "ids ARCH-tOne-1<",
-            lambda: plan(d4, c4)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
-        # The generated artifacts are rendered FROM the roster, so reading them is self-reference one
-        # hop out. LIVE.md carries a COUNT for the same reason the region carries the list: only one
-        # of the two files is inside check 7's entry budget.
-        d5, c5 = _roster_tree("rosterexcl", {"memory/LIVE.md": "ARCH-tOne-77\n",
-                                             "memory/ledger/2026-08.md": "ARCH-tOne-88\n"})
-        arm("an id present only in a GENERATED artifact never joins a roster", "ids ARCH-tOne-1<",
-            lambda: plan(d5, c5)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
-        arm("the capped artifacts carry a COUNT, never the id list", "| arch | 2 |",
-            lambda: plan(d1, c1)[0]["memory/LIVE.md"])
-
-        # ---- the folder-claim sentence. These are FIXTURE arms on purpose: once the corpus is
-        # ---- migrated the sentence is gone from it, so a control run against the live tree has
-        # ---- nothing left to catch and passes whatever the remover does.
-        def _rec(tmp, body):
-            c = _fixture(tmp, spec_status="INPROGRESS")
-            p = os.path.join(tmp, "memory", "builds", "tOne", "README.md")
-            t = read_text(p)
-            write_text(p, t.replace("# tOne\n", "# tOne\n\n" + body + "\n"))
-            run("git", "add", "-A", cwd=tmp)
-            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=tmp)
-            return c
-
-        ta = os.path.join(base, "recsurv"); os.makedirs(ta)
-        ca = _rec(ta, "Records live under `spec/`. The table below is\nGENERATED from the header.")
-        arm("the text following the sentence SURVIVES the removal", "The table below is",
-            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
-        arm("the authored sentence leaves the body", "1",
-            lambda: str(plan(ta, ca)[0]["memory/builds/tOne/README.md"].count("Records live under")))
-        tb = os.path.join(base, "recwhole"); os.makedirs(tb)
-        cb = _rec(tb, "Records live under `spec/`.")
-        # ASSERT THE SHAPE, NOT A COUNT. The count `1` is satisfied by the DERIVED sentence alone, so
-        # it holds whether the whole-line branch deletes the line or leaves it empty — collapsing
-        # `del lines[i]` to `lines[i] = rest` passed the entire selftest while changing the render.
-        # The residual blank line is the only observable difference, so that is what is asserted.
-        # The sentence line sat between two blanks, so deleting it leaves exactly those two and the
-        # marker follows. Collapsing the branch to `lines[i] = rest` leaves a THIRD blank — the only
-        # observable difference, and the one a count could never see.
-        arm("a line that was ONLY the sentence is removed entirely, leaving no extra blank",
-            "# tOne" + chr(10) * 3 + MARK_OPEN,
-            lambda: plan(tb, cb)[0]["memory/builds/tOne/README.md"])
-        # and the mid-line case keeps ONE space where the sentence was, which pins the `[ ]?`
-        tb2 = os.path.join(base, "recmid"); os.makedirs(tb2)
-        cb2 = _rec(tb2, "Prefix text. Records live under `spec/`. Suffix text.")
-        arm("removing a mid-line sentence leaves exactly one space, not two",
-            "Prefix text. Suffix text.",
-            lambda: plan(tb2, cb2)[0]["memory/builds/tOne/README.md"])
-        # [6] front matter is structured input, not prose: a key whose value carries the anchor
-        # was silently BLANKED, and --check then agreed with the blanked file forever.
-        tfm = os.path.join(base, "recfm"); os.makedirs(tfm)
-        cfm = _fixture(tfm, spec_status="INPROGRESS")
-        _q = os.path.join(tfm, "memory", "builds", "tOne", "README.md")
-        write_text(_q, read_text(_q).replace("ids: ARCH-tOne-1",
-                    "ids: ARCH-tOne-1" + chr(10) + "notes: Records live under `spec/`."))
-        run("git", "add", "-A", cwd=tfm); run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=tfm)
-        arm("the anchor inside FRONT MATTER is refused, never blanked",
-            "a structured value is not prose", lambda: plan(tfm, cfm))
-        tc = os.path.join(base, "rectwice"); os.makedirs(tc)
-        cc = _rec(tc, "Records live under `spec/`. one\n\nRecords live under `build/`. two")
-        arm("the sentence appearing twice outside the region is a REFUSAL",
-            "is not identifying one sentence", lambda: plan(tc, cc))
-        arm("the derived sentence names only the folders that exist", "Records live under `spec/`.",
-            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
-
-        # ---- the four shapes the closing review reproduced against the first cut. Each corrupted or
-        # ---- silently skipped an authored README, and each is now a fixture rather than a promise.
-        td = os.path.join(base, "recdot"); os.makedirs(td)
-        cd_ = _rec(td, "Records live under `spec/` and `notes.md`. The table below is\nGENERATED.")
-        # The surviving line must be EXACTLY the next sentence. Asserting merely that "The table
-        # below is" appears does NOT discriminate: the truncating pattern leaves `md`. The table
-        # below is`, which contains it — both first-cut arms passed over the corruption they were
-        # written to catch, and only the negative control exposed them.
-        arm("a dot INSIDE the claim does not truncate the match, leaving no fragment",
-            chr(10) + "The table below is" + chr(10),
-            lambda: plan(td, cd_)[0]["memory/builds/tOne/README.md"])
-        te = os.path.join(base, "recfence"); os.makedirs(te)
-        ce = _rec(te, "The old text read:\n\n```\nRecords live under `spec/`, `build/`. Quoted.\n```\n\nNow derived.")
-        arm("a fenced QUOTE of the sentence is left untouched", "Records live under `spec/`, `build/`. Quoted.",
-            lambda: plan(te, ce)[0]["memory/builds/tOne/README.md"])
-        tf = os.path.join(base, "recbelow"); os.makedirs(tf)
-        cf = _rec(tf, "intro")
-        _p = os.path.join(tf, "memory", "builds", "tOne", "README.md")
-        write_text(_p, read_text(_p) + "\n### later\n\nRecords live under `build/`. Read in order.\n")
-        run("git", "add", "-A", cwd=tf); run("git", "commit", "-q", "-m", "b", "--no-verify", cwd=tf)
-        arm("a claim BELOW the marker pair is removed too, not ignored", "1",
-            lambda: str(plan(tf, cf)[0]["memory/builds/tOne/README.md"].count("Records live under")))
-        tg = os.path.join(base, "recwrap"); os.makedirs(tg)
-        cg = _rec(tg, "Records live under `spec/`, `build/` and\n`reviews/`. The table below is GENERATED.")
-        arm("a claim WRAPPED across lines is a named refusal, not a silent skip",
-            "no complete sentence", lambda: plan(tg, cg))
+        # TOOL-dFramedEntrypoint-5 S4 class (c) — THE SENTENCE-REMOVAL ARMS ARE RETIRED, all of them,
+        # because their subject is. `strip_records_sentence` existed to delete an AUTHORED copy of a
+        # sentence this generator also rendered; this unit stops rendering it, so the remover was
+        # retired rather than left to delete an author's prose and write nothing back.
+        #
+        # WHAT THOSE ARMS WERE REALLY WATCHING is kept, not dropped. Two of them asserted the
+        # OCCURRENCE COUNT of the derived sentence, and the sentence was the record selector's
+        # liveness assertion — nine arms detected a mis-segmented selector by noticing it had gone
+        # missing. The replacement is the counted `Records: <n> bound to this build` line and its
+        # positive arm above: a build that holds records and reports zero is the same
+        # mis-segmentation, said out loud instead of inferred from an absence.
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)
@@ -1889,23 +1690,28 @@ def do_selftest() -> int:
         # WHOLE regions, markers and body together. Stripping only the marker lines orphans the
         # rendered body as loose authored text, which makes the fixture genuinely non-conforming and
         # reds a later arm for a reason that has nothing to do with what this one tests.
+        # ADDRESSED BY NAME, not by tuple index. The index form read `for _i in (3, 2, 1)` and
+        # raised IndexError the moment TOOL-dFramedEntrypoint-5 removed the last entry — a break no
+        # grep for the marker STRING could have predicted, which is why the spec names this as its
+        # own blast-radius class.
+        _TRAILING = [r for r in GEN_REGIONS if r[0] != "build-index"]
         _ls = read_text(rd12).split("\n")
-        for _i in (3, 2, 1):
-            _o, _c = _marker_index(_ls, GEN_REGIONS[_i][1]), _marker_index(_ls, GEN_REGIONS[_i][2])
+        for _n, _mo, _mc in reversed(_TRAILING):
+            _o, _c = _marker_index(_ls, _mo), _marker_index(_ls, _mc)
             if _o is not None and _c is not None:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
         arm("check does not CREATE an absent pair", "0", lambda: str(do_check(t12, conf12)))
-        arm("the three pairs really are absent for that arm", "3",
-            lambda: str(sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
+        arm("every trailing pair really is absent for that arm", str(len(GEN_REGIONS) - 1),
+            lambda: str(sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         do_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
-            sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
-        arm("write CREATED the three absent pairs", "3",
-            lambda: str(sum(GEN_REGIONS[i][1] in read_text(rd12) for i in (1, 2, 3))))
+            sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
+        arm("write CREATED every absent trailing pair", str(len(GEN_REGIONS) - 1),
+            lambda: str(sum(mo in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
-            read_text(rd12).index(GEN_REGIONS[1][1]) < read_text(rd12).index(GEN_REGIONS[2][1])
-            < read_text(rd12).index(GEN_REGIONS[3][1])))
+            all(read_text(rd12).index(_TRAILING[k][1]) < read_text(rd12).index(_TRAILING[k + 1][1])
+                for k in range(len(_TRAILING) - 1))))
 
         # S8 — over a README that VIOLATES the sequence, the pair still lands and no authored byte
         # moves. This is the branch the whole corpus takes until the surgery unit lands, so it is the
@@ -1918,7 +1724,7 @@ def do_selftest() -> int:
         arm("a violating README keeps its authored tail", "authored prose below the region.",
             lambda: read_text(rd13))
         arm("a violating README still gains its pairs", "True",
-            lambda: str(all(GEN_REGIONS[i][1] in read_text(rd13) for i in (1, 2, 3))))
+            lambda: str(all(mo in read_text(rd13) for _n, mo, _mc in _TRAILING)))
 
         # S4 — BOTH triggers. The second one is the arm an earlier draft of the spec had no rule for,
         # and it is the one the single corpus README carrying a plan pair actually trips.
@@ -2115,15 +1921,15 @@ def do_selftest() -> int:
             lambda: str(all(l.startswith("| [") for l in reg17.split("\n")
                             if l.startswith("| [") or " — second](" in l)))
 
-        # S11 — the document inventory NAMES a record. This arm exists because the first cut bucketed
-        # each record by its own filename rather than by its kind folder, so no kind ever matched and
-        # the region rendered EMPTY between its two markers — which reads as "this build holds no
-        # records", not as a fault. A region whose population selector silently matches nothing is the
-        # vacuous-selector class, and only a positive arm catches it.
-        arm("the document inventory names a real record", "2026-08-01-spec-tOne-1.md",
-            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
-        arm("the document inventory buckets under its KIND folder", "**`spec/`**",
-            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
+        # TOOL-dFramedEntrypoint-5 — the document inventory is GONE, and so are the two arms that
+        # rendered it. What they were really watching is the record SELECTOR: the original defect
+        # bucketed each record by its own filename, so no kind matched and the region rendered EMPTY
+        # between two markers, which reads as "this build holds no records" rather than as a fault.
+        # That watch is KEPT, moved onto the counted line that replaced the derived sentence — a
+        # build holding records and reporting zero is the same mis-segmentation, said out loud.
+        arm("the document inventory region is no longer rendered at all", "False",
+            lambda: str("gen:build-docs" in render_region(
+                [b for b in collect(t12, conf12) if b["slug"] == "tOne"][0])))
 
         # S10 — an edge to a build that does not exist is a typo, not a relation.
         t15 = os.path.join(base, "badedge"); os.makedirs(t15)
@@ -2236,15 +2042,24 @@ def do_selftest() -> int:
             lambda: str(do_print_bindings(t13, conf13)))
 
         # ---- the rendered Records table and the two coverage joins.
-        arm("a build with a record renders it in the Records table",
-            "| [2026-08-01-review-tOne-1.md](reviews/2026-08-01-review-tOne-1.md) | spec-audit | ARCH-tOne-1 |",
+        # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
+        # SENTENCE arm both lose their subject here. The sentence was the record selector's liveness
+        # assertion — its absence is what nine arms watched for — so the watch moves onto the counted
+        # line that replaced it, over the fixture that actually HOLDS a record. A build holding one
+        # record and reporting zero is the same mis-segmentation the sentence used to reveal by
+        # vanishing, and this says it out loud instead of inferring it from an absence.
+        arm("the record selector reports a NON-ZERO count for a build that holds records",
+            "Records: 1 bound to this build",
             lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
-        arm("the derived folder sentence SURVIVES the table (nine arms depend on it)",
-            "Records live under", lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        arm("the record count names how many FOLDERS the records sit in", "record folder(s)",
+            lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        arm("the records TABLE is no longer rendered", "False",
+            lambda: str("| Record | Kind | Serves |" in
+                        plan(t13, conf13)[0]["memory/builds/tOne/README.md"]))
         # The record above serves the build's only id, so neither join has anything to report. A
         # positive-population arm: an empty table rendering silently is the failure that matters.
-        arm("a fully-covered build renders no coverage line", "True",
-            lambda: str("Ids no record names:" not in
+        arm("a fully-covered build STILL renders both joins, saying none", "True",
+            lambda: str("Ids no record names: none" in
                         plan(t13, conf13)[0]["memory/builds/tOne/README.md"]))
         t14 = os.path.join(base, "gap"); os.makedirs(t14)
         conf14 = _fixture(t14)
@@ -2255,12 +2070,12 @@ def do_selftest() -> int:
         arm("a build whose only record is a journal names its id as never spec-audited",
             "Ids no `spec-audit` record has ever named: ARCH-tOne-1",
             lambda: plan(t14, conf14)[0]["memory/builds/tOne/README.md"])
-        arm("...and does NOT claim the id is unnamed, which a journal did name", "True",
-            lambda: str("Ids no record names:" not in
+        arm("...and its other join says `none`, because a journal DID name that id", "True",
+            lambda: str("Ids no record names: none" in
                         plan(t14, conf14)[0]["memory/builds/tOne/README.md"]))
         t15 = os.path.join(base, "norec"); os.makedirs(t15)
         conf15 = _fixture(t15)
-        arm("a build with NO records renders neither the table nor a coverage line", "True",
+        arm("a build with NO records renders no table, and BOTH joins saying none", "True",
             lambda: str("| Record | Kind | Serves |" not in
                         plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
 

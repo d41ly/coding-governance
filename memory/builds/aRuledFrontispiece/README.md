@@ -311,14 +311,11 @@ ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-
 | [TOOL-aRuledFrontispiece-9 — the build method's roster claim and its parallelism test are corrected](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md) | — | 2 | CLOSED | rev-2 | 2026-08-17 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md](build/2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md) | journal | TOOL-aRuledFrontispiece-11 |
-| [2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md](reviews/2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
-| [2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
-| [2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md) | diff-review | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -330,25 +327,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-1.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-1.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-10.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-10.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-2.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-2.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-3.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-3.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-4.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-4.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-5.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-5.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-6.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-6.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-7.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-7.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-8.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-8.md)
-  - [2026-08-16-spec-TOOL-aRuledFrontispiece-9.md](spec/2026-08-16-spec-TOOL-aRuledFrontispiece-9.md)
-  - [2026-08-17-spec-TOOL-aRuledFrontispiece-11.md](spec/2026-08-17-spec-TOOL-aRuledFrontispiece-11.md)
-- **`build/`**
-  - [2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md](build/2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md](reviews/2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md)
-  - [2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md)
-  - [2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md](reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md)
-<!-- /gen:build-docs -->

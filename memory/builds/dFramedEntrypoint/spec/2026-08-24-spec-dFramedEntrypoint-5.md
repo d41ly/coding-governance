@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 6 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 6 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -208,6 +208,7 @@ retired per S4c.
   this spec's own Migration paragraph already carried the correct enumeration and is the wording the
   other five now follow.
 - rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-6 · 2026-08-25 · BUILT and CLOSED in ONE commit. Both regions gone from all 62 READMEs, both joins re-emitted UNCONDITIONALLY, `strip_records_sentence` retired with its subject, and all three selftest classes handled. The IndexError this spec predicted fired on the first run. Five of eight curation-debt rows drained, measured by emptying the registry and re-running rather than by inspection, and TOOL-dUnstalledConvoy-13 closes with them. Ledger: `build/2026-08-25-build-TOOL-dFramedEntrypoint-5-acceptance.md`.
 
 ## 10. Reuse audit
 

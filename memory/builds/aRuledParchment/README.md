@@ -24,11 +24,9 @@ ids TOOL-aRuledParchment-1 TOOL-aRuledParchment-2
 | [TOOL-aRuledParchment-1 — Port the spec-format discipline into the memory-tree kit](spec/2026-07-15-spec-aRuledParchment-1.md) | — | 1 | CLOSED | rev-1 | 2026-07-15 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-07-15-build-TOOL-aRuledParchment-1-1.md](build/2026-07-15-build-TOOL-aRuledParchment-1-1.md) | journal | TOOL-aRuledParchment-1 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aRuledParchment-1.
 <!-- /gen:build-index -->
@@ -42,11 +40,3 @@ Ids no `spec-audit` record has ever named: TOOL-aRuledParchment-1.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-07-15-spec-aRuledParchment-1.md](spec/2026-07-15-spec-aRuledParchment-1.md)
-- **`build/`**
-  - [2026-07-15-build-TOOL-aRuledParchment-1-1.md](build/2026-07-15-build-TOOL-aRuledParchment-1-1.md)
-<!-- /gen:build-docs -->

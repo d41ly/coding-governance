@@ -102,14 +102,11 @@ ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aT
 | [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md) | journal | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md) | spec-audit | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
-| [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md) | diff-review | DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -121,21 +118,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-1.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-2.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-3.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-4.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-5.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-6.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md)
-  - [2026-08-16-spec-DEPL-aTetheredConvoy-7.md](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md)
-- **`build/`**
-  - [2026-08-16-build-DEPL-aTetheredConvoy-1-1.md](build/2026-08-16-build-DEPL-aTetheredConvoy-1-1.md)
-- **`reviews/`**
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-1.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-1.md)
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-2.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-2.md)
-  - [2026-08-16-review-DEPL-aTetheredConvoy-1-3.md](reviews/2026-08-16-review-DEPL-aTetheredConvoy-1-3.md)
-<!-- /gen:build-docs -->

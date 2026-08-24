@@ -93,20 +93,9 @@ ids TOOL-dClosedLexicon-13 TOOL-dClosedLexicon-14 TOOL-dClosedLexicon-15
 | [TOOL-dClosedLexicon-4 — a `**` file rule must not claim what another rule already owns](spec/2026-08-16-spec-dClosedLexicon-4.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 10 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md) | spec-audit | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md) | diff-review | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md) | diff-review | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md) | diff-review | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md) | diff-review | TOOL-dClosedLexicon-1 |
-| [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md) | diff-review | TOOL-dClosedLexicon-4 |
-| [2026-08-17-review-TOOL-dClosedLexicon-11-10.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-10.md) | spec-audit | TOOL-dClosedLexicon-11 |
-| [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md) | spec-audit | TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12 TOOL-dClosedLexicon-13 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-4.
 <!-- /gen:build-index -->
@@ -120,27 +109,3 @@ Ids no `spec-audit` record has ever named: PLAY-dClosedLexicon-1 TOOL-dClosedLex
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-PLAY-dClosedLexicon-1.md](spec/2026-08-16-spec-PLAY-dClosedLexicon-1.md)
-  - [2026-08-16-spec-dClosedLexicon-1.md](spec/2026-08-16-spec-dClosedLexicon-1.md)
-  - [2026-08-16-spec-dClosedLexicon-2.md](spec/2026-08-16-spec-dClosedLexicon-2.md)
-  - [2026-08-16-spec-dClosedLexicon-4.md](spec/2026-08-16-spec-dClosedLexicon-4.md)
-  - [2026-08-17-spec-dClosedLexicon-11.md](spec/2026-08-17-spec-dClosedLexicon-11.md)
-  - [2026-08-17-spec-dClosedLexicon-12.md](spec/2026-08-17-spec-dClosedLexicon-12.md)
-  - [2026-08-17-spec-dClosedLexicon-13.md](spec/2026-08-17-spec-dClosedLexicon-13.md)
-- **`reviews/`**
-  - [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-1.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-1.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-3.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-3.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-4.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-4.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-5.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-5.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-1-6.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-1-6.md)
-  - [2026-08-16-review-TOOL-dClosedLexicon-4-8.md](reviews/2026-08-16-review-TOOL-dClosedLexicon-4-8.md)
-  - [2026-08-17-review-TOOL-dClosedLexicon-11-10.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-10.md)
-  - [2026-08-17-review-TOOL-dClosedLexicon-11-9.md](reviews/2026-08-17-review-TOOL-dClosedLexicon-11-9.md)
-<!-- /gen:build-docs -->
-

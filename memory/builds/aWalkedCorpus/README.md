@@ -79,14 +79,11 @@ ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedC
 | [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | — | 2 | CLOSED | rev-5 | 2026-08-17 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 4 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 |
-| [2026-08-17-review-TOOL-aWalkedCorpus-3-2.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-2.md) | spec-audit | TOOL-aWalkedCorpus-3 |
-| [2026-08-17-review-TOOL-aWalkedCorpus-3-3.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-3.md) | spec-audit | TOOL-aWalkedCorpus-3 |
-| [2026-08-17-review-TOOL-aWalkedCorpus-3-4.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-4.md) | diff-review | TOOL-aWalkedCorpus-3 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -98,16 +95,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aWalkedCorpus-1.md](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md)
-  - [2026-08-16-spec-TOOL-aWalkedCorpus-2.md](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md)
-  - [2026-08-17-spec-TOOL-aWalkedCorpus-3.md](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md)
-  - [2026-08-17-review-TOOL-aWalkedCorpus-3-2.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-2.md)
-  - [2026-08-17-review-TOOL-aWalkedCorpus-3-3.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-3.md)
-  - [2026-08-17-review-TOOL-aWalkedCorpus-3-4.md](reviews/2026-08-17-review-TOOL-aWalkedCorpus-3-4.md)
-<!-- /gen:build-docs -->

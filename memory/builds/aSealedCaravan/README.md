@@ -99,14 +99,11 @@ ids DEPL-aSealedCaravan-2 DEPL-aSealedCaravan-3 PLAY-aSealedCaravan-1 TOOL-aSeal
 | [TOOL-aSealedCaravan-1 — one declared install prefix, and the gates that make it true](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-10 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md) | journal | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
-| [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md) | spec-audit | TOOL-aSealedCaravan-1 DEPL-aSealedCaravan-2 |
-| [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md) | spec-audit | DEPL-aSealedCaravan-2 |
-| [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md) | spec-audit | DEPL-aSealedCaravan-2 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -118,16 +115,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-10-spec-DEPL-aSealedCaravan-2.md](spec/2026-08-10-spec-DEPL-aSealedCaravan-2.md)
-  - [2026-08-10-spec-TOOL-aSealedCaravan-1.md](spec/2026-08-10-spec-TOOL-aSealedCaravan-1.md)
-- **`build/`**
-  - [2026-08-10-build-TOOL-aSealedCaravan-1-1.md](build/2026-08-10-build-TOOL-aSealedCaravan-1-1.md)
-- **`reviews/`**
-  - [2026-08-10-review-TOOL-aSealedCaravan-1-1.md](reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md)
-  - [2026-08-11-review-DEPL-aSealedCaravan-2-2.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-2.md)
-  - [2026-08-11-review-DEPL-aSealedCaravan-2-3.md](reviews/2026-08-11-review-DEPL-aSealedCaravan-2-3.md)
-<!-- /gen:build-docs -->

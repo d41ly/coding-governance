@@ -27,7 +27,11 @@ ids TOOL-dNomadicAtlas-1
 | [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | — | 2 | CLOSED | rev-1 | 2026-08-11 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records: 0 bound to this build, across 1 record folder(s).
+
+Ids no record names: TOOL-dNomadicAtlas-1.
+
+Ids no `spec-audit` record has ever named: TOOL-dNomadicAtlas-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -39,9 +43,3 @@ Records live under `spec/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md)
-<!-- /gen:build-docs -->

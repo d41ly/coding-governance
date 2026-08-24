@@ -261,34 +261,9 @@ ids TOOL-dUnstalledConvoy-37 TOOL-dUnstalledConvoy-38
 | [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 24 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md) | journal | TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-11 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md) | journal | TOOL-dUnstalledConvoy-23 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md) | journal | TOOL-dUnstalledConvoy-24 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md) | journal | TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md) | journal | TOOL-dUnstalledConvoy-26 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md) | journal | TOOL-dUnstalledConvoy-27 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md) | journal | TOOL-dUnstalledConvoy-28 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md) | journal | TOOL-dUnstalledConvoy-29 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md) | journal | TOOL-dUnstalledConvoy-31 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md) | journal | TOOL-dUnstalledConvoy-32 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md) | journal | TOOL-dUnstalledConvoy-33 |
-| [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | TOOL-dUnstalledConvoy-26 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | TOOL-dUnstalledConvoy-26 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33.
 <!-- /gen:build-index -->
@@ -302,58 +277,3 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-20-spec-PLAY-dUnstalledConvoy-1.md](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-1.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-10.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-11.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-12.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-2.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-3.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-4.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-5.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-6.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-7.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-8.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-9.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-23.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-24.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-25.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md)
-  - [2026-08-23-spec-TOOL-dUnstalledConvoy-26.md](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-27.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-28.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-29.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-30.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-31.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-32.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-33.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md)
-- **`build/`**
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md)
-- **`reviews/`**
-  - [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md)
-<!-- /gen:build-docs -->

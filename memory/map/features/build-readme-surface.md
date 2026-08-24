@@ -1,8 +1,8 @@
-# build README surface — the slot contract and the four generated regions
+# build README surface — the slot contract, the heading canon and the three generated regions
 
 ```toml
 feature = "build-readme-surface"
-title = "A build README is mostly generated, and its authored slots are positional"
+title = "A build README is mostly generated, and its authored slots are positional and named"
 status = "shipped"
 streams = ["tooling"]
 decisions = []

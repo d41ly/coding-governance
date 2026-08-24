@@ -24,11 +24,9 @@ ids TOOL-aLeasedGauntlet-1
 | [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | — | 2 | CLOSED | rev-4 | 2026-07-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md](reviews/2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md) | diff-review | TOOL-aLeasedGauntlet-1 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aLeasedGauntlet-1.
 <!-- /gen:build-index -->
@@ -42,11 +40,3 @@ Ids no `spec-audit` record has ever named: TOOL-aLeasedGauntlet-1.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-07-20-spec-aLeasedGauntlet-1.md](spec/2026-07-20-spec-aLeasedGauntlet-1.md)
-- **`reviews/`**
-  - [2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md](reviews/2026-07-20-review-TOOL-aLeasedGauntlet-1-1.md)
-<!-- /gen:build-docs -->

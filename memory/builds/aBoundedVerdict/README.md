@@ -442,22 +442,9 @@ ids TOOL-aBoundedVerdict-25 TOOL-aBoundedVerdict-26 TOOL-aBoundedVerdict-27 TOOL
 | [TOOL-aBoundedVerdict-5 — parking becomes a verb instead of a hand-edit](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md) | — | 2 | CLOSED | rev-10 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 12 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md) | — | *none — an adversarial research pass run BEHIND this build; it precedes the spec set and is what warranted it* |
-| [2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md) | research | TOOL-aBoundedVerdict-1 |
-| [2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md) | research | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 |
-| [2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md](build/2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md) | journal | TOOL-aBoundedVerdict-22 |
-| [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
-| [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 |
-| [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-14 TOOL-aBoundedVerdict-15 TOOL-aBoundedVerdict-16 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
-| [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 |
-| [2026-08-20-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md) | spec-audit | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
-| [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
-| [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-17 TOOL-aBoundedVerdict-18 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-21 |
-| [2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md](reviews/2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-22 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-aShardedFloor-4 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-22.
 <!-- /gen:build-index -->
@@ -471,38 +458,3 @@ Ids no `spec-audit` record has ever named: TOOL-aBoundedVerdict-22.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-1.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-1.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-2.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-2.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-3.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-3.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-4.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-4.md)
-  - [2026-08-16-spec-TOOL-aBoundedVerdict-5.md](spec/2026-08-16-spec-TOOL-aBoundedVerdict-5.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-11.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-11.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-12.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-12.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-13.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-13.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-14.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-14.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-15.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-15.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-16.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-16.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-17.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-17.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-18.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-18.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-19.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-19.md)
-  - [2026-08-19-spec-TOOL-aBoundedVerdict-21.md](spec/2026-08-19-spec-TOOL-aBoundedVerdict-21.md)
-  - [2026-08-21-spec-TOOL-aBoundedVerdict-22.md](spec/2026-08-21-spec-TOOL-aBoundedVerdict-22.md)
-- **`build/`**
-  - [2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md](build/2026-08-16-build-TOOL-aBoundedVerdict-1-flow-research.md)
-  - [2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-close-path-audit.md)
-  - [2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md](build/2026-08-18-build-TOOL-aBoundedVerdict-1-review-loop-design.md)
-  - [2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md](build/2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1-2.md)
-  - [2026-08-16-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-16-review-TOOL-aBoundedVerdict-1.md)
-  - [2026-08-19-review-TOOL-aBoundedVerdict-1-2.md](reviews/2026-08-19-review-TOOL-aBoundedVerdict-1-2.md)
-  - [2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1-round2.md)
-  - [2026-08-20-review-TOOL-aBoundedVerdict-1.md](reviews/2026-08-20-review-TOOL-aBoundedVerdict-1.md)
-  - [2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md)
-  - [2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md](reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round4.md)
-  - [2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md](reviews/2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md)
-<!-- /gen:build-docs -->

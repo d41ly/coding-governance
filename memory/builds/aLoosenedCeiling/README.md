@@ -131,12 +131,7 @@ ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL
 | [TOOL-aLoosenedCeiling-4 — the NicoCares adopter's read-path ceiling, raised against its measured growth](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md) | — | 1 | CLOSED | rev-4 | 2026-08-18 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
-
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
-| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aLoosenedCeiling-4.
 
@@ -152,15 +147,3 @@ Ids no `spec-audit` record has ever named: TOOL-aLoosenedCeiling-4.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-18-spec-TOOL-aLoosenedCeiling-1.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-1.md)
-  - [2026-08-18-spec-TOOL-aLoosenedCeiling-2.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-2.md)
-  - [2026-08-18-spec-TOOL-aLoosenedCeiling-3.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-3.md)
-  - [2026-08-18-spec-TOOL-aLoosenedCeiling-4.md](spec/2026-08-18-spec-TOOL-aLoosenedCeiling-4.md)
-- **`reviews/`**
-  - [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md)
-  - [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md)
-<!-- /gen:build-docs -->

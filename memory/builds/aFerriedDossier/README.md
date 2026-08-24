@@ -60,11 +60,11 @@ ids DEPL-aFerriedDossier-1 DEPL-aFerriedDossier-2 DEPL-aFerriedDossier-3
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records live under `build/`.
+Records: 1 bound to this build, across 1 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md](build/2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md) | — | *none — an adopter handoff carried in from another repo; this build holds no spec for it to serve* |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -76,9 +76,3 @@ Records live under `build/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`build/`**
-  - [2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md](build/2026-08-16-build-aFerriedDossier-1-incms-adopter-handoff.md)
-<!-- /gen:build-docs -->

@@ -35,15 +35,9 @@ ids TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedL
 | [TOOL-aMendedLedger-8 — U9: the merge driver, redesigned around what git already gets right](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md) | — | 2 | SPECCED | rev-2 | 2026-08-10 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md) | journal | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
-| [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
-| [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
-| [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
-| [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md) | diff-review | TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8.
 <!-- /gen:build-index -->
@@ -57,23 +51,3 @@ Ids no `spec-audit` record has ever named: TOOL-aMendedLedger-1 TOOL-aMendedLedg
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-09-spec-aMendedLedger-1.md](spec/2026-08-09-spec-aMendedLedger-1.md)
-  - [2026-08-09-spec-aMendedLedger-2-u1-journal-relocation.md](spec/units/2026-08-09-spec-aMendedLedger-2-u1-journal-relocation.md)
-  - [2026-08-09-spec-aMendedLedger-3-u2-ledger-retirement.md](spec/units/2026-08-09-spec-aMendedLedger-3-u2-ledger-retirement.md)
-  - [2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md](spec/units/2026-08-09-spec-aMendedLedger-4-u3-hygiene-gate.md)
-  - [2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md](spec/units/2026-08-09-spec-aMendedLedger-5-u5-merge-driver.md)
-  - [2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md](spec/units/2026-08-09-spec-aMendedLedger-6-u6-doc-truth.md)
-  - [2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md](spec/units/2026-08-09-spec-aMendedLedger-7-u8-keyed-corpus.md)
-  - [2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md](spec/units/2026-08-10-spec-aMendedLedger-8-u9-driver-redesign.md)
-- **`build/`**
-  - [2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md](build/2026-08-10-build-TOOL-aMendedLedger-1-1-driver-repro-corpus.md)
-- **`reviews/`**
-  - [2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-1-closing-diff.md)
-  - [2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-2-repair.md)
-  - [2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md](reviews/2026-08-09-review-TOOL-aMendedLedger-1-3-regression.md)
-  - [2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md](reviews/2026-08-10-review-TOOL-aMendedLedger-1-4-u9-redesign.md)
-<!-- /gen:build-docs -->

@@ -1923,6 +1923,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "remove_dead_regions",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "remove_fenced",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1961,11 +1966,6 @@
       "id": "render_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
-    },
-    {
-      "id": "render_docs",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_edges",
@@ -2481,11 +2481,6 @@
       "id": "stripStrings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "strip_records_sentence",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "structure_identity",

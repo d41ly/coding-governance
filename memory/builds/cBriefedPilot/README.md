@@ -348,15 +348,9 @@ ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBrie
 | [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | — | 1 | CLOSED | rev-4 | 2026-08-16 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md) | — | *none — a design pass that PRECEDES and produced this build's spec set* |
-| [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md) | journal | TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-21 |
-| [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md) | spec-audit | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
-| [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md) | diff-review | TOOL-cBriefedPilot-1 TOOL-cBriefedPilot-2 TOOL-cBriefedPilot-3 TOOL-cBriefedPilot-4 TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-6 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-9 TOOL-cBriefedPilot-10 TOOL-cBriefedPilot-11 TOOL-cBriefedPilot-12 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBriefedPilot-17 TOOL-cBriefedPilot-18 TOOL-cBriefedPilot-19 TOOL-cBriefedPilot-20 TOOL-cBriefedPilot-21 TOOL-cBriefedPilot-22 |
-| [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md) | diff-review | TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-22 TOOL-cBriefedPilot-23 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 <!-- /gen:build-index -->
@@ -370,38 +364,3 @@ Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-14-spec-cBriefedPilot-1.md](spec/2026-08-14-spec-cBriefedPilot-1.md)
-  - [2026-08-14-spec-cBriefedPilot-10.md](spec/2026-08-14-spec-cBriefedPilot-10.md)
-  - [2026-08-14-spec-cBriefedPilot-11.md](spec/2026-08-14-spec-cBriefedPilot-11.md)
-  - [2026-08-14-spec-cBriefedPilot-12.md](spec/2026-08-14-spec-cBriefedPilot-12.md)
-  - [2026-08-14-spec-cBriefedPilot-13.md](spec/2026-08-14-spec-cBriefedPilot-13.md)
-  - [2026-08-14-spec-cBriefedPilot-14.md](spec/2026-08-14-spec-cBriefedPilot-14.md)
-  - [2026-08-14-spec-cBriefedPilot-15.md](spec/2026-08-14-spec-cBriefedPilot-15.md)
-  - [2026-08-14-spec-cBriefedPilot-16.md](spec/2026-08-14-spec-cBriefedPilot-16.md)
-  - [2026-08-14-spec-cBriefedPilot-17.md](spec/2026-08-14-spec-cBriefedPilot-17.md)
-  - [2026-08-14-spec-cBriefedPilot-18.md](spec/2026-08-14-spec-cBriefedPilot-18.md)
-  - [2026-08-14-spec-cBriefedPilot-19.md](spec/2026-08-14-spec-cBriefedPilot-19.md)
-  - [2026-08-14-spec-cBriefedPilot-2.md](spec/2026-08-14-spec-cBriefedPilot-2.md)
-  - [2026-08-14-spec-cBriefedPilot-20.md](spec/2026-08-14-spec-cBriefedPilot-20.md)
-  - [2026-08-14-spec-cBriefedPilot-21.md](spec/2026-08-14-spec-cBriefedPilot-21.md)
-  - [2026-08-14-spec-cBriefedPilot-22.md](spec/2026-08-14-spec-cBriefedPilot-22.md)
-  - [2026-08-14-spec-cBriefedPilot-3.md](spec/2026-08-14-spec-cBriefedPilot-3.md)
-  - [2026-08-14-spec-cBriefedPilot-4.md](spec/2026-08-14-spec-cBriefedPilot-4.md)
-  - [2026-08-14-spec-cBriefedPilot-5.md](spec/2026-08-14-spec-cBriefedPilot-5.md)
-  - [2026-08-14-spec-cBriefedPilot-6.md](spec/2026-08-14-spec-cBriefedPilot-6.md)
-  - [2026-08-14-spec-cBriefedPilot-7.md](spec/2026-08-14-spec-cBriefedPilot-7.md)
-  - [2026-08-14-spec-cBriefedPilot-8.md](spec/2026-08-14-spec-cBriefedPilot-8.md)
-  - [2026-08-14-spec-cBriefedPilot-9.md](spec/2026-08-14-spec-cBriefedPilot-9.md)
-  - [2026-08-16-spec-cBriefedPilot-23.md](spec/2026-08-16-spec-cBriefedPilot-23.md)
-- **`build/`**
-  - [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md)
-  - [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md)
-- **`reviews/`**
-  - [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md)
-  - [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md)
-  - [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md)
-<!-- /gen:build-docs -->

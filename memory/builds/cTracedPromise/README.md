@@ -99,7 +99,11 @@ ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTrac
 | [TOOL-cTracedPromise-2 — an acceptance criterion has to name something a machine can find](spec/2026-08-15-spec-cTracedPromise-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-15 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records: 0 bound to this build, across 1 record folder(s).
+
+Ids no record names: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2.
+
+Ids no `spec-audit` record has ever named: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -111,10 +115,3 @@ Records live under `spec/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-14-spec-cTracedPromise-1.md](spec/2026-08-14-spec-cTracedPromise-1.md)
-  - [2026-08-15-spec-cTracedPromise-2.md](spec/2026-08-15-spec-cTracedPromise-2.md)
-<!-- /gen:build-docs -->

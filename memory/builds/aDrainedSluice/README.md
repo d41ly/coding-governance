@@ -55,13 +55,9 @@ ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrai
 | [TOOL-aDrainedSluice-9 — V8: a dead DIRECTORY citation is a dead citation](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md) | — | 2 | CLOSED | rev-3 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 3 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
-| [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md) | spec-audit | TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 |
-| [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md) | spec-audit | TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aDrainedSluice-1.
 <!-- /gen:build-index -->
@@ -75,21 +71,3 @@ Ids no `spec-audit` record has ever named: TOOL-aDrainedSluice-1.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-08-spec-aDrainedSluice-1.md](spec/2026-08-08-spec-aDrainedSluice-1.md)
-  - [2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md](spec/units/2026-08-08-spec-aDrainedSluice-2-v1-arms-every-gate.md)
-  - [2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md](spec/units/2026-08-08-spec-aDrainedSluice-3-v3-nested-recordings.md)
-  - [2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md](spec/units/2026-08-08-spec-aDrainedSluice-4-v4-rev-scan-reset.md)
-  - [2026-08-08-spec-aDrainedSluice-5-v2-arm-the-branches.md](spec/units/2026-08-08-spec-aDrainedSluice-5-v2-arm-the-branches.md)
-  - [2026-08-08-spec-aDrainedSluice-6-v5-python-resolver.md](spec/units/2026-08-08-spec-aDrainedSluice-6-v5-python-resolver.md)
-  - [2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md](spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md)
-  - [2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md](spec/units/2026-08-08-spec-aDrainedSluice-8-v7-three-hardenings.md)
-  - [2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md](spec/units/2026-08-08-spec-aDrainedSluice-9-v8-dead-path-census.md)
-- **`reviews/`**
-  - [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md)
-  - [2026-08-08-review-TOOL-aDrainedSluice-2-1.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-2-1.md)
-  - [2026-08-08-review-TOOL-aDrainedSluice-5-2.md](reviews/2026-08-08-review-TOOL-aDrainedSluice-5-2.md)
-<!-- /gen:build-docs -->

@@ -102,13 +102,11 @@ ids TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aSharded
 | [TOOL-aShardedFloor-4 — the dispatch hint reads a repository-wide store](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md) | — | 2 | WONTDO | rev-4 | 2026-08-21 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 3 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md) | research | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
-| [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md) | journal | TOOL-aShardedFloor-4 |
-| [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md) | spec-audit | TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 
@@ -121,17 +119,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-21-spec-TOOL-aShardedFloor-1.md](spec/2026-08-21-spec-TOOL-aShardedFloor-1.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-2.md](spec/2026-08-21-spec-TOOL-aShardedFloor-2.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-3.md](spec/2026-08-21-spec-TOOL-aShardedFloor-3.md)
-  - [2026-08-21-spec-TOOL-aShardedFloor-4.md](spec/2026-08-21-spec-TOOL-aShardedFloor-4.md)
-- **`build/`**
-  - [2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md](build/2026-08-21-build-TOOL-aShardedFloor-1-design-brief.md)
-  - [2026-08-21-build-TOOL-aShardedFloor-4-repricing.md](build/2026-08-21-build-TOOL-aShardedFloor-4-repricing.md)
-- **`reviews/`**
-  - [2026-08-21-review-TOOL-aShardedFloor-1.md](reviews/2026-08-21-review-TOOL-aShardedFloor-1.md)
-<!-- /gen:build-docs -->
