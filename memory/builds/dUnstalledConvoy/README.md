@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34 TOOL-dUnstalledConvoy-35 TOOL-dUnstalledConvoy-36
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34 TOOL-dUnstalledConvoy-35 TOOL-dUnstalledConvoy-36 TOOL-dUnstalledConvoy-37 TOOL-dUnstalledConvoy-38
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -230,6 +230,7 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
 ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34 TOOL-dUnstalledConvoy-35 TOOL-dUnstalledConvoy-36
+ids TOOL-dUnstalledConvoy-37 TOOL-dUnstalledConvoy-38
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
