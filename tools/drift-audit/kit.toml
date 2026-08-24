@@ -44,16 +44,16 @@ means = "adopted"
 
 [[gate_leg]]
 name = "drift-audit selftest"
+subject = "kit"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
-subject = "kit"
 
 [[gate_leg]]
 name = "drift-audit records"
+subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
-subject = "repo"
 
 [[hole]]
 id = "drift-product-globs"
@@ -81,13 +81,13 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
 [[gate_leg]]
 name = "drift-audit wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
-subject = "repo"
 [[lf_pin]]
 pattern = ".claude/skills/drift-audit/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

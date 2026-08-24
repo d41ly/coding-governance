@@ -25,12 +25,12 @@ means = "adopted"
 
 [[gate_leg]]
 name = "agent-instructions wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-agent-instructions.sh", "--check"]
 guard = []
-subject = "repo"
 
 [[gate_leg]]
 name = "agent-instructions self-test"
+subject = "kit"
 argv = ["bash", "{kit}/adopt-agent-instructions.test.sh"]
 guard = ["{kit}/"]
-subject = "kit"

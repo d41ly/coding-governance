@@ -1262,7 +1262,12 @@ user_skills = "/tmp/gk-fake-skills"
                 '#!/usr/bin/env bash\necho "  1. git add something && commit."\ngit add .\n',
                 encoding="utf-8", newline="\n")
             (g / "tools" / "gate-legs.json").write_text(
-                json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard]}], indent=2) + "\n",
+                # THE MANIFEST DECLARES ITS SUBJECT, like the descriptor beside it. An
+                # omission here is the M1 case: the descriptor says one thing and the
+                # manifest says nothing, which every reader defaults to `repo` — a silent
+                # disagreement, and selfcheck refuses it now.
+                json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard],
+                             "subject": "repo"}], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
             # Only govkit.py was copied, so this tree arrives with no subject pin and the ratchet
             # reds on its absence — correctly, and this fixture's premise is a tree where every
@@ -1490,6 +1495,136 @@ user_skills = "/tmp/gk-fake-skills"
         _r4 = run_in(rg)
         check("a pin row naming a leg the manifest no longer declares REDS",
               _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
+
+        sys.path.insert(0, str(HERE))
+        import govkit  # noqa: E402
+
+        # ---- L1: THE REFUSAL BRANCHES THIS BUILD ADDED, each reached by an arm ----------------
+        # Six of twelve were unverified text — any of them could be misspelled, unreachable, or emit
+        # the wrong operator instruction with nothing reporting it, and M1 above is the live proof
+        # that "unarmed" and "wrong" arrive together. `refusal_join.py` is the mechanism meant to
+        # catch this and its JOIN half has never executed, so these are hand-written.
+        def _desc(subject_line: str, extra: str = "") -> None:
+            kitf.write_text(
+                'id = "demo"\nhome = "tools/demo"\n'
+                'version_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                '[[gate_leg]]\nname = "demo"\n' + subject_line +
+                'argv = ["true"]\nguard = []\n' + extra,
+                encoding="utf-8", newline="\n")
+
+        _write_legs("repo")
+        run_in_gov(rg, "selfcheck", "--write")
+        _desc("")                       # the descriptor declares no subject at all
+        _r = run_in(rg)
+        check("L1: a descriptor gate leg with NO subject REDS",
+              _r.returncode == 1 and "with no `subject`" in _r.stdout, _r.stdout + _r.stderr)
+        check("L1: and the refusal points at where the criterion is stated",
+              "ask what a FAILURE of this leg MEANS" in _r.stdout, _r.stdout)
+
+        _desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
+        _r = run_in(rg)
+        check("L1: a descriptor subject outside the closed set kit|repo REDS",
+              _r.returncode == 1 and "outside the closed set kit|repo" in _r.stdout,
+              _r.stdout + _r.stderr)
+
+        _desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
+        _r = run_in(rg)
+        check("L1: a descriptor and manifest that DISAGREE about subject RED",
+              _r.returncode == 1 and "disagree about whether this leg runs by default" in _r.stdout,
+              _r.stdout + _r.stderr)
+
+        # ...back to agreement, then the PIN's own two refusals.
+        _desc('subject = "repo"\n')
+        run_in_gov(rg, "selfcheck", "--write")
+        check("L1 control: the fixture is GREEN again before the pin arms below",
+              run_in(rg).returncode == 0, "")
+        _pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
+        _pinf.write_text("# fixture pin\ndemo repo\n", encoding="utf-8", newline="\n")
+        _r = run_in(rg)
+        check("L1: a pin row with no TAB REDS rather than being skipped as unparseable",
+              _r.returncode == 1 and "has a row with no tab" in _r.stdout, _r.stdout + _r.stderr)
+        _pinf.unlink()
+        _r = run_in(rg)
+        check("L1: a MISSING pin file REDS — the ratchet with no pin compares against nothing",
+              _r.returncode == 1 and "has no pin to compare against" in _r.stdout,
+              _r.stdout + _r.stderr)
+        run_in_gov(rg, "selfcheck", "--write")
+
+        # ---- M1: AN ABSENT MANIFEST SUBJECT IS A DISAGREEMENT, not an exemption ---------------
+        # The first draft guarded the comparison on `m_sub is not None`, so a manifest row with no
+        # key never disagreed with anything — while the runner defaults it to `repo` and the emitter
+        # ships the DESCRIPTOR's value to every adopter. Reproduced end to end on the live tree by
+        # the closing review: gov runs the leg and every adopter holds it, with this check green,
+        # and -29's own remediation then pins the derived default and makes it permanent.
+        _write_legs("kit")
+        _mf = json.loads(legsf.read_text(encoding="utf-8"))
+        for _r in _mf:
+            _r.pop("subject", None)
+        legsf.write_text(json.dumps(_mf, indent=2) + "\n", encoding="utf-8", newline="\n")
+        _m1 = run_in(rg)
+        check("M1: a descriptor subject against a manifest row that declares none REDS",
+              _m1.returncode == 1 and "declares none" in _m1.stdout, _m1.stdout + _m1.stderr)
+        check("M1: and the refusal says every reader defaults the missing key to repo",
+              "defaults a missing key to 'repo'" in _m1.stdout, _m1.stdout)
+        # ITS CONTROL: put the key back and the same tree is green again, so the arm is about the
+        # omission and not about the fixture being broken in some other way.
+        _write_legs("kit")
+        run_in_gov(rg, "selfcheck", "--write")
+        _m1c = run_in(rg)
+        check("M1 control: with the manifest key present the same tree is GREEN",
+              _m1c.returncode == 0, _m1c.stdout + _m1c.stderr)
+
+        # ---- M5: the gate-policy predicate's two evasions -------------------------------------
+        # Both are things a person writes without thinking: a trailing comment, and the shell
+        # default form, which assigns exactly as hard as `=`. The INVOCATION control is the half
+        # that keeps the predicate from redding on its own source — `GATE_SELFTESTS=1 bash ...`
+        # appears dozens of times across this tree in docs, arms and refusal strings.
+        _pol_re = _re.compile(
+            r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
+            r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+            r"[ \t]*(?:#.*)?$")
+        _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("M5: the predicate this arm grades is the one govkit.py actually compiles",
+              "GATE_SELFTESTS=\\S*|" in _gk_src or "GATE_SELFTESTS=" in _gk_src, "")
+        for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
+                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}"):
+            check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
+        for _s in ("GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh",
+                   'if [ -n "${GATE_SELFTESTS:-}" ]; then',
+                   'echo "set GATE_SELFTESTS=1 to run"'):
+            check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
+                  not _pol_re.match(_s), _s)
+
+        # ---- M6: `subject` is emitted only where the target can READ it -----------------------
+        # The manifest's key set is PINNED by the `run-gates canary`, a leg the run-gates kit ships
+        # and that runs on every adopter's bar. Writing the key into a tree whose run-gates predates
+        # it reds their canary as a side effect of an apply that was installing something else.
+        with tempfile.TemporaryDirectory() as _vd:
+            _vp = pathlib.Path(_vd)
+            check("M6: a target with no run-gates at all still gets the key — there is no canary "
+                  "to red, and withholding it would deny the feature silently",
+                  govkit.target_reads_subject(_vp, {"prefix": "tools"}), "")
+            (_vp / "tools" / "run-gates").mkdir(parents=True)
+            _rgs = _vp / "tools" / "run-gates" / "run-gates.sh"
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.0\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: a target BELOW the floor does not get the key",
+                  not govkit.target_reads_subject(_vp, {"prefix": "tools"}), "1.0 accepted")
+            _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.1\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: a target AT the floor does",
+                  govkit.target_reads_subject(_vp, {"prefix": "tools"}), "1.1 refused")
+            _rgs.write_text("#!/usr/bin/env bash\n# no version constant here\n",
+                            encoding="utf-8", newline="\n")
+            check("M6: an UNREADABLE version is treated as below the floor — the direction that "
+                  "costs a feature is recoverable, the one that reds somebody else's bar is not",
+                  not govkit.target_reads_subject(_vp, {"prefix": "tools"}), "unreadable accepted")
+            check("M6: the floor is the version the canary's key set moved in",
+                  govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
+                  str(govkit.SUBJECT_FLOOR_RUN_GATES))
 
         # AC5 — the header says what the check does NOT decide, in the generated file itself, where
         # a reader who found the pin will actually be looking.

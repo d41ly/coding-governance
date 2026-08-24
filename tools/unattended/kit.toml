@@ -82,6 +82,7 @@ means = "render-failed-half-stamped"
 
 [[gate_leg]]
 name = "unattended kit gate"
+subject = "repo"
 argv = ["bash", "{kit}/check-unattended.sh"]
 guard = []
 red_after_land = true
@@ -89,20 +90,19 @@ red_after_land = true
 # the playbook validity leg. No guard: it grades an adopter's playbooks and
 # the kit's own fixture, so a guard scoped to this kit dir would skip it on exactly the commits that
 # change a playbook.
-subject = "repo"
 [[gate_leg]]
 name = "playbook validity gate"
+subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
 guard = []
 red_after_land = true
-subject = "repo"
 
 [[gate_leg]]
 name = "unattended skill wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
-subject = "repo"
 
 [[hole]]
 id = "keepalive-tool-names"

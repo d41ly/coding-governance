@@ -16,7 +16,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.0   # gov:kit run-gates@1.0
+KIT_RUN_GATES_VERSION=1.1   # gov:kit run-gates@1.1
+# 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
+# the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
+# there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the

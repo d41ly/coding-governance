@@ -40,11 +40,11 @@ the gate IS the check. Running it over a target's own charter is what the gate l
 # `requires` guarantees; the plumbing existed and was simply not connected.
 [[gate_leg]]
 name = "micro-format definitions"
-argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
 subject = "repo"
+argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
 
 [[gate_leg]]
 name = "micro-format gate selftest"
+subject = "kit"
 argv = ["bash", "{prefix}/check-microformats.test.sh"]
 guard = ["{prefix}/check-microformats.sh", "{prefix}/check-microformats.test.sh"]
-subject = "kit"

@@ -153,6 +153,16 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # absent at BASE — keying on BASE would red a run for following the method.
 baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [fallback-commit]
   _bu_rel=$1; _bu_bre=$2; _bu_cut=${3:-}; _bu_fb=${4:-}
+  # IT CALLS `region`, WHICH THIS LIBRARY DOES NOT DEFINE. Both current callers define their own —
+  # two spellings, in the driver and in the checker, and the legs that compare them are the marker
+  # contract's, which this build moved off and back onto the automatic bar. A third caller that
+  # forgot would get `region: command not found` on stderr and an EMPTY region, which this function
+  # would then report as an empty roster: a wrong answer wearing a legitimate refusal. Named and
+  # checked rather than assumed, because a dependency a file does not state is one nobody maintains.
+  command -v region >/dev/null 2>&1 || {
+    echo "baseline_units needs a region() in the calling shell and this one has none, so the units region would read as empty and be reported as an empty roster"
+    return 1
+  }
   _bu_base=""
   for _bu_c in $(GIT log --reverse --format=%H -- "$_bu_rel" 2>/dev/null); do
     case "$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null | grep -m1 '^phase:')" in

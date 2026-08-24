@@ -23,12 +23,12 @@ why_no_adopter = "it needs no install step: the population is DERIVED from the a
 
 [[gate_leg]]
 name = "testsuite counts (every bar self-test prints one)"
+subject = "repo"
 argv = ["bash", "{prefix}/check-testsuite-counts.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "tools/gate-legs.json"]
-subject = "repo"
 
 [[gate_leg]]
 name = "testsuite counts self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/check-testsuite-counts.test.sh"]
 guard = ["{prefix}/check-testsuite-counts.sh", "{prefix}/check-testsuite-counts.test.sh"]
-subject = "kit"

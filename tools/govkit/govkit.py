@@ -895,7 +895,22 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' with subject '{d_sub}', "
                                f"which is outside the closed set kit|repo — an unrecognised value "
                                f"would be defaulted by every reader to whichever side it assumed")
-                    elif m_sub is not None and d_sub != m_sub:
+                    elif m_sub is None:
+                        # THE ONE CASE THE FIRST DRAFT EXEMPTED, and it is the case that drifts
+                        # SILENTLY and then permanently. Guarding the comparison on
+                        # `m_sub is not None` meant a manifest row with no key never disagreed with
+                        # anything — while the runner defaults it to `repo` and the emitter ships
+                        # the DESCRIPTOR's value to every adopter. Reproduced end to end: gov runs
+                        # the leg on every bar and every adopter holds it forever, with this check
+                        # green. Worse, -29's ratchet reds once and its own remediation
+                        # (`selfcheck --write`) then pins the DERIVED default and the disagreement
+                        # is green for good. The sibling exempt-leg path already refused exactly
+                        # this; the two paths agree now.
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' and "
+                               f"tools/gate-legs.json declares none — every reader defaults a "
+                               f"missing key to 'repo', so an omission here is a silent "
+                               f"disagreement that the subject pin will then make permanent")
+                    elif d_sub != m_sub:
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' while "
                                f"tools/gate-legs.json says '{m_sub}' — the descriptor and the "
                                f"manifest disagree about whether this leg runs by default")
@@ -1041,7 +1056,14 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # but the assignment is a policy. Run over the tracked tree before wiring: 0 hits and 54
     # near-misses, none of them a policy. Records under the memory root are excluded — a decision
     # log quoting a policy line is not executing one.
-    policy_re = re.compile(r"^[ \t]*(?:export[ \t]+)?GATE_SELFTESTS=\S*[ \t]*$")
+    # TWO EVASIONS the first spelling admitted, both of them things a person writes without
+    # thinking: a trailing comment (`export GATE_SELFTESTS=1  # gov only`) and the shell default
+    # form (`: ${GATE_SELFTESTS:=1}`), which assigns exactly as hard as `=`. Re-run over the tracked
+    # tree after widening: still one hit, still no invocation matched.
+    policy_re = re.compile(
+        r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
+        r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+        r"[ \t]*(?:#.*)?$")
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the
     # payload and reported a confident zero over the rest — the could-not-fail shape, arriving as an
@@ -1884,6 +1906,38 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
     return gr
 
 
+# The run-gates version at which `subject` entered the manifest's pinned key set. Below it, the
+# target's own canary refuses the key. TOOL-dUnstalledConvoy-26.
+SUBJECT_FLOOR_RUN_GATES = (1, 1)
+
+
+def target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
+    """Can this target's installed run-gates parse a `subject` key without redding its own canary?
+
+    Read from the TARGET, never assumed and never taken from gov's own tree: the question is what
+    THEY have installed. A tree with no run-gates at all gets the key — there is no canary to red,
+    and withholding it would silently deny them the feature. An unreadable version is treated as
+    BELOW the floor, because the direction that costs a feature is recoverable and the direction
+    that reds somebody else's bar is not.
+    """
+    prefix = (deploy.get("prefix") or "tools").strip("/")
+    runner = target / prefix / "run-gates" / "run-gates.sh"
+    if not runner.is_file():
+        return True
+    try:
+        txt = runner.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    m = re.search(r"^KIT_RUN_GATES_VERSION=([0-9]+(?:\.[0-9]+)*)", txt, re.M)
+    if not m:
+        return False
+    try:
+        got = tuple(int(x) for x in m.group(1).split("."))
+    except ValueError:
+        return False
+    return got >= SUBJECT_FLOOR_RUN_GATES
+
+
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     """Parse the target's runner output into leg name -> green|red|skipped.
 
@@ -2652,7 +2706,16 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                 # an ordinary bar leg, which is the defect the unit exists to remove.
                 # Defaulted to `repo`, because an undeclared leg belongs ON the bar: the other
                 # default silently removes a leg the descriptor never spoke about.
-                row = {"name": nm, "argv": argv, "subject": leg.get("subject") or "repo"}
+                # SUBJECT IS EMITTED ONLY WHERE THE TARGET CAN READ IT. `tools/gate-legs.json`
+                # has a PINNED key set, asserted by the `run-gates canary` leg that the run-gates
+                # kit ships and that runs on every adopter's bar — and that pin did not carry
+                # `subject` before this build. Writing the key into a tree whose run-gates predates
+                # it reds their canary as a side effect of a routine `apply --kits memory-tree`,
+                # which is the deployer breaking a target's gate while installing something else.
+                # The floor is read from the TARGET's installed runner, not assumed.
+                row = {"name": nm, "argv": argv}
+                if target_reads_subject(target, deploy):
+                    row["subject"] = leg.get("subject") or "repo"
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 if nm in by_name:

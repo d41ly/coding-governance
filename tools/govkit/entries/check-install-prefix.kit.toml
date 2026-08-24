@@ -43,6 +43,6 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 
 [[gate_leg]]
 name = "install-prefix (shipped surface)"
+subject = "repo"
 argv = ["bash", "{prefix}/check-install-prefix.sh"]
 guard = []
-subject = "repo"

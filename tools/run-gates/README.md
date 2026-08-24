@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.0` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.1` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `tools/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -10,6 +10,32 @@ presence-only check.
 The merge-bar runner, its two harnesses, and the adopter that keeps a target's verdict-reading
 declaration honest. The runner is a thin iterator over a leg manifest: it holds no leg command of
 its own, and the canary asserts that.
+
+## The switch every adopter needs to know about
+
+**A leg declaring `subject = "kit"` is HELD.** It does not run on your bar unless you ask:
+
+```bash
+GATE_SELFTESTS=1 bash <prefix>/run-gates/run-gates.sh
+```
+
+A kit-subject leg is a self-test of a KIT'S OWN SOURCE — it stages a break into a copy of a checker
+and asserts the checker still catches it. That job exists when the kit's source changes, and it does
+not exist in a repository that copy-installs the kit and never edits it. Run them once when you
+install or upgrade a kit, and after that only when you edit one.
+
+**`GATE_FULL=1` does NOT unlock them.** It means *ignore every leg guard*, and a kit's own tests are
+not a guard. A green bar without `GATE_SELFTESTS=1` says nothing about the kits — and the runner
+says so itself: held legs get their own verb, are subtracted from the total, and are named in the
+summary, `gates GREEN — 43/43 legs passed (42 held: kit self-tests, GATE_SELFTESTS=1 runs them)`.
+
+A leg that declares no `subject` defaults to `repo` and runs, so nothing you already had changes
+behaviour by arriving here. A whole manifest of held legs is REFUSED rather than reported green,
+because a bar that executed nothing is not a bar that passed.
+
+The state reaches two other readers: the deployer, which reads a held leg as `held` rather than as a
+leg that vanished, and the `gate-full-green` stamp, which records whether the run covered them so a
+push boundary cannot mistake a partial bar for a whole one.
 
 ## Why it became a kit
 
