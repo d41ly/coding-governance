@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable
 
-**Status:** INPROGRESS · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 

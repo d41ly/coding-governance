@@ -41,9 +41,10 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
 | [two-answers-to-one-question](two-answers-to-one-question.md) | class | 6 | yes | a fact stated in two places drifts, and the copies need not disagree loudly to be wrong |
+| [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-29 record(s): 29 class, 0 note, 0 superseded · 4 universal · 0 unanchored
+30 record(s): 30 class, 0 note, 0 superseded · 4 universal · 0 unanchored
 
 <!-- END GENERATED -->

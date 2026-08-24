@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 

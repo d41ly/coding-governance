@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults
 
-**Status:** INPROGRESS · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 

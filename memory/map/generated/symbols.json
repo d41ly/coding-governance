@@ -688,6 +688,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_runner_verbs",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
+    },
+    {
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"

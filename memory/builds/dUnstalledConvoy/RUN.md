@@ -36,3 +36,15 @@ base: b164a29603cb4fa3e5533721252de164853f948d
 2026-08-24T08:47:10Z rescope · item add TOOL-dUnstalledConvoy-31 · reason promoted from round 2's NON-CONVERGENT spec audit: an on-demand skip reaches the run total, so a switch-off bar cannot print 85/85
 
 2026-08-24T08:47:11Z rescope · item add TOOL-dUnstalledConvoy-32 · reason promoted from round 2's NON-CONVERGENT spec audit: an on-demand skip reaches chunk_close, so a fully skipped chunk cannot close green-by-absence
+
+2026-08-24T11:16:09Z rescope · item retire TOOL-dUnstalledConvoy-25 · reason my own dry-run falsified the owner's chosen option: the narrow predicate examines four tokens across seven specs and is blind to the identifier class the unit existed to catch. Retired rather than rebuilt, and the falsification is in the spec's revision log
+
+2026-08-24T11:16:09Z rescope · item add TOOL-dUnstalledConvoy-33 · reason the closing bar found check 24 and check 48 mutually unsatisfiable: a roster that grew before anyone recorded it can never be recorded, because the add verb refuses any unit already in the generated units region. That is the owner's first observation — builds refuse to rescope — living in the driver that is supposed to let them
+
+2026-08-24T11:19:11Z rescope · item add TOOL-dUnstalledConvoy-23 · reason added to the roster by an explicit owner turn after this run entered BUILDING; the row is written late, at the closing review, because the driver refused it at the time — see TOOL-dUnstalledConvoy-33
+
+2026-08-24T11:19:12Z rescope · item add TOOL-dUnstalledConvoy-24 · reason added to the roster by an explicit owner turn after this run entered BUILDING; the row is written late, at the closing review, because the driver refused it at the time — see TOOL-dUnstalledConvoy-33
+
+2026-08-24T11:19:13Z rescope · item add TOOL-dUnstalledConvoy-26 · reason added to the roster by an explicit owner turn after this run entered BUILDING; the row is written late, at the closing review, because the driver refused it at the time — see TOOL-dUnstalledConvoy-33
+
+2026-08-24T11:19:18Z rescope · item add TOOL-dUnstalledConvoy-25 · reason added to the roster by an explicit owner turn after this run entered BUILDING, and later retired when my own dry-run falsified the owner's chosen option; both rows are written late, at the closing review — see TOOL-dUnstalledConvoy-33

@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -226,10 +226,10 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 23 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
+**Build status:** CLOSED · 24 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
-ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
+ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 TOOL-dUnstalledConvoy-34
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
@@ -250,13 +250,14 @@ ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 T
 | [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | CLOSED | rev-5 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | SPECCED | rev-3 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | INPROGRESS | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | INPROGRESS | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | INPROGRESS | rev-2 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | SPECCED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | SPECCED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | SPECCED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | CLOSED | rev-3 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | CLOSED | rev-2 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-33 — a roster that grew before anybody recorded it can be recorded, because refusing is how a run gets wedged](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md) | CLOSED | rev-2 | 2026-08-24 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -268,9 +269,14 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md) | journal | TOOL-dUnstalledConvoy-23 |
 | [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md) | journal | TOOL-dUnstalledConvoy-24 |
 | [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md) | journal | TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md) | journal | TOOL-dUnstalledConvoy-26 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
 | [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md) | journal | TOOL-dUnstalledConvoy-27 |
 | [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md) | journal | TOOL-dUnstalledConvoy-28 |
 | [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md) | journal | TOOL-dUnstalledConvoy-29 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md) | journal | TOOL-dUnstalledConvoy-31 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md) | journal | TOOL-dUnstalledConvoy-32 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md) | journal | TOOL-dUnstalledConvoy-33 |
 | [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
@@ -282,9 +288,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 | [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 
-Ids no record names: TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32.
-
-Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32.
+Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -323,15 +327,21 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
   - [2026-08-24-spec-TOOL-dUnstalledConvoy-30.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md)
   - [2026-08-24-spec-TOOL-dUnstalledConvoy-31.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md)
   - [2026-08-24-spec-TOOL-dUnstalledConvoy-32.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md)
+  - [2026-08-24-spec-TOOL-dUnstalledConvoy-33.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md)
 - **`build/`**
   - [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md)
+  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md)
+  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md)
   - [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md)
   - [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md)
   - [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md)
+  - [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md)
+  - [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md)
+  - [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md)
 - **`reviews/`**
   - [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md)
   - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md)

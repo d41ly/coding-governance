@@ -107,6 +107,7 @@
       "workflows"
     ],
     "git-hooks": [
+      "gate-env.sh",
       "pre-commit",
       "pre-push"
     ],

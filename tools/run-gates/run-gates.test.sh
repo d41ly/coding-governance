@@ -646,6 +646,60 @@ n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 
+# 3h4. AN ALL-HELD RUN REFUSES. TOOL-dUnstalledConvoy-26 AC10. A repository whose whole manifest is
+#      kit-subject would otherwise print `gates GREEN — 0/0 legs passed` on every run forever while
+#      executing not one leg, and stamp a record saying so. Measured before the fix: exit 0 and
+#      exactly that line.
+S3="$SCRATCH/allheld"
+mkdir -p "$S3/tools/run-gates" "$S3/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S3/tools/run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S3/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S3/fx/a.sh"
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
+]
+JSON
+( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+[ "$rc" = 2 ] \
+  || { echo "canary: an all-held run exited $rc, not the configuration-refusal code 2"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'executed NOTHING' \
+  || { echo "canary: an all-held run did not say it executed nothing"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q 'GATE_SELFTESTS=1' \
+  || { echo "canary: the refusal did not name the switch that would fix it"; fail=1; }
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN' \
+  && { echo "canary: an all-held run reported a GREEN over an empty population"; fail=1; }
+
+# ITS CONTROL, and it is what keeps the refusal narrow. The SAME manifest with one repo-subject leg
+# added is an ordinary partial bar and must stay green — a refusal that fired here would red every
+# adopter whose kits are all held, which is every adopter.
+cat > "$S3/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
+  {"name": "r one", "argv": ["bash", "fx/a.sh"], "subject": "repo"}
+]
+JSON
+( cd "$S3" && git add -A && git commit -qm two ) >/dev/null 2>&1
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 1/1 legs passed'; } \
+  || { echo "canary: CONTROL — one repo-subject leg beside two held ones must still be a green partial bar, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# ...and with the switch ON the all-held manifest is an ordinary full bar, not a refusal. The
+# refusal is about a run that executed nothing, never about the subject values themselves.
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+n=$((n+1))
+{ [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$'; } \
+  || { echo "canary: CONTROL — with the switch on, the same manifest must run every leg, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
 #     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
 #     when no recorded full green covers the pushed tip. So a guard can now scope the

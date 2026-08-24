@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base b164a296 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-08-24 · node d · Tier-1 · base b164a296 · streams tooling
 
 ## 1. Goal
 

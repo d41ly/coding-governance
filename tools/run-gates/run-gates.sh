@@ -1108,6 +1108,21 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
 ran=$((n-skips-${ondemands:-0}))
 
+# A BAR THAT RAN NOTHING BECAUSE EVERYTHING WAS HELD IS NOT A GREEN BAR. It is the loudest possible
+# green-by-absence: a repository whose whole manifest is kit-subject would print `gates GREEN` on
+# every run forever while executing not one leg, and the record it stamps would say so too.
+# NARROW ON PURPOSE — guard-skips and reuses are ORDINARY reasons for a leg not to run, and a scoped
+# run over an untouched tree legitimately executes nothing. This fires only when the on-demand hold
+# is the SOLE reason: nothing ran, nothing was skipped, nothing was reused, and something was held.
+# Exit 2, the runner's own configuration-refusal code, never 0 and never 1. TOOL-dUnstalledConvoy-26.
+if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
+   && [ "$skips" = 0 ] && [ "${reuses:-0}" = 0 ]; then
+  echo "run-gates: every leg in this manifest is subject=kit and the self-tests were not asked for,"
+  echo "run-gates: so this run executed NOTHING. Refusing to report a green over an empty population."
+  echo "run-gates: run it as GATE_SELFTESTS=1, or give this manifest at least one repo-subject leg."
+  exit 2
+fi
+
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
 # `reuses` is the fourth full-green precondition, counted by the reuse verb above. A run that reused
 # ANY leg has not proven the whole bar this time, so it cannot stamp a full green — which is what

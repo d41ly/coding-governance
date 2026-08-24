@@ -1476,34 +1476,19 @@ for f in $RUNS; do
   # ---- here because hygiene check 9 refuses a stale index, so a spec committed by then is in the
   # ---- region by then; that dependency is the reason this shortcut is sound and is stated rather
   # ---- than assumed.
-  rsbase=""
-  for rsc in $(GIT log --reverse --format=%H -- "$f" 2>/dev/null); do
-    case "$(GIT show "$rsc:$f" 2>/dev/null | grep -m1 '^phase:')" in
-      *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) rsbase="$rsc"; break ;;
-    esac
-  done
-  [ -n "$rsbase" ] || rsbase="$rb"
-  rsb=$(GIT show "$rsbase:$bre" 2>/dev/null || true)
-  rs_cut=${UNITS_REGION_CUTOFF:-}
-  rs_date=$(GIT show -s --format=%cs "$rsbase" 2>/dev/null || true)
-  if [ -z "$rsb" ]; then
-    report "check 24 skipped for $f — no build README at the baseline commit, so there is no authorized roster to compare against"
-  elif ! printf '%s\n' "$rsb" | grep -qxF -- '<!-- gen:build-units -->'; then
-    report "check 24 skipped for $f — the baseline build README carries no units region, so the comparison would be vacuous over an empty set"
-  elif [ -n "$rs_cut" ] && [ -n "$rs_date" ] && ! printf '%s\n%s\n' "$rs_cut" "$rs_date" | sort -C; then
-    report "check 24 skipped for $f — the baseline predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
-  elif ! rs_was=$(printf '%s\n' "$rsb" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
-    report "check 24 skipped for $f — the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+  # ONE DERIVATION, in lib-unattended.sh, called by the driver too. Deciding "what roster did this
+  # run start with" separately in each is what made check 24 and check 48 unsatisfiable together:
+  # this file asked whether a unit was in the BASELINE roster, and the driver asked whether it was
+  # in the CURRENT one — a different question with a different answer, and a run whose roster grew
+  # before anybody recorded it was wedged between the two. TOOL-dUnstalledConvoy-33.
+  rs_why=""
+  if ! rs_was=$(baseline_units "$f" "$bre" "${UNITS_REGION_CUTOFF:-}" "$rb"); then
+    rs_why=$rs_was; rs_was=""
+  fi
+  if [ -n "$rs_why" ]; then
+    report "check 24 skipped for $f — $rs_why"
   elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
     report "check 24 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
-  elif ! printf '%s
-  ' "$rs_was" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+'; then
-    # AN EMPTY BASELINE ROSTER IS NOT A COMPARISON, and it is not vacuously TRUE either — it is
-    # vacuously ACCUSATORY: every unit the build has would read as added. MEASURED by this unit's
-    # own fixture, whose run carries a live phase from its first commit, so the baseline predates
-    # every spec. That is exactly the prompt-authorized shape, where a run legitimately authors
-    # its whole roster after preflight. Skipping is the honest answer and it says so out loud.
-    report "check 24 skipped for $f — the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
   else
     rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
     # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
