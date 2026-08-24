@@ -89,11 +89,31 @@ is that the raisable ceiling is the defect.
 **The ruling: six units build now, and `-9` becomes a SEVENTH item gated on evidence rather than the
 terminus of a five-phase chain nobody can stop.**
 
-| status | units | why |
+| status | units | outcome |
 |---|---|---|
-| **SPECCED — build now** | `-2` `-6` `-7` `-8` `-10` `-14` | ~750 lines. No new pin, no conf scalar, no receipt reader, no 459-row backfill, no freeze, no runbook. `-7` lands FIRST and `-10` first or second. |
-| **DEFERRED** | `-4` `-9` `-11` `-12` `-13` `-15` | Parked behind the two measurements this plan takes and never consults. |
+| **CLOSED — built** | `-2` `-6` `-7` `-8` `-10` `-14` | All six. No new pin, no conf scalar, no receipt reader, no backfill, no freeze, no runbook — and `VERB_OFFENDER_PIN` never rose once, falling 463 → 384 by RENAMING. |
+| **DEFERRED** | `-4` `-9` `-11` `-12` `-13` `-15` | Parked behind the two measurements this plan takes and never consults. Both now exist. |
 | **WONTDO** | `-3` `-5` | Cut. Each spec's own section 9 carries the killing argument. |
+
+`TOOL-dScaffoldedMirror-1`, the defect that opened this build, is CLOSED — retired by `-8` deleting
+its subject rather than patching that write path a fourth time.
+
+## What shipped, and the one number that decides what happens next
+
+**The demo that opened this build passes.** The owner's original fixture, re-scaffolded after `-8`:
+all six deliberately-bad names are offenders where all six passed green.
+
+**The kit no longer derives its standard from the corpus it grades.** `canon.py` is frozen, shipped,
+and an adopter cannot edit it; the corpus decides which CONCEPTS appear and never what they are
+CALLED. The polarity arm is the proof — a corpus of `get_*` and `fetch_*` with no `load` anywhere
+proposes `read` and `load`, the two spellings it does not use.
+
+**And the enforcement half now has a standing measurement.** `build_lexicon_marginal_offense_rate`
+read **4.3% in files written FRESH** in its window on its first run. `-7`'s docstring carries the
+kill rule: at or below roughly 5% across two further readings, the pressure chain — `-4`, `-9`, and
+`-11`'s cut fourth pin — should be ABANDONED rather than deferred. **That is reading one of two.**
+A second reading is owed before anyone acts, and this build deliberately took none of the pressure
+work while the question is open.
 
 **The stop rule this build did not have.** After the six land: read `-7`'s first standing measurement,
 and run `--probe` read-only against `C:/projects/incms/main`. Those are the two measurements the
