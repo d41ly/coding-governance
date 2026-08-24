@@ -93,6 +93,40 @@ against a corpus that contains that extension, is a refusal. That arm is itself 
 corpus, so the kit-side arm is a frozen SENTINEL fixture per shipped pattern set in `selftest.py` —
 a pattern set that goes inert fails there.
 
+## Supply — how the table reaches whoever is writing the name
+
+The declaration is the half of this kit with a measured record. Since it landed, this repo added 136
+definitions and zero offenders over a window in which the gate refused nothing — so the mechanism
+that works is CONTEXT DELIVERY, and the failure mode it attacks is ABSENCE rather than randomness.
+
+```bash
+python tools/lexicon/lexicon.py --suggest <identifier>   # one line, no corpus pass, ~45 ms
+python tools/lexicon/lexicon.py --brief <path>           # how the corpus already spells this file's objects
+bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
+```
+
+`--suggest` answers from the declaration alone. Off-table, it names the REPLACEMENT and quotes the
+negative that bans what you tried — `use load_remote — the declaration says load, NOT fetch: read a
+store into memory` — which is why the NOT clauses are the product rather than decoration.
+
+`--brief` keys on the OBJECTS the file already names and reports every leading token live for each
+across the corpus, flagging any object spelled more than one way. Not a directory histogram: one
+adopter test directory carries 750 distinct off-table leading tokens, so a truncated list shows about
+1% of the vocabulary and the truncation that bounds the cost voids the signal. On a `dark` extension
+it REFUSES, because an empty "established here" section reads as invent-freely.
+
+**Neither verb is a gate, structurally.** Neither can exit 1, neither prints a pin, and nothing in
+`scaffold_lexicon.py` imports either — so what the corpus DOES has no code path to becoming what it
+SHOULD do. A promise would not survive a refactor; the absence of a return path does.
+
+### The rendered Skill
+
+`SKILL.template.md` renders into `.claude/skills/lexicon/SKILL.md`, carrying the whole table so an
+agent has it without opening the conf. It is a GENERATED second carrier and its gate re-renders and
+byte-compares, so a declaration edit nobody re-rendered REDS with `DRIFTED`. The leg
+(`lexicon skill wiring`) carries NO guard — its answer changes when the declaration moves, and a
+kit-directory guard would leave exactly that edit unchecked.
+
 ## Waivers
 
 Three registries beside this file, keyed on the matched **TEXT** rather than `<path>:<line>`. Keying

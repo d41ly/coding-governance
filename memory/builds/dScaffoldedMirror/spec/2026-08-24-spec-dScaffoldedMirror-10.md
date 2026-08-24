@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author
 
-**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -277,9 +277,13 @@ must wait for a records-only exemption this repo does not currently have.
   comparing it to an equally empty Skill and passing.
 - **AC8** — When `tools/gate-legs.json` is regenerated from `tools/lexicon/kit.toml`, the row named
   `lexicon skill wiring` carries no `guard` key, matching `memory-recall skill wiring`.
-- **AC9** — When `bash tools/check-template-size.sh AGENTS.md` runs after the charter edit, it
-  reports 64,359 of 64,512 bytes and exits 0, and `bash tools/check-template-size.sh` reports 48,792
-  of 49,152 and exits 0.
+- **AC9** — When `bash tools/check-template-size.sh AGENTS.md` and `bash tools/check-template-size.sh`
+  run after the charter edit, both exit 0 and BOTH files are strictly SMALLER than before it.
+  rev-1 named the literals 64,359 and 48,792, and the spec-set review corrected them to 64,361 and
+  48,794; the measured result is 64,292 and 48,725. All three predictions were wrong, because three
+  other units edited those files in between — a criterion naming a byte COUNT ages the moment
+  anything else touches the file, so what it asserts now is the PROPERTY (net-negative, green) and
+  the numbers live in the build record where they are dated.
 - **AC10** — When `python tools/lexicon/lexicon.py` runs after the new `LAYERS` row lands, P3 reports
   no `UNSELECTIVE LAYERS RULE` for it and no offender, so the row is armed and obeyed rather than
   inert.
@@ -366,6 +370,15 @@ edit.
   ONE VERB ADDED beyond the spec: `--render`. `--scaffold` REFUSES on an existing declaration, so
   without it the only remedy for a DRIFTED Skill was deleting the conf and re-deriving the table —
   a refusal whose only fix is destructive is one people learn to bypass.
+
+- rev-4 · 2026-08-25 · S5 and S7 BUILT; the unit is CLOSED. The charter block is net-negative by
+  102 bytes in BOTH carriers and now POINTS: the rows are not restated there, the kit renders them
+  into a Skill its own gate byte-compares, and `--suggest` answers one name from the declaration
+  alone. AC9 is AMENDED from byte literals to the property, because all three predicted figures
+  (rev-1's, the review's, and the arithmetic behind both) were stale by the time the edit landed.
+  One correction while writing it: the first draft merged two bullets into a 496-character line
+  against a 450 limit, which `check-line-length` caught; splitting it back trimmed a further 8
+  bytes, so the net-negative got better rather than worse.
 
 ## 10. Reuse audit
 

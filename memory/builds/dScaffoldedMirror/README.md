@@ -119,7 +119,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | INPROGRESS | rev-3 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | CLOSED | rev-4 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-11 — the scoped extractor, and the one predicate it makes possible](spec/2026-08-24-spec-dScaffoldedMirror-11.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-12 — the consistency instrument, measured before it is believed](spec/2026-08-24-spec-dScaffoldedMirror-12.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | DEFERRED | rev-1 | 2026-08-24 |
@@ -141,6 +141,7 @@ Records live under `spec/` and `build/`.
 |---|---|---|
 | [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md) | research | TOOL-dScaffoldedMirror-2 |
 | [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2..15 |
+| [2026-08-25-build-TOOL-dScaffoldedMirror-10.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-10.md) | journal | TOOL-dScaffoldedMirror-10 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-14.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-14.md) | journal | TOOL-dScaffoldedMirror-14 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md) | journal | TOOL-dScaffoldedMirror-2 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md) | journal | TOOL-dScaffoldedMirror-6 |
@@ -177,6 +178,7 @@ Records live under `spec/` and `build/`.
 - **`build/`**
   - [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md)
   - [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md)
+  - [2026-08-25-build-TOOL-dScaffoldedMirror-10.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-10.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-14.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-14.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md)
