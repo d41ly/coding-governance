@@ -1,148 +1,185 @@
-# TOOL-dUnstalledConvoy-26 — a kit's self-tests become an owner-adjustable, on-demand population instead of bar legs
+# TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable
 
-**Status:** SPECCED · rev-1 · 2026-08-23 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 
-A kit's self-tests read THE KIT. They stage a break into a copy of a checker and assert the checker
-still catches it, so they have a job when the kit's source changes and none at all in a repo that
+A kit's self-tests read THE KIT: they stage a break into a copy of a checker and assert the checker
+still catches it. They have a job when the kit's source changes and none at all in a repo that
 copy-installs the kit and never edits it. Today they are ordinary bar legs, so every adopter runs them
 on every full gate.
 
-`f5f4732a` fixed this for one kit by DELETING seven legs. That is an instance fix: it left twenty-nine
-descriptor legs across eleven other kits, took the coverage away from this repo too, and installed no
-mechanism to stop the next kit repeating it. The owner's ruling is that emitting and running them
-should be ADJUSTABLE rather than decided once by deletion.
+`f5f4732a` fixed this for one kit by DELETING seven legs, and its commit message drew the distinction
+this unit generalises: the RECORD AND WIRING checks read the REPOSITORY and go stale with nobody
+editing the kit, while the SELF-TESTS read the kit. rev-1 tried to name the second group by counting
+`.test.sh` legs and got the population wrong twice over. This revision makes the distinction DECLARED.
 
 ## 2. Scope (IN)
 
-- **S1 — a self-test leg DECLARES itself.** `[[gate_leg]]` gains `on_demand = true`. The population is
-  declared in the descriptor, never inferred from `.test.sh` appearing in an argv — an inferred
-  population is a spelling test, and this repo already carries a leg whose script does not end in
-  `.test.sh` and one that is a self-test without saying so.
-- **S2 — `run-gates` skips an `on_demand` leg unless asked**, and `GATE_FULL=1` does NOT ask. That is
-  the whole point: `changed()` returns 0 the moment `GATE_FULL` is set, so today's `guard = ["{kit}/"]`
-  is bypassed at exactly the push boundary where an adopter feels it.
-- **S3 — the ask is one switch**, `GATE_SELFTESTS=1`, and it is the only thing that unlocks them. With
-  it set they run; without it they are reported as skipped by name, never omitted.
-- **S4 — the skip ANNOUNCES itself**, in the run's own summary, with a count. A leg that vanishes from
-  a green bar is the shape this repo has redded for twice.
-- **S5 — the twenty-nine descriptor legs are migrated**, derived by reading each `kit.toml` rather than
-  from a list typed here: `agent-instructions` 1, `codebase-map` 2, `drift-audit` 1, `agent-cap` 2,
-  `lexicon` 1, `memory-recall` 1, `memory-tree` 11, `playbook-render` 1,
-  `pytest-parallel-guardrails` 1, `run-gates` 5, `review-harness` 3.
-- **S6 — this repo's own manifest carries the same flag**, on the 47 of its 85 legs that are
-  self-tests, so the descriptor↔manifest cross-check keeps agreeing in both directions.
-- **S7 — govkit's cross-check learns the field.** A leg declared `on_demand` in a descriptor must be
-  `on_demand` in the manifest, and the mismatch is a refusal — otherwise the two spellings drift and
-  the deployer's own thesis goes unapplied to the deployer again.
-- **S8 — the adopter is told how to run them**, once at adoption and on demand after, in the text
-  govkit already prints at the end of an install.
-- **S9 — every change lands with its arm, and the arms that can fail are observed failing first.**
+- **S1 — every `[[gate_leg]]` declares `subject`, one of `kit` or `repo`.** A `kit`-subject leg tests
+  the kit's own source; a `repo`-subject leg reads the repository it is installed in. Only `kit`
+  legs become on-demand. This is the membership criterion rev-1 never stated, and it is the owner's
+  own vocabulary from `f5f4732a` rather than a new one.
+- **S1b — the population is DERIVED the way govkit derives it**, through `read_descriptors`, which
+  loads `tools/*/kit.toml` AND `tools/govkit/entries/*.kit.toml`. rev-1 globbed the first only and
+  missed ten legs; that is `two-answers-to-one-question` with the consumer as the other answer. No
+  count of this population appears anywhere in this spec, because a number in prose beside a derived
+  set is wrong on the next commit.
+- **S2 — `run-gates` skips a `kit`-subject leg unless asked**, and `GATE_FULL=1` does NOT ask.
+  `changed()` returns 0 the moment `GATE_FULL` is set, so the `guard = ["{kit}/"]` these legs carry is
+  bypassed at exactly the push boundary an adopter feels.
+- **S3 — the ask is `GATE_SELFTESTS=1`** and nothing else unlocks them.
+- **S4 — the skip has its OWN verb and its OWN counter.** NOT `skips`, and not the `GATE skip …
+  (unchanged vs <branch>)` line: that tail would be a lie — the leg is not unchanged, it is out of
+  subject — and `skips` is load-bearing elsewhere (S5). The verb is new, and `profile_bar.py`'s closed
+  verb set learns it, or the row is silently dropped from the profile summary.
+- **S5 — the `gate-full-green` stamp keeps its meaning.** `[ "$skips" = 0 ]` is one of its five
+  preconditions, so an on-demand skip counted as a skip means the stamp is never written again — and
+  `.githooks/pre-push` then forces `GATE_FULL=1` on every push forever, with the lag bound
+  permanently unreachable. Counting it separately is what keeps the stamp writable; **and the stamp
+  RECORDS the switch state**, so a record named `gate-full-green` can never certify a partial run
+  without saying it was partial.
+- **S6 — the wire format gains the field, and `chunk` moves with it.** `chunk` is the LAST field of
+  the reader's `\x1e`-separated row, so a sixth field appended after it is parsed as chunk. rev-1's
+  §3 claimed `chunk` was untouched; it is touched by construction.
+- **S7 — the decision sits in the GUARD PRE-PASS, not the dispatch loop.** A skip inside the dispatch
+  loop with no result sentinel reds the bar with a "(no result)" row per skipped leg, because the
+  reporting pass reads a result the loop never wrote.
+- **S8 — `gate-legs.json` carries `subject` on every leg**, and govkit's both-directions cross-check
+  learns the field so a descriptor and the manifest cannot disagree about it. The eight legs the
+  descriptors EXEMPT are reachable by the exemption path only, so the check must read them there or
+  it silently covers less than it claims.
+- **S9 — govkit EMITS `subject` into a target's manifest.** Nothing in rev-1's scope did this, and
+  `govkit.py`'s emission drops every field but name, argv and guard — so without this item the flag
+  never reaches an adopter and the whole unit stops at this repo's edge.
+- **S10 — the adopter is told how to run them**, once at adoption and on demand after, in govkit's
+  install summary.
+- **S11 — every change lands with its arm, and every arm that can fail is observed failing first.**
 
 ## 3. Non-goals (OUT)
 
-- **Deleting any self-test.** The unattended kit's seven stay deleted because that was an owner ruling
-  on that kit; this unit does not restore them, and does not remove any other.
-- **Changing what a self-test asserts.** This unit moves WHEN they run, never what they check.
-- **A per-kit or per-leg opt-out in the target's `deploy.toml`.** One switch, repo-wide. A per-kit
-  matrix is a configuration surface nobody will audit, and the failure mode is a kit silently exempt.
-- **Making `GATE_FULL` unlock them.** `GATE_FULL` means "ignore every guard"; if it also meant "run the
-  kit's own tests" there would be no way to ask for a complete bar without them.
-- **The `impure` and `chunk` fields**, the timing cache, and the chunk reporting. Untouched.
+- **Deleting or restoring any self-test.** The unattended kit's seven stay deleted; that was an owner
+  ruling on that kit.
+- **Changing what any self-test asserts.** This moves WHEN they run.
+- **A per-kit or per-leg opt-out matrix.** One switch, repo-wide. A matrix is a surface nobody audits
+  and its failure mode is a kit silently exempt from its own tests.
+- **Making `GATE_FULL` unlock them.** `GATE_FULL` means "ignore every guard"; conflating it with
+  "run the kit's own tests" leaves no way to ask for a complete bar without them.
+- **Re-subjecting the repo-subject legs.** `kit/dogfood doc parity`, `review-protocol parity`,
+  `marker contracts` and `run-gates canary` read the REPOSITORY — the canary holds the manifest
+  key-set pin and the guard-liveness refusal — and they stay on the bar under `subject = "repo"`.
 
 ## 4. Design
 
-The runner already carries per-leg fields on its wire format — `name`, `guard`, `argv`, `impure`,
-`chunk`, `\x1e`-separated, one row per leg — so `on_demand` is a sixth field beside them rather than
-new machinery. The reader emits it, the dispatcher consults it, and a leg that is skipped keeps its
-index, which the manifest's 1:1 row correspondence already depends on.
+The whole unit turns on S1. rev-1 tried to name a population by pattern and was wrong twice: it
+globbed one of two descriptor roots, and it would have swept in four legs whose subject is the
+repository. A declared field is checkable in both directions, survives a rename, and says which
+answer is meant at the point where somebody has to choose.
 
-S1 is declared rather than inferred because the alternative is a predicate over argv text, and this
-build has now twice written such a predicate, measured it, and thrown it away. A descriptor field is
-checkable in both directions and cannot be fooled by a rename.
+S5 is the finding rev-1 missed entirely and it is the reason `§5 — security: none` was backwards. The
+stamp is a five-way conjunction including `skips = 0`; a new skip that lands in that counter does not
+weaken the bar quietly, it silences the stamp and pins `pre-push` into forcing a full run forever.
+Both readings are bad and they are bad in opposite directions, which is why the switch state goes INTO
+the stamp: a green that means "everything except the kit's own tests" has to say so where the push
+boundary reads it.
 
-S2's argument is the measurement: `changed() { [ -n "${GATE_FULL:-}" ] && return 0; ... }`. The guard
-these legs already carry is bypassed whenever `GATE_FULL` is set, and `.githooks/pre-push` sets it when
-it decides a full run is owed. So the existing guard does not do the job the leg descriptors imply it
-does, and no adopter can tell from reading them.
+S7 and S4 are one lesson twice. The dispatch loop writes a result per index and the reporting pass
+reads one; skipping inside the loop leaves a hole the reporter reports. And the existing skip verb
+carries a REASON in its text — `unchanged vs main` — which is false for this skip and would be read by
+a human as a guard outcome.
 
-S4 exists because the alternative is a bar that got smaller without saying so. The count is reported
-the way a skipped leg is already reported, which is the shape the charter requires and this repo has
-twice landed a defect against.
-
-What this does NOT buy: it does not verify that a kit's self-tests still PASS in an adopter's repo. It
-moves them off the automatic bar; running them is then the owner's choice and their result is the
-owner's to read. A green adopter bar after this says nothing about the kit's own health, and S8's text
-says so where an adopter will see it.
+What this does NOT buy: it does not verify a kit's self-tests still pass in an adopter's repo. It
+moves them off the automatic bar; running them is the owner's choice and reading the result is the
+owner's job. A green adopter bar after this says nothing about the kit's own health, and S10's text
+says so where an adopter sees it.
 
 ## 5. Production-readiness checklist
 
-- **security** — none. Fewer things run by default; nothing new is executed and nothing gains reach.
-- **perf/scale** — an adopter's full gate loses 29 legs' worth of work. This repo's own bar is
-  unchanged by default and loses 47 legs when the switch is off, which is the point of the switch.
+- **security** — this changes the push boundary's behaviour, which is the opposite of rev-1's claim.
+  S5 is the whole of the answer: the stamp stays writable and records what it covered.
+- **perf/scale** — an adopter's full gate loses the kit-subject legs. This repo's own bar is unchanged
+  when the switch is set and loses them when it is not.
 - **a11y / i18n** — N/A.
-- **error/empty/loading states** — a manifest with EVERY leg `on_demand` and the switch off must
-  report a bar of zero legs as a refusal, not as green. That is the empty-population class.
-- **observability** — S4 is the observability, and it is in scope rather than assumed.
-- **testing/gates** — `run-gates`' own self-tests, govkit's selftest and matrix, plus the full bar.
-- **migration/rollback** — an adopter that wants today's behaviour sets `GATE_SELFTESTS=1` in their
-  runner's environment. Rollback needs no code change and no re-deploy.
-- **help/ docs** — govkit's install summary (S8), `tools/run-gates/README.md`, and `AGENTS.md`'s merge
-  bar section, which currently describes guards without mentioning that `GATE_FULL` overrides them for
-  this population.
+- **error/empty/loading states** — a manifest whose every leg is `kit`-subject, with the switch off,
+  must refuse rather than report green. The observable is a RUN OUTCOME, so the arm drives the runner
+  over such a manifest rather than asserting a predicate over the manifest alone.
+- **observability** — S4's verb and S5's stamp field are the observability, and both are in scope.
+- **testing/gates** — `run-gates`' own self-tests, govkit's selftest and matrix, plus the full bar
+  invoked as `GATE_FULL=1 GATE_SELFTESTS=1`, which is what the Definition of Done needs. rev-1 named
+  `GATE_FULL=1` alone while also specifying that it does not unlock these legs, so its own DoD
+  invocation skipped every leg its acceptance criteria are observed by.
+- **migration/rollback** — an adopter wanting today's behaviour sets `GATE_SELFTESTS=1`. No code
+  change, no re-deploy. **`govkit apply` refuses an upgrade re-apply across the green→skipped
+  transition**, so the migration path for an already-installed target is named in S10 rather than
+  discovered.
+- **help/ docs** — govkit's install summary, `tools/run-gates/README.md`, and `AGENTS.md`'s merge-bar
+  section, which describes guards without saying `GATE_FULL` overrides them.
 
 ## 6. Acceptance criteria
 
-- **AC1** — a manifest leg marked `on_demand` does not run on a default bar AND does not run under
-  `GATE_FULL=1`, observed in `tools/run-gates/run-gates.test.sh`.
-- **AC2** — the same leg RUNS with `GATE_SELFTESTS=1`, observed in
+- **AC1** — a `kit`-subject leg does not run on a default bar AND does not run under `GATE_FULL=1`,
+  observed in `tools/run-gates/run-gates.test.sh`.
+- **AC2** — the same leg RUNS under `GATE_SELFTESTS=1`, observed in
   `tools/run-gates/run-gates.test.sh`.
-- **AC3** — a skipped `on_demand` leg is reported by name with a count, not omitted, observed in
+- **AC3** — a skipped `kit` leg is reported with the NEW verb, its own counter, and NOT the
+  `unchanged vs` text, observed in `tools/run-gates/run-gates.test.sh`.
+- **AC4** — `profile_bar.py` renders that verb rather than dropping the row, observed in
   `tools/run-gates/run-gates.test.sh`.
-- **AC4** — a manifest whose every leg is `on_demand`, with the switch off, refuses rather than
-  reporting green, observed in `tools/run-gates/run-gates.test.sh`.
-- **AC5** — `on_demand` in a descriptor and in the manifest must agree, and a mismatch is a refusal in
-  both directions, observed in `tools/govkit/selftest.py`.
-- **AC6** — the 29 descriptor legs carry the flag, asserted by DERIVING the self-test population from
-  each `kit.toml` and requiring every member to declare it, observed in `tools/govkit/selftest.py`.
-- **AC7** — a target installed by govkit receives the flag on those legs, observed in
-  `tools/govkit/matrix.py`.
-- **AC8** — govkit's install summary names how to run them once and on demand, observed in
+- **AC5** — a full green run with the switch OFF still writes `gate-full-green`, and the stamp records
+  the switch state; with the switch ON the stamp records that too, observed in
+  `tools/run-gates/run-gates.test.sh`.
+- **AC6** — `.githooks/pre-push` does not force a full run on the strength of a stamp written with the
+  switch off, observed in `tools/run-gates/run-gates.test.sh`.
+- **AC7** — every leg in `tools/gate-legs.json` carries `subject`, and every descriptor leg does too,
+  with the population read through govkit's own descriptor loader rather than a glob, observed in
   `tools/govkit/selftest.py`.
-- **AC9** — this repo's own bar is unchanged with the switch on and loses exactly the self-test legs
-  with it off, observed by `bash tools/run-gates/run-gates.sh`.
-- **AC10** — every arm that can fail was observed failing against the pre-fix code, observed in
-  `2026-08-23-build-TOOL-dUnstalledConvoy-26-1-red-first.md`.
-- **AC11** — the full bar is green, observed by `bash tools/run-gates/run-gates.sh`.
+- **AC8** — a descriptor and the manifest disagreeing about `subject` is a refusal in both directions,
+  and the check reaches the EXEMPTED legs, observed in `tools/govkit/selftest.py`.
+- **AC9** — a target installed by govkit receives `subject` on its emitted legs, observed in
+  `tools/govkit/matrix.py`.
+- **AC10** — a manifest of only `kit` legs with the switch off REFUSES when the runner is driven over
+  it, observed in `tools/run-gates/run-gates.test.sh`.
+- **AC11** — govkit's install summary names how to run them once and on demand, observed in
+  `tools/govkit/selftest.py`.
+- **AC12** — every arm that can fail was observed failing against the pre-fix code, observed in
+  `2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md`.
+- **AC13** — the full bar is green under `GATE_FULL=1 GATE_SELFTESTS=1`, observed by
+  `bash tools/run-gates/run-gates.sh`.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh`, with `run-gates`' own self-tests and govkit's selftest and matrix
-as the legs that exercise this. `GATE_FULL=1` for the Definition of Done.
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. Both variables, because
+`GATE_FULL` alone skips every leg this unit's acceptance criteria are observed by.
 
 ## 8. Open questions
 
-- **F1 — one repo-wide switch, or per-kit?** RESOLVED: one. A per-kit matrix is a surface nobody
-  audits, and its failure mode is a kit silently exempt from its own tests — the shape this repo
-  already refuses for path exemptions.
-- **F2 — should `GATE_FULL` unlock them?** RESOLVED: no. `GATE_FULL` means "ignore every guard", and
-  conflating it with "run the kit's own tests" leaves no way to ask for a complete bar without them.
-  It is also the exact bypass that makes today's `guard = ["{kit}/"]` ineffective.
-- **F3 — does the flag default to on or off for THIS repo?** RESOLVED: off, like every adopter. This
-  repo dogfoods its kits, so it is the one place the switch will routinely be set — but a default that
-  differs between the source repo and its targets is two behaviours for one mechanism, and the first
-  thing that drifts.
+- **F1 — one repo-wide switch, or per-kit?** RESOLVED: one. A matrix is a surface nobody audits and
+  its failure mode is a kit silently exempt from its own tests.
+- **F2 — should `GATE_FULL` unlock them?** RESOLVED: no, and S5 is why it is safe to say so — the
+  stamp records the switch, so a full run without self-tests is legible rather than indistinguishable.
+- **F3 — which legs are `kit` and which are `repo`?** RESOLVED by S1's criterion rather than by a
+  list: a leg whose subject is the kit's own source is `kit`, one that reads the repository is `repo`.
+  rev-1 had no criterion, which is how four repo-subject legs were about to be swept off the bar.
+- **F4 — does the switch default on or off for THIS repo?** RESOLVED: off, like every adopter, with
+  the switch set in this repo's own pre-push and DoD invocation. A default that differs between the
+  source repo and its targets is two behaviours for one mechanism.
 
 ## 9. Revision log
 
-- rev-1 · 2026-08-23 · initial draft. Written against the code: the runner's wire format and its
-  `changed()` guard were read before the design, and the 29-leg population was derived from the
-  descriptors rather than counted by hand.
+- rev-2 · 2026-08-24 · spec audit returned BLOCKED with three blockers, all reproduced at base before
+  folding. The `gate-full-green` stamp conjoins `skips = 0`, so rev-1's skip would have silenced it
+  and pinned pre-push into forcing a full run forever — unmentioned in rev-1 and the reason its
+  "security — none" was backwards. The population was derived from one of govkit's two descriptor
+  roots and missed ten legs. And rev-1's own DoD invocation, `GATE_FULL=1`, skips every leg its ACs
+  are observed by. The membership criterion is now a declared `subject` field rather than a pattern,
+  which also keeps four repo-subject legs on the bar that rev-1 would have swept off.
+- rev-1 · 2026-08-23 · initial draft. Written against the runner's wire format and `changed()` guard,
+  but with the population globbed rather than read the way its consumer reads it.
 
 ## 10. Reuse audit
 
-The runner's per-leg wire format already carries four optional fields and this adds a fifth in the
-same shape. `[[gate_leg]]` already carries `guard` and `red_after_land`, and `kind` is an established
-descriptor idiom. The descriptor↔manifest cross-check already runs in both directions and already
-refuses a stale exemption; S7 extends it rather than adding a second checker. No new file, no new kit.
+The runner's per-leg wire format already carries optional fields and this adds one in the same shape.
+`[[gate_leg]]` already carries `guard` and `red_after_land`. The descriptor↔manifest cross-check
+already runs in both directions and already refuses a stale exemption; S8 extends it. `subject` reuses
+the vocabulary `f5f4732a` established rather than coining a second one. No new file, no new kit, no
+new script.

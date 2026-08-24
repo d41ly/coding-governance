@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d1e49632ce891935cfe86e10a12b767df715ea03
-phase: REVIEWING
+witness: 02f8495e3132c79b014ccf1ec331ef8448db5cc3
+phase: FOLDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 77a106cd
@@ -20,3 +20,5 @@ anchor-ref: refs/heads/main
 base: b164a29603cb4fa3e5533721252de164853f948d
 
 ## Parked
+
+2026-08-24T08:13:47Z review · item TOOL-dUnstalledConvoy-26 · reason verdict BLOCKED · blockers 3
