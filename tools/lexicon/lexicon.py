@@ -182,14 +182,27 @@ def _probe_defs(src: str, pset: str):
     return hits("functions"), hits("types"), hits("imports")
 
 
+def extract_text(src: str, mode: str, pset: str):
+    """`(functions, types, imports)` for SOURCE TEXT, or `None` when the mode declares no extractor.
+
+    Split out of `extract` so a caller holding BYTES rather than a path uses the SAME extractor.
+    `drift-audit`'s marginal-offense-rate signal derives its two operands from git blobs at two shas
+    and never writes a tree; a second implementation there would be the
+    `second-implementation-is-not-a-second-opinion` class inside the one instrument whose entire
+    value is that both of its operands come from one extractor. TOOL-dScaffoldedMirror-7 S4.
+    """
+    if mode == "dark":
+        return None
+    if mode == "parser":
+        return _python_defs(src)
+    return _probe_defs(src, pset)
+
+
 def extract(path: Path, mode: str, pset: str):
     """`(functions, types, imports)` for one file, or `None` when the mode declares no extractor."""
     if mode == "dark":
         return None
-    src = path.read_text(encoding="utf-8", errors="replace")
-    if mode == "parser":
-        return _python_defs(src)
-    return _probe_defs(src, pset)
+    return extract_text(path.read_text(encoding="utf-8", errors="replace"), mode, pset)
 
 
 def load_waivers(kit: Path, kind: str) -> dict[str, str]:

@@ -663,19 +663,19 @@ def render_region(build: dict) -> str:
             if r["state"] == "unbound":
                 out.append(f"| [{label}]({rel}) | — | *none — {r['reason']}* |")
             else:
-                out.append(f"| [{label}]({rel}) | {r['kind']} | {_collapse_ids(r['ids'])} |")
+                out.append(f"| [{label}]({rel}) | {r['kind']} | {_render_id_ranges(r['ids'])} |")
         named = {i for r in recs for i in r.get("ids", [])}
         audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
         own = [u["id"] for u in build["units"]]
         gap = [i for i in own if i not in named]
         agap = [i for i in own if i not in audited]
         if gap:
-            out += [""] + _wrap_prose_ids("Ids no record names:", gap)
+            out += [""] + _render_wrapped_ids("Ids no record names:", gap)
         if agap:
             # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit
             # record names EVER — a spec audited at rev-1 and since bumped does not appear here.
             # An "unreviewed" label would be a coverage claim the data cannot support.
-            out += [""] + _wrap_prose_ids("Ids no `spec-audit` record has ever named:", agap)
+            out += [""] + _render_wrapped_ids("Ids no `spec-audit` record has ever named:", agap)
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
@@ -683,10 +683,10 @@ def render_region(build: dict) -> str:
 IDS_WRAP = 300
 
 
-def _collapse_ids(ids: list) -> str:
+def _render_id_ranges(ids: list) -> str:
     """`FAMILY-slug-2 … FAMILY-slug-15` as `FAMILY-slug-2..15`, contiguous runs only.
 
-    A TABLE cell cannot wrap the way `_wrap_prose_ids` wraps a paragraph, so the bindings row needs
+    A TABLE cell cannot wrap the way `_render_wrapped_ids` wraps a paragraph, so the bindings row needs
     a shorter spelling rather than more lines. This is `TOOL-dUnstalledConvoy-13`: a record serving
     a build past about eleven units cannot fit the row under the entry cap BY CONSTRUCTION, because
     the row carries the filename, the path AND every id it serves. Measured at 505 characters for a
@@ -719,7 +719,7 @@ def _collapse_ids(ids: list) -> str:
     return " ".join(out)
 
 
-def _wrap_prose_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
+def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
     """`<prefix> <id> <id> ….` as one or more lines, none wider than `cap`.
 
     Consecutive non-blank lines join into ONE markdown paragraph, so the wrap is invisible to a
@@ -1276,25 +1276,25 @@ def do_selftest() -> int:
             fails.append(label)
             print(f"arm FAIL  {label} — expected to see: {want}\n      got: {got}")
 
-    # `_collapse_ids` — the bindings row's cap remedy (TOOL-dUnstalledConvoy-13). The COLLAPSING arm
+    # `_render_id_ranges` — the bindings row's cap remedy (TOOL-dUnstalledConvoy-13). The COLLAPSING arm
     # alone is the fixture-passes-by-finding-nothing shape: a stub returning its input joined would
     # fail it, but so would a greedy version that swallows a gap, and only the second arm can tell
     # those apart. The third holds the boundary at two, where a range is not shorter than the pair.
     arm("a contiguous run collapses to a range", "TOOL-dX-2..4",
-        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-4"]))
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-4"]))
     arm("a GAP is never swallowed by the range", "TOOL-dX-2..3 TOOL-dX-7",
-        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-7"]))
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-7"]))
     arm("a differing slug does not join a run", "TOOL-dX-2 TOOL-dY-3",
-        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dY-3"]))
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dY-3"]))
     arm("a non-numeric tail is emitted verbatim", "TOOL-dX-head",
-        lambda: _collapse_ids(["TOOL-dX-head"]))
+        lambda: _render_id_ranges(["TOOL-dX-head"]))
 
-    # `_wrap_prose_ids` — the gap lines' cap remedy. The arm asserts the WRAP, not the content: a
+    # `_render_wrapped_ids` — the gap lines' cap remedy. The arm asserts the WRAP, not the content: a
     # version that never wraps returns one line and fails on the count, which is the property the
     # 399-character overflow was about.
     arm("a long id list wraps below the cap", "True", lambda: str(
-        len(_wrap_prose_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
-        and max(len(x) for x in _wrap_prose_ids(
+        len(_render_wrapped_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
+        and max(len(x) for x in _render_wrapped_ids(
             "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
 
     with tempfile.TemporaryDirectory() as base:
