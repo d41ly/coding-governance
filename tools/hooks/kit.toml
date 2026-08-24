@@ -57,15 +57,18 @@ to = "{prefix}/hooks/scratch-guard.fragment.json"
 
 [[gate_leg]]
 name = "scratch-guard self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/hooks/scratch-guard.test.sh"]
 guard = ["{prefix}/hooks/"]
 
 [adopt]
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
+subject = "kit"
 
 [[gate_leg]]
 name = "agent-cap self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
 guard = ["{prefix}/hooks/"]
 
@@ -75,6 +78,7 @@ guard = ["{prefix}/hooks/"]
 none = """
 the kit ships a self-test that rides the bar as its own leg, and no adopter and no rendered artifact — so there is nothing here for `check` to run that is not already a gate. Whether the hook is WIRED is check-wiring's question, not this kit's
 """
+subject = "kit"
 
 [[lf_pin]]
 pattern = "*.fragment.json"

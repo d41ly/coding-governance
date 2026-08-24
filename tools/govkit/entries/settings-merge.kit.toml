@@ -38,3 +38,4 @@ the shipped engine DOES carry a check arm and this entry deliberately does not w
 name = "settings-merge selftest"
 argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
 guard = ["{prefix}/"]
+subject = "kit"

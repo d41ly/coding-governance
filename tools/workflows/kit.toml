@@ -26,9 +26,11 @@ why_no_adopter = "the harness is copied and its protocol rendered; the render is
 name = "verifier fan-out"
 argv = ["bash", "{kit}/check-verifier-fanout.sh"]
 guard = ["{kit}/"]
+subject = "repo"
 
 [[gate_leg]]
 name = "review-protocol parity (kit vs dogfood)"
+subject = "kit"
 argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
 
@@ -38,21 +40,25 @@ guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
 none = """
 the parity gate is this entry's leg and it performs its own render comparison; there is no adopter to ask
 """
+subject = "kit"
 
 [[gate_leg]]
 name = "verifier fan-out self-test"
 argv = ["bash", "{kit}/check-verifier-fanout.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "review-join ban (no ref-keyed join)"
 argv = ["bash", "{kit}/check-review-join.sh"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "workflow script syntax"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "review-join self-test"
@@ -62,6 +68,7 @@ guard = ["{kit}/"]
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+subject = "kit"
 [[lf_pin]]
 pattern = "{kit}/*.js"
 why = "measured: 350 CR bytes made the shipped harness unlaunchable while its own syntax leg stayed green"

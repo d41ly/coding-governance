@@ -62,6 +62,7 @@ name = "memory hygiene"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
 guard = []
 history_depth = "full"
+subject = "repo"
 
 [[hole]]
 id = "memory-tree-taxonomy"
@@ -90,21 +91,25 @@ the adopter accepts only `--scaffold`, measured. Its verifiers default to a chec
 name = "verdict epoch (kit version dates the engine)"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "verdict-epoch self-test"
 argv = ["bash", "{kit}/check-verdict-epoch.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "memory-hygiene self-test"
 argv = ["bash", "{kit}/check-memory-hygiene.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "row-keyed merge driver replay"
 argv = ["bash", "{kit}/merge-rows.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "kit/dogfood doc parity"
@@ -119,51 +124,61 @@ guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_
 # TWO carriers, because govkit copies a descriptor's declared guard verbatim into a target: fixing
 # gov's manifest alone would leave the half that SHIPS open, and the hole would be exported rather
 # than fixed.
+subject = "kit"
 
 [[gate_leg]]
 name = "method carriers (every pointer declared)"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "method-carriers self-test"
 argv = ["bash", "{kit}/check-method-carriers.test.sh"]
 guard = []
+subject = "kit"
 
 [[gate_leg]]
 name = "build README slot contract"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "build-index selftest"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "corpus-ids selftest"
 argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "gotchas selftest"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "row-grammar selftest"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "marker contracts"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
+subject = "kit"
 
 [[gate_leg]]
 name = "harness arms (fail branches armed or pinned)"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "check-arms selftest"
@@ -173,6 +188,7 @@ guard = ["{kit}/"]
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+subject = "kit"
 [[lf_pin]]
 pattern = "{memory_root}/**/*.md"
 why = "three gates byte- or char-compare these"

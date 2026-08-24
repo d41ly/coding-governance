@@ -41,8 +41,10 @@ the gate IS the check. Running it over a target's own charter is what the gate l
 [[gate_leg]]
 name = "micro-format definitions"
 argv = ["bash", "{prefix}/check-microformats.sh", "{playbook_path}"]
+subject = "repo"
 
 [[gate_leg]]
 name = "micro-format gate selftest"
 argv = ["bash", "{prefix}/check-microformats.test.sh"]
 guard = ["{prefix}/check-microformats.sh", "{prefix}/check-microformats.test.sh"]
+subject = "kit"

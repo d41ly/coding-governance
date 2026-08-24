@@ -858,7 +858,9 @@ def selfcheck(root: pathlib.Path) -> int:
     #          refuses a leg that is BOTH claimed and exempted.
     legs_path = root / "tools" / "gate-legs.json"
     if legs_path.is_file():
-        manifest = {leg.get("name") for leg in json.loads(legs_path.read_text(encoding="utf-8"))}
+        _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
+        manifest = {leg.get("name") for leg in _legs_json}
+        manifest_subject = {leg.get("name"): leg.get("subject") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -874,6 +876,26 @@ def selfcheck(root: pathlib.Path) -> int:
                            f"tools/gate-legs.json — a descriptor and the manifest are two spellings "
                            f"of one fact and this is the direction that deploys a leg a target's "
                            f"runner will never match")
+                else:
+                    # AND THEY MUST AGREE ABOUT SUBJECT. The name check above proves the leg exists
+                    # in both; it says nothing about whether they agree on which side of the bar it
+                    # sits. A descriptor saying `kit` against a manifest saying `repo` deploys a leg
+                    # that is held in the target and run here, or the reverse — two spellings of one
+                    # fact, drifting exactly where nobody is reading. TOOL-dUnstalledConvoy-26.
+                    d_sub = leg.get("subject")
+                    m_sub = manifest_subject.get(nm)
+                    if d_sub is None:
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with no `subject` — a leg "
+                               f"that does not say whose subject it is cannot be held or run "
+                               f"deliberately, and defaulting it here would hide the omission")
+                    elif d_sub not in ("kit", "repo"):
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' with subject '{d_sub}', "
+                               f"which is outside the closed set kit|repo — an unrecognised value "
+                               f"would be defaulted by every reader to whichever side it assumed")
+                    elif m_sub is not None and d_sub != m_sub:
+                        r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' while "
+                               f"tools/gate-legs.json says '{m_sub}' — the descriptor and the "
+                               f"manifest disagree about whether this leg runs by default")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
                 if re.search(r"\([^)]*\d[^)]*\)", nm):
@@ -2448,7 +2470,12 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                     raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
                                   f"target's receipt does not claim it — overwriting a leg the "
                                   f"target wrote silently deletes their own coverage")
-                row = {"name": nm, "argv": argv}
+                # SUBJECT TRAVELS. Without this the field never reaches an adopter and the whole
+                # mechanism stops at this repo's edge — a target would receive every kit self-test as
+                # an ordinary bar leg, which is the defect the unit exists to remove.
+                # Defaulted to `repo`, because an undeclared leg belongs ON the bar: the other
+                # default silently removes a leg the descriptor never spoke about.
+                row = {"name": nm, "argv": argv, "subject": leg.get("subject") or "repo"}
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 if nm in by_name:

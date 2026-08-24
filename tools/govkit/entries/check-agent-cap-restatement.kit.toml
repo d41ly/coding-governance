@@ -37,8 +37,10 @@ this entry IS a gate. Its self-test is the leg, and running a gate from `check` 
 name = "agent-cap restatement"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.sh"]
 guard = []
+subject = "repo"
 
 [[gate_leg]]
 name = "agent-cap restatement self-test"
 argv = ["bash", "{prefix}/check-agent-cap-restatement.test.sh"]
 guard = ["{prefix}/check-agent-cap-restatement.sh"]
+subject = "kit"

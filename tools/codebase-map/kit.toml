@@ -53,6 +53,7 @@ name = "codebase-map coverage + freshness"
 argv = ["python", "{gate_file}"]
 guard = []
 history_depth = "full"
+subject = "repo"
 
 [[hole]]
 id = "map-extractors"
@@ -73,6 +74,7 @@ the adopter accepts only `--scaffold`, measured. The kit ships runnable verifier
 name = "codebase-map kit selftest"
 argv = ["python3", "{kit}/selftest.py"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "codebase-map adopter e2e"
@@ -82,6 +84,7 @@ guard = ["{kit}/"]
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+subject = "kit"
 [[lf_pin]]
 pattern = ".codebase-map.conf"
 why = "a sourced conf: a CR reaches the shell as part of the value"

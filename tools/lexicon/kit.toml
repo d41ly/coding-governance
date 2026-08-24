@@ -53,16 +53,19 @@ means = "adopted"
 name = "lexicon naming predicates"
 argv = ["python", "{kit}/lexicon.py"]
 guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
+subject = "repo"
 
 [[gate_leg]]
 name = "lexicon selftest"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "lexicon wiring"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 guard = ["{kit}/"]
+subject = "repo"
 
 [[hole]]
 id = "lexicon-ratified"

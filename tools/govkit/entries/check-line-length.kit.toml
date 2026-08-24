@@ -34,8 +34,10 @@ the gate IS the check. Its leg runs it over whatever the target declared, and a 
 [[gate_leg]]
 name = "line length"
 argv = ["bash", "{prefix}/check-line-length.sh"]
+subject = "repo"
 
 [[gate_leg]]
 name = "line-length gate selftest"
 argv = ["bash", "{prefix}/check-line-length.test.sh"]
 guard = ["{prefix}/check-line-length.sh", "{prefix}/check-line-length.test.sh"]
+subject = "kit"

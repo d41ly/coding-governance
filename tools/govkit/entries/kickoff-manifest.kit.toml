@@ -37,6 +37,7 @@ argv = ["bash", "{prefix}/manifest-check.sh"]
 guard = []
 history_depth = "full"
 red_after_land = true
+subject = "repo"
 
 [[hole]]
 id = "manifest-section-b"
@@ -61,6 +62,7 @@ guard = []
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+subject = "repo"
 [[lf_pin]]
 pattern = "{user_skills}/session-kickoff/SKILL.md"
 why = "measured: 224 CR bytes under a gate that greps its text"

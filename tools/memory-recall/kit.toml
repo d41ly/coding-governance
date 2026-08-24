@@ -51,6 +51,7 @@ means = "adopted"
 name = "memory-recall kit selftest"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "memory-recall skill wiring"
@@ -60,6 +61,7 @@ guard = []
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
 # answer about which paths they govern, never these pattern strings.
+subject = "repo"
 [[lf_pin]]
 pattern = ".claude/skills/memory-recall/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

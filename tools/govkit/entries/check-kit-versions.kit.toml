@@ -41,3 +41,4 @@ this entry IS a gate, and it lands as a `seed` the target is expected to edit do
 name = "kit version markers"
 argv = ["bash", "{prefix}/check-kit-versions.sh"]
 guard = []
+subject = "repo"

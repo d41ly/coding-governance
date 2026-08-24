@@ -55,6 +55,8 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 # to strand a target on. It is the arm set for the two predicates a closing review found certifying
 # without measuring — an unrecognised `kits` member silently deleting a charter section, and a value
 # substituted verbatim into a markdown table row.
+subject = "repo"
 [[gate_leg]]
 name = "playbook render selftest"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]
+subject = "kit"

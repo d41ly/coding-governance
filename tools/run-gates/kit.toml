@@ -57,6 +57,7 @@ guard = ["{kit}/"]
 # Guarded on the kit dir ALONE, and that is COMPLETE rather than convenient: the harness drives the
 # profiler over its own `GATE_LEGS` fixtures in a scratch repo, so it reads nothing outside this kit —
 # not the real manifest, not the real timing cache. A guard may name what the leg READS.
+subject = "kit"
 
 [[gate_leg]]
 name = "run-gates turnstile"
@@ -66,6 +67,7 @@ guard = ["{kit}/"]
 # there, so the suite reads nothing outside this kit — not the real manifest, and deliberately not
 # the real beacon: a suite that queued against the repository it is testing would serialize itself
 # behind the very bar that is running it.
+subject = "kit"
 
 [[gate_leg]]
 name = "run-gates canary"
@@ -74,19 +76,23 @@ argv = ["bash", "{kit}/run-gates.test.sh"]
 # `apply` itself creates in the target — so the leg's own arrival changed the file it guards on and
 # the target ended wedged. A guard may name what the leg READS, never what installing it WRITES.
 guard = ["{kit}/"]
+subject = "repo"
 
 [[gate_leg]]
 name = "run-gates evidence"
 argv = ["bash", "{kit}/run-gates.evidence.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "run-gates adopter e2e"
 argv = ["bash", "{kit}/adopt-run-gates.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[gate_leg]]
 name = "run-gates wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
 guard = []
 
@@ -124,6 +130,7 @@ observed_reused = ["GATE reuse {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.
+subject = "repo"
 [[lf_pin]]
 pattern = "{kit}/*.sh"
 why = "a CRLF shell script does not execute"

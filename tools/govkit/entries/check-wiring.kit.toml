@@ -20,6 +20,7 @@ why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a
 
 [[gate_leg]]
 name = "check-wiring self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 
@@ -29,3 +30,4 @@ guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 none = """
 it IS the wiring checker. The runbook explicitly warns against running it as a merge-bar leg; running it from `check` is the same mistake through a different door. Its self-test is the leg
 """
+subject = "kit"

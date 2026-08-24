@@ -576,7 +576,7 @@ def main() -> int:
             (g / "tools" / "gate-legs.json").write_text(
                 json.dumps([{"name": "demo leg",
                              "argv": ["bash", "tools/memory-tree/engine.sh"],
-                             "guard": []}], indent=2) + NL,
+                             "guard": [], "subject": "repo"}], indent=2) + NL,
                 encoding="utf-8", newline=NL)
             (mt / "kit.toml").write_text(kit_toml, encoding="utf-8", newline=NL)
             (g / "tools" / "govkit" / "registry.toml").write_text(NL.join([
@@ -615,7 +615,10 @@ def main() -> int:
                          else 'include = ["engine.sh", "kit.toml"]')
             lines.append('role = "engine"')
             if leg_name is not None:
-                lines += ["[[gate_leg]]", 'name = "%s"' % leg_name,
+                # The fixture declares `subject`, because govkit now refuses a descriptor leg without
+                # one — a leg that does not say whose subject it is cannot be held or run
+                # deliberately. TOOL-dUnstalledConvoy-26.
+                lines += ["[[gate_leg]]", 'name = "%s"' % leg_name, 'subject = "repo"',
                           'argv = ["bash", "{kit}/engine.sh"]', "guard = []"]
             return NL.join(lines) + NL
 
@@ -1218,7 +1221,7 @@ user_skills = "/tmp/gk-fake-skills"
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                 f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n\n'
-                '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n',
+                '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\nsubject = "repo"\n',
                 encoding="utf-8", newline="\n")
             # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
             # the distinction that made this assertion necessary in the first place.

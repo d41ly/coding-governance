@@ -26,6 +26,7 @@ why_no_adopter = "the kit ships no adopter; adoption is merging its snippet into
 name = "pytest-guardrails self-test"
 argv = ["bash", "{kit}/pytest-parallel-guardrails.test.sh"]
 guard = ["{kit}/"]
+subject = "kit"
 
 [[hole]]
 id = "pytest-ini-knobs"
