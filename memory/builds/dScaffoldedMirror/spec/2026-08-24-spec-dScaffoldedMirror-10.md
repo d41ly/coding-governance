@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -261,7 +261,11 @@ must wait for a records-only exemption this repo does not currently have.
   quotes the negative definition and names `load`; until then the arm asserts only the token.
 - **AC3** — When `python tools/lexicon/lexicon.py --brief tools/memory-tree/gen_build_index.py` runs,
   its output carries one row per distinct object in that file and each row lists every leading token
-  live for that object across the corpus, with `do_check_format` showing both `do` and `cmd`.
+  live for that object across the corpus, flagging any object spelled more than one way. rev-1 named
+  `do_check_format` showing both `do` and `cmd`; `TOOL-dScaffoldedMirror-14` renamed every `do_` away
+  before this unit was built, so that example is GONE and its absence is the earlier unit having
+  worked. The live example the arm uses instead is `conf`, spelled `load` x9, `read` x1 and `budget`
+  x1 — the `load_conf`/`read_conf` conflict the research pass measured, surfaced by this verb.
 - **AC4** — When `--brief` is handed a path whose extension is declared `dark`, it prints
   `COVERAGE: dark` naming the extension, produces no established-here section, and exits `2`.
 - **AC5** — When either verb runs over any selftest fixture, its stdout contains neither
@@ -339,6 +343,14 @@ edit.
   from which the 750-token directory and the 7,996-byte list are drawn. Charter and block byte
   figures re-measured on this worktree while writing.
 - rev-1 status 2026-08-24 · KEPT whole and RE-ORDERED to land first or second. Three defects owed at rev-2: it reds three gate legs its own section 7 lists as green, AC9's byte literals are wrong by two (the measured delta is -33, landing at 64,361 and 48,794), and two map inventory keys go unclaimed.
+
+- rev-2 · 2026-08-25 · S1, S2, S3 and S6 BUILT; S4, S5 and S7 remain. AC3's stated example is GONE
+  and the spec now says why: `-14` renamed every `do_` away first, so `check_format` shows only
+  `cmd`. A criterion naming a live instance ages with the tree, and the honest repair is to name
+  what is live NOW rather than to weaken the criterion. AC1, AC2, AC4, AC5 and AC11 are met and
+  observed — AC11 at 84 ms worst of 20 against a 100 ms bar. AC2's FULL form works because
+  `TOOL-dScaffoldedMirror-8` S6/S7 landed first: `--suggest fetch_remote` names `load_remote` and
+  quotes the negative, which is the whole reason that split was taken.
 
 ## 10. Reuse audit
 

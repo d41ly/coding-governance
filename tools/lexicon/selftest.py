@@ -602,6 +602,54 @@ check("S6: a banned token that is itself a row is a finding",
       code != 0 and "itself a row" in out, out)
 check("S6: ...and it names the token", "add" in out.split("itself a row")[1][:60], out)
 
+# ---- TOOL-dScaffoldedMirror-10: the two SUPPLY verbs ---------------------------------------------
+#
+# Every arm here asserts that neither verb can behave like a gate. That is S6, and it is the property
+# that keeps "what the corpus does" from becoming "what the corpus should do": a report that can exit
+# 1 is a gate with a softer name.
+
+_U10 = {"core/a.py": "def build_index():\n    pass\n",
+        "core/b.py": "def render_index():\n    pass\n", **LAYER_SIDES}
+
+code, out = run_case(_U10, BASE_CONF, args=("--suggest", "build_index"))
+check("--suggest: a declared verb answers OK and exits 0", code == 0 and out.startswith("OK"), out)
+
+code, out = run_case(_U10, BASE_CONF, args=("--suggest", "fetch_remote"))
+check("--suggest: an off-table token names the REPLACEMENT from the NOT clause",
+      code == 0 and "load_remote" in out and "`load`" in out and "`fetch`" in out, out)
+check("--suggest: ...and quotes the negative definition rather than only the token",
+      "NOT `fetch`" in out, out)
+
+code, out = run_case(_U10, BASE_CONF, args=("--suggest", "frobnicate_thing"))
+check("--suggest: a token NO row bans says so, and still exits 0",
+      code == 0 and "no row bans it by name" in out, out)
+
+# S6 — the structural guards. A report that can exit 1, or that prints a pin, is a gate.
+for _v in (("--suggest", "fetch_remote"), ("--brief", "core/a.py")):
+    code, out = run_case(_U10, BASE_CONF, args=_v)
+    check(f"S6: {_v[0]} never exits 1", code != 1, f"rc={code} {out}")
+    check(f"S6: {_v[0]} prints no pin figure",
+          "_OFFENDER_PIN" not in out and "over pin" not in out, out)
+
+# --brief keys on the OBJECTS this file names, and reports every spelling live for each.
+code, out = run_case(_U10, BASE_CONF, args=("--brief", "core/a.py"))
+check("--brief: reports the file's object", code == 0 and "index:" in out, out)
+check("--brief: names EVERY spelling live for that object across the corpus",
+      "build" in out and "render" in out, out)
+check("--brief: and flags an object spelled more than one way",
+      "SPELLED MORE THAN ONE WAY" in out, out)
+check("--brief: says it decides nothing", "decides nothing" in out, out)
+
+# S3 — a dark extension REFUSES rather than printing an empty section, which would read as
+# "nothing is established, invent freely" and is byte-identical to "this language is not extracted".
+_DARK = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                          'LANGS="py:python-ast:parser conf::dark sh::dark"')
+code, out = run_case({**_U10, "scripts/go.sh": "build_it() {\n  :\n}\n"}, _DARK,
+                     args=("--brief", "scripts/go.sh"))
+check("--brief: a dark extension is a NAMED refusal, not an empty section",
+      code == 2 and "COVERAGE: dark" in out, out)
+check("--brief: ...and it says why an empty section would be worse", "invent freely" in out, out)
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

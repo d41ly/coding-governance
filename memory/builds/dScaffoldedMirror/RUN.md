@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: 500a5db6b8e056c11bbe1c3cd82a16bc186ada5a
 
 ## Parked
+
+2026-08-24T22:34:24Z decision · item drift-audit's non_terminal_specs_cited_by_product_source is 3 over pin 2 while this build is in flight · reason The two extra citations are TOOL-dScaffoldedMirror-8 and -10, both INPROGRESS, both cited by the code they specify. That is inherent to building: a unit's own source names its own unit id for provenance, per charter section 6, and the id is non-terminal until the unit closes. Options seen: (a) raise the pin, refused because a raisable ceiling is the defect this whole build exists to remove; (b) strip the ids from the comments, which trades provenance for a green signal and would have to be undone at close; (c) park, because BOTH units close inside this build and the count returns to the pin-2 baseline (aBatchedLintel-1, a known standing drain) before anything lands. Taking (c). If either unit ends the build non-terminal, this becomes a real finding rather than a transient one, and the close will say so.

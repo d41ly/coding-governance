@@ -119,7 +119,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | SPECCED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | INPROGRESS | rev-2 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-11 — the scoped extractor, and the one predicate it makes possible](spec/2026-08-24-spec-dScaffoldedMirror-11.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-12 — the consistency instrument, measured before it is believed](spec/2026-08-24-spec-dScaffoldedMirror-12.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | DEFERRED | rev-1 | 2026-08-24 |

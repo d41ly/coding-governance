@@ -5,6 +5,8 @@
     python tools/lexicon/lexicon.py            # assert; non-zero on an unwaived offender
     python tools/lexicon/lexicon.py --list     # print every offender, waived or not (authoring aid)
     python tools/lexicon/lexicon.py --measure  # print the three pins THIS conf produces; decide nothing
+    python tools/lexicon/lexicon.py --suggest <name>   # one line for ONE identifier, no corpus pass
+    python tools/lexicon/lexicon.py --brief <path>     # how the corpus already spells this file's objects
 
 WHAT THIS IS FOR, since it is not typo-catching. A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility, so a name that will not fit the table is
@@ -714,16 +716,179 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     return exit_code
 
 
+
+# ============================================================================================
+# TOOL-dScaffoldedMirror-10 — SUPPLY. The half of this kit with a measured record.
+#
+# Since the declaration landed, this repo added 136 definitions and zero offenders over a window in
+# which the gate refused NOTHING. That half works by delivering context, and it was delivered by a
+# session happening to open the conf. These two verbs hand the table to the author instead.
+#
+# THE GUARDS ARE STRUCTURAL, NOT STATED (S6). Section 12 of the charter bans a GATE whose vocabulary
+# is a mirror of the code it grades. Neither verb below is a gate: neither can exit 1, neither prints
+# a pin, and nothing in `scaffold_lexicon.py` imports either — so what the corpus DOES can never
+# become what the corpus SHOULD do by a path anyone can take. A promise would not survive a refactor;
+# the absence of a return path does.
+# ============================================================================================
+
+
+def build_banned_index(conf: dict) -> dict:
+    """`{banned-token: verb}` — the inverse of the NOT clauses, so a refusal can name the REPLACEMENT.
+
+    Depends on `TOOL-dScaffoldedMirror-8`'s structured grammar and does not re-parse it. A verb may
+    ban several tokens; a token banned by two verbs keeps the first, which the two asserts in that
+    unit make impossible to reach.
+    """
+    out = {}
+    for verb, banned in build_negatives(conf).items():
+        for tok in banned:
+            out.setdefault(tok, verb)
+    return out
+
+
+def run_suggest(root: Path, name: str) -> int:
+    """S1 — one deterministic line for ONE identifier. Reads the declaration and nothing else.
+
+    NO CORPUS PASS, deliberately and measurably: the whole value is that an author can ask before
+    writing, and a verb that walks 900 files to answer one question is a verb nobody waits for.
+    """
+    try:
+        conf = load_conf(root / CONF_NAME)
+    except (ConfError, OSError) as exc:
+        print(f"lexicon: cannot read the declaration: {exc}")
+        return 2
+    verbs = conf.get("VERBS") or {}
+    if not verbs:
+        print("lexicon: no VERBS declared; nothing to suggest against")
+        return 2
+
+    verb = leading_verb(name)
+    if not verb:
+        print(f"lexicon: {name} has no word characters, so it is ungradeable rather than wrong")
+        return 0
+    if verb in verbs:
+        print(f"OK — {name} leads with `{verb}`, which the declaration carries")
+        return 0
+
+    banned = build_banned_index(conf)
+    rest = name[len(verb):].lstrip("_") if name.lower().startswith(verb) else ""
+    if verb in banned:
+        want = banned[verb]
+        gloss = (verbs.get(want) or "").strip()
+        swap = f"{want}_{rest}" if rest else want
+        print(f"use `{swap}` — the declaration says `{want}`, NOT `{verb}`: {gloss}")
+    else:
+        print(f"`{verb}` is not in the declared table, and no row bans it by name. "
+              f"Declared verbs: {' '.join(sorted(verbs))}")
+    return 0
+
+
+def read_object(name: str) -> str:
+    """The OBJECT of an identifier: its subtokens after the leading one, rejoined.
+
+    `build_index` and `render_index` share the object `index`, which is what makes two spellings of
+    one concept comparable. A single-token name has no object and is not comparable to anything.
+    """
+    parts = subtokens(name)
+    return "_".join(parts[1:]) if len(parts) > 1 else ""
+
+
+def run_brief(root: Path, target: str) -> int:
+    """S2/S3 — for the objects THIS file names, which leading tokens are live across the corpus.
+
+    NOT A DIRECTORY HISTOGRAM, and the difference is not stylistic. A histogram of a directory's
+    off-table leading tokens is bounded by that directory's vocabulary: measured on one adopter test
+    directory, 750 distinct tokens and a 7,996-byte full list, so a top-nine line shows 1.2% of it and
+    the truncation that bounds the cost voids the signal. Keying on the objects the author's OWN file
+    already names is bounded by construction and surfaces the only drift class actually measured here
+    — one concept spelled two ways in two kits.
+
+    IT PRINTS WHAT THE CORPUS DOES, NEVER WHAT IT SHOULD DO. No verdict, no pin, no exit 1.
+    """
+    rel = target.replace("\\", "/")
+    p = root / rel
+    if not p.is_file():
+        print(f"lexicon: {rel} is not a file in this tree")
+        return 2
+
+    try:
+        conf = load_conf(root / CONF_NAME)
+    except (ConfError, OSError) as exc:
+        print(f"lexicon: cannot read the declaration: {exc}")
+        return 2
+    declared = {e: (ps, m) for e, ps, m in langs(conf)}
+    ext = ext_of(rel)
+    if ext not in declared:
+        print(f"COVERAGE: undeclared — .{ext} has no LANGS entry, so nothing is extracted for it")
+        return 2
+    pset, mode = declared[ext]
+    if mode == "dark" or (mode == "probe" and pset not in PATTERN_SETS):
+        print(f"COVERAGE: dark — .{ext} declares no extractor, so this file's definitions are not "
+              f"read at all. An empty section here would be indistinguishable from 'nothing is "
+              f"established, invent freely', which is why this refuses instead.")
+        return 2
+    print(f"COVERAGE: {mode} — .{ext}" + (f" ({pset})" if pset else "")
+          + ("; a probe is incomplete BY CONSTRUCTION" if mode == "probe" else ""))
+
+    got = extract(p, mode, pset)
+    here = sorted({read_object(n) for n, _ln in (got[0] if got else []) if read_object(n)})
+    if not here:
+        print("this file names no multi-token definition, so there is no object to compare")
+        return 0
+
+    live: dict = {}
+    for f in tracked_files(root):
+        e = ext_of(f)
+        if e not in declared:
+            continue
+        ps, md = declared[e]
+        if md == "dark" or (md == "probe" and ps not in PATTERN_SETS):
+            continue
+        try:
+            g = extract(root / f, md, ps)
+        except (SyntaxError, OSError):
+            continue
+        if not g:
+            continue
+        for n, _ln in g[0]:
+            obj = read_object(n)
+            if obj:
+                live.setdefault(obj, {}).setdefault(leading_verb(n) or "?", 0)
+                live[obj][leading_verb(n) or "?"] += 1
+
+    verbs = conf.get("VERBS") or {}
+    print("this prints what the corpus DOES, never what it should do — it decides nothing")
+    for obj in here:
+        seen = live.get(obj) or {}
+        shown = ", ".join(f"{v} x{c}" + ("" if v in verbs else " (off-table)")
+                          for v, c in sorted(seen.items(), key=lambda kv: (-kv[1], kv[0])))
+        flag = "  <-- SPELLED MORE THAN ONE WAY" if len(seen) > 1 else ""
+        print(f"  {obj}: {shown or 'no other definition names this object'}{flag}")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure"):
-        sys.stderr.write("usage: python tools/lexicon/lexicon.py [--check|--list|--measure]\n")
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--brief"):
+        sys.stderr.write("usage: python tools/lexicon/lexicon.py "
+                         "[--check|--list|--measure|--suggest <name>|--brief <path>]\n")
+        return 2
+    if mode in ("--suggest", "--brief") and len(argv) < 3:
+        sys.stderr.write(f"usage: python tools/lexicon/lexicon.py {mode} "
+                         + ("<identifier>\n" if mode == "--suggest" else "<path>\n"))
         return 2
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")
         return 2
-    return run(Path(out.stdout.strip()), list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
+    root = Path(out.stdout.strip())
+    # The two SUPPLY verbs return before `run()`, which is what keeps them off the gate path: they
+    # cannot reach a pin, a waiver or an exit code of 1 even by accident.
+    if mode == "--suggest":
+        return run_suggest(root, argv[2])
+    if mode == "--brief":
+        return run_brief(root, argv[2])
+    return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 
 if __name__ == "__main__":
