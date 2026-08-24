@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -133,12 +133,12 @@ row-grammar merge driver over the backlog shard.
 
 - **F1 — does the decision row supersede one id or two?** The census conclusion and the generated-prose
   record's non-goal are separate statements in separate records, and both refuse a build-README prose
-  template. Naming only one leaves the other standing. Recommendation: name both in one row, since one
-  decision reverses one policy however many records stated it.
+  template. Naming only one leaves the other standing. RESOLVED (agent, 2026-08-24, delegated): name both in
+  one row. One decision reverses one policy however many records stated it.
 - **F2 — is the drift audit's README mechanism pin re-baselined in this unit or after unit 7?** The
   signal scans exactly the authored region this build shrinks, so its value will move twice.
-  Recommendation: record it here and re-baseline after unit 7, so the pin is set against the corpus the
-  contract produced rather than against an intermediate state.
+  RESOLVED (agent, 2026-08-24, delegated): record the value here and re-baseline after unit 7, so the pin
+  is set against the corpus the contract produced rather than against an intermediate state.
 
 ## 9. Revision log
 
@@ -153,6 +153,7 @@ row-grammar merge driver over the backlog shard.
   is narrowed to the decision append; the dossier is not a member of that path. The generator's
   stale plan-pair comment is named as a stale RATIONALE under a rule that still holds, rather than
   folded into the dossier's factual errors.
+- rev-4 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

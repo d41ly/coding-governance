@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -178,12 +178,15 @@ retired per S4c.
 - **F1 — the five headerless legacy specs lose their only link.** They carry no status header, so they
   render no unit row and are not record paths, and after this unit nothing in the tree points at them.
   Options: accept the loss; give the units table a line naming specs that carry no status header; or
-  add them to the legacy-files registry with a reason. Recommendation: the units-table line, because it
-  is derived, costs one branch, and reports a real gap rather than hiding it. Owner decision.
+  add them to the legacy-files registry with a reason. RESOLVED (agent, 2026-08-24, delegated): the
+  units-table line naming specs that carry no status header. Most feature-rich of the three: derived,
+  one branch, and it REPORTS a real gap instead of hiding one. The registry records the loss without
+  reporting it, and accepting the loss records nothing.
 - **F2 — do the two coverage joins belong in the index region at all, once the records they summarise
   are rendered spec-side by unit 6?** Keeping them here means the build-level answer stays at the
   build level, which is right. Moving them would scatter one build-wide fact across every spec.
-  Recommendation: keep, as specced.
+  RESOLVED (agent, 2026-08-24, delegated): keep them at the build level. Moving them would scatter one
+  build-wide fact across every spec in the build.
 
 ## 9. Revision log
 
@@ -204,6 +207,7 @@ retired per S4c.
 - rev-4 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation;
   this spec's own Migration paragraph already carried the correct enumeration and is the wording the
   other five now follow.
+- rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

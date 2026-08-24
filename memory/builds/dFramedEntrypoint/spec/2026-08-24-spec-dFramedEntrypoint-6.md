@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -155,16 +155,19 @@ contract` · `check-kit-versions.sh` (leg `kit version markers`, unguarded) · `
 
 - **F1 — does the region carry the record's kind, or only its link?** The kind is what lets a reader
   tell a research report from a spec audit without opening it, and the coverage joins already key on it.
-  Recommendation: carry it, as specced.
+  RESOLVED (agent, 2026-08-24, delegated): carry the kind. It is what lets a reader tell a research report
+  from a spec audit without opening it, and the coverage joins already key on it.
 - **F3 — does `--write` gain path scoping, or does the corpus render in one commit?** Scoping keeps
   every intermediate state small and matches what §4 Migration promises; one commit matches unit 5's
   shape and needs no new argument. Recommendation: one commit, verified by re-running the verb rather
-  than by reading the diff, and the incremental language deleted — a new verb argument to make a
-  migration feel smaller is a mechanism bought for one use.
+  than by reading the diff, and the incremental language deleted. RESOLVED (agent, 2026-08-24, delegated): one
+  commit, no path scoping. A new verb argument bought for a single migration is a mechanism with a
+  fan-in of one, which is below this repo's own threshold for calling something a seam.
 - **F2 — should a spec's region also name the records that serve its BUILD but no unit?** An unbound
   record has a reason recorded in its own binding line and belongs to the build, not to a spec.
-  Rendering it at every spec would repeat one fact N times. Recommendation: no, and the build-level
-  answer stays with the build. Owner may disagree if unbound records prove hard to find after unit 5.
+  Rendering it at every spec would repeat one fact N times. RESOLVED (agent, 2026-08-24, delegated): no. An
+  unbound record belongs to the build rather than to a spec, and repeating one fact N times is the
+  duplication this build exists to remove.
 
 ## 9. Revision log
 
@@ -177,6 +180,7 @@ contract` · `check-kit-versions.sh` (leg `kit version markers`, unguarded) · `
   count.
 - rev-3 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
+- rev-4 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

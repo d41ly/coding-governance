@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -156,12 +156,15 @@ check 3's allowlist, with its arm in `check-memory-hygiene.test.sh` ·
 - **F1 — should the exempt pin start at the full corpus size or at the measured non-conforming count?**
   Starting at the full size means the first conformance does not move the number; starting at the
   measured count makes the pin bind immediately but requires unit 7 to land first.
-  Recommendation: start at the full size in this unit and let unit 7 lower it in the commit that seeds
-  the bound set, so neither unit depends on the other's ordering.
+  RESOLVED (agent, 2026-08-24, delegated): start at the full corpus size here, and let unit 7 lower it in
+  the commit that seeds the bound set. More feature-rich than the alternative: AC4 is satisfiable at
+  BOTH units' landings, and neither depends on the other's ordering.
 - **F2 — do build READMEs under a build with a terminal status ever leave the exempt list?** They are
   historical artifacts nobody resumes from, and their two judgement slots cannot be honestly authored
-  after the fact. Recommendation: they stay exempt permanently, with the reason recorded once in the
-  file's header rather than per row. Owner decision.
+  after the fact. RESOLVED (agent, 2026-08-24, delegated): permanently exempt, with the reason recorded
+  once in the file's header rather than per row. The alternative satisfies no acceptance criterion
+  here and would require authoring two judgement slots for builds nobody resumes from — the objection
+  this tree's review-verdict cutoff was set forward-only to avoid.
 
 ## 9. Revision log
 
@@ -177,6 +180,7 @@ check 3's allowlist, with its arm in `check-memory-hygiene.test.sh` ·
   and is false, and the paragraph now rests on the shape match it actually has.
 - rev-4 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
+- rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

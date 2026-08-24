@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -190,11 +190,14 @@ the new data files · `check-kit-versions.sh` (leg `kit version markers`, unguar
 - **F1 — do the ceilings ratchet down on a schedule, or only when an owner edits a row?** A schedule
   makes the budget shrink without anyone deciding to; a manual edit means it never shrinks. The
   measured precedent in this tree is that every cap moved manually and every movement is recorded with
-  its reason. Recommendation: manual, with `--report` making the margin visible. Owner decision.
+  its reason. RESOLVED (agent, 2026-08-24, delegated): manual. The scheduled option satisfies no
+  additional acceptance criterion in this spec and would move a declared ceiling with nobody deciding
+  to, which is the shape the charter's own gate rules refuse.
 - **F2 — is the advisory's persisted-log home sufficient, or should a breached high-water surface on
   the runner's own summary line?** Surfacing it on the summary needs a runner change, which widens
-  this unit past one mechanism. Recommendation: persisted log plus `--report` in this unit; a runner
-  advisory channel is its own follow-up if the log proves unread.
+  this unit past one mechanism. RESOLVED (agent, 2026-08-24, delegated): persisted log plus `--report`.
+  A runner advisory channel is a SECOND mechanism, and M2's one-mechanism-per-spec rule puts it in its
+  own unit rather than in this one.
 
 ## 9. Revision log
 
@@ -217,6 +220,7 @@ the new data files · `check-kit-versions.sh` (leg `kit version markers`, unguar
   scaffolded row with no ceiling value, legal and announced — rather than a promised outcome with no
   way to reach it. The high-water file gains its own absent-state semantics, which the rev-2 split
   created and did not define.
+- rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

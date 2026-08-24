@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -141,14 +141,19 @@ boundary.
 
 - **F1 — are all 12 live builds in the seed, or only those conformable without an owner judgement?**
   Some live READMEs carry improvements and detriments nobody ever wrote, and inventing them is the same
-  fault as conforming a terminal build. Recommendation: seed with the conformable subset and report the
-  remainder as still-exempt with the missing slot named, so the gap is visible rather than filled.
+  fault as conforming a terminal build. RESOLVED (agent, 2026-08-24, delegated): seed with the conformable
+  subset, and report the remainder as still-exempt with the missing slot NAMED, so the gap is visible
+  rather than filled. Inventing a judgement nobody held is the same fault S6 already forbids for a
+  terminal build.
 - **F2 — where do the evicted owner-decision and fork-ruling blocks actually go?** A spec's open-questions
   section holds a fork that belongs to that spec, but a kickoff ruling that binds a whole SET belongs to
   no single spec — and one build measured four dangling citations the last time such a block was
   relocated under cap pressure. Options: a build journal record with a stable name, cited by every spec
-  it binds; or the build-level rules slot, which is budgeted and short. Recommendation: the journal
-  record, with the citation shape fixed before the first move rather than after. Owner decision.
+  it binds; or the build-level rules slot, which is budgeted and short. RESOLVED (agent, 2026-08-24, delegated): a
+  build journal record with a stable name, cited by every spec it binds, and the citation shape fixed
+  BEFORE the first move. The rules slot is budgeted and short, so a ruling set routed there is evicted
+  again at the next cap movement; and one build measured four dangling citations the last time such a
+  block moved without a fixed shape.
 
 ## 9. Revision log
 
@@ -160,6 +165,7 @@ boundary.
   AC8 writes into. The alternatives paragraph is re-grounded on the terminal and node-ownership
   counts rather than on a retirement whose premise unit 8 corrects. The ceiling seeding is stated as
   this unit's, once.
+- rev-3 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

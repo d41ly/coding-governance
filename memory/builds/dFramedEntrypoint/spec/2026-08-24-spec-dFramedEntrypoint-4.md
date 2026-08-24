@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -155,13 +155,14 @@ markers`, unguarded) · `check-verdict-epoch.sh` · `kit/dogfood doc parity`.
 
 - **F1 — does the order verb become MANDATORY for new specs, and if so keyed on what?** The README
   class refused date keys because they exempt everything on the day they are set; the spec class has a
-  filename date and an existing precedent for exactly this shape. Recommendation: not in this unit,
-  and decided once this build has measured what adopting the verb actually costs an author.
-  Owner decision.
+  filename date and an existing precedent for exactly this shape. RESOLVED (agent, 2026-08-24, delegated): not
+  in this unit. Making it mandatory needs a dated cutoff over the SPEC class, which is a different
+  population with its own measurement, and taking it here would widen the unit past the one mechanism
+  M2 allows it.
 - **F2 — should an order value be required to be contiguous from one?** Gaps render silently today.
   Against requiring it: a gap is how a retired unit leaves an order without renumbering the rest, and
-  renumbering is the class this repo's id rules already refuse. Recommendation: permit gaps, and say so
-  in the grammar so the silence is a decision rather than an omission.
+  renumbering is the class this repo's id rules already refuse. RESOLVED (agent, 2026-08-24, delegated): permit
+  gaps, stated in the grammar so the silence is a decision rather than an omission.
 
 ## 9. Revision log
 
@@ -178,6 +179,7 @@ markers`, unguarded) · `check-verdict-epoch.sh` · `kit/dogfood doc parity`.
   an em-dash is three bytes rather than one. The measurement moves to AC8 and states its unit.
 - rev-4 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
+- rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

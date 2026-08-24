@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -217,7 +217,9 @@ refresh rather than a new claim. NOT `tools/gate-legs.json` — see S6.
   canon self-serving for every new build and removes the commonest way to fail it. Against: `--write`
   has never authored prose, and a scaffold shipping empty required bodies would red the shape check it
   was meant to satisfy. Recommendation: no scaffold in this unit; revisit if unit 7 measures authoring
-  friction as the dominant cost.
+  friction as the dominant cost. RESOLVED (agent, 2026-08-24, delegated): no scaffold. Veto 1 discards the
+  alternative outright — a scaffold shipping empty required bodies fails AC1 and AC5, which this
+  same spec writes.
 
 ## 9. Revision log
 
@@ -240,6 +242,7 @@ refresh rather than a new claim. NOT `tools/gate-legs.json` — see S6.
   read-path charge for this unit's BUILD-METHOD.md growth becomes its own S-item: round 1 asked for
   both halves and the first fold priced only unit 8's, which rev-3 then narrowed so it cannot cover
   this one. The stale `tools/gate-legs.json` entry in Files touched is DELETED rather than negated.
+- rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
 
 ## 10. Reuse audit
 

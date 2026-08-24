@@ -36,14 +36,14 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier](spec/2026-08-24-spec-dFramedEntrypoint-4.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | SPECCED | rev-3 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | SPECCED | rev-2 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | SPECCED | rev-3 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier](spec/2026-08-24-spec-dFramedEntrypoint-4.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | SPECCED | rev-4 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | SPECCED | rev-3 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | SPECCED | rev-4 | 2026-08-24 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
