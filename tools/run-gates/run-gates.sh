@@ -694,6 +694,18 @@ rows = [" ".join(str(i) for i in order)]
 # Defaulted to `repo`: a leg that has not declared is on the bar, because the other default silently
 # removes an undeclared leg from every run. NOTE: this program is inside a single-quoted shell block,
 # so a comment here may carry no apostrophe. TOOL-dUnstalledConvoy-26.
+#
+# THE CRITERION, and it is the ONE statement of it. Ask what a FAILURE of this leg MEANS:
+#
+#   "the kit source is broken"          -> subject = kit   (held; the owner asks for it)
+#   "this repository is misconfigured"  -> subject = repo  (on the bar, every run)
+#
+# Asking instead what a leg TESTS is the wording that does not decide, and it decided four legs
+# wrongly before this sentence replaced it. A kit whose product is a repository configuration —
+# the push and commit boundaries are the case — has a self-test that reads BOTH the kit source and
+# the live hook installed here, so "what does it test" has two true answers and the failure question
+# has one. Those four legs are `repo`: a broken boundary in THIS repository cannot wait for somebody
+# to remember a variable. TOOL-dUnstalledConvoy-30.
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")

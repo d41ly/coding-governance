@@ -56,7 +56,6 @@ guard = ["{prefix}/push-main.sh", ".githooks/"]
 none = """
 the self-test is this entry's gate leg and there is no rendered artifact to compare. The branch-guard region is a `merged` rule, and its drift arm is the merged writer's, not this key's
 """
-subject = "repo"
 
 [[gate_leg]]
 name = "pre-push self-test"

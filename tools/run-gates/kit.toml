@@ -130,7 +130,6 @@ observed_reused = ["GATE reuse {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.
-subject = "repo"
 [[lf_pin]]
 pattern = "{kit}/*.sh"
 why = "a CRLF shell script does not execute"

@@ -48,4 +48,3 @@ guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"
 none = """
 this entry IS a gate. Its self-test is the leg, and running a gate from `check` would make `check` a second merge bar rather than a verifier of the install.
 """
-subject = "kit"

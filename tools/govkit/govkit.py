@@ -887,7 +887,10 @@ def selfcheck(root: pathlib.Path) -> int:
                     if d_sub is None:
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' with no `subject` — a leg "
                                f"that does not say whose subject it is cannot be held or run "
-                               f"deliberately, and defaulting it here would hide the omission")
+                               f"deliberately, and defaulting it here would hide the omission. "
+                               f"The criterion is stated once, at the `subject` field declaration "
+                               f"in tools/run-gates/run-gates.sh: ask what a FAILURE of this leg "
+                               f"MEANS, not what it tests")
                     elif d_sub not in ("kit", "repo"):
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' with subject '{d_sub}', "
                                f"which is outside the closed set kit|repo — an unrecognised value "

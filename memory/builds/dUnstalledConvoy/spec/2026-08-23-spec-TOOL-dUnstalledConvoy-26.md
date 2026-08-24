@@ -68,6 +68,12 @@ editing the kit, while the SELF-TESTS read the kit. rev-1 tried to name the seco
 - **Re-subjecting the repo-subject legs.** `kit/dogfood doc parity`, `review-protocol parity`,
   `marker contracts` and `run-gates canary` read the REPOSITORY — the canary holds the manifest
   key-set pin and the guard-liveness refusal — and they stay on the bar under `subject = "repo"`.
+  CORRECTED by `TOOL-dUnstalledConvoy-30` (2026-08-24): that list read as exhaustive and was not.
+  Four more legs are `repo` — `pre-push self-test`, `branch-guard self-test`, `push-main self-test`
+  and `run-gates gov canary` — because a failure of any of them means this repository has a broken
+  push or commit boundary, which cannot wait for somebody to remember a variable. This spec's §4
+  criterion asked what a leg TESTS, and against `push-main.kit.toml` that wording puts all four on
+  the held side; `-30` replaces it with what a leg FAILURE MEANS.
 
 ## 4. Design
 
