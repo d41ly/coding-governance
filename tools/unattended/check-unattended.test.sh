@@ -286,6 +286,13 @@ reset_tree
 reset_tree; sed -i 's/^AUTH_MODES=.*/AUTH_MODES=unparseable/' tools/unattended/unattended.sh
 hit "$(run)" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true"
 
+# ---- the same read, one set over (TOOL-dNarrowedAnchor-1), and the DIRECTION of the failure is why
+# ---- it gets its own refusal rather than a default. An unreadable AUTH_MODES makes checks keyed on
+# ---- it vacuously TRUE; an unreadable SECOND_ANCHOR_MODES makes check 29 treat every mode as
+# ---- inadmissible, so it would red every branch-anchored run in the tree instead of passing them.
+reset_tree; sed -i 's/^SECOND_ANCHOR_MODES=.*/SECOND_ANCHOR_MODES=unparseable/' tools/unattended/unattended.sh
+hit "$(run)" "cannot read SECOND_ANCHOR_MODES from the driver, so check 29 would treat every declared mode as inadmissible on the second anchor and red every branch-anchored run in the tree"
+
 # ---- checks 2 and 3: the CORE sets are one-directional. Deleting a member reds; ADDING a project
 # ---- member is green — and that green half is the arm that keeps the check from being "the sets
 # ---- must be exactly the core sets", which would make PHASES_EXTRA and DOD_EXTRA unusable.
@@ -1599,11 +1606,13 @@ hit  "$(run)" "a run-state file records an authorization mode outside the kit's 
 miss "$(run)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 anchor_restore
 
-# ---- THE README SIDE. MEASURED while writing this arm: the whole mode block is guarded by
-# ---- `[ -n "$recmode" ]`, so a SILENT record never computes `dmode` and this branch is unreachable
-# ---- from any fixture whose record carries no mode. That guard is correct — a legacy record is
-# ---- outside the arm by construction — and it means the fixture must pair a LEGAL recorded mode
-# ---- with an ILLEGAL declared one. The agreement branch fires too on that pair, which is expected;
+# ---- THE README SIDE. The fixture must pair a LEGAL recorded mode with an ILLEGAL declared one,
+# ---- because check 19 lives inside the `[ -n "$recmode" ]` guard: a record carrying no mode of its
+# ---- own is outside this arm by construction, and that is correct for a legacy record.
+# ---- The ORIGINAL note here said the reason was that a silent record never computes `dmode`. That
+# ---- stopped being true at TOOL-dNarrowedAnchor-1, which hoisted the `dmode` derivation ABOVE the
+# ---- guard so check 29 could reach every record. The requirement is unchanged; the reason for it
+# ---- is now the guard alone, and a measured claim that has quietly gone false is worse than none. The agreement branch fires too on that pair, which is expected;
 # ---- this arm asserts only its own message, because asserting the absence of the other would be
 # ---- asserting a coincidence rather than a behaviour.
 anchor_break add_bad_mode
@@ -1611,6 +1620,39 @@ sed -i '/^base: /a mode: slug' memory/builds/tRun/RUN.md
 git add -A >/dev/null
 hit "$(run)" "the build README at a run's recorded BASE declares an authorization mode outside the kit's published set, so the authorization names a discipline no kit member defines - legal values are"
 anchor_restore
+
+# ---- check 29: THE SECOND ANCHOR IS ADMISSIBLE PER MODE, and the bar has its own opinion of it.
+# ---- The fixture is a base on the `unit` branch and NOT on the advertised default branch, which is
+# ---- exactly what the second anchor produces — no stub, because the discriminator is an ancestry
+# ---- test against a real advertisement and a fixture that faked it would assert this file's own
+# ---- imagination. The README at that base carries no `authorized-by:` key, which reads as `slug`.
+reset_tree
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+hit "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+
+# ---- ...and the ADMITTED direction, which is the only thing separating this check from one that
+# ---- reds every branch-anchored run. Same base, same anchor, one declared mode different.
+reset_tree
+sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md
+git add -A >/dev/null && git commit -q -m prompt-mode --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+miss "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+
+# ---- ...and CANNOT TELL stays silent. With no remote there is no advertised default-branch tip, so
+# ---- the ancestry test has nothing to run against. A leg that reds a fleet on a network fault is
+# ---- worse than one that waits for the next run, and without this arm the guard could red on
+# ---- absence and every other arm here would still pass.
+reset_tree; mkconf
+git commit -q --allow-empty -m unit-only --no-verify
+sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
+git add -A >/dev/null
+git remote remove origin
+miss "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+git remote add origin "$ORIGIN"
+reset_tree
 
 # ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two

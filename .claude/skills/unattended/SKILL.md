@@ -90,7 +90,9 @@ It is [below](#produce-pieces-attended), after the unattended paths it shares it
    On the **default-branch** anchor that means committed before your branch existed, and preflight
    REFUSES a build folder you created — a run that authorizes itself has no authorization. Where the
    project declares **published**, the tip the remote advertises for your OWN branch also counts, so a
-   run may author its build folder and push it; protocol section 1 states what that costs, and the
+   run may author its build folder and push it — but only where the build folder declares
+   `authorized-by: prompt` or `recipe`. A `slug` folder, which is what NO `authorized-by:` key means,
+   is refused on that anchor; protocol section 1 states what the anchor costs, and the
    run-state file records which anchor was used. You still do not create the run-state file:
    preflight does that.
    **If the build is not on the default branch, PUSH YOUR BRANCH FIRST.** Where the project declares
@@ -167,6 +169,11 @@ path above or do ordinary attended work.
 `default-branch` there is no anchor a build folder you author can resolve at, so every step below
 would end in the refusal step 1 names, with its remedy inert. If the value above is not `published`,
 say so and stop — do not start, and do not write a build folder nothing can authorize.
+
+**And `authorized-by: prompt` in step 3 is not bookkeeping.** The second anchor is admissible per
+MODE: omit that key and the folder reads as `slug`, which is refused on this anchor because `slug`
+means a folder that already existed. The refusal arrives AFTER the push, where there is no owner turn
+left to ask about it.
 
 The steps are ORDERED and the order is the point. Everything before the push is provably older than
 the commit that authorizes the run; everything after it is contemporaneous with a run already
