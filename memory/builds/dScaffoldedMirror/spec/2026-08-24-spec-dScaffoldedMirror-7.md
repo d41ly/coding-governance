@@ -1,13 +1,13 @@
 # TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
 Nothing in this kit measures the owner's actual demand — are new generations constrained. The one
 result that reframes the whole build, 136 definitions and zero offenders since the table landed, is
 one agent's afternoon over eight days with a named confound, and re-deriving it today under a
-plainly stated keying gives 21.2% instead of 0% (§4). Ship a standing `drift-audit` signal:
+plainly stated keying gives 21.2% instead of 0% (§4). Ship a standing `drift-audit` signal (`build_lexicon_marginal_offense_rate`):
 offenders ADDED per definition ADDED between a derived base and HEAD, both operands produced at both
 shas by the kit's own extractor. Nothing authored, nothing raisable. This unit discharges owner
 ruling `TOOL-dScaffoldedMirror-17` — it is what makes the benefit measurable and therefore what
@@ -16,8 +16,10 @@ who writes it.
 
 ## 2. Scope (IN)
 
-- **S1** — `signal_lexicon_marginal_offense_rate` in `tools/drift-audit/drift_report.py`, reporting
-  offenders added and definitions added over the window, with `gateable: False`.
+- **S1** — `build_lexicon_marginal_offense_rate` in `tools/drift-audit/drift_report.py`, reporting
+  offenders added and definitions added over the window, with `gateable: False`. The leading verb is
+  `build`, which is row 1 of the declared table, so this unit adds NO offender and moves no pin —
+  see §4, where rev-1's contrary claim is recorded and corrected.
 - **S2** — the base is DERIVED, never declared: the commit that first added `.lexicon.conf`,
   resolved as `git log --diff-filter=A --format=%H -- .lexicon.conf | tail -1`. On this repo that is
   `b0626152`, 2026-08-16. The window is "everything since the declaration existed", which is the
@@ -161,18 +163,40 @@ Who writes it is this unit's builder, in this unit's commit. A supersession land
 unit's commit than the mechanism that discharges it is a supersession nobody will find, which is the
 failure mode `TOOL-dScaffoldedMirror-17` exists to prevent.
 
-### The pin this unit moves, and the phase order it depends on
+### The pin this unit does NOT move, and the false premise that said it did
 
-Every signal in `drift_report.py` leads with `signal_`, and `signal` is off-table — the conf's own
-archaeology records the last two arrivals raising the pin 415 → 417 for exactly this reason. So this
-unit adds one offender and `VERB_OFFENDER_PIN` moves 463 → 464, which under
-`TOOL-dScaffoldedMirror-5` needs a `463 -> 464` marker within 14 lines above the pin. Its helpers
-take `measure` and `derive`, both already in the table, so the count is one and not four.
+**rev-1 asserted "every signal in `drift_report.py` leads with `signal_`" and that is false.**
+Measured on this worktree at `287b7e67`: of the ten signal functions, eight lead with `signal` and
+**two already lead with `build`** — `build_live_backlog_rows` (`:791`) and
+`build_readme_mechanism_drift` (`:923`). `build` is row 1 of the declared table and `signal` is in it
+nowhere. So the naming was never forced, the 463 → 464 move was never owed, and the
+`TOOL-dScaffoldedMirror-5` marker it would have needed is not written.
 
-That is only true while this unit lands before `TOOL-dScaffoldedMirror-9`. After the freeze, a
-post-freeze offender cannot be grandfathered and cannot be raised away, so the name would have to
-change or a waiver would have to carry it. Phase 0 before Phase 4 is what keeps this a one-line pin
-move; if the order slips, this becomes a renaming question and the spec should be re-read.
+The correction is worth more than the line it saves, because rev-1's reasoning was the exact shape
+this build exists to remove: it read the corpus, found a convention, and proposed to raise a ceiling
+to accommodate it — without checking whether the convention was universal. It was not. **Naming the
+new signal `build_` costs nothing and the pin stays at 463.**
+
+The phase-order dependency dissolves with it. rev-1 made this unit's cost conditional on landing
+before `TOOL-dScaffoldedMirror-9`, because a post-freeze offender can be neither grandfathered nor
+raised away. With no offender there is nothing for the freeze to catch, so this unit is
+order-independent and its Phase-0 position is now a value judgement about what should be measured
+first rather than a constraint.
+
+### What reading of this signal KILLS the pressure chain
+
+No spec in the set says what would falsify the plan, so this one does. **If the rate over files
+written fresh in the window stays at or below roughly 5% across two further readings, the pressure
+chain — `TOOL-dScaffoldedMirror-4`, `-9`, and `-11`'s cut fourth pin — should be abandoned rather
+than deferred.** That is the reading which says the declaration already constrains the generations
+and the enforcement half is buying nothing, which is the research pass's own thesis stated as a
+number a later session can check. §4's first table puts that figure at 4.3% today, so the plan is
+already one reading into its own refutation and the honest posture is that `-9` is on probation
+rather than merely queued.
+
+The converse binds too: a rate that CLIMBS in fresh files across two readings is the evidence `-9`
+was always missing, and it promotes the pressure chain from probation to scheduled. Either way the
+decision is a reading rather than an argument, which is what the plan lacked.
 
 ### Files touched (estimate)
 
@@ -238,10 +262,16 @@ move; if the order slips, this becomes a renaming question and the spec should b
   rather than serving the cached rate, proving the S7 cache key includes the table digest.
 - **AC6** — When `bash tools/run-gates/run-gates.sh` runs after the change, `drift-audit selftest`,
   `drift-audit records`, `lexicon naming predicates`, `lexicon selftest` and `lexicon wiring` are
-  green, with `VERB_OFFENDER_PIN` at `464` and its `463 -> 464` marker in place.
+  green, and `VERB_OFFENDER_PIN` is UNCHANGED at `463` — the rev-1 move to `464` was owed to a
+  premise §4 now records as false. `python tools/lexicon/lexicon.py --measure` prints `463`.
 - **AC7** — When `grep -n "unmeasurable" tools/lexicon/README.md memory/map/features/lexicon.md`
   runs after the change, it returns nothing, and both files instead cite
   `TOOL-dScaffoldedMirror-17` and this signal.
+
+- **AC8** — When the signal's docstring is read, it carries §4's kill-reading verbatim: the
+  fresh-file rate at or below ~5% across two further readings abandons the pressure chain. Grep
+  `grep -c "pressure chain" tools/drift-audit/drift_report.py` returns non-zero. A falsifier that
+  lives only in a spec is a falsifier nobody applies.
 
 ## 7. Gates
 
@@ -279,10 +309,37 @@ records` leg and its arms ride `drift-audit selftest`. The leg count is not the 
   conclusion but does show that the figure is not yet a measurement.
 - rev-1 status 2026-08-24 · KEPT and RE-ORDERED to land FIRST in the six-unit build. Two corrections owed at rev-2: the signal name leads with a token outside the declared table, and this spec's pin move rests on a false premise - two `SIGNALS` entries already lead with `build`. Add the sentence no spec in the set contains: what reading of this signal KILLS the pressure chain.
 
+- rev-2 · 2026-08-24 · folded the spec-set review under the six-unit ruling. THREE changes, two of
+  them corrections to rev-1's own reasoning. The signal is renamed to lead with `build`, and §4
+  records WHY rev-1 got it wrong: it read the corpus, found a convention, and proposed raising a
+  ceiling to fit it without checking the convention was universal — two signal functions already
+  lead with `build`, measured. The pin move and its marker are deleted and AC6 inverts to assert
+  463 UNCHANGED. §4 gains the kill-reading no spec in the set carried, and AC8 puts it in the
+  shipped docstring rather than leaving it here. §10 gains the recall terms M5 requires and the
+  liveness convention the recall probe surfaced and `reuse_lookup` did not.
+
 ## 10. Reuse audit
 
+**The recall terms, which rev-1 omitted and M5 requires** — the composing is the expensive half and
+M7 re-runs the query at every pass boundary:
+
+```bash
+python tools/memory-recall/query.py "why is a drift-audit signal reported rather than gated, and what makes a derived-base measurement honest" \
+  --terms "drift signal gateable pin ratchet derived operand liveness DEAD PROBE vacuous selector baseline trend"
+```
+
+**That probe found a binding convention `reuse_lookup` did not, which is the case for running both.**
+`dClosedLexicon`'s review B2 rules that *every signal's liveness must be an expression over something
+it measured*, and records that six of the eight signals then existing already derived it. Re-measured
+here: of the sixteen `"live"` expressions in `drift_report.py`, **four are still the literal `False`**
+and the rest are expressions over a measured population (`checked > 0`, `pop > 0`, `bool(used)`). S5
+conforms to the convention rather than inventing one, and this is where that is recorded — a spec
+that satisfies a rule by accident is indistinguishable from one that never read it.
+
 `python tools/codebase-map/reuse_lookup.py signal marginal rate liveness derivation` returns the
-`derive_*` family in `tools/playbook/render_playbook.py` (nine functions, all fan-in 0), the gotcha
+`derive_*` family — rev-1 placed it in `tools/playbook/render_playbook.py`; re-run at `287b7e67` the
+top hits are `derive_install_order` and `derive_rule_kind` in `tools/govkit/govkit.py`, both fan-in 1,
+and the correction is recorded rather than silently patched — the gotcha
 class `assertion-between-two-derived-values.md`, and the inventory key `derive [lexicon-verbs]`. The
 `derive_*` family is a naming echo rather than a seam — each one reads a deploy answer for the
 renderer and none of them touches a sha, a tree or a population. The gotcha class is a hazard this
