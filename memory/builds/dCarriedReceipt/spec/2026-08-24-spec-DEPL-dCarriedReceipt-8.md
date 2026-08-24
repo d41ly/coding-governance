@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -39,7 +39,22 @@ This unit is where `gov_oid` starts meaning gov's blob at `commit` and keeps mea
 - **S2** — the raw-write branch at `:3069-3073` writes `oid` and `gov_oid` as the same gov blob.
   The two agreeing there is not a coincidence to maintain, it is the definition of that arm.
 - **S3** — `oid != gov_oid` is the local-delta predicate, recomputed per run from `-7`'s index read
-  against the row's `gov_oid`. No stored boolean expresses it, here or anywhere.
+  against the row's STORED `gov_oid`. No stored boolean expresses it, here or anywhere. A row a
+  proven `carry` rung explains reads `oid != gov_oid` TOO, because a filtered or relocated copy is
+  never byte-identical to gov's blob. Such a row is NOT a local delta in the adopter-edit sense; it
+  is CARRIED, and the two states are distinguished by `-9`'s proof rather than by this predicate.
+  `-9` owns the rung and this unit does not restate its mechanism. The one consequence that binds
+  here is that a proven rung leaves `o_state` alone, so the verdict still comes from the unchanged
+  `VERDICT_GRID` (`:2843`) and the row RECONCILES through this unit's `three_way` (`:2897`) with
+  `-9`'s rung already applied. A proven rung therefore never re-opens the raw-write arm **through the
+  `stale` cell**: `stale` sits on the `equal` OURS row of the grid, and a carried row is not on it.
+  The arm at `:3069-3073` is guarded by `v == "stale" or v == "missing"`, and the second half is NOT
+  closed by this reasoning — `missing` comes from the `absent` OURS row (`:2887-2888`), which a
+  carried row the target DELETED does reach, with no `ours` bytes left to prove a rung against. That
+  cell is `-9` S11's, and it writes the CARRIED form from the row's own directory pair rather than
+  gov's raw bytes. Stating only the `stale` half here is what made rev-3's version of this bullet
+  false in exactly the case S11 exists for. Read the bullet as licensing a rung row onto the raw arm
+  by either route and the destruction this unit exists to close comes straight back in through `-9`.
 - **S4** — a delta row routes to `three_way` (`:2897`) ALWAYS and is never eligible for the
   raw-write arm again. `-7` already routes the predicate into the grid's OURS axis, so this is
   structural rather than a second branch; what this unit adds is the ASSERTION that it is
@@ -54,8 +69,9 @@ This unit is where `gov_oid` starts meaning gov's blob at `commit` and keeps mea
 
 ## 3. Non-goals (OUT)
 
-- **Not** the `carry` rungs. A delta a rung would explain still reads as a delta here; `-9` is what
-  narrows it, and this unit must not pre-empt the ladder by guessing at one rung of it.
+- **Not** the `carry` rungs. A carried row still reads `oid != gov_oid` here and still routes to the
+  three-way; what `-9` adds is the PROOF of which rung explains the difference and the reconciliation
+  that proof enables. This unit must not pre-empt the ladder by guessing at one rung of it.
 - **Not** strict mode. inCMS's policy that vendored kits carry zero local edits makes a delta row a
   violation rather than a merge, and that flag is keyed on the target descriptor. This unit makes
   the state expressible; it does not decide anyone's policy.
@@ -133,10 +149,14 @@ vintages), and one `selfcheck` predicate.
 - testing + left-shift gates — the class is "a receipt field written by one side and read as the
   other", and AC5 gates it structurally over `VERDICT_GRID` rather than over the one row that
   exposed it.
-- migration / rollback — a receipt already carrying a corrupted merge stamp is repaired on the first
-  run after this unit lands, because `gov_oid` is recomputed from `blob_at(root, commit, source)`
-  rather than trusted from the file. An adopter whose edit was already destroyed is not recoverable
-  by this unit, and the landing note says so.
+- migration / rollback — `gov_oid` is STORED and trusted from the file, per the owner decision of
+  2026-08-24 recorded in `-7` S3 and in F4 below; nothing recomputes it per run. It is DERIVED once,
+  from `blob_at(root, row["commit"], row["source"])`, on the schema-2 to schema-3 upgrade `-7`
+  performs, and that one derivation is what repairs a receipt already carrying a corrupted merge
+  stamp: the corrupted `sha256` is carried into neither identity. From schema 3 onward the stored
+  field is kept honest by `-7` S9's preamble assertion over every row that carries it, which refuses
+  by name rather than repairing silently. An adopter whose edit was already destroyed is not
+  recoverable by this unit, and the landing note says so.
 - user docs — `WIRE-INTO-PROJECT.md`'s update section gains the sentence that a row with a local
   delta is merged on every subsequent update and is never overwritten.
 
@@ -189,9 +209,29 @@ no new leg file.
   the new field names, so the AC1 sequence reproduces identically at `9ddcc5c9` and on `-7`'s tip;
   the measurement above is the `9ddcc5c9` one, and the build re-runs it on `-7`'s tip before fixing.
   RESOLVED (agent, 2026-08-24, delegated): observe on both, fix on `-7`'s tip.
+- **F4 — is `gov_oid` stored in the receipt, or recomputed from `blob_at(root, commit, source)` on
+  every read?** Stored. Recomputed was the rejected alternative, and the reason is `-13`: with
+  `gov_oid` derived from `commit` at read time, `commit` alone would determine the base every row is
+  compared and merged against, so `-13`'s `evidence: "pinned"` would assert nothing
+  `evidence: "vintage-match"` does not already assert — there would be nothing pinned. The cost of
+  storing it is a field that can go stale through a text merge of `install.json`, and that cost is
+  paid by `-7` S9's per-row integrity refusal rather than absorbed.
+  RESOLVED (owner, 2026-08-24): stored, with `-7` S9's per-row integrity refusal.
+- **F5 — what relation must `--to` bear to the receipt's `gov_commit`?** A BACKWARDS `commit` is the
+  rejected alternative. Today `:2940-2944` validates `--to` with `rev-parse --verify` and nothing
+  compares it to `receipt["gov_commit"]`, so `update --to <older sha>` raw-writes every clean row
+  backwards and rewinds `receipt["gov_commit"]` at `:3126`. This unit does not close that, and says
+  so rather than leaving it implied: the two refusals — `--to` a descendant of the receipt's commit,
+  and `--to` reachable from some ref — land in `-12`, each with its `refusal_join.py` arm.
+  RESOLVED (agent, 2026-08-24, delegated): backwards rejected; both refusals are `-12`'s.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-3 fold: S3's rev-3 sentence was FALSE in exactly the case `-9` S11
+  exists for. It claimed a proven rung never re-opens the raw arm at `:3069-3073` because that arm
+  sits on the grid's `equal` row — but the arm is guarded by `v == "stale" or v == "missing"`, and
+  `missing` comes from the `absent` OURS row at `:2887-2888`, which a carried row the target DELETED
+  does reach. S3 now closes both routes and hands the second to `-9` S11 by name.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every cited
   line was opened at `9ddcc5c9`, and the destruction was reproduced rather than inferred: install,
   rewind, local edit, merge at `372e6b2a`, overwrite at `9ddcc5c9`, local line count 1 then 0. Two
@@ -203,6 +243,22 @@ no new leg file.
   is described as routing a delta row to the three-way always, and the honest mechanism is that
   `-7` feeds the delta predicate into the grid's OURS axis, which makes the raw-write arm
   unreachable for such a row structurally rather than by a second guard.
+- rev-2 · 2026-08-24 · folded the pre-code review: the migration line now matches the owner's
+  decision that `gov_oid` is STORED rather than recomputed, naming the one derivation on the
+  schema-2 upgrade as the repair path and `-7` S9's assertion as what keeps the stored field honest.
+  §8 gains F4, which records recomputation as the rejected alternative and what it would cost
+  `-13`'s `evidence: "pinned"`, and F5, which records a BACKWARDS `commit` as the rejected `--to`
+  relation and points the two new refusals at `-12` rather than at this unit. S3 gains the
+  one-sentence `-9` qualification, without which a builder reading this spec alone builds a grid in
+  which no proven `carry` rung can ever take an automatic write.
+- rev-3 · 2026-08-24 · round-2 fold: S3 is rewritten so the rung case is explicit rather than
+  implied. A rung row reads `oid != gov_oid` like any other, is NOT a local delta in the
+  adopter-edit sense, and reconciles through the three-way with `-9`'s rung already applied, so the
+  raw-write arm stays closed on it. The bullet now cross-references `-9` instead of restating its
+  base-and-theirs cancellation, and rev-2's closing clause is gone because a builder taking
+  "no proven rung ever reaches an automatic write" literally builds exactly the raw-arm defect this
+  unit closes. §3's matching non-goal is restated the same way so the two cannot drift, and §5's
+  migration line is aligned with `-7` S9's field-presence scoping.
 
 ## 10. Reuse audit
 

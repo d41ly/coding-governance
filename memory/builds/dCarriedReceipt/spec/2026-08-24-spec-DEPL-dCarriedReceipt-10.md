@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-10 — role `forked`, report-only
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -27,11 +27,18 @@ report it instead of writing it.
 - **S3** — `UNLANDED_REASON` (`:236`) gains a `forked` line, which is what makes `selfcheck` arm 7g
   (`:843`) demand an `UPDATE_ROLE` row for it without that demand being written twice.
 - **S4** — `UPDATE_ROLE` (`:2857`) gains `"forked": "report"`, the disposition `-2` introduces. A
-  forked row prints one line with its verdict and its `direction`, is counted in the tally, and is
-  NEVER written in either direction.
+  forked row prints one line with its verdict and, WHEN THE ROW CARRIES ONE, its `direction`; it is
+  counted in the tally and is NEVER written in either direction. The printer TOLERATES an absent
+  `direction`: `how = UPDATE_ROLE.get(role)` at `:2974` keys on the RECEIPT's role, so a row reaches
+  this printer from receipts this unit never wrote — one stamped before the role existed, or one
+  whose descriptor has since changed its keys — and a printer that raises `KeyError` on a
+  report-only row converts a report into a crash. The missing-key refusal is S5's, and it fires on
+  DESCRIPTORS only.
 - **S5** — a `forked` rule declares two required keys, and a descriptor that omits either is a
   `selfcheck` failure by name. `direction` is one of `gov-from-target`, `target-from-gov` or `both`,
-  and `record` is the id that ratified the fork.
+  and `record` is the id that ratified the fork. The demand is on the DESCRIPTOR rule and nowhere
+  else: a receipt row is read by S4's printer, never validated by it. Required on write, tolerated
+  on read — the refusal lives where an operator can fix it.
 - **S6** — a `selfcheck` arm over gov's own kit-source surface: any source whose head carries a
   `FORKED from` header must be claimed by a rule whose role is `forked`. The predicate was run over
   the real tree before being proposed; §4 records what it hits and what it nearly hits.
@@ -39,7 +46,8 @@ report it instead of writing it.
   the SAME commit as S6. Without it S6 reds gov's own registry on the first run and the unit cannot
   land alone.
 - **S8** — `selftest.py` arms for each new refusal branch, plus one asserting a `forked` row is
-  reported and not written by `update --write`.
+  reported and not written by `update --write`, and one asserting a `forked` row with no `direction`
+  is printed rather than raised on.
 
 ## 3. Non-goals (OUT)
 
@@ -69,9 +77,13 @@ into a target-owned file", which is a statement about `merged` and is false of a
 kind previews from the pool like every non-blocked role, prints its own mark, and carries its own
 reason.
 
-The descriptor rule shape, and the receipt row, both carry `direction` and `record`. Neither has a
-default: an unstated direction is the same silence `version_from` already refuses, and a fork with no
-ratifying record is a fork nobody agreed to.
+The DESCRIPTOR rule declares `direction` and `record`, and neither has a default: an unstated
+direction is the same silence `version_from` already refuses, and a fork with no ratifying record is
+a fork nobody agreed to. A written receipt row COPIES both from the rule that produced it — `-13` S5
+binds a row's role and these two keys to the rule `resolve_entry` returned rather than to any
+measurement — but the update-side printer treats them as OPTIONAL on read, because `UPDATE_ROLE` is
+keyed on the receipt's role (`:2974`) and a receipt outlives the descriptor that wrote it. Required
+on write, tolerated on read: one rule, two call sites, and no crash on the report path.
 
 One pre-existing hazard sits directly under S1 and is recorded because a builder will meet it.
 `LANDABLE_ROLES` is assigned TWICE at module level: a literal `("engine", "seed")` at `:230` and the
@@ -133,7 +145,7 @@ the one of the three that is accidentally safe today.
 ### Files touched (estimate)
 
 `tools/govkit/govkit.py` (~30 lines across the four tables, the plan summary and the update
-dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py` (5 arms).
+dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py` (6 arms).
 
 ## 5. Production-readiness checklist
 
@@ -146,15 +158,21 @@ dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py`
 - i18n — N/A.
 - error / empty / loading states — a `forked` rule missing `direction` or `record` fails by name in
   `selfcheck` rather than defaulting; a `forked` row in a receipt whose descriptor no longer declares
-  the role is reported, not written, because `UPDATE_ROLE` is keyed on the RECEIPT's role.
+  the role is reported, not written, because `UPDATE_ROLE` is keyed on the RECEIPT's role — and such
+  a row prints without a `direction` rather than raising on the missing key.
 - observability — every forked row prints with its `direction` and its `record`, so the operator sees
   which way the derivation runs and which decision authorised it, without opening the file.
 - risks — the residual risk is a fork with no header, which the S6 arm cannot see. Named rather than
   implied: the arm gates the class "a file gov marked as forked is declared as forked", not the class
   "every fork is marked". The second needs a convention nobody can enforce from inside the tool.
-- testing + left-shift gates — five `selftest.py` arms plus the standing `selfcheck` predicate. The
-  finding left-shifted is the memory-recall landmine, gated as a class over the whole registry rather
-  than as a fix to three files.
+- testing + left-shift gates — SIX `selftest.py` arms, which is the number §4 estimates and the
+  number S8 plus F3 enumerate: one per new refusal branch (S5's missing `direction`, S5's missing
+  `record`, S6's undeclared fork), one asserting a `forked` row is reported and not written by
+  `update --write`, one asserting a `forked` row carrying no `direction` is printed rather than
+  raised on, and F3's bounded-head arm placing a marker below the 40-line bound and expecting no
+  hit. They sit alongside the standing `selfcheck` predicate, which is a gate rather than an arm.
+  The finding left-shifted is the memory-recall landmine, gated as a class over the whole registry
+  rather than as a fix to three files.
 - migration / rollback — none on disk. A receipt written before this unit carries no `forked` row, so
   nothing to migrate; reverting the role returns those three files to `engine`, which is the state
   this unit exists to end.
@@ -183,13 +201,18 @@ dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py`
   computed and never printed.
 - **AC6** — `selfcheck`'s existing arm 7g stays green: every key of `UNLANDED_REASON` and every
   member of `LANDABLE_ROLES` still has a row in `UPDATE_ROLE`, now including `forked`.
+- **AC7** — A receipt row carrying `role: "forked"` and NO `direction` key — the shape a receipt
+  written before this unit produces, and the shape a descriptor edit leaves behind — is printed and
+  counted by `govkit.py update --write`, writes no bytes, and the run exits `0`. Observe RED first:
+  a printer that reads `row["direction"]` raises `KeyError` on that row, turning the report
+  disposition into a traceback on the one path that exists to avoid acting.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs. This unit adds refusal branches — S5's two missing-key refusals and S6's — so
 `tools/govkit/refusal_join.py` applies: every branch needs an arm asserting it, and the shrink-only
-`BRANCH_PIN` at `161` is raised to the new live count in the same commit, with the old and new values
+`BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` is raised to the new live count in the same commit, with the old and new values
 named beside it as that file's own convention requires.
 
 ## 8. Open questions
@@ -213,6 +236,7 @@ named beside it as that file's own convention requires.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason `-5` records.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every table
   and line number cited was opened at `9ddcc5c9`; the landmine was reproduced end to end rather than
   reasoned about, and the S6 predicate was run over the real tree before it was proposed. Three
@@ -224,6 +248,18 @@ named beside it as that file's own convention requires.
   `.claude/hooks/recall-opened.js`, which no descriptor claims. Third: the landmine is two live rows
   rather than one — inCMS declares `.claude/hooks/recall-opened.js` as `engine` as well, and gov's
   copy of that file is also a fork.
+- rev-2 · 2026-08-24 · folded the pre-code review: B3's `-10` half, which is that this unit made
+  `direction` and `record` required on BOTH the descriptor rule and the receipt row while `-13` wrote
+  forked rows carrying neither. The keys are now required on the DESCRIPTOR and tolerated on the
+  receipt row S4's printer reads, with the reason stated — the dispatch at `:2974` keys on the
+  receipt's role, so rows this unit never wrote reach that printer — and AC7 observes it. The
+  companion half, binding a row's role to the rule rather than to the attribution walk, is `-13` S5's
+  and lands there.
+- rev-3 · 2026-08-24 · round-2 fold: the selftest arm count no longer contradicts itself. §5 said
+  five arms while §4's files-touched estimate said six; re-counted against S8 and F3 the answer is
+  SIX — three refusal branches, the reported-not-written arm, the absent-`direction` arm, and F3's
+  bounded-head arm — so §5 now enumerates them and §4's estimate stands unchanged. Logged at the
+  foot of this section because this file's revision log runs oldest-first.
 
 ## 10. Reuse audit
 
@@ -243,4 +279,6 @@ does today, so no precedence machinery changes.
 The S6 arm extends `selfcheck`'s existing per-entry descriptor sweep, walking the same `descs` map
 and the same `rule_sources` helper that arms 3 and 4 already walk, rather than adding a second pass
 over the registry. `refusal_join.py`'s anchor-based join needs no change: the new branches are
-ordinary `r.fail` call sites inside the functions it already enumerates.
+ordinary `r.fail` call sites inside the functions it already enumerates — and the count does not
+move on the read side, because the receipt-row tolerance added at S4 is the ABSENCE of a branch
+rather than another one.

@@ -1,18 +1,23 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
 After `-7` a receipt row carries two identities, `gov_oid` and `oid`, and `oid != gov_oid` is the
 local-delta predicate. On its own that predicate is too blunt to install anything. An adopter at a
 non-default `prefix` differs from gov on every file that spells a path, so those rows read as local
-deltas forever and never take an automatic write — which is the state both live targets are in.
+deltas forever: the raw-write arm is closed to every one of them, and each is handed to a three-way
+whose `base` still spells gov's prefix where the target's own copy does not, so gov's change reaches
+only the hunks whose context does not name the path. That is the state both live targets are in.
 Measured on inCMS at `2cff5855` against each row's own recorded gov commit: of the 52 rows whose
 commit resolves, 21 are byte-identical, 6 differ only in line endings, and 5 differ only by the
-prefix relocation. Eleven rows carry no local edit at all and the blunt predicate refuses every one.
+prefix relocation. Eleven rows carry no local edit at all and the blunt predicate calls every one a
+local delta.
 This unit explains the difference with a per-row `carry` rung — `verbatim`, `eol` or `relocate` —
-recomputed by proof on every run and never read back from the receipt.
+recomputed by proof on every run and never read back from the receipt. A proven rung does not open
+the raw-write arm. It corrects what the three-way is handed, so such a row RECONCILES automatically
+to the carried bytes with no operator turn (S9), and what the row is stamped with afterwards is S12.
 
 ## 2. Scope (IN)
 
@@ -38,14 +43,52 @@ recomputed by proof on every run and never read back from the receipt.
 - **S7** — the run prints one line per dropped ambiguous gov directory and one line naming the pair
   count and the needle count, so a map that silently collapsed is visible rather than inferred.
 - **S8** — `selftest.py` arms: one per rung, one for the ambiguity drop, one for the `~` form, one
-  for the no-rescan property, one asserting the three-way sees only the semantic change, and one
-  asserting a stored `carry` in a fixture receipt is ignored.
+  for the no-rescan property, one asserting the three-way sees only the semantic change, one
+  asserting a stored `carry` in a fixture receipt is ignored, one over a reconciled `relocate` row's
+  resulting INDEX blob (AC8), one over a DELETED `relocate` row's restore (AC9) and one over the ROW
+  that restore leaves behind (AC10) — ten arms.
+- **S9** — a proven rung sets `carry` and does NOT change `o_state`. The ours-vs-receipt comparison
+  (`:2889`) is untouched, the verdict still comes from the UNCHANGED `VERDICT_GRID` (`:2843-2853`),
+  and no rung may move a row into the raw-write arm at `:3069-3071`. A rung row that diverges lands
+  on `diverged` and RECONCILES through the three-way per S6: the rung is applied to `base` and
+  `theirs`, it cancels in the base-to-theirs diff, and `git merge-file` sees only gov's semantic
+  change. Reconciliation to the CARRIED bytes is the outcome; a raw write of gov's un-carried bytes
+  is not, so a stale rung can never revert a target's spelling. The reconciled row is stamped per
+  S12.
+- **S10** — reporting. A rung row whose gov copy did NOT move classifies `("differs","equal")` =
+  `"patched"` (`:2847`), which is a LIE for a `relocate` row: the target edited nothing. The verdict
+  print (`:3024`) labels such a row `carried (relocate)`, sourced from `carry` and from nothing else,
+  and the tally counts it under the label it printed.
+- **S11** — the `missing` restore arm carries too. `classify_row` returns `o_state = "absent"`
+  (`:2887-2888`), both `("absent", …)` cells are `"missing"` (`:2850-2851`), and `missing` shares the
+  raw arm at `:3069-3071` — so a rung-carrying row the target DELETED would be restored with gov's
+  un-carried bytes, because there are no `ours` bytes to prove a rung against. The restore derives
+  `relocate` from the row's OWN `(dirname(source), dirname(path))` pair, which needs no bytes and is
+  exactly S3's derivation, applies THAT ONE pair's needles rather than the whole map, and writes the
+  carried form. The restored row is stamped per S12, and NOT with the stamp `-8` gives the rest of
+  that arm — gov's blob into BOTH identities — which over carried bytes would leave the receipt
+  claiming the target holds gov's copy while it holds the target's own spelling.
+- **S12** — ONE stamping rule, covering both arms of this unit that write bytes gov does not hold:
+  S9's reconcile and S11's restore. `oid` records the blob ACTUALLY WRITTEN — the merged bytes on
+  S9's arm, the carried form on S11's — and `gov_oid` keeps the meaning `-8` gives it, gov's blob at
+  the row's `commit`, which either write advances to `to_commit`. So `oid != gov_oid` holds
+  afterwards, and it reads "this row carries a rung": the state a `relocate` row is in after any
+  normal reconcile, and NOT a local delta, because `carry` is re-proved on the next run (S2) and
+  re-explains the difference. This NARROWS one cell of `-8`'s write table rather than contradicting
+  it. That table's raw arm puts gov's blob into both identities for `stale` and `missing` alike, and
+  a `missing` row this unit restores in the carried form is the one row on that arm whose written
+  bytes are not gov's. Taking the un-narrowed stamp is the corrupt pairing: two identities recorded
+  EQUAL over bytes gov never shipped, which the next run reads as a clean gov-owned row and
+  raw-overwrites back to gov's prefix.
 
 ## 3. Non-goals (OUT)
 
-- **Not** a write-time transform. `alpha` is a PROOF instrument: it is applied to gov's bytes only to
-  compare them, never to produce bytes that get landed on the strength of the map alone. That
-  alternative was measured and is rejected in §4.
+- **Not** a write-time transform, with ONE bounded exception. `alpha` is a PROOF instrument: it is
+  applied to gov's bytes only to compare them, never to produce bytes that get landed on the strength
+  of the map alone. That alternative was measured and is rejected in §4. The exception is S11's
+  `missing` restore, where the target holds no bytes to prove anything against and the alternative is
+  writing gov's prefix into a target that does not use it; it applies the row's own single pair,
+  never the derived map.
 - **Not** an authored, overridable or descriptor-declared map, and **not** a free-form rewrite rule
   or line-level partial application. All three sit on the build-wide cut list.
 - **Not** rename detection. A row whose target path moved is `-11`, and this unit must not grow a
@@ -60,8 +103,9 @@ recomputed by proof on every run and never read back from the receipt.
 ### Data model
 
 One new row field, `carry`, holding `verbatim`, `eol`, `relocate`, or absent. It is output, not
-input. No other receipt shape changes, and a receipt written before this unit reads identically
-after it — every rung is recomputed from the two identities the row already carries.
+input. No other row field changes; the only other on-disk move is the schema stamp below, and a
+schema-3 receipt written before this unit still READS identically here — every rung is recomputed
+from the two identities the row already carries.
 
 ### Inventory
 
@@ -104,8 +148,13 @@ the dirname lift keeps `tools/hooks` to `.claude/hooks` separate from it.
   rewrites although it names no prefix at all, and lines 132-133, where the fixture builds a
   directory literally named `my tools/unattended` and the needle turns it into `my scripts`. Under
   the proof gate this row simply matches no rung and stays a local delta, and none of those six
-  lines is ever written. Measured more widely: of the 27 rows that are green by identity today, a
-  blanket write-time rewrite changes the bytes of 17.
+  lines is ever written. The wider blast-radius figure this bullet used to carry — "27 rows green by
+  identity, 17 flipped" — is WITHDRAWN as unsourced: the pre-code review could not reproduce it under
+  eight populations and the fold could not under two more, and no population is named that would. The
+  rejection does not need it. It rests on the six lines above, re-opened at `ce5dca99` while folding:
+  the four `bash tools/land.sh` occurrences are lines 34, 63, 83 and 91, and the `my tools/unattended`
+  construction is lines 132-133. A blast-radius count, if one is ever wanted, comes from the shipped
+  derivation rather than from a reconstruction of it.
 - *Lift each row to a directory pair by stripping EQUAL trailing segments.* Measured and rejected;
   it is also the form the design brief carries, and it is wrong. Stripping `unattended` as an equal
   segment collapses `tools/unattended` into the bare gov directory `tools`, which then collides with
@@ -120,21 +169,34 @@ the dirname lift keeps `tools/hooks` to `.claude/hooks` separate from it.
 
 ### Migration
 
-None. `carry` is additive and derived; a schema-2 receipt written before this unit is read
-identically after it, and the field is recomputed on the first run regardless of what it holds.
+**The schema number does not move for this unit.** `-7` S6 performs the one bump this build takes,
+2 to 3, and `-13` §4 Migration defines schema 3 as the generation carrying every field this build
+adds — `gov_oid`, `oid`, `carry` and `evidence` — so no later unit mints a second number. The
+constant's own comment at `:39` reads "bumped by any unit that adds a per-**role** row field";
+`carry` adds no role, and a build that bumped once per contributing unit would ship three numbers for
+one generation, which is the drift the single-owner rule exists to prevent.
+
+There is no migration CONTENT either: `carry` is derived output, recomputed on the first run whatever
+the row holds, so a schema-3 receipt written before this unit lands reads identically after it.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~70 lines: the derivation, the substituter, the rung ladder inside
-`classify_row`, the two report lines), `tools/govkit/selftest.py` (7 arms), and one fixture receipt
-carrying a non-default prefix and a deliberately ambiguous gov directory.
+`tools/govkit/govkit.py` (~90 lines: the derivation, the substituter, the rung ladder inside
+`classify_row`, S10's label, S11's restore arm, S12's stamp on both carried arms, the two report
+lines), `tools/govkit/selftest.py` (10 arms), and one fixture receipt carrying a non-default prefix,
+a deliberately ambiguous gov
+directory, a `relocate` row whose gov copy moved, and a `relocate` row the target deleted.
 
 ## 5. Production-readiness checklist
 
-- security — the rung ladder WIDENS the automatic-write arm, which is the one direction that needs
-  argument. It is contained by S5: a rung opens the arm only after proving whole-file equality
-  against bytes gov holds, so a row admitted here is one whose content is provably a mechanical
-  restatement of gov's, and the raw-write arm stays closed to every row that is not.
+- security — the rung ladder does NOT widen the automatic-write arm, and that is the point. A proven
+  rung sets `carry` only; `o_state`, the verdict grid and the raw arm at `:3069-3071` are untouched
+  (S9). What a rung buys is the MERGE path: with the rung applied to `base` and `theirs` (S6),
+  `git merge-file` applies gov's change cleanly, emits the carried spelling, and costs the operator
+  no turn — zero conflicts rather than a new class of raw write. S5 still bounds it: a rung is proved
+  on WHOLE-FILE equality against bytes gov holds, and a row that proves no rung keeps exactly the
+  verdict it has today. S11's restore is the ONE arm that writes carried bytes without a bytes-proof,
+  and it fires only where the target holds no bytes at all.
 - perf / scale — one extra whole-file comparison per non-identical row, and at most one substitution
   pass per such row. The measured population is 92 rows, and the blob reads that dominate the run
   already happen. No new subprocess.
@@ -151,12 +213,19 @@ carrying a non-default prefix and a deliberately ambiguous gov directory.
   while the target genuinely edited one of them. That requires the edit to be exactly the
   substitution, in which case the bytes are gov's answer anyway. The larger risk runs the other way
   and is accepted by design: a row like `adopt-unattended.test.sh` will never take an automatic
-  write, and that is the correct outcome rather than a gap.
-- testing + left-shift gates — seven `selftest.py` arms (S8). The classes left-shifted are "a
-  substitution that chains" and "a map with an ambiguous key", both gated directly rather than
-  through the row that exposed them.
-- migration / rollback — none; revertible as a pure addition. Dropping the field returns every row to
-  the `-7` and `-8` behaviour with no on-disk change.
+  write, and that is the correct outcome rather than a gap. S11's restore carries a residual of its
+  own: a literal inside a restored file that happens to spell the row's own directory pair is
+  rewritten with it. That is accepted because the alternative on that arm is writing gov's prefix
+  into a target that does not use it, and the arm fires only on a file the target deleted.
+- testing + left-shift gates — ten `selftest.py` arms (S8). The classes left-shifted are "a
+  substitution that chains", "a map with an ambiguous key", "a rung row reverted to gov's spelling by
+  the raw arm", "a deleted carried row restored un-carried" and "carried bytes stamped as though gov
+  wrote them", all gated directly rather than through the row that exposed them.
+- migration / rollback — the schema stamp does not move for this unit; `-7` S6 owns the build's only
+  bump and schema 3 already names `carry`. A rollback that drops the field therefore leaves a
+  schema-3 receipt every reader still accepts.
+  Otherwise a pure addition: the field is derived, and dropping it returns every row to the `-7` and
+  `-8` behaviour with no other on-disk change.
 - user docs — `WIRE-INTO-PROJECT.md` gains one paragraph beside the update step naming the three
   rungs and stating that a row with no rung is never written automatically.
 
@@ -185,14 +254,34 @@ carrying a non-default prefix and a deliberately ambiguous gov directory.
   classifies exactly as it does at `9ddcc5c9`.
 - **AC7** — A fixture receipt carrying a hand-written `"carry": "relocate"` on a row that provably
   matches no rung classifies as a local delta anyway, and `python tools/govkit/govkit.py update`
-  never reads the stored value.
+  never reads the stored value. After `--write` that receipt reads `"schema": 4`, and a schema-3
+  fixture still classifies without refusal.
+- **AC8** — A fixture `relocate` row whose gov copy MOVED between the row's `commit` and `to_commit`
+  RECONCILES rather than reverts: after `python tools/govkit/govkit.py update --write`, the blob the
+  TARGET's index holds for that path — read with `git -C <target> rev-parse :<path>` — spells the
+  target's `scripts/` prefix AND carries gov's new semantic line. Observe RED first: at `9ddcc5c9`
+  that row takes the raw arm at `:3069-3071`, lands gov's `tools/` spelling verbatim, and exits 0.
+- **AC9** — A fixture `relocate` row the target DELETED classifies `missing` and is restored in the
+  CARRIED form: the restored file spells `scripts/`, and its index blob is NOT gov's blob for that
+  source. Observe RED first: at `9ddcc5c9` the same row is restored from `c["theirs"]` at `:3071`
+  with gov's `tools/` spelling, because `o_state` is `absent` (`:2887-2888`) and there are no `ours`
+  bytes to prove a rung against.
+- **AC10** — the STAMP that restore leaves, over the AC9 fixture, asserting both halves together.
+  After `python tools/govkit/govkit.py update --write` the restored file spells the target's
+  `scripts/` prefix and spells gov's `tools/` nowhere, AND the row it left behind reads
+  `"carry": "relocate"` with `oid` equal to `git -C <target> rev-parse :<path>` and `gov_oid` equal
+  to gov's blob at the row's `commit`, so `oid != gov_oid` holds. The arm fails against a draft that
+  writes the carried bytes and then takes `-8`'s raw-arm stamp: the two identities come back EQUAL
+  over bytes gov never shipped, and the NEXT run reads that row as clean and raw-overwrites it back
+  to `tools/`. Observe RED first: at `9ddcc5c9` there is no `carry` key at all and the single
+  `sha256` field holds gov's own bytes.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
-selfcheck` legs. Adds seven arms and one fixture; adds no new leg file. It adds NO refusal branch —
+selfcheck` legs. Adds ten arms and one fixture; adds no new leg file. It adds NO refusal branch —
 the ambiguity drop reports through `r.note` and a print rather than `r.fail` — so
-`tools/govkit/refusal_join.py` and its shrink-only `BRANCH_PIN = 161` are unmoved, and that pin
+`tools/govkit/refusal_join.py` and its shrink-only `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` are unmoved, and that pin
 staying untouched in the diff is itself the assertion.
 
 ## 8. Open questions
@@ -217,6 +306,28 @@ staying untouched in the diff is itself the assertion.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-3 fold: the schema bump is WITHDRAWN. `-7` S6 owns the build's single
+  move, 2 to 3, and `-13` §4 defines schema 3 as the generation carrying every field this build adds,
+  `carry` included. Three rev-3 specs disagreed about the number and two acceptance criteria were
+  mutually unsatisfiable on one tree; the constant's own comment reads "per-**role** row field", and
+  `carry` adds no role. §4 Migration, §5 migration/rollback and the §9 summary all say so now.
+- rev-3 · 2026-08-24 · round-2 fold: the composition of S11 with `-8`. S12 states ONE stamping
+  rule for both arms that write bytes gov does not hold — `oid` is the blob actually written,
+  `gov_oid` keeps `-8`'s meaning — so a carried restore stops inheriting `-8`'s raw-arm stamp of
+  gov's blob into BOTH identities, and `oid != gov_oid` afterwards reads "carries a rung" rather
+  than "local delta". S9 and S11 both point at it, AC10 asserts the restored bytes and the resulting
+  row together, and the arm count goes 9 to 10. §1 no longer says those rows "never take an
+  automatic write", which S9 answers with reconciliation.
+- rev-2 · 2026-08-24 · folded the pre-code review: a proven rung now sets `carry` only and never
+  `o_state`, so a rung row reconciles THROUGH the three-way (S9) instead of widening the raw-write
+  arm — §5's security bullet claimed the opposite and is replaced. The `missing` restore arm carries
+  too, from the row's own directory pair (S11), which is the one bounded exception §3 now names. A
+  rung row whose gov copy did not move prints `carried (relocate)` rather than the grid's lying
+  `patched` (S10). The schema number does NOT move: `-7` S6 owns the build's single bump and schema 3
+  already names `carry`, which is the rev-4 correction below. Two RED-first ACs land
+  — AC8 on the index blob after a reconciliation, AC9 on a deleted `relocate` row — and the arm count
+  goes 7 to 9. §4's unsourced "27 green by identity / 17 flipped" is WITHDRAWN, with the six
+  corrupted lines re-opened at `ce5dca99` and cited by line number in its place.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every line
   number cited was opened at `9ddcc5c9`, and every count in §4 was re-measured against inCMS at
   `2cff5855` rather than carried from the brief. Four corrections to the brief are folded in.

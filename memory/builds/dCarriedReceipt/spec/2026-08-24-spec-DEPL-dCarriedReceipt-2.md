@@ -1,13 +1,13 @@
 # DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
 Three roles dispatch to `refuse` in `UPDATE_ROLE` (`govkit.py:2864-2866`), which calls `r.fail` and
 `continue`s **before** `classify_row` and before `acted.append`. It therefore never prevented a
 write — it only made `r.problems` non-empty, which permanently skips the receipt re-stamp
-(`:3111`). One `attributes` row in a target makes every future `update` on that target exit 1 and
+(`:3115`). One `attributes` row in a target makes every future `update` on that target exit 1 and
 never advance its `gov_commit`. NC's kit selection includes `kickoff-manifest` and `playbook`, both
 of which declare an `lf_pin`, so an onboarded NC would carry exactly such a row. Nothing else in
 this build can run until a target can re-stamp.
@@ -90,6 +90,7 @@ No receipt-shape change. `pins` is a dispatch value only.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-24 · round-3 fold: the re-stamp guard citation: `:3111` is that guard's explanatory comment; the `if r.problems:` it names is `:3115`.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold).
 
 ## 10. Reuse audit

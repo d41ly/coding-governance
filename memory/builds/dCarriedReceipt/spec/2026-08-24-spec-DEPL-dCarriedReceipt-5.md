@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -157,7 +157,7 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selftest`, `govkit selfcheck` and
 `govkit refusal join`. That last one is a real obligation rather than a mention: this unit adds
-roughly seven refusal branches, and `BRANCH_PIN = 161` in `tools/govkit/refusal_join.py:40` is
+roughly seven refusal branches, and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
 shrink-only, so it is re-derived and moved in the SAME commit with both values named beside it, per
 that file's own convention. Every new branch also needs an arm asserting it, which is the join's
 declared contract and is why the arm count in §4 tracks the branch count.
@@ -178,6 +178,7 @@ declared contract and is why the arm count in §4 tracks the branch count.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn — it is a shrink-only FLOOR and the build's own landing order falsifies any number pinned here before this unit lands.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass. Every cited site was read at
   `9ddcc5c9` and three brief citations are corrected here rather than repeated. The hole-discharge
   runner the `discharge` field reuses is at `:1657-1679`, not the `[check].argv` runner at

@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-14 — post-write verification, with index rollback
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -10,7 +10,7 @@ conflict already leaves the file byte-identical and writes an order (`:3085-3095
 merge-file` that succeeds on non-overlapping hunks produces a plausible, wrong, executable file whose
 first observer is a merge bar days later. `three_way`'s own docstring says so — a wrong argument order
 does not error, it emits a plausible file with one side silently dropped (`:2899-2902`) — and the
-write loop then hands that file to `git add` and re-stamps the receipt at `:3124`. Every kit in this
+write loop then hands that file to `git add` and re-stamps the receipt at `:3125`. Every kit in this
 repo already declares how to measure whether it works: `[check].argv`, run per kit by `cmd_check` at
 `:1632-1644`. This unit runs that same declaration after a write, and rolls the kit back when it reds.
 
@@ -20,27 +20,45 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   descriptor, a ctx and a target, returning the state it already computes: `adopted`,
   `landed-but-inert`, or `landed-unmeasured`. `cmd_check` calls the helper; nothing about its output
   changes.
-- **S2** — a pre-write snapshot, taken before the first byte moves, of every path the run will touch:
-  its index entry from `git -C <target> ls-files -s -- <path>` as `(mode, oid)`, or the marker
-  `absent`. The snapshot rides `-7`'s index-side read rather than adding a second index reader.
-- **S3** — the snapshot also captures each touched ROW's `sha256`, `commit` and `gov_oid` **before**
+- **S2** — a pre-write snapshot, taken before the first byte moves, keyed on the ROW rather than on a
+  path string. It carries every path that row occupies — for a `renamed` row (`-11` S4) BOTH
+  spellings, old and new — each with its index entry from `git -C <target> ls-files -s -- <path>` as
+  `(mode, oid)`, or the marker `absent`. The snapshot rides `-7`'s index-side read rather than adding
+  a second index reader. Keyed on the old path alone it cannot restore a rename: the bytes land at a
+  path whose pre-write entry is `absent` under a key nothing ever looks up.
+- **S3** — the snapshot also captures each touched ROW's `sha256`, `commit`, `gov_oid` and `oid` **before**
   the loop mutates them in place at `:3072-3073` and `:3098-3099`. Restoring bytes while leaving a row
   stamped forward re-creates `-8` exactly: the next run reads the row as `equal` against bytes that
   were reverted.
-- **S4** — after the write loop, for every TOUCHED kit — a kit owning at least one path in `changed`
-  or `deleted` — run S1's helper. A kit the run did not touch is not executed.
-- **S5** — a kit returning `landed-but-inert` is rolled back, that kit only: for each of its touched
-  paths, `git -C <target> update-index --cacheinfo <mode>,<oid>,<path>` then `git -C <target>
+- **S4** — S1's helper runs TWICE for every TOUCHED kit: once as a BASELINE before the first byte
+  moves, and once after the write loop. A touched kit is one owning at least one path in `changed`,
+  `renamed` or `deleted` — `renamed` because `-11` S6's rows appear in neither of the other two, and
+  a predicate reading only those two never verifies, never snapshots and never rolls back a rename.
+  The population is known before the write, which is the same fact S2 already depends on, so the
+  baseline needs no second classification pass. A kit the run did not touch is executed NEITHER time:
+  the baseline is bounded to exactly the kits S4 was already going to check, so it never becomes the
+  whole-bar run §3 rejects.
+- **S5** — the rollback keys on the TRANSITION, never on the after-state alone. A kit that was
+  `adopted` at baseline and `landed-but-inert` after is rolled back, that kit only: for each of its
+  touched paths, `git -C <target> update-index --cacheinfo <mode>,<oid>,<path>` then `git -C <target>
   checkout-index -f -- <path>`; a path whose snapshot is `absent` is `git rm --cached`-ed and
-  unlinked. Its rows are restored from S3.
-- **S6** — a rolled-back kit writes an outbox order in the shape `cmd_update` already uses at `:3087`,
-  naming the kit, its check argv, the exit code and every path restored, and calls `r.fail`. The
-  existing `if r.problems` arm (`:3111`) then declines to re-stamp the receipt, which is already the
-  correct behaviour and needs no change.
-- **S7** — the skip announces itself. A kit whose `[check]` is `{ none = "…" }`, or whose argv carries
+  unlinked, and a renamed row is restored under BOTH spellings from its S2 entry. Its rows are
+  restored from S3.
+- **S6** — a kit that was `landed-but-inert` at BOTH runs is **pre-existing red**: it is printed and
+  counted under that name, its writes stand, and it is NOT rolled back and does NOT `r.fail`. That is
+  the same disposition §8 F2 already gives `landed-unmeasured`, and it is the only escape from the
+  wedge — rolling back on the after-state alone means an adopter carrying one unrelated local red
+  reverts every correct write on every run, forever, while `r.fail` reaching `:3115` keeps
+  `gov_commit` from ever advancing and §3 refuses the `--force` that would otherwise be the way out.
+- **S7** — a rolled-back kit writes an outbox order in the shape `cmd_update` already uses at `:3087`,
+  naming the kit, its check argv, both exit codes and every path restored, and calls `r.fail`. The
+  existing `if r.problems` arm (`:3115`) then declines to re-stamp the receipt, which is already the
+  correct behaviour and needs no change. A pre-existing red writes an order too, naming the kit and
+  both exit codes, but without the `r.fail`, so the run completes and the receipt re-stamps.
+- **S8** — the skip announces itself. A kit whose `[check]` is `{ none = "…" }`, or whose argv carries
   an unresolved token (`:1634-1637`), returns `landed-unmeasured` and is printed as **unverified**,
   counted separately from verified. A check that could not run is not a pass.
-- **S8** — `selftest.py` arms per branch, and a `refusal_join.py` arm for the refusals S5 and S6 add.
+- **S9** — `selftest.py` arms per branch, and a `refusal_join.py` arm for the refusals S5 and S7 add.
 
 ## 3. Non-goals (OUT)
 
@@ -54,15 +72,21 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   restores the index and the worktree to the exact pre-write state for those paths and stops there.
 - **Not** a `--force`, `--skip-verify` or `--no-verify` in any spelling. Cut-list item, and a verifier
   reachable past a flag is a verifier nobody runs.
-- **Land-alone:** this unit needs `-7` beneath it for S2's index-side read. With `-7` landed it stands
-  alone and leaves both trees green.
+- **Land-alone:** this unit needs `-7` beneath it for S2's index-side read and `-11` beneath it for
+  the `renamed` disposition S2 and S4 both read. The full order is `-7`, then `-11`, then this unit,
+  and it is an ORDER rather than a conflict — §8 F3 ratifies it and this bullet must not be read as
+  a weaker "should". With both landed it stands alone and leaves both trees green. Nothing here
+  orders against `-13`.
 
 ## 4. Design
 
 ### Data model
 
-No receipt shape change. The snapshot is per-run state: one map from touched path to `(mode, oid)` or
-`absent`, and one map from touched path to the row's pre-write `sha256`, `commit` and `gov_oid`.
+No receipt shape change. The snapshot is per-run state and it is keyed on the ROW, not on a path
+string: one entry per touched row, carrying every path that row occupies — for a `renamed` row both
+the old and the new spelling — each with its `(mode, oid)` or the marker `absent`, plus the row's
+pre-write `sha256`, `commit`, `gov_oid` and `oid`. A path-keyed map cannot restore a rename, because the new
+path's pre-write state is `absent` and sits under a key the old spelling does not reach.
 
 ### Rollout
 
@@ -81,36 +105,46 @@ is deliberate — an opt-in verifier verifies the runs that were already careful
   it the first time a filter or an `eol` pin is in play.
 - *Roll back on the conflict path too.* Nothing is written there; the file is already byte-identical
   and the order already exists. Adding a rollback would be a check that cannot fail.
-- *Run the check before the write as a baseline.* It doubles the run cost to answer a question the
-  operator can answer with `govkit check` on a tree they have not yet modified, and a kit that was
-  already red before the write is a state this unit reports rather than repairs.
+- *Baseline EVERY claimed kit before the write.* Rejected on the "every claimed kit" half only: it
+  runs checks for kits the run never touches, which is the whole-bar behaviour §3 refuses. S4
+  baselines the TOUCHED kits and nothing else, costing one extra check per kit the run was already
+  going to check, and it is the only way to tell "this write broke it" from "it was already broken" —
+  the distinction the rollback keys on, and the difference between a verifier and a wedge.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~110 lines: the extracted helper, the snapshot, the verify-and-roll-back
-pass in `cmd_update`), `tools/govkit/selftest.py` (7 arms), one fixture whose kit check rejects the
-exact file a clean three-way produces.
+`tools/govkit/govkit.py` (~125 lines: the extracted helper, the row-keyed snapshot, the baseline
+pass and the verify-and-roll-back pass in `cmd_update`), `tools/govkit/selftest.py` (8 arms), one
+fixture whose kit check rejects the exact file a clean three-way produces, and one whose kit check
+reds at the baseline as well.
 
 ## 5. Production-readiness checklist
 
 - security — this unit executes the target's copy of a kit check, which `cmd_check` already does for
   every claimed kit, so no new execution surface is opened. It stays bounded to kits the receipt
   claims: running a check for an unclaimed kit would execute code the receipt never authorized.
-- perf / scale — one check per TOUCHED kit, not per row and not per claimed kit. On a run that moves
-  rows in two kits, two checks run.
+- perf / scale — two checks per TOUCHED kit, one baseline and one after, and none at all per row or
+  per untouched claimed kit. On a run that moves rows in two kits, four checks run.
 - a11y — N/A: CLI.
 - i18n — N/A.
 - error / empty / loading states — a check that crashes rather than exiting non-zero is treated as
   red and rolled back; a run that touched nothing runs no checks and says so; a `checkout-index` that
   itself fails is a refusal naming the path, never a silent partial restore.
-- observability — one line per touched kit carrying its state, one rolled-back-paths list per red kit,
-  and separate tallies for verified, unverified and rolled back. The unverified count is printed even
-  when it is zero, so its absence is never mistaken for coverage.
-- risks — the residual risk is a check whose own dependencies are unavailable in the adopter's
-  environment: it reds, the kit rolls back, and a correct write is reverted. That is the direction
-  chosen: a spurious rollback costs a re-run, a missed bad merge costs the file. `landed-unmeasured`
-  exists so the third case — cannot run — is not silently folded into either.
-- testing + left-shift gates — seven `selftest.py` arms, RED-first at AC1. The class left-shifted is
+- observability — one line per touched kit carrying BOTH its states, one rolled-back-paths list per
+  rolled-back kit, and separate tallies for verified, unverified, rolled back and pre-existing red.
+  Every one of those counts is printed even when it is zero, so an absence is never mistaken for
+  coverage — a silent pre-existing-red tally would hide exactly the kits nothing verified.
+- risks — the wedge is the risk to name first. Rolling back on the after-state alone means a target
+  carrying ONE unrelated local red in a touched kit reverts every correct write on every run,
+  forever: S5 would revert it, S7's `r.fail` reaches `:3115` so `gov_commit` never advances, and §3
+  refuses a `--force` in any spelling, so nothing gets the adopter out and the run reports their
+  standing red as a bad merge. The escape is S4's baseline, not a flag. Red-before-and-red-after is
+  reported as pre-existing and left alone, and only green-before-red-after rolls back. What remains
+  is narrower and is stated rather than implied: a kit already red keeps its writes, so a genuinely
+  broken merge inside THAT kit lands unobserved, because a binary check cannot tell "still broken"
+  from "newly broken". The trade is accepted in that direction, since reverting correct writes
+  forever is the worse failure. `landed-unmeasured` still covers the third case, cannot run.
+- testing + left-shift gates — eight `selftest.py` arms, RED-first at AC1. The class left-shifted is
   "a write reaches the index with nothing observing it", gated as AC5: after a red kit, that kit's
   paths are byte-identical to their pre-write index OIDs.
 - migration / rollback — none on disk. Reverting the unit removes a verifier and restores today's
@@ -128,8 +162,11 @@ exact file a clean three-way produces.
   `landed-but-inert`, and exits **1**.
 - **AC3** — The rolled-back path's index entry equals its pre-write OID: `git -C <target> rev-parse
   :<path>` matches the snapshot, and `git -C <target> status --porcelain -- <path>` prints nothing.
-- **AC4** — The receipt row for that path still carries its pre-run `sha256`, `commit` and `gov_oid`,
-  and `install.json`'s `gov_commit` is unchanged — the `if r.problems` arm at `:3111` declining to
+  In a `-11` rename fixture the same assertion holds under BOTH spellings: the old path is restored
+  from its snapshotted `(mode, oid)` and the new path is gone from the index. That is S2's row-keyed
+  snapshot observed directly, and it is unreachable from a snapshot keyed on the old path alone.
+- **AC4** — The receipt row for that path still carries its pre-run `sha256`, `commit`, `gov_oid` and `oid`,
+  and `install.json`'s `gov_commit` is unchanged — the `if r.problems` arm at `:3115` declining to
   re-stamp.
 - **AC5** — A green kit's writes survive a sibling kit's rollback: in a two-kit fixture where only one
   reds, the other kit's paths are staged at the new bytes and its rows carry the `--to` commit.
@@ -141,12 +178,18 @@ exact file a clean three-way produces.
 - **AC8** — `python tools/govkit/refusal_join.py` exits 0, with an arm for each refusal branch this
   unit adds, and `govkit.py check` output is byte-identical before and after the S1 extraction on a
   fixture target.
+- **AC9** — the pre-existing-red arm. In a fixture whose kit `[check].argv` reds at the BASELINE as
+  well as after the write, `update --write` prints that kit as **pre-existing red**, performs no
+  rollback — `git -C <target> rev-parse :<path>` does NOT match the pre-write snapshot and the new
+  bytes stand — raises no `r.fail` for it, and `install.json`'s `gov_commit` advances to `--to`. This
+  is the wedge arm, and it fails against a draft that keys the rollback on the after-state: there, an
+  adopter with one unrelated local red reverts every correct write on every run, forever.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
-selfcheck` legs, plus `tools/govkit/refusal_join.py`. Adds seven arms and the AC8 extraction-parity
-assertion; adds no new leg file. The `refusal_join.py` anchor set moves because S1 relocates
+selfcheck` legs, plus `tools/govkit/refusal_join.py`. Adds eight arms, the AC8 extraction-parity
+assertion and AC9's pre-existing-red arm; adds no new leg file. The `refusal_join.py` anchor set moves because S1 relocates
 `cmd_check`'s existing `r.fail` calls into a helper, and that shift is re-pinned in the same commit
 rather than waived.
 
@@ -161,12 +204,38 @@ rather than waived.
   target permanently red from a successful update — the failure `-2` exists to remove. It is counted
   as unverified and named in the run's output.
   RESOLVED (agent, 2026-08-24, delegated): report loudly, do not block.
-- **F3 — landing order.** This unit cannot land before `-7`, whose index-side read S2 reuses. It has
-  no other dependency and does not conflict with `-11` or `-13`.
-  RESOLVED (agent, 2026-08-24, delegated): lands after `-7`.
+- **F3 — landing order.** This unit cannot land before `-7`, whose index-side read S2 reuses, and it
+  cannot land before `-11` either. `-11` introduces the `renamed` disposition that S2's row-keyed
+  snapshot and S4's touched-kit predicate both read, and a merged renamed row lands at a NEW path
+  whose pre-write snapshot is `absent` under the old key, so rev-1's "does not conflict with `-11`"
+  was false. It is an ORDER rather than a conflict, and the order is `-7`, then `-11`, then this
+  unit. Nothing here touches `-13`.
+  RESOLVED (agent, 2026-08-24, delegated): lands after `-7` and after `-11`.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-3 fold: the rollback snapshot restored three of the receipt's four
+  per-row identity fields. S3, §4 and AC4 each enumerated `sha256`, `commit` and `gov_oid` — the set
+  as it stood before `-7` added `oid` as a stored field — so a rolled-back row kept the failed run's
+  `oid` and read as a local delta forever after. All three enumerations now carry `oid`.
+- rev-3 · 2026-08-24 · round-2 fold: §3's land-alone bullet now carries the ORDER F3 ratified —
+  `-7`, then `-11`, then this unit — instead of naming the two prerequisites without their sequence,
+  so the two sections cannot be read as a hard order and a soft preference. The `cmd_check`
+  citations were re-measured at `9ddcc5c9` and both stand: the `[check].argv` arm is `:1632-1644`
+  and the state machine around it is `:1630-1655`, with the `[[hole]].discharge` runner beginning at
+  `:1657` — which this unit does not touch and does not cite.
+- rev-2 · 2026-08-24 · folded the pre-code review: the verifier no longer wedges a target that was
+  already red. S4 baselines the TOUCHED kits — the population it already bounds — and runs the check
+  before as well as after; S5 keys the rollback on the TRANSITION, so only green-before-red-after
+  reverts; a new S6 reports red-before-and-red-after as pre-existing red, without a rollback and
+  without an `r.fail`, so `gov_commit` still advances and the adopter is not reverted forever with no
+  `--force` to escape by; and §5's risks line now states the wedge, the escape and the narrower
+  residual it leaves. The `-11` interaction is folded too: S2's snapshot is keyed on the ROW and
+  carries both spellings of a renamed row, S4's touched-kit predicate reads `renamed`, AC3 asserts
+  the rename rollback, and F3's "does not conflict with `-11`" is replaced by the ordering `-7`,
+  `-11`, this unit. AC9 is the pre-existing-red fixture arm, the old S6–S8 renumber to S7–S9, and
+  the three `if r.problems` citations move from `:3111` to `:3115` with the re-stamp at `:3125`,
+  both re-read at `9ddcc5c9`.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). The unobserved
   write path (`:3097`, `:3103`), the conflict path's byte-identical guarantee (`:3085-3095`),
   `three_way`'s dropped-side docstring (`:2899-2902`), `cmd_check`'s argv runner and its three states
@@ -181,7 +250,7 @@ twice rather than re-implemented, and it keeps using `resolve_tokens` (`:516`) a
 `resolve_shell_argv` (`:498`) exactly as it does today. The target-side index read is `-7`'s, not a
 second one. The outbox order reuses the path and format already written for a three-way conflict
 (`:3087-3093`), and the receipt-not-re-stamped behaviour reuses the existing `if r.problems` arm
-(`:3111`) rather than adding a second condition. The refusals reuse the `Refusal` class (`:78`) and
+(`:3115`) rather than adding a second condition. The refusals reuse the `Refusal` class (`:78`) and
 the `Report` channel (`:565`) and are counted by the existing `refusal_join.py` contract. One new
 mechanism exists — the index snapshot and restore — and it has no prior seam: nothing in this engine
 has ever undone a write.

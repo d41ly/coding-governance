@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -10,8 +10,8 @@ was shipped to that target. Four lines later it asks precisely that question of 
 (`:2690-2699`), dropping one that matches no tracked path, with the reason written out at
 `:2657-2660`. The same question, aimed at the thing the leg actually executes, is unasked — so gov
 can hand an adopter a leg row that names a file gov never ships, record it in the receipt as
-emitted coverage, and never notice. Measured at `9ddcc5c9`, the rule fires once on NicoCares, and
-that single hit is a gov defect: `kickoff-manifest.kit.toml:60` declares a leg running
+emitted coverage, and never notice. Measured at `9ddcc5c9`, the rule fires on exactly ONE LEG at
+NicoCares, and that leg is a gov defect: `kickoff-manifest.kit.toml:60` declares a leg running
 `{prefix}/check-template-size.sh` while `registry.toml:177` marks that file `[[exempt]]`, so no
 adopter can ever receive it.
 
@@ -49,8 +49,11 @@ adopter can ever receive it.
 - **Not** teaching `update` to re-emit or repair a leg row. `UPDATE_ROLE["gate-leg"]` becomes
   `report` in `-2` and stays there.
 - **Not** widening the predicate past the `/` rule. §8 F2 pins what that leaves uncovered.
-- **Land-alone:** this unit leaves both trees green on its own. It should land after `-1`, and the
-  reason is measured rather than structural — see §4.
+- **Land-alone:** this unit leaves both trees green on its own. Its dependency on `-1` is an ORDER
+  rather than a conflict, in the vocabulary `-14` §8 F3 ratifies: AC6 asserts the post-`-1` world of
+  exactly ONE surviving leg at each target, and the pre-`-1` inCMS tree shows two. The reason is
+  measured rather than structural — see §4. Nothing here depends on `-2`; the `UPDATE_ROLE` line in
+  §3 is a non-goal pointing at where that disposition is decided, not a landing order.
 
 ## 4. Design
 
@@ -66,10 +69,20 @@ The predicate was run over both live trees before being wired, printing hits and
 is this repo's standing rule for a candidate gate. Two predicates were measured, because the
 question "is this engine absent" has a different answer before and after the run's own writes:
 
-| target | tracked-only hits | tracked ∪ this run's writes | survivor |
+Both columns count HIT LEGS, not hit argv elements. The two are not the same number and the spec
+says which it means, because a finding is reported per leg and names every offending element in it:
+
+| target | tracked-only hit legs | tracked ∪ this run's writes | survivor |
 |---|---|---|---|
 | NicoCares | 1 | 1 | `kickoff engine size <=18KiB` |
 | inCMS | 17 | 2 | that leg, plus `pre-push self-test` |
+
+At element granularity NicoCares' one hit leg carries TWO offending elements, both from
+`kickoff-manifest.kit.toml:60` — `{prefix}/check-template-size.sh`, the engine, and
+`skills/session-kickoff/SKILL.md`, the leg's SUBJECT. inCMS's column is measured against a
+descriptor reconstructed from `.governance/kits.json`, because inCMS has no `.governance/deploy.toml`
+at `9ddcc5c9`; reproducing it needs that reconstruction to carry inCMS's `[kit.*]` layout overrides,
+without which the reading runs high.
 
 The second predicate is the one `apply` uses, and the gap between the columns is the whole design.
 inCMS's 17 measure the tree AS IT STANDS — the same partial adoption `-4` counts from the other
@@ -82,7 +95,19 @@ with a finding and one that does not.
 
 Near-misses, from the same run: the argv elements carrying no `/` are `bash`, `python`, `python3`,
 `node`, `.`, `18432`, `--check`, `--check-format`, `--selftest` and `--target`. None is a path, so
-the rule has zero false positives and, over today's descriptors, zero false negatives.
+none of them is graded.
+
+What the rule does NOT do is tell an engine from a leg's SUBJECT, and rev-1's "zero false positives"
+overstated that. `kickoff-manifest.kit.toml:60`'s third argv element is
+`skills/session-kickoff/SKILL.md`, a file the leg READS, and no target holds it at that spelling —
+the kit ships `SKILL.md` as a machine-scoped link to `{user_skills}/session-kickoff`, so the argv
+names a gov-relative path in a command a target runs. Under S1's rule that is a hit, and it is a
+TRUE one: the path is absent from the target and the leg cannot run. It is simply not an ENGINE
+absence, so the finding is reported per LEG and names every offending element rather than claiming
+each is a missing engine. No narrowing is attempted — separating an engine from a subject means
+grading argument strings by guessing what they are, which is exactly the widening §8 F2 rejects.
+S5 withdraws that whole leg, so both of its elements are cured by one edit and the class is not
+reachable from today's shipped descriptors afterwards.
 
 ### Alternatives rejected
 
@@ -165,8 +190,12 @@ move and no adopter holds the withdrawn leg.
 - **AC5** — A fixture leg whose argv names `{prefix}/absent-engine.sh` produces exactly one finding,
   no row in the target's `gate-legs.json`, and exit 1 — not a `Refusal`, and not an aborted install:
   the receipt is still written and the other legs are still emitted.
-- **AC6** — `govkit.py plan --target <inCMS>` names the two surviving legs and not the fifteen that
-  this run's own writes would satisfy, which is the union predicate of S3 observed directly.
+- **AC6** — `govkit.py plan --target <inCMS>` names exactly ONE surviving leg, `kickoff engine size
+  <=18KiB`, and not the fifteen that this run's own writes would satisfy — which is the union
+  predicate of S3 observed directly. `pre-push self-test` is a hit only BEFORE `-1`, whose resolver
+  writes `.githooks/pre-push.test.sh` to the target root; this unit lands after `-1`, so a second leg
+  in that output is a regression in `-1` rather than a defect in this predicate. Both live targets
+  therefore print the same single leg, which is what §4 already says and what rev-1's AC6 did not.
 - **AC7** — `python tools/govkit/govkit.py selfcheck` stays green over arms 7h, 7h2 and 7h3 after
   S5, and `git diff --exit-code -- tools/govkit/subject-pins.tsv` is clean.
 
@@ -174,7 +203,7 @@ move and no adopter holds the withdrawn leg.
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selfcheck`, `govkit selftest`,
 `govkit acceptance matrix` and `govkit refusal join`. The join is an obligation, not a mention: this
-unit adds refusal branches and `BRANCH_PIN = 161` in `tools/govkit/refusal_join.py:40` is
+unit adds refusal branches and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
 shrink-only, so it is re-derived and moved in the SAME commit with both values named, and every new
 branch gets an arm asserting it. The `kit version markers` leg stays green untouched, for the reason
 given in §4.
@@ -200,6 +229,23 @@ given in §4.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason `-5` records; and the README's deps cell now mirrors this spec's own §3 rather than contradicting it.
+- rev-3 · 2026-08-24 · round-2 fold: §3's land-alone bullet states the `-1` dependency as an ORDER
+  rather than a conflict, matching what AC6 and §4 already assert and using the vocabulary `-14` §8
+  F3 ratifies; it also says plainly that `-2` is not a landing order for this unit, because §3's
+  `UPDATE_ROLE["gate-leg"]` line reads like one. One review premise did NOT reproduce and is
+  recorded rather than folded: this spec was said to state the coverage figure `55` without a
+  vintage label, and it states no coverage figure at all — its inventory counts hit LEGS (`1` and
+  `1` at NicoCares, `17` and `2` at inCMS), which is a different object from `-4`'s gap rows.
+- rev-2 · 2026-08-24 · folded the pre-code review: AC6 now asserts the post-`-1` world this unit
+  lands in — exactly ONE surviving leg at each target, reconciling it with §4, which already said so
+  while AC6 asserted two — and §4's inventory now declares that its columns count hit LEGS, with the
+  element-level reading spelled out beside it. The "zero false positives" claim is withdrawn and
+  replaced by a measured statement: `kickoff-manifest.kit.toml:60`'s third argv element,
+  `skills/session-kickoff/SKILL.md`, is a `/`-carrying leg SUBJECT rather than an engine path, the
+  rule hits it, and the hit is TRUE — no target holds that spelling — so the finding is reported per
+  leg naming every offending element, and no engine-versus-subject narrowing is attempted because
+  §8 F2 already ruled that out.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass. Everything cited was read at
   `9ddcc5c9`, and the predicate was run over both live trees before being specified. Four
   corrections to the brief are folded in rather than repeated. The argv refusal is at `:2686-2689`

@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -15,15 +15,16 @@ Measured here on 2026-08-24 at `9ddcc5c9`. A scratch target takes `govkit.py app
 memory-tree`, which lands 24 files and writes 28 rows, and `update` against it reports `current 24 ·
 missing 3`. The same target cloned with `git clone -c core.autocrlf=true` reports `current 1 ·
 missing 3 · patched 23`. Twenty-three of twenty-four engine rows read as locally modified because
-the worktree holds CRLF and gov shipped LF. The one survivor is the single path that kit's `lf_pin`
-block governs, and the shipped kits declare four `lf_pin` patterns across twelve registry entries,
-so nothing govkit installs makes an adopter immune. An adopter on a default Windows clone therefore
-reads about 96% false divergence, achieves zero automatic adoption, and is shown a plausible table
-while it happens.
+the worktree holds CRLF and gov shipped LF. The one survivor is the one engine row of that kit's
+twenty-four that falls under one of its `lf_pin` blocks, and the shipped kits declare 22 `lf_pin`
+patterns across 11 of the 25 registry entries, so nothing govkit installs makes an adopter immune.
+An adopter on a default Windows clone therefore reads about 96% false divergence, achieves zero
+automatic adoption, and is shown a plausible table while it happens.
 
-The fix is the two identities. `gov_oid` is the git blob gov shipped at the row's `commit`, and it
-means that forever. `oid` is the git blob the TARGET holds, read from its INDEX and never from its
-worktree. `sha256` is retained so a schema-2 reader keeps working, and stops being the comparator.
+The fix is the two identities. `gov_oid` is the git blob gov shipped at the row's `commit`, it
+means that forever, and it is STORED in the receipt rather than recomputed on every read (owner
+decision, 2026-08-24). `oid` is the git blob the TARGET holds, read from its INDEX and never from
+its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops being the comparator.
 
 ## 2. Scope (IN)
 
@@ -32,8 +33,12 @@ worktree. `sha256` is retained so a schema-2 reader keeps working, and stops bei
 - **S2** — `classify_row` reads ours as the target's INDEX blob, from one batched
   `git -C <target> ls-files -s -z --` over the receipt's paths, rather than `read_bytes` at `:2884`.
   `theirs` and `base` keep `blob_at` (`:2148`), which is already index-side by construction.
-- **S3** — the OURS axis compares that index blob against the row's `gov_oid`, not against `sha256`.
-  `oid != gov_oid` is the local-delta predicate, evaluated per run, stored as no boolean anywhere.
+- **S3** — `gov_oid` is a STORED receipt field. It is written once per row, from gov's blob at
+  that row's `commit`, and read back from the file on every later run; nothing recomputes it at read
+  time. The OURS axis compares the target's LIVE index blob against that stored `gov_oid`, never
+  against `sha256`. `oid != gov_oid` is the local-delta predicate, evaluated per run from the live
+  read, and no boolean anywhere stores its answer. Stored field, live comparison — S9 is what keeps
+  the stored half honest.
 - **S4** — a receipt-claimed path that is tracked in the target but carries no index entry is a
   REFUSAL naming the path. Without it the index read's own `absent` routes to `missing` and then to
   the raw write at `:3069`, which would overwrite whatever untracked file the operator has there.
@@ -41,10 +46,29 @@ worktree. `sha256` is retained so a schema-2 reader keeps working, and stops bei
   `git checkout-index -f --`, so the TARGET's own filters decide its worktree bytes. The mode comes
   from the row's existing index entry, and from gov's tree entry at `commit` for a row with none.
 - **S6** — `RECEIPT_SCHEMA` goes 2 to 3 (`:39`) and readers accept 1, 2 and 3. The schema-1
-  role-distrust arm keeps its `schema < 2` bound and keeps firing.
+  role-distrust arm keeps its `schema < 2` bound and keeps firing. This is the build's ONLY schema
+  move. `-13` §4 Migration states that rule and names every field schema 3 carries, `-9`'s and
+  `-13`'s included, so no later unit in this build mints a second number.
 - **S7** — `cmd_apply` records both identities: `gov_oid` from the blob it wrote, and `oid` read
   from the index after the `git add` it already performs at `:2477`.
 - **S8** — one selftest arm per acceptance criterion, plus the class gate AC6 describes.
+- **S9** — `cmd_update`'s preamble gains a per-row integrity assertion, beside the existing
+  unresolvable-commit refusal at `:2946`, running over the whole receipt before any row is
+  classified. It is SCOPED BY FIELD PRESENCE, in three arms. A row carrying BOTH `commit` and
+  `gov_oid` is asserted: `gov_oid == blob_at(root, row["commit"], row["source"])`, and a row that
+  fails refuses by name, naming the path and both oids, rather than being classified against a field
+  the file no longer earns. A row carrying NEITHER field is passed over here, because it is not a
+  failed integrity check. It is `-13` S7's `evidence: "unattributed"` state, which a `forked` row
+  lands in whenever the walk found nothing, and `-13` S7 prints, counts and skips it inside the
+  classification loop. A row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
+  corruption shape this unit exists to catch, because `-11` rewrites `path`, `source`, `commit` and
+  `gov_oid` together on a rename and a text merge of `install.json` is what splits them. **The
+  ordering is fixed, and the two preconditions are sequential rather than competing.** S9 runs first,
+  in the preamble, over every row. `-13` S7's skip runs later, inside the classification loop, ahead
+  of `UPDATE_ROLE.get(role)` at `:2974`. S9 therefore cannot lean on that skip having already
+  happened, which is exactly why it is scoped by field presence and not by `role` or by `evidence`.
+  Two refusal branches, each carrying its own `refusal_join.py` arm, under that file's contract that
+  every refusal branch is reached by an arm asserting it.
 
 ## 3. Non-goals (OUT)
 
@@ -60,8 +84,13 @@ worktree. `sha256` is retained so a schema-2 reader keeps working, and stops bei
   is untouched here.
 - **Not** repairing the exec bit on rows `apply` already landed. This unit needs a mode to call
   `update-index` at all; it does not claim to fix what earlier installs wrote.
-- **Land-alone:** yes. Its fixture selects `check-wiring`, which declares no `lf_pin` and therefore
-  produces no `attributes` row, so this unit does not need `-2` green to observe its acceptance.
+- **Land-alone:** no, and `-2` lands first. The dependency is stated here rather than defended by a
+  fixture no acceptance criterion touches. Acceptance runs on the `memory-tree` fixture, and that
+  kit declares five `[[lf_pin]]` blocks, each becoming a `role:"attributes"` row at `:1420-1424`.
+  `UPDATE_ROLE["attributes"]` is `"refuse"` at `:2864`, so every one of them takes `r.fail` +
+  `continue` at `:3009-3012`, and `if r.problems:` at `:3115` returns at `:3123` — before
+  `receipt["schema"] = RECEIPT_SCHEMA` at `:3125`. AC5 therefore cannot read `"schema": 3` on that
+  fixture until `-2` teaches `update` how to move an `attributes` row.
 
 ## 4. Design
 
@@ -69,17 +98,31 @@ worktree. `sha256` is retained so a schema-2 reader keeps working, and stops bei
 
 | field | means | written by | read by |
 |---|---|---|---|
-| `gov_oid` | the blob gov shipped at this row's `commit` | `apply`, `update` | the OURS axis, and `check`'s provenance loop |
+| `gov_oid` | the blob gov shipped at this row's `commit`, STORED | `apply`, `update` | the OURS axis, and `check`'s provenance loop |
 | `oid` | the blob the target's index held when the row was last written | `apply`, `update` | `check`'s integrity loop |
 | `sha256` | sha256 of gov's bytes at install | `apply`, `update` | `install.sums` and its join, and no verdict |
 
-The live delta predicate reads the target's CURRENT index blob and compares it to `gov_oid`. The
-stored `oid` is that same quantity as of the last write, which is how `check` sees a change nobody
-recorded. Two questions, two fields, and neither field answering both is the whole unit.
+The live delta predicate reads the target's CURRENT index blob and compares it to the STORED
+`gov_oid`. Both fields are stored and only the comparison is live: `gov_oid` is never recomputed at
+read time, it is ASSERTED instead, on every row that carries it, by S9's preamble refusal, which is
+what a stored field costs. The stored `oid` is that same quantity as of the last write, which is how
+`check` sees a change nobody recorded. Two questions, two fields, and neither field answering both is
+the whole unit.
 
 Feeding the predicate into the grid's OURS axis is what keeps `VERDICT_GRID` (`:2843`) untouched.
 Identities that agree give `equal`, which is the only axis value the raw-write verdicts sit on.
 Identities that differ give `differs`, which reaches only `patched` and `diverged`.
+
+S9's scoping is measured rather than assumed. On inCMS at `9ddcc5c9`, `.governance/install.index`
+holds 92 rows, and 54 of them carry a blob absent from gov's object database. Excluding its 13
+`project-owned` rows leaves 41 gov-authored rows that no verbatim walk attributes: 25 are `engine`
+rows and 16 are the declared divergences `.governance/kits.json` documents, each with a `record` id.
+Two of the 25 are `scripts/unattended/fixture-records/scripts~unattended~fixture-pieces~one~piece.md.md`
+and its `~two~` sibling, which `.governance/kits.json` declares `engine` rather than diverged, so
+they are the unattributed state rather than a declared fork. Whatever the `eol` and `relocate` rungs
+recover, the residue reaches `update` carrying no `commit` and no `gov_oid`. An assertion demanding
+both fields of EVERY row refuses on every one of them before a single row is classified, and no
+update ever runs on that adopter. That is the composition this scoping exists to keep working.
 
 ### Alternatives rejected
 
@@ -95,8 +138,10 @@ Identities that differ give `differs`, which reaches only `patched` and `diverge
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~70 lines), `tools/govkit/selftest.py` (~8 arms), and one anchor in
-`tools/govkit/refusal_join.py`'s enumerated set.
+`tools/govkit/govkit.py` (~90 lines), `tools/govkit/selftest.py` (~12 arms), and THREE anchors in
+`tools/govkit/refusal_join.py`'s enumerated set: one for S4, and two for S9. That file keys an anchor
+on a refusal CALL SITE, and S9's two arms are two sites. The mismatch and the half-populated pair
+carry different messages and cannot share one.
 
 ## 5. Production-readiness checklist
 
@@ -108,17 +153,26 @@ Identities that differ give `differs`, which reaches only `patched` and `diverge
 - i18n — N/A.
 - error / empty / loading states — a target with no index entry for a claimed path refuses by name.
   A `checkout-index` that fails reports and leaves the index entry rather than half-writing, with
-  the rollback itself left to `-14`.
+  the rollback itself left to `-14`. A row carrying neither identity field is not an error state on
+  this unit at all: S9 passes over it, and `-13` S7 skips it by name inside the loop.
 - observability — the printed table keeps its shape and its vocabulary. The header line at `:2967`
   moves from `receipt schema 2` to `receipt schema 3`, which is how an operator sees the migration.
 - risks — the residual risk is a target whose index is stale against its worktree, where this unit
   reports a file as gov's while the operator's editor shows otherwise. Stated rather than solved:
   `-12`'s dirty-path precondition refuses that exact state before any write, and `-12` lands ahead.
+  The second risk is the stored half of `gov_oid`, and it is the whole reason S9 exists.
+  `install.json` is a committed file, and `-11` rewrites `path`, `source`, `commit` and `gov_oid`
+  together on a rename, so a text merge can pair `commit` from one side with `gov_oid` from the
+  other. A stale `gov_oid` that happens to equal the target's live index blob reads the delta
+  predicate FALSE and opens the raw-write arm on a row carrying a local edit — the destruction `-8`
+  exists to close, reached from the receipt instead of from the merge. S9's per-row assertion is the
+  only thing standing between a text-merged receipt and that write.
 - testing + left-shift gates — the class is "a receipt field asked to be two things at once", and
   AC6 gates it behaviourally by corrupting every `sha256` and asserting no verdict moves.
 - migration / rollback — a schema-2 receipt upgrades in place on the first `update`, with both
-  identities computed from evidence rather than carried over from `sha256`. A schema-3 receipt read
-  by an older govkit is benign: it ignores unknown keys and still finds `sha256`.
+  identities computed from evidence rather than carried over from `sha256`, and `gov_oid` STORED
+  from that one computation rather than re-derived on any later run. A schema-3 receipt read by an
+  older govkit is benign: it ignores unknown keys and still finds `sha256`.
 - user docs — `WIRE-INTO-PROJECT.md`'s receipt section gains the two-identity paragraph and the
   schema-3 note.
 
@@ -139,19 +193,36 @@ Identities that differ give `differs`, which reaches only `patched` and `diverge
   byte-identical to `git -C <gov> rev-parse <to>:<source>`, and leaves the worktree file carrying
   the line endings that target's own filters produce. Observe RED first: `dp.write_bytes` at
   `:3071` lands LF, which is not what those filters produce for that path.
-- **AC5** — After `--write`, `install.json` reads `"schema": 3` and every engine row carries
+- **AC5** — After a `--write` run that ends with no findings — which on the `memory-tree` fixture
+  means after `-2` lands, per §3 — `install.json` reads `"schema": 3` and every engine row carries
   `gov_oid`, `oid` and `sha256`. A hand-built schema-1 fixture and a schema-2 fixture both still
   classify without refusal, and the schema-1 role-distrust arm still fires on the schema-1 fixture.
 - **AC6** — The class gate. An arm rewrites every row's `sha256` to one constant and asserts the
   printed verdict lines are byte-identical to the run before it. Observe RED first: at `9ddcc5c9`
   that corruption turns every row `patched`.
 - **AC7** — `python tools/govkit/govkit.py selfcheck` exits 0, and `python
-  tools/govkit/refusal_join.py` accounts for S4's new refusal branch with an arm that reaches it.
+  tools/govkit/refusal_join.py` accounts for all THREE new refusal branches, with an arm that reaches
+  each. They are S4's absent index entry, S9's `gov_oid` mismatch, and S9's half-populated pair.
+- **AC8** — Hand-edit one row's `gov_oid` in a fixture receipt to any other valid blob oid and run
+  `update`. It refuses by name, names the path, writes nothing, and leaves the receipt
+  byte-identical. Observe RED first by staging S1 through S8 without S9: the same edited row is
+  classified against the wrong identity and the run walks on to its write arm.
+- **AC9** — The composition arm, which is what `-7` and `-13` landing together must not break. A
+  fixture receipt carries one row with NEITHER `commit` nor `gov_oid`, written by `adopt` as a
+  `forked` destination at `evidence: "unattributed"`, beside one genuinely stale `engine` row that
+  carries both. `update --write` then runs to completion: the stale row's bytes move, the field-less
+  row is printed and skipped BY NAME, no refusal fires, and the run exits **0**. Observe RED first by
+  staging S9 unscoped over every row, at which point the preamble refuses on the field-less row and
+  the stale row never moves.
+- **AC10** — The half-populated pair still refuses. A fixture row carrying `commit` and no `gov_oid`
+  refuses by name, writes nothing, and leaves the receipt byte-identical. The mirrored row carrying
+  `gov_oid` and no `commit` refuses the same way. Both arms run in the same fixture as AC9, because
+  the scoping AC9 asserts must never be built as a blanket pass for any row missing a field.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest`, `govkit selfcheck`
-and `refusal_join` legs. Adds arms and one refusal anchor; adds no new leg.
+and `refusal_join` legs. Adds arms and three refusal anchors; adds no new leg.
 
 ## 8. Open questions
 
@@ -181,12 +252,34 @@ and `refusal_join` legs. Adds arms and one refusal anchor; adds no new leg.
   different reason — a repo-wide `* text=auto eol=lf` baseline in its own `.gitattributes` — despite
   carrying `core.autocrlf=true` locally. Neither live target reproduces the defect, so the red-first
   observation runs on a constructed fixture and this spec says so rather than implying a live red.
+- rev-2 · 2026-08-24 · folded the pre-code review: `gov_oid` is STORED and read by the OURS axis
+  (owner decision, B2), S9 adds the per-row integrity refusal beside `:2946` with its
+  `refusal_join.py` arm, AC7 now covers both refusal branches and AC8 observes the new one, and §5
+  risks states once why a stored field needs that assertion. B5 is resolved the second way: the
+  land-alone claim is dropped and `-2` is named as the dependency in §3, because AC1's red-first
+  measurement is the `memory-tree` fixture's own and moving every criterion onto `check-wiring`
+  would discard measured evidence in order to keep a claim. The `lf_pin` figure is corrected to 22
+  patterns across 11 of the 25 registry entries — re-measured here — and the conclusion it served,
+  that only one of the 24 memory-tree engine rows falls under a pin, is unchanged.
+- rev-3 · 2026-08-24 · round-2 fold: S9's integrity assertion is SCOPED by field presence, so a row
+  carrying neither `commit` nor `gov_oid` is passed over as `-13` S7's unattributed state while a row
+  carrying exactly one of them still refuses, and S9 now states its ordering against that in-loop
+  precondition so the two cannot be read as competing. AC9 and AC10 are added for the two halves of
+  that scoping, and §5's error-states line says the same thing once. The refusal-anchor count is
+  re-counted to THREE, and §4, §7 and AC7 are made to agree. §7 had said one, which is the direction
+  that ships an unarmed branch. The §4 measurement is the corrected one. The round-2 brief said 19
+  inCMS engine rows match no gov commit and that the two `piece.md.md` fixture records are the
+  declared forked case; measured here it is 25 engine rows, and `.governance/kits.json` declares
+  those two records `engine` rather than diverged, so they are the unattributed case while the 16
+  documented divergences are the forked one. The figures now agree with `-13` §4's inventory,
+  because both come off the same instrument.
 
 ## 10. Reuse audit
 
 Wires through seams that already exist rather than adding any. `blob_at` (`:2148`) keeps answering
 "what did gov ship", and its docstring already states the index-side rule this unit extends to the
-target side. The batched index read joins the `ls-files` form already spelled at `:112` (`tracked`),
+target side; S9's per-row assertion calls that same function rather than adding a second reader of
+gov's trees. The batched index read joins the `ls-files` form already spelled at `:112` (`tracked`),
 `:1790`, `:2642` and `:2673` rather than adding a fourth spelling, and `tracked` itself is the seam
 for the tracked-versus-indexed distinction S4 needs. `VERDICT_GRID` (`:2843`), `UPDATE_ROLE`
 (`:2857`) and the `classify_row` (`:2874`) and `three_way` (`:2897`) pair are untouched in shape;
