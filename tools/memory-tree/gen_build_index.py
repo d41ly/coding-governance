@@ -1059,6 +1059,115 @@ def _marker_index(lines: list, mark: str):
     return None
 
 
+SLOT_LIMITS = "build-readme-slot-limits.txt"
+SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
+
+
+def _read_slot_table(path: str) -> dict:
+    """`heading -> int | None` from a tab-separated declaration file. None is the UNARMED state.
+
+    A COMMENT IS A LINE WITH NO TAB, never a line starting with `#`. Every canonical slot heading
+    starts with `#`, so the obvious comment predicate ate every data row: the table parsed to empty
+    and the leg reported five slots UNARMED, which reads exactly like a deliberate configuration.
+    Found by running the verb, and it is the reason `_assert_slot_table` below exists — a data file
+    that parses to nothing must be a refusal, not a plausible state.
+    """
+    out = {}
+    for raw in read_text(path).split("\n"):
+        if not raw.strip() or "\t" not in raw:
+            continue
+        head, _tab, val = raw.partition("\t")
+        head, val = head.strip(), val.strip()
+        if not head:
+            continue
+        out[head] = int(val) if val.isdigit() else None
+    return out
+
+
+def _assert_slot_table(limits: dict, where: str) -> None:
+    """Both directions over the declared ceilings. Runs whether or not any README is BOUND.
+
+    An earlier cut checked this only while grading a bound file, so with an empty population a
+    completely unparsed limits file reported as deliberate UNARMED slots. A declaration's integrity
+    cannot depend on whether anything happens to be using it.
+    """
+    canon = [h for h, _e, _b in SLOT_CANON]
+    for h in canon:
+        if h not in limits:
+            raise Problem(f"{where} has NO ROW for the canonical slot `{h}`; a slot nobody priced is "
+                          f"a slot nobody decided about, which is not the same as one deliberately "
+                          f"left unarmed")
+    for h in limits:
+        if h not in canon:
+            raise Problem(f"{where} carries a row for `{h}`, which SLOT_CANON does not declare — a "
+                          f"ceiling outliving its slot silently widens what it was written to bound")
+
+
+def slot_sizes(readme_text: str) -> list:
+    """`[(heading, bytes)]` over the AUTHORED slice of each canonical slot, in canon order.
+
+    A slot runs from its heading line to the line before the next canonical heading; the LAST slot
+    stops at the authored roster pair where one is present and at the first generated marker
+    otherwise. Stopping unconditionally at the generated marker would bill the roster table to the
+    parked-decisions slot, which unit 1's non-goals forbid touching.
+
+    BYTES, not characters — and the reason is not the one an earlier draft gave. The hygiene entry cap
+    is DECLARED in characters; what its own comment refuses to pin is awk's `length()`, which counts
+    bytes or characters depending on the build and the locale. This check is Python, where the choice
+    is explicit, and it picks bytes so the verdict is node-independent by construction.
+    """
+    lines = readme_text.split("\n")
+    stop = len(lines)
+    for _n, mo, _mc in GEN_REGIONS:
+        i = _marker_index(lines, mo)
+        if i is not None:
+            stop = min(stop, i)
+    po = _marker_index(lines, PLAN_OPEN)
+    if po is not None and po < stop:
+        stop = po
+    heads = {h: None for h, _e, _b in SLOT_CANON}
+    idx = []
+    for i in range(0, stop):
+        if lines[i] in heads:
+            idx.append((i, lines[i]))
+    out = []
+    for n, (i, h) in enumerate(idx):
+        end = idx[n + 1][0] if n + 1 < len(idx) else stop
+        out.append((h, len("\n".join(lines[i + 1:end]).strip().encode("utf-8"))))
+    return out
+
+
+def budget_findings(root: str, conf: dict, rel: str) -> tuple:
+    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
+    here = pathlib.Path(__file__).resolve().parent
+    limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
+    if not os.path.exists(limits_p):
+        raise Problem(f"{SLOT_LIMITS} is absent at {limits_p}; a slot budget with no declared "
+                      f"ceilings would grade nothing and report clean")
+    limits = _read_slot_table(limits_p)
+    highs = _read_slot_table(hw_p) if os.path.exists(hw_p) else {}
+    _assert_slot_table(limits, SLOT_LIMITS)
+    hard, adv = [], []
+    for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+        cap, hw = limits.get(head), highs.get(head)
+        if cap is not None and size > cap:
+            hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B")
+        elif hw is not None and size > hw:
+            adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
+                       f"{hw} B and under its {cap} B ceiling")
+    return hard, adv
+
+
+def unarmed_slots() -> list:
+    """Canonical slots whose declared ceiling is blank — the ANNOUNCED unarmed state."""
+    here = pathlib.Path(__file__).resolve().parent
+    p = str(here / SLOT_LIMITS)
+    if not os.path.exists(p):
+        return []
+    limits = _read_slot_table(p)
+    return [h for h, _e, _b in SLOT_CANON if limits.get(h) is None]
+
+
 def read_contract_registry(root: str, conf: dict) -> set:
     """The build READMEs the heading canon BINDS, from the declared registry. Empty when absent.
 
@@ -1321,16 +1430,36 @@ def do_check_format(root: str, conf: dict) -> int:
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
                if p.endswith("/README.md")]
     bound = read_contract_registry(root, conf)
-    bad = []
+    # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
+    # conditional on anything using it.
+    _here = pathlib.Path(__file__).resolve().parent
+    if not (_here / SLOT_LIMITS).exists():
+        raise Problem(f"{SLOT_LIMITS} is absent at {_here / SLOT_LIMITS}; a slot budget with no "
+                      f"declared ceilings would grade nothing and report clean")
+    _assert_slot_table(_read_slot_table(str(_here / SLOT_LIMITS)), SLOT_LIMITS)
+    bad, adv = [], []
     for rel in sorted(tracked):
         for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
             bad.append(f"    {rel}:{line} — {why}")
+        if rel in bound:
+            h, a = budget_findings(root, conf, rel)
+            bad += h
+            adv += a
+    # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
+    # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
+    for line in adv:
+        print("build-index ADVISORY — a slot passed its recorded high-water:")
+        print(line)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
         for line in bad:
             print(line)
         return 1
     graded = len([r for r in tracked if r in bound])
+    unarmed = unarmed_slots()
+    if unarmed:
+        print(f"build-index: NOTE {len(unarmed)} canonical slot(s) ship UNARMED — no declared "
+              f"ceiling: {', '.join(unarmed)}")
     print(f"build-index: slot contract clean ({len(tracked)} build README(s); "
           f"heading canon BOUND on {graded})")
     if not graded:
@@ -1339,6 +1468,53 @@ def do_check_format(root: str, conf: dict) -> int:
         # date-keyed cutoff was refused for this contract in the first place.
         print(f"build-index: NOTE the heading canon is bound on ZERO build READMEs — "
               f"{m}/{CONTRACT_REGISTRY} declares none, so trigger 3 graded nothing this run")
+    return 0
+
+
+def do_report(root: str, conf: dict) -> int:
+    """Every bound README's slot sizes against both numbers. The margin, readable BEFORE a breach.
+
+    This exists because the runner prints one ok line for a passing leg and echoes leg stdout only on
+    failure, so an advisory inside a green leg reaches nobody. A warning nobody can read is a check
+    nobody runs.
+    """
+    m = conf["MEMORY_ROOT"]
+    here = pathlib.Path(__file__).resolve().parent
+    limits = _read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
+    highs = _read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
+    bound = sorted(read_contract_registry(root, conf))
+    if not bound:
+        print(f"build-index: no build README is BOUND — {m}/{CONTRACT_REGISTRY} declares none, so "
+              f"there is nothing to report sizes for. The ceilings below are declared and inert.")
+        for h, _e, _b in SLOT_CANON:
+            c = limits.get(h)
+            print(f"    {h} — ceiling {c if c is not None else 'UNARMED'}")
+        return 0
+    for rel in bound:
+        for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+            c, hw = limits.get(head), highs.get(head)
+            print(f"    {rel} · {head} — {size} B · high-water {hw if hw is not None else '-'} · "
+                  f"ceiling {c if c is not None else 'UNARMED'}")
+    return 0
+
+
+def do_bump(root: str, conf: dict) -> int:
+    """Rewrite the HIGH-WATER file from the measured tree. It never writes the ceiling file."""
+    here = pathlib.Path(__file__).resolve().parent
+    bound = sorted(read_contract_registry(root, conf))
+    peak = {h: 0 for h, _e, _b in SLOT_CANON}
+    for rel in bound:
+        for head, size in slot_sizes(read_text(os.path.join(root, rel))):
+            peak[head] = max(peak.get(head, 0), size)
+    p = str(here / SLOT_HIGHWATER)
+    keep = [l for l in read_text(p).split("\n") if not l.strip() or l.lstrip().startswith("#")] \
+        if os.path.exists(p) else []
+    while keep and not keep[-1].strip():
+        keep.pop()
+    rows = [f"{h}\t{peak[h]}" for h, _e, _b in SLOT_CANON]
+    write_text(p, "\n".join(keep + rows) + "\n")
+    print(f"build-index: high-water rewritten for {len(rows)} slot(s) over {len(bound)} bound "
+          f"README(s); {SLOT_LIMITS} untouched")
     return 0
 
 
@@ -1779,6 +1955,34 @@ def do_selftest() -> int:
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
 
+        # ------------------------------------------------ TOOL-dFramedEntrypoint-2, the slot budget
+        # THE READER'S OWN TRAP, armed because it shipped broken for one commit: every canonical slot
+        # heading starts with `#`, so a comment predicate keyed on `#` ate every data row and the
+        # table parsed to EMPTY — which the leg then reported as five deliberate UNARMED slots.
+        _tbl = os.path.join(base, "tbl.txt")
+        write_text(_tbl, "# a real comment, no tab\n"
+                         "## The problem this build exists to solve\t900\n"
+                         "## Expected improvements\t\n")
+        arm("a heading row is DATA even though it starts with a hash", "900",
+            lambda: str(_read_slot_table(_tbl).get("## The problem this build exists to solve")))
+        arm("a line with no tab is the comment, and is skipped", "1",
+            lambda: str(sum(1 for k in _read_slot_table(_tbl) if "real comment" in k) + 1))
+        arm("a row with no value is the ANNOUNCED unarmed state, not a missing row", "None",
+            lambda: str(_read_slot_table(_tbl)["## Expected improvements"]))
+        # Both directions over the declaration, asserted whether or not anything is BOUND.
+        arm("a limits table missing a canonical slot is a refusal", "has NO ROW for the canonical slot",
+            lambda: _assert_slot_table({"## Expected improvements": 1}, "t.txt"))
+        arm("a limits row for an unknown slot is a refusal", "which SLOT_CANON does not declare",
+            lambda: _assert_slot_table({h: 1 for h, _e, _b in SLOT_CANON} | {"## Nope": 1}, "t.txt"))
+        # The measured slice: authored only, and it STOPS at the roster pair.
+        _sz = dict(slot_sizes("\n".join(
+            ["# t", ""] + GOOD + ["", PLAN_OPEN, "| # | a very wide authored roster row |", PLAN_CLOSE,
+             "", MARK_OPEN, "generated bytes that must not be billed to a slot", MARK_CLOSE, ""])))
+        arm("the last slot's slice stops at the roster pair, not the generated marker", "0",
+            lambda: str(_sz["## Parked decisions"]))
+        arm("a slot's size counts its authored body only", "22",
+            lambda: str(_sz["## The problem this build exists to solve"]))
+
         # ------------------------------------------------ TOOL-dFramedEntrypoint-4, the order verb
         # The shipped regex ended `(?![0-9])`, which rejects a longer NUMBER and nothing else. Both
         # of these were PROBED against it before the change and both rendered a plausible step.
@@ -1984,9 +2188,11 @@ def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return do_selftest()
-    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey"):
+    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
+                    "--report", "--bump"):
         print("usage: gen_build_index.py "
-              "[--check|--write|--check-format|--survey|--print-bindings|--selftest]")
+              "[--check|--write|--check-format|--survey|--report|--bump|"
+              "--print-bindings|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -2001,6 +2207,10 @@ def main(argv: list) -> int:
             return do_check_format(root, conf)
         if mode == "--survey":
             return do_survey(root, conf)
+        if mode == "--report":
+            return do_report(root, conf)
+        if mode == "--bump":
+            return do_bump(root, conf)
         return do_check(root, conf) if mode == "--check" else do_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

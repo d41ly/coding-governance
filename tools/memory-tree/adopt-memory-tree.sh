@@ -135,6 +135,17 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
 ' > "$M/project/unarmed-branches.txt"
+# build-readme-slot-limits.txt ships with its ROWS and without gov's VALUES. A ceiling measured
+# against this repo's corpus is a pin the adopter never measured, which is vacuous or permanently red
+# — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists beside
+# it. A row with no value is the ANNOUNCED unarmed state and the leg counts it on every run; a MISSING
+# row is a refusal, so the rows must survive the strip and only the numbers may go.
+if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
+  awk -F'\t' 'BEGIN{OFS="\t"} /^## /{ print $1, ""; next } { print }' \
+    "$HERE/build-readme-slot-limits.txt" > "$HERE/.slot-limits.tmp" \
+    && mv "$HERE/.slot-limits.tmp" "$HERE/build-readme-slot-limits.txt"
+fi
+
 # method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
 # files that POINT AT the build method — this adopter is one, the kit README is another — so an
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is

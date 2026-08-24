@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 4 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 4 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -221,6 +221,7 @@ the new data files · `check-kit-versions.sh` (leg `kit version markers`, unguar
   way to reach it. The high-water file gains its own absent-state semantics, which the rev-2 split
   created and did not define.
 - rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-6 · 2026-08-24 · BUILT and CLOSED. Two declared files, the two verdict tiers, `--report`, `--bump`, the adopter strip and the kit hole. Seven arms, 95 to 102. One defect shipped and was caught by running the verb: the comment predicate ate every data row because a slot heading starts with a hash, and with an empty population nothing validated the declaration at all — so the table assertion now runs on every check rather than only while grading a bound file. Ledger: `build/2026-08-24-build-TOOL-dFramedEntrypoint-2-acceptance.md`.
 
 ## 10. Reuse audit
 

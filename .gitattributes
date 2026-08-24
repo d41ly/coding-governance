@@ -174,3 +174,8 @@ tools/unattended/fixture-records/*.md eol=lf
 # subject value, so `repo\r` compares unequal to `repo` and the ratchet reds on every leg at once.
 # TOOL-dUnstalledConvoy-29.
 tools/govkit/subject-pins.tsv text eol=lf
+
+# TOOL-dFramedEntrypoint-2 - the two slot-budget declarations. Tab-separated and read line by
+# line, so a CR would land inside the value field and a ceiling would parse as UNARMED.
+tools/memory-tree/build-readme-slot-limits.txt eol=lf
+tools/memory-tree/build-readme-slot-highwater.txt eol=lf

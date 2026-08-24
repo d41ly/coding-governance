@@ -298,6 +298,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "budget_findings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "buildBlankedRun",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -733,6 +738,11 @@
       "file": "tools/workflows/check-workflow-syntax.js"
     },
     {
+      "id": "do_bump",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "do_check",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -800,6 +810,11 @@
     {
       "id": "do_report",
       "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "do_report",
+      "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
     },
     {
@@ -831,6 +846,11 @@
       "id": "do_selftest",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "do_survey",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "do_write",
@@ -1788,6 +1808,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_contract_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2408,6 +2433,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "slot_sizes",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "slot_violations",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2991,6 +3021,11 @@
       "id": "tree_root",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "unarmed_slots",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "unfenced",
