@@ -27,6 +27,16 @@ include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-la
 role = "seed"
 to = "{kit}/{relpath}"
 
+# The rendered Skill. `role = "rendered"` rather than `engine` because its CONTENT is derived from
+# the adopter's own declaration, so shipping this repo's copy would teach every adopter THIS repo's
+# verbs. The wildcard rule above cannot claim it: a rule's pool excludes any file whose destination
+# another rule owns, which is the property that lets this entry exist beside `include = "**"`.
+[[files]]
+include = ["SKILL.template.md"]
+role = "rendered"
+to = ".claude/skills/lexicon/SKILL.md"
+placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "BRIEF_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
+
 [config]
 file = ".lexicon.conf"
 owner = "lexicon"
@@ -90,3 +100,20 @@ blocks_adopt = false
 blocks_gate = true
 why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
 discharge = { command = ["python", "{kit}/lexicon.py"] }
+
+# NO GUARD, deliberately, and it is the only leg in this kit without one. Every other leg here is
+# scoped to a path whose movement could change its answer; this one's answer changes when
+# `.lexicon.conf` moves, and that file is not a guard pathspec govkit can express (the descriptor
+# says why, above). A guard naming the kit dir would leave a conf-only edit unchecked, which is
+# exactly the drift this leg exists to catch.
+[[gate_leg]]
+name = "lexicon skill wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
+guard = []
+
+# Line-ending pin for the target: a rendered artifact its own gate byte-compares. A CR that git
+# introduces on checkout would read as DRIFT on every run.
+[[lf_pin]]
+pattern = ".claude/skills/lexicon/SKILL.md"
+why = "a rendered artifact its own gate byte-compares"

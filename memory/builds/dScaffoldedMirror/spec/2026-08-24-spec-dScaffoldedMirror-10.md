@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author
 
-**Status:** INPROGRESS · rev-2 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -351,6 +351,21 @@ edit.
   observed — AC11 at 84 ms worst of 20 against a 100 ms bar. AC2's FULL form works because
   `TOOL-dScaffoldedMirror-8` S6/S7 landed first: `--suggest fetch_remote` names `load_remote` and
   quotes the negative, which is the whole reason that split was taken.
+
+- rev-3 · 2026-08-25 · S4 BUILT; S5 and S7 remain. THREE defects found while building, and all three
+  were already documented one kit over. (1) `KITREL` was derived by trimming `ROOT` off `KIT_DIR`,
+  and on Windows those are spelled `C:/...` and `/c/...`, so the trim silently did nothing and the
+  ABSOLUTE path rendered into the Skill description — which shipped, briefly, into a registered
+  Skill. `memory-recall` derives the same value with `git rev-parse --show-prefix` and its comment
+  says the wrong way writes a drifting diff into a committed artifact silently. (2) The render
+  stripped CR from the TEMPLATE but not from substituted VALUES, and Python's `print` emits CRLF on
+  Windows — so `--check` reported DRIFTED against a file it had just written. The strip belongs at
+  the last point before emission, where it covers every value. (3) `diff -q -` reading stdin AND a
+  process substitution returned non-zero on identical content under Git-Bash; replaced with two
+  temp files and `cmp -s`.
+  ONE VERB ADDED beyond the spec: `--render`. `--scaffold` REFUSES on an existing declaration, so
+  without it the only remedy for a DRIFTED Skill was deleting the conf and re-deriving the table —
+  a refusal whose only fix is destructive is one people learn to bypass.
 
 ## 10. Reuse audit
 

@@ -869,6 +869,17 @@
     "subject": "repo"
   },
   {
+    "name": "lexicon skill wiring",
+    "argv": [
+      "bash",
+      "tools/lexicon/adopt-lexicon.sh",
+      "--check"
+    ],
+    "guard": [],
+    "chunk": "wiring",
+    "subject": "repo"
+  },
+  {
     "name": "playbook placeholder catalogue",
     "argv": [
       "bash",
