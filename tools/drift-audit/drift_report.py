@@ -221,6 +221,86 @@ def ratchet_findings(git: "Git", root: pathlib.Path, ratchets, lookback: int = D
     return out
 
 
+# --------------------------------------------------------------------------------------------
+# S5 of TOOL-dScaffoldedMirror-6 — the LANGS mode ratchet.
+#
+# BESIDE `RATCHETS`, NOT INSIDE IT, and the reason is shape rather than taste. `RATCHETS` compares
+# one SCALAR per (file, key) and its whole grammar — `_scalar_at`, `_justified`, `weakens: up|down`
+# — is built on a number. A `LANGS` declaration is a SET of (extension, mode) pairs inside one
+# string, so a mode move is per-extension and ordinal rather than numeric, and widening the scalar
+# ratchet to carry it would make one mechanism answer two questions. The spec's section 3 refuses
+# that widening explicitly.
+#
+# WHY THIS EXISTS AT ALL: flipping an armed extension to `dark` is a ONE-STRING edit that empties a
+# graded population and, before this, reddened nothing. Measured on this repo — flip `py` from
+# `parser` to `dark` and the armed share of definition-carrying files falls from 42.2% to 7.8%,
+# with the gate still exiting 0.
+#
+# THE GAP IT DOES NOT CLOSE, said plainly. An extension ARRIVING already-dark is a rise from absent
+# (-1) to dark (0), so it is not a weakening and nothing here fires — yet it lowers coverage exactly
+# as a flip does. The spec's rev-1 gave that case to a `COVERAGE_FLOOR` that rev-2 cut, so it is
+# currently VISIBLE (the fraction moves, and the lexicon gate prints it every run) and not gated.
+LANG_MODE_RANK = {"parser": 2, "probe": 1, "dark": 0}
+
+
+def read_lang_modes(text: str) -> dict:
+    """`{ext: mode}` from a `LANGS="<ext>:<pset>:<mode> …"` declaration. Absent key gives {}."""
+    m = re.search(r'^LANGS="([^"]*)"', text, re.M)
+    if not m:
+        return {}
+    out = {}
+    for tok in m.group(1).split():
+        bits = tok.split(":")
+        if len(bits) == 3 and bits[2]:
+            out[bits[0]] = bits[2]
+    return out
+
+
+def _check_mode_justified(text: str, ext: str, old: str, new: str, lookback: int) -> bool:
+    """A comment within `lookback` lines above the `LANGS` line naming `<ext>: <old> -> <new>`.
+
+    The EXTENSION is required in the marker, unlike the scalar ratchet's, because one `LANGS` line
+    carries every extension: a bare `parser -> dark` beside it would justify a move for whichever
+    extension the reader guessed.
+    """
+    lines = text.splitlines()
+    at = next((i for i, ln in enumerate(lines) if ln.startswith("LANGS=")), None)
+    if at is None:
+        return False
+    want = re.compile(r"\b" + re.escape(ext) + r"\b\s*:?\s*\b" + re.escape(old)
+                      + r"\b\s*(?:->|\u2192|to)\s*\b" + re.escape(new) + r"\b")
+    return any(want.search(ln) for ln in lines[max(0, at - lookback): at + 1])
+
+
+def build_lang_mode_findings(git: "Git", root: pathlib.Path, path: str = ".lexicon.conf",
+                             lookback: int = DEFAULT_RATCHET_LOOKBACK) -> list:
+    """Extensions whose coverage mode WEAKENED between the base and HEAD, unjustified."""
+    p = root / path
+    if not p.exists():
+        return []                          # the kit is not adopted here; nothing declared, nothing to rank
+    head_txt = p.read_text(encoding="utf-8", errors="replace")
+    base = git.run("show", f"{git.base_ref}:{path}")
+    if base.returncode != 0:
+        return []                          # the declaration is new on this branch; nothing to compare
+    now, was = read_lang_modes(head_txt), read_lang_modes(base.stdout)
+    out = []
+    for ext, old in sorted(was.items()):
+        new = now.get(ext)
+        old_rank = LANG_MODE_RANK.get(old, -1)
+        new_rank = LANG_MODE_RANK.get(new, -1) if new is not None else -1
+        if new_rank >= old_rank:
+            continue
+        shown = new if new is not None else "absent"
+        if not _check_mode_justified(head_txt, ext, old, shown, lookback):
+            out.append(
+                f"{path}: LANGS .{ext} moved {old} -> {shown}, which WEAKENS coverage, with no "
+                f"justification beside it. Emptying a graded population is a one-string edit and "
+                f"reds nothing else — write why, naming the move as '{ext}: {old} -> {shown}', "
+                f"within {lookback} lines above the LANGS line."
+            )
+    return out
+
+
 class Git:
     def __init__(self, root: pathlib.Path, base_ref: str):
         self.root, self.base_ref = root, base_ref
@@ -1369,6 +1449,7 @@ def main(argv: list[str] | None = None) -> int:
         # is enumerated in the project layer, never inferred.
         declared = set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())
         ratchets = ratchet_findings(ctx.git, root, getattr(ctx.proj, "RATCHETS", ()), lookback)
+        ratchets += build_lang_mode_findings(ctx.git, root, lookback=lookback)
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)
         over = [s for s in out if s["gateable"] and s["live"] and s["value"] > s["pin"]]

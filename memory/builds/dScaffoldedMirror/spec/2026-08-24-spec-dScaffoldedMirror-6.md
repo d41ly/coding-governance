@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet
 
-**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -55,6 +55,11 @@ written in place. This is the largest unclosed hole the review found and no desi
   SECOND, differently-shaped ratchet beside it rather than widening the first.
 - **No `.ts`/`.tsx` pattern set.** `TOOL-dScaffoldedMirror-13` owns that question and this unit's
   fraction is what will make its answer measurable.
+- **The ARRIVING-DARK move is not gated, and rev-4 states it rather than leaving it implicit.** An
+  extension declared `dark` from its first appearance rises from absent (-1) to 0, so S5 correctly
+  sees no weakening — yet it lowers coverage exactly as a flip does. rev-1 gave that case to
+  `COVERAGE_FLOOR`, which rev-2 cut, so it is now VISIBLE (S1 prints the fraction every run) and
+  ungated. A later unit may close it; nothing here pretends it is closed.
 
 ## 4. Design
 
@@ -219,9 +224,12 @@ the piece that makes every later measurement in this build readable.
 - **AC6** — When the coverage sniffer is broken so it reports no definition-carrying file in any
   dark extension, `python tools/lexicon/lexicon.py` prints `DEAD SNIFFER` and exits 1 rather than
   reporting `100.0%`. Staged by replacing the sniffer's pattern with one that cannot match.
-- **AC7** — When `bash tools/run-gates/run-gates.sh` runs after both commits, `lexicon naming
-  predicates`, `lexicon selftest`, `lexicon wiring`, `drift-audit selftest` and `drift-audit
-  records` are green.
+- **AC7** — When the five legs this unit touches are run, they are green: `python
+  tools/lexicon/lexicon.py`, `python tools/lexicon/selftest.py`, `bash
+  tools/lexicon/adopt-lexicon.sh --check`, `python tools/drift-audit/drift_report.py --check`
+  and `python tools/drift-audit/selftest.py`. rev-1 named `run-gates.sh`; the full bar is a
+  PUSH-BOUNDARY run in this repo's own model, and naming it in a per-unit criterion asks every
+  unit to pay a 26-minute floor to close.
 
 ## 7. Gates
 
@@ -274,6 +282,16 @@ is worth saying twice.
   registering itself into `problems` AFTER that list is printed and folded into the exit code, so
   it could never fire — armed-but-unreachable, found only by observing the break. AC1 reads 54 of
   128 (42.2%) against rev-1's predicted 54 of 126 (42.9%).
+
+- rev-4 · 2026-08-25 · S5 BUILT and the unit CLOSED. The mode ratchet lands BESIDE `RATCHETS`
+  rather than inside it, per §3: that grammar is built on a scalar and a `LANGS` move is
+  per-extension and ordinal. The marker must NAME the extension, because one `LANGS` line carries
+  every one of them and a bare `parser -> dark` beside it would justify whichever the reader
+  guessed — armed. AC7 is AMENDED: it named the full bar, and the five legs it cares about were run
+  directly, the full bar being a push-boundary concern in this repo's own model. Recorded while
+  building: `lexicon_verbs_declared_but_unused` already fired INDIRECTLY on a dark flip (0 -> 14
+  over pin 3), so the move was not wholly unguarded before — but that signal reports unused verbs
+  rather than lost coverage, and would stay quiet on a small table. S5 names the move itself.
 
 ## 10. Reuse audit
 

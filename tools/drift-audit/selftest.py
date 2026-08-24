@@ -1400,6 +1400,72 @@ def test_ratchet_message_states_its_window(tmp: pathlib.Path) -> None:
           bool(out_def) and f"within {dr.DEFAULT_RATCHET_LOOKBACK} lines" in out_def[0], str(out_def))
 
 
+def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
+    """The LANGS mode ratchet: a weakening move needs its reason beside it.
+
+    THE ARM THAT MATTERS IS THE JUSTIFIED ONE. A ratchet that only ever fires is a ratchet nobody can
+    satisfy, and it would be indistinguishable from one that fires unconditionally -- which is the
+    same could-not-fail shape one level up. Both directions are asserted over one fixture.
+
+    THE EXTENSION IS REQUIRED IN THE MARKER, and that has its own arm. One LANGS line carries every
+    extension, so a bare `parser -> dark` beside it would justify a move for whichever extension the
+    reader guessed.
+    """
+    print("LANGS mode ratchet (a weakening move needs its reason)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import drift_report as dr
+
+    class _Git:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="py:python-ast:parser js:js-regex:probe"\n'})()
+
+    root = tmp / "langmode"
+    root.mkdir(parents=True, exist_ok=True)
+    conf = root / ".lexicon.conf"
+
+    # UNJUSTIFIED: py falls parser -> dark with nothing beside it.
+    conf.write_text('LANGS="py:python-ast:dark js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    out = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an unjustified parser -> dark is a finding", bool(out), str(out))
+    check("mode ratchet: it names the extension and both modes",
+          bool(out) and ".py" in out[0] and "parser -> dark" in out[0], str(out))
+
+    # JUSTIFIED: the same move, with the marker above the LANGS line.
+    conf.write_text('# py: parser -> dark, because the extractor moved to another kit.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: the SAME move with its reason beside it is silent",
+          dr.build_lang_mode_findings(_Git(), root) == [], str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # The marker must name the EXTENSION, not just the two modes.
+    conf.write_text('# parser -> dark, and this comment names no extension.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a marker naming no extension does NOT justify the move",
+          bool(dr.build_lang_mode_findings(_Git(), root)),
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # A STRENGTHENING move is free, and an extension that never moved is silent.
+    conf.write_text('LANGS="py:python-ast:parser js:js-regex:parser"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a tightening move needs no justification",
+          dr.build_lang_mode_findings(_Git(), root) == [],
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # An extension DROPPED from LANGS entirely is the strongest weakening: rank falls to absent.
+    conf.write_text('LANGS="js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    gone = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an extension DELETED from LANGS is a weakening, not an absence",
+          bool(gone) and "absent" in gone[0], str(gone))
+
+    # NOT ADOPTED: no declaration at all is silence, never a finding.
+    conf.unlink()
+    check("mode ratchet: a repo without the kit reports nothing",
+          dr.build_lang_mode_findings(_Git(), root) == [], "expected []")
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -1414,6 +1480,7 @@ def main() -> int:
         test_ratchet_guard(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
+        test_lang_mode_ratchet(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")
