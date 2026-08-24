@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 
@@ -17,6 +17,10 @@ decides it. What a machine can do is make CHANGING it deliberate.
   value that differs from its pin reds until the pin moves in the same commit.
 - **S2 — the pin is DERIVED into the check, not hand-listed.** It is generated from the descriptors,
   so adding a leg adds a pin row and nothing goes stale by omission.
+  **AMENDED rev-2: generated from `tools/gate-legs.json`, not from the descriptors.** Section 7h
+  already asserts the two agree in both directions, so pinning the manifest pins every descriptor
+  leg transitively — and it also covers the `[[exempt_leg]]` rows, which no descriptor claims and a
+  descriptor-derived pin would have left free to move. The narrower population was the weaker one.
 - **S3 — the refusal names the leg, both values, and what moving the pin means** — that a leg moving
   from `repo` to `kit` leaves the automatic bar.
 - **S4 — the check states what it does NOT decide**, in its own header: it grades CHANGE, never
@@ -81,6 +85,18 @@ not write it as evidence the subjects are right. It is not, and the header is wh
 
 - rev-1 · 2026-08-24 · promoted from round 2's NON-CONVERGENT spec audit, which found that all-`repo`
   and all-`kit` both satisfy every acceptance criterion the parent spec carries.
+- rev-2 · 2026-08-24 · S2 amended at build time: the pin derives from the leg MANIFEST rather than
+  from the descriptors, because the manifest is the superset and the exempt legs are exactly the
+  rows the narrower derivation would have missed. Built and CLOSED.
+
+  Two arms were sharpened after the red-first run rather than before it, and the reason is worth
+  keeping. `AC4: and the generated pin is exactly the derived population` and `AC2: and the moved
+  pin records the new value` both PASSED against a build with no ratchet in it: the fixture's
+  hand-written pin already held the bytes they asserted, so regeneration was never the thing being
+  measured. Corrupting the pin first, and planting a stale row the regeneration must drop, made both
+  discriminating. One arm remains non-discriminating BY CONSTRUCTION and is labelled `CONTROL`: an
+  assertion that a correct tree is green cannot fail when the mechanism is absent, and it is kept
+  because a ratchet that reds on a correct tree is the other way this fails.
 
 ## 10. Reuse audit
 

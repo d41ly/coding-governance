@@ -578,6 +578,12 @@ def main() -> int:
                              "argv": ["bash", "tools/memory-tree/engine.sh"],
                              "guard": [], "subject": "repo"}], indent=2) + NL,
                 encoding="utf-8", newline=NL)
+            # `shutil.copytree(HERE, ...)` above brings gov's own subject pin with it, and this
+            # tree has one leg rather than gov's whole manifest. Overwritten with a pin for THIS
+            # fixture, because a pin naming legs the tree does not have is exactly the stale-pin
+            # refusal the ratchet exists to raise. TOOL-dUnstalledConvoy-29.
+            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+                "# fixture pin" + NL + "demo leg\trepo" + NL, encoding="utf-8", newline=NL)
             (mt / "kit.toml").write_text(kit_toml, encoding="utf-8", newline=NL)
             (g / "tools" / "govkit" / "registry.toml").write_text(NL.join([
                 "version = 1",
@@ -1224,8 +1230,11 @@ user_skills = "/tmp/gk-fake-skills"
         # find anything. These arms build a scratch gov tree — a copy of the engine plus a minimal
         # registry — and feed it input that MUST red. Without them, the two arms below would be the
         # repo's own `fixture-passes-by-finding-nothing` class living inside the tool that gates it.
-        def scratch_gov(mutates: str, guard: str) -> pathlib.Path:
-            g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}"
+        def scratch_gov(mutates: str, guard: str, tag: str = "") -> pathlib.Path:
+            # `tag` disambiguates two fixtures built from the SAME pair. The name was derived from
+            # the arguments alone, so a second call with identical ones met a directory that already
+            # existed and died with FileExistsError rather than reusing or refusing.
+            g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}{tag}"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
@@ -1255,6 +1264,11 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "gate-legs.json").write_text(
                 json.dumps([{"name": "demo", "argv": ["true"], "guard": [guard]}], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
+            # Only govkit.py was copied, so this tree arrives with no subject pin and the ratchet
+            # reds on its absence — correctly, and this fixture's premise is a tree where every
+            # declared fact agrees. The manifest leg declares no subject, so it derives to `repo`.
+            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+                "# fixture pin\ndemo\trepo\n", encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -1332,6 +1346,111 @@ user_skills = "/tmp/gk-fake-skills"
               bad_g.returncode == 1 and "declared classes" in bad_g.stdout, bad_g.stdout)
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
+
+        # ---- THE SUBJECT RATCHET (TOOL-dUnstalledConvoy-29) --------------------------------------
+        # A leg's subject decides whether it runs on every bar or waits for GATE_SELFTESTS=1, and no
+        # predicate over a descriptor can decide whether a given value is RIGHT — that needs to know
+        # what the leg's failure MEANS. So the value is ratcheted instead: it cannot move without the
+        # move appearing in a diff. These arms grade the ratchet, and none of them grades correctness.
+        rg = scratch_gov("true", "tools/demo/", tag="-ratchet")
+        pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
+        legsf = rg / "tools" / "gate-legs.json"
+        kitf = rg / "tools" / "demo" / "kit.toml"
+
+        def _relegs(subject: str, extra: bool = False) -> None:
+            rows = [{"name": "demo", "argv": ["true"], "guard": ["tools/demo/"],
+                     "subject": subject}]
+            if extra:
+                rows.append({"name": "demo two", "argv": ["true"], "guard": [], "subject": "repo"})
+            legsf.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
+            # The DESCRIPTOR moves with it. Leaving it behind reds on the 7h agreement check, and
+            # the arm would then be green for a reason that has nothing to do with the ratchet.
+            body = ('id = "demo"\nhome = "tools/demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                    f'[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n'
+                    f'subject = "{subject}"\n')
+            if extra:
+                body += ('\n[[gate_leg]]\nname = "demo two"\nargv = ["true"]\nguard = []\n'
+                         'subject = "repo"\n')
+            kitf.write_text(body, encoding="utf-8", newline="\n")
+
+        # AC4 — the pin is DERIVED, not hand-listed: regenerating it over this tree produces exactly
+        # the tree's own population, and the tree is green afterwards.
+        #
+        # The pin is CORRUPTED first, on purpose. With a fixture pin that already matched, the two
+        # arms below passed against a build with no ratchet in it at all — the generated content was
+        # the content that was already there, and a tree nothing checks is green for free. Starting
+        # wrong is what makes regeneration the thing being measured.
+        pinf.write_text("# fixture pin\ndemo\tkit\nzzz gone\trepo\n", encoding="utf-8", newline="\n")
+        _liv = run_in(rg)
+        check("LIVENESS: a pin that disagrees with the manifest REDS, so the arms below are not "
+              "measuring a tree that was already correct",
+              _liv.returncode == 1 and "is subject 'repo' and pinned 'kit'" in _liv.stdout,
+              _liv.stdout + _liv.stderr)
+        _w = run_in_gov(rg, "selfcheck", "--write")
+        check("AC4: selfcheck --write regenerates the subject pin",
+              _w.returncode == 0 and "wrote 1 subject pin" in _w.stdout, _w.stdout + _w.stderr)
+        _rows = [l for l in pinf.read_text(encoding="utf-8").split("\n")
+                 if l.strip() and not l.startswith("#")]
+        check("AC4: and the generated pin is exactly the derived population",
+              _rows == ["demo\trepo"], str(_rows))
+        _g0 = run_in(rg)
+        # A CONTROL, not a discriminating arm: an assertion that something is green cannot fail when
+        # the mechanism is absent, and this one passed in the red-first run for exactly that reason.
+        # It is kept because a ratchet that reds on a correct tree is the other way this fails.
+        check("CONTROL: a tree whose pin was just regenerated is GREEN",
+              _g0.returncode == 0, _g0.stdout + _g0.stderr)
+
+        # AC1 — a flip with the pin left behind REDS, and the refusal names the leg, both values,
+        # and what the move actually does. "subject changed" would tell a reader nothing.
+        _relegs("kit")
+        _r1 = run_in(rg)
+        check("AC1: flipping a subject without moving its pin REDS",
+              _r1.returncode == 1, _r1.stdout + _r1.stderr)
+        check("AC1: and the refusal names the leg and BOTH values",
+              "gate leg 'demo' is subject 'kit' and pinned 'repo'" in _r1.stdout, _r1.stdout)
+        check("AC1: and says what the move does — leaving the automatic bar",
+              "OFF the automatic bar" in _r1.stdout, _r1.stdout)
+        check("AC1: and says it grades the change rather than the value",
+              "never whether the value is right" in _r1.stdout, _r1.stdout)
+
+        # AC2 — moving the pin in the same commit is the sanctioned path, and it passes. Without
+        # this arm the ratchet could be a check that reds on everything forever.
+        _w2 = run_in_gov(rg, "selfcheck", "--write")
+        check("AC2: moving the pin in the same commit passes",
+              _w2.returncode == 0, _w2.stdout + _w2.stderr)
+        _rows2 = [l for l in pinf.read_text(encoding="utf-8").split("\n")
+                  if l.strip() and not l.startswith("#")]
+        # EXACTLY the new population, which is what makes this arm discriminating: the stale row
+        # planted in the corruption above must be GONE, and only a real regeneration removes it.
+        check("AC2: and the moved pin records the new value and drops the stale row",
+              _rows2 == ["demo\tkit"], str(_rows2))
+
+        # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
+        # it would let a leg arrive already held, on nobody's decision.
+        _relegs("kit", extra=True)
+        _r3 = run_in(rg)
+        check("AC3: a NEW leg with no pin row REDS rather than passing",
+              _r3.returncode == 1 and "gate leg 'demo two' has no row in" in _r3.stdout,
+              _r3.stdout + _r3.stderr)
+
+        # ...and its mirror: a pin naming a leg that is gone. A stale row is a pin for nothing, and
+        # it silently adopts the next leg that arrives under that name.
+        run_in_gov(rg, "selfcheck", "--write")
+        _relegs("kit")
+        _r4 = run_in(rg)
+        check("a pin row naming a leg the manifest no longer declares REDS",
+              _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
+
+        # AC5 — the header says what the check does NOT decide, in the generated file itself, where
+        # a reader who found the pin will actually be looking.
+        run_in_gov(rg, "selfcheck", "--write")
+        check("AC5: the generated pin's own header states it grades change and not correctness",
+              "GRADES CHANGE, NOT CORRECTNESS" in pinf.read_text(encoding="utf-8"),
+              pinf.read_text(encoding="utf-8"))
 
         # ---- a `**` rule must not claim what another rule owns (TOOL-dClosedLexicon-4) ----------
         # REPRODUCED before it was fixed: `apply` iterated file rules in order, and an

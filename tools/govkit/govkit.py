@@ -585,7 +585,7 @@ class Report:
 
 
 # ------------------------------------------------------------------------------------- selfcheck
-def selfcheck(root: pathlib.Path) -> int:
+def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r = Report()
     reg_path = root / "tools" / "govkit" / "registry.toml"
     reg = load_toml(reg_path)
@@ -928,6 +928,82 @@ def selfcheck(root: pathlib.Path) -> int:
                    f"a new leg must red until a declaration says whether an adopter receives it")
         r.note(f"legs: {len(manifest)} in the manifest · {len(claimed_legs)} claimed · "
                f"{len(exempt_legs)} exempt")
+
+        # ---- 7h2: THE SUBJECT RATCHET. TOOL-dUnstalledConvoy-29.
+        #
+        # WHAT THIS DOES NOT CHECK, said here because a check named for subjects sitting green on a
+        # bar reads to everybody who did not write it as evidence the subjects are RIGHT. It is not.
+        # Deciding whether a leg belongs on the automatic bar means knowing what its failure MEANS,
+        # which no predicate over a descriptor can see. This grades CHANGE and nothing else: a
+        # subject cannot move without the move appearing in a diff somebody reviews. A green row here
+        # is evidence that nobody flipped a value quietly, never that the value is correct.
+        #
+        # PINNED OVER THE MANIFEST, not over the descriptors. 7h above already asserts the two agree
+        # in both directions, so pinning the manifest pins every descriptor leg transitively AND
+        # covers the [[exempt_leg]] rows, which no descriptor claims and a descriptor-derived pin
+        # would therefore leave free to move. The spec asked for the descriptors; this is the amended
+        # answer and -29 rev-2 records why.
+        pin_path = root / "tools" / "govkit" / "subject-pins.tsv"
+        live = {nm: (manifest_subject.get(nm) or "repo") for nm in manifest if nm}
+        bad_name = sorted(nm for nm in live if "\t" in nm)
+        for nm in bad_name:
+            r.fail(f"gate leg '{nm}' carries a TAB in its name, which is this pin file's field "
+                   f"separator — a name that cannot be recorded cannot be ratcheted")
+        body = "".join(f"{nm}\t{live[nm]}\n" for nm in sorted(live) if nm not in bad_name)
+        header = (
+            "# subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py "
+            "selfcheck --write`.\n"
+            "#\n"
+            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>. `kit` legs are HELD "
+            "off the\n"
+            "# automatic bar and run only under GATE_SELFTESTS=1; `repo` legs run on every bar.\n"
+            "#\n"
+            "# THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without\n"
+            "# the move appearing in a diff. Whether any given value is RIGHT is a review judgement\n"
+            "# — the criterion is stated once, at the `subject` field declaration in\n"
+            "# tools/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.\n")
+        want = header + body
+        if write:
+            pin_path.parent.mkdir(parents=True, exist_ok=True)
+            pin_path.write_text(want, encoding="utf-8", newline="\n")
+            subprocess.run(["git", "-C", str(root), "add", "--", "tools/govkit/subject-pins.tsv"],
+                           capture_output=True, check=False)
+            print(f"govkit selfcheck — wrote {len(live)} subject pin(s) to "
+                  f"tools/govkit/subject-pins.tsv")
+        elif not pin_path.is_file():
+            r.fail("tools/govkit/subject-pins.tsv is missing — the subject ratchet has no pin to "
+                   "compare against, so every leg could leave the automatic bar unobserved. "
+                   "Regenerate with `python tools/govkit/govkit.py selfcheck --write`")
+        else:
+            pinned: dict[str, str] = {}
+            for ln in pin_path.read_text(encoding="utf-8").split("\n"):
+                if not ln.strip() or ln.lstrip().startswith("#"):
+                    continue
+                nm, _tab, sv = ln.partition("\t")
+                if not _tab:
+                    r.fail(f"tools/govkit/subject-pins.tsv has a row with no tab: {ln!r}")
+                    continue
+                pinned[nm] = sv.strip()
+            for nm in sorted(set(live) - set(pinned)):
+                r.fail(f"gate leg '{nm}' has no row in tools/govkit/subject-pins.tsv — a NEW leg "
+                       f"reds until its subject is on the record, because an unpinned leg is one "
+                       f"whose side of the bar nobody chose. Regenerate with "
+                       f"`python tools/govkit/govkit.py selfcheck --write`")
+            for nm in sorted(set(pinned) - set(live)):
+                r.fail(f"tools/govkit/subject-pins.tsv pins '{nm}', which is in no leg of "
+                       f"tools/gate-legs.json — a stale pin row is a pin for nothing, and it hides "
+                       f"the next leg that arrives under that name")
+            for nm in sorted(set(live) & set(pinned)):
+                if live[nm] != pinned[nm]:
+                    moved = ("OFF the automatic bar: it will run only under GATE_SELFTESTS=1"
+                             if live[nm] == "kit" else
+                             "ON to the automatic bar: it will run on every gate run")
+                    r.fail(f"gate leg '{nm}' is subject '{live[nm]}' and pinned '{pinned[nm]}' — "
+                           f"this moves the leg {moved}. If that is intended, move the pin in the "
+                           f"SAME commit with `python tools/govkit/govkit.py selfcheck --write`; "
+                           f"this check grades the CHANGE and never whether the value is right")
+            r.note(f"subject pins: {len(pinned)} pinned · "
+                   f"{sum(1 for v in live.values() if v == 'kit')} held")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
@@ -3113,9 +3189,12 @@ def main(argv: list[str]) -> int:
         verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
-            if len(argv) != 1:
-                raise Refusal("selfcheck takes no arguments")
-            return selfcheck(root)
+            # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
+            # purpose: `selfcheck` is the verb a gate leg runs, and a verb that writes by default
+            # would let the bar repair the very record it is supposed to be grading.
+            if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
+                raise Refusal("selfcheck takes no arguments except --write")
+            return selfcheck(root, write=(len(argv) == 2))
         if verb in ("plan", "check", "apply", "intake", "update"):
             if target is None:
                 raise Refusal(
