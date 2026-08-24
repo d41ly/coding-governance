@@ -74,7 +74,7 @@ def check(label: str, cond: bool, detail: str = "") -> None:
         FAILURES.append(f"{label}{(' — ' + detail) if detail else ''}")
 
 
-def run_case(files: dict, conf: str | None, waivers: dict | None = None):
+def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: tuple = ()):
     """Build a throwaway repo, run the engine in it, return (exit_code, output)."""
     with build_tempdir() as td:
         root = Path(td)
@@ -98,7 +98,7 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None):
         # identifiers — a fixture measuring itself rather than its fixture.
         subprocess.run(["git", "add", "--", *files, *([".lexicon.conf"] if conf is not None else [])],
                        cwd=root, check=True, capture_output=True)
-        r = subprocess.run([sys.executable, "tools/lexicon/lexicon.py"], cwd=root,
+        r = subprocess.run([sys.executable, "tools/lexicon/lexicon.py", *args], cwd=root,
                            capture_output=True, text=True)
         return r.returncode, r.stdout + r.stderr
 
@@ -481,6 +481,47 @@ with build_tempdir() as td:
     check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
 # ---- verdict ------------------------------------------------------------------------------------
+# ---- TOOL-dScaffoldedMirror-2: per-predicate populations, counts on green, an honest --measure ----
+#
+# WHAT THESE ARE NOT. None of them asserts a VERDICT change: this unit reports, and section 3 of its
+# spec forbids moving an exit code except `--measure`'s. So every arm below reads OUTPUT, and the two
+# that read an exit code read `--measure`'s, which is the one this unit is allowed to move.
+
+_U2 = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
+
+code, out = run_case(_U2, BASE_CONF)
+check("counts on GREEN: every predicate reports graded/offenders/waived",
+      code == 0 and "P1 verb" in out and "graded=" in out and "offenders=" in out and "waived=" in out,
+      out)
+check("counts on GREEN: the SUFFIX predicate reports its own population, not a folded one",
+      "P2 suffix graded=" in out, out)
+
+# The armed-but-empty pair. `js` declares a types extractor and this fixture has no class, which is a
+# repo that writes no JavaScript classes rather than an extractor gone inert — so it is NAMED and the
+# run stays GREEN. Making it red was rev-1's design and the spec's section 4 records why that is wrong.
+_JS_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                             'LANGS="py:python-ast:parser js:js-regex:probe conf::dark"')
+code, out = run_case({**_U2, "web/app.js": "function build_widget() {}\n"}, _JS_CONF)
+check("armed but empty: the (extension, predicate) pair is NAMED", ".js suffix=0" in out, out)
+check("armed but empty: ...and it is a REPORT, so the run stays green", code == 0, out)
+check("armed but empty: the wording says it is not a refusal", "not a refusal" in out, out)
+
+# ...and the count is DERIVED, not a constant: give the same fixture a class and it moves. Without
+# this arm the one above passes against a hardcoded zero.
+code, out = run_case({**_U2, "web/app.js": "class Widget {}\nfunction build_widget() {}\n"}, _JS_CONF)
+check("the suffix population is derived: a class makes it non-zero",
+      ".js suffix=0" not in out and "P2 suffix graded=1" in out, out)
+
+# `--measure` exits on its own refusals. It printed them as `# NOTE:` under an unconditional 0, and
+# three later units use it as a discharge probe.
+code, out = run_case(_U2, BASE_CONF, args=("--measure",))
+check("--measure on a clean tree still exits 0", code == 0 and "VERB_OFFENDER_PIN" in out, out)
+
+code, out = run_case({**_U2, "notes.R": "x <- 1\n"}, BASE_CONF, args=("--measure",))
+check("--measure exits NON-ZERO over an undeclared extension", code != 0, out)
+check("--measure still prints the pins it was asked for", "VERB_OFFENDER_PIN" in out, out)
+check("--measure names the undeclared extension", "UNDECLARED EXTENSIONS" in out and "R" in out, out)
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

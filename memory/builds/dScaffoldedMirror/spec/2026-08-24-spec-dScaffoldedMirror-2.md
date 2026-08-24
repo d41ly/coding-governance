@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness
 
-**Status:** SPECCED · rev-2 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -135,9 +135,10 @@ pair as dark. Without that arm S2 is a rule with one escape hatch and no record 
 - **AC4** — When `python tools/lexicon/lexicon.py --measure` runs over a conf carrying an undeclared
   extension, it exits 1. Today it prints `# NOTE:` and exits 0; the arm stages an extension into the
   corpus and asserts the exit code moved.
-- **AC5** — When `python tools/lexicon/selftest.py` runs, it covers both AC1's refusal and AC2's
-  resolution; a fixture that stops triggering AC1 fails the suite rather than passing silently
-  (`fixture-passes-by-finding-nothing`).
+- **AC5** — When `python tools/lexicon/selftest.py` runs, it covers AC1's REPORT and AC2's
+  resolution, and a fixture that stops triggering either fails the suite rather than passing
+  silently (`fixture-passes-by-finding-nothing`). rev-2 turned AC1 from a refusal into a report
+  and this criterion still said "refusal"; rev-3 is that word, corrected.
 - **AC6** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs after the change, it is unchanged
   in output and exit code — this unit does not touch the adoption path.
 
@@ -199,6 +200,10 @@ by printing the number, which is what S3 does.
   `LANGS` grammar is needed, so this unit stays Tier-1 and touches no shared contract. AC1 and AC2
   are rewritten to assert the COUNT rather than a refusal. The §3 non-goal that pointed at
   `TOOL-dScaffoldedMirror-3` now stands on its own reason, that unit being WONTDO.
+
+- rev-3 · 2026-08-25 · built and CLOSED. One correction: AC5 still said "AC1's refusal" after rev-2
+  made AC1 a report — a spec disagreeing with itself one section apart, which is exactly what M2's
+  sub-spec cross-read is for. No mechanism changed.
 
 ## 10. Reuse audit
 

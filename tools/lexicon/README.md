@@ -43,6 +43,27 @@ undeclared one is a named refusal.
 definitions at all, and declaring them dark is what makes the undeclared-extension refusal
 meaningful rather than noisy.
 
+## What every run reports, and what a zero there means
+
+Every run prints one line per predicate — `graded`, `offenders`, `waived` — on GREEN as well as on
+red, because a green line carrying a file count and no population cannot be told apart from a run
+that found nothing to look at.
+
+`graded` is per (extension, PREDICATE), never per extension. Those were summed once, and the fold hid
+a real state: an extension can be armed, report a healthy total, and have one of its predicates
+grading ZERO. A pair in that state is NAMED every run and does **not** red:
+
+```
+lexicon: armed but grading nothing (reported, not a refusal): .js suffix=0
+```
+
+**That is a report on purpose, and the reason is the difference between two things a single tree
+cannot separate.** A language with no classes in THIS repo is not an extractor that has gone inert —
+it is a repo that does not write classes, which is ordinary and permanent. Redding it would leave no
+discharge but declaring the whole extension dark, which buys a green bar by deleting real coverage.
+The inert case is owned by the frozen sentinels below, which CAN tell the two apart. What this line
+buys is that the zero is visible rather than folded away.
+
 ## Vacuity is armed on BOTH sides
 
 A predicate that selects an empty population passes green forever and tells you nothing. The

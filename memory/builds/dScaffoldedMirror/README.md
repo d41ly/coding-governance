@@ -125,7 +125,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 | [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-14 — the `t_` and `do_` renames, and `cmd` as a reserved row](spec/2026-08-24-spec-dScaffoldedMirror-14.md) | SPECCED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-15 — wire the runbook-parity gate, and pay what wiring it costs](spec/2026-08-24-spec-dScaffoldedMirror-15.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness](spec/2026-08-24-spec-dScaffoldedMirror-2.md) | SPECCED | rev-2 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness](spec/2026-08-24-spec-dScaffoldedMirror-2.md) | CLOSED | rev-3 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-3 — corpus scoping derived from the install receipt](spec/2026-08-24-spec-dScaffoldedMirror-3.md) | WONTDO | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-4 — waiver keying and the mandatory reason](spec/2026-08-24-spec-dScaffoldedMirror-4.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-5 — the three RATCHETS rows and the delete-then-re-add repair](spec/2026-08-24-spec-dScaffoldedMirror-5.md) | WONTDO | rev-1 | 2026-08-24 |
@@ -141,6 +141,7 @@ Records live under `spec/` and `build/`.
 |---|---|---|
 | [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md) | research | TOOL-dScaffoldedMirror-2 |
 | [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2..15 |
+| [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md) | journal | TOOL-dScaffoldedMirror-2 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md) | journal | TOOL-dScaffoldedMirror-7 |
 <!-- /gen:build-index -->
 
@@ -174,5 +175,6 @@ Records live under `spec/` and `build/`.
 - **`build/`**
   - [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md)
   - [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md)
+  - [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md)
   - [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md)
 <!-- /gen:build-docs -->

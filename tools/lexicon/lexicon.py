@@ -445,7 +445,11 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
 
     # --- extraction, with the vacuity arm ----------------------------------------------------
     offenders: dict[str, list[Offender]] = {"verb": [], "suffix": [], "layer": []}
-    populations: dict[str, int] = {}
+    # S1 — keyed on (extension, PREDICATE), never on extension alone. The fold this replaces
+    # summed functions and types into one number, so `.js` reported a healthy 89 while P2 graded
+    # ZERO JavaScript classes and nothing could say so. A population is per-predicate or it is
+    # not a population — the predicate is what decides which definitions were even eligible.
+    graded: dict[tuple[str, str], int] = {}
 
     for rel in files:
         ext = ext_of(rel)
@@ -465,7 +469,9 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         if got is None:
             continue
         funcs, types_, imports = got
-        populations[ext] = populations.get(ext, 0) + len(funcs) + len(types_)
+        graded[(ext, "verb")] = graded.get((ext, "verb"), 0) + len(funcs)
+        graded[(ext, "suffix")] = graded.get((ext, "suffix"), 0) + len(types_)
+        graded[(ext, "layer")] = graded.get((ext, "layer"), 0) + len(imports)
 
         for name, lineno in funcs:
             verb = leading_verb(name)
@@ -500,7 +506,11 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     for ext, (pset, mode) in sorted(declared.items()):
         if mode == "dark":
             continue
-        if any(ext_of(f) == ext for f in files) and not populations.get(ext):
+        # UNCHANGED SEMANTICS, deliberately. This sums the VERB and SUFFIX populations because
+        # that is what the folded number was, and section 3 forbids this unit moving a verdict.
+        # Imports are excluded for the same reason: they were never in the fold.
+        ext_total = graded.get((ext, "verb"), 0) + graded.get((ext, "suffix"), 0)
+        if any(ext_of(f) == ext for f in files) and not ext_total:
             problems.append(f"DEAD PROBE — .{ext} is declared `{mode}`"
                             + (f" ({pset})" if pset else "")
                             + " and the corpus contains it, but the extractor found NO definitions. "
@@ -522,10 +532,15 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
             print("# NOTE: the run also reported problems that are not pin-counted:")
             for p in problems:
                 print(f"#   {p}")
-        return 0
+        # S4 — the exit code these four conditions always described. UNDECLARED EXTENSIONS, DEAD
+        # PROBE, UNSELECTIVE LAYERS RULE and STALE WAIVERS rode as `# NOTE:` comments under an
+        # unconditional 0, so `--measure` could not fail. Three later units use it as a discharge
+        # probe, and a probe that cannot fail discharges nothing.
+        return 1 if problems else 0
 
     # --- waivers, pins, verdict ---------------------------------------------------------------
     exit_code = 0
+    tally: dict[str, tuple[int, int, int]] = {}
     for kind in ("verb", "suffix", "layer"):
         waivers = load_waivers(kit, kind)
         found = offenders[kind]
@@ -541,6 +556,8 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
             problems.append(f"STALE WAIVERS in {WAIVER_FILES[kind]} (the matched text is gone; "
                             f"delete the row): {', '.join(sorted(stale))}")
 
+        tally[kind] = (sum(v for (_e, k), v in graded.items() if k == kind),
+                       len(unwaived), len(found) - len(unwaived))
         pin_raw = conf.get(PIN_KEYS[kind], "")
         try:
             pin = int(pin_raw) if str(pin_raw).strip() else 0
@@ -559,6 +576,23 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         print(f"lexicon: {p}")
     if problems:
         exit_code = 1
+
+    # S3 — the counts, on GREEN as well as on RED. The green line used to print the file count and
+    # the coverage modes and NO population and NO offender count, so a reader could not tell this
+    # repo from one with nothing to find. A green row is a measurement or it is a mood.
+    label = {"verb": "P1 verb  ", "suffix": "P2 suffix", "layer": "P3 layer "}
+    for kind in ("verb", "suffix", "layer"):
+        g, off, wv = tally[kind]
+        print(f"lexicon: {label[kind]} graded={g} offenders={off} waived={wv}")
+
+    # S2 — a REPORT, not a refusal. An armed pair that grades nothing is NAMED so the zero is
+    # legible; it does not red. `.js` here is armed and has no classes at all, which is a repo
+    # that does not write JavaScript classes rather than an extractor that went inert — and the
+    # inert case is owned by the frozen SENTINELS fixture in this kit's own selftest, which can
+    # tell the two apart where a single tree cannot. See the spec's section 4.
+    empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
+    if empty:
+        print("lexicon: armed but grading nothing (reported, not a refusal): " + ", ".join(empty))
 
     if exit_code == 0:
         modes = ", ".join(f".{e}={m}" for e, (_, m) in sorted(declared.items()))
