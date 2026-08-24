@@ -1,6 +1,6 @@
 # TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them
 
-**Status:** OPEN · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 

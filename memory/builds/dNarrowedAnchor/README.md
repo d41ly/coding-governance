@@ -10,13 +10,13 @@ ids: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2
 # dNarrowedAnchor — the second anchor becomes PER-MODE, so a `slug` run cannot reach it
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | OPEN | rev-1 | 2026-08-24 |
+| [TOOL-dNarrowedAnchor-1 — the second anchor is admissible per MODE, and `slug` is not one of them](spec/2026-08-24-spec-TOOL-dNarrowedAnchor-1.md) | INPROGRESS | rev-1 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`.
