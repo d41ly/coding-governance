@@ -290,7 +290,8 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 | [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | TOOL-dUnstalledConvoy-26 |
 
-Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33.
+Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
+TOOL-dUnstalledConvoy-33.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

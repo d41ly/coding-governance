@@ -165,6 +165,7 @@ the leg count is not the coverage.
 - rev-1 · 2026-08-24 · initial draft, grounded on the `dScaffoldedMirror` research pass
   (`research/2026-08-24-research-lexicon-usefulness.md`, recommendation R1) and on the read-only
   adopter probe of `incms/main` taken the same day.
+- rev-1 status 2026-08-24 · KEPT whole in the six-unit build, and the `LANGS` pair-level grammar widening is pulled INTO scope at rev-2. AC2's escape hatch needs that grammar; the only cheap alternative was declaring js dark, which is a 45-offender absorbing move with a green bar.
 
 ## 10. Reuse audit
 

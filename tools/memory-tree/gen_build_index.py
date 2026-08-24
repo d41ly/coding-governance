@@ -670,17 +670,39 @@ def render_region(build: dict) -> str:
         gap = [i for i in own if i not in named]
         agap = [i for i in own if i not in audited]
         if gap:
-            out += ["", f"Ids no record names: {' '.join(gap)}."]
+            out += [""] + _wrap_prose_ids("Ids no record names:", gap)
         if agap:
             # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit
             # record names EVER — a spec audited at rev-1 and since bumped does not appear here.
             # An "unreviewed" label would be a coverage claim the data cannot support.
-            out += ["", f"Ids no `spec-audit` record has ever named: {' '.join(agap)}."]
+            out += [""] + _wrap_prose_ids("Ids no `spec-audit` record has ever named:", agap)
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
 
 IDS_WRAP = 300
+
+
+def _wrap_prose_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
+    """`<prefix> <id> <id> ….` as one or more lines, none wider than `cap`.
+
+    Consecutive non-blank lines join into ONE markdown paragraph, so the wrap is invisible to a
+    reader and the rendered text is unchanged — while every emitted line stays under the per-line
+    entry cap check 7 enforces. Hit for real by a thirteen-unit build: the `spec-audit` gap line
+    reached 399 characters against a 350 ceiling and the build could not be committed. The remedy
+    must never be raising that ceiling, because this population grows with every unit a build
+    carries, so a raise buys one build and reds the next. Same renderer-shaped class as
+    `TOOL-dUnstalledConvoy-13` and NOT a fix for it: that row is the generated record-BINDINGS row,
+    a different line with a different grammar, and it stays open.
+    """
+    lines, cur = [], prefix
+    for i in ids:
+        if cur not in ("", prefix) and len(cur) + 1 + len(i) > cap:
+            lines.append(cur)
+            cur = ""
+        cur += (" " if cur else "") + i
+    lines.append(cur + ".")
+    return lines
 
 
 def _wrap_ids(roster: list) -> list:
