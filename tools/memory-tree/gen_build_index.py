@@ -1276,6 +1276,27 @@ def do_selftest() -> int:
             fails.append(label)
             print(f"arm FAIL  {label} — expected to see: {want}\n      got: {got}")
 
+    # `_collapse_ids` — the bindings row's cap remedy (TOOL-dUnstalledConvoy-13). The COLLAPSING arm
+    # alone is the fixture-passes-by-finding-nothing shape: a stub returning its input joined would
+    # fail it, but so would a greedy version that swallows a gap, and only the second arm can tell
+    # those apart. The third holds the boundary at two, where a range is not shorter than the pair.
+    arm("a contiguous run collapses to a range", "TOOL-dX-2..4",
+        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-4"]))
+    arm("a GAP is never swallowed by the range", "TOOL-dX-2..3 TOOL-dX-7",
+        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-7"]))
+    arm("a differing slug does not join a run", "TOOL-dX-2 TOOL-dY-3",
+        lambda: _collapse_ids(["TOOL-dX-2", "TOOL-dY-3"]))
+    arm("a non-numeric tail is emitted verbatim", "TOOL-dX-head",
+        lambda: _collapse_ids(["TOOL-dX-head"]))
+
+    # `_wrap_prose_ids` — the gap lines' cap remedy. The arm asserts the WRAP, not the content: a
+    # version that never wraps returns one line and fails on the count, which is the property the
+    # 399-character overflow was about.
+    arm("a long id list wraps below the cap", "True", lambda: str(
+        len(_wrap_prose_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
+        and max(len(x) for x in _wrap_prose_ids(
+            "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
+
     with tempfile.TemporaryDirectory() as base:
         # AC5 — a build leaves LIVE.md when its units go terminal, with nothing edited by hand.
         t = os.path.join(base, "live"); os.makedirs(t)
