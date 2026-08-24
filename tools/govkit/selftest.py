@@ -878,6 +878,30 @@ user_skills = "/tmp/gk-fake-skills"
         check("apply probes the target's pre-commit hook without committing",
               "/HOOKPROBE]" in pa.stdout, pa.stdout)
         check("apply emits the leg as the LEGS step", "gate legs: emitted" in pa.stdout, pa.stdout)
+
+        # ---- AC11 (TOOL-dUnstalledConvoy-26): the install summary tells the adopter about the
+        # ---- legs it just made INVISIBLE. A kit-subject leg is held by default, so an adopter who
+        # ---- is not told at install has a self-test they will never run and no way to learn it
+        # ---- exists — the removal would read to them as the kit shipping no tests at all.
+        # ---- The check-wiring entry emits exactly one leg and it is subject = "kit", so this
+        # ---- fixture is the right shape for the arm rather than an accident of it.
+        _kits_in = [r for r in json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+                    if (r.get("subject") or "repo") == "kit"]
+        check("LIVENESS: the fixture actually emitted a kit-subject leg, or the AC11 arms below "
+              "would be asserting about a summary with nothing to summarise",
+              len(_kits_in) == 1, str(_kits_in))
+        check("AC11: the install summary states how many emitted legs are HELD kit self-tests",
+              f"govkit apply — {len(_kits_in)} of those are kit SELF-TESTS and are HELD by default"
+              in pa.stdout, pa.stdout)
+        # The invocation is the TARGET's declared runner command, not this repo's path — an adopter
+        # pointed at a script absent from their tree has been told nothing.
+        check("AC11: and names the once-and-on-demand invocation against the target's own runner",
+              "govkit apply —   GATE_SELFTESTS=1 bash tools/runner.sh" in pa.stdout, pa.stdout)
+        # The GATE_FULL sentence is not decoration: `guard = ["{kit}/"]` was the mechanism this
+        # replaced, and it failed precisely because GATE_FULL ignores guards. An adopter who reads
+        # `GATE_FULL=1` as "everything" will believe a green bar covered the kits.
+        check("AC11: and says plainly that GATE_FULL does NOT run them",
+              "GATE_FULL=1 does NOT run them" in pa.stdout, pa.stdout)
         check("and re-reads the runner afterwards", "/AFTER]" in pa.stdout, pa.stdout)
         after_out = run_runner(gt)
         # EXECUTION, not success: a leg that fails has still executed, and `observed_failed` is a

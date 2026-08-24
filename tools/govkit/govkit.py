@@ -2490,7 +2490,14 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                     existing[by_name[nm]] = row
                 else:
                     existing.append(row)
+                # THE RECEIPT CARRIES SUBJECT TOO, and not only so the summary below can count it.
+                # The receipt is what a later apply reads to decide what this deployer owns; a
+                # field that reaches the target's manifest but not the receipt is a field no drift
+                # check can ever see move. The first draft omitted it and the summary silently
+                # counted zero — an `if n_kit:` that is never true prints nothing and reads exactly
+                # like a kit with no self-tests. TOOL-dUnstalledConvoy-26.
                 emitted.append({"name": nm, "kit": eid, "argv": argv, "guard": guards,
+                                "subject": row["subject"],
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:
@@ -2503,6 +2510,24 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
                            capture_output=True, check=False)
             print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
+            # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
+            # they can run them for the first time against the kit they just installed, and once as
+            # the standing way to ask. Without this line the legs are simply absent from their bar
+            # and nothing says they exist. TOOL-dUnstalledConvoy-26.
+            n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
+            if n_kit:
+                print(f"govkit apply — {n_kit} of those are kit SELF-TESTS and are HELD by default: "
+                      f"they test the kit's own source, which does not change in a repo that "
+                      f"copy-installs it. Run them once now to verify this install, and afterwards "
+                      f"whenever you edit a kit:")
+                # THE TARGET'S OWN RUNNER COMMAND, not this repo's path. An adopter told to run a
+                # script that does not exist in their tree has been told nothing, and `command` is
+                # the declaration govkit already validated and already echoed at BASELINE.
+                _cmd = " ".join(gr.get("command") or []) or "your gate runner"
+                print(f"govkit apply —   GATE_SELFTESTS=1 {_cmd}")
+                print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
+                      f"kit's own tests are not a guard. A green bar without that variable says "
+                      f"nothing about the kits themselves.")
     else:
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]
