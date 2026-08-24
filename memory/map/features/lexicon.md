@@ -173,9 +173,14 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
   by a CASE TABLE row keyed to the defect. The transferable finding is that a predicate's
   correctness concentrates in its helpers, and fixtures do not reach them: extend the tables, not
   just the fixtures. P1, P2 and the placeholder gate were never implicated.
-- **The benefit is unmeasurable by construction**, which is why the kit is opt-in and why the
-  retirement condition is written down rather than left to argument: retire P1 if it goes unused
-  across two adopters.
+- **Both halves of this bullet are SUPERSEDED, and it is rewritten rather than trimmed because it
+  carried two dead premises in one sentence.** It read "the benefit is unmeasurable by construction,
+  which is why the kit is opt-in and why the retirement condition is written down: retire P1 if it
+  goes unused across two adopters." `TOOL-dScaffoldedMirror-17` kills the first — `drift-audit`'s
+  `lexicon_marginal_offense_rate` measures offenders-added per definition-added between the
+  declaration's adoption commit and HEAD, both operands derived by this kit's own extractor.
+  `TOOL-dScaffoldedMirror-16` kills the second: F4 is superseded, P1 stays and is strengthened, and
+  no later session may close it on that condition. Opt-in survives; the REASON for it does not.
 
 ## Reuse affordance
 

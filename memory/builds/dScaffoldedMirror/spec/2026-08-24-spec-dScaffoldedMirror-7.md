@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -30,9 +30,10 @@ who writes it.
   offender is an added pair whose leading token is outside the table AT HEAD.
 - **S4** — `extract_text(src, mode, pset)` splits out of `extract()` (`lexicon.py:182-190`), which
   becomes a two-line path wrapper. The signal reads blobs from git and never writes a tree.
-- **S5** — the liveness assertion, three conditions, any one false giving DEAD PROBE rather than a
-  number: the base sha resolves in this object store; the definition population at the base is
-  non-zero; the definition population at HEAD is non-zero.
+- **S5** — the liveness assertion, FOUR conditions, any one false giving DEAD PROBE rather than a
+  number: the repository is not SHALLOW; the base sha resolves in this object store; the definition
+  population at the base is non-zero; the definition population at HEAD is non-zero. The first is a
+  rev-3 correction and §4 records the measurement that forced it.
 - **S6** — a window with zero definitions ADDED is NOT ASKED, not a rate of 0, routed through the
   existing `_build_not_asked` renderer so the three states stay three.
 - **S7** — a per-sha cache keyed on `(sha, digest of the VERBS table)`, because a commit's tree is
@@ -91,10 +92,21 @@ converts the claim into one a later session can falsify.
 ### The base, and the failing case that replaces the research's
 
 R6 states the failing case as "set the base to a sha not in the object store". Under S2 that case is
-unreachable: there is no base to set. The assertion survives and its trigger changes — a SHALLOW
-clone, which CI does routinely, does not contain the adoption commit, and `git cat-file -e
-<sha>^{commit}` fails there. That is the same assertion with a reachable trigger, and it is the one
-staged in §6.
+unreachable: there is no base to set.
+
+**rev-2 replaced it with a shallow clone and asserted that the adoption commit would not resolve
+there. MEASURED 2026-08-25, that is false**, and the way it is false is worse than a miss. In a
+`git clone --depth 1`, `git log --diff-filter=A -- .lexicon.conf` does not fail and does not return
+nothing — it returns the SHALLOW ROOT as the commit that "added" the file, and that sha resolves
+perfectly. Observed: derived base `37bfdd19`, the only commit present, against a true adoption commit
+of `b0626152`. A resolves-check is therefore armed against a case it can never see, and the signal
+would have reported a rate over a one-commit window as though it were the real one — the
+armed-but-unreachable class, inside this unit's own liveness assertion.
+
+The assertion that FIRES asks whether the repository is truncated at all
+(`git rev-parse --is-shallow-repository`), which is the honest question: a derived base is only as
+trustworthy as the history it was derived from. Both arms observed — DEAD PROBE in the `--depth 1`
+clone, a normal rate on the full tree.
 
 Deriving the base also removes the only knob. `.lexicon.conf` was added once; the value is a fact
 about a commit already made, and shortening the window would require deleting and re-adding the
@@ -102,12 +114,13 @@ conf, which is a visible act with its own consequences under `TOOL-dScaffoldedMi
 
 ### What `live` actually asserts, stated because a liveness flag is usually a lie
 
-Three conditions, each independently falsifiable, and the third is the one that catches the mundane
-failure:
+Four conditions, each independently falsifiable. L1 is the rev-3 correction above; the last is the
+one that catches the mundane failure:
 
 | | condition | what makes it false |
 |---|---|---|
-| L1 | base sha resolves | shallow clone, grafted history, a fresh clone with `--depth` |
+| L1 | the repository is not shallow | any `--depth` clone, which CI does routinely |
+| L1b | base sha resolves | a grafted or otherwise mangled history |
 | L2 | definition count at base > 0 | the extractor broke, or `LANGS` went dark at the base |
 | L3 | definition count at HEAD > 0 | the extractor broke at HEAD |
 
@@ -250,9 +263,9 @@ decision is a reading rather than an argument, which is what the plan lacked.
 - **AC1** — When `python tools/drift-audit/drift_report.py` runs on this worktree, it reports
   `lexicon_marginal_offense_rate` with `gateable: False` and a value derived at `b0626152` and at
   HEAD, and the report names both operands rather than only the ratio.
-- **AC2** — When the same command runs in a `git clone --depth 1` of this repo, the signal reports
-  DEAD PROBE naming the unresolvable base, and no rate is printed. This is the reachable replacement
-  for R6's unreachable "point the base at an absent sha" case.
+- **AC2** — When the signal runs in a `git clone --depth 1` of this repo, it reports DEAD PROBE
+  naming the SHALLOW REPOSITORY, and no rate is printed. OBSERVED 2026-08-25: `live: False`,
+  `value: 0`. rev-2 asserted the trigger was an unresolvable base; §4 records why that is false.
 - **AC3** — When the window contains no added definition, the signal renders as NOT ASKED through
   `_build_not_asked` rather than as a rate of `0`. Staged by running the report with base and head
   at the same sha.
@@ -264,9 +277,12 @@ decision is a reading rather than an argument, which is what the plan lacked.
   `drift-audit records`, `lexicon naming predicates`, `lexicon selftest` and `lexicon wiring` are
   green, and `VERB_OFFENDER_PIN` is UNCHANGED at `463` — the rev-1 move to `464` was owed to a
   premise §4 now records as false. `python tools/lexicon/lexicon.py --measure` prints `463`.
-- **AC7** — When `grep -n "unmeasurable" tools/lexicon/README.md memory/map/features/lexicon.md`
-  runs after the change, it returns nothing, and both files instead cite
-  `TOOL-dScaffoldedMirror-17` and this signal.
+- **AC7** — When `grep -c "dScaffoldedMirror-17" tools/lexicon/README.md` and the same over
+  `memory/map/features/lexicon.md` run after the change, both return non-zero, and every surviving
+  occurrence of the dead premise sits INSIDE a sentence that supersedes it. rev-2 asserted the word
+  `unmeasurable` must vanish; that was wrong — this repo supersedes a ratified claim by QUOTING it
+  beside its supersession, so an absence grep would have forced the one edit shape the convention
+  forbids.
 
 - **AC8** — When the signal's docstring is read, it carries §4's kill-reading verbatim: the
   fresh-file rate at or below ~5% across two further readings abandons the pressure chain. Grep
@@ -317,6 +333,19 @@ records` leg and its arms ride `drift-audit selftest`. The leg count is not the 
   463 UNCHANGED. §4 gains the kill-reading no spec in the set carried, and AC8 puts it in the
   shipped docstring rather than leaving it here. §10 gains the recall terms M5 requires and the
   liveness convention the recall probe surfaced and `reuse_lookup` did not.
+
+- rev-3 · 2026-08-25 · built, and THREE of rev-2's own statements did not survive contact with the
+  tree. (1) S5's shallow-clone trigger is unreachable: `git log --diff-filter=A` in a `--depth 1`
+  clone does not fail, it returns the SHALLOW ROOT as the adding commit, and that sha resolves — so
+  a resolves-check is armed against a case it can never see and the signal would report a rate over
+  a one-commit window. Observed: derived base 37bfdd19 against a true adoption commit of b0626152.
+  S5 gains a repository-shallowness condition, which is the assertion that actually fires, and both
+  arms were observed. (2) AC7 demanded the word `unmeasurable` vanish; this repo supersedes by
+  QUOTING the dead claim beside its supersession, so the AC asserted the one edit shape the
+  convention forbids. Reworded to assert the supersession. (3) NO `PINS` row is added: `--check`
+  exits 0 without one for a non-gateable signal, and §3 already forbids a threshold here, so a pin
+  would be the raisable integer this build exists to delete wearing a percentage sign. rev-1's
+  Files-touched line named one; that line is the departure, not §3.
 
 ## 10. Reuse audit
 

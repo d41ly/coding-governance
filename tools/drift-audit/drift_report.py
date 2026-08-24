@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
 import pathlib
@@ -761,6 +762,198 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
             "langs_commit": langs_sha}
 
 
+_LEX_RATE_CACHE: dict = {}
+
+
+def _build_armed_exts(langs_value, lex, _langs):
+    """`{ext: (pset, mode)}` for the extensions an extractor can actually READ. Dark and
+    unknown-pattern-set extensions are dropped here, so both operands are derived over the same
+    population and a `LANGS` edit moves both ends together rather than one."""
+    out = {}
+    for ext, pset, mode in _langs({"LANGS": langs_value}):
+        if mode == "dark" or (mode == "probe" and pset not in lex.PATTERN_SETS):
+            continue
+        out[ext] = (pset, mode)
+    return out
+
+
+def _read_defs_at_sha(ctx, sha, armed, lex):
+    """`{(path, name)}` — every function definition an armed extractor sees in the tree at `sha`.
+
+    ONE `git cat-file --batch` for the whole tree, not one read per file. Measured on node `d`: the
+    per-file shape cost 2.774 s for both shas at 108 spawns, and this box taxes every exec by roughly
+    0.022 s (`memory/gotchas/process-creation-is-the-suite-cost.md`), so 108 spawns IS 2.4 s of that.
+    The cost here is spawn count rather than compute, and the batched read is what keeps it off the
+    signal's budget.
+    """
+    listing = ctx.git.run("ls-tree", "-r", sha)
+    if listing.returncode != 0:
+        return None
+    want = []
+    for line in listing.stdout.splitlines():
+        meta, _, path = line.partition("\t")
+        bits = meta.split()
+        if len(bits) < 3 or bits[1] != "blob" or lex.ext_of(path) not in armed:
+            continue
+        want.append((bits[2], path))
+    if not want:
+        return set()
+    batch = subprocess.run(
+        ["git", "-C", str(ctx.root), "cat-file", "--batch"],
+        input="".join(b + "\n" for b, _ in want).encode(),
+        capture_output=True,
+    )
+    if batch.returncode != 0:
+        return None
+    defs, buf, i = set(), batch.stdout, 0
+    for _blob, path in want:
+        nl = buf.find(b"\n", i)
+        if nl < 0:
+            return None
+        header = buf[i:nl].split()
+        if len(header) < 3:
+            return None
+        size = int(header[2])
+        src = buf[nl + 1: nl + 1 + size].decode("utf-8", errors="replace")
+        i = nl + 1 + size + 1
+        pset, mode = armed[lex.ext_of(path)]
+        try:
+            got = lex.extract_text(src, mode, pset)
+        except (SyntaxError, ValueError):
+            continue
+        if got:
+            for nm, _ln in got[0]:
+                defs.add((path, nm))
+    return defs
+
+
+def build_lexicon_marginal_offense_rate(ctx) -> dict:
+    """Offenders ADDED per definition ADDED, between the commit that adopted the declaration and HEAD.
+
+    THE ONLY INSTRUMENT HERE THAT MEASURES THE THING THE KIT IS FOR: are new generations constrained.
+    Both operands are DERIVED at both shas by the lexicon's own extractor, so there is nothing
+    authored and nothing raisable — no pin, no threshold, no knob that shortens the window.
+
+    WHAT KILLS THE PRESSURE CHAIN, stated here rather than in a spec nobody re-reads. If the rate over
+    files written FRESH in the window stays at or below roughly 5% across two further readings, the
+    pressure chain — `TOOL-dScaffoldedMirror-4`, `-9`, and `-11`'s cut fourth pin — should be
+    ABANDONED rather than deferred: that reading says the declaration already constrains the
+    generations and the enforcement half is buying nothing. A rate that CLIMBS in fresh files across
+    two readings is the evidence `-9` was always missing, and promotes it from probation to scheduled.
+    Either way the decision is a reading and not an argument, which is what the plan lacked.
+
+    THE OPERANDS ARE PART OF THE CONTRACT, not an implementation detail (S3). A definition is a
+    `(path, name)` pair from the armed extractors; ADDED is present at HEAD and absent at base; an
+    OFFENDER is an added pair whose leading token is outside the table AT HEAD. Keying on `(path,
+    name)` rather than the bare name is deliberate — a definition that moved file would otherwise read
+    as deleted and re-added, inflating both operands.
+
+    NOT the `assertion-between-two-derived-values` class, and the distinction is precise: the same
+    code derives both operands from TWO DIFFERENT SOURCES — the tree at the base and the tree at HEAD
+    — and a commit's content is exogenous to this checker. The comparison can disagree, and it did.
+
+    NAMED `build_`, following `build_live_backlog_rows`, which already wrote this rule down: a new
+    definition can be named right for free. Its spec's rev-1 argued the opposite and proposed raising
+    `VERB_OFFENDER_PIN` to fit; the comment forty lines below refuted it before it was written.
+    """
+    name = "lexicon_marginal_offense_rate"
+    if not _resolve_lexicon_conf(ctx):
+        return _build_not_asked(name, "no .lexicon.conf at the repo root; the lexicon kit is not adopted")
+    loaded = _load_lexicon(ctx)
+    if loaded is None:
+        return _build_not_asked(name, ".lexicon.conf is present but its kit is not importable here")
+    import sys as _sys
+    kit = str(ctx.root / "tools" / "lexicon")
+    if kit not in _sys.path:
+        _sys.path.insert(0, kit)
+    try:
+        import lexicon as lex
+        from lexicon_conf import langs as _langs
+    except Exception:
+        return _build_not_asked(name, "the lexicon engine is not importable here; nothing judged")
+
+    verbs, _ratified, langs_value = loaded
+    if not verbs:
+        return _build_not_asked(name, ".lexicon.conf declares no VERBS; nothing to judge")
+
+    # S2 — the base is DERIVED, never declared. A knob that shortens the window hides the stretch it
+    # removes, so the only base is the fact of when the declaration started existing.
+    adopt = ctx.git.run("log", "--diff-filter=A", "--format=%H", "--", ".lexicon.conf")
+    shas = [s for s in adopt.stdout.split() if s] if adopt.returncode == 0 else []
+    base = shas[-1] if shas else ""
+    head = ctx.git.run("rev-parse", "HEAD").stdout.strip()
+
+    # L1 — the history is COMPLETE. Measured, and it corrects this unit's own spec: rev-2 asserted a
+    # shallow clone makes the base unresolvable. It does not. `git log --diff-filter=A` there returns
+    # the SHALLOW ROOT as the commit that "added" the file, and that sha resolves perfectly — so a
+    # resolves-check is armed against a case it can never see, and the signal would report a rate over
+    # a one-commit window as though it were the real one. Observed in a `--depth 1` clone: derived base
+    # 37bfdd19, the only commit present, against a true adoption commit of b0626152.
+    #
+    # Asking whether the REPOSITORY is truncated is the assertion that actually fires. A derived base
+    # is only as trustworthy as the history it was derived from.
+    if ctx.git.run("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
+        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+                "live": False, "unjudgeable": 0,
+                "detail": [{"note": "DEAD PROBE — this is a shallow clone, so the commit that added "
+                                    ".lexicon.conf is not necessarily present and a derived base "
+                                    "cannot be trusted; no rate is derived"}]}
+
+    # L1b — and the base still has to resolve, for a grafted or otherwise mangled history.
+    if not base or not ctx.git.is_commit(base):
+        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+                "live": False, "unjudgeable": 0,
+                "detail": [{"note": "DEAD PROBE — the commit that added .lexicon.conf does not "
+                                    "resolve in this object store (a shallow or grafted clone); "
+                                    "no rate is derived"}]}
+
+    armed = _build_armed_exts(langs_value, lex, _langs)
+    key_digest = hashlib.sha256(" ".join(sorted(verbs)).encode()).hexdigest()[:16]
+    both = {}
+    for sha in (base, head):
+        ck = (sha, key_digest)
+        if ck not in _LEX_RATE_CACHE:
+            _LEX_RATE_CACHE[ck] = _read_defs_at_sha(ctx, sha, armed, lex)
+        both[sha] = _LEX_RATE_CACHE[ck]
+
+    at_base, at_head = both[base], both[head]
+    # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
+    # is indistinguishable from a clean window unless it is said out loud.
+    if at_base is None or at_head is None or not at_base or not at_head:
+        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+                "live": False, "unjudgeable": 0,
+                "detail": [{"note": "DEAD PROBE — the definition population is empty at the base or "
+                                    "at HEAD, so the extractor is not reading this tree",
+                            "at_base": len(at_base or ()), "at_head": len(at_head or ())}]}
+
+    added = at_head - at_base
+    # S6 — nobody added a definition is a REAL state (a records-only stretch) and is NOT a rate of 0.
+    if not added:
+        return _build_not_asked(name, "no definition was added between the declaration's adoption "
+                                      "commit and HEAD; there is no marginal rate to report")
+
+    offenders = {(p, n) for p, n in added if (lex.leading_verb(n) or "") not in verbs}
+    base_files = {p for p, _ in at_base}
+    fresh = [x for x in added if x[0] not in base_files]
+    fresh_off = [x for x in fresh if x in offenders]
+    pre = [x for x in added if x[0] in base_files]
+    pre_off = [x for x in pre if x in offenders]
+
+    def _measure_pct(a, b):
+        return round(100.0 * len(a) / len(b), 1) if b else 0.0
+
+    return {"signal": name, "value": len(offenders), "of": len(added), "tolerance": 0,
+            "gateable": False, "live": bool(at_base and at_head), "unjudgeable": 0,
+            "detail": [
+                {"note": "offenders added per definition added since the declaration was adopted",
+                 "base": base[:8], "head": head[:8], "rate_pct": _measure_pct(offenders, added)},
+                {"note": "files written FRESH in the window — the reading the kill-rule watches",
+                 "added": len(fresh), "offenders": len(fresh_off), "rate_pct": _measure_pct(fresh_off, fresh)},
+                {"note": "files that predate the declaration",
+                 "added": len(pre), "offenders": len(pre_off), "rate_pct": _measure_pct(pre_off, pre)},
+            ]}
+
+
 # --------------------------------------------------------------------------------------------
 # Signal 9 — live backlog rows per shard (TOOL-aRelaxedShard-4)
 #
@@ -1035,7 +1228,8 @@ def build_readme_mechanism_drift(ctx) -> dict:
     }
 
 
-SIGNALS = [signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
+SIGNALS = [build_lexicon_marginal_offense_rate,
+           signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_readme_mechanism_drift]

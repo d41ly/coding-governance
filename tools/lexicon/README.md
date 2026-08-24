@@ -6,8 +6,14 @@ An OPT-IN kit that gates three naming predicates against a per-repo DECLARATION.
 
 **What it is for, since it is not typo-catching.** A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility. A name that will not fit the table is
-reporting an unclear responsibility or a seam in the wrong place. That is the whole value, and it is
-not measurable — which is why the kit is opt-in rather than required.
+reporting an unclear responsibility or a seam in the wrong place. That is the whole value.
+
+**It USED to say that value was not measurable, and that the kit was opt-in because of it.** The
+first half is superseded by `TOOL-dScaffoldedMirror-17`: `drift-audit`'s
+`lexicon_marginal_offense_rate` derives offenders-added per definition-added between the commit that
+adopted the declaration and HEAD, both operands produced by this kit's own extractor at both shas.
+The kit stays OPT-IN — that did not change — but it is opt-in because adopting a vocabulary is a
+choice, not because nobody could tell whether it works.
 
 ## The three predicates
 
