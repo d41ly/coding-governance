@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-8 — the shipped frozen canon, and `--probe`
 
-**Status:** INPROGRESS · rev-2 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -24,10 +24,13 @@ standard and is admitted as evidence for exactly one thing: which spellings beco
 - **S3** — `--probe`: read-only, no arguments, no state, exits 0 unconditionally, and legal
   against any repo at any time including one with no `.lexicon.conf`. It reports per cluster which
   forms are live, how many sites each has, and what convergence would cost.
-- **S4** — `--probe --write`: writes the proposed `VERBS` block into the conf and the debt ledger
-  to `tools/lexicon/lexicon-debt.tsv`. It REFUSES on a conf whose `ratified` stamp is non-empty,
-  naming the refusal — it is an adoption-time verb, not a maintenance verb, and gov's own conf
-  carries about 70 lines of pin archaeology a rewrite would silently destroy.
+- **S4 — CUT by the owner's six-unit ruling.** `--probe --write` and the debt ledger were to write
+  the proposed table and `lexicon-debt.tsv`. NO GATE READS the ledger, its artifact would ship
+  `role = "seed"`, and the adopter population is zero — so it is a file nobody reads produced by a
+  verb nobody runs. `--probe` alone REPORTS the same numbers, and `--scaffold` already writes the
+  table. What the cut costs is stated rather than hidden: convergence debt is visible on demand
+  and is recorded nowhere, so nothing tracks it falling.
+
 - **S5** — delete the frequency allowlist from `scaffold_lexicon.py`: the `collections.Counter`
   loop, `SEED_VERBS`, the `verb_offenders` arithmetic and the three pin lines it heads. The
   scaffold's `VERBS` block becomes the canon's proposal for that corpus.
@@ -394,6 +397,16 @@ the coverage, and a new leg here would only advertise that a conf assert needed 
   `build_negatives` is so named because `negatives` leads with a token outside the table; the pin
   stayed at 384, which is the fifth unit running where a new definition took a declared verb rather
   than a raise.
+
+- rev-3 · 2026-08-25 · S1, S2, S3, S5 and S8 BUILT; S4 CUT; the unit is CLOSED. Two defects found by
+  running the ORIGINAL demo against the new scaffold. The seed was born failing this unit's own S6
+  assert — fourteen canon glosses, fourteen rows with no negative — so `canon.render_negative`
+  emits each cluster's first alternative and the curator sharpens rather than invents. And the
+  `LAYER_OFFENDER_PIN` line carried a trailing comment, which the conf grammar forbids: the reader
+  REFUSED the file the scaffold had just written. Both are armed.
+  ONE REFINEMENT beyond the spec: `--probe` separates a token that is RATIFIED outside the canon
+  (`cmd`, `arm`, `seed` here, 38 sites) from one that is genuinely unnominatable (340). Reporting a
+  deliberately ratified row as debt would be a finding against a decision somebody made.
 
 ## 10. Reuse audit
 

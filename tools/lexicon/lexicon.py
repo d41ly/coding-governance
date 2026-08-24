@@ -7,6 +7,7 @@
     python tools/lexicon/lexicon.py --measure  # print the three pins THIS conf produces; decide nothing
     python tools/lexicon/lexicon.py --suggest <name>   # one line for ONE identifier, no corpus pass
     python tools/lexicon/lexicon.py --brief <path>     # how the corpus already spells this file's objects
+    python tools/lexicon/lexicon.py --probe            # what the canon would propose here; read-only, exits 0
 
 WHAT THIS IS FOR, since it is not typo-catching. A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility, so a name that will not fit the table is
@@ -81,6 +82,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lexicon_conf import ConfError, langs, load_conf, build_negatives  # noqa: E402
+import canon  # noqa: E402
 from subtokens import leading_verb, subtokens  # noqa: E402
 
 KIT_LEXICON_VERSION = "1.1"
@@ -91,6 +93,8 @@ WAIVER_FILES = {
     "suffix": "lexicon-suffix-waivers.txt",
     "layer": "lexicon-layer-waivers.txt",
 }
+SCAFFOLD_KNOWN = {"py": ("", "parser"), "js": ("js-regex", "probe")}
+
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN", "layer": "LAYER_OFFENDER_PIN"}
 
 #: The shipped `probe` pattern sets. Each one MUST have a frozen sentinel fixture in `selftest.py`
@@ -867,11 +871,98 @@ def run_brief(root: Path, target: str) -> int:
     return 0
 
 
+
+def run_probe(root: Path) -> int:
+    """S3 — what the canon would propose here, and what the corpus spells otherwise.
+
+    READ-ONLY, NO ARGUMENTS, NO STATE, EXITS 0 UNCONDITIONALLY, and legal against a repo with no
+    declaration at all. Those are properties, not manners: an adopter deciding whether to take this
+    kit needs to see what it would say BEFORE anything is written, and a probe that can fail or
+    write is one nobody runs on a repo they care about.
+
+    IT DECIDES NOTHING. The canon fixes the representative; the corpus only reports which concepts
+    are present and which spellings are debt. Reading this output cannot change what a proposal
+    would name, which is exactly the property a frequency ranking did not have.
+    """
+    forms = canon.build_form_index()
+    conf = None
+    try:
+        if (root / CONF_NAME).is_file():
+            conf = load_conf(root / CONF_NAME)
+    except ConfError:
+        conf = None
+    declared = {e: (ps, m) for e, ps, m in langs(conf)} if conf else dict(SCAFFOLD_KNOWN)
+
+    counts: dict = {}
+    files = tracked_files(root)
+    for rel in files:
+        ext = ext_of(rel)
+        if ext not in declared:
+            continue
+        pset, mode = declared[ext]
+        if mode == "dark" or (mode == "probe" and pset not in PATTERN_SETS):
+            continue
+        try:
+            got = extract(root / rel, mode, pset)
+        except (SyntaxError, OSError):
+            continue
+        if not got:
+            continue
+        for name, _ln in got[0]:
+            v = leading_verb(name)
+            if v:
+                counts[v] = counts.get(v, 0) + 1
+
+    total = sum(counts.values())
+    print(f"lexicon --probe — {total} definition(s) over {len(files)} tracked file(s)"
+          + ("" if conf else "; NO .lexicon.conf here, so this is what adoption would find"))
+    print("the canon decides what each concept is CALLED; this corpus only decides which appear")
+    print()
+
+    proposed, debt_rows, off = [], [], {}
+    for rep, _gloss, others in canon.CLUSTERS:
+        live = [(f, counts.get(f, 0)) for f in (rep,) + tuple(others) if counts.get(f)]
+        if not live:
+            continue
+        proposed.append(rep)
+        shown = ", ".join(f"{f} x{n}" + ("" if f == rep else " -> debt") for f, n in live)
+        print(f"  {rep:<9} {shown}")
+        debt_rows += [(f, n, rep) for f, n in live if f != rep]
+    for v, n in counts.items():
+        if v not in forms:
+            off[v] = n
+
+    print()
+    print(f"  would propose {len(proposed)} of {len(canon.CLUSTERS)} cluster(s): {' '.join(proposed)}")
+    if debt_rows:
+        cost = sum(n for _f, n, _r in debt_rows)
+        print(f"  convergence would cost {cost} rename(s) across {len(debt_rows)} spelling(s): "
+              + ", ".join(f"{f}->{r} x{n}" for f, n, r in sorted(debt_rows, key=lambda x: -x[1])[:8]))
+    else:
+        print("  no debt: every live site already uses its cluster's representative")
+    # A token in no cluster is not automatically debt. The canon bounds what a MACHINE may propose;
+    # it does not bound what an owner may RATIFY, and this repo's own table carries `seed`, `arm` and
+    # `cmd`, which no cluster holds. Reporting a ratified row as unnominatable would read as a
+    # finding against a decision somebody made deliberately.
+    ratified = set((conf or {}).get("VERBS") or {})
+    beyond = {v: n for v, n in off.items() if v in ratified}
+    unnamed = {v: n for v, n in off.items() if v not in ratified}
+    if beyond:
+        top = ", ".join(f"{v} x{n}" for v, n in sorted(beyond.items(), key=lambda kv: -kv[1])[:8])
+        print(f"  {sum(beyond.values())} definition(s) lead with a RATIFIED row outside the canon: {top}")
+        print("  legal: the canon bounds what a proposal may name, never what an owner may declare")
+    if unnamed:
+        top = ", ".join(f"{v} x{n}" for v, n in sorted(unnamed.items(), key=lambda kv: -kv[1])[:8])
+        print(f"  {sum(unnamed.values())} definition(s) lead with a token in NO cluster and NO row: {top}")
+        print("  unnominatable by absence — no proposal can ever name them")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure", "--suggest", "--brief"):
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--brief", "--probe"):
         sys.stderr.write("usage: python tools/lexicon/lexicon.py "
-                         "[--check|--list|--measure|--suggest <name>|--brief <path>]\n")
+                         "[--check|--list|--measure|--suggest <name>|--brief <path>|--probe]\n")
         return 2
     if mode in ("--suggest", "--brief") and len(argv) < 3:
         sys.stderr.write(f"usage: python tools/lexicon/lexicon.py {mode} "
@@ -888,6 +979,8 @@ def main(argv: list[str]) -> int:
         return run_suggest(root, argv[2])
     if mode == "--brief":
         return run_brief(root, argv[2])
+    if mode == "--probe":
+        return run_probe(root)
     return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 

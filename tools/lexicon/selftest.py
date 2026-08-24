@@ -650,6 +650,96 @@ check("--brief: a dark extension is a NAMED refusal, not an empty section",
       code == 2 and "COVERAGE: dark" in out, out)
 check("--brief: ...and it says why an empty section would be worse", "invent freely" in out, out)
 
+# ---- TOOL-dScaffoldedMirror-8: the canon, and the rule that makes it worth having ----------------
+
+import canon as _canon   # noqa: E402
+
+# The canon's own shape. A form in two clusters makes the representative depend on iteration order.
+_idx = _canon.build_form_index()
+_dupes = []
+_seen = {}
+for _rep, _g, _others in _canon.CLUSTERS:
+    for _f in (_rep,) + tuple(_others):
+        if _f in _seen and _seen[_f] != _rep:
+            _dupes.append(_f)
+        _seen[_f] = _rep
+check("canon: no surface form appears in two clusters", not _dupes, str(_dupes))
+check("canon: every representative maps to itself",
+      all(_idx[r] == r for r, _g, _o in _canon.CLUSTERS), "a representative resolved elsewhere")
+check("canon: every row can render a negative",
+      all(_canon.render_negative(r) for r, _g, _o in _canon.CLUSTERS), "a cluster with no alternative")
+
+# ARM (a) — VOLUME CANNOT PROMOTE. Five hundred sites of a token in no cluster must not enter.
+_many = {"core/a%d.py" % i: "def frobnicate_thing%d():\n    pass\n" % i for i in range(60)}
+_many["core/z.py"] = "def build_it():\n    pass\n"
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    for _rel, _b in _many.items():
+        _p = _r / _rel
+        _p.parent.mkdir(parents=True, exist_ok=True)
+        _p.write_text(_b, encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", *_many], cwd=_r, check=True, capture_output=True)
+    subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+                   cwd=_r, capture_output=True, text=True)
+    _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
+    check("canon: 60 sites of an off-canon token do NOT put it in the proposed table",
+          "frobnicate" not in _conf, _conf[-400:])
+    check("canon: ...while the one in-canon site DOES enter", "\n  build " in _conf, _conf[-400:])
+
+# ARM (b) — THE POLARITY ARM, and the one a dominance table fails. `get` and `fetch` each have a
+# live site and `load` has NONE, so a count-based rule proposes get or fetch. The first-element rule
+# proposes `load`, which is in neither file.
+_pol = {"core/a.py": "def get_row():\n    pass\n", "core/b.py": "def fetch_row():\n    pass\n"}
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    for _rel, _b in _pol.items():
+        _p = _r / _rel
+        _p.parent.mkdir(parents=True, exist_ok=True)
+        _p.write_text(_b, encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", *_pol], cwd=_r, check=True, capture_output=True)
+    subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+                   cwd=_r, capture_output=True, text=True)
+    _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
+    check("POLARITY: a corpus of get and fetch proposes `read` and `load`, the forms it does not use",
+          "\n  read " in _conf and "\n  load " in _conf, _conf[-400:])
+    check("POLARITY: ...and proposes NEITHER spelling the corpus actually wrote",
+          "\n  get " not in _conf and "\n  fetch " not in _conf, _conf[-400:])
+
+    # --probe is legal against a repo with NO declaration and exits 0 either way.
+    (_r / ".lexicon.conf").unlink()
+    _got = subprocess.run([sys.executable, "tools/lexicon/lexicon.py", "--probe"],
+                          cwd=_r, capture_output=True, text=True)
+    check("--probe: legal with NO declaration, and exits 0",
+          _got.returncode == 0 and "NO .lexicon.conf" in _got.stdout, _got.stdout[-300:])
+    check("--probe: says it decides nothing",
+          "corpus only decides which appear" in _got.stdout, _got.stdout[:300])
+
+# S8 — `conf` is seeded whether or not the corpus contains one, because the scaffold runs before the
+# file it writes is tracked.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_r / "core").mkdir(parents=True, exist_ok=True)
+    (_r / "core" / "a.py").write_text("def build_it():\n    pass\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", "core/a.py"], cwd=_r, check=True, capture_output=True)
+    subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+                   cwd=_r, capture_output=True, text=True)
+    _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
+    check("S8: `conf::dark` is seeded even though no .conf file was tracked at scaffold time",
+          "conf::dark" in _conf, [l for l in _conf.split(chr(10)) if l.startswith("LANGS=")])
+    # The conf grammar forbids a comment after a value on the same line, and the first cut of the
+    # canon scaffold put one there -- the reader then REFUSED the file the scaffold had just written.
+    _pin_lines = [l for l in _conf.split(chr(10)) if l.startswith(("VERB_OFFENDER_PIN",
+                                                                  "SUFFIX_OFFENDER_PIN",
+                                                                  "LAYER_OFFENDER_PIN"))]
+    check("S8: all three pins are emitted, each on a line carrying no trailing comment",
+          len(_pin_lines) == 3 and not any("#" in l for l in _pin_lines), str(_pin_lines))
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

@@ -23,11 +23,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import canon
 import lexicon as lex  # noqa: E402
 
 #: How many leading tokens to propose. Not a tuning knob so much as a legibility bound: a table
 #: nobody reads is not closed in any sense that matters.
-SEED_VERBS = 25
 
 #: Extensions this kit can extract today. Everything else present in the corpus is seeded `dark`,
 #: which is a DECLARATION, not a gap — it is named on every run rather than silently absent.
@@ -49,6 +49,28 @@ HEADER = """\
 """
 
 
+
+def _measure_suffix_offenders(root, files) -> int:
+    """Type definitions ending in a banned suffix, over the same corpus the verb pin uses."""
+    banned = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
+    n = 0
+    for rel in files:
+        ext = lex.ext_of(rel)
+        if ext not in KNOWN:
+            continue
+        pset, mode = KNOWN[ext]
+        try:
+            got = lex.extract(root / rel, mode, pset)
+        except (SyntaxError, OSError):
+            continue
+        if not got:
+            continue
+        for name, _ln in got[1]:
+            if any(name.endswith(b) for b in banned):
+                n += 1
+    return n
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         sys.stderr.write("usage: scaffold_lexicon.py <conf-path>\n")
@@ -59,9 +81,18 @@ def main(argv: list[str]) -> int:
     files = lex.tracked_files(root)
 
     exts = sorted({lex.ext_of(f) for f in files})
+    # S8 — `conf` is seeded UNCONDITIONALLY, present or not. This scaffold runs BEFORE the file it
+    # writes is tracked, so the extension it is about to create cannot be in `exts` — and the
+    # adopter's very first `git add .lexicon.conf` then reds with UNDECLARED EXTENSIONS. Every fresh
+    # adoption hit that in its first five minutes (TOOL-dScaffoldedMirror-1's second finding).
+    exts = sorted(set(exts) | {"conf"})
     langs = [f"{e}:{KNOWN[e][0]}:{KNOWN[e][1]}" if e in KNOWN else f"{e}::dark" for e in exts]
 
-    counts: collections.Counter = collections.Counter()
+    # S2 — WHICH CLUSTERS enter is decided by the corpus; WHICH FORM represents one is decided by
+    # the canon, always element 0. Two questions, two deciders. The frequency ranking this replaces
+    # answered both with the corpus, which is why it legalised whatever a repo already did most.
+    forms = canon.build_form_index()
+    counts: collections.Counter = collections.Counter()   # surface form -> live sites
     types_seen = 0
     for rel in files:
         ext = lex.ext_of(rel)
@@ -81,11 +112,15 @@ def main(argv: list[str]) -> int:
             if v:
                 counts[v] += 1
 
-    # ALPHABETIC only. `leading_verb` can return a digit run (`2fa_check` -> `2`), and the conf
-    # reader REFUSES a non-alphabetic verb row — so an unfiltered seed could write a file its own
-    # reader rejects, which is the worst possible first experience of a kit.
-    seeded = [v for v, _n in counts.most_common() if v.isalpha()][:SEED_VERBS]
     total_defs = sum(counts.values())
+    suffix_offenders = _measure_suffix_offenders(root, files)
+    # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
+    # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
+    live = {forms[v] for v in counts if v in forms}
+    seeded = [rep for rep, _gloss, _others in canon.CLUSTERS if rep in live]
+    # DEBT, which is the corpus's one other job here: every live site spelled as a non-first form.
+    debt = sorted(((v, n) for v, n in counts.items() if v in forms and forms[v] != v),
+                  key=lambda kv: (-kv[1], kv[0]))
     verb_offenders = sum(n for v, n in counts.items() if v not in set(seeded))
 
     body = [HEADER, ""]
@@ -97,13 +132,18 @@ def main(argv: list[str]) -> int:
     body.append("# here with no declaration is a named refusal, never a silent skip.")
     body.append(f'LANGS="{" ".join(langs)}"')
     body.append("")
-    body.append("# MEASURED against this corpus at scaffold time, AGAINST THE DERIVED SEED BELOW —")
-    body.append("# which you are about to rewrite. Re-measure after curating:")
-    body.append("#     python tools/lexicon/lexicon.py --measure")
-    body.append("# Shrink-only thereafter: the count may fall, never rise. A pin copied from a larger")
-    body.append("# tree is either vacuous or permanently red.")
+    body.append("# ALL THREE MEASURED against this corpus at scaffold time. The verb pin counts every")
+    body.append("# definition whose leading token is outside the proposal; the other two count their own")
+    body.append("# offenders. They used to be hardcoded `0` under a comment that called them measured, so")
+    body.append("# a corpus with one `Manager` type scaffolded green and redded on its first gate run,")
+    body.append("# against a pin the tool itself had written (TOOL-dScaffoldedMirror-1).")
+    body.append("# Re-measure after curating: python tools/lexicon/lexicon.py --measure")
+    body.append("# Shrink-only thereafter: the count may fall, never rise.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
-    body.append('SUFFIX_OFFENDER_PIN="0"')
+    body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
+    body.append("# LAYERS ships EMPTY below, so no layer offender can exist yet. This comment is on its")
+    body.append("# OWN line deliberately: the conf grammar forbids one after a value, and the first cut of")
+    body.append("# this scaffold put it inline and made the reader refuse the file it had just written.")
     body.append('LAYER_OFFENDER_PIN="0"')
     body.append("")
     body.append("# The date and node that CURATED the seed below. While this is empty,")
@@ -111,11 +151,18 @@ def main(argv: list[str]) -> int:
     body.append("# code, and that is the one shape a naming gate must not have.")
     body.append('ratified=""')
     body.append("")
-    body.append(f"# PROPOSED — derived from {total_defs} definition(s) across {len(files)} tracked file(s).")
-    body.append("# Meanings are BLANK on purpose: writing them is the curation this seed is asking for.")
+    body.append(f"# PROPOSED from the SHIPPED CANON, over {total_defs} definition(s) in {len(files)} tracked")
+    body.append("# file(s). The corpus chose WHICH concepts appear; it did not choose what any of them is")
+    body.append("# CALLED — that is the canon's element 0, always, at every frequency. A frequency ranking")
+    body.append("# would adopt whatever this repo already does most, which is how a naming gate ends up")
+    body.append("# certifying the habit it was installed to change.")
+    body.append("#")
+    body.append("# The glosses below are the canon's. CURATE THEM ANYWAY, and add the NEGATIVE each row")
+    body.append("# needs — the gate refuses a row that carries none, because a row with only a positive")
+    body.append("# gloss cannot tell two verbs apart.")
     body.append("VERBS:")
     for v in seeded:
-        body.append(f"  {v}")
+        body.append(f"  {v:<9} {canon.read_gloss(v)}{canon.render_negative(v)}")
     body.append("")
     body.append("# FORBIDDEN import directions, `<glob> -> <glob>`. Seeded EMPTY and the gate REDS until")
     body.append("# you declare one: a frequency count cannot observe intended architecture, so there is")
