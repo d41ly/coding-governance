@@ -18,7 +18,11 @@ hard rule here, and the last arm re-hashes the live log to prove this run did no
 
 from __future__ import annotations
 
+import contextlib
+import datetime
 import hashlib
+import inspect
+import io
 import json
 import os
 import pathlib
@@ -72,6 +76,75 @@ def check(name):
 
 class _Skip(Exception):
     """This arm could not run here, and says why. Reported separately — never counted as passed."""
+
+
+def resolve_memory_root() -> str:
+    """The corpus root from the RESOLVED conf.
+
+    A function, not a constant, so every fixture path in the ported arms below reaches it through
+    the conf rather than through a literal `memory/` that would be silently wrong in a tree calling
+    its corpus something else.
+
+    The import is INSIDE, and so is every other sibling import in the ported arms below. `extract`
+    resolves the conf AT IMPORT, so a module-level import would turn a conf-less tree — a state
+    this suite already runs in and still reports arms for — into a traceback before the first arm
+    ran. Imported per arm, an unresolvable conf lands as that arm's FAIL carrying the conf refusal,
+    beside the arms it does not affect, which is what the suite already does there today.
+    """
+    import extract as E
+    return E.CONF.memory_root
+
+
+# --- the arm count, and what keeps its history honest ---------------------------------------------
+# `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
+# from both the order list and the definitions and it passes silently. This is the external number
+# that cannot be satisfied by deleting both halves.
+SELFTEST_ARMS = 58
+# 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): the twenty-four arms ported from inCMS's
+#   scripts/recall/selftest.py — ten over `bench.py`/`union.py`, which `verbatim.json` pinned by
+#   digest and nothing exercised; eleven over the half of `query.py` that diffs to zero changed
+#   lines against inCMS's copy; and three over the alias join, one of which covers the query-side
+#   call site a recall floor structurally cannot see.
+
+
+def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
+    """`SELFTEST_ARMS` must be the END of an unbroken `N -> M` chain of comment lines.
+
+    Ported from inCMS `scripts/check_recall.py`. Upstream's pin had been bumped six times over
+    35 -> 62, and once more over 83 -> 92, with no line recorded. A session that has to re-derive
+    the pin then cannot tell which arms the missing ones were — which is exactly the state where a
+    quiet DELETION reads as a legitimate re-pin. Writing the lines is the fix; this is what keeps
+    them written, because a comment nothing reads rots (that is how the holes opened).
+
+    IT LIVES HERE AND NOT IN `check-recall.py`, which is where upstream keeps it, and that is the
+    one deliberate divergence in the port. Upstream's leg RUNS the selftest as a subprocess and
+    reads the executed count off its summary line; this repo already runs the selftest as its own
+    gate leg, so doing it again there would double the bar's slowest leg, and the alternative —
+    counting `@check(` decorators by reading the source — grades TEXT rather than EXECUTION, which
+    is exactly the weakness `check-testsuite-counts.sh` was written against. `len(_checks)` is the
+    executed count and it is only available in here.
+
+    Args are for the arm, which drives all three failure directions over synthetic sources.
+    """
+    if src is None:
+        src = pathlib.Path(__file__).read_text(encoding="utf-8", errors="replace")
+    if pinned is None:
+        pinned = SELFTEST_ARMS
+    steps = [(int(a), int(b))
+             for a, b in re.findall(r"^#\s*(\d+) -> (\d+) on 20\d\d-", src, re.M)]
+    if not steps:
+        return ("FAIL selftest: SELFTEST_ARMS carries no `N -> M on <date>` line. Every bump "
+                "records one — that is how a deletion stays distinguishable from a re-pin.")
+    # strict=False deliberately: the pairwise walk is over n-1 windows of an n-list.
+    for (_, to), (nxt, _) in zip(steps, steps[1:], strict=False):
+        if to != nxt:
+            return (f"FAIL selftest: the SELFTEST_ARMS provenance chain breaks at {to} -> {nxt}; "
+                    "the bump between them has no line.")
+    if steps[-1][1] != pinned:
+        return (f"FAIL selftest: SELFTEST_ARMS is {pinned} but its provenance chain ends at "
+                f"{steps[-1][1]} — add the `{steps[-1][1]} -> {pinned}` line naming what the "
+                "bump bought.")
+    return ""
 
 
 # ------------------------------------------------------------------ throwaway repo construction
@@ -1300,6 +1373,821 @@ def test_one_walk_two_callers():
         cleanup(root)
 
 
+
+# ==================================================================================================
+# THE INSTRUMENT'S OWN BEHAVIOUR — ported from inCMS `scripts/recall/selftest.py` (2026-08-24).
+#
+# WHY THIS BLOCK EXISTS. `bench.py` and `union.py` are byte-identical between the two trees and
+# `verbatim.json` pins both by digest, so `t_verbatim_files` proves the bytes have not moved and
+# NOTHING here proved they still behave. Same for the half of `query.py` that has not forked:
+# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against inCMS's copy.
+# A digest is not a check of behaviour; these are. Every arm below either drives a verbatim file or
+# drives a query.py function that is byte-identical to the one it was written against.
+#
+# WHAT WAS REPATHED, and it is only ever one of three things: inCMS's `_throwaway_repo()` becomes
+# gov's `make_repo()` plus `run_in_repo()`; an `ARCH-` id becomes a `TOOL-` id from this repo's conf;
+# and a `memory/architecture/...` path becomes a `<MEMORY_ROOT>/tooling/...` one. No assertion was
+# weakened and no measurement re-derived — the figures quoted in these docstrings were measured on
+# inCMS's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
+#
+# `query` is bound to `QRY` and never to `Q`, in every arm below: `Q` is this file's standard query
+# argv tuple, and shadowing it turned `run(root, kitdir, *Q)` into "Value after * must be an
+# iterable, not module" across twelve unrelated arms before the alias was changed.
+#
+# WHAT WAS DELIBERATELY LEFT UPSTREAM: the id-grammar and anchor-shape arms. Those are precisely the
+# arms this kit's four anchor regexes and its H1-is-not-an-anchor rule still lack — but every one of
+# their sixteen fixtures is an inCMS id embedded in an inCMS row shape, and rewriting them in this
+# conf's vocabulary is authoring a new arm rather than moving one. They are worth purpose-writing
+# here as separate work.
+#
+# One more piece of this contribution does not live in this block: `SELFTEST_ARMS` and
+# `check_provenance_chain`, up beside the harness, ported from inCMS's `scripts/check_recall.py`.
+# ==================================================================================================
+
+
+@contextlib.contextmanager
+def run_in_repo(root: pathlib.Path):
+    """chdir into a throwaway repo, for the arms that call the CLI IN PROCESS.
+
+    `query.main` resolves its repo, its cache AND its log from the CWD, so an in-process arm run
+    from this worktree appends to the LIVE query log — the self-inflicted-traffic defect this
+    file's header names and the last arm re-hashes for. `make_repo` deliberately does not chdir
+    (its own arms drive subprocesses with `cwd=root`), so the isolation is explicit here.
+    """
+    prev = os.getcwd()
+    os.chdir(root)
+    try:
+        yield root
+    finally:
+        os.chdir(prev)
+
+
+def seed_records(root: pathlib.Path, n: int = 14) -> None:
+    """Enough distinct records sharing one coined term that a query returns well over RESULT_CAP.
+
+    H2 anchors, not H1: `A_HEADING` is `#{2,6}` on purpose, so an H1 fixture would extract zero
+    records and the arms below would grade a chunks-only corpus without saying so.
+    """
+    d = root / resolve_memory_root() / "tooling"
+    d.mkdir(parents=True, exist_ok=True)
+    for i in range(n):
+        (d / f"note{i}.md").write_text(
+            f"## TOOL-aZylo-{i} — zylophone latch {i}\n\nThe zylophone latch drifts on flush {i}.\n",
+            encoding="utf-8", newline="\n",
+        )
+
+
+def read_log_rows(root: pathlib.Path) -> list[dict]:
+    import query as QRY
+    raw = QRY.log_path(root).read_text(encoding="utf-8").splitlines()
+    return [json.loads(x) for x in raw if x.strip()]
+
+
+def build_synthetic_log(days: int = 2, per_day: int = 3, first_qid: int = 1) -> list[dict]:
+    """Deterministic rows over REAL consecutive dates.
+
+    An earlier version formatted the day as `2026-08-{d+1:02d}`, which the export truncates back to
+    ten characters — so day 100 collapsed onto day 10 and a "600 day" fixture held 99. No wall clock
+    here: the base date is fixed, so two runs produce identical rows.
+    """
+    base = datetime.date(2026, 1, 1)
+    rows, qid = [], first_qid
+    for d in range(days):
+        for i in range(per_day):
+            rows.append({
+                "qid": qid,
+                "at": f"{base + datetime.timedelta(days=d)}T0{i}:00:00+00:00",
+                "type": "query",
+                "query": f"why does the widget latch drift on flush number {qid}",
+                "terms": ["zylophone", "latch", "flush"],
+                "rewritten": True,
+                "bytes_emitted": 1000 + qid,
+                "worktree": "C:/t/wt" if i else None,
+                "n_hits": 30,
+                "n_shown": 4,
+                "results": [{"set": "records", "id": "TOOL-001",
+                             "path": f"{resolve_memory_root()}/tooling/DECISIONS.md", "line": 1}],
+            })
+            qid += 1
+    return rows
+
+
+@check("bench: a chunk is credited for an id it ANCHORS, never for merely sharing its file")
+def test_chunk_matching():
+    """Path-only matching credits all ~40 chunks of a long file for one hit and inflates recall."""
+    import bench as B
+    docs = [
+        {"path": f"{resolve_memory_root()}/x.md", "text": "unrelated prose about caching"},
+        {"path": f"{resolve_memory_root()}/x.md", "text": "## TOOL-123 — sanitize at every write path"},
+        {"path": f"{resolve_memory_root()}/other.md", "text": "TOOL-123 is cited here but not anchored"},
+    ]
+    anchors = {"TOOL-123": [f"{resolve_memory_root()}/x.md"]}
+    got = B.expected_hits(docs, {"expected_ids": ["TOOL-123"], "expected_paths": []}, anchors)
+    assert got == {1}, f"chunk matching credited the wrong docs: {got}"
+    return "1 of 3 documents credited"
+
+
+@check("bench: r@k, f@k, rr and b@k over a synthetic ranking")
+def test_scoring():
+    import bench as B
+    docs = [{"text": "a" * 100} for _ in range(10)]
+    ks = [1, 5, 10]
+    # target at rank 3 -> miss at k=1, hit from k=5, RR = 1/3
+    s = B.score(docs, [9, 8, 2, 7, 6, 5, 4, 3, 1, 0], {"T": {2}}, ks)
+    assert s["r@1"] == 0.0 and s["r@5"] == 1.0 and abs(s["rr"] - 1 / 3) < 1e-9, s
+    assert s["b@5"] == 500, s
+    # full@k = every TARGET covered; two targets, the second only reachable by k=10
+    s2 = B.score(docs, list(range(10)), {"A": {2}, "B": {9}}, ks)
+    assert s2["f@5"] == 0.0 and s2["f@10"] == 1.0, s2
+    # a query that misses entirely scores RR 0, not a crash
+    s3 = B.score(docs, [0, 1], {"T": {5}}, ks)
+    assert s3["rr"] == 0.0 and s3["r@10"] == 0.0, s3
+    return "r@k, f@k, rr and b@k all move on the cases that should move them"
+
+
+@check("bench: full@k counts TARGETS, not the documents that satisfy them")
+def test_full_at_k_counts_targets_not_documents():
+    """One target satisfied by 5 chunks needs ONE of them retrieved, not all five.
+
+    Requiring every matching document measured full@20 at 0.03 against a published 0.66 — a metric
+    bug that reads as a catastrophic result rather than as a broken instrument.
+    """
+    import bench as B
+    docs = [{"text": "x" * 50} for _ in range(10)]
+    s = B.score(docs, [4], {"TOOL-1": {0, 1, 2, 3, 4}}, [1])
+    assert s["f@1"] == 1.0, f"full@k demanded every matching doc, not one per target: {s}"
+    two = {"TOOL-1": {0, 1}, "TOOL-2": {7}}
+    assert B.score(docs, [1], two, [1])["f@1"] == 0.0, "second target was not required"
+    assert B.score(docs, [1, 7], two, [2])["f@2"] == 1.0, "both targets covered but full@2 failed"
+    return "one target, five satisfying chunks, one retrieved -> full@1 = 1.0"
+
+
+@check("bench: FTS5 punctuation is query SYNTAX — a hostile question is a miss, never a crash")
+def test_fts_query_safety():
+    import bench as B
+    db = B.build_index([
+        {"id": "TOOL-1", "path": "a.md", "text": 'a missing "use client" directive breaks it'},
+        {"id": "TOOL-2", "path": "b.md", "text": "unrelated content about pagination"},
+    ])
+    for q in ['why does "use client" break?', "c++ AND OR NEAR(", "-- ; DROP", "", "???"]:
+        B.run_fts(db, q, 5, False)  # must not raise
+    hits = B.run_fts(db, 'missing "use client" directive', 5, False)
+    assert 0 in hits, f"quoted-phrase query failed to retrieve its document: {hits}"
+    return "5 hostile strings survived, the quoted phrase still retrieves"
+
+
+@check("bench: the alias column is separate, searchable, and weighted below the body")
+def test_alias_column_is_separate_and_downweighted():
+    """Moving alias text to its own column does NOT reduce dilution — FTS5's bm25() normalises by
+    total row length across all columns, so the denominator is unchanged, and it measured identical
+    to inline at every k. What the column buys is an independent WEIGHT, and the sweep put the
+    useful range well below 1.0: at 1.0 the layer costs r@10 a point, at 16.0 it costs six.
+    """
+    import bench as B
+    assert 0 < B.ALIAS_WEIGHT < 1.0, f"alias weight {B.ALIAS_WEIGHT} outside measured-good range"
+    docs = [
+        {"id": "TOOL-1", "path": "a.md", "text": "sanitize at every write path"},
+        {"id": "TOOL-2", "path": "b.md", "text": "unrelated pagination content"},
+    ]
+    assert B.run_fts(B.build_index(docs), "sanitize write path", 5, False) == [0]
+    # the same corpus with an alias block must still retrieve, now also by the bridge text
+    docs[1] = {**docs[1], "alias": "why does my saved markup come back mangled"}
+    db2 = B.build_index(docs)
+    assert 1 in B.run_fts(db2, "saved markup mangled", 5, False), "alias column is not searchable"
+    assert B.run_fts(db2, "sanitize write path", 5, False)[0] == 0, "alias displaced a body hit"
+    return f"ALIAS_WEIGHT={B.ALIAS_WEIGHT}, searchable, and it does not displace a body hit"
+
+
+@check("union: an ensemble spec is a spec, and a Windows path is not one")
+def test_ensemble_arg_grammar():
+    """A Windows path's drive letter must not parse as a document set (it did: set "C")."""
+    import union as U
+    for good in (
+        "records:fts5",
+        "records:fts5+chunks:fts5",
+        "spine:rm3+chunks:fts5w",
+        "records:embed+chunks:fts5",  # optional-stack substrates are valid names too
+        "records:hybrid2",
+    ):
+        assert U.is_ensemble(good), f"valid ensemble rejected: {good}"
+    for bad in (
+        "C:/Users/x/out.json",
+        "C:\\Users\\x\\out.json",
+        "--json",
+        "20",
+        "records:word2vec",  # substrate this harness does not implement
+        "bogus:fts5",
+        "records",
+    ):
+        assert not U.is_ensemble(bad), f"non-ensemble accepted: {bad}"
+    return "5 specs accepted, 7 non-specs rejected including both drive-letter forms"
+
+
+@check("union.SUBS is a subset of what bench.rank_with can dispatch")
+def test_substrate_dispatch_is_total():
+    """The one arm spanning BOTH verbatim files. A drift between them is silent today: an ensemble
+    naming a substrate `rank_with` cannot dispatch scores zero and reports it as a result.
+    """
+    import bench as B
+    import union as U
+    known = set(B.LEXICAL) | set(B.ROLLUP) | set(B.DENSE) | set(B.HYBRID)
+    for s in U.SUBS:
+        assert s in known, f"union advertises substrate {s!r} that rank_with cannot dispatch"
+    assert B.rank_with("nope", [], None, None, "q", 5) is None, "unknown substrate must return None"
+    return f"{len(U.SUBS)} advertised substrates, all dispatchable"
+
+
+@check("bench: rollup keeps ONE chunk per parent, and a chunk with no record rolls up to its file")
+def test_rollup_dedupes_by_parent():
+    import bench as B
+    docs = [
+        {"path": "a.md", "rec": "TOOL-1", "text": "alpha beta"},
+        {"path": "a.md", "rec": "TOOL-1", "text": "alpha gamma"},
+        {"path": "a.md", "rec": "TOOL-2", "text": "alpha delta"},
+        {"path": "b.md", "text": "alpha epsilon"},  # no rec -> falls back to path
+    ]
+    assert B.parent_of(docs[0]) == "TOOL-1"
+    assert B.parent_of(docs[3]) == "b.md", "a chunk with no record must roll up to its file"
+    rolled = B.run_rollup(B.build_index(docs), docs, "alpha", 4)
+    parents = [B.parent_of(docs[i]) for i in rolled]
+    assert len(parents) == len(set(parents)), f"rollup returned duplicate parents: {parents}"
+    assert len(parents) == 3, f"expected 3 distinct parents, got {parents}"
+    return "4 chunks, 3 distinct parents"
+
+
+@check("bench.build_index still defaults db_path to ':memory:' for its benchmark callers")
+def test_build_index_default_stays_in_memory():
+    """`query.py` gave `build_index` a `db_path`; benchmark callers must keep `:memory:`.
+
+    If the default ever changes, every bench/union run starts writing a file somewhere and the
+    measured numbers silently start describing a different thing. Asserted on the SIGNATURE, not on
+    behaviour, because a behavioural test would pass on a default of "some other in-memory name".
+    """
+    import bench as B
+    sig = inspect.signature(B.build_index)
+    assert sig.parameters["db_path"].default == ":memory:", (
+        f"build_index db_path default is {sig.parameters['db_path'].default!r}, must be ':memory:'"
+    )
+    return "signature default held at ':memory:'"
+
+
+@check("query_expr refuses an all-stopword question and phrases an id adjacently")
+def test_query_expr_refuses_empty_and_phrases_ids():
+    """Two defects the CLI would otherwise inherit from `match_expr`.
+
+    1. `match_expr` falls back to `'"the"'` on an empty term set, so "how do I do it" returns
+       arbitrary documents presented as answers. `query_expr` returns None and the CLI refuses.
+    2. `terms()` drops the numeric half of an id, so `TOOL-169` searches as `tool`. The id must
+       reach FTS5 as an adjacency PHRASE.
+    """
+    import query as QRY
+    assert QRY.query_expr("how do I do it") is None, "an all-stopword question must not build a query"
+    assert QRY.query_expr("") is None
+
+    expr = QRY.query_expr("what is TOOL-169")
+    assert expr is not None
+    assert '"tool 169"' in expr, f"id not phrased into the expression: {expr}"
+    assert '"what"' not in expr, "stop words must still be dropped from the plain half"
+
+    # A supplied term that terms() would destroy survives verbatim.
+    expr2 = QRY.query_expr("stale index", ["c++", "422", "db"])
+    for t in ('"c++"', '"422"', '"db"'):
+        assert t in expr2, f"supplied term {t} lost from {expr2}"
+    return "stopword-only refused, id phrased, three destroyable terms survived"
+
+
+@check("rrf fuses on RANKS, so cross-set agreement outranks a strong position in one set")
+def test_rrf_is_rank_based_not_score_based():
+    """The two indexes' `bm25()` values are not comparable, so fusion must use RANKS only.
+
+    Pinned with a case where a raw score merge would order differently: a document ranked 3 by BOTH
+    sets must beat one ranked 1 by a single set.
+    """
+    import query as QRY
+    recs = [
+        {"set": "records", "path": "a.md", "line": 1, "id": "TOOL-1", "text": ""},
+        {"set": "records", "path": "b.md", "line": 1, "id": "TOOL-2", "text": ""},
+        {"set": "records", "path": "c.md", "line": 1, "id": "TOOL-3", "text": ""},
+    ]
+    chunks = [
+        {"set": "chunks", "path": "z.md", "line": 9, "id": "", "text": ""},
+        {"set": "chunks", "path": "y.md", "line": 9, "id": "", "text": ""},
+        {"set": "chunks", "path": "c.md", "line": 1, "id": "", "text": ""},
+    ]
+    fused = QRY.rrf([recs, chunks])
+    order = [(h["path"], h["line"]) for h in fused]
+    # c.md is rank 3 in BOTH sets (2/63 = 0.0317) and beats a.md, rank 1 in one set (1/61 = 0.0164).
+    # That IS the property being bought, and it is exactly what a raw bm25 concatenation cannot do.
+    assert order[0] == ("c.md", 1), f"a doc hit by BOTH sets must lead the fusion, got {order}"
+    assert order[1] == ("a.md", 1), f"rank-1 of one set must come next, got {order}"
+    # The record-level view wins the merge, because it is the one carrying the id.
+    assert fused[0]["id"] == "TOOL-3", "the record view of a shared passage must survive the merge"
+    return "agreement at rank 3 beat rank 1 of one set; the record view carried the id"
+
+
+@check("the rrf key separates two windows of ONE section, and still merges one passage")
+def test_rrf_key_separates_two_windows_of_one_section():
+    """A chunk's `line` is its SECTION's start, so windows of one section share (path, line).
+
+    Keyed on (path, line) alone, 47 696 of 71 359 chunks collided upstream: distinct passages were
+    dropped from the answer, and each collision was scored as cross-set AGREEMENT, inflating the
+    fused recall figure a merge-bar leg pins.
+    """
+    import query as QRY
+    same_section = [
+        {"set": "chunks", "path": "a.md", "line": 5, "id": "", "text": "first window text here"},
+        {"set": "chunks", "path": "a.md", "line": 5, "id": "", "text": "second window, different"},
+    ]
+    assert len(QRY.rrf([same_section])) == 2, "two windows of one section collapsed"
+
+    # And a record and a chunk that genuinely ARE the same passage still merge, which is the
+    # cross-set agreement RRF exists for.
+    shared = "the latch closes on flush and the guard rejects a stale write"
+    merged = QRY.rrf([
+        [{"set": "records", "path": "b.md", "line": 9, "id": "TOOL-1", "text": shared}],
+        [{"set": "chunks", "path": "b.md", "line": 9, "id": "", "text": shared}],
+    ])
+    assert len(merged) == 1 and merged[0]["id"] == "TOOL-1", "the same passage must still merge"
+    return "two windows stay two; one passage across two sets stays one"
+
+
+@check("emit: the byte budget bounds emission, names its overflow, and beats full documents")
+def test_budget_bounds_emission_and_beats_full_documents():
+    """Three properties, each of which was an acceptance criterion that could not fail as written:
+    emission never exceeds the budget except for a lone first hit that does not fit; the
+    `shown N of M` truncation line is reachable; and snippets actually cost less than whole
+    documents on the SAME ranked pool — comparing emission to a fixed 70 KB could never fail,
+    because the budget caps emission below it by construction.
+    """
+    import query as QRY
+    hits = [
+        {
+            "set": "records",
+            "id": f"TOOL-{i:03d}",
+            "path": f"{resolve_memory_root()}/tooling/area{i}.md",
+            "line": i,
+            "snippet": "…the latch closes on flush and the guard rejects a stale write…",
+            "text": "the latch closes on flush and the guard rejects a stale write. " * 40,
+        }
+        for i in range(1, 21)
+    ]
+    q = "latch guard stale write"
+
+    for budget in (600, 2_000, 20_000):
+        text, shown, spent, overflow = QRY.emit(hits, q, budget)
+        assert spent == len(text.encode()) - max(0, shown - 1), "accounting must match the emission"
+        if shown > 1:
+            assert spent <= budget, f"emitted {spent} B over a {budget} B budget"
+        assert shown >= 1, "a budget must never emit an empty list while hits exist"
+
+    # A budget below one hit emits exactly that hit and reports the overflow.
+    _, shown, _, overflow = QRY.emit(hits, q, 10)
+    assert shown == 1 and overflow > 0, "a lone oversized hit is emitted and its overflow named"
+
+    # Truncation is reachable, which a default-budget-only test would never show.
+    _, shown, _, _ = QRY.emit(hits, q, 2_000)
+    assert shown < len(hits), "the shown-N-of-M path must be exercised by some budget"
+
+    # Snippets against whole documents, same pool, same budget ceiling raised out of the way.
+    _, _, snip_b, _ = QRY.emit(hits, q, 10_000_000)
+    _, _, full_b, _ = QRY.emit(hits, q, 10_000_000, full=True)
+    assert snip_b <= 0.4 * full_b, f"snippets cost {snip_b} B against {full_b} B for full documents"
+    return f"snippets {snip_b} B against {full_b} B for the same 20 hits"
+
+
+@check("supplied --terms bypass terms() verbatim, and the refusal LEADS with --terms")
+def test_rewrite_terms_are_required_and_survive_verbatim():
+    """The rewrite argument grammar, and the defect that made its central mechanism inert.
+
+    Supplied terms must NOT go through `bench.terms()`. Reproduced: `match_expr("c++ db ui 422")`
+    returns `'"the"'` — every coined token deleted — and `db`, `ui`, `422`, `c++`, `nh3` and every
+    id are exactly what a rewriter produces. A test using only survivable terms would pass without
+    the feature existing, so this one uses terms that `terms()` destroys.
+    """
+    import bench as B
+    import query as QRY
+    assert B.match_expr("c++ db ui 422") == '"the"', (
+        "the premise changed: terms() no longer destroys these, so re-derive the bypass")
+    expr = QRY.query_expr("stale editor save", ["c++", "db", "ui", "422", "nh3", "TOOL-169"])
+    for t in ('"c++"', '"db"', '"ui"', '"422"', '"nh3"', '"tool 169"'):
+        assert t in expr, f"supplied term {t} did not survive into {expr}"
+
+    # The refusal must LEAD with --terms. A refusal that leads with the escape hatch teaches the
+    # escape hatch, and would still satisfy a criterion that only asked for "a refusal".
+    first = next(ln for ln in QRY.REFUSAL.splitlines() if "--" in ln)
+    assert "--terms" in first and "--no-terms" not in first, (
+        f"the refusal's first flag line must be --terms, got: {first!r}")
+    assert "--no-terms" in QRY.REFUSAL, "the measurement escape must still be documented"
+
+    # Contradictory flags are a named error, not a silent preference. Driven inside a throwaway
+    # repo: both return before any log write TODAY, and an arm that relies on that is one refactor
+    # away from writing to the live log this suite exists to leave alone.
+    root, _ = make_repo()
+    try:
+        with run_in_repo(root), contextlib.redirect_stderr(io.StringIO()):
+            assert QRY.main(["q", "--terms", "a b", "--no-terms"]) == 2
+            assert QRY.main(["--terms=a", "--no-terms"]) == 2
+    finally:
+        cleanup(root)
+    return "6 destroyable terms survived; the refusal leads with --terms"
+
+
+@check("argv is ONE left-to-right scan, and the refusal is reachable and logged")
+def test_argv_grammar_and_the_refusal_are_gated():
+    """Three defects a closing review found by running the tool, now pinned.
+
+    1. The question picker was "first argv not starting with --", repaired per flag ordering. With
+       `--terms` before `--budget`, `query.py --terms "..." --budget 400 "question"` printed
+       "33 hits for: 400". A parser repaired per ordering is wrong for the next ordering.
+    2. An EMPTY `--terms` bypassed the refusal entirely and logged identically to `--no-terms` —
+       the whole mechanism, opt-out by accident.
+    3. The refusal itself had no test: deleting the entire `--terms`-required branch left the
+       suite green.
+    """
+    import query as QRY
+    q = "how is stored html sanitized"
+    t = "sanitize nh3 allowlist write path guard document override"
+    for argv in (
+        [q, "--terms", t, "--budget", "400"],
+        ["--terms", t, "--budget", "400", q],
+        ["--budget", "400", "--terms", t, q],
+        ["--budget=400", f"--terms={t}", q],
+    ):
+        flags, pos, err = QRY.parse(argv)
+        assert err is None, f"{argv} -> {err}"
+        assert pos == [q], f"{argv} resolved the question to {pos!r}, not {q!r}"
+        assert flags["--budget"] == "400" and flags["--terms"] == t
+
+    # A value flag with nothing after it is an error, not a silent default.
+    _, _, err = QRY.parse([q, "--terms"])
+    assert err and "--terms" in err
+
+    # The refusals run in a THROWAWAY repo, because `QRY.main` resolves its log from the CWD and the
+    # bare-question arm APPENDS a `refused` row. Upstream's un-isolated version wrote one synthetic
+    # refusal into the SHARED query log on every gate run on every node: 471 of that log's 489
+    # refusals were this one string, against 18 genuine caller ones.
+    root, _ = make_repo()
+    try:
+        with run_in_repo(root):
+            with contextlib.redirect_stderr(io.StringIO()):
+                assert QRY.main([q]) == 2, "a bare question must be refused"
+                assert QRY.main([q, "--terms", ""]) == 2, (
+                    "an empty --terms must be refused, not treated as none")
+                assert QRY.main([q, "--k", "abc", "--no-terms"]) == 2, "a non-integer --k must refuse"
+                assert QRY.main([q, "--k", "-1", "--no-terms"]) == 2, "a non-positive --k must refuse"
+            assert [r for r in read_log_rows(root)
+                    if r.get("type") == "refused" and r.get("query") == q], (
+                "the bare-question refusal no longer logs at all")
+    finally:
+        cleanup(root)
+    return "4 orderings resolve one question; 4 refusals fire and the bare one logs"
+
+
+@check("the result cap shrinks `results` and does NOT clamp `n_hits`")
+def test_result_cap_keeps_the_true_hit_count():
+    """A cap applied to the fused list before `len(hits)` is read would make every record claim it
+    found 5 things, which is the same log with its one honest number destroyed.
+    """
+    import query as QRY
+    root, _ = make_repo()
+    try:
+        seed_records(root)
+        with run_in_repo(root), contextlib.redirect_stdout(io.StringIO()):
+            assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush drift"]) == 0
+            rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
+        assert rec["n_hits"] > QRY.RESULT_CAP, (
+            f"fixture too small to test the cap: {rec['n_hits']} hits <= {QRY.RESULT_CAP}")
+        assert len(rec["results"]) == QRY.RESULT_CAP, f"results not capped: {len(rec['results'])}"
+        assert rec["n_shown"] <= rec["n_hits"]
+        return f"{rec['n_hits']} hits, {len(rec['results'])} kept in `results`"
+    finally:
+        cleanup(root)
+
+
+@check("shown_paths carries one entry per EMITTED hit, so a rank past the cap is recoverable")
+def test_shown_paths_make_every_rank_recoverable():
+    """The opened-rank hook can only infer a rank the log recorded.
+
+    `RESULT_CAP` deliberately keeps only the top 5 rich result objects. If that were also the only
+    path record, every inferred rank would be clamped to 5 and the log would report "the answer was
+    always in the top 5" BY CONSTRUCTION. The fixture is sized so `n_shown` exceeds `RESULT_CAP`;
+    otherwise the clamp and the correct behaviour are indistinguishable and this proves nothing.
+    """
+    import query as QRY
+    root, _ = make_repo()
+    try:
+        seed_records(root)
+        with run_in_repo(root), contextlib.redirect_stdout(io.StringIO()):
+            assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush drift"]) == 0
+            rec = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]
+        paths = rec.get("shown_paths")
+        assert isinstance(paths, list), "shown_paths missing — the hook cannot infer any rank"
+        assert rec["n_shown"] > QRY.RESULT_CAP, (
+            f"fixture too small: n_shown {rec['n_shown']} <= RESULT_CAP {QRY.RESULT_CAP}, so a "
+            "clamped implementation would pass this check")
+        assert len(paths) == rec["n_shown"], (
+            f"shown_paths has {len(paths)} entries for {rec['n_shown']} emitted hits")
+        # Rank order must agree with `results` where the two overlap, or the inferred rank is wrong.
+        assert [h["path"] for h in rec["results"]] == paths[: len(rec["results"])], (
+            "shown_paths is not in the same rank order as results")
+        # The property the hook actually needs: a rank BEYOND the cap is still recoverable.
+        assert paths.index(paths[QRY.RESULT_CAP]) + 1 > QRY.RESULT_CAP
+        return f"n_shown {rec['n_shown']} against RESULT_CAP {QRY.RESULT_CAP}, every rank recoverable"
+    finally:
+        cleanup(root)
+
+
+@check("--export is byte-stable and leaks no raw query text")
+def test_export_is_idempotent_and_leaks_no_query_text():
+    """The leak arm quantifies over the WHOLE query set, never a sample — but only on questions of
+    three tokens or more. A one-word query is vocabulary, not text: grepping for it matches the
+    corpus PATHS the export legitimately prints, so an unbounded grep fails a correct export and
+    the instinctive repair (check a sample) is the vacuity the criterion exists to prevent.
+    """
+    import query as QRY
+    rows = build_synthetic_log(first_qid=QRY.build_cutoff("a") + 1)
+    rows.append({
+        "qid": QRY.build_cutoff("a") + 99, "at": "2026-08-02T09:00:00+00:00", "type": "refused",
+        "reason": "no-rewrite-terms", "query": "make the editor stop eating my drafts",
+    })
+    a = QRY.export_text(rows, "a")
+    assert a == QRY.export_text(rows, "a"), "export is not byte-stable across two runs on one log"
+
+    leaked = [r["query"] for r in rows
+              if len((r.get("query") or "").split()) >= 3 and r["query"] in a]
+    assert not leaked, f"raw query text reached the export: {leaked[:2]}"
+    # Non-vacuity: the guard must be able to see a leak at all.
+    assert any(len((r.get("query") or "").split()) >= 3 for r in rows), "no multi-word query"
+    assert rows[0]["query"] in (a + rows[0]["query"]), "the containment test is inert"
+    return f"{len(rows)} rows, byte-stable, none of their questions echoed"
+
+
+@check("--export per-day counts agree with a count that shares no code with the export")
+def test_export_day_counts_agree_with_an_independent_count():
+    """Comparing generated output to generated output is green by construction — the
+    same-generator class this instrument was already caught by once.
+    """
+    import query as QRY
+    rows = build_synthetic_log(days=3, per_day=4, first_qid=QRY.build_cutoff("a") + 1)
+    text = QRY.export_text(rows, "a")
+    # Days come from the INPUT rows; the counts are hand-derived below. Neither reads the export's
+    # grouping, which is the whole point.
+    days = sorted({r["at"][:10] for r in rows})
+    assert len(days) == 3, f"fixture drifted: {days}"
+    for day in days:
+        want = sum(1 for r in rows if r["type"] == "query"
+                   and r["at"].startswith(day) and r["qid"] > QRY.build_cutoff("a"))
+        m = re.search(rf"^\| {day} \| (\d+) \|", text, re.M)
+        assert m, f"no row for {day} in the export"
+        assert int(m.group(1)) == want, f"{day}: export says {m.group(1)}, hand count {want}"
+        assert want == 4, "fixture drifted; the hand count is meant to be 4"
+    return "3 days, 4 queries each, hand-counted against the table"
+
+
+@check("--opened attaches to an EXPLICIT qid, the query prints it, an unknown qid writes nothing")
+def test_opened_attaches_to_an_explicit_qid_and_the_query_prints_it():
+    """`--opened` had ONE attach point — the last non-`opened` row in a REPO-WIDE log, with no
+    session or worktree predicate — and the CLI never printed the qid it had just written, so the
+    caller could not name the query they meant. The fix is a KEY, not a filter: measured over the
+    live log, the cross-worktree race a filter would close has ZERO instances in 120
+    worktree-bearing rows, while the race that does happen is INTRA-worktree (49 of 54 consecutive
+    gaps from one checkout under 60 s), where a worktree predicate discriminates nothing.
+    """
+    import query as QRY
+    root, _ = make_repo()
+    try:
+        seed_records(root)
+        with run_in_repo(root):
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                assert QRY.main(["zylophone latch drift", "--terms", "zylophone latch flush"]) == 0
+            first = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
+            assert f"qid {first}" in buf.getvalue(), (
+                f"the query path never printed its own qid: {buf.getvalue()[-200:]!r}")
+
+            # A SECOND query moves the last row. Without it the explicit key and the bare fallback
+            # resolve to the same qid and the arms below prove nothing.
+            with contextlib.redirect_stdout(io.StringIO()):
+                assert QRY.main(["zylophone latch flush", "--terms", "zylophone latch drift"]) == 0
+            second = [r for r in read_log_rows(root) if r.get("type") == "query"][-1]["qid"]
+            assert second != first, "both queries logged one qid; the arms below prove nothing"
+
+            with contextlib.redirect_stdout(io.StringIO()):
+                assert QRY.main(["--opened", "2", "--qid", str(first)]) == 0
+            rec = [r for r in read_log_rows(root) if r.get("type") == "opened"][-1]
+            assert rec["of_qid"] == first, (
+                f"--qid {first} recorded against query {rec['of_qid']} — the key was ignored")
+
+            n = len(read_log_rows(root))
+            with contextlib.redirect_stderr(io.StringIO()):
+                assert QRY.main(["--opened", "1", "--qid", str(second + 999)]) == 2, (
+                    "a qid that is in no log row must be refused, not recorded")
+            assert len(read_log_rows(root)) == n, "a dangling --qid still wrote an outcome record"
+        return f"qid {first} printed and attachable while {second} was the newest"
+    finally:
+        cleanup(root)
+
+
+# ------------------------------------------------------------------- the alias join, end to end
+#
+# Every fixture below uses ids VERIFIED ABSENT from whatever alias file the kit dir carries —
+# `TOOL-777` and `TOOL-778`. The alias source resolves beside the SCRIPT, so a fixture reusing the
+# ids `make_repo` seeds would grade REAL alias text in an adopter who authored some, and pass with
+# the fixture join broken. This kit ships the alias MECHANISM and no alias DATA, so the guard reads
+# as trivially true here — it is written for the tree that has the file, not for the one that does
+# not, and it costs one set intersection.
+
+ALIAS_Q = ["why does my widget latch stay shut", "the flush never reopens the latch"]
+
+ALIAS_CORPUS = (
+    "# Decisions\n\n"
+    "## TOOL-777 — the aliased record\n\nthe latch closes on flush\n\n"
+    "## TOOL-778 — the un-aliased record\n\nunrelated pagination content\n"
+)
+
+
+def build_alias_repo():
+    """A repo whose ONE corpus file is DURABLE and carries an aliased and an un-aliased record.
+
+    The durable path matters: `spine` selects only `DECISIONS`/`decisions/`-shaped paths, so a
+    fixture in a plain `<root>/x.md` would leave spine empty and the "no spine document carries an
+    alias key" arm green under every mutation. `make_repo` already writes its corpus to
+    `<MEMORY_ROOT>/tooling/DECISIONS.md`, which `extract.DURABLE` matches.
+    """
+    root, kitdir = make_repo()
+    corpus = root / resolve_memory_root() / "tooling" / "DECISIONS.md"
+    corpus.write_text(ALIAS_CORPUS, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    return root, kitdir
+
+
+def write_alias_fixture(root: pathlib.Path, rows: list[dict] | None = None) -> pathlib.Path:
+    """A fixture aliases file beside a fixture repo, in the shape `load_aliases` reads."""
+    p = root / "fixture-aliases.json"
+    p.write_text(
+        json.dumps(rows if rows is not None else [{"id": "TOOL-777", "questions": ALIAS_Q}]),
+        encoding="utf-8", newline="\n",
+    )
+    return p
+
+
+def read_jsonl(p: pathlib.Path) -> list[dict]:
+    return [json.loads(ln) for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip()]
+
+
+@check("the alias join lands on the NAMED record and on nothing else")
+def test_alias_join_lands_on_the_named_record_and_only_it():
+    """The join reaches a `records` document, over a PINNED fixture population.
+
+    Rev-1 of this criterion quantified over "every record whose id is in the aliases file" — the
+    selftest's ids are invented and appear in no aliases file, so the antecedent was never
+    satisfied, the universal was vacuously true, and its own stated mutation could not fire. This
+    names the matched id, pins the exact text, and pins the negative case.
+
+    Mutation: delete the `join_aliases` call in `extract.main` -> the alias assert reds.
+    """
+    import extract as E
+    committed = E.load_aliases()[0]
+    assert not ({"TOOL-777", "TOOL-778"} & set(committed)), (
+        "the fixture ids are in the shipped aliases file, so this check would grade real text")
+
+    root, kitdir = build_alias_repo()
+    out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-alias-"))
+    _SWEPT.append(out)
+    try:
+        p = run(root, kitdir, str(root), str(out), "--aliases", str(write_alias_fixture(root)),
+                script="extract.py")
+        assert p.returncode == 0, p.stderr
+        recs = {r["id"]: r for r in read_jsonl(out / "records.jsonl")}
+        assert set(recs) == {"TOOL-777", "TOOL-778"}, sorted(recs)
+        assert recs["TOOL-777"].get("alias") == "\n".join(ALIAS_Q), recs["TOOL-777"]
+        assert "alias" not in recs["TOOL-778"], "a record with no alias row grew an alias key"
+        assert "1 records aliased" in p.stdout, p.stdout
+        return "1 of 2 records aliased, text pinned, the other untouched"
+    finally:
+        shutil.rmtree(out, onerror=_set_writable)
+        cleanup(root)
+
+
+@check("the alias join reaches the QUERY index, not only extract.py's output dir")
+def test_alias_join_reaches_the_query_index():
+    """End to end through the CLI's OWN index — the half a recall floor cannot see.
+
+    `check-recall.py` grades a SUBPROCESS of `extract.py`. `query.py` never runs that entry point
+    and never reads its output dir: it re-extracts in process and indexes that. So every recall
+    floor stays green with the query-side join deleted, and the shipped product indexes an empty
+    alias column. The search expression is built ONLY from alias vocabulary that appears nowhere in
+    the record body, so a body hit cannot fake it.
+
+    Mutation: delete the `join_aliases` call in `query._docs` -> this reds while the two arms
+    either side of it stay green.
+    """
+    import extract as E
+    import query as QRY
+    rel = f"{resolve_memory_root()}/tooling/NOTE2.md"
+    body = "the latch closes on flush"
+    # Every probe word is in the alias block and in NOTHING the record itself indexes — not the
+    # body, not the path, not the id, which together are the `head` and `body` columns. Asserted,
+    # not assumed: the first draft of this check probed "latch" and "flush", which the BODY carries,
+    # so it stayed green with the query-side join deleted. That is the exact defect it exists for.
+    probe = "widget shut reopens"
+    assert all(w not in f"{body} {rel} TOOL-777".lower() for w in probe.split()), probe
+    assert all(any(w in q for q in ALIAS_Q) for w in probe.split()), probe
+
+    root, _ = make_repo()
+    try:
+        (root / rel).write_text(
+            f"# Note\n\n## TOOL-777 — the aliased record\n\n{body}\n",
+            encoding="utf-8", newline="\n",
+        )
+        orig = E.ALIASES_DEFAULT
+        try:
+            E.ALIASES_DEFAULT = write_alias_fixture(root)
+            with run_in_repo(root):
+                dirp, _, _ = QRY.ensure_cache(root, force=True)
+                expr = QRY.query_expr(probe)
+                assert expr
+                hits = QRY.search(dirp, "records", expr, 10)
+        finally:
+            E.ALIASES_DEFAULT = orig
+        assert any(h["id"] == "TOOL-777" for h in hits), (
+            "the query index carries no alias column — the CLI ships without the layer, "
+            f"got {[h['id'] for h in hits]}")
+        return "a query built only from bridge vocabulary reached the aliased record"
+    finally:
+        cleanup(root)
+
+
+@check("--aliases <file> versus --aliases none differs in the records' alias key and nowhere else")
+def test_alias_on_versus_none_is_a_differential():
+    """ON vs NONE over ONE fixture: only the records' `alias` key may differ.
+
+    Three arms, three DISTINCT mutations, because no single edit reds all of them:
+      chunks  — move the join into `extract_chunks` (the chunk extractor slices FILE text and never
+                sees a record dict, so the record-text mutation cannot reach it)
+      text    — concatenate the block onto `r["text"]` instead of into its own key
+      spine   — derive spine AFTER the join, or without copying (it filters the same dict objects)
+    """
+    root, kitdir = build_alias_repo()
+    on = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-alias-on-"))
+    none = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-alias-none-"))
+    _SWEPT.extend((on, none))
+    try:
+        a = run(root, kitdir, str(root), str(on), "--aliases", str(write_alias_fixture(root)),
+                script="extract.py")
+        b = run(root, kitdir, str(root), str(none), "--aliases", "none", script="extract.py")
+        assert a.returncode == 0 and b.returncode == 0, (a.stderr, b.stderr)
+
+        assert read_jsonl(on / "chunks.jsonl") == read_jsonl(none / "chunks.jsonl"), (
+            "the alias join moved the chunk set — every published figure holds chunks constant")
+        ron = {r["id"]: r for r in read_jsonl(on / "records.jsonl")}
+        rnone = {r["id"]: r for r in read_jsonl(none / "records.jsonl")}
+        assert {i: r["text"] for i, r in ron.items()} == {i: r["text"] for i, r in rnone.items()}, (
+            "the alias block landed in the record BODY, which is the dilution the column exists "
+            "to avoid")
+        assert ron["TOOL-777"].get("alias"), ron["TOOL-777"]
+        assert "alias" not in rnone["TOOL-777"], "`--aliases none` still joined"
+        spine = read_jsonl(on / "spine.jsonl") + read_jsonl(none / "spine.jsonl")
+        assert spine, "the fixture put nothing in spine, so the spine arm proves nothing"
+        assert not any("alias" in d for d in spine), (
+            "a spine document carries an alias key — no published figure was measured on that set")
+        return f"chunks and record text identical, {len(spine)} spine document(s) alias-free"
+    finally:
+        for d in (on, none):
+            shutil.rmtree(d, onerror=_set_writable)
+        cleanup(root)
+
+
+@check("the arm-count pin ends an unbroken provenance chain, and main() actually reads the verdict")
+def test_the_selftest_pin_carries_an_unbroken_provenance_chain():
+    """`SELFTEST_ARMS` must END a contiguous `N -> M` chain of comment lines.
+
+    Upstream's equivalent pin had been bumped six times over 35 -> 62, and once more over 83 -> 92,
+    with no line recorded. A session that has to re-derive the pin then cannot tell which suite the
+    missing arms belonged to — which is exactly the state where a quiet DELETION reads as a
+    legitimate re-pin. Writing the lines is the fix; this is what keeps them written, because a
+    comment nothing reads rots. The LIVE file is asserted green here so the gate can never ship
+    already-red.
+
+    Mutation: delete any `N -> M on <date>` line above the pin, or bump the pin without adding one
+    -> the live assert reds.
+    """
+    assert check_provenance_chain() == "", check_provenance_chain()
+    src = pathlib.Path(__file__).read_text(encoding="utf-8", errors="replace")
+    body = src.partition("\ndef main() -> int:")[2]
+    assert body, "main() is no longer the last definition, so the dead-plumbing arm reads nothing"
+    assert "check_provenance_chain(" in body, (
+        "the chain gate is defined but `main()` never calls it — dead plumbing")
+
+    hole = "# 3 -> 4 on 2026-01-01 (x): a\n# 5 -> 6 on 2026-01-02 (x): b\n"
+    assert "chain breaks" in check_provenance_chain(hole, 6), "a hole in the chain passed"
+    assert "add the" in check_provenance_chain("# 3 -> 4 on 2026-01-01 (x): a\n", 9), (
+        "a pin ahead of its own chain passed")
+    assert "no `N -> M" in check_provenance_chain("# nothing at all\n", 4), (
+        "a file with no provenance line passed")
+    return f"the live chain ends at {SELFTEST_ARMS}; three synthetic failure directions all red"
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -1323,8 +2211,41 @@ def main() -> int:
         t_version_marker, t_verbatim_files, t_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
+        # ported from inCMS scripts/recall/selftest.py — the two verbatim files, the unforked half
+        # of query.py, and the alias join
+        test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,
+        test_fts_query_safety, test_alias_column_is_separate_and_downweighted,
+        test_ensemble_arg_grammar, test_substrate_dispatch_is_total, test_rollup_dedupes_by_parent,
+        test_build_index_default_stays_in_memory, test_query_expr_refuses_empty_and_phrases_ids,
+        test_rrf_is_rank_based_not_score_based, test_rrf_key_separates_two_windows_of_one_section,
+        test_budget_bounds_emission_and_beats_full_documents,
+        test_rewrite_terms_are_required_and_survive_verbatim,
+        test_argv_grammar_and_the_refusal_are_gated, test_result_cap_keeps_the_true_hit_count,
+        test_shown_paths_make_every_rank_recoverable,
+        test_export_is_idempotent_and_leaks_no_query_text,
+        test_export_day_counts_agree_with_an_independent_count,
+        test_opened_attaches_to_an_explicit_qid_and_the_query_prints_it,
+        test_alias_join_lands_on_the_named_record_and_only_it,
+        test_alias_join_reaches_the_query_index, test_alias_on_versus_none_is_a_differential,
+        test_the_selftest_pin_carries_an_unbroken_provenance_chain,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
+    # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the
+    # external number that is not. Appended as a check row rather than raised, so a stale pin
+    # reports next to the arms instead of replacing them with a traceback.
+    _checks.append(
+        ("ok", "the declared arm count matches its pin", f"{len(order)} == SELFTEST_ARMS")
+        if len(order) == SELFTEST_ARMS
+        else ("FAIL", "the declared arm count matches its pin",
+              f"{len(order)} arms ran, SELFTEST_ARMS pins {SELFTEST_ARMS} — bump it WITH its "
+              "`N -> M on <date>` line, or restore what was deleted")
+    )
+    _chain = check_provenance_chain()
+    _checks.append(
+        ("ok", "the arm-count pin ends an unbroken provenance chain", f"ends at {SELFTEST_ARMS}")
+        if not _chain
+        else ("FAIL", "the arm-count pin ends an unbroken provenance chain", _chain)
+    )
 
     if live is not None:
         after = hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"

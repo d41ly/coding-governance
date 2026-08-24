@@ -323,6 +323,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_alias_repo",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "build_base_dir",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -386,6 +391,11 @@
       "id": "build_substitution",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "build_synthetic_log",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "build_tempdir",
@@ -491,6 +501,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_provenance_chain",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "check_quiet",
@@ -1803,6 +1818,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_jsonl",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -1811,6 +1831,11 @@
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "read_log_rows",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "read_manifest",
@@ -2058,6 +2083,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_memory_root",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -2233,6 +2263,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_in_repo",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "run_rm3",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -2316,6 +2351,11 @@
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "seed_records",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "selectable",
@@ -2743,9 +2783,34 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_alias_column_is_separate_and_downweighted",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_join_lands_on_the_named_record_and_only_it",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_join_reaches_the_query_index",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_alias_on_versus_none_is_a_differential",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_all_miss_fixture",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_argv_grammar_and_the_refusal_are_gated",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_audit_green",
@@ -2771,6 +2836,21 @@
       "id": "test_both_red_on_wholesale_drop",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_budget_bounds_emission_and_beats_full_documents",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_build_index_default_stays_in_memory",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_chunk_matching",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_conf_parser_matches_bash",
@@ -2818,9 +2898,24 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_ensemble_arg_grammar",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_every_inventory_key_is_claimed_or_baselined",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
+      "id": "test_export_day_counts_agree_with_an_independent_count",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_export_is_idempotent_and_leaks_no_query_text",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_extract_failure_refuses",
@@ -2831,6 +2926,16 @@
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_fts_query_safety",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_full_at_k_counts_targets_not_documents",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_generated_artifacts_are_fresh",
@@ -2888,6 +2993,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_opened_attaches_to_an_explicit_qid_and_the_query_prints_it",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_out_of_vocabulary_pin_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2906,6 +3016,11 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_query_expr_refuses_empty_and_phrases_ids",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_ratchet_guard",
@@ -2928,14 +3043,59 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_result_cap_keeps_the_true_hit_count",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_rewrite_terms_are_required_and_survive_verbatim",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_rollup_dedupes_by_parent",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_rrf_is_rank_based_not_score_based",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_rrf_key_separates_two_windows_of_one_section",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_scoring",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_shown_paths_make_every_rank_recoverable",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_substrate_dispatch_is_total",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_tautological_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_the_selftest_pin_carries_an_unbroken_provenance_chain",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_undeclared_file_stays_out",
@@ -3021,6 +3181,11 @@
       "id": "write",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "write_alias_fixture",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "write_block",
