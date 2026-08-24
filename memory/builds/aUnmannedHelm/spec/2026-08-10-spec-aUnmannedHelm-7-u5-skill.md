@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base 930d50be · streams tooling · ratified 2026-08-10 · review wf_077104e6
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](../reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Put the protocol where the agent actually reads it: a Skill, rendered from the kit's template plus

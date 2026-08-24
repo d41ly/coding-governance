@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-13 |
+| [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](../reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-13 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make the `build-complete` Definition-of-Done item satisfiable by a build that follows the method. Its

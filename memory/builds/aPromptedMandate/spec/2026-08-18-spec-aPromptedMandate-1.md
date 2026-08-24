@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md](../build/2026-08-18-build-TOOL-aPromptedMandate-1-anchor-reuse-reproduction.md) | research | TOOL-aPromptedMandate-2 |
+| [2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-1-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
+| [2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-1-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-2 TOOL-aPromptedMandate-3 TOOL-aPromptedMandate-4 TOOL-aPromptedMandate-5 TOOL-aPromptedMandate-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make a run started from the owner's prose distinguishable, after the fact and by machine, from a run

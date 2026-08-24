@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-10 · node a · Tier-2 · base 1005e696 · streams tooling+playbook · ratified 2026-08-10 · review wf_077104e6
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](../reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Turn the block of chat the owner retypes to launch an unattended run into a committed document with

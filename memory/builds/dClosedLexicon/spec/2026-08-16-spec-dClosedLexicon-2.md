@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-16 · node d · Tier-2 · base a9bd87d5 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-dClosedLexicon-1-7.md](../reviews/2026-08-16-review-PLAY-dClosedLexicon-1-7.md) | diff-review | PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 |
+| [2026-08-16-review-TOOL-dClosedLexicon-1-2.md](../reviews/2026-08-16-review-TOOL-dClosedLexicon-1-2.md) | spec-audit | TOOL-dClosedLexicon-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-dClosedLexicon-1` ships a closed verb table that is closed only by convention: nothing stops it

@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-7 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 3 · streams tooling · ratified 2026-08-24
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md) | journal | — |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The owner's ask is that build order be authored on the SPECS and computed in the README. The verb for

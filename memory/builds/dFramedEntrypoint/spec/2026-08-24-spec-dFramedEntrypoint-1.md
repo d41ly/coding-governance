@@ -2,6 +2,23 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 2 · streams tooling · ratified 2026-08-24
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md) | journal | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md) | research | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md) | research | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md) | research | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md) | research | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md) | research | — |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md) | journal | — |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md) | spec-audit | — |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The shipped slot contract constrains only WHERE authored content sits in a build README, never WHAT

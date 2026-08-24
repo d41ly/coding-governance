@@ -2,6 +2,17 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md](../build/2026-08-17-build-TOOL-aRuledFrontispiece-11-corpus-surgery.md) | journal | — |
+| [2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md](../reviews/2026-08-16-review-TOOL-aRuledFrontispiece-1-1.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 |
+| [2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md](../reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-2.md) | spec-audit | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 |
+| [2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md](../reviews/2026-08-17-review-TOOL-aRuledFrontispiece-1-3.md) | diff-review | TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Move authored prose in the build READMEs that violate the slot contract, and wrap each authored unit

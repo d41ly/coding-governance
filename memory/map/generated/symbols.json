@@ -1113,6 +1113,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "insert_spec_records",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "intConsts",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -1121,6 +1126,11 @@
       "id": "inventory_ids",
       "kind": "function",
       "file": "tools/codebase-map/map_extractors.py"
+    },
+    {
+      "id": "invert_bindings",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "is_ensemble",
@@ -1999,6 +2009,11 @@
     },
     {
       "id": "render_shards",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },

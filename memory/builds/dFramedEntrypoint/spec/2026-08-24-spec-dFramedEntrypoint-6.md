@@ -1,6 +1,16 @@
 # TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 7 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 7 · streams tooling · ratified 2026-08-24
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-build-TOOL-dFramedEntrypoint-6-acceptance.md](../build/2026-08-25-build-TOOL-dFramedEntrypoint-6-acceptance.md) | journal | — |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
+
+<!-- /gen:spec-records -->
 
 ## 1. Goal
 
@@ -181,6 +191,7 @@ contract` · `check-kit-versions.sh` (leg `kit version markers`, unguarded) · `
 - rev-3 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
 - rev-4 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-5 · 2026-08-25 · BUILT and CLOSED. The region renders into every header-carrying spec, above the first numbered section, and check 12 passes over the whole tracked corpus rather than over a fixture. Two defects of mine were caught by checks: an absolute path used as a repo-relative artifact key, and a repo-relative fallback that made every cross-build link resolve to nothing. Ledger: `build/2026-08-25-build-TOOL-dFramedEntrypoint-6-acceptance.md`.
 
 ## 10. Reuse audit
 

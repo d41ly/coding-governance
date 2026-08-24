@@ -2,6 +2,14 @@
 
 **Status:** SPECCED · rev-3 · 2026-08-20 · node a · Tier-2 · base 43a6c13e · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-review-TOOL-aPacedTurnstile-14.md](../reviews/2026-08-20-review-TOOL-aPacedTurnstile-14.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `roster_ids` pipes `region` into `grep`, so `region`'s exit-3 refusal is discarded and a malformed

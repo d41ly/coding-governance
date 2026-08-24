@@ -117,6 +117,15 @@ SLOT_CANON = (
 # population is legal and is ANNOUNCED on every run, because a rule binding nothing that reports
 # `clean` is the vacuous-selector class this repo names.
 CONTRACT_REGISTRY = "project/readme-contract.txt"
+
+# TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
+# spec's status header and its first numbered section, which is the one place in a spec that hygiene
+# check 12 does not look: its section-equality compare collects `## ` headings and this is not one,
+# and its empty-body walk has not started. Measured on a scratch clone before the unit was written.
+# An eleventh `## ` section would have needed a new canon AND a dated cutoff, and would have left
+# every landed spec without the region.
+SPEC_RECORDS_OPEN = "<!-- gen:spec-records -->"
+SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
 # than spelled. It is written INTO the adopter's generated artifacts and committed there, so a
 # hardcoded prefix does not merely mislead — it lands a dead path in their tree, and the byte-compare
@@ -1258,6 +1267,59 @@ def insert_region(readme_text: str, mark_open: str, mark_close: str) -> str:
     return "\n".join(tail + ["", mark_open, mark_close, ""])
 
 
+def render_spec_records(spec_id: str, recs: list, spec_rel: str) -> str:
+    """The records naming `spec_id`, rendered for that spec. The empty case is EXPLICIT, never absent.
+
+    An absent region cannot be told from a spec nobody has recorded against, which is the
+    absence-reads-as-coverage class. The population is every tracked spec carrying a status header —
+    NOT only the ones a record names, which is the narrowing that made this unit's first draft
+    declare two opposite populations for one region.
+    """
+    out = [SPEC_RECORDS_OPEN, ""]
+    if not recs:
+        out.append("*No record names this unit.*")
+    else:
+        out += ["| Record | Kind | Also serves |", "|---|---|---|"]
+        for r in sorted(recs, key=lambda x: x["path"]):
+            # RELATIVE TO THE SPEC'S OWN DIRECTORY, computed rather than assembled. The first cut
+            # special-cased the same-build case and fell back to the repo-relative path for a
+            # cross-build record — which a markdown reader resolves against the SPEC's directory, so
+            # every one of the 17 cross-build edges rendered a link to nothing. Hygiene check 2 caught
+            # it; `os.path.relpath` is what should have been there from the start.
+            rel = os.path.relpath(r["path"], spec_rel.rsplit("/", 1)[0]).replace(os.sep, "/")
+            label = r["path"].rsplit("/", 1)[-1]
+            others = [i for i in r.get("ids", []) if i != spec_id]
+            out.append(f"| [{label}]({rel}) | {r.get('kind') or '—'} | "
+                       f"{' '.join(others) if others else '—'} |")
+    out += ["", SPEC_RECORDS_CLOSE]
+    return "\n".join(out)
+
+
+def invert_bindings(builds: list) -> dict:
+    """`spec id -> [record]`, inverted from the bindings every build already carries.
+
+    A record filed under one build folder may name a spec in ANOTHER; keying on the id rather than on
+    the folder is what puts a cross-build review at the spec a reader is actually looking at.
+    """
+    out = {}
+    for b in builds:
+        for r in b.get("records") or []:
+            for i in r.get("ids", []):
+                out.setdefault(i, []).append(r)
+    return out
+
+
+def insert_spec_records(spec_text: str) -> str:
+    """Create the pair between the status header and the first `## ` section. Nothing else moves."""
+    lines = spec_text.split("\n")
+    at = next((i for i, l in enumerate(lines) if l.startswith("## ")), None)
+    if at is None:
+        at = len(lines)
+    while at > 0 and not lines[at - 1].strip():
+        at -= 1
+    return "\n".join(lines[:at] + ["", SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE] + lines[at:])
+
+
 def remove_dead_regions(readme_text: str) -> str:
     """Delete a RETIRED region's marker pair and everything between it, leaving no authored byte.
 
@@ -1350,6 +1412,32 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
                 continue  # a region this README has not adopted — S1c
             text = apply_region(text, renderer(b), b["readme"], mo, mc)
         artifacts[b["readme"]] = text
+    # TOOL-dFramedEntrypoint-6 — every record renders inside the SPEC it serves. The population is
+    # every tracked spec carrying a status header, not only the ones a record names: an unnamed spec
+    # renders an EXPLICIT empty case, because an absent region cannot be told from a spec nobody has
+    # recorded against. `--write` creates the pair, `--check` never demands one — the same asymmetry
+    # the build-README regions rely on, so this ships without demanding a corpus-wide render.
+    inverted = invert_bindings(builds)
+    for b in builds:
+        base = b["readme"].rsplit("/", 1)[0]
+        for u in b["units"]:
+            # `u["path"]` is ABSOLUTE and mixed-separator on Windows. Every other artifact key here
+            # is repo-relative, and `do_write` joins the key onto `root` — so an absolute key wrote
+            # the right file by luck and computed the wrong relative link. Re-derive it the way
+            # `render_region` already does, from the build root plus the tail.
+            marker = "/builds/" + b["slug"] + "/"
+            tail = u["path"].replace(os.sep, "/").split(marker, 1)[1]
+            rel = base + "/" + tail
+            stext = read_text(os.path.join(root, rel))
+            lines = stext.split("\n")
+            has = _marker_index(lines, SPEC_RECORDS_OPEN) is not None
+            if not has and not create_missing:
+                continue
+            if not has:
+                stext = insert_spec_records(stext)
+            artifacts[rel] = apply_region(
+                stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
+                SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
@@ -1815,6 +1903,31 @@ def do_selftest() -> int:
         arm("a registry row binds its path and comments are skipped",
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
+
+        # ------------------------------------- TOOL-dFramedEntrypoint-6, records inside their specs
+        _R = {"path": "memory/builds/tOne/reviews/2026-08-01-review-tOne-1.md",
+              "kind": "spec-audit", "ids": ["ARCH-tOne-1", "ARCH-tTwo-9"]}
+        arm("the region renders a record RELATIVE to the spec's own directory",
+            "](../reviews/2026-08-01-review-tOne-1.md)",
+            lambda: render_spec_records("ARCH-tOne-1", [_R],
+                                        "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"))
+        # The first cut fell back to the REPO-relative path for a cross-build record, which a reader
+        # resolves against the spec's directory — so every cross-build edge linked to nothing.
+        arm("a CROSS-BUILD record still resolves, which the repo-relative fallback did not",
+            "](../../tOne/reviews/2026-08-01-review-tOne-1.md)",
+            lambda: render_spec_records("ARCH-tTwo-9", [_R],
+                                        "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-9.md"))
+        arm("the region names the OTHER ids a shared record serves", "ARCH-tTwo-9",
+            lambda: render_spec_records("ARCH-tOne-1", [_R], "memory/builds/tOne/spec/x.md"))
+        arm("a spec no record names renders the EXPLICIT empty case", "*No record names this unit.*",
+            lambda: render_spec_records("ARCH-tOne-1", [], "memory/builds/tOne/spec/x.md"))
+        arm("the pair is created ABOVE the first numbered section, never inside one", "True",
+            lambda: str(insert_spec_records("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+                        .index(SPEC_RECORDS_OPEN) <
+                        insert_spec_records("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+                        .index("## 1. Goal")))
+        arm("the inversion keys a record on every id it names, not on its folder", "2",
+            lambda: str(len(invert_bindings([{"records": [_R]}]))))
 
         # -------------------------------------------- TOOL-dFramedEntrypoint-3, the contract registry
         t18 = os.path.join(base, "contract"); os.makedirs(t18)

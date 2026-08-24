@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base 57d9b5460
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](../prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md) | research | — |
+| [2026-08-04-review-TOOL-aGuardedTally-1-1.md](../reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/workflows/tier2-review.js:128` returns `clean: 0 findings` when every finder agent has

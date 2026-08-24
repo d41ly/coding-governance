@@ -2,6 +2,14 @@
 
 **Status:** SPECCED · rev-2 · 2026-07-22 · node b · Tier-2 · base 7b01979ad7 · review wf_69de6d2e-926
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-22-review-TOOL-bConvergentLodestar-1-1.md](../reviews/2026-07-22-review-TOOL-bConvergentLodestar-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `codebase-map` proves COVERAGE (what exists, who owns it) but never NON-REDUNDANCY, so a repo does not

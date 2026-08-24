@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 709d260d · streams tooling · ratified 2026-08-16
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](../reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md) | diff-review | TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-7 TOOL-cBriefedPilot-8 TOOL-cBriefedPilot-13 TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-22 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `check-arms.py` certified nine branches as armed while the arms sat past an unconditional `exit`, and

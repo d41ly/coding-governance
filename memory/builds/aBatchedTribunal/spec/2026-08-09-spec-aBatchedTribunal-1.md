@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-09 · node a · Tier-2 · base a938fb0c · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-09-review-TOOL-aBatchedTribunal-1-7.md](../reviews/2026-08-09-review-TOOL-aBatchedTribunal-1-7.md) | diff-review | TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+| [2026-08-08-review-TOOL-aBatchedTribunal-1-3.md](../../aDrainedSluice/reviews/2026-08-08-review-TOOL-aBatchedTribunal-1-3.md) | diff-review | TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-8 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Adopt `memory/review-workflow-protocol.md` (upstream inCMS, binding charter) into this repo, and

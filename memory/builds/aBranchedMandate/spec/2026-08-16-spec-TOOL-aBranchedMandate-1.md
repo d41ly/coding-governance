@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-17 · node a · Tier-1 · base 96141aed · streams tooling · ratified 2026-08-16
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](../reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-1.md](../reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/memory-recall/adopt-memory-recall.sh --check` byte-compares the rendered Skill against a fresh

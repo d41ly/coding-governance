@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-1 · 2026-07-15 · node a · Tier-1 · base c78958c7 · ratified upstream 2026-07-14 · review wf_8643be81 (inCMS)
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-07-15-build-TOOL-aRuledParchment-1-1.md](../build/2026-07-15-build-TOOL-aRuledParchment-1-1.md) | journal | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make the canonical spec/design-pass format (status header + nine sections + machine gate) a

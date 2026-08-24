@@ -2,6 +2,19 @@
 
 **Status:** INPROGRESS · rev-2 · 2026-08-03 · node a · Tier-2 · base 9368d1e8 · ratified 2026-08-03 · U1-U3 built, closing review folded; NOT CLOSED — §8 Q6 is deliberately open
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-1.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-1.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-2.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-2.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-3.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-3.md) | journal | — |
+| [2026-08-03-build-TOOL-aQuarriedLantern-1-4.md](../build/2026-08-03-build-TOOL-aQuarriedLantern-1-4.md) | journal | — |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-1.md](../reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-1.md) | spec-audit | — |
+| [2026-08-03-review-TOOL-aQuarriedLantern-1-2.md](../reviews/2026-08-03-review-TOOL-aQuarriedLantern-1-2.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Port the working memory-tree retrieval CLI from the inCMS repo (the scripts/recall folder, records

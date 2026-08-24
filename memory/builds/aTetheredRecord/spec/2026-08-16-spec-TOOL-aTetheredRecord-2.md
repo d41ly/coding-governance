@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-20 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-aTetheredRecord-1-1.md](../reviews/2026-08-17-review-TOOL-aTetheredRecord-1-1.md) | spec-audit | TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Define the one authored line that binds a record to the spec it is evidence about, and put its parser

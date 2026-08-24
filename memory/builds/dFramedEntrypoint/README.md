@@ -42,11 +42,11 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 | [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | 4 | 2 | CLOSED | rev-6 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | 5 | 2 | CLOSED | rev-6 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | 6 | 2 | CLOSED | rev-6 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | 7 | 2 | SPECCED | rev-4 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | 7 | 2 | CLOSED | rev-5 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | 8 | 2 | SPECCED | rev-3 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

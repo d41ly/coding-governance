@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · order 1 · streams tooling · ratified 2026-08-24
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md) | journal | — |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 |
+| [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 This build writes a prose template for build READMEs, and a ratified record in this tree says not to.
