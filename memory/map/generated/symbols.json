@@ -2163,6 +2163,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_slot_data_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "resolve_template_path",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

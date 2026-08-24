@@ -982,7 +982,7 @@ SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
 _SLOT_DATA_DIR = None
 
 
-def slot_data_dir():
+def resolve_slot_data_dir():
     """Where the two slot declaration files live. Overridable ONLY so an arm can call the verbs."""
     return pathlib.Path(_SLOT_DATA_DIR) if _SLOT_DATA_DIR \
         else pathlib.Path(__file__).resolve().parent
@@ -1064,7 +1064,7 @@ def measure_slot_sizes(readme_text: str) -> list:
 
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
-    here = slot_data_dir()
+    here = resolve_slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
         raise Problem(f"{SLOT_LIMITS} is absent at {limits_p}; a slot budget with no declared "
@@ -1085,7 +1085,7 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
 
 def scan_unarmed_slots() -> list:
     """Canonical slots whose declared ceiling is blank — the ANNOUNCED unarmed state."""
-    here = slot_data_dir()
+    here = resolve_slot_data_dir()
     p = str(here / SLOT_LIMITS)
     if not os.path.exists(p):
         return []
@@ -1523,7 +1523,7 @@ def do_check_format(root: str, conf: dict) -> int:
     bound = read_contract_registry(root, conf)
     # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
     # conditional on anything using it.
-    _here = slot_data_dir()
+    _here = resolve_slot_data_dir()
     if not (_here / SLOT_LIMITS).exists():
         raise Problem(f"{SLOT_LIMITS} is absent at {_here / SLOT_LIMITS}; a slot budget with no "
                       f"declared ceilings would grade nothing and report clean")
@@ -1570,7 +1570,7 @@ def do_report(root: str, conf: dict) -> int:
     nobody runs.
     """
     m = conf["MEMORY_ROOT"]
-    here = slot_data_dir()
+    here = resolve_slot_data_dir()
     limits = read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
     highs = read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
     bound = sorted(read_contract_registry(root, conf))
@@ -1591,7 +1591,7 @@ def do_report(root: str, conf: dict) -> int:
 
 def do_bump(root: str, conf: dict) -> int:
     """Rewrite the HIGH-WATER file from the measured tree. It never writes the ceiling file."""
-    here = slot_data_dir()
+    here = resolve_slot_data_dir()
     bound = sorted(read_contract_registry(root, conf))
     peak = {h: 0 for h, _e, _b in SLOT_CANON}
     for rel in bound:
@@ -1942,7 +1942,7 @@ def do_selftest() -> int:
                    "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
         write_text(os.path.join(_bdir, SLOT_HIGHWATER), "# high-water, seeded empty\n")
 
-        def _bump_rows():
+        def measure_bump_rows():
             global _SLOT_DATA_DIR
             _SLOT_DATA_DIR = _bdir
             try:
@@ -1954,7 +1954,7 @@ def do_selftest() -> int:
                 _SLOT_DATA_DIR = None
 
         arm("two --bump runs leave exactly one row per canonical slot, not two",
-            str(len(SLOT_CANON)), lambda: str(_bump_rows()))
+            str(len(SLOT_CANON)), lambda: str(measure_bump_rows()))
         arm("--bump keeps the file's comment lines across a round-trip", "high-water, seeded empty",
             lambda: read_text(os.path.join(_bdir, SLOT_HIGHWATER)))
 
