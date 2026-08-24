@@ -241,6 +241,31 @@ case "$(decide_on)" in
   *) bad "23 a record that covered the kit self-tests did not satisfy a push that runs them" ;;
 esac
 
+# 24 — THE HOOK SOURCES THE REPOSITORY'S OWN GATE POLICY. TOOL-dUnstalledConvoy-28 moved gov's
+#      GATE_SELFTESTS out of this hook — which ships verbatim to every push-main adopter — and into
+#      `.githooks/gate-env.sh`, which no kit claims. The MECHANISM travels and the CHOICE does not,
+#      and until now nothing anywhere arms the mechanism half: delete the two source lines and every
+#      other arm in this file stays green while gov silently stops running its own kit self-tests.
+#      Driven through the DECISION, not through the environment: the switch is only observable here
+#      by what predicate 8 does with it.
+mkdir -p "$tmp/work/.githooks"
+printf '#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n' > "$tmp/work/.githooks/gate-env.sh"
+git -C "$tmp/work" add -A >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)" 0
+case "$(decide)" in
+  *"FULL gate"*"kit self-tests"*) ok "24 the hook sources .githooks/gate-env.sh, so the repo's own switch reaches the decision" ;;
+  *) bad "24 a gate-env.sh setting the switch did not reach the boundary — the sourcing is dead: $(decide)" ;;
+esac
+# ITS CONTROL: remove the file and the same push decides SCOPED again. Without it the arm above
+# passes on a hook that forces unconditionally.
+rm -f "$tmp/work/.githooks/gate-env.sh"
+git -C "$tmp/work" add -A >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)" 0
+case "$(decide)" in
+  *"scoped gate"*) ok "24b control — with no gate-env.sh the same push is SCOPED" ;;
+  *) bad "24b the boundary forced with no gate-env.sh present, so arm 24 proves nothing" ;;
+esac
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here
