@@ -59,7 +59,7 @@ ratified="2026-08-16 node d"
 VERBS:
   build   create a new value and return it — NOT `create`
   load    read from a store into memory — NOT `fetch`
-  add     append to an existing collection
+  add     append to an existing collection — NOT `push`
 
 LAYERS:
   core/* -> adapters/*
@@ -573,6 +573,34 @@ with build_tempdir() as _td:
           _got.returncode != 0 and "DEAD SNIFFER" in _all, _all[-300:])
     check("S6: ...and it names the reading it contradicts",
           "ARMED extractor did" in _all, _all[-300:])
+
+# ---- TOOL-dScaffoldedMirror-8 S6: the table's own shape ------------------------------------------
+#
+# These two grade the DECLARATION rather than the corpus, which makes them the only checks in this
+# suite whose fixture is a conf and not a tree. Both directions are armed: a table that satisfies
+# them, and a table that does not.
+
+_S6_OK = BASE_CONF   # every row in BASE_CONF already carries a NOT clause
+
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_OK)
+check("S6: a table whose every row carries a negative is silent",
+      code == 0 and "carrying no negative" not in out, out)
+
+# A row with no negative cannot draw a boundary, and the gate message degrades to "not in the table".
+_S6_BARE = _S6_OK.replace("  load    read from a store into memory \u2014 NOT `fetch`",
+                          "  load    read from a store into memory")
+check("S6 fixture really differs (or the next arm proves nothing)", _S6_BARE != _S6_OK, "replace missed")
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_BARE)
+check("S6: a row with NO negative is a finding", code != 0 and "carrying no negative" in out, out)
+check("S6: ...and it names the row", "load" in out.split("carrying no negative")[1][:80], out)
+
+# A token that is both banned and declared bans and permits itself at once.
+_S6_CLASH = _S6_OK.replace("NOT `fetch`", "NOT `add`")
+check("S6 clash fixture really differs", _S6_CLASH != _S6_OK, "replace missed")
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_CLASH)
+check("S6: a banned token that is itself a row is a finding",
+      code != 0 and "itself a row" in out, out)
+check("S6: ...and it names the token", "add" in out.split("itself a row")[1][:60], out)
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

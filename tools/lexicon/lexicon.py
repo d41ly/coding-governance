@@ -78,7 +78,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lexicon_conf import ConfError, langs, load_conf  # noqa: E402
+from lexicon_conf import ConfError, langs, load_conf, build_negatives  # noqa: E402
 from subtokens import leading_verb, subtokens  # noqa: E402
 
 KIT_LEXICON_VERSION = "1.1"
@@ -480,6 +480,30 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     files = tracked_files(root)
 
     problems: list[str] = []
+
+    # --- S6 of TOOL-dScaffoldedMirror-8: the table's own shape --------------------------------
+    #
+    # These two run against the DECLARATION, not the corpus, and they are the only checks here that
+    # do. A row with no negative cannot tell two verbs apart — `build` alone says nothing that
+    # `create` does not — so the gate's whole message degrades to "not in the table", which names no
+    # replacement and teaches nothing. The kit's own README calls a table without negative
+    # definitions decoration, and this is that sentence made checkable.
+    neg = build_negatives(conf)
+    bare = sorted(v for v in verbs if not neg.get(v))
+    if bare:
+        problems.append(
+            "VERBS rows carrying no negative definition (write `NOT \\`<token>\\`` into the gloss): "
+            + ", ".join(bare) + ". A row that only says what it IS cannot draw a boundary, and the "
+            "boundary is the whole product.")
+
+    # A declared negative that is ALSO a row bans and permits one token at once. Satisfied today,
+    # and it earns its place forward: it is what stops a later unit admitting a verb some other row
+    # already banned — which is exactly how a closed table becomes a synonym list.
+    contradicted = sorted({t for ts in neg.values() for t in ts} & set(verbs))
+    if contradicted:
+        problems.append(
+            "VERBS declares as BANNED a token that is itself a row: " + ", ".join(contradicted)
+            + ". One token cannot be both the verb to use and the verb not to use.")
 
     # --- the declaration surface -------------------------------------------------------------
     present = sorted({ext_of(f) for f in files})

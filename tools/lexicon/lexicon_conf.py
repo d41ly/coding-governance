@@ -117,6 +117,23 @@ def _parse_block(key: str, rows: list[tuple[int, str]], p: Path):
     return pairs
 
 
+
+def build_negatives(conf: dict) -> dict:
+    r"""`{verb: {banned-token, ...}}` from the NOT clauses in each VERBS gloss.
+
+    THE BACKTICKS ARE THE GRAMMAR, not decoration. Measured against the table this landed on: the
+    pattern ``NOT\s+`([A-Za-z]+)` `` matches exactly the rows a bare `\bNOT\b` word match does, so
+    there is no un-backticked `NOT` anywhere in the corpus this must govern — it parses every
+    existing row with zero rewrites and zero false positives. A looser pattern would have to guess
+    where the token ends, and the prose after the comma is the half a reader actually needs.
+
+    A row may carry SEVERAL build_negatives. The gloss keeps its prose; only the tokens are extracted.
+    """
+    out = {}
+    for verb, gloss in (conf.get("VERBS") or {}).items():
+        out[verb] = set(re.findall(r"NOT\s+`([A-Za-z][A-Za-z0-9_]*)`", gloss or ""))
+    return out
+
 def langs(conf: dict) -> list[tuple[str, str, str]]:
     """`LANGS` as `(ext, pattern_set_id, mode)` triples. An empty pattern-set id is legal and is
     what a `dark` declaration looks like — it names no extractor on purpose."""

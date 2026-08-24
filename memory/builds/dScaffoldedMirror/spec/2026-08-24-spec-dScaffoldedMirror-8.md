@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-8 — the shipped frozen canon, and `--probe`
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -381,6 +381,19 @@ the coverage, and a new leg here would only advertise that a conf assert needed 
   whole cluster rather than over its representative, which is what lets a zero-site `load` be
   proposed at all. The cluster count is 20 rather than the pass's "about 19", per F4.
 - rev-1 status 2026-08-24 · KEPT and SPLIT at the S5/S6 seam by the owner ruling. S6/S7 (the structured NOT-clause grammar and the eleven backfilled negatives) land FIRST, in Phase 0, because `-10`'s message depends on them. `--probe --write`, the debt ledger and its seed artifact are CUT: no gate reads them and no adopter exists to run them.
+
+- rev-2 · 2026-08-25 · S6 and S7 BUILT and landed FIRST, ahead of S1-S5 and S8, which is the split
+  the spec-set review recommended: `TOOL-dScaffoldedMirror-10`'s `--suggest` message consumes this
+  grammar and cannot be built without it. The eleven backfills are the clauses §4 published, and the
+  measurement §4 rests on held: the backticked pattern matched exactly the rows a bare word-match
+  did, so all 23 rows parse with zero rewrites and zero false positives.
+  ONE INTEGRATION COST, recorded because it is the assert working rather than a defect: adding a
+  DECLARATION-shaped check means every fixture conf must satisfy it, and the suite's own `BASE_CONF`
+  had an `add` row with no negative — 15 arms redded at once until it was given one. A check whose
+  subject is the conf reaches every fixture that writes a conf.
+  `build_negatives` is so named because `negatives` leads with a token outside the table; the pin
+  stayed at 384, which is the fifth unit running where a new definition took a declared verb rather
+  than a raise.
 
 ## 10. Reuse audit
 
