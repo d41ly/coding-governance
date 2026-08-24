@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-20
 streams: tooling+playbook
 roster: TOOL+PLAY
-ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
+ids: PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26
 ---
 
 # dUnstalledConvoy — an unattended run may change its own scope, dispatch disjoint work concurrently, evidence what it built, and reach a terminal state it can actually get to
@@ -219,9 +219,10 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 16 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
+**Build status:** SPECCED · 17 unit(s) · node d · opened 2026-08-20 · streams tooling+playbook
 ids PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11
 ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 TOOL-dUnstalledConvoy-15 TOOL-dUnstalledConvoy-16 TOOL-dUnstalledConvoy-17 TOOL-dUnstalledConvoy-18 TOOL-dUnstalledConvoy-19 TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25
+ids TOOL-dUnstalledConvoy-26
 
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
@@ -242,6 +243,7 @@ ids TOOL-dUnstalledConvoy-12 TOOL-dUnstalledConvoy-13 TOOL-dUnstalledConvoy-14 T
 | [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | CLOSED | rev-5 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | CLOSED | rev-4 | 2026-08-21 |
 | [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-26 — a kit's self-tests become an owner-adjustable, on-demand population instead of bar legs](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | SPECCED | rev-1 | 2026-08-23 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -262,7 +264,9 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 |
 | [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 |
 
-Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25.
+Ids no record names: TOOL-dUnstalledConvoy-26.
+
+Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -294,6 +298,7 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstal
   - [2026-08-21-spec-TOOL-dUnstalledConvoy-23.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md)
   - [2026-08-21-spec-TOOL-dUnstalledConvoy-24.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md)
   - [2026-08-21-spec-TOOL-dUnstalledConvoy-25.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md)
+  - [2026-08-23-spec-TOOL-dUnstalledConvoy-26.md](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md)
 - **`build/`**
   - [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md)
   - [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md)
