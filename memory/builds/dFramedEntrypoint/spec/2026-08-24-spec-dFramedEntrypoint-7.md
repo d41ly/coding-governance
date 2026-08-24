@@ -1,11 +1,12 @@
 # TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 8 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 8 · streams tooling · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-TOOL-dFramedEntrypoint-7-acceptance.md](../build/2026-08-25-build-TOOL-dFramedEntrypoint-7-acceptance.md) | journal | — |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-8 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round2.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-8 |
 
@@ -175,6 +176,7 @@ boundary.
   counts rather than on a retirement whose premise unit 8 corrects. The ceiling seeding is stated as
   this unit's, once.
 - rev-3 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-4 · 2026-08-25 · BUILT and CLOSED. This build's own README is conformed to the canon it defines and is the first and only BOUND row; the pin fell 62 to 61 and the ceilings are seeded from it. Three breaks staged against the bound file: a non-canon heading, a slot over its ceiling, and a slot past its high-water. The seed is ONE file rather than the twelve F1 contemplated, which is F1's rule applied literally — conform what can be conformed without inventing a judgement, and report the rest. Ledger: `build/2026-08-25-build-TOOL-dFramedEntrypoint-7-acceptance.md`.
 
 ## 10. Reuse audit
 
