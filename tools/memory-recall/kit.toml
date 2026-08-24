@@ -49,11 +49,13 @@ means = "adopted"
 
 [[gate_leg]]
 name = "memory-recall kit selftest"
+subject = "kit"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "memory-recall skill wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 guard = []
 

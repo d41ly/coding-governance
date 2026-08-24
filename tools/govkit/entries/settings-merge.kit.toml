@@ -36,5 +36,6 @@ the shipped engine DOES carry a check arm and this entry deliberately does not w
 
 [[gate_leg]]
 name = "settings-merge selftest"
+subject = "kit"
 argv = ["python3", "{prefix}/settings-merge.py", "--selftest"]
 guard = ["{prefix}/"]

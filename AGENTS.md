@@ -479,7 +479,9 @@ that can. What survives here is what a session cannot get anywhere else.
 ```bash
 bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard; what pre-push runs, and what a DoD needs
+GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every kit self-test
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the kit self-tests, which are held by default
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # the complete bar, and what a DoD needs
 ```
 
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
@@ -488,8 +490,10 @@ state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather t
 an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
 is still available — but `.githooks/pre-push` no longer sets it unconditionally. It DECIDES, forcing a
 total run when no recorded full green covers the pushed tip, when that green is more than a declared
-number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, or
-when the leg manifest itself moved. A guard can therefore scope the authoritative run too, and a
+number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, when
+the leg manifest itself moved, or when the push runs the kit self-tests and the recorded green was
+earned with them held. That last one is COVERAGE and not equality — a green that covered MORE still
+satisfies a push that needs less, and a stamp with no such key at all reads as HELD. A guard can therefore scope the authoritative run too, and a
 too-narrow
 guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
 skip forever and silently, so the run-gates canary refuses one.

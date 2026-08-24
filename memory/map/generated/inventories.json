@@ -107,6 +107,7 @@
       "workflows"
     ],
     "git-hooks": [
+      "gate-env.sh",
       "pre-commit",
       "pre-push"
     ],
@@ -153,6 +154,7 @@
       "trace-profile-measures-itself.md",
       "trailing-comma-counted-as-an-element.md",
       "two-answers-to-one-question.md",
+      "two-guards-one-question-two-answers.md",
       "two-readers-of-one-config-one-re-derived.md",
       "vacuous-selector-empty-population.md"
     ],

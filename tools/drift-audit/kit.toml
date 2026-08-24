@@ -44,11 +44,13 @@ means = "adopted"
 
 [[gate_leg]]
 name = "drift-audit selftest"
+subject = "kit"
 argv = ["python", "{kit}/selftest.py"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "drift-audit records"
+subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]
 guard = []
 history_depth = "full"
@@ -79,6 +81,7 @@ discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
 [[gate_leg]]
 name = "drift-audit wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 guard = []
 

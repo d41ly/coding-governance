@@ -498,6 +498,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_target_reads_subject",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -686,6 +691,11 @@
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_runner_verbs",
+      "kind": "function",
+      "file": "tools/run-gates/profile_bar.py"
     },
     {
       "id": "derive_status",

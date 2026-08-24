@@ -20,6 +20,7 @@ why_no_adopter = "it IS the wiring checker; the runbook wires its self-test as a
 
 [[gate_leg]]
 name = "check-wiring self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/check-wiring.test.sh"]
 guard = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh"]
 

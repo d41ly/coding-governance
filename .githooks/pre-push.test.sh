@@ -116,14 +116,26 @@ decide() {   # -> the hook's decision line for a push of the current main
   # BOTH streams. The refusal cases above capture stderr only, because a refusal is an error; the
   # decision line is ordinary progress output on STDOUT, and `1>/dev/null` threw it away — which
   # read as 'the hook made no decision' rather than 'the arm looked in the wrong place'.
-  ( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
+  # GATE_SELFTESTS IS CLEARED, NOT INHERITED. It is an INPUT to the decision this function grades
+  # (TOOL-dUnstalledConvoy-27's predicate 8), and the bar itself exports it — so under
+  # `GATE_SELFTESTS=1 run-gates.sh` every arm below silently switched to the forcing case and the
+  # control arm reported a hook bug that was really an uncontrolled input.
+  ( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
 }
 stamp() {    # write a full-green record naming a sha, with a reproducible fingerprint
-  local sha=$1 gd; gd=$(git rev-parse --git-dir)
+  # $2, when given, is the `selftests` value the record claims. OMITTED writes no key at all, which
+  # is the shape of every record written before TOOL-dUnstalledConvoy-26 and is what AC4 grades.
+  local sha=$1 st=${2-} gd; gd=$(git rev-parse --git-dir)
   local fp=""
   [ -x tools/run-gates/gate-fingerprint.sh ] && fp=$(bash tools/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
     "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
+  [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
+  return 0
+}
+decide_on() {   # the hook's decision line for a push made WITH the self-test switch on
+  git commit -q --allow-empty -m "decide-on $RANDOM" >/dev/null 2>&1
+  ( GATE_SELFTESTS=1 GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
 }
 
 # --- the control FIRST: a fresh, covered record must choose SCOPED ---------------------------
@@ -182,6 +194,78 @@ case "$(decide)" in
   *"gate on main push"*) ok "15 the boundary prints its decision and its reason on one line, every time" ;;
   *) bad "15 the boundary made a decision without announcing it" ;;
 esac
+# --- 19-23: THE SWITCH FIELD IS READ (TOOL-dUnstalledConvoy-27) -------------------------------
+# The stamp records whether the kit-subject legs ran. Written and never read, that field is a byte
+# nobody consults and the boundary trusts a partial bar as a whole one. The relation is COVERAGE,
+# not equality: a record that covered MORE still satisfies a push that needs less.
+cd "$tmp/work" || exit 2
+
+# 19 — a record earned switch-OFF does not satisfy a switch-ON push. This is the only direction
+#      that forces, and it is the one the whole unit is for.
+stamp "$(git rev-parse HEAD)" 0
+line=$(decide_on)
+case "$line" in
+  *"FULL gate"*) ok "19 a switch-OFF record offered for a switch-ON push → FULL" ;;
+  *) bad "19 a record that never ran the kit self-tests satisfied a push that does: ${line:-<no decision line>}" ;;
+esac
+
+# 20 — and the reason NAMES the switch. A run forced for an unstated reason teaches its operator
+#      nothing, and this line is the only window into the decision.
+case "$line" in
+  *"kit self-tests"*"HELD"*) ok "20 and the forcing reason names the switch" ;;
+  *) bad "20 the boundary forced without saying the switch was why: ${line:-<no decision line>}" ;;
+esac
+
+# 21 — AC4: a record with NO switch key at all reads as OFF. Every stamp written before the parent
+#      unit lacks the key, and reading its absence as 'covered everything' would make each of them
+#      certify legs it never ran.
+stamp "$(git rev-parse HEAD)"
+case "$(decide_on)" in
+  *"FULL gate"*"kit self-tests"*) ok "21 a record with NO switch key reads as OFF" ;;
+  *) bad "21 a record missing the switch key was treated as covering the kit self-tests" ;;
+esac
+
+# 22 — COVERAGE, not equality: a record earned switch-ON satisfies a switch-OFF push. Equality here
+#      would force a full run on every adopter's ordinary push and delete the parent unit's saving.
+stamp "$(git rev-parse HEAD)" 1
+case "$(decide)" in
+  *"scoped gate"*) ok "22 a switch-ON record satisfies a switch-OFF push (coverage, not equality)" ;;
+  *) bad "22 a STRONGER record forced a full run, which is equality wearing coverage's name" ;;
+esac
+
+# 23 — its control: switch-ON record, switch-ON push. Without this, an implementation that forced
+#      on every switch-ON push would still pass 19 through 22.
+stamp "$(git rev-parse HEAD)" 1
+case "$(decide_on)" in
+  *"scoped gate"*) ok "23 control — a switch-ON record satisfies a switch-ON push" ;;
+  *) bad "23 a record that covered the kit self-tests did not satisfy a push that runs them" ;;
+esac
+
+# 24 — THE HOOK SOURCES THE REPOSITORY'S OWN GATE POLICY. TOOL-dUnstalledConvoy-28 moved gov's
+#      GATE_SELFTESTS out of this hook — which ships verbatim to every push-main adopter — and into
+#      `.githooks/gate-env.sh`, which no kit claims. The MECHANISM travels and the CHOICE does not,
+#      and until now nothing anywhere arms the mechanism half: delete the two source lines and every
+#      other arm in this file stays green while gov silently stops running its own kit self-tests.
+#      Driven through the DECISION, not through the environment: the switch is only observable here
+#      by what predicate 8 does with it.
+mkdir -p "$tmp/work/.githooks"
+printf '#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n' > "$tmp/work/.githooks/gate-env.sh"
+git -C "$tmp/work" add -A >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)" 0
+case "$(decide)" in
+  *"FULL gate"*"kit self-tests"*) ok "24 the hook sources .githooks/gate-env.sh, so the repo's own switch reaches the decision" ;;
+  *) bad "24 a gate-env.sh setting the switch did not reach the boundary — the sourcing is dead: $(decide)" ;;
+esac
+# ITS CONTROL: remove the file and the same push decides SCOPED again. Without it the arm above
+# passes on a hook that forces unconditionally.
+rm -f "$tmp/work/.githooks/gate-env.sh"
+git -C "$tmp/work" add -A >/dev/null 2>&1
+stamp "$(git rev-parse HEAD)" 0
+case "$(decide)" in
+  *"scoped gate"*) ok "24b control — with no gate-env.sh the same push is SCOPED" ;;
+  *) bad "24b the boundary forced with no gate-env.sh present, so arm 24 proves nothing" ;;
+esac
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here

@@ -32,11 +32,13 @@ mutates_index = false
 
 [[gate_leg]]
 name = "playbook placeholder catalogue"
+subject = "repo"
 argv = ["bash", "{prefix}/check-placeholders.sh"]
 guard = []
 
 [[gate_leg]]
 name = "placeholder-catalogue self-test"
+subject = "kit"
 argv = ["bash", "{prefix}/check-placeholders.test.sh"]
 guard = ["{prefix}/check-placeholders.sh", "{prefix}/check-placeholders.test.sh"]
 

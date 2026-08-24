@@ -50,6 +50,7 @@ means = "seeded-extractors-or-crashed"
 
 [[gate_leg]]
 name = "codebase-map coverage + freshness"
+subject = "repo"
 argv = ["python", "{gate_file}"]
 guard = []
 history_depth = "full"
@@ -71,11 +72,13 @@ the adopter accepts only `--scaffold`, measured. The kit ships runnable verifier
 
 [[gate_leg]]
 name = "codebase-map kit selftest"
+subject = "kit"
 argv = ["python3", "{kit}/selftest.py"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "codebase-map adopter e2e"
+subject = "kit"
 argv = ["bash", "{kit}/adopt-codebase-map.test.sh"]
 guard = ["{kit}/"]
 

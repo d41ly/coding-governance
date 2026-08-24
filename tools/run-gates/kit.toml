@@ -52,6 +52,7 @@ means = "adopted"
 # not written here; the number that used to sit in this sentence was wrong one commit later.
 [[gate_leg]]
 name = "profile-bar selftest"
+subject = "kit"
 argv = ["bash", "{kit}/profile_bar.test.sh"]
 guard = ["{kit}/"]
 # Guarded on the kit dir ALONE, and that is COMPLETE rather than convenient: the harness drives the
@@ -60,6 +61,7 @@ guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates turnstile"
+subject = "kit"
 argv = ["bash", "{kit}/run-gates.turnstile.test.sh"]
 guard = ["{kit}/"]
 # Guarded on the kit dir ALONE. Every arm builds its own scratch repository and drives the runner
@@ -69,6 +71,7 @@ guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates canary"
+subject = "repo"
 argv = ["bash", "{kit}/run-gates.test.sh"]
 # Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
 # `apply` itself creates in the target — so the leg's own arrival changed the file it guards on and
@@ -77,16 +80,19 @@ guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates evidence"
+subject = "kit"
 argv = ["bash", "{kit}/run-gates.evidence.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates adopter e2e"
+subject = "kit"
 argv = ["bash", "{kit}/adopt-run-gates.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "run-gates wiring"
+subject = "repo"
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]
 guard = []
 
@@ -121,6 +127,12 @@ observed_skipped = ["GATE skip  {name}"]
 # refusal can never fire. One trailing space after the verb, because the verbs are padded so the
 # NAME starts in one column.
 observed_reused = ["GATE reuse {name}"]
+# The FIFTH verb (TOOL-dUnstalledConvoy-26). Without it every kit-subject leg is invisible to
+# `read_gate_verdicts`, and an upgrading adopter's apply reports each one as GONE AFTER — a leg that
+# was green before, holds no state after, and trips the "a leg that vanished is not a leg that
+# passed" refusal. Two trailing spaces, because the verbs are padded so the NAME starts in one
+# column and the reader anchors on that prefix.
+observed_held = ["GATE held  {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.

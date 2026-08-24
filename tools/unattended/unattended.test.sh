@@ -4217,7 +4217,50 @@ same "the repeat added no row" "$(grep -c 'rescope · item ' memory/builds/tRun/
 # unconditional membership refusal would fire forever on a run that recorded after authoring.
 run --rescope tRun --act add --item ARCH-tRun-1 --reason "recorded before the render caught up" >/dev/null 2>&1
 out=$(run --rescope tRun --act add --item ARCH-tRun-1 --reason "recorded before the render caught up")
-hit "$out" "a rescope adds a unit the generated units region already carries and no matching row explains it, so this records a transition that did not happen:"
+# TOOL-dUnstalledConvoy-33 AC3: with the run-state file never committed there is NO baseline roster
+# to derive, so the guard cannot tell a late record from a fabricated one and REFUSES. That is the
+# direction that cannot fabricate a permanent record, and it is why this caller passes no fallback
+# commit while the checker passes its pinned BASE.
+hit "$out" "a rescope adds a unit the generated units region already carries, and the roster this run entered its live phase with cannot be derived, so there is no way to tell a late record from a transition that did not happen:"
+
+# ---- TOOL-dUnstalledConvoy-33: LATE-BUT-TRUE vs FABRICATED ----------------------------------------
+# The question `add` must answer is not "is this id in the region NOW" — the region is rendered from
+# the specs that exist, so by the time anybody writes the row the spec is there. It is "was this id
+# in the roster the run STARTED with", which is the same question check 24 asks. Deciding it two
+# different ways made the pair unsatisfiable: check 24 demanded a row for every unit added after the
+# run went live, and the driver refused every one of them. Measured on gov's own dUnstalledConvoy —
+# four units, all added by explicit owner turns mid-run, all unrecordable.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+run --phase tRun BUILDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1
+fixture                       # the run-state file is now COMMITTED in a live phase: a baseline exists
+
+# AC2 — a unit that WAS in that baseline roster is still refused. This is the fabrication check 48
+# exists for, and it must survive the change or the guard has been deleted rather than corrected.
+out=$(run --rescope tRun --act add --item ARCH-tRun-1 --reason "this one was there all along")
+hit "$out" "a rescope adds a unit that was already in the roster this run entered its live phase with, so this records a transition that did not happen:"
+
+# AC1 — a unit the region carries NOW and the baseline did not is ACCEPTED, and the acceptance says
+# the record is LATE so a reader is not left to infer it was written at the time.
+awk '{ print } /ARCH-tRun-1 — the unit/ { print "| [ARCH-tRun-2 — the late one](spec/two.md) | OPEN | rev-1 | 2026-08-24 |" }' \
+  memory/builds/tRun/README.md > memory/builds/tRun/README.new \
+  && mv memory/builds/tRun/README.new memory/builds/tRun/README.md
+same "the fixture roster actually grew, or the arm below proves nothing" \
+  "$(grep -c 'ARCH-tRun-2' memory/builds/tRun/README.md)" "1"
+out=$(run --rescope tRun --act add --item ARCH-tRun-2 --reason "the owner asked for it after the run went live")
+hit "$out" "LATE record — ARCH-tRun-2 entered the roster after this run went live and is only being recorded now"
+hit "$out" "amendment recorded — add ARCH-tRun-2"
+
+# AC4 — ONE derivation, in the shared library, called by both. A second copy anywhere is how the two
+# came to answer differently in the first place.
+same "baseline_units is defined exactly once, in the shared library" \
+  "$(grep -c '^baseline_units()' "$HERE/lib-unattended.sh")" "1"
+same "the driver calls it rather than deciding the same question its own way" \
+  "$(grep -c 'baseline_units ' "$HERE/unattended.sh")" "1"
+same "and so does the checker" \
+  "$(grep -c 'baseline_units ' "$HERE/check-unattended.sh")" "1"
+same "and neither defines its own" \
+  "$(grep -c '^baseline_units()' "$HERE/unattended.sh" "$HERE/check-unattended.sh" | grep -c ':0$')" "2"
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
 hit "$out" "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default:"

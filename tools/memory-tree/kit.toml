@@ -59,6 +59,7 @@ means = "refused-foreign-tree"
 
 [[gate_leg]]
 name = "memory hygiene"
+subject = "repo"
 argv = ["bash", "{kit}/check-memory-hygiene.sh"]
 guard = []
 history_depth = "full"
@@ -88,26 +89,31 @@ the adopter accepts only `--scaffold`, measured. Its verifiers default to a chec
 
 [[gate_leg]]
 name = "verdict epoch (kit version dates the engine)"
+subject = "repo"
 argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
 
 [[gate_leg]]
 name = "verdict-epoch self-test"
+subject = "kit"
 argv = ["bash", "{kit}/check-verdict-epoch.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "memory-hygiene self-test"
+subject = "kit"
 argv = ["bash", "{kit}/check-memory-hygiene.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "row-keyed merge driver replay"
+subject = "kit"
 argv = ["bash", "{kit}/merge-rows.test.sh"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "kit/dogfood doc parity"
+subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
 guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{kit}/"]
 # BUILD-METHOD.md is in the guard because the leg VALIDATES it — the pairs this test compares are
@@ -122,51 +128,61 @@ guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_
 
 [[gate_leg]]
 name = "method carriers (every pointer declared)"
+subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
 guard = []
 
 [[gate_leg]]
 name = "method-carriers self-test"
+subject = "kit"
 argv = ["bash", "{kit}/check-method-carriers.test.sh"]
 guard = []
 
 [[gate_leg]]
 name = "build README slot contract"
+subject = "repo"
 argv = ["python3", "{kit}/gen_build_index.py", "--check-format"]
 guard = []
 
 [[gate_leg]]
 name = "build-index selftest"
+subject = "kit"
 argv = ["python3", "{kit}/gen_build_index.py", "--selftest"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "corpus-ids selftest"
+subject = "kit"
 argv = ["python3", "{kit}/corpus_ids.py", "--selftest"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "gotchas selftest"
+subject = "kit"
 argv = ["python3", "{kit}/gotchas.py", "--selftest"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "row-grammar selftest"
+subject = "kit"
 argv = ["python3", "{kit}/row_grammar.py", "--selftest"]
 guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "marker contracts"
+subject = "repo"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
 
 [[gate_leg]]
 name = "harness arms (fail branches armed or pinned)"
+subject = "repo"
 argv = ["python3", "{kit}/check-arms.py", "--check"]
 guard = []
 
 [[gate_leg]]
 name = "check-arms selftest"
+subject = "kit"
 argv = ["python3", "{kit}/check-arms.py", "--selftest"]
 guard = ["{kit}/"]
 

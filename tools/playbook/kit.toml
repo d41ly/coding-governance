@@ -48,6 +48,7 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 
 [[gate_leg]]
 name = "playbook render wiring"
+subject = "repo"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 
 # THE ENGINE'S OWN ARMS, and an adopter receives them because they are about the ENGINE rather than
@@ -57,4 +58,5 @@ argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check
 # substituted verbatim into a markdown table row.
 [[gate_leg]]
 name = "playbook render selftest"
+subject = "kit"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--selftest"]

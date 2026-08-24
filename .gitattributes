@@ -170,3 +170,7 @@ tools/unattended/playbook.fixture.md eol=lf
 tools/unattended/fixture-pieces/**/*.md eol=lf
 memory/builds/*/pieces/*.md eol=lf
 tools/unattended/fixture-records/*.md eol=lf
+# The GENERATED subject pin: parsed with a TAB field separator, and a stray CR lands inside the
+# subject value, so `repo\r` compares unequal to `repo` and the ratchet reds on every leg at once.
+# TOOL-dUnstalledConvoy-29.
+tools/govkit/subject-pins.tsv text eol=lf

@@ -16,7 +16,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.0   # gov:kit run-gates@1.0
+KIT_RUN_GATES_VERSION=1.1   # gov:kit run-gates@1.1
+# 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
+# the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
+# there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
@@ -63,7 +66,7 @@ resolve_python() {
 }
 # <<< resolve_python
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
-fails=0; n=0; skips=0
+fails=0; n=0; skips=0; ondemands=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
@@ -689,19 +692,38 @@ rows = [" ".join(str(i) for i in order)]
 # text: the reason string is for a human reading the manifest, and the runner only ever asks whether
 # there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
 # here, which is what keeps a prose reason from being able to corrupt the wire format.
+# The SIXTH field is `subject`, appended AFTER chunk so the chunk position is unchanged — a field
+# inserted before it would be parsed as chunk by any reader that had not moved in the same commit.
+# Defaulted to `repo`: a leg that has not declared is on the bar, because the other default silently
+# removes an undeclared leg from every run. NOTE: this program is inside a single-quoted shell block,
+# so a comment here may carry no apostrophe. TOOL-dUnstalledConvoy-26.
+#
+# THE CRITERION, and it is the ONE statement of it. Ask what a FAILURE of this leg MEANS:
+#
+#   "the kit source is broken"          -> subject = kit   (held; the owner asks for it)
+#   "this repository is misconfigured"  -> subject = repo  (on the bar, every run)
+#
+# Asking instead what a leg TESTS is the wording that does not decide, and it decided four legs
+# wrongly before this sentence replaced it. A kit whose product is a repository configuration —
+# the push and commit boundaries are the case — has a self-test that reads BOTH the kit source and
+# the live hook installed here, so "what does it test" has two true answers and the failure question
+# has one. Those four legs are `repo`: a broken boundary in THIS repository cannot wait for somebody
+# to remember a variable. TOOL-dUnstalledConvoy-30.
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
-         + "\x1e" + str(l.get("chunk", "") or "") for l in data]
+         + "\x1e" + str(l.get("chunk", "") or "")
+         + "\x1e" + (l.get("subject") or "repo") for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
+  subjects+=("${sj:-repo}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -709,6 +731,16 @@ total=${#names[@]}
 # deciding before dispatch keeps the skip verdict independent of scheduling.
 for ((i=0; i<total; i++)); do
   [ -z "${names[$i]}" ] && continue
+  # SUBJECT FIRST, and in this pass rather than in the dispatch loop. A kit-subject leg tests the
+  # KIT'S OWN SOURCE and has no job in a repo that copy-installs the kit and never edits it, so it
+  # runs only when asked. `GATE_FULL` deliberately does NOT ask: it means "ignore every guard", and
+  # conflating it with "run the kit's own tests" would leave no way to request a complete bar
+  # without them — and it is the very bypass that made `guard = ["{kit}/"]` ineffective here.
+  # Deciding in the dispatch loop instead would leave an index with no result, which the reporting
+  # pass reports as `(no result)`. TOOL-dUnstalledConvoy-26.
+  if [ "${subjects[$i]}" = kit ] && [ -z "${GATE_SELFTESTS:-}" ]; then
+    printf 'ondemand' > "$WORK/$i.rc"; continue
+  fi
   [ -z "${guards[$i]}" ] && continue
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
@@ -898,7 +930,14 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
-  if [ "$rc" = skip ]; then
+  if [ "$rc" = ondemand ]; then
+    # THE FIFTH VERB, and it is NOT `skip`. Two reasons, both load-bearing. `skip`'s tail says
+    # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
+    # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
+    # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
+    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
+    printf 'GATE held  %s  (kit self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
+  elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = reuse ]; then
     # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
@@ -957,7 +996,7 @@ nwalk=${#WALK[@]}
 disp=($ORDER); ndisp=${#disp[@]}; di=0; wi=0; next=0
 [ "$nwalk" -gt 0 ] && next=${WALK[0]}
 # per-chunk tallies, reset at each boundary
-cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 CHUNK_ROLLUP=""
 chunk_close() {   # emit the verdict for the chunk just finished
   [ -n "$cur_chunk" ] || return 0
@@ -966,15 +1005,22 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # A CHUNK IN WHICH EVERY LEG WAS SKIPPED REPORTS AS SKIPPED, never as green. On a scoped run the
   # guard pre-pass decides those legs before dispatch, so the chunk closes at once — and calling that
   # green would be the loudest possible green-by-absence, one altitude above a single leg.
-  elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && [ "$c_skip" -gt 0 ]; then verdict="skipped"
+  # A HELD LEG IS A LEG THAT DID NOT RUN, so it satisfies this rule exactly as a guard-skip does.
+  # The rule above was already correct and already stated; what it lacked was reachability from the
+  # newer skip kind, which is worse than a missing rule because the comment asserts it. A chunk of
+  # nothing but kit self-tests closed GREEN on every switch-off bar. TOOL-dUnstalledConvoy-32.
+  elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && { [ "$c_skip" -gt 0 ] || [ "${c_ondemand:-0}" -gt 0 ]; }; then verdict="skipped"
   else verdict="green"; fi
-  printf -- '---- chunk %s: %s  (%s ran, %s failed, %s skipped, %s reused)\n' \
-    "$cur_chunk" "$verdict" "$c_ran" "$c_fail" "$c_skip" "$c_reuse"
+  # HELD IS ITS OWN TALLY and not folded into `skipped`, for the reason the leg verb is its own verb:
+  # the two have different remedies. A guard-skip runs again when its path moves; a held leg runs
+  # when somebody sets the variable, and a reader who cannot tell them apart waits for the wrong one.
+  printf -- '---- chunk %s: %s  (%s ran, %s failed, %s skipped, %s reused, %s held)\n' \
+    "$cur_chunk" "$verdict" "$c_ran" "$c_fail" "$c_skip" "$c_reuse" "${c_ondemand:-0}"
   # PER-CHUNK WALL TIME goes to the durable records and NOT to stdout: a wall clock on a terminal
   # line invites comparison between runs that are not comparable, which is the whole reason the
   # profiling verb records an envelope.
-  CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${secs}\n"
-  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+  CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
+  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 }
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
@@ -1054,6 +1100,48 @@ fi
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 [ "${reuses:-0}" -gt 0 ] && skipnote="$skipnote (${reuses} reused)"
+# THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
+# total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
+# population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
+[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: kit self-tests, GATE_SELFTESTS=1 runs them)"
+
+# THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
+# Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
+# the one a reader quotes. A leg that was held did not run, so counting it in the total is the
+# green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
+ran=$((n-skips-${ondemands:-0}))
+
+# A BAR THAT RAN NOTHING BECAUSE EVERYTHING WAS HELD IS NOT A GREEN BAR. It is the loudest possible
+# green-by-absence: a repository whose whole manifest is kit-subject would print `gates GREEN` on
+# every run forever while executing not one leg, and the record it stamps would say so too.
+# NARROW ON PURPOSE — guard-skips and reuses are ORDINARY reasons for a leg not to run, and a scoped
+# run over an untouched tree legitimately executes nothing. This fires only when the on-demand hold
+# is the SOLE reason: nothing ran, nothing was skipped, nothing was reused, and something was held.
+# Exit 2, the runner's own configuration-refusal code, never 0 and never 1. TOOL-dUnstalledConvoy-26.
+if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
+   && [ "$skips" = 0 ] && [ "${reuses:-0}" = 0 ]; then
+  echo "run-gates: every leg in this manifest is subject=kit and the self-tests were not asked for,"
+  echo "run-gates: so this run executed NOTHING. Refusing to report a green over an empty population."
+  echo "run-gates: run it as GATE_SELFTESTS=1, or give this manifest at least one repo-subject leg."
+  # A VERDICT IS WRITTEN BEFORE THE EXIT. The run record's ABSENCE is this runner's crash signal —
+  # a directory with a header and no verdict means the process died — so exiting between the two
+  # manufactures that signature for a deliberate refusal, and leaves the PREVIOUS run's `gates
+  # GREEN` standing in gate-last-summary.txt for anyone who reads the durable record instead of the
+  # terminal. Both records say REFUSED instead. TOOL-dUnstalledConvoy-26.
+  if [ -n "$RUNDIR" ]; then
+    { printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'verdict\tREFUSED\n'
+      printf 'ran\t0\n'
+      printf 'failed\t0\n'
+      printf 'skipped\t%s\n' "$skips"
+      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'reused\t0\n'
+    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
+  fi
+  [ -n "$sfile" ] && printf 'gates REFUSED — every leg is a held kit self-test, so this run executed nothing\n' >"$sfile" 2>/dev/null || true
+  exit 2
+fi
 
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
 # `reuses` is the fourth full-green precondition, counted by the reuse verb above. A run that reused
@@ -1072,9 +1160,10 @@ if [ -n "$RUNDIR" ]; then
   {
     printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'verdict\t%s\n' "$gate_verdict"
-    printf 'ran\t%s\n' "$((n-skips))"
+    printf 'ran\t%s\n' "$ran"
     printf 'failed\t%s\n' "$fails"
     printf 'skipped\t%s\n' "$skips"
+    printf 'held\t%s\n' "${ondemands:-0}"
     printf 'reused\t%s\n' "$reuses"
     printf 'fingerprint_end\t%s\n' "$FPRINT_END"
     printf 'tree_moved\t%s\n' "$tree_moved"
@@ -1098,6 +1187,11 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    # WHAT THIS GREEN COVERED. Without it a record named `gate-full-green` cannot say
+    # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
+    # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
+    # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
+    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
@@ -1122,10 +1216,14 @@ if [ "$fails" = 0 ]; then
   # measurement.
   # `QUEUE_SUMMARY` rides beside `PROF_LINE` on every path — green, red, and the durable RED copy —
   # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
-  echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
 else
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  # THE SAME DENOMINATOR THE GREEN LINE USES. `$n` is the whole manifest, so a red bar that held
+  # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
+  # are read by the same person in the same terminal and a figure that changes meaning between them
+  # is worse than either. TOOL-dUnstalledConvoy-31.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
@@ -1134,7 +1232,7 @@ else
     { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
-  echo "gates RED — $fails/$n legs failed$skipnote"
+  echo "gates RED — $fails/$ran legs failed$skipnote"
   [ -n "$sfile" ] && echo "gate summary saved to $sfile"
   [ -n "$gd" ] && [ -f "$gd/gate-last-failure.txt" ] && echo "gate failure record saved to $gd/gate-last-failure.txt"
   exit 1
