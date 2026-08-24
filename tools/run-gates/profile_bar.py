@@ -336,6 +336,16 @@ def main():
               "unverifiable — refusing rather than reporting a profile it may under-count."
               % RUNNER, file=sys.stderr)
         return 2
+    # AND THE REGEX MUST CARRY EVERY PINNED VERB. `PINNED_VERBS` is what this refusal compares, but
+    # `VERDICT` is what actually PARSES — a verb in the tuple and not in the alternation is dropped
+    # exactly as silently as one in neither, which is the drift this guard was written to stop. Two
+    # spellings of one set, and only one of them was being checked.
+    _unmatched = sorted(v for v in PINNED_VERBS if not VERDICT.match("GATE %s  x" % v))
+    if _unmatched:
+        print("profile-bar: PINNED_VERBS carries %s, which the VERDICT regex does not match. A verb "
+              "the pin knows and the parser does not is dropped just as silently as one in neither."
+              % ", ".join(_unmatched), file=sys.stderr)
+        return 2
     _unknown = sorted(_emitted - set(PINNED_VERBS))
     if _unknown:
         print("profile-bar: the runner emits verb(s) %s that this reader does not know. Every line "

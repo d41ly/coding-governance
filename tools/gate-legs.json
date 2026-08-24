@@ -261,7 +261,7 @@
       "tools/memory-tree/"
     ],
     "chunk": "declarations",
-    "subject": "kit"
+    "subject": "repo"
   },
   {
     "name": "method carriers (every pointer declared)",
@@ -450,7 +450,7 @@
       "tools/workflows/"
     ],
     "chunk": "declarations",
-    "subject": "kit"
+    "subject": "repo"
   },
   {
     "name": "review-join ban (no ref-keyed join)",
@@ -906,7 +906,7 @@
       "tools/memory-tree/marker-contract.test.sh"
     ],
     "chunk": "declarations",
-    "subject": "kit"
+    "subject": "repo"
   },
   {
     "name": "verifier fan-out",

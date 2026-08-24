@@ -479,7 +479,9 @@ that can. What survives here is what a session cannot get anywhere else.
 ```bash
 bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard; what pre-push runs, and what a DoD needs
+GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every kit self-test
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the kit self-tests, which are held by default
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # the complete bar, and what a DoD needs
 ```
 
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming

@@ -124,7 +124,7 @@ guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_
 # TWO carriers, because govkit copies a descriptor's declared guard verbatim into a target: fixing
 # gov's manifest alone would leave the half that SHIPS open, and the hole would be exported rather
 # than fixed.
-subject = "kit"
+subject = "repo"
 
 [[gate_leg]]
 name = "method carriers (every pointer declared)"
@@ -172,7 +172,7 @@ subject = "kit"
 name = "marker contracts"
 argv = ["bash", "{kit}/marker-contract.test.sh"]
 guard = []
-subject = "kit"
+subject = "repo"
 
 [[gate_leg]]
 name = "harness arms (fail branches armed or pinned)"

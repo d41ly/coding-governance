@@ -1120,6 +1120,23 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
   echo "run-gates: every leg in this manifest is subject=kit and the self-tests were not asked for,"
   echo "run-gates: so this run executed NOTHING. Refusing to report a green over an empty population."
   echo "run-gates: run it as GATE_SELFTESTS=1, or give this manifest at least one repo-subject leg."
+  # A VERDICT IS WRITTEN BEFORE THE EXIT. The run record's ABSENCE is this runner's crash signal —
+  # a directory with a header and no verdict means the process died — so exiting between the two
+  # manufactures that signature for a deliberate refusal, and leaves the PREVIOUS run's `gates
+  # GREEN` standing in gate-last-summary.txt for anyone who reads the durable record instead of the
+  # terminal. Both records say REFUSED instead. TOOL-dUnstalledConvoy-26.
+  if [ -n "$RUNDIR" ]; then
+    { printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'verdict\tREFUSED\n'
+      printf 'ran\t0\n'
+      printf 'failed\t0\n'
+      printf 'skipped\t%s\n' "$skips"
+      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'reused\t0\n'
+    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
+  fi
+  [ -n "$sfile" ] && printf 'gates REFUSED — every leg is a held kit self-test, so this run executed nothing\n' >"$sfile" 2>/dev/null || true
   exit 2
 fi
 
@@ -1199,7 +1216,11 @@ if [ "$fails" = 0 ]; then
   [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
 else
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  # THE SAME DENOMINATOR THE GREEN LINE USES. `$n` is the whole manifest, so a red bar that held
+  # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
+  # are read by the same person in the same terminal and a figure that changes meaning between them
+  # is worse than either. TOOL-dUnstalledConvoy-31.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
@@ -1208,7 +1229,7 @@ else
     { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
-  echo "gates RED — $fails/$n legs failed$skipnote"
+  echo "gates RED — $fails/$ran legs failed$skipnote"
   [ -n "$sfile" ] && echo "gate summary saved to $sfile"
   [ -n "$gd" ] && [ -f "$gd/gate-last-failure.txt" ] && echo "gate failure record saved to $gd/gate-last-failure.txt"
   exit 1

@@ -38,14 +38,14 @@ install-prefix self-test	kit
 kickoff engine size <=18KiB	repo
 kickoff-manifest ratchet	repo
 kit version markers	repo
-kit/dogfood doc parity	kit
+kit/dogfood doc parity	repo
 lexicon naming predicates	repo
 lexicon selftest	kit
 lexicon wiring	repo
 line length	repo
 line-length gate selftest	kit
 manifest-check self-test	kit
-marker contracts	kit
+marker contracts	repo
 memory hygiene	repo
 memory-hygiene self-test	kit
 memory-recall kit selftest	kit
@@ -70,7 +70,7 @@ recall floor	repo
 recall floor arms	repo
 review-join ban (no ref-keyed join)	repo
 review-join self-test	kit
-review-protocol parity (kit vs dogfood)	kit
+review-protocol parity (kit vs dogfood)	repo
 row-grammar selftest	kit
 row-keyed merge driver replay	kit
 run-gates adopter e2e	kit

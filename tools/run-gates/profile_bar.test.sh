@@ -18,7 +18,7 @@
 # fixture leg names out of the real timing cache, which the runner would carry forward forever.
 set -u
 
-FLOOR_ASSERTIONS=36
+FLOOR_ASSERTIONS=39
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 export HERE_DIR="$HERE"   # the inline python arms import profile_bar from it
@@ -354,6 +354,21 @@ print("OK" if "held" in p.NOT_RUN and "skip" in p.NOT_RUN else "GOT:%s" % (p.NOT
 PYEOF
 )
 chk $([ "$NR" = OK ] && echo 0 || echo 1) "not-run arm: NOT_RUN returned $NR"
+
+# ...and every PINNED verb is one the regex actually matches. The guard above compares the runner
+# against PINNED_VERBS; VERDICT is what PARSES. A verb in the tuple and not in the alternation is
+# dropped exactly as silently as one in neither — two spellings of one set, and only one of them
+# was being checked.
+RX=$("$PY" - <<'PYEOF'
+import sys, os
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+
+bad = [v for v in p.PINNED_VERBS if not p.VERDICT.match("GATE %s  x" % v)]
+print("OK" if not bad else "UNMATCHED:%s" % bad)
+PYEOF
+)
+chk $([ "$RX" = OK ] && echo 0 || echo 1) "verb-regex arm: PINNED_VERBS vs VERDICT returned $RX"
 
 # ---------------------------------------------------------------------------------------- verdict
 if [ "$bad" -ne 0 ]; then

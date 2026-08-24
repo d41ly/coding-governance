@@ -30,7 +30,7 @@ subject = "repo"
 
 [[gate_leg]]
 name = "review-protocol parity (kit vs dogfood)"
-subject = "kit"
+subject = "repo"
 argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
 guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
 
