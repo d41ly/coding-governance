@@ -36,7 +36,7 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | CLOSED | rev-6 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | SPECCED | rev-5 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | SPECCED | rev-5 | 2026-08-24 |
 | [TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier](spec/2026-08-24-spec-dFramedEntrypoint-4.md) | SPECCED | rev-5 | 2026-08-24 |
@@ -50,6 +50,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 | Record | Kind | Serves |
 |---|---|---|
+| [2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md) | journal | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md) | research | TOOL-dFramedEntrypoint-1 |
@@ -84,6 +85,7 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-24-spec-dFramedEntrypoint-7.md](spec/2026-08-24-spec-dFramedEntrypoint-7.md)
   - [2026-08-24-spec-dFramedEntrypoint-8.md](spec/2026-08-24-spec-dFramedEntrypoint-8.md)
 - **`build/`**
+  - [2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-contradictions.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-corpus-census.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-derivation.md)

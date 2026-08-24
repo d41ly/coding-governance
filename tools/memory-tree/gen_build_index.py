@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
-    python tools/memory-tree/gen_build_index.py --check      # drift gate (writes nothing)
-    python tools/memory-tree/gen_build_index.py --write      # (re)render every artifact
-    python tools/memory-tree/gen_build_index.py --selftest    # fixtures, in a temp dir
+    python tools/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python tools/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python tools/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
+    python tools/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python tools/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
+
+WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
+closed heading canon — only for the ones the declared registry BINDS. It never grades what a slot
+SAYS, whether the description is the one first authored, or how large any slot is. Size is a separate
+declared budget; the description's immutability is a DOCUMENTED check in HYGIENE.md and deliberately
+not a gated one, because 26 of 61 description blocks already carry more than one commit and a
+history-based predicate would have no green starting state to land on.
 
 It replaces the retired directory-listing generator. A listing carried paths, which git already
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
@@ -77,6 +86,31 @@ GEN_REGIONS = (
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
     ("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),
 )
+
+# TOOL-dFramedEntrypoint-1 — the CLOSED heading canon for a build README's authored half. The slot
+# contract above constrains only WHERE authored content sits; this constrains WHAT it is. Position
+# stays the mechanism: no slot gets a marker pair of its own, which is what TOOL-aRuledFrontispiece-1
+# refused and what that refusal's surviving reason (two more lines per README to solve a problem
+# position already solves) still forbids. Its OTHER refusal — heading-detection, because
+# check_authorization byte-compared a marker-delimited region — expired at TOOL-aBoundedVerdict-11,
+# and reading the two as one refusal is how a live rule gets deleted with its dead neighbour.
+#
+# `(heading, empty_ok, bullets)`. The FIRST entry is also the build's GOAL BOUND, the sentence M3's
+# rescope rule may not amend: folded into the description rather than given a slot of its own,
+# because two slots that must agree are one fact in two places.
+SLOT_CANON = (
+    ("## The problem this build exists to solve", False, False),
+    ("## Expected improvements", False, True),
+    ("## Detriments if this is not built", False, True),
+    ("## Build-level rules", True, False),
+    ("## Parked decisions", True, False),
+)
+# The registry declaring which build READMEs the canon BINDS. Unit 3 writes the file; this reader
+# ships here so the predicate is complete before its population exists, and returns the EMPTY SET
+# when the file is absent — which unit 3 then replaces with a refusal. Until then an empty
+# population is legal and is ANNOUNCED on every run, because a rule binding nothing that reports
+# `clean` is the vacuous-selector class this repo names.
+CONTRACT_REGISTRY = "project/readme-contract.txt"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
 # than spelled. It is written INTO the adopter's generated artifacts and committed there, so a
 # hardcoded prefix does not merely mislead — it lands a dead path in their tree, and the byte-compare
@@ -980,12 +1014,88 @@ def _marker_index(lines: list, mark: str):
     return None
 
 
-def slot_violations(readme_text: str, readme: str) -> list:
+def read_contract_registry(root: str, conf: dict) -> set:
+    """The build READMEs the heading canon BINDS, from the declared registry. Empty when absent.
+
+    Empty is LEGAL here and is announced by the caller rather than reported as clean. Unit 3 turns
+    an absent file into a refusal and owns that change; this reader deliberately does not, so unit 1
+    lands without depending on a file unit 3 has not written yet.
+    """
+    p = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
+    if not os.path.exists(p):
+        return set()
+    out = set()
+    for raw in read_text(p).split("\n"):
+        s = raw.strip()
+        if s and not s.startswith("#") and not s.startswith("!"):
+            out.add(s)
+    return out
+
+
+def _canon_violations(lines: list, first_open: int) -> list:
+    """The CLOSED heading canon over the authored half. Trigger 3 (TOOL-dFramedEntrypoint-1 S1).
+
+    The authored half runs from the title to whichever comes first: the authored plan pair's opening
+    marker, or the first generated marker. The plan pair belongs to NO slot — terminating at the
+    generated marker instead would bill its table to the last slot, which unit 2's budget then
+    charges to a block this unit's own non-goals forbid touching.
+    """
+    stop = first_open
+    po = _marker_index(lines, PLAN_OPEN)
+    if po is not None and po < stop:
+        stop = po
+    title = next((i for i, l in enumerate(lines) if l.startswith("# ")), None)
+    if title is None:
+        return [(1, "no `# ` title line, so the authored half has no start")]
+    out, seen = [], []
+    for i in range(title + 1, stop):
+        l = lines[i]
+        if l.startswith("## "):
+            seen.append((i, l.rstrip()))
+        elif l.strip() and not seen:
+            out.append((i + 1, "authored content between the title and the first canonical heading"))
+    want = [h for h, _e, _b in SLOT_CANON]
+    got = [h for _i, h in seen]
+    if got != want:
+        for i, h in seen:
+            if h not in want:
+                out.append((i + 1, f"heading outside the canon: {h}"))
+        for n, h in enumerate(want):
+            if h not in got:
+                out.append((title + 1, f"canonical slot missing: {h}"))
+            elif [g for g in got if g in want].index(h) != n:
+                out.append((title + 1, f"canonical slot out of order: {h}"))
+        return sorted(set(out))
+    # Bodies. A slot runs to the next canonical heading, or to `stop` for the last.
+    for n, (idx, head) in enumerate(seen):
+        end = seen[n + 1][0] if n + 1 < len(seen) else stop
+        body = [l for l in lines[idx + 1:end] if l.strip()]
+        _h, empty_ok, bullets = SLOT_CANON[n]
+        if not body and not empty_ok:
+            out.append((idx + 1, f"canonical slot has an empty body and may not: {head}"))
+        if bullets:
+            for j in range(idx + 1, end):
+                s = lines[j].strip()
+                if s and not s.startswith(("- ", "* ")) and not lines[j].startswith("  "):
+                    out.append((j + 1, f"slot requires a bullet list: {head}"))
+    return sorted(set(out))
+
+
+def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     """Authored content sitting where the slot contract forbids it (TOOL-aRuledFrontispiece-1 S4).
 
-    TWO triggers, not one. An earlier draft of the owning spec named only the first, which would have
-    passed the one README in the corpus that already carries a plan pair — the exact file the surgery
-    unit exists to relocate.
+    THREE triggers since TOOL-dFramedEntrypoint-1, and the third is OPT-IN per file: the canon binds
+    only the READMEs the declared registry names, so a caller grading an unbound file passes
+    `canon=False` and gets the two position triggers alone.
+
+    **WHAT THIS DOES NOT CHECK.** It grades SHAPE — heading text, heading order, body emptiness, and
+    whether a body that must be a list is one. It never grades whether a slot says anything true,
+    whether the description is the one first authored, or whether the improvements are improvements.
+    The immutability of the description is a DOCUMENTED check in `memory/HYGIENE.md` and deliberately
+    not a gated one: 26 of 61 description blocks already carry more than one commit, so a
+    history-based predicate has no green starting state. Nor does it grade SIZE — that is
+    TOOL-dFramedEntrypoint-2's declared per-slot budget, kept separate so a shape failure and a size
+    failure are distinguishable to whoever reads the red.
     """
     lines = readme_text.split("\n")
     spans = []            # (open_index, close_index) of every registered generated region present
@@ -994,7 +1104,12 @@ def slot_violations(readme_text: str, readme: str) -> list:
         if o is not None and c is not None and c > o:
             spans.append((o, c))
     if not spans:
-        return []
+        # TOOL-dFramedEntrypoint-1 S4 — the TOTAL-EXEMPTION hole. This returned [] unconditionally,
+        # so a README carrying no generated pair passed every trigger however much prose it held:
+        # measured on a 45,185-byte fixture with two invented sections, which reported clean. No file
+        # in the live corpus reaches it today, which is exactly why it went unnoticed.
+        return [(1, "no generated region pair, so every slot trigger would pass vacuously — "
+                    "run --write to create the pairs")]
     first_open = min(o for o, _c in spans)
     inside = {i for o, c in spans for i in range(o, c + 1)}
     out = []
@@ -1008,6 +1123,9 @@ def slot_violations(readme_text: str, readme: str) -> list:
         for i in range(pc + 1, first_open):
             if lines[i].strip():
                 out.append((i + 1, "authored content between the plan pair and the generated region"))
+    # Trigger 3 — the closed heading canon, only over a file the registry BINDS.
+    if canon:
+        out += _canon_violations(lines, first_open)
     return sorted(set(out))
 
 
@@ -1145,20 +1263,65 @@ def do_check_format(root: str, conf: dict) -> int:
     Build READMEs violate the sequence at this unit's base, so a refusal on the render path would red
     hygiene check 9 across the corpus on this unit's own commit. The leg at the last build position
     is what makes this binding; the surgery unit before it is what makes it pass.
+
+    **WHAT THIS VERB DOES NOT CHECK**, stated here because a structural check reads as a semantic one
+    to everybody who did not write it. It grades POSITION for every tracked build README, and SHAPE —
+    the closed heading canon — only for the READMEs the declared registry BINDS. It does not grade
+    what a slot SAYS, whether the description is the one first authored, or how big any slot is. Size
+    is TOOL-dFramedEntrypoint-2's separate budget; immutability is a documented check in
+    `memory/HYGIENE.md` and not a gated one, because 26 of 61 description blocks already carry more
+    than one commit and a history predicate would have no green starting state.
     """
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
                if p.endswith("/README.md")]
+    bound = read_contract_registry(root, conf)
     bad = []
     for rel in sorted(tracked):
-        for line, why in slot_violations(read_text(os.path.join(root, rel)), rel):
+        for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
             bad.append(f"    {rel}:{line} — {why}")
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
         for line in bad:
             print(line)
         return 1
-    print(f"build-index: slot contract clean ({len(tracked)} build README(s))")
+    graded = len([r for r in tracked if r in bound])
+    print(f"build-index: slot contract clean ({len(tracked)} build README(s); "
+          f"heading canon BOUND on {graded})")
+    if not graded:
+        # A rule binding nothing must SAY so. A green line over an empty declared population is
+        # indistinguishable from coverage, which is the class the charter names and the reason a
+        # date-keyed cutoff was refused for this contract in the first place.
+        print(f"build-index: NOTE the heading canon is bound on ZERO build READMEs — "
+              f"{m}/{CONTRACT_REGISTRY} declares none, so trigger 3 graded nothing this run")
+    return 0
+
+
+def do_survey(root: str, conf: dict) -> int:
+    """Run the canon over EVERY tracked build README, bound or not, and report. Never fails.
+
+    This repo requires a new gate predicate to be run over the real tree before it is wired, printing
+    hits AND near-misses. It is a verb rather than a flag because `main()` ignores an unrecognised
+    argument, so an acceptance criterion naming a flag that does not exist would pass by printing the
+    ordinary clean line — which is precisely what this unit's first draft specified.
+    """
+    m = conf["MEMORY_ROOT"]
+    tracked = sorted(p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
+                     if p.endswith("/README.md"))
+    bound = read_contract_registry(root, conf)
+    hits = 0
+    for rel in tracked:
+        vs = slot_violations(read_text(os.path.join(root, rel)), rel, canon=True)
+        tag = "BOUND  " if rel in bound else "unbound"
+        if vs:
+            hits += 1
+            print(f"{tag} {rel} — {len(vs)} violation(s)")
+            for line, why in vs:
+                print(f"        :{line} — {why}")
+        else:
+            print(f"{tag} {rel} — conforms")
+    print(f"build-index: survey over {len(tracked)} build README(s) — {hits} would fail the canon, "
+          f"{len(tracked) - hits} conform; {len(bound)} are BOUND today")
     return 0
 
 
@@ -1507,6 +1670,70 @@ def do_selftest() -> int:
         arm("a conforming README trips no trigger", "[]",
             lambda: str(slot_violations(read_text(rd12), "x")))
 
+        # ---------------------------------------------------- TOOL-dFramedEntrypoint-1, trigger 3
+        # S4 — the TOTAL-EXEMPTION hole. This is the arm that FAILED before this unit: a README with
+        # no generated pair returned [] whatever it held. No live file reaches it, so it needs a
+        # fixture or it is never exercised at all.
+        arm("a README with no generated pair is a violation, not a pass",
+            "no generated region pair",
+            lambda: str(slot_violations("---\nslug: x\n---\n\n# x\n\n45 KB of prose.\n", "x")))
+        arm("the no-pair violation fires even with canon off", "1",
+            lambda: str(len(slot_violations("# x\n\nprose\n", "x", canon=False))))
+
+        def _canon_readme(slots):
+            """A build README whose authored half is `slots`, plus a valid generated pair."""
+            head = ["---", "slug: tOne", "node: t", "opened: 2026-01-01", "streams: s",
+                    "roster: ARCH", "ids: ARCH-tOne-1", "---", "", "# tOne", ""]
+            return "\n".join(head + slots + ["", MARK_OPEN, MARK_CLOSE, ""])
+
+        GOOD = ["## The problem this build exists to solve", "", "It states the problem.", "",
+                "## Expected improvements", "", "- one improvement", "",
+                "## Detriments if this is not built", "", "- one detriment", "",
+                "## Build-level rules", "",
+                "## Parked decisions", ""]
+        arm("a canon-conforming README trips trigger 3 not at all", "[]",
+            lambda: str(slot_violations(_canon_readme(GOOD), "x", canon=True)))
+        arm("the canon is OPT-IN — an unbound file is graded on position alone", "[]",
+            lambda: str(slot_violations(_canon_readme(
+                GOOD + ["", "## Afterword", "", "anything at all"]), "x", canon=False)))
+        arm("a heading outside the canon is named", "heading outside the canon: ## Afterword",
+            lambda: str(slot_violations(_canon_readme(
+                GOOD + ["", "## Afterword", "", "prose"]), "x", canon=True)))
+        arm("canonical slots out of order are named", "out of order",
+            lambda: str(slot_violations(_canon_readme(
+                GOOD[4:] + GOOD[:4]), "x", canon=True)))
+        arm("prose above the first canonical heading is named",
+            "authored content between the title and the first canonical heading",
+            lambda: str(slot_violations(_canon_readme(["stray sentence.", ""] + GOOD),
+                                        "x", canon=True)))
+        arm("a required slot with an empty body is named",
+            "empty body and may not: ## The problem this build exists to solve",
+            lambda: str(slot_violations(_canon_readme(
+                ["## The problem this build exists to solve", ""] + GOOD[3:]), "x", canon=True)))
+        arm("an OPTIONAL slot with an empty body is legal", "[]",
+            lambda: str(slot_violations(_canon_readme(GOOD), "x", canon=True)))
+        arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
+            lambda: str(slot_violations(_canon_readme(
+                GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))
+        # The plan pair belongs to NO slot: the authored half must STOP at it, or its table is read
+        # as body content of the last canonical slot.
+        arm("the authored plan pair does not become body of the last slot", "[]",
+            lambda: str(slot_violations("\n".join([
+                "# tOne", ""] + GOOD + ["", PLAN_OPEN, "| # | unit |", PLAN_CLOSE, "",
+                MARK_OPEN, MARK_CLOSE, ""]), "x", canon=True)))
+        # The registry reader: absent file is the EMPTY SET here, and unit 3 turns that into a
+        # refusal. Armed so the handover between the two units is visible rather than assumed.
+        t16 = os.path.join(base, "registry"); os.makedirs(t16)
+        conf16 = _fixture(t16, spec_status="OPEN")
+        arm("an absent contract registry reads as the empty set", "set()",
+            lambda: str(read_contract_registry(t16, conf16)))
+        os.makedirs(os.path.join(t16, "memory", "project"), exist_ok=True)
+        write_text(os.path.join(t16, "memory", CONTRACT_REGISTRY),
+                   "# a comment\n\nmemory/builds/tOne/README.md\n")
+        arm("a registry row binds its path and comments are skipped",
+            "memory/builds/tOne/README.md",
+            lambda: str(read_contract_registry(t16, conf16)))
+
         # S11 — the document inventory NAMES a record. This arm exists because the first cut bucketed
         # each record by its own filename rather than by its kind folder, so no kind ever matched and
         # the region rendered EMPTY between its two markers — which reads as "this build holds no
@@ -1667,8 +1894,9 @@ def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return do_selftest()
-    if mode not in ("--check", "--write", "--check-format", "--print-bindings"):
-        print("usage: gen_build_index.py [--check|--write|--check-format|--print-bindings|--selftest]")
+    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey"):
+        print("usage: gen_build_index.py "
+              "[--check|--write|--check-format|--survey|--print-bindings|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -1681,6 +1909,8 @@ def main(argv: list) -> int:
     try:
         if mode == "--check-format":
             return do_check_format(root, conf)
+        if mode == "--survey":
+            return do_survey(root, conf)
         return do_check(root, conf) if mode == "--check" else do_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

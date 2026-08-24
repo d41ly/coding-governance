@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -243,6 +243,7 @@ refresh rather than a new claim. NOT `tools/gate-legs.json` — see S6.
   both halves and the first fold priced only unit 8's, which rev-3 then narrowed so it cannot cover
   this one. The stale `tools/gate-legs.json` entry in Files touched is DELETED rather than negated.
 - rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-6 · 2026-08-24 · BUILT and CLOSED. The canon, the registry reader, the no-markers arm and the survey verb all landed; 13 selftest arms added, 71 to 84, and the canon walk was disabled in place to watch five of them fail before restoring. Two things changed during the build: the method pointers were compacted after the first wording pushed BUILD-METHOD.md further over its own line budget, and the read-path figure in the conf was re-derived after that compaction rather than carried forward. Ledger: `build/2026-08-24-build-TOOL-dFramedEntrypoint-1-acceptance.md`.
 
 ## 10. Reuse audit
 

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.30 -->
+<!-- gov:kit memory-tree@2.31 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -35,7 +35,7 @@ pass unreviewable — the closing diff cannot tell which half a finding lands on
 answers "which ids exist", never "which units are planned", and a planned unit cannot be added to it by hand. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
 `memory/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
 
-**Classify, first match wins.** Write it into the build README before acting on it.
+**Classify, first match wins.** Write it into the build README's BUILD-LEVEL RULES slot before acting on it — a canon closes the HEADING set, never slot bodies, so this needs no slot of its own.
 
 1. **MISSING** — no conforming spec carries the id.
 2. **THIN** — §2 Scope, §6 Acceptance or §7 Gates is empty, a placeholder, or names nothing observable.
@@ -70,8 +70,7 @@ Sweep §8 across the whole set before any code, including forks M2 just created.
 resolved before it, a decision.
 
 **What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
-the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL
-statement is what a run may not amend, and the delegation does not reach veto 2's governance-carrier clause,
+the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause,
 M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
 With no mandate, forks go to the owner and this is preparation.
 
@@ -130,7 +129,7 @@ verdict line; write it anyway, because M9 derives from these records. **Carry th
 answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
-**A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is PROMOTED** to a unit of this build, specced at its tier and built; not parked, not waived, not re-reviewed, and audited as a SPEC, which is what makes promotion terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README.
+**A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is PROMOTED** to a unit of this build, specced at its tier and built; not parked, not waived, not re-reviewed, and audited as a SPEC, which is what makes promotion terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
 
 ## M5 — Recall and reuse
 
