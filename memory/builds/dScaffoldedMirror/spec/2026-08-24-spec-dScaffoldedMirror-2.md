@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -18,10 +18,10 @@ checker that measures nothing.
   `populations[ext] = len(funcs) + len(types_)`; it becomes at least `funcs_per_ext` and
   `types_per_ext` plus a per-predicate roll-up, so P1's population and P2's population are separately
   observable for the same extension.
-- **S2** — a new `DEAD PREDICATE` refusal: an extension declared `parser` or `probe` whose population
-  for a given predicate is 0, while the corpus contains that extension, REDS and names the
-  (extension, predicate) pair. This is the existing `DEAD PROBE` law applied at the resolution the
-  fold currently destroys.
+- **S2 — REPORT, not RED, and rev-2 corrects rev-1 here.** An extension declared `parser` or `probe`
+  whose population for a given predicate is 0 is NAMED on every run as `graded=0`, and the run's
+  verdict is unchanged. rev-1 made it a refusal; §4 records the two measurements that killed that.
+  The extension-level `DEAD PROBE` RED stays exactly as it is today.
 - **S3** — the green line reports counts. Every run prints `graded=<n> offenders=<n> waived=<n>` per
   predicate, on green as well as on red, so a green row is a measurement rather than a mood.
 - **S4** — `measure_mode` stops returning 0 unconditionally (`lexicon.py:502-512`). When `problems` is
@@ -37,8 +37,10 @@ checker that measures nothing.
 - **No change to any predicate's semantics.** P1, P2 and P3 grade exactly the population they grade
   today; this unit changes what is REPORTED about that population and when the run refuses. A verdict
   change would make the unit's own before/after comparison unreadable.
-- **No corpus scoping.** The kit still grades itself. That is `TOOL-dScaffoldedMirror-3` and it is a
-  separate unit precisely because it moves the graded set, which this one must hold still.
+- **No corpus scoping.** The kit still grades itself. rev-1 pointed at `TOOL-dScaffoldedMirror-3`
+  for it; that unit is WONTDO as of 2026-08-24 and the non-goal now stands on its own reason —
+  scoping moves the graded set, and this unit must hold it still or its own before/after comparison
+  is unreadable.
 - **No new predicate, no vocabulary change, no pin change.** Phases 2 through 4.
 - **No coverage floor.** Reporting the graded fraction is `-6`; this unit reports per-predicate
   counts, which is a different number answering a different question.
@@ -120,11 +122,13 @@ pair as dark. Without that arm S2 is a rule with one escape hatch and no record 
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/lexicon/lexicon.py` runs on a tree where `.js` is declared
-  `js-regex:probe` and contains zero `class` definitions, it prints `DEAD PREDICATE` naming the
-  `(.js, P2)` pair and exits 1. Observed on THIS worktree with no staged break.
-- **AC2** — When that same tree declares the js/types pair `dark`, the run exits 0 AND the coverage
-  line names the pair as dark, so the escape hatch leaves a record.
+- **AC1** — When `python tools/lexicon/lexicon.py` runs on this worktree, its output names the
+  `(.js, suffix)` pair with `graded=0`, so the empty population is legible instead of hidden behind
+  the folded 89. The run's exit code is UNCHANGED from today's. rev-1 demanded a refusal here; §4
+  records why that was wrong.
+- **AC2** — When a tree's `.js` files gain a `class` definition, the same command reports a non-zero
+  `graded` for `(.js, suffix)`, proving the count is derived rather than a constant. Staged in
+  `tools/lexicon/selftest.py`, since this worktree has no JavaScript classes to add.
 - **AC3** — When any run succeeds, stdout carries `graded=` , `offenders=` and `waived=` for each of
   the three predicates, on green as well as on red. Asserted by a selftest arm grepping the green
   output, not by reading it.
@@ -160,12 +164,41 @@ the leg count is not the coverage.
   RESOLVED (agent, 2026-08-24, delegated): P3 is out of scope here; the FROM-side assertion is filed
   against the canon unit.
 
+### Why S2 is a report and not a refusal — two measurements
+
+**A per-predicate refusal fires on an HONEST tree and has no discharge.** `.js` here is armed
+(`js-regex:probe`) and carries **zero** `class` definitions across 10 tracked files. That is not an
+extractor that went inert; it is a repo that does not write JavaScript classes, which is an ordinary
+and permanent state. Under rev-1 the only way to clear it was to declare a `(extension, predicate)`
+pair dark — and `LANGS` has no pair grammar, so the only reachable discharge was declaring all of
+`.js` dark, which drops **45 real P1 offenders** and buys a green bar by deleting coverage. A refusal
+whose only discharge is a coverage loss is a refusal that will be discharged that way.
+
+**And the defect it was written for is already covered elsewhere.** Measured: `js-regex` DOES declare
+a `types` extractor, so the pair is armed and simply empty. The case rev-1 wanted — a pattern set that
+has gone inert — is caught by the frozen SENTINELS fixture in `tools/lexicon/selftest.py`, which
+asserts every shipped pattern set still matches its own fixture. The corpus-side arm cannot separate
+"inert" from "genuinely none" from one tree; the kit-side arm does not have to.
+
+So the honest split is: the SENTINEL owns inertness, the extension-level `DEAD PROBE` owns "this
+extension has files and no definitions at all", and this unit makes the per-predicate zero VISIBLE.
+The original complaint — that a reader cannot tell this repo from one with zero findings — is answered
+by printing the number, which is what S3 does.
+
 ## 9. Revision log
 
 - rev-1 · 2026-08-24 · initial draft, grounded on the `dScaffoldedMirror` research pass
   (`research/2026-08-24-research-lexicon-usefulness.md`, recommendation R1) and on the read-only
   adopter probe of `incms/main` taken the same day.
 - rev-1 status 2026-08-24 · KEPT whole in the six-unit build, and the `LANGS` pair-level grammar widening is pulled INTO scope at rev-2. AC2's escape hatch needs that grammar; the only cheap alternative was declaring js dark, which is a 45-offender absorbing move with a green bar.
+
+- rev-2 · 2026-08-25 · folded the spec-set review's B4 and the six-unit ruling. S2 becomes a REPORT:
+  a per-predicate refusal fires on a tree that honestly has no JavaScript classes, and its only
+  reachable discharge was declaring `.js` dark, which deletes 45 real P1 offenders to buy a green
+  bar. §4 carries both measurements. That dissolves B4 rather than answering it — no pair-level
+  `LANGS` grammar is needed, so this unit stays Tier-1 and touches no shared contract. AC1 and AC2
+  are rewritten to assert the COUNT rather than a refusal. The §3 non-goal that pointed at
+  `TOOL-dScaffoldedMirror-3` now stands on its own reason, that unit being WONTDO.
 
 ## 10. Reuse audit
 
