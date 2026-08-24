@@ -24,8 +24,8 @@
 # ADOPTERS DO NOT INHERIT THESE. `adopt-memory-tree.sh` scaffolds this file with its rows and NO
 # ceilings, because a pin measured against this corpus and shipped into a tree that never measured it
 # is either vacuous or permanently red. `kit.toml` carries the declared hole and its discharge probe.
-## The problem this build exists to solve	
-## Expected improvements	
-## Detriments if this is not built	
-## Build-level rules	
-## Parked decisions	
+## The problem this build exists to solve	900
+## Expected improvements	500
+## Detriments if this is not built	500
+## Build-level rules	1800
+## Parked decisions	1800

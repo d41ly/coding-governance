@@ -135,16 +135,35 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
 ' > "$M/project/unarmed-branches.txt"
-# build-readme-slot-limits.txt ships with its ROWS and without gov's VALUES. A ceiling measured
-# against this repo's corpus is a pin the adopter never measured, which is vacuous or permanently red
-# — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists beside
-# it. A row with no value is the ANNOUNCED unarmed state and the leg counts it on every run; a MISSING
-# row is a refusal, so the rows must survive the strip and only the numbers may go.
-if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
-  awk -F'\t' 'BEGIN{OFS="\t"} /^## /{ print $1, ""; next } { print }' \
-    "$HERE/build-readme-slot-limits.txt" > "$HERE/.slot-limits.tmp" \
-    && mv "$HERE/.slot-limits.tmp" "$HERE/build-readme-slot-limits.txt"
-fi
+# build-readme-slot-limits.txt ships with its ROWS and without the origin repo's VALUES. A ceiling
+# measured against one corpus is a pin the adopter never measured, which is vacuous or permanently
+# red — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists
+# beside it. A row with no value is the ANNOUNCED unarmed state; a MISSING row is a refusal, so the
+# rows survive and only the numbers go.
+#
+# GUARDED ON THE KIT LIVING INSIDE $ROOT, and that guard is the whole correction. The first cut wrote
+# to "$HERE" unconditionally — the only write in this script landing outside $ROOT, against the
+# invariant its own header states — so running the scaffolder FROM a governance checkout blanked that
+# checkout's ceilings rather than an adopter's copy. It did exactly that here: five values were lost
+# in a landed commit, and the bar kept printing "slot contract clean" because a blank ceiling is the
+# legal unarmed state. The kit's own self-test re-triggered it on every run.
+#
+# Inside $ROOT the kit IS the adopter's copy and stripping it is the intended install step. Outside
+# $ROOT it is somebody's source tree and must not be touched; that is the same case the KIT_REL
+# branch above already detects and prints about.
+case "$HERE/" in
+  "$ROOT"/*)
+    if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
+      awk -F'\t' 'BEGIN{OFS="\t"} /^## /{ print $1, ""; next } { print }' \
+        "$HERE/build-readme-slot-limits.txt" > "$HERE/.slot-limits.tmp" \
+        && mv "$HERE/.slot-limits.tmp" "$HERE/build-readme-slot-limits.txt"
+    fi
+    ;;
+  *)
+    echo "memory-tree: kit dir is outside \$ROOT — leaving its build-readme-slot-limits.txt alone; \
+copy the kit into the target tree first if you want its ceilings stripped." >&2
+    ;;
+esac
 
 # readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
 # registry is a refusal and an empty one reds the adopter's first run on the FORWARD assertion.

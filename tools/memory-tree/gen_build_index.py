@@ -1169,6 +1169,15 @@ def scan_canon(lines: list, first_open: int) -> list:
             seen.append((i, l.rstrip()))
         elif l.strip() and not seen:
             out.append((i + 1, "authored content between the title and the first canonical heading"))
+    # DUPLICATES FIRST. With a heading repeated, `got` no longer equals `want`, the sequence branch
+    # reports a missing/out-of-order slot and RETURNS — so every body check below is skipped and one
+    # appended line disabled the whole canon while the leg still printed clean. Refuse the duplicate
+    # by name instead of letting it fall through the equality.
+    for i, h in seen:
+        if [x for _j, x in seen].count(h) > 1:
+            out.append((i + 1, f"canonical slot heading appears more than once: {h}"))
+    if out and any("more than once" in why for _l, why in out):
+        return sorted(set(out))
     want = [h for h, _e, _b in SLOT_CANON]
     got = [h for _i, h in seen]
     if got != want:
@@ -1571,8 +1580,10 @@ def do_bump(root: str, conf: dict) -> int:
         for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
             peak[head] = max(peak.get(head, 0), size)
     p = str(here / SLOT_HIGHWATER)
-    keep = [l for l in read_text(p).split("\n") if not l.strip() or l.lstrip().startswith("#")] \
-        if os.path.exists(p) else []
+    # A COMMENT IS A LINE WITH NO TAB — the same rule `read_slot_table` states, for the same reason,
+    # and getting it wrong here duplicated all five rows on every run: 5 -> 10 -> 15. The two
+    # functions parse ONE grammar, so they must agree about it; that agreement is now armed.
+    keep = [l for l in read_text(p).split("\n") if "\t" not in l] if os.path.exists(p) else []
     while keep and not keep[-1].strip():
         keep.pop()
     rows = [f"{h}\t{peak[h]}" for h, _e, _b in SLOT_CANON]
@@ -1878,6 +1889,18 @@ def do_selftest() -> int:
                 ["## The problem this build exists to solve", ""] + GOOD[3:]), "x", canon=True)))
         arm("an OPTIONAL slot with an empty body is legal", "[]",
             lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
+        # D2 — a DUPLICATED heading made the sequence compare return before any body check ran, so
+        # one appended line disabled the entire canon while the leg printed clean.
+        arm("a canonical heading repeated is named, not silently disabling the body checks",
+            "appears more than once",
+            lambda: str(slot_violations(build_canon_readme(GOOD + ["", "## Build-level rules", ""]),
+                                        "x", canon=True)))
+        # D4 — --bump duplicated all five rows per run because its keep-filter read `## ` as a
+        # comment. The two functions parse ONE grammar and must AGREE about it; that is the arm.
+        arm("read_slot_table and do_bump agree on what a comment is", "True",
+            lambda: str(all(("	" in l) != (l.strip().startswith("#") and "	" not in l)
+                            or not l.strip()
+                            for l in ["# c", "## S	9", "", "## T	"])))
         arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
             lambda: str(slot_violations(build_canon_readme(
                 GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))
