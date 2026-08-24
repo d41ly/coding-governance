@@ -46,3 +46,16 @@ memory/backlog/TOOL.md
 # room - 17996 B against a 25600 cap - and the longest line that is NOT the bindings row measures
 # 319 chars against the 350 tier. So nothing is hidden today. Drains when the row shape is revisited.
 memory/builds/dUnstalledConvoy/README.md
+# memory/builds/dFramedEntrypoint/README.md - the SAME generated record-bindings row that earned
+# dUnstalledConvoy its row above, reproduced by the build that exists to remove it. The round-1 spec
+# audit legitimately serves all eight units, so the Records row the renderer emits spells eight ids
+# and measures 357 chars against the 350 tier. The binding grammar expands a contiguous range at
+# authoring time, so no authoring choice shortens it, and narrowing the binding would make the
+# "ids no spec-audit record has ever named" join - one of the two signals this build is protecting -
+# assert something false.
+# BLAST RADIUS, measured before listing: this silences checks 6 and 7 on this file. Check 8's
+# population is the backlog shards alone and never reached this path. Check 6 passes with room today
+# (4589 B against a 25600 cap) and the longest line that is NOT the bindings row measures 264 chars
+# against the 350 tier, so nothing is hidden. DRAINS AT TOOL-dFramedEntrypoint-5, which deletes the
+# Records table outright - this row is a dated debt with a named discharge, not an open-ended waiver.
+memory/builds/dFramedEntrypoint/README.md
