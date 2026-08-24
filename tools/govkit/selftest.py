@@ -1504,7 +1504,7 @@ user_skills = "/tmp/gk-fake-skills"
         # the wrong operator instruction with nothing reporting it, and M1 above is the live proof
         # that "unarmed" and "wrong" arrive together. `refusal_join.py` is the mechanism meant to
         # catch this and its JOIN half has never executed, so these are hand-written.
-        def _desc(subject_line: str, extra: str = "") -> None:
+        def _write_desc(subject_line: str, extra: str = "") -> None:
             kitf.write_text(
                 'id = "demo"\nhome = "tools/demo"\n'
                 'version_from = { none = "fixture" }\n\n'
@@ -1517,27 +1517,27 @@ user_skills = "/tmp/gk-fake-skills"
 
         _write_legs("repo")
         run_in_gov(rg, "selfcheck", "--write")
-        _desc("")                       # the descriptor declares no subject at all
+        _write_desc("")                       # the descriptor declares no subject at all
         _r = run_in(rg)
         check("L1: a descriptor gate leg with NO subject REDS",
               _r.returncode == 1 and "with no `subject`" in _r.stdout, _r.stdout + _r.stderr)
         check("L1: and the refusal points at where the criterion is stated",
               "ask what a FAILURE of this leg MEANS" in _r.stdout, _r.stdout)
 
-        _desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
+        _write_desc('subject = "Kit"\n')      # right word, wrong case: outside the closed set
         _r = run_in(rg)
         check("L1: a descriptor subject outside the closed set kit|repo REDS",
               _r.returncode == 1 and "outside the closed set kit|repo" in _r.stdout,
               _r.stdout + _r.stderr)
 
-        _desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
+        _write_desc('subject = "kit"\n')      # descriptor kit against a manifest that says repo
         _r = run_in(rg)
         check("L1: a descriptor and manifest that DISAGREE about subject RED",
               _r.returncode == 1 and "disagree about whether this leg runs by default" in _r.stdout,
               _r.stdout + _r.stderr)
 
         # ...back to agreement, then the PIN's own two refusals.
-        _desc('subject = "repo"\n')
+        _write_desc('subject = "repo"\n')
         run_in_gov(rg, "selfcheck", "--write")
         check("L1 control: the fixture is GREEN again before the pin arms below",
               run_in(rg).returncode == 0, "")
@@ -1606,22 +1606,22 @@ user_skills = "/tmp/gk-fake-skills"
             _vp = pathlib.Path(_vd)
             check("M6: a target with no run-gates at all still gets the key — there is no canary "
                   "to red, and withholding it would deny the feature silently",
-                  govkit.target_reads_subject(_vp, {"prefix": "tools"}), "")
+                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "")
             (_vp / "tools" / "run-gates").mkdir(parents=True)
             _rgs = _vp / "tools" / "run-gates" / "run-gates.sh"
             _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.0\n",
                             encoding="utf-8", newline="\n")
             check("M6: a target BELOW the floor does not get the key",
-                  not govkit.target_reads_subject(_vp, {"prefix": "tools"}), "1.0 accepted")
+                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.0 accepted")
             _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.1\n",
                             encoding="utf-8", newline="\n")
             check("M6: a target AT the floor does",
-                  govkit.target_reads_subject(_vp, {"prefix": "tools"}), "1.1 refused")
+                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.1 refused")
             _rgs.write_text("#!/usr/bin/env bash\n# no version constant here\n",
                             encoding="utf-8", newline="\n")
             check("M6: an UNREADABLE version is treated as below the floor — the direction that "
                   "costs a feature is recoverable, the one that reds somebody else's bar is not",
-                  not govkit.target_reads_subject(_vp, {"prefix": "tools"}), "unreadable accepted")
+                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "unreadable accepted")
             check("M6: the floor is the version the canary's key set moved in",
                   govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
                   str(govkit.SUBJECT_FLOOR_RUN_GATES))

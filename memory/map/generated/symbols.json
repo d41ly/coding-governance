@@ -498,6 +498,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_target_reads_subject",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "checks",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"

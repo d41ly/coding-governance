@@ -1911,7 +1911,7 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
 SUBJECT_FLOOR_RUN_GATES = (1, 1)
 
 
-def target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
+def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
     """Can this target's installed run-gates parse a `subject` key without redding its own canary?
 
     Read from the TARGET, never assumed and never taken from gov's own tree: the question is what
@@ -2714,7 +2714,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                 # which is the deployer breaking a target's gate while installing something else.
                 # The floor is read from the TARGET's installed runner, not assumed.
                 row = {"name": nm, "argv": argv}
-                if target_reads_subject(target, deploy):
+                if check_target_reads_subject(target, deploy):
                     row["subject"] = leg.get("subject") or "repo"
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
