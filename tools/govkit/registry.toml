@@ -220,6 +220,10 @@ path = "tools/govkit"
 why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
 
 [[exempt]]
+path = ".githooks/gate-env.sh"
+why = "THIS repository's gate policy, deliberately not shipped. `.githooks/pre-push` travels to every push-main adopter, so a choice written into it is a choice they inherit; this file is the choice, and no kit claims it. Selfcheck ASSERTS that property rather than trusting this row — TOOL-dUnstalledConvoy-28"
+
+[[exempt]]
 path = ".githooks/pre-commit.test.sh"
 why = "gov's own red/green self-test of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file."
 

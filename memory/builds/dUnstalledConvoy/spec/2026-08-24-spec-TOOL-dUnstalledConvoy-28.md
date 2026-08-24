@@ -1,6 +1,6 @@
 # TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
 ## 1. Goal
 

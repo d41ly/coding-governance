@@ -128,6 +128,14 @@ fi
 # later needs no code.
 GATE_FULL_MAX_LAG=10
 
+# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
+# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
+# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
+# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
+_gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
+# shellcheck source=/dev/null
+[ -f "$_gate_env" ] && . "$_gate_env"
+
 gd=$(git rev-parse --git-dir 2>/dev/null)
 kitfp="$(git rev-parse --show-toplevel)/tools/run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"

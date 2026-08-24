@@ -1347,6 +1347,52 @@ user_skills = "/tmp/gk-fake-skills"
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
+        # ---- A REPO-LOCAL GATE POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD ------------------------
+        # TOOL-dUnstalledConvoy-28. `.githooks/pre-push` ships verbatim to every push-main adopter,
+        # so a GATE_SELFTESTS assignment written into it turns the kit self-tests back on for
+        # exactly the repositories TOOL-dUnstalledConvoy-26 exists to spare. The mechanism that
+        # READS the choice may travel; the file that MAKES it may not. Armed on a fixture rather
+        # than on this tree alone, because gating the instance certifies coverage nobody has.
+        pg = scratch_gov("true", "tools/demo/", tag="-policy")
+        # `tools/demo/` is claimed by an `include = "**"` engine rule, so anything dropped in it is
+        # payload. That is the case a claims-only derivation missed: 13 of 58 file rules in gov's
+        # own tree declare `claims` at all.
+        (pg / "tools" / "demo" / "policy.sh").write_text(
+            "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "policy in the payload")
+        _pol = run_in(pg)
+        check("AC2: a bare GATE_SELFTESTS assignment inside a kit's payload REDS",
+              _pol.returncode == 1 and "carries a bare GATE_SELFTESTS assignment AND is shipped"
+              in _pol.stdout, _pol.stdout + _pol.stderr)
+        check("AC2: and the refusal names the file and the kit that would ship it",
+              "'tools/demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
+
+        # ITS CONTROL, and it is the arm that stops this being a ban on the variable. The same line
+        # in a path no kit claims is the SANCTIONED shape — that is where gov keeps its own — and a
+        # check that redded on it would have no place left to put the policy.
+        (pg / "tools" / "demo" / "policy.sh").unlink()
+        (pg / ".githooks").mkdir(parents=True, exist_ok=True)
+        (pg / ".githooks" / "gate-env.sh").write_text(
+            "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "policy outside the payload")
+        _ok = run_in(pg)
+        check("CONTROL: the same assignment in a path no kit ships is GREEN",
+              _ok.returncode == 0, _ok.stdout + _ok.stderr)
+
+        # An INVOCATION is not a policy. `GATE_SELFTESTS=1 bash ...` appears in docs, arms and
+        # refusal strings all over gov's tree — 54 such lines when the predicate was run over it —
+        # and a check that called those policies would be permanently red on its own source.
+        (pg / "tools" / "demo" / "invoke.sh").write_text(
+            "#!/usr/bin/env sh\nGATE_SELFTESTS=1 bash run-gates.sh\n",
+            encoding="utf-8", newline="\n")
+        git(pg, "add", "-A")
+        git(pg, "commit", "-qm", "an invocation, not a policy")
+        _inv = run_in(pg)
+        check("an INVOCATION inside the payload is not a policy and stays GREEN",
+              _inv.returncode == 0, _inv.stdout + _inv.stderr)
+
         # ---- THE SUBJECT RATCHET (TOOL-dUnstalledConvoy-29) --------------------------------------
         # A leg's subject decides whether it runs on every bar or waits for GATE_SELFTESTS=1, and no
         # predicate over a descriptor can decide whether a given value is RIGHT — that needs to know

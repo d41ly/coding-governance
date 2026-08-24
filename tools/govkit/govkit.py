@@ -1005,6 +1005,63 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.note(f"subject pins: {len(pinned)} pinned · "
                    f"{sum(1 for v in live.values() if v == 'kit')} held")
 
+    # ---- 7h3: A REPO-LOCAL POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD. TOOL-dUnstalledConvoy-28.
+    #
+    # `.githooks/pre-push` ships VERBATIM to every push-main adopter, so a `GATE_SELFTESTS`
+    # assignment written into it is a choice every adopter inherits without making it — and it would
+    # turn the kit self-tests back on for exactly the repositories TOOL-dUnstalledConvoy-26 exists to
+    # spare, at exactly the boundary it was measured for. The mechanism may travel; the choice may
+    # not. This is the assertion that keeps that true after everyone has forgotten why it was chosen.
+    #
+    # WHAT IT DOES NOT CHECK: whether the policy is the RIGHT one, or whether the file that carries
+    # it is wired to anything. It answers one question — is a file that DECIDES this also a file a
+    # kit COPIES — and the shipped set is derived through the same descriptors `apply` writes from,
+    # never listed, because a second list of what a kit ships is the two-spellings class this build
+    # has already paid for twice.
+    #
+    # THE PREDICATE IS A BARE ASSIGNMENT, deliberately: `GATE_SELFTESTS=1 bash ...` is an INVOCATION
+    # and appears in docs, arms and refusal strings all over this tree, while a line that is nothing
+    # but the assignment is a policy. Run over the tracked tree before wiring: 0 hits and 54
+    # near-misses, none of them a policy. Records under the memory root are excluded — a decision
+    # log quoting a policy line is not executing one.
+    policy_re = re.compile(r"^[ \t]*(?:export[ \t]+)?GATE_SELFTESTS=\S*[ \t]*$")
+    # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
+    # rules in this tree, so deriving from that key alone would have quantified over a third of the
+    # payload and reported a confident zero over the rest — the could-not-fail shape, arriving as an
+    # under-derived population rather than as a wrong predicate. `**` is expanded against the
+    # entry's home exactly as check 7i expands it.
+    _all_tracked = tracked(root)
+    shipped_owner: dict[str, str] = {}
+    for eid, (d, _dpath) in descs.items():
+        _home = (d.get("home") or "").rstrip("/")
+        for rule in d.get("files", []):
+            _inc = rule.get("include")
+            _srcs = _inc if isinstance(_inc, list) else ([_inc] if _inc else [])
+            if any(s == "**" for s in _srcs) and _home:
+                _paths = [f for f in _all_tracked if f.startswith(_home + "/")]
+            else:
+                _paths = rule_sources(d, rule)
+            for _c in list(_paths) + [str(c) for c in (rule.get("claims") or [])]:
+                shipped_owner.setdefault(_c, eid)
+    policy_files = []
+    for f in _all_tracked:
+        if not f or f.startswith("memory/") or f.endswith(".md"):
+            continue
+        try:
+            txt = (root / f).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if any(policy_re.match(ln) for ln in txt.split("\n")):
+            policy_files.append(f)
+    for f in sorted(set(policy_files) & set(shipped_owner)):
+        owner = shipped_owner[f]
+        r.fail(f"'{f}' carries a bare GATE_SELFTESTS assignment AND is shipped by kit '{owner}' — "
+               f"a repo-local gate policy written into a file a kit copies is a policy every adopter "
+               f"inherits without choosing it. Move the assignment to a path no kit claims; the "
+               f"mechanism that reads it may travel, the choice may not")
+    r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
+           f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
+
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
     #          that home would red on every tracked file under it — hundreds — rather than on the one
