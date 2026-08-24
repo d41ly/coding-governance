@@ -34,16 +34,16 @@ research record disagree, the verification wins.
 ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | CLOSED | rev-6 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | SPECCED | rev-5 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | SPECCED | rev-5 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier](spec/2026-08-24-spec-dFramedEntrypoint-4.md) | SPECCED | rev-5 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | SPECCED | rev-5 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | SPECCED | rev-4 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | SPECCED | rev-3 | 2026-08-24 |
-| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | CLOSED | rev-5 | 2026-08-24 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true](spec/2026-08-24-spec-dFramedEntrypoint-8.md) | 1 | 1 | CLOSED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon](spec/2026-08-24-spec-dFramedEntrypoint-1.md) | 2 | 2 | CLOSED | rev-6 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier](spec/2026-08-24-spec-dFramedEntrypoint-4.md) | 3 | 2 | CLOSED | rev-7 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-2 — per-slot budgets: a hard declared ceiling and an advisory high-water](spec/2026-08-24-spec-dFramedEntrypoint-2.md) | 4 | 2 | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds](spec/2026-08-24-spec-dFramedEntrypoint-3.md) | 5 | 2 | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README](spec/2026-08-24-spec-dFramedEntrypoint-5.md) | 6 | 2 | SPECCED | rev-5 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves](spec/2026-08-24-spec-dFramedEntrypoint-6.md) | 7 | 2 | SPECCED | rev-4 | 2026-08-24 |
+| [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | 8 | 2 | SPECCED | rev-3 | 2026-08-24 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.
@@ -57,6 +57,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md) | research | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md) | journal | TOOL-dFramedEntrypoint-1 |
+| [2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md) | journal | TOOL-dFramedEntrypoint-4 |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md) | journal | TOOL-dFramedEntrypoint-8 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md) | spec-audit | TOOL-dFramedEntrypoint-1 |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |
@@ -65,7 +66,16 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dFramedEntrypoint-8` | no |
+| 2 | `TOOL-dFramedEntrypoint-1` | no |
+| 3 | `TOOL-dFramedEntrypoint-4` | no |
+| 4 | `TOOL-dFramedEntrypoint-2` | no |
+| 5 | `TOOL-dFramedEntrypoint-3` | no |
+| 6 | `TOOL-dFramedEntrypoint-5` | no |
+| 7 | `TOOL-dFramedEntrypoint-6` | no |
+| 8 | `TOOL-dFramedEntrypoint-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
@@ -92,6 +102,7 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md)
+  - [2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md)
   - [2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md](build/2026-08-24-build-TOOL-dFramedEntrypoint-8-acceptance.md)
 - **`reviews/`**
   - [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md)

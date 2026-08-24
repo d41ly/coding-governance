@@ -90,9 +90,9 @@ every spec in this folder — do not hand-edit it.
 ids TOOL-cSteadyMetronome-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | CLOSED | rev-4 | 2026-08-14 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cSteadyMetronome-1 — concurrency proved by rendezvous, not by elapsed time](spec/2026-08-14-spec-cSteadyMetronome-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-14 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

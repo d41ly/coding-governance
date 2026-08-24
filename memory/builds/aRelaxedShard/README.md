@@ -151,10 +151,10 @@ The table below is GENERATED from the status header of every spec in this folder
 ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxedShard-4
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | CLOSED | rev-8 | 2026-08-17 |
-| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | CLOSED | rev-4 | 2026-08-18 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aRelaxedShard-1 — the row class becomes declared byte bounds](spec/2026-08-17-spec-TOOL-aRelaxedShard-1.md) | — | 2 | CLOSED | rev-8 | 2026-08-17 |
+| [TOOL-aRelaxedShard-4 — the backlog's slope, not its ceiling](spec/2026-08-18-spec-TOOL-aRelaxedShard-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-18 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

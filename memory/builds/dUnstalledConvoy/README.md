@@ -233,32 +233,32 @@ ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 T
 ids TOOL-dUnstalledConvoy-37 TOOL-dUnstalledConvoy-38
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | CLOSED | rev-2 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | CLOSED | rev-6 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | CLOSED | rev-3 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | CLOSED | rev-5 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | CLOSED | rev-5 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | CLOSED | rev-3 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | CLOSED | rev-2 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-33 — a roster that grew before anybody recorded it can be recorded, because refusing is how a run gets wedged](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md) | CLOSED | rev-2 | 2026-08-24 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | — | 2 | CLOSED | rev-6 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | — | 2 | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | — | 2 | WONTDO | rev-2 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | — | 2 | CLOSED | rev-3 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | — | 2 | CLOSED | rev-2 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-33 — a roster that grew before anybody recorded it can be recorded, because refusing is how a run gets wedged](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md) | — | 2 | CLOSED | rev-2 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | — | 2 | CLOSED | rev-3 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | — | 2 | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

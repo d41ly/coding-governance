@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aRuledParchment-1 TOOL-aRuledParchment-2
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aRuledParchment-1 — Port the spec-format discipline into the memory-tree kit](spec/2026-07-15-spec-aRuledParchment-1.md) | CLOSED | rev-1 | 2026-07-15 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aRuledParchment-1 — Port the spec-format discipline into the memory-tree kit](spec/2026-07-15-spec-aRuledParchment-1.md) | — | 1 | CLOSED | rev-1 | 2026-07-15 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `build/`.

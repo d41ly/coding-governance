@@ -51,9 +51,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aNumeralWarden-1 TOOL-aNumeralWarden-2 TOOL-aNumeralWarden-3 TOOL-aNumeralWarden-4
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to](spec/2026-08-10-spec-aNumeralWarden-1.md) | CLOSED | rev-6 | 2026-08-10 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aNumeralWarden-1 — agent-cap enforces the verifier number, and reaches the modality it was blind to](spec/2026-08-10-spec-aNumeralWarden-1.md) | — | 2 | CLOSED | rev-6 | 2026-08-10 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

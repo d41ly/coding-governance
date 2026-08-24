@@ -72,11 +72,11 @@ hand-edit it.
 ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7 TOOL-aWalkedCorpus-8 TOOL-aWalkedCorpus-9 TOOL-aWalkedCorpus-10
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | DEFERRED | rev-2 | 2026-08-16 |
-| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | CLOSED | rev-5 | 2026-08-17 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aWalkedCorpus-1 — the two corpus enumerators become one](spec/2026-08-16-spec-TOOL-aWalkedCorpus-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-2 — the corpus gets something that grades it](spec/2026-08-16-spec-TOOL-aWalkedCorpus-2.md) | — | 2 | DEFERRED | rev-2 | 2026-08-16 |
+| [TOOL-aWalkedCorpus-3 — the recall floor, built against the harness that exists](spec/2026-08-17-spec-TOOL-aWalkedCorpus-3.md) | — | 2 | CLOSED | rev-5 | 2026-08-17 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

@@ -148,15 +148,15 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-2 TOOL-aUnmannedHelm-3 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 TOOL-aUnmannedHelm-10
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | CLOSED | rev-5 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-4 — the protocol document, and the authorization it rests on](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md) | CLOSED | rev-3 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | CLOSED | rev-4 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | CLOSED | rev-4 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | CLOSED | rev-3 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | CLOSED | rev-3 | 2026-08-10 |
-| [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | CLOSED | rev-3 | 2026-08-10 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aUnmannedHelm-1 — the run-state file, and the hygiene contract that admits it](spec/2026-08-10-spec-aUnmannedHelm-1.md) | — | 2 | CLOSED | rev-5 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-4 — the protocol document, and the authorization it rests on](spec/2026-08-10-spec-aUnmannedHelm-4-u2-protocol.md) | — | 2 | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-5 — the driver, and the four verbs it is allowed to have](spec/2026-08-10-spec-aUnmannedHelm-5-u3-driver.md) | — | 2 | CLOSED | rev-4 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-6 — the gate, and the three legs that carry it](spec/2026-08-10-spec-aUnmannedHelm-6-u4-gate.md) | — | 2 | CLOSED | rev-4 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-7 — the rendered skill, and the two ways it goes stale](spec/2026-08-10-spec-aUnmannedHelm-7-u5-skill.md) | — | 2 | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-8 — the kickoff hand-back, and the five exits it does NOT buy](spec/2026-08-10-spec-aUnmannedHelm-8-u6-handback.md) | — | 2 | CLOSED | rev-3 | 2026-08-10 |
+| [TOOL-aUnmannedHelm-9 — the adopter path, and the version marker that announces it](spec/2026-08-10-spec-aUnmannedHelm-9-u7-adopter.md) | — | 2 | CLOSED | rev-3 | 2026-08-10 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

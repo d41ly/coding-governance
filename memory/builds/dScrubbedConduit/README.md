@@ -18,9 +18,9 @@ suspicion, and four of the five are invisible in this repo because gov's own lay
 ids TOOL-dScrubbedConduit-1 TOOL-dScrubbedConduit-2 TOOL-dScrubbedConduit-3
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them](spec/2026-08-23-spec-dScrubbedConduit-1.md) | CLOSED | rev-3 | 2026-08-23 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dScrubbedConduit-1 — five kit defects an adopter found by hitting them](spec/2026-08-23-spec-dScrubbedConduit-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-23 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

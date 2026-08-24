@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-5 — the document inventory and the records table leave the build README
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 6 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

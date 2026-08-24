@@ -84,10 +84,10 @@ there and repairs the leak that keeps refilling it.
 ids TOOL-aTetheredScratch-1 TOOL-aTetheredScratch-2 TOOL-aTetheredScratch-3 TOOL-aTetheredScratch-4
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aTetheredScratch-1 — a PreToolUse guard that denies a home-directory write outside the sanctioned scratch roots](spec/2026-08-20-spec-TOOL-aTetheredScratch-1.md) | INPROGRESS | rev-2 | 2026-08-20 |
-| [TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding](spec/2026-08-20-spec-TOOL-aTetheredScratch-2.md) | INPROGRESS | rev-3 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aTetheredScratch-1 — a PreToolUse guard that denies a home-directory write outside the sanctioned scratch roots](spec/2026-08-20-spec-TOOL-aTetheredScratch-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-08-20 |
+| [TOOL-aTetheredScratch-2 — sweep the litter, and stop the leak that is 71% of the crowding](spec/2026-08-20-spec-TOOL-aTetheredScratch-2.md) | — | 2 | INPROGRESS | rev-3 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

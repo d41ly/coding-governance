@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-8 — the superseding decision, and the three records that assert what is not true
 
-**Status:** CLOSED · rev-5 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · order 1 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

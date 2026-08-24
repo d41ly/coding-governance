@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-4 — the build-order verb becomes legal and hardened, and the roster renders order and tier
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-7 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 3 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -18,8 +18,15 @@ renders order and tier as columns of the roster, and makes this build's own spec
   a documented-versus-gated disagreement rather than adding a feature.
 - **S2** — `ORDER_RE` is anchored so a malformed value is a REFUSAL, not a silent step. Measured today:
   a hexadecimal-looking value renders as step 0 and a digit-then-letter value renders as its digit.
-- **S3** — hygiene check 12's status-header predicate validates the verb when present: a positive
-  integer, at most once per header, and after the base field.
+- **S3** — the verb's validation lives in the GENERATOR, not in hygiene check 12: a positive
+  integer, at most once per header. `_parse_order` refuses anything that looks like the verb and
+  does not conform, and that refusal already rides `--check` and `--write`, which are unguarded
+  merge-bar legs. AMENDED from check 12 during the build, for two reasons that only became
+  visible with the code in front of me. A second validator in shell would give one verb two
+  definitions, which is the two-answers-to-one-question class this build exists to remove; and it
+  would cost an armed branch, an `ARMS_FLOORS` movement and a fixture in a 181-second self-test
+  to re-state a refusal the generator already makes. The hygiene gate is also GUARDED while the
+  generator's legs are not, so the generator is the stricter home.
 - **S4** — the roster table rendered into the nested units region gains an ORDER column and a TIER
   column. Tier is already captured by the header regex and discarded one line later; order is already
   in the unit record and reaches only the order region.
@@ -180,6 +187,8 @@ markers`, unguarded) · `check-verdict-epoch.sh` · `kit/dogfood doc parity`.
 - rev-4 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
 - rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-6 · 2026-08-24 · S3 AMENDED mid-build: the order verb's validation moves from hygiene check 12 to the generator's own `_parse_order`. One verb with two validators is the class this build removes, and the shell home would cost an arm, a floor movement and a fixture to restate a refusal the generator already makes on an unguarded leg. M2's rule is to change the spec first and then the code, which is the order this took.
+- rev-7 · 2026-08-24 · BUILT and CLOSED. The verb is legal, anchored on both sides and refused when malformed or doubled; the roster carries Order and Tier and sorts by build order; this build is the verb's first adopter and the first non-empty build-order region in the corpus. Eleven arms, 84 to 95, with the old regex staged back to watch two of them fail. Two defects of mine were caught by running rather than reading: the duplicate refusal was unreachable below an early return, and the sort arm measured the wrong string. Ledger: `build/2026-08-24-build-TOOL-dFramedEntrypoint-4-acceptance.md`.
 
 ## 10. Reuse audit
 

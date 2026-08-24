@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aGuardedTally-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `reviews/` and `prompts/`.

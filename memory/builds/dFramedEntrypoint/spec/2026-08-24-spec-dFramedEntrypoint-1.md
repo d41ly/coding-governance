@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-1 — the build README's authored half becomes a closed heading canon
 
-**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 2 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

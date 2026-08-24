@@ -278,14 +278,14 @@ it.
 ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | CLOSED | rev-7 | 2026-08-17 |
-| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | — | 1 | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | — | 1 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | — | 1 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | — | 2 | CLOSED | rev-5 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | — | 2 | CLOSED | rev-7 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-17 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

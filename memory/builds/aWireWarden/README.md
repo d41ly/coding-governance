@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aWireWarden-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aWireWarden-1 — Wiring-health check + SessionStart nudge for per-clone tool wiring](spec/2026-07-15-spec-aWireWarden-1.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aWireWarden-1 — Wiring-health check + SessionStart nudge for per-clone tool wiring](spec/2026-07-15-spec-aWireWarden-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`.

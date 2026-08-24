@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.31 -->
+<!-- gov:kit memory-tree@2.32 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -56,7 +56,15 @@ retroactively red — and which means every spec written from that date onward m
 - `base` is the immutable default-branch sha (8+ hex chars) the design was grounded against.
 - `streams` names the discipline(s) this spec served, `+`-joined, each one a legal `DISCIPLINES`
   value. See the cutoff section above for when it becomes mandatory.
-- The tail holds POINTERS only — a review workflow id, `ratified <date>` — never prose.
+- The tail holds POINTERS and DECLARED VERBS only — a review workflow id, `ratified <date>`,
+  `order <n>` — never prose.
+- `order <n>` is the BUILD-ORDER verb: a positive integer, at most once, declaring this unit's step
+  within its build. Units sharing a value are the parallel group; gaps are permitted, because a gap
+  is how a retired unit leaves an order without renumbering the rest. It is PERMITTED, never
+  required, so no landed spec goes retroactively red — and a malformed value is a REFUSAL rather
+  than a silent misread: the generator anchors the verb on both sides and raises on anything that
+  looks like it and does not conform. The build README's roster and its build-order region are both
+  DERIVED from this field, which is why the order belongs on the spec and not in README prose.
 - Fleet inventory (merged state only — unpushed specs on other nodes are invisible):
   `git grep -lE '^\*\*Status:\*\* (SPECCED|INPROGRESS)' -- '<MEMORY_ROOT>/builds/*/spec/'` lists
   every open spec; swap the token set to taste.

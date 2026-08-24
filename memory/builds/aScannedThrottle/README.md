@@ -42,9 +42,9 @@ recommendation against an existing backlog id or a new one; landing any of them 
 ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8 TOOL-aScannedThrottle-9 TOOL-aScannedThrottle-10 TOOL-aScannedThrottle-11
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | CLOSED | rev-3 | 2026-08-21 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | — | 1 | CLOSED | rev-3 | 2026-08-21 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

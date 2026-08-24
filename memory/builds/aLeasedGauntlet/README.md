@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aLeasedGauntlet-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | CLOSED | rev-4 | 2026-07-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aLeasedGauntlet-1 — port reconcile-before-gate into the kit](spec/2026-07-20-spec-aLeasedGauntlet-1.md) | — | 2 | CLOSED | rev-4 | 2026-07-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/` and `reviews/`.

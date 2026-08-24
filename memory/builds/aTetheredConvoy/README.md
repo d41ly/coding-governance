@@ -91,15 +91,15 @@ from the status header of every spec in this folder — do not hand-edit it.
 ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 DEPL-aTetheredConvoy-8 DEPL-aTetheredConvoy-9 TOOL-aTetheredConvoy-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | CLOSED | rev-6 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | CLOSED | rev-4 | 2026-08-20 |
-| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-aTetheredConvoy-1 — the truthful core: roles, the receipt, and one expansion](spec/2026-08-16-spec-DEPL-aTetheredConvoy-1.md) | — | 2 | CLOSED | rev-6 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-2 — update, the verb that moves an install forward](spec/2026-08-16-spec-DEPL-aTetheredConvoy-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-3 — the convergence ratchet: nothing new ships un-deployable](spec/2026-08-16-spec-DEPL-aTetheredConvoy-3.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-4 — the gate-runner declaration, end to end](spec/2026-08-16-spec-DEPL-aTetheredConvoy-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-5 — check stops printing states and starts carrying evidence](spec/2026-08-16-spec-DEPL-aTetheredConvoy-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-6 — the merged role, the attributes block, and the renormalize](spec/2026-08-16-spec-DEPL-aTetheredConvoy-6.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [DEPL-aTetheredConvoy-7 — the acceptance matrix, the refusal join, and the runbook parity gate](spec/2026-08-16-spec-DEPL-aTetheredConvoy-7.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

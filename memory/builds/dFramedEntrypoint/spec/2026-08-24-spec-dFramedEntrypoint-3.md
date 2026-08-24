@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 5 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

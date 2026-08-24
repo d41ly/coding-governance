@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aBatchedLintel-1 TOOL-aBatchedLintel-2
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBatchedLintel-1 — memory-tree kit: collapse checks 12 and 7 to one awk each](spec/2026-08-03-spec-aBatchedLintel-1.md) | INPROGRESS | rev-3 | 2026-08-03 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBatchedLintel-1 — memory-tree kit: collapse checks 12 and 7 to one awk each](spec/2026-08-03-spec-aBatchedLintel-1.md) | — | 2 | INPROGRESS | rev-3 | 2026-08-03 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

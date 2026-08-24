@@ -22,9 +22,9 @@ the reflexive re-run passed, so the evidence was gone for good.
 ids TOOL-dNomadicAtlas-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | CLOSED | rev-1 | 2026-08-11 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dNomadicAtlas-1 — a red leg leaves its reason on disk](spec/2026-08-11-spec-dNomadicAtlas-1-run-gates-evidence.md) | — | 2 | CLOSED | rev-1 | 2026-08-11 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`.

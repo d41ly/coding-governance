@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 8 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

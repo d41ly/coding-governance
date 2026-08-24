@@ -19,9 +19,9 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aQuarriedLantern-1 TOOL-aQuarriedLantern-2 TOOL-aQuarriedLantern-3
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aQuarriedLantern-1 — memory-recall: the retrieval CLI as a project-agnostic kit](spec/2026-08-03-spec-aQuarriedLantern-1.md) | INPROGRESS | rev-2 | 2026-08-03 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aQuarriedLantern-1 — memory-recall: the retrieval CLI as a project-agnostic kit](spec/2026-08-03-spec-aQuarriedLantern-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-08-03 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

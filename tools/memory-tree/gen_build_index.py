@@ -146,7 +146,15 @@ H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
 # the parallel group; the owner resolved against a second `group` verb, which would have needed its
 # own contradiction refusals to render an identical region.
-ORDER_RE = re.compile(r"·\s*order\s+(\d+)(?![0-9])")
+# TOOL-dFramedEntrypoint-4 S2 — ANCHORED on both sides. The shipped form ended `(?![0-9])`, which
+# rejects a longer number and nothing else: `order 0x2` matched `0` and rendered as step 0, and
+# `order 2x` matched `2` and rendered as step 2 — both probed on the shipped regex before this change.
+# A malformed value must be a REFUSAL rather than a plausible step, so the trailing context is now a
+# field separator or end-of-header, and `parse_spec` raises on a value that looks like the verb but
+# does not conform. That refusal is what makes the verb safe to require later; a silent misread is
+# the shape TOOL-aRuledFrontispiece-2's §4 specified and never shipped.
+ORDER_RE = re.compile(r"·\s*order\s+(\d+)\s*(?=·|$)")
+ORDER_LOOSE_RE = re.compile(r"·\s*order\s+(\S+)")
 SHARD_RE = re.compile(r"^\d{4}-\d{2}\.md$")
 REQUIRED_KEYS = ("slug", "node", "opened", "streams", "roster", "ids")
 
@@ -290,6 +298,29 @@ def parse_front_matter(path: str, slug: str) -> dict:
     return fm
 
 
+def _parse_order(header: str, path: str):
+    """The build-order verb, or None. A value that LOOKS like the verb but does not conform REFUSES.
+
+    Dropping a malformed value silently would be worse than the misread it replaces: the unit would
+    simply render as unordered, and an author who typed a bad value would see a plausible build order
+    with their unit missing from it.
+    """
+    # ORDER MATTERS HERE, and the first draft got it wrong: the duplicate check sat BELOW the
+    # early return, so a header whose FIRST occurrence was well-formed never reached it. The refusal
+    # existed, read correctly, and was unreachable. Caught by running it rather than by reading it.
+    if len(ORDER_LOOSE_RE.findall(header)) > 1:
+        raise Problem(f"{path}: status header carries the `order` verb more than once, so which step "
+                      f"this unit occupies has two answers")
+    ok = ORDER_RE.search(header)
+    if ok:
+        return int(ok.group(1))
+    loose = ORDER_LOOSE_RE.search(header)
+    if loose:
+        raise Problem(f"{path}: status header carries `order {loose.group(1)}`, which is not a "
+                      f"positive integer followed by a field separator or the end of the header")
+    return None
+
+
 def parse_spec(path: str) -> dict | None:
     """Return the unit record, or None when the file carries no parseable status header.
 
@@ -320,7 +351,11 @@ def parse_spec(path: str) -> dict | None:
         "date": hdr.group("date"),
         # PERMITTED, never required (fork 5). HDR_RE has no end anchor, so a header carrying this
         # verb parses identically with or without it and no landed spec goes retroactively red.
-        "order": (lambda mo: int(mo.group(1)) if mo else None)(ORDER_RE.search(hdr.string)),
+        "order": _parse_order(hdr.string, path),
+        # Tier was captured by HDR_RE and discarded here, one line after the match. The roster now
+        # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
+        # unit row always has a value and only the ORDER cell can be empty.
+        "tier": hdr.group("tier"),
     }
 
 
@@ -677,11 +712,21 @@ def render_region(build: dict) -> str:
     # now has an ADDRESS a reader can name instead of a shape it has to guess.
     out.append(UNITS_OPEN)
     if build["units"]:
-        out += ["| Unit | Status | Rev | Last change |", "|---|---|---|---|"]
-        for u in sorted(build["units"], key=lambda x: x["path"]):
+        # TOOL-dFramedEntrypoint-4 S4/S5 — ORDER and TIER join the roster, and the sort key becomes
+        # the BUILD order rather than the path. Both values were already parsed and thrown away: tier
+        # was a named group of HDR_RE discarded one line after the match, and order reached only the
+        # order region. The LINK CELL STAYS FIRST and STATUS STAYS A WHOLE |-DELIMITED CELL, because
+        # the unattended driver selects unit rows by `^| \[.*\]\(spec/` and terminal units by
+        # `| (CLOSED|WONTDO) |`; inserting columns between them is safe, moving either is not.
+        # Only ORDER can be empty — tier is mandatory in the header regex, so a row that exists has one.
+        out += ["| Unit | Order | Tier | Status | Rev | Last change |", "|---|---|---|---|---|---|"]
+        for u in sorted(build["units"], key=lambda x: (x.get("order") is None, x.get("order") or 0,
+                                                       x["id"])):
             rel = u["path"].split(f"/builds/{build['slug']}/", 1)[1]
             label = f"{u['id']} — {u['title']}" if u["title"] else u["id"]
-            out.append(f"| [{label}]({rel}) | {u['status']} | rev-{u['rev']} | {u['date']} |")
+            order = str(u["order"]) if u.get("order") is not None else "—"
+            out.append(f"| [{label}]({rel}) | {order} | {u.get('tier', '—')} | {u['status']} | "
+                       f"rev-{u['rev']} | {u['date']} |")
     else:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
@@ -1733,6 +1778,51 @@ def do_selftest() -> int:
         arm("a registry row binds its path and comments are skipped",
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
+
+        # ------------------------------------------------ TOOL-dFramedEntrypoint-4, the order verb
+        # The shipped regex ended `(?![0-9])`, which rejects a longer NUMBER and nothing else. Both
+        # of these were PROBED against it before the change and both rendered a plausible step.
+        arm("a hex-looking order value is refused, not read as 0", "not a positive integer",
+            lambda: _parse_order("x · order 0x2 · y", "f.md"))
+        arm("a digit-then-letter order value is refused, not read as its digit",
+            "not a positive integer",
+            lambda: _parse_order("x · order 2x · y", "f.md"))
+        arm("a well-formed order value still parses", "3",
+            lambda: str(_parse_order("x · base ab · order 3 · streams s", "f.md")))
+        arm("an order value at the end of the header parses", "7",
+            lambda: str(_parse_order("x · base ab · order 7", "f.md")))
+        arm("an absent order verb is None, not an error", "None",
+            lambda: str(_parse_order("x · base ab · streams s", "f.md")))
+        # The duplicate refusal sat BELOW the early return in the first draft, so a header whose
+        # first occurrence was well-formed never reached it: present, correct, and unreachable.
+        arm("the order verb twice in one header is refused", "more than once",
+            lambda: _parse_order("x · order 2 · order 3 · y", "f.md"))
+
+        # S4/S5 — the roster carries ORDER and TIER, sorts by build order, and keeps the two cells
+        # the unattended driver selects on: the link FIRST and the status as a whole |-delimited cell.
+        t17 = os.path.join(base, "roster"); os.makedirs(t17)
+        conf17 = _fixture(t17, spec_status="OPEN")
+        sp17 = os.path.join(t17, "memory", "builds", "tOne", "spec")
+        write_text(os.path.join(sp17, "2026-01-02-spec-tOne-2.md"),
+                   "# ARCH-tOne-2 — second\n\n**Status:** OPEN · rev-1 · 2026-01-02 · node t · "
+                   "Tier-1 · base abcdef12 · order 1\n")
+        run("git", "add", "-A", cwd=t17)
+        run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t17)
+        reg17 = plan(t17, conf17)[0]["memory/builds/tOne/README.md"]
+        arm("the roster header carries Order and Tier", "| Unit | Order | Tier | Status |",
+            lambda: reg17)
+        # SCOPED TO THE ROWS. The first spelling compared `reg17.index(...)` over the whole region
+        # and read False on a correct sort, because both ids appear earlier in the `ids` roster line
+        # than in the table. An arm that measures the wrong string fails honestly and proves nothing.
+        _rows17 = [l for l in reg17.splitlines() if l.startswith("| [")]
+        arm("an ordered unit sorts ahead of an unordered one", "True",
+            lambda: str(_rows17[0].startswith("| [ARCH-tOne-2") and
+                        _rows17[1].startswith("| [ARCH-tOne-1")))
+        arm("a unit with no order verb renders an em-dash in that cell", "| — |", lambda: reg17)
+        arm("the tier cell always renders a value", "| 1 | OPEN |", lambda: reg17)
+        arm("the link cell stays FIRST, which the driver selects on", "True",
+            lambda: str(all(l.startswith("| [") for l in reg17.split("\n")
+                            if l.startswith("| [") or " — second](" in l)))
 
         # S11 — the document inventory NAMES a record. This arm exists because the first cut bucketed
         # each record by its own filename rather than by its kind folder, so no kind ever matched and

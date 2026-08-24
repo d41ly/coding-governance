@@ -116,14 +116,14 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
 ids PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 PLAY-aPrunedCeremony-5 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-aPrunedCeremony-1 — the full merge bar runs once, at the push boundary](spec/2026-07-19-spec-PLAY-aPrunedCeremony-1.md) | CLOSED | rev-2 | 2026-07-19 |
-| [PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse](spec/2026-07-19-spec-PLAY-aPrunedCeremony-2.md) | CLOSED | rev-2 | 2026-07-19 |
-| [PLAY-aPrunedCeremony-3 — recurring bug class: a ratchet that never exercises its target is vacuous](spec/2026-07-19-spec-PLAY-aPrunedCeremony-3.md) | CLOSED | rev-2 | 2026-07-19 |
-| [PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`](spec/2026-07-19-spec-PLAY-aPrunedCeremony-4.md) | CLOSED | rev-4 | 2026-07-19 |
-| [TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md) | CLOSED | rev-4 | 2026-07-19 |
-| [TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md) | CLOSED | rev-3 | 2026-07-19 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [PLAY-aPrunedCeremony-1 — the full merge bar runs once, at the push boundary](spec/2026-07-19-spec-PLAY-aPrunedCeremony-1.md) | — | 2 | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-2 — diff-scoped gates are fail-closed and coarse](spec/2026-07-19-spec-PLAY-aPrunedCeremony-2.md) | — | 1 | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-3 — recurring bug class: a ratchet that never exercises its target is vacuous](spec/2026-07-19-spec-PLAY-aPrunedCeremony-3.md) | — | 1 | CLOSED | rev-2 | 2026-07-19 |
+| [PLAY-aPrunedCeremony-4 — bookkeeping lands before the push; retire the derivable `pushed:<sha>`](spec/2026-07-19-spec-PLAY-aPrunedCeremony-4.md) | — | 2 | CLOSED | rev-4 | 2026-07-19 |
+| [TOOL-aPrunedCeremony-1 — manifest-driven gate legs + a no-hardcode canary](spec/2026-07-19-spec-TOOL-aPrunedCeremony-1.md) | — | 2 | CLOSED | rev-4 | 2026-07-19 |
+| [TOOL-aPrunedCeremony-2 — pre-push full-gate enforcement (drift signal scoped, not dropped)](spec/2026-07-19-spec-TOOL-aPrunedCeremony-2.md) | — | 2 | CLOSED | rev-3 | 2026-07-19 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

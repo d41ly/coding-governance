@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-6 — every record renders inside the spec it serves
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams tooling · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 7 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 

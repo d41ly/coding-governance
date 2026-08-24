@@ -22,9 +22,9 @@ because the generated index needs it.
 ids TOOL-cSightedPlumb-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cSightedPlumb-1 — the drift-audit kit: port record-vs-reality auditing out of inCMS](spec/2026-08-05-spec-cSightedPlumb-1.md) | CLOSED | rev-1 | 2026-08-05 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cSightedPlumb-1 — the drift-audit kit: port record-vs-reality auditing out of inCMS](spec/2026-08-05-spec-cSightedPlumb-1.md) | — | 2 | CLOSED | rev-1 | 2026-08-05 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`.
