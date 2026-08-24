@@ -1173,8 +1173,12 @@ def scan_canon(lines: list, first_open: int) -> list:
     # reports a missing/out-of-order slot and RETURNS — so every body check below is skipped and one
     # appended line disabled the whole canon while the leg still printed clean. Refuse the duplicate
     # by name instead of letting it fall through the equality.
+    canon_heads = [h for h, _e, _b in SLOT_CANON]
     for i, h in seen:
-        if [x for _j, x in seen].count(h) > 1:
+        # CANONICAL headings only. Scanning every `## ` heading reported a repeated NON-canonical one
+        # as a duplicated canonical slot AND suppressed the accurate `heading outside the canon`
+        # message through the early return below — two wrong answers out of one over-wide population.
+        if h in canon_heads and [x for _j, x in seen].count(h) > 1:
             out.append((i + 1, f"canonical slot heading appears more than once: {h}"))
     if out and any("more than once" in why for _l, why in out):
         return sorted(set(out))
@@ -1897,10 +1901,22 @@ def do_selftest() -> int:
                                         "x", canon=True)))
         # D4 — --bump duplicated all five rows per run because its keep-filter read `## ` as a
         # comment. The two functions parse ONE grammar and must AGREE about it; that is the arm.
-        arm("read_slot_table and do_bump agree on what a comment is", "True",
-            lambda: str(all(("	" in l) != (l.strip().startswith("#") and "	" not in l)
-                            or not l.strip()
-                            for l in ["# c", "## S	9", "", "## T	"])))
+        # CALLS BOTH PARSERS over ONE real file. The first spelling was a closed boolean over four
+        # hardcoded literals and touched neither `read_slot_table` nor `do_bump` — it could not
+        # fail, which is the could-not-fail class this entire build is about, written into the build
+        # that is about it. D4's corruption duplicated rows because the two functions disagreed on
+        # what a comment is, so the arm has to exercise that disagreement, not restate it.
+        _bhw = os.path.join(base, "bump-hw.txt")
+        write_text(_bhw, "# a comment carrying no tab\n"
+                         "## The problem this build exists to solve\t1\n")
+        arm("do_bump's keep-filter drops the DATA row and keeps only the comment", "1",
+            lambda: str(len([l for l in read_text(_bhw).split("\n")
+                             if "\t" not in l and l.strip()])))
+        arm("read_slot_table reads the row do_bump's filter dropped", "1",
+            lambda: str(len(read_slot_table(_bhw))))
+        arm("the two parsers PARTITION the file, so a --bump round-trip cannot duplicate a row", "2",
+            lambda: str(len([l for l in read_text(_bhw).split("\n")
+                             if "\t" not in l and l.strip()]) + len(read_slot_table(_bhw))))
         arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
             lambda: str(slot_violations(build_canon_readme(
                 GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))

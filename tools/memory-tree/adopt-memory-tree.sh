@@ -15,7 +15,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # substitutes nothing and looks like it worked.
 ROOT_N="$(cd "$ROOT" && pwd)"
 KIT_REL=${HERE#"$ROOT_N"/}
+# CAPTURED, because the branch below REASSIGNS KIT_REL and the fact is needed again further down.
+# Comparing $HERE against the raw $ROOT instead is the two-spellings trap this file's own header
+# warns about twelve lines up: $ROOT is `C:/...` from `git rev-parse` and $HERE is `/c/...` from
+# `cd && pwd`, so `case "$HERE/" in "$ROOT"/*)` never matches on any node in the registry. It shipped
+# that way for one commit and made the ceiling strip DEAD everywhere while printing an else-arm
+# instruction telling the operator to do what they had just done.
+KIT_INSIDE=yes
 if [ "$KIT_REL" = "$HERE" ]; then
+  KIT_INSIDE=no
   # The kit dir is OUTSIDE the tree being scaffolded — the legitimate "run the shipped adopter from
   # the governance checkout against a fresh repo" flow, which the runbook's copy-then-run order does
   # not cover but people use. Scaffolding is still correct: every asset is read from $HERE and every
@@ -151,8 +159,8 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # Inside $ROOT the kit IS the adopter's copy and stripping it is the intended install step. Outside
 # $ROOT it is somebody's source tree and must not be touched; that is the same case the KIT_REL
 # branch above already detects and prints about.
-case "$HERE/" in
-  "$ROOT"/*)
+case "$KIT_INSIDE" in
+  yes)
     if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
       awk -F'\t' 'BEGIN{OFS="\t"} /^## /{ print $1, ""; next } { print }' \
         "$HERE/build-readme-slot-limits.txt" > "$HERE/.slot-limits.tmp" \
@@ -160,8 +168,9 @@ case "$HERE/" in
     fi
     ;;
   *)
-    echo "memory-tree: kit dir is outside \$ROOT — leaving its build-readme-slot-limits.txt alone; \
-copy the kit into the target tree first if you want its ceilings stripped." >&2
+    echo "memory-tree: kit dir is outside the tree being scaffolded — leaving its \
+build-readme-slot-limits.txt alone. The ceilings are stripped when the kit is copied INTO the target \
+tree and the adopter runs it from there, which is the runbook order." >&2
     ;;
 esac
 
