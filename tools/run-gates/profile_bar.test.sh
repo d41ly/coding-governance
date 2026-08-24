@@ -297,11 +297,12 @@ PYEOF
 )
 chk $([ "$PK" = "True,False" ] && echo 0 || echo 1)     "packing arm: check_packing(possible,impossible) returned '$PK', expected True,False"
 
-# ---------------------------------------------------------------------------------------- verdict
-if [ "$bad" -ne 0 ]; then
-  echo "FAIL ($bad of $n assertions failed)"
-  exit 1
-fi
+# THE ARMS BELOW SIT ABOVE THE VERDICT BLOCK ON PURPOSE. Appended after it, they ran and could
+# not FAIL: `chk` increments `bad`, and the only reader of `bad` is the block that has already
+# exited by then — so a broken arm printed ASSERT FAILED and the suite still printed PASS and
+# exited 0. Observed exactly that with `held` removed from NOT_RUN. The floor check at the end of
+# the file is not a substitute: it counts assertions, it does not read their verdicts.
+# TOOL-dUnstalledConvoy-26.
 # ------------------- arm 9: THE VERB SET AGREES WITH THE RUNNER, and `held` is in it
 # TOOL-dUnstalledConvoy-26 added a fifth verb to run-gates.sh and not to this reader, so 42 of gov's
 # 85 legs were dropped from every profile with nothing reporting a gap. That is the same silent
@@ -354,6 +355,11 @@ PYEOF
 )
 chk $([ "$NR" = OK ] && echo 0 || echo 1) "not-run arm: NOT_RUN returned $NR"
 
+# ---------------------------------------------------------------------------------------- verdict
+if [ "$bad" -ne 0 ]; then
+  echo "FAIL ($bad of $n assertions failed)"
+  exit 1
+fi
 if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "FAIL (ran $n assertions, floor is $FLOOR_ASSERTIONS — arms went missing)"
   exit 1

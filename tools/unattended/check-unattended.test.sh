@@ -2091,6 +2091,8 @@ reset_tree
 # ---- run whose baseline already names a unit, and the empty case is asserted separately as a SKIP.
 URO='| [ARCH-tRos-1 — the first unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
 UR7='| [ARCH-tRos-7 — a later unit](spec/seven.md) | OPEN | rev-1 | 2026-08-01 |'
+# A unit that is WONTDO in the BASELINE region itself — the case the retire loop exempts.
+UROW='| [ARCH-tRos-8 — retired before the run](spec/eight.md) | WONTDO | rev-1 | 2026-08-01 |'
 UEND='<!-- /gen:build-units -->'
 seed_ros() {
   reset_tree
@@ -2116,7 +2118,7 @@ hit "$(run)" "a unit is in the roster this run is executing and was not in the r
 seed_ros; add_u7
 rrow "add ARCH-tRos-7" "the build needed it"
 git add -A && git commit -q -m recorded --no-verify
-miss "$(run)" "check 22 FAILED"
+miss "$(run)" "check 24 FAILED"
 
 # ...so does a SUPERSEDE row naming it as the SUCCESSOR, which is the case an add-only rule redded:
 # a correct supersession leaves the successor present now and absent then, and the sibling verb
@@ -2124,7 +2126,7 @@ miss "$(run)" "check 22 FAILED"
 seed_ros; add_u7
 rrow "supersede ARCH-tRos-1 -> ARCH-tRos-7" "the mechanism split"
 git add -A && git commit -q -m superseded --no-verify
-miss "$(run)" "check 22 FAILED"
+miss "$(run)" "check 24 FAILED"
 
 # ...a SUPERSESSION whose successor never landed is a retirement wearing a better name.
 seed_ros
@@ -2143,15 +2145,35 @@ seed_ros
 sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
 rrow "retire ARCH-tRos-1" "the probe cannot see this tree"
 git add -A && git commit -q -m "retired on the record" --no-verify
-miss "$(run)" "check 22 FAILED"
+miss "$(run)" "check 24 FAILED"
+
+# ...and a unit that was ALREADY WONTDO AT THE BASELINE owes NOTHING, because nothing transitioned.
+# This arm exists because TOOL-dUnstalledConvoy-33 broke exactly it: moving the baseline derivation
+# into the library, the first draft returned BARE IDS, and this loop asks `id_rows … | grep -q
+# "| WONTDO |"` — which no bare id can satisfy. The exemption went dead and every build carrying a
+# unit retired BEFORE its run would have redded for a retirement nobody performed. It had no arm,
+# because the four negatives in this block all asserted the absence of `check 22 FAILED`, a message
+# this check cannot print.
+reset_tree
+build tRos
+awk -v r="$UROW" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/rosw.$$ \
+  && mv /tmp/rosw.$$ memory/builds/tRos/README.md
+sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "already retired before the run" --no-verify
+miss "$(run)" "check 24 FAILED"
+# ITS LIVENESS HALF: the fixture must actually carry a WONTDO row, or the arm above is green because
+# the loop selected nothing rather than because the exemption fired.
+same "the already-WONTDO fixture carries the row the exemption reads" \
+  "$(grep -c '| WONTDO |' memory/builds/tRos/README.md)" "1"
 
 # ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
 # ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
 reset_tree
 hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
 out=$(run)
-miss "$out" "check 22 skipped"
-miss "$out" "check 22 FAILED"
+miss "$out" "check 24 skipped"
+miss "$out" "check 24 FAILED"
 reset_tree
 
 # ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.

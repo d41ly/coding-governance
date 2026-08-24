@@ -1779,6 +1779,55 @@ user_skills = "/tmp/gk-fake-skills"
         return subprocess.run([sys.executable, str(_gov / "tools" / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True)
 
+    # ---- THE OBSERVED-STATE TABLE IS THE ONE SPELLING OF IT ---------------------------------
+    # Three copies existed and they disagreed: the reader's state tuple, the validator's
+    # string-check tuple, and the seed writer's hardcoded key list. `observed_reused` reached one of
+    # the three; `observed_held` (TOOL-dUnstalledConvoy-26) reached none — which made every
+    # kit-subject leg invisible to `read_gate_verdicts`, so an upgrading adopter's apply saw a leg
+    # that was green before, holding NO state after, and tripped "a leg that vanished is not a leg
+    # that passed" on every one of them.
+    sys.path.insert(0, str(HERE))
+    import govkit as _GK
+    _OBS_KEYS = _GK.OBSERVED_KEYS
+    check("OBSERVED_KEYS is derived from OBSERVED_STATES rather than re-typed",
+          _OBS_KEYS == tuple(k for _s, k in _GK.OBSERVED_STATES), str(_OBS_KEYS))
+    check("the table carries the held verb, or the fifth verb is invisible to the deployer",
+          "observed_held" in _OBS_KEYS, str(_OBS_KEYS))
+    check("and the reused verb, which was declared by a kit and read by nobody",
+          "observed_reused" in _OBS_KEYS, str(_OBS_KEYS))
+    check("held is a not-executed state beside skipped, so an all-held baseline carries no "
+          "information and the dead-probe refusal can see that",
+          set(_GK.NOT_EXECUTED) == {"skipped", "held"}, str(_GK.NOT_EXECUTED))
+
+    # BEHAVIOURAL: drive the reader over a runner that prints one line per verb and assert every
+    # bare leg name comes back under the right state. A synthetic runner, because the subject is the
+    # PARSE and a real bar takes minutes to say the same thing.
+    with tempfile.TemporaryDirectory() as _rd:
+        _rp = pathlib.Path(_rd)
+        (_rp / "echo_verbs.py").write_text(
+            "print('GATE ok    a repo leg')\n"
+            "print('GATE FAIL  a red leg  (exit 1)')\n"
+            "print('GATE skip  a guarded leg  (unchanged vs main)')\n"
+            "print('GATE reuse a reused leg  (proven green, inputs unchanged)')\n"
+            "print('GATE held  a kit self-test  (kit self-test, set GATE_SELFTESTS=1 to run)')\n",
+            encoding="utf-8", newline="\n")
+        _verbs = {"green": "GATE ok    ", "red": "GATE FAIL  ", "skipped": "GATE skip  ",
+                  "reused": "GATE reuse ", "held": "GATE held  "}
+        _gr = {"command": [sys.executable, "echo_verbs.py"]}
+        for _st, _key in _GK.OBSERVED_STATES:
+            _gr[_key] = [_verbs[_st] + "{name}"]
+        _got = _GK.read_gate_verdicts(_rp, _gr)
+        check("the reader classifies all five verbs, by name and by state",
+              _got == {"a repo leg": "green", "a red leg": "red", "a guarded leg": "skipped",
+                       "a reused leg": "reused", "a kit self-test": "held"}, str(_got))
+        # ITS LIVENESS HALF: with the held template removed that leg holds NO state at all, which is
+        # the exact shape that made an upgrading adopter's apply refuse.
+        _gr2 = dict(_gr)
+        del _gr2["observed_held"]
+        _got2 = _GK.read_gate_verdicts(_rp, _gr2)
+        check("LIVENESS: without the held template that leg holds no state at all",
+              "a kit self-test" not in _got2, str(_got2))
+
     reg = load_seed_toml(_gov / "tools" / "govkit" / "registry.toml")
     seeded = []
     for e in reg.get("entry", []):
@@ -1787,6 +1836,13 @@ user_skills = "/tmp/gk-fake-skills"
             seeded.append((e["id"], d["gate_runner_seed"]))
     check("at least one registry entry declares a [gate_runner_seed] to round-trip",
           bool(seeded), "no entry declares one — this arm would pass by finding nothing")
+    # A SHIPPED seed must declare the verb its own runner prints, or the emission arms above
+    # quantify over a set that never contains it and pass by finding nothing.
+    check("a shipped [gate_runner_seed] declares observed_held",
+          any("observed_held" in s for _e, s in seeded),
+          "no seed declares it, so every held leg is invisible to every adopter's deployer")
+    check("...and observed_reused",
+          any("observed_reused" in s for _e, s in seeded), "no seed declares it")
     for eid, seed in seeded:
         with tempfile.TemporaryDirectory() as td:
             tgt = pathlib.Path(td) / "t"
@@ -1800,6 +1856,20 @@ user_skills = "/tmp/gk-fake-skills"
                 check(f"[{eid}] the emitted {key} is a LIST, which is what the reader iterates",
                       isinstance(v, list) and bool(v),
                       f"{key} = {v!r} — a string here is walked character by character")
+            # EVERY key the SEED declares must reach the emitted deploy.toml — not the two a
+            # previous pass remembered. The emitter's key list was hand-written and dropped
+            # `observed_reused` from every target since the day the run-gates kit declared it: a
+            # template that shipped, that no adopter ever received and no reader ever read. The
+            # population is the seed's own keys, so a verb added to a kit is covered here on the
+            # commit that adds it. TOOL-dUnstalledConvoy-26.
+            # DERIVED FROM THE SEED, never from OBSERVED_KEYS. Quantifying over the table
+            # would make this arm stop checking a verb on the same edit that drops it from
+            # the table — a predicate derived from the thing it grades. Measured: removing
+            # `held` from OBSERVED_STATES left this loop silently green about it.
+            for key in sorted(k for k in seed if k.startswith("observed_")):
+                check(f"[{eid}] the seed declares {key} and the emitted deploy.toml carries it",
+                      isinstance(decl.get(key), list) and bool(decl.get(key)),
+                      f"the seed declares {key} and the emission produced {decl.get(key)!r}")
             # The round trip that matters: feed a line the runner really prints back through the
             # reader's own head-extraction and assert the BARE LEG NAME comes back.
             for key, sample in (("observed_ran", "GATE ok    memory hygiene"),

@@ -127,6 +127,12 @@ observed_skipped = ["GATE skip  {name}"]
 # refusal can never fire. One trailing space after the verb, because the verbs are padded so the
 # NAME starts in one column.
 observed_reused = ["GATE reuse {name}"]
+# The FIFTH verb (TOOL-dUnstalledConvoy-26). Without it every kit-subject leg is invisible to
+# `read_gate_verdicts`, and an upgrading adopter's apply reports each one as GONE AFTER — a leg that
+# was green before, holds no state after, and trips the "a leg that vanished is not a leg that
+# passed" refusal. Two trailing spaces, because the verbs are padded so the NAME starts in one
+# column and the reader anchors on that prefix.
+observed_held = ["GATE held  {name}"]
 
 # Line-ending pins this kit needs in a TARGET. Every shipped file here is a shell script or the
 # manifest a shell script parses; a CRLF script does not execute.

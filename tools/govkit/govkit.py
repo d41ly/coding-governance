@@ -1809,6 +1809,27 @@ def lf_pins(descs: dict, selection: list[str], ctx_of) -> list[tuple[str, str, s
 # one well beats half-writing four, because a splice into a Makefile that half-works ships a target a
 # leg that never runs while this tool exits 0 — the silent-green direction.
 GR_KINDS = ("none", "manifest")
+
+# THE OBSERVED-STATE TABLE, and it is the ONE spelling of it. Three copies existed: the reader's
+# state tuple, the validator's string-check tuple, and the seed writer's hardcoded key list — and
+# they disagreed. `observed_reused` was declared by the run-gates kit, read by nobody and emitted by
+# nobody, so the kit.toml comment claiming it made the reused outcome reachable was describing a
+# path that did not exist. `observed_held` then arrived with TOOL-dUnstalledConvoy-26 and reached
+# none of the three, which made every upgrading adopter's `apply` report its held legs as VANISHED.
+#
+# ORDER IS SEMANTIC. `read_gate_verdicts` scans in this order and `setdefault` keeps the FIRST
+# state a line matches, so a more specific verb must never sit behind a prefix of itself.
+OBSERVED_STATES = (
+    ("green", "observed_ran"),
+    ("red", "observed_failed"),
+    ("skipped", "observed_skipped"),
+    ("reused", "observed_reused"),
+    ("held", "observed_held"),
+)
+OBSERVED_KEYS = tuple(k for _s, k in OBSERVED_STATES)
+# A state that means the leg DID NOT EXECUTE. Neither is a failure and neither is evidence of a
+# pass; the dead-probe refusal below rests on exactly this distinction.
+NOT_EXECUTED = ("skipped", "held")
 GR_REQUIRED = ("file", "grammar", "dedupe_key", "command", "run_all_env",
                "observed_ran", "observed_failed")
 
@@ -1846,7 +1867,7 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
     # near-miss — it is walked character by character and silently classifies every line green.
     # Refused BY NAME here rather than left to the reader, because the reader's failure is silent
     # and this one is not. The assertion is what stops the next kit repeating it.
-    for _obs in ("observed_ran", "observed_failed", "observed_skipped"):
+    for _obs in OBSERVED_KEYS:
         if isinstance(gr.get(_obs), str):
             r.fail(f"[gate_runner].{_obs} is a STRING; it must be an array of templates. Its only "
                    f"consumer iterates it, so a string is walked character by character: the head "
@@ -1880,8 +1901,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     # neither pass wired on its own: main resolved four, the merged branch found the fifth.
     out = subprocess.run(resolve_shell_argv(list(cmd)), cwd=str(target), capture_output=True, text=True)
     verdicts: dict[str, str] = {}
-    for state, key in (("green", "observed_ran"), ("red", "observed_failed"),
-                       ("skipped", "observed_skipped")):
+    for state, key in OBSERVED_STATES:
         for tmpl in (gr.get(key) or []):
             head = tmpl.split("{name}")[0]
             for line in (out.stdout + out.stderr).splitlines():
@@ -2215,6 +2235,10 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         step(STEP_BASELINE, "reading the target's own runner")
         before_map = read_gate_verdicts(target, gr)
         baseline["legs"] = before_map
+        # A map with nothing green or red carries no information — every leg after the install
+        # would land in the row that carries the exemptions. `held` joins `skipped` here by being
+        # absent from the green/red test, which is what makes an all-held baseline refuse rather
+        # than sail through on an empty map. TOOL-dUnstalledConvoy-26.
         if before_map and not any(v in ("green", "red") for v in before_map.values()):
             raise Refusal(
                 "DEAD PROBE: the baseline read parsed legs but not one of them is green or red — a "
@@ -2709,6 +2733,15 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             b, a2 = before_map.get(nm), after_map.get(nm)
             if b == "green" and a2 == "red":
                 r.fail(f"leg '{nm}' was green before this install and is red after")
+            elif b == "green" and a2 == "held":
+                # NOT A FAILURE, and this is the whole point of the state. A leg whose subject this
+                # install set to `kit` is HELD afterwards BY DESIGN — that is what an adopter is
+                # buying. Silent would be wrong too: the leg stops running and nothing else says so.
+                print(f"govkit apply — leg '{nm}' ran before this install and is HELD after: it is "
+                      f"a kit self-test now, and runs under GATE_SELFTESTS=1")
+            elif b == "green" and a2 == "reused":
+                print(f"govkit apply — leg '{nm}' was REUSED after this install rather than "
+                      f"re-executed; its verdict is carried, not earned")
             elif b == "green" and a2 == "skipped":
                 r.fail(f"leg '{nm}' was green before and did not execute after — the install broke "
                        f"its guard")
@@ -3156,8 +3189,10 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         # seed's observation templates into strings, and `read_gate_verdicts` iterates them — so it
         # walked each one character by character and could never report a red leg. The emitter and
         # the reader had never met, because every arm on the bar hand-writes the array form.
-        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env",
-                  "observed_ran", "observed_failed", "observed_skipped", "command"):
+        # DERIVED from OBSERVED_KEYS rather than re-typed. The hand-written list here dropped
+        # `observed_reused` from every emitted deploy.toml, so a template the kit declared never
+        # reached a single target — the emitter and the reader had never met.
+        for k in ("kind", "grammar", "file", "dedupe_key", "run_all_env") + OBSERVED_KEYS + ("command",):
             if k not in seed:
                 continue
             v = resolve_seed_value(seed[k])

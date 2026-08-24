@@ -134,8 +134,15 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # it, because by then the spec existed and the region carried the id. That is the owner's first
 # observation, builds refuse to rescope, living in the driver written to let them.
 #
-# CONTRACT. Prints the baseline ids, one per line, and exits 0 ONLY when it derived a NON-EMPTY
-# roster. Exits 1 otherwise, with the reason as its ONLY output — one line, no prefix, so a caller
+# CONTRACT. Prints the baseline units REGION, verbatim, and exits 0 ONLY when it derived a region
+# carrying at least one id.
+#
+# THE REGION TEXT, NOT A LIST OF IDS, and the closing review's blocker is why. The first draft
+# printed bare ids; check 24's second loop then asked `id_rows "$rs_was" "$rsid" | grep -q
+# "| WONTDO |"`, which can never match a bare id — so its "was it ALREADY retired at the baseline"
+# exemption went dead and every build carrying a WONTDO unit from before its run would have redded
+# for a retirement nobody performed. The callers want membership and STATUS, and only the region
+# carries both. Membership still works: `id_in` matches a whole token anywhere in the text. Exits 1 otherwise, with the reason as its ONLY output — one line, no prefix, so a caller
 # can drop it straight into its own message. The reason goes to STDOUT and not stderr, so one
 # capture gets either the ids or the reason and the exit code says which; a caller juggling two
 # streams for one answer is a caller that will drop one. Empty is a FAILURE and not an empty success: an empty baseline
@@ -178,10 +185,13 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
     echo "the baseline build README carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
     return 1
   fi
+  # The ids are derived only to decide EMPTINESS. An empty baseline is not a comparison and is not
+  # vacuously true either — it is vacuously accusatory, because every unit the build has would read
+  # as added.
   _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
   if [ -z "$_bu_ids" ]; then
     echo "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
     return 1
   fi
-  printf '%s\n' "$_bu_ids"
+  printf '%s\n' "$_bu_was"
 }
