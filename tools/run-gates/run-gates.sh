@@ -63,7 +63,7 @@ resolve_python() {
 }
 # <<< resolve_python
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
-fails=0; n=0; skips=0
+fails=0; n=0; skips=0; ondemands=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
@@ -689,19 +689,26 @@ rows = [" ".join(str(i) for i in order)]
 # text: the reason string is for a human reading the manifest, and the runner only ever asks whether
 # there is one. Newlines and the field separators cannot appear in it because it is reduced to a flag
 # here, which is what keeps a prose reason from being able to corrupt the wire format.
+# The SIXTH field is `subject`, appended AFTER chunk so the chunk position is unchanged — a field
+# inserted before it would be parsed as chunk by any reader that had not moved in the same commit.
+# Defaulted to `repo`: a leg that has not declared is on the bar, because the other default silently
+# removes an undeclared leg from every run. NOTE: this program is inside a single-quoted shell block,
+# so a comment here may carry no apostrophe. TOOL-dUnstalledConvoy-26.
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
-         + "\x1e" + str(l.get("chunk", "") or "") for l in data]
+         + "\x1e" + str(l.get("chunk", "") or "")
+         + "\x1e" + (l.get("subject") or "repo") for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
+  subjects+=("${sj:-repo}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -709,6 +716,16 @@ total=${#names[@]}
 # deciding before dispatch keeps the skip verdict independent of scheduling.
 for ((i=0; i<total; i++)); do
   [ -z "${names[$i]}" ] && continue
+  # SUBJECT FIRST, and in this pass rather than in the dispatch loop. A kit-subject leg tests the
+  # KIT'S OWN SOURCE and has no job in a repo that copy-installs the kit and never edits it, so it
+  # runs only when asked. `GATE_FULL` deliberately does NOT ask: it means "ignore every guard", and
+  # conflating it with "run the kit's own tests" would leave no way to request a complete bar
+  # without them — and it is the very bypass that made `guard = ["{kit}/"]` ineffective here.
+  # Deciding in the dispatch loop instead would leave an index with no result, which the reporting
+  # pass reports as `(no result)`. TOOL-dUnstalledConvoy-26.
+  if [ "${subjects[$i]}" = kit ] && [ -z "${GATE_SELFTESTS:-}" ]; then
+    printf 'ondemand' > "$WORK/$i.rc"; continue
+  fi
   [ -z "${guards[$i]}" ] && continue
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
@@ -898,7 +915,14 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
-  if [ "$rc" = skip ]; then
+  if [ "$rc" = ondemand ]; then
+    # THE FIFTH VERB, and it is NOT `skip`. Two reasons, both load-bearing. `skip`'s tail says
+    # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
+    # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
+    # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
+    ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
+    printf 'GATE held  %s  (kit self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
+  elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = reuse ]; then
     # THE FOURTH VERB, padded to the same column as the other three and following the two-space tail
@@ -957,7 +981,7 @@ nwalk=${#WALK[@]}
 disp=($ORDER); ndisp=${#disp[@]}; di=0; wi=0; next=0
 [ "$nwalk" -gt 0 ] && next=${WALK[0]}
 # per-chunk tallies, reset at each boundary
-cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 CHUNK_ROLLUP=""
 chunk_close() {   # emit the verdict for the chunk just finished
   [ -n "$cur_chunk" ] || return 0
@@ -974,7 +998,7 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # line invites comparison between runs that are not comparable, which is the whole reason the
   # profiling verb records an envelope.
   CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${secs}\n"
-  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_t0=$(date +%s)
+  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 }
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
@@ -1098,6 +1122,11 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
     printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    # WHAT THIS GREEN COVERED. Without it a record named `gate-full-green` cannot say
+    # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
+    # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
+    # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
+    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
