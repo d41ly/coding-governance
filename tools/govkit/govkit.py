@@ -922,6 +922,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 r.fail(f"leg '{nm}' is exempted AND claimed by entry '{claimed_legs[nm]}' — an "
                        f"exemption and a claim for one fact is the two-spellings class arriving "
                        f"through the escape hatch built to prevent it")
+            # AND ITS SUBJECT IS READ HERE, because this is the only path that reaches it.
+            # An exempted leg is claimed by no descriptor, so every subject arm above — presence,
+            # closed set, descriptor-vs-manifest agreement — quantifies over a population these
+            # rows are not in. Without this the check silently covers less than its name claims,
+            # which is the exact wording TOOL-dUnstalledConvoy-26 S8 used and the exact item its
+            # build left unfinished. Read from the MANIFEST, since that is where an exempt leg's
+            # subject is written and where the runner reads it from.
+            _x_sub = manifest_subject.get(nm)
+            if _x_sub is None:
+                r.fail(f"exempt_leg '{nm}' is a leg in tools/gate-legs.json that declares no "
+                       f"`subject` — an exempted leg is reachable by no descriptor, so this is the "
+                       f"only check that can see it, and a defaulted subject is a side of the bar "
+                       f"nobody chose")
+            elif _x_sub not in ("kit", "repo"):
+                r.fail(f"exempt_leg '{nm}' declares subject '{_x_sub}', outside the closed set "
+                       f"kit|repo — an unrecognised value is defaulted by every reader to whichever "
+                       f"side it assumed")
             exempt_legs[nm] = why
         for nm in sorted(manifest - set(claimed_legs) - set(exempt_legs)):
             r.fail(f"gate leg '{nm}' is claimed by no descriptor and carried by no [[exempt_leg]] — "

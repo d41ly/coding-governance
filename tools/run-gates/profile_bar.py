@@ -62,7 +62,31 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # The TAIL contract is unaffected and is what the split below relies on: two spaces before any
 # parenthesised tail. Requiring two here dropped every `GATE reuse` line silently, which
 # under-counts the bar without reporting anything.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse)\s+(.*)$")
+# `held` is the fifth verb (TOOL-dUnstalledConvoy-26): a kit-subject leg the run did not ask for.
+# It was added to the runner and NOT to this set, which is precisely the failure the paragraph above
+# records for `reuse` — an unlisted verb is dropped SILENTLY, so 42 of gov's 85 legs vanished from
+# every profile with nothing reporting a gap. `derive_runner_verbs()` below now derives the
+# runner's own set and refuses on any verb this pin does not carry, so the sixth verb reds instead.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held)\s+(.*)$")
+PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held")
+# Verbs whose leg did NOT execute. `skip` is a guard decision and `held` is a subject decision; the
+# two have different remedies and are counted separately, but neither contributes work.
+NOT_RUN = ("skip", "held")
+
+
+def derive_runner_verbs(runner_path):
+    """The verb set DERIVED from the runner's own emission sites, or None if it cannot be read.
+
+    A pin nothing compares against is a pin that goes stale the next time somebody adds a verb, and
+    this file has now been that stale twice. Returns None rather than an empty set when the runner is
+    unreadable, so `no verbs found` cannot be mistaken for `agrees`.
+    """
+    try:
+        src = open(runner_path, encoding="utf-8", errors="replace").read()
+    except OSError:
+        return None
+    found = set(re.findall(r"""printf ['"]GATE ([A-Za-z]+)""", src))
+    return found or None
 
 
 def parse_verdicts(stdout):
@@ -301,6 +325,25 @@ def main():
         print("profile-bar: runner not found beside this verb: %s" % RUNNER, file=sys.stderr)
         return 2
 
+    # THE VERB SET AGREES WITH THE RUNNER, or this refuses before spending a bar. An unlisted verb
+    # is dropped SILENTLY by `parse_verdicts`, so the failure mode is a profile that under-counts
+    # without reporting anything — measured twice now, once for `reuse` and once for `held`. Derived
+    # from the runner rather than re-typed, and a runner it cannot READ is a refusal too, because
+    # `no verbs found` and `agrees` must never be the same answer.
+    _emitted = derive_runner_verbs(RUNNER)
+    if _emitted is None:
+        print("profile-bar: cannot read the runner's verb set out of %s, so the pinned set is "
+              "unverifiable — refusing rather than reporting a profile it may under-count."
+              % RUNNER, file=sys.stderr)
+        return 2
+    _unknown = sorted(_emitted - set(PINNED_VERBS))
+    if _unknown:
+        print("profile-bar: the runner emits verb(s) %s that this reader does not know. Every line "
+              "carrying one would be dropped silently and the profile would under-count the bar "
+              "while looking complete. Add them to PINNED_VERBS and to VERDICT, and decide for each "
+              "whether it belongs in NOT_RUN." % ", ".join(_unknown), file=sys.stderr)
+        return 2
+
     bash, bash_tried = resolve_bash(RUNNER)
     if not bash:
         print("profile-bar: no bash could open the runner. Tried: %s" % ", ".join(bash_tried),
@@ -358,14 +401,14 @@ def main():
 
     legs, missing = [], []
     for name, verdict in verdicts:
-        if verdict == "skip":
+        if verdict in NOT_RUN:
             legs.append({"name": name, "verdict": verdict, "sec": None})
             continue
         legs.append({"name": name, "verdict": verdict, "sec": durs.get(name)})
         if name not in durs:
             missing.append(name)
 
-    executed = [l["sec"] for l in legs if l["verdict"] != "skip" and l["sec"] is not None]
+    executed = [l["sec"] for l in legs if l["verdict"] not in NOT_RUN and l["sec"] is not None]
 
     # FRESHNESS, acted on rather than merely recorded. The runner writes the cache with
     # `cp ... || true`, an advisory write that fails silently on a locked or read-only gitdir while
@@ -427,16 +470,17 @@ def main():
 
 def print_summary(rec):
     r = rec["regime"]
-    ran = [l for l in rec["legs"] if l["verdict"] != "skip"]
+    ran = [l for l in rec["legs"] if l["verdict"] not in NOT_RUN]
     skipped = [l for l in rec["legs"] if l["verdict"] == "skip"]
+    held = [l for l in rec["legs"] if l["verdict"] == "held"]
     failed = rec.get("failed_legs", [])
     print("")
     print("profile-bar %s  ·  %s  ·  width %d (%s)  ·  %s  ·  runner exit %s" % (
         rec["sha"], rec["host"], rec["width"], rec.get("width_source", "?"),
         "FULL" if rec["full"] else "scoped", rec.get("exit", "?")))
     print("  wall observed      %8.1fs" % rec["wall"])
-    print("  total leg work     %8.1fs   across %d executed leg(s), %d skipped, %d FAILED"
-          % (r["work"], len(ran), len(skipped), len(failed)))
+    print("  total leg work     %8.1fs   across %d executed leg(s), %d skipped, %d held, %d FAILED"
+          % (r["work"], len(ran), len(skipped), len(held), len(failed)))
     print("  floor  (longest)   %8.1fs   <- no width beats this" % r["floor"])
     print("  throughput (work/w)%8.1fs   <- perfect packing at width %d" % (r["throughput"], rec["width"]))
     print("  ideal              %8.1fs   packing %.2fx" % (r["ideal"], r.get("packing") or 0))

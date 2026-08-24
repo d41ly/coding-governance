@@ -18,7 +18,7 @@
 # fixture leg names out of the real timing cache, which the runner would carry forward forever.
 set -u
 
-FLOOR_ASSERTIONS=33
+FLOOR_ASSERTIONS=36
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 export HERE_DIR="$HERE"   # the inline python arms import profile_bar from it
@@ -302,6 +302,58 @@ if [ "$bad" -ne 0 ]; then
   echo "FAIL ($bad of $n assertions failed)"
   exit 1
 fi
+# ------------------- arm 9: THE VERB SET AGREES WITH THE RUNNER, and `held` is in it
+# TOOL-dUnstalledConvoy-26 added a fifth verb to run-gates.sh and not to this reader, so 42 of gov's
+# 85 legs were dropped from every profile with nothing reporting a gap. That is the same silent
+# under-count the file's own comment records for `reuse`, one verb later. The set is now DERIVED from
+# the runner and compared, so the sixth verb reds instead of vanishing.
+VB=$("$PY" - <<'PYEOF'
+import sys, os
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+
+runner = os.path.join(os.environ["HERE_DIR"], "run-gates.sh")
+emitted = p.derive_runner_verbs(runner)
+if emitted is None:
+    print("UNREADABLE")
+else:
+    unknown = sorted(emitted - set(p.PINNED_VERBS))
+    # LIVENESS: a derivation that found nothing agrees with everything. `held` specifically, because
+    # it is the verb that motivated the arm and its absence is the regression to catch.
+    if len(emitted) < 4 or "held" not in emitted:
+        print("UNARMED:%s" % sorted(emitted))
+    else:
+        print("OK" if not unknown else "UNKNOWN:%s" % unknown)
+PYEOF
+)
+chk $([ "$VB" = OK ] && echo 0 || echo 1) "verb-set arm: derived-vs-pinned returned $VB"
+
+# ...and a `held` line actually PARSES, with its name recovered through the two-space tail contract.
+# The set agreeing is not the same fact as the regex matching.
+HV=$("$PY" - <<'PYEOF'
+import sys, os
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+
+line = "GATE held  a kit self-test  (kit self-test, set GATE_SELFTESTS=1 to run)\n"
+got = p.parse_verdicts(line)
+print("OK" if got == [("a kit self-test", "held")] else "GOT:%s" % got)
+PYEOF
+)
+chk $([ "$HV" = OK ] && echo 0 || echo 1) "held-parse arm: parse_verdicts returned $HV"
+
+# ...and a held leg is NOT counted as executed work. It did not run, so a profile that averaged it
+# in would report a bar that is faster than the bar.
+NR=$("$PY" - <<'PYEOF'
+import sys, os
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+
+print("OK" if "held" in p.NOT_RUN and "skip" in p.NOT_RUN else "GOT:%s" % (p.NOT_RUN,))
+PYEOF
+)
+chk $([ "$NR" = OK ] && echo 0 || echo 1) "not-run arm: NOT_RUN returned $NR"
+
 if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then
   echo "FAIL (ran $n assertions, floor is $FLOOR_ASSERTIONS — arms went missing)"
   exit 1

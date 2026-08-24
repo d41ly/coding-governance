@@ -116,7 +116,11 @@ decide() {   # -> the hook's decision line for a push of the current main
   # BOTH streams. The refusal cases above capture stderr only, because a refusal is an error; the
   # decision line is ordinary progress output on STDOUT, and `1>/dev/null` threw it away — which
   # read as 'the hook made no decision' rather than 'the arm looked in the wrong place'.
-  ( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
+  # GATE_SELFTESTS IS CLEARED, NOT INHERITED. It is an INPUT to the decision this function grades
+  # (TOOL-dUnstalledConvoy-27's predicate 8), and the bar itself exports it — so under
+  # `GATE_SELFTESTS=1 run-gates.sh` every arm below silently switched to the forcing case and the
+  # control arm reported a hook bug that was really an uncontrolled input.
+  ( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) | grep -m1 -E 'gate on main push' || true
 }
 stamp() {    # write a full-green record naming a sha, with a reproducible fingerprint
   # $2, when given, is the `selftests` value the record claims. OMITTED writes no key at all, which

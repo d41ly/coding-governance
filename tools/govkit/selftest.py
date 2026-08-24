@@ -1403,7 +1403,7 @@ user_skills = "/tmp/gk-fake-skills"
         legsf = rg / "tools" / "gate-legs.json"
         kitf = rg / "tools" / "demo" / "kit.toml"
 
-        def _relegs(subject: str, extra: bool = False) -> None:
+        def _write_legs(subject: str, extra: bool = False) -> None:
             rows = [{"name": "demo", "argv": ["true"], "guard": ["tools/demo/"],
                      "subject": subject}]
             if extra:
@@ -1452,7 +1452,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # AC1 — a flip with the pin left behind REDS, and the refusal names the leg, both values,
         # and what the move actually does. "subject changed" would tell a reader nothing.
-        _relegs("kit")
+        _write_legs("kit")
         _r1 = run_in(rg)
         check("AC1: flipping a subject without moving its pin REDS",
               _r1.returncode == 1, _r1.stdout + _r1.stderr)
@@ -1477,7 +1477,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
         # it would let a leg arrive already held, on nobody's decision.
-        _relegs("kit", extra=True)
+        _write_legs("kit", extra=True)
         _r3 = run_in(rg)
         check("AC3: a NEW leg with no pin row REDS rather than passing",
               _r3.returncode == 1 and "gate leg 'demo two' has no row in" in _r3.stdout,
@@ -1486,7 +1486,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ...and its mirror: a pin naming a leg that is gone. A stale row is a pin for nothing, and
         # it silently adopts the next leg that arrives under that name.
         run_in_gov(rg, "selfcheck", "--write")
-        _relegs("kit")
+        _write_legs("kit")
         _r4 = run_in(rg)
         check("a pin row naming a leg the manifest no longer declares REDS",
               _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
