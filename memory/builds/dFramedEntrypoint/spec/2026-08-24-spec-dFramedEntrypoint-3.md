@@ -1,6 +1,6 @@
 # TOOL-dFramedEntrypoint-3 — the declared registry that says which build READMEs the contract binds
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 5 · streams tooling · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · order 5 · streams tooling · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -181,6 +181,7 @@ check 3's allowlist, with its arm in `check-memory-hygiene.test.sh` ·
 - rev-4 · 2026-08-24 · folded spec-audit round 2. The kit-version carrier set becomes a derivation,
   and `kit version markers` joins the gate list.
 - rev-5 · 2026-08-24 · every open fork in section 8 resolved under the standing mandate's delegated resolver authority, by M3's rule: the most feature-rich survivor after the three vetoes. No option was taken that needed a new dependency, install location or public surface. The one question this build refuses is not a spec fork and is parked on the run-state file instead.
+- rev-6 · 2026-08-25 · BUILT and CLOSED. The registry is seeded with 62 exempt rows and none bound, both assertion directions and the equality pin fire on staged breaks, and check 3's allowlist admits the file. Unit 1's absent-file arm is INVERTED here, in the unit that changed the behaviour. Found while building: dead-path-waivers.txt is line-keyed and unpinned on four inserted comment lines, which is a lesson this repo had already recorded for a different registry. Ledger: `build/2026-08-25-build-TOOL-dFramedEntrypoint-3-acceptance.md`.
 
 ## 10. Reuse audit
 

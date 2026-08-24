@@ -146,6 +146,36 @@ if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
     && mv "$HERE/.slot-limits.tmp" "$HERE/build-readme-slot-limits.txt"
 fi
 
+# readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
+# registry is a refusal and an empty one would red the adopter's first run on the FORWARD assertion.
+# Every row carries its reason inline, and the pin equals the count, so the file the adopter receives
+# already satisfies both directions and the equality.
+{
+  printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.
+'
+  printf '# Asserted BOTH ways: an unnamed tracked README refuses, and a row naming a path that is not
+'
+  printf '# one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and carries its reason
+'
+  printf '# after " - ". `exempt-pin:` is an EQUALITY with the measured exempt count.
+'
+  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds nothing
+'
+  printf '# on day one and says so on every run. Convert a row to bound when you conform that README.
+
+'
+  _rc=$({ git ls-files 2>/dev/null; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||'; }         | sort -u | grep -E "^$M/builds/[^/]+/README\.md$")
+  printf 'exempt-pin: %s
+
+' "$(printf '%s
+' "$_rc" | grep -c . )"
+  printf '%s
+' "$_rc" | grep . | while IFS= read -r f; do
+    printf '!%s - predates the contract in this tree; drains when its build is conformed
+' "$f"
+  done
+} > "$M/project/readme-contract.txt"
+
 # method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
 # files that POINT AT the build method — this adopter is one, the kit README is another — so an
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is

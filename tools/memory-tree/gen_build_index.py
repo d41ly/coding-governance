@@ -1169,21 +1169,71 @@ def unarmed_slots() -> list:
 
 
 def read_contract_registry(root: str, conf: dict) -> set:
-    """The build READMEs the heading canon BINDS, from the declared registry. Empty when absent.
+    """The build READMEs the heading canon BINDS. Bound rows only; see `read_contract_rows` for both.
 
-    Empty is LEGAL here and is announced by the caller rather than reported as clean. Unit 3 turns
-    an absent file into a refusal and owns that change; this reader deliberately does not, so unit 1
-    lands without depending on a file unit 3 has not written yet.
+    TOOL-dFramedEntrypoint-3 REPLACED unit 1's behaviour here: an absent registry was the empty set,
+    which is a pass, and is now a refusal. Unit 1 shipped the permissive form deliberately so it did
+    not depend on a file unit 3 had not written; this is the handover, and it is stated in both specs
+    rather than left as two specs disagreeing.
     """
-    p = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
-    if not os.path.exists(p):
-        return set()
-    out = set()
-    for raw in read_text(p).split("\n"):
+    bound, _exempt, _pin = read_contract_rows(root, conf)
+    return bound
+
+
+def read_contract_rows(root: str, conf: dict) -> tuple:
+    """`(bound, exempt, declared_pin)` from the declared registry. An absent file REFUSES."""
+    rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
+    full = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
+    if not os.path.exists(full):
+        raise Problem(f"{rel} is absent; the heading canon and the slot budgets would then bind "
+                      f"nothing and report clean, which is coverage of nothing")
+    bound, exempt, pin = set(), {}, None
+    for n, raw in enumerate(read_text(full).split("\n"), 1):
         s = raw.strip()
-        if s and not s.startswith("#") and not s.startswith("!"):
-            out.add(s)
-    return out
+        if not s or s.startswith("#"):
+            continue
+        if s.startswith("exempt-pin:"):
+            v = s.split(":", 1)[1].strip()
+            if not v.isdigit():
+                raise Problem(f"{rel}:{n}: exempt-pin is `{v}`, which is not a count")
+            pin = int(v)
+            continue
+        if s.startswith("!"):
+            path, _sep, why = s[1:].partition(" - ")
+            path = path.strip()
+            if not why.strip():
+                raise Problem(f"{rel}:{n}: exempt row `{path}` carries no reason; an exemption whose "
+                              f"reason lives elsewhere is one nobody can drain")
+            exempt[path] = why.strip()
+            continue
+        if " " in s:
+            raise Problem(f"{rel}:{n}: `{s}` is neither a bare bound path, an `!`-prefixed exempt "
+                          f"row with a reason, nor an `exempt-pin:` line")
+        bound.add(s)
+    if pin is None:
+        raise Problem(f"{rel}: no `exempt-pin:` line; the exempt list is shrink-only and a list with "
+                      f"no pin cannot report that it stopped shrinking")
+    return bound, exempt, pin
+
+
+def assert_contract_registry(root: str, conf: dict, tracked: list) -> None:
+    """Both directions, plus the equality pin. Every failure names the row or the path."""
+    rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
+    bound, exempt, pin = read_contract_rows(root, conf)
+    named, have = bound | set(exempt), set(tracked)
+    # FORWARD — a tracked build README nothing names cannot silently escape the contract.
+    for miss in sorted(have - named):
+        raise Problem(f"{rel} names neither a bound nor an exempt row for `{miss}`, so a new build "
+                      f"would escape the contract by existing")
+    # REVERSE — a row naming a path that is not a tracked build README widens what it narrowed.
+    for dead in sorted(named - have):
+        raise Problem(f"{rel} carries a row for `{dead}`, which is not a tracked build README; a "
+                      f"stale row silently widens the surface it was written to narrow")
+    # The pin is an EQUALITY in both directions: above the count is permanent slack after a drain.
+    if pin != len(exempt):
+        raise Problem(f"{rel}: exempt-pin is {pin} and the measured exempt count is {len(exempt)}; "
+                      f"the pin is an equality, because a pin left above the count after a drain is "
+                      f"slack nothing reports")
 
 
 def _canon_violations(lines: list, first_open: int) -> list:
@@ -1429,6 +1479,7 @@ def do_check_format(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
                if p.endswith("/README.md")]
+    assert_contract_registry(root, conf, tracked)
     bound = read_contract_registry(root, conf)
     # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
     # conditional on anything using it.
@@ -1946,14 +1997,50 @@ def do_selftest() -> int:
         # refusal. Armed so the handover between the two units is visible rather than assumed.
         t16 = os.path.join(base, "registry"); os.makedirs(t16)
         conf16 = _fixture(t16, spec_status="OPEN")
-        arm("an absent contract registry reads as the empty set", "set()",
-            lambda: str(read_contract_registry(t16, conf16)))
+        # INVERTED BY TOOL-dFramedEntrypoint-3, deliberately and in the unit that changed it. Unit 1
+        # shipped an absent registry as the EMPTY SET — a pass — so that it did not depend on a file
+        # unit 3 had not written yet. Unit 3 makes it a refusal. Leaving unit 1's arm asserting the
+        # old behaviour would have been two arms disagreeing about one contract.
+        arm("an absent contract registry now REFUSES (was the empty set until unit 3)", "is absent",
+            lambda: read_contract_registry(t16, conf16))
         os.makedirs(os.path.join(t16, "memory", "project"), exist_ok=True)
         write_text(os.path.join(t16, "memory", CONTRACT_REGISTRY),
-                   "# a comment\n\nmemory/builds/tOne/README.md\n")
+                   "# a comment\nexempt-pin: 0\nmemory/builds/tOne/README.md\n")
         arm("a registry row binds its path and comments are skipped",
             "memory/builds/tOne/README.md",
             lambda: str(read_contract_registry(t16, conf16)))
+
+        # -------------------------------------------- TOOL-dFramedEntrypoint-3, the contract registry
+        t18 = os.path.join(base, "contract"); os.makedirs(t18)
+        conf18 = _fixture(t18, spec_status="OPEN")
+        reg18 = os.path.join(t18, "memory", CONTRACT_REGISTRY)
+        os.makedirs(os.path.dirname(reg18), exist_ok=True)
+        trk18 = ["memory/builds/tOne/README.md"]
+
+        def _reg(body):
+            write_text(reg18, body)
+            return lambda: assert_contract_registry(t18, conf18, trk18)
+
+        # An ABSENT registry is a REFUSAL here — the behaviour unit 1 shipped as the empty set, and
+        # this unit REPLACES it. Stated in both specs rather than left as two specs disagreeing.
+        os.path.exists(reg18) and os.remove(reg18)
+        arm("an absent registry refuses, replacing unit 1's empty set", "is absent",
+            lambda: assert_contract_registry(t18, conf18, trk18))
+        arm("a registry with no pin refuses", "no `exempt-pin:` line",
+            _reg("memory/builds/tOne/README.md\n"))
+        arm("a tracked README named by no row refuses", "names neither a bound nor an exempt row",
+            _reg("exempt-pin: 0\n"))
+        arm("a row naming a path that is not a tracked README refuses", "stale row silently widens",
+            _reg("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
+        arm("an exempt row with no reason refuses", "carries no reason",
+            _reg("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
+        arm("the pin ABOVE the measured count refuses, not only below", "the pin is an equality",
+            _reg("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
+        arm("a bound row and a matching pin pass", "None",
+            lambda: str(_reg("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+        arm("a bound row is BOUND and an exempt row is not",
+            "{'memory/builds/tOne/README.md'}",
+            lambda: str(read_contract_rows(t18, conf18)[0]))
 
         # ------------------------------------------------ TOOL-dFramedEntrypoint-2, the slot budget
         # THE READER'S OWN TRAP, armed because it shipped broken for one commit: every canonical slot

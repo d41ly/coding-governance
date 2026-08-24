@@ -253,6 +253,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "assert_contract_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "attribute_paths",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1809,6 +1814,11 @@
     },
     {
       "id": "read_contract_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_contract_rows",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
