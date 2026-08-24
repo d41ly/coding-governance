@@ -579,6 +579,73 @@ n=$((n+1))
 grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
   || { echo "canary: a switch-ON green did not record the switch in its stamp"; fail=1; }
 
+# 3h3. THE HELD LEGS REACH THE ARITHMETIC: the run total, the recorded figure, and the chunk close.
+#     TOOL-dUnstalledConvoy-31 and -32. Its parent gave the on-demand hold its own counter so it
+#     would stay out of `skips`, which the full-green stamp conjoins. Kept out of `skips`, it was
+#     also kept out of every figure `skips` feeds — so a bar that ran 43 of 85 legs printed
+#     `85/85 legs passed`, and the chunk holding nothing but kit self-tests closed GREEN. Both
+#     numbers are what a reader quotes, which is what makes this arithmetic worth an arm.
+S2="$SCRATCH/heldmath"
+mkdir -p "$S2/tools/run-gates" "$S2/fx"
+cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S2/tools/run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2/tools/run-gates/" 2>/dev/null || true
+cp "$SCRATCH/fx/instant.sh" "$S2/fx/a.sh"
+# TWO CHUNKS, ONE OF EACH SHAPE. `mixed` proves the tally is per-chunk and does not swallow the
+# chunk it appears in; `held` proves the all-held chunk changes verdict. A fixture with only the
+# second would pass on a runner that called every chunk skipped.
+cat > "$S2/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "m repo one", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
+  {"name": "m repo two", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
+  {"name": "m kit one",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "mixed"},
+  {"name": "h kit one",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"},
+  {"name": "h kit two",  "argv": ["bash", "fx/a.sh"], "subject": "kit",  "chunk": "held"}
+]
+JSON
+( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
+  && git add -A && git commit -qm fx ) >/dev/null 2>&1
+
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+# -31 AC1: the total is the count that RAN. Two repo legs ran, so the total is 2 and not 5.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
+  || { echo "canary: the run total counted legs that were held rather than run"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
+# shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: kit self-tests, GATE_SELFTESTS=1 runs them)$' \
+  || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+# -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
+# come to disagree, and the record is what a later run and the push boundary read instead of stdout.
+n=$((n+1))
+vf="$S2/.git/gate-run/$(cat "$S2/.git/gate-run/current" 2>/dev/null)/verdict"
+if [ -f "$vf" ]; then
+  awk -F'\t' '$1=="ran" && $2==2 {ok=1} END{exit !ok}' "$vf" \
+    || { echo "canary: the recorded run figure disagrees with the printed total"; awk -F'\t' '$1=="ran"||$1=="held"||$1=="skipped"' "$vf" | sed 's/^/    /'; fail=1; }
+  n=$((n+1))
+  awk -F'\t' '$1=="held" && $2==3 {ok=1} END{exit !ok}' "$vf" \
+    || { echo "canary: the held count is not on the run record at all"; fail=1; }
+else
+  echo "canary: no verdict record was written, so the recorded-figure arms prove nothing"; fail=1
+fi
+# -32 AC1: an all-held chunk closes SKIPPED. The runner already had this rule for guard-skips and
+# already asserted it in a comment; what it lacked was reachability from the newer skip kind.
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE '^---- chunk held: skipped  \(0 ran, 0 failed, 0 skipped, 0 reused, 2 held\)$' \
+  || { echo "canary: a chunk whose every leg was held closed green-by-absence"; printf '%s\n' "$o" | grep -- '---- chunk' | sed 's/^/    /'; fail=1; }
+# -32 AC2: its control — a chunk that DID run stays green, and carries its own held tally. Without
+# this a runner that called every chunk skipped would pass the arm above.
+n=$((n+1))
+printf '%s\n' "$o" | grep -qE '^---- chunk mixed: green  \(2 ran, 0 failed, 0 skipped, 0 reused, 1 held\)$' \
+  || { echo "canary: a mixed chunk lost its held tally or changed verdict"; printf '%s\n' "$o" | grep -- '---- chunk' | sed 's/^/    /'; fail=1; }
+
+# -31 AC4: with the switch ON nothing is held, so the total is the whole manifest and the note is
+# gone. A note that survives a run with nothing to report is the same defect pointing the other way.
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+n=$((n+1))
+printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
+  || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
+
 # 3i. GATE_FULL bypasses every guard. This is the invariant the whole diff-scoping scheme rests on:
 #     `.githooks/pre-push` no longer sets it unconditionally: it DECIDES, and forces a total run
 #     when no recorded full green covers the pushed tip. So a guard can now scope the
@@ -1113,7 +1180,7 @@ case "$order" in
   *) echo "canary: chunked reporting did not group an interleaved manifest — legs reported as: $order"; fail=1 ;;
 esac
 n=$((n+1))
-printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused\)$' \
+printf '%s' "$cout" | grep -qE '^---- chunk one: green  \(2 ran, 0 failed, 0 skipped, 0 reused, 0 held\)$' \
   || { echo "canary: the per-chunk verdict line is missing or off-grammar"; printf '%s\n' "$cout" | grep 'chunk' | sed 's/^/    /'; fail=1; }
 n=$((n+1))
 # A LEG WITH NO KEY falls into `default` rather than being dropped — a leg that vanishes from the

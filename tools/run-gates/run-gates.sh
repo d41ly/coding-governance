@@ -990,14 +990,21 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # A CHUNK IN WHICH EVERY LEG WAS SKIPPED REPORTS AS SKIPPED, never as green. On a scoped run the
   # guard pre-pass decides those legs before dispatch, so the chunk closes at once — and calling that
   # green would be the loudest possible green-by-absence, one altitude above a single leg.
-  elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && [ "$c_skip" -gt 0 ]; then verdict="skipped"
+  # A HELD LEG IS A LEG THAT DID NOT RUN, so it satisfies this rule exactly as a guard-skip does.
+  # The rule above was already correct and already stated; what it lacked was reachability from the
+  # newer skip kind, which is worse than a missing rule because the comment asserts it. A chunk of
+  # nothing but kit self-tests closed GREEN on every switch-off bar. TOOL-dUnstalledConvoy-32.
+  elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && { [ "$c_skip" -gt 0 ] || [ "${c_ondemand:-0}" -gt 0 ]; }; then verdict="skipped"
   else verdict="green"; fi
-  printf -- '---- chunk %s: %s  (%s ran, %s failed, %s skipped, %s reused)\n' \
-    "$cur_chunk" "$verdict" "$c_ran" "$c_fail" "$c_skip" "$c_reuse"
+  # HELD IS ITS OWN TALLY and not folded into `skipped`, for the reason the leg verb is its own verb:
+  # the two have different remedies. A guard-skip runs again when its path moves; a held leg runs
+  # when somebody sets the variable, and a reader who cannot tell them apart waits for the wrong one.
+  printf -- '---- chunk %s: %s  (%s ran, %s failed, %s skipped, %s reused, %s held)\n' \
+    "$cur_chunk" "$verdict" "$c_ran" "$c_fail" "$c_skip" "$c_reuse" "${c_ondemand:-0}"
   # PER-CHUNK WALL TIME goes to the durable records and NOT to stdout: a wall clock on a terminal
   # line invites comparison between runs that are not comparable, which is the whole reason the
   # profiling verb records an envelope.
-  CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${secs}\n"
+  CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
   cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 }
 live() { jobs -rp | wc -l; }
@@ -1078,6 +1085,16 @@ fi
 echo "----"
 skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 [ "${reuses:-0}" -gt 0 ] && skipnote="$skipnote (${reuses} reused)"
+# THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
+# total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
+# population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
+[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: kit self-tests, GATE_SELFTESTS=1 runs them)"
+
+# THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
+# Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
+# the one a reader quotes. A leg that was held did not run, so counting it in the total is the
+# green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
+ran=$((n-skips-${ondemands:-0}))
 
 # ---- the verdict, the full-green stamp, and the sweep --------------------------------------
 # `reuses` is the fourth full-green precondition, counted by the reuse verb above. A run that reused
@@ -1096,9 +1113,10 @@ if [ -n "$RUNDIR" ]; then
   {
     printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'verdict\t%s\n' "$gate_verdict"
-    printf 'ran\t%s\n' "$((n-skips))"
+    printf 'ran\t%s\n' "$ran"
     printf 'failed\t%s\n' "$fails"
     printf 'skipped\t%s\n' "$skips"
+    printf 'held\t%s\n' "${ondemands:-0}"
     printf 'reused\t%s\n' "$reuses"
     printf 'fingerprint_end\t%s\n' "$FPRINT_END"
     printf 'tree_moved\t%s\n' "$tree_moved"
@@ -1151,8 +1169,8 @@ if [ "$fails" = 0 ]; then
   # measurement.
   # `QUEUE_SUMMARY` rides beside `PROF_LINE` on every path — green, red, and the durable RED copy —
   # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$((n-skips))" "$((n-skips))" "$skipnote"; } >"$sfile" 2>/dev/null || true
-  echo "gates GREEN — $((n-skips))/$((n-skips)) legs passed$skipnote"; exit 0
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
+  echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
 else
   [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
