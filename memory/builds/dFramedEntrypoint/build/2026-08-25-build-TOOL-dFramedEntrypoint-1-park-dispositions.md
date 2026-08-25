@@ -22,7 +22,8 @@ conforms it", which is now the literal policy rather than a placeholder.
 
 ### 2. The authored `roster:units` pair becomes MANDATORY and gated
 
-**Ruling: gate its presence.** `build-complete` term 3 stops passing vacuously on 51 of 62 builds and
+**Ruling: gate its presence.** `build-complete` term 3 stops passing vacuously on 51 of 62 builds
+and
 becomes a real check, and `TOOL-aPacedTurnstile-14` closes.
 
 **This is follow-up work and it is not small.** 51 build READMEs gain a pair; the gate needs a
@@ -39,7 +40,8 @@ set a different figure, which is the owner exercising exactly the authority M3's
 
 M1 declares the pair and no gate enforces it, which is why the file sat 2 lines over unnoticed. The
 raise makes the current content legal with room; whether the pair ever gets a gate is now a separate
-question nobody has been asked. Recorded plainly: this ruling fixes the breach and not the blindness.
+question nobody has been asked. Recorded plainly: this ruling fixes the breach and not the
+blindness.
 
 ### 4. `dead-path-waivers.txt` keys on the surrounding line's TEXT
 
@@ -59,8 +61,19 @@ about STATUS; they disagree about which unit each volunteers first. The fix live
 
 ## Not a decision
 
-The sixth parked entry is a CORRECTION, not a question: this run parked the lexicon naming leg as red
+The sixth parked entry is a CORRECTION, not a question: this run parked the lexicon naming leg as
+red
 at BASE and therefore not its to fix, and that was wrong. Measured with `git stash` on a tree whose
 work was already committed, so stash dropped nothing and the reading was of HEAD. Re-measured in an
 isolated worktree, BASE is green; the whole overage was this build's own functions, and it was fixed
 by renaming twelve of them onto declared verbs with no pin raised.
+
+## An id collision this record has to own
+
+The four rows above were first filed as `TOOL-dFramedEntrypoint-2` through `-5`, which are the ids
+of four CLOSED specs in this same build. Section 2's rule is that `<seq>` is the numeric max of your
+own ids in that family plus one, and the max was 9; I took the next four unused-looking numbers
+instead of deriving them. Renumbered to 10 through 13 before anything cited them. The hygiene gate
+did not catch it, and it would not: a backlog row CITING an id is not a second DEFINITION of it, so
+checks 13 and 14 both read this as legal. The collision is semantic and the only reader who would
+have noticed is a person following the id to the wrong document.

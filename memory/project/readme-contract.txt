@@ -85,6 +85,7 @@ exempt-pin: 61
 !memory/builds/cTracedPromise/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/dClosedLexicon/README.md - predates the contract; drains when its build's owner conforms it
 memory/builds/dFramedEntrypoint/README.md
+memory/builds/dHonouredPark/README.md
 !memory/builds/dNomadicAtlas/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/dScriptedRepeat/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/dScrubbedConduit/README.md - predates the contract; drains when its build's owner conforms it

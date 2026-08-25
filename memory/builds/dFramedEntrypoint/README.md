@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: tooling
 roster: TOOL
-ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
+ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9 TOOL-dFramedEntrypoint-10 TOOL-dFramedEntrypoint-11 TOOL-dFramedEntrypoint-12 TOOL-dFramedEntrypoint-13
 ---
 
 # dFramedEntrypoint — the build README becomes a closed, budgeted authored slot set
@@ -60,7 +60,8 @@ lexicon naming leg is red at the base with its guard hiding it. None is this bui
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-08-24 · streams tooling
-ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
+ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9 TOOL-dFramedEntrypoint-10 TOOL-dFramedEntrypoint-11
+ids TOOL-dFramedEntrypoint-12 TOOL-dFramedEntrypoint-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -98,5 +99,5 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [dHonouredPark](../dHonouredPark/README.md)
 <!-- /gen:build-edges -->
