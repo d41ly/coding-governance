@@ -2,7 +2,7 @@
 
 # TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt
 
-**Status:** OPEN · rev-4 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
+**Status:** WONTDO · rev-5 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling · retired: the instruction already ships via memory-tree
 
 <!-- gen:spec-records -->
 
@@ -137,6 +137,15 @@ untouched, and `LAYER_OFFENDER_PIN` stays `0` because nothing crosses the declar
   assertion.
 
 ## 9. Revision log
+
+- rev-5 · 2026-08-25 · node d · WONTDO. Retired, not parked. Spec-audit round 2 (B6) found that the
+  instruction this unit adds already ships three ways, one of them word-for-word: BUILD-METHOD.md:140
+  renders the reuse_lookup call with the behavioural-phrase wording AND a derived {{TOOL_ROOT}} prefix,
+  which is the install-prefix problem rev-4 could not solve; SPEC-TEMPLATE.template.md:227 is a second
+  carrier and check-memory-hygiene.sh:744 the forcing function. A fourth carrier is
+  two-answers-to-one-question, which this spec cites in its own non-goals. The residual value -- the
+  moment and the audience, on the will-not-fit branch only -- does not carry a documented
+  anti-pattern. Three audits found this spec wrong three times, which is its own evidence.
 
 - rev-1 · 2026-08-25 · node d · OPEN. Proposed a subprocess from `lexicon.py` into
   `reuse_lookup.py` on the refusal path, keyed on `read_object()`.
