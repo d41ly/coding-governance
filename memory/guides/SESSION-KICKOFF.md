@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T09:27:07+03:00 @ 85d67742c44a33b5f21040263adc518b4d70ea1a
+last-audit: 2026-08-25T10:52:51+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f5ccdb1175c54e8b3ffc281296e97fce86675d7b
+last-body-change: 70df24ea1963afd7ee12749acb3bd323e5fa239a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -97,9 +97,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
   the cheap check is a `git log` at kickoff rather than a merge at landing.
 
-- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
-  `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
-  16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
+- **The read path is NOT full, and the ceiling measuring it is being retired.** The pin went
+  135677 -> 161120 on 2026-08-25, leaving 25600 B — four days at the measured 6184 B/day. Do NOT
+  raise it again by reflex: it moved 26 times in 17 days, 25 up, and the one drop was another
+  check's doing. `TOOL-dSpentCeiling` replaces it with a rate signal. Prune when it is terminal.
 
 ### Pointer map (load the row(s) the task touches)
 
