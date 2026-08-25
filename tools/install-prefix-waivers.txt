@@ -16,5 +16,5 @@ tools/codebase-map/map_lib.py:1244      REGEN_CMD legacy, deliberate: a pre-1.1 
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
 tools/memory-tree/README.md:108         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it
-tools/memory-tree/corpus_ids.py:781     check-15 selftest fixture: a wrong-prefix citation, built to prove the check fires
-tools/memory-tree/corpus_ids.py:785     the tracked file that fixture cites at the correct prefix
+tools/memory-tree/corpus_ids.py:833     check-15 selftest fixture: a wrong-prefix citation, built to prove the check fires
+tools/memory-tree/corpus_ids.py:837     the tracked file that fixture cites at the correct prefix

@@ -538,6 +538,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_read_path",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "check_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -786,6 +791,16 @@
       "id": "dead_alias_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "declares",

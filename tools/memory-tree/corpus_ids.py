@@ -30,6 +30,7 @@ never the silent pass a bare `try: import` would produce.
 """
 from __future__ import annotations
 
+import io
 import os
 import posixpath
 import pathlib
@@ -98,6 +99,42 @@ def load_conf(root: str) -> dict:
             k, _, v = line.partition("=")
             conf[k.strip()] = v.strip().strip('"').strip("'")
     return conf
+
+
+def read_declared_keys(root: str) -> set:
+    """The keys the project's conf ACTUALLY writes, as against `load_conf`'s merged defaults.
+
+    Two callers need the distinction and neither can get it from `conf`: a retired key is announced
+    on PRESENCE, and a `CHARTER` the adopter never declared is a tree with no mandatory reading yet
+    rather than a mis-set one. Re-parsing one small file is cheaper than threading a second return
+    value through every caller of `load_conf`, and it cannot drift from it — same file, same rule.
+    """
+    out = set()
+    p = os.path.join(root, ".memory-tree.conf")
+    if os.path.isfile(p):
+        for line in read(p).split("\n"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                out.add(line.partition("=")[0].strip())
+    return out
+
+
+def read_declared_keys(root: str) -> set:
+    """The keys the project's conf ACTUALLY writes, as against `load_conf`'s merged defaults.
+
+    Two callers need the distinction and neither can get it from `conf`: a retired key is announced
+    on PRESENCE, and a `CHARTER` the adopter never declared is a tree with no mandatory reading yet
+    rather than a mis-set one. Re-parsing one small file is cheaper than threading a second return
+    value through every caller of `load_conf`, and it cannot drift from it — same file, same rule.
+    """
+    out = set()
+    p = os.path.join(root, ".memory-tree.conf")
+    if os.path.isfile(p):
+        for line in read(p).split("\n"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                out.add(line.partition("=")[0].strip())
+    return out
 
 
 def _parse_conf_int(conf: dict, key: str, default=None) -> int:
@@ -377,7 +414,7 @@ def read_set(w: dict) -> tuple:
     return sorted(members), sorted(absent)
 
 
-def _kit_version(root: str) -> tuple:
+def _read_kit_version(root: str) -> tuple:
     """The ENGINE's own version as `(major, minor)`, ASKED of the engine.
 
     The grace below ends by version, so this must come from where the engine's identity actually
@@ -413,26 +450,35 @@ def check_read_path(root: str, conf: dict) -> tuple:
     Returns `(bad, notes)`. Notes print and do not touch the exit code.
     """
     bad, notes = [], []
+    written = read_declared_keys(root)
     for k in RETIRED_KEYS:
-        if k in conf:
+        if k in written:
             notes.append(f"check 16: NOTE {k} is declared in .memory-tree.conf and is no longer "
                          f"read — the read-path budget was retired, and check 6's per-member byte "
                          f"caps are the bound. Delete the line.")
 
     charter = conf["CHARTER"]
     tracked = {p for p in run("git", "ls-files", cwd=root).split("\n") if p}
+    found = []
     if charter not in tracked:
+        if "CHARTER" not in written:
+            # NOT ASKED, and it announces itself. A freshly scaffolded tree declares no CHARTER and
+            # has no AGENTS.md yet: it has no mandatory reading, which is a REAL state rather than a
+            # defect, and refusing it would red every adopter on the day they adopt. Measured — this
+            # is exactly what `adopt-memory-tree.sh --scaffold` produces.
+            notes.append(f"check 16: not asked — this tree declares no CHARTER and the default "
+                         f"'{charter}' is not tracked, so there is no read path to grade yet")
+            return bad, notes
         # A FINDING plus an early return, never a raise. Raising here escaped `checks()` and made
         # main() print one line, so a mis-set CHARTER replaced every check-13/14/15 finding in the
         # run with itself. This check owns its own failure and lets its siblings report.
-        bad.append(f"check 16: CHARTER '{charter}' is not a tracked file, so the read path has no "
-                   f"source and rules 3 and 4 graded nothing")
-        return bad, notes
+        found.append(f"check 16: CHARTER '{charter}' is declared and is not a tracked file, so the "
+                     f"read path has no source and rules 3 and 4 graded nothing")
+        return _resolve_sink(root, bad, notes, found)
 
     members, absent = read_set({"root": root, "conf": conf, "tracked": tracked})
     capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
     waived = set(conf["READ_PATH_WAIVER"].split())
-    found = []
     for p in members:                                                              # rule 3
         if p not in capped and p not in waived:
             found.append(f"check 16 rule 3: {charter} points a session at {p}, which is under "
@@ -445,7 +491,13 @@ def check_read_path(root: str, conf: dict) -> tuple:
         found.append(f"check 16 rule 4: {p} is tracked but absent from the worktree, so the charter "
                      f"points a session at a file that is not there")
 
-    if found and _kit_version(root) < READ_PATH_GATES_FROM:
+    return _resolve_sink(root, bad, notes, found)
+
+
+def _resolve_sink(root: str, bad: list, notes: list, found: list) -> tuple:
+    """Route this check's findings to the gating list or the reporting one. ONE decision, in one
+    place, so the charter arm and the two rules cannot drift apart on whether the grace applies."""
+    if found and _read_kit_version(root) < READ_PATH_GATES_FROM:
         # THE GRACE ANNOUNCES ITSELF. A rule that is not gating and does not say so is
         # indistinguishable from a rule that found nothing.
         gate_at = "%d.%d" % READ_PATH_GATES_FROM
@@ -880,23 +932,48 @@ def cmd_selftest() -> int:
 
         # THE RETIRED KEYS — announced, never refused. The shipped example declared the ceiling
         # BLANK, so a rule that refused on presence would red every adopter for doing nothing.
-        for _k in RETIRED_KEYS:
-            c7r = dict(c7clean); c7r[_k] = "161120"
-            arm(f"a declared {_k} is announced and does NOT gate",
-                f"NOTES:check 16: NOTE {_k} is declared",
-                lambda c=c7r: _rp(t7c, c))
-            c7rb = dict(c7clean); c7rb[_k] = ""
-            arm(f"...and a BLANK {_k} is announced identically, since presence is the test",
-                f"NOTES:check 16: NOTE {_k} is declared",
-                lambda c=c7rb: _rp(t7c, c))
+        # The key must be written into the CONF FILE, not into the parsed dict: `read_declared_keys()`
+        # re-reads the file precisely so a merged default cannot masquerade as a declaration, and an
+        # arm that mutated the dict would pass against a version that never read the file at all.
+        for _ki, _k in enumerate(RETIRED_KEYS):
+            for _vi, _v in enumerate(('"161120"', '""')):
+                tR = os.path.join(base, "retired%d%d" % (_ki, _vi)); os.makedirs(tR)
+                cR = _scratch(tR, pins=False)
+                _cp = os.path.join(tR, ".memory-tree.conf")
+                with io.open(_cp, "a", encoding="utf-8", newline="") as fh:
+                    fh.write("%s=%s\n" % (_k, _v))
+                run("git", "add", "-A", cwd=tR)
+                run("git", "commit", "-q", "-m", "retired", "--no-verify", cwd=tR)
+                cR = load_conf(tR)
+                how = "declared" if _vi == 0 else "declared BLANK"
+                arm(f"a {how} {_k} in the conf FILE is announced and does NOT gate",
+                    f"NOTES:check 16: NOTE {_k} is declared",
+                    lambda t=tR, c=cR: _rp(t, c))
         arm("a retired key alone does not arm checks 13-15",
             None, lambda: str(armed(dict(c7clean, READ_PATH_CEILING="161120"))).replace("False", ""))
 
         # A MIS-SET CHARTER IS THIS CHECK'S OWN FINDING, not a Problem that escapes checks() and
         # replaces every sibling finding in the run with one line.
         c7c = dict(c7); c7c["CHARTER"] = "NOPE.md"
-        arm("a missing charter is check 16's finding and returns early",
-            "check 16: CHARTER 'NOPE.md' is not a tracked file", lambda: _rp(t7, c7c))
+        arm("a DECLARED charter that is not tracked is check 16's own finding",
+            "check 16: CHARTER 'NOPE.md' is declared and is not a tracked file",
+            lambda: _rp(t7, c7c))
+        # A YOUNG TREE IS NOT A BROKEN ONE. `adopt-memory-tree.sh --scaffold` writes no CHARTER and
+        # no AGENTS.md, so an unconditional check 16 refused every adopter on the day they adopted —
+        # measured, as a RED on this repo's own scaffolder arm before this branch was corrected.
+        t7y = os.path.join(base, "readpath-young"); os.makedirs(t7y)
+        c7y = _scratch(t7y, pins=False)
+        os.remove(os.path.join(t7y, "AGENTS.md"))
+        run("git", "rm", "-q", "--cached", "AGENTS.md", cwd=t7y)
+        run("git", "commit", "-q", "-m", "no charter", "--no-verify", cwd=t7y)
+        _conf_no_charter = io.open(os.path.join(t7y, ".memory-tree.conf"),
+                                   encoding="utf-8", newline="").read()
+        io.open(os.path.join(t7y, ".memory-tree.conf"), "w", encoding="utf-8", newline="").write(
+            "\n".join(l for l in _conf_no_charter.split("\n") if not l.startswith("CHARTER=")))
+        c7yc = load_conf(t7y)
+        arm("an undeclared CHARTER with no default file is NOT ASKED, and says so",
+            "not asked", lambda: _rp(t7y, c7yc))
+        arm("...and it does not gate", "BAD: NOTES:", lambda: _rp(t7y, c7yc))
         arm("...and read_set still RAISES for cmd_report, which catches it",
             "is not a tracked file",
             lambda: read_set({"root": t7, "conf": c7c, "tracked": set()}))
