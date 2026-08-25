@@ -1,6 +1,6 @@
 # TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -268,15 +268,19 @@ units 3 and 4 both list and rev-1 omitted · `check-kit-versions.sh` · `check-v
 
 ## 8. Open questions
 
-- **F1 — does the presence assertion live in the driver or on the slot-contract leg?** The SLOT LEG,
-  per S3: the driver has no notion of the population, and a presence check there would only run when a
-  run exists, which is not when a README is authored. S4 records the condition that answer carries —
-  the leg must not inherit `_marker_index`'s first-match semantics.
-- **F2 — RESOLVED.** rev-1 asked what happens to a build EXEMPT today that becomes bound later. The
-  contract's membership no longer scopes this assertion, so the question does not arise.
+- **F1 — does the presence assertion live in the driver or on the slot-contract leg?**
+  RESOLVED (agent, 2026-08-25, delegated) — the SLOT LEG, per S3. The driver has no notion of the
+  population, and a presence check there would only run when a run exists, which is not when a README
+  is authored. S4 records the condition that answer carries: the leg must not inherit the engine
+  helper's first-match semantics.
+- **F2 — what happens to a build EXEMPT today that becomes bound later?** RESOLVED (agent, 2026-08-25, delegated)
+  — the question does not arise. The contract's membership no longer scopes this assertion, so there is
+  no transition to handle.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · M3 fork sweep. F1 resolved to the slot leg; F2 restated as the question it
+  was and resolved as not arising. Both marks now carry the documented shape.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s first park.
 - rev-3 · 2026-08-25 · round-2 fold. Fixed §4's commit ORDER, which rev-1 and rev-2 both stated
   backwards in the sentence before stating it forwards. Deleted the non-goal that survived ruling 1's

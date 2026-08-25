@@ -1,6 +1,6 @@
 # TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 2 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 2 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -275,18 +275,21 @@ helper, which it does not today.
 
 ## 8. Open questions
 
-- **F1 — is whitespace normalisation the right tolerance?** Leading and trailing only. Tabs inside a
-  line are part of its text and the parse rule in §4 handles them. Recommendation: as specced — a
-  re-indent should not unpin a waiver, and anything wider starts matching lines the author did not
+- **F1 — is whitespace normalisation the right tolerance?** RESOLVED (agent, 2026-08-25, delegated) —
+  leading and trailing only. Tabs inside a line are part of its text and §4's parse rule handles them.
+  A re-indent must not unpin a waiver, and anything wider starts matching lines the author did not
   mean.
-- **F2 — does `install-prefix-waivers.txt` follow?** It is the file `check-dead-paths.sh:51` claims
-  parity with, twelve rows in the same shape with the same exposure. The owner ruled one file, and S6
-  corrects the parity sentence rather than the sibling. Recommendation: no, and it moves only when its
-  own keying has actually failed — but the corrected sentence should say the divergence is deliberate,
-  so the next reader does not "restore" it.
+- **F2 — does `install-prefix-waivers.txt` follow?** RESOLVED (agent, 2026-08-25, delegated) — NO. It
+  carries twelve rows in the same shape with the same exposure and is the file `check-dead-paths.sh`
+  claims parity with, but the owner ruled ONE file and a registry moves when its own keying has
+  actually failed, not by association. S6's corrected parity sentence must say the divergence is
+  DELIBERATE, so the next reader does not "restore" it — that clause is the whole cost of this
+  answer.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · M3 fork sweep. F1 and F2 resolved as specced; F2's answer carries a cost —
+  S6's corrected parity sentence must say the divergence from the sibling registry is deliberate.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s fifth park.
 - rev-3 · 2026-08-25 · round-2 fold. Restated S3's staleness as a MEMBERSHIP test after round 2 found
   the needle formulation is not computable — the checker attributes no needle to any row, and two

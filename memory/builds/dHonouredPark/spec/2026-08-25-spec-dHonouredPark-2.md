@@ -1,6 +1,6 @@
 # TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 60ba1d60 · order 1 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 60ba1d60 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -191,10 +191,14 @@ confirmed against unit 3.
 
 ## 8. Open questions
 
-- **F1 — does the pair get a gate?** UNRULED, and deliberately left so. The owner was asked only about
-  the budget figure and the byte cap; the gate was never put to them, and the parent build's `RUN.md`
-  records three options with no recommendation. rev-1 carried a resolution stamp on this question while
-  its own text said the question stays unruled. The stamp is withdrawn.
+- **F1 — does THIS UNIT add a gate for the pair?** RESOLVED (agent, 2026-08-25, delegated) — no, which
+  §3's first non-goal already states. The fork is decided for this unit and nothing here is left open.
+
+  **Whether a gate is EVER added is a different question and it is PARKED, not resolved.** M3's veto 2
+  puts a change to a governance carrier's own constraints outside the delegated mandate, and the budget
+  pair is exactly that, so no resolver this run holds exists for it. The owner was asked about the line
+  figure and the byte cap and was never asked this; the parent build's `RUN.md` records three options
+  with no recommendation. The park carries it to the wrap-up.
 
   It is described here rather than quoted, and that is not fastidiousness. `plan_state` in
   `tools/unattended/unattended.sh` decides FORKED against READY by matching the stamp's pattern
@@ -206,6 +210,9 @@ confirmed against unit 3.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · M3 fork sweep. F1 split: whether THIS unit adds a gate is resolved (no, per
+  §3), and whether one is ever added is PARKED under veto 2 as a governance-carrier change no
+  delegated mandate reaches.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s second park.
 - rev-3 · 2026-08-25 · round-2 fold. Corrected the mean-line denominator, which counted 72 blank lines
   and overstated the remaining room by ~30%. Stopped quoting the withdrawn resolution stamp, which

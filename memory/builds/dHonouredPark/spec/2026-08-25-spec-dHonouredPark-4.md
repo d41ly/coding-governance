@@ -1,6 +1,6 @@
 # TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -250,17 +250,21 @@ this list. An exemption is not coverage, so the exemption is written down with w
 
 ## 8. Open questions
 
-- **F1 — RESOLVED.** `--plan` still reads the spec files, for two things the region does not carry:
-  `plan_state`'s THIN/FORKED/READY classification, and S6's two `NOT A UNIT` conditions. The region
-  supplies the SET and its ORDER. One source per question, which is the rule rather than a compromise.
-- **F2 — should `--status` and `--plan` share one enumerator function?** It would make divergence
-  structurally impossible rather than merely tested. Against: it widens this unit into a refactor of
-  two verbs with different output contracts, and S4 establishes that one intended divergence survives
-  anyway. Recommendation: shared enumerator IF it falls out of S1 without changing either verb's
-  output; otherwise S7's arms are the guard and the refactor is its own row.
+- **F1 — does `--plan` keep reading the spec files at all?** RESOLVED (agent, 2026-08-25, delegated) —
+  yes, for two things the region does not carry: `plan_state`'s THIN/FORKED/READY classification, and
+  S6's two `NOT A UNIT` conditions. The region supplies the SET and its ORDER. One source per question,
+  which is the rule rather than a compromise between two.
+- **F2 — should `--status` and `--plan` share one enumerator function?** RESOLVED (agent, 2026-08-25, delegated)
+  — NO, not in this unit. It would make divergence structurally impossible rather than merely tested,
+  which is the better end state; but it widens a scoped change into a refactor of two verbs with
+  different output contracts, and S4 establishes that one INTENDED divergence survives it anyway, so
+  the refactor would not even close the question it is for. S9's arms are the guard. The refactor is
+  its own backlog row, filed with this resolution rather than left as a conditional nobody decides.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · M3 fork sweep. F1 restated as a question and resolved; F2 resolved NO rather
+  than left conditional, with the shared-enumerator refactor filed as its own backlog row.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s third park —
   the one park that was still unruled when the build landed.
 - rev-3 · 2026-08-25 · round-2 fold. Corrected S6's second diagnostic — the branch tests whether the
