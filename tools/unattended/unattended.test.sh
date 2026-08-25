@@ -61,7 +61,11 @@ n=0
 
 # A POSITIVE assertion: the run's output must CONTAIN the branch's own failure text. `hit` is the
 # only arming helper here; `miss` is deliberately spelled so check-arms scores it as negative.
-hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
+# A FAILING ASSERTION SHOWS WHAT IT GOT. `hit` printed only the needle, so every red here read
+# "the driver did not say X" with no way to learn what it DID say — and diagnosing three stale
+# arms in this file meant re-running a 900 s suite to find out. The actual output is truncated
+# because some refusals are paragraphs, and the first line is always the verdict.
+hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
@@ -1663,6 +1667,12 @@ same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && ech
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
 
+# REBUILT IMMEDIATELY BEFORE THE ARM (TOOL-dHonouredPark-4 fallout, not this build's). A
+# `reset_tree` between the setup above and this line wipes tPlanEmpty, so `--plan` ran against
+# a build that no longer existed. The OLD driver fell through to the spec-derived listing and
+# printed the message below anyway; S5 removed that fall-through, so the absent README now
+# refuses at check 42 and this arm asserted a branch it could no longer reach.
+reset_tree; readme tPlanEmpty; fixture
 hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against"
 
 # ---- TOOL-dHonouredPark-4 — the SET and its ORDER come from the GENERATED region -----------------
@@ -2901,7 +2911,7 @@ hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 
 # refused correctly and the reader was told the offender was `other R9` — a true refusal for a
 # false reason, which is the kit's own recorded class sending them to the wrong field.
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "leg [a · b]"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg "$(printf 'a
 b')" --verdict PASS)" "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
 
@@ -2955,6 +2965,12 @@ reset_tree
 # ---- ...and both writers REFUSE the flag at write time, which is the guard the citation above points
 # ---- at. The pair matters: the driver prevents, check 10 detects what landed anyway, and neither
 # ---- alone is the both-ends coverage the charter asks for on a guarded surface.
+# ---- THE FIXTURE IS REBUILT FIRST. The `reset_tree` above wipes `pc/` and `recs/`, so without this
+# ---- the driver refuses on "a piece record names a path that is not a file in this tree" and the
+# ---- bypass branch below is never reached — the arm asserted a message it could not provoke and
+# ---- read as this suite's own rot rather than as a fixture that had gone stale under it.
+mkdir -p pc/one recs recs2; printf 'a fixture piece
+' > pc/one/piece.md; git add -A >/dev/null
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a --no-verify b' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a --no-verify b' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 
@@ -2993,7 +3009,7 @@ hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b'
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "leg [a · reason b]"
 # ...and a separator in the SET, which is the field the widening added and the message did not.
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg ok --verdict PASS --set 'AAAA · leg honest · verdict PASS')" "set [AAAA · leg honest · verdict PASS]"
-hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 
 # ---- HIGH 2: the row dropper takes NO REGEX. Both writers spelled it as a `sed` ADDRESS carrying an
 # ---- unescaped caller-supplied leg name, so a leg named `.*` matched every verdict row and erased a
