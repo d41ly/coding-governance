@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dPromptedSeam-1
+ids: TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2
 ---
 
 # dPromptedSeam — a refused name also answers "does this already exist"
@@ -43,23 +43,27 @@ make `build_index` and `render_index` comparable as one concept, and today only 
   nothing.
 
 ## Parked decisions
-None yet.
+- The spec audit refuted rev-1's mechanism on three grounds and the goal was re-specced through the
+  rendered Skill. What is NOT resolved is whether an instruction nobody is forced to read is enough:
+  rev-2 trades an automatic trigger for a correct query and says so plainly rather than arguing the
+  loss away. If the Skill step is measured to go unread, `-1` Q2 reopens.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dPromptedSeam-1
+**Build status:** OPEN · 2 unit(s) · node d · opened 2026-08-25 · streams tooling
+ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 2 | OPEN | rev-1 | 2026-08-25 |
+| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | OPEN | rev-2 | 2026-08-25 |
+| [TOOL-dPromptedSeam-2 — `read_object` returns nothing usable for a third of the corpus](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | OPEN | rev-1 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dPromptedSeam-1.
+Ids no record names: TOOL-dPromptedSeam-2.
 
-Ids no `spec-audit` record has ever named: TOOL-dPromptedSeam-1.
+Ids no `spec-audit` record has ever named: TOOL-dPromptedSeam-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
