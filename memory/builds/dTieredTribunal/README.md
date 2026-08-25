@@ -13,12 +13,13 @@ status: OPEN
 ## The problem this build exists to solve
 `BUILD-METHOD.md` M4 forbids `tier2-review.js` on a spec — it reviews DIFFS, and a spec is not code —
 so every spec audit is driven by a script authored from scratch in the session that needs it. That is
-the MAJORITY kind: 82 of this corpus's 156 review records are `spec-audit` against 73 `diff-review`.
+the MAJORITY kind: 82 of this corpus's 156 records are `spec-audit` against 73 `diff-review`.
 A hand-written driver re-loses the harness's trust accounting — the integer verdict join, the
-dead-lens and dead-skeptic counters, unverified-is-not-refuted, the synth-death hole — each of which
-is a defect that shipped once and is now a comment. When one regresses the review is discarded and
-its tokens are gone: `aSiftedPlaybook`'s round-1 spec audit ran one lens of four with no skeptic pass
-and no synthesis, and its own closing line forbids any spec proceeding on it.
+dead-lens and dead-skeptic counters, unverified-is-not-refuted, the synth-death hole — each a defect
+that shipped once and survives only as a comment. The loss is measured: of three agent-spawning
+pipelines in `tools/workflows/`, only `tier2-review.js` carries any of it, and the bar is green over
+all three. It shows as ABSENCE, not a crash: a field a program emits appears in 77–88% of records,
+one a document asks a human to remember in 5–27%.
 
 ## Expected improvements
 - One hardened engine drives every review a build needs — spec audit, diff review, fold round,
@@ -54,7 +55,7 @@ and no synthesis, and its own closing line forbids any spec proceeding on it.
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 0 record folder(s).
+Records: 1 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
