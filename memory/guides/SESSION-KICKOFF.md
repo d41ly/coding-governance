@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-26T09:30:00+03:00 @ 155e23ded6a95d21a8ca7591cfe2d499b43274b7
+last-audit: 2026-08-26T10:10:00+03:00 @ 7cca313af857c780b2c42ccf9d81df4c6fa1f035
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f5ccdb1175c54e8b3ffc281296e97fce86675d7b
+last-body-change: 7cca313af857c780b2c42ccf9d81df4c6fa1f035
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -50,11 +50,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
-  authority are M3's and M6's; they are not restated here, for the reason the directives bullet
-  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
-  pass's declared write set, and the comparison REPORTS to stdout without ever failing the bar
-  (`TOOL-dUnstalledConvoy-23`). Declare write sets anyway; a green leg is not a disjointness proof.
+  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
+  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
@@ -97,6 +95,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
   the cheap check is a `git log` at kickoff rather than a merge at landing.
 
+- **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
+  or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
+  readme-contract's bound subset. Seed a new build's from its own spec ids.
 - **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
   `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
   16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
