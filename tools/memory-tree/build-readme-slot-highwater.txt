@@ -19,7 +19,7 @@
 # EMPTY of rows today, because the declared population is empty until TOOL-dFramedEntrypoint-7 seeds
 # it. `--bump` writes the measured rows at that point.
 ## The problem this build exists to solve	693
-## Expected improvements	435
+## Expected improvements	468
 ## Detriments if this is not built	397
-## Build-level rules	720
-## Parked decisions	480
+## Build-level rules	823
+## Parked decisions	543
