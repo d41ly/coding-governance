@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dFramedEntrypoint-10
+ids: TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4
 parents: dFramedEntrypoint
 ---
 
@@ -37,11 +37,6 @@ stop answering one question differently. A ruling nobody builds is a park with a
   bumps its kit version across the DERIVED carrier set — `git grep -l 'gov:kit <kit>@'` outside
   `memory/builds/` and `memory/archive/`, never the set an epoch gate's remedy text names.
 - A unit that grows a capped read-path member prices its OWN charge against `READ_PATH_CEILING`.
-- The unit IDS read `TOOL-dFramedEntrypoint-10` through `-13` while this folder is `dHonouredPark`,
-  and that is deliberate. Section 2 scopes an id to the SESSION that mints it and a session keeps one
-  slug; this build's units were minted in the session that built `dFramedEntrypoint`. The folder takes
-  a second slug because a LANDED build's folder cannot take units outside its stated goal, which M3
-  forbids amending. Ids follow the session, folders follow the build, and here those differ.
 - Two kits are touched here and they are separate streams. Check `git log origin/main -20` over each
   before starting a unit inside it, per the manifest's own concurrent-rewrite rule.
 
@@ -52,32 +47,32 @@ another one — and it goes on the run-state file with its options, not in this 
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 4 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dFramedEntrypoint-10
+ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dFramedEntrypoint-11 — the build method's declared budget rises to 350 lines](spec/2026-08-25-spec-dHonouredPark-11.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dFramedEntrypoint-12 — the dead-path waiver registry keys on line TEXT, not line NUMBER](spec/2026-08-25-spec-dHonouredPark-12.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dFramedEntrypoint-10 — the authored roster pair becomes mandatory, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-10.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dFramedEntrypoint-13 — `--plan` reads the rendered units region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-13.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-dHonouredPark-2 — the build method's declared budget rises to 350 lines](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT, not line NUMBER](spec/2026-08-25-spec-dHonouredPark-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-dHonouredPark-4 — `--plan` reads the rendered units region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dFramedEntrypoint-10 TOOL-dFramedEntrypoint-11 TOOL-dFramedEntrypoint-12 TOOL-dFramedEntrypoint-13.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dFramedEntrypoint-10 TOOL-dFramedEntrypoint-11 TOOL-dFramedEntrypoint-12 TOOL-dFramedEntrypoint-13.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dFramedEntrypoint-11` | no |
-| 2 | `TOOL-dFramedEntrypoint-12` | no |
-| 3 | `TOOL-dFramedEntrypoint-10` | no |
-| 4 | `TOOL-dFramedEntrypoint-13` | no |
+| 1 | `TOOL-dHonouredPark-2` | no |
+| 2 | `TOOL-dHonouredPark-3` | no |
+| 3 | `TOOL-dHonouredPark-1` | no |
+| 4 | `TOOL-dHonouredPark-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

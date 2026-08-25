@@ -1,10 +1,12 @@
-# TOOL-dFramedEntrypoint-11 — the build method's declared budget rises to 350 lines
+# TOOL-dHonouredPark-2 — the build method's declared budget rises to 350 lines
 
 **Status:** SPECCED · rev-1 · 2026-08-25 · node d · Tier-1 · base 60ba1d60 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
 
 <!-- /gen:spec-records -->
 

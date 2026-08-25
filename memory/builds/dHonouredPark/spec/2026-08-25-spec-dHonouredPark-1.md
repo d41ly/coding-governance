@@ -1,10 +1,12 @@
-# TOOL-dFramedEntrypoint-10 — the authored roster pair becomes mandatory, and its Definition-of-Done term becomes a check that can fail
+# TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory, and its Definition-of-Done term becomes a check that can fail
 
 **Status:** SPECCED · rev-1 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
 
 <!-- /gen:spec-records -->
 

@@ -1,10 +1,12 @@
-# TOOL-dFramedEntrypoint-13 — `--plan` reads the rendered units region, so both verbs answer from one source
+# TOOL-dHonouredPark-4 — `--plan` reads the rendered units region, so both verbs answer from one source
 
 **Status:** SPECCED · rev-1 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +40,7 @@ authoritative. The owner ruled `--plan` reads the rendered region.
 
 - No change to what `--status` reads. It is already the region and is the verb the other is being
   brought into line with.
-- No change to the MISSING join or to `roster_ids`. S3 states the boundary; `TOOL-dFramedEntrypoint-10`
+- No change to the MISSING join or to `roster_ids`. S3 states the boundary; `TOOL-dHonouredPark-1`
   is the unit that changes anything about the authored pair.
 - No sorting of `--plan` by the order verb directly. That was the other option and it couples the
   unattended driver to a grammar the memory-tree kit owns, which is the cross-kit dependency this
