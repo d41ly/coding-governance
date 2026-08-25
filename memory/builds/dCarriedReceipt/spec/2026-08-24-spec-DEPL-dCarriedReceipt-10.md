@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-10 — role `forked`, report-only
 
-**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -223,10 +223,10 @@ dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py`
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs. This unit adds refusal branches — S5's two missing-key refusals and S6's — so
-`tools/govkit/refusal_join.py` applies: every branch needs an arm asserting it, and the shrink-only
-`BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal
-here)` is raised to the new live count in the same commit, with the old and new values
-named beside it as that file's own convention requires.
+`tools/govkit/refusal_join.py` applies: every branch needs an arm asserting it. `BRANCH_PIN` in
+`tools/govkit/refusal_join.py:41` is a shrink-only FLOOR, so it is re-derived at landing rather than
+pinned to a literal here, and it is moved in the SAME commit with both values named beside it, per
+that file's own convention.
 
 ## 8. Open questions
 
@@ -249,6 +249,10 @@ named beside it as that file's own convention requires.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · round-4 fold: L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
+  an inline code identifier, and the repair round 3 claimed landed in one spec of four. It now
+  carries `-9` §7's repaired shape, identifier inside the backticks and property in prose beside it,
+  citing `tools/govkit/refusal_join.py:41` where the constant actually sits.
 - rev-5 · 2026-08-24 · round-4 fold: S4's print shape is bound to `-2` S3's `report` disposition
   explicitly — one counted row, no `r.fail`, with `direction` an optional trailing field rather
   than a second line. This unit is that disposition's second consumer and does not re-specify it.

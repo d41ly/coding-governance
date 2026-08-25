@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -168,11 +168,11 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selftest`, `govkit selfcheck` and
 `govkit refusal join`. That last one is a real obligation rather than a mention: this unit adds
-roughly seven refusal branches, and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at
-landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
-shrink-only, so it is re-derived and moved in the SAME commit with both values named beside it, per
-that file's own convention. Every new branch also needs an arm asserting it, which is the join's
-declared contract and is why the arm count in §4 tracks the branch count.
+roughly seven refusal branches, and `BRANCH_PIN` in `tools/govkit/refusal_join.py:41` is a
+shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here, and it is
+moved in the SAME commit with both values named beside it, per that file's own convention. Every
+new branch also needs an arm asserting it, which is the join's declared contract and is why the arm
+count in §4 tracks the branch count.
 
 ## 8. Open questions
 
@@ -190,6 +190,11 @@ declared contract and is why the arm count in §4 tracks the branch count.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · round-4 fold: L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
+  an inline code identifier and cited `tools/govkit/refusal_join.py:40`, where the constant is at
+  `:41` and `:39-40` is the comment above it. It now carries `-9` §7's repaired shape, identifier
+  inside the backticks and property in prose beside it, with the duplicated shrink-only clause
+  dropped.
 - rev-3 · 2026-08-25 · round-5 fold: §1's coverage figure carried the pre-`-1` vintage flat, which
   `-4` rev-2 arms as a regression alarm. It now reads 54 with 55 labelled as the pre-`-1`
   measurement, and AC10's fixture is labelled frozen rather than live.

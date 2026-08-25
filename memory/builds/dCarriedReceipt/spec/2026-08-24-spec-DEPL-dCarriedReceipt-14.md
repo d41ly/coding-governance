@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-14 — post-write verification, with index rollback
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -35,10 +35,11 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   `(mode, oid)`, or the marker `absent`. The snapshot rides `-7`'s index-side read rather than adding
   a second index reader. Keyed on the old path alone it cannot restore a rename: the bytes land at a
   path whose pre-write entry is `absent` under a key nothing ever looks up.
-- **S3** — the snapshot also captures each touched ROW's `sha256`, `commit`, `gov_oid` and `oid` **before**
-  the loop mutates them in place at `:3072-3073` and `:3098-3099`. Restoring bytes while leaving a row
-  stamped forward re-creates `-8` exactly: the next run reads the row as `equal` against bytes that
-  were reverted.
+- **S3** — the snapshot also captures each touched ROW's `path`, `source`, `sha256`, `commit`,
+  `gov_oid` and `oid` — every field `-11` S4 rewrites as a set, plus the two identities — **before**
+  the loop mutates them in place at `:3072-3073`, at `:3098-3099`, and in `-11` S4, the third
+  mutation site. Restoring bytes while leaving a row stamped forward re-creates `-8` exactly: the
+  next run reads the row as `equal` against bytes that were reverted.
 - **S4** — S1's helper runs TWICE for every TOUCHED kit: once as a BASELINE before the first byte
   moves, and once after the write loop. A touched kit is one owning at least one path in `changed`,
   `renamed` or `deleted` — `renamed` because `-11` S6's rows appear in neither of the other two, and
@@ -52,7 +53,9 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   touched paths, `git -C <target> update-index --cacheinfo <mode>,<oid>,<path>` then `git -C <target>
   checkout-index -f -- <path>`; a path whose snapshot is `absent` is `git rm --cached`-ed and
   unlinked, and a renamed row is restored under BOTH spellings from its S2 entry. Its rows are
-  restored from S3.
+  restored from S3. Restoring a renamed row restores `path` and `source` together with `commit` and
+  `gov_oid`, because `-7` S9 asserts them against each other and a partial restore is the split that
+  assertion exists to refuse.
 - **S6** — a kit that was `landed-but-inert` at BOTH runs is **pre-existing red**: it is printed and
   counted under that name, its writes stand, and it is NOT rolled back and does NOT `r.fail`. That is
   the same disposition §8 F2 already gives `landed-unmeasured`, and it is the only escape from the
@@ -94,8 +97,9 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
 No receipt shape change. The snapshot is per-run state and it is keyed on the ROW, not on a path
 string: one entry per touched row, carrying every path that row occupies — for a `renamed` row both
 the old and the new spelling — each with its `(mode, oid)` or the marker `absent`, plus the row's
-pre-write `sha256`, `commit`, `gov_oid` and `oid`. A path-keyed map cannot restore a rename, because the new
-path's pre-write state is `absent` and sits under a key the old spelling does not reach.
+pre-write `path`, `source`, `sha256`, `commit`, `gov_oid` and `oid` — every field `-11` S4 rewrites
+as a set, plus the two identities. A path-keyed map cannot restore a rename, because the new path's
+pre-write state is `absent` and sits under a key the old spelling does not reach.
 
 ### Rollout
 
@@ -172,15 +176,21 @@ reds at the baseline as well.
 - **AC3** — The rolled-back path's index entry equals its pre-write OID: `git -C <target> rev-parse
   :<path>` matches the snapshot, and `git -C <target> status --porcelain -- <path>` prints nothing.
   In a `-11` rename fixture the same assertion holds under BOTH spellings: the old path is restored
-  from its snapshotted `(mode, oid)` and the new path is gone from the index. That is S2's row-keyed
-  snapshot observed directly, and it is unreachable from a snapshot keyed on the old path alone.
-- **AC4** — The receipt row for that path still carries its pre-run `sha256`, `commit`, `gov_oid` and `oid`,
-  and `install.json`'s `gov_commit` is unchanged — the `if r.problems` arm at `:3115` declining to
-  re-stamp.
+  from its snapshotted `(mode, oid)` and the new path is gone from the index, and the rolled-back
+  row's `path` and `source` both carry the OLD spelling, so `-7` S9's preamble assertion holds on
+  the next run. That is S2's row-keyed snapshot observed directly, and it is unreachable from a
+  snapshot keyed on the old path alone.
+- **AC4** — The receipt row for that path still carries its pre-run `path`, `source`, `sha256`,
+  `commit`, `gov_oid` and `oid`, and `install.json`'s `gov_commit` is unchanged — the
+  `if r.problems` arm at `:3115` declining to re-stamp.
 - **AC5** — A green kit's writes survive a sibling kit's rollback: in a two-kit fixture where only one
   reds, the other kit's paths are staged at the new bytes and its rows carry the `--to` commit.
-- **AC6** — Only touched kits run. In a fixture claiming three kits where one moves rows, exactly one
-  `[check].argv` subprocess is observed and the tally names the other two as `not-run`.
+- **AC6** — Only touched kits run, twice each. In a fixture claiming three kits where one moves
+  rows, exactly TWO `[check].argv` subprocesses are observed — S4's baseline and S4's after-pass
+  over the one touched kit — and the tally names the other two kits as `not-run` with zero
+  subprocesses for them. The arm fails both against a draft that baselines every claimed kit (six
+  subprocesses, the whole-bar behaviour §3 refuses) and against one that skips the baseline (one
+  subprocess, the wedge AC9 exists to close).
 - **AC7** — A kit declaring `[check] = { none = "…" }` and a kit whose argv carries an unresolved
   token are both printed as `landed-unmeasured` and counted as **unverified**, and neither is counted
   as verified.
@@ -224,6 +234,15 @@ rather than waived.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-4 fold: B3 — the rollback snapshot enumerated four of the six fields
+  `-11` S4 rewrites as a set, so a rolled-back rename kept `path`/`source` at their post-rename
+  spelling beside `commit`/`gov_oid` at their pre-rename values, which is the
+  exactly-one-of-the-two split `-7` S9 refuses the whole run on. S3, §4's Data model and AC4 now
+  enumerate `path`, `source`, `sha256`, `commit`, `gov_oid` and `oid`; S3 names `-11` S4 as the
+  third mutation site; S5 restores a renamed row's paths together with its identities; and AC3's
+  rename arm asserts the OLD spelling on both. H3 — AC6 asserted ONE `[check].argv` subprocess
+  where S4 mandates two per touched kit, so it reds a correct build; it now asserts TWO and names
+  the two drafts it fails against.
 - rev-4 · 2026-08-24 · round-3 fold: the rollback snapshot restored three of the receipt's four
   per-row identity fields. S3, §4 and AC4 each enumerated `sha256`, `commit` and `gov_oid` — the set
   as it stood before `-7` added `oid` as a stored field — so a rolled-back row kept the failed run's

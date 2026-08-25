@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -37,8 +37,11 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
 
 ## 2. Scope (IN)
 
-- **S1** — every receipt row gov writes carries `gov_oid` and `oid`, both git blob oids. `sha256` is
-  still written, is still what `install.sums` lists, and decides no verdict.
+- **S1** — every receipt row gov writes for a LANDED file — the `writes` channel at
+  `:2443-2460` — carries `gov_oid` and `oid`. A row written through the `unlanded` channel at
+  `:2440` carries neither, as it carries no `commit` today, and this unit does not add them: there
+  are no gov bytes at that destination to hash. `sha256` is still written, is still what
+  `install.sums` lists, and decides no verdict.
 - **S2** — `classify_row` reads ours as the target's INDEX blob, from one batched
   `git -C <target> ls-files -s -z --` over the receipt's paths, rather than `read_bytes` at `:2884`.
   `theirs` and `base` keep `blob_at` (`:2148`), which is already index-side by construction.
@@ -55,7 +58,10 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
   carries no index entry", which describes nothing: `tracked()` at `:111-112` IS `git ls-files`, a
   read of the index, so tracked-and-not-indexed is empty except for an unmerged path — and an
   unmerged path is `-12` S3's refusal, one step earlier. `-12` S4's dirty check carves this state out
-  explicitly so the two units do not both refuse it with different messages.
+  explicitly so the two units do not both refuse it with different messages. The predicate is
+  evaluated in the PREAMBLE, over the same batched `ls-files -s` read S2 takes, before any row is
+  classified — it is a whole-run refusal and must not depend on which rows the loop has already
+  reached.
 - **S5** — writes go `git hash-object -w --stdin`, then `git update-index --cacheinfo`, then
   `git checkout-index -f --`, so the TARGET's own filters decide its worktree bytes. The mode comes
   from the row's existing index entry, and from gov's tree entry at `commit` for a row with none.
@@ -74,16 +80,20 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
   the file no longer earns. A row carrying NEITHER field is passed over here, because it is not a
   failed integrity check — there is nothing to compare. Note what that row is NOT: it is not
   necessarily `-13` S7's `evidence: "unattributed"` state. Every row `apply` writes through the
-  `unlanded` channel at `:2440` also carries neither field, which is `project-owned`, `generated` and
-  `rendered`. S9 passes over all of them for the one reason that covers every case — no operand — and
-  what happens next is the ROLE's business, in the classification loop, not this preamble's.
-  A row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
+  `unlanded` channel also carries neither field: those are the rows `apply` writes at `:2440` —
+  `project-owned`, `generated` and `rendered`. `UNLANDED_REASON` (`:236`) carries a fourth key,
+  `merged`, and `resolve_entry`'s `unlanded` list carries merged entries too; `apply` skips them at
+  `:2428-2429` and writes the real merged row at `:2417` instead. `-10` S3 adds a fifth key,
+  `forked`. S9 passes over all of them for the one reason that covers every case — no operand —
+  and what happens next is the ROLE's business, in the classification loop, not this preamble's. A
+  row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
   corruption shape this unit exists to catch, because `-11` rewrites `path`, `source`, `commit` and
   `gov_oid` together on a rename and a text merge of `install.json` is what splits them. **The
   ordering is fixed, and the two preconditions are sequential rather than competing.** S9 runs first,
-  in the preamble, over every row. `-13` S7's skip runs later, inside the classification loop, ahead
-  of `UPDATE_ROLE.get(role)` at `:2974`. S9 therefore cannot lean on that skip having already
-  happened, which is exactly why it is scoped by field presence and not by `role` or by `evidence`.
+  in the preamble, over every row. `-13` S7's skip runs later, inside the classification loop, after
+  `how` resolves at `:2974` and before `classify_row` at `:3014`. S9 therefore cannot lean on that
+  skip having already happened, which is exactly why it is scoped by field presence and not by
+  `role` or by `evidence`.
   Two refusal branches, each carrying its own `refusal_join.py` arm, under that file's contract that
   every refusal branch is reached by an arm asserting it.
 
@@ -228,7 +238,7 @@ carry different messages and cannot share one.
   fixture receipt carries one row with NEITHER `commit` nor `gov_oid`, written by `adopt` as a
   `forked` destination at `evidence: "unattributed"`, beside one genuinely stale `engine` row that
   carries both. `update --write` then runs to completion: the stale row's bytes move, the field-less
-  row is printed and skipped BY NAME, no refusal fires, and the run exits **0**. Observe RED first by
+  row is printed BY NAME and written in neither direction, no refusal fires, and the run exits **0**. Observe RED first by
   staging S9 unscoped over every row, at which point the preamble refuses on the field-less row and
   the stale row never moves.
 - **AC10** — The half-populated pair still refuses. A fixture row carrying `commit` and no `gov_oid`
@@ -259,6 +269,14 @@ and `refusal_join` legs. Adds arms and three refusal anchors; adds no new leg.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-4 fold: M4 scopes S1's quantifier to the `writes` channel at
+  `:2443-2460` and says plainly that an `unlanded` row at `:2440` carries neither identity, so S1
+  and S9 stop contradicting each other. M6 replaces S9's three-role gloss: `UNLANDED_REASON`
+  (`:236`) carries a fourth key, `merged`, `-10` S3 adds `forked`, and `apply` reaches three only by
+  skipping merged entries at `:2428-2429`. H1 moves S9's ordering sentence onto the scoped reading —
+  `-13` S7's skip runs after `how` resolves at `:2974` and before `classify_row` at `:3014`, not
+  ahead of `:2974`. M1 states in S4 that its predicate is evaluated in the PREAMBLE, which is the
+  ordering `-12` §4's table now carries as step 5.
 - rev-4 · 2026-08-25 · round-5 fold: S4's predicate was unsatisfiable as written — `tracked()` at
   `:111-112` IS `git ls-files`, so tracked-and-not-indexed is empty but for an unmerged path,
   which `-12` S3 refuses first. Restated as present-in-worktree/absent-from-index, and §10's false

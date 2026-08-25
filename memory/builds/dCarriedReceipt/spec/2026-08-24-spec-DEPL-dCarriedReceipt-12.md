@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -41,13 +41,13 @@ the vintage is half a guard, so both halves land here.
   **DIRTY IS DEFINED HERE, once, because three acceptance criteria in two other units depend on the
   answer and two of them need it in opposite directions.** A claimed path is dirty when it differs
   index-versus-HEAD or worktree-versus-index — `git diff --cached` and `git diff` over that path, and
-  deliberately NOT `git status --porcelain`, which also flags `??`. Two carve-outs, each bought by a
-  criterion elsewhere:
-  - A claimed path absent from BOTH the index and the worktree is **not dirty**. There is nothing to
-    compare, and the row's own verdict is `missing` — which is `-9` S11's restore case. Without this
-    carve-out `-9` AC9 and AC10 can never go green: they require `--write` to reach the `missing`
-    cell for a row the target deleted, this unit lands at step 2 of the README order and `-9` at step
-    4, so a builder would land `-12` and then be unable to red `-9`'s own RED-first observation.
+  deliberately NOT `git status --porcelain`, which also flags `??`. Two carve-outs, the second of
+  them bought by a criterion elsewhere:
+  - A claimed path absent from both the index and the worktree is dirty when HEAD still carries it:
+    a STAGED deletion is an operator decision and the run refuses, naming the path. It is NOT dirty
+    when HEAD does not carry it either, which is the committed deletion `-9` S11 restores and `-9`
+    AC9 requires; that is the only state this carve-out covers, and the reason is that there is
+    nothing left to diff.
   - An untracked file SHADOWING a claimed path that is absent from the index is **not dirty** here.
     That state is `-7` S4's refusal, which names the path and the risk; two units refusing the same
     state gives the operator two different messages for one tree.
@@ -83,30 +83,32 @@ the vintage is half a guard, so both halves land here.
 This unit owns the FIRST gate a write passes, and FIVE other units add their own further in. No spec
 composed them, so the order is declared here and the others cross-reference it rather than restating
 it. A `--write` run passes in this sequence and stops at the first refusal. The table runs from the
-preamble to the write; `-14`'s post-write verification is step 9 and is the only entry AFTER bytes
-land, which is why its failure mode is a rollback rather than a refusal.
+preamble to the write. `-14`'s post-write verification is step 12 and is the only entry AFTER bytes
+land; its snapshot and baseline are steps 10 and 11, whose relative order is free.
 
 | # | owner | what it decides | on failure |
 |---|---|---|---|
-| 1 | this unit, S1–S3 | is the target mid-operation (`MERGE_HEAD`, `REBASE_HEAD`, `CHERRY_PICK_HEAD`, an unresolved index)? | refuse, whole run |
+| 1 | this unit, S1–S3 | is the target mid-operation? | refuse, whole run |
 | 2 | this unit, S4–S5 | is any receipt-claimed path dirty, and can the lock be taken? | refuse, whole run |
 | 3 | this unit, S7–S8 | is `--to` a descendant of the receipt's `gov_commit`, and reachable from a ref? | refuse, whole run |
 | 4 | `-7` S9 | for a row carrying BOTH `commit` and `gov_oid`, do they agree? | refuse, whole run |
-| 5 | `-13` S7 | does this ROW carry `evidence: "unattributed"`? | print, count, skip the ROW, before `UPDATE_ROLE` |
-| 4b | `-7` S4 | is a claimed path present in the worktree and absent from the index? | refuse, whole run |
-| 6 | `-9` S1/S5 | which `carry` rung, if any, proves itself over the whole file? | no failure mode; it classifies |
-| 7 | `-11` S2 | did gov rename this row's source between the two vintages? | verdict `renamed`; `-11`'s own two refusals |
-| 8 | `-9` S6 | apply the proven rung to `base` and `theirs` before `three_way` | no failure mode; it feeds the merge |
-| 9 | `-14` | re-run each touched kit's own `[check].argv` AFTER the write | roll back from the recorded OIDs; `r.fail` |
+| 5 | `-7` S4 | is a claimed path present in the worktree and absent from the index? | refuse, whole run |
+| 6 | `-13` S7 | does this ROW carry `evidence: "unattributed"` AND resolve to the `table` disposition? | print, count, skip the ROW, after `how` resolves and before `classify_row` |
+| 7 | `-9` S1/S5 | which `carry` rung, if any, proves itself over the whole file? | no failure mode; it classifies |
+| 8 | `-11` S2 | did gov rename this row's source between the two vintages? | verdict `renamed`; `-11`'s own two refusals |
+| 9 | `-9` S6 | apply the proven rung to `base` and `theirs` before `three_way` | no failure mode; it feeds the merge |
+| 10 | `-14` S2–S3 | snapshot every touched row's paths and its six identity fields | none; it is the rollback's only input |
+| 11 | `-14` S4 | run each touched kit's `[check].argv` as a BASELINE | none; it decides whether step 12 may roll back |
+| 12 | `-14` S4–S5 | re-run each touched kit's `[check].argv` AFTER the write | roll back from the recorded OIDs; `r.fail` |
 
 Two things in that table are load-bearing rather than arbitrary, and the first is easy to get
-backwards. **Step 4 is in the PREAMBLE and step 5 is inside the classification loop**, so the
+backwards. **Steps 4 and 5 are in the PREAMBLE and step 6 is inside the classification loop**, so the
 integrity check runs BEFORE the unattributed skip and cannot lean on it. That is precisely why `-7`
 S9 is scoped by FIELD PRESENCE rather than by `role` or by `evidence`: an unattributed row carries
 neither field, so S9 has nothing to assert about it and passes over it silently, and the row is
-skipped by name one step later. Scope S9 by role instead and it would have to know a classification
+skipped by name two steps later. Scope S9 by role instead and it would have to know a classification
 that has not happened yet; scope it by nothing and it refuses on all 41 of inCMS's unattributable
-rows and no adopter ever updates. Second, **steps 1–3 precede everything per-row**, because a
+rows and no adopter ever updates. Second, **steps 1–5 precede everything per-row**, because a
 refusal that depends on which rows a receipt happens to hold is a refusal an operator cannot predict.
 
 ### Data model
@@ -135,7 +137,7 @@ not change.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~60 lines), `tools/govkit/selftest.py` (7 arms), one fixture that builds
+`tools/govkit/govkit.py` (~60 lines), `tools/govkit/selftest.py` (8 arms), one fixture that builds
 a linked worktree and one scratch gov carrying a two-branch history.
 
 ## 5. Production-readiness checklist
@@ -154,7 +156,7 @@ a linked worktree and one scratch gov carrying a two-branch history.
 - risks — the residual risk is a target mutated by another process between the precondition check
   and the write. The lock covers govkit-vs-govkit; it does not cover govkit-vs-human, and this spec
   does not claim otherwise.
-- testing + left-shift gates — seven arms, each observed RED before the fix. The linked-worktree arm
+- testing + left-shift gates — eight arms, each observed RED before the fix. The linked-worktree arm
   is the one that matters and is the one no existing fixture covers, which is why the defect shipped.
   The two vintage arms gate the CLASS — any `--to` outside the forward, published range — rather than
   the single older-sha instance that surfaced them.
@@ -183,6 +185,9 @@ a linked worktree and one scratch gov carrying a two-branch history.
 - **AC8** — `update --to <sha reachable from no ref> --write` refuses by name; that same sha, once a
   ref contains it, proceeds. Observe RED first: `rev-parse --verify` at `:2940` accepts a dangling
   or branch-only object today and nothing else looks.
+- **AC9** — A claimed path deleted with `git rm` and NOT committed refuses by name; the same path
+  once committed proceeds to the `missing` cell. Both arms run against S4's definition and neither
+  is reachable from AC4's dirty-path arm, which edits a path that still exists.
 
 ## 7. Gates
 
@@ -202,6 +207,14 @@ every one needs an arm asserting it, which is the join's declared contract.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-4 fold: H5 restates S4's first carve-out — a STAGED deletion is dirty
+  and refuses, a COMMITTED one is not — and deletes the false claim that the carve-out is what buys
+  `-9` AC9 and AC10, with AC9 added over both states. M1 renumbers §4's ordering table 1..12 with no
+  letter suffixes, moves `-7` S4 above the per-row skip, adds `-14`'s snapshot and baseline as steps
+  10 and 11, and amends the two orderings named below it. H1 rewrites step 6's decision and failure
+  cells: the skip is scoped to rows resolving to the `table` disposition and runs after `how`
+  resolves, before `classify_row`. The declared arm count moves 7 to 8 for AC9; the refusal-branch
+  count is unmoved, because a staged deletion refuses through S4's existing dirty branch.
 - rev-4 · 2026-08-25 · round-5 fold: `dirty` is DEFINED in S4, with the two carve-outs three
   acceptance criteria in two other units depend on. §4's table is corrected and completed — step
   6's owner was wrong, `-7` S4, `-11` and `-9` S6 were missing, `-14`'s post-write rollback is now

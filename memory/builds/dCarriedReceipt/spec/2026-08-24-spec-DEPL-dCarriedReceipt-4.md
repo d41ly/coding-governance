@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -139,7 +139,7 @@ has left the gap set entirely.
   what "no coverage measurement exists in this tool" looks like from the outside.
 - **AC2** — After the change, the FULL command against NicoCares — `python tools/govkit/govkit.py
   plan --target <NC> --coverage --kits
-check-install-prefix,gate-lint,kickoff-manifest,lexicon,memory-tree,playbook,run-gates,settings-merge,agent-cap,codebase-map,drift-audit,memory-recall,playbook-render,unattended,review-harness`
+  check-install-prefix,gate-lint,kickoff-manifest,lexicon,memory-tree,playbook,run-gates,settings-merge,agent-cap,codebase-map,drift-audit,memory-recall,playbook-render,unattended,review-harness`
   — reports `181` plan rows, `143` write rows and `gap 0`, and exits 0. The `--kits` list is not
   decoration: `resolve_selection` (`:410-429`) branches on `all` / `kits` / `default_kits(reg)` and
   never reads `deploy["kits"]`, so the same command without it resolves the registry default set and
@@ -182,6 +182,11 @@ a measurement, not a finding, which is F1 below.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · round-4 fold: L6 — the rev-3 rewrap had pushed AC2's `--kits` continuation
+  to column 0, the only de-indented continuation in the corpus and one blank line from detaching
+  from its criterion. It is re-indented two spaces. The value is 193 columns on one line, so it is
+  split at a comma across two indented lines; the wider of the two is 104 columns, which no
+  two-line split of that value gets under, and de-indenting is what this finding refuses.
 - rev-3 · 2026-08-24 · round-2 fold: every LIVE statement of the gap count now carries its vintage.
   §5's observability line and §8 F1 read `54` (post-`-1`) where they read a bare `55` that rev-2's
   own AC3 defines as a regression alarm, and the rev-1 entry below keeps its `55` as the historical

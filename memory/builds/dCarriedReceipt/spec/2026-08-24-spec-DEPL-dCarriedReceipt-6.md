@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -43,7 +43,7 @@ adopter can ever receive it.
   add an `[[exempt_leg]]` row for `kickoff engine size <=18KiB` in `registry.toml`, carrying the
   reason its sibling `charter size` row (`registry.toml:235`) already states for the same script.
 - **S6** — the LEGS step reads the index through `tracked()` (`:111`) instead of the inline
-  `git ls-files` at `:2674-2675`, so the bar and the guard branch share ONE index reader.
+  `git ls-files` at `:2673-2674`, so the bar and the guard branch share ONE index reader.
 
 ## 3. Non-goals (OUT)
 
@@ -61,8 +61,11 @@ adopter can ever receive it.
 - **Land-alone:** this unit leaves both trees green on its own. Its dependency on `-1` is an ORDER
   rather than a conflict, in the vocabulary `-14` §8 F3 ratifies: AC6 asserts the post-`-1` world of
   exactly ONE surviving leg at each target, and the pre-`-1` inCMS tree shows two. The reason is
-  measured rather than structural — see §4. Nothing here depends on `-2`; the `UPDATE_ROLE` line in
-  §3 is a non-goal pointing at where that disposition is decided, not a landing order.
+  measured rather than structural — see §4. A real inCMS reading additionally needs
+  `.governance/deploy.toml` in that repo, since `load_deploy` (`:553`) refuses without one;
+  `ABL-dPinnedVintage-1` writes it. That is a target-side prerequisite, not a landing partner.
+  Nothing here depends on `-2`; the `UPDATE_ROLE` line in §3 is a non-goal pointing at where that
+  disposition is decided, not a landing order.
 
 ## 4. Design
 
@@ -199,12 +202,15 @@ move and no adopter holds the withdrawn leg.
 - **AC5** — A fixture leg whose argv names `{prefix}/absent-engine.sh` produces exactly one finding,
   no row in the target's `gate-legs.json`, and exit 1 — not a `Refusal`, and not an aborted install:
   the receipt is still written and the other legs are still emitted.
-- **AC6** — `govkit.py plan --target <inCMS>` names exactly ONE surviving leg, `kickoff engine size
-  <=18KiB`, and not the fifteen that this run's own writes would satisfy — which is the union
-  predicate of S3 observed directly. `pre-push self-test` is a hit only BEFORE `-1`, whose resolver
-  writes `.githooks/pre-push.test.sh` to the target root; this unit lands after `-1`, so a second leg
-  in that output is a regression in `-1` rather than a defect in this predicate. Both live targets
-  therefore print the same single leg, which is what §4 already says and what rev-1's AC6 did not.
+- **AC6** — `govkit.py plan --target <inCMS>`, run against an inCMS checkout carrying the
+  `.governance/deploy.toml` the adopter-side unit writes — its 14 kits at `prefix = "scripts"`
+  with its `[kit.*]` layout overrides, the same descriptor `-4` AC3 names — names exactly ONE
+  surviving leg, `kickoff engine size <=18KiB`, and not the fifteen that this run's own writes
+  would satisfy — which is the union predicate of S3 observed directly. `pre-push self-test` is
+  a hit only BEFORE `-1`, whose resolver writes `.githooks/pre-push.test.sh` to the target root;
+  this unit lands after `-1`, so a second leg in that output is a regression in `-1` rather than
+  a defect in this predicate. Both live targets therefore print the same single leg, which is
+  what §4 already says and what rev-1's AC6 did not.
 - **AC7** — `python tools/govkit/govkit.py selfcheck` stays green over arms 7h, 7h2 and 7h3 after
   S5, and `git diff --exit-code -- tools/govkit/subject-pins.tsv` is clean.
 
@@ -212,11 +218,11 @@ move and no adopter holds the withdrawn leg.
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selfcheck`, `govkit selftest`,
 `govkit acceptance matrix` and `govkit refusal join`. The join is an obligation, not a mention: this
-unit adds refusal branches and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing
-rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
-shrink-only, so it is re-derived and moved in the SAME commit with both values named, and every new
-branch gets an arm asserting it. The `kit version markers` leg stays green untouched, for the reason
-given in §4.
+unit adds refusal branches, and `BRANCH_PIN` in `tools/govkit/refusal_join.py:41` is a shrink-only
+FLOOR, so it is re-derived at landing rather than pinned to a literal here, and it is moved in the
+SAME commit with both values named beside it, per that file's own convention. Every new branch gets
+an arm asserting it. The `kit version markers` leg stays green untouched, for the reason given in
+§4.
 
 ## 8. Open questions
 
@@ -239,6 +245,13 @@ given in §4.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-4 fold: H6 — AC6 named a command `load_deploy` (`:553`) refuses on,
+  because inCMS carries no `.governance/deploy.toml` at `9ddcc5c9` and no scope item here creates
+  one. AC6 now runs against a checkout carrying the descriptor the adopter-side unit writes, in
+  `-4` AC3's own words, and §3's land-alone bullet states the target-side prerequisite in the
+  sentence `-4` §3 already uses. L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
+  an inline identifier and cited `refusal_join.py:40`; the constant is at `:41` and `:39-40` is the
+  comment above it, so the sentence takes `-9` §7's repaired shape.
 - rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason
   `-5` records; and the README's deps cell now mirrors this spec's own §3 rather than
   contradicting it.
@@ -277,7 +290,7 @@ The bar is assembled from seams that already exist and adds no second answer to 
 `resolve_tokens` (`:516`) and `target_context` (`:535`) render the argv exactly as the emitter does,
 so the bar cannot grade a different string from the one that ships. `tracked` (`:111`) is the index
 reader, and S6 exists precisely to stop there being two: the legs step currently re-implements it
-inline at `:2674-2675`, which is the two-answers-to-one-question class this file names in its own
+inline at `:2673-2674`, which is the two-answers-to-one-question class this file names in its own
 comments. The refusal shape is the `Report.fail` channel (`Report` at `:565`, `Refusal` at `:78`)
 and the new branches are counted by the existing `refusal_join.py` contract rather than a new
 counter. The gov-side arm wires through arm 7h3's `shipped_owner` derivation (`:1067-1082`) instead

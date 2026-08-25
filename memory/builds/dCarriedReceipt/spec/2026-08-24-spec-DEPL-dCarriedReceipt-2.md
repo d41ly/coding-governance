@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -56,7 +56,7 @@ No receipt-shape change. `pins` is a dispatch value only.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~10 lines), `tools/govkit/selftest.py` (2 arms).
+`tools/govkit/govkit.py` (~10 lines), `tools/govkit/selftest.py` (3 arms).
 
 ## 5. Production-readiness checklist
 
@@ -100,6 +100,9 @@ No receipt-shape change. `pins` is a dispatch value only.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-25 · round-4 fold: L2 — §4's Files touched said `selftest.py` (2 arms) while §5
+  reads "three arms" and §7 "Adds three arms". Two of the three said three, and the two-arm figure
+  is the one a builder budgets from, so §4 now reads (3 arms).
 - rev-2 · 2026-08-24 · round-3 fold: the re-stamp guard citation: `:3111` is that guard's
   explanatory comment; the `if r.problems:` it names is `:3115`.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold).
