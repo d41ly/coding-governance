@@ -81,7 +81,11 @@ out=$(leg)
 same "fixture precondition: the leg is silent over the untouched fixture" "$out" ""
 
 # ---- ARM 1: a build folder the RUN authored, branch NOT pushed. Nothing published authorizes it.
-mk tRun
+# DECLARES A MODE (TOOL-dNarrowedAnchor-1). This whole suite runs under ANCHOR_SCOPE="published"
+# (set at the top), so every run in it reaches the SECOND anchor — and a bare `mk` writes no
+# `authorized-by:` key, which reads as `slug` and is refused there. The fixture, not the arm, was
+# what went stale when the anchor became per-mode.
+mk tRun "authorized-by: prompt"
 git add -A >/dev/null && git commit -q -m "run-authored build folder" --no-verify
 before=$([ -f memory/builds/tRun/RUN.md ] && git hash-object memory/builds/tRun/RUN.md || echo none)
 out=$(drive --preflight tRun --keepalive-id k1)
