@@ -112,6 +112,29 @@ claimed surface, or one the descriptor now resolves to several destinations — 
 naming the source and the reason, because a report costs a line and a guess costs a file in the
 wrong place.
 
+**Every `--write` run verifies what it wrote, and a kit that this run broke undoes itself.** The
+exposure was specifically the CLEAN-merge path: a three-way that succeeds on non-overlapping hunks
+produces a plausible, wrong, executable file, and its first observer used to be a merge bar days
+later. So after the write loop, `update` runs each TOUCHED kit's own `[check].argv` — the same
+declaration `check` runs, not a second implementation — and compares it against a BASELINE it took
+of that same kit before the first byte moved. A kit that passed before and fails after is rolled
+back: every path it touched goes back to the index entry it had, both spellings of a rename
+included, its receipt rows go back with them, an order lands under `<target>/.governance/outbox/`
+naming the kit, its check argv, both exit codes and every path restored, and the receipt is not
+re-stamped. Only that kit — a sibling kit's write is correct and reverting it to punish a neighbour
+discards a good result.
+
+The baseline is the part that keeps this from becoming a wedge. A kit that was ALREADY red before
+the run is reported as pre-existing red, keeps its writes, and does not block the receipt: without
+that, one unrelated standing red in a target would revert every correct write on every run, forever,
+with no `--force` in any spelling to escape by. What that costs is stated rather than implied — a
+binary check cannot tell "still broken" from "newly broken", so a bad merge inside a kit that was
+already red lands unobserved. A kit whose check is `{ none = "…" }`, or whose argv does not resolve,
+is counted as **unverified** rather than green, because a check that could not run is not a pass. A
+claimed kit this run did not touch is printed `not-run` and its check is executed neither time. Every
+one of those five counts prints even when it is zero. There is no flag to turn any of this off: an
+opt-in verifier verifies the runs that were already careful.
+
 The two roles `update` classifies but never writes — `seed` and `rendered` — get the `renamed`
 verdict AND a second line saying the row was reported rather than moved, so a template or a
 rendered document whose gov source moved is visible rather than silent. Performing that one is

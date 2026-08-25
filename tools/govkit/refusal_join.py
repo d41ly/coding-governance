@@ -38,7 +38,16 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 185    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 190    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 185 -> 190 (DEPL-dCarriedReceipt-14). Its five new refusals, and this unit also RELOCATES four:
+# `cmd_check`'s existing check-arm failures moved into the extracted `run_kit_check`, which changes
+# their anchors and not their count. The five that are new: a check arm that cannot LAUNCH (armed by
+# the no-such-binary fixture), the post-write rollback's own finding (armed by the roll fixture, and
+# seen RED with it removed), and the rollback's THREE restore failures — `git rm --cached`,
+# `git update-index --cacheinfo` and `git checkout-index`. Those three are NOT armed and say so in
+# their own branches: reaching one needs the TARGET's git to refuse a plumbing call this suite
+# manufactures no way to provoke, which is exactly where `-11` left `land_through_index`'s
+# post-`git mv` failure. 2/5 armed, stated rather than rounded up.
 # 180 -> 185 (DEPL-dCarriedReceipt-11). Its five new refusals: the escaping destination, the
 # occupied destination, the failed move, the ambiguous destination and the out-of-kit source.
 # FOUR of the five are reached by a named selftest arm; the fifth -- `land_through_index` failing

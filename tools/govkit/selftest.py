@@ -4399,6 +4399,543 @@ user_skills = "/tmp/gk-fake-skills"
               _rowc11.get("path") == "scripts/demo/pathy2.txt"
               and _rowc11.get("source") == "tools/demo/pathy2.txt", str(_rowc11)[:400])
 
+        # ========= DEPL-dCarriedReceipt-14 — post-write verification, with index rollback ========
+        #
+        # THE MEASURED RED, on this block's own fixture, against the engine with `-1`..`-13` landed
+        # and this unit not: `update --write` exited **0**, printed `0 conflict(s)`, left a
+        # plausible and WRONG three-way merge staged at `tools/demo/conf.txt`, and re-stamped the
+        # receipt at the new vintage. ZERO check subprocesses ran. The kit's own `[check].argv` —
+        # the declaration `check` has always run — reported `landed-but-inert` on the very next
+        # command, over a file `update` had just written and nothing had observed. Every arm below
+        # was written against that observation rather than against the spec's prediction of it.
+        #
+        # WHY THE CONF FIXTURE IS SHAPED LIKE THIS. `git merge-file` succeeds on NON-OVERLAPPING
+        # hunks, so gov changing line 2 and the adopter changing line 7 merges clean and exits 0.
+        # The result carries both changes, and the kit's own check declares that those two settings
+        # may not coexist. That is the whole exposure in four lines: a merge nothing rejected, a
+        # file nothing executed, and a receipt stamped forward over it.
+
+        GK14 = govkit_module()
+
+        _14_CONF_A = "# demo conf\nMODE=lax\nalpha\nbeta\ngamma\ndelta\nLEGACY=off\n"
+        _14_CONF_B = _14_CONF_A.replace("MODE=lax", "MODE=strict")
+        _14_CONF_T = _14_CONF_A.replace("LEGACY=off", "LEGACY=on")
+        _14_CONF_M = _14_CONF_B.replace("LEGACY=off", "LEGACY=on")
+        _14_MOVED = "moved one\nmoved two\nmoved three\nmoved four\nmoved five\n"
+
+        # The two guards, and they are the fixture's whole semantics. `conflict` is a rule about the
+        # FILE — two settings that may not coexist — which is what makes a clean merge break it.
+        # `unwired` is red from the install onward and has nothing to do with any write, which is
+        # what makes it the pre-existing-red arm.
+        _14_GUARD_CONFLICT = ('conf="$d/conf.txt"\n'
+                              'test -f "$conf" || exit 3\n'
+                              'if grep -q "^MODE=strict$" "$conf" && grep -q "^LEGACY=on$" "$conf"\n'
+                              "then\n"
+                              '  echo "check: MODE=strict and LEGACY=on cannot both be set"\n'
+                              "  exit 1\n"
+                              "fi\n"
+                              "exit 0\n")
+        _14_GUARD_UNWIRED = ('test -f "$d/wired.marker" || exit 1\n'
+                             "exit 0\n")
+
+        def build_kit14(eid: str, arm: str) -> str:
+            """One fixture descriptor. `arm` selects which `[check]` SHAPE it declares."""
+            chk = {
+                "argv": '[check]\nargv = ["bash", "{kit}/check.sh"]\n',
+                "none": '[check]\nnone = "a fixture kit that declares no runnable check"\n',
+                "token": '[check]\nargv = ["bash", "{kit}/check.sh", "{needs_an_answer}"]\n',
+                "no-binary": '[check]\nargv = ["{kit}/no-such-binary-xyzzy"]\n',
+            }[arm]
+            return (f'id = "{eid}"\nhome = "tools/{eid}"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    + chk +
+                    '\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    "[adopt]\nargv = []\nmutates_index = false\n")
+
+        def build_verify_gov(tag: str, kits: dict) -> tuple[pathlib.Path, pathlib.Path]:
+            """A scratch gov carrying one entry per requested kit, and the run LOG its checks write.
+
+            THE COPY IS TAKEN HERE, at fixture-build time — a break staged into this repo's
+            `govkit.py` AFTER the copy runs the UNPATCHED engine and the arm reports on nothing.
+
+            The log lives OUTSIDE the target and its absolute path is baked into each check script.
+            Inside the target it would be swept into the fixture's own `settle`, which commits
+            whatever the previous arm's checks appended and makes the count a property of the
+            fixture's history rather than of this run.
+            """
+            g = tmp / f"v14-{tag}-gov"
+            log = tmp / f"v14-{tag}-runs.txt"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                "[selection]\ndefault = [" + ", ".join(f'"{e}"' for e in kits) + "]\n\n"
+                + "".join(f'[[entry]]\nid = "{e}"\ndescriptor = "tools/{e}/kit.toml"\n\n'
+                          for e in kits)
+                + '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            for eid, spec in kits.items():
+                d = g / "tools" / eid
+                d.mkdir(parents=True, exist_ok=True)
+                (d / "kit.toml").write_text(build_kit14(eid, spec.get("arm", "argv")),
+                                            encoding="utf-8", newline="\n")
+                (d / "check.sh").write_text(
+                    "#!/usr/bin/env bash\n"
+                    'd="$(cd "$(dirname "$0")" && pwd)"\n'
+                    f'printf "%s\\n" "{eid}" >> "{log.as_posix()}"\n'
+                    + spec.get("guard", "exit 0\n"),
+                    encoding="utf-8", newline="\n")
+                for rel, body in (spec.get("files") or {}).items():
+                    (d / rel).write_text(body, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g, log
+
+        def build_verify_target(g: pathlib.Path, name: str, kits) -> pathlib.Path:
+            """An installed target, built by running the real `apply` rather than by authoring a
+            receipt — so every arm below grades an install this engine can actually produce."""
+            t = make_target(tmp / f"v14-{name}",
+                            'gov_source = "local"\nprefix = "tools"\nkits = ['
+                            + ", ".join(f'"{e}"' for e in kits) + "]\n")
+            _ap = run_in_gov(g, "apply", "--target", str(t), "--kits", ",".join(kits))
+            check(f"[-14] the {name} fixture installs GREEN, or every arm over it grades a broken "
+                  f"target", _ap.returncode == 0, _ap.stdout[-900:] + _ap.stderr[-600:])
+            settle(t, "the install")
+            return t
+
+        def read_runs14(log: pathlib.Path) -> list[str]:
+            return [x for x in log.read_text(encoding="utf-8").split() if x] if log.is_file() else []
+
+        def remove_runs14(log: pathlib.Path) -> None:
+            log.unlink(missing_ok=True)
+
+        def read_bytes14(p: pathlib.Path) -> bytes:
+            """Bytes, or empty. `check()` concatenates its detail onto the FAIL line and every arm
+            below a RAISING one never runs, so an arm that reads a file the break just removed
+            reports its own coverage as untested rather than as red. Measured on this unit's break
+            sweep, on the arm guarding the untracked file at a refused rename destination — and
+            `-11`'s ledger says the same thing about the same class."""
+            return p.read_bytes() if p.is_file() else b""
+
+        def read_text14(p: pathlib.Path) -> str:
+            return p.read_text(encoding="utf-8") if p.is_file() else ""
+
+        def read_index_oid14(t: pathlib.Path, p: str) -> str:
+            """The target's index OID at one path, or the empty string where it has no entry."""
+            bits = gout(t, "ls-files", "-s", "--", p).split()
+            return bits[1] if len(bits) >= 2 else ""
+
+        # ---- THE ROLLBACK FIXTURE. Two kits: `demo` breaks on the clean merge, `sib` is written
+        # ---- by the same run and stays green. One run answers AC1..AC5, because an arm that gets
+        # ---- its own fixture can pass by that fixture doing nothing.
+        _g14, _log14 = build_verify_gov("roll", {
+            "demo": {"guard": _14_GUARD_CONFLICT,
+                     "files": {"conf.txt": _14_CONF_A, "moved.txt": _14_MOVED}},
+            "sib": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+        })
+        _A14 = gout(_g14, "rev-parse", "HEAD").strip()
+        _t14 = build_verify_target(_g14, "roll-t", ["demo", "sib"])
+        # THE ADOPTER'S EDIT, committed rather than staged: `-12` S4 refuses a writing verb over a
+        # dirty claimed path, so an uncommitted edit would make the update refuse and every arm
+        # below would grade a run that never happened.
+        (_t14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
+        settle(_t14, "the adopter edits LEGACY in demo's conf")
+
+        # gov's second vintage: one hunk in each kit's conf, and one pure rename inside `demo`.
+        (_g14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g14 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g14, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        git(_g14, "add", "-A")
+        git(_g14, "commit", "-qm", "B")
+        _B14 = gout(_g14, "rev-parse", "HEAD").strip()
+
+        # ---- THE FIXTURE'S OWN PRECONDITIONS. A fixture that does not trigger the rule proves
+        # ---- nothing, and every rule here is triggered by `git merge-file` and by git's rename
+        # ---- scoring rather than by anything this file controls directly.
+        _pre14 = run_in_gov(_g14, "check", "--target", str(_t14))
+        check("[-14] the fixture's own check arm is GREEN before the write — without that the "
+              "transition S5 keys on cannot exist and AC9 would be the only reachable arm",
+              "govkit check — demo: adopted" in _pre14.stdout, _pre14.stdout)
+        check("[-14] ...and so is the sibling's, or AC5 grades a kit that was already red",
+              "govkit check — sib: adopted" in _pre14.stdout, _pre14.stdout)
+        _snap14 = {p: read_index_oid14(_t14, p) for p in
+                   ("tools/demo/conf.txt", "tools/demo/moved.txt", "tools/sib/conf.txt")}
+        check("[-14] the fixture's three touched paths all have index entries before the write",
+              all(_snap14.values()), str(_snap14))
+        check("[-14] ...and the rename destination has NONE, which is the `absent` marker S2 exists "
+              "for: keyed on the old path alone the new spelling sits behind a key nothing reaches",
+              read_index_oid14(_t14, "tools/demo/renamed.txt") == "", "")
+        _rec14a = json.loads((_t14 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row14a = {f["path"]: dict(f) for f in _rec14a["files"]}
+        # AGAINST GOV'S OWN BLOB, not against the constant the fixture just wrote. The first cut of
+        # this arm compared the file to `_14_CONF_T` — which is what put it there — so it held even
+        # with the adopter's edit removed from the fixture entirely. An arm that cannot fail.
+        check("[-14] the fixture's demo conf really carries an adopter edit gov's blob does not have",
+              read_bytes14(_t14 / "tools" / "demo" / "conf.txt")
+              != GK14.blob_at(_g14, _A14, "tools/demo/conf.txt")
+              and read_bytes14(_t14 / "tools" / "demo" / "conf.txt") == _14_CONF_T.encode(),
+              repr(read_bytes14(_t14 / "tools" / "demo" / "conf.txt")))
+        check("[-14] ...and the sibling's does NOT, so its row takes the raw arm and stays green",
+              read_bytes14(_t14 / "tools" / "sib" / "conf.txt") == _14_CONF_A.encode(), "")
+        check("[-14] LIVENESS the three-way this fixture is built around really merges CLEAN and "
+              "really produces the file the kit's check rejects",
+              GK14.three_way(_14_CONF_T.encode(), _14_CONF_A.encode(), _14_CONF_B.encode())
+              == (_14_CONF_M.encode(), "merged"),
+              repr(GK14.three_way(_14_CONF_T.encode(), _14_CONF_A.encode(), _14_CONF_B.encode())))
+        check("[-14] ...and that merged file carries BOTH settings the kit declares incompatible",
+              "MODE=strict" in _14_CONF_M and "LEGACY=on" in _14_CONF_M, _14_CONF_M)
+
+        remove_runs14(_log14)
+        _w14 = run_in_gov(_g14, "update", "--target", str(_t14), "--write")
+
+        # ---- AC2: the run REDS, and it reds by NAME rather than on an exit code alone.
+        check("[-14] AC2 the run that would have landed the broken merge exits 1",
+              _w14.returncode == 1, _w14.stdout[-2000:] + _w14.stderr[-900:])
+        check("[-14] AC2 ...reporting the kit by its own state vocabulary, both states on one line",
+              any(ln.startswith("govkit update — verify demo:") and "adopted -> landed-but-inert" in ln
+                  for ln in _w14.stdout.splitlines()), _w14.stdout)
+        check("[-14] AC2 ...naming BOTH exit codes, because one of them is the whole verdict",
+              "exit 0 -> 1" in _w14.stdout, _w14.stdout)
+        check("[-14] AC2 ...and the verdict that got it there was the CLEAN merge, not a conflict",
+              verdict_of(_w14.stdout, "tools/demo/conf.txt") == "diverged"
+              and "0 conflict(s)" in _w14.stdout, _w14.stdout)
+
+        # ---- AC3: the index is back where it was, byte for byte, and the rename is undone under
+        # ---- BOTH spellings. This is S2's row-keyed snapshot observed directly.
+        check("[-14] AC3 the rolled-back path's index entry EQUALS its pre-write oid",
+              read_index_oid14(_t14, "tools/demo/conf.txt") == _snap14["tools/demo/conf.txt"],
+              f"{read_index_oid14(_t14, 'tools/demo/conf.txt')} vs {_snap14['tools/demo/conf.txt']}")
+        check("[-14] AC3 ...and its worktree bytes are the adopter's own, not the merge",
+              read_bytes14(_t14 / "tools" / "demo" / "conf.txt") == _14_CONF_T.encode(),
+              repr(read_bytes14(_t14 / "tools" / "demo" / "conf.txt")))
+        check("[-14] AC3 ...so the target's own git reports NOTHING for it: not staged, not dirty",
+              gout(_t14, "status", "--porcelain", "--", "tools/demo/conf.txt").strip() == "",
+              gout(_t14, "status", "--porcelain", "--", "tools/demo/conf.txt"))
+        check("[-14] AC3 the RENAMED row is restored under its OLD spelling, from its snapshot entry",
+              read_index_oid14(_t14, "tools/demo/moved.txt") == _snap14["tools/demo/moved.txt"]
+              and (_t14 / "tools" / "demo" / "moved.txt").is_file(),
+              read_index_oid14(_t14, "tools/demo/moved.txt"))
+        check("[-14] AC3 ...and the NEW spelling is gone from the index AND from the worktree — the "
+              "half a path-keyed snapshot cannot reach",
+              read_index_oid14(_t14, "tools/demo/renamed.txt") == ""
+              and not (_t14 / "tools" / "demo" / "renamed.txt").exists(),
+              gout(_t14, "ls-files"))
+        check("[-14] AC3 ...and the whole kit is clean in the target's own git, both paths at once",
+              gout(_t14, "status", "--porcelain", "--", "tools/demo").strip() == "",
+              gout(_t14, "status", "--porcelain", "--", "tools/demo"))
+
+        # ---- AC4: the ROW, and all six fields of it. Restoring bytes and leaving the row stamped
+        # ---- forward re-creates `-8`; restoring some of the six is the split `-7` S9 refuses on.
+        _rec14b = json.loads((_t14 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row14b = {f["path"]: dict(f) for f in _rec14b["files"]}
+        check("[-14] AC4 the rolled-back row carries all six pre-run fields, together",
+              all(_row14b.get("tools/demo/conf.txt", {}).get(k)
+                  == _row14a["tools/demo/conf.txt"].get(k) for k in GK14.ROLLBACK_FIELDS),
+              str(_row14b.get("tools/demo/conf.txt"))[:400])
+        check("[-14] AC4 ...and the RENAMED row's `path` and `source` both carry the OLD spelling, "
+              "beside the old `commit` and `gov_oid` — so `-7` S9's preamble holds on the next run",
+              _row14b.get("tools/demo/moved.txt", {}).get("source") == "tools/demo/moved.txt"
+              and _row14b.get("tools/demo/moved.txt", {}).get("commit") == _A14
+              and "tools/demo/renamed.txt" not in _row14b, str(sorted(_row14b)))
+        check("[-14] AC4 install.json's gov_commit is UNCHANGED — the `if r.problems` arm declining "
+              "to re-stamp", _rec14b.get("gov_commit") == _A14 and _A14 != _B14,
+              str(_rec14b.get("gov_commit")))
+
+        # ---- AC5: a green kit's writes SURVIVE a sibling's rollback. Kits are independent, and
+        # ---- reverting a correct write to punish a sibling discards a good result.
+        check("[-14] AC5 the sibling kit is reported verified, on its own line",
+              any(ln.startswith("govkit update — verify sib:") and "verified" in ln
+                  for ln in _w14.stdout.splitlines()), _w14.stdout)
+        check("[-14] AC5 ...its path is staged at gov's NEW bytes",
+              read_index_oid14(_t14, "tools/sib/conf.txt")
+              == GK14.blob_oid(GK14.blob_at(_g14, _B14, "tools/sib/conf.txt")),
+              read_index_oid14(_t14, "tools/sib/conf.txt"))
+        check("[-14] AC5 ...on disk too", read_bytes14(_t14 / "tools" / "sib" / "conf.txt")
+              == _14_CONF_B.encode(), repr(read_bytes14(_t14 / "tools" / "sib" / "conf.txt")))
+        check("[-14] AC5 ...and its row carries the --to commit while the rolled-back one does not",
+              _row14b.get("tools/sib/conf.txt", {}).get("commit") == _B14
+              and _row14b.get("tools/demo/conf.txt", {}).get("commit") == _A14,
+              str(_row14b.get("tools/sib/conf.txt"))[:300])
+
+        # ---- S7's ORDER. A rollback that left no readable record is a revert the operator finds by
+        # ---- accident, days later, in a diff.
+        _ord14 = _t14 / ".governance" / "outbox" / "update-rollback-demo.md"
+        check("[-14] S7 a rolled-back kit leaves an order under .governance/outbox/",
+              _ord14.is_file(),
+              str(sorted(p.name for p in (_t14 / ".governance" / "outbox").glob("*"))))
+        _ordt14 = read_text14(_ord14)
+        check("[-14] S7 ...naming the kit's check argv, BOTH exit codes and every path restored",
+              "check.sh" in _ordt14 and "exit 0 -> 1" in _ordt14
+              and "restored  tools/demo/conf.txt" in _ordt14
+              and "restored  tools/demo/moved.txt" in _ordt14
+              and "restored  tools/demo/renamed.txt" in _ordt14, _ordt14)
+        check("[-14] S7 ...and NO order was written for the sibling this run did not roll back",
+              not (_t14 / ".governance" / "outbox" / "update-rollback-sib.md").exists(), "")
+        check("[-14] §5 the closing counts DROP the rolled-back work: `wrote` names the writes that "
+              "STAND, and a restored rename leaves `moved` in both spellings at once",
+              "wrote 1, moved 0, deleted 0" in _w14.stdout,
+              str([ln for ln in _w14.stdout.splitlines() if "wrote " in ln]))
+
+        # ---- S4's two runs per touched kit, counted on this same fixture: two kits, four
+        # ---- subprocesses, and the identities of them are the two kits and nothing else.
+        check("[-14] S4 exactly two check subprocesses ran per TOUCHED kit, and none for anything "
+              "else", sorted(read_runs14(_log14)) == ["demo", "demo", "sib", "sib"],
+              str(sorted(read_runs14(_log14))))
+
+        # ---- THE NEXT RUN. The rollback's whole point is that the target is still updatable: if
+        # ---- the six fields had been restored partially, `-7` S9's preamble would refuse this run
+        # ---- and the target could never be updated again.
+        _n14 = run_in_gov(_g14, "update", "--target", str(_t14))
+        check("[-14] AC4 the run AFTER a rollback is accepted by `-7`'s receipt-integrity preamble",
+              "REFUSING" not in _n14.stderr, _n14.stdout[-900:] + _n14.stderr[-900:])
+        check("[-14] AC4 ...and it re-offers exactly the work that was rolled back",
+              verdict_of(_n14.stdout, "tools/demo/conf.txt") == "diverged"
+              and verdict_of(_n14.stdout, "tools/demo/moved.txt") == "renamed", _n14.stdout)
+
+        # ---- THE PATH THIS RUN NEVER WROTE. A rename destination the target already holds is
+        # ---- REFUSED by `-11`, so nothing lands there — and if the same kit then rolls back, the
+        # ---- snapshot's `absent` marker for that destination would have the restore unlink an
+        # ---- UNTRACKED operator file that refusal exists to protect. The restore is bounded to the
+        # ---- paths this run actually wrote, and this is the arm that says so.
+        _go14, _logo14 = build_verify_gov("occupied", {
+            "demo": {"guard": _14_GUARD_CONFLICT,
+                     "files": {"conf.txt": _14_CONF_A, "moved.txt": _14_MOVED}},
+        })
+        _to14 = build_verify_target(_go14, "occupied-t", ["demo"])
+        (_to14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+                                                           newline="\n")
+        settle(_to14, "the adopter edits LEGACY")
+        # WRITTEN AFTER THE SETTLE, deliberately: tracked, it would restore from its own index entry
+        # and this arm would pass over the safe half of the branch it exists to grade.
+        (_to14 / "tools" / "demo" / "renamed.txt").write_text(
+            "the operator's own untracked file, at the path gov is about to move something to\n",
+            encoding="utf-8", newline="\n")
+        (_go14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                           newline="\n")
+        git(_go14, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        git(_go14, "add", "-A")
+        git(_go14, "commit", "-qm", "B")
+        check("[-14] the occupied fixture really holds an UNTRACKED file at the rename destination — "
+              "tracked, it would restore from its own index entry and this arm would be vacuous",
+              (_to14 / "tools" / "demo" / "renamed.txt").is_file()
+              and "tools/demo/renamed.txt" not in gout(_to14, "ls-files").split(),
+              gout(_to14, "ls-files"))
+        _wo14 = run_in_gov(_go14, "update", "--target", str(_to14), "--write")
+        check("[-14] the rename is refused by `-11` AND the same kit still rolls back its conf, so "
+              "this arm grades a rollback rather than a run that stopped early",
+              "ALREADY holds a file there" in _wo14.stdout and "ROLLED BACK" in _wo14.stdout,
+              _wo14.stdout[-1500:])
+        check("[-14] ...and the operator's untracked bytes SURVIVE it: a path this run never wrote "
+              "is not a path it may undo",
+              read_bytes14(_to14 / "tools" / "demo" / "renamed.txt").startswith(
+                  b"the operator's own untracked file"),
+              repr(read_bytes14(_to14 / "tools" / "demo" / "renamed.txt")[:80]))
+        check("[-14] ...the order SAYS so rather than listing it as restored",
+              "left alone tools/demo/renamed.txt" in read_text14(
+                  _to14 / ".governance" / "outbox" / "update-rollback-demo.md"),
+              read_text14(_to14 / ".governance" / "outbox" / "update-rollback-demo.md"))
+
+        # ---- AC6: ONLY TOUCHED KITS RUN, TWICE EACH. Three claimed kits, one moving rows. The arm
+        # ---- fails both against a draft that baselines every claimed kit — six subprocesses, the
+        # ---- whole-bar behaviour §3 refuses — and against one that skips the baseline, which is
+        # ---- one subprocess and the wedge AC9 exists to close.
+        _g6, _log6 = build_verify_gov("three", {
+            "demo": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+            "idle1": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+            "idle2": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+        })
+        _t6 = build_verify_target(_g6, "three-t", ["demo", "idle1", "idle2"])
+        (_g6 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g6, "add", "-A")
+        git(_g6, "commit", "-qm", "B")
+        _B6 = gout(_g6, "rev-parse", "HEAD").strip()
+        check("[-14] AC6 the fixture really claims three kits and moves rows in exactly one",
+              json.loads((_t6 / ".governance" / "install.json").read_text(encoding="utf-8"))["kits"]
+              == ["demo", "idle1", "idle2"], "")
+        remove_runs14(_log6)
+        _w6 = run_in_gov(_g6, "update", "--target", str(_t6), "--write")
+        check("[-14] AC6 EXACTLY TWO check subprocesses ran — the baseline and the after-pass, over "
+              "the one touched kit", read_runs14(_log6) == ["demo", "demo"], str(read_runs14(_log6)))
+        check("[-14] AC6 ...and zero for the two claimed kits this run did not touch",
+              not [x for x in read_runs14(_log6) if x != "demo"], str(read_runs14(_log6)))
+        check("[-14] AC6 each of those two prints ONE not-run line, naming itself",
+              len([ln for ln in _w6.stdout.splitlines()
+                   if ln.startswith("govkit update — verify idle1:") and "not-run" in ln]) == 1
+              and len([ln for ln in _w6.stdout.splitlines()
+                       if ln.startswith("govkit update — verify idle2:") and "not-run" in ln]) == 1,
+              _w6.stdout)
+        check("[-14] AC6 ...and the not-run TALLY reads 2, which is the COUNT rather than the lines",
+              "not-run 2" in _w6.stdout, _w6.stdout)
+        check("[-14] AC6 the touched kit was verified and the run exits 0",
+              _w6.returncode == 0 and "verified 1" in _w6.stdout, _w6.stdout[-1200:])
+        check("[-14] AC6 ...and gov_commit advanced, because a verified run is a clean run",
+              json.loads((_t6 / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("gov_commit") == _B6, "")
+        check("[-14] §5 EVERY tally prints, including the zeros — an absence is never coverage",
+              all(w in _w6.stdout for w in ("verified 1", "unverified 0", "not-run 2",
+                                            "rolled back 0", "pre-existing red 0")),
+              str([ln for ln in _w6.stdout.splitlines() if "verify:" in ln]))
+
+        # ---- AC7: THE SKIP ANNOUNCES ITSELF. A declared `none` and an argv that does not resolve
+        # ---- are both `landed-unmeasured`, both counted UNVERIFIED, and neither counted verified.
+        # ---- A check that could not run is not a pass.
+        _g7v, _log7v = build_verify_gov("unmeasured", {
+            "mute": {"arm": "none", "files": {"conf.txt": _14_CONF_A}},
+            "tokened": {"arm": "token", "guard": _14_GUARD_CONFLICT,
+                        "files": {"conf.txt": _14_CONF_A}},
+        })
+        _t7v = build_verify_target(_g7v, "unmeasured-t", ["mute", "tokened"])
+        for _e in ("mute", "tokened"):
+            (_g7v / "tools" / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g7v, "add", "-A")
+        git(_g7v, "commit", "-qm", "B")
+        remove_runs14(_log7v)
+        _w7v = run_in_gov(_g7v, "update", "--target", str(_t7v), "--write")
+        check("[-14] AC7 a kit declaring `[check] = { none = \"…\" }` is landed-unmeasured and is "
+              "printed UNVERIFIED",
+              any(ln.startswith("govkit update — verify mute:") and "landed-unmeasured" in ln
+                  and "UNVERIFIED" in ln for ln in _w7v.stdout.splitlines()), _w7v.stdout)
+        check("[-14] AC7 ...and so is a kit whose check argv carries an unresolved token",
+              any(ln.startswith("govkit update — verify tokened:") and "landed-unmeasured" in ln
+                  and "UNVERIFIED" in ln for ln in _w7v.stdout.splitlines()), _w7v.stdout)
+        check("[-14] AC7 ...they are counted apart from verified, which reads ZERO here",
+              "unverified 2" in _w7v.stdout and "verified 0" in _w7v.stdout, _w7v.stdout)
+        check("[-14] AC7 LIVENESS the unresolved argv really ran NOTHING — an unverified kit that "
+              "quietly executed its check would be the worst of both",
+              read_runs14(_log7v) == [], str(read_runs14(_log7v)))
+        check("[-14] AC7 ...and neither state blocks the receipt, which is §8 F2's ruling: report "
+              "loudly, do not block",
+              _w7v.returncode == 0 and json.loads((_t7v / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("gov_commit") == gout(_g7v, "rev-parse", "HEAD").strip(),
+              _w7v.stdout[-900:])
+
+        # ---- AC9: THE WEDGE ARM. A kit red at the BASELINE as well as after is pre-existing red:
+        # ---- reported, NOT rolled back, no `r.fail`, and the receipt re-stamps. This arm fails
+        # ---- against any draft that keys the rollback on the after-state alone — there, an adopter
+        # ---- carrying one unrelated local red reverts every correct write on every run, forever,
+        # ---- with `gov_commit` frozen and no `--force` in any spelling to escape by.
+        _g9v, _log9v = build_verify_gov("preexisting", {
+            "demo": {"guard": _14_GUARD_UNWIRED, "files": {"conf.txt": _14_CONF_A}},
+        })
+        _t9v = build_verify_target(_g9v, "preexisting-t", ["demo"])
+        _pre9 = run_in_gov(_g9v, "check", "--target", str(_t9v))
+        check("[-14] AC9 the fixture's kit really is RED before anything is written — without that "
+              "precondition this arm grades the verified path and proves nothing",
+              "govkit check — demo: landed-but-inert" in _pre9.stdout, _pre9.stdout)
+        _snap9 = read_index_oid14(_t9v, "tools/demo/conf.txt")
+        (_g9v / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g9v, "add", "-A")
+        git(_g9v, "commit", "-qm", "B")
+        _B9 = gout(_g9v, "rev-parse", "HEAD").strip()
+        remove_runs14(_log9v)
+        _w9v = run_in_gov(_g9v, "update", "--target", str(_t9v), "--write")
+        check("[-14] AC9 the kit is printed PRE-EXISTING RED, with both states and both exit codes",
+              any(ln.startswith("govkit update — verify demo:") and "PRE-EXISTING RED" in ln
+                  and "landed-but-inert -> landed-but-inert" in ln and "exit 1 -> 1" in ln
+                  for ln in _w9v.stdout.splitlines()), _w9v.stdout)
+        check("[-14] AC9 ...and counted under its own tally rather than folded into another",
+              "pre-existing red 1" in _w9v.stdout and "rolled back 0" in _w9v.stdout, _w9v.stdout)
+        check("[-14] AC9 NO ROLLBACK: the index does NOT match the pre-write snapshot",
+              read_index_oid14(_t9v, "tools/demo/conf.txt") != _snap9,
+              f"{read_index_oid14(_t9v, 'tools/demo/conf.txt')} vs {_snap9}")
+        check("[-14] AC9 ...and gov's new bytes stand on disk",
+              read_bytes14(_t9v / "tools" / "demo" / "conf.txt") == _14_CONF_B.encode(),
+              repr(read_bytes14(_t9v / "tools" / "demo" / "conf.txt")))
+        check("[-14] AC9 no r.fail was raised for it: the run exits 0 and gov_commit ADVANCES to "
+              "--to, which is the only thing that stops the wedge",
+              _w9v.returncode == 0
+              and json.loads((_t9v / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("gov_commit") == _B9, _w9v.stdout[-1200:])
+        check("[-14] AC9 ...and it still leaves an ORDER, so a standing red is readable rather than "
+              "merely tolerated",
+              (_t9v / ".governance" / "outbox" / "update-preexisting-red-demo.md").is_file()
+              and "still broken" in read_text14(_t9v / ".governance" / "outbox"
+                                             / "update-preexisting-red-demo.md"),
+              str(sorted(p.name for p in (_t9v / ".governance" / "outbox").glob("*"))))
+        check("[-14] AC9 LIVENESS both runs happened — a wedge escape that skipped the after-pass "
+              "would report the same words over one subprocess",
+              read_runs14(_log9v) == ["demo", "demo"], str(read_runs14(_log9v)))
+
+        # ---- §5's error state: a check that CANNOT LAUNCH is red, never unmeasured and never a
+        # ---- traceback. Measured through `check`, which is the verb that reports the finding.
+        _gnb, _lognb = build_verify_gov("nobinary", {
+            "demo": {"arm": "no-binary", "files": {"conf.txt": _14_CONF_A}},
+        })
+        _tnb = build_verify_target(_gnb, "nobinary-t", ["demo"])
+        _cnb = run_in_gov(_gnb, "check", "--target", str(_tnb))
+        check("[-14] §5 a check argv naming a binary the target does not have is reported "
+              "landed-but-inert and NAMED, never a traceback",
+              "govkit check — demo: landed-but-inert" in _cnb.stdout
+              and "could not run" in _cnb.stdout
+              and "Traceback" not in (_cnb.stdout + _cnb.stderr), _cnb.stdout + _cnb.stderr[-600:])
+        check("[-14] §5 ...and it is a finding, so `check` reds rather than exiting 0 on a kit "
+              "nothing could measure", _cnb.returncode == 1, _cnb.stdout)
+
+        # ---- THE ORPHAN ROW. A row can name a kit the receipt's own `kits` list does not claim —
+        # ---- nothing validates the two against each other, and a hand-edited or text-merged
+        # ---- `install.json` produces exactly this. That row still gets a verdict and still gets
+        # ---- WRITTEN, and there is no descriptor to ask and no check to run for it. Announced
+        # ---- rather than skipped: a kit whose writes nothing verified, reported as nothing, is
+        # ---- indistinguishable from one that passed.
+        _gor, _logor = build_verify_gov("orphan", {
+            "demo": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+            "sib": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+        })
+        _tor = build_verify_target(_gor, "orphan-t", ["demo", "sib"])
+        _recor = json.loads((_tor / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _recor["kits"] = ["demo"]          # the row for `sib` stays; the CLAIM for it goes
+        (_tor / ".governance" / "install.json").write_text(
+            json.dumps(_recor, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(_tor, "a receipt whose kit list has lost one of its rows' kits")
+        for _e in ("demo", "sib"):
+            (_gor / "tools" / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_gor, "add", "-A")
+        git(_gor, "commit", "-qm", "B")
+        check("[-14] the orphan fixture really carries a row whose kit the receipt does not claim",
+              any(f.get("kit") == "sib" for f in json.loads(
+                  (_tor / ".governance" / "install.json").read_text(encoding="utf-8"))["files"])
+              and "sib" not in json.loads((_tor / ".governance" / "install.json").read_text(
+                  encoding="utf-8"))["kits"], "")
+        remove_runs14(_logor)
+        _wor = run_in_gov(_gor, "update", "--target", str(_tor), "--write")
+        check("[-14] an orphan row's kit is NAMED as unverified rather than silently passed over",
+              any(ln.startswith("govkit update — verify sib:") and "NOT VERIFIED" in ln
+                  for ln in _wor.stdout.splitlines()), _wor.stdout)
+        check("[-14] ...and no check was executed for it, because there is no claim authorising one",
+              read_runs14(_logor) == ["demo", "demo"], str(read_runs14(_logor)))
+        check("[-14] ...while the CLAIMED kit beside it was still verified normally",
+              "verified 1" in _wor.stdout and _wor.returncode == 0, _wor.stdout[-1000:])
+
+        # ---- AC8's second half: the S1 extraction changed `check`'s BEHAVIOUR nowhere. The
+        # ---- comparison is against the engine as it stood before this unit, read out of git rather
+        # ---- than remembered — a byte comparison of two live runs over one fixture target.
+        _pe_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+                                  "HEAD:tools/govkit/govkit.py"], capture_output=True).stdout
+        check("[-14] AC8 the pre-extraction engine really came out of git, and it is the engine "
+              "BEFORE the helper existed",
+              len(_pe_src) > 100000 and b"def cmd_check" in _pe_src
+              and b"def run_kit_check" not in _pe_src, str(len(_pe_src)))
+        # A COPY OF THE WHOLE GOV TREE, `.git` and all: `check` resolves every row's provenance
+        # against gov's own blobs, so the pre-extraction engine needs the same commits under it or
+        # the two runs would differ for a reason that has nothing to do with the extraction.
+        _pre_gov = tmp / "v14-pre-gov"
+        shutil.copytree(_g14, _pre_gov)
+        (_pre_gov / "tools" / "govkit" / "govkit.py").write_bytes(_pe_src)
+        _ac8_now = run_in_gov(_g14, "check", "--target", str(_t14))
+        _ac8_was = run_in_gov(_pre_gov, "check", "--target", str(_t14))
+        check("[-14] AC8 `check` output is BYTE-IDENTICAL across the S1 extraction, on a fixture "
+              "target carrying an argv check, a rolled-back row and a receipt",
+              _ac8_now.stdout == _ac8_was.stdout and _ac8_now.returncode == _ac8_was.returncode,
+              "NOW:\n" + _ac8_now.stdout[-900:] + "\nWAS:\n" + _ac8_was.stdout[-900:])
+        check("[-14] AC8 LIVENESS that comparison ran over a NON-EMPTY report — comparing two "
+              "identical empty strings would prove nothing",
+              "govkit check — demo:" in _ac8_now.stdout and len(_ac8_now.stdout) > 100,
+              _ac8_now.stdout)
+
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
     # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written

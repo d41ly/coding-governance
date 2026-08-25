@@ -508,6 +508,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "check_argv_of",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_audit",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -2486,6 +2491,11 @@
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_kit_check",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "run_probe",
