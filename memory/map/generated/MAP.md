@@ -71,8 +71,8 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `recall floor` | memory-recall |
 | `recall floor arms` | memory-recall |
-| `review-join ban (no ref-keyed join)` | baseline |
-| `review-join self-test` | baseline |
+| `review-join ban (no ref-keyed join)` | review-harnesses |
+| `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `row-grammar selftest` | row-grammar |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
@@ -94,7 +94,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
-| `workflow script syntax` | baseline |
+| `workflow script syntax` | review-harnesses |
 
 ## kits
 
@@ -128,10 +128,10 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `check-workflow-syntax.js` | baseline |
-| `drift-audit-code.js` | baseline |
-| `drift-audit-state.js` | baseline |
-| `tier2-review.js` | baseline |
+| `check-workflow-syntax.js` | review-harnesses |
+| `drift-audit-code.js` | review-harnesses |
+| `drift-audit-state.js` | review-harnesses |
+| `tier2-review.js` | review-harnesses |
 
 ## skill-engines
 
