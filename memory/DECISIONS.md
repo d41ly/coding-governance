@@ -91,3 +91,4 @@
 
 *(none yet)*
 - TOOL-aTaperedSluice-1 · an Agent slot had no release path, so the budget counted LIFETIME per prompt, not concurrency — 5 sequential agents refused the 6th all turn. A 45-min expiry makes it a rolling window. Open: does Agent fire PostToolUse? That unlocks a real release
+- TOOL-dHonouredPark-2 · BUILD-METHOD.md's LINE budget rises to 350, the BYTE half stays at 24576, both owner calls of 2026-08-25. Bytes are named the binding half: at ~100 B per prose line they run out near line 316, so most of the 350 is headroom they do not grant
