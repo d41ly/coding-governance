@@ -1,10 +1,12 @@
 # TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build
 
-**Status:** SPECCED · rev-2 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md](../reviews/2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -32,32 +34,42 @@ says what it is.
 - **S5** — the token renders at two sites in `tools/unattended/SKILL.template.md`: the `## Which path`
   routing row for the prompt path, and the fence that opens `## Start a run from a PROMPT`. Routing
   row 4 also declares `prompt` and is handled by S6's pointer rather than by a third substitution.
-- **S6** — the VALUE GRAMMAR is stated in the Skill. The parameter takes one argument, which is
-  either a path to a readable file holding the prompt, or a literal prose block stating the build.
-  The discriminator is whitespace: a value containing whitespace is prose, a value containing none is
-  a path. A whitespace-free value that does not resolve to a readable file is a REFUSAL and not a
-  one-word prose block. Routing row 4 gains one clause saying it inherits this fence.
-- **S7** — the prompt path's step 3 is amended. Where the value was a path, the run carries the
-  file's CONTENT verbatim into the build README under the existing heading, and records the path it
-  came from beside it. The build folder is the authorization, so it may not authorize by reference to
-  a file that can change after the run starts.
-- **S8** — the kit vintage moves across EVERY carrier `tools/check-kit-versions.sh` asserts, which is
-  nine lines in six tracked source files, not the two an earlier revision of this spec named. The
-  inventory is in section 4.
+- **S6** — the VALUE GRAMMAR is stated in the Skill. The ARGUMENT is everything after the token to
+  the end of the invocation line, with one layer of surrounding quotes stripped before any test. It
+  is then read as a path or as prose by the four-row table in section 4. A relative path resolves
+  against the repository root, `git rev-parse --show-toplevel`, never against the session's working
+  directory. Routing row 4 gains one clause saying it inherits this fence.
+- **S7** — the prompt path's step 3 is amended, and the carried value goes to a RECORD rather than
+  into the build README. It is written to `{{MEMORY_ROOT}}/builds/<slug>/prompts/`, which is where
+  this memory tree already sanctions prompt-kind files, carrying its `**Serves:**` line and, where
+  the value was a path, the path it came from. The README's problem slot states the build in its own
+  words and points at that record.
+- **S8** — the kit vintage moves across every carrier `tools/check-kit-versions.sh` asserts. The
+  population is DERIVED, not counted here: two engine constants plus the marker each shares its line
+  with, and one marker per tracked `tools/unattended/*.template.md` enumerated from `git ls-files`.
+  Section 4 records what that resolves to today and why the figure is not the scope item.
 - **S9** — `tools/unattended/kit.toml` gains `AUTH_PARAM` in the SKILL render's `placeholders` list
   and in `[config] optional_keys`, and `ANCHOR_SCOPE` in both. `ANCHOR_SCOPE` has been absent from
   the placeholders list since `TOOL-aPromptedMandate-5` landed the seventh substitution.
 - **S10** — the SECOND hand-kept renderer is updated: the `sed` chain in
-  `tools/unattended/cross-component.test.sh` gains a `{{AUTH_PARAM}}` entry. Nothing reds if this is
-  missed, which is why it is a numbered scope item rather than a step.
-- **S11** — `tools/unattended/adopt-unattended.test.sh` gains an arm that seeds `AUTH_PARAM=""` and
-  asserts the default renders. Without it the whole suite passes with S2's normalisation deleted,
-  because the fixture conf declares no such key and the pre-set alone satisfies every existing
-  assertion.
+  `tools/unattended/cross-component.test.sh` gains a `{{AUTH_PARAM}}` entry, AND that fixture gains
+  an assertion that its own scratch render carries no surviving brace shape. Without the assertion
+  the entry is unobservable, because nothing downstream reads that render.
+- **S11** — `tools/unattended/adopt-unattended.test.sh` gains SIX arms: a blank declaration derives
+  the default, a legal NON-DEFAULT declaration reaches the render unchanged, and one refusal arm for
+  each of S3's four conditions. The non-default arm is the one that makes the conf channel itself
+  falsifiable; without it every other arm is satisfied by an implementation that hardcodes the
+  default and never reads the conf, which is the one behaviour the mandate asks for.
 - **S12** — all THREE installed artifacts are re-installed by RUNNING `adopt-unattended.sh`, never by
   hand: `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-PROTOCOL.md`, and
   `memory/guides/PLAYBOOK-TEMPLATE.md`. The third is byte-diffed by the same `--check` leg and drifts
   on the version bump alone.
+- **S14** — the read-path ceiling MOVES. This unit adds a section 8 row to
+  `memory/guides/UNATTENDED-PROTOCOL.md` and a row to `memory/DECISIONS.md`, both on the read path,
+  whose live margin is under 200 B. `READ_PATH_CEILING` in `.memory-tree.conf` is advanced to the
+  measured path plus the 256 B margin that file declares, with the derivation recorded beside it, and
+  committed in this same pass — an uncommitted floor bump is silently reverted by an unrelated
+  `git checkout`, and a floor goes slack rather than red when it does.
 - **S13** — the kickoff manifest is re-audited and `last-audit` re-stamped.
   `memory/guides/SESSION-KICKOFF.md` carries `.unattended.conf` in its `watch:` list, so this unit's
   conf edit obliges the ratchet.
@@ -115,7 +127,7 @@ Three characters and one prefix are refused, each for a reason that is not taste
 
 | Refused | Why |
 |---|---|
-| a value not beginning with `-` | check 24 reads the LAST whole-cell backticked lowercase token of each routing row as an authorization mode. A bare word rendered as a cell could be picked up as one. A leading hyphen cannot match `[a-z]`. |
+| a value not beginning with `-` | the value is an argv flag an owner types and an agent tests the invocation for; a bare word reads as a positional argument and re-opens the prose inference the fence forbids |
 | whitespace | the token is one argv word; a value with a space renders a fence naming two things and reads as prose |
 | a pipe | the token renders inside a markdown table row, which a pipe closes |
 | a backtick | the token renders inside a code span, which a backtick closes |
@@ -123,26 +135,55 @@ Three characters and one prefix are refused, each for a reason that is not taste
 The refusal is an `echo` and an `exit`, matching the existing refusal for a kit path containing
 whitespace. It is not a `fail()` call and owes no arm.
 
+**What does NOT justify the leading-hyphen rule, recorded so nobody re-derives it.** Check 24 of
+`check-unattended.sh` reads the routing table for authorization modes, and an earlier revision of
+this spec justified the rule by it. That reason is false: the check binds `tmpl` to
+`SKILL.template.md` and reads the TEMPLATE, where the cell holds `{{AUTH_PARAM}}`, so no rendered
+value can reach its predicate in any placement. The rule stands on the argv argument above and on
+nothing else.
+
 ### The value grammar
 
-The parameter takes one argument and there are exactly three readings of it.
+The argument is everything after the token to the end of the invocation line, with one layer of
+surrounding quotes stripped first. The FILE TEST runs before the whitespace test, and there are four
+readings.
 
 | Value shape | Reading | What the run does |
 |---|---|---|
-| contains whitespace | a literal prose block | carries it verbatim into the build README |
 | no whitespace, resolves to a readable file | a path | reads it, carries the CONTENT, records the path |
 | no whitespace, resolves to nothing | a refusal | says the path did not resolve and does not start |
+| contains whitespace, resolves to nothing | a literal prose block | carries it verbatim |
+| contains whitespace AND resolves to a readable file | a refusal | says the value is ambiguous and does not start |
 
-The whitespace discriminator is chosen over a file-existence test alone because a typo'd path must
-not silently become the build's entire scope statement. A prose block stating a build is multi-word
-in every case.
+The file test runs FIRST because the whitespace rule is not symmetric. "A prose block is multi-word"
+is true; its converse, "a path is single-word", is NOT — a quoted path containing a space arrives as
+one argument containing whitespace, and this adopter already refuses a whitespace-bearing kit path
+rather than treating one as impossible. Reading such a value as prose would make a real prompt file
+silently become the build's entire scope statement, which is the failure the discriminator exists to
+prevent. So the ambiguous case is a refusal rather than a guess, and the whitespace test decides only
+values that name no file.
 
-### Why the value is carried by content
+### Why the value is carried by content, and why into a RECORD
 
-The build folder IS the authorization the merge bar re-derives. A README naming a prompt file instead
-of holding its bytes would authorize by reference to something editable after the run began, which is
-the property `playbook:` resolution at BASE exists to deny on the recipe path. Recording the path
-beside the content keeps the provenance without keeping the dependency.
+The build folder IS the authorization the merge bar re-derives. A folder naming a prompt file outside
+itself would authorize by reference to something editable after the run began, which is the property
+`playbook:` resolution at BASE exists to deny on the recipe path. So the bytes travel, and the source
+path is recorded beside them as provenance rather than as a dependency.
+
+They travel into `prompts/`, not into the README, and that is a REUSE rather than a new place: this
+memory tree already sanctions prompt-kind files there and nowhere else, with a filename grammar and a
+`**Serves:**` binding the hygiene gate enforces. Three properties fall out, and each one is a defect
+avoided rather than a preference.
+
+- **The build README's heading canon is CLOSED for a bound README.** A carried prompt under its own
+  `## ` heading is `heading outside the canon`, and the canonical slots carry byte ceilings a real
+  prompt would blow.
+- **The README is PARSED and a record is not.** `region()` matches its markers with `index(ln, o) == 1`
+  and is blind to fencing, so a prompt quoting `<!-- gen:build-index -->` at column 1 — ordinary in a
+  prompt about this repository — makes preflight raise the malformed-markers refusal.
+- **It moves the failure earlier.** A malformed or oversized record reds the memory-tree hygiene gate
+  at step 3, BEFORE the commit and the push. The README route reds at preflight, which is after the
+  push, where the prompt path itself says no owner turn remains.
 
 ### Inventory
 
@@ -158,7 +199,15 @@ second spelling of it.
 | `tools/unattended/SKILL.template.md` | the marker |
 | `tools/unattended/PROTOCOL.template.md` | the marker |
 | `tools/unattended/PLAYBOOK-TEMPLATE.template.md` | the marker |
-| the three installed artifacts | regenerated by the adopter, never hand-edited |
+
+Measured 2026-08-25 with `git grep -c 'gov:kit unattended@' -- tools/unattended/`: five lines in five
+tracked source files, carrying seven values, because the first two lines each hold a constant AND a
+marker. An earlier revision of this spec said nine lines in six files, which reproduces against
+nothing — it was carried in from a probe rather than derived, and the figure is recorded here as a
+measurement precisely so the SCOPE item can point at the derivation instead of at a number.
+
+The three installed artifacts are NOT this checker's population. They are byte-diffed by
+`adopt-unattended.sh --check`, which is a different leg, and they are regenerated rather than edited.
 
 `1.9` to `1.10` is a safe spelling: `check-kit-versions.sh` compares by equality, and `govkit`'s only
 numeric comparison is a tuple of ints, which orders `(1, 10)` above `(1, 9)`.
@@ -216,27 +265,41 @@ literal twice while claiming to write it once.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/unattended/adopt-unattended.sh --check` runs on this tree, it exits 0,
+- **AC1** — When `bash tools/unattended/adopt-unattended.sh --check` runs on this tree it exits 0,
   and `grep -nE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md` prints nothing.
 - **AC2** — When `.claude/skills/unattended/SKILL.md` is grepped for the token, it appears at BOTH
   the routing row and the prompt-path fence.
-- **AC3** — When `adopt-unattended.sh` renders against a fixture whose conf declares `AUTH_PARAM=""`,
-  the rendered Skill carries the kit default and not an empty string. The arm lives in
-  `tools/unattended/adopt-unattended.test.sh` and FAILS when S2's derivation is deleted.
-- **AC4** — When `bash tools/unattended/check-unattended.sh` runs with the new key declared in
+- **AC3** — When a fixture conf declares `AUTH_PARAM=""`, the render carries the kit default. The arm
+  lives in `tools/unattended/adopt-unattended.test.sh` and FAILS when S2's derivation is deleted.
+- **AC4** — When a fixture conf declares a legal NON-DEFAULT value, the render carries THAT value at
+  both sites and does NOT carry the kit default. Arm in `tools/unattended/adopt-unattended.test.sh`.
+  This is the only criterion that can fail against an implementation which hardcodes the default and
+  never reads the conf, and the conf channel is the whole of what was asked for.
+- **AC5** — When `bash tools/unattended/check-unattended.sh` runs with the key declared in
   `.unattended.conf` and its row present in section 8, it exits 0.
-- **AC5** — When the `AUTH_PARAM` row is deleted from section 8 of
+- **AC6** — When the `AUTH_PARAM` row is deleted from section 8 of
   `memory/guides/UNATTENDED-PROTOCOL.md`, `check-unattended.sh` fails naming check 22. Observed RED,
   then restored.
-- **AC6** — When a fixture conf declares a malformed value, `adopt-unattended.sh` exits non-zero and
-  names the value. Both a bare word and a value containing a pipe are exercised.
-- **AC7** — When `bash tools/check-kit-versions.sh` runs after the bump, it exits 0, and
-  `grep -rn 'unattended@1\.9' tools/unattended/ .claude/skills/unattended/ memory/guides/` prints
-  nothing.
-- **AC8** — When `bash tools/unattended/adopt-unattended.test.sh` and
-  `bash tools/unattended/cross-component.test.sh` run, both exit 0.
-- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs after the conf edit, it exits 0.
-- **AC10** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, every leg is green.
+- **AC7** — When a fixture conf declares each of the four malformed values in turn — a bare word, a
+  value containing whitespace, one containing a pipe, one containing a backtick —
+  `adopt-unattended.sh` exits non-zero and names the value. All four arms observed RED, in
+  `tools/unattended/adopt-unattended.test.sh`; a guard arm that has only ever passed is an assertion
+  about nothing.
+- **AC8** — When the `## Start a run from a PROMPT` section of the rendered Skill is sliced and
+  grepped, in the shape check 25 already uses on this template, it carries the four-row value
+  grammar, the record-carry rule and the recorded provenance path.
+- **AC9** — When `tools/unattended/kit.toml` is read, `AUTH_PARAM` and `ANCHOR_SCOPE` each appear in
+  the SKILL render's `placeholders` list AND in `[config] optional_keys`.
+- **AC10** — When `bash tools/check-kit-versions.sh` runs after the bump it exits 0, and
+  `git grep -n 'unattended@1\.9'` prints nothing.
+- **AC11** — When `bash tools/unattended/adopt-unattended.test.sh` and
+  `bash tools/unattended/cross-component.test.sh` run, both exit 0, and the latter asserts its own
+  scratch render carries no surviving brace shape.
+- **AC12** — When `bash skills/session-kickoff/manifest-check.sh` runs after the `.unattended.conf`
+  and `.memory-tree.conf` edits and the re-stamp, it exits 0.
+- **AC13** — When `python tools/memory-tree/corpus_ids.py --report` is measured against the moved
+  `READ_PATH_CEILING`, hygiene check 16 is green and the margin is the declared 256 B.
+- **AC14** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, every leg is green.
 
 ## 7. Gates
 
@@ -283,6 +346,16 @@ codebase-map coverage and freshness legs · `govkit` selfcheck and selftest. The
 
 - rev-1 · 2026-08-25 · initial draft, after the owner replaced the opening thoroughness-word default
   with a mode-naming token and gave the parameter a path-or-prose argument.
+- rev-3 · 2026-08-25 · folded the M4 spec audit, workflow `wf_c6fdfda7-723` — four lenses, 40 raised,
+  15 confirmed, 25 refuted, precision 0.38, verdict CLEAN WITH FIXES. The load-bearing corrections:
+  no criterion rendered a NON-DEFAULT value, so the whole set was satisfiable by an implementation
+  that ignores the conf; the leading-hyphen guard was justified by check 24, which reads the TEMPLATE
+  and can never see a rendered value; the whitespace discriminator was argued in one direction and
+  silently read a quoted spaced path as prose; and rev-2's "nine lines in six files" reproduces
+  against nothing. S7 changed mechanism rather than wording — the carried value goes to a `prompts/`
+  record, which is where this tree already sanctions prompt-kind files, and which moves the failure
+  from preflight after the push to the hygiene gate before the commit. Added S14, the read-path
+  ceiling movement, found while measuring rather than by the audit.
 - rev-2 · 2026-08-25 · folded workflow `wf_38add5e5-594`, a five-lens read-only grounding probe.
   Four blockers: the version bump has nine carriers in six files rather than two, the adopter installs
   three artifacts rather than two, `.unattended.conf` is a watched file so the manifest ratchet is

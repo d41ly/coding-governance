@@ -65,14 +65,14 @@ ids TOOL-aNamedGesture-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-25 |
+| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aNamedGesture-1.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aNamedGesture-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

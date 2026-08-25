@@ -87,20 +87,19 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   it; anything this session closes is inside it.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
-  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
-  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
-  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
-  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
-  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
-  the cheap check is a `git log` at kickoff rather than a merge at landing.
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. Two builds rewrote
+  `tools/unattended/` concurrently on 2026-08-21 and neither noticed until the landing: 25 conflicting
+  files, and four merge-bar legs red on the merged tree with none red on either parent. §3's rule is
+  own STREAMS not files, and a kit is the unit that rule is about.
 
 - **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
   or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
   readme-contract's bound subset. Seed a new build's from its own spec ids.
-- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
-  `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
-  16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
+- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~275 B and the margin is smaller,
+  so a new ratified decision reds hygiene check 16 until the ceiling MOVES — that is the recorded
+  remedy, not a trim. Read the live pair from TWO files: `corpus_ids.py --report` measures the path,
+  `.memory-tree.conf` declares `READ_PATH_CEILING`. `--measure` prints a SUGGESTION, not the live
+  ceiling, and reading it as one is how a session claims 25 KB of headroom against 82 bytes.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -309,5 +308,5 @@ does — hit three times in one file in one session) · `process-creation-is-the
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
   skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
 - A spent budget blocks RECORDING work, not doing it: the read path is spent on arrival, a movement
-  takes measured-plus-153 B, and a decision row's cost is its own prose. Measure with
+  takes measured-plus-256 B, and a decision row's cost is its own prose. Measure with
   `corpus_ids.py --report` before and after; never estimate. Every movement is recorded in `.memory-tree.conf`.
