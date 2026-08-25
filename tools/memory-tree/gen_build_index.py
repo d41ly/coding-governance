@@ -952,7 +952,7 @@ def apply_region(readme_text: str, region: str, readme: str,
         # refuse — a divergence introduced by the very change that removed two others. It cannot be
         # demonstrated on an MSYS node, where the runtime strips CR before awk sees a byte, so it is
         # asserted at SOURCE level here rather than by a fixture that would pass either way.
-        return (line[:-1] if line.endswith(CR) else line) == mark
+        return check_marker_line(line, mark)
     opens = [i for i, l in enumerate(lines) if _is(l, mark_open)]
     closes = [i for i, l in enumerate(lines) if _is(l, mark_close)]
     if not opens and not closes:
@@ -1020,10 +1020,22 @@ def render_shards(builds: list, m: str) -> dict:
     return out
 
 
+def check_marker_line(line: str, mark: str) -> bool:
+    """The ONE spelling of "is this line exactly this marker", CR-stripped.
+
+    R2-L2 (closing review round 2). This predicate had FOUR live spellings in this file — two nested
+    `_is` helpers, `_marker_index`'s inline compare, and `slot_violations`' own — inside a module
+    whose comments forbid two answers to one question. They agreed, which is why nothing caught it;
+    the cost of four copies is that the NEXT edit makes them disagree, and this build already spent
+    two rounds on exactly that between this file and the driver.
+    """
+    return (line[:-1] if line.endswith(CR) else line) == mark
+
+
 def _marker_index(lines: list, mark: str):
     """The index of a marker line, or None. Same COLUMN-0, one-trailing-CR contract as apply_region."""
     for i, l in enumerate(lines):
-        if (l[:-1] if l.endswith(CR) else l) == mark:
+        if check_marker_line(l, mark):
             return i
     return None
 
@@ -1323,6 +1335,56 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
         for i in range(pc + 1, first_open):
             if lines[i].strip():
                 out.append((i + 1, "authored content between the plan pair and the generated region"))
+    # Trigger 4 — the authored roster pair is MANDATORY, on EVERY tracked build README.
+    # TOOL-dHonouredPark-1. It is not gated on `canon`: the contract registry declares which READMEs
+    # the heading canon and the SLOT BUDGETS bind, and a roster is neither. The owner ruled this
+    # population on 2026-08-25, and the reason it is the whole tracked set is that `build-complete`
+    # term 3 reads the pair on every build — so binding a subset would leave a later deletion
+    # silently restoring the vacuous pass it exists to remove.
+    #
+    # THE DISCIPLINE IS THE DRIVER'S, not `_marker_index`'s. `region()` in
+    # tools/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
+    # the open comes first; `_marker_index` returns the FIRST match and has no notion of duplicates or
+    # order. An assertion built on the helper would accept what the driver rejects, which is two
+    # answers to one question in the two tools that both read this marker.
+    #
+    # The vocabulary is the driver's too — absent, duplicated, transposed — because it already spells
+    # those three words for the sibling region, forty lines from where this is read.
+    # H4 (closing review) — MATCH THE DRIVER BYTE FOR BYTE. `region()` compares at column 0 with a
+    # trailing CR stripped and nothing else, so `l.strip()` here made this gate CERTIFY an indented
+    # or trailing-space pair that the driver then refuses. That is the exact two-answers-to-one-
+    # question defect S4 was written to prevent, reintroduced by the implementation of S4.
+    # R2-M2 — THE NEAR-MISS SET IS COMPUTED FIRST and reported on its own. A marker indented by two
+    # spaces is not an ABSENT marker and it is certainly not a DUPLICATED one, and the count branch
+    # said both: it saw zero of that marker and then blamed whichever count was not one. A reader
+    # sent to find a duplicate that does not exist reads the file twice and trusts the gate less.
+    near = []
+    for i, l in enumerate(lines):
+        s = l[:-1] if l.endswith("\r") else l
+        st = s.strip()
+        for m in (PLAN_OPEN, PLAN_CLOSE):
+            if s != m and (st == m or s.startswith(m) or st.startswith(m)):
+                near.append((i + 1, "a roster marker line is not the marker alone — the driver "
+                                    "compares at column 0 with nothing before or after it: %r" % s[:60]))
+    # R3-M1 — ACCUMULATE, never return. The first cut returned here, and a canon-bound README with a
+    # perturbed marker lost all six of its canon findings — a trigger suppressing another inside a
+    # function whose whole contract is that its findings are a union.
+    out += near
+    n_open = sum(1 for l in lines if check_marker_line(l, PLAN_OPEN))
+    n_close = sum(1 for l in lines if check_marker_line(l, PLAN_CLOSE))
+    if near:
+        pass  # a perturbed marker is already named above; do not also diagnose it as absent
+    elif n_open == 0 and n_close == 0:
+        out.append((1, "no authored %s pair, which every build README must carry" % PLAN_OPEN))
+    elif n_open != 1 or n_close != 1:
+        out.append((1, "the authored roster pair is not exactly one open and one close marker — "
+                       "found %d open and %d close" % (n_open, n_close)))
+    else:
+        oi = next(i for i, l in enumerate(lines) if check_marker_line(l, PLAN_OPEN))
+        ci = next(i for i, l in enumerate(lines) if check_marker_line(l, PLAN_CLOSE))
+        if ci < oi:
+            out.append((ci + 1, "the authored roster pair is TRANSPOSED — the close marker precedes "
+                                "the open one"))
     # Trigger 3 — the closed heading canon, only over a file the registry BINDS.
     if canon:
         out += scan_canon(lines, first_open)
@@ -1942,7 +2004,10 @@ def cmd_selftest() -> int:
 
         # A conforming README yields NO violations — the arm that keeps the walk from being vacuous.
         arm("a conforming README trips no trigger", "[]",
-            lambda: str(slot_violations(read_text(rd12), "x")))
+            lambda: str(slot_violations(
+                read_text(rd12).replace(MARK_OPEN, PLAN_OPEN + "\n| # | Unit |\n" + PLAN_CLOSE
+                                        + "\n\n" + MARK_OPEN, 1), "x")))
+
 
         # ---------------------------------------------------- TOOL-dFramedEntrypoint-1, trigger 3
         # S4 — the TOTAL-EXEMPTION hole. This is the arm that FAILED before this unit: a README with
@@ -1954,11 +2019,18 @@ def cmd_selftest() -> int:
         arm("the no-pair violation fires even with canon off", "1",
             lambda: str(len(slot_violations("# x\n\nprose\n", "x", canon=False))))
 
-        def build_canon_readme(slots):
-            """A build README whose authored half is `slots`, plus a valid generated pair."""
+        def build_canon_readme(slots, plan=True):
+            """A build README whose authored half is `slots`, plus a valid generated pair.
+
+            `plan` writes the authored roster pair, which TOOL-dHonouredPark-1 made MANDATORY on
+            every tracked build README. It defaults ON because a fixture standing for a conforming
+            file has to conform: four arms asserting [] were previously passing on a fixture that
+            would red the live leg. Pass plan=False to exercise trigger 4 itself.
+            """
             head = ["---", "slug: tOne", "node: t", "opened: 2026-01-01", "streams: s",
                     "roster: ARCH", "ids: ARCH-tOne-1", "---", "", "# tOne", ""]
-            return "\n".join(head + slots + ["", MARK_OPEN, MARK_CLOSE, ""])
+            tail = ([PLAN_OPEN, "| # | Unit |", PLAN_CLOSE, ""] if plan else [])
+            return "\n".join(head + slots + [""] + tail + [MARK_OPEN, MARK_CLOSE, ""])
 
         GOOD = ["## The problem this build exists to solve", "", "It states the problem.", "",
                 "## Expected improvements", "", "- one improvement", "",
@@ -2020,6 +2092,57 @@ def cmd_selftest() -> int:
         write_text(os.path.join(_bdir, SLOT_LIMITS),
                    "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
         write_text(os.path.join(_bdir, SLOT_HIGHWATER), "# high-water, seeded empty\n")
+
+        # ------------------------------------------------- TOOL-dHonouredPark-1, trigger 4
+        # THE PAIR IS MANDATORY, on every tracked build README and not on the contract's bound
+        # subset. Owner ruling. Each of the three conditions is armed by NAME, because a single
+        # "malformed" verdict sends a reader to diff a file against a rule it does not state.
+        #
+        # The discipline is the DRIVER's: exactly one open, exactly one close, open first. The
+        # engine's own `_marker_index` returns the first match and has no notion of duplicates or
+        # order, so an assertion built on it would accept what the driver refuses.
+        arm("an ABSENT roster pair is named", "must carry",
+            lambda: str(slot_violations(build_canon_readme(GOOD, plan=False), "x")))
+        # R2-M2: the message no longer says DUPLICATED, because it was said over files where nothing
+        # was duplicated — a whitespace-perturbed marker counted as absent and then blamed the count.
+        arm("a roster pair that is not exactly one open and one close is named", "found 2 open and 1 close",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, PLAN_OPEN + "\n" + PLAN_OPEN, 1), "x")))
+        # R2-M2 / R2-L1 — a marker perturbed by whitespace is NOT absent and NOT duplicated, and the
+        # count branch said both. These two arms are the branch's first failing case: it shipped with
+        # no arm at all, so nobody had ever seen it red.
+        arm("an INDENTED roster marker is named as not-the-marker-alone", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x")))
+        # R3-M3 — the control probes the phrase the module ACTUALLY emits. It probed "DUPLICATED",
+        # which R2-M2 had already retired, so it asserted the absence of a string nothing could
+        # produce: a fixture passing by finding nothing, which is on this diff's own checklist.
+        arm("...and is NOT also diagnosed by the marker-count branch", "False",
+            lambda: str("not exactly one open and one close" in str(
+                slot_violations(build_canon_readme(GOOD)
+                                .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x"))))
+        arm("a marker BOTH indented and trailed is still named", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN + " ", 1), "x")))
+        arm("a perturbed marker does NOT suppress the canon findings", "outside the canon",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p"]).replace(PLAN_OPEN, "  " + PLAN_OPEN, 1),
+                "x", canon=True)))
+        arm("a TRAILING-SPACE roster marker is named the same way", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, PLAN_OPEN + " ", 1), "x")))
+        arm("a TRANSPOSED roster pair is named", "TRANSPOSED",
+            lambda: str(slot_violations("\n".join(
+                ["---", "slug: tOne", "---", "", "# tOne", ""] + GOOD
+                + ["", PLAN_CLOSE, "| # | Unit |", PLAN_OPEN, "", MARK_OPEN, MARK_CLOSE, ""]), "x")))
+        # AND IT IS NOT GATED ON `canon`. The contract registry declares which READMEs the heading
+        # canon and the SLOT BUDGETS bind; a roster is neither, and binding trigger 4 to that subset
+        # would leave a later deletion silently restoring the vacuous pass on every other build.
+        arm("trigger 4 fires with canon OFF, like triggers 1 and 2", "must carry",
+            lambda: str(slot_violations(build_canon_readme(GOOD, plan=False), "x", canon=False)))
+        arm("a well-formed but EMPTY pair is LEGAL", "[]",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace("| # | Unit |", ""), "x")))
 
         def measure_bump_rows():
             global _SLOT_DATA_DIR

@@ -17,6 +17,14 @@ This folder was written in the pre-flatten shape and moved into `builds/<slug>/`
 branches reconciled; the spec's own content is unchanged, and its front matter is authored here
 because the generated index needs it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-cSightedPlumb-1` | 2 | the drift-audit kit: port record-vs-reality auditing out of inCMS |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-05 · streams tooling
 ids TOOL-cSightedPlumb-1

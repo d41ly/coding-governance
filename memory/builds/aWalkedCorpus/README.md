@@ -67,6 +67,16 @@ rather than widening.
 The table below is GENERATED from the status header of every spec in this folder — do not
 hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aWalkedCorpus-1` | 2 | the two corpus enumerators become one |
+| 2 | `TOOL-aWalkedCorpus-2` | 2 | the corpus gets something that grades it |
+| 3 | `TOOL-aWalkedCorpus-3` | 2 | the recall floor, built against the harness that exists |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 3 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aWalkedCorpus-1 TOOL-aWalkedCorpus-2 TOOL-aWalkedCorpus-3 TOOL-aWalkedCorpus-4 TOOL-aWalkedCorpus-5 TOOL-aWalkedCorpus-6 TOOL-aWalkedCorpus-7 TOOL-aWalkedCorpus-8 TOOL-aWalkedCorpus-9 TOOL-aWalkedCorpus-10

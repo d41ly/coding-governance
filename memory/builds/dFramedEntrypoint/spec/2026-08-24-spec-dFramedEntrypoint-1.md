@@ -13,6 +13,7 @@
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-enforcement.md) | research | — |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-migration.md) | research | — |
 | [2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md](../build/2026-08-24-build-TOOL-dFramedEntrypoint-1-owner-rulings.md) | journal | — |
+| [2026-08-25-build-TOOL-dFramedEntrypoint-1-park-dispositions.md](../build/2026-08-25-build-TOOL-dFramedEntrypoint-1-park-dispositions.md) | journal | — |
 | [2026-08-25-build-TOOL-dFramedEntrypoint-1-review-fold.md](../build/2026-08-25-build-TOOL-dFramedEntrypoint-1-review-fold.md) | journal | — |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-claim-verification.md) | spec-audit | — |
 | [2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md](../reviews/2026-08-24-review-TOOL-dFramedEntrypoint-1-spec-audit-round1.md) | spec-audit | TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 |

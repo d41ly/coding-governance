@@ -110,6 +110,15 @@ been asked; it is F3 above, now asked and answered.
 The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-cFinalBerth-1` | 2 | the terminal transition: LANDED as an observation, ABORTED as a record |
+| 2 | `TOOL-cFinalBerth-2` | 2 | the close that survives the landing it precedes |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-13 · streams tooling
 ids TOOL-cFinalBerth-1 TOOL-cFinalBerth-2 TOOL-cFinalBerth-3 TOOL-cFinalBerth-4 TOOL-cFinalBerth-5

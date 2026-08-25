@@ -122,6 +122,28 @@ The audit that grounds every number here, with its method and its own instrument
 `memory/builds/dCarriedReceipt/build/` (to be carried in from the adopter side, matching how
 `aFerriedDossier` carried its dossier).
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `DEPL-dCarriedReceipt-1` | 2 | `{relpath}` resolves through `rule_relpath` in the seam that writes |
+| 2 | `DEPL-dCarriedReceipt-10` | 2 | role `forked`, report-only |
+| 3 | `DEPL-dCarriedReceipt-11` | 2 | rename detection, and `withdrawn` stops deleting silently |
+| 4 | `DEPL-dCarriedReceipt-12` | 2 | write preconditions and a lock, on both writing verbs |
+| 5 | `DEPL-dCarriedReceipt-13` | 2 | `govkit adopt`, the receipt bootstrap |
+| 6 | `DEPL-dCarriedReceipt-14` | 2 | post-write verification, with index rollback |
+| 7 | `DEPL-dCarriedReceipt-15` | 2 | gov stops shipping its own prefix inside kit bodies |
+| 8 | `DEPL-dCarriedReceipt-2` | 1 | `refuse` becomes `report`, and `attributes` gets a pins arm |
+| 9 | `DEPL-dCarriedReceipt-3` | 1 | `intake` honours `--answer prefix=` |
+| 10 | `DEPL-dCarriedReceipt-4` | 1 | `coverage_rows()` and `plan --coverage` |
+| 11 | `DEPL-dCarriedReceipt-5` | 1 | the `[[decline]]` contract, and three arms that keep it honest |
+| 12 | `DEPL-dCarriedReceipt-6` | 2 | the silenced-gate-leg bar, and the gov defect it finds |
+| 13 | `DEPL-dCarriedReceipt-7` | 2 | two identities, read index-side |
+| 14 | `DEPL-dCarriedReceipt-8` | 2 | a merge result never overwrites `gov_oid` |
+| 15 | `DEPL-dCarriedReceipt-9` | 2 | `carry` rungs, recomputed, over a derived needle map |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer
 ids DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12

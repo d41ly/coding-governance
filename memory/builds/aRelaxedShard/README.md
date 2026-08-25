@@ -146,6 +146,15 @@ are in this unit's prose sweep anyway, so S16 corrects the attribution while it 
 
 The table below is GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aRelaxedShard-1` | 2 | the row class becomes declared byte bounds |
+| 2 | `TOOL-aRelaxedShard-4` | 2 | the backlog's slope, not its ceiling |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-17 · streams tooling
 ids TOOL-aRelaxedShard-1 TOOL-aRelaxedShard-2 TOOL-aRelaxedShard-3 TOOL-aRelaxedShard-4

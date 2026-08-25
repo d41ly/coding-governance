@@ -118,6 +118,17 @@ Two facts this build had asserted and could not support: unit 1's section 10 cit
 decided the OPPOSITE of what it was quoted for, and unit 4's account of the adopter's stale comment
 block was wrong in both halves. Both are corrected at the rev the audit produced.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aLoosenedCeiling-1` | 2 | the read-path headroom becomes a declaration, and its default rises |
+| 2 | `TOOL-aLoosenedCeiling-2` | 2 | check 6's per-class caps become adopter declarations |
+| 3 | `TOOL-aLoosenedCeiling-3` | 1 | this repo's read-path ceiling, re-derived at the new headroom |
+| 4 | `TOOL-aLoosenedCeiling-4` | 1 | the NicoCares adopter's read-path ceiling, raised against its measured growth |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 TOOL-aLoosenedCeiling-4 TOOL-aLoosenedCeiling-5 TOOL-aLoosenedCeiling-6

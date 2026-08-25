@@ -138,6 +138,27 @@ installs the kit anywhere, and every unit raises the price of adopting it, in a 
 because nobody adopts it. That last one is the largest unaddressed risk in the set and it has no
 owner yet.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dScaffoldedMirror-10` | 2 | supply the vocabulary to the author |
+| 2 | `TOOL-dScaffoldedMirror-11` | 2 | the scoped extractor, and the one predicate it makes possible |
+| 3 | `TOOL-dScaffoldedMirror-12` | 1 | the consistency instrument, measured before it is believed |
+| 4 | `TOOL-dScaffoldedMirror-13` | 1 | the .ts/.tsx darkness, decided rather than inherited |
+| 5 | `TOOL-dScaffoldedMirror-14` | 1 | the `t_` and `do_` renames, and `cmd` as a reserved row |
+| 6 | `TOOL-dScaffoldedMirror-15` | 1 | wire the runbook-parity gate, and pay what wiring it costs |
+| 7 | `TOOL-dScaffoldedMirror-2` | 1 | honest reporting and per-predicate liveness |
+| 8 | `TOOL-dScaffoldedMirror-3` | 1 | corpus scoping derived from the install receipt |
+| 9 | `TOOL-dScaffoldedMirror-4` | 1 | waiver keying and the mandatory reason |
+| 10 | `TOOL-dScaffoldedMirror-5` | 1 | the three RATCHETS rows and the delete-then-re-add repair |
+| 11 | `TOOL-dScaffoldedMirror-6` | 1 | the coverage floor and the LANGS mode ratchet |
+| 12 | `TOOL-dScaffoldedMirror-7` | 1 | the marginal-offense-rate signal |
+| 13 | `TOOL-dScaffoldedMirror-8` | 2 | the shipped frozen canon, and `--probe` |
+| 14 | `TOOL-dScaffoldedMirror-9` | 2 | the grandfather set with a provenance assert, replacing all three pins |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 14 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dScaffoldedMirror-1 TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11

@@ -415,6 +415,29 @@ to *split*, because the authored roster is the only carrier of a planned-but-uns
 generated region is a subset of the specs by construction. Each rev names what was wrong and how it
 was found.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aBoundedVerdict-1` | 2 | the review loop converges or promotes, and no round is refused by a counter |
+| 2 | `TOOL-aBoundedVerdict-11` | 2 | the units region becomes generated, mandatory, and read by name |
+| 3 | `TOOL-aBoundedVerdict-12` | 2 | a blocked close names its cause, not just the item it blocked on |
+| 4 | `TOOL-aBoundedVerdict-13` | 2 | every remote observation is bounded, and pays its cost last |
+| 5 | `TOOL-aBoundedVerdict-14` | 2 | an adversarial round after the first reviews the fold, not the build |
+| 6 | `TOOL-aBoundedVerdict-15` | 1 | every close-path write is staged, guarded, and reachable by a verb |
+| 7 | `TOOL-aBoundedVerdict-16` | 2 | `closing-review-recorded` joins a diff-review, in range |
+| 8 | `TOOL-aBoundedVerdict-17` | 2 | a split fetch/push URL stops being an unsatisfiable authorization |
+| 9 | `TOOL-aBoundedVerdict-18` | 2 | the two checks that cannot fail get subjects |
+| 10 | `TOOL-aBoundedVerdict-19` | 1 | the protocol pair says what the code does, and one closed AC is settled |
+| 11 | `TOOL-aBoundedVerdict-2` | 2 | a halted run records WHY, in a vocabulary something reads |
+| 12 | `TOOL-aBoundedVerdict-21` | 2 | the landing push is bounded too |
+| 13 | `TOOL-aBoundedVerdict-22` | 2 | the promoted blockers: the fold's own defects, specced rather than re-reviewed |
+| 14 | `TOOL-aBoundedVerdict-3` | 2 | every remaining place a run would wait for the owner gets a disposition |
+| 15 | `TOOL-aBoundedVerdict-4` | 2 | a fork that says it is unresolved stops reading as resolved |
+| 16 | `TOOL-aBoundedVerdict-5` | 2 | parking becomes a verb instead of a hand-edit |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 16 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-3 TOOL-aBoundedVerdict-4 TOOL-aBoundedVerdict-5 TOOL-aBoundedVerdict-6 TOOL-aBoundedVerdict-7 TOOL-aBoundedVerdict-8 TOOL-aBoundedVerdict-9 TOOL-aBoundedVerdict-10 TOOL-aBoundedVerdict-11 TOOL-aBoundedVerdict-12

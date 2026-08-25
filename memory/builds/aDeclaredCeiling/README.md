@@ -91,6 +91,17 @@ Nothing is unassigned, and one of the four is discharged by being disproved.
   its §10 that it did.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `PLAY-aDeclaredCeiling-1` | 1 | the refuted follow-up, recorded where it was asserted |
+| 2 | `TOOL-aDeclaredCeiling-1` | 2 | the size ceilings become one declaration with their history beside them |
+| 3 | `TOOL-aDeclaredCeiling-2` | 2 | the recall corpus reaches a constraint declared in a conf |
+| 4 | `TOOL-aDeclaredCeiling-3` | 2 | a landed run's frozen region stops being compared to a moving source |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling
 ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3

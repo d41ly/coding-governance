@@ -43,7 +43,11 @@ declaration is delivered three ways, and none of them is the gate.
   that row means. The suggestion keeps your separator, case, acronyms and digits — it hands back a
   name you can type, not one you have to edit.
 - **`python tools/lexicon/lexicon.py --brief <file>`** lists the OBJECTS a file already defines, so a
-  new function in it can be named alongside its neighbours rather than against the whole repo.
+  new function in it can be named alongside its neighbours rather than against the whole repo. Two
+  groups are NOT concept drift and are labelled so you do not read them as such: definitions with no
+  object at all (single-token names) are counted rather than dropped, and names sharing only a
+  dead tail — `pin_of`, `cache_of`, `token_of`, or a one-character object — are marked a shared DEAD
+  tail rather than a shared concept. Until `TOOL-dPromptedSeam-3` they were reported as one concept spelled many ways.
 
 Read the table when you are naming something, not when a gate stops you.
 

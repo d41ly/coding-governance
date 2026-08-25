@@ -1116,6 +1116,30 @@ def test_js_probe_against_the_lexicon():
         import lexicon_conf as lxc
     finally:
         sys.path.pop(0)
+    # THE STOPWORD PARITY, and this file is the only legal home for it. `.lexicon.conf` forbids
+    # `tools/lexicon/* -> tools/codebase-map/*`, so the lexicon may not import `map_lib` and must
+    # restate the 21-word set inline. The ban is DIRECTIONAL and FILE-SCOPED: it says nothing about a
+    # third file importing both, and this one already imports both. So the equality the lexicon's own
+    # docstring can only assert is asserted HERE, where it can actually be read.
+    # TOOL-dPromptedSeam-3, added by the closing review after the lexicon-side comment claimed no
+    # such check could exist.
+    # RAISES AssertionError, which is this module's ONLY failure idiom — `check()` at :52 catches
+    # exactly that and nothing else. The first cut called `fail(...)`, which is not defined here: the
+    # arm's only failure path raised NameError, `check()` did not catch it, and sixteen later arms
+    # never ran. Worse, the commit adding it claimed the break had been "watched to red naming the
+    # dropped word" — what was actually watched was a traceback whose text happened to contain the
+    # word being grepped for. A gate whose failing case has never been seen is an assertion about
+    # nothing, and this one was that in the commit that fixed an instance of it. Round-2 B2.
+    if lx.DEAD_TOKENS != m._STOPWORDS:
+        only_lex = sorted(lx.DEAD_TOKENS - m._STOPWORDS)
+        only_map = sorted(m._STOPWORDS - lx.DEAD_TOKENS)
+        raise AssertionError(
+            "lexicon.DEAD_TOKENS has drifted from map_lib._STOPWORDS — the lexicon restates this set "
+            "because the layer ban forbids importing it, so nothing but this arm can see them "
+            f"disagree. only in lexicon: {only_lex or 'none'}; only in map_lib: {only_map or 'none'}")
+    print(f"     ok stopword parity: lexicon.DEAD_TOKENS == map_lib._STOPWORDS "
+          f"({len(m._STOPWORDS)} words)")
+
     root = m.repo_root()
     conf = lxc.load_conf(root / ".lexicon.conf")
     langs = {ext: (pset, mode) for ext, pset, mode in lxc.langs(conf) if mode != "dark"}

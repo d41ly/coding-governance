@@ -1,19 +1,24 @@
 # TOOL-dSpentCeiling-1 — the read-path ceiling's movement history, as the retirement exhibit
 
-**Status:** CLOSED · rev-1 · 2026-08-25 · node d · Tier-2 · base 70df24ea · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-25 · node d · Tier-2 · base 70df24ea · streams tooling
 
 **Serves:** research TOOL-dSpentCeiling-1
 
 This is the comment block that stood above `READ_PATH_CEILING` in `.memory-tree.conf` until the key
 was retired. It is moved here rather than deleted because it IS the evidence the retirement rests
-on: 27 movements between 2026-08-08 and 2026-08-25, 26 of them up, each one argued in place at the
-time. Nothing below has been edited — it is the block verbatim at `8e9a04e1`.
+on: every raise argued in place, at the time, by someone who had thought about it.
 
-Read it as an argument against itself. Every paragraph is a careful, honest justification for a
-raise, and not one of them is wrong on its own terms. What none of them could see, because the
-instrument never reported it, is that 54.0% of what the budget measured is rendered from OTHER
-kits' templates and cannot be trimmed by this repo at all — so most of these raises were pricing
-another kit's release against this kit's budget.
+Read it as an argument against itself. Not one paragraph is wrong on its own terms. What none of
+them could see, because the instrument never reported it, is that over half of what the budget
+measured is rendered from OTHER kits' templates and cannot be trimmed by this repo at all — so most
+of these raises were pricing another kit's release against this kit's budget.
+
+**Two lineages, and this is main's.** While this branch retired the key it also raised it one last
+time, `135677 -> 161120` at `18cc9b78`, to unblock its own record-keeping. Main never took that step:
+it went its own way to `137976`. The block below is MAIN's, because that is the history that
+survives the merge; this branch's final raise is recorded in its own commit and in the build journal.
+That two branches independently kept raising the same number, for unrelated reasons, in the same
+week, is itself the finding.
 
 ---
 
@@ -174,7 +179,14 @@ another kit's release against this kit's budget.
 # 133243 before and 133305 after, so the claims cost +62 net rather than +1240. 153 B of
 # margin, the same figure every movement above uses.
 #
-# NET ACROSS THIS BUILD: 132760 -> 133458. Two units charged this budget and each priced its own
+# RAISED 133458 -> 133733 on 2026-08-25, for the OWNER RULINGS on this build's parked decisions.
+# One memory/DECISIONS.md row records that the build-README contract grows ORGANICALLY - each
+# build's owner conforms their own README on next touch - which is a policy a later session has to
+# know before it wonders why the contract binds one file of sixty-two. Measured 133458 before and
+# 133580 after, so the row cost +122; 153 B of margin, the same figure every movement above uses.
+# The other three rulings are backlog rows and cost this path nothing.
+#
+# NET ACROSS THIS BUILD: 132760 -> 133733. Two units charged this budget and each priced its own
 # charge, which is why the two movements above are recorded separately — but the ratchet reads
 # only the endpoints, and a raise and a drain are indistinguishable to it without this line.
 # The +698 is three things that could not be shortened away: one memory/DECISIONS.md row
@@ -212,40 +224,62 @@ another kit's release against this kit's budget.
 # main now carries. The margin still does not admit a `memory/DECISIONS.md` row at ~295 B, so the
 # parked decision under `TOOL-dScaffoldedMirror` is unchanged by any of this: the read path is full,
 # and three merges in a row have each priced their own growth without anyone trimming it.
+
+# RAISED 133733 -> 134558 on 2026-08-25, for TOOL-dHonouredPark-2. Measured 133673 before and 134405
+# after, so the charge is +732 in THREE parts: +259 for the M1 budget passage, which gains the dated
+# 2026-08-25 line raise, the clause naming the BYTE half as the binding one, and the clause saying a
+# gate for the pair is unruled — less the 92 B headless sentence tail that raise removed; and +268 for
+# one memory/DECISIONS.md row; and +205 for the manifest repair the first two FORCED. 153 B of margin,
+# the figure the recent movements use and a deliberate DEPARTURE from the measure-plus-
+# READ_PATH_HEADROOM jump the tool prints.
 #
-# THE TWENTY-SEVENTH MOVEMENT, AND THE LAST ONE THIS KEY WILL TAKE. TOOL-dSpentCeiling-1 opens to
-# DELETE this comparison and keep check 16 rule 3 gating on its own structural condition. NOTHING
-# REPLACES IT: rule 1 was a second bound over a population check 6 already caps, so the successor
-# to a redundant instrument is no instrument. Reconstructed against each commit's first parent, this key has moved 27 times
-# since 2026-08-08 - 26 up, 1 down - counting the raise below. The single downward move
-# (95431 -> 86476, d816c30b) was forced by hygiene check 11's new 400-byte per-entry cap taking a
-# manifest from 20920 B to 12215 B. It was not this ceiling's doing, and in 17 days the budget has
-# never once caused a trim.
+# THE THIRD PART IS THE ONE TO KNOW ABOUT, because it caught this unit out. `.memory-tree.conf` and
+# `memory/guides/BUILD-METHOD.md` are both on the kickoff manifest's `watch:` list, so touching either
+# forces a manifest re-audit bundled into the same commit — and `memory/guides/SESSION-KICKOFF.md` IS
+# a read-path member. So a unit that charges this budget and trips the manifest ratchet charges it
+# AGAIN, after it thought it was done, and the second movement is discovered by check 16 going red on
+# a tree that was green a minute earlier. Price the repair with the edit, not after it.
 #
-# AN EARLIER DRAFT OF THIS BLOCK SAID THE BREACH WAS STRUCTURALLY GUARANTEED because
-# `memory/DECISIONS.md` is append-only by charter section 6. That was WRONG, and it is corrected here
-# rather than quietly dropped: append-only does not mean unshrinkable, and that file ROTATED on
-# 2026-08-10, moving 79 rows byte-identical to `memory/archive/DECISIONS.2026-08-10.md`. Rotation is
-# the shrink mechanism and it has already been exercised once.
+# THE DECISION ROW COST NEARLY THREE TIMES WHAT THE PRIOR ONE DID (+268 against the +122 recorded
+# above), which is worth knowing before the next unit prices its own: a row's cost is its prose, and
+# this build has three more rows to write against whatever margin is left.
+# RAISED 134558 -> 134812 on 2026-08-25, for TOOL-dHonouredPark-3. Measured 134405 before and 134659 after:
+# one memory/DECISIONS.md row and nothing else, this unit's subject being outside the read path.
+# +254 against the +268 the previous row cost, which is what the note above asked the next unit to
+# watch — a row's cost is its prose, and this one was written short on purpose.
+# RAISED 134812 -> 135107 on 2026-08-25, for TOOL-dHonouredPark-1. Measured 134659 before and 134954 after:
+# one memory/DECISIONS.md row, +295. The unit's subject is 52 build READMEs and two checkers, none of
+# which is on this path.
+# RAISED 135107 -> 135872 on 2026-08-25, for TOOL-dHonouredPark-4. Measured 134954 before and 135719 after:
+# UNATTENDED-PROTOCOL.md gains the paragraph describing what --plan now reads, and one
+# memory/DECISIONS.md row. The protocol is edited in tools/unattended/PROTOCOL.template.md and
+# RENDERED here; editing the rendered copy directly reds the adopter drift check.
+# NET AGAINST MAIN: 135677 -> 135872. The five movements above are this BRANCH's, each priced by the
+# unit that charged it from 133733; local main meanwhile reached 135677 by work this branch does not
+# carry, so the ratchet's own comparison is that pair and not any step in the narrative.
 #
-# THE REAL FINDING IS COMPOSITION, and this instrument never surfaced it. Check 6 already caps every
-# member: six members at 61440 B each is 368640 B of first bounds against the 135706 B actually held,
-# so rule 1 was a SECOND bound over an already-bounded population and it bound earlier only because
-# it summed six incommensurable things. `memory/guides/BUILD-METHOD.md` carries `gov:kit
-# memory-tree@2.41` and `memory/guides/UNATTENDED-PROTOCOL.md` carries `gov:kit unattended@1.8`, so
-# 73268 B - 54.0% of mandatory reading - is RENDERED FROM KIT TEMPLATES and cannot be trimmed by this
-# repo at all. Over the seven days to 2026-08-25 those two supplied 28216 B of 43460 B of growth
-# (64.9%), `memory/LIVE.md` SHRANK by 303 B, and `memory/DECISIONS.md` contributed 11%. Every raise
-# was argued as though this repo's own prose were the driver. It was not.
+# LOWERED 135872 -> 135564, which TIGHTENS the ratchet and needs no excuse the way a raise does —
+# recorded anyway, because a number that moves without a measurement beside it is what this whole
+# narrative is against. Each per-unit movement above was correct WHEN MADE; later passes then
+# SHRANK the path, the manifest's traps bullet coming back down after breaching its own 400 B cap
+# being most of it. Measured 135411, so the ceiling is measured-plus-153 again rather than carrying
+# 461 B of slack — the permanent-slack fault the sibling registry's equality pin exists to catch.
+# Found by the closing review, which read the tree instead of the narrative.
+
+# THE dHonouredPark MERGE, and BOTH narratives above survive it. main reached 135677 across
+# dScaffoldedMirror, dFramedEntrypoint and dNarrowedAnchor; this branch reached 135564 across five
+# movements of its own from 133733. Folding either into the other would leave a ceiling nobody can
+# archaeologise, which is the failure the first block already spends a paragraph refusing.
 #
-# RAISED 135677 -> 161120, and the value is the kit's OWN advice corroborated by an independent
-# derivation. `corpus_ids.py --measure` printed 161120 at the moment of the decision: a measured
-# 135520 B plus the declared READ_PATH_HEADROOM of 25600. This build's own records then took the path
-# to 135706, so the live margin is 25414 and the pin is deliberately NOT chased to the new --measure
-# output, because a ceiling that tracks the measurement is not a ceiling. The read path grew
-# 92234 -> 135520 over the seven days to 2026-08-25, a measured 6184 B/day, against which 25600 B is
-# a four-day horizon. Sized from the rate, not the overshoot, per TOOL-aLoosenedCeiling-4.
-READ_PATH_CEILING="161120"
+# THE MARGIN IS 256, NOT 153. main's own text settles this: dNarrowedAnchor's DECLARED 256 supersedes
+# dFramedEntrypoint's ad-hoc 153, because a later argued doctrine beats an earlier improvised figure.
+# This branch used 153 throughout and adopts main's on arrival rather than carrying its own in.
+#
+# THE PAIR THE RATCHET READS IS 135677 -> 137976, main's value being the one in the conf at this
+# merge's base. MEASURED 137720 B on the merged tree — not computed from either side's arithmetic,
+# because the two branches grew different files and only a measurement over the union can say what
+# the union costs.
+READ_PATH_CEILING="137976"
 # The headroom `corpus_ids.py --measure` adds to the measured read path when it prints a ceiling to
 # paste back into this file. ABSENT = the kit's shipped default, which TOOL-aLoosenedCeiling-1 sets
 # to 25,600 B and which is 20,480 B until it lands. It is advice to an author, never an input to the

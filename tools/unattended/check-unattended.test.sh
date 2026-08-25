@@ -1358,6 +1358,15 @@ reset_tree; kick_engine
 mutate tools/unattended/SKILL.template.md '/unattended.sh --preflight/d'
 hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
 
+# ---- 30 (TOOL-dHonouredPark, closing review round 3): a --plan run may never claim terminality over
+# ---- a build it graded nothing on. The check WALKS the corpus, so its liveness assertion is the one
+# ---- that decides whether a clean verdict means anything: with every build's units pair broken,
+# ---- every --plan refuses, the walk grades nothing, and a check without this branch would report
+# ---- clean over an empty population.
+reset_tree
+mutate memory/builds/tRun/README.md '/gen:build-units/d'
+hit "$(run)" "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus"
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
 # ---- silent whether the predicate worked or not, which is the class this kit keeps meeting.

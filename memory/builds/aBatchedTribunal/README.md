@@ -30,6 +30,16 @@ drift. W4 is a separate spec because it answers a separate document — the clos
 | W5 | `-6` | the review of W4 — the new self-test was failing open |
 | W6 | `-8` | the epoch gate's endpoint hole; the per-commit trade measured, not guessed |
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aBatchedTribunal-1` | 2 | the review protocol becomes a gate, not a note |
+| 2 | `TOOL-aBatchedTribunal-6` | 2 | W4: the four rows the closing review left open |
+| 3 | `TOOL-aBatchedTribunal-8` | 2 | W6: the epoch gate's endpoint hole, and the trade measured |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aBatchedTribunal-1 TOOL-aBatchedTribunal-2 TOOL-aBatchedTribunal-3 TOOL-aBatchedTribunal-4 TOOL-aBatchedTribunal-5 TOOL-aBatchedTribunal-6 TOOL-aBatchedTribunal-7 TOOL-aBatchedTribunal-8

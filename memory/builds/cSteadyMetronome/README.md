@@ -85,6 +85,14 @@ has no backlog row, because there is no room to write one.
 The table below is GENERATED from the status header of
 every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-cSteadyMetronome-1` | 2 | concurrency proved by rendezvous, not by elapsed time |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cSteadyMetronome-1

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.8 -->
+<!-- gov:kit unattended@1.9 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -424,10 +424,16 @@ what preserves the strong claim wherever the strong claim is available.
 - `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
   that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
   structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
-- `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
-  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
-  against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a
-  roster whose markers are malformed is a named refusal rather than a complete-looking list.
+- `--plan` — takes its unit SET and its ORDER from the GENERATED units region, which is why its
+  "next" and `--status`'s are the same unit by construction rather than by coincidence. It prints
+  each unit's id, status and the build method's M2 classification, and names the next one. It
+  COMPUTES that vocabulary and does not define it; M2 does. It reads the SPEC FILES for two things
+  the region cannot carry: that classification, and the two `NOT A UNIT` conditions, since a file
+  with no parseable status header has no rendered row to appear in. A region that is absent OR
+  malformed is a named refusal, never a fall-back to the older spec-derived listing. It still joins
+  the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
+  specced is reported as MISSING — that question cannot be answered from a region rendered out of
+  the specs that exist.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the

@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T20:39:24+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
+last-audit: 2026-08-25T20:46:44+03:00 @ 68d2c152e8ed29efb828f8fec339162155e88556
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 70df24ea1963afd7ee12749acb3bd323e5fa239a
+last-body-change: 68d2c152e8ed29efb828f8fec339162155e88556
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -50,11 +50,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
-  authority are M3's and M6's; they are not restated here, for the reason the directives bullet
-  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
-  pass's declared write set, and the comparison REPORTS to stdout without ever failing the bar
-  (`TOOL-dUnstalledConvoy-23`). Declare write sets anyway; a green leg is not a disjointness proof.
+  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
+  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
@@ -97,9 +95,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
   the cheap check is a `git log` at kickoff rather than a merge at landing.
 
+- **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
+  or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
+  readme-contract's bound subset. Seed a new build's from its own spec ids.
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
-  the bound; check 16 keeps rules 3 and 4 and is STRUCTURAL, behind no pin. Do not re-add a summed
-  ceiling — it moved 27 times in 17 days, 26 of them up, and never once caused a trim.
+  the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -307,6 +307,6 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
   skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF` is the seam.
-- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
-  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
-  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
+- A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
+  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
+  before and after, never estimate, and record every movement beside the number.

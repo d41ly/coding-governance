@@ -188,7 +188,11 @@ with this build's file list, and the rev-1 spec was machine-clean against the fo
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
-<!-- roster:units -->
+#### The scope table this build shipped
+
+*Kept verbatim. It uses `S<n>` HANDLES, not unit ids, which is why the roster pair below it was
+INERT: `roster_ids` selects `[A-Z]+-<slug>-[0-9]+` and matched none of these. Recorded as fixed by
+`TOOL-dHonouredPark-1` rather than silently kept.*
 
 | Area | What changes |
 |---|---|
@@ -201,6 +205,12 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 | **S6** | BUILT — phase members named for M6's PASS kinds, plus `--phase`, the producer they needed |
 | **S7** | BUILT — seven statements of the rule, all now agreeing with the rule |
 | **S8** | BUILT — the roster marker pair, and the integrity check it makes possible |
+
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aStandingWrit-1` | 2 | the run authorizes on a plan it did not write |
 
 <!-- /roster:units -->
 

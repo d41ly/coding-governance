@@ -38,7 +38,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.8   # gov:kit unattended@1.8 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.9   # gov:kit unattended@1.9 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1522,11 +1522,20 @@ plan_state() { # spec file -> prints the M2 state
 # planned-but-unspecced question keeps the authored pair: absent, `missing_units` is trivially
 # satisfied, which is the status quo for 45 of 49 builds and weakens nothing that worked before.
 roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecced units
-  local slug="$1" rel; rel=$(readme_of "$slug")
+  # TOOL-dHonouredPark-1 S5. `region` REFUSES a malformed pair with exit 3, and this function used
+  # to pipe it straight into `grep | sort` and take the LAST stage's status - so the refusal was
+  # discarded and whatever `region` printed BEFORE failing was parsed as ids. A malformed pair
+  # yielded a partial id list and no error at all.
+  #
+  # PIPEFAIL IS NOT THE FIX, and it was measured before this was written rather than after. A
+  # well-formed but EMPTY pair is LEGAL - it means the build plans exactly its specced units - and
+  # `grep -oE` exits 1 on no match, so `set -o pipefail` would turn the legal case into a refusal.
+  # The status is tested on `region` ALONE instead.
+  local slug="$1" rel _reg; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
   grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
-  region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null \
-    | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+  _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
+  printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
@@ -1546,8 +1555,16 @@ spec_ids() { # dir
   done | sort -u
 }
 missing_units() { # slug · dir
-  local want have; want=$(roster_ids "$1"); have=$(spec_ids "$2")
-  [ -n "$want" ] || return 0
+  # THE STATUS IS TESTED. `set -u` is on and `set -e` is not, so a status this caller did not read
+  # would change nothing observable however carefully roster_ids returned it - which is the defect
+  # round 2 found in S5's first draft: the item would have gone green over a surviving vacuous pass.
+  #
+  # The `[ -n "$want" ] || return 0` guard that stood here is GONE. With the pair mandatory on every
+  # tracked build README it is unreachable, and it was measured INERT anyway: `comm` over an empty
+  # side emits one blank line, which command substitution strips to length 0 and `for` word-splits
+  # to zero iterations. Deleted because it is dead, not because deleting it changes behaviour.
+  local want have; want=$(roster_ids "$1") || return 3
+  have=$(spec_ids "$2")
   comm -23 <(printf '%s\n' "$want") <(printf '%s\n' "$have")
 }
 # S6 - extracted out of verb_status's inline pipeline, ahead of the unit that consumes it. Unit 7's
@@ -1606,41 +1623,115 @@ verb_plan() { # slug
   # the branch's signature, and a $( ) inside the message lands IN that signature - so no arm can
   # ever match it. Same class as the positional trap this repo already documents.
   local _rmp; _rmp=$(readme_of "$slug")
-  if grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
-    if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
-      fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
-      return 1
-    fi
+  # TOOL-dHonouredPark-4 S5. The ABSENT case no longer falls through. It used to be guarded away by
+  # the `grep -qF` below, so a README with no units region at all got the old spec-derived listing
+  # while a MALFORMED one refused - and a silent fall-back restores the divergence this unit removes
+  # exactly when the tree is in the state most likely to hide it.
+  if ! grep -qF -- "$UNITS_OPEN" "$_rmp" 2>/dev/null; then
+    fail 42 "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    return 1
+  fi
+  if ! region "$_rmp" "$UNITS_OPEN" "$UNITS_CLOSE" >/dev/null 2>&1; then
+    fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
+    return 1
+  fi
+  # R2-M3 — THE ROSTER IS RESOLVED HERE, beside the other region guards and before a single row is
+  # printed. It used to sit after the whole listing, so a malformed pair produced a complete-looking
+  # table and only then a refusal; and the arm that was meant to catch that asserted the refusal TEXT
+  # without looking at the table above it, which is how it shipped.
+  local _rids
+  if ! _rids=$(roster_ids "$slug"); then
+    fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice: $_rmp"
+    return 1
   fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
   if [ -z "$specs" ]; then
     fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
     return 1
   fi
+  # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
+  # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
+  # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
+  # the second, which the driver's own comment below already states - so the second is armed by
+  # fixture or not at all.
+  # R3-M4 — the renderable count comes from `spec_ids`, which is this driver's OWN answer to "does
+  # this spec parse as a unit" and whose comment says it exists so two callers cannot disagree. The
+  # inline count that stood here was a third spelling of that predicate, looser than the generator's,
+  # so the stale-region refusal could name an inert repair. Latent — zero of 277 tracked specs
+  # disagree today — and removed rather than left to be discovered by the first one that does.
+  local _sid _renderable
+  _renderable=$(spec_ids "$dir" | grep -c . || true)
   for spec in $specs; do
-    # ONE awk, not three chained processes. Same semantics: first matching line wins, a trailing CR
-    # is stripped, and nothing is printed when the file carries no status header.
     st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
-    # NO status header, NO unit. M2 defines a unit's spec as the file whose STATUS HEADER carries the
-    # id, so a file without one is a recording that happens to live here. Taking it anyway made this
-    # verb invent units and name one as `next` on 5 of the 25 builds in this corpus.
     if [ -z "$st" ]; then
       printf '%-34s %-11s %s\n' "$(basename "$spec")" "-" "NOT A UNIT (no status header)"
       continue
     fi
-    id=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
-    # NO basename fallback. `spec_ids` prints only when BOTH the status header and the id parse, so a
-    # fallback here made the two halves disagree about an unparseable heading: the file listed under
-    # its basename with a real status, and the SAME unit counted absent by `missing_units` — printed
-    # twice, once as a phantom MISSING that sends an unattended agent to re-spec a specced unit.
-    # Zero divergent files across all tracked specs today; this keeps both halves blind alike.
-    if [ -z "$id" ]; then
-      printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+    _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
+    [ -n "$_sid" ] || printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+  done
+
+  # R2-H2 — the EMPTY-REGION guard, ordered HERE and conditioned on `_renderable`. Above the two
+  # passes it refused on 7 of 63 live builds — every build whose specs render no row at all — and
+  # named `--write` as the repair on trees where `--check` was already clean, so the remedy was
+  # provably inert. A refusal whose fix cannot change anything is worse than the vacuity it replaced.
+  # Now it fires only where a spec that WOULD render a row exists and the region has none, which is
+  # the stale-render case it was written for; where nothing renders, the NOT A UNIT rows above ARE
+  # the answer.
+  local _rows; _rows=$(unit_rows "$_rmp")
+  if [ "$_renderable" -gt 0 ] && [ -z "$_rows" ]; then
+    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    return 1
+  fi
+  # S1/S2 - the SET and its ORDER come from the REGION, which is rendered in BUILD ORDER. `--status`
+  # already reads it, so this makes three verbs agree instead of two disagreeing with a third. The
+  # join key is the ID, never the row's LINK: `unit_rows` pattern-matches the link and never opens it,
+  # and the harness fixture links a bare `one.md` while `mkspec` writes a dated filename, so a
+  # link-resolving join would break every arm that reads this output.
+  # ONE id per ROW, not one per MATCH. A rendered row spells its id twice - once as the link's text
+  # and once inside the link's target - so a `grep -o` over the whole region emits every unit twice.
+  # Measured on the real corpus before this was written: the listing doubled.
+  #
+  # SCOPED TO $slug, which the closing review found: `[A-Za-z]+` admits no DIGIT in the slug
+  # segment, and every other reader here does - check_slug, the folder grammar, the heading
+  # parser. A build slugged `tRun2` listed ZERO units beside a roster line reporting one, the two
+  # halves of one report contradicting each other on screen. Scoping fixes the digit case and the
+  # not-scoped case together, and matches `unit_ids_of` rather than adding a third spelling.
+  # R2-H1 — COLLECTED FIRST, so "the region had rows and none of them named a unit of this build" is
+  # a state this verb can SEE. Iterating the substitution directly made it indistinguishable from an
+  # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
+  # false all-clear on the one verb an agent reads to pick up work.
+  local _ids _graded=0
+  _ids=$(printf '%s
+' "$_rows" | while IFS= read -r _row; do
+        printf '%s
+' "$_row" | grep -oE "[A-Z]+-$slug-[0-9]+" | head -1
+      done)
+  if [ -n "$_rows" ] && [ -z "$_ids" ]; then
+    fail 42 "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade: $_rmp"
+    return 1
+  fi
+  for id in $_ids; do
+    spec=""
+    for _c in $specs; do
+      _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$_c")
+      [ "$_sid" = "$id" ] && { spec="$_c"; break; }
+    done
+    # S7 - a region row whose id no tracked spec defines. It cannot arise while the region is rendered
+    # FROM those specs, but S1 makes it representable and a row that fell through would be invisible.
+    # Distinct from the authored pair's MISSING, which is about a PLANNED unit nobody has specced.
+    if [ -z "$spec" ]; then
+      printf '%-34s %-11s %s\n' "$id" "-" "NO TRACKED SPEC (rendered row without one)"
       continue
     fi
+    # The status comes from the spec the id resolved to. Its two unparseable shapes were reported by
+    # the S6 pass above and cannot reach here: a row exists in the region only for a spec whose status
+    # header parsed, so this branch grades a file already known to be a unit.
+    st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
     printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
+    _graded=1
     case "$state" in
       THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
       READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
@@ -1654,12 +1745,23 @@ verb_plan() { # slug
     nmiss=$((nmiss + 1))
     [ -n "$next" ] || next="$miss (MISSING - spec it first)"
   done
-  if [ -n "$(roster_ids "$slug")" ]; then
-    echo "roster: the README roster region, $(roster_ids "$slug" | grep -c .) id(s); $nmiss with no tracked spec"
+  # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
+  # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
+  if [ -n "$_rids" ]; then
+    echo "roster: the README roster region, $(printf '%s\n' "$_rids" | grep -c .) id(s); $nmiss with no tracked spec"
   else
-    echo "roster: tracked specs under $dir/spec (a planned unit with no spec is invisible here)"
+    echo "roster: the generated units region, in build order (the authored pair names no id of this build)"
   fi
-  if [ -n "$next" ]; then echo "next: $next"; else echo "next: none - every tracked spec is terminal"; fi
+  # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
+  # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
+  # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
+  if [ -n "$next" ]; then
+    echo "next: $next"
+  elif [ "$_graded" = 0 ]; then
+    echo "next: none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"
+  else
+    echo "next: none - every tracked spec is terminal"
+  fi
   return 0
 }
 
@@ -2751,7 +2853,14 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="the build's generated units region names no unit id, so there is no roster to judge completeness against: $(readme_of "$slug")"
         return 1
       fi
-      _bcmiss=$(missing_units "$slug" "$M/builds/$slug")
+      # THE STATUS IS READ HERE TOO. TOOL-dHonouredPark-1 taught `roster_ids` to refuse a malformed
+      # pair with exit 3 and taught `missing_units` to propagate it — and then this caller took the
+      # value into a bare assignment and never looked, so the refusal died one hop from the term it
+      # exists to protect. `set -e` is off; an unread status changes nothing anywhere.
+      if ! _bcmiss=$(missing_units "$slug" "$M/builds/$slug"); then
+        DOD_OUT="the build README's authored roster pair is absent or malformed, so the planned-vs-specced join this term makes cannot be made: $(readme_of "$slug")"
+        return 1
+      fi
       if [ -n "$_bcmiss" ]; then
         DOD_OUT="the authored plan names a unit that no tracked spec carries, so the build is incomplete by its own roster: $_bcmiss"
         return 1

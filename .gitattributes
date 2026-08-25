@@ -67,6 +67,9 @@ coding-governance-agents.template.md text eol=lf
 AGENTS.md text eol=lf
 .governance/deploy.toml text eol=lf
 tools/line-length-limits.txt text eol=lf
+# TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
+# in a way they were not while a row was `<path>:<line>` plus free whitespace.
+tools/dead-path-waivers.txt text eol=lf
 
 # The rendered recall Skill is compared to a fresh render with plain `diff` by
 # `adopt-memory-recall.sh --check`. The renderer always emits LF, so without this pin a Windows
