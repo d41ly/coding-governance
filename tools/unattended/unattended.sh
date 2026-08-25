@@ -1598,6 +1598,15 @@ verb_plan() { # slug
     fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
     return 1
   fi
+  # H2 — the EMPTY case. `region` exits 0 with empty stdout for a well-formed pair enclosing nothing,
+  # so the unit loop below would run zero times and this verb would report `next: none - every
+  # tracked spec is terminal` over a build full of SPECCED units. That is the state of EVERY build
+  # between its first --write and the next one after spec #1 exists. `build-complete` spells this
+  # guard already; this verb took two of its three and not the one that matters most often.
+  if [ -z "$(unit_rows "$_rmp")" ]; then
+    fail 42 "the generated units region carries no unit rows, so this verb has no unit set to grade: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    return 1
+  fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
   if [ -z "$specs" ]; then
     fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
@@ -1626,9 +1635,15 @@ verb_plan() { # slug
   # ONE id per ROW, not one per MATCH. A rendered row spells its id twice - once as the link's text
   # and once inside the link's target - so a `grep -o` over the whole region emits every unit twice.
   # Measured on the real corpus before this was written: the listing doubled.
+  #
+  # SCOPED TO $slug, which the closing review found: `[A-Za-z]+` admits no DIGIT in the slug
+  # segment, and every other reader here does - check_slug, the folder grammar, the heading
+  # parser. A build slugged `tRun2` listed ZERO units beside a roster line reporting one, the two
+  # halves of one report contradicting each other on screen. Scoping fixes the digit case and the
+  # not-scoped case together, and matches `unit_ids_of` rather than adding a third spelling.
   for id in $(unit_rows "$_rmp" | while IFS= read -r _row; do
         printf '%s
-' "$_row" | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | head -1
+' "$_row" | grep -oE "[A-Z]+-$slug-[0-9]+" | head -1
       done); do
     spec=""
     for _c in $specs; do
@@ -1662,8 +1677,17 @@ verb_plan() { # slug
     nmiss=$((nmiss + 1))
     [ -n "$next" ] || next="$miss (MISSING - spec it first)"
   done
-  if [ -n "$(roster_ids "$slug")" ]; then
-    echo "roster: the README roster region, $(roster_ids "$slug" | grep -c .) id(s); $nmiss with no tracked spec"
+  # H1 — RESOLVED ONCE, and its status read. Two `$( )` calls meant two discarded exit-3s, and the
+  # else-branch then printed "the authored pair names no id of this build" over a pair that was
+  # MALFORMED rather than empty — an affirmatively false sentence, and one this kit's own skill doc
+  # promises in the same diff that it will not print.
+  local _rids
+  if ! _rids=$(roster_ids "$slug"); then
+    fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice: $_rmp"
+    return 1
+  fi
+  if [ -n "$_rids" ]; then
+    echo "roster: the README roster region, $(printf '%s\n' "$_rids" | grep -c .) id(s); $nmiss with no tracked spec"
   else
     echo "roster: the generated units region, in build order (the authored pair names no id of this build)"
   fi
@@ -2759,7 +2783,14 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT="the build's generated units region names no unit id, so there is no roster to judge completeness against: $(readme_of "$slug")"
         return 1
       fi
-      _bcmiss=$(missing_units "$slug" "$M/builds/$slug")
+      # THE STATUS IS READ HERE TOO. TOOL-dHonouredPark-1 taught `roster_ids` to refuse a malformed
+      # pair with exit 3 and taught `missing_units` to propagate it — and then this caller took the
+      # value into a bare assignment and never looked, so the refusal died one hop from the term it
+      # exists to protect. `set -e` is off; an unread status changes nothing anywhere.
+      if ! _bcmiss=$(missing_units "$slug" "$M/builds/$slug"); then
+        DOD_OUT="the build README's authored roster pair is absent or malformed, so the planned-vs-specced join this term makes cannot be made: $(readme_of "$slug")"
+        return 1
+      fi
       if [ -n "$_bcmiss" ]; then
         DOD_OUT="the authored plan names a unit that no tracked spec carries, so the build is incomplete by its own roster: $_bcmiss"
         return 1

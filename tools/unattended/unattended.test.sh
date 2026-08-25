@@ -1686,6 +1686,31 @@ mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 units tPlan "| [ARCH-tPlan-9](spec/nine.md) | SPECCED | rev-1 | 2026-08-01 |"
 fixture
 hit "$(run --plan tPlan)" "NO TRACKED SPEC (rendered row without one)"
+
+# H2 (closing review) — the EMPTY case, which is the third vacuity shape and the one that shipped
+# broken. `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so the unit
+# loop ran zero times and this verb reported every spec terminal over a build full of SPECCED units.
+# That is the state of EVERY build between its first --write and the next one after spec #1 exists.
+# The generic form worth keeping: a verb deriving its unit SET from a region owes all THREE arms.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+units tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries no unit rows, so this verb has no unit set to grade:"
+miss "$out" "every tracked spec is terminal"
+
+# H1 (closing review) — a MALFORMED authored roster pair. `roster_ids` refuses it with exit 3, and
+# before the fold this verb discarded that status twice and printed "the authored pair names no id of
+# this build" — a sentence that is affirmatively FALSE over a pair that is malformed rather than
+# empty, and one the skill doc written in the same diff promises will not print.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+printf '\n%s\n%s\n' '<!-- roster:units -->' '<!-- roster:units -->' >> memory/builds/tPlan/README.md
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice:"
+miss "$out" "the authored pair names no id of this build"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.

@@ -1280,16 +1280,29 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     #
     # The vocabulary is the driver's too — absent, duplicated, transposed — because it already spells
     # those three words for the sibling region, forty lines from where this is read.
-    n_open = sum(1 for l in lines if l.strip() == PLAN_OPEN)
-    n_close = sum(1 for l in lines if l.strip() == PLAN_CLOSE)
+    # H4 (closing review) — MATCH THE DRIVER BYTE FOR BYTE. `region()` compares at column 0 with a
+    # trailing CR stripped and nothing else, so `l.strip()` here made this gate CERTIFY an indented
+    # or trailing-space pair that the driver then refuses. That is the exact two-answers-to-one-
+    # question defect S4 was written to prevent, reintroduced by the implementation of S4.
+    def _is(l, m):
+        return (l[:-1] if l.endswith("\r") else l) == m
+    n_open = sum(1 for l in lines if _is(l, PLAN_OPEN))
+    n_close = sum(1 for l in lines if _is(l, PLAN_CLOSE))
+    # ...and a marker that is ALMOST the marker is its own violation, which is `region`'s `bad` arm.
+    for i, l in enumerate(lines):
+        s = l[:-1] if l.endswith("\r") else l
+        for m in (PLAN_OPEN, PLAN_CLOSE):
+            if m in s and s != m:
+                out.append((i + 1, "a roster marker line carries more than the marker itself, which "
+                                   "the driver refuses at column 0: %r" % s[:60]))
     if n_open == 0 and n_close == 0:
         out.append((1, "no authored %s pair, which every build README must carry" % PLAN_OPEN))
     elif n_open != 1 or n_close != 1:
         out.append((1, "the authored roster pair is DUPLICATED — %d open and %d close marker(s), "
                        "where exactly one of each is legal" % (n_open, n_close)))
     else:
-        oi = next(i for i, l in enumerate(lines) if l.strip() == PLAN_OPEN)
-        ci = next(i for i, l in enumerate(lines) if l.strip() == PLAN_CLOSE)
+        oi = next(i for i, l in enumerate(lines) if _is(l, PLAN_OPEN))
+        ci = next(i for i, l in enumerate(lines) if _is(l, PLAN_CLOSE))
         if ci < oi:
             out.append((ci + 1, "the authored roster pair is TRANSPOSED — the close marker precedes "
                                 "the open one"))
