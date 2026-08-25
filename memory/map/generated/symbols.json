@@ -1923,6 +1923,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_object_state",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -1946,6 +1951,11 @@
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "read_token_is_live",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "reconcile",

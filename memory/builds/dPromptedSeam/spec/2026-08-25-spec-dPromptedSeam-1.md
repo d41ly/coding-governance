@@ -2,12 +2,16 @@
 
 # TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt
 
-**Status:** OPEN · rev-2 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
+**Status:** WONTDO · rev-5 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling · retired: the instruction already ships via memory-tree
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md) | diff-review | TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 |
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-2.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-2.md) | diff-review | TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 |
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md) | spec-audit | TOOL-dPromptedSeam-2 |
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md) | spec-audit | TOOL-dPromptedSeam-2 |
 | [2026-08-25-review-TOOL-dPromptedSeam-1-spec-audit.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -29,9 +33,13 @@ needed at all.
 - **S2 — the instruction is phrased against the callee's own contract.** It must tell the reader to
   write a behavioural phrase, because `reuse-lookup.agent.md` says a picked name is the wrong input
   and rev-1 was refuted for supplying exactly that.
-- **S3 — conditional on the sibling kit.** The rendered step is emitted only where the target repo
-  adopts `codebase-map`, using the renderer's existing conditional-block mechanism. An adopter
-  without the map must not read an instruction naming a tool it does not have.
+- **S3 — UNCONDITIONAL, and worded to survive a map-less adopter.** rev-3 made the rung conditional
+  on `codebase-map` and claimed the renderer already had a mechanism for that. It does not:
+  `render_skill()` is six literal `${out//{{KEY}}/…}` substitutions and holds no fence parser, while
+  the `kit:`/`when:` dropper lives in `render_playbook.py`, which renders the CHARTER and never sees
+  `SKILL.template.md`. Rather than build a fence pass for one rung, the step ships to everyone and
+  names the tool as one an adopter may or may not have — which is true, costs nothing, and is what a
+  reader needs either way.
 - **S4 — the human-facing doc follows.** `tools/lexicon/LEXICON.md`'s delivery section gains the
   same step in prose, so the Skill and the doc do not disagree.
 
@@ -61,9 +69,14 @@ trigger and paid for it with the wrong input. The Skill's reader knows what they
 and can describe it, which is the input `reuse_lookup` documents wanting. Automating a bad query is
 not better than prompting for a good one.
 
-**D3 — the conditional block, not a runtime check.** `adopt-playbook.sh` already drops `kit:`/`when:`
-blocks a target has no kit for, and the lexicon's own renderer fills placeholders from the
-declaration. S3 uses that existing mechanism; nothing decides anything at run time.
+**D3 — NO CONDITION AT ALL, which is the shape the tree actually supports.** rev-3 asserted the
+lexicon renderer could drop a block per adopted kit. Verified against the source: it cannot, and the
+mechanism it named belongs to a different renderer with a different subject. The three ways out were
+to build a fence pass (new machinery, a new placeholder, a new leftover check, and its own staged
+failure), to add a build-time presence probe (`discovery logic`, which §3 forbids by name), or to
+drop the condition. The third is taken. An adopter without the map reads one sentence naming a tool
+they do not have, which is the ordinary cost of a kit that mentions its siblings, and it keeps §9's
+Tier-1 claim true — no renderer code path moves.
 
 **D4 — what rev-2 does NOT claim.** It does not fire automatically. An agent that never reads the
 Skill never sees the step. That is a real cost and the audit named it; it is accepted because the
@@ -93,9 +106,12 @@ alternative was a mechanism refuted on cost, query shape and declared architectu
 - **AC2** — When that token is deleted from `.claude/skills/lexicon/SKILL.md` by hand,
   `bash tools/lexicon/adopt-lexicon.sh --check` exits non-zero naming `DRIFTED`; restoring it by
   re-rendering returns it to zero. The failing case is OBSERVED, per §7's rule for a new check.
-- **AC3** — When the renderer runs against a fixture target whose `deploy.toml` declares no
-  `codebase-map`, the emitted Skill contains no occurrence of `reuse_lookup.py`, and the same
-  fixture with the kit declared contains exactly one.
+- **AC3** — When `grep -c 'codebase-map' .claude/skills/lexicon/SKILL.md` runs, the rung's sentence
+  names the sibling kit as one the reader may not have, so the instruction is READABLE by a map-less
+  adopter rather than silently wrong for them. rev-3's AC3 named `deploy.toml` and a target-taking
+  renderer; `adopt-lexicon.sh` accepts only `--scaffold|--check|--render`, takes no target and never
+  reads that file, so the criterion had no subject and its absent-kit branch could never run on any
+  bar.
 - **AC4** — When `python tools/lexicon/lexicon.py --suggest fetch_conf` runs after this unit, its
   output is byte-identical to the same command's output at base `671e953d`, proving the engine was
   not touched.
@@ -114,14 +130,37 @@ untouched, and `LAYER_OFFENDER_PIN` stays `0` because nothing crosses the declar
   `reuse-lookup.agent.md`?** RESOLVED: name the script and let its own agent doc own the how. Two
   documents describing one invocation is the class this repo names, and the agent doc is the copy
   that stays current.
-- **Q2 — should `--suggest`'s output mention the Skill step?** UNRESOLVED, deliberately. It would
-  reintroduce a coupling between the engine's output and a document, and AC4 pins the engine's output
-  as unchanged. Revisit only if the Skill step is measured to go unread.
+- **Q2 — should `--suggest`'s output mention the Skill step?** RESOLVED (agent, 2026-08-25,
+  delegated): NO. Mentioning it fails AC4, which pins the engine's output byte-identical to base —
+  so the option is discarded by M3's veto 1 before any preference is needed, and a veto is not a
+  licence to take the vetoed option. It would also put a pointer to a document inside a command's
+  output, which is the coupling D1 exists to avoid. Revisit only if the Skill step is MEASURED to go
+  unread; that measurement does not exist and inventing one here would be a fork resolved by
+  assertion.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · node d · WONTDO. Retired, not parked. Spec-audit round 2 (B6) found that the
+  instruction this unit adds already ships three ways, one of them word-for-word: BUILD-METHOD.md:140
+  renders the reuse_lookup call with the behavioural-phrase wording AND a derived {{TOOL_ROOT}} prefix,
+  which is the install-prefix problem rev-4 could not solve; SPEC-TEMPLATE.template.md:227 is a second
+  carrier and check-memory-hygiene.sh:744 the forcing function. A fourth carrier is
+  two-answers-to-one-question, which this spec cites in its own non-goals. The residual value -- the
+  moment and the audience, on the will-not-fit branch only -- does not carry a documented
+  anti-pattern. Three audits found this spec wrong three times, which is its own evidence.
+
 - rev-1 · 2026-08-25 · node d · OPEN. Proposed a subprocess from `lexicon.py` into
   `reuse_lookup.py` on the refusal path, keyed on `read_object()`.
+- rev-4 · 2026-08-25 · node d · OPEN. Spec audit round 1 returned BLOCKED and four of its six
+  blockers were this unit's, all tracing to one undecided question: whether the rung is conditional.
+  It is not. S3, D3, AC3 and §10 each asserted a conditional-block mechanism in a renderer that has
+  none — `render_skill()` is six literal substitutions, and the fence dropper belongs to
+  `render_playbook.py`, which renders the charter. Dropping the condition retires all four rather
+  than building a fence pass, a placeholder, a leftover check and a staged failure for one sentence.
+- rev-3 · 2026-08-25 · node d · OPEN. §8 Q2 RESOLVED under the standing mandate: discarded by veto
+  1 for failing AC4, not chosen on preference. §10 gains the recall terms M5 requires, which rev-2
+  omitted — the probes were run for the set and their terms were not written down, which is the half
+  M7 re-runs.
 - rev-2 · 2026-08-25 · node d · OPEN, Tier-2 → Tier-1. **rev-1's MECHANISM is withdrawn; its GOAL is
   kept.** A three-lens spec audit refuted it on three independent grounds, each re-verified by hand
   before acceptance. First, the 1.85 s cost that D4 called "the binding constraint" does not
@@ -144,6 +183,18 @@ untouched, and `LAYER_OFFENDER_PIN` stays `0` because nothing crosses the declar
 - `tools/codebase-map/reuse-lookup.agent.md` — POINTED AT, not restated. It already turns a
   shortlist into a decision, and duplicating that guidance in the lexicon's Skill would be two
   answers to one question.
-- The renderer's conditional-block mechanism — REUSED as-is for S3. No new conditional machinery.
+- The renderer's conditional-block mechanism — NOT reused, because it is not in this renderer.
+  rev-3 claimed it was. `render_skill()` (`tools/lexicon/adopt-lexicon.sh:95-123`) substitutes six
+  placeholders and parses no fences; `remove_fenced`/`OPEN_RE` (`tools/playbook/render_playbook.py`)
+  render the charter. Two renderers, one sentence, and the audit caught it.
 - `read_object()` — NOT used by this unit. rev-1's use of it is withdrawn, and its own defects are
   `TOOL-dPromptedSeam-2` rather than this unit's business.
+
+**Recall terms used**, recorded because composing them is the expensive half and M7 re-runs the
+query: `lexicon subtokens port self-contained layers import ban codebase-map map_lib kit
+independence adopter reuse seam`. The behaviour phrase for the map probe was *"reduce an identifier
+to the concept it names, dropping the leading verb"*. What came back that MATTERS: `leading_verb`
+(`tools/lexicon/subtokens.py`, fan-in 3, SEAM) is the only seam in this area, and
+`TOOL-aRootedPrefix-1` records that `codebase-map` once hardcoded its `<root>/codebase-map/` install
+convention — which is exactly the discovery problem rev-2 no longer has to solve, because it makes
+no cross-kit call at all.
