@@ -37,7 +37,7 @@ import time
 
 KIT_GOVKIT_VERSION = "1.9"  # gov:kit govkit@1.9 — kit identity; set HERE, never from a conf
 
-RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
+RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
@@ -2219,6 +2219,92 @@ def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
     return out.stdout if out.returncode == 0 else None
 
 
+# ---------------------------------------------------------------- the two identities (DEPL-dCarriedReceipt-7)
+# `gov_oid` is the git blob GOV shipped at a row's `commit`. `oid` is the git blob the TARGET holds,
+# read from its INDEX. One receipt field was being asked to be both: `classify_row` compared `sha256`
+# against the target's WORKTREE bytes while `check` compared the same field against gov's blob, and
+# both claims hold only where the target's worktree is byte-identical to what gov shipped — false for
+# any adopter whose clone applies a line-ending filter. Measured on a `core.autocrlf=true` clone of a
+# memory-tree install: 23 of 24 engine rows read `patched` with nothing edited.
+def blob_oid(data: bytes) -> str:
+    """Git's object name for these bytes — the string `git hash-object --stdin` would print.
+
+    Computed rather than spawned, because both callers already hold the bytes: `apply` has gov's
+    blob in hand and `update` has just read it through `blob_at`. The rule is git's own and not a
+    hash of this tool's choosing — the header is `blob <byte-length>` and a NUL.
+
+    WHAT THIS DOES NOT COVER, stated because a structural check reads as a semantic one: a
+    repository on the sha256 object format names the same bytes differently, and gov is sha1 like
+    every repo this deployer has met. A target on the other format would read every identity as
+    DIFFERING, which is the safe direction — `differs` reaches only `patched` and `diverged`, and no
+    raw write sits on either.
+    """
+    return hashlib.sha1(b"blob %d\0" % len(data) + data,  # noqa: S324 - git's object name, not a MAC
+                        usedforsecurity=False).hexdigest()
+
+
+def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[str, str]], set[str]]:
+    """The TARGET's index, batched: `(path -> (mode, oid))` at STAGE 0, and every path at ANY stage.
+
+    ONE `ls-files -s -z` over the receipt's whole path list rather than one read per row (§8 F2).
+    Chunked, because a receipt can outgrow a command line and this one is measured in the hundreds
+    on a live adopter.
+
+    TWO return values because two questions need different populations. The map answers "what blob
+    does the target hold", and only a stage-0 entry answers it: an unmerged path carries stages 1-3
+    and no stage 0, and reading a merge stage as the target's blob answers a question nobody asked.
+    The SET is every path with any entry at all, so `-7` S4's absent-from-the-index refusal does not
+    fire on a path that is merely unmerged — that state is `-12` S3's refusal, one step earlier, and
+    two units refusing one state hand the operator two different messages for it.
+    """
+    at_stage0: dict[str, tuple[str, str]] = {}
+    present: set[str] = set()
+    for i in range(0, len(paths), 400):
+        chunk = paths[i:i + 400]
+        if not chunk:
+            continue
+        out = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "-z", "--", *chunk],
+                             capture_output=True, text=True, check=False)
+        for rec in out.stdout.split("\0"):
+            if not rec.strip():
+                continue
+            meta, _tab, pth = rec.partition("\t")
+            bits = meta.split()
+            if len(bits) < 3 or not pth:
+                continue
+            mode, oid, stage = bits[0], bits[1], bits[2]
+            present.add(pth)
+            if stage == "0":
+                at_stage0[pth] = (mode, oid)
+    return at_stage0, present
+
+
+def index_blob(target: pathlib.Path, oid: str) -> bytes | None:
+    """The bytes behind an index entry, from the target's object database and never from its disk.
+
+    Called ONLY where the bytes themselves are needed — the three-way merge and the order it writes
+    on a conflict. Every verdict is decided from the OID alone, which is why this is not one spawn
+    per row.
+    """
+    out = subprocess.run(["git", "-C", str(target), "cat-file", "blob", oid],
+                         capture_output=True, check=False)
+    return out.stdout if out.returncode == 0 else None
+
+
+def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
+    """The file mode gov's own tree records for a path at a commit.
+
+    §8 F1: a row with no existing index entry in the target takes THIS mode rather than a literal
+    `100644`. A hook that lands non-executable is a hook that does not run.
+    """
+    out = subprocess.run(["git", "-C", str(root), "ls-tree", commit, "--", path],
+                         capture_output=True, text=True, check=False)
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    mode = out.stdout.split()[0]
+    return mode if mode in ("100644", "100755", "120000") else None
+
+
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
                         receipt: dict | None) -> list[str]:
     """Registry entries resolvable in the target that THIS target's receipt does not claim.
@@ -2639,7 +2725,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         step(STEP_BASELINE, "no runner declared" if gr.get("kind") == "none"
              else "this target's descriptor declares no [gate_runner] at all")
 
-    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 2
+    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 3
     staged: list[str] = []      # only what this run actually wrote
 
     # ---- ATTRIBUTES. The pin block is written EARLY — before any content — because it is what the
@@ -2778,8 +2864,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 r.fail(f"entry '{eid}': {w['src']} does not resolve at {commit[:8]}")
                 continue
             dp = target / dest
+            # BOTH IDENTITIES, on this channel only (S1, S7). `gov_oid` is the blob gov shipped at
+            # `commit` and means that forever; `oid` is the blob the TARGET's index holds and is
+            # filled after the stage below, because it does not exist until this run stages it. The
+            # other three producers — the `merged` row, the `attributes` row and the `unlanded`
+            # rows — take NEITHER, and each for its own stated reason: there is no whole-file gov
+            # blob at those destinations to name.
             row = {"path": dest, "role": w["role"], "kit": eid, "version": vers,
-                   "sha256": hashlib.sha256(data).hexdigest(),
+                   "sha256": hashlib.sha256(data).hexdigest(), "gov_oid": blob_oid(data),
                    "source": w["src"], "commit": commit}
             if w["role"] == "seed" and dp.exists():
                 # seed: copied ONCE, then the target owns it. The ROW is recorded either way —
@@ -2800,6 +2892,16 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     if staged:
         subprocess.run(["git", "-C", str(target), "add", "--"] + staged,
                        capture_output=True, check=False)
+    # S7's second half: `oid` is read from each row's INDEX ENTRY, once the stage above has made one.
+    # ONE batched read over the writes channel's paths, per row and not per stage — that one `git
+    # add` covers every channel, and a seed the target already owned was never staged by this run at
+    # all. A row whose path the target does not track gets no `oid`, which is a true statement about
+    # a target that holds no index entry for it.
+    _landed = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES]
+    _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    for w in rows:
+        if w.get("role") in LANDABLE_ROLES and w["path"] in _idx:
+            w["oid"] = _idx[w["path"]][1]
     step(STEP_STAGE, f"{len(staged)} path(s)")
 
     # ---- HOOK PROBE. After the stage, because the question is whether the OPERATOR's landing commit
@@ -3194,27 +3296,88 @@ def _sha(b: bytes | None) -> str | None:
     return hashlib.sha256(b).hexdigest() if b is not None else None
 
 
-def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str) -> dict:
-    """One receipt row's verdict, from three blobs. `ours` is compared to the RECEIPT's hash.
+def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
+                 index: dict[str, tuple[str, str]]) -> dict:
+    """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
 
-    Not to `base`: for a rendered row those differ by construction, and for every row the receipt's
-    hash is what gov actually wrote.
+    OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
+    shipped at this row's `commit`. Not to `sha256`, and not to the target's WORKTREE: `sha256` is a
+    hash of bytes at write time, the worktree is whatever that target's own filters produced from
+    the blob, and asking either of them "did the operator change this file" answers a different
+    question. On a `core.autocrlf=true` clone the worktree read called 23 of 24 untouched engine
+    rows `patched`.
+
+    Both fields are STORED and only the COMPARISON is live: `gov_oid` is read back off the receipt
+    and never recomputed here — S9's preamble asserts it instead — while the target's oid is read
+    fresh on every run. No boolean anywhere stores the answer.
+
+    A row carrying no `gov_oid` cannot be called equal to anything, so a present index entry reads
+    `differs`. That is the SAFE direction by construction: `differs` reaches only `patched` and
+    `diverged`, and `diverged` additionally needs a THEIRS that moved, which needs the `source` and
+    `commit` such a row does not have. No raw write sits on this state.
+
+    `ours` BYTES are fetched only where they are actually consumed — the three-way merge and the
+    order it writes on a conflict — so the batched index read stays one spawn per run rather than
+    one per row.
     """
     src, base_commit = row.get("source"), row.get("commit")
     theirs = blob_at(root, to_commit, src) if src else None
     base = blob_at(root, base_commit, src) if (src and base_commit) else None
-    dp = target / row["path"]
-    ours = dp.read_bytes() if dp.is_file() else None
+    entry = index.get(row["path"])
+    ours_oid = entry[1] if entry else None
+    gov_oid = row.get("gov_oid")
 
     t_state = "absent" if theirs is None else ("equal" if _sha(theirs) == _sha(base) else "differs")
-    if ours is None:
+    if ours_oid is None:
         o_state = "absent"
-    elif _sha(ours) == row.get("sha256"):
+    elif gov_oid and ours_oid == gov_oid:
         o_state = "equal"
     else:
         o_state = "differs"
-    return {"verdict": VERDICT_GRID[(o_state, t_state)], "ours": ours, "theirs": theirs,
+    verdict = VERDICT_GRID[(o_state, t_state)]
+    ours = index_blob(target, ours_oid) if (ours_oid and verdict == "diverged") else None
+    return {"verdict": verdict, "ours": ours, "ours_oid": ours_oid, "theirs": theirs,
             "base": base, "o_state": o_state, "t_state": t_state}
+
+
+def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
+                       data: bytes, to_commit: str,
+                       index: dict[str, tuple[str, str]]) -> tuple[str | None, str | None]:
+    """Put bytes into the target THROUGH ITS OWN INDEX, and let its filters decide the worktree (S5).
+
+    Three plumbing calls, in this order and for this reason. `hash-object -w --stdin` puts the blob
+    in the TARGET's object database unchanged — no clean filter runs, so what lands is what gov
+    shipped, byte for byte. `update-index --cacheinfo` names it at the row's path. `checkout-index
+    -f` materialises the worktree file, which is the ONLY step that runs the target's smudge filter.
+
+    The replaced `write_bytes` had this exactly backwards: it decided the WORKTREE bytes from here
+    and left the index to catch up, so on a clone with a line-ending filter every file gov landed was
+    immediately `modified` in the target's own `git status`.
+
+    MODE from the row's existing index entry, and from gov's tree entry at `commit` for a row with
+    none (§8 F1) — a hook that lands non-executable is a hook that does not run.
+
+    Returns `(oid, None)` on success and `(None, why)` on failure. A failure LEAVES the index entry
+    rather than half-writing; rolling one back is `-14`'s.
+    """
+    out = subprocess.run(["git", "-C", str(target), "hash-object", "-w", "--stdin"],
+                         input=data, capture_output=True, check=False)
+    if out.returncode != 0:
+        return None, f"git hash-object refused the bytes: {out.stderr.decode('utf-8', 'replace').strip()}"
+    oid = out.stdout.decode("utf-8", "replace").strip()
+    entry = index.get(path)
+    mode = entry[0] if entry else ((gov_tree_mode(root, to_commit, src) if src else None) or "100644")
+    up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                         f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
+    if up.returncode != 0:
+        return None, f"git update-index refused {mode},{oid[:12]},{path}: {up.stderr.strip()}"
+    (target / path).parent.mkdir(parents=True, exist_ok=True)
+    co = subprocess.run(["git", "-C", str(target), "checkout-index", "-f", "--", path],
+                        capture_output=True, text=True, check=False)
+    if co.returncode != 0:
+        return None, (f"the index now names {oid[:12]} at '{path}' and `git checkout-index` could "
+                      f"not write the worktree file: {co.stderr.strip()}")
+    return oid, None
 
 
 def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, str]:
@@ -3304,6 +3467,102 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                           f"nobody")
     available = [e for e in all_kits(descs) if e not in claimed]
 
+    # ---- THE PRECONDITIONS THIS UNIT ADDS (DEPL-dCarriedReceipt-7), steps 4 and 5 of the build's
+    # ---- declared preamble order: after `-12`'s three and before any row is classified.
+    # THE WHOLE LIST, unfiltered. A row with no `path` key is malformed and has always raised out of
+    # the classification loop; filtering it out here would turn that into a silent drop, which is a
+    # skip that looks like a pass — one row of a receipt quietly ungraded and nothing saying so.
+    rows_all = receipt.get("files", [])
+
+    # ---- SCHEMA MIGRATION, and it runs before S9 because S9's third arm grades a field this fills.
+    # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
+    # read as S9's half-populated pair. Fill it ONCE, from EVIDENCE — gov's own blob at the row's
+    # recorded `commit` — and never from `sha256`, which hashes the bytes that landed and is not an
+    # object name. SCOPED TO `schema < RECEIPT_SCHEMA`: a schema-3 receipt is NEVER back-filled,
+    # because a schema-3 row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists
+    # to catch, and filling it in is how a text-merged receipt gets laundered into a plausible one.
+    # Scoped to LANDABLE_ROLES for S1's reason: those are the only rows whose destination holds a
+    # whole-file gov blob. A `merged` row's gov bytes are a BLOCK inside a file the target owns and
+    # an `attributes` row's are a block `lf_pins` composes — neither has a blob to name, and neither
+    # gets one invented for it here.
+    if schema < RECEIPT_SCHEMA:
+        for row in rows_all:
+            if row.get("role", "engine") not in LANDABLE_ROLES or row.get("gov_oid"):
+                continue
+            if not (row.get("source") and row.get("commit")):
+                continue
+            was = blob_at(root, row["commit"], row["source"])
+            if was is not None:
+                row["gov_oid"] = blob_oid(was)
+
+    # ---- S9. THE RECEIPT'S OWN INTEGRITY, over EVERY row, before any of them is classified.
+    # `gov_oid` is a STORED field and this is what a stored field costs. `install.json` is committed,
+    # `-11` rewrites `path`, `source`, `commit` and `gov_oid` together on a rename, and a TEXT merge
+    # of that file can pair `commit` from one side with `gov_oid` from the other. A stale `gov_oid`
+    # that happens to equal the target's live index blob reads the delta predicate FALSE and opens
+    # the raw-write arm on a row carrying a local edit.
+    # SCOPED BY FIELD PRESENCE, in three arms, plus ONE exemption by ROLE.
+    for row in rows_all:
+        # §8 F4, RATIFIED. A row whose `role` is `merged` is passed over BY ROLE, whatever `commit`
+        # it carries: that commit names the vintage the BLOCK was taken from, `UPDATE_ROLE['merged']`
+        # is its reader, and S9 has no whole-file gov blob to assert against. The arm reads `role`
+        # rather than `evidence` deliberately — `role` is on every row `apply` and `adopt` write, so
+        # it needs no later precondition to have run. Without it the FIRST update against any target
+        # that ever applied a hash-comment merged rule refuses everything: measured on a `push-main`
+        # receipt, whose merged row carries `commit`, `source` and `block_sha256` and NEITHER
+        # identity — which is the exactly-one shape two arms below.
+        if row.get("role") == "merged":
+            continue
+        has_commit, has_gov = bool(row.get("commit")), bool(row.get("gov_oid"))
+        if not has_commit and not has_gov:
+            # Nothing to compare, so this is not a failed integrity check. NOTE WHAT THIS ROW IS
+            # NOT: it is not necessarily `-13` S7's `evidence: "unattributed"` state. Every row
+            # `apply` writes through the `unlanded` channel carries neither field, and so does the
+            # synthesized `attributes` row. What happens to it next is its ROLE's business, in the
+            # classification loop, not this preamble's.
+            continue
+        if has_commit and has_gov:
+            was = blob_at(root, row["commit"], row["source"]) if row.get("source") else None
+            now = blob_oid(was) if was is not None else None
+            if now != row["gov_oid"]:
+                raise Refusal(
+                    f"receipt row '{row['path']}' records gov_oid {row['gov_oid']} for "
+                    f"'{row.get('source')}' at {str(row.get('commit'))[:12]}, and gov's blob there "
+                    f"is {now or '(no such blob)'}. REFUSING the whole run rather than classifying "
+                    f"this row against an identity the file no longer earns: `gov_oid` is stored, "
+                    f"and a stored identity that disagrees with its own evidence is how a "
+                    f"text-merged receipt opens the raw-write arm on a locally edited file"
+                )
+            continue
+        raise Refusal(
+            f"receipt row '{row['path']}' carries "
+            + ("`commit` and no `gov_oid`" if has_commit else "`gov_oid` and no `commit`")
+            + ". The two are written together and are meaningless apart, so this pairing is the "
+              "corruption shape a text merge of `install.json` produces — REFUSING the whole run "
+              "rather than acting on half of it. A receipt below schema "
+            + f"{RECEIPT_SCHEMA} has `gov_oid` filled from gov's blob at the row's own `commit` "
+              "before this check, so a row that still lacks it either could not be upgraded — gov "
+              "has no blob for that source at that commit — or was written at schema "
+            + f"{RECEIPT_SCHEMA} and has since been split"
+        )
+
+    # ---- S4. A claimed path PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX, over the same
+    # ---- batched read S2 classifies from. Without this, the index read's own `absent` routes to
+    # ---- `missing` and then to the write arm, which would overwrite whatever untracked file the
+    # ---- operator has there. Evaluated HERE, in the preamble: it is a whole-run refusal and must
+    # ---- not depend on which rows the loop has already reached.
+    index0, index_present = index_read(target, [w["path"] for w in rows_all])
+    shadowed = sorted(w["path"] for w in rows_all
+                      if w["path"] not in index_present and (target / w["path"]).is_file())
+    if shadowed:
+        raise Refusal(
+            "these receipt-claimed path(s) are present in the target's WORKTREE and absent from its "
+            "INDEX: " + ", ".join(shadowed) + ". `update` reads ours from the index, so an untracked "
+            "file there classifies as `missing` and the write arm would overwrite it with gov's "
+            "bytes. REFUSING: track it (`git add`) if it is meant to be gov's, or move it aside if "
+            "it is yours"
+        )
+
     print(f"govkit update — {target.as_posix()}")
     print(f"govkit update — {base_commit[:8] if base_commit else '(none)'} -> {to_commit[:8]} · "
           f"receipt schema {schema} · {'WRITE' if write else 'read-only'}")
@@ -3313,7 +3572,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     acted: list[dict] = []
     # S2's order, collected in the loop and written in the write phase below, where `outbox` exists.
     pins_order: str | None = None
-    for row in receipt.get("files", []):
+    for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
         if how is None:
@@ -3388,7 +3647,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 pins_order = _text
             continue
 
-        c = classify_row(root, target, row, to_commit)
+        c = classify_row(root, target, row, to_commit, index0)
         v = c["verdict"]
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
@@ -3455,8 +3714,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             continue
 
         if v == "stale" or v == "missing":
-            dp.parent.mkdir(parents=True, exist_ok=True)
-            dp.write_bytes(c["theirs"])
+            oid, why = land_through_index(root, target, row["path"], row.get("source"),
+                                          c["theirs"], to_commit, index0)
+            if oid is None:
+                r.fail(f"'{row['path']}' could not be landed: {why}")
+                continue
+            # BOTH identities, and they agree here BY CONSTRUCTION: gov's blob went into the target's
+            # object database unchanged, so the name the target gave it is the name gov's tree gives
+            # it. `sha256` is written too and decides nothing — it is what `install.sums` lists.
+            row["gov_oid"] = blob_oid(c["theirs"])
+            row["oid"] = oid
             row["sha256"] = _sha(c["theirs"])
             row["commit"] = to_commit
             changed.append(row["path"])
@@ -3469,27 +3736,48 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # forever — every updated target permanently red, from a successful update.
             withdrawn_rows.append(row)
         elif v == "diverged":
+            if c["ours"] is None:
+                # OURS is now read from the target's object database rather than off its disk, so
+                # this is the one new way it can be missing: the index names a blob the odb does not
+                # hold. NO ARM REACHES THIS, and the skip announces itself rather than passing for
+                # coverage — manufacturing a corrupt object database is not something this suite
+                # does, and merging against a silent `b""` would drop the operator's whole side.
+                r.fail(f"'{row['path']}' is diverged and its index blob {str(c['ours_oid'])[:12]} "
+                       f"does not read back from the target's object database — refusing to merge "
+                       f"against bytes this verb could not obtain")
+                continue
             merged, how = three_way(c["ours"], c["base"] or b"", c["theirs"])
             if merged is None:
                 conflicts += 1
                 (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
                     f"# update conflict — {row['path']}\n\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
-                    f"ours   on disk       sha {_sha(c['ours'])}\n"
+                    f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                     f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
                     f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n",
                     encoding="utf-8", newline="\n")
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
             else:
-                dp.write_bytes(merged)
+                oid, why = land_through_index(root, target, row["path"], row.get("source"),
+                                              merged, to_commit, index0)
+                if oid is None:
+                    r.fail(f"'{row['path']}' merged cleanly and could not be landed: {why}")
+                    continue
+                # DELIBERATELY UNCHANGED in shape: the merge RESULT is stamped into both identities,
+                # so `gov_oid` here names bytes gov never shipped. That is the corruption `-8` owns
+                # and fixes; renaming the field without moving the defect is what keeps `-8`'s own
+                # red-first observation reachable after this unit lands (§3, non-goals).
+                row["gov_oid"] = blob_oid(merged)
+                row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit
                 changed.append(row["path"])
 
-    if changed:
-        subprocess.run(["git", "-C", str(target), "add", "--"] + changed,
-                       capture_output=True, check=False)
+    # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
+    # re-adding them would re-CLEAN what the smudge filter just produced, and a filter pair that does
+    # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
+    # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
         subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
                        capture_output=True, check=False)

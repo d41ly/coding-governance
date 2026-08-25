@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** SPECCED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-7-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-7-acceptance-ledger.md) | journal | — |
 | [2026-08-25-build-DEPL-dCarriedReceipt-7-merged-row-reproduction.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-7-merged-row-reproduction.md) | research | DEPL-dCarriedReceipt-13 |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-8 |

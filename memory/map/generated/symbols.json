@@ -278,6 +278,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "blob_oid",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "boundedK",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -1138,6 +1143,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "gov_tree_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "govkit_kind_marks",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -1193,9 +1203,19 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "index_blob",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "index_of",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "index_read",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "inert_only",
@@ -1256,6 +1276,11 @@
       "id": "kit_rel",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "land_through_index",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "langs",

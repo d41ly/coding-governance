@@ -145,6 +145,14 @@ def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
     git(t, "init", "-q", "-b", "main")
     git(t, "config", "user.email", "t@e")
     git(t, "config", "user.name", "t")
+    # PINNED, not inherited. DEPL-dCarriedReceipt-7 S5 lands bytes through `checkout-index`, so the
+    # TARGET's own filters decide its worktree — which is the whole point, and which makes every
+    # arm asserting worktree bytes depend on the DEVELOPER's global `core.autocrlf` until it is
+    # pinned here. It is `true` by default on a Windows git install, and measured: eight arms
+    # asserting `b"v3\n"` went red on this machine for that reason alone. The filter is still
+    # exercised, deliberately and per fixture, by the clones `-7`'s own arms build with
+    # `-c core.autocrlf=true`.
+    git(t, "config", "core.autocrlf", "false")
     (t / "README.md").write_text("target\n", encoding="utf-8")
     if deploy is not None:
         gov = t / ".governance"
@@ -321,7 +329,11 @@ def main() -> int:
               all(s in govkit_steps() for s in seen), str(seen))
 
         rec1 = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
-        check("the receipt declares its schema", rec1.get("schema") == 2, str(rec1.get("schema")))
+        # THE ENGINE'S OWN CONSTANT, for the reason `govkit_steps` gives: a number spelled here goes
+        # stale the next time a unit adds a per-role row field, and the arm then grades the harness's
+        # memory of the schema instead of the receipt's declaration of it.
+        check("the receipt declares its schema", rec1.get("schema") == govkit_module().RECEIPT_SCHEMA,
+              str(rec1.get("schema")))
         check("every receipt row carries the kit version resolved at install",
               all("version" in f for f in rec1["files"]), "")
 
@@ -519,6 +531,12 @@ def main() -> int:
                 b = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
                                    capture_output=True).stdout
                 f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
+                # AND `gov_oid`, or this fixture is not "landed at an older vintage" — it is a row
+                # whose `commit` came from one vintage and whose `gov_oid` came from another, which
+                # is EXACTLY the corruption `-7` S9 refuses. Measured: nine arms went red on that
+                # refusal, and they were right to. The engine's own helper, so the fixture and the
+                # thing it grades cannot disagree about what a blob is named.
+                f["gov_oid"] = govkit_module().blob_oid(b)
                 (t / f["path"]).write_bytes(b)
             rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
             # -12 S4: `apply` staged every row, and the loop above then rewound their bytes in
@@ -2138,6 +2156,7 @@ user_skills = "/tmp/gk-fake-skills"
             git(host, "init", "-q", "-b", "main")
             git(host, "config", "user.email", "t@e")
             git(host, "config", "user.name", "t")
+            git(host, "config", "core.autocrlf", "false")   # pinned, for `make_target`'s reason
             (host / "README.md").write_text("host\n", encoding="utf-8", newline="\n")
             git(host, "add", "-A")
             git(host, "commit", "-qm", "base")
@@ -2438,8 +2457,408 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-12] S4 the fixture is out of the index but present on disk",
               CW not in gout(u9, "ls-files").split() and (u9 / CW).is_file(), "")
         _p9c = run("update", "--target", str(u9), "--write")
-        check("[-12] S4 an untracked file shadowing a claimed path is NOT dirty here",
-              _p9c.returncode == 0, _p9c.stdout + _p9c.stderr)
+        # The carve-out still holds, and the assertion moved from an EXIT CODE to a MESSAGE because
+        # `-7` S4 has since landed and claims this exact tree. `-12`'s dirty check must still not
+        # fire on it — two units refusing one state hand the operator two different messages — so
+        # the arm asserts which refusal speaks: `-7`'s index-absence one, and not `-12`'s DIRTY one.
+        check("[-12] S4 an untracked file shadowing a claimed path is NOT `-12` dirty",
+              "DIRTY" not in _p9c.stderr, _p9c.stdout + _p9c.stderr)
+        check("[-12] S4 ...it is `-7` S4's refusal that owns that tree now",
+              _p9c.returncode == 2 and "absent from its INDEX" in _p9c.stderr,
+              _p9c.stdout + _p9c.stderr)
+
+        # ---- DEPL-dCarriedReceipt-7: TWO IDENTITIES, READ INDEX-SIDE -------------------------
+        #
+        # WHAT WENT WRONG, measured rather than argued. One receipt field was asked to be two things
+        # at once: `classify_row` compared `sha256` against the target's WORKTREE bytes while
+        # `check`'s provenance loop compared that same field against gov's blob at the row's
+        # `commit`. Both claims hold only where the target's worktree is byte-identical to what gov
+        # shipped, and that is false for any adopter whose clone applies a line-ending filter. On a
+        # `core.autocrlf=true` clone of a memory-tree install, 23 of 24 engine rows read `patched`
+        # with nothing edited: near-total false divergence, zero automatic adoption, and a plausible
+        # table shown while it happened.
+        #
+        # `gov_oid` is the blob gov shipped at a row's `commit`, and it is STORED. `oid` is the blob
+        # the TARGET holds, read from its INDEX and never from its worktree. `sha256` is retained so
+        # a schema-2 reader keeps working, and decides nothing.
+        #
+        # EVERY ARM BELOW WAS WATCHED TO FAIL before it was kept, by staging the break into
+        # `govkit.py` and running it — never by reasoning about what it would do.
+
+        def clone_crlf(src: pathlib.Path, name: str) -> pathlib.Path:
+            """A clone whose CHECKOUT applies a line-ending filter — where the adopter actually is.
+
+            No fixture in this file had one, which is exactly why a worktree-side comparator
+            shipped: every arm written against a repo whose worktree is byte-identical to gov's
+            blobs passes while the comparator is wrong.
+            """
+            c = tmp / name
+            subprocess.run(["git", "clone", "-q", "-c", "core.autocrlf=true", str(src), str(c)],
+                           capture_output=True)
+            git(c, "config", "user.email", "t@e")
+            git(c, "config", "user.name", "t")
+            return c
+
+        def tally_of(out: str) -> str:
+            """The one summary line `update` prints, which is where the counts live."""
+            head = "govkit update — "
+            for ln in out.splitlines():
+                if not ln.startswith(head):
+                    continue
+                body = ln[len(head):]
+                bits = body.split(" · ")
+                if bits and all(_re.fullmatch(r"[a-z:-]+ \d+", b) for b in bits):
+                    return body
+            return "(no tally line)"
+
+        def verdict_of(out: str, path: str) -> str:
+            """The verdict `update` printed for ONE row, by path."""
+            for ln in out.splitlines():
+                if ln.startswith("  ") and ln.rstrip().endswith(" " + path):
+                    return ln[2:].split("[", 1)[0].strip()
+            return "(no row)"
+
+        MTR = "tools/memory-tree/README.md"
+        i7 = make_target(tmp / "id7", DEPLOY_FULL)
+        run("apply", "--target", str(i7), "--kits", "memory-tree")
+        settle(i7, "the install")
+        c7 = clone_crlf(i7, "id7-clone")
+
+        # ---- AC1: the clone reads the same as the original. THE FIXTURE IS ASSERTED FIRST — a
+        # ---- fixture that does not trigger the rule proves nothing, and this rule is triggered by
+        # ---- a filter rather than by an edit.
+        check("[-7] AC1 the fixture really carries the filter — the clone's worktree holds CRLF",
+              b"\r\n" in (c7 / MTR).read_bytes() and b"\r\n" not in (i7 / MTR).read_bytes(),
+              repr((c7 / MTR).read_bytes()[:40]))
+        check("[-7] AC1 ...and both INDEXES still name the identical blob, so nothing was edited",
+              gout(c7, "ls-files", "-s", "--", MTR).split()[1]
+              == gout(i7, "ls-files", "-s", "--", MTR).split()[1],
+              gout(c7, "ls-files", "-s", "--", MTR))
+        _ti = tally_of(run("update", "--target", str(i7)).stdout)
+        _tc = tally_of(run("update", "--target", str(c7)).stdout)
+        check("[-7] AC1 the autocrlf clone reports the SAME tally as the uncloned original",
+              _tc == _ti and _tc != "(no tally line)", f"original {_ti!r} · clone {_tc!r}")
+        check("[-7] AC1 ...and that tally carries no `patched` at all", "patched" not in _tc, _tc)
+
+        # ---- AC2: BOTH ARMS of the index read. A fix that reads neither side is indistinguishable
+        # ---- from one that reads the wrong side, so the PAIR is the assertion and neither half is.
+        (c7 / MTR).write_bytes((c7 / MTR).read_bytes() + b"\nLOCAL EDIT\n")
+        _a2 = run("update", "--target", str(c7))
+        check("[-7] AC2 an UNSTAGED worktree edit leaves the row `current` — the index decides",
+              verdict_of(_a2.stdout, MTR) == "current", _a2.stdout)
+        git(c7, "add", "--", MTR)
+        _a2b = run("update", "--target", str(c7))
+        check("[-7] AC2 ...and STAGING that same edit moves it to `patched`",
+              verdict_of(_a2b.stdout, MTR) == "patched", _a2b.stdout)
+
+        # ---- AC3: S4. A claimed path present in the WORKTREE and absent from the INDEX. This arm
+        # ---- guards a hazard S2 itself introduces, so its failing case was observed by staging S2
+        # ---- WITHOUT S4: `update --write` then classified the operator's untracked file as
+        # ---- `missing` and overwrote it with gov's bytes at exit 0.
+        c3 = clone_crlf(i7, "id7-c3")
+        git(c3, "rm", "-q", "--cached", "--", MTR)
+        (c3 / MTR).write_bytes(b"MINE, NOT GOVS\n")
+        check("[-7] AC3 the fixture is out of the INDEX and present in the WORKTREE",
+              MTR not in gout(c3, "ls-files").split() and (c3 / MTR).is_file(), "")
+        _a3 = run("update", "--target", str(c3), "--write")
+        check("[-7] AC3 update --write refuses a claimed path the index does not carry",
+              _a3.returncode == 2 and "absent from its INDEX" in _a3.stderr, _a3.stderr)
+        check("[-7] AC3 the refusal names the path", MTR in _a3.stderr, _a3.stderr)
+        check("[-7] AC3 the operator's untracked bytes are byte-identical afterwards",
+              (c3 / MTR).read_bytes() == b"MINE, NOT GOVS\n", "")
+        git(c3, "add", "--", MTR)
+        _a3b = run("update", "--target", str(c3), "--write")
+        check("[-7] AC3 NEGATIVE: the same tree with that path STAGED proceeds",
+              "absent from its INDEX" not in _a3b.stderr, _a3b.stdout + _a3b.stderr)
+
+        # ---- AC6: THE CLASS GATE. The class is "a receipt field asked to be two things at once",
+        # ---- and the behavioural form of "it decides nothing now" is that corrupting it moves no
+        # ---- verdict. Staged red: with the worktree/sha256 comparator patched back in, this same
+        # ---- corruption moved all 26 engine rows from `current` to `patched`.
+        c6 = clone_crlf(i7, "id7-c6")
+        _before6 = [ln for ln in run("update", "--target", str(c6)).stdout.splitlines()
+                    if ln.startswith("  ")]
+        _rp6 = c6 / ".governance" / "install.json"
+        _r6 = json.loads(_rp6.read_text(encoding="utf-8"))
+        _n6 = 0
+        for _f in _r6["files"]:
+            if "sha256" in _f:
+                _f["sha256"] = "0" * 64
+                _n6 += 1
+        _rp6.write_text(json.dumps(_r6, indent=2) + "\n", encoding="utf-8", newline="\n")
+        check("[-7] AC6 the fixture corrupted a NON-EMPTY population of sha256 fields",
+              _n6 > 0 and len(_before6) > 0, f"{_n6} field(s), {len(_before6)} row line(s)")
+        _after6 = [ln for ln in run("update", "--target", str(c6)).stdout.splitlines()
+                   if ln.startswith("  ")]
+        check("[-7] AC6 every row's sha256 rewritten to one constant moves NO verdict line",
+              _before6 == _after6,
+              str([(a, b) for a, b in zip(_before6, _after6) if a != b][:3]))
+
+        # ---- AC5: the schema. `-2` had to land first for this fixture to reach a finding-free run
+        # ---- at all — its `attributes` row used to take `refuse` and freeze the re-stamp forever.
+        c5 = clone_crlf(i7, "id7-c5")
+        _a5 = run("update", "--target", str(c5), "--write")
+        _r5 = json.loads((c5 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _eng5 = [f for f in _r5["files"] if f.get("role") == "engine"]
+        check("[-7] AC5 a --write run with no findings exits 0", _a5.returncode == 0,
+              _a5.stdout + _a5.stderr)
+        check("[-7] AC5 ...and re-stamps the receipt at the engine's own schema",
+              _r5.get("schema") == govkit_module().RECEIPT_SCHEMA, str(_r5.get("schema")))
+        check("[-7] AC5 the fixture's engine population is non-empty, so the next arm CAN fail",
+              len(_eng5) > 0, str(len(_eng5)))
+        check("[-7] AC5 every engine row carries gov_oid, oid AND sha256",
+              all(all(k in f for k in ("gov_oid", "oid", "sha256")) for f in _eng5),
+              str([f["path"] for f in _eng5
+                   if not all(k in f for k in ("gov_oid", "oid", "sha256"))][:3]))
+        check("[-7] AC5 and the synthesized attributes row takes NEITHER identity",
+              all(not (f.get("gov_oid") or f.get("oid"))
+                  for f in _r5["files"] if f.get("role") == "attributes"), "")
+
+        # ---- AC5, the older schemas. A hand-built schema-1 and a schema-2 receipt must still
+        # ---- classify without a refusal — `gov_oid` is filled from EVIDENCE on the first update of
+        # ---- one, never carried over from `sha256` — and schema 1's role-distrust arm must still
+        # ---- fire, because a migration that disarms an older guard is not a migration.
+        for _sch in (1, 2):
+            _co = clone_crlf(i7, f"id7-s{_sch}")
+            _rp = _co / ".governance" / "install.json"
+            _rr = json.loads(_rp.read_text(encoding="utf-8"))
+            _rr["schema"] = _sch
+            for _f in _rr["files"]:
+                _f.pop("gov_oid", None)
+                _f.pop("oid", None)
+            _rp.write_text(json.dumps(_rr, indent=2) + "\n", encoding="utf-8", newline="\n")
+            _ao = run("update", "--target", str(_co))
+            check(f"[-7] AC5 a schema-{_sch} receipt still classifies without a refusal",
+                  _ao.returncode != 2 and "REFUSING" not in _ao.stderr, _ao.stderr[:400])
+            check(f"[-7] AC5 ...and a schema-{_sch} row is GRADED rather than skipped wholesale",
+                  verdict_of(_ao.stdout, MTR) in ("current", "patched", "stale"),
+                  verdict_of(_ao.stdout, MTR))
+        # ---- ...and the schema-1 role-distrust guard still FIRES, which the loop above cannot
+        # ---- show: that guard fires on a DISAGREEMENT between the recorded role and the one the
+        # ---- descriptor resolves now, and the receipts above carry correct roles. Built here
+        # ---- instead, as unit 1 measured it: a schema-1 receipt stamping `engine` on a file its
+        # ---- descriptor declares otherwise. A migration that disarms an older guard is not a
+        # ---- migration, and this is the arm that would notice.
+        s1 = clone_crlf(i7, "id7-s1role")
+        _rp1 = s1 / ".governance" / "install.json"
+        _rr1 = json.loads(_rp1.read_text(encoding="utf-8"))
+        _rr1["schema"] = 1
+        _lied = None
+        for _f in _rr1["files"]:
+            _f.pop("gov_oid", None)
+            _f.pop("oid", None)
+            if _f.get("role") == "rendered" and _lied is None:
+                _lied, _f["role"] = _f["path"], "engine"
+        _rp1.write_text(json.dumps(_rr1, indent=2) + "\n", encoding="utf-8", newline="\n")
+        check("[-7] AC5 the fixture really mislabels a non-engine row, so the guard CAN fire",
+              _lied is not None, str(_lied))
+        _ao1 = run("update", "--target", str(s1))
+        check("[-7] AC5 the schema-1 role-distrust arm still fires on a schema-1 receipt",
+              "a schema-1 receipt cannot be trusted about" in _ao1.stdout, _ao1.stdout[-800:])
+        check("[-7] AC5 ...and names the row it refused", str(_lied) in _ao1.stdout,
+              _ao1.stdout[-800:])
+
+        # ---- AC4, AC8, AC9 and AC10 need a row that is GENUINELY STALE — gov moved between the
+        # ---- receipt's vintage and `--to` — which `stale_target` cannot give them: it rewinds one
+        # ---- real kit against gov's own history and every arm here needs three rows it can poison
+        # ---- independently. A scratch gov with three files, built rather than borrowed.
+        def identity_gov(name: str) -> pathlib.Path:
+            g = tmp / f"{name}-gov"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "tools/demo"\n'
+                'version_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = ["demo.txt", "extra.txt", "spare.txt"]\nrole = "engine"\n\n'
+                '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
+            for _n, _c in (("demo.txt", "alpha\nbeta\ngamma\n"), ("extra.txt", "x1\n"),
+                           ("spare.txt", "s1\n")):
+                (g / "tools" / "demo" / _n).write_text(_c, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def identity_target(g: pathlib.Path, name: str) -> pathlib.Path:
+            """A target installed from THAT gov at its current HEAD, committed.
+
+            Run through the SCRATCH gov's own copy of the engine, which is the seam that acts —
+            a break staged into this repo's `govkit.py` does not reach a copy taken before it.
+            """
+            t = make_target(tmp / name, None)
+            for verb in ("intake", "apply"):
+                subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), verb,
+                                "--target", str(t), "--kits", "demo"], capture_output=True)
+            settle(t, "the demo install")
+            return t
+
+        def gov_update(g: pathlib.Path, t: pathlib.Path, *extra: str):
+            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+                                   "update", "--target", str(t), *extra],
+                                  capture_output=True, text=True)
+
+        def poison(t: pathlib.Path, path: str, drop: tuple[str, ...] = (),
+                   **set_to) -> dict:
+            """Rewrite ONE receipt row, and return it so the arm can assert the state it built."""
+            rp = t / ".governance" / "install.json"
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            hit = {}
+            for f in rec["files"]:
+                if f.get("path") != path:
+                    continue
+                for k in drop:
+                    f.pop(k, None)
+                f.update(set_to)
+                hit = f
+            rp.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+            return hit
+
+        ig = identity_gov("id4")
+        DMO = "tools/demo/demo.txt"
+        # EVERY target is installed at vintage A and gov moves to B AFTERWARDS, once, below. Built
+        # in this order deliberately: a target installed after the move records B, and then "the
+        # stale row's bytes moved" is trivially true because they were never anywhere else. That is
+        # a fixture that cannot trigger the rule it grades, and the first cut of this block had it.
+        it4 = identity_target(ig, "id4-t")
+        c4 = clone_crlf(it4, "id4-clone")
+        it8 = identity_target(ig, "id8-t")
+        it9 = identity_target(ig, "id9-t")
+        it10s = {d: identity_target(ig, f"id10-{d}") for d in ("gov_oid", "commit")}
+        (ig / "tools" / "demo" / "demo.txt").write_text("alpha\nbeta CHANGED\ngamma\n",
+                                                        encoding="utf-8", newline="\n")
+        git(ig, "add", "-A")
+        git(ig, "commit", "-qm", "B")
+        _govblob = gout(ig, "rev-parse", "HEAD:tools/demo/demo.txt").strip()
+
+        # ---- AC4: what lands in the INDEX is gov's blob, and what lands in the WORKTREE is
+        # ---- whatever THAT target's own filters make of it. Staged red, twice over: the replaced
+        # ---- `write_bytes` landed LF into a tree whose filters produce CRLF — and on this very
+        # ---- fixture the pre-unit engine never even reached its write arm, because the worktree
+        # ---- comparator called the untouched clone `diverged` and left a conflict order instead.
+        check("[-7] AC4 the fixture's clone really carries CRLF where gov shipped LF",
+              b"\r\n" in (c4 / DMO).read_bytes(), repr((c4 / DMO).read_bytes()))
+        _a4 = gov_update(ig, c4, "--write")
+        check("[-7] AC4 the row was genuinely STALE, so this arm graded a write and not a no-op",
+              verdict_of(_a4.stdout, DMO) == "stale", _a4.stdout + _a4.stderr)
+        check("[-7] AC4 the INDEX blob is byte-identical to gov's blob at --to",
+              gout(c4, "ls-files", "-s", "--", DMO).split()[1] == _govblob,
+              gout(c4, "ls-files", "-s", "--", DMO) + " vs " + _govblob)
+        check("[-7] AC4 ...while the WORKTREE carries the endings that target's filters produce",
+              b"\r\n" in (c4 / DMO).read_bytes() and b"CHANGED" in (c4 / DMO).read_bytes(),
+              repr((c4 / DMO).read_bytes()))
+        check("[-7] AC4 ...and the target's own git sees NO unstaged delta on it afterwards",
+              gout(c4, "status", "--porcelain", "--", DMO)[1:2] == " ",
+              repr(gout(c4, "status", "--porcelain", "--", DMO)))
+
+        # ---- AC8: the STORED half of `gov_oid`, and the only thing standing between a text-merged
+        # ---- receipt and a destroyed local edit. The poison is not arbitrary: `-11` rewrites
+        # ---- `path`, `source`, `commit` and `gov_oid` together on a rename, so a text merge of
+        # ---- `install.json` can pair `commit` from one side with `gov_oid` from the other. Staged
+        # ---- red: with S9's mismatch arm patched out, this exact fixture classified the operator's
+        # ---- COMMITTED edit as `equal` to gov, called the row `stale`, and overwrote it at exit 0.
+        (it8 / DMO).write_text("alpha\nbeta MINE\ngamma\n", encoding="utf-8", newline="\n")
+        settle(it8, "an operator edit, committed")
+        _mine = gout(it8, "ls-files", "-s", "--", DMO).split()[1]
+        _row8 = poison(it8, DMO, gov_oid=_mine)
+        _sum8 = (it8 / ".governance" / "install.json").read_bytes()
+        check("[-7] AC8 the fixture pairs a real `commit` with a `gov_oid` from the other side",
+              _row8.get("gov_oid") == _mine and bool(_row8.get("commit")), str(_row8)[:200])
+        _a8 = gov_update(ig, it8, "--write")
+        check("[-7] AC8 update refuses a row whose stored gov_oid disagrees with its evidence",
+              _a8.returncode == 2 and "records gov_oid" in _a8.stderr, _a8.stderr)
+        check("[-7] AC8 the refusal names the path and BOTH oids",
+              DMO in _a8.stderr and _mine in _a8.stderr, _a8.stderr)
+        check("[-7] AC8 the operator's edit is still there — the refusal wrote nothing",
+              b"beta MINE" in (it8 / DMO).read_bytes(), repr((it8 / DMO).read_bytes()))
+        check("[-7] AC8 and the receipt is byte-identical",
+              (it8 / ".governance" / "install.json").read_bytes() == _sum8, "")
+
+        # ---- AC9 + AC10: the SCOPING, both halves, in one fixture. AC9 says a row carrying NEITHER
+        # ---- field is passed over; AC10 says a row carrying exactly ONE still refuses. They must
+        # ---- live together or the first is built as a blanket pass for any row missing a field.
+        # ---- Staged red for AC9: with S9's neither-arm patched out — the unscoped assertion — the
+        # ---- preamble refused on the field-less row and the stale row never moved.
+        #
+        # The field-less row carries no `source` either, which is the shape AC9 describes and the
+        # only one that reaches "written in neither direction" under THIS unit alone. MEASURED, and
+        # deliberately not pinned by an arm: the same row WITH a `source` and no `commit` reads
+        # `diverged` and is merged against an empty base. That population is `-13` S7's in-loop
+        # skip, keyed on `evidence: "unattributed"` and running after `how` resolves — step 6 of the
+        # build's preamble order, where S9 is step 4. This unit does not own it and does not pin it.
+        _r9 = poison(it9, "tools/demo/extra.txt", drop=("commit", "gov_oid", "source"),
+                     evidence="unattributed")
+        check("[-7] AC9 the fixture's field-less row really carries neither identity",
+              not _r9.get("commit") and not _r9.get("gov_oid")
+              and _r9.get("evidence") == "unattributed", str(_r9)[:200])
+        check("[-7] AC9 ...and its receipt is at the CURRENT schema, so no migration fills them in",
+              json.loads((it9 / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("schema") == govkit_module().RECEIPT_SCHEMA, "")
+        _x9 = (it9 / "tools" / "demo" / "extra.txt").read_bytes()
+        _a9 = gov_update(ig, it9, "--write")
+        check("[-7] AC9 the run completes over the field-less row and exits 0",
+              _a9.returncode == 0, _a9.stdout + _a9.stderr)
+        check("[-7] AC9 the genuinely stale row's bytes MOVED",
+              b"CHANGED" in (it9 / DMO).read_bytes(), repr((it9 / DMO).read_bytes()))
+        check("[-7] AC9 the field-less row was printed BY NAME",
+              verdict_of(_a9.stdout, "tools/demo/extra.txt") != "(no row)", _a9.stdout)
+        check("[-7] AC9 ...and written in NEITHER direction",
+              (it9 / "tools" / "demo" / "extra.txt").read_bytes() == _x9, "")
+
+        for _drop, _why in (("gov_oid", "commit and no gov_oid"), ("commit", "gov_oid and no commit")):
+            it10 = it10s[_drop]
+            poison(it10, "tools/demo/extra.txt", drop=("commit", "gov_oid", "source"),
+                   evidence="unattributed")
+            _r10 = poison(it10, "tools/demo/spare.txt", drop=(_drop,))
+            _sum10 = (it10 / ".governance" / "install.json").read_bytes()
+            _b10 = (it10 / DMO).read_bytes()
+            check(f"[-7] AC10 the fixture's `engine` row really carries {_why}",
+                  _r10.get("role") == "engine" and (_drop not in _r10)
+                  and bool(_r10.get("commit") or _r10.get("gov_oid")), str(_r10)[:200])
+            _a10 = gov_update(ig, it10, "--write")
+            check(f"[-7] AC10 a half-populated pair ({_why}) refuses by name",
+                  _a10.returncode == 2 and "meaningless apart" in _a10.stderr
+                  and "tools/demo/spare.txt" in _a10.stderr, _a10.stderr)
+            check(f"[-7] AC10 ...writes nothing ({_why})", (it10 / DMO).read_bytes() == _b10, "")
+            check(f"[-7] AC10 ...and leaves the receipt byte-identical ({_why})",
+                  (it10 / ".governance" / "install.json").read_bytes() == _sum10, "")
+
+        # ---- AC11: §8 F4's exemption, OBSERVED. `push-main` is the kit because it is one of the
+        # ---- two in this tree declaring `role = "merged"` at `marker_style = "hash-comment"`,
+        # ---- which is the branch that writes the row shape under test. Staged red: with the
+        # ---- `merged` arm patched out of S9, that row's `commit`-without-`gov_oid` tripped the
+        # ---- exactly-one branch and the WHOLE run refused before any row was classified — on the
+        # ---- first update against any target that ever applied such a rule.
+        t11 = make_target(tmp / "id11", None)
+        run("intake", "--target", str(t11), "--kits", "push-main")
+        run("apply", "--target", str(t11), "--kits", "push-main")
+        settle(t11, "the push-main install")
+        _r11 = json.loads((t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _mrg = [f for f in _r11["files"] if f.get("role") == "merged"]
+        check("[-7] AC11 the fixture really produced a merged row", len(_mrg) == 1,
+              str([f.get("role") for f in _r11["files"]]))
+        check("[-7] AC11 ...and it carries `commit` with NEITHER identity — S9's exactly-one shape",
+              bool(_mrg[0].get("commit")) and not _mrg[0].get("gov_oid")
+              and not _mrg[0].get("oid"), str(sorted(_mrg[0])))
+        _a11 = run("update", "--target", str(t11), "--write")
+        check("[-7] AC11 update runs to completion over that receipt and exits 0",
+              _a11.returncode == 0, _a11.stdout + _a11.stderr)
+        check("[-7] AC11 NEGATIVE: no refusal fires on the merged row",
+              "meaningless apart" not in _a11.stderr and "REFUSING" not in _a11.stderr,
+              _a11.stderr)
+        check("[-7] AC11 the merged row reached its own block compare, by name",
+              verdict_of(_a11.stdout, ".githooks/pre-commit") in ("current", "block-moved"),
+              _a11.stdout)
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
