@@ -793,16 +793,6 @@
       "file": "tools/memory-recall/query.py"
     },
     {
-      "id": "declared_keys",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "declared_keys",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
       "id": "declares",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -1881,6 +1871,16 @@
       "id": "read_contract_rows",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "read_declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "read_descriptors",

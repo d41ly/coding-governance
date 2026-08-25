@@ -56,8 +56,11 @@ RETIRED_KEYS = ("READ_PATH_CEILING", "READ_PATH_HEADROOM")
 # pins, so in any tree that never declared the retired ceiling these rules have never run at all —
 # gating them the moment the kit upgrades would red an adopter for a pre-existing condition on their
 # first upgraded bar. The END of the grace is DECLARED here and resolved from the engine's own
-# version, not left to somebody remembering: bump KIT_MEMORY_TREE_VERSION to 2.43 and they gate.
-READ_PATH_GATES_FROM = (2, 43)
+# version, not left to somebody remembering: bump KIT_MEMORY_TREE_VERSION to 2.44 and they gate.
+# It moved 2.43 -> 2.44 when the retirement's own last fix forced a second engine bump: the grace
+# is ONE RELEASE after the one that ships the retirement, so it tracks that release rather than
+# a number typed once. Bumping the engine WITHOUT moving this would end the grace silently.
+READ_PATH_GATES_FROM = (2, 44)
 
 REGISTRY = "project/corpus-path-unresolved.txt"
 WAIVER = "project/id-orphan-waiver.txt"

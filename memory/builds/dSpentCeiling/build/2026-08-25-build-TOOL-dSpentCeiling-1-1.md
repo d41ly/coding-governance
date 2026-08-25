@@ -14,6 +14,8 @@ switches to `.get`. The tracked-but-absent finding becomes rule 4 and loses its 
 check 12. A conf still declaring a retired key is announced on a non-redding channel. Rules 3 and 4
 report rather than gate until `READ_PATH_GATES_FROM`.
 
+The release that ships this is memory-tree 2.43 and the grace ends at 2.44 — one release later, which is what the owner's ruling means. That pair MOVED once during the build: the closing fix changed the engine again, `check-verdict-epoch` required a second bump, and bumping onto 2.43 while the flip still read 2.43 would have ended the grace silently. The coupling is written beside `READ_PATH_GATES_FROM` so the next bump does not repeat it.
+
 Landed across two commits on purpose: `47f9ba6b` carries the change without the version bump so
 `check-verdict-epoch`'s refusal could be OBSERVED, and `8d5b8be0` carries the bump.
 
