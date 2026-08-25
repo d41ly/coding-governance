@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-25-build-TOOL-dSpentCeiling-1-1.md](../build/2026-08-25-build-TOOL-dSpentCeiling-1-1.md) | journal | — |
 | [2026-08-25-build-TOOL-dSpentCeiling-1-ceiling-history.md](../build/2026-08-25-build-TOOL-dSpentCeiling-1-ceiling-history.md) | research | — |
+| [2026-08-25-review-TOOL-dSpentCeiling-1-1.md](../reviews/2026-08-25-review-TOOL-dSpentCeiling-1-1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

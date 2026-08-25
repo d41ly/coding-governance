@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T14:59:27+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
+last-audit: 2026-08-25T20:39:24+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 70df24ea1963afd7ee12749acb3bd323e5fa239a
@@ -97,10 +97,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
   the cheap check is a `git log` at kickoff rather than a merge at landing.
 
-- **The read path is NOT full, and the ceiling measuring it is being retired.** The pin went
-  135677 -> 161120 on 2026-08-25, leaving 25600 B — four days at the measured 6184 B/day. Do NOT
-  raise it again by reflex: it moved 27 times in 17 days, 26 up, and the one drop was another
-  check's doing. `TOOL-dSpentCeiling` deletes it; check 6's caps were always the bound. Prune then.
+- **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
+  the bound; check 16 keeps rules 3 and 4 and is STRUCTURAL, behind no pin. Do not re-add a summed
+  ceiling — it moved 27 times in 17 days, 26 of them up, and never once caused a trim.
 
 ### Pointer map (load the row(s) the task touches)
 

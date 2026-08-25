@@ -106,9 +106,9 @@ derives its baseline floor from that constant, and a stale one put the floor bef
 ## Reuse affordance
 
 seam: the CAPTURE-BEFORE-SOURCE idiom — reuse for any conf key that must NOT be disableable by
-blanking its line. `check-memory-hygiene.sh:36` stashes the shipped value in `_SPEC10_SHIPPED` before
-the conf is sourced and `:79` restores it with `: "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"` after. There is
-the same channel.
+blanking its line. `check-memory-hygiene.sh` stashes the shipped value in `_SPEC10_SHIPPED` before the
+conf is sourced, and restores it afterwards with `: "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"`. Anchored on
+those two NAMES rather than on line numbers, which move under any edit above them.
 seam: the `cl = 0` sentinel plus the guarded comparison — reuse for adding a size class that bounds
 bytes only; extend by adding a branch to the awk after the class it must override, and nothing else:
 the message split reads the same variable, so a new class gets the right output for free.

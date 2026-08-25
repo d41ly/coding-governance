@@ -1575,6 +1575,40 @@ n=$((n+1))
 [ "$_hy_claimed" = "$_hy_derived" ] || { echo "FAIL the kit README claims $_hy_claimed checks and the engine defines $_hy_derived ($(echo $_hy_ids | tr '
 ' ' ')) - the one figure a reader is told to trust is wrong"; st=1; }
 
+# ---- check 16's NON-GATING channel must reach a human THROUGH THIS SCRIPT.
+# ---- corpus_ids.py prints notes (not-asked, the grace banner, a retired key still declared) and
+# ---- exits 0. The wrapper used to capture stdout and print it ONLY on a non-zero exit, so every
+# ---- one of those notices was computed and thrown away. Adopters run this gate, never the module,
+# ---- so the retirement had no notification channel at all. The class generalises: a delegated
+# ---- checker gained a channel that is meaningful at exit 0, and every arm called the callee.
+_b1=$(mktemp -d)
+(
+  cd "$_b1" || exit 1
+  git init -q .; git config user.email t@t.test; git config user.name t
+  mkdir -p memory/guides memory/builds/tOne/spec memory/project
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
+  printf 'READ_PATH_CEILING="135677"\n' >> .memory-tree.conf
+  printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
+  printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
+  git add -A >/dev/null 2>&1
+  git -c commit.gpgsign=false commit -q -m f --no-verify >/dev/null 2>&1
+  "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1
+  git add -A >/dev/null 2>&1
+  git -c commit.gpgsign=false commit -q -m gen --no-verify >/dev/null 2>&1
+) >/dev/null 2>&1
+_b1out=$(cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1); _b1rc=$?
+n=$((n+1))
+[ "$_b1rc" = 0 ] || { echo "FAIL the check-16 note fixture is not otherwise clean (rc=$_b1rc), so the arm below would pass or fail for the wrong reason:"; printf '%s\n' "$_b1out" | sed 's/^/      /'; st=1; }
+n=$((n+1))
+case "$_b1out" in
+  *"READ_PATH_CEILING is declared"*) : ;;
+  *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
+esac
+rm -rf "$_b1"
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the

@@ -51,16 +51,31 @@ GRAMMAR_DIR = HERE.parent / "memory-recall"
 # names are absent from load_conf's defaults below — keep them out of it.
 RETIRED_KEYS = ("READ_PATH_CEILING", "READ_PATH_HEADROOM")
 
-# The engine version at which check 16's rules 3 and 4 begin to RED. Until then they PRINT and leave
-# the exit code alone. The grace exists because arming used to be a MODULE-WIDE switch over three
-# pins, so in any tree that never declared the retired ceiling these rules have never run at all —
-# gating them the moment the kit upgrades would red an adopter for a pre-existing condition on their
-# first upgraded bar. The END of the grace is DECLARED here and resolved from the engine's own
-# version, not left to somebody remembering: bump KIT_MEMORY_TREE_VERSION to 2.44 and they gate.
-# It moved 2.43 -> 2.44 when the retirement's own last fix forced a second engine bump: the grace
-# is ONE RELEASE after the one that ships the retirement, so it tracks that release rather than
-# a number typed once. Bumping the engine WITHOUT moving this would end the grace silently.
-READ_PATH_GATES_FROM = (2, 44)
+# The charter every adopter's conf ships pointing at. Named once, because `load_conf`'s default and
+# check 16's not-asked test must agree and two spellings of one value is how they stop agreeing.
+DEFAULT_CHARTER = "AGENTS.md"
+
+# Do check 16's rules 3 and 4 RED, or merely print? False = print and leave the exit code alone.
+#
+# The grace exists because arming used to be a MODULE-WIDE switch over three pins, so in any tree that
+# never declared the retired ceiling these rules have never run at all — gating them the moment the
+# kit upgrades would red an adopter for a pre-existing condition on their first upgraded bar. A tree
+# that DID declare the ceiling is not graced at all: see `_resolve_sink`.
+#
+# IT IS A DELIBERATE FLIP, NOT A VERSION COMPARISON, and that is a correction. The first cut keyed on
+# `KIT_MEMORY_TREE_VERSION >= (2, 44)`, reasoning that the grace should end one release after the one
+# that ships the retirement. MEASURED against this repo's actual cadence, that cannot express what it
+# says: the engine went 2.41 -> 2.46 in under two days across concurrent branches, for reasons having
+# nothing to do with this check, so any pin is overtaken by unrelated work before an adopter sees a
+# release. Worse, two branches minted identical version literals from one base, so the flip would
+# have arrived by MERGE ORDER. A version-keyed grace in a repo whose version moves this way is a
+# grace that ends when nobody decided it should. Keying it on the engine version also made the engine
+# version readable through a print mode BELOW the conf source, which handed a project conf a one-line
+# spoof of the constant its own comment promises cannot be spoofed. That print mode is gone with it.
+#
+# The obligation to flip this is a backlog row, not a memory: TOOL-dSpentCeiling-7. Until it flips,
+# every run SAYS the rules are reporting rather than gating.
+READ_PATH_RULES_GATE = False
 
 REGISTRY = "project/corpus-path-unresolved.txt"
 WAIVER = "project/id-orphan-waiver.txt"
@@ -89,7 +104,7 @@ def read(path) -> str:
 
 def load_conf(root: str) -> dict:
     conf = {
-        "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": "AGENTS.md",
+        "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": DEFAULT_CHARTER,
         "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_WAIVER": "",
         "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
@@ -122,24 +137,6 @@ def read_declared_keys(root: str) -> set:
     return out
 
 
-def read_declared_keys(root: str) -> set:
-    """The keys the project's conf ACTUALLY writes, as against `load_conf`'s merged defaults.
-
-    Two callers need the distinction and neither can get it from `conf`: a retired key is announced
-    on PRESENCE, and a `CHARTER` the adopter never declared is a tree with no mandatory reading yet
-    rather than a mis-set one. Re-parsing one small file is cheaper than threading a second return
-    value through every caller of `load_conf`, and it cannot drift from it — same file, same rule.
-    """
-    out = set()
-    p = os.path.join(root, ".memory-tree.conf")
-    if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                out.add(line.partition("=")[0].strip())
-    return out
-
-
 def _parse_conf_int(conf: dict, key: str, default=None) -> int:
     """The integer bound to `key`, or a named Problem — never a raw ValueError traceback.
 
@@ -151,7 +148,7 @@ def _parse_conf_int(conf: dict, key: str, default=None) -> int:
 
     The `minimum=` keyword this carried was deleted with its last caller (TOOL-dSpentCeiling-1):
     it existed for the two retired byte figures, where zero was meaningless. Both surviving callers
-    are COUNT pins, where zero is the strict end and a legal value, so the floor is 0 for everyone
+    are COUNT pins, where zero is the strict end and a legal value, so the floor is 0 for everyone,
     and a parameter nothing varies is the green-by-absence shape one level down.
     """
     raw = conf.get(key, "").strip()
@@ -272,6 +269,14 @@ def ask_shell(flag: str, root: str) -> str:
     if out.returncode != 0:
         raise Problem("corpus_ids: `%s %s` failed: %s"
                       % (HYGIENE.name, flag, out.stderr.strip() or out.stdout.strip()))
+    # A PRINT MODE THAT PRINTS FINDINGS ANSWERED THE WRONG QUESTION. `--print-index-set` is computed
+    # below checks 1-5, so a structure failure earlier in that script lands on this stdout and every
+    # line of it becomes a member of `capped` — which makes check 16 rule 3 pass by finding nothing.
+    # A probe that cannot answer says so rather than returning a reassuring set.
+    if any(l.startswith("HYGIENE ") for l in out.stdout.split("\n")):
+        raise Problem("corpus_ids: `%s %s` answered with findings rather than a set, so the set it "
+                      "returned cannot be trusted — fix the earlier check first"
+                      % (HYGIENE.name, flag))
     return out.stdout
 
 
@@ -413,24 +418,8 @@ def read_set(w: dict) -> tuple:
                 if os.path.isfile(os.path.join(root, cand)):
                     members.add(cand)
                 else:
-                    absent.add(cand)          # tracked but missing: check 12's finding, not ours
+                    absent.add(cand)          # tracked but missing: check 16 rule 4 owns this
     return sorted(members), sorted(absent)
-
-
-def _read_kit_version(root: str) -> tuple:
-    """The ENGINE's own version as `(major, minor)`, ASKED of the engine.
-
-    The grace below ends by version, so this must come from where the engine's identity actually
-    lives — `KIT_MEMORY_TREE_VERSION` in the shell script, which is set there and never from a
-    project conf so that a conf cannot spoof which engine graded a tree. Declaring a second copy
-    here would be that same spoofable duplicate one file over.
-    """
-    raw = ask_shell("--print-kit-version", root).strip()
-    parts = raw.split(".")
-    if len(parts) < 2 or not all(_ASCII_INT.match(p) for p in parts[:2]):
-        raise Problem(f"corpus_ids: the memory-tree engine reported version {raw!r}, which is not "
-                      f"<major>.<minor> — check 16 cannot say whether its rules are gating")
-    return int(parts[0]), int(parts[1])
 
 
 def check_read_path(root: str, conf: dict) -> tuple:
@@ -464,7 +453,12 @@ def check_read_path(root: str, conf: dict) -> tuple:
     tracked = {p for p in run("git", "ls-files", cwd=root).split("\n") if p}
     found = []
     if charter not in tracked:
-        if "CHARTER" not in written:
+        # The shipped `.memory-tree.conf.example` DECLARES CHARTER="AGENTS.md" and the scaffolder
+        # copies it verbatim without writing that file, so keying only on `not in written` never
+        # fired for a real adopter — it fired only for a conf hand-edited into a state the installer
+        # does not produce. The default value is therefore treated as undeclared: an adopter who
+        # means something else says something else.
+        if "CHARTER" not in written or charter == DEFAULT_CHARTER:
             # NOT ASKED, and it announces itself. A freshly scaffolded tree declares no CHARTER and
             # has no AGENTS.md yet: it has no mandatory reading, which is a REAL state rather than a
             # defect, and refusing it would red every adopter on the day they adopt. Measured — this
@@ -477,7 +471,7 @@ def check_read_path(root: str, conf: dict) -> tuple:
         # run with itself. This check owns its own failure and lets its siblings report.
         found.append(f"check 16: CHARTER '{charter}' is declared and is not a tracked file, so the "
                      f"read path has no source and rules 3 and 4 graded nothing")
-        return _resolve_sink(root, bad, notes, found)
+        return _resolve_sink(written, bad, notes, found)
 
     members, absent = read_set({"root": root, "conf": conf, "tracked": tracked})
     capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
@@ -494,18 +488,25 @@ def check_read_path(root: str, conf: dict) -> tuple:
         found.append(f"check 16 rule 4: {p} is tracked but absent from the worktree, so the charter "
                      f"points a session at a file that is not there")
 
-    return _resolve_sink(root, bad, notes, found)
+    return _resolve_sink(written, bad, notes, found)
 
 
-def _resolve_sink(root: str, bad: list, notes: list, found: list) -> tuple:
+def _resolve_sink(written: set, bad: list, notes: list, found: list) -> tuple:
     """Route this check's findings to the gating list or the reporting one. ONE decision, in one
-    place, so the charter arm and the two rules cannot drift apart on whether the grace applies."""
-    if found and _read_kit_version(root) < READ_PATH_GATES_FROM:
+    place, so the charter arm and the two rules cannot drift apart on whether the grace applies.
+
+    THE GRACE DOES NOT REACH A TREE THAT DECLARED A RETIRED KEY. Declaring `READ_PATH_CEILING` is
+    proof rules 3 and 4 were already armed and green there, so nothing in such a tree is
+    pre-existing and gating it is honest. Without this the grace SUSPENDED a live check in every
+    repo that had one — including the repo that wrote it — which is a coverage loss wearing a
+    courtesy's clothes.
+    """
+    if found and not (written & set(RETIRED_KEYS)) and not READ_PATH_RULES_GATE:
         # THE GRACE ANNOUNCES ITSELF. A rule that is not gating and does not say so is
         # indistinguishable from a rule that found nothing.
-        gate_at = "%d.%d" % READ_PATH_GATES_FROM
-        notes.append(f"check 16: the {len(found)} finding(s) below are REPORTED, not gated — rules 3 "
-                     f"and 4 begin to red at memory-tree {gate_at}. Fix them before then.")
+        notes.append(f"check 16: the {len(found)} finding(s) below are REPORTED, not gated — this "
+                     f"tree never declared the retired read-path ceiling, so these rules have never "
+                     f"run here. They gate when READ_PATH_RULES_GATE flips. Fix them before then.")
         notes.extend(found)
     else:
         bad.extend(found)
@@ -895,18 +896,38 @@ def cmd_selftest() -> int:
         # THE GRACE. The comparison is the subject, so the arms vary the DECLARED threshold rather
         # than substituting a stand-in for the mechanism: below the flip a finding is a NOTE and the
         # gating list is empty, at or above it the finding is gating and the note is gone.
-        _gates = READ_PATH_GATES_FROM
+        # THE GRACE, BOTH SIDES. The constant is the subject, so the arms vary the DECLARED flip
+        # rather than substituting a stand-in for the mechanism.
+        _gate = READ_PATH_RULES_GATE
         try:
-            globals()["READ_PATH_GATES_FROM"] = (99, 0)
-            arm("below the flip version a rule-3 finding is REPORTED, never gated",
+            globals()["READ_PATH_RULES_GATE"] = False
+            arm("while the flip is off a rule-3 finding is REPORTED, never gated",
                 "BAD: NOTES:", lambda: _rp(t7, c7))
             arm("...and the grace SAYS SO, rather than looking like a clean run",
                 "are REPORTED, not gated", lambda: _rp(t7, c7))
-            globals()["READ_PATH_GATES_FROM"] = (0, 0)
-            arm("at or above the flip version the same finding GATES",
+            globals()["READ_PATH_RULES_GATE"] = True
+            arm("once the flip is on the same finding GATES",
                 "BAD:check 16 rule 3", lambda: _rp(t7, c7))
+
+            # H1 — THE GRACE MUST NOT REACH A TREE THAT DECLARED THE RETIRED CEILING. Rules 3 and 4
+            # were already armed and green there, so gracing them SUSPENDS a live check. This arm is
+            # the one whose absence let that ship: every earlier grace arm tested the reporting side
+            # only, and a grace nobody has watched decline to fire is not a grace, it is an off switch.
+            globals()["READ_PATH_RULES_GATE"] = False
+            tD = os.path.join(base, "declared-ceiling"); os.makedirs(tD)
+            cD = _scratch(tD, pins=False, extra={
+                "AGENTS.md": "# charter\n\nRead `memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md` first.\n"})
+            _cp = os.path.join(tD, ".memory-tree.conf")
+            with io.open(_cp, "a", encoding="utf-8", newline="") as fh:
+                fh.write('READ_PATH_CEILING="135677"' + chr(10))
+            run("git", "add", "-A", cwd=tD)
+            run("git", "commit", "-q", "-m", "declared", "--no-verify", cwd=tD)
+            cD = load_conf(tD)
+            arm("a tree that DECLARED the retired ceiling is not graced — its finding GATES",
+                "BAD:check 16 rule 3", lambda: _rp(tD, cD))
+            arm("...and it is still told the key is dead", "is declared", lambda: _rp(tD, cD))
         finally:
-            globals()["READ_PATH_GATES_FROM"] = _gates
+            globals()["READ_PATH_RULES_GATE"] = _gate
 
         # THE VALVE, observed after the finding and never before.
         c7w = dict(c7)

@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6
+ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7
 ---
 
 # dSpentCeiling — the read-path budget becomes a rate signal, and rule 3 keeps its teeth
@@ -56,7 +56,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6
+ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -64,7 +64,7 @@ ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCe
 | [TOOL-dSpentCeiling-1 — retire check 16's byte budget, and make rules 3 and 4 structural](spec/2026-08-25-spec-TOOL-dSpentCeiling-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

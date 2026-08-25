@@ -1878,11 +1878,6 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
-      "id": "read_declared_keys",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

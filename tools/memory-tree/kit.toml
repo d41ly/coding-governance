@@ -95,7 +95,7 @@ id = "measured-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
-why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-16 are simply OFF, so the hygiene leg exits 0 with the hole wide open."
+why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 [check]

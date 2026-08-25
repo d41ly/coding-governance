@@ -47,7 +47,8 @@ SPEC10_CUTOFF="2026-08-04"
 # path from it. Usually AGENTS.md or CLAUDE.md.
 CHARTER="AGENTS.md"
 
-# --- corpus_ids.py (checks 13-16). Every number below is MEASURED against YOUR corpus by
+# --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no pin). Every number below
+# --- is MEASURED against YOUR corpus by
 # --- `python memory-tree/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
 # --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
 # --- Ship them blank, run --measure once the tree has content, and paste what it prints.

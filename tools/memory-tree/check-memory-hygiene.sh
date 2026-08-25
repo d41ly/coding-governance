@@ -104,7 +104,6 @@ FILES=$(git ls-files "$M/")
 APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
-  --print-kit-version) printf '%s\n' "$KIT_MEMORY_TREE_VERSION"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -1045,15 +1044,20 @@ esac
 $bad12"
 fi
 
-# 13-16 — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
+# 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
-# classifier reads is measured per corpus, and blank pins turn the whole unit off.
+# classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
 if [ "$STAGED" = 0 ]; then
-  if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
-    printf '%s
-' "$ids"; status=1
-  fi
+  # PRINT WHATEVER IT SAID, then decide the status from the exit code. The classifier has a
+  # NON-GATING channel — check 16's not-asked, grace and retired-key notices all print at exit 0
+  # — and the old form captured stdout and threw it away unless the run was already red. Every
+  # one of those notices was computed and discarded, so the retirement had no notification
+  # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
+  ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
+  [ -n "$ids" ] && printf '%s
+' "$ids"
+  [ "$_idsrc" -ne 0 ] && status=1
 fi
 
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
