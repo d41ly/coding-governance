@@ -1405,12 +1405,13 @@ done
 EX="$HERE/.memory-tree.conf.example"
 # ---- DERIVED from the engine's own validation loop, never retyped. The hand-kept version of this
 # ---- list covered seven of the engine's keys and missed DOSSIER_CAP_* entirely, so adding two more
-# ---- by hand would have been the same omission a third time. READ_PATH_HEADROOM is appended because
-# ---- it is corpus_ids.py's key rather than this engine's, so no loop here can yield it.
+# ---- by hand would have been the same omission a third time. Nothing is appended any more:
+# ---- READ_PATH_HEADROOM used to be, being corpus_ids.py's key rather than this engine's, and it was
+# ---- retired with READ_PATH_CEILING in memory-tree 2.42.
 _engkeys=$(sed -n 's/^for _k in \(.*\); do$/\1/p' "$HERE/check-memory-hygiene.sh" | head -1)
 n=$((n+1))
 [ -n "$_engkeys" ] || { echo "FAIL could not derive the cap-key list from the engine; the example-conf arms below would pass by finding nothing"; st=1; }
-for _k in $_engkeys READ_PATH_HEADROOM; do
+for _k in $_engkeys; do
   n=$((n+1))
   grep -qE "^$_k=" "$EX" || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, so an adopter cannot discover it"; st=1; }
 done

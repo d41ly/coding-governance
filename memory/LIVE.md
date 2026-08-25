@@ -21,4 +21,4 @@ terminal status. Nothing here is edited by hand.
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 2 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |
-| [dSpentCeiling](builds/dSpentCeiling/README.md) | SPECCED | d | 2026-08-25 | tooling | 1 |
+| [dSpentCeiling](builds/dSpentCeiling/README.md) | INPROGRESS | d | 2026-08-25 | tooling | 5 |

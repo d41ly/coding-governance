@@ -56,16 +56,11 @@ ORPHAN_ID_PIN=""
 # Dead repo-path citations in the present-tense corpus. Measure 0 on a fresh tree and it becomes a
 # ratchet: the next unresolving citation reds until it is registered or repaired.
 DEAD_PATH_PIN=""
-# The charter's read path under MEMORY_ROOT, in bytes, plus headroom. One-sided: a session's
-# mandatory reading is a budget, and a new binding doc spends from it visibly.
-READ_PATH_CEILING=""
-# The headroom `--measure` ADDS to the measured total when it prints a ceiling for you to paste
-# above. Advice to an author, never an input to check 16 — that check compares the measured total
-# against READ_PATH_CEILING alone, because a ceiling COMPUTED from a headroom would let a growing
-# corpus raise its own budget. ABSENT = the kit's default, which is larger than one member of the
-# largest class on a typical read path. Declare your own if your tree grows continuously rather
-# than in rare jumps: a headroom that cannot absorb one more binding document absorbs nothing.
-READ_PATH_HEADROOM=""
+# READ_PATH_CEILING and READ_PATH_HEADROOM were RETIRED in memory-tree 2.42. Check 16 no longer
+# sums the read path: check 6 already caps every member by class, so the sum was a second bound over
+# an already-bounded population, and across 27 movements it never once caused a trim. A conf that
+# still declares either key is ANNOUNCED on every run and reds nothing — delete the line when you
+# see it. What survives is check 16's rules 3 and 4, which are STRUCTURAL and behind no pin.
 # Check 6's per-class size caps. Declared here with the SHIPPED values rather than blank, because
 # blank is not 'use the default' for these: the gate SOURCES this file, so an empty assignment
 # overrides the built-in with an empty string and is refused at startup. Delete a line to take the

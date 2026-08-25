@@ -1,10 +1,12 @@
 # TOOL-dSpentCeiling-1 — retire check 16's byte budget, and make rules 3 and 4 structural
 
-**Status:** SPECCED · rev-1 · 2026-08-25 · node d · Tier-2 · base 70df24ea · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-25 · node d · Tier-2 · base 70df24ea · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-build-TOOL-dSpentCeiling-1-ceiling-history.md](../build/2026-08-25-build-TOOL-dSpentCeiling-1-ceiling-history.md) | research | — |
 
 <!-- /gen:spec-records -->
 
@@ -199,6 +201,7 @@ epoch` · `install prefix` · `method carriers` · `govkit selfcheck` · `kit/do
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-25 · built. AC6's stated mechanism was too narrow and is corrected here: it said the pre-change engine printed ONE line because the `Problem` escaped `checks()`. Observed both paths — with a ceiling declared it printed one line and check 14 vanished, and with no ceiling declared the mis-set charter was INVISIBLE because check 16 never ran. The post-change engine prints both findings in either case.
 - rev-1 · 2026-08-25 · initial draft. Scope cut from a six-unit decomposition to one unit on the
   owner's ruling that six specs to remove one variable is the tail wagging the dog; the designed
   replacement signal is recorded in §4 as rejected rather than dropped from the record.

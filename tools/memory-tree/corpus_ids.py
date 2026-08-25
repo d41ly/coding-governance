@@ -26,7 +26,7 @@ never the silent pass a bare `try: import` would produce.
   13  id-definition collision   one id claimed by two different build folders
   14  orphan ids                cited but never defined; waiver + shrink-only pin + stale guard
   15  dead repo-path citations  registry + four rules, keyed on (file, path), NEVER on a line number
-  16  read-path accounting      the charter's own read set: total under a ceiling, every member watched
+  16  read-path accounting      the charter's own read set: every member byte-capped, and present
 """
 from __future__ import annotations
 
@@ -44,13 +44,19 @@ HYGIENE = HERE / "check-memory-hygiene.sh"
 # the kits somewhere other than `tools/` still finds it.
 GRAMMAR_DIR = HERE.parent / "memory-recall"
 
-# The headroom `--measure` ADDS to the measured read path when it prints a ceiling to paste into
-# .memory-tree.conf. Advice to an author, never an input to check 16: that check compares the
-# measured total against READ_PATH_CEILING alone, because a ceiling COMPUTED from a headroom
-# would let a growing corpus raise its own budget. Overridable per project as READ_PATH_HEADROOM.
-# 20480 until TOOL-aLoosenedCeiling-1: it had become smaller than a single member of the largest
-# class on a real read path, and absorbing one more member of that class is what headroom is for.
-DEFAULT_READ_PATH_HEADROOM = 25600
+# TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
+# is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
+# presence would red every adopter for doing nothing. Presence is an EXACT test only because both
+# names are absent from load_conf's defaults below — keep them out of it.
+RETIRED_KEYS = ("READ_PATH_CEILING", "READ_PATH_HEADROOM")
+
+# The engine version at which check 16's rules 3 and 4 begin to RED. Until then they PRINT and leave
+# the exit code alone. The grace exists because arming used to be a MODULE-WIDE switch over three
+# pins, so in any tree that never declared the retired ceiling these rules have never run at all —
+# gating them the moment the kit upgrades would red an adopter for a pre-existing condition on their
+# first upgraded bar. The END of the grace is DECLARED here and resolved from the engine's own
+# version, not left to somebody remembering: bump KIT_MEMORY_TREE_VERSION to 2.43 and they gate.
+READ_PATH_GATES_FROM = (2, 43)
 
 REGISTRY = "project/corpus-path-unresolved.txt"
 WAIVER = "project/id-orphan-waiver.txt"
@@ -80,8 +86,7 @@ def read(path) -> str:
 def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": "AGENTS.md",
-        "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_CEILING": "", "READ_PATH_WAIVER": "",
-        "READ_PATH_HEADROOM": "",
+        "DEAD_PATH_PIN": "", "ORPHAN_ID_PIN": "", "READ_PATH_WAIVER": "",
         "DEAD_PATH_EXCLUDE": ".claude/worktrees/",
     }
     p = os.path.join(root, ".memory-tree.conf")
@@ -95,7 +100,7 @@ def load_conf(root: str) -> dict:
     return conf
 
 
-def _parse_conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> int:
+def _parse_conf_int(conf: dict, key: str, default=None) -> int:
     """The integer bound to `key`, or a named Problem — never a raw ValueError traceback.
 
     The contract is `row_grammar.pin_of`'s, deliberately: EMPTY means the default, because a key
@@ -104,9 +109,10 @@ def _parse_conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> 
     with a bare `int()`, so a typo in a project conf raised a traceback out of a gate — which the
     module docstring already forbids. One accessor, four keys.
 
-    `minimum` is 0 for the COUNT pins, where zero is the strict end and a legal value, and 1 for
-    the two byte figures, where zero is meaningless: a zero ceiling is permanently red and a zero
-    headroom prints a pin equal to the measured total, which reds on the next byte added.
+    The `minimum=` keyword this carried was deleted with its last caller (TOOL-dSpentCeiling-1):
+    it existed for the two retired byte figures, where zero was meaningless. Both surviving callers
+    are COUNT pins, where zero is the strict end and a legal value, so the floor is 0 for everyone
+    and a parameter nothing varies is the green-by-absence shape one level down.
     """
     raw = conf.get(key, "").strip()
     if raw == "":
@@ -116,15 +122,23 @@ def _parse_conf_int(conf: dict, key: str, default=None, *, minimum: int = 0) -> 
     # ASCII-only ON PURPOSE: str.isdigit() is True for "\u00b2" and other unicode digit forms that
     # int() then REJECTS, so gating on it and calling int() on what it admitted escapes as a raw
     # ValueError past main()'s `except Problem` — the one outcome this module's docstring forbids.
-    if not _ASCII_INT.match(raw) or int(raw) < minimum:
-        raise Problem(f"corpus_ids: {key} must be a whole number of at least {minimum}, "
+    if not _ASCII_INT.match(raw):
+        raise Problem(f"corpus_ids: {key} must be a whole number of at least 0, "
                       f"got {raw!r}")
     return int(raw)
 
 
 def armed(conf: dict) -> bool:
-    """Any pin set arms the unit. Blank everywhere = off, and the grammar is never imported."""
-    return any(conf[k] for k in ("DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"))
+    """Any pin set arms checks 13-15. Blank everywhere = off, and the grammar is never imported.
+
+    Check 16 is NOT on this switch and has not been since TOOL-dSpentCeiling-1. It was, and that was
+    the defect: a module-wide switch over three pins meant blanking one line silenced a structural
+    citation check, and striking the retired ceiling from this tuple without lifting check 16 out of
+    `checks()` would have silently disarmed 13, 14 and 15 for any adopter whose only set pin was that
+    ceiling — a legal state at the time. `.get` rather than a subscript so a key absent from
+    load_conf's defaults is a False, never a raw KeyError out of a gate.
+    """
+    return any(conf.get(k) for k in ("DEAD_PATH_PIN", "ORPHAN_ID_PIN"))
 
 
 def grammar(root: str):
@@ -143,7 +157,7 @@ def grammar(root: str):
         raise Problem(
             "corpus_ids: a pin is set in .memory-tree.conf, but the id grammar lives in the "
             "memory-recall kit and %s/extract.py is not installed. Either adopt that kit or blank "
-            "DEAD_PATH_PIN / ORPHAN_ID_PIN / READ_PATH_CEILING to turn checks 13-16 off." % GRAMMAR_DIR
+            "DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off." % GRAMMAR_DIR
         )
     if str(GRAMMAR_DIR) not in sys.path:
         sys.path.insert(0, str(GRAMMAR_DIR))
@@ -151,7 +165,7 @@ def grammar(root: str):
 
     if not hasattr(extract, "grammar_for"):
         raise Problem("corpus_ids: the installed memory-recall kit predates grammar_for(root); "
-                      "update it, or blank the pins to turn checks 13-16 off")
+                      "update it, or blank the pins to turn checks 13-15 off")
     return extract.grammar_for(root)
 
 
@@ -363,6 +377,86 @@ def read_set(w: dict) -> tuple:
     return sorted(members), sorted(absent)
 
 
+def _kit_version(root: str) -> tuple:
+    """The ENGINE's own version as `(major, minor)`, ASKED of the engine.
+
+    The grace below ends by version, so this must come from where the engine's identity actually
+    lives — `KIT_MEMORY_TREE_VERSION` in the shell script, which is set there and never from a
+    project conf so that a conf cannot spoof which engine graded a tree. Declaring a second copy
+    here would be that same spoofable duplicate one file over.
+    """
+    raw = ask_shell("--print-kit-version", root).strip()
+    parts = raw.split(".")
+    if len(parts) < 2 or not all(_ASCII_INT.match(p) for p in parts[:2]):
+        raise Problem(f"corpus_ids: the memory-tree engine reported version {raw!r}, which is not "
+                      f"<major>.<minor> — check 16 cannot say whether its rules are gating")
+    return int(parts[0]), int(parts[1])
+
+
+def check_read_path(root: str, conf: dict) -> tuple:
+    """Check 16 — the charter's read path. STRUCTURAL: it runs whenever the conf is loadable.
+
+    Behind no pin, deliberately, and behind no NEW pin either: its population comes from `CHARTER`,
+    which SHIPS WITH A VALUE, so a blank resolves FORWARD rather than off. That is the ratified
+    pattern this tree already uses for `SPEC10_CUTOFF`, not a new convention, and minting a fourth
+    blankable pin would be the defect TOOL-dSpentCeiling-1 exists to close, renamed.
+
+    The BUDGET this check used to carry is gone. Check 6 already caps every member by class, so the
+    sum was a second bound over an already-bounded population; it bound earlier only because it added
+    six incommensurable things together, and across seventeen days and twenty-seven movements it
+    never once caused a trim. The exhibit is in `memory/builds/dSpentCeiling/`.
+
+    Calls neither `walk()` nor `grammar()`: `read_set` needs only root, conf and tracked, so the
+    memory-recall kit stays a CONDITIONAL dependency rather than becoming a hard one for every
+    adopter of memory-tree alone.
+
+    Returns `(bad, notes)`. Notes print and do not touch the exit code.
+    """
+    bad, notes = [], []
+    for k in RETIRED_KEYS:
+        if k in conf:
+            notes.append(f"check 16: NOTE {k} is declared in .memory-tree.conf and is no longer "
+                         f"read — the read-path budget was retired, and check 6's per-member byte "
+                         f"caps are the bound. Delete the line.")
+
+    charter = conf["CHARTER"]
+    tracked = {p for p in run("git", "ls-files", cwd=root).split("\n") if p}
+    if charter not in tracked:
+        # A FINDING plus an early return, never a raise. Raising here escaped `checks()` and made
+        # main() print one line, so a mis-set CHARTER replaced every check-13/14/15 finding in the
+        # run with itself. This check owns its own failure and lets its siblings report.
+        bad.append(f"check 16: CHARTER '{charter}' is not a tracked file, so the read path has no "
+                   f"source and rules 3 and 4 graded nothing")
+        return bad, notes
+
+    members, absent = read_set({"root": root, "conf": conf, "tracked": tracked})
+    capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
+    waived = set(conf["READ_PATH_WAIVER"].split())
+    found = []
+    for p in members:                                                              # rule 3
+        if p not in capped and p not in waived:
+            found.append(f"check 16 rule 3: {charter} points a session at {p}, which is under "
+                         f"no byte cap and not in READ_PATH_WAIVER — nothing watches it")
+    for p in absent:                                                               # rule 4
+        # NOT a duplicate of check 12, whatever this line used to claim. Check 12's tracked-but-absent
+        # arm is built from a grep restricted to builds/*/spec/*.md, and `index_set()` filters absent
+        # files out of check 6 before it measures. For a charter-cited guide or a generated index this
+        # is the ONLY detector, and the comment that said otherwise was an invitation to delete it.
+        found.append(f"check 16 rule 4: {p} is tracked but absent from the worktree, so the charter "
+                     f"points a session at a file that is not there")
+
+    if found and _kit_version(root) < READ_PATH_GATES_FROM:
+        # THE GRACE ANNOUNCES ITSELF. A rule that is not gating and does not say so is
+        # indistinguishable from a rule that found nothing.
+        gate_at = "%d.%d" % READ_PATH_GATES_FROM
+        notes.append(f"check 16: the {len(found)} finding(s) below are REPORTED, not gated — rules 3 "
+                     f"and 4 begin to red at memory-tree {gate_at}. Fix them before then.")
+        notes.extend(found)
+    else:
+        bad.extend(found)
+    return bad, notes
+
+
 # ----------------------------------------------------------------------------------------- registry
 def parse_registry(root: str, m: str) -> list:
     """Rows are `<citing-file>\\t<cited-path>\\t<count>\\t<absent|moved:DEST>`."""
@@ -445,23 +539,8 @@ def checks(w: dict) -> list:
         pin = _parse_conf_int(conf, "DEAD_PATH_PIN")
         if len(rows) > pin:                                                    # rule 2
             bad.append(f"check 15 rule 2: the dead-path registry holds {len(rows)} rows, pinned at {pin} (shrink-only)")
-
-    # 16 — read-path accounting.
-    if conf["READ_PATH_CEILING"]:
-        members, absent = read_set(w)
-        capped = {l for l in ask_shell("--print-index-set", root).split("\n") if l.strip()}
-        waived = set(conf["READ_PATH_WAIVER"].split())
-        total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-        ceiling = _parse_conf_int(conf, "READ_PATH_CEILING", minimum=1)
-        if total > ceiling:
-            bad.append(f"check 16: the charter's read path is {total} B, ceiling {ceiling} B "
-                       f"({len(members)} files) — trim it or raise the ceiling in a commit that says why")
-        for p in members:
-            if p not in capped and p not in waived:
-                bad.append(f"check 16 rule 3: {conf['CHARTER']} points a session at {p}, which is under "
-                           f"no byte cap and not in READ_PATH_WAIVER — nothing watches it")
-        for p in absent:
-            bad.append(f"check 16: NOTE {p} is tracked but absent from the worktree; check 12 owns that finding")
+    # 16 lives in check_read_path(), OUTSIDE this function and outside armed(): it needs neither
+    # walk() nor the grammar, and putting it here is what tied a structural check to a deletable pin.
     return bad
 
 
@@ -494,13 +573,9 @@ def _measure_lines(root: str, conf: dict) -> list:
     returns 0 is unobservable to it — which is why nothing exercised this path for its whole life."""
     w = walk(root, conf)
     orphans = sorted(set(w["cites"]) - set(w["defs"]))
-    members, _ = read_set(w)
-    total = sum(os.path.getsize(os.path.join(root, p)) for p in members)
-    headroom = _parse_conf_int(conf, "READ_PATH_HEADROOM", DEFAULT_READ_PATH_HEADROOM, minimum=1)
     return [
         f'ORPHAN_ID_PIN="{len(orphans)}"',
         f'DEAD_PATH_PIN="{len(w["dead"])}"',
-        f'READ_PATH_CEILING="{total + headroom}"   # measured {total} B + {headroom} B headroom',
     ]
 
 
@@ -519,7 +594,7 @@ def _scratch(tmp: str, *, pins=True, extra=None):
     run("git", "config", "user.name", "t", cwd=tmp)
     conf = ['MEMORY_ROOT=memory', 'DISCIPLINES="arch"', 'FAMILIES="arch:ARCH"', 'CHARTER="AGENTS.md"']
     if pins:
-        conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"', 'READ_PATH_CEILING="100000"']
+        conf += ['ORPHAN_ID_PIN="0"', 'DEAD_PATH_PIN="0"']
     _w(tmp, ".memory-tree.conf", "\n".join(conf) + "\n")
     _w(tmp, "AGENTS.md", "# charter\n\nRead `memory/README.md` before touching code.\n")
     # A tracked `.claude/` path, so `.claude/` is a REAL top-level directory in the fixture. Without
@@ -742,40 +817,89 @@ def cmd_selftest() -> int:
             ".claude/worktrees/whatever",
             lambda: "\n".join(checks(walk(tX, cX2))))
 
-        # 16 — the charter's read path.
+        # 16 — the charter's read path. STRUCTURAL since TOOL-dSpentCeiling-1: these arms call
+        # check_read_path() directly, because it is deliberately NOT reachable from checks(walk(...))
+        # any more. Every arm below rides ONE fixture whose charter cites a tracked, present file the
+        # index set does not cap, so the only thing varying is the declaration under test.
         t7 = os.path.join(base, "readpath"); os.makedirs(t7)
-        c7 = _scratch(t7, extra={
+        c7 = _scratch(t7, pins=False, extra={
             "AGENTS.md": "# charter\n\nRead `memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md` first.\n"})
-        arm("check 16 rule 3 catches an unwatched charter citation", "which is under\nno byte cap",
-            lambda: "\n".join(checks(walk(t7, c7))).replace("under ", "under\n"))
-        c7b = dict(c7); c7b["READ_PATH_CEILING"] = "1"
-        arm("check 16 catches a read path over its ceiling", "ceiling 1 B",
-            lambda: "\n".join(checks(walk(t7, c7b))))
-        # --- the measure verb's headroom. Every arm rides the SAME t7 fixture, so the only thing
-        # --- varying between them is the declaration under test. The `want` strings are LITERALS
-        # --- rather than interpolations of DEFAULT_READ_PATH_HEADROOM: an arm that re-types the
-        # --- constant it is checking agrees with itself whatever the constant says.
-        arm("--measure adds the SHIPPED default when no headroom is declared", "+ 25600 B headroom",
-            lambda: "\n".join(_measure_lines(t7, c7)))
-        c7h = dict(c7); c7h["READ_PATH_HEADROOM"] = "40960"
-        arm("--measure adds a DECLARED headroom in place of the default", "+ 40960 B headroom",
-            lambda: "\n".join(_measure_lines(t7, c7h)))
-        c7i = dict(c7); c7i["READ_PATH_HEADROOM"] = "twenty thousand"
-        arm("a malformed headroom is a named refusal, not a traceback",
-            "READ_PATH_HEADROOM must be a whole number of at least 1",
-            lambda: "\n".join(_measure_lines(t7, c7i)))
-        c7j = dict(c7); c7j["READ_PATH_HEADROOM"] = "0"
-        arm("a zero headroom is refused, since it prints a ceiling equal to the measured total",
-            "READ_PATH_HEADROOM must be a whole number of at least 1",
-            lambda: "\n".join(_measure_lines(t7, c7j)))
-        c7k = dict(c7); c7k["READ_PATH_CEILING"] = "not a number"
-        arm("a malformed ceiling is a named refusal too, which a bare int() never gave",
-            "READ_PATH_CEILING must be a whole number of at least 1",
-            lambda: "\n".join(checks(walk(t7, c7k))))
 
+        def _rp(root, conf):
+            b, n = check_read_path(root, conf)
+            return "BAD:" + " | ".join(b) + " NOTES:" + " | ".join(n)
+
+        # THE DEFECT THIS UNIT CLOSES, as an arm. With every pin blank the old engine returned 0 from
+        # main() before check 16 could run, so this citation was invisible. `pins=False` is the whole
+        # point of the fixture: an arm that sets a pin would pass against the old code too.
+        arm("rule 3 fires with NO pin set at all — the silence this unit removes",
+            "which is under", lambda: _rp(t7, c7))
+        arm("...and armed() is False on that same conf, so 13-15 stay off and the grammar unloaded",
+            None, lambda: str(armed(c7)).replace("False", ""))
+
+        # THE GRACE. The comparison is the subject, so the arms vary the DECLARED threshold rather
+        # than substituting a stand-in for the mechanism: below the flip a finding is a NOTE and the
+        # gating list is empty, at or above it the finding is gating and the note is gone.
+        _gates = READ_PATH_GATES_FROM
+        try:
+            globals()["READ_PATH_GATES_FROM"] = (99, 0)
+            arm("below the flip version a rule-3 finding is REPORTED, never gated",
+                "BAD: NOTES:", lambda: _rp(t7, c7))
+            arm("...and the grace SAYS SO, rather than looking like a clean run",
+                "are REPORTED, not gated", lambda: _rp(t7, c7))
+            globals()["READ_PATH_GATES_FROM"] = (0, 0)
+            arm("at or above the flip version the same finding GATES",
+                "BAD:check 16 rule 3", lambda: _rp(t7, c7))
+        finally:
+            globals()["READ_PATH_GATES_FROM"] = _gates
+
+        # THE VALVE, observed after the finding and never before.
+        c7w = dict(c7)
+        c7w["READ_PATH_WAIVER"] = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        arm("READ_PATH_WAIVER silences rule 3, and is the only conf key check 16 still reads",
+            None, lambda: _rp(t7, c7w).replace("BAD: NOTES:", ""))
+
+        # A CLEAN CHARTER MUST BE SILENT, or every arm above passes by finding something unrelated.
+        t7c = os.path.join(base, "readpath-clean"); os.makedirs(t7c)
+        c7clean = _scratch(t7c, pins=False)
+        arm("a charter citing only CAPPED files produces nothing",
+            None, lambda: _rp(t7c, c7clean).replace("BAD: NOTES:", ""))
+
+        # RULE 4 — tracked but absent. Its old comment claimed check 12 owned this finding; check 12's
+        # arm is restricted to builds/*/spec/*.md and index_set() drops absent files before check 6
+        # measures, so for a charter-cited guide this is the only detector there is.
+        t7a = os.path.join(base, "readpath-absent"); os.makedirs(t7a)
+        c7a = _scratch(t7a, pins=False, extra={
+            "AGENTS.md": "# charter\n\nRead `memory/guides/g.md` first.\n",
+            "memory/guides/g.md": "# g\n"})
+        os.remove(os.path.join(t7a, "memory/guides/g.md"))
+        arm("rule 4 fires on a charter citation that is tracked but not on disk",
+            "check 16 rule 4", lambda: _rp(t7a, c7a))
+        arm("...and its message no longer misattributes the finding to check 12",
+            None, lambda: "x" if "check 12" in _rp(t7a, c7a) else "")
+
+        # THE RETIRED KEYS — announced, never refused. The shipped example declared the ceiling
+        # BLANK, so a rule that refused on presence would red every adopter for doing nothing.
+        for _k in RETIRED_KEYS:
+            c7r = dict(c7clean); c7r[_k] = "161120"
+            arm(f"a declared {_k} is announced and does NOT gate",
+                f"NOTES:check 16: NOTE {_k} is declared",
+                lambda c=c7r: _rp(t7c, c))
+            c7rb = dict(c7clean); c7rb[_k] = ""
+            arm(f"...and a BLANK {_k} is announced identically, since presence is the test",
+                f"NOTES:check 16: NOTE {_k} is declared",
+                lambda c=c7rb: _rp(t7c, c))
+        arm("a retired key alone does not arm checks 13-15",
+            None, lambda: str(armed(dict(c7clean, READ_PATH_CEILING="161120"))).replace("False", ""))
+
+        # A MIS-SET CHARTER IS THIS CHECK'S OWN FINDING, not a Problem that escapes checks() and
+        # replaces every sibling finding in the run with one line.
         c7c = dict(c7); c7c["CHARTER"] = "NOPE.md"
-        arm("a missing charter is a named error", "is not a tracked file",
-            lambda: "\n".join(checks(walk(t7, c7c))))
+        arm("a missing charter is check 16's finding and returns early",
+            "check 16: CHARTER 'NOPE.md' is not a tracked file", lambda: _rp(t7, c7c))
+        arm("...and read_set still RAISES for cmd_report, which catches it",
+            "is not a tracked file",
+            lambda: read_set({"root": t7, "conf": c7c, "tracked": set()}))
 
         # the off switch, and the armed-without-grammar error.
         t8 = os.path.join(base, "off"); os.makedirs(t8)
@@ -853,9 +977,13 @@ def main(argv: list) -> int:
         if mode != "--check":
             print("usage: corpus_ids.py [--check|--report|--measure|--selftest]")
             return 2
-        if not armed(conf):
-            return 0                       # every pin blank: checks 13-16 are off, grammar unloaded
-        bad = checks(walk(root, conf))
+        # Check 16 runs ALWAYS. Checks 13-15 stay behind the pins, and the grammar stays unloaded
+        # when they are blank — the cross-kit dependency is still conditional.
+        bad, notes = check_read_path(root, conf)
+        if armed(conf):
+            bad += checks(walk(root, conf))
+        for line in notes:
+            print("HYGIENE " + line)
         for line in bad:
             print("HYGIENE " + line)
         return 1 if bad else 0

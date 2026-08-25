@@ -237,8 +237,9 @@ def extract_declarations(path: str, text: str) -> list[dict]:
     """One chunk per ``KEY=value`` assignment, carrying the comment block ABOVE it.
 
     The comment block is the whole point. This tree puts a constraint's justification in the lines
-    above the number -- ``READ_PATH_CEILING`` is fourteen of them for one value -- and a chunk of
-    just ``READ_PATH_CEILING="86476"`` would be reachable and worthless.
+    above the number -- ``INDEX_CAP_BYTES`` carries its derivation and every movement of it -- and a
+    chunk of just ``INDEX_CAP_BYTES="61440"`` would be reachable and worthless. The example this
+    docstring used to give was ``READ_PATH_CEILING``, retired in memory-tree 2.42.
 
     These are CHUNKS, not records: a record is keyed by a corpus id in this tree's
     ``FAMILY-slug-seq`` grammar, and a declaration has a KEY. Admitting them to ``records`` would

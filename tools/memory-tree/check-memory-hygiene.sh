@@ -104,6 +104,7 @@ FILES=$(git ls-files "$M/")
 APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
+  --print-kit-version) printf '%s\n' "$KIT_MEMORY_TREE_VERSION"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -446,8 +447,9 @@ if [ -n "$sel6" ]; then
   # per project — the value that suits one corpus is not the value that suits another.
   #
   # A guide is prose the charter points a session at and reads end to end; for it a line limit is a
-  # PROXY for the read budget rather than the budget itself — check 16's `READ_PATH_CEILING` is the real
-  # one, measured in bytes, and it is not relaxed here. Every other class is a row set, and for a row set
+  # PROXY for the byte cap beside it. There is no SECOND, SUMMED budget over the read path any more —
+  # TOOL-dSpentCeiling-1 retired it, having measured that these per-class caps were always the real
+  # bound and the sum was a second one over an already-bounded population. Every other class is a row set, and for a row set
   # the line count was never the bound that bound: at check 7's declared entry budget a 250-line row
   # document may hold 75,000 B, so the byte figure decided every real case and the line figure needed
   # rows averaging under 82 B. Measured over this corpus's backlog rows: 253.7 B.
