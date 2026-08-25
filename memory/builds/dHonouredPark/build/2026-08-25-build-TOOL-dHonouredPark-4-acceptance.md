@@ -13,6 +13,17 @@ that file either — the two facts the spec's §7 declares as a skip. They are s
 `bash -n` and nothing more. That is a real gap and it is stated here rather than left for a reader to
 discover.
 
+**And the gap bit immediately.** The first draft of those arms was written against an `arm` helper
+this file does not have — it has `hit`, `miss`, `same` — inside a function nothing ever called. Dead
+twice over, and `bash -n` passed it happily. What caught it was `check-arms.py` on the merge bar,
+refusing the new `fail 42` branch as unarmed, which forced a read of how the harness actually asserts.
+An unrunnable suite is not merely unverified: arms written for it can be wrong in ways only a
+different gate notices.
+
+The same read found a STRANDED assertion. S1 replaced the roster summary sentence, and an existing
+arm asserted the old text — the `arm-literal-strands-on-message-edit` class the closing checklist
+selected for this diff. It is fixed here.
+
 What stands in its place is stronger about BEHAVIOUR and says nothing about the arms.
 `bash tools/unattended/unattended.sh --plan <slug>` was captured over **all 63 tracked builds** before
 the change and again after, and the two captures diffed:

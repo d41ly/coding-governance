@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T23:40:00+03:00 @ 60ba1d602c1c4dba21a362c2b37172cecd0016f0
+last-audit: 2026-08-26T00:15:00+03:00 @ 60ba1d602c1c4dba21a362c2b37172cecd0016f0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: beb5fce43e2680983f01732975ae005b004eb980
@@ -305,8 +305,6 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
   skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
-- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
-  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
-  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
-  **The read path is spent on arrival**: a movement takes measured-plus-153 B, so a session has room
-  for well under one decision row, whose cost is its PROSE — +122 and +268 measured, never estimated.
+- A spent budget blocks RECORDING work, not doing it: the read path is spent on arrival, a movement
+  takes measured-plus-153 B, and a decision row's cost is its own prose. Measure with
+  `corpus_ids.py --report` before and after; never estimate. Every movement is recorded in `.memory-tree.conf`.
