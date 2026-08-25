@@ -2436,13 +2436,60 @@ done
 
 # ...and DECLARED, the same tree, now authorizes. Paired with the arms above so "it refused" and "it
 # refused for the reason we think" are two claims, not one.
-reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+#
+# THE MODE IS NOW LOAD-BEARING HERE (TOOL-dNarrowedAnchor-1). This fixture carried no
+# `authorized-by:` line, so it declared `slug` by default and this arm was the passing case for a
+# self-authorizing slug run — the exact behaviour that unit narrows. What changed is the fixture's
+# declaration, not the tree it is asserted against.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
 out=$(run --preflight tBr --keepalive-id k1)
 miss "$out" "no build README at the pinned BASE, so nothing committed before this run branched authorizes it"
 hit "$out" "preflight OK"
 hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 hit "$(cat memory/builds/tBr/RUN.md)" "branch-ref: refs/heads/unit"
+hit "$(cat memory/builds/tBr/RUN.md)" "mode: prompt"
+
+# ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
+# ---- saying it refused the right thing and a companion saying it did not refuse everything.
+# ----
+# ---- 50a: the DEFAULT. No `authorized-by:` key at all reads as `slug`, which is every build README
+# ---- written before that key existed — so this arm decides whether the narrowing reaches the
+# ---- population it exists for, rather than only the ones that spell the value out.
+reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+same "check 50 created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+
+# ---- 50b: the EXPLICIT spelling refuses identically. A guard that catches only the defaulted value
+# ---- is one `authorized-by: slug` line away from being no guard at all.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: slug'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+hit "$(run --preflight tBr --keepalive-id k1)" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+
+# ---- 50c: `recipe` is INSIDE the set, and the Skill's playbook path is why — it tells an author in
+# ---- as many words that writing the build folder yourself needs `published`. It passes this branch
+# ---- and refuses further down on its own missing playbook. A narrowing that swallowed `recipe`
+# ---- would make this kit refuse a path its own carrier instructs.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+hit "$out" "a recipe-mode build README declares no playbook"
+
+# ---- 50d: the FIRST anchor is UNTOUCHED. Same project, same `published` declaration, a build folder
+# ---- that IS at the merge-base, declaring `slug` by default — the ordinary case every adopter runs.
+# ---- Without this arm the refusal could fire on every run and every other arm here would still pass.
+reset_tree; scope published; git add -A >/dev/null && git commit -q -m sc --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tRun/RUN.md)" "anchor-kind: default-branch"
+reset_tree
 
 # ---- 32: the branch is committed but NOT published. Nothing the remote advertises authorizes it.
 reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
@@ -2488,7 +2535,13 @@ git checkout -qf unit
 # ---- S12's WIDENED fail 18. The guard now fires only for a base on NEITHER derivation, which is
 # ---- strictly smaller than before — so without a failing case here "monotone" and "deleted" look
 # ---- identical from outside. The base recorded is a commit on no advertised history at all.
-reset_tree; readme tBr; scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+# The fixture DECLARES `prompt` (TOOL-dNarrowedAnchor-1): this arm needs preflight to SUCCEED on the
+# second anchor so that a run-state file exists to corrupt, and `readme` writes no `authorized-by:`
+# key, which reads as `slug` and is now refused there. Measured: without this the preflight refused,
+# the `sed` below reported a missing file, and the fail-18 arm read as broken by a change that had
+# nothing to do with base ancestry.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
 git push -q -f origin unit 2>/dev/null
 run --preflight tBr --keepalive-id k1 >/dev/null
 ORPHAN=$(git commit-tree -m orphan "$(git rev-parse HEAD^{tree})" 2>/dev/null)

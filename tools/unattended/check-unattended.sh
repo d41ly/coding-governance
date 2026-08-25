@@ -188,6 +188,20 @@ if [ -z "$AUTH_MODES" ]; then
   fail 1 "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set - an empty vocabulary makes every check keyed on it vacuously true: $DRIVER"
 fi
 
+# TOOL-dNarrowedAnchor-1 - the partition of that vocabulary by which modes may reach the SECOND
+# anchor, read through the same parse for the same reason: a second spelling of a set is how two
+# files come to disagree about it silently.
+#
+# EMPTY IS A REFUSAL, and the direction matters more here than it does for AUTH_MODES. An empty
+# AUTH_MODES makes checks keyed on it vacuously TRUE; an empty SECOND_ANCHOR_MODES makes check 29
+# fire on EVERY mode, so a failed read would red a fleet of legitimate prompt runs rather than
+# silently pass them. Both failure modes are wrong and this one is louder, which is why it refuses
+# rather than defaulting to the driver's pair.
+SECOND_ANCHOR_MODES=$(core_of SECOND_ANCHOR_MODES)
+if [ -z "$SECOND_ANCHOR_MODES" ]; then
+  fail 1 "cannot read SECOND_ANCHOR_MODES from the driver, so check 29 would treat every declared mode as inadmissible on the second anchor and red every branch-anchored run in the tree: $DRIVER"
+fi
+
 # The parked-kind taxonomy. Read here for the same reason the four above are: a set declared in the
 # driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
 # predicate hanging off it.
@@ -951,12 +965,42 @@ while IFS= read -r f; do
       # ---- twice agrees wrongly. That is smaller than the class it belongs to - a forged RECORD is
       # ---- still caught, which is the threat - and it is stated here rather than left to be found.
       recmode=$(fact_of "$f" mode)
+      # HOISTED out of the presence guard below (TOOL-dNarrowedAnchor-1). Check 29 needs the DECLARED
+      # mode for every run-state file, not only the ones carrying a `mode:` line of their own: a
+      # record written before that key existed still has a recorded BASE, and whether that base sits
+      # off the default branch is answerable without it. Leaving the derivation inside the guard
+      # would have scoped the new check to the best-recorded half of the population, which is the
+      # half least likely to need it.
+      dmode=$(printf '%s\n' "$bb" | awk '
+        NR == 1 { next }
+        /^---[[:space:]]*\r?$/ { exit }
+        /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
+      [ -n "$dmode" ] || dmode=slug
+
+      # ---- 29: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. The driver refuses this at preflight; this
+      # ---- is the merge bar's own opinion of the same question, and it is DERIVED rather than read
+      # ---- back. `anchor-kind` is recorded in the very file under inspection, so reading it would
+      # ---- be asking the subject to grade itself - the rule this leg already keeps for the base.
+      # ----
+      # ---- THE DISCRIMINATOR IS `ADV_HEAD`, NOT `is_published`. That helper answers "ancestor of ANY
+      # ---- advertised tip", which is true under BOTH anchors and would therefore never separate
+      # ---- them - it would be a check that cannot fail. Ancestry of the advertised DEFAULT-BRANCH
+      # ---- tip is the question: a base the first anchor could have produced is one that sits on it.
+      # ----
+      # ---- CANNOT TELL STAYS SILENT, exactly as `is_published` does. An unreadable or unadvertised
+      # ---- default-branch tip means the remote could not be observed, and a leg that reds a whole
+      # ---- fleet on a network fault is worse than one that waits for the next run.
+      case " $SECOND_ANCHOR_MODES " in
+        *" $dmode "*) ;;
+        *)
+          if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null \
+             && GIT cat-file -e "$rb^{commit}" 2>/dev/null \
+             && ! GIT merge-base --is-ancestor "$rb" "$ADV_HEAD" 2>/dev/null; then
+            fail 29 "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode $dmode, admissible on that anchor are $SECOND_ANCHOR_MODES, base $rb in $f"
+          fi ;;
+      esac
+
       if [ -n "$recmode" ]; then
-        dmode=$(printf '%s\n' "$bb" | awk '
-          NR == 1 { next }
-          /^---[[:space:]]*\r?$/ { exit }
-          /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }')
-        [ -n "$dmode" ] || dmode=slug
         # ---- MEMBERSHIP first, then agreement, and they are two
         # ---- questions. This arm compared the two recorded values and had no opinion about
         # ---- whether either was LEGAL, so a README and a record carrying the SAME misspelling

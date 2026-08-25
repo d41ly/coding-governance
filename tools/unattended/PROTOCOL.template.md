@@ -32,6 +32,10 @@ the agent asks at its single opening turn. Four properties, all mechanical:
     and push it, which is cost 1 below made USABLE rather than merely conceded. Which anchor
     authorized a run is recorded, and so is the discipline it claimed — neither is a verdict, and §9's
     reduction applies to both.
+    **Bounded by MODE**: admissible only for `prompt` and `recipe`, the driver's
+    `SECOND_ANCHOR_MODES`. A `slug` README — which is what an absent `authorized-by:` means — is
+    refused there by preflight and by the bar. §9 still applies; what this removes is
+    self-authorization by DEFAULT.
 - **It is reachable from the pinned BASE.** A build folder introduced by a commit on the run's own
   branch grants nothing. Reachability is the machine-checkable form of "somebody with push rights put
   this here before this run branched" — and the run holds push rights by construction, so it is a
