@@ -26,7 +26,7 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 62
+exempt-pin: 63
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
@@ -83,6 +83,7 @@ exempt-pin: 62
 !memory/builds/cSightedPlumb/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/cSteadyMetronome/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/cTracedPromise/README.md - predates the contract; drains when its build's owner conforms it
+!memory/builds/dCarriedReceipt/README.md - authored at base 9ddcc5c9, before the canon landed; drains when TOOL-dFramedEntrypoint-7 converts it
 !memory/builds/dClosedLexicon/README.md - predates the contract; drains when its build's owner conforms it
 memory/builds/dFramedEntrypoint/README.md
 memory/builds/dNarrowedAnchor/README.md
