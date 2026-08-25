@@ -37,7 +37,7 @@ criterion.*
   `ANCHOR_SCOPE` present in the SKILL render's `placeholders` and in `[config] optional_keys`.
 - AC10 — `bash tools/check-kit-versions.sh` — exits 0, and `git grep -l 'unattended@1.9'` prints
   nothing across the whole tree. Eight carriers now read `1.10`.
-- AC11 — PARTLY OBSERVED, and the shortfall is named rather than folded away.
+- AC11 — `bash tools/unattended/adopt-unattended.test.sh` exits 0; `bash tools/unattended/cross-component.test.sh` does not, and the shortfall is named rather than folded away.
   `bash tools/unattended/adopt-unattended.test.sh` exits 0 at `PASS (53 assertions)`, including the
   new fixture self-assertion that its render carries no surviving brace shape.
   `bash tools/unattended/cross-component.test.sh` exits 1 — on arm 5, with
@@ -48,14 +48,24 @@ criterion.*
   satisfied for the half this unit owns and OPEN for the half it does not.
 - AC12 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 after the `.unattended.conf` and
   `.memory-tree.conf` edits and the `last-audit` re-stamp.
-- AC13 — AMENDED rev-5, then OBSERVED. The criterion as written at rev-4 was graded by re-typing a
-  measurement, and the measurement was stale within this build: the real figure at the fold is 3 B
-  larger, so the ceiling of 139132 carried a 253 B margin against a declared 256 while both carriers
-  agreed with each other. Round 1 L2. The witness is now the command, not a number:
+- AC13 — amended rev-5 — the criterion graded itself by re-typing a measurement, and the
+  measurement went stale inside this same build: the real figure at the fold is 3 B larger, so the
+  ceiling of 139132 carried a 253 B margin against a declared 256 while both carriers agreed with
+  each other. Round 1 L2, logged in section 9. The witness is now the command, not a number:
   `bash tools/memory-tree/check-memory-hygiene.sh` exits 0, and
   `python tools/memory-tree/corpus_ids.py --report` subtracted from `READ_PATH_CEILING` in
   `.memory-tree.conf` gives exactly 256. Ceiling now 139135.
-- AC14 — `bash tools/run-gates/run-gates.sh` — PENDING-BAR.
+- AC14 — `bash tools/run-gates/run-gates.sh` — GREEN, 39/39 legs passed, exit 0, on the second run.
+  The FIRST run was RED on `drift-audit records`, for two reasons both belonging to this unit. The
+  ratchet refuses a `READ_PATH_CEILING` raise unless the pair `137976 -> 139135` appears within 14
+  lines above the declaration, because a raise and a drain are otherwise indistinguishable to it; the
+  justification narrative was 15 lines and the pair sat one line out of reach. And
+  `non_terminal_specs_cited_by_product_source` read 3 against a pin of 2 because this spec is cited in
+  `tools/unattended/adopt-unattended.sh` while still INPROGRESS — an ordering dependency, cleared by
+  closing the spec. Seven legs were guard-SKIPPED as unchanged against main: branch-guard self-test,
+  pre-push self-test, run-gates gov canary, kit/dogfood doc parity, review-protocol parity, govkit
+  refusal join, govkit acceptance matrix. Thirty-nine kit self-tests were HELD per the owner's
+  standing instruction; `GATE_SELFTESTS=1` runs them.
 
 ## What the criteria did NOT prove, stated rather than implied
 

@@ -33,12 +33,15 @@ the authorization and then declines to name it.
 ## Build-level rules
 - **The token names the MODE it starts.** `--prompt` renders the `authorized-by: prompt` value it
   produces, so the gesture and the record it writes are one word. Owner ruling, 2026-08-25.
-- **One home for the literal.** `--prompt` is written in `adopt-unattended.sh` and nowhere else. Both
-  shipped confs declare the key BLANK, already this file's idiom for kit-owned, and the rendered
-  Skill is where a reader learns the value.
-- **The value is carried by CONTENT, never by reference.** A file path is resolved and its bytes go
-  into the build README with the path recorded beside them. The build folder IS the authorization, so
-  it may not point at something that can change after the run starts.
+- **One PRODUCTION home for the literal.** `--prompt` is derived once, in `adopt-unattended.sh`. Both
+  shipped confs declare the key BLANK, already this file's idiom for kit-owned, and the rendered Skill
+  is where a reader learns the value. Two test fixtures also spell it, as the EXPECTED value of
+  assertions, which is what makes the default falsifiable rather than a second source of it.
+- **The value is carried by CONTENT into a `prompts/` RECORD, never by reference.** A file path is
+  resolved and its bytes are written under the build's own `prompts/`, where this memory tree already
+  sanctions prompt-kind files, with the source path recorded beside them. Not into this README: its
+  heading canon is closed and its marker matcher reads column 1 blind to fencing, so a prompt quoting
+  a generated-region marker would be refused after the push.
 - **No new `fail` call site.** A new one costs an arm in `unarmed-branches.txt` and an `ARMS_FLOORS`
   bump, and buys nothing: the render's surviving-placeholder arm already catches the only
   machine-visible failure this key has.
@@ -59,13 +62,13 @@ the authorization and then declines to name it.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-25 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-25 · streams tooling
 ids TOOL-aNamedGesture-1 TOOL-aNamedGesture-2 TOOL-aNamedGesture-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | INPROGRESS | rev-5 | 2026-08-25 |
+| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).

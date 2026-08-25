@@ -1,6 +1,6 @@
 # TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build
 
-**Status:** INPROGRESS · rev-5 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
+**Status:** CLOSED · rev-5 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
