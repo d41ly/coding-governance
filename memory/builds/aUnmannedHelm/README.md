@@ -143,6 +143,20 @@ Eight blocker-severity findings collapsing to five distinct defects, all folded 
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aUnmannedHelm-1` | 2 | the run-state file, and the hygiene contract that admits it |
+| 2 | `TOOL-aUnmannedHelm-4` | 2 | the protocol document, and the authorization it rests on |
+| 3 | `TOOL-aUnmannedHelm-5` | 2 | the driver, and the four verbs it is allowed to have |
+| 4 | `TOOL-aUnmannedHelm-6` | 2 | the gate, and the three legs that carry it |
+| 5 | `TOOL-aUnmannedHelm-7` | 2 | the rendered skill, and the two ways it goes stale |
+| 6 | `TOOL-aUnmannedHelm-8` | 2 | the kickoff hand-back, and the five exits it does NOT buy |
+| 7 | `TOOL-aUnmannedHelm-9` | 2 | the adopter path, and the version marker that announces it |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-10 · streams tooling+kickoff+playbook+deployer
 ids TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-2 TOOL-aUnmannedHelm-3 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-6 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 TOOL-aUnmannedHelm-10

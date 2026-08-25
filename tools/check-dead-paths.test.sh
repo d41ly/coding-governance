@@ -106,23 +106,90 @@ printf 'the spec cited parallel-coding-governance.domain-rules.md at the time\n'
 ( cd "$BASE" && git add -A )
 arm "green: an append-only record under memory/ is not a carrier" 0 "no undeclared carrier" -- run "$BASE"
 
-# ---- 4. waivers ----------------------------------------------------------------------------------
-reset_base 'see parallel-coding-governance.domain-rules.md for the checklists'
-printf '# waivers\nREADME.md:2   deliberate, migration prose\n' > "$BASE/tools/dead-path-waivers.txt"
+# ---- 4. waivers — keyed by TEXT and an occurrence ORDINAL (TOOL-dHonouredPark-3) ------------------
+# A row is `<path>\t<ordinal>\t<line-text>\t<reason>`. Tab-separated rows are unreadable written
+# inline, so one helper writes them and the arms below read as what they assert.
+wrow() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"; }
+CARRIER='see parallel-coding-governance.domain-rules.md for the checklists'
+
+reset_base "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "green: a declared waiver silences its own hit" 0 "1 declared waiver(s)" -- run "$BASE"
 
+# THE ARM THE WHOLE RE-KEY EXISTS FOR. Under line keying this redded, twice in one build, for a
+# change that had nothing to do with the waiver.
+reset_base 'an unrelated line inserted above the carrier' "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "green: a DIFFERENT line above the carrier does not unpin the waiver" 0 "1 declared waiver(s)" -- run "$BASE"
+
 # A waiver whose carrier is gone must red, or the list stops shrinking.
 reset_base
-printf '# waivers\nREADME.md:2   the carrier this excuses was already removed\n' > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'the carrier this excuses was already removed'; } > "$BASE/tools/dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: a waiver whose carrier is gone is stale" 1 "stale waiver(s)" -- run "$BASE"
 
+# REWORDING is the one drift the text key does NOT survive, and that is intended: a reworded line is
+# a line whose waiver should be re-read. The message is the UNWAIVED one, not the stale one, because
+# the unwaived report comes first and exits — asserted as it behaves rather than as it reads better.
+reset_base 'see parallel-coding-governance.domain-rules.md for the checklist'
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "red: a REWORDED carrier is no longer waived" 1 "names a path this repo DELETED" -- run "$BASE"
+
 # A waiver must not silence a DIFFERENT line in the same file.
 reset_base 'filler' 'see parallel-coding-governance.domain-rules.md here'
-printf '# waivers\nREADME.md:2   waives the wrong line\n' > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'waives text that is not here'; } > "$BASE/tools/dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
-arm "red: a waiver keyed on another line does not cover this hit" 1 "names a path this repo DELETED" -- run "$BASE"
+arm "red: a waiver whose text names no line does not cover this hit" 1 "names a path this repo DELETED" -- run "$BASE"
+
+# N IDENTICAL CARRIERS NEED N ROWS. Waiving one occurrence leaves the others unwaived, and an
+# unwaived hit reds. This is the case the ordinal exists for and the case rev-2 of the spec got
+# wrong, asserting that one ordinal-bearing row could clear it.
+reset_base "$CARRIER" "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence only'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "red: two identical carriers, one row — the second is unwaived" 1 "names a path this repo DELETED" -- run "$BASE"
+
+reset_base "$CARRIER" "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence'; wrow README.md 2 "$CARRIER" 'second occurrence, its own reason'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "green: two identical carriers, two rows at ordinals 1 and 2" 0 "2 declared waiver(s)" -- run "$BASE"
+
+# THE RESIDUAL, armed rather than argued away. An IDENTICAL line above a waived carrier DOES move the
+# ordinal — the one drift the new key keeps, named in the registry header as the case it exists for.
+reset_base "$CARRIER" "$CARRIER"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'pinned to the second occurrence'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "red: an IDENTICAL line above a waived carrier renumbers it" 1 "names a path this repo DELETED" -- run "$BASE"
+
+# A MALFORMED ordinal is its own refusal, distinct from a stale row: line numbers were unique by
+# construction and an occurrence index is not, so the property has to be asserted rather than
+# inherited.
+for bad in 0 zero '' -1; do
+  reset_base "$CARRIER"
+  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'ordinal is not a positive integer'; } > "$BASE/tools/dead-path-waivers.txt"
+  ( cd "$BASE" && git add -A )
+  arm "red: ordinal [$bad] is MALFORMED, not stale" 1 "MALFORMED waiver row" -- run "$BASE"
+done
+
+# A row naming a file that is not there resolves to nothing and is stale BY THAT REASON. Without this
+# the branch is unreachable in the ordinary case, because a gone file usually leaves its carrier
+# behind as an unwaived hit and that report exits first.
+reset_base
+{ printf '# waivers\n'; wrow NO-SUCH-FILE.md 1 'text that is not a carrier anywhere' 'names a file that is gone'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "red: a row naming an absent file is stale, with its own reason" 1 "file is gone" -- run "$BASE"
+
+# THE `awk -v` TRAP, armed on the shape that bit the real registry. A -v assignment expands backslash
+# sequences, so a carrier holding a literal \n compares unequal to itself and the row reads stale for
+# a reason nobody can see. ENVIRON does not expand, and this arm is what proves it.
+BSLASH='printf "# ARCH \\n" and parallel-coding-governance.domain-rules.md'
+reset_base "$BSLASH"
+{ printf '# waivers\n'; wrow README.md 1 "$BSLASH" 'carrier text holds a literal backslash-n'; } > "$BASE/tools/dead-path-waivers.txt"
+( cd "$BASE" && git add -A )
+arm "green: a carrier holding a literal backslash-n still resolves" 0 "1 declared waiver(s)" -- run "$BASE"
 
 # ---- 5. anti-vacuity — the arms that matter ------------------------------------------------------
 # A repo that has never deleted anything must REFUSE, not report clean. This is the shape the gate

@@ -1,18 +1,21 @@
-<!-- gov:kit memory-tree@2.41 -->
+<!-- gov:kit memory-tree@2.46 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
-**Budget: ≤24 KB, ≤310 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤24 KB, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed, and again to ≤24 KB / ≤310 on 2026-08-21 — both owner
-calls, because the figure is a stated constraint of a document rather than a measurement of one. The
-second: two builds added rules here concurrently and both parents fitted the old cap alone, so nothing
-was droppable and the constraint moved instead of the content. No gate enforces this pair, which is why
-exceeding it silently was the one option not taken.
-governance carrier and M3's veto 2 makes changing one an owner turn rather than an agent's.
+It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, and the LINE half to
+≤350 on 2026-08-25 — all owner calls, because the figure is a stated constraint of a document rather
+than a measurement of one. The 2026-08-21 raise: two builds added rules concurrently and both parents
+fitted the old cap alone, so nothing was droppable and the constraint moved instead of the content.
+The 2026-08-25 raise cleared a two-line breach; a trim was offered and declined.
+**The BYTE half binds first** — at this file's ~100 B prose line the bytes run out near line 316, so
+most of the line figure is headroom the bytes do not grant. No gate enforces the pair, which is why
+exceeding it silently was the one option not taken, and whether one is ever added is a SEPARATE
+question nobody has ruled.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here

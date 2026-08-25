@@ -86,6 +86,20 @@ merely rework.
 The table below is GENERATED
 from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `DEPL-aTetheredConvoy-1` | 2 | the truthful core: roles, the receipt, and one expansion |
+| 2 | `DEPL-aTetheredConvoy-2` | 2 | update, the verb that moves an install forward |
+| 3 | `DEPL-aTetheredConvoy-3` | 2 | the convergence ratchet: nothing new ships un-deployable |
+| 4 | `DEPL-aTetheredConvoy-4` | 2 | the gate-runner declaration, end to end |
+| 5 | `DEPL-aTetheredConvoy-5` | 2 | check stops printing states and starts carrying evidence |
+| 6 | `DEPL-aTetheredConvoy-6` | 2 | the merged role, the attributes block, and the renormalize |
+| 7 | `DEPL-aTetheredConvoy-7` | 2 | the acceptance matrix, the refusal join, and the runbook parity gate |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams deployer+tooling
 ids DEPL-aTetheredConvoy-1 DEPL-aTetheredConvoy-2 DEPL-aTetheredConvoy-3 DEPL-aTetheredConvoy-4 DEPL-aTetheredConvoy-5 DEPL-aTetheredConvoy-6 DEPL-aTetheredConvoy-7 DEPL-aTetheredConvoy-8 DEPL-aTetheredConvoy-9 TOOL-aTetheredConvoy-1

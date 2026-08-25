@@ -86,6 +86,7 @@ exempt-pin: 63
 !memory/builds/dCarriedReceipt/README.md - authored at base 9ddcc5c9, before the canon landed; drains when TOOL-dFramedEntrypoint-7 converts it
 !memory/builds/dClosedLexicon/README.md - predates the contract; drains when its build's owner conforms it
 memory/builds/dFramedEntrypoint/README.md
+memory/builds/dHonouredPark/README.md
 memory/builds/dNarrowedAnchor/README.md
 memory/builds/dPromptedSeam/README.md
 !memory/builds/dNomadicAtlas/README.md - predates the contract; drains when its build's owner conforms it

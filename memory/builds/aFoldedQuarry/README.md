@@ -37,6 +37,20 @@ U6 first in wall-clock terms: every other unit's adversarial review runs on that
 U1 (it changes every path the rest operate on), U2, then U3 and U4 (independent of each other),
 then U5.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aFoldedQuarry-1` | 2 | fold the upstream ledger + trove builds into the memory-tree kit |
+| 2 | `TOOL-aFoldedQuarry-2` | 2 | U6: index-keyed verdict join in the Tier-2 review harness |
+| 3 | `TOOL-aFoldedQuarry-3` | 2 | U1: retire the discipline directory axis, keep the discipline signal |
+| 4 | `TOOL-aFoldedQuarry-4` | 2 | U2: the generated build index replaces the authored tree |
+| 5 | `TOOL-aFoldedQuarry-5` | 2 | U3: one id grammar, one walk, every consumer |
+| 6 | `TOOL-aFoldedQuarry-6` | 2 | U4: the bug-class corpus and its per-diff checklist |
+| 7 | `TOOL-aFoldedQuarry-7` | 2 | U5: the harness disciplines, made mechanical |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-08 · streams tooling
 ids TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7 TOOL-aFoldedQuarry-8 TOOL-aFoldedQuarry-9

@@ -1,27 +1,54 @@
-# dead-path waivers — deliberate spellings of a DELETED filename outside memory/.
-# One "<path>:<line>" per row, reason after whitespace. SHRINK-ONLY: the count may fall, never rise.
-# A row whose hit is gone reds as stale, so this file cannot quietly outlive what it excuses.
+# dead-path waivers - deliberate spellings of a DELETED filename outside memory/.
 #
-# Three classes only, and every row is one of them. (1) A GATE THAT BANS THE NAME must spell it —
+# A ROW IS `<path>\t<ordinal>\t<line-text>\t<reason>`, TAB-separated, and the LINE NUMBER is not in
+# it. TOOL-dHonouredPark-3. Line keying cost this repo two cycles in one build: any insertion above a
+# waived carrier moved it, the row went stale, and the bar redded for a reason unrelated to the
+# change. The second re-key was performed by PROXIMITY and scrambled three rows onto the wrong
+# reasons, which is a failure that keying invites rather than merely permits.
+#
+# THE FIELDS. The parser splits on the FIRST tab for the path, the SECOND for the ordinal, and the
+# LAST for the reason - everything between is the text. So a waived line MAY contain a tab and a
+# REASON MAY NOT, which is a constraint on the author and is stated rather than discovered.
+#
+# A LINE WITH NO TAB IS A COMMENT. Not a leading `#`: a waived line's own text may begin with one,
+# and two rows below point at `#` comment lines.
+#
+# THE ORDINAL is which occurrence of that TEXT in that file the row means, counting occurrences and
+# never lines. Inserting a DIFFERENT line above a waived carrier does not move it, which is the whole
+# point; inserting an IDENTICAL one does, and that residual is real and armed. All eight rows below
+# are ordinal 1 - no text on this tree occurs twice in its own file - so the ambiguous case has an
+# EMPTY population here and its arms are staged.
+#
+# N IDENTICAL CARRIERS NEED N ROWS. Waiving one occurrence does not waive the others, and an
+# unwaived hit reds the run before any staleness is reported. The ordinal buys each occurrence its
+# own reason, which is what keying on the PATH alone could not give and is why path-alone was
+# rejected.
+#
+# SHRINK-ONLY: the count may fall, never rise. A row whose resolved line is no longer a hit reds as
+# stale, so this file cannot quietly outlive what it excuses - and that is a MEMBERSHIP test against
+# the derived hit set, not a "does this text still appear" test, which would be strictly weaker.
+#
+# Three classes only, and every row is one of them. (1) A GATE THAT BANS THE NAME must spell it -
 # the hygiene checker refuses `MEMORY.md`/`IN-FLIGHT.md`/`STATUS.md` by name, and its fixtures create
 # them to prove the refusal fires. (2) MIGRATION PROSE for an adopter whose tree still HAS the file
 # gov deleted: the runbook step that tells them how to leave it behind must name it. (3) PAST-TENSE
 # HISTORY explaining why a constant moved, where the name is the subject of the sentence rather than
 # a pointer a reader would follow.
 #
-# Seeded 2026-08-18 from the measured population, after the v3.0 carriers were repointed — so the
+# Seeded 2026-08-18 from the measured population, after the v3.0 carriers were repointed - so the
 # leg landed green over the tree it was written against rather than over an assumption about it.
 #
-# A ROW IS KEYED BY LINE, so a merge that lands another branch's edits ABOVE a carrier moves it and
-# the row goes stale — the row is then re-stamped to the line the same carrier now sits on, which is
-# not a widening: the count is unchanged and the carrier text is identical. Re-stamp only after
-# reading BOTH lines; if the text differs, the old carrier is gone and the row is deleted instead.
+# RE-STAMPING, which replaces the line-keyed protocol this file used to carry. A merge landing
+# another branch's edits above a carrier no longer touches a row: the text is unchanged and the
+# ordinal counts occurrences. A row goes stale only when the carrier's TEXT changed or the carrier
+# stopped being a hit. Read the row and the file BOTH ways before editing: if the text was reworded
+# the old carrier is gone and the row is DELETED, never re-pointed at whatever now sits nearby.
 
-WIRE-INTO-PROJECT.md:264                           migration: names the old pointer stub an adopter still holds
-WIRE-INTO-PROJECT.md:270                           migration: the step that folds that file's prose away
-tools/memory-tree/check-memory-hygiene.sh:288      the gate BANS these names; it cannot refuse what it may not spell
-tools/memory-tree/check-memory-hygiene.sh:554      retirement note for the STATUS.md check, naming what it retired
-tools/memory-tree/check-memory-hygiene.test.sh:1175   fixture creates the banned names to prove the refusal fires
-tools/memory-tree/check-memory-hygiene.test.sh:1314   fixture builds an over-long STATUS.md for the size arm
-tools/memory-tree/check-memory-hygiene.test.sh:1319   positive arm: check 6 hits the banned STATUS.md
-tools/memory-tree/check-memory-hygiene.test.sh:1375   negative arm: check 6 does NOT hit it once retired
+WIRE-INTO-PROJECT.md	1	carries `<MEMORY_ROOT>/project/IN-FLIGHT.md` (the pointer stub) plus `<MEMORY_ROOT>/project/in-flight/<tag>.md`	migration: names the old pointer stub an adopter still holds
+WIRE-INTO-PROJECT.md	1	`<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLIGHT.md`'s protocol prose into	migration: the step that folds that file's prose away
+tools/memory-tree/check-memory-hygiene.sh	1	# machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —	the gate BANS these names; it cannot refuse what it may not spell
+tools/memory-tree/check-memory-hygiene.sh	1	#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it	retirement note for the STATUS.md check, naming what it retired
+tools/memory-tree/check-memory-hygiene.test.sh	1	for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do	fixture creates the banned names to prove the refusal fires
+tools/memory-tree/check-memory-hygiene.test.sh	1	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	fixture builds an over-long STATUS.md for the size arm
+tools/memory-tree/check-memory-hygiene.test.sh	1	chit 6 'memory/builds/tLong/STATUS.md'	positive arm: check 6 hits the banned STATUS.md
+tools/memory-tree/check-memory-hygiene.test.sh	1	cnot 6 'memory/builds/tLong/STATUS.md'	negative arm: check 6 does NOT hit it once retired

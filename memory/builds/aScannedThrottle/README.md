@@ -37,6 +37,14 @@ as a controlled pair, two consecutive runs in one worktree, hint absent then pre
 It changes no scheduling, shards no leg and edits no runner. Every improvement is emitted as a
 recommendation against an existing backlog id or a new one; landing any of them is a separate unit.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aScannedThrottle-1` | 1 | measure the lander, find what actually binds its wall clock |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-20 · streams tooling
 ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8 TOOL-aScannedThrottle-9 TOOL-aScannedThrottle-10 TOOL-aScannedThrottle-11

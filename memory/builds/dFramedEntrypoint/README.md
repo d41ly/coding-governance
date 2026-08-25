@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: tooling
 roster: TOOL
-ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8
+ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
 ---
 
 # dFramedEntrypoint — the build README becomes a closed, budgeted authored slot set
@@ -58,9 +58,24 @@ authored `roster:units` pair becomes mandatory or its three readers are deleted 
 gate watching; that `--status` and `--plan` now disagree about which unit is next; and that the
 lexicon naming leg is red at the base with its guard hiding it. None is this build's to decide.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dFramedEntrypoint-8` | 1 | the superseding decision, and the three records that assert what is not true |
+| 2 | `TOOL-dFramedEntrypoint-1` | 2 | the build README's authored half becomes a closed heading canon |
+| 3 | `TOOL-dFramedEntrypoint-4` | 2 | the build-order verb becomes legal and hardened, and the roster renders order and tier |
+| 4 | `TOOL-dFramedEntrypoint-2` | 2 | per-slot budgets: a hard declared ceiling and an advisory high-water |
+| 5 | `TOOL-dFramedEntrypoint-3` | 2 | the declared registry that says which build READMEs the contract binds |
+| 6 | `TOOL-dFramedEntrypoint-5` | 2 | the document inventory and the records table leave the build README |
+| 7 | `TOOL-dFramedEntrypoint-6` | 2 | every record renders inside the spec it serves |
+| 8 | `TOOL-dFramedEntrypoint-7` | 2 | the conformance pass that seeds the registry with a real population |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-08-24 · streams tooling
-ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8
+ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,7 +90,7 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 | [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | 8 | 2 | CLOSED | rev-4 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 3 record folder(s).
+Records: 22 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -98,5 +113,5 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [dHonouredPark](../dHonouredPark/README.md)
 <!-- /gen:build-edges -->

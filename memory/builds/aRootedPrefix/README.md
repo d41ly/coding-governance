@@ -15,6 +15,14 @@ segment short, and the two entrypoints that do not import the project layer answ
 corpus that produced instead of failing. Measured on paired fixture repos: one range with a genuine
 shipped reinvention reports `collision_flags: 1` at a root install and `0` at a prefixed one.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aRootedPrefix-1` | 2 | codebase-map: make the kit correct at any install prefix |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-09 · streams tooling
 ids TOOL-aRootedPrefix-1 TOOL-aRootedPrefix-2 TOOL-aRootedPrefix-3

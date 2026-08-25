@@ -216,6 +216,20 @@ to extend: it is a gov-only gate leg over a single file, and these checks must r
 not a skipped audit.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `KICK-cKeyedLaunchpad-1` | 1 | the installed engine, and why link-ness is the wrong thing to check |
+| 2 | `KICK-cKeyedLaunchpad-2` | 2 | one location list, and the three kits the move drags in |
+| 3 | `KICK-cKeyedLaunchpad-3` | 2 | three checks the ratchet never had, and the stall it can actually measure |
+| 4 | `KICK-cKeyedLaunchpad-4` | 2 | the sealed task region, and the duplication it must remove rather than ratify |
+| 5 | `KICK-cKeyedLaunchpad-6` | 2 | evicting the traps that pay, and restoring the cap the kit already shipped |
+| 6 | `KICK-cKeyedLaunchpad-7` | 1 | the engine's prose pass, and the three strings it must not touch |
+| 7 | `TOOL-cKeyedLaunchpad-5` | 1 | the anchor selector without a diff, and the latent split it exposes |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node c · opened 2026-08-13 · streams kickoff+tooling
 ids KICK-cKeyedLaunchpad-1 KICK-cKeyedLaunchpad-2 KICK-cKeyedLaunchpad-3 KICK-cKeyedLaunchpad-4 KICK-cKeyedLaunchpad-6 KICK-cKeyedLaunchpad-7 TOOL-cKeyedLaunchpad-5

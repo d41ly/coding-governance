@@ -60,6 +60,13 @@ PREFIX. `check-dead-paths.sh` holds the other half: a path that resolves nowhere
 deleted. They are one class — a sentence nothing executes — and they are two gates because the
 populations are derived from different sources and neither derivation can see the other's defect.
 
+The two have DIVERGED in one respect since `TOOL-dHonouredPark-3`, deliberately.
+`tools/dead-path-waivers.txt` is keyed by the carrier line's TEXT plus an occurrence ordinal;
+`tools/install-prefix-waivers.txt` is still `<path>:<line>`. Line keying cost this repo two cycles in
+one build — any insertion above a carrier unpinned its row — and the owner ruled ONE file. The
+sibling moves when its own keying has actually failed, not by association, so a reader finding the
+two grammars different is looking at a decision rather than at drift.
+
 MEASURED, which is why the second gate exists. The v3.0 charter convergence deleted two companion
 files and ELEVEN carriers kept naming them: the repo's front door, the charter every session reads,
 the install runbook twice, a kit README an adopter receives, the kickoff engine's hand-back offer,

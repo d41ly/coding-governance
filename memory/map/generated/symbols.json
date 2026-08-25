@@ -528,6 +528,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_marker_line",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

@@ -48,6 +48,17 @@ make `build_index` and `render_index` comparable as one concept, and today only 
   rev-2 trades an automatic trigger for a correct query and says so plainly rather than arguing the
   loss away. If the Skill step is measured to go unread, `-1` Q2 reopens.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dPromptedSeam-1` | 1 | a refused name carries a reuse prompt |
+| 2 | `TOOL-dPromptedSeam-2` | 1 | `read_object` cannot say WHY it returned nothing |
+| 3 | `TOOL-dPromptedSeam-3` | 1 | `--brief` calls nine unrelated concepts one concept, out loud |
+| 4 | `TOOL-dPromptedSeam-4` | 1 | the stopword parity is checked on demand, so a push can land drift |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** DEFERRED · 4 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 TOOL-dPromptedSeam-4
