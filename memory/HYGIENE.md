@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.41 -->
+<!-- gov:kit memory-tree@2.47 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -147,9 +147,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
    and check 16 refuses a charter-cited file that nothing caps — but for a guide the LINE count is a
-   proxy, and check 16's `READ_PATH_CEILING` is the real budget, measured in bytes and NOT relaxed
-   here. So a guide's effective room is whichever of the two binds first, and past ~250 lines that is
-   normally the read-path ceiling rather than this cap. Entry-budget exempt (check 7's `ex7`) — a
+   proxy for the byte cap beside it. There is no longer a SUMMED read-path budget behind these:
+   `READ_PATH_CEILING` was retired in 2.42, and these per-class caps ARE the bound a guide has.
+   Entry-budget exempt (check 7's `ex7`) — a
    guide is prose, not index rows. `builds/*/RUN.md` is a ROW document on both counts: it is designed
    to GROW, so the cap is the bound the protocol spills against (oldest parked entries move to the
    build's own `build/` folder as a dated recording).
@@ -200,14 +200,23 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
     (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
 16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
-    from the charter's own text through three token arms. `--measure` prints a ceiling as the
-    measured total plus `READ_PATH_HEADROOM`, which is ADVICE for the author pasting the pin back;
-    the CHECK compares against `READ_PATH_CEILING` alone, because a ceiling computed from a headroom
-    would let a growing corpus raise its own budget. The total stays under `READ_PATH_CEILING`
-    (one-sided — shrinking never reds) and every member is either byte-capped by check 6 or listed in
-    `READ_PATH_WAIVER`; a charter citation nothing watches is the rule-3 case.
+    from the charter's own text through three token arms. TWO rules, and NO byte budget: rule 3 is
+    that every member is byte-capped by check 6 or listed in `READ_PATH_WAIVER`, because a charter
+    citation nothing watches is a read budget nobody watches; rule 4 is that a cited file tracked but
+    absent from the worktree is a finding, and it is the ONLY detector for that class — check 12's
+    arm covers `builds/*/spec/*.md` alone and the index set drops absent files before check 6
+    measures. The SUMMED budget `READ_PATH_CEILING` carried was retired in 2.42: check 6 already
+    caps every member, so the sum was a second bound over an already-bounded population and it never
+    once caused a trim. A conf still declaring `READ_PATH_CEILING` or `READ_PATH_HEADROOM` is
+    ANNOUNCED and reds nothing.
 
-Checks 13-16 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
+Check 16 is STRUCTURAL: it runs whenever the conf is loadable, is behind no pin, and reaches neither
+`walk()` nor the id grammar. It was behind a pin, and that was the defect — one blank line silenced a
+citation check. Rules 3 and 4 REPORT without gating until the version named in `corpus_ids.py`'s
+`READ_PATH_GATES_FROM`, so an adopter is not redded for a pre-existing condition on their first
+upgraded bar; the grace announces itself on every run.
+
+Checks 13-15 live in `tools/memory-tree/corpus_ids.py` and are DISABLED when their pins are blank.
 Every pin is MEASURED against the adopting corpus (`corpus_ids.py --measure`), never inherited: a pin
 copied from a larger tree is either vacuous or permanently red. The id grammar comes from the
 memory-recall kit, so arming these checks requires that kit — with the pins blank it is never

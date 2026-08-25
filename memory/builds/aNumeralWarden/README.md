@@ -46,6 +46,14 @@ lens counter, and this spec's own non-goal.
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aNumeralWarden-1` | 2 | agent-cap enforces the verifier number, and reaches the modality it was blind to |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-10 · streams tooling
 ids TOOL-aNumeralWarden-1 TOOL-aNumeralWarden-2 TOOL-aNumeralWarden-3 TOOL-aNumeralWarden-4

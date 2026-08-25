@@ -53,7 +53,16 @@ cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash tools/push-main.sh|g' \
-    -e 's|{{ANCHOR_SCOPE}}|published|g' "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+# TOOL-aNamedGesture-1 - this chain is a SECOND hand-kept renderer, and nothing downstream reads the
+# file it writes closely enough to notice a placeholder nobody added an entry for. So the fixture
+# asserts its own render, which is what turns an omission here into a failure instead of a silent
+# divergence from adopt-unattended.sh.
+if grep -qE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md; then
+  echo "FAIL the fixture render carries a surviving placeholder - this sed chain is missing an entry:"
+  grep -oE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md | sort -u | sed 's/^/    /'
+  exit 1
+fi
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     "$HERE/../../.unattended.conf" > .unattended.conf
@@ -70,8 +79,22 @@ mk() { # slug · optional extra front-matter line
     echo; echo '<!-- gen:build-index -->'
     # TOOL-aBoundedVerdict-11 S5 - the NESTED units pair. Check 21 requires it on every tracked build
     # README, so a fixture that omits it reds the leg on the fixture rather than on the kit.
-    echo '<!-- gen:build-units -->'; echo '<!-- /gen:build-units -->'
+    # TOOL-dHonouredPark-4 fallout: the region is POPULATED and a matching spec is written. An empty
+    # region plus no spec makes `--plan` refuse, so check 30 of the leg walked ZERO builds whose
+    # `--plan` returned a verdict and redded on its own liveness assertion — five arms here failed for
+    # a fixture that had never satisfied a check added after it. The status is deliberately NON
+    # terminal: check 30 flags a build whose every tracked spec is terminal, so `CLOSED` here would
+    # trade one red for another.
+    echo '<!-- gen:build-units -->'
+    echo '| Unit | Status | Rev | Last change |'; echo '|---|---|---|---|'
+    echo "| [ARCH-$1-1 — the unit](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |"
+    echo '<!-- /gen:build-units -->'
     echo '<!-- /gen:build-index -->'; } > "memory/builds/$1/README.md"
+  mkdir -p "memory/builds/$1/spec"
+  printf '# ARCH-%s-1 the unit
+
+**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams tooling
+' "$1" > "memory/builds/$1/spec/one.md"
 }
 
 # ---- PRECONDITION: the fixture is COMPLETE before anything perturbs it. An arm that runs against a

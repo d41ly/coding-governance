@@ -260,6 +260,21 @@ recommendation is worth more on the record than off it:
 - It recommended keeping `-5` and `-6` as one spec. Refused in `-6` §8, with the reason recorded
   there: the split isolates the half a reviewer must be hostile toward.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aPacedTurnstile-1` | 2 | the gate runner becomes a deployable kit |
+| 2 | `TOOL-aPacedTurnstile-14` | 2 | the authored roster is read with its refusal intact |
+| 3 | `TOOL-aPacedTurnstile-2` | 2 | the runner's knobs become a declared hardware profile table |
+| 4 | `TOOL-aPacedTurnstile-3` | 2 | ordered chunks, and a verdict the operator sees before the run ends |
+| 5 | `TOOL-aPacedTurnstile-4` | 2 | the turnstile: one bar per repo, and a queue for the rest |
+| 6 | `TOOL-aPacedTurnstile-5` | 2 | the run record: a durable, machine-readable status emitter |
+| 7 | `TOOL-aPacedTurnstile-6` | 2 | reuse a proven green, and scope a worktree to its own branch point |
+| 8 | `TOOL-aPacedTurnstile-7` | 2 | the push boundary scopes to the diff, and "every leg" becomes a bounded obligation |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-18 · streams tooling
 ids TOOL-aPacedTurnstile-1 TOOL-aPacedTurnstile-2 TOOL-aPacedTurnstile-3 TOOL-aPacedTurnstile-4 TOOL-aPacedTurnstile-5 TOOL-aPacedTurnstile-6 TOOL-aPacedTurnstile-7 TOOL-aPacedTurnstile-8 TOOL-aPacedTurnstile-9 TOOL-aPacedTurnstile-10 TOOL-aPacedTurnstile-11 TOOL-aPacedTurnstile-12

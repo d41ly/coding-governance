@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T09:27:07+03:00 @ 85d67742c44a33b5f21040263adc518b4d70ea1a
+last-audit: 2026-08-26T00:23:32+03:00 @ 2196414866a0e2db52759ebd015aae4a79dd0e8d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f5ccdb1175c54e8b3ffc281296e97fce86675d7b
+last-body-change: 2196414866a0e2db52759ebd015aae4a79dd0e8d
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -50,11 +50,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
-  authority are M3's and M6's; they are not restated here, for the reason the directives bullet
-  below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
-  pass's declared write set, and the comparison REPORTS to stdout without ever failing the bar
-  (`TOOL-dUnstalledConvoy-23`). Declare write sets anyway; a green leg is not a disjointness proof.
+  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
+  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
@@ -89,17 +87,16 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   it; anything this session closes is inside it.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
-  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
-  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
-  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
-  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
-  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
-  the cheap check is a `git log` at kickoff rather than a merge at landing.
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. Two builds rewrote
+  `tools/unattended/` concurrently on 2026-08-21 and neither noticed until the landing: 25 conflicting
+  files, and four merge-bar legs red on the merged tree with none red on either parent. §3's rule is
+  own STREAMS not files, and a kit is the unit that rule is about.
 
-- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
-  `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
-  16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
+- **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
+  or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
+  readme-contract's bound subset. Seed a new build's from its own spec ids.
+- **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
+  the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -306,7 +303,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   that name states a count.
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
-  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
-- A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
-  TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
-  the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
+  skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF` is the seam.
+- A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
+  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
+  before and after, never estimate, and record every movement beside the number.

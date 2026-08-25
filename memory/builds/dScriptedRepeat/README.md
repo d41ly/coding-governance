@@ -148,6 +148,27 @@ Named here because the research raised each one and an unstated exclusion reads 
   and an installed conf the bar reads but no arm grades.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dScriptedRepeat-1` | 2 | the mode vocabulary, published and joined |
+| 2 | `TOOL-dScriptedRepeat-10` | 2 | the two start paths and the playbook-scoped directives |
+| 3 | `TOOL-dScriptedRepeat-11` | 2 | authoring a playbook: creation, and owner-instructed amendment |
+| 4 | `TOOL-dScriptedRepeat-13` | 2 | the bypass-flag guard covers the evidence records too, in the leg that can see them |
+| 5 | `TOOL-dScriptedRepeat-14` | 2 | a build README asserting a mechanism its own spec set has since revised |
+| 6 | `TOOL-dScriptedRepeat-15` | 2 | the kit's self-test suite becomes affordable, and every number here carries the command that... |
+| 7 | `TOOL-dScriptedRepeat-2` | 2 | the PLAYBOOK TEMPLATE, derived then frozen |
+| 8 | `TOOL-dScriptedRepeat-3` | 2 | the playbook validity gate |
+| 9 | `TOOL-dScriptedRepeat-4` | 2 | the declaration seam: README names the path, playbook holds the globs |
+| 10 | `TOOL-dScriptedRepeat-5` | 2 | the per-piece record: its writer, its reader, and its states |
+| 11 | `TOOL-dScriptedRepeat-6` | 2 | `pieces-complete`, the ninth core Definition-of-Done item |
+| 12 | `TOOL-dScriptedRepeat-7` | 2 | SET-scoped checks, and where they run |
+| 13 | `TOOL-dScriptedRepeat-8` | 2 | the output-scope refusal, and what it cannot see |
+| 14 | `TOOL-dScriptedRepeat-9` | 2 | the `proposal` park kind and the `--propose` verb |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 14 unit(s) · node d · opened 2026-08-20 · streams tooling
 ids TOOL-dScriptedRepeat-1 TOOL-dScriptedRepeat-2 TOOL-dScriptedRepeat-3 TOOL-dScriptedRepeat-4 TOOL-dScriptedRepeat-5 TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-8 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 TOOL-dScriptedRepeat-12

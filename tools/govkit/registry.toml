@@ -189,7 +189,7 @@ why = "the red/green self-test for the above, which is itself exempt. Exemptions
 
 [[exempt]]
 path = "tools/dead-path-waivers.txt"
-why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and gov line numbers; seeded from this repo's measured population, meaningless in any other tree."
+why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and the TEXT of gov carrier lines, keyed by occurrence rather than by line number since TOOL-dHonouredPark-3; seeded from this repo's measured population, meaningless in any other tree."
 
 [[exempt]]
 path = "tools/check-playbook-parity.sh"

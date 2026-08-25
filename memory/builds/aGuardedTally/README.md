@@ -14,6 +14,14 @@ Node `a` · opened 2026-08-03 · streams tooling.
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aGuardedTally-1` | 2 | a dead reviewer must never read as a clean one |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-03 · streams tooling
 ids TOOL-aGuardedTally-1

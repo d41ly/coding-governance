@@ -40,6 +40,14 @@ rev-2 reframed S5 around the shipped-reinvention closing loop (rev-1's metric wa
 - **F7** collision-WARN / backlog home: (a) append to the reinvention backlog file, dedup by {new,resembles} *(rec)* · (b) stdout-only · (c) per-node sharded log.
 - **F8** collision precision knobs: (a) token stem + fan-in threshold · (b) + structural signal *(rec)* · (c) + affordance cross-check; threshold in `.codebase-map.conf`.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-bConvergentLodestar-1` | 2 | reuse-convergence layer for codebase-map |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 1 unit(s) · node b · opened 2026-07-22 · streams tooling
 ids TOOL-bConvergentLodestar-1

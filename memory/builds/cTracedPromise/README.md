@@ -88,6 +88,15 @@ audit and the M8 closing adversarial review, and it stays there. The signal narr
 from "no measurement at all" to "the link is measured, the content is reviewed".
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-cTracedPromise-1` | 2 | a closed spec has to point at a commit that changed the product |
+| 2 | `TOOL-cTracedPromise-2` | 2 | an acceptance criterion has to name something a machine can find |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node c · opened 2026-08-14 · streams tooling
 ids TOOL-cTracedPromise-1 TOOL-cTracedPromise-2 TOOL-cTracedPromise-3 TOOL-cTracedPromise-4 TOOL-cTracedPromise-5 TOOL-cTracedPromise-6 TOOL-cTracedPromise-7

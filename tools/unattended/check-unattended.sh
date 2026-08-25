@@ -26,7 +26,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.9   # gov:kit unattended@1.9 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.10   # gov:kit unattended@1.10 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2484,6 +2484,36 @@ TPLSKEOF
   fi
 fi
 
+fi
+
+
+# ---- check 30 - a --plan run may never claim terminality over a build it graded nothing on.
+# TOOL-dHonouredPark, closing review round 3. A CORPUS check rather than a fixture one, and
+# deliberately: the blocker it gates was live on FIVE tracked builds while every fixture arm in
+# this kit was green. The predicate is the SHAPE, not the branch - any output carrying both a
+# NOT A UNIT row and the terminal verdict is a build being told it is finished by a verb that
+# graded nothing on it. It redded on those five the day it was written, which is the failing case
+# observed before landing.
+#
+# A build whose --plan REFUSES is skipped: a refusal is a verdict this check has no opinion about.
+if [ -d "$MEMORY_ROOT/builds" ]; then
+  _pv_seen=0; _pv_bad=""; _pv_drv="$(cd "$(dirname "$0")" && pwd)/unattended.sh"
+  for _pv_rm in $(GIT ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
+    _pv_slug=$(basename "$(dirname "$_pv_rm")")
+    _pv_out=$(bash "$_pv_drv" --plan "$_pv_slug" 2>/dev/null) || continue
+    _pv_seen=$((_pv_seen+1))
+    case "$_pv_out" in
+      *"NOT A UNIT"*)
+        case "$_pv_out" in
+          *"every tracked spec is terminal"*) _pv_bad="$_pv_bad $_pv_slug" ;;
+        esac ;;
+    esac
+  done
+  # LIVENESS. A loop that graded nothing would report clean, which is the vacuous-selector shape
+  # this tree gates against everywhere else - and this assertion is not decoration: the first cut
+  # of this check resolved the driver path wrongly, walked zero builds, and this line caught it.
+  [ "$_pv_seen" -gt 0 ] || fail 30 "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus: $MEMORY_ROOT/builds"
+  [ -z "$_pv_bad" ] || fail 30 "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it:$_pv_bad"
 fi
 
 exit "$status"

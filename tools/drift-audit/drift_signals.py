@@ -227,7 +227,8 @@ PINS: dict[str, int] = {
     # `--check` on one open row.
     # 81 -> 89. RAISED at the reground onto main, and by the signal doing its job on its first real
     # merge: two branches' live rows united, and neither side was over its own watermark. Same shape
-    # as READ_PATH_CEILING in this same reconcile, one budget over.
+    # as the read-path ceiling in that same reconcile, one budget over — that ceiling has since been
+    # retired (TOOL-dSpentCeiling-1) and its RATCHETS row deleted with it.
     "live_backlog_rows_per_shard": 89,
     "lexicon_ratified_older_than_language_surface": 0,
 }
@@ -265,7 +266,6 @@ RATCHET_LOOKBACK = 14
 RATCHETS: list[dict] = [
     {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
-    {"file": ".memory-tree.conf", "key": "READ_PATH_CEILING", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
     {"file": "tools/drift-audit/drift_signals.py",

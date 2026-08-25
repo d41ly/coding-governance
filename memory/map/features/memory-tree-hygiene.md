@@ -105,10 +105,10 @@ derives its baseline floor from that constant, and a stale one put the floor bef
 
 ## Reuse affordance
 
-seam: `_resolve_cap <name> <value> <default>` — reuse for any conf key that must NOT be disableable by
-blanking its line; extend by calling it once per key immediately after the conf is sourced. It reports
-on stderr and returns the value on stdout, because a gate that returns a value cannot also diagnose on
-the same channel.
+seam: the CAPTURE-BEFORE-SOURCE idiom — reuse for any conf key that must NOT be disableable by
+blanking its line. `check-memory-hygiene.sh` stashes the shipped value in `_SPEC10_SHIPPED` before the
+conf is sourced, and restores it afterwards with `: "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"`. Anchored on
+those two NAMES rather than on line numbers, which move under any edit above them.
 seam: the `cl = 0` sentinel plus the guarded comparison — reuse for adding a size class that bounds
 bytes only; extend by adding a branch to the awk after the class it must override, and nothing else:
 the message split reads the same variable, so a new class gets the right output for free.

@@ -93,6 +93,26 @@ DIRECTIVES_FLOOR="15"
 # the whole story: the leg cannot read THIS file, but it can read that.
 ANCHOR_SCOPE=""
 
+# TOOL-aNamedGesture-1 - the TOKEN that authorizes a prompt-mode run. The Skill's prompt path is
+# entered only when the invocation carries it, so this is the gesture that separates a description of
+# a build from a run that will merge and push with no owner turn. Its ARGUMENT is the build: either a
+# path to a file holding the prompt, or the prompt itself.
+#
+# BLANK is the kit default and is what every adopter should ship. The default literal lives in
+# adopt-unattended.sh and nowhere else, and the RENDERED Skill states it verbatim - so read the value
+# out of .claude/skills/unattended/SKILL.md rather than expecting this file to name it. Declare a
+# value here only to override the spelling, which is worth doing in a project whose ordinary prose
+# would contain the default.
+#
+# WHAT IS REFUSED at render time, and why each: a value that does not begin with a hyphen (a bare
+# word reads as a positional argument, which is the prose inference the fence forbids), and a value
+# carrying whitespace, a pipe or a backtick (it is interpolated into a markdown table row and a code
+# span, and each of those three ends one of them early).
+#
+# NOTHING VERIFIES THE GESTURE. No script in this kit sees an invocation, so this key buys a token an
+# agent can test for and never an authorization; the authorization stays the pushed build folder.
+AUTH_PARAM=""
+
 # UNITS_REGION_CUTOFF - the day THIS repo's build READMEs started carrying the generated
 # `gen:build-units` region, as YYYY-MM-DD. It decides what a pinned BASE whose README carries NO such
 # region means to the scope-integrity check in `check_authorization`.

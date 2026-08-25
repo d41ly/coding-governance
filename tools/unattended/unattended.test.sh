@@ -61,7 +61,11 @@ n=0
 
 # A POSITIVE assertion: the run's output must CONTAIN the branch's own failure text. `hit` is the
 # only arming helper here; `miss` is deliberately spelled so check-arms scores it as negative.
-hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
+# A FAILING ASSERTION SHOWS WHAT IT GOT. `hit` printed only the needle, so every red here read
+# "the driver did not say X" with no way to learn what it DID say — and diagnosing three stale
+# arms in this file meant re-running a 900 s suite to find out. The actual output is truncated
+# because some refusals are paragraphs, and the first line is always the verdict.
+hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
@@ -352,6 +356,22 @@ roster() { # slug · body   (pure shell: a python launcher here is unresolved, a
 # TOOL-aBoundedVerdict-11 - the GENERATED pair's fixture writer. The authorization scope moved off the
 # authored roster onto this region, so the arms below drive THIS. Appends a second pair when the
 # README already has one, which is exactly what the duplicate-pair arms need.
+# TOOL-dHonouredPark-4, closing review round 2. `units` APPENDS a pair to a README that `readme`
+# already gave one — which is what the malformed-pair arm WANTS, and what three arms written for the
+# absent/empty/NO-TRACKED-SPEC branches got by accident. All three built DUPLICATED-pair fixtures and
+# asserted branches they could never reach. This one REPLACES the rendered body instead.
+#
+# ENVIRON, never `awk -v`: a -v assignment expands backslash sequences, and a unit row is a value a
+# caller wrote rather than a literal this file controls.
+setunits() { # slug · body (an EMPTY body leaves a well-formed pair enclosing nothing)
+  local _t; _t=$(mktemp)
+  BODY="$2" awk '
+    BEGIN { b = ENVIRON["BODY"] }
+    $0 == "<!-- gen:build-units -->" { print; if (b != "") print b; skip = 1; next }
+    $0 == "<!-- /gen:build-units -->" { skip = 0 }
+    !skip { print }
+  ' "memory/builds/$1/README.md" > "$_t" && mv "$_t" "memory/builds/$1/README.md"
+}
 units() { # slug · body
   printf '
 %s
@@ -1522,8 +1542,11 @@ mkdir -p .git/index-blocked 2>/dev/null || true
 # ---- S4, the gap list. The states are the build method's M2 vocabulary, spelled exactly; what is
 # ---- asserted here is that this verb COMPUTES them, never that it defines them.
 mkspec() { # slug · id · status · scope · acceptance · gates · forks
+  # THE FILENAME IS DERIVED FROM THE ID, not pinned to `-1`. It was pinned, so a second call in one
+  # fixture silently OVERWROTE the first and any arm wanting two units got one. Backward compatible:
+  # every existing caller passes an id ending `-1`, which lands on the same path it always did.
   mkdir -p "memory/builds/$1/spec"
-  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-1.md" <<SPEC
+  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-${2##*-}.md" <<SPEC
 # $2 — a unit
 
 **Status:** $3 · rev-1 · 2026-08-01 · node a · Tier-2 · base abcdef12 · streams architecture
@@ -1615,8 +1638,11 @@ reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 fixture
 out=$(run --plan tPlan)
-hit "$out" "roster: tracked specs under"
-hit "$out" "a planned unit with no spec is invisible here"
+# TOOL-dHonouredPark-4 S1: the SET comes from the GENERATED region now, so the summary no longer
+# says "tracked specs under ...". The authored roster pair is what is absent here, and the sentence
+# says so. The two markers are different regions and only one of them is missing in this fixture.
+hit "$out" "roster: the generated units region, in build order"
+hit "$out" "the authored pair names no id of this build"
 miss "$out" "MISSING"
 
 # ---- S6's extraction is BYTE-IDENTICAL at --status. A refactor and a behaviour change in one
@@ -1641,7 +1667,129 @@ same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && ech
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
 
+# REBUILT IMMEDIATELY BEFORE THE ARM (TOOL-dHonouredPark-4 fallout, not this build's). A
+# `reset_tree` between the setup above and this line wipes tPlanEmpty, so `--plan` ran against
+# a build that no longer existed. The OLD driver fell through to the spec-derived listing and
+# printed the message below anyway; S5 removed that fall-through, so the absent README now
+# refuses at check 42 and this arm asserted a branch it could no longer reach.
+reset_tree; readme tPlanEmpty; fixture
 hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against"
+
+# ---- TOOL-dHonouredPark-4 — the SET and its ORDER come from the GENERATED region -----------------
+# NOT EXECUTED IN THIS BUILD. A standing owner instruction of 2026-08-23 forbids running this kit's
+# self-test suites and no bar leg invokes this file, so these were written and syntax-checked and
+# nothing more. The compensating observation is in the unit's build record: `--plan` captured over
+# ALL 63 tracked builds before and after, unit SET identical on every one, ORDER moved on 11.
+# That is evidence about the DRIVER and none at all about these lines.
+
+# S5 — an ABSENT units region REFUSES. It used to fall through to the spec-derived listing, guarded
+# away by the outer `grep -qF`, while a MALFORMED one already refused.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+# NO PYTHON LAUNCHER. `check-python-resolver` bans a bare `python3` in a tracked script and this
+# suite has no resolver in scope, so the marker pair is stripped with grep instead.
+_tmp_rm=$(mktemp)
+grep -v 'gen:build-units' memory/builds/tPlan/README.md > "$_tmp_rm"
+mv "$_tmp_rm" memory/builds/tPlan/README.md
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region:"
+miss "$out" "ARCH-tPlan-1"
+
+# S1/S2 — the region's ORDER wins, and it is not the spec files' path order. `units` replaces the
+# rendered body, so the two rows are deliberately written id-descending.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+mkspec tPlan ARCH-tPlan-2 SPECCED "S1 another" "AC1 it works" "the bar" "none"
+# R2-M4: the TARGET carries the id too, which is what `render_region` emits and what makes the
+# `head -1` dedup load-bearing. With `spec/two.md` targets the arm passed with the dedup deleted.
+setunits tPlan "| [ARCH-tPlan-2](spec/2026-08-01-spec-ARCH-tPlan-2.md) | SPECCED | rev-1 | 2026-08-01 |
+| [ARCH-tPlan-1](spec/2026-08-01-spec-ARCH-tPlan-1.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+out=$(run --plan tPlan)
+same "--plan lists the region's FIRST row first, not the lowest id" "$(printf '%s\n' "$out" | head -1 | awk '{print $1}')" "ARCH-tPlan-2"
+same "each unit appears ONCE — a row spells its id twice, in the link text and the target" "$(printf '%s\n' "$out" | grep -c '^ARCH-tPlan-1 ')" "1"
+
+# S7 — a region row whose id no tracked spec defines. Unreachable while the region is rendered from
+# those specs; S1 makes the state representable, so it gets a name rather than falling through.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan "| [ARCH-tPlan-9](spec/nine.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+hit "$(run --plan tPlan)" "NO TRACKED SPEC (rendered row without one)"
+
+# H2 (closing review) — the EMPTY case, which is the third vacuity shape and the one that shipped
+# broken. `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so the unit
+# loop ran zero times and this verb reported every spec terminal over a build full of SPECCED units.
+# That is the state of EVERY build between its first --write and the next one after spec #1 exists.
+# The generic form worth keeping: a verb deriving its unit SET from a region owes all THREE arms.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale:"
+miss "$out" "every tracked spec is terminal"
+
+# R2-H2 — and the guard must NOT fire where nothing renders. Seven live builds have specs with no
+# status header, so their region is legitimately empty; the first cut of this guard refused all seven
+# and named a repair that could not change the tree. The NOT A UNIT rows ARE the answer there.
+reset_tree; readme tPlan
+mkdir -p memory/builds/tPlan/spec
+printf '# not a spec
+
+no status header here.
+' > memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "so the region is stale"
+# R3-H1 — THE TAIL LINE IS PINNED. This arm asserted only the refusal's ABSENCE, so it stayed green
+# while the verb printed `next: none - every tracked spec is terminal` over a build it graded nothing
+# on. Both sibling arms carry this `miss`; this one dropped it, and a blocker shipped through the gap.
+miss "$out" "every tracked spec is terminal"
+hit "$out" "no tracked spec grades as a unit"
+
+# R3-H1, second shape — a spec that WAS meant to be one and failed to parse, which is the realistic
+# case. The fixture above uses a file that was never a spec at all, so it never exercised a build
+# whose author believed it had a unit.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+sed -i 's/^\*\*Status:\*\*/  **Status:**/' memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "every tracked spec is terminal"
+
+# R2-H1 — rows that name no unit of THIS build. Before the fold the loop iterated a substitution, so
+# this was indistinguishable from an empty region and the verb answered `next: none - every tracked
+# spec is terminal` at exit 0 — a false all-clear on the verb an agent reads to pick up work.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan "| [ARCH-tOther-9](spec/2026-08-01-spec-ARCH-tOther-9.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade:"
+miss "$out" "every tracked spec is terminal"
+
+# H1 (closing review) — a MALFORMED authored roster pair. `roster_ids` refuses it with exit 3, and
+# before the fold this verb discarded that status twice and printed "the authored pair names no id of
+# this build" — a sentence that is affirmatively FALSE over a pair that is malformed rather than
+# empty, and one the skill doc written in the same diff promises will not print.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+printf '\n%s\n%s\n' '<!-- roster:units -->' '<!-- roster:units -->' >> memory/builds/tPlan/README.md
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice:"
+miss "$out" "the authored pair names no id of this build"
+# R3-M5 — THE ORDERING IS ASSERTED, not just the message. R2-M3 hoisted this guard above the listing
+# so a malformed pair stops producing a complete-looking table first; the arm pinned only the refusal
+# TEXT, so moving the guard back below the listing kept the suite green. With the guard at the top the
+# verb returns before any unit row prints, so the fixture's id appears nowhere.
+miss "$out" "ARCH-tPlan-1"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.
@@ -2763,7 +2911,7 @@ hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 
 # refused correctly and the reader was told the offender was `other R9` — a true refusal for a
 # false reason, which is the kit's own recorded class sending them to the wrong field.
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a · b' --verdict PASS)" "leg [a · b]"
-hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'x --no-verify y' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg "$(printf 'a
 b')" --verdict PASS)" "a piece record field contains a newline, and these records are parsed line-wise, so this would forge a verdict row nothing wrote"
 
@@ -2817,6 +2965,12 @@ reset_tree
 # ---- ...and both writers REFUSE the flag at write time, which is the guard the citation above points
 # ---- at. The pair matters: the driver prevents, check 10 detects what landed anyway, and neither
 # ---- alone is the both-ends coverage the charter asks for on a guarded surface.
+# ---- THE FIXTURE IS REBUILT FIRST. The `reset_tree` above wipes `pc/` and `recs/`, so without this
+# ---- the driver refuses on "a piece record names a path that is not a file in this tree" and the
+# ---- bypass branch below is never reached — the arm asserted a message it could not provoke and
+# ---- read as this suite's own rot rather than as a fixture that had gone stale under it.
+mkdir -p pc/one recs recs2; printf 'a fixture piece
+' > pc/one/piece.md; git add -A >/dev/null
 hit "$(run --record-piece tRun --records-root recs --path pc/one/piece.md --leg 'a --no-verify b' --verdict PASS)" "a piece record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a --no-verify b' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag"
 
@@ -2855,7 +3009,7 @@ hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b'
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'a · reason b' --verdict PASS)" "leg [a · reason b]"
 # ...and a separator in the SET, which is the field the widening added and the message did not.
 hit "$(run --record-set tRun --records-root recs2 --run R1 --leg ok --verdict PASS --set 'AAAA · leg honest · verdict PASS')" "set [AAAA · leg honest · verdict PASS]"
-hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and a tracked evidence record carrying it is exactly as bad as a run-state file carrying one; say it without the literal flag:"
+hit "$(run --record-set tRun --records-root recs2 --run R1 --leg 'drop --no-verify' --verdict PASS)" "a set record field spells the declared bypass flag, and check 10 of the playbook leg greps every tracked record under a declared records root for it, so writing this would red the bar on a record no verb can rewrite; say it without the literal flag:"
 
 # ---- HIGH 2: the row dropper takes NO REGEX. Both writers spelled it as a `sed` ADDRESS carrying an
 # ---- unescaped caller-supplied leg name, so a leg named `.*` matched every verdict row and erased a
@@ -4435,3 +4589,4 @@ esac
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
+

@@ -18,6 +18,21 @@ governing docs that describe a tree this repo no longer has.
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aMendedLedger-1` | 2 | finish the memory rework: drain the ledger, drive the merge, re-true the docs |
+| 2 | `TOOL-aMendedLedger-2` | 2 | U1: the journal relocation pass, plus the three .md stub deletions |
+| 3 | `TOOL-aMendedLedger-3` | 2 | U2: retire the authored session ledger and resolve the drift probe |
+| 4 | `TOOL-aMendedLedger-4` | 2 | U3: make the hygiene gate and the adopter scaffold match the drained tree |
+| 5 | `TOOL-aMendedLedger-5` | 2 | U5: the row-keyed merge driver, its launcher shim and its wiring |
+| 6 | `TOOL-aMendedLedger-6` | 2 | U6: doc truth, the template edit, the residual sweep and the adopter note |
+| 7 | `TOOL-aMendedLedger-7` | 2 | U8: a fully keyed decision corpus |
+| 8 | `TOOL-aMendedLedger-8` | 2 | U9: the merge driver, redesigned around what git already gets right |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 8 unit(s) · node a · opened 2026-08-09 · streams tooling+playbook
 ids TOOL-aMendedLedger-1 TOOL-aMendedLedger-2 TOOL-aMendedLedger-3 TOOL-aMendedLedger-4 TOOL-aMendedLedger-5 TOOL-aMendedLedger-6 TOOL-aMendedLedger-7 TOOL-aMendedLedger-8 TOOL-aMendedLedger-9

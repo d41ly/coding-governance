@@ -47,13 +47,19 @@
 # that names a file deleted after it was written is correct, not stale. Rewriting one to please a
 # gate would be falsifying the record.
 #
-# WAIVERS are a tracked file, one `<path>:<line>` per row with a reason after whitespace, matching
-# `install-prefix-waivers.txt` exactly. Shrink-only, and a waiver whose hit is gone reds as stale.
+# WAIVERS are a tracked file, one `<path>\t<ordinal>\t<line-text>\t<reason>` per row. Shrink-only,
+# and a waiver whose resolved line is no longer a hit reds as stale.
+#
+# IT NO LONGER MATCHES `install-prefix-waivers.txt`, and the divergence is DELIBERATE rather than an
+# oversight to tidy away. That sibling is still `<path>:<line>` and carries the same line-drift
+# exposure; the owner ruled ONE file, and a registry moves when its own keying has actually failed,
+# not by association. Do not "restore" the parity.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "dead-paths: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
 WAIVERS="tools/dead-path-waivers.txt"
+TABC=$(printf '\t')
 # FROZEN SENTINEL. The needle derivation walks history and could go silently empty — a bad
 # `--diff-filter`, a shallow clone, a `git log` that stops answering — and an empty needle set makes
 # this gate pass by matching nothing, which is the vacuous-selector shape
@@ -130,9 +136,61 @@ hits=$(git grep -nE "$RE" -- ':(exclude)memory/*' \
                             ':(exclude)tools/check-dead-paths.test.sh' 2>/dev/null \
        | awk -F: '{print $1":"$2}' | sort -u)
 
-waived_rows=""
-[ -f "$WAIVERS" ] && waived_rows=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}')
-waived_n=$(printf '%s' "$waived_rows" | grep -c . || true)
+# --- resolve the registry -------------------------------------------------------------------------
+# TOOL-dHonouredPark-3. A row is keyed by TEXT and an occurrence ORDINAL, and resolving each one to
+# the `<path>:<line>` token it names is the WHOLE change: every set difference below is untouched, so
+# "stale" keeps the exact meaning line keying gave it -- MEMBERSHIP in the derived hit set, which
+# still reds a row whose line survives but whose needle left the derivation. A predicate asking only
+# "does this text still appear somewhere" would be strictly weaker and would waive nothing while
+# reporting green.
+#
+# A LINE WITH NO TAB IS A COMMENT, never a leading `#`: a waived line's own text may begin with one
+# and two rows on this tree point at `#` comment lines.
+#
+# ENVIRON, NEVER `awk -v`. A `-v` assignment expands backslash sequences, so a waived line holding a
+# literal `\n` -- there is one on this tree, the STATUS.md size fixture -- compares unequal to itself
+# and the row reads stale for a reason nobody could see. Measured on that row before this was
+# written; it fails RED rather than green, which is why it would have cost a debugging session
+# rather than a wrong verdict.
+waived_rows=""; malformed=""; unresolved=""
+if [ -f "$WAIVERS" ]; then
+  while IFS= read -r _row || [ -n "$_row" ]; do
+    case "$_row" in *"$TABC"*) ;; *) continue ;; esac
+    _wpath=${_row%%"$TABC"*}; _rest=${_row#*"$TABC"}
+    _word=${_rest%%"$TABC"*}; _rest=${_rest#*"$TABC"}
+    _wtext=${_rest%"$TABC"*}
+    case "$_word" in ''|*[!0-9]*) malformed="$malformed$_wpath:<ordinal [$_word] is not a positive integer>
+"; continue ;; esac
+    [ "$_word" -ge 1 ] 2>/dev/null || { malformed="$malformed$_wpath:<ordinal $_word is below 1>
+"; continue; }
+    if [ ! -f "$_wpath" ]; then
+      unresolved="$unresolved$_wpath:<file is gone>
+"; continue
+    fi
+    _hitline=$(NEEDLE="$_wtext" ORD="$_word" awk '
+        BEGIN { t = ENVIRON["NEEDLE"]; want = ENVIRON["ORD"] + 0; n = 0 }
+        { s = $0; sub(/\r$/, "", s); sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s)
+          if (s == t) { n++; if (n == want) { print NR; exit } } }
+        END { }' "$_wpath")
+    if [ -z "$_hitline" ]; then
+      unresolved="$unresolved$_wpath:<no occurrence $_word of that text>
+"; continue
+    fi
+    waived_rows="$waived_rows$_wpath:$_hitline
+"
+  done < "$WAIVERS"
+fi
+waived_rows=$(printf '%s' "$waived_rows" | grep -c . >/dev/null 2>&1 && printf '%s' "$waived_rows" | sed '/^$/d' || true)
+waived_n=$(printf '%s\n' "$waived_rows" | grep -c . || true)
+
+# A row that cannot be RESOLVED is reported by its own reason and never by omission. Dropping it from
+# the waived set would make it look like a row nobody wrote, and the carrier it excused would come
+# back as an ordinary unwaived hit with no trace of the waiver that stopped covering it.
+if [ -n "$malformed" ]; then
+  echo "dead-paths: MALFORMED waiver row(s) -- the ordinal is absent, zero or not a number:"
+  printf '%s' "$malformed" | sed '/^$/d' | sed 's/^/  /'
+  exit 1
+fi
 
 if [ "$MODE" = --list ]; then
   echo "dead-paths: $(printf '%s\n' "$hits" | grep -c .) hit(s) over $(printf '%s\n' "$needles" | grep -c .) derived needle(s)"
@@ -174,6 +232,14 @@ for w in $stale_rows; do
   [ "$stale" = 0 ] && echo "dead-paths: stale waiver(s) — the carrier they excuse is gone; delete the row:"
   stale=$((stale+1)); printf '  %s\n' "$w"
 done
+# UNRESOLVED rows are stale too, and are reported with the reason they could not resolve: the file is
+# gone, or the text was REWORDED and the carrier it excused no longer exists. Re-pointing such a row
+# at whatever now sits nearby is the proximity error that earned this whole re-key.
+if [ -n "$unresolved" ]; then
+  [ "$stale" = 0 ] && echo "dead-paths: stale waiver(s) — the carrier they excuse is gone; delete the row:"
+  printf '%s' "$unresolved" | sed '/^$/d' | sed 's/^/  /'
+  stale=$((stale+1))
+fi
 [ "$stale" = 0 ] || exit 1
 
 echo "dead-paths: clean — $(printf '%s\n' "$needles" | grep -c .) derived needle(s), $waived_n declared waiver(s), no undeclared carrier"

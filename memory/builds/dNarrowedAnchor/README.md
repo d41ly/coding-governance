@@ -52,6 +52,14 @@ the folder predates the run, so such a run has contradicted its own declaration 
   `TOOL-dNarrowedAnchor-2` rather than fixed here, because a suite repair inside a feature build is
   how an unrelated red gets attributed to the feature.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dNarrowedAnchor-1` | 2 | the second anchor is admissible per MODE, and `slug` is not one of them |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3

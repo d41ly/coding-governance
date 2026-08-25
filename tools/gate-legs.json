@@ -504,7 +504,8 @@
     ],
     "guard": [
       "tools/codebase-map/",
-      "tools/lib/"
+      "tools/lib/",
+      "tools/lexicon/"
     ],
     "chunk": "selftests",
     "subject": "kit"

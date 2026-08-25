@@ -37,6 +37,15 @@ while `AGENTS.md` calls that run the full bar. Making individual legs cheaper is
 floor stops being the sum and becomes the longest leg under load.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aTimedTurnstile-2` | 2 | diff-scope the self-test legs, keep the push boundary full |
+| 2 | `TOOL-aTimedTurnstile-5` | 2 | run the merge bar's legs concurrently |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aTimedTurnstile-1 TOOL-aTimedTurnstile-2 TOOL-aTimedTurnstile-3 TOOL-aTimedTurnstile-4 TOOL-aTimedTurnstile-5 TOOL-aTimedTurnstile-6 TOOL-aTimedTurnstile-7 TOOL-aTimedTurnstile-8

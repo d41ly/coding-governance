@@ -538,6 +538,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_marker_line",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -546,6 +551,11 @@
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_read_path",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "check_slot_table",
@@ -1993,6 +2003,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2048,6 +2063,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_object_state",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2071,6 +2091,11 @@
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "read_token_is_live",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "reconcile",

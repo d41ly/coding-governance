@@ -89,6 +89,17 @@ It does not widen the pool, shard a third time, or touch `gate-profiles.txt` —
 dead ends in that report. It does not fix `input_key`'s tree-not-commit hole, which
 `TOOL-aShardedFloor-4` would make routine rather than rare; that is its own unit and its own risk.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aShardedFloor-1` | 2 | record the turnstile queue wait in the run record |
+| 2 | `TOOL-aShardedFloor-2` | 2 | the shard contract, and the driver selftest split by it |
+| 3 | `TOOL-aShardedFloor-3` | 2 | the gate selftest, split by the same contract |
+| 4 | `TOOL-aShardedFloor-4` | 2 | the dispatch hint reads a repository-wide store |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-21 · streams tooling
 ids TOOL-aShardedFloor-1 TOOL-aShardedFloor-2 TOOL-aShardedFloor-3 TOOL-aShardedFloor-4

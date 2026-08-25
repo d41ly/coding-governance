@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.9 -->
+<!-- gov:kit unattended@1.10 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -21,8 +21,9 @@ check, not merely removed.
 The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
 that resolves at the anchor the project declares. On the default-branch anchor that means committed
 before the run's branch existed. The owner's act is `/unattended <slug>`, or — where the project
-admits the second anchor — an invocation carrying the authorizing parameter and the prose the build
-is scoped by. They author nothing per run except the reason text of a directive waiver, which
+admits the second anchor — an invocation carrying the authorizing parameter, whose spelling the
+project declares as `AUTH_PARAM` (§8) and whose ARGUMENT is the prose the build is scoped by, or a
+path to a file holding it. They author nothing per run except the reason text of a directive waiver, which
 `--preflight` records on their behalf (§10), and on the prompt path the prose itself plus whatever
 the agent asks at its single opening turn. Four properties, all mechanical:
 
@@ -424,10 +425,16 @@ what preserves the strong claim wherever the strong claim is available.
 - `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
   that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
   structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
-- `--plan` — prints each tracked spec's id, status and the build method's M2 classification, and
-  names the next unit. It COMPUTES that vocabulary and does not define it; M2 does. It joins the build README's roster region
-  against the tracked specs, so a planned unit nobody has specced is reported as MISSING, and a
-  roster whose markers are malformed is a named refusal rather than a complete-looking list.
+- `--plan` — takes its unit SET and its ORDER from the GENERATED units region, which is why its
+  "next" and `--status`'s are the same unit by construction rather than by coincidence. It prints
+  each unit's id, status and the build method's M2 classification, and names the next one. It
+  COMPUTES that vocabulary and does not define it; M2 does. It reads the SPEC FILES for two things
+  the region cannot carry: that classification, and the two `NOT A UNIT` conditions, since a file
+  with no parseable status header has no rendered row to appear in. A region that is absent OR
+  malformed is a named refusal, never a fall-back to the older spec-derived listing. It still joins
+  the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
+  specced is reported as MISSING — that question cannot be answered from a region rendered out of
+  the specs that exist.
 - `--status` — prints one line naming the current phase and the first non-terminal unit.
 - `--resume` — re-enters the run from the run-state file and must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the
@@ -493,6 +500,7 @@ where this document says it may:
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
 | `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch` and `published`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
+| `AUTH_PARAM` | the token an invocation must carry to start a prompt-mode run, rendered into the Skill at its routing row and its opening fence. BLANK or absent is the kit default, which that render states verbatim rather than this table restating it. Its ARGUMENT is a prompt file path or the prompt itself. A value that is not a hyphen-led flag, or that carries whitespace, a pipe or a backtick, is refused at render time — it is interpolated into a table row and a code span, and each of those three characters ends one of them early. Gates NOTHING at run time: no script sees the invocation, so this is the gesture and never the authorization, which stays the pushed build folder (§1) |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `DIRECTIVES_EXTRA` | project directive members, appended to the core set |
 | `DIRECTIVES_FLOOR` | the shrink-only SIZE of the kit's core directive set. MANDATORY, for the reason `CORE_FLOOR` is |
