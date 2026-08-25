@@ -1289,10 +1289,14 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     n_open = sum(1 for l in lines if check_marker(l, PLAN_OPEN))
     n_close = sum(1 for l in lines if check_marker(l, PLAN_CLOSE))
     # ...and a marker that is ALMOST the marker is its own violation, which is `region`'s `bad` arm.
+    # PREFIX, not containment. `region` tests `index(ln, m) == 1` — the marker at column 0 — and the
+    # first cut of this loop tested `m in s`, which fires on any line MENTIONING the marker. Prose
+    # that names the marker is not a malformed marker, and the fix for a two-answers-to-one-question
+    # defect had introduced a second, narrower one. Found by four lenses in the closing review.
     for i, l in enumerate(lines):
         s = l[:-1] if l.endswith("\r") else l
         for m in (PLAN_OPEN, PLAN_CLOSE):
-            if m in s and s != m:
+            if s.startswith(m) and s != m:
                 out.append((i + 1, "a roster marker line carries more than the marker itself, which "
                                    "the driver refuses at column 0: %r" % s[:60]))
     if n_open == 0 and n_close == 0:

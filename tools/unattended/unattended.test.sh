@@ -352,6 +352,22 @@ roster() { # slug · body   (pure shell: a python launcher here is unresolved, a
 # TOOL-aBoundedVerdict-11 - the GENERATED pair's fixture writer. The authorization scope moved off the
 # authored roster onto this region, so the arms below drive THIS. Appends a second pair when the
 # README already has one, which is exactly what the duplicate-pair arms need.
+# TOOL-dHonouredPark-4, closing review round 2. `units` APPENDS a pair to a README that `readme`
+# already gave one — which is what the malformed-pair arm WANTS, and what three arms written for the
+# absent/empty/NO-TRACKED-SPEC branches got by accident. All three built DUPLICATED-pair fixtures and
+# asserted branches they could never reach. This one REPLACES the rendered body instead.
+#
+# ENVIRON, never `awk -v`: a -v assignment expands backslash sequences, and a unit row is a value a
+# caller wrote rather than a literal this file controls.
+setunits() { # slug · body (an EMPTY body leaves a well-formed pair enclosing nothing)
+  local _t; _t=$(mktemp)
+  BODY="$2" awk '
+    BEGIN { b = ENVIRON["BODY"] }
+    $0 == "<!-- gen:build-units -->" { print; if (b != "") print b; skip = 1; next }
+    $0 == "<!-- /gen:build-units -->" { skip = 0 }
+    !skip { print }
+  ' "memory/builds/$1/README.md" > "$_t" && mv "$_t" "memory/builds/$1/README.md"
+}
 units() { # slug · body
   printf '
 %s
@@ -1522,8 +1538,11 @@ mkdir -p .git/index-blocked 2>/dev/null || true
 # ---- S4, the gap list. The states are the build method's M2 vocabulary, spelled exactly; what is
 # ---- asserted here is that this verb COMPUTES them, never that it defines them.
 mkspec() { # slug · id · status · scope · acceptance · gates · forks
+  # THE FILENAME IS DERIVED FROM THE ID, not pinned to `-1`. It was pinned, so a second call in one
+  # fixture silently OVERWROTE the first and any arm wanting two units got one. Backward compatible:
+  # every existing caller passes an id ending `-1`, which lands on the same path it always did.
   mkdir -p "memory/builds/$1/spec"
-  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-1.md" <<SPEC
+  cat > "memory/builds/$1/spec/2026-08-01-spec-$1-${2##*-}.md" <<SPEC
 # $2 — a unit
 
 **Status:** $3 · rev-1 · 2026-08-01 · node a · Tier-2 · base abcdef12 · streams architecture
@@ -1672,7 +1691,7 @@ miss "$out" "ARCH-tPlan-1"
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 mkspec tPlan ARCH-tPlan-2 SPECCED "S1 another" "AC1 it works" "the bar" "none"
-units tPlan "| [ARCH-tPlan-2](spec/two.md) | SPECCED | rev-1 | 2026-08-01 |
+setunits tPlan "| [ARCH-tPlan-2](spec/two.md) | SPECCED | rev-1 | 2026-08-01 |
 | [ARCH-tPlan-1](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |"
 fixture
 out=$(run --plan tPlan)
@@ -1683,7 +1702,7 @@ same "each unit appears ONCE — a row spells its id twice, in the link text and
 # those specs; S1 makes the state representable, so it gets a name rather than falling through.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
-units tPlan "| [ARCH-tPlan-9](spec/nine.md) | SPECCED | rev-1 | 2026-08-01 |"
+setunits tPlan "| [ARCH-tPlan-9](spec/nine.md) | SPECCED | rev-1 | 2026-08-01 |"
 fixture
 hit "$(run --plan tPlan)" "NO TRACKED SPEC (rendered row without one)"
 
@@ -1694,7 +1713,7 @@ hit "$(run --plan tPlan)" "NO TRACKED SPEC (rendered row without one)"
 # The generic form worth keeping: a verb deriving its unit SET from a region owes all THREE arms.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
-units tPlan ""
+setunits tPlan ""
 fixture
 out=$(run --plan tPlan)
 hit "$out" "the generated units region carries no unit rows, so this verb has no unit set to grade:"
