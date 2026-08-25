@@ -1691,8 +1691,10 @@ miss "$out" "ARCH-tPlan-1"
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 mkspec tPlan ARCH-tPlan-2 SPECCED "S1 another" "AC1 it works" "the bar" "none"
-setunits tPlan "| [ARCH-tPlan-2](spec/two.md) | SPECCED | rev-1 | 2026-08-01 |
-| [ARCH-tPlan-1](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |"
+# R2-M4: the TARGET carries the id too, which is what `render_region` emits and what makes the
+# `head -1` dedup load-bearing. With `spec/two.md` targets the arm passed with the dedup deleted.
+setunits tPlan "| [ARCH-tPlan-2](spec/2026-08-01-spec-ARCH-tPlan-2.md) | SPECCED | rev-1 | 2026-08-01 |
+| [ARCH-tPlan-1](spec/2026-08-01-spec-ARCH-tPlan-1.md) | SPECCED | rev-1 | 2026-08-01 |"
 fixture
 out=$(run --plan tPlan)
 same "--plan lists the region's FIRST row first, not the lowest id" "$(printf '%s\n' "$out" | head -1 | awk '{print $1}')" "ARCH-tPlan-2"
@@ -1716,7 +1718,33 @@ mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
 setunits tPlan ""
 fixture
 out=$(run --plan tPlan)
-hit "$out" "the generated units region carries no unit rows, so this verb has no unit set to grade:"
+hit "$out" "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale:"
+miss "$out" "every tracked spec is terminal"
+
+# R2-H2 — and the guard must NOT fire where nothing renders. Seven live builds have specs with no
+# status header, so their region is legitimately empty; the first cut of this guard refused all seven
+# and named a repair that could not change the tree. The NOT A UNIT rows ARE the answer there.
+reset_tree; readme tPlan
+mkdir -p memory/builds/tPlan/spec
+printf '# not a spec
+
+no status header here.
+' > memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "so the region is stale"
+
+# R2-H1 — rows that name no unit of THIS build. Before the fold the loop iterated a substitution, so
+# this was indistinguishable from an empty region and the verb answered `next: none - every tracked
+# spec is terminal` at exit 0 — a false all-clear on the verb an agent reads to pick up work.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+setunits tPlan "| [ARCH-tOther-9](spec/2026-08-01-spec-ARCH-tOther-9.md) | SPECCED | rev-1 | 2026-08-01 |"
+fixture
+out=$(run --plan tPlan)
+hit "$out" "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade:"
 miss "$out" "every tracked spec is terminal"
 
 # H1 (closing review) — a MALFORMED authored roster pair. `roster_ids` refuses it with exit 3, and

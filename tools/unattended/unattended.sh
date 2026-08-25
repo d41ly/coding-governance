@@ -1598,13 +1598,13 @@ verb_plan() { # slug
     fail 42 "the build README carries a units marker but not exactly one well-formed pair, so the roster this verb would join against is not a single slice: $_rmp"
     return 1
   fi
-  # H2 — the EMPTY case. `region` exits 0 with empty stdout for a well-formed pair enclosing nothing,
-  # so the unit loop below would run zero times and this verb would report `next: none - every
-  # tracked spec is terminal` over a build full of SPECCED units. That is the state of EVERY build
-  # between its first --write and the next one after spec #1 exists. `build-complete` spells this
-  # guard already; this verb took two of its three and not the one that matters most often.
-  if [ -z "$(unit_rows "$_rmp")" ]; then
-    fail 42 "the generated units region carries no unit rows, so this verb has no unit set to grade: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+  # R2-M3 — THE ROSTER IS RESOLVED HERE, beside the other region guards and before a single row is
+  # printed. It used to sit after the whole listing, so a malformed pair produced a complete-looking
+  # table and only then a refusal; and the arm that was meant to catch that asserted the refusal TEXT
+  # without looking at the table above it, which is how it shipped.
+  local _rids
+  if ! _rids=$(roster_ids "$slug"); then
+    fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice: $_rmp"
     return 1
   fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
@@ -1617,7 +1617,7 @@ verb_plan() { # slug
   # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
   # the second, which the driver's own comment below already states - so the second is armed by
   # fixture or not at all.
-  local _sid
+  local _sid _renderable=0
   for spec in $specs; do
     st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
     if [ -z "$st" ]; then
@@ -1625,8 +1625,25 @@ verb_plan() { # slug
       continue
     fi
     _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
-    [ -n "$_sid" ] || printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+    if [ -z "$_sid" ]; then
+      printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+      continue
+    fi
+    _renderable=$((_renderable+1))
   done
+
+  # R2-H2 — the EMPTY-REGION guard, ordered HERE and conditioned on `_renderable`. Above the two
+  # passes it refused on 7 of 63 live builds — every build whose specs render no row at all — and
+  # named `--write` as the repair on trees where `--check` was already clean, so the remedy was
+  # provably inert. A refusal whose fix cannot change anything is worse than the vacuity it replaced.
+  # Now it fires only where a spec that WOULD render a row exists and the region has none, which is
+  # the stale-render case it was written for; where nothing renders, the NOT A UNIT rows above ARE
+  # the answer.
+  local _rows; _rows=$(unit_rows "$_rmp")
+  if [ "$_renderable" -gt 0 ] && [ -z "$_rows" ]; then
+    fail 42 "the generated units region carries no unit rows but this build has specs that would render them, so the region is stale: $_rmp · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+    return 1
+  fi
   # S1/S2 - the SET and its ORDER come from the REGION, which is rendered in BUILD ORDER. `--status`
   # already reads it, so this makes three verbs agree instead of two disagreeing with a third. The
   # join key is the ID, never the row's LINK: `unit_rows` pattern-matches the link and never opens it,
@@ -1641,10 +1658,21 @@ verb_plan() { # slug
   # parser. A build slugged `tRun2` listed ZERO units beside a roster line reporting one, the two
   # halves of one report contradicting each other on screen. Scoping fixes the digit case and the
   # not-scoped case together, and matches `unit_ids_of` rather than adding a third spelling.
-  for id in $(unit_rows "$_rmp" | while IFS= read -r _row; do
+  # R2-H1 — COLLECTED FIRST, so "the region had rows and none of them named a unit of this build" is
+  # a state this verb can SEE. Iterating the substitution directly made it indistinguishable from an
+  # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
+  # false all-clear on the one verb an agent reads to pick up work.
+  local _ids
+  _ids=$(printf '%s
+' "$_rows" | while IFS= read -r _row; do
         printf '%s
 ' "$_row" | grep -oE "[A-Z]+-$slug-[0-9]+" | head -1
-      done); do
+      done)
+  if [ -n "$_rows" ] && [ -z "$_ids" ]; then
+    fail 42 "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade: $_rmp"
+    return 1
+  fi
+  for id in $_ids; do
     spec=""
     for _c in $specs; do
       _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$_c")
@@ -1677,15 +1705,8 @@ verb_plan() { # slug
     nmiss=$((nmiss + 1))
     [ -n "$next" ] || next="$miss (MISSING - spec it first)"
   done
-  # H1 — RESOLVED ONCE, and its status read. Two `$( )` calls meant two discarded exit-3s, and the
-  # else-branch then printed "the authored pair names no id of this build" over a pair that was
-  # MALFORMED rather than empty — an affirmatively false sentence, and one this kit's own skill doc
-  # promises in the same diff that it will not print.
-  local _rids
-  if ! _rids=$(roster_ids "$slug"); then
-    fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice: $_rmp"
-    return 1
-  fi
+  # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
+  # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
   if [ -n "$_rids" ]; then
     echo "roster: the README roster region, $(printf '%s\n' "$_rids" | grep -c .) id(s); $nmiss with no tracked spec"
   else

@@ -894,7 +894,7 @@ def apply_region(readme_text: str, region: str, readme: str,
         # refuse — a divergence introduced by the very change that removed two others. It cannot be
         # demonstrated on an MSYS node, where the runtime strips CR before awk sees a byte, so it is
         # asserted at SOURCE level here rather than by a fixture that would pass either way.
-        return (line[:-1] if line.endswith(CR) else line) == mark
+        return check_marker_line(line, mark)
     opens = [i for i, l in enumerate(lines) if _is(l, mark_open)]
     closes = [i for i, l in enumerate(lines) if _is(l, mark_close)]
     if not opens and not closes:
@@ -962,10 +962,22 @@ def render_shards(builds: list, m: str) -> dict:
     return out
 
 
+def check_marker_line(line: str, mark: str) -> bool:
+    """The ONE spelling of "is this line exactly this marker", CR-stripped.
+
+    R2-L2 (closing review round 2). This predicate had FOUR live spellings in this file — two nested
+    `_is` helpers, `_marker_index`'s inline compare, and `slot_violations`' own — inside a module
+    whose comments forbid two answers to one question. They agreed, which is why nothing caught it;
+    the cost of four copies is that the NEXT edit makes them disagree, and this build already spent
+    two rounds on exactly that between this file and the driver.
+    """
+    return (line[:-1] if line.endswith(CR) else line) == mark
+
+
 def _marker_index(lines: list, mark: str):
     """The index of a marker line, or None. Same COLUMN-0, one-trailing-CR contract as apply_region."""
     for i, l in enumerate(lines):
-        if (l[:-1] if l.endswith(CR) else l) == mark:
+        if check_marker_line(l, mark):
             return i
     return None
 
@@ -1284,29 +1296,30 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     # trailing CR stripped and nothing else, so `l.strip()` here made this gate CERTIFY an indented
     # or trailing-space pair that the driver then refuses. That is the exact two-answers-to-one-
     # question defect S4 was written to prevent, reintroduced by the implementation of S4.
-    def check_marker(l, m):
-        return (l[:-1] if l.endswith("\r") else l) == m
-    n_open = sum(1 for l in lines if check_marker(l, PLAN_OPEN))
-    n_close = sum(1 for l in lines if check_marker(l, PLAN_CLOSE))
-    # ...and a marker that is ALMOST the marker is its own violation, which is `region`'s `bad` arm.
-    # PREFIX, not containment. `region` tests `index(ln, m) == 1` — the marker at column 0 — and the
-    # first cut of this loop tested `m in s`, which fires on any line MENTIONING the marker. Prose
-    # that names the marker is not a malformed marker, and the fix for a two-answers-to-one-question
-    # defect had introduced a second, narrower one. Found by four lenses in the closing review.
+    # R2-M2 — THE NEAR-MISS SET IS COMPUTED FIRST and reported on its own. A marker indented by two
+    # spaces is not an ABSENT marker and it is certainly not a DUPLICATED one, and the count branch
+    # said both: it saw zero of that marker and then blamed whichever count was not one. A reader
+    # sent to find a duplicate that does not exist reads the file twice and trusts the gate less.
+    near = []
     for i, l in enumerate(lines):
         s = l[:-1] if l.endswith("\r") else l
         for m in (PLAN_OPEN, PLAN_CLOSE):
-            if s.startswith(m) and s != m:
-                out.append((i + 1, "a roster marker line carries more than the marker itself, which "
-                                   "the driver refuses at column 0: %r" % s[:60]))
+            if s != m and (s.strip() == m or s.startswith(m)):
+                near.append((i + 1, "a roster marker line is not the marker alone — the driver "
+                                    "compares at column 0 with nothing before or after it: %r" % s[:60]))
+    if near:
+        out += near
+        return sorted(set(out))
+    n_open = sum(1 for l in lines if check_marker_line(l, PLAN_OPEN))
+    n_close = sum(1 for l in lines if check_marker_line(l, PLAN_CLOSE))
     if n_open == 0 and n_close == 0:
         out.append((1, "no authored %s pair, which every build README must carry" % PLAN_OPEN))
     elif n_open != 1 or n_close != 1:
-        out.append((1, "the authored roster pair is DUPLICATED — %d open and %d close marker(s), "
-                       "where exactly one of each is legal" % (n_open, n_close)))
+        out.append((1, "the authored roster pair is not exactly one open and one close marker — "
+                       "found %d open and %d close" % (n_open, n_close)))
     else:
-        oi = next(i for i, l in enumerate(lines) if check_marker(l, PLAN_OPEN))
-        ci = next(i for i, l in enumerate(lines) if check_marker(l, PLAN_CLOSE))
+        oi = next(i for i, l in enumerate(lines) if check_marker_line(l, PLAN_OPEN))
+        ci = next(i for i, l in enumerate(lines) if check_marker_line(l, PLAN_CLOSE))
         if ci < oi:
             out.append((ci + 1, "the authored roster pair is TRANSPOSED — the close marker precedes "
                                 "the open one"))
@@ -2007,9 +2020,23 @@ def do_selftest() -> int:
         # order, so an assertion built on it would accept what the driver refuses.
         arm("an ABSENT roster pair is named", "must carry",
             lambda: str(slot_violations(build_canon_readme(GOOD, plan=False), "x")))
-        arm("a DUPLICATED roster pair is named", "DUPLICATED",
+        # R2-M2: the message no longer says DUPLICATED, because it was said over files where nothing
+        # was duplicated — a whitespace-perturbed marker counted as absent and then blamed the count.
+        arm("a roster pair that is not exactly one open and one close is named", "found 2 open and 1 close",
             lambda: str(slot_violations(build_canon_readme(GOOD)
                                         .replace(PLAN_OPEN, PLAN_OPEN + "\n" + PLAN_OPEN, 1), "x")))
+        # R2-M2 / R2-L1 — a marker perturbed by whitespace is NOT absent and NOT duplicated, and the
+        # count branch said both. These two arms are the branch's first failing case: it shipped with
+        # no arm at all, so nobody had ever seen it red.
+        arm("an INDENTED roster marker is named as not-the-marker-alone", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x")))
+        arm("...and is NOT reported as duplicated", "False",
+            lambda: str("DUPLICATED" in str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x"))))
+        arm("a TRAILING-SPACE roster marker is named the same way", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, PLAN_OPEN + " ", 1), "x")))
         arm("a TRANSPOSED roster pair is named", "TRANSPOSED",
             lambda: str(slot_violations("\n".join(
                 ["---", "slug: tOne", "---", "", "# tOne", ""] + GOOD
