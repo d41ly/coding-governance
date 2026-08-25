@@ -157,6 +157,17 @@ authrefuse "whitespace is refused"    '--prompt me'
 authrefuse "a pipe is refused"        '--pro|mpt'
 authrefuse "a backtick is refused"    '--pro`mpt'
 
+# A HOLED RENDER, refused on the WRITE path. TOOL-aNamedGesture-1 round 1, L1. This value passes the
+# character guard - it is hyphen-led and carries no whitespace, pipe or backtick - so it reaches
+# render(), where the LAST-substitution order deliberately lets it survive as a brace shape. Before
+# the fold that shape was only ever looked for under --check, so the adopter INSTALLED it at exit 0.
+AH="$TMP/authholed"; seed "$AH"; authconf "$AH" "'--{{LANDER}}'"
+( cd "$AH" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+# rc CAPTURED FIRST: `$?` read after the counter increment is the ASSIGNMENT's status, always 0.
+ahrc=$?
+n=$((n+1)); [ "$ahrc" != 0 ] || { echo "FAIL a holed render adopted at exit 0"; st=1; }
+absent "$AH/.claude/skills/unattended/SKILL.md" "a holed render wrote no Skill"
+
 # ---- ARM 2: a FOREIGN repo. The kit lives in host A; the caller runs it from host B. Nothing may be
 # ---- written into EITHER tree — not the caller's, and not the kit owner's.
 B="$TMP/other"; mkdir -p "$B"

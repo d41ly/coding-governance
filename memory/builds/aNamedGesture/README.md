@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-aNamedGesture-1 TOOL-aNamedGesture-2
+ids: TOOL-aNamedGesture-1 TOOL-aNamedGesture-2 TOOL-aNamedGesture-3
 ---
 
 # aNamedGesture — the authorizing parameter gets a name, and the name carries the build
@@ -60,15 +60,15 @@ the authorization and then declines to name it.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-25 · streams tooling
-ids TOOL-aNamedGesture-1 TOOL-aNamedGesture-2
+ids TOOL-aNamedGesture-1 TOOL-aNamedGesture-2 TOOL-aNamedGesture-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | INPROGRESS | rev-4 | 2026-08-25 |
+| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | INPROGRESS | rev-5 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

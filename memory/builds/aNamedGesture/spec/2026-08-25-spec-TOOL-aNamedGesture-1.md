@@ -1,12 +1,13 @@
 # TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build
 
-**Status:** INPROGRESS · rev-4 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
+**Status:** INPROGRESS · rev-5 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-25-build-TOOL-aNamedGesture-1-acceptance-ledger.md](../build/2026-08-25-build-TOOL-aNamedGesture-1-acceptance-ledger.md) | journal | — |
+| [2026-08-25-review-TOOL-aNamedGesture-1-diff-review-round1.md](../reviews/2026-08-25-review-TOOL-aNamedGesture-1-diff-review-round1.md) | diff-review | — |
 | [2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md](../reviews/2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -119,8 +120,15 @@ this one has a correct kit-owned default.
 `render()` performs its substitutions in sequence over one string. A conf value containing another
 key's placeholder text would be re-substituted by any pass that follows it. Appending
 `{{AUTH_PARAM}}` after `{{ANCHOR_SCOPE}}` means such a value survives into the output as a brace
-shape, where the existing surviving-placeholder arm reds it. Order is the fail-closed direction here,
-not a preference.
+shape, where a surviving-placeholder refusal reds it. Order is the fail-closed direction here, not a
+preference.
+
+**That refusal has to exist on BOTH paths, and it did not.** The shipped grep lived only inside the
+`--check` branch, so the ordering above produced the brace shape correctly and the WRITE path then
+installed the holed Skill at exit 0, with the operator learning about it on the next run from a
+message blaming an undeclared key. Round 1 L1: the refusal is hoisted beside the write path's
+empty-render assertion, and its fixture arm was observed RED before the fix landed. A fail-closed
+ORDERING is worth nothing without something that looks, on the path that writes.
 
 ### The value guard
 
@@ -354,6 +362,15 @@ codebase-map coverage and freshness legs · `govkit` selfcheck and selftest. The
 
 - rev-1 · 2026-08-25 · initial draft, after the owner replaced the opening thoroughness-word default
   with a mode-naming token and gave the parameter a path-or-prose argument.
+- rev-5 · 2026-08-25 · folded the closing diff review, workflow `wf_c30b408b-f64` — four lenses, 9
+  raised, 4 confirmed, 5 refuted, precision 0.44, verdict CLEAN WITH FIXES, no blockers and no highs.
+  Three distinct defects, all in this unit's own work. L1: the surviving-placeholder refusal the
+  substitution ORDER depends on lived only under `--check`, so the write path installed a holed Skill
+  at exit 0 — hoisted, with a fixture arm observed RED. L2: the movement block carried a MEASURED
+  figure that went stale inside this same build and was re-typed into the acceptance ledger, making a
+  declared 256 B margin really 253 — the literal is deleted and both carriers now point at
+  `corpus_ids.py --report`. L3: the map dossier claimed the driver and the leg read `AUTH_PARAM`;
+  neither does, and the same page said so two sections down.
 - rev-4 · 2026-08-25 · built. Two amendments the build itself forced. The backtick refusal is only
   reachable through a single-quoted conf declaration, because a double-quoted backtick is command
   substitution at source time — its first fixture passed by never triggering the rule. And the read-path

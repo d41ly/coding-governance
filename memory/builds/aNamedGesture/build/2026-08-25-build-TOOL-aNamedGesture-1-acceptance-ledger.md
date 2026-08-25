@@ -27,6 +27,9 @@ criterion.*
   `tools/unattended/adopt-unattended.sh`, every refusal arm failed — bare word, whitespace, pipe and
   backtick each reported *a malformed AUTH_PARAM adopted at exit 0* plus its companion
   *wrote no Skill* assertion. Restored; the suite returned to `PASS (53 assertions)`.
+  A SIXTH refusal arm was added at the fold — a value carrying another key's placeholder text,
+  `--{{LANDER}}` — and observed RED the same way: with the write-path refusal removed the suite
+  reported *a holed render adopted at exit 0* and *a holed render wrote no Skill*.
 - AC8 — `awk` slice of `## Start a run from a PROMPT` in the rendered Skill — carries
   `THE VALUE IS THE BUILD`, the fourth grammar row `has whitespace AND names a readable file`, the
   rule `goes to a RECORD, never into this README`, and the provenance clause `the path it came from`.
@@ -34,12 +37,24 @@ criterion.*
   `ANCHOR_SCOPE` present in the SKILL render's `placeholders` and in `[config] optional_keys`.
 - AC10 — `bash tools/check-kit-versions.sh` — exits 0, and `git grep -l 'unattended@1.9'` prints
   nothing across the whole tree. Eight carriers now read `1.10`.
-- AC11 — `bash tools/unattended/adopt-unattended.test.sh` and
-  `bash tools/unattended/cross-component.test.sh` — PENDING-XCOMP.
+- AC11 — PARTLY OBSERVED, and the shortfall is named rather than folded away.
+  `bash tools/unattended/adopt-unattended.test.sh` exits 0 at `PASS (53 assertions)`, including the
+  new fixture self-assertion that its render carries no surviving brace shape.
+  `bash tools/unattended/cross-component.test.sh` exits 1 — on arm 5, with
+  `UNATTENDED check 30 FAILED — check 30 walked no build whose --plan returned a verdict`. ATTRIBUTED
+  by baseline rather than assumed: a throwaway worktree at BASE `381008a1` runs the same suite to five
+  FAIL lines with the identical message on arms 3 and 3b, so the red predates this unit and this tip
+  fails fewer arms than its base. Filed as `TOOL-aNamedGesture-3`. This criterion is therefore
+  satisfied for the half this unit owns and OPEN for the half it does not.
 - AC12 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 after the `.unattended.conf` and
   `.memory-tree.conf` edits and the `last-audit` re-stamp.
-- AC13 — `bash tools/memory-tree/check-memory-hygiene.sh` — exits 0. `corpus_ids.py --report` measures
-  138876 B against the moved `READ_PATH_CEILING` of 139132, a margin of exactly the declared 256 B.
+- AC13 — AMENDED rev-5, then OBSERVED. The criterion as written at rev-4 was graded by re-typing a
+  measurement, and the measurement was stale within this build: the real figure at the fold is 3 B
+  larger, so the ceiling of 139132 carried a 253 B margin against a declared 256 while both carriers
+  agreed with each other. Round 1 L2. The witness is now the command, not a number:
+  `bash tools/memory-tree/check-memory-hygiene.sh` exits 0, and
+  `python tools/memory-tree/corpus_ids.py --report` subtracted from `READ_PATH_CEILING` in
+  `.memory-tree.conf` gives exactly 256. Ceiling now 139135.
 - AC14 — `bash tools/run-gates/run-gates.sh` — PENDING-BAR.
 
 ## What the criteria did NOT prove, stated rather than implied

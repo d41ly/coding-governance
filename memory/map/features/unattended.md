@@ -72,9 +72,12 @@ recorded reap — and the reaped item is labelled agent-attested wherever it is 
 spends the `--close` override budget.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
-bypass flag, the scheduler tool names and the token that authorizes a prompt-mode run all live in the
-repo-root `.unattended.conf`. The driver and
-the leg READ them; a phase token or a DoD item spelled into a script is a defect. The kit owns the
+bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
+the leg READ them; a phase token or a DoD item spelled into a script is a defect. `AUTH_PARAM` lives
+in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
+time, and its value reaches an agent only through the rendered Skill. Grouping it with the rest was
+round 1 L3 of `TOOL-aNamedGesture-1` — a prose claim about who reads a key, on a page whose own
+affordance section already said otherwise. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
 without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
 and the fleet already has a recorded case of a pin RAISE being indistinguishable from a drain.

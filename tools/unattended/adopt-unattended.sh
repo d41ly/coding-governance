@@ -294,6 +294,18 @@ render > "$TMPW" || { rm -f "$TMPW"; echo "unattended: the render FAILED — the
 # Write through a temp file and refuse an EMPTY one. Redirecting straight into the target truncated it
 # to zero bytes the instant sed failed, and then reported success.
 [ -s "$TMPW" ] || { rm -f "$TMPW"; echo "unattended: the render produced an EMPTY file — refusing to install it over the Skill"; exit 1; }
+# ...and refuse a HOLED one, on the WRITE path and not only under --check. TOOL-aNamedGesture-1 round 1,
+# L1. The identical grep lived only inside the --check branch, so the write path installed a Skill with
+# a surviving placeholder at exit 0 and the operator learned about it on the NEXT run, from a --check
+# message that blames an undeclared conf key rather than the value that carried the token. Reproducible
+# with a conf declaring a value that contains another key's placeholder text, which is exactly the case
+# the {{AUTH_PARAM}}-last substitution order was chosen to make fail closed - it produced the brace
+# shape correctly and then nothing on this path looked for it.
+if grep -qE '\{\{[A-Z_]+\}\}' "$TMPW"; then
+  echo "unattended: the render carries an unfilled placeholder — refusing to install it over the Skill"
+  grep -noE '\{\{[A-Z_]+\}\}' "$TMPW" | sort -u -t: -k2 | head -5 | sed 's/^/    /'
+  rm -f "$TMPW"; exit 1
+fi
 mv "$TMPW" "$SKILL_OUT"
 echo "unattended: rendered $SKILL_OUT"
 cat <<EOF
