@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md) | diff-review | TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 |
 | [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md) | spec-audit | TOOL-dPromptedSeam-2 |
 | [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md) | spec-audit | TOOL-dPromptedSeam-2 |
 | [2026-08-25-review-TOOL-dPromptedSeam-1-spec-audit.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-spec-audit.md) | spec-audit | — |

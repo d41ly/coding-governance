@@ -2,11 +2,13 @@
 
 # TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud
 
-**Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
+**Status:** CLOSED · rev-4 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md) | diff-review | TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 |
 
 <!-- /gen:spec-records -->
 
@@ -134,14 +136,27 @@ report a human reads, and gating a report's prose is how a report stops being ch
 ## 8. Open questions
 
 - **Q1 — must the inline set EQUAL `map_lib._STOPWORDS`, or may it be a subset?** RESOLVED (agent,
-  2026-08-25, delegated): EQUAL, and the docstring says so, because a subset would make the two kits
-  disagree about the same word silently. Nothing gates the pair — the layer ban forbids the import
-  that would let a parity check read both — so the docstring is the only carrier and it names that
-  limitation rather than implying coverage.
+  2026-08-25, delegated): EQUAL — and RE-RESOLVED by the closing review, which found the reason given
+  here was false. It said nothing could gate the pair because the layer ban forbids the import a
+  parity check needs. The ban is DIRECTIONAL and FILE-SCOPED: it forbids the lexicon importing the
+  map and says nothing about a third file importing both, and `tools/codebase-map/selftest.py`
+  already imports both. The parity arm lives there now and reds naming the drifted words. The false
+  reason was worse than the gap: it closed this question as RESOLVED and foreclosed the repair.
 - **Q2 — should a dead-object row print at all?** RESOLVED (agent, 2026-08-25, delegated): yes,
   without the marker, per D4. Deleting it would hide a true observation to fix a false label.
 
 ## 9. Revision log
+
+- rev-4 · 2026-08-25 · node d · CLOSED. Closing diff review round 1 folded. B1: symbols.json was
+  never regenerated for this unit two definitions, which reds an UNGUARDED merge-bar leg and would
+  have blocked the push. M1/M2: the DEAD_TOKENS docstring claimed the map_lib parity could not be
+  gated; the layer ban is directional and file-scoped, codebase-map selftest already imports both,
+  and the arm now lives there and was watched to red on a removed word. L1: the withheld-marker
+  label said STOPWORD on a branch that also fires by length. L3: the change comment blamed the
+  truthiness filter for dropping dead-tail objects, which it never did. L4: run_brief re-derived
+  the liveness rule inline instead of calling the helper written for it. L2 is REFUTED, not folded
+  — it claimed the 11-of-31 denominator does not reproduce; measured in a detached worktree at BASE
+  ee6554c3 it is exactly 11 of 31, and the spec figure stands.
 
 - rev-3 · 2026-08-25 · node d · CLOSED. S1-S4 built and every criterion observed: AC1 the  row
   loses the marker while four live rows keep it, AC2 three distinct states, AC3 six no-object

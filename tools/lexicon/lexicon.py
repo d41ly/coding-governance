@@ -856,9 +856,14 @@ def run_suggest(root: Path, name: str) -> int:
 #: The 21 words `map_lib._STOPWORDS` holds, RESTATED rather than imported. `.lexicon.conf` declares
 #: `tools/lexicon/* -> tools/codebase-map/*` forbidden and gives self-containment as the reason, so
 #: the kit cannot read the authority it is copying. The set must EQUAL `map_lib`'s: a subset would
-#: make two kits disagree about the same word, silently. NOTHING GATES THAT EQUALITY — the same layer
-#: ban that forces the copy forbids the import a parity check would need — so this comment is the
-#: only carrier, and it says so rather than implying somebody is watching. TOOL-dPromptedSeam-3 Q1.
+#: make two kits disagree about the same word, silently.
+#:
+#: THE EQUALITY IS GATED, and the first draft of this comment said it could not be. That was false and
+#: the falsehood mattered, because it closed the spec's own open question as RESOLVED and foreclosed
+#: the repair. The `LAYERS` rule is DIRECTIONAL and FILE-SCOPED — `tools/lexicon/* -> tools/codebase-map/*`
+#: forbids THIS kit importing THAT one, and says nothing about a third file importing both.
+#: `tools/codebase-map/selftest.py` already imports `lexicon` and `map_lib` together, which is where
+#: the parity arm now lives. TOOL-dPromptedSeam-3 Q1, corrected by the closing review.
 DEAD_TOKENS = frozenset(
     "a an the to of in on for and or is be as at by from into with it this that".split())
 
@@ -955,9 +960,11 @@ def run_brief(root: Path, target: str) -> int:
         print(f"lexicon: {rel} cannot be read as source, so its objects cannot be listed: {exc}")
         return 2
     names = [n for n, _ln in (got[0] if got else [])]
-    # THE THREE GROUPS ARE KEPT APART, and the filter that used to collapse them is gone. This line
-    # was `if read_object(n)`, which is truthiness — so a single-token definition and an
-    # all-stopword object were both dropped, and the reader was told about neither. S3.
+    # THE THREE GROUPS ARE KEPT APART. This line was `if read_object(n)`, which is truthiness — and
+    # that dropped exactly ONE group, the single-token names, silently. It did NOT drop the dead-tail
+    # objects: `pin_of` returns `"of"`, which is truthy, so those were kept and REPORTED, and what
+    # they were reported as was the false shared-concept row this unit removes. Two defects, one
+    # line apart, and the first draft of this comment blamed the filter for both. L3.
     states = {n: read_object_state(n) for n in names}
     here = sorted({read_object(n) for n in names if states[n] != "none"})
     noneless = sorted(n for n in names if states[n] == "none")
@@ -969,6 +976,7 @@ def run_brief(root: Path, target: str) -> int:
         return 0
 
     live: dict = {}
+    spellings_of: dict = {}
     for f in tracked_files(root):
         e = ext_of(f)
         if e not in declared:
@@ -987,6 +995,9 @@ def run_brief(root: Path, target: str) -> int:
             if obj:
                 live.setdefault(obj, {}).setdefault(leading_verb(n) or "?", 0)
                 live[obj][leading_verb(n) or "?"] += 1
+                # One identifier per object is enough to ask the helper for a verdict, and keeping a
+                # real one means the rule is never re-derived from the object string. L4.
+                spellings_of.setdefault(obj, set()).add(n)
 
     verbs = conf.get("VERBS") or {}
     print("this prints what the corpus DOES, never what it should do — it decides nothing")
@@ -999,9 +1010,16 @@ def run_brief(root: Path, target: str) -> int:
         # calling them one concept spelled three ways is a false one. Measured before this changed:
         # 11 of the 31 files whose `--brief` printed any multi-spelling row printed at least one
         # that was false, `map_lib.py` two of them. S2, and D4 on why the row survives the marker.
-        dead = not any(read_token_is_live(t) for t in subtokens(obj))
+        # ONE READER OF THE RULE, not two. The first cut re-derived `any(read_token_is_live(...))`
+        # here, three lines from the helper that exists to answer exactly this — so the same rule had
+        # two spellings and the second would have drifted. `read_object_state` takes the IDENTIFIER,
+        # and every name sharing this object yields it, so any one of them answers for the row. L4.
+        dead = read_object_state(next(iter(sorted(spellings_of[obj])))) == "dead"
         if len(seen) > 1 and dead:
-            flag = "  (shared STOPWORD tail, not a shared concept)"
+            # NOT "STOPWORD": a token dies by membership OR by being shorter than two characters, and
+            # this branch fires for both. Naming only the first would print a reason that is wrong for
+            # every length-dead object — a correct verdict under a false explanation. L1.
+            flag = "  (shared DEAD tail — a stopword or a one-character token, not a shared concept)"
         elif len(seen) > 1:
             flag = "  <-- SPELLED MORE THAN ONE WAY"
         else:

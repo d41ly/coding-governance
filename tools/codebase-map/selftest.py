@@ -1116,6 +1116,23 @@ def test_js_probe_against_the_lexicon():
         import lexicon_conf as lxc
     finally:
         sys.path.pop(0)
+    # THE STOPWORD PARITY, and this file is the only legal home for it. `.lexicon.conf` forbids
+    # `tools/lexicon/* -> tools/codebase-map/*`, so the lexicon may not import `map_lib` and must
+    # restate the 21-word set inline. The ban is DIRECTIONAL and FILE-SCOPED: it says nothing about a
+    # third file importing both, and this one already imports both. So the equality the lexicon's own
+    # docstring can only assert is asserted HERE, where it can actually be read.
+    # TOOL-dPromptedSeam-3, added by the closing review after the lexicon-side comment claimed no
+    # such check could exist.
+    if lx.DEAD_TOKENS != m._STOPWORDS:
+        only_lex = sorted(lx.DEAD_TOKENS - m._STOPWORDS)
+        only_map = sorted(m._STOPWORDS - lx.DEAD_TOKENS)
+        fail("lexicon.DEAD_TOKENS has drifted from map_lib._STOPWORDS — the lexicon restates this set "
+             "because the layer ban forbids importing it, so nothing but this arm can see them "
+             f"disagree. only in lexicon: {only_lex or 'none'}; only in map_lib: {only_map or 'none'}")
+    else:
+        print(f"     ok stopword parity: lexicon.DEAD_TOKENS == map_lib._STOPWORDS "
+              f"({len(m._STOPWORDS)} words)")
+
     root = m.repo_root()
     conf = lxc.load_conf(root / ".lexicon.conf")
     langs = {ext: (pset, mode) for ext, pset, mode in lxc.langs(conf) if mode != "dark"}

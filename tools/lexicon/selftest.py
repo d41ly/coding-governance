@@ -1037,7 +1037,7 @@ check("--brief keeps the marker on a LIVE shared object",
       "index:" in _o and "SPELLED MORE THAN ONE WAY" in _o.split("index:")[1].split(chr(10))[0], _o)
 check("--brief WITHHOLDS the marker on a dead shared object, and still prints the row",
       "of:" in _o and "SPELLED MORE THAN ONE WAY" not in _o.split("of:")[1].split(chr(10))[0]
-      and "STOPWORD" in _o.split("of:")[1].split(chr(10))[0], _o)
+      and "DEAD tail" in _o.split("of:")[1].split(chr(10))[0], _o)
 check("--brief reports the definitions with no object at all, rather than dropping them",
       "no object at all" in _o, _o)
 
