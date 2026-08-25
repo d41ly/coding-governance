@@ -1284,10 +1284,10 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     # trailing CR stripped and nothing else, so `l.strip()` here made this gate CERTIFY an indented
     # or trailing-space pair that the driver then refuses. That is the exact two-answers-to-one-
     # question defect S4 was written to prevent, reintroduced by the implementation of S4.
-    def _is(l, m):
+    def check_marker(l, m):
         return (l[:-1] if l.endswith("\r") else l) == m
-    n_open = sum(1 for l in lines if _is(l, PLAN_OPEN))
-    n_close = sum(1 for l in lines if _is(l, PLAN_CLOSE))
+    n_open = sum(1 for l in lines if check_marker(l, PLAN_OPEN))
+    n_close = sum(1 for l in lines if check_marker(l, PLAN_CLOSE))
     # ...and a marker that is ALMOST the marker is its own violation, which is `region`'s `bad` arm.
     for i, l in enumerate(lines):
         s = l[:-1] if l.endswith("\r") else l
@@ -1301,8 +1301,8 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
         out.append((1, "the authored roster pair is DUPLICATED — %d open and %d close marker(s), "
                        "where exactly one of each is legal" % (n_open, n_close)))
     else:
-        oi = next(i for i, l in enumerate(lines) if _is(l, PLAN_OPEN))
-        ci = next(i for i, l in enumerate(lines) if _is(l, PLAN_CLOSE))
+        oi = next(i for i, l in enumerate(lines) if check_marker(l, PLAN_OPEN))
+        ci = next(i for i, l in enumerate(lines) if check_marker(l, PLAN_CLOSE))
         if ci < oi:
             out.append((ci + 1, "the authored roster pair is TRANSPOSED — the close marker precedes "
                                 "the open one"))
