@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-14 — post-write verification, with index rollback
 
-**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -49,9 +49,12 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   The population is known before the write, which is the same fact S2 already depends on, so the
   baseline needs no second classification pass. A kit the run did not touch is executed NEITHER time:
   the baseline is bounded to exactly the kits S4 was already going to check, so it never becomes the
-  whole-bar run §3 rejects. Such a kit is printed once as `not-run` and counted under its own
-  tally. That state is owned here rather than by S1's helper, which returns only the three states
-  a check that RAN can produce: a kit nothing executed has no check result to return.
+  whole-bar run §3 rejects. A CLAIMED kit the run did not touch is printed once as `not-run` and
+  counted under its own tally; an unclaimed registry entry is not one of these — `cmd_update`
+  already prints it as `available (not installed)` at `:3027-3032`, and a second line about the
+  same kit is two answers to one question. That state is owned here rather than by S1's helper,
+  which returns only the three states a check that RAN can produce: a kit nothing executed has no
+  check result to return.
 - **S5** — the rollback keys on the TRANSITION, never on the after-state alone. A kit that was
   `adopted` at baseline and `landed-but-inert` after is rolled back, that kit only: for each of its
   touched paths, `git -C <target> update-index --cacheinfo <mode>,<oid>,<path>` then `git -C <target>
@@ -192,10 +195,10 @@ reds at the baseline as well.
   reds, the other kit's paths are staged at the new bytes and its rows carry the `--to` commit.
 - **AC6** — Only touched kits run, twice each. In a fixture claiming three kits where one moves
   rows, exactly TWO `[check].argv` subprocesses are observed — S4's baseline and S4's after-pass
-  over the one touched kit — and the tally names the other two kits as `not-run` with zero
-  subprocesses for them. The arm fails both against a draft that baselines every claimed kit (six
-  subprocesses, the whole-bar behaviour §3 refuses) and against one that skips the baseline (one
-  subprocess, the wedge AC9 exists to close).
+  over the one touched kit — and the other two claimed kits each print one `not-run` line and the
+  `not-run` tally reads 2, with zero subprocesses for them. The arm fails both against a draft
+  that baselines every claimed kit (six subprocesses, the whole-bar behaviour §3 refuses) and
+  against one that skips the baseline (one subprocess, the wedge AC9 exists to close).
 - **AC7** — A kit declaring `[check] = { none = "…" }` and a kit whose argv carries an unresolved
   token are both printed as `landed-unmeasured` and counted as **unverified**, and neither is counted
   as verified.
@@ -239,6 +242,14 @@ rather than waived.
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-25 · round-6 fold: L6 — rev-6 declared the `not-run` state in the scope item
+  that owns it, but left it UNSCOPED: "a kit the run did not touch", where §5 and AC6 both bound
+  it to CLAIMED kits. A builder implementing S4 as written prints a `not-run` line for every
+  registry entry the target does not claim, which `cmd_update` already prints as `available (not
+  installed)` at `:3027-3032` — two answers to one question, in the output of the verb built to
+  end silent partial installs. S4 now carries the bound and names that collision. AC6's "the
+  tally names the other two kits" is split into the LINE per kit and the COUNT, matching §5's two
+  outputs rather than giving one output two spellings.
 - rev-6 · 2026-08-25 · round-5 fold: M5 — AC6 asserted a tally state `not-run` that S1's
   return set, S8 and §5's enumeration all omitted, so a builder implementing §5 as written
   printed four tallies and reds the one criterion fencing S4's baseline. The state is added where

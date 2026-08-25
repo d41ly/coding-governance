@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-8 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -344,6 +344,12 @@ staying untouched in the diff is itself the assertion.
 
 ## 9. Revision log
 
+- rev-8 · 2026-08-25 · round-6 fold: L5 — §10's reuse audit still summarised the derivation as
+  reading the RECEIPT, after rev-7 rewrote S3 to take a SEQUENCE OF PAIRS because it has two
+  callers. The polarity was reversed by that fold rather than pre-existing it, so the two
+  sentences answered one question two ways. §10 now says `alpha` reads what its CALLER supplies:
+  the receipt from `cmd_update`, the run's own planned pairs from `adopt`. Same
+  one-sentence-left-behind shape rev-7's own M4 filed, one section over.
 - rev-7 · 2026-08-25 · round-5 fold: M4 — S3 still said the map is derived from the RECEIPT
   after the round-4 fold gave the derivation a second caller in §8 F3 and §10. It is the
   normative scope item `-13` S4a cites, so a builder read it and wrote a helper taking receipt
@@ -413,8 +419,10 @@ and `rule_relpath` (`:172`) already know how a source maps to a destination, and
 would look like reuse. They answer for the descriptor as it reads TODAY, while `alpha` must answer
 for what the target actually installed, possibly at a different gov commit and a different `prefix`.
 Reusing them would make the map drift with the registry — the same two-spellings-of-one-fact class
-`-1` exists to close, re-created one layer down. `alpha` therefore reads the receipt, which is the
-only record of what was taken, and no new seam is created: the derivation is a private helper with
-two callers. The first is `cmd_update` (`:2918`), which feeds it the receipt. The second is the
-`adopt` verb `-13` adds, which feeds it the planned descriptor pairs of that run, because at
-bootstrap no receipt exists yet — §8 F3 records why that is not a re-opening of the fork.
+`-1` exists to close, re-created one layer down. `alpha` therefore reads what its CALLER supplies
+rather than re-resolving the descriptors — the receipt from `cmd_update`, since it is the only
+record of what was taken, and the run's own planned pairs from `adopt`, which has no receipt yet
+(S3). No new seam is created: the derivation is a private helper with two callers. The first is
+`cmd_update` (`:2918`), which feeds it the receipt. The second is the `adopt` verb `-13` adds,
+which feeds it the planned descriptor pairs of that run, because at bootstrap no receipt
+exists yet — §8 F3 records why that is not a re-opening of the fork.

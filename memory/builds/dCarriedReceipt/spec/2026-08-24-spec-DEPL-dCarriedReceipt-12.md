@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -106,12 +106,16 @@ land; its snapshot and baseline are steps 10 and 11, whose relative order is fre
 Two things in that table are load-bearing rather than arbitrary, and the first is easy to get
 backwards. **Steps 4 and 5 are in the PREAMBLE and step 6 is inside the classification loop**, so the
 integrity check runs BEFORE the unattributed skip and cannot lean on it. That is precisely why `-7`
-S9 is scoped by FIELD PRESENCE rather than by `role` or by `evidence`: an unattributed row carries
-neither field, so S9 has nothing to assert about it and passes over it silently, and the row is
-skipped by name two steps later. Scope S9 by role instead and it would have to know a classification
-that has not happened yet; scope it by nothing and it refuses on all 41 of inCMS's unattributable
-rows and no adopter ever updates. Second, **steps 1–5 precede everything per-row**, because a
-refusal that depends on which rows a receipt happens to hold is a refusal an operator cannot predict.
+S9 is scoped by FIELD PRESENCE rather than by `evidence`: an unattributed row carries neither
+field, so S9 has nothing to assert about it and passes over it silently, and the row is skipped by
+name two steps later. Scope S9 by `evidence` instead and it would have to know a classification
+that has not happened yet — `evidence` is `-13`'s field and is exactly what step 6 keys on. `role`
+is different: it is on every row `apply` and `adopt` write and is read at `:2973` before the
+dispatch resolves at `:2974`, which is why S9's one exemption by ROLE (`-7` §8 F4) needs no later
+precondition and does not re-open this ordering. Scope it by nothing and it refuses on all 41 of
+inCMS's unattributable rows and no adopter ever updates. Second, **steps 1–5 precede everything
+per-row**, because a refusal that depends on which rows a receipt happens to hold is a refusal an
+operator cannot predict.
 
 ### Data model
 
@@ -209,6 +213,14 @@ every one needs an arm asserting it, which is the join's declared contract.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · round-6 fold: H1 — §4's ordering prose still argued that `-7` S9 CANNOT
+  be scoped by `role`, which is exactly what S9's fourth arm now does. The round-5 narrowing
+  landed in `-7` and not here, and `-12` is README step 2 while `-7` is step 3, so a builder met
+  an emphatic impossibility argument before meeting the ruling. The paragraph now contrasts
+  `role` against `evidence` alone: `role` is stored on every row `apply` and `adopt` write and is
+  read at `:2973` one line before the dispatch resolves at `:2974`, so the exemption (`-7` §8 F4)
+  needs no classification to have happened. The "scope it by nothing" clause and the 41-row
+  measurement are untouched — both are correct and neither is about `role`.
 - rev-5 · 2026-08-25 · round-4 fold: H5 restates S4's first carve-out — a STAGED deletion is dirty
   and refuses, a COMMITTED one is not — and deletes the false claim that the carve-out is what buys
   `-9` AC9 and AC10, with AC9 added over both states. M1 renumbers §4's ordering table 1..12 with no

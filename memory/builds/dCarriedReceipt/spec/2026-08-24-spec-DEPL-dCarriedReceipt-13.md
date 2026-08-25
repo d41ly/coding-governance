@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap
 
-**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -111,7 +111,8 @@ reaches either target without it.
   This precondition and `-7` S9's integrity assertion are SEQUENTIAL rather than competing. S9 runs
   first, in `cmd_update`'s preamble over the whole receipt, and is scoped by field presence,
   so it passes over a row carrying neither field rather than refusing on it; this precondition then
-  catches that row inside the classification loop.
+  catches such a row inside the classification loop only when it carries
+  `evidence: "unattributed"`.
 - **S8** — three refusals: `--target` resolving to the gov checkout (the form at `:2930`); an existing
   `install.json` without `--re-adopt`, on `cmd_intake`'s stated reasoning (`:3186-3191`) that a
   committed authorization is not something a verb silently rewrites; and a dirty target index.
@@ -181,10 +182,14 @@ reaches either target without it.
 
 ### Data model
 
-Each written row carries the receipt shape `apply` already produces at `:2458-2460` — `path`, `role`,
-`kit`, `version`, `sha256`, `source`, `commit` — plus `-7`'s `gov_oid` and `oid`, `-9`'s `carry`, and
-this unit's `evidence`. `evidence` takes exactly `"apply"`, `"vintage-match"`, `"pinned"` or
-`"unattributed"`.
+Each DESTINATION row — the rows S1–S7 describe, built from `resolve_entry`'s two channels — carries
+the receipt shape `apply` already produces at `:2458-2460` — `path`, `role`, `kit`, `version`,
+`sha256`, `source`, `commit` — plus `-7`'s `gov_oid` and `oid`, `-9`'s `carry`, and this unit's
+`evidence`. S11's two synthesized classes carry none of `sha256`, `gov_oid`, `oid` or `evidence`;
+S11 states each absence and why, and this table does not restate them. `evidence` takes exactly
+`"apply"`, `"vintage-match"`, `"pinned"` or `"unattributed"` on every row that carries it, and is
+ABSENT on S11's two classes — absence is the fifth state and is NOT a synonym for
+`"unattributed"`, which is what S7's skip keys on.
 
 `sha256` is `_sha` of the TARGET's bytes at the moment the receipt is written. That is a NARROWING
 of what `apply` records at `:2459`, which hashes `data = blob_at(root, commit, src)` (`:2453`) —
@@ -350,7 +355,9 @@ AC12 asserts.
   carries none of `orders`, `baseline`, `after`, `hook_block`, `gate_runner`. The value of
   `gov_commit` equals the resolved `--to`, and `install.sums` is non-empty, carrying one line per
   row that carries a `sha256` — the filter the writer at `:2828-2830` applies, `cmd_check`'s join
-  re-applies at `:1551` and `cmd_update` re-applies at `:3117-3119`. That is NOT the same set as
+  re-applies at `:1551` and `cmd_update` re-applies at BOTH its sidecar writers — `:3117-3119` on
+  a run that had findings and `:3128-3130` on the clean re-stamp — four sites in all, and a filter
+  changed at three of them reds `cmd_check`'s join at `:1552-1555`. That is NOT the same set as
   the rows carrying a `commit`: an `evidence: "unattributed"` row carries `sha256` with no
   `commit`, and a `merged` row carries `commit` with no `sha256`. `govkit.py check --target
   <fixture>` reports N lines compared against N hashed rows for that same N, and N greater than
@@ -444,6 +451,18 @@ file. The `selfcheck` verb-coverage arm must also see the new verb, so its asser
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-25 · round-6 fold: M4, L4 and L2's second half. M4 — §4's Data model still
+  declared `sha256`, `gov_oid`, `oid` and `evidence` universal over every written row, which
+  rev-6's own S5 and S11 had just made false for the two synthesized classes; taken literally it
+  put those rows into `install.sums`, which S5 forbids by name. The sentence is scoped to
+  DESTINATION rows and points at S11 for the rest, and `evidence`'s enumeration now names KEY
+  ABSENCE as the fifth state rather than letting it read as `"unattributed"`. L4 — AC10 named
+  three of the FOUR sites applying the `sha256` filter, carried verbatim from round-5 H1's own
+  finding text; the count was re-derived from the tree rather than copied, and the four are
+  `:1551`, `:2829`, `:3118` and `:3129`. The omitted one is the clean re-stamp, which runs on
+  every successful update and produces the sidecar an adopter actually holds. L2 — S7's own
+  sequencing clause said the precondition catches a row carrying neither identity field, which is
+  the field-absence reading the scope item's bolded rule refuses two paragraphs earlier.
 - rev-6 · 2026-08-25 · round-5 fold: B1 is resolved to Direction A in `-7` §8 F4, and S11 now
   STATES the choice rather than inheriting it: neither synthesized class carries `evidence`,
   `gov_oid` or `oid`, and a merged row's `commit` with no `gov_oid` is exempt from `-7` S9 by
