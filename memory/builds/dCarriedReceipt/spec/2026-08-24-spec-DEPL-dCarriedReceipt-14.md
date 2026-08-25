@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-14 — post-write verification, with index rollback
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -48,7 +48,9 @@ repo already declares how to measure whether it works: `[check].argv`, run per k
   The population is known before the write, which is the same fact S2 already depends on, so the
   baseline needs no second classification pass. A kit the run did not touch is executed NEITHER time:
   the baseline is bounded to exactly the kits S4 was already going to check, so it never becomes the
-  whole-bar run §3 rejects.
+  whole-bar run §3 rejects. Such a kit is printed once as `not-run` and counted under its own
+  tally. That state is owned here rather than by S1's helper, which returns only the three states
+  a check that RAN can produce: a kit nothing executed has no check result to return.
 - **S5** — the rollback keys on the TRANSITION, never on the after-state alone. A kit that was
   `adopted` at baseline and `landed-but-inert` after is rolled back, that kit only: for each of its
   touched paths, `git -C <target> update-index --cacheinfo <mode>,<oid>,<path>` then `git -C <target>
@@ -144,8 +146,9 @@ reds at the baseline as well.
 - error / empty / loading states — a check that crashes rather than exiting non-zero is treated as
   red and rolled back; a run that touched nothing runs no checks and says so; a `checkout-index` that
   itself fails is a refusal naming the path, never a silent partial restore.
-- observability — one line per touched kit carrying BOTH its states, one rolled-back-paths list per
-  rolled-back kit, and separate tallies for verified, unverified, rolled back and pre-existing red.
+- observability — one line per touched kit carrying BOTH its states, one `not-run` line per
+  claimed kit the run did not touch, one rolled-back-paths list per rolled-back kit, and separate
+  tallies for verified, unverified, not-run, rolled back and pre-existing red.
   Every one of those counts is printed even when it is zero, so an absence is never mistaken for
   coverage — a silent pre-existing-red tally would hide exactly the kits nothing verified.
 - risks — the wedge is the risk to name first. Rolling back on the after-state alone means a target
@@ -235,6 +238,12 @@ rather than waived.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · round-5 fold: M5 — AC6 asserted a tally state `not-run` that S1's
+  return set, S8 and §5's enumeration all omitted, so a builder implementing §5 as written
+  printed four tallies and reds the one criterion fencing S4's baseline. The state is added where
+  it is owned: S4 declares it and says why S1's helper cannot supply it, and §5's observability
+  line prints a `not-run` line per untouched claimed kit and carries the fifth tally. AC6 is
+  unchanged; its subprocess half was already right.
 - rev-5 · 2026-08-25 · round-4 fold: B3 — the rollback snapshot enumerated four of the six fields
   `-11` S4 rewrites as a set, so a rolled-back rename kept `path`/`source` at their post-rename
   spelling beside `commit`/`gov_oid` at their pre-rename values, which is the

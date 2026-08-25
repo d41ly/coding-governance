@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -55,7 +55,10 @@ reaches either target without it.
 - **S5** — the row written: `role`, `sha256`, `gov_oid`, `oid`, `commit`, `carry`, and a new
   `evidence` field reading `"vintage-match"`. `apply` writes `"apply"`. An INFERRED base must never be
   mistaken for one a write produced, and today no receipt row carries any provenance-of-provenance
-  field at all.
+  field at all. Every destination row `adopt` writes carries `sha256`, attributed or
+  `unattributed`, because §8 F5 makes it the target's own bytes. S11's two synthesized classes do
+  not — `apply` gives neither the `attributes` row at `:2350` nor the merged row at `:2417` a
+  `sha256`, and `adopt` matches that — so neither appears in `install.sums`.
   **`role` comes from the rule `resolve_entry` returned for that destination, NEVER from the
   attribution outcome.** A rule declaring `forked` writes `role: "forked"` carrying that rule's
   `direction` and `record` even when the walk finds a match, and whatever `commit` and `gov_oid` the
@@ -122,7 +125,7 @@ reaches either target without it.
   | `gov_commit` | the resolved `--to` | `-12` S7/S8's vintage refusals; `-11` S0/S1's rename base at `:2938` |
   | `prefix` | `deploy["prefix"]` | destination resolution on a later `apply` |
   | `kits` | the claimed selection | `-2`'s pins arm; `:2957`'s `claimed` list |
-  | `files` | the rows S1–S7 describe | everything |
+  | `files` | the rows S1–S7 describe, plus S11's two synthesized classes | everything |
 
   `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are NOT written: each records what an
   install DID, and this verb installs nothing. Every one of their readers already tolerates absence
@@ -144,6 +147,16 @@ reaches either target without it.
   `:2428-2429`. Without both, `-2`'s `pins` arm never dispatches and `cmd_check`'s merged loop raises
   on `row['block_id']` at `:1570`.
 
+  **Neither synthesized class carries `evidence`, and neither carries `gov_oid` or `oid`.** Both
+  are measured from the target's own bytes rather than attributed to a gov vintage, and S7's skip
+  is keyed on `evidence: "unattributed"`, so both dispatch through `UPDATE_ROLE` unconditionally.
+  The identity half is STATED here rather than inherited from the shape it copies, because a
+  merged row's `commit` with no `gov_oid` is exactly `-7` S9's exactly-one refusal shape. That
+  fork was resolved by exempting role `merged` from that preamble rather than by giving the row
+  both identities — the ruling is `-7` §8 F4, whose reasoning is the round-5 part-2 review
+  record — and `adopt` writes the same row `apply` writes, so it inherits the same exemption
+  and adds no second reading of it.
+
 ## 3. Non-goals (OUT)
 
 - **Not** refusing when some rows fail to attribute. Partial attribution is the normal state of a
@@ -159,8 +172,8 @@ reaches either target without it.
   the source path the descriptor declares TODAY; `-11` owns renames on the update path.
 - **Not** installing an unadopted kit, and **not** `--force` or `--yes`. Both are cut-list items.
 - **Land-alone:** `adopt` needs `-1` (destinations), `-7` (two identities), `-9` (the rungs), `-10`
-  (role `forked`) and `-12` (the S7 vintage guard AC11 observes) beneath it. It cannot land before
-  them, and it is stated in section 8.
+  (role `forked`), `-12` (the S7 vintage guard AC11 observes) and `-2` (the `pins` disposition
+  AC13 and AC14 observe) beneath it. It cannot land before them, and it is stated in section 8.
 
 ## 4. Design
 
@@ -171,9 +184,11 @@ Each written row carries the receipt shape `apply` already produces at `:2458-24
 this unit's `evidence`. `evidence` takes exactly `"apply"`, `"vintage-match"`, `"pinned"` or
 `"unattributed"`.
 
-`sha256` is `_sha` of the TARGET's bytes at the moment the receipt is written — the same quantity
-`apply` records at `:2459` and the quantity `cmd_check`'s integrity loop compares at `:1513-1518` —
-so `install.sums` stays verifiable with `sha256sum -c` on a tree `adopt` did not touch. Without it,
+`sha256` is `_sha` of the TARGET's bytes at the moment the receipt is written. That is a NARROWING
+of what `apply` records at `:2459`, which hashes `data = blob_at(root, commit, src)` (`:2453`) —
+gov's blob, indistinguishable from the target's only while every row is `verbatim`. It is also what
+`cmd_check`'s integrity loop compares at `:1513-1518`, until `-8` S6 moves that loop onto `oid`. So
+`install.sums` stays verifiable with `sha256sum -c` on a tree `adopt` did not touch. Without it,
 `install.sums` (`:2828`) is empty, `cmd_check`'s sidecar join (`:1551`) compares zero rows against
 zero lines and passes, and its integrity loop counts every row as verified without hashing anything.
 Which bytes the field holds for a carried row is F5.
@@ -306,11 +321,14 @@ AC12 asserts.
   `relocate` while an older commit matches `verbatim`, the written row's `commit` is the older one and
   its `carry` is `"verbatim"`.
 - **AC6** — Partial attribution proceeds, under its OWN state. A fixture carrying one destination
-  that matches no gov vintage writes that row with `evidence: "unattributed"`, no `commit` and no
-  `gov_oid`, keeps the `role` its rule declared, and the run exits **0**. A following `update --write`
-  prints that row, writes zero bytes to it, and never reaches `classify_row` (`:3014`) for it. The
-  row's role is asserted to be its rule's, NOT `forked` — the arm fails if the two states are
-  collapsed back together.
+  whose rule declares role `engine` — so the row resolves at `:2974` to the `table` disposition
+  — and which matches no gov vintage writes that row with `evidence: "unattributed"`, no `commit`
+  and no `gov_oid`, keeps the `role` its rule declared, and the run exits **0**. A following
+  `update --write` prints that row, writes zero bytes to it, and never reaches `classify_row`
+  (`:3014`) for it. The row's role is asserted to be its rule's, NOT `forked` — the arm fails if
+  the two states are collapsed back together. AC14 owns the non-`table` roles, which dispatch
+  instead of skipping; the two criteria partition the population and neither generalizes to the
+  other's half.
 - **AC7** — `--pin <path>=<rev>` overrides the walk for that path only, and the row records
   `evidence: "pinned"` rather than `"vintage-match"`.
 - **AC8** — All three refusals fire by name: `--target` pointed at the gov checkout; a second `adopt`
@@ -328,9 +346,13 @@ AC12 asserts.
 - **AC10** — The envelope. After `python tools/govkit/govkit.py adopt --write --target <fixture>`,
   `install.json` carries `schema`, `gov_source`, `gov_commit`, `prefix`, `kits` and `files`, and
   carries none of `orders`, `baseline`, `after`, `hook_block`, `gate_runner`. The value of
-  `gov_commit` equals the resolved `--to`, and `install.sums` is non-empty, carrying one line per row
-  that carries a `commit`, with `govkit.py check --target <fixture>` reporting N lines compared
-  against N hashed rows for that same N.
+  `gov_commit` equals the resolved `--to`, and `install.sums` is non-empty, carrying one line per
+  row that carries a `sha256` — the filter the writer at `:2828-2830` applies, `cmd_check`'s join
+  re-applies at `:1551` and `cmd_update` re-applies at `:3117-3119`. That is NOT the same set as
+  the rows carrying a `commit`: an `evidence: "unattributed"` row carries `sha256` with no
+  `commit`, and a `merged` row carries `commit` with no `sha256`. `govkit.py check --target
+  <fixture>` reports N lines compared against N hashed rows for that same N, and N greater than
+  zero, because both sides render from one list and the equality is otherwise structural.
 - **AC11** — The envelope is LIVE, not merely present: immediately after that `adopt --write`,
   `govkit.py update --to <an older sha> --write` REFUSES by `-12` S7, naming both shas. Observe RED
   first: with `gov_commit` absent, `-12` S7 skips its own check by its own words and the run proceeds
@@ -352,12 +374,14 @@ AC12 asserts.
   `resolve_entry`'s two channels alone, `install.json` carries no `attributes` row, `-2`'s `pins` arm
   never dispatches, and `check` raises `KeyError` on `row['block_id']` at `:1570`.
 - **AC14** — S7's scoping, both ways. In a fixture whose bootstrapped receipt carries an
-  unattributed `seed` row and an unattributed `attributes` row, `update --write` dispatches BOTH
+  unattributed `seed` row and S11's synthesized `attributes` row, `update --write` dispatches BOTH
   through `UPDATE_ROLE` (`:2974`) rather than skipping them: the `seed` row reaches the seed override
   at `:3016-3020` and reports, the `attributes` row reaches `-2`'s `pins` arm and reports, and
-  neither writes a byte (`git -C <target> status --porcelain` empty). Observe RED first: under a skip
-  scoped by field-absence, or by anything wider than the `table` disposition, both rows are printed,
-  counted and skipped and neither disposition ever runs.
+  neither writes a byte (`git -C <target> status --porcelain` empty). Observe RED first: under a
+  skip scoped by FIELD ABSENCE, both rows are swallowed — the `seed` row carries no `commit` and
+  no `gov_oid`, and the `attributes` row carries neither by construction — and neither
+  disposition ever runs. A skip scoped by anything wider than the `table` disposition reds the
+  same way.
 
 ## 7. Gates
 
@@ -384,9 +408,11 @@ file. The `selfcheck` verb-coverage arm must also see the new verb, so its asser
 - **F3 — landing order.** This unit cannot land alone: it consumes `-1`'s destination resolution,
   `-7`'s two identities, `-9`'s rungs and `-10`'s `forked` role, and AC11 observes `-12` S7's vintage
   guard in both directions, so `-12` is a landing dependency of this unit's criteria rather than of
-  its code. It lands after all five, which is the build README's step 5.
-  RESOLVED (agent, 2026-08-24, delegated): lands after `-1`, `-7`, `-9`, `-10`, and after `-12`,
-  whose S7 vintage guard AC11 observes. The fifth was added 2026-08-25 in the round-4 fold.
+  its code. AC13 and AC14 observe `-2`'s `pins` disposition the same way, so `-2` is a criterion
+  dependency too. It lands after all six, which is the build README's step 5.
+  RESOLVED (agent, 2026-08-24, delegated): lands after `-1`, `-7`, `-9`, `-10`, after `-12`,
+  whose S7 vintage guard AC11 observes, and after `-2`, whose `pins` disposition AC13 and AC14
+  observe. The fifth was added 2026-08-25 in the round-4 fold and the sixth in the round-5 fold.
 - **F4 — do `--re-adopt` and `--pin` pass the flag test `-11` and `-12` share?** That test reads: a
   scope flag enables a NARROWER class of action, defaults OFF, and overrides no refusal. `--pin`
   passes on all three arms — it narrows the attribution of ONE named destination, defaults OFF, and
@@ -400,18 +426,34 @@ file. The `selfcheck` verb-coverage arm must also see the new verb, so its asser
   clean, `--re-adopt` passes with the released refusal named here.
 - **F5 — for a carried (`eol`/`relocate`) row, whose bytes does `sha256` hash: gov's at `commit`, or
   the target's on disk?** The TARGET's, at the moment the receipt is written. This row class is the
-  first place the two diverge, and three instruments already read the field that way: `cmd_apply`
-  hashes the bytes it wrote to the target (`data` at `:2459`), `-8`'s ratified Alternatives bullet
-  keeps `_sha(merged)` for the same reason, and `cmd_check`'s integrity loop compares the field
-  against the target's file (`:1513-1518`). It is also the only reading under which `install.sums`
-  survives a plain `sha256sum -c` on a tree `adopt` did not touch. `gov_oid` stays gov's blob at
-  `commit` per S5, so the two remain different facts and the inversion §4 warns about is untouched.
-  RESOLVED (agent, 2026-08-25, round-4 fold): the target's bytes at receipt-write time. Recorded as
-  the round-4 reviewer's inference from those three instruments rather than as a measured fact, and
+  first place the two diverge, and two instruments already read the field that way: `cmd_apply`
+  hashes the bytes it wrote to the target (`data` at `:2459`), and `-8`'s ratified Alternatives
+  bullet keeps `_sha(merged)` for the same reason. A third was cited here and is WITHDRAWN: `-8`
+  S6 moves both `cmd_check` loops onto `gov_oid` and `oid`, so by the time `adopt` lands no check
+  reads this field and `install.sums` is its only reader — which is what makes the choice free,
+  and what makes stating it in one place mandatory. That one place is `-7` §4's field
+  dictionary; this fork records the reasoning and does not restate the definition. It is also the
+  only reading under which `install.sums` survives a plain `sha256sum -c` on a tree `adopt` did
+  not touch. `gov_oid` stays gov's blob at `commit` per S5, so the two remain different facts and
+  the inversion §4 warns about is untouched.
+  RESOLVED (agent, 2026-08-25, delegated): the target's bytes at receipt-write time. Recorded as
+  the round-4 reviewer's inference from those instruments rather than as a measured fact, and
   flagged there as a decision the owner should ratify.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · round-5 fold: B1 is resolved to Direction A in `-7` §8 F4, and S11 now
+  STATES the choice rather than inheriting it: neither synthesized class carries `evidence`,
+  `gov_oid` or `oid`, and a merged row's `commit` with no `gov_oid` is exempt from `-7` S9 by
+  ROLE. That closes M3 as well, which asked S11 to decide the `evidence` question AC14 depends
+  on; AC14's fixture clause and RED arm are reworded onto the row S11 actually writes. H1 moves
+  AC10's `install.sums` predicate from `commit` to `sha256`, the filter all three call sites
+  apply, and S5 states the split once: every `adopt` destination row carries `sha256` and neither
+  synthesized class does. H2 makes §4's `sha256` sentence a NARROWING of `:2459` and withdraws
+  F5's `:1513-1518` instrument, which `-8` S6 removes before `adopt` ever runs. M1 adds `-2` to
+  §3's land-alone bullet and to F3, since AC13 and AC14 observe its `pins` disposition. M2
+  names AC6's fixture role `engine` and hands the non-`table` roles to AC14. L2 widens S10's
+  `files` cell onto S11's two classes.
 - rev-5 · 2026-08-25 · round-4 fold: B1 adds S4a — `adopt` derives `-9`'s `alpha` map from the
   planned `(src, dest)` pairs, because the receipt derivation `-9` F3 ratifies has no receipt to read
   at bootstrap — and AC12 observes it; without the map the `relocate` rung cannot fire and AC4 and

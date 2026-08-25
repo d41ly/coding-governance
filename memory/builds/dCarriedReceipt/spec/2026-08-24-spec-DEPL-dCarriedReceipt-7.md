@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -41,8 +41,11 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
 - **S1** — every receipt row gov writes for a LANDED file — the `writes` channel at
   `:2443-2460` — carries `gov_oid` and `oid`. A row written through the `unlanded` channel at
   `:2440` carries neither, as it carries no `commit` today, and this unit does not add them: there
-  are no gov bytes at that destination to hash. `sha256` is still written, is still what
-  `install.sums` lists, and decides no verdict.
+  are no gov bytes at that destination to hash. There is a THIRD channel. The `merged` row `apply`
+  writes at `:2417` carries `source` and `commit` but NEITHER identity — gov's bytes at that
+  destination are a BLOCK inside a file the target owns, so there is no whole-file gov blob to hash,
+  which is why `-8` keeps `block_sha256` for it. `sha256` is still written on the `writes` channel's
+  rows, is still what `install.sums` lists, and decides no verdict.
 - **S2** — `classify_row` reads ours as the target's INDEX blob, from one batched
   `git -C <target> ls-files -s -z --` over the receipt's paths, rather than `read_bytes` at `:2884`.
   `theirs` and `base` keep `blob_at` (`:2148`), which is already index-side by construction.
@@ -75,26 +78,35 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
 - **S8** — one selftest arm per acceptance criterion, plus the class gate AC6 describes.
 - **S9** — `cmd_update`'s preamble gains a per-row integrity assertion, beside the existing
   unresolvable-commit refusal at `:2946`, running over the whole receipt before any row is
-  classified. It is SCOPED BY FIELD PRESENCE, in three arms. A row carrying BOTH `commit` and
-  `gov_oid` is asserted: `gov_oid == blob_at(root, row["commit"], row["source"])`, and a row that
-  fails refuses by name, naming the path and both oids, rather than being classified against a field
-  the file no longer earns. A row carrying NEITHER field is passed over here, because it is not a
-  failed integrity check — there is nothing to compare. Note what that row is NOT: it is not
-  necessarily `-13` S7's `evidence: "unattributed"` state. Every row `apply` writes through the
-  `unlanded` channel also carries neither field: those are the rows `apply` writes at `:2440` —
-  `project-owned`, `generated` and `rendered`. `UNLANDED_REASON` (`:236`) carries a fourth key,
-  `merged`, and `resolve_entry`'s `unlanded` list carries merged entries too; `apply` skips them at
-  `:2428-2429` and writes the real merged row at `:2417` instead. `-10` S3 adds a fifth key,
-  `forked`. S9 passes over all of them for the one reason that covers every case — no operand —
-  and what happens next is the ROLE's business, in the classification loop, not this preamble's. A
-  row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
-  corruption shape this unit exists to catch, because `-11` rewrites `path`, `source`, `commit` and
-  `gov_oid` together on a rename and a text merge of `install.json` is what splits them. **The
+  classified. It is SCOPED BY FIELD PRESENCE, in three arms, plus one exemption by ROLE. A row
+  carrying BOTH `commit` and `gov_oid` is asserted: `gov_oid == blob_at(root, row["commit"],
+  row["source"])`, and a row that fails refuses by name, naming the path and both oids, rather than
+  being classified against a field the file no longer earns. A row carrying NEITHER field is passed
+  over here, because it is not a failed integrity check — there is nothing to compare. Note what
+  that row is NOT: it is not necessarily `-13` S7's `evidence: "unattributed"` state. Every row
+  `apply` writes through the `unlanded` channel also carries neither field: those are the rows
+  `apply` writes at `:2440` — `project-owned`, `generated` and `rendered`. `UNLANDED_REASON`
+  (`:236`) carries a fourth key, `merged`, and `resolve_entry`'s `unlanded` list carries merged
+  entries too; `apply` skips them at `:2428-2429` and writes the real merged row at `:2417`
+  instead. `-10` S3 adds a fifth key, `forked`. S9 passes over the `:2440` rows for the one reason
+  that covers every case — no operand — and over a `merged` row by the role arm below; what
+  happens next is the ROLE's business, in the classification loop, not this preamble's. A row
+  whose `role` is `merged` is
+  passed over whatever `commit` it carries. That `commit` names the vintage the BLOCK was taken
+  from, `UPDATE_ROLE['merged']`'s own compare at `:2996-3005` is its reader, and S9 has no
+  whole-file gov blob to assert against — so this is an exemption by ROLE, the one place this
+  preamble is not scoped by field presence, and it is stated here rather than left to fall through
+  the exactly-one branch. A row carrying exactly ONE of the two is its own REFUSAL. That pairing is
+  the corruption shape this unit exists to catch, because `-11` rewrites `path`, `source`, `commit`
+  and `gov_oid` together on a rename and a text merge of `install.json` is what splits them. **The
   ordering is fixed, and the two preconditions are sequential rather than competing.** S9 runs first,
   in the preamble, over every row. `-13` S7's skip runs later, inside the classification loop, after
   `how` resolves at `:2974` and before `classify_row` at `:3014`. S9 therefore cannot lean on that
   skip having already happened, which is exactly why it is scoped by field presence and not by
-  `role` or by `evidence`.
+  `evidence`. The `merged` arm above is the one exception, and reading `role` there rather than
+  `evidence` is deliberate: `role` is on every row `apply` and `adopt` write, so the arm needs no
+  later precondition to have run, while `evidence` is `-13`'s field and is exactly what the in-loop
+  skip keys on. That narrowing is §8 F4's ruling, not a softening of the scoping rule.
   Two refusal branches, each carrying its own `refusal_join.py` arm, under that file's contract that
   every refusal branch is reached by an arm asserting it.
 
@@ -128,7 +140,7 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
 |---|---|---|---|
 | `gov_oid` | the blob gov shipped at this row's `commit`, STORED | `apply`, `update` | the OURS axis, and `check`'s provenance loop |
 | `oid` | the blob the target's index held when the row was last written | `apply`, `update` | `check`'s integrity loop |
-| `sha256` | sha256 of gov's bytes at install | `apply`, `update` | `install.sums` and its join, and no verdict |
+| `sha256` | sha256 of the bytes the row's destination holds in the TARGET at the moment the row is written — identical to gov's blob at `commit` for a `verbatim` row, the CARRIED bytes for an `eol`/`relocate` row (`-13` §8 F5), the merge result after `-8` | `apply`, `update` | `install.sums` and its join, and no verdict |
 
 The live delta predicate reads the target's CURRENT index blob and compares it to the STORED
 `gov_oid`. Both fields are stored and only the comparison is live: `gov_oid` is never recomputed at
@@ -169,7 +181,9 @@ update ever runs on that adopter. That is the composition this scoping exists to
 `tools/govkit/govkit.py` (~90 lines), `tools/govkit/selftest.py` (~12 arms), and THREE anchors in
 `tools/govkit/refusal_join.py`'s enumerated set: one for S4, and two for S9. That file keys an anchor
 on a refusal CALL SITE, and S9's two arms are two sites. The mismatch and the half-populated pair
-carry different messages and cannot share one.
+carry different messages and cannot share one. S9's `merged` exemption adds no fourth anchor: it
+removes a row class from a refusal rather than adding a branch, so it is armed by AC11's negative
+assertion beside the exactly-one anchor.
 
 ## 5. Production-readiness checklist
 
@@ -246,6 +260,15 @@ carry different messages and cannot share one.
   refuses by name, writes nothing, and leaves the receipt byte-identical. The mirrored row carrying
   `gov_oid` and no `commit` refuses the same way. Both arms run in the same fixture as AC9, because
   the scoping AC9 asserts must never be built as a blanket pass for any row missing a field.
+- **AC11** — The `merged` exemption is OBSERVED rather than assumed. A fixture target takes
+  `python tools/govkit/govkit.py apply --kits push-main`, whose `.githooks/pre-commit` rule is
+  `role = "merged"` at `marker_style = "hash-comment"` and therefore lands the `:2417` row shape,
+  and a following `update` runs to completion: the merged row reaches `UPDATE_ROLE["merged"]`'s
+  compare at `:2996-3005`, S9's preamble refuses nothing, and the run exits **0**. Observe RED
+  first by staging S9 without its `merged` arm, at which point that row carries `commit` and no
+  `gov_oid`, trips the exactly-one branch, and the whole run refuses before any row is classified.
+  `python tools/govkit/refusal_join.py` still accounts for THREE branches: this arm asserts that a
+  refusal is NOT reached and adds no anchor.
 
 ## 7. Gates
 
@@ -267,9 +290,30 @@ and `refusal_join` legs. Adds arms and three refusal anchors; adds no new leg.
   the join that asserts the sidecar against the receipt, which is the artifact a target verifies
   with bash alone.
   RESOLVED (agent, 2026-08-24, delegated): retain.
+- **F4 — does the `merged` row carry both identities, or is it exempt from S9 by ROLE?** The row
+  `apply` writes at `:2417` carries `commit` and neither identity, which is S9's own exactly-one
+  refusal shape, so the first `update` against any target that ever ran `apply` with a hash-comment
+  merged rule would refuse everything the moment this unit lands. Two kits in gov reach that row
+  today, `push-main` and `pytest-parallel-guardrails`. Either the row gains both identities or the
+  preamble exempts the role.
+  RESOLVED (agent, 2026-08-25, delegated): exempt by ROLE — S1's third channel and S9's fourth
+  arm. The reasoning is not restated here; it is in
+  `memory/builds/dCarriedReceipt/reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md`,
+  under "The fork B1 raises, and how it was resolved".
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · round-5 fold: B1, resolved to Direction A and recorded as §8 F4. S1
+  names the THIRD channel M4's two-channel enumeration left out — the `merged` row at `:2417`,
+  which carries `source` and `commit` and neither identity — and S9 gains a fourth item, an
+  exemption by ROLE for that row, placed immediately before the exactly-one refusal it would
+  otherwise trip. M6's conclusion is narrowed to the `:2440` rows plus that arm, since a merged row
+  has both `source` and `commit` and so is not passed over for want of an operand. S9's own "not
+  by `role` or by `evidence`" sentence is NARROWED rather than left standing beside its exception,
+  and says why the exemption reads `role`. AC11 observes the exemption over a `push-main` fixture,
+  so the arm is run rather than assumed, and §4 records that it adds no fourth refusal anchor.
+  H2 moves `sha256`'s definition onto the TARGET's bytes at write time, which is `-13` §8 F5's
+  ratified reading, so one stored field stops carrying two live definitions.
 - rev-5 · 2026-08-25 · round-4 fold: M4 scopes S1's quantifier to the `writes` channel at
   `:2443-2460` and says plainly that an `unlanded` row at `:2440` carries neither identity, so S1
   and S9 stop contradicting each other. M6 replaces S9's three-role gloss: `UNLANDED_REASON`

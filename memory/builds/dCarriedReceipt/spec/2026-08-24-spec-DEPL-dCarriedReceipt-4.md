@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -183,11 +183,17 @@ a measurement, not a finding, which is F1 below.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-5 fold: L1 — the rev-4 entry below recorded as done the one
+  edit its own commit undid. It claimed AC2's `--kits` value is split at a comma across two
+  indented lines and measured the wider half at 104 columns; the value is on ONE line, 195
+  columns, because a newline inside the inline code span stops the FULL command being one shell
+  argument. The entry now records the reversal and its reason. No spec text moved.
 - rev-4 · 2026-08-25 · round-4 fold: L6 — the rev-3 rewrap had pushed AC2's `--kits` continuation
   to column 0, the only de-indented continuation in the corpus and one blank line from detaching
-  from its criterion. It is re-indented two spaces. The value is 193 columns on one line, so it is
-  split at a comma across two indented lines; the wider of the two is 104 columns, which no
-  two-line split of that value gets under, and de-indenting is what this finding refuses.
+  from its criterion. It is re-indented two spaces and deliberately left on ONE line. A split at a
+  comma was tried and withdrawn: the value sits inside the multi-line inline code span that IS the
+  FULL command, and a newline mid-value breaks it. The line is 195 columns and stays that way —
+  the over-width line is the narrower defect, and de-indenting is what this finding refuses.
 - rev-3 · 2026-08-24 · round-2 fold: every LIVE statement of the gap count now carries its vintage.
   §5's observability line and §8 F1 read `54` (post-`-1`) where they read a bare `55` that rev-2's
   own AC3 defines as a regression alarm, and the rev-1 entry below keeps its `55` as the historical

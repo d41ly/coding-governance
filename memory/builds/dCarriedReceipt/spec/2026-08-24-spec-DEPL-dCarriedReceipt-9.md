@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -38,10 +38,14 @@ to the carried bytes with no operator turn (S9), and what the row is stamped wit
 - **S2** — `carry` is RECOMPUTED on every run and never trusted from the receipt. It is written into
   the row for reporting, and the reader is the print loop only. No branch in either verb may read a
   stored `carry`, which is asserted by an arm rather than left to discipline.
-- **S3** — `alpha` is DERIVED from the receipt and never authored. Each row contributes one pair,
-  `(dirname(source), dirname(path))`; the pairs are deduplicated; any gov directory that yields two
-  DIFFERENT target directories is DROPPED and reported by name. There is no override key and no
-  descriptor field: an authored map is a second answer to a question the receipt already answers.
+- **S3** — `alpha` is DERIVED, never authored, and the derivation takes a SEQUENCE OF PAIRS
+  rather than a receipt, because it has two callers. `cmd_update` feeds it the receipt: each row
+  contributes one pair, `(dirname(source), dirname(path))`. `adopt` feeds it the planned
+  `(src, dest)` pairs of its own run, lifted the same way — `-13` S4a, and §8 F3 records
+  why that is not a re-opening of the fork. The pairs are deduplicated; any gov directory that
+  yields two DIFFERENT target directories is DROPPED and reported by name. There is no override
+  key and no AUTHORED descriptor field: a hand-written map is a second answer to a question the
+  caller's own pairs already answer.
 - **S4** — needles emit in both the `/` form and the `~` form, because gov flattens paths into
   fixture filenames. Substitution is a single left-to-right pass, longest needle first, and the
   output is never rescanned, so one substitution can never feed another.
@@ -339,6 +343,12 @@ staying untouched in the diff is itself the assertion.
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-25 · round-5 fold: M4 — S3 still said the map is derived from the RECEIPT
+  after the round-4 fold gave the derivation a second caller in §8 F3 and §10. It is the
+  normative scope item `-13` S4a cites, so a builder read it and wrote a helper taking receipt
+  rows, which `adopt` has none of. S3 now states the input as a SEQUENCE OF PAIRS with the two
+  callers named, and its closing sentence forbids what it actually forbids — an AUTHORED map,
+  not the caller's own pairs.
 - rev-6 · 2026-08-25 · round-4 fold: B1's half lands in §8 F3 and §10 — `adopt` is the derivation's
   SECOND caller and reads the descriptor pairs, because at bootstrap there is no receipt, and §10
   now names both callers instead of one. M2 corrects AC1's RED-first population from 32 to 31, with

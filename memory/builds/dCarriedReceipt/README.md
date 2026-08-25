@@ -51,11 +51,12 @@ applies. Role `forked` is a claim the DESCRIPTOR RULE makes about a file's prove
 that rule on every run and never inferred from what the attribution walk found; a forked row is
 report-only and written in neither direction. A destination that attributes to no gov vintage is a
 SEPARATE state, `evidence: "unattributed"` — no `commit`, no `gov_oid`, its role still whatever its
-rule declared — printed, counted and skipped before any writing disposition is consulted, because
-every one of them needs a base and such a row has none. `oid != gov_oid` **is** the local-delta predicate, so no stored
-flag can go stale behind it. A new read-only verb `govkit adopt` writes that
-receipt for an already-installed tree by measuring it against gov history. Partial *adoption* is
-measured separately and earlier by `plan --coverage`, which needs only `deploy.toml`.
+rule declared — printed, counted and skipped once its role resolves to the one disposition that
+writes, before the verdict table, because that disposition needs a base and such a row has none.
+`oid != gov_oid` **is** the local-delta predicate, so no stored flag can go stale behind it. A new
+read-only verb `govkit adopt` writes that receipt for an already-installed tree by measuring it
+against gov history. Partial *adoption* is measured separately and earlier by `plan --coverage`,
+which needs only `deploy.toml`.
 
 ## Units
 
@@ -73,7 +74,7 @@ measured separately and earlier by `plan --coverage`, which needs only `deploy.t
 | DEPL-dCarriedReceipt-10 | U10 | role `forked`, report-only | 2 | 2 |
 | DEPL-dCarriedReceipt-11 | U11 | rename detection; `withdrawn` stops deleting silently | 2 | 7 |
 | DEPL-dCarriedReceipt-12 | U12 | write preconditions + lock | 2 | — |
-| DEPL-dCarriedReceipt-13 | U13 | `govkit adopt` — the receipt bootstrap | 2 | 1, 7, 9, 10, 12 |
+| DEPL-dCarriedReceipt-13 | U13 | `govkit adopt` — the receipt bootstrap | 2 | 1, 2, 7, 9, 10, 12 |
 | DEPL-dCarriedReceipt-14 | U14 | post-write verification with index rollback | 2 | 7, 11 |
 | DEPL-dCarriedReceipt-15 | U17 | gov stops shipping literal prefixes in kit bodies | 2 | — |
 
@@ -99,8 +100,10 @@ line is the authority; the `deps` column above mirrors it.
    internal order is not free: `-14` lands after `-11`, whose `renamed` disposition its snapshot and
    its touched-kit predicate both read. `-9` and `-11` intersect on a renamed row carrying a rung
    (`-11` S11), but that item is inert until both are landed and neither blocks the other.
-5. **`-13`** — `adopt`, which needs `-1`, `-7`, `-9`, `-10` and `-12` beneath it; `-12`'s S7
-   vintage guard is what its AC11 observes, and step 2 already puts `-12` below this one.
+5. **`-13`** — `adopt`, which needs `-1`, `-7`, `-9`, `-10`, `-12` and `-2` beneath it; `-12`'s
+   S7 vintage guard is what its AC11 observes, and step 2 already puts `-12` below this one.
+   `-2`'s `pins` disposition is what AC13 and AC14 observe, and step 1 already puts it below this
+   one.
 6. **`-4`, `-5`, `-6`** — coverage. `-4` is independently useful once step 2 is beneath it — it
    needs `-1`, whose reading AC3 asserts — and may be pulled forward to step 3; it is the only unit
    that runs against a real adopter today.
@@ -136,17 +139,17 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-10 — role `forked`, report-only](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
-| [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
-| [DEPL-dCarriedReceipt-14 — post-write verification, with index rollback](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-14 — post-write verification, with index rollback](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-15 — gov stops shipping its own prefix inside kit bodies](spec/2026-08-24-spec-DEPL-dCarriedReceipt-15.md) | — | 2 | SPECCED | rev-4 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm](spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md) | — | 1 | SPECCED | rev-3 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-3 — `intake` honours `--answer prefix=`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-3.md) | — | 1 | SPECCED | rev-1 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md) | — | 1 | SPECCED | rev-4 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md) | — | 1 | SPECCED | rev-5 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | — | 1 | SPECCED | rev-4 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
-| [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md) | — | 2 | SPECCED | rev-4 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | SPECCED | rev-7 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 3 record folder(s).
