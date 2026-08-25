@@ -458,7 +458,9 @@ Ask what is left instead of re-reading prose for it:
 bash {{KIT_DIR}}/unattended.sh --plan <slug>
 ```
 
-It prints each tracked spec's id, status and classification, and names the next unit. It also joins
+It takes its unit SET and ORDER from the generated units region, so its "next" and `--status`'s
+are the same unit by construction. It prints each unit's id, status and classification, and names
+the next one. It also joins
 the build README's roster region against the tracked specs, so a planned unit nobody has specced
 is reported as MISSING rather than silently omitted — and a roster whose markers are malformed is
 a named refusal rather than a complete-looking list.

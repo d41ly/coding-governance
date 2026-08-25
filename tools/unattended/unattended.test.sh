@@ -4382,3 +4382,60 @@ esac
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
+
+# ---- TOOL-dHonouredPark-4 — --plan takes its SET and ORDER from the rendered region --------------
+# NOT EXECUTED IN THIS BUILD, and that is declared rather than hidden. A standing owner instruction
+# of 2026-08-23 forbids running this kit's self-test suites, and no leg on the bar invokes this file
+# either. The compensating observation is recorded in the unit's build record: `--plan` was captured
+# over ALL 63 tracked builds before and after the change and diffed, and the unit SET is identical on
+# every one of them — only the ORDER moved, on the 11 builds whose region is not already in id order.
+# That is stronger evidence about BEHAVIOUR than these arms would give, and it is no evidence at all
+# about the arms, which is why this paragraph exists.
+plan_region_arms() {
+  local B; B=$(mktemp -d); trap 'rm -rf "$B"' RETURN
+  ( cd "$B" && git init -q . && mkdir -p memory/builds/tPlan/spec )
+
+  # A region carrying two units in an order that is NOT id order. No fixture in this file did.
+  readme_with_order() {
+    { printf -- '---
+slug: tPlan
+node: t
+opened: 2026-01-01
+streams: s
+roster: ARCH
+ids: ARCH-tPlan-1
+---
+
+# tPlan
+
+'
+      printf -- '%s
+' "$ROSTER_OPEN" '' "$ROSTER_CLOSE" ''
+      printf -- '%s
+' "$UNITS_OPEN"
+      printf -- '| Unit | Order | Status | Rev | Last change |
+|---|---|---|---|---|
+'
+      printf -- '| [ARCH-tPlan-2](spec/two.md) | 1 | SPECCED | rev-1 | x |
+'
+      printf -- '| [ARCH-tPlan-1](spec/one.md) | 2 | SPECCED | rev-1 | x |
+'
+      printf -- '%s
+' "$UNITS_CLOSE"
+    } > "$B/memory/builds/tPlan/README.md"
+  }
+
+  # ORDER: the region's order, not the spec files' path order.
+  arm "--plan reports units in the region's order, not in path order" 0 "ARCH-tPlan-2" --       sh -c "cd '$B' && bash '$PWD/tools/unattended/unattended.sh' --plan tPlan | head -1"
+
+  # S5: an ABSENT region refuses. At BASE this fell through to the spec-derived listing.
+  arm "--plan REFUSES a build README with no units region" 42 "no units marker at all" --       sh -c "cd '$B' && bash '$PWD/tools/unattended/unattended.sh' --plan tPlan"
+
+  # S7: a rendered row whose id no tracked spec defines.
+  arm "--plan classifies a region row with NO tracked spec" 0 "NO TRACKED SPEC" --       sh -c "cd '$B' && bash '$PWD/tools/unattended/unattended.sh' --plan tPlan"
+
+  # S6: both NOT A UNIT conditions survive the move. The second has ZERO live instances corpus-wide,
+  # so it exists only as a fixture — which is the whole reason it is written here.
+  arm "--plan still reports a spec with NO status header" 0 "NOT A UNIT (no status header)" --       sh -c "cd '$B' && bash '$PWD/tools/unattended/unattended.sh' --plan tPlan"
+  arm "--plan still reports a spec whose heading id does not parse" 0 "heading id does not parse" --       sh -c "cd '$B' && bash '$PWD/tools/unattended/unattended.sh' --plan tPlan"
+}

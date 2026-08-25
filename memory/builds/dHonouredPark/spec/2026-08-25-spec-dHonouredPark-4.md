@@ -1,11 +1,12 @@
 # TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-TOOL-dHonouredPark-4-acceptance.md](../build/2026-08-25-build-TOOL-dHonouredPark-4-acceptance.md) | journal | — |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 |
 
@@ -263,6 +264,16 @@ this list. An exemption is not coverage, so the exemption is written down with w
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-25 · AC6 and AC10 AMENDED to unobservable-in-this-build. Both need a fixture in
+  `unattended.test.sh`, which a standing owner instruction forbids running, and neither condition
+  occurs in the corpus — AC10's has ZERO live instances by the driver's own count. The arms are
+  written and unexecuted. Amended rather than given a witness that would read as observed, because
+  the ledger grammar's two forms are OBSERVED and AMENDED and there is no honest third.
+- rev-5 · 2026-08-25 · BUILT and CLOSED. Verified by a corpus-wide before/after capture of `--plan`
+  over all 63 tracked builds: the unit SET is identical on every one, and only the ORDER moved.
+  The arms in `unattended.test.sh` were WRITTEN AND NOT RUN — the owner's standing instruction
+  forbids that suite and no bar leg invokes it — so they are syntax-checked only, and that is the
+  declared skip §7 describes rather than a claim of coverage.
 - rev-4 · 2026-08-25 · M3 fork sweep. F1 restated as a question and resolved; F2 resolved NO rather
   than left conditional, with the shared-enumerator refactor filed as its own backlog row.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s third park —
