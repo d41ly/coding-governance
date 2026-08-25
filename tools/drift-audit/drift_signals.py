@@ -203,8 +203,8 @@ PINS: dict[str, int] = {
     # that way is a number, not a measurement.
     "closed_specs_with_no_product_commit": 1,
     # 3 — MEASURED on the day the table was ratified, and non-zero BY CONSTRUCTION rather than as
-    # tolerated rot. `--scaffold` derives the verb table by leading-token frequency and a human then
-    # curates it, and curation ADDS aspirational verbs the corpus does not use yet: `measure`, `print`
+    # tolerated rot. `--scaffold` seeds a concept only where the corpus has a live site, spells it the
+    # canon's way, and a human then curates; curation ADDS verbs the corpus does not use yet: `measure`, `print`
     # and `set` are declared because that is what this repo should call those operations, not because
     # anything is already called that. Reading this 3 as debt inverts what it records.
     #

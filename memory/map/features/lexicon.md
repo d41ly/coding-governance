@@ -25,8 +25,8 @@ guides = []
 backlog-shards = []
 lexicon-verbs = [
   "add",
-  "cmd",
   "arm",
+  "cmd",
   "build",
   "check",
   "derive",
@@ -68,12 +68,20 @@ unmeasurable: `TOOL-dScaffoldedMirror-17` superseded that premise and `drift-aud
 superseded only the copy in Gaps, which is this repo's own "a fix naming more than one carrier lands
 in only one" class, inside the fix for it.
 
-**The seed is DERIVED and then FROZEN, and the freeze is checkable.** Companion §12 bans a gate whose
-vocabulary is a hand-kept mirror of the codebase's own identifiers. A prescriptive verb table is the
-inverse and is safe — but `--scaffold` derives its proposal from the adopter's corpus, so for one
-moment it IS the banned shape. The resolution is procedural: mark it `PROPOSED`, leave `ratified`
-empty, and red until a human stamps it. Without that arm an unedited seed reaches the merge bar
-disguised as a curated vocabulary.
+**TWO QUESTIONS, TWO DECIDERS — and this paragraph used to hold the answer to only one.** Companion
+§12 bans a gate whose vocabulary is a hand-kept mirror of the codebase's own identifiers, and until
+`TOOL-dScaffoldedMirror-8` the scaffold was exactly that: it ranked the corpus's leading tokens and
+adopted the top rows, so a repo that already called everything `get` was certified as calling it
+`get`. What the corpus now decides is MEMBERSHIP — does any spelling of this concept have a live
+definition site. What it is CALLED comes from `canon.py`, twenty frozen clusters whose element 0 is
+the representative unconditionally. The corpus cannot promote a spelling and cannot nominate a verb
+the canon does not hold, so the seed is prescriptive at the moment it is written.
+
+The `ratified` arm survives and is no longer the RESOLUTION, only the second half: a canon-sourced
+seed is a starting vocabulary and not a curated one, so it ships `PROPOSED` with `ratified` empty and
+reds until a human stamps it. This paragraph and the one above it were the SAME claim in two
+carriers, and the round-1 fix rewrote the other; that is this file confessing to the class it
+confesses to two paragraphs down, twice.
 
 **Vacuity is pushed back on three ways, and the third is narrower than it first shipped.** The
 corpus-side arm is `DEAD PROBE`: a `parser` or `probe` language whose definition population is empty

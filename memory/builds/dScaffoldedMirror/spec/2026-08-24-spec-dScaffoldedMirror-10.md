@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author
 
-**Status:** CLOSED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams tooling
 
 ## 1. Goal
 
@@ -276,7 +276,10 @@ must wait for a records-only exemption this repo does not currently have.
 - **AC7** — When the render is forced to produce an empty file, `--check` refuses rather than
   comparing it to an equally empty Skill and passing.
 - **AC8** — When `tools/gate-legs.json` is regenerated from `tools/lexicon/kit.toml`, the row named
-  `lexicon skill wiring` carries no `guard` key, matching `memory-recall skill wiring`.
+  `lexicon wiring` carries an EMPTY `guard`, matching `memory-recall skill wiring`. **Re-pointed at
+  rev-5**: this read `lexicon skill wiring`, a SECOND leg this unit added whose argv was byte-identical
+  to `lexicon wiring`'s. The closing review found it (M8) and it was deleted, so the criterion as
+  written could no longer be evaluated — it named a row that does not exist.
 - **AC9** — When `bash tools/check-template-size.sh AGENTS.md` and `bash tools/check-template-size.sh`
   run after the charter edit, both exit 0 and BOTH files are strictly SMALLER than before it.
   rev-1 named the literals 64,359 and 48,792, and the spec-set review corrected them to 64,361 and
@@ -296,11 +299,17 @@ Keeps green: `lexicon naming predicates`, `lexicon selftest`, `lexicon wiring`, 
 `charter size`, `template size <=48KiB`, `playbook parity`, `playbook render wiring`, `govkit
 selfcheck`, `kit version markers` and `marker contracts`.
 
-Adds exactly one leg: **`lexicon skill wiring`**, `subject = "repo"`, argv
-`bash tools/lexicon/adopt-lexicon.sh --check`, and **no guard**. Everything else this unit builds is
-a new refusal or a new verb inside an existing leg, which is deliberate — the leg count is not the
-coverage, and the one addition exists because no existing leg can be made to fire on a declaration
-edit.
+Adds NO leg, and rev-5 corrects rev-1 through rev-4 on that. It was specced to add
+`lexicon skill wiring` with `subject = "repo"`, argv `bash tools/lexicon/adopt-lexicon.sh --check`
+and no guard — and it did, beside `lexicon wiring`, whose argv was already byte-identical. Two rows,
+one check, two green verdicts: the closing review found it as M8 and the duplicate was deleted. The
+NET effect of this unit on the manifest is a GUARD CHANGE — `lexicon wiring` lost its
+`["tools/lexicon/"]` guard so a declaration edit outside the kit directory still fires it, which is
+the whole thing the new leg was wanted for. `tools/lexicon/kit.toml` carries that explanation at the
+`[[gate_leg]]` entry.
+
+Everything else this unit builds is a new refusal or a new verb inside an existing leg, which is
+deliberate — the leg count is not the coverage.
 
 ## 8. Open questions
 
@@ -379,6 +388,16 @@ edit.
   One correction while writing it: the first draft merged two bullets into a 496-character line
   against a 450 limit, which `check-line-length` caught; splitting it back trimmed a further 8
   bytes, so the net-negative got better rather than worse.
+- rev-5 · 2026-08-25 · node d · CLOSED, corrected by the closing review's round 2. §7 and AC8 both
+  named `lexicon skill wiring`, a leg this unit added beside `lexicon wiring` with byte-identical
+  argv — one check reporting two green rows. Round 1 found it (M8) and deleted the duplicate, so
+  from that commit onward AC8 named a row that does not exist and could not be evaluated at all.
+  The unit's real net effect on the manifest is a GUARD CHANGE, not a new leg, and both sections
+  now say so. S7 was also half-built: `tools/lexicon/README.md` got its half and
+  `tools/lexicon/LEXICON.md` was never touched by this build — `git log --name-only` over the
+  whole range returns nine files under `tools/lexicon/` and that is not one of them, while rev-4
+  recorded S7 BUILT. The missing delivery section has been written rather than the claim
+  retracted, since the section is what the unit was for.
 
 ## 10. Reuse audit
 

@@ -267,12 +267,17 @@ def _check_mode_justified(text: str, ext: str, old: str, new: str, lookback: int
     at = next((i for i, ln in enumerate(lines) if ln.startswith("LANGS=")), None)
     if at is None:
         return False
-    # BOUNDARY LOOKAROUNDS, not `\b`, around the EXTENSION. `\b` is a word-character boundary, so for
-    # the `<none>` extension -- the one this repo declares for a dotless basename -- it sits before a
-    # `<` and after a `>` and can never match. The marker was unsatisfiable for exactly the extension
-    # whose name is not a word, so a weakening move on it could never be justified and would red
-    # forever. Closing review M2.
-    want = re.compile(r"(?:(?<=\s)|^)" + re.escape(ext) + r"(?=\s|:|,|$)"
+    # NEGATIVE WORD-CHARACTER LOOKAROUNDS around the EXTENSION -- a strict SUPERSET of the `\b` this
+    # replaced, and that property is what took two rounds. `\b` is a word-character boundary, so for
+    # `<none>` -- the extension this repo declares for a dotless basename -- it sat before a `<` and
+    # after a `>` and could never match: the marker was unsatisfiable for exactly the extension whose
+    # name is not a word, and a weakening move on it would have redded forever with a correct marker
+    # sitting right above it. The round-1 fix demanded whitespace-or-start before the extension,
+    # which fixed `<none>` and QUIETLY NARROWED everything else -- `#py:`, `# (py:` and `# js,py:`,
+    # the natural way to justify one move for two extensions, all stopped matching, reintroducing the
+    # same symptom for every shape that used to work. Asserting no word character on either side
+    # admits all of those and still rejects `pyx`. Closing review M2, corrected by the round-2 review.
+    want = re.compile(r"(?<![A-Za-z0-9_])" + re.escape(ext) + r"(?![A-Za-z0-9_])"
                       + r"\s*:?\s*\b" + re.escape(old)
                       + r"\b\s*(?:->|\u2192|to)\s*\b" + re.escape(new) + r"\b")
     return any(want.search(ln) for ln in lines[max(0, at - lookback): at + 1])
@@ -757,10 +762,11 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
     declared-but-unused verb violates nothing, and it is the sort of fact that is true for weeks
     before anyone should act on it.
 
-    THE DAY-ONE SEED IS NOT ZERO, and that is correct rather than a failed build. `--scaffold` derives
-    the table by frequency and a human then curates it; curation ADDS aspirational verbs the corpus
-    does not use yet. Same shape as `non_terminal_specs_cited_by_product_source`, whose pin comment
-    records a known residual rather than proven rot.
+    THE DAY-ONE SEED IS NOT ZERO, and that is correct rather than a failed build. `--scaffold` seeds a
+    concept only when the corpus has a live site for it, but it spells that concept the CANON's way,
+    and a human then curates -- and curation ADDS aspirational verbs the corpus does not use yet.
+    Same shape as `non_terminal_specs_cited_by_product_source`, whose pin comment records a known
+    residual rather than proven rot.
     """
     name = "lexicon_verbs_declared_but_unused"
     if not _resolve_lexicon_conf(ctx):
@@ -1017,6 +1023,17 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # rather than as a violation -- but "" is not in `verbs`, so it counted as an offender AND stayed
     # in the denominator, inflating the rate at both ends. Closing review L4.
     gradeable = {(p, n) for p, n in added if lex.leading_verb(n)}
+    if not gradeable:
+        # THE EMPTINESS GUARD MOVED WITH THE OPERANDS. The round-1 L4 fix pointed every consumer at
+        # `gradeable` and left the `if not added` guard above it reading `added`, so a window whose
+        # every added definition was ungradeable fell through to the ordinary return with value 0,
+        # of 0, live True and no `not_asked` -- and `0 > 0` is false, so it printed a plain `ok`.
+        # That is this signal's own stated failure class handed back to it: the docstring says an
+        # empty population at either end is indistinguishable from a clean window unless it is said
+        # out loud. Found by the round-2 review, which built the window and observed the `ok`.
+        return _build_not_asked(
+            name, "every definition added since the declaration was adopted has a name with no word "
+                  "characters, so this window holds nothing gradeable")
     offenders = {(p, n) for p, n in gradeable if lex.leading_verb(n) not in verbs}
     base_files = {p for p, _ in at_base}
     fresh = [x for x in gradeable if x[0] not in base_files]

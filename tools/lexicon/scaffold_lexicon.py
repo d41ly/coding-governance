@@ -33,8 +33,9 @@ import lexicon as lex  # noqa: E402
 #: Extensions this kit can extract today, READ FROM THE ENGINE rather than restated. Everything else
 #: present in the corpus is seeded `dark`, which is a DECLARATION, not a gap — it is named on every
 #: run rather than silently absent. The two copies had already diverged on the `py` pattern-set id
-#: within one build, so a `--probe` against an undeclared repo graded python through a different code
-#: path than the `--scaffold` that would adopt it. Closing review M7.
+#: within one build — a real divergence with no observable consequence, since nothing compares a
+#: pattern-set id against `""`. Collapsed because two carriers of one fact is the defect, not because
+#: this one had bitten. Closing review M7, trimmed by round 2.
 KNOWN = lex.KNOWN_EXTS
 
 HEADER = """\

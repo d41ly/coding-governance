@@ -95,9 +95,12 @@ a pattern set that goes inert fails there.
 
 ## Supply — how the table reaches whoever is writing the name
 
-The declaration is the half of this kit with a measured record. Since it landed, this repo added 136
-definitions and zero offenders over a window in which the gate refused nothing — so the mechanism
-that works is CONTEXT DELIVERY, and the failure mode it attacks is ABSENCE rather than randomness.
+The declaration is the half of this kit with a measured record, and the measurement is NOT written
+here: `python tools/drift-audit/drift_report.py` derives `lexicon_marginal_offense_rate` live, over
+the window from the declaration's adoption commit to HEAD, splitting fresh files from pre-existing
+ones. A figure typed into this paragraph was wrong within a week of being written and nothing caught
+it, which is the rule this repo breaks most often — a value stated in prose beside the source that
+owns it rots between changes. Read it from the signal.
 
 ```bash
 python tools/lexicon/lexicon.py --suggest <identifier>   # one line, no corpus pass, ~45 ms
@@ -124,7 +127,7 @@ SHOULD do. A promise would not survive a refactor; the absence of a return path 
 `SKILL.template.md` renders into `.claude/skills/lexicon/SKILL.md`, carrying the whole table so an
 agent has it without opening the conf. It is a GENERATED second carrier and its gate re-renders and
 byte-compares, so a declaration edit nobody re-rendered REDS with `DRIFTED`. The leg
-(`lexicon skill wiring`) carries NO guard — its answer changes when the declaration moves, and a
+(`lexicon wiring`) carries NO guard — its answer changes when the declaration moves, and a
 kit-directory guard would leave exactly that edit unchecked.
 
 ## Waivers
@@ -143,11 +146,16 @@ python tools/lexicon/lexicon.py                  # the gate
 python tools/lexicon/lexicon.py --list           # every offender, waived or not (authoring aid)
 ```
 
-`--scaffold` derives a verb table from your own corpus by leading-token frequency and marks it
-`PROPOSED`. **Curate it before ratifying.** A derived table is a mirror of the code, which is the one
-shape a naming gate must not have; the rows that make it worth gating are the NEGATIVE definitions a
-human writes — `build` not `create`, `load` not `fetch`. `--check` reds while `ratified` is empty, so
-an uncurated seed cannot reach the merge bar disguised as a vocabulary.
+`--scaffold` asks your corpus ONE question per concept — does any spelling of this have a live
+definition site — and seeds the concepts that answer yes. It takes the SPELLING from the kit's own
+frozen canon, never from your code, so the corpus cannot promote a habit it already has and cannot
+nominate a verb the canon does not hold. Two questions, two deciders: which concepts, and what each
+is called.
+
+The seed is still marked `PROPOSED` and **wants curating before you ratify** — the canon's negatives
+are generic, your domain rows are missing, and a starting vocabulary is not a curated one. `--check`
+reds while `ratified` is empty, so an uncurated seed cannot reach the merge bar disguised as a
+vocabulary.
 
 Pins are MEASURED against the adopting corpus at scaffold and are never inherited: a pin copied from
 a larger tree is either vacuous or permanently red.

@@ -15,6 +15,7 @@ would be judging the wrong file.
 """
 
 import contextlib
+import re
 import shutil
 import subprocess
 import sys
@@ -752,48 +753,104 @@ with build_tempdir() as _td:
 # Both arms below gate a CLASS. The review's own words on why: "a single-site fix certifies coverage
 # the script does not have, and the shape will recur the next time a mode is added."
 
-# H1 — `--measure` and `--check` must AGREE on the exit code over one tree. The four conditions the
-# `--measure` comment names all reached `problems` AFTER the measure-mode return, so two of them
-# could never fire there: `--measure` printed pins and exited 0 over a corpus carrying dead waivers
-# while `--check` exited 1 naming them. Asserting AGREEMENT gates every such condition at once,
-# including any added later, and would have caught the DEAD SNIFFER defect as well.
-ZZZ_STALE = "zzz_gone_symbol  a waiver whose target text is gone\n"
-_AGREE = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
-for _label, _files, _waiv in (
-        ("a clean tree", _AGREE, None),
-        ("a STALE waiver", _AGREE, {"lexicon-verb-waivers.txt": "zzz_gone_symbol  dead\n"}),
-        ("an UNDECLARED extension", {**_AGREE, "notes.R": "x <- 1\n"}, None),
+# H1 — `--measure` and `--check` must AGREE, and agreement is on the REASON as well as the code.
+# Round 1 asserted the exit codes alone and this comment claimed the arm "would have caught the DEAD
+# SNIFFER defect as well". It would not have, twice over: DEAD SNIFFER was not one of the trees the
+# loop enumerated, and it set `exit_code` directly seventy-nine lines below the measure-mode return,
+# so `--measure` exited 0 with three clean pins over a tree `--check` redded by name. Measured on an
+# isolated tree on 2026-08-25 — one whose ONLY problem was the blind sniffer, because every earlier
+# probe reused a conf that raised two other problems and masked it. A claim of class coverage,
+# written into the fix for the class of claims that are not true. Found by the round-2 review.
+#
+# THE DEAD SNIFFER ROW IS NOW IN THE LOOP, and each row names the text both modes must carry. A
+# shared exit code of 1 for two different reasons is not agreement, and asserting the number alone
+# cannot tell those apart.
+ZZZ_STALE = "zzz_gone_symbol  a waiver whose target text is gone" + chr(10)
+# A `def` split by a line continuation: `ast` parses it, and a line-anchored `def` sniff sees nothing
+# on either line. That disagreement between extractor and sniffer IS the DEAD SNIFFER condition, and
+# it is the only shape in this file that produces it.
+BLIND_DEF = "def " + chr(92) + chr(10) + "build_thing():" + chr(10) + "    pass" + chr(10)
+_AGREE = {"core/a.py": "def build_index():" + chr(10) + "    pass" + chr(10), **LAYER_SIDES}
+for _label, _files, _waiv, _reason in (
+        ("a clean tree", _AGREE, None, None),
+        ("a STALE waiver", _AGREE, {"lexicon-verb-waivers.txt": ZZZ_STALE}, "STALE WAIVERS"),
+        ("an UNDECLARED extension", {**_AGREE, "notes.R": "x <- 1" + chr(10)}, None,
+         "UNDECLARED EXTENSIONS"),
+        ("a DEAD SNIFFER", {**_AGREE, "core/blind.py": BLIND_DEF}, None, "DEAD SNIFFER"),
 ):
     _c, _co = run_case(_files, BASE_CONF, _waiv)
     _m, _mo = run_case(_files, BASE_CONF, _waiv, args=("--measure",))
     check(f"--measure and --check agree on the exit code over {_label}",
           (_c == 0) == (_m == 0), f"check={_c} measure={_m} | {_mo[:200]}")
+    if _reason:
+        check(f"...and both name the SAME reason over {_label}",
+              _reason in _co and _reason in _mo,
+              f"check={_reason in _co} measure={_reason in _mo} | {_mo[:200]}")
 
-# ...and the agreement arm is only worth anything if one of its cases is NON-trivial: a tree where
-# both exit non-zero. Without this, three green rows could all be the clean case.
+# ...and the agreement arms are only worth anything if the non-clean cases are NON-trivial: trees
+# where both modes exit non-zero. Without this, every green row above could be the clean case. The
+# fixture is `ZZZ_STALE`, the same object the loop uses — round 1 declared that constant and then
+# hardcoded a DIFFERENT waiver string in the loop, so this arm certified a case the loop never ran.
 _c, _ = run_case(_AGREE, BASE_CONF, {"lexicon-verb-waivers.txt": ZZZ_STALE})
-_m, _ = run_case(_AGREE, BASE_CONF, {"lexicon-verb-waivers.txt": ZZZ_STALE},
-                 args=("--measure",))
+_m, _ = run_case(_AGREE, BASE_CONF, {"lexicon-verb-waivers.txt": ZZZ_STALE}, args=("--measure",))
 check("...and the stale-waiver case is a NON-trivial agreement (both non-zero)",
+      _c != 0 and _m != 0, f"check={_c} measure={_m}")
+_c, _ = run_case({**_AGREE, "core/blind.py": BLIND_DEF}, BASE_CONF)
+_m, _ = run_case({**_AGREE, "core/blind.py": BLIND_DEF}, BASE_CONF, args=("--measure",))
+check("...and the DEAD SNIFFER case is a NON-trivial agreement (both non-zero)",
       _c != 0 and _m != 0, f"check={_c} measure={_m}")
 
 # H3 — every call of a function that can fail must be checked. `adopt-lexicon.sh` runs under `set -u`
 # and NOT `-e`, so a bare call takes the next command's status: the --scaffold path printed
 # "wrote .lexicon.conf" and exited 0 with no Skill on disk. Grepping the CALL SITES gates the shape
 # for any mode added later, which a single-site fix does not.
+# THE PREDICATE MATCHES A CALL ANYWHERE ON THE LINE, and the population it considered is asserted
+# per function. Round 1 required the call at column 0 after stripping and excluded any line holding
+# `$(` or `=`, which between them removed BOTH of `render_skill`'s real call sites -- they are
+# `rendered="$(render_skill)"` -- and left exactly two `write_skill` lines, both already `||`-checked.
+# Half the named population was structurally out of reach, and the sibling arm counted substring
+# MENTIONS, which includes the definition, so it could not notice. The round-2 review reintroduced H3
+# in full, as `[ -n "$CONF" ] && write_skill`, and watched the suite report 146 arms green.
 _sh = (KIT / "adopt-lexicon.sh").read_text(encoding="utf-8")
+_FNS = ("write_skill", "render_skill")
+_seen = {_fn: 0 for _fn in _FNS}
 _unchecked = []
 for _i, _line in enumerate(_sh.splitlines(), 1):
     _t = _line.strip()
-    if _t.startswith("#") or "()" in _t:
+    if _t.startswith("#") or _t.startswith(("function ", "local ")):
         continue
-    for _fn in ("write_skill", "render_skill"):
-        if _t.startswith(_fn) and "||" not in _t and "$(" not in _t and "=" not in _t:
+    for _fn in _FNS:
+        if _fn not in _t:
+            continue
+        # The DEFINITION is not a call. Matched by shape rather than by an exact trailing `() {`,
+        # because `render_skill() { # -> stdout` carries a comment after the brace.
+        if re.match(r"^(function\s+)?" + _fn + r"\s*\(\s*\)", _t):
+            continue
+        _seen[_fn] += 1
+        # A call is STATUS-CHECKED when its own status is consumed: `||`, `&&`, an `if`/`while`
+        # head, a `$(...)` capture whose assignment is checked on the next line, or an explicit
+        # `return`/`exit` on the same line. `&&` BEFORE the call is the reintroduction shape the
+        # review used -- it makes the call conditional and discards its status -- so a `&&` only
+        # counts when it FOLLOWS the call.
+        _pre, _, _post = _t.partition(_fn)
+        _checked = ("||" in _post or "&&" in _post
+                    or _pre.strip().startswith(("if ", "while ", "until ", "! "))
+                    or "$(" in _pre)
+        if not _checked:
             _unchecked.append(f"{_i}: {_t}")
 check("every write_skill/render_skill CALL is status-checked (set -u, no -e)",
       not _unchecked, "; ".join(_unchecked))
-check("...and the arm sees the real call sites (or it proves nothing)",
-      _sh.count("write_skill") >= 3, f"only {_sh.count('write_skill')} mentions")
+# ...and the population is asserted PER FUNCTION. A zero for either name means the predicate never
+# looked at it, which reads identically to a clean result and is the whole defect above.
+for _fn in _FNS:
+    check(f"...and the arm actually considered {_fn}'s call sites (or it proves nothing)",
+          _seen[_fn] >= 2, f"{_fn}: {_seen[_fn]} line(s) considered")
+# ...and the predicate must REJECT the exact reintroduction the review staged, or it is tuned to the
+# current file rather than to the shape. Run over a synthetic line, not over the tracked script.
+_BAD = '[ -n "$CONF" ] && write_skill'
+_pre, _, _post = _BAD.partition("write_skill")
+check("...and the predicate rejects a call made conditional by a PRECEDING &&",
+      not ("||" in _post or "&&" in _post or "$(" in _pre), _BAD)
 
 # ---- closing-review left-shifts (round 1, second batch) ------------------------------------------
 #
@@ -811,6 +868,18 @@ for _bad, _want in (
         ("_fetchRemoteThing", "_loadRemoteThing"),
         ("fetch", "load"),
         ("_fetch", "_load"),
+        # The shapes the round-2 review measured, where rebuilding the tail from `subtokens()` lost
+        # information the original surface carried. Each was CORRECT before round 1 touched it, or
+        # correct in neither version; all are correct now because the tail is sliced, not rebuilt.
+        ("fetch_v2_data", "load_v2_data"),          # digit boundary: was `load_v_2_data`
+        ("fetch_2fa", "load_2fa"),                  # digit boundary at the head of a token
+        ("fetchXMLParser", "loadXMLParser"),        # acronym run: was `loadXmlParser`
+        ("fetchHTTPServerData", "loadHTTPServerData"),
+        ("FetchUserData", "LoadUserData"),          # PascalCase: the verb inherits the case
+        ("FETCH_USER_DATA", "LOAD_USER_DATA"),      # SCREAMING_SNAKE, likewise
+        ("fetch-user-data", "load-user-data"),      # kebab: the separator is the caller's
+        ("fetch_conf_", "load_conf_"),              # trailing underscore survives
+        ("__fetch__", "__load__"),                  # ...on both ends
 ):
     _c, _o = run_case(_U10, BASE_CONF, args=("--suggest", _bad))
     # EVERY ROW MUST ACTUALLY REACH THE REJOIN. `BASE_CONF` declares three verbs and bans exactly
@@ -818,25 +887,38 @@ for _bad, _want in (
     # negative sibling below would then pass by finding nothing -- this repo's own
     # `fixture-passes-by-finding-nothing` class, inside the fix for a different one. Asserting the
     # suggestion was PRODUCED is what stops that.
+    # THE SWAP IS ASSERTED EXACTLY, as the first backticked token. Round 1 asserted `` `<want>` `` was
+    # somewhere in the output, and the message template ALWAYS prints "the declaration says `load`",
+    # so the row `("fetch", "load")` passed on the template rather than on the suggestion -- observed
+    # by replacing the whole `swap` expression with a constant and watching that one row stay green.
+    # L1's own class, reproduced inside the fix for L1. Found by the round-2 review.
+    _got = _o.split("`")[1] if _o.startswith("use `") else "<no suggestion>"
     check(f"--suggest preserves shape and object: {_bad} -> {_want}",
-          _c == 0 and _o.startswith("use ") and f"`{_want}`" in _o, _o)
+          _c == 0 and _got == _want, f"got {_got!r} | {_o}")
 
-# ...and the table is only worth anything if it can FAIL. A shape spelled the way the DEFECT spelled
-# it must not be satisfiable, or every row above is decoration.
-_c, _o = run_case(_U10, BASE_CONF, args=("--suggest", "fetchRemoteThing"))
-check("...and the camelCase row rejects the underscore-glued form the defect produced",
-      _o.startswith("use ") and "`load_RemoteThing`" not in _o, _o)
-_c, _o = run_case(_U10, BASE_CONF, args=("--suggest", "_fetch_conf"))
-check("...and the underscore row rejects the object-dropping form the defect produced",
-      _o.startswith("use ") and "`_load`" not in _o.replace("`_load_conf`", ""), _o)
+# The two arms that used to sit here are DELETED rather than repaired. Each asserted that a specific
+# wrong spelling was absent from a line the row above had already pinned exactly, so neither could
+# fail while its partner passed -- and both named forms the current code cannot produce at all, since
+# they were spellings of an implementation that no longer exists. The round-2 review staged three
+# separate defects and watched both stay green through all of them. An exact assertion on the swap
+# makes an absence assertion beside it redundant by construction.
 
 # M3 — an unparseable target is a NAMED refusal with its own exit code, never a traceback. `--brief`
 # called the extractor with no guard while the corpus loop beside it caught and skipped, so the one
 # mode pointed at a single file was the one mode that died on a file mid-edit.
 _c, _o = run_case({"core/broken.py": "def build_x(:" + chr(10)}, BASE_CONF,
                   args=("--brief", "core/broken.py"))
-check("--brief on an unparseable file refuses by name and exits 2 (not 1, not a traceback)",
-      _c == 2 and "core/broken.py" in _o and "does not parse" in _o, f"exit={_c} {_o[:200]}")
+check("--brief on an unreadable file refuses by name and exits 2 (not 1, not a traceback)",
+      _c == 2 and "core/broken.py" in _o and "cannot be read as source" in _o,
+      f"exit={_c} {_o[:200]}")
+# ...and the guard catches the SAME exception pair the corpus loop 30 lines below it does. Round 1
+# caught `(SyntaxError, ValueError)` against the loop's `(SyntaxError, OSError)`: it missed the
+# unreadable-file case and swallowed any internal `ValueError` as "this file does not parse".
+# Two readers of one question, differing. Asserted on the SOURCE, since no fixture reaches both.
+_src = (KIT / "lexicon.py").read_text(encoding="utf-8")
+check("...and it catches the same exception pair the corpus loop does",
+      _src.count("except (SyntaxError, OSError)") >= 3,
+      f"{_src.count(chr(101)+chr(120)+chr(99)+chr(101)+chr(112)+chr(116))} except clauses total")
 check("...and exit 1 stays reserved for VERDICTS, so a refusal cannot read as a finding",
       "Traceback" not in _o, _o[:200])
 
@@ -849,6 +931,50 @@ check("the scaffold and the engine share ONE extension catalog object",
       f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
 check("...and that catalog is non-empty, or the identity above holds vacuously",
       len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
+
+# N1 — an unreadable KIT_LEXICON_VERSION must REFUSE, not render a version-less marker. The capture
+# is a pipeline, and a pipeline takes its LAST command's status, so `head -1` succeeding on empty
+# input is a zero: the emptiness has to be tested for. The round-2 review renamed the constant in a
+# sandbox, watched `--render` succeed with `gov:kit lexicon@` and nothing after the `@`, and watched
+# `--check` still report "Skill in sync" — because that gate re-renders and byte-compares, so both
+# sides carried the same empty version. A drift gate cannot see a defect present in both operands.
+# THE SANDBOX LIVES UNDER THE REPO ROOT, not under the system temp dir. This bash reaches the system
+# temp dir under neither the drive-colon spelling nor the MSYS drive-prefix one -- both answer "No
+# such file or directory" with exit 127 on a file python can stat -- and every one of those failures
+# is NON-ZERO, so the refusal arm below would have passed on a broken invocation rather than on the
+# version check. Its sibling caught that twice, which is why a refusal arm needs one. A path under
+# the repo is one bash already resolves, since every other arm here runs scripts from it. Untracked,
+# so no gate sees it, and `TemporaryDirectory` removes it on either outcome.
+with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
+    # A REAL REPO, because the script resolves its own kit-relative path with `git rev-parse` before
+    # it reads the version and refuses with "not a git repo" otherwise -- a non-zero exit for the
+    # wrong reason, which the sibling arm caught. The sandbox is shaped like an adopter: a git repo
+    # with the kit under `tools/lexicon/` and no declaration, which is exactly where the version is
+    # read and one step before any conf check.
+    subprocess.run(["git", "init", "-q", "."], cwd=_td, capture_output=True)
+    _kit = Path(_td) / "tools" / "lexicon"
+    shutil.copytree(KIT, _kit, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    _lx = _kit / "lexicon.py"
+    _lx.write_text(_lx.read_text(encoding="utf-8").replace("KIT_LEXICON_VERSION = ", "RENAMED_AWAY = "),
+                   encoding="utf-8", newline=chr(10))
+    # ...AND A VALID DECLARATION, so that removing the guard makes `--render` SUCCEED. Without one
+    # the script refuses later for a missing conf, which is also non-zero -- so the refusal arm below
+    # would pass with the guard deleted and could not independently fail. That is the same vacuity
+    # class this round is fixing, reproduced inside the arm written to close it; observed by staging
+    # the deletion and watching the arm stay green.
+    (Path(_td) / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8", newline=chr(10))
+    subprocess.run(["git", "add", "-A"], cwd=_td, capture_output=True)
+    # THE MSYS DRIVE FORM, `/c/...`, not `C:/...`. Neither `str()` nor `.as_posix()` is enough: the
+    # first gives bash `C:Users...` and the second gives it a path it answers "No such file or
+    # directory" to with exit 127, even though python can stat the file. Both are NON-ZERO, so the
+    # refusal arm above would have passed on a bash error rather than on the version check -- the
+    # sibling arm below caught exactly that, twice, which is the whole reason a refusal arm needs one.
+    _r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--render"],
+                        capture_output=True, text=True, cwd=_td)
+    check("a kit whose version constant cannot be read REFUSES to render",
+          _r.returncode != 0, f"exit={_r.returncode} {(_r.stdout + _r.stderr)[:200]}")
+    check("...and says which file it could not read it from",
+          "KIT_LEXICON_VERSION" in (_r.stdout + _r.stderr), (_r.stdout + _r.stderr)[:200])
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

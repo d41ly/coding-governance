@@ -96,7 +96,7 @@ id = "lexicon-ratified"
 kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
-why = "`--scaffold` DERIVES the verb table from the adopter's own corpus, which for one moment is exactly the hand-kept mirror of the codebase that companion §12 bans a gate from having. The seed ships marked PROPOSED with an empty `ratified` key, and an unedited seed reaching the merge bar would be a naming gate whose vocabulary is the code it grades. The stamp is the checkable form of `a human curated this`."
+why = "`--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's corpus only which concepts are live, so the seed is prescriptive rather than the hand-kept mirror companion §12 bans. It is still not CURATED: the canon's negatives are generic and the domain rows are missing. The seed ships marked PROPOSED with an empty `ratified` key, and the stamp is the checkable form of `a human read this table`."
 discharge = { command = ["bash", "{kit}/adopt-lexicon.sh", "--check"] }
 
 [[hole]]

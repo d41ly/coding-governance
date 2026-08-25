@@ -37,10 +37,13 @@ THREE MEASUREMENTS SAY THIS IS NOT ONE AGENT'S TASTE, and they are worth keeping
      lead with a verb from this repo's table, in a repo that has never carried a declaration — and
      all six of that corpus's commonest off-table leaders land in a cluster (get, list -> read;
      validate, require -> check; create, make -> build).
-  3. Of the ten non-verbs the 2026-08-16 curation deleted from the derived seed, EIGHT are in no
-     cluster and are unnominatable by ABSENCE, and the other two (`do`, `is`) are non-first elements
-     of `run` and `check` and are unnominatable by the FIRST-ELEMENT rule. Two closing mechanisms
-     with no gap between them.
+  3. Of the ten non-verbs the 2026-08-16 curation deleted from the derived seed, SEVEN are in no
+     cluster and are unnominatable by ABSENCE, and the other three (`t`, `do`, `is`) are non-first
+     elements of `test`, `run` and `check` and are unnominatable by the FIRST-ELEMENT rule. Two
+     closing mechanisms with no gap between them, which is the claim that matters and survives.
+     The first cut of this line said eight and two, which the data forty lines below refutes: `t`
+     is element 3 of the `test` cluster. A docstring arguing that this canon is not one agent's
+     taste is the worst place in the file to be counting badly. Found by the round-2 review.
 
 WHAT THIS DOES NOT BOUND. A human may ratify a row outside the canon — this repo's own table carries
 `seed` and `arm`, which no cluster holds. The canon bounds what a MACHINE may propose, never what an

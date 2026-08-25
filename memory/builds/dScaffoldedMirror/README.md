@@ -31,13 +31,20 @@ de-duplication rather than a rename.
 So the DECLARATION constrains the generations and the ENFORCEMENT has a measured contribution of
 zero. That ordering decides the phase order: supply before pressure, and honesty before both.
 
-**The single root cause of the useless half is one property in two places.** Every standard in the
-kit is derived from the corpus it grades, pointing the same direction the corpus points.
-`--scaffold` ranks the corpus's own leading tokens and adopts the top rows as an ALLOWLIST, so a repo
-that consistently does the wrong thing legalises it; `scaffold_lexicon.py:105-107` then writes the
+**The single root cause of the useless half WAS one property in two places** — past tense, and the
+tense is the point: this paragraph is the diagnosis this build opened with, kept because the record
+of what was wrong is worth more than a description of what is now right. It stood in the present
+tense until the round-2 review reported it, along with a `scaffold_lexicon.py:105-107` pointer that
+had come to name the replacement rather than the defect.
+
+Every standard in the kit was derived from the corpus it graded, pointing the same direction the
+corpus pointed. `--scaffold` ranked the corpus's own leading tokens and adopted the top rows as an
+ALLOWLIST, so a repo that consistently did the wrong thing legalised it; the scaffold then wrote the
 ceiling from that same corpus, two thirds of it as hardcoded `"0"` literals under a comment claiming
-all three are MEASURED. When the corpus grows, the ceiling is raised. No exogenous reference exists
-anywhere in the design.
+all three were MEASURED. When the corpus grew, the ceiling rose with it. No exogenous reference
+existed anywhere in the design. `TOOL-dScaffoldedMirror-8` supplied one — `tools/lexicon/canon.py`,
+whose clusters are frozen and whose element 0 is the representative unconditionally — and
+`TOOL-dScaffoldedMirror-1` closed by deleting the ranking rather than by tuning it.
 
 ## The adopter probe, and why its numbers are not the research pass's numbers
 
@@ -139,7 +146,7 @@ ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-1
 <!-- gen:build-units -->
 | Unit | Status | Rev | Last change |
 |---|---|---|---|
-| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | CLOSED | rev-4 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | CLOSED | rev-5 | 2026-08-25 |
 | [TOOL-dScaffoldedMirror-11 — the scoped extractor, and the one predicate it makes possible](spec/2026-08-24-spec-dScaffoldedMirror-11.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-12 — the consistency instrument, measured before it is believed](spec/2026-08-24-spec-dScaffoldedMirror-12.md) | DEFERRED | rev-1 | 2026-08-24 |
 | [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | DEFERRED | rev-1 | 2026-08-24 |
@@ -168,6 +175,7 @@ Records live under `spec/`, `build/` and `reviews/`.
 | [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md) | journal | TOOL-dScaffoldedMirror-7 |
 | [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md) | journal | TOOL-dScaffoldedMirror-8 |
 | [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md) | diff-review | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-6..8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
+| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md) | diff-review | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-6..8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -208,4 +216,5 @@ Records live under `spec/`, `build/` and `reviews/`.
   - [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md)
 - **`reviews/`**
   - [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md)
+  - [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md)
 <!-- /gen:build-docs -->

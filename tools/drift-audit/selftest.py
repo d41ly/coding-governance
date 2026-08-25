@@ -800,17 +800,56 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     # green against a version that merely stopped counting it as an offender while leaving it in
     # `of`, which is the same rate wrong in the other direction. Closing review L4.
     before = report(r)[name]
+    # A GRADEABLE CONTROL LANDS IN THE SAME COMMIT. Round 1 asserted `before["of"] > 0` as its
+    # non-vacuity guard, which is a property of the PREVIOUS window and says nothing about whether
+    # this commit reached the signal at all -- the round-2 review patched the extractor to skip
+    # word-character-free names entirely, an ordinary upstream change, and watched all three arms
+    # report ok. The control makes one assertion do both jobs: `of` must rise by exactly one, which
+    # proves the commit was seen, AND `value` must not move, which proves the ungradeable name left
+    # both operands. Neither can pass by finding nothing.
     (r / "src" / "ungradeable.py").write_text(
-        "def __():\n    pass\n", encoding="utf-8", newline="\n")
+        "def __():" + chr(10) + "    pass" + chr(10) + chr(10) + chr(10)
+        + "def build_control():" + chr(10) + "    pass" + chr(10),
+        encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], r)
-    run(["git", "commit", "-q", "-m", "add a name with no word characters", "--no-verify"], r)
+    run(["git", "commit", "-q", "-m", "one ungradeable name and one gradeable control", "--no-verify"], r)
     after = report(r)[name]
     check("an ungradeable name is not counted as an offender",
           after["value"] == before["value"], f"before={before['value']} after={after['value']}")
-    check("...and is not counted in the population it would be graded against either",
-          after["of"] == before["of"], f"before={before['of']} after={after['of']}")
-    check("...and the arm is non-vacuous: the population it compares is non-empty",
-          before["of"] > 0, f"{before}")
+    check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
+          after["of"] == before["of"] + 1, f"before={before['of']} after={after['of']}")
+
+    # ...and a window in which EVERY added definition is ungradeable must say so rather than read as
+    # a clean measured window. The round-1 L4 fix pointed every operand at `gradeable` and left the
+    # emptiness guard reading `added`, so that window returned value 0, of 0, live True and no
+    # `not_asked` -- and `0 > 0` is false, so it printed a plain `ok`. Found by the round-2 review.
+    #
+    # IT NEEDS ITS OWN REPO. The window runs from the declaration's adoption commit to HEAD and is
+    # cumulative, so appending an ungradeable file to the fixture above leaves the earlier gradeable
+    # definitions in it and the window is not all-ungradeable at all. The first spelling of this arm
+    # carried an `or of > 0` escape to paper over that, which made it satisfiable by the very
+    # population it was supposed to exclude -- observed staying green with the guard reverted.
+    b = make_repo(tmp, "lexblind")
+    shutil.copytree(kit_src, b / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (b / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
+        + 'VERB_OFFENDER_PIN="99"' + chr(10) + 'SUFFIX_OFFENDER_PIN="0"' + chr(10)
+        + 'LAYER_OFFENDER_PIN="0"' + chr(10) + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
+        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10) + chr(10)
+        + "LAYERS:" + chr(10) + "  src/* -> vendor/*" + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], b)
+    (b / "src" / "onlyblind.py").write_text(
+        "def __():" + chr(10) + "    pass" + chr(10), encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "add only an ungradeable name", "--no-verify"], b)
+    _blind = report(b)[name]
+    check("an all-ungradeable window is NOT ASKED, never a clean zero",
+          _blind.get("not_asked") is True, f"{_blind}")
+    check("...and it says WHY, so the zero is never mistaken for a clean window",
+          "no word characters" in str(_blind["detail"]), f"{_blind['detail']}")
 
     # ADMITTING the verb must move the rate. Without this the offender test could be reading a
     # frozen table and nothing here would notice.
@@ -1489,6 +1528,28 @@ def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
     _j = dr.build_lang_mode_findings(_GitNone(), root)
     check("mode ratchet: a non-word extension CAN be justified (the marker must be satisfiable)",
           _j == [], str(_j))
+
+    # THE MARKER GRAMMAR IS A SUPERSET OF THE ONE IT REPLACED, and that is asserted rather than
+    # assumed. The round-1 M2 fix required whitespace-or-start before the extension, which fixed
+    # `<none>` and silently NARROWED every other shape: `#py:` with no space, a parenthesised marker,
+    # and `# js,py:` -- the natural way to justify one move for two extensions -- all stopped
+    # matching. That reintroduced M2's own symptom (a permanent red under a correct-looking marker)
+    # for the shapes that used to work, which is why the rows below are spellings and not one
+    # spelling. `pyx` is the negative: a longer name must never be justified by a shorter one's row.
+    for _marker, _want_ok in (
+            ("# py: parser -> dark", True),
+            ("#py: parser -> dark", True),
+            ("# (py: parser -> dark)", True),
+            ("# js,py: parser -> dark", True),
+            ("# ext=py: parser -> dark", True),
+            ("# pyx: parser -> dark", False),
+            ("# parser -> dark", False),
+    ):
+        conf.write_text(_marker + chr(10) + 'LANGS="py:python-ast:dark js:js-regex:probe"' + chr(10),
+                        encoding="utf-8", newline=chr(10))
+        _silent = dr.build_lang_mode_findings(_Git(), root) == []
+        check(f"mode ratchet: {'justifies' if _want_ok else 'refuses'} {_marker!r}",
+              _silent is _want_ok, f"silent={_silent} want_ok={_want_ok}")
 
     # A STRENGTHENING move is free, and an extension that never moved is silent.
     conf.write_text('LANGS="py:python-ast:parser js:js-regex:parser"\n',

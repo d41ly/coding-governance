@@ -1,10 +1,12 @@
 """lexicon_conf.py — the ONE reader of `.lexicon.conf`.
 
-Three consumers need this file: the engine (`tools/lexicon/lexicon.py`), the adopter script
-(`tools/lexicon/adopt-lexicon.sh`, in bash), and — when its unit unparks — this repo's
-`map_extractors.py`. Two or three hand-written parsers for one file is the
-two-answers-to-one-question class, so the bash side calls `--print-verbs` here rather than
-reimplementing the grammar, and any other consumer imports `load_conf`.
+FOUR consumers need this file: the engine (`tools/lexicon/lexicon.py`), the adopter script
+(`tools/lexicon/adopt-lexicon.sh`, in bash), this repo's `map_extractors.py`, and `drift-audit`'s
+signals. Two hand-written parsers for one file is the two-answers-to-one-question class, so the bash
+side calls `--print-verbs` here rather than reimplementing the grammar, and every Python consumer
+imports `load_conf`. The count above read "three" and hedged the third with "when its unit unparks"
+long after it unparked, while the map dossier said four and listed them correctly — two carriers of
+one count, disagreeing, in a file whose whole subject is not having two of something.
 
 THE GRAMMAR, and why it is not exactly the sibling one. `.memory-tree.conf` and
 `.codebase-map.conf` are a RESTRICTED line-based `KEY=VALUE` that bash can `source` and Python can

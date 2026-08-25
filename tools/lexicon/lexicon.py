@@ -95,9 +95,11 @@ WAIVER_FILES = {
 }
 #: The extensions this kit can extract, and the ONE place they are declared. `scaffold_lexicon.py`
 #: imports this rather than keeping its own copy: the two had ALREADY diverged on the `py` pattern
-#: set (`""` here against `"python-ast"` there) within one build, so a probe against a repo with no
-#: declaration graded python through a different code path than the scaffold that would adopt it.
-#: Closing review M7.
+#: set (`""` here against `"python-ast"` there) within one build. The divergence was real; the
+#: CONSEQUENCE this comment first claimed was not. It said the two graded python through different
+#: code paths, and they do not — `extract_text` dispatches on `mode` alone and reads `pset` only
+#: under `probe`, so nothing anywhere compares a pattern-set id against `""`. A fix comment is read
+#: as provenance, so an overstated one is worse than none. Closing review M7, trimmed by round 2.
 KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe")}
 
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN", "layer": "LAYER_OFFENDER_PIN"}
@@ -629,6 +631,11 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # DEAD SNIFFER defect, in the commit whose own comment claimed the opposite.
     waived_by: dict[str, dict] = {}
     unwaived_by: dict[str, list] = {}
+    # PARSED ONCE. The round-1 H1 hoist copied the `int(pin_raw)` parse up here for its exception
+    # side-effect and left the original below, so one fact had two readers that were identical that
+    # day and free to diverge on any edit after it -- the class three of round 1's own findings were
+    # about. The value is kept here and read below. Found by the round-2 review.
+    pins_by_kind: dict[str, int] = {}
     for kind in ("verb", "suffix", "layer"):
         waivers = load_waivers(kit, kind)
         found = offenders[kind]
@@ -640,9 +647,25 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
                             f"delete the row): {', '.join(sorted(stale))}")
         pin_raw = conf.get(PIN_KEYS[kind], "")
         try:
-            int(pin_raw) if str(pin_raw).strip() else 0
+            pins_by_kind[kind] = int(pin_raw) if str(pin_raw).strip() else 0
         except ValueError:
+            pins_by_kind[kind] = 0
             problems.append(f"{PIN_KEYS[kind]}={pin_raw!r} is not an integer")
+
+    # DEAD SNIFFER JOINS THE OTHER REFUSALS, and this is the SECOND hoist into this spot. Round 1
+    # moved the waiver, stale and pin refusals above this return and wrote an arm whose own comment
+    # claimed it "would have caught the DEAD SNIFFER defect as well". It would not have: DEAD SNIFFER
+    # set `exit_code` directly, seventy-nine lines BELOW this return, so it never entered `problems`
+    # and `--measure` exited 0 with three clean pins over a tree `--check` redded by name. A gate
+    # satisfied by its own comment prose, written into the fix for that very class. The scan moved up
+    # with it -- `--measure` now pays for one definition-carrier scan it did not before, which is the
+    # honest price of the two modes answering the same question. Found by the round-2 review.
+    carriers = scan_definition_carriers(root, files)
+    blind = sorted(extractor_carriers - carriers)
+    if blind:
+        problems.append(f"DEAD SNIFFER (the coverage sniffer found no definition in {len(blind)} "
+                        f"file(s) where an ARMED extractor did, e.g. {blind[0]}; the denominator is "
+                        f"undercounting, which reports coverage as BETTER than it is)")
 
     if measure_mode:
         for kind in ("verb", "suffix", "layer"):
@@ -671,11 +694,7 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
 
         tally[kind] = (sum(v for (_e, k), v in graded.items() if k == kind),
                        len(unwaived), len(found) - len(unwaived))
-        pin_raw = conf.get(PIN_KEYS[kind], "")
-        try:
-            pin = int(pin_raw) if str(pin_raw).strip() else 0
-        except ValueError:
-            pin = 0
+        pin = pins_by_kind[kind]
         if len(unwaived) > pin:
             exit_code = 1
             print(f"lexicon: {kind} offenders {len(unwaived)} over pin {pin}:")
@@ -704,7 +723,6 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # tell the two apart where a single tree cannot. See the spec's section 4.
     # S1/S2 — the coverage fraction, on every run. The armed share of the files that actually
     # carry a definition, which is the number a `LANGS` edit moves and nothing else reported.
-    carriers = scan_definition_carriers(root, files)
     armed_exts = {e for e, (ps, m) in declared.items()
                   if m == "parser" or (m == "probe" and ps in PATTERN_SETS)}
     armed_carriers = {f for f in carriers if ext_of(f) in armed_exts}
@@ -718,17 +736,12 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # What is falsifiable without that flaw is AGREEMENT: every file an ARMED extractor found a
     # definition in must also sniff positive. Two independent readings of one population, and a
     # sniffer that has gone blind contradicts the extractors rather than merely reporting zero.
-    # PRINTS AND SETS THE CODE HERE, not via `problems`. The first cut appended to that list, which
-    # is already printed and already folded into `exit_code` forty lines above — so this refusal could
-    # never fire and a staged break proved it: blinding the sniffer left the run at exit 0. A refusal
-    # registered after its own reader has run is the armed-but-unreachable class, and the only thing
-    # that caught it was observing the break rather than reasoning about it.
-    blind = sorted(extractor_carriers - carriers)
-    if blind:
-        exit_code = 1
-        print(f"lexicon: DEAD SNIFFER — the coverage sniffer found no definition in {len(blind)} "
-              f"file(s) where an ARMED extractor did (e.g. {blind[0]}). The denominator is "
-              f"undercounting, which reports coverage as BETTER than it is.")
+    # THE REFUSAL ITSELF IS RAISED ABOVE, with the other three, so `--check` and `--measure` agree
+    # on it. It was moved twice for the same reason and the history is worth keeping: the first cut
+    # appended to `problems` after that list had already been printed and folded into `exit_code`, so
+    # it could never fire; the second printed and set `exit_code` directly, which fixed `--check` and
+    # left `--measure` blind to it. Both were armed-but-unreachable, one round apart, and both were
+    # caught by observing a staged break rather than by reading the code.
 
     empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
     if empty:
@@ -795,26 +808,44 @@ def run_suggest(root: Path, name: str) -> int:
         return 0
 
     banned = build_banned_index(conf)
-    # THE TAIL COMES FROM THE SAME SPLITTER THE VERB DID. Slicing the raw name by `len(verb)` is
-    # wrong whenever the two disagree about where the verb starts: `leading_verb` strips leading
-    # underscores first, so `_fetch_conf` sliced to `h_conf` and the suggestion dropped the object
-    # entirely. And the rejoin followed no convention: `getUserData` came back as `read_UserData`,
-    # gluing a camelCase tail after an underscore. Closing review M4 and M5.
+    # THE TAIL IS THE ORIGINAL SURFACE, SLICED. It is never re-derived, and two review rounds were
+    # needed to land on that. Round 1 found the tail sliced by `len(verb)` while `leading_verb` had
+    # stripped the leading underscores first, so the two disagreed about where the verb ended and
+    # `_fetch_conf` suggested `_load_h_conf`. Round 2 found that rebuilding the tail out of
+    # `subtokens()` -- the round-1 fix -- traded that for worse: the splitter lowercases, breaks
+    # acronym runs, splits digit boundaries and drops anything outside its character class, so
+    # `getUserURLs` came back as `readUserUrLs`, `fetch_v2_data` as `load_v_2_data` and `create$data`
+    # as `build_data` with the `$` silently gone. Three of those had been CORRECT before the fix.
+    #
+    # Slicing at the end of the FIRST SUBTOKEN's own surface is what both rounds were reaching for.
+    # The splitter decides where the verb ends, which is the half round 1 had right; nothing
+    # downstream re-spells a character the caller wrote, which is the half round 2 had right.
+    # Separator style, case, acronym runs, digit suffixes, trailing underscores and characters the
+    # splitter cannot even see all survive, because not one of them is ever regenerated.
     lead = name[:len(name) - len(name.lstrip("_"))]
-    tail_tokens = subtokens(name)[1:]
-    body = name.lstrip("_")
-    camel = "_" not in body and body != body.lower()
-    if not tail_tokens:
-        rest = ""
-    elif camel:
-        rest = "".join(t[:1].upper() + t[1:] for t in tail_tokens)
+    body = name[len(lead):]
+    _toks = subtokens(name)
+    _first = _toks[0] if _toks else ""
+    if not _first or body[:len(_first)].lower() != _first:
+        # The splitter and the surface disagree. `leading_verb`'s contract allows that for a name
+        # with no word characters; suggest the bare verb rather than invent a tail for it.
+        surface, rest = "", ""
     else:
-        rest = "_".join(tail_tokens)
+        surface, rest = body[:len(_first)], body[len(_first):]
     if verb in banned:
         want = banned[verb]
         gloss = (verbs.get(want) or "").strip()
-        swap = (lead + want + rest) if camel and rest else (
-            f"{lead}{want}_{rest}" if rest else lead + want)
+        # THE VERB INHERITS THE CASE OF THE TOKEN IT REPLACES, so a SCREAMING_SNAKE name is not
+        # answered in lower snake and a PascalCase one is not answered in camelCase. Round 1 answered
+        # every shape in the declaration's own lowercase, which is a second way of handing back a
+        # name whose only remaining defect is that the author must edit it before typing it.
+        if len(surface) > 1 and surface.isupper():
+            want_cased = want.upper()
+        elif surface[:1].isupper():
+            want_cased = want[:1].upper() + want[1:]
+        else:
+            want_cased = want
+        swap = lead + want_cased + rest
         print(f"use `{swap}` — the declaration says `{want}`, NOT `{verb}`: {gloss}")
     else:
         print(f"`{verb}` is not in the declared table, and no row bans it by name. "
@@ -874,8 +905,13 @@ def run_brief(root: Path, target: str) -> int:
     # than saying which file and why. Exit 2, keeping 1 reserved for verdicts. Closing review M3.
     try:
         got = extract(p, mode, pset)
-    except (SyntaxError, ValueError) as exc:
-        print(f"lexicon: {rel} does not parse, so its objects cannot be read: {exc}")
+    except (SyntaxError, OSError) as exc:
+        # THE SAME PAIR THE CORPUS LOOP CATCHES, which is the point of the guard. Round 1 caught
+        # `(SyntaxError, ValueError)`: it missed the unreadable-file case the loop handles, and it
+        # swallowed `ValueError` from anywhere inside the extractor, so an internal bug would have
+        # been reported to the user as "this file does not parse". Two modes answering one question
+        # differently is the class; matching the pair is the fix. Found by the round-2 review.
+        print(f"lexicon: {rel} cannot be read as source, so its objects cannot be listed: {exc}")
         return 2
     here = sorted({read_object(n) for n, _ln in (got[0] if got else []) if read_object(n)})
     if not here:

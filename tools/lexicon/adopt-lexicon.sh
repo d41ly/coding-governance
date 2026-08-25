@@ -7,8 +7,11 @@
 # WHY THE SEED IS DERIVED AND THEN FROZEN. Companion §12 bans a gate whose vocabulary is a
 # hand-kept mirror of the codebase's own identifiers; a PRESCRIPTIVE verb table is the inverse and
 # is safe. But an adopter cannot author a closed vocabulary for a domain they have not read yet, so
-# `--scaffold` derives a proposal from their own corpus by leading-token frequency — which for one
-# moment IS the banned shape. The resolution is that the proposal is marked PROPOSED, a human
+# `--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's
+# corpus only which concepts are live in it, so the seed is prescriptive at the moment it is
+# written and is NOT the banned shape. It ranked the corpus's own leading tokens until
+# `TOOL-dScaffoldedMirror-8`, and that WAS the banned shape: a repo already calling everything
+# `get` was certified as calling it `get`.
 # curates it, and "was edited" is CHECKABLE: `--check` reds while `ratified` is empty, so an
 # unedited seed cannot reach the merge bar disguised as a curated vocabulary.
 #
@@ -64,7 +67,18 @@ KITREL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)" || exit 2
 KITREL="${KITREL%/}"
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 SKILL="$ROOT/.claude/skills/lexicon/SKILL.md"
+# CHECKED, because an empty value here is INVISIBLE downstream. The Skill's marker would render as
+# `gov:kit lexicon@` with nothing after the `@`, and `--check` would still report "Skill in sync":
+# its drift gate re-renders and byte-compares, so it compares a render against a render and both
+# carry the same empty version. Round 2 of the closing review renamed the constant in a sandbox and
+# watched exactly that happen. A pipeline takes its LAST command's status, so `head -1` succeeding
+# on empty input is a zero — the emptiness has to be tested for, not inferred from the exit code.
 KIT_VERSION="$(grep -oE 'KIT_LEXICON_VERSION = "[0-9.]+"' "$KIT_DIR/lexicon.py" | grep -oE '[0-9.]+' | head -1)"
+if [ -z "$KIT_VERSION" ]; then
+  echo "lexicon-adopt: cannot read KIT_LEXICON_VERSION from $KIT_DIR/lexicon.py — the Skill would"
+  echo "lexicon-adopt: render a version-less marker and its own drift gate could not tell." >&2
+  exit 2
+fi
 # ---- S4 of TOOL-dScaffoldedMirror-10: the rendered Skill -----------------------------------------
 #
 # WHY A RENDER AND NOT A POINTER. The charter can only POINT at the declaration -- it has 118 bytes of
@@ -211,10 +225,11 @@ if [ "$MODE" = "--check" ]; then
   # NON-EMPTY value — and the unratified-seed refusal passes exactly when it should fire.
   ratified=$(tr -d '\r' < "$CONF" | grep -E '^ratified=' | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
   if [ -z "${ratified// /}" ]; then
-    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold DERIVES the verb"
-    echo "lexicon-adopt: table from your corpus and marks it PROPOSED; a derived table that nobody"
-    echo "lexicon-adopt: curated is a mirror of the code, which is the shape a naming gate must not"
-    echo "lexicon-adopt: have. Curate the table, then stamp \`ratified=\"<date> node <tag>\"\`."
+    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold takes each verb's"
+    echo "lexicon-adopt: SPELLING from the kit's frozen canon and asks your corpus only which concepts"
+    echo "lexicon-adopt: are live, so the seed is prescriptive rather than a mirror of your code — but"
+    echo "lexicon-adopt: it is not CURATED: the negatives are generic and your domain rows are missing."
+    echo "lexicon-adopt: Read the table, edit it, then stamp \`ratified=\"<date> node <tag>\"\`."
     fail=1
   fi
   verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-verbs "$CONF" 2>/dev/null | grep -c . || true)
