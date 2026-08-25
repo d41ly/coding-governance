@@ -80,10 +80,24 @@ lines above the site round 1's H1 fixed; and the `tPlanEmpty` arm's fixture is d
 Everything is committed on `branch/build-readme-governance-e1c044`. Nothing was merged and nothing
 was pushed beyond that branch. The work to do, in order:
 
-1. Fix the three broken `--plan` arms — the fixture must not call `units` on a README that already
-   carries a pair.
-2. Fix the almost-a-marker trigger to match `region()` at column 0.
-3. Decide whether `--plan`'s id extraction should be slug-scoped at all, given it now drops rows
-   silently.
-4. Re-derive `READ_PATH_CEILING` down to measured-plus-153.
-5. Re-run the closing review from `c80d9233`, which is round 1's recorded tip, and grade these 17.
+1. ~~Fix the three broken `--plan` arms~~ — DONE at `abf5fc22`. `setunits` replaces the rendered
+   body where `units` appended a second pair, and it was verified STANDALONE — an empty body leaves
+   one pair with zero rows, a two-row body leaves one pair in order — which is the property the
+   broken arms needed and is checkable without running the suite the owner instruction covers. That
+   matters beyond this fix: the three earlier defects in blind-written arms were all found by other
+   gates, and this is the first one that could have been caught here.
+2. ~~Fix the almost-a-marker trigger~~ — DONE at `abf5fc22`. A column-0 prefix test now, matching
+   `region()`.
+3. **STILL OPEN — a judgement, not a fix.** Whether `--plan`'s id extraction should be slug-scoped
+   at all. Scoping fixed the digit case and the unscoped case together, and it also makes a rendered
+   row carrying another build's slug invisible rather than named. No instance exists in the corpus
+   today, so nothing is broken; the question is whether silence is the right answer if one appears.
+4. ~~Re-derive `READ_PATH_CEILING`~~ — DONE at `abf5fc22`, 135872 → 135564 against a measured 135411.
+5. **STILL OPEN — the one this round could not do.** Re-run the closing review from `c80d9233`,
+   round 1's recorded tip, and grade the fourteen findings that remain ungraded.
+
+Also fixed on the way: `mkspec` pinned every spec to `-1.md`, so any two-unit fixture silently
+collapsed to one — the class, not just this instance. And the kit constant reached 2.43, its third
+bump discovered only after a red bar, now filed as `TOOL-dHonouredPark-9`.
+
+The full bar is GREEN at 85/85 over all of it.
