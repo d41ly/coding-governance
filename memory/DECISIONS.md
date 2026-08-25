@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-dFramedEntrypoint-9 · the build-README contract grows ORGANICALLY: each build's owner conforms their own README on next touch (owner). Declines making the two judgement slots empty_ok for pre-existing builds; binds 1 of 62 today and the 49 terminal builds never bind
 - TOOL-dFramedEntrypoint-8 · the build README's authored half GETS a prose template, bound to a DECLARED REGISTRY not the corpus. Reverses aMouldedFolio-1 conclusion 3 and aMouldedFolio-3 §3 knowingly (owner): they refused on 17 of 25 violating day one, re-measured 20 of 61
 - TOOL-aRelaxedShard-4 · the backlog's bound is its LIVE ROW COUNT, not its byte cap: rotation carries forward every non-terminal row. `live_backlog_rows_per_shard` reports it per shard, REPORT-ONLY — a pin on an unguarded merge leg is a scheduled refusal. Sharding rejected on the slope
 - TOOL-aRelaxedShard-1 · check 6's row cap is DECLARED (`ROW_DOC_CAP_BYTES`, `DOSSIER_CAP_BYTES`; both ship at 20480) and the row class loses its LINE bound. Reverses aWidenedGuide-1 knowingly: the bound DID bind, on 22 of 29 row documents. Blank resolves forward, never off

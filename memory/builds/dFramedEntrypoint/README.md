@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: tooling
 roster: TOOL
-ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8
+ids: TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
 ---
 
 # dFramedEntrypoint — the build README becomes a closed, budgeted authored slot set
@@ -60,7 +60,7 @@ lexicon naming leg is red at the base with its guard hiding it. None is this bui
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-08-24 · streams tooling
-ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8
+ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,7 +75,7 @@ ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 T
 | [TOOL-dFramedEntrypoint-7 — the conformance pass that seeds the registry with a real population](spec/2026-08-24-spec-dFramedEntrypoint-7.md) | 8 | 2 | CLOSED | rev-4 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 3 record folder(s).
+Records: 22 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
