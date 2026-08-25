@@ -65,7 +65,7 @@ ids TOOL-aNamedGesture-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build](spec/2026-08-25-spec-TOOL-aNamedGesture-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
