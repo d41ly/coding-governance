@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: ea49714abdf92a14f856e392cb208ab34a2b331b
-phase: LANDING
+phase: LANDED
 branch-sha: 500a5db6b8e056c11bbe1c3cd82a16bc186ada5a
 branch-ref: refs/heads/branch/lexicon-kit-overview-00de02
 mode: slug
