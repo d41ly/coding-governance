@@ -1,11 +1,12 @@
 # TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 2 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 2 · streams tooling · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-TOOL-dHonouredPark-3-acceptance.md](../build/2026-08-25-build-TOOL-dHonouredPark-3-acceptance.md) | journal | — |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
 
@@ -288,6 +289,8 @@ helper, which it does not today.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · BUILT and CLOSED. All eleven criteria observed against the REAL tree before
+  any arm was written; the ledger is in this unit's build record. Arms 3 -> 13.
 - rev-4 · 2026-08-25 · M3 fork sweep. F1 and F2 resolved as specced; F2's answer carries a cost —
   S6's corrected parity sentence must say the divergence from the sibling registry is deliberate.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s fifth park.
