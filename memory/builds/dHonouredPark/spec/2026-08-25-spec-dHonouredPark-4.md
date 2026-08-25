@@ -1,6 +1,6 @@
-# TOOL-dHonouredPark-4 — `--plan` reads the rendered units region, so both verbs answer from one source
+# TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source
 
-**Status:** SPECCED · rev-1 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -12,58 +12,102 @@
 
 ## 1. Goal
 
-Since the roster sorts by build order, `--status` and `--plan` volunteer different units as next:
-`--status` reads the generated units region and names the first in build order, `--plan` re-derives
-from tracked specs and sorts by id. Neither is wrong about STATUS, and that is what makes the
-disagreement expensive — two verbs answering one question differently, with nothing to say which is
-authoritative. The owner ruled `--plan` reads the rendered region.
+Since the roster sorts by build order, `--status` and `--plan` volunteer different units as next.
+`--status` reads the generated units region and names the first non-terminal row in build order;
+`--plan` re-derives from tracked specs in `git ls-files` order — which is LEXICAL PATH order, not id
+order as rev-1 claimed. `unattended.sh:1578` has no sort anywhere, and path order coincides with id
+order only while dates and unpadded ordinals happen to agree; on a build with more than nine units it
+gives 1, 10, 11, …, 2, 20.
+
+Neither verb is wrong about STATUS, and that is what makes the disagreement expensive — two verbs
+answering one question differently, with nothing to say which is authoritative. The owner ruled
+`--plan` reads the rendered region.
 
 ## 2. Scope (IN)
 
-- **S1** — `--plan`'s unit enumeration reads the `gen:build-units` region rather than re-deriving from
-  tracked specs. That region is already the shape `check_authorization` and `--status` read, so this
-  makes three verbs agree instead of two disagreeing with a third.
+- **S1** — `--plan`'s unit enumeration takes its SET and its ORDER from the `gen:build-units` region.
+  This EXTENDS an existing read rather than adding one: `verb_plan` already opens that region at
+  `unattended.sh:1572-1573` for its malformed-pair refusal. A row resolves to its unit **by ID, not by
+  link** — `unit_rows` (`:1538-1541`) pattern-matches `^\| \[.*\]\(spec/` and never opens the target,
+  and eleven arms plus `UNATTENDED-PROTOCOL.md:423` describe the output; resolving by link would break
+  them, because the `readme()` fixture links to a bare `one.md` under its `spec/` dir while `mkspec`
+  writes a dated filename.
 - **S2** — `--plan` reports units in the region's own order, which is build order, so its "next" and
-  `--status`'s "next" are the same unit by construction rather than by coincidence.
+  `--status`'s "next" are the same unit **over the SPECCED set** by construction rather than by
+  coincidence.
 - **S3** — the MISSING join is UNCHANGED and still reads the authored `roster:units` pair. That
   question — which units are planned but unspecced — cannot be answered from a region rendered out of
   the specs that exist, and pointing it there was tried and reverted at `TOOL-aBoundedVerdict-11`.
-  This unit moves where the SPECCED set comes from and does not touch where the PLANNED set does.
-- **S4** — a REFUSAL when the region is absent or malformed, naming the file and the marker, rather
-  than a silent fallback to the old derivation. A fallback would restore the divergence exactly when
-  the tree is in the state most likely to hide it.
-- **S5** — arms: both verbs name the same next unit on a build with order values; both name the same
-  on a build with none; a malformed region refuses; and the MISSING join still fires from the
-  authored pair with the region present.
+- **S4** — the residual divergence S3 preserves is DOCUMENTED rather than claimed away. On a build
+  whose specced units are all terminal AND whose roster names an unspecced id, `verb_plan` falls
+  through to `next="$miss (MISSING - spec it first)"` (`:1614-1618`) while `verb_status` prints
+  `(no non-terminal unit)` (`:2226-2227`). The verbs then name different things because they are
+  answering different questions, and `--plan` is the one with the more complete answer. rev-1's
+  "the same unit by construction" was false in that state; this unit scopes the claim and pins the
+  exception with an arm instead of leaving it as an unverified sentence.
+- **S5** — a REFUSAL when the region is ABSENT, naming the file and the marker, rather than a silent
+  fallback to the old derivation. The MALFORMED case already refuses with `fail 42` at `:1572-1576`
+  and is already armed at `unattended.test.sh:1601-1611`; `units_refusal` at `:1557` already spells the
+  message. Only the truly-absent case falls through today, guarded away by the outer
+  `grep -qF -- "$UNITS_OPEN"`. This unit changes that guard's condition — which rev-1 did not
+  acknowledge, having treated the whole refusal as new code.
+- **S6** — the two `NOT A UNIT` diagnostics are PRESERVED. `render_region` emits rows only from
+  `build["units"]`, i.e. specs whose status header parsed, while the spec walk at `:1592-1602` reports
+  a spec with no status header and a spec whose heading and header disagree. Five tracked specs
+  produce such a row today (`aDeployScout`, `aKitHardener`, `aLeanRework`, `aPortableWarden`,
+  `aRatchetForge`), so moving the enumeration onto the region would drop a live signal. `--plan` keeps
+  a spec-file walk for this purpose alone, reporting the same two conditions, and rev-1's "otherwise
+  identical" is withdrawn.
+- **S7** — arms: both verbs name the same next unit on a build with order values; both name the same
+  on a build with none; an absent region refuses; a malformed region still refuses; the MISSING join
+  still fires from the authored pair with the region present; the S4 divergence is pinned; and each of
+  the two `NOT A UNIT` conditions still reports.
 
 ## 3. Non-goals (OUT)
 
 - No change to what `--status` reads. It is already the region and is the verb the other is being
   brought into line with.
-- No change to the MISSING join or to `roster_ids`. S3 states the boundary; `TOOL-dHonouredPark-1`
-  is the unit that changes anything about the authored pair.
+- No change to the MISSING join or to `roster_ids`. S3 states the boundary;
+  `TOOL-dHonouredPark-1` is the unit that changes anything about the authored pair.
 - No sorting of `--plan` by the order verb directly. That was the other option and it couples the
   unattended driver to a grammar the memory-tree kit owns, which is the cross-kit dependency this
   repo's stream rules exist to avoid. Reading the region gets the same order without the coupling.
 - No new region and no new marker. The units region already has an address.
+- No shared enumerator for the two verbs. See §8 F2 — it stays conditional on falling out of S1.
 
 ## 4. Design
 
 ### Data model
 
-Unchanged. `--plan` stops parsing spec files for this list and parses the region instead; both carry
-id, status and title.
+Unchanged. `--plan` stops parsing spec files for the unit LIST and parses the region instead; both
+carry id, status and title. The spec-file walk survives for S6's two diagnostics and for
+`plan_state`'s THIN/FORKED/READY classification, which the region does not carry.
 
 ### Inventory
 
-Three readers of the units region after this unit: `check_authorization`, `--status` and `--plan`.
-One reader of the authored pair: `roster_ids`, feeding the MISSING join. The split stays exactly where
-`TOOL-aBoundedVerdict-11` put it, and this unit moves one verb from the wrong side of it to the right.
+The units region has more readers than rev-1 counted, and `verb_plan` is already among them. Call
+sites of `UNITS_OPEN`, `unit_rows`, `unit_ids_of` and `nonterminal_units` sit at `unattended.sh:1251`,
+`:1572`, `:1874`, `:2041`, `:2226`, `:2693-2722` and `:3522`; the driver's own comment at `:1864`
+already calls `unit_rows` the THIRD reader before this unit adds anything. rev-1's "three readers after
+this unit" was wrong in both direction and count.
 
 ### Migration
 
 One commit. `--plan`'s output changes ORDER for any build carrying order values and is otherwise
-identical; nothing downstream parses it, verified by grep for the verb across the tree.
+identical **except** for S6, which it preserves deliberately. Downstream readers: eleven assertions in
+`unattended.test.sh:1555-1644` and one description in `UNATTENDED-PROTOCOL.md:423`. rev-1's "nothing
+downstream parses it" was overstated; they parse the id, which S1 keeps as the join key.
+
+### The fixture this unit has to build
+
+`grep -n Order tools/unattended/unattended.test.sh` returns nothing. The `readme()` fixture renders a
+four-column units region (Unit · Status · Rev · Last change) while the live corpus renders six, with
+Order second. **AC1 quantifies over a build whose units carry order values, and no such build exists in
+the harness.** Building that fixture is part of this unit, not a precondition of it.
+
+The column mismatch itself is harmless and must not be "fixed" as a side effect: `nonterminal_units`
+selects with `grep -vE '\| (CLOSED|WONTDO) \|'` and `unit_rows` with `^\| \[.*\]\(spec/`, both
+column-count agnostic.
 
 ### Alternatives rejected
 
@@ -72,73 +116,116 @@ driver would have to read a status-header grammar the memory-tree kit defines an
 two kits are separate streams.
 
 **Document the divergence.** Zero code, and it leaves two verbs volunteering different next units —
-the two-answers-to-one-question class this build's parent spent itself removing.
+the two-answers-to-one-question class this build's parent spent itself removing. Note that S4 does
+document a divergence, but a strictly narrower one that survives by design rather than by neglect.
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh` · its arms · the kit version sites · `memory/guides/UNATTENDED-PROTOCOL.md`
-only if it states what `--plan` reads, which is checked rather than assumed.
+`tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` including the new
+order-bearing fixture · the kit version sites · `memory/guides/UNATTENDED-PROTOCOL.md` only if it
+states what `--plan` reads, which is checked rather than assumed — and it does, at line 423, so the
+charge is real.
 
 ## 5. Production-readiness checklist
 
 - security — N/A.
-- perf / scale — strictly cheaper: one region parse instead of one parse per tracked spec.
+- perf / scale — strictly cheaper for the list; the S6 walk keeps one pass over the spec files.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — an absent or malformed region REFUSES by S4. A build with no units
-  renders the region's own empty-case sentence and `--plan` reports no next unit, which is the
-  existing behaviour and stays.
-- observability — the refusal names the file and the marker, so a stale render is distinguishable
-  from an empty build.
-- risks — the fallback is the risk, and S4 removes it. A silent fall-back to the old derivation would
-  reintroduce the divergence precisely when the region is stale, which is the case where the two
-  answers differ most.
-- testing + left-shift gates — five arms, including the both-verbs-agree pair, which is the assertion
-  that would have caught this divergence when it was introduced.
+- error / empty / loading states — an absent region REFUSES by S5, a malformed one already does. A
+  build with no units renders the region's own empty-case sentence and `--plan` reports no next unit,
+  which is existing behaviour and stays.
+- observability — the refusal names the file and the marker, so a stale render is distinguishable from
+  an empty build. S6 is the other half: the two `NOT A UNIT` conditions keep reporting.
+- risks — the silent fallback, removed by S5. Second risk: S6. Reading the region is the obvious
+  simplification and it silently drops a diagnostic that fires on five tracked specs today, which is
+  precisely the kind of loss a green test suite would not notice.
+- read path — `memory/guides/UNATTENDED-PROTOCOL.md:423` states what `--plan` prints and is a capped
+  member at 48838 B; this unit charges it and its own `memory/DECISIONS.md` row. Both are priced and
+  the ceiling moved in the same commit, per this build's rules slot. rev-1 named the file as possibly
+  touched and never priced the charge.
+- testing + left-shift gates — S7's arms, plus the order-bearing fixture they need.
 - migration / rollback — one commit, invertible.
-- user docs — the protocol only if it makes a claim about `--plan`'s source.
+- user docs — the protocol, at the line that describes the source.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash tools/unattended/unattended.sh --plan <slug>` and `--status <slug>` run over a
-  build whose units carry order values, both name the SAME unit as next.
-- **AC2** — `--plan` and `--status` over a build carrying NO order values still name the same unit.
-- **AC3** — When the `gen:build-units` region is absent or its markers are malformed, `--plan` exits
-  non-zero naming the file and the marker, and does NOT fall back to the spec derivation.
-- **AC4** — When a build's authored `roster:units` pair names an id no spec defines, `--plan` still
+- **AC1** — When `--plan <slug>` and `--status <slug>` run over a build whose units carry order values
+  **and which has a run-state file**, both name the SAME unit as next. The run-state clause is not
+  decoration: `verb_status` fails 10 at `:2210` without one, so this criterion is unreachable on a bare
+  build and rev-1 did not say so.
+- **AC2** — When `bash tools/unattended/unattended.sh --plan <slug>` and `--status <slug>` run over a
+  build carrying NO order values, with a run-state file present, both name the SAME unit as next.
+- **AC3** — When the `gen:build-units` region is ABSENT, `--plan` exits non-zero naming the file and
+  the marker, and does NOT fall back to the spec derivation. Observed RED first: at BASE the outer
+  `grep -qF` guard makes this case fall through silently.
+- **AC4** — When the region's markers are MALFORMED, `--plan` refuses. **Green at BASE** (`fail 42` at
+  `:1572-1576`, armed at `:1601-1611`); kept as a regression guard, not as evidence.
+- **AC5** — When a build's authored `roster:units` pair names an id no spec defines, `--plan` still
   reports it MISSING with the region present, proving S3's boundary held.
-- **AC5** — When `--plan` runs over a build carrying order values, its rows appear in build order.
-- **AC6** — When `bash tools/unattended/check-unattended.sh` runs, the kit gate is green, and the
-  both-verbs-agree arm is observed RED first against a staged re-derivation.
+- **AC6** — On a build whose specced units are ALL terminal and whose roster names an unspecced id,
+  `--plan` names the missing unit and `--status` reports no non-terminal unit, and an arm asserts
+  exactly that pair of outputs. This is S4's pinned exception: the divergence is intended and is
+  therefore tested, not asserted away.
+- **AC7** — When a tracked spec carries no status header, and when its heading and status header
+  disagree, `--plan` still reports each as `NOT A UNIT`. Observed against the five live instances.
+- **AC8** — When `--plan` runs over a build carrying order values, its rows appear in build order.
+- **AC9** — When `python tools/memory-tree/corpus_ids.py --report` runs before and after, both totals
+  are recorded and `.memory-tree.conf` carries this unit's own movement line.
 
 ## 7. Gates
 
-`unattended kit gate` · `memory hygiene` · `check-kit-versions.sh` · `check-verdict-epoch.sh` ·
-`check-arms.py` floors if the driver gains `fail` branches.
+`unattended kit gate` · `memory hygiene` (incl. check 16) · `check-kit-versions.sh` ·
+`check-verdict-epoch.sh` · `check-arms.py` floors — the driver gains `fail` branches ·
+`unattended skill wiring`.
+
+**Declared skip, with its compensating check.** The arms this unit adds live in
+`tools/unattended/unattended.test.sh`, and **no leg on the bar runs that file**: `tools/gate-legs.json`
+carries only `unattended kit gate`, `playbook validity gate` and `unattended skill wiring` for this
+kit, so `GATE_FULL=1 GATE_SELFTESTS=1` does not reach them. That is deliberate — the kit's self-tests
+were pulled off the bar at the owner's ruling of 2026-08-23 for costing 68% of it, and a standing owner
+instruction forbids running them. rev-1's AC6 named `bash tools/unattended/check-unattended.sh` as the
+runner that would observe an arm RED; that script never invokes `unattended.test.sh`, so the criterion
+could not have been met as written.
+
+The compensating check: each arm is observed RED against a staged break at authoring time and the
+observation recorded in the unit's build record with the staged diff, and the owner is handed the one
+command — `bash tools/unattended/run-unattended-gates.sh` — rather than having `--selftests` added to
+this list. An exemption is not coverage, so the exemption is written down with what stands in for it.
 
 ## 8. Open questions
 
-- **F1 — does `--plan` keep re-deriving anything from the spec files?** It still needs each spec's
-  own classification, which the region does not carry. Recommendation: read the region for the SET
-  and its order, and the spec files for per-unit classification — one source per question, which is
-  the rule rather than a compromise between two.
+- **F1 — RESOLVED.** `--plan` still reads the spec files, for two things the region does not carry:
+  `plan_state`'s THIN/FORKED/READY classification, and S6's two `NOT A UNIT` conditions. The region
+  supplies the SET and its ORDER. One source per question, which is the rule rather than a compromise.
 - **F2 — should `--status` and `--plan` share one enumerator function?** It would make divergence
   structurally impossible rather than merely tested. Against: it widens this unit into a refactor of
-  two verbs with different output contracts. Recommendation: shared enumerator, IF it falls out of
-  S1's implementation without changing either verb's output; otherwise the arm in S5 is the guard and
-  the refactor is its own row.
+  two verbs with different output contracts, and S4 establishes that one intended divergence survives
+  anyway. Recommendation: shared enumerator IF it falls out of S1 without changing either verb's
+  output; otherwise S7's arms are the guard and the refactor is its own row.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s third park —
   the one park that was still unruled when the build landed.
+- rev-2 · 2026-08-25 · spec-audit fold. Corrected §1: `--plan` orders by lexical PATH, not by id. S1
+  now records that `verb_plan` ALREADY reads the region and that rows join by id, not by link. Added
+  S4 and AC6 for the divergence rev-1 claimed away, and S6 and AC7 for the two `NOT A UNIT`
+  diagnostics the move would have dropped. Narrowed S5 to the absent case after finding the malformed
+  refusal already ships and is armed. Added the missing run-state clause to AC1. Took the
+  order-bearing fixture into scope — no such fixture exists. Replaced rev-1's AC6 runner, which cannot
+  run the file it names, with a declared skip and its compensating check. Priced the read-path charge.
 
 ## 10. Reuse audit
 
 Memory-recall terms for the regrounding read: `plan status next unit units region rendered derived
-divergence build order id order driver verbs`. The seam is the `gen:build-units` region and the
-existing readers of it — `check_authorization` at the authorization path and `nonterminal_units`
-behind `--status` — both of which select rows out of that region already, so `--plan` is joining an
-established pattern rather than inventing one. The negative finding: there is no shared enumerator
-today, which is why two verbs could drift at all, and F2 asks whether creating one falls out of this
-change or needs its own unit.
+divergence build order id order driver verbs not a unit`.
+
+The seam is the `gen:build-units` region and its existing readers, enumerated in §4. `verb_plan` is
+already one of them, which rev-1 missed and which changes S1 from "add a reader" to "extend a read" —
+the smaller and safer framing.
+
+The negative findings worth recording: there is no shared enumerator today, which is why two verbs
+could drift at all (F2 asks whether creating one falls out of this change); and there is no
+order-bearing fixture in the harness, so the arm that would have caught this divergence when it was
+introduced could not have been written without building one first.

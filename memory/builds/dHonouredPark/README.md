@@ -14,21 +14,23 @@ parents: dFramedEntrypoint
 
 `dFramedEntrypoint` landed with five decisions parked because taking them was outside its stated
 goal, and the owner has since ruled four of them. Each ruling is real work in a kit that build did
-not own: a Definition-of-Done term that currently passes vacuously on 51 of 62 builds has to become
-a real check, a governance carrier's declared budget has to move, a waiver registry has to stop
-being keyed on a line number that any insertion above it invalidates, and two driver verbs have to
+not own: a Definition-of-Done term that passed vacuously on 51 of 62 builds at this build's base
+has to become a real check, a governance carrier's declared budget has to move, a waiver registry
+has to stop being keyed on a line number that any insertion above it invalidates, and two driver verbs have to
 stop answering one question differently. A ruling nobody builds is a park with a nicer name.
 
 ## Expected improvements
 
-- `build-complete` term 3 becomes a check that can fail, on 62 builds instead of 11.
+- `build-complete` term 3 becomes a check that can fail, on every tracked build README instead of the
+  eleven that happen to carry a roster pair.
 - A waiver registry stops unpinning every time an unrelated line is inserted above a waived hit.
 - `--plan` and `--status` answer "which unit is next" from one source and cannot drift apart.
 
 ## Detriments if this is not built
 
 - Four owner rulings sit as backlog rows while the conditions that earned them stay live.
-- A Definition-of-Done item keeps reporting a pass it did not earn on 84% of the corpus.
+- A Definition-of-Done item keeps reporting a pass it did not earn on most of the corpus. The share is
+  not written here, because it moves with every build that lands.
 - The next insertion above a waived dead-path hit reds the bar for a reason unrelated to the change.
 
 ## Build-level rules
@@ -52,10 +54,10 @@ ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonoure
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHonouredPark-2 — the build method's declared budget rises to 350 lines](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT, not line NUMBER](spec/2026-08-25-spec-dHonouredPark-3.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-25 |
-| [TOOL-dHonouredPark-4 — `--plan` reads the rendered units region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-25 |
+| [TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | SPECCED | rev-2 | 2026-08-25 |
+| [TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER](spec/2026-08-25-spec-dHonouredPark-3.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-25 |
+| [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-25 |
+| [TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

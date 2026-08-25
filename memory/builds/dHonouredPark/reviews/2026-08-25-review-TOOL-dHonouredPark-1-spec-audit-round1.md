@@ -8,6 +8,10 @@ verifier total both at the charter's cap.*
 
 ## Verdict: BLOCKED
 
+*Round 1's verdict, kept as what this round found. Both blockers were closed after it — one fixed in
+the same pass, one by owner ruling — and the fold is recorded at the foot of this file. A round 2 over
+rev-2 is what establishes convergence; this record does not get to declare it.*
+
 67 raw findings. 67 graded. 39 CONFIRMED, 25 CORRECTED, 3 REFUTED. Strict precision (confirmed over
 raised) 0.58; survival rate 0.96.
 
@@ -117,7 +121,7 @@ options are to raise `READ_PATH_CEILING` with the movement recorded as this buil
 `READ_PATH_WAIVER`, or to trim a capped member. This needs a ruling before the fold, because the
 answer changes which unit carries the change and whether unit 2's ACs are satisfiable at all.
 
-## The decision the audit surfaced — unit 1's gate binds 2 files, and the owner ruled 51
+## The decision the audit surfaced — RULED 2026-08-25: the gate binds every tracked build README
 
 **`L1F1` · `L4F3` · `L3F2` · `L4F6` · CORRECTED and CONFIRMED · final HIGH · NEEDS AN OWNER RULING**
 
@@ -342,13 +346,44 @@ three arms at `check-dead-paths.test.sh:109-125` all need rewriting) · `L4F12` 
    exactly one line each, and none contains a tab. A green starting state worth pinning rather than
    leaving unknown.
 
-## What the fold owes
+## The owner's rulings, 2026-08-25
 
-The build is BLOCKED on two things and neither is a spec wording fix.
+Three questions were put to the owner with the measurements above. All three were ruled the same day
+and rev-2 of the four specs implements them.
 
-1. BLOCKER 2 is open: no spec says where the 60 bytes come from, and four decision-log rows alone
-   exceed them.
-2. Unit 1's gate population was never ruled. The spec gates 2 files where the owner's ruling named 51,
-   and non-goal 4 is an inference, not a constraint.
+1. **The roster gate binds every tracked build README.** Not the contract's BOUND set, which was
+   never the population any ruling named. Unit 1's non-goal 4 is withdrawn, its migration-ordering
+   rationale — false under the two-file scoping — becomes the operative reason, and the alternatives
+   the owner declined (the bound set, and a non-terminal-only population) are recorded in that spec.
+2. **`READ_PATH_CEILING` rises, as declared scope, with each unit pricing its own charge.** This is
+   the convention `.memory-tree.conf` already runs: one recorded movement per charging unit, each with
+   its measurement and its reason, each keeping the same 153 B margin. All four specs gained a
+   read-path scope item and an acceptance criterion; unit 2's is observed RED first by staging its
+   prose edit without the ceiling movement.
+3. **The byte cap stays at 24576.** The owner was shown that the 310→350 line raise buys about six
+   usable lines rather than forty, and ruled the line figure moves alone. Unit 2 gains a scope item and
+   an acceptance criterion stating that the BYTE half is the binding one, which is the clause whose
+   absence made the ruling unplannable.
 
-Everything else folds into rev-2 of the four specs.
+## What the fold did
+
+Every surviving finding is folded into rev-2 of the four specs. The changes that are more than
+wording:
+
+- Unit 1's population widened, its S4 rewritten after the audit found it named a construct that does
+  not exist, and two new scope items added for the engine/driver marker-discipline split and the
+  `region` refusal `roster_ids` currently swallows.
+- Unit 3 gained an occurrence ORDINAL, reusing `unarmed-branches.txt`'s shape, because the bare
+  ambiguity refusal had no legal remedy. Its staleness semantics were corrected to the derived-needle
+  rule that ships today, and the set-difference restructure — the largest part of its diff — was taken
+  into scope after rev-1 described it as swapping one comparison.
+- Unit 4 gained S4 and AC6 for a divergence rev-1 claimed away, S6 and AC7 for two diagnostics the
+  move would have dropped, an order-bearing test fixture that does not exist yet, and a declared skip
+  with its compensating check in place of an acceptance criterion that named a runner which cannot run
+  the file it names.
+- Several acceptance criteria across all four units are now marked GREEN AT BASE and kept as
+  regression guards rather than presented as coverage this build adds. That class — an acceptance
+  criterion that cannot fail — is the parent build's own recurring defect arriving one level up.
+
+Blocker 1 was fixed in the same pass and is verified above. Blocker 2 is closed by ruling 2. The build
+is no longer blocked.
