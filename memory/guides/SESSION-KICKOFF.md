@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T08:55:30+03:00 @ 60ba1d602c1c4dba21a362c2b37172cecd0016f0
+last-audit: 2026-08-25T09:14:59+03:00 @ 60ba1d602c1c4dba21a362c2b37172cecd0016f0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 48a88bf6967b7d236dc843c23a12b47bea2861e5
+last-body-change: f5ccdb1175c54e8b3ffc281296e97fce86675d7b
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -76,8 +76,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   the handles are written here — that is the drift the pointer design exists to avoid.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
-  discipline, which scoped directives apply, and whether the piece-scoped Definition-of-Done items
-  evaluate at all or announce a skip. The set is a driver constant, the unattended Skill's routing
+  discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the
+  piece-scoped Definition-of-Done items evaluate at all or announce a skip. The set is a driver
+  constant and so is the subset admissible on the second anchor, the unattended Skill's routing
   table names a start path per member, and a leg joins the two in both directions. Neither the
   members nor their count are written here, for the reason the directives bullet above gives.
 

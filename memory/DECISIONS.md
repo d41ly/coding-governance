@@ -85,6 +85,7 @@
 - TOOL-aPacedTurnstile-16 · the bar is FLOOR-bound (one leg is 836.5 s of a 1033.2 s wall at 86 legs), so scheduling cannot move it: `-3` loses its reorder and its chunk-major dispatch and keeps reporting only. Order becomes -5 -> -4 -> -6 -> -7 -> -3
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
+- TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
 
 ## DEPL — deployer
 

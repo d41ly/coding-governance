@@ -359,6 +359,22 @@ DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-review
 # either: the sets below pin a shrink-only count because a project may EXTEND them, and nothing
 # extends this one, so a pin here would guard a variable only this kit moves.
 AUTH_MODES="slug prompt recipe"
+# TOOL-dNarrowedAnchor-1 - the PARTITION of that vocabulary by whether the mode's own discipline is
+# to AUTHOR the build folder the run is authorized by. `slug` is defined as a folder that already
+# exists, so a `slug` run never needs the second anchor and a `slug` run that REACHED it has
+# contradicted its own declaration. `prompt` always authors one; `recipe` may, and SKILL.template.md
+# tells a playbook author in as many words that authoring it "needs `published`" - so excluding
+# `recipe` would make this kit refuse a path its own carrier instructs.
+#
+# KIT-OWNED, with no conf channel, for the reason AUTH_MODES states one line up and one more of its
+# own: an adopter-declarable set is an adopter-reopenable hole, and there is no project in which a
+# `slug` run legitimately authorizes itself off a branch it pushed.
+#
+# ABSENT `authorized-by:` DEFAULTS TO `slug`, so every build README written before that key existed
+# is outside this set. That is the right answer for all of them - they were landed on the default
+# branch, which is the first anchor, and this set is only ever consulted on the second.
+SECOND_ANCHOR_MODES="prompt recipe"
+is_second_anchor_mode(){ case " $SECOND_ANCHOR_MODES " in *" $1 "*) return 0;; esac; return 1; }
 
 phases()  { printf '%s %s\n' "$PHASES_CORE" "$PHASES_EXTRA"; }
 dod()     { printf '%s %s\n' "$DOD_CORE" "$DOD_EXTRA"; }
@@ -1165,6 +1181,27 @@ check_authorization() { # slug · base
   # member would have left the sentence naming two and nothing would have reported the drift.
   if ! is_auth_mode "$AUTH_MODE"; then
     fail 44 "the build README at the pinned BASE declares an authorization mode outside the closed set, and defaulting an unrecognised mode would select a discipline nobody declared - legal values are $AUTH_MODES, declared: $AUTH_MODE"
+    return 1
+  fi
+  # TOOL-dNarrowedAnchor-1 - THE SECOND ANCHOR IS ADMISSIBLE PER MODE. `ANCHOR_SCOPE` is a
+  # whole-project switch: an adopter turns it on for the prompt path and, before this branch, also
+  # got a `slug`-mode run that could author its own build folder, push its own branch and be
+  # authorized by it - with nothing anywhere saying so. Reported by an adopter that had to write the
+  # concession into its own charter because the kit gave it no way to scope one.
+  #
+  # AFTER the membership test and not before, because AUTH_MODE has no meaning until it is known to
+  # be legal, and a refusal keyed on an unrecognised value would name a discipline nobody declared.
+  #
+  # ORDER, and it is the reason this is a refusal rather than a selector: the mode lives in a blob
+  # the anchor must resolve BEFORE anything can read it, so the anchor cannot be chosen by the mode.
+  # Both facts exist only here, and here is where they are compared.
+  #
+  # `ANCHOR_KIND` IS FRESH, not recalled. The evidence-never-an-input rule bans reading a value back
+  # out of the run-state file, which is a byte the subject wrote; this one was derived by
+  # `resolve_base` from the remote observation and the local history inside this same invocation,
+  # exactly as the `recipe` branch below reads a freshly-parsed AUTH_MODE.
+  if [ "$ANCHOR_KIND" = run-branch ] && ! is_second_anchor_mode "$AUTH_MODE"; then
+    fail 50 "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode $AUTH_MODE, admissible on this anchor are $SECOND_ANCHOR_MODES; land the build folder on the default branch, or declare the discipline the run is actually under"
     return 1
   fi
   # the declaration seam, evaluated where the MODE exists and nowhere else.
