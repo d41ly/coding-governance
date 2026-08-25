@@ -54,6 +54,13 @@ def govkit_update_role() -> dict:
     sys.path.insert(0, str(HERE))
     import govkit  # noqa: E402
     return govkit.UPDATE_ROLE
+
+
+def govkit_module():
+    """The engine module itself, for arms that call a resolver directly rather than a verb."""
+    sys.path.insert(0, str(HERE))
+    import govkit  # noqa: E402
+    return govkit
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -1344,6 +1351,42 @@ user_skills = "/tmp/gk-fake-skills"
               _UR["ci"] == "report", str(_UR))
         check("[-2] and no role is left on the refuse disposition by accident",
               "refuse" not in _UR.values(), str(_UR))
+
+        # ============ DEPL-dCarriedReceipt-1: {relpath} in the seam that WRITES ============
+        # `rule_relpath` resolves {relpath} against the RULE'S BASE; `resolve_dests` took the
+        # basename instead. push-main's hook rule declares `to = "{relpath}"` over
+        # `.githooks/pre-push`, so the writer landed a bare `pre-push` at the target ROOT while the
+        # same rule's own `claims` spelled `.githooks/pre-push`. Observed on a live target before
+        # the fix: the receipt carried `pre-push` and `pre-push.test.sh` at the root.
+        _gk = govkit_module()
+        _pm = _gk.load_toml(HERE / "entries" / "push-main.kit.toml")
+        _hook = [rr for rr in _pm.get("files", [])
+                 if rr.get("root_relative") and rr.get("to") == "{relpath}"]
+        check("[-1] push-main still declares the root-relative {relpath} rule this unit is about",
+              len(_hook) == 1, str([rr.get("to") for rr in _pm.get("files", [])]))
+        if _hook:
+            _rule = _hook[0]
+            _ctx = _gk.canonical_ctx("push-main")
+            _got = [dd for dd, _m in _gk.resolve_dests(
+                _pm, _rule, ".githooks/pre-push", _ctx, (_pm.get("home") or "").rstrip("/"))]
+            check("[-1] the WRITING seam resolves {relpath} against the rule's base",
+                  _got == [".githooks/pre-push"], str(_got))
+            check("[-1] and it agrees with the rule's own claims",
+                  set(_got) <= set(_rule.get("claims", [])), str(_got))
+
+        # THE OTHER BRANCH. A source directly under `home` still resolves to its basename under the
+        # kit directory -- the case the buggy form got RIGHT, so the fix must not regress it. An arm
+        # that only covers the broken branch cannot tell a fix from an overcorrection.
+        _eng = [rr for rr in _pm.get("files", [])
+                if rr.get("to") == "{prefix}/{relpath}" and not rr.get("root_relative")]
+        check("[-1] push-main still declares the home-relative rule", len(_eng) == 1,
+              str([rr.get("to") for rr in _pm.get("files", [])]))
+        if _eng:
+            _got2 = [dd for dd, _m in _gk.resolve_dests(
+                _pm, _eng[0], "push-main.sh", _gk.canonical_ctx("push-main"),
+                (_pm.get("home") or "").rstrip("/"))]
+            check("[-1] a source under `home` still resolves to its basename",
+                  _got2 == ["tools/push-main.sh"], str(_got2))
 
         # ================= liveness of the two derived assertions =================
         # An assertion that finds nothing on a clean tree is indistinguishable from one that CANNOT

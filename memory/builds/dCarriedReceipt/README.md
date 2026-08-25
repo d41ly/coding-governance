@@ -139,7 +139,7 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md) | — | 2 | SPECCED | rev-1 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-10 — role `forked`, report-only](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
@@ -156,7 +156,7 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | SPECCED | rev-8 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -639,6 +639,44 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"'{dest_owner[dest]}' and '{eid}'")
                 dest_owner[dest] = eid
 
+    # ---- 4b: a rule declaring BOTH `to` and `claims` resolves `to` INTO its own claims.
+    #          DEPL-dCarriedReceipt-1 S4. The unit's defect was `{relpath}` resolving to a basename
+    #          in the seam that writes while `destinations_for` resolved it through `rule_relpath`,
+    #          so push-main's hook rule landed a bare `pre-push` at the target ROOT while the same
+    #          rule's `claims` spelled `.githooks/pre-push`. Two spellings of one destination inside
+    #          one rule. This arm gates the CLASS: fixing the instance and scanning only the instance
+    #          certifies coverage that does not exist, and the next token to go wrong is not
+    #          necessarily `{relpath}`.
+    #
+    #          Scoped to rules declaring BOTH keys, because `claims` is what makes the disagreement
+    #          decidable -- a rule declaring no claims states no second opinion to contradict. A
+    #          destination still carrying an unresolved `{...}` token is SKIPPED rather than failed:
+    #          those are answer keys a target supplies, `claims` are written without them, and
+    #          comparing the two spellings would red every templated rule in the registry.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            claims = rule.get("claims")
+            if not rule.get("to") or not claims:
+                continue
+            # THROUGH `resolve_dests`, which is what `plan`, the write loop and the wildcard
+            # exclusion all call. The first draft of this arm asked `rule_destinations`, which
+            # routes through `destinations_for` -- the resolver that was already correct -- so
+            # staging the defect back in left selfcheck GREEN. An arm that reads a different value
+            # from the one the writer uses cannot fail on the writer's bug.
+            _ctx = canonical_ctx(eid)
+            _home = (d.get("home") or "").rstrip("/")
+            _dests: list[str] = []
+            for _s in rule_sources(d, rule):
+                _dests.extend(dest for dest, _m in resolve_dests(d, rule, _s, _ctx, _home))
+            for dest in _dests:
+                if "{" in dest:
+                    continue
+                if dest not in claims:
+                    r.fail(f"entry '{eid}' declares a rule whose destination '{dest}' is not among "
+                           f"its own claims ({', '.join(sorted(claims))}) — one rule spelling one "
+                           f"destination two ways, which is the shape that landed a bare basename "
+                           f"at a target root while the claims named the real path")
+
     # ---- 5: version_from resolves to EXACTLY one line, or declares an explicit `none` with a reason.
     for eid, (d, _dpath) in descs.items():
         vf = d.get("version_from")
@@ -2086,7 +2124,12 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
 
     ONE spelling, called by `plan`, by the write loop, and by the wildcard exclusion — each has to
     ask the same question the writer will answer, and two computations of one thing is the class this
-    repo keeps a record about.
+    repo keeps a record about. DEPL-dCarriedReceipt-1: that claim was false for `{relpath}`, which
+    this function resolved as a BASENAME while `destinations_for` resolved it through
+    `rule_relpath`. push-main's hook rule declares `to = "{relpath}"` over `.githooks/pre-push`, so
+    the writer landed a bare `pre-push` at the target ROOT while the same rule's own `claims` spelled
+    `.githooks/pre-push`. Both now call `rule_relpath`, and `selfcheck` asserts the CLASS: every
+    rule declaring both `to` and `claims` must resolve into its own claims.
 
     THE `missing` LIST IS RETURNED, not dropped. An earlier cut called `resolve_tokens(...)[0]` and
     discarded it, so `apply --kits kickoff-manifest` with no `manifest_path` answer wrote a file
@@ -2098,7 +2141,8 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
     not have. The default applies only where the rule declared no destination.
     """
     if rule.get("to"):
-        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)
+        rel = rule_relpath(desc, rule, src)
+        return [resolve_tokens(x.replace("{relpath}", rel), ctx)
                 for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
     rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
         pathlib.PurePosixPath(src).name
