@@ -1265,6 +1265,34 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
         for i in range(pc + 1, first_open):
             if lines[i].strip():
                 out.append((i + 1, "authored content between the plan pair and the generated region"))
+    # Trigger 4 — the authored roster pair is MANDATORY, on EVERY tracked build README.
+    # TOOL-dHonouredPark-1. It is not gated on `canon`: the contract registry declares which READMEs
+    # the heading canon and the SLOT BUDGETS bind, and a roster is neither. The owner ruled this
+    # population on 2026-08-25, and the reason it is the whole tracked set is that `build-complete`
+    # term 3 reads the pair on every build — so binding a subset would leave a later deletion
+    # silently restoring the vacuous pass it exists to remove.
+    #
+    # THE DISCIPLINE IS THE DRIVER'S, not `_marker_index`'s. `region()` in
+    # tools/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
+    # the open comes first; `_marker_index` returns the FIRST match and has no notion of duplicates or
+    # order. An assertion built on the helper would accept what the driver rejects, which is two
+    # answers to one question in the two tools that both read this marker.
+    #
+    # The vocabulary is the driver's too — absent, duplicated, transposed — because it already spells
+    # those three words for the sibling region, forty lines from where this is read.
+    n_open = sum(1 for l in lines if l.strip() == PLAN_OPEN)
+    n_close = sum(1 for l in lines if l.strip() == PLAN_CLOSE)
+    if n_open == 0 and n_close == 0:
+        out.append((1, "no authored %s pair, which every build README must carry" % PLAN_OPEN))
+    elif n_open != 1 or n_close != 1:
+        out.append((1, "the authored roster pair is DUPLICATED — %d open and %d close marker(s), "
+                       "where exactly one of each is legal" % (n_open, n_close)))
+    else:
+        oi = next(i for i, l in enumerate(lines) if l.strip() == PLAN_OPEN)
+        ci = next(i for i, l in enumerate(lines) if l.strip() == PLAN_CLOSE)
+        if ci < oi:
+            out.append((ci + 1, "the authored roster pair is TRANSPOSED — the close marker precedes "
+                                "the open one"))
     # Trigger 3 — the closed heading canon, only over a file the registry BINDS.
     if canon:
         out += scan_canon(lines, first_open)
@@ -1863,7 +1891,10 @@ def do_selftest() -> int:
 
         # A conforming README yields NO violations — the arm that keeps the walk from being vacuous.
         arm("a conforming README trips no trigger", "[]",
-            lambda: str(slot_violations(read_text(rd12), "x")))
+            lambda: str(slot_violations(
+                read_text(rd12).replace(MARK_OPEN, PLAN_OPEN + "\n| # | Unit |\n" + PLAN_CLOSE
+                                        + "\n\n" + MARK_OPEN, 1), "x")))
+
 
         # ---------------------------------------------------- TOOL-dFramedEntrypoint-1, trigger 3
         # S4 — the TOTAL-EXEMPTION hole. This is the arm that FAILED before this unit: a README with
@@ -1875,11 +1906,18 @@ def do_selftest() -> int:
         arm("the no-pair violation fires even with canon off", "1",
             lambda: str(len(slot_violations("# x\n\nprose\n", "x", canon=False))))
 
-        def build_canon_readme(slots):
-            """A build README whose authored half is `slots`, plus a valid generated pair."""
+        def build_canon_readme(slots, plan=True):
+            """A build README whose authored half is `slots`, plus a valid generated pair.
+
+            `plan` writes the authored roster pair, which TOOL-dHonouredPark-1 made MANDATORY on
+            every tracked build README. It defaults ON because a fixture standing for a conforming
+            file has to conform: four arms asserting [] were previously passing on a fixture that
+            would red the live leg. Pass plan=False to exercise trigger 4 itself.
+            """
             head = ["---", "slug: tOne", "node: t", "opened: 2026-01-01", "streams: s",
                     "roster: ARCH", "ids: ARCH-tOne-1", "---", "", "# tOne", ""]
-            return "\n".join(head + slots + ["", MARK_OPEN, MARK_CLOSE, ""])
+            tail = ([PLAN_OPEN, "| # | Unit |", PLAN_CLOSE, ""] if plan else [])
+            return "\n".join(head + slots + [""] + tail + [MARK_OPEN, MARK_CLOSE, ""])
 
         GOOD = ["## The problem this build exists to solve", "", "It states the problem.", "",
                 "## Expected improvements", "", "- one improvement", "",
@@ -1941,6 +1979,32 @@ def do_selftest() -> int:
         write_text(os.path.join(_bdir, SLOT_LIMITS),
                    "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
         write_text(os.path.join(_bdir, SLOT_HIGHWATER), "# high-water, seeded empty\n")
+
+        # ------------------------------------------------- TOOL-dHonouredPark-1, trigger 4
+        # THE PAIR IS MANDATORY, on every tracked build README and not on the contract's bound
+        # subset. Owner ruling. Each of the three conditions is armed by NAME, because a single
+        # "malformed" verdict sends a reader to diff a file against a rule it does not state.
+        #
+        # The discipline is the DRIVER's: exactly one open, exactly one close, open first. The
+        # engine's own `_marker_index` returns the first match and has no notion of duplicates or
+        # order, so an assertion built on it would accept what the driver refuses.
+        arm("an ABSENT roster pair is named", "must carry",
+            lambda: str(slot_violations(build_canon_readme(GOOD, plan=False), "x")))
+        arm("a DUPLICATED roster pair is named", "DUPLICATED",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, PLAN_OPEN + "\n" + PLAN_OPEN, 1), "x")))
+        arm("a TRANSPOSED roster pair is named", "TRANSPOSED",
+            lambda: str(slot_violations("\n".join(
+                ["---", "slug: tOne", "---", "", "# tOne", ""] + GOOD
+                + ["", PLAN_CLOSE, "| # | Unit |", PLAN_OPEN, "", MARK_OPEN, MARK_CLOSE, ""]), "x")))
+        # AND IT IS NOT GATED ON `canon`. The contract registry declares which READMEs the heading
+        # canon and the SLOT BUDGETS bind; a roster is neither, and binding trigger 4 to that subset
+        # would leave a later deletion silently restoring the vacuous pass on every other build.
+        arm("trigger 4 fires with canon OFF, like triggers 1 and 2", "must carry",
+            lambda: str(slot_violations(build_canon_readme(GOOD, plan=False), "x", canon=False)))
+        arm("a well-formed but EMPTY pair is LEGAL", "[]",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace("| # | Unit |", ""), "x")))
 
         def measure_bump_rows():
             global _SLOT_DATA_DIR

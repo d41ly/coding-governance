@@ -58,6 +58,21 @@ authored `roster:units` pair becomes mandatory or its three readers are deleted 
 gate watching; that `--status` and `--plan` now disagree about which unit is next; and that the
 lexicon naming leg is red at the base with its guard hiding it. None is this build's to decide.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dFramedEntrypoint-8` | 1 | the superseding decision, and the three records that assert what is not true |
+| 2 | `TOOL-dFramedEntrypoint-1` | 2 | the build README's authored half becomes a closed heading canon |
+| 3 | `TOOL-dFramedEntrypoint-4` | 2 | the build-order verb becomes legal and hardened, and the roster renders order and tier |
+| 4 | `TOOL-dFramedEntrypoint-2` | 2 | per-slot budgets: a hard declared ceiling and an advisory high-water |
+| 5 | `TOOL-dFramedEntrypoint-3` | 2 | the declared registry that says which build READMEs the contract binds |
+| 6 | `TOOL-dFramedEntrypoint-5` | 2 | the document inventory and the records table leave the build README |
+| 7 | `TOOL-dFramedEntrypoint-6` | 2 | every record renders inside the spec it serves |
+| 8 | `TOOL-dFramedEntrypoint-7` | 2 | the conformance pass that seeds the registry with a real population |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-08-24 · streams tooling
 ids TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7 TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-9

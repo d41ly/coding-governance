@@ -76,6 +76,20 @@ scope. Unit 2 was always inert without unit 1, so parking it costs this run noth
 The table below is
 GENERATED from the status header of every spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `PLAY-dClosedLexicon-1` | 2 | §0 gains a fallback rule, and the §14 externalization is refuted |
+| 2 | `TOOL-dClosedLexicon-1` | 2 | a declared naming lexicon, gated, and portable into an unknown repo |
+| 3 | `TOOL-dClosedLexicon-11` | 2 | a build may have more than one unattended run |
+| 4 | `TOOL-dClosedLexicon-12` | 2 | the census question, measured: refuse the coupling, close the real hole |
+| 5 | `TOOL-dClosedLexicon-13` | 2 | govkit's preview promises writes `apply` will not perform |
+| 6 | `TOOL-dClosedLexicon-2` | 2 | wiring the verb table into the map ratchet and the drift signal set |
+| 7 | `TOOL-dClosedLexicon-4` | 2 | a `**` file rule must not claim what another rule already owns |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node d · opened 2026-08-16 · streams playbook+tooling
 ids PLAY-dClosedLexicon-1 TOOL-dClosedLexicon-1 TOOL-dClosedLexicon-2 TOOL-dClosedLexicon-3 TOOL-dClosedLexicon-4 TOOL-dClosedLexicon-5 TOOL-dClosedLexicon-6 TOOL-dClosedLexicon-7 TOOL-dClosedLexicon-8 TOOL-dClosedLexicon-9 TOOL-dClosedLexicon-10 TOOL-dClosedLexicon-11 TOOL-dClosedLexicon-12

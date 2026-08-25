@@ -52,6 +52,12 @@ All three rows. Nothing here has been actioned.
 
 Rendered by `gen_build_index.py` from this file's front matter — do not hand-edit it.
 
+<!-- roster:units -->
+
+*No unit is planned beyond this build's tracked specs.*
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-16 · streams deployer
 ids DEPL-aFerriedDossier-1 DEPL-aFerriedDossier-2 DEPL-aFerriedDossier-3

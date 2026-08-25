@@ -126,6 +126,19 @@ None yet. The forks are in the spec's §8.
 The table below is GENERATED from the status header of every
 spec in this folder — do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aWrittenMethod-1` | 2 | the build method, rendered and delivered |
+| 2 | `TOOL-aWrittenMethod-2` | 2 | the mandate BASE the run cannot steer |
+| 3 | `TOOL-aWrittenMethod-3` | 1 | the method's displacement, at 247 of 250 lines |
+| 4 | `TOOL-aWrittenMethod-4` | 2 | a gate for the sixth carrier |
+| 5 | `TOOL-aWrittenMethod-5` | 1 | the method in the manifest's watch set |
+| 6 | `TOOL-aWrittenMethod-6` | 2 | escaping conf values before substitution |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-11 · streams tooling+playbook+kickoff
 ids TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6

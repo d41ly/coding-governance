@@ -191,6 +191,20 @@ arms — kit gone, or kit named in the playbook — which is also the one delibe
 marked in place, so no unit is classified FORKED.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `PLAY-aSiftedPlaybook-1` | 2 | the template's claims reconverge with the kits they describe |
+| 2 | `PLAY-aSiftedPlaybook-2` | 2 | the default branch stops being hardcoded as `main` |
+| 3 | `PLAY-aSiftedPlaybook-3` | 2 | the playbook learns which kits it ships |
+| 4 | `PLAY-aSiftedPlaybook-4` | 1 | the companions stop contradicting their own contents |
+| 5 | `TOOL-aSiftedPlaybook-1` | 2 | the template ceiling moves to 48 KiB, as a recorded rule reversal |
+| 6 | `TOOL-aSiftedPlaybook-2` | 2 | the size gate's failing case gets observed for the first time |
+| 7 | `TOOL-aSiftedPlaybook-3` | 2 | the playbook's claims about the repo become machine-checked |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams playbook+tooling
 ids PLAY-aSiftedPlaybook-1 PLAY-aSiftedPlaybook-2 PLAY-aSiftedPlaybook-3 PLAY-aSiftedPlaybook-4 TOOL-aSiftedPlaybook-1 TOOL-aSiftedPlaybook-2 TOOL-aSiftedPlaybook-3

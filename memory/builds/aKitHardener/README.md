@@ -19,6 +19,12 @@ Makes every kit **version-detectable** and every adopt script **re-run-safe**, s
 - [build/2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md) — the 7 surfaces, what
   shipped, verification ledger (incl. the no-Python-interpreter caveat), gate deltas, and the closing review.
 
+<!-- roster:units -->
+
+*No unit is planned beyond this build's tracked specs.*
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 0 unit(s) · node a · opened 2026-07-14 · streams deployer
 ids DEPL-aKitHardener-1

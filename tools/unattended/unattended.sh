@@ -1485,11 +1485,20 @@ plan_state() { # spec file -> prints the M2 state
 # planned-but-unspecced question keeps the authored pair: absent, `missing_units` is trivially
 # satisfied, which is the status quo for 45 of 49 builds and weakens nothing that worked before.
 roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecced units
-  local slug="$1" rel; rel=$(readme_of "$slug")
+  # TOOL-dHonouredPark-1 S5. `region` REFUSES a malformed pair with exit 3, and this function used
+  # to pipe it straight into `grep | sort` and take the LAST stage's status - so the refusal was
+  # discarded and whatever `region` printed BEFORE failing was parsed as ids. A malformed pair
+  # yielded a partial id list and no error at all.
+  #
+  # PIPEFAIL IS NOT THE FIX, and it was measured before this was written rather than after. A
+  # well-formed but EMPTY pair is LEGAL - it means the build plans exactly its specced units - and
+  # `grep -oE` exits 1 on no match, so `set -o pipefail` would turn the legal case into a refusal.
+  # The status is tested on `region` ALONE instead.
+  local slug="$1" rel _reg; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
   grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
-  region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null \
-    | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+  _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
+  printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
@@ -1509,8 +1518,16 @@ spec_ids() { # dir
   done | sort -u
 }
 missing_units() { # slug · dir
-  local want have; want=$(roster_ids "$1"); have=$(spec_ids "$2")
-  [ -n "$want" ] || return 0
+  # THE STATUS IS TESTED. `set -u` is on and `set -e` is not, so a status this caller did not read
+  # would change nothing observable however carefully roster_ids returned it - which is the defect
+  # round 2 found in S5's first draft: the item would have gone green over a surviving vacuous pass.
+  #
+  # The `[ -n "$want" ] || return 0` guard that stood here is GONE. With the pair mandatory on every
+  # tracked build README it is unreachable, and it was measured INERT anyway: `comm` over an empty
+  # side emits one blank line, which command substitution strips to length 0 and `for` word-splits
+  # to zero iterations. Deleted because it is dead, not because deleting it changes behaviour.
+  local want have; want=$(roster_ids "$1") || return 3
+  have=$(spec_ids "$2")
   comm -23 <(printf '%s\n' "$want") <(printf '%s\n' "$have")
 }
 # S6 - extracted out of verb_status's inline pipeline, ahead of the unit that consumes it. Unit 7's

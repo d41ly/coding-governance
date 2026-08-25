@@ -19,6 +19,12 @@ This build shipped on 2026-07-16 without a spec, before the spec-format ratchet 
 only record is the recording under `build/`. That recording carries no status header, which is why
 the front matter above declares `status:` outright instead of leaving it to be derived.
 
+<!-- roster:units -->
+
+*No unit is planned beyond this build's tracked specs.*
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 0 unit(s) · node b · opened 2026-07-16 · streams tooling
 ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2

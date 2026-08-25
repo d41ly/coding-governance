@@ -42,6 +42,17 @@ several corrected real errors — read them before citing anything here.
 The table below is GENERATED from this folder's spec status headers —
 do not hand-edit it.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aMouldedFolio-2` | 2 | the build README's `ids:` becomes derived, and its mechanical prose joins the generated region |
+| 2 | `TOOL-aMouldedFolio-3` | 2 | the build README's folder claim becomes derived, because 15 of 17 are false |
+| 3 | `TOOL-aMouldedFolio-4` | 2 | one marker contract across four readers, and a test that drives all four |
+| 4 | `TOOL-aMouldedFolio-5` | 2 | check 20 reuses the kit's fence reader, and refuses a fence it cannot close |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-11 · streams tooling
 ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5

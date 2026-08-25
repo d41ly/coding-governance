@@ -120,6 +120,20 @@ and unit 7 is the one that most needs it: it exists because a recommendation was
 adversarial pass has yet tried to break it.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aTetheredRecord-1` | 1 | mint the five missing spec ids, and drain the orphan waiver |
+| 2 | `TOOL-aTetheredRecord-2` | 2 | the binding grammar and its read-only parser |
+| 3 | `TOOL-aTetheredRecord-3` | 1 | the retrofit: all 76 records gain a binding line |
+| 4 | `TOOL-aTetheredRecord-4` | 2 | check 21: the binding becomes the merge bar |
+| 5 | `TOOL-aTetheredRecord-5` | 2 | the rendered Records table and the coverage join |
+| 6 | `TOOL-aTetheredRecord-6` | 2 | the adopter path: the obligation ships with the step that arms it |
+| 7 | `TOOL-aTetheredRecord-7` | 1 | the rename: every record filename names a spec |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7

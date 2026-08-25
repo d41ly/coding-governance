@@ -111,6 +111,19 @@ reintroduce the staleness, so it is a scoped follow-up rather than universally m
    directly and `check-wiring.sh` already auto-wires an unset path. **Recommend: record N/A**, do not
    port the signal. Detail in TOOL-2 §4/§8.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `PLAY-aPrunedCeremony-1` | 2 | the full merge bar runs once, at the push boundary |
+| 2 | `PLAY-aPrunedCeremony-2` | 1 | diff-scoped gates are fail-closed and coarse |
+| 3 | `PLAY-aPrunedCeremony-3` | 1 | recurring bug class: a ratchet that never exercises its target is vacuous |
+| 4 | `PLAY-aPrunedCeremony-4` | 2 | bookkeeping lands before the push; retire the derivable `pushed:<sha>` |
+| 5 | `TOOL-aPrunedCeremony-1` | 2 | manifest-driven gate legs + a no-hardcode canary |
+| 6 | `TOOL-aPrunedCeremony-2` | 2 | pre-push full-gate enforcement (drift signal scoped, not dropped) |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-07-19 · streams playbook+tooling
 ids PLAY-aPrunedCeremony-1 PLAY-aPrunedCeremony-2 PLAY-aPrunedCeremony-3 PLAY-aPrunedCeremony-4 PLAY-aPrunedCeremony-5 TOOL-aPrunedCeremony-1 TOOL-aPrunedCeremony-2

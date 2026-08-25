@@ -1,11 +1,12 @@
 # TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-TOOL-dHonouredPark-1-acceptance.md](../build/2026-08-25-build-TOOL-dHonouredPark-1-acceptance.md) | journal | — |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
 
@@ -279,6 +280,11 @@ units 3 and 4 both list and rev-1 omitted · `check-kit-versions.sh` · `check-v
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · BUILT and CLOSED, with ONE scope item NARROWED. S7 named three dead guards;
+  only `missing_units`' `[ -n "$want" ]` was deleted. The two in `roster_ids` — an absent FILE and
+  an absent MARKER — are unreachable only once trigger 4 has RUN, and the driver runs standalone on
+  trees the leg has not graded, so deleting them would be a behaviour change on exactly the input
+  they exist for. Recorded here rather than done quietly.
 - rev-4 · 2026-08-25 · M3 fork sweep. F1 resolved to the slot leg; F2 restated as the question it
   was and resolved as not arising. Both marks now carry the documented shape.
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s first park.

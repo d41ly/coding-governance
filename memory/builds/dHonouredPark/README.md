@@ -47,6 +47,17 @@ stop answering one question differently. A ruling nobody builds is a park with a
 None yet. This build exists to unpark, so a park taken here is a ruling that turned out to need
 another one — and it goes on the run-state file with its options, not in this slot.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dHonouredPark-2` | 1 | the build method's declared line budget rises to 350, and the byte half stays where it is |
+| 2 | `TOOL-dHonouredPark-3` | 2 | the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER |
+| 3 | `TOOL-dHonouredPark-1` | 2 | the authored roster pair becomes mandatory on every build README, and its Definition-of-Done... |
+| 4 | `TOOL-dHonouredPark-4` | 2 | `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from... |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** SPECCED · 4 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 TOOL-dHonouredPark-5 TOOL-dHonouredPark-6 TOOL-dHonouredPark-7
@@ -56,11 +67,11 @@ ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonoure
 |---|---|---|---|---|---|
 | [TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | CLOSED | rev-5 | 2026-08-25 |
 | [TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER](spec/2026-08-25-spec-dHonouredPark-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-25 |
-| [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | SPECCED | rev-4 | 2026-08-25 |
+| [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | CLOSED | rev-5 | 2026-08-25 |
 | [TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

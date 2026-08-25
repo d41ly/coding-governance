@@ -291,6 +291,24 @@ hold the same version with different refusals. Refused to drop it silently; it i
 five to reverse.
 
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aRuledFrontispiece-1` | 2 | the build README gets a slot contract and an immutable authored plan |
+| 2 | `TOOL-aRuledFrontispiece-10` | 2 | the corpus retrofit and the kit version bump |
+| 3 | `TOOL-aRuledFrontispiece-11` | 2 | the corpus is conformed to the slot contract, by hand |
+| 4 | `TOOL-aRuledFrontispiece-2` | 2 | build order and parallel groups become a header verb and a region |
+| 5 | `TOOL-aRuledFrontispiece-3` | 2 | dependency edges between builds, declared once and rendered both ways |
+| 6 | `TOOL-aRuledFrontispiece-4` | 2 | the build README gets a generated document inventory |
+| 7 | `TOOL-aRuledFrontispiece-5` | 2 | the build README joins the hygiene index set at its own cap tier |
+| 8 | `TOOL-aRuledFrontispiece-6` | 2 | the slot contract becomes a leg of its own on the merge bar |
+| 9 | `TOOL-aRuledFrontispiece-7` | 1 | the STATUS.md slot is retired |
+| 10 | `TOOL-aRuledFrontispiece-8` | 2 | check 8 stops judging a run it can no longer repair |
+| 11 | `TOOL-aRuledFrontispiece-9` | 2 | the build method's roster claim and its parallelism test are corrected |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 11 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aRuledFrontispiece-1 TOOL-aRuledFrontispiece-2 TOOL-aRuledFrontispiece-3 TOOL-aRuledFrontispiece-4 TOOL-aRuledFrontispiece-5 TOOL-aRuledFrontispiece-6 TOOL-aRuledFrontispiece-7 TOOL-aRuledFrontispiece-8 TOOL-aRuledFrontispiece-9 TOOL-aRuledFrontispiece-10 TOOL-aRuledFrontispiece-11

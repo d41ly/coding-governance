@@ -37,6 +37,22 @@ V1 → V3 → V4 first: each changes the set of `fail` branches, and V2 arms wha
 is. Arming before the set settles would be arming a moving target. V5–V8 are independent of the
 branch work and of each other.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aDrainedSluice-1` | 2 | drain the tooling backlog to zero |
+| 2 | `TOOL-aDrainedSluice-2` | 2 | V1: the harness meta-gate discovers its gates |
+| 3 | `TOOL-aDrainedSluice-3` | 2 | V3: check 5 governs a recording at any depth |
+| 4 | `TOOL-aDrainedSluice-4` | 2 | V4: the §9 rev high-water stops at §9 |
+| 5 | `TOOL-aDrainedSluice-5` | 2 | V2: arm every pinned branch, or say why not |
+| 6 | `TOOL-aDrainedSluice-6` | 2 | V5: one python resolver, and it EXECUTES the candidate |
+| 7 | `TOOL-aDrainedSluice-7` | 2 | V6: the recall cache is bounded |
+| 8 | `TOOL-aDrainedSluice-8` | 2 | V7: three gates that could not see what they judge |
+| 9 | `TOOL-aDrainedSluice-9` | 2 | V8: a dead DIRECTORY citation is a dead citation |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 9 unit(s) · node a · opened 2026-08-08 · streams tooling
 ids TOOL-aDrainedSluice-1 TOOL-aDrainedSluice-2 TOOL-aDrainedSluice-3 TOOL-aDrainedSluice-4 TOOL-aDrainedSluice-5 TOOL-aDrainedSluice-6 TOOL-aDrainedSluice-7 TOOL-aDrainedSluice-8 TOOL-aDrainedSluice-9
