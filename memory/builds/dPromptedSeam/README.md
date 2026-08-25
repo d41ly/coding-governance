@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
+ids: TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 TOOL-dPromptedSeam-4
 ---
 
 # dPromptedSeam — a refused name also answers "does this already exist"
@@ -49,8 +49,8 @@ make `build_index` and `render_index` comparable as one concept, and today only 
   loss away. If the Skill step is measured to go unread, `-1` Q2 reopens.
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
+**Build status:** DEFERRED · 4 unit(s) · node d · opened 2026-08-25 · streams tooling
+ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3 TOOL-dPromptedSeam-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -58,13 +58,14 @@ ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
 | [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | WONTDO | rev-5 | 2026-08-25 |
 | [TOOL-dPromptedSeam-2 — `read_object` cannot say WHY it returned nothing](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | WONTDO | rev-4 | 2026-08-25 |
 | [TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud](spec/2026-08-25-spec-dPromptedSeam-3.md) | — | 1 | CLOSED | rev-4 | 2026-08-25 |
+| [TOOL-dPromptedSeam-4 — the stopword parity is checked on demand, so a push can land drift](spec/2026-08-25-spec-dPromptedSeam-4.md) | — | 1 | DEFERRED | rev-1 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dPromptedSeam-4.
 
-Ids no `spec-audit` record has ever named: TOOL-dPromptedSeam-3.
+Ids no `spec-audit` record has ever named: TOOL-dPromptedSeam-3 TOOL-dPromptedSeam-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
