@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: deployer
 roster: DEPL
-ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3
+ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3 TOOL-dCarriedReceipt-4
 ---
 
 # dCarriedReceipt — a receipt that carries provenance, and an update that can be trusted with it
@@ -134,14 +134,14 @@ The audit that grounds every number here, with its method and its own instrument
 <!-- gen:build-index -->
 **Build status:** SPECCED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer
 ids DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12
-ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3
+ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3 TOOL-dCarriedReceipt-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-10 — role `forked`, report-only](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md) | — | 2 | CLOSED | rev-7 | 2026-08-25 |
-| [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | — | 2 | SPECCED | rev-6 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | — | 2 | CLOSED | rev-7 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | — | 2 | CLOSED | rev-6 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | — | 2 | SPECCED | rev-7 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-14 — post-write verification, with index rollback](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md) | — | 2 | SPECCED | rev-7 | 2026-08-25 |
@@ -156,7 +156,7 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | CLOSED | rev-9 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 3 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

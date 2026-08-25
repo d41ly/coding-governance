@@ -78,4 +78,8 @@ why = "a rendered artifact its own gate byte-compares"
 include = ["extract.py", "query.py", "recall-opened.js"]
 role = "forked"
 direction = "gov-from-target"
-record = "TOOL-aQuarriedLantern-1"
+record = "DEPL-dCarriedReceipt-10"
+# The RECORD is the unit that adjudicated these three declarations -- its section 4 Inventory
+# names each source, its direction and why -- and NOT the memory-recall port that first created
+# the divergence. That port's spec is deliberately never closed, so citing it from a tracked
+# source is a permanent drift drain rather than the transient one the signal is meant to catch.

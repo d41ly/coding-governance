@@ -38,7 +38,12 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 180    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 185    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 180 -> 185 (DEPL-dCarriedReceipt-11). Its five new refusals: the escaping destination, the
+# occupied destination, the failed move, the ambiguous destination and the out-of-kit source.
+# FOUR of the five are reached by a named selftest arm; the fifth -- `land_through_index` failing
+# AFTER a successful `git mv` -- is declared unarmed in its own branch, because reaching it needs
+# the TARGET's git to refuse a blob write and this suite manufactures no such mode.
 # 161 -> 180 (DEPL-dCarriedReceipt-7, -8, -10). Re-derived at the landing of the receipt build
 # rather than guessed: -7's S9 integrity assertion and its land-failure reports, -8's cmd_check
 # gov_oid mismatch and its verdict-grid cell arm, and -10's three `forked` rule refusals plus

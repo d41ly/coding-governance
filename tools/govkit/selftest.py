@@ -3830,6 +3830,575 @@ user_skills = "/tmp/gk-fake-skills"
               (_t7 / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
               == FORK_TARGET_BYTES, "")
 
+        # ============ DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting =========
+        #
+        # THE MEASURED RED, on the fixture this block builds, against the engine as it stood with `-1`
+        # through `-10` landed and this unit not: `update --write` exited **0**, unlinked EIGHT tracked
+        # files from the target, `git rm`-ed them, dropped all eight rows from `install.json` and landed
+        # nothing at any new path — 18 tracked files before it, 10 after. SEVEN of those eight were rows
+        # whose gov source gov had RENAMED and still ships; the eighth was the one genuine withdrawal, and
+        # it was destroyed on the same verdict and by the same branch. The `seed` row printed `current`
+        # while its gov source no longer existed, and the `rendered` row printed `patched` and got no
+        # second line at all. Every arm below was written against that observation rather than against
+        # the spec's prediction of it.
+        #
+        # WHY ONE GOV AND ONE TARGET CARRY MOST OF IT. Each row below is a different question — a clean
+        # rename, a rename that also changes content, a rename over a local delta, a rename gov scored
+        # below the threshold, a rename OUT of the kit, a rename to two destinations, a `seed` and a
+        # `rendered` — and they are answered on one run so that no arm can pass because a fixture of its
+        # own did nothing. The two questions that need a different SHAPE of target get their own: the
+        # carried rename needs an install at a prefix gov does not use, which `apply` cannot produce, and
+        # the two write-refusals need a target holding something in the way.
+
+        GK11 = govkit_module()
+
+
+        def read_bytes11(p) -> bytes:
+            """Bytes, or empty. `check()` concatenates its detail onto the FAIL line and every arm below
+            a raising one never runs, so an arm that reads a file the break just removed would report its
+            own coverage as untested rather than as red. Measured on this unit's break sweep."""
+            return p.read_bytes() if p.is_file() else b""
+
+        _11_LOW_A = "alpha\nbeta\ngamma\ndelta\nepsilon\nzeta\neta\ntheta\niota\nkappa\n"
+        _11_LOW_B = ("alpha\nbeta\ngamma\nXX1xxxx\nXX2xxxx\nXX3xxxx\nXX4xxxx\nXX5xxxx\nXX6xxxx\n"
+                     "XX7xxxx\n")
+        _11_DELTA_T = "delta one\ndelta two\ndelta three\nADOPTER EDIT\n"
+        _11_DELTA_B = "delta one\nDELTA GOV CHANGE\ndelta three\ndelta four\n"
+        _11_DELTA_M = "delta one\nDELTA GOV CHANGE\ndelta three\nADOPTER EDIT\n"
+        _11_CONTENT_B = "content one\nCONTENT GOV CHANGE\ncontent three\ncontent four\n"
+
+        # The descriptor, in its two vintages. Gov renaming a file inside its own kit and updating its own
+        # includes in the same commit is the whole motivating scenario, so the fixture does exactly that —
+        # and it is what makes `resolve_entry` the only thing that can answer where the new source lands.
+        _11_KIT_A = ('id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+                     '[check]\nnone = "a fixture kit"\n\n'
+                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                     '[[files]]\ninclude = ["twin.txt"]\n'
+                     'to = ["{kit}/twin-a.txt", "{kit}/twin-b.txt"]\nrole = "engine"\n\n'
+                     '[[files]]\ninclude = ["seed.txt"]\nrole = "seed"\n\n'
+                     '[[files]]\ninclude = ["rendered.txt"]\nrole = "rendered"\n\n'
+                     '[adopt]\nargv = []\nmutates_index = false\n')
+        _11_KIT_B = (_11_KIT_A.replace('include = ["twin.txt"]', 'include = ["twin2.txt"]')
+                     .replace('include = ["seed.txt"]', 'include = ["seed2.txt"]')
+                     .replace('include = ["rendered.txt"]', 'include = ["rendered2.txt"]'))
+
+        _11_SRC = {
+            "keep.txt": "keep A\n",                       # the control: gov EDITS it, never moves it
+            "moved.txt": "moved one\nmoved two\nmoved three\n",
+            "content.txt": "content one\ncontent two\ncontent three\ncontent four\n",
+            "delta.txt": "delta one\ndelta two\ndelta three\ndelta four\n",
+            "low.txt": _11_LOW_A,
+            "gone.txt": "gone one\ngone two\ngone three\n",
+            "twin.txt": "twin one\ntwin two\ntwin three\n",
+            "seed.txt": "seed one\nseed two\nseed three\n",
+            "rendered.txt": "rendered one\nrendered two\nrendered three\n",
+            "sub.txt": "sub one\nsub two\nsub three\n",
+            "dropped.txt": "dropped one\ndropped two\ndropped three\n",
+        }
+
+
+        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A) -> pathlib.Path:
+            """A scratch gov carrying ONE `demo` kit and a copy of the engine.
+
+            THE COPY IS TAKEN HERE, at fixture-build time — a break staged into this repo's `govkit.py`
+            AFTER the copy runs the UNPATCHED engine and the arm reports on nothing.
+            """
+            g = tmp / f"rn-{tag}-gov"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            d = g / "tools" / "demo"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "kit.toml").write_text(kit_a, encoding="utf-8", newline="\n")
+            for rel, body in _11_SRC.items():
+                (d / rel).write_text(body, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+
+        def write_rename_vintage(g: pathlib.Path) -> str:
+            """Gov's second vintage: nine renames, one deletion-and-addition, two edits."""
+            d = g / "tools" / "demo"
+            git(g, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+            git(g, "mv", "tools/demo/content.txt", "tools/demo/content2.txt")
+            (d / "content2.txt").write_text(_11_CONTENT_B, encoding="utf-8", newline="\n")
+            git(g, "mv", "tools/demo/delta.txt", "tools/demo/delta2.txt")
+            (d / "delta2.txt").write_text(_11_DELTA_B, encoding="utf-8", newline="\n")
+            (d / "low.txt").unlink()                       # rewritten far enough that git pairs nothing
+            (d / "newlow.txt").write_text(_11_LOW_B, encoding="utf-8", newline="\n")
+            (g / "docs").mkdir(parents=True, exist_ok=True)
+            git(g, "mv", "tools/demo/gone.txt", "docs/gone.txt")     # OUT of the kit's home entirely
+            git(g, "mv", "tools/demo/twin.txt", "tools/demo/twin2.txt")
+            git(g, "mv", "tools/demo/seed.txt", "tools/demo/seed2.txt")
+            git(g, "mv", "tools/demo/rendered.txt", "tools/demo/rendered2.txt")
+            (d / "sub").mkdir(parents=True, exist_ok=True)
+            git(g, "mv", "tools/demo/sub.txt", "tools/demo/sub/sub.txt")     # into a NEW subdirectory
+            git(g, "mv", "tools/demo/dropped.txt", "tools/demo/dropped2.txt")
+            (d / "keep.txt").write_text("keep B\n", encoding="utf-8", newline="\n")
+            (d / "kit.toml").write_text(_11_KIT_B, encoding="utf-8", newline="\n")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "B")
+            return gout(g, "rev-parse", "HEAD").strip()
+
+
+        def build_rename_target(g: pathlib.Path, name: str) -> pathlib.Path:
+            """An installed target, built by running the real `apply` rather than by authoring a receipt.
+
+            The adopter's own file is written BEFORE `apply`, because a `rendered` destination that is
+            absent when apply looks at it is a finding — and a fixture whose apply reds is a fixture whose
+            later arms are grading a broken install. The local delta is an EDIT AFTER the install, which is
+            the state the three-way exists for.
+            """
+            t = make_target(tmp / name, 'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+            (t / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+            (t / "tools" / "demo" / "rendered.txt").write_text(
+                "the adopter rendered this\n", encoding="utf-8", newline="\n")
+            settle(t, "the adopter's own rendered file")
+            _ap = run_in_gov(g, "apply", "--target", str(t), "--kits", "demo")
+            check(f"[-11] the {name} fixture's install applies GREEN, or every arm over it grades a "
+                  f"broken target", _ap.returncode == 0, _ap.stdout[-900:] + _ap.stderr[-600:])
+            (t / "tools" / "demo" / "delta.txt").write_text(_11_DELTA_T, encoding="utf-8", newline="\n")
+            # AND ONE ROW THE TARGET DELETED, committed rather than staged: `-12` S4 calls a STAGED
+            # deletion dirty and would refuse the run before any verdict, so a path absent from the
+            # index, the worktree AND HEAD is the only way to reach this state at all.
+            (t / "tools" / "demo" / "dropped.txt").unlink()
+            settle(t, "the install, one adopter edit and one adopter deletion")
+            return t
+
+
+        _g11 = build_rename_gov("main")
+        _A11 = gout(_g11, "rev-parse", "HEAD").strip()
+        _t11 = build_rename_target(_g11, "rn-main-t")
+        _B11 = write_rename_vintage(_g11)
+
+        # ---- THE FIXTURE'S OWN PRECONDITIONS. A fixture that does not trigger the rule proves nothing,
+        # ---- and every rule below is triggered by GIT's rename scoring rather than by anything this file
+        # ---- controls directly.
+        _rn50 = gout(_g11, "diff", "--find-renames=50%", "--name-status", _A11, _B11)
+        _rn10 = gout(_g11, "diff", "--find-renames=10%", "--name-status", _A11, _B11)
+        _pairs50 = {ln.split("\t")[1]: ln.split("\t")[2] for ln in _rn50.splitlines()
+                    if ln.startswith("R") and len(ln.split("\t")) == 3}
+        check("[-11] the fixture really renames: git pairs nine sources at the declared threshold",
+              len(_pairs50) == 9 and _pairs50.get("tools/demo/moved.txt") == "tools/demo/renamed.txt",
+              _rn50)
+        check("[-11] ...including one that leaves the kit's home, which only an UNSCOPED diff can see",
+              _pairs50.get("tools/demo/gone.txt") == "docs/gone.txt", _rn50)
+        check("[-11] S7 the low-similarity pair is NOT paired at the declared threshold",
+              "tools/demo/low.txt" not in _pairs50, _rn50)
+        check("[-11] S7 LIVENESS ...and IS paired below it, so the constant is what decides, not the bytes",
+              "R" in _rn10 and "tools/demo/low.txt\ttools/demo/newlow.txt" in _rn10, _rn10)
+        check("[-11] S7 the threshold is a NAMED constant rather than git's implicit default",
+              GK11.RENAME_SIMILARITY_PERCENT == 50, str(GK11.RENAME_SIMILARITY_PERCENT))
+        _map11 = GK11.derive_rename_map(_g11, _A11, _B11)
+        check("[-11] S1 the engine's own map is that same pairing, derived rather than restated",
+              _map11 == _pairs50, str(sorted(_map11.items())))
+        check("[-11] S1 a receipt carrying no gov_commit gets an EMPTY map, never a guessed base",
+              GK11.derive_rename_map(_g11, None, _B11) == {}, "")
+        _rec11a = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row11 = {f["path"]: f for f in _rec11a["files"]}
+        check("[-11] the fixture's delta row really carries an adopter edit gov's blob does not have",
+              (_t11 / "tools" / "demo" / "delta.txt").read_bytes() != _11_SRC["delta.txt"].encode(), "")
+        check("[-11] ...and its clean row does NOT, or AC8 would grade the merge arm by accident",
+              (_t11 / "tools" / "demo" / "content.txt").read_bytes() == _11_SRC["content.txt"].encode(), "")
+        check("[-11] the fixture's rendered row is in the receipt AND in the target's index",
+              _row11.get("tools/demo/rendered.txt", {}).get("role") == "rendered"
+              and "tools/demo/rendered.txt" in gout(_t11, "ls-files").split(), str(sorted(_row11)))
+        check("[-11] the fixture's seed row is in the receipt as `seed`",
+              _row11.get("tools/demo/seed.txt", {}).get("role") == "seed", str(sorted(_row11)))
+
+        # ---- THE READ-ONLY RUN. AC10 lives here: it asserts a string is ABSENT from the whole output, so
+        # ---- it has to run over a fixture where no row can legitimately print it.
+        _ro11 = run_in_gov(_g11, "update", "--target", str(_t11))
+        check("[-11] the read-only run exits 0 over a receipt full of renamed sources",
+              _ro11.returncode == 0, _ro11.stdout[-1200:] + _ro11.stderr[-800:])
+        check("[-11] S1 the run PRINTS the map it derived rather than finding renames silently",
+              "rename map: 9 gov source(s) moved" in _ro11.stdout, _ro11.stdout[:1400])
+        check("[-11] S2 a clean renamed row takes the new verdict rather than `withdrawn`",
+              verdict_of(_ro11.stdout, "tools/demo/moved.txt") == "renamed", _ro11.stdout)
+        check("[-11] AC3 a rename git scored below the threshold stays `withdrawn` — nothing is invented",
+              verdict_of(_ro11.stdout, "tools/demo/low.txt") == "withdrawn", _ro11.stdout)
+        check("[-11] S3 a source renamed OUT of the kit's surface is a withdrawal, not a move",
+              verdict_of(_ro11.stdout, "tools/demo/gone.txt") == "withdrawn"
+              and "it has left this kit's claimed surface" in _ro11.stdout, _ro11.stdout)
+        check("[-11] S3 ...and a new source the kit resolves to SEVERAL destinations is dropped LOUDLY",
+              verdict_of(_ro11.stdout, "tools/demo/twin-a.txt") == "withdrawn"
+              and "3 destinations" in _ro11.stdout and "picking one would be a guess" in _ro11.stdout,
+              _ro11.stdout)
+        check("[-11] the control row gov EDITED is still `stale`, so the map moved nothing it should not",
+              verdict_of(_ro11.stdout, "tools/demo/keep.txt") == "stale", _ro11.stdout)
+        check("[-11] the fixture's deleted row is absent from the target's index, worktree AND HEAD",
+              "tools/demo/dropped.txt" not in gout(_t11, "ls-files").split()
+              and not (_t11 / "tools" / "demo" / "dropped.txt").exists()
+              and "tools/demo/dropped.txt" not in gout(
+                  _t11, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
+        check("[-11] S2 a row the TARGET deleted is not a rename however the map reads: there is nothing "
+              "to move, and the grid already answers `converged` for a file gone on both sides",
+              verdict_of(_ro11.stdout, "tools/demo/dropped.txt") == "converged", _ro11.stdout)
+        check("[-11] AC10 S0c a `seed` row whose gov source MOVED prints `renamed`",
+              verdict_of(_ro11.stdout, "tools/demo/seed.txt") == "renamed", _ro11.stdout)
+        check("[-11] AC10 S0c ...and the string `current` appears NOWHERE in that run's output — the seed "
+              "override may not rewrite this verdict over a source that no longer exists",
+              "current" not in _ro11.stdout, _ro11.stdout)
+        check("[-11] AC6 the read-only run wrote NOTHING: no outbox, no order, no deletion",
+              not (_t11 / ".governance" / "outbox").exists()
+              or not list((_t11 / ".governance" / "outbox").glob("update-withdrawn-*")),
+              str(sorted(p.name for p in (_t11 / ".governance" / "outbox").glob("*"))
+                  if (_t11 / ".governance" / "outbox").exists() else []))
+
+        # ---- THE WRITE RUN. AC6's standing predicate is measured ACROSS it: no `update --write` without
+        # ---- `--write-withdrawals` may reduce the target's tracked-file count, whatever any verdict says.
+        _files_before = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _w11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        _files_after = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        check("[-11] AC2 `update --write` exits 0 with nine renamed sources in the receipt",
+              _w11.returncode == 0, _w11.stdout[-2000:] + _w11.stderr[-1000:])
+        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count is UNCHANGED across a run with no "
+              "--write-withdrawals", len(_files_before) == len(_files_after),
+              f"{len(_files_before)} -> {len(_files_after)}: "
+              f"{sorted(set(_files_before) - set(_files_after))}")
+        check("[-11] AC3 ...so the below-threshold row's file is still on disk",
+              (_t11 / "tools" / "demo" / "low.txt").is_file(), "")
+        check("[-11] AC3 ...and still tracked, and still a row in install.json",
+              "tools/demo/low.txt" in _files_after
+              and any(f["path"] == "tools/demo/low.txt" for f in json.loads(
+                  (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
+        check("[-11] S8 ...with an ORDER naming the file, its last gov commit and why nothing was deleted",
+              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file()
+              and "NOTHING was deleted" in (_t11 / ".governance" / "outbox"
+                                            / "update-withdrawn-low.txt.md").read_text(encoding="utf-8")
+              and _A11 in (_t11 / ".governance" / "outbox"
+                           / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"),
+              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").read_text(encoding="utf-8")
+              if (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file() else "no order")
+
+        _status11 = gout(_t11, "status", "--porcelain")
+        check("[-11] AC2 the target's own git sees an R entry for the clean rename",
+              any(ln.startswith("R") and "tools/demo/moved.txt" in ln and "tools/demo/renamed.txt" in ln
+                  for ln in _status11.splitlines()), _status11)
+        check("[-11] AC2 ...the old path is gone from the worktree and the new one is there",
+              not (_t11 / "tools" / "demo" / "moved.txt").exists()
+              and (_t11 / "tools" / "demo" / "renamed.txt").is_file(), "")
+        check("[-11] S4 ...and the rename into a NEW subdirectory worked, parent and all",
+              (_t11 / "tools" / "demo" / "sub" / "sub.txt").is_file(), "")
+        _rec11b = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row11b = {f["path"]: f for f in _rec11b["files"]}
+        check("[-11] AC2 the receipt row's `path` AND `source` both carry the new spelling",
+              _row11b.get("tools/demo/renamed.txt", {}).get("source") == "tools/demo/renamed.txt",
+              str(sorted(_row11b)))
+        check("[-11] S4 ...and the old spelling is a row no more",
+              "tools/demo/moved.txt" not in _row11b, str(sorted(_row11b)))
+        check("[-11] S2 ...and the run stayed HEALTHY over it — no `git mv` of a file that is not "
+              "there, and no traceback either: asserting only the absence of a message would let a "
+              "crash pass for a guard",
+              _w11.returncode == 0 and "could not be moved" not in _w11.stdout
+              and "Traceback" not in (_w11.stdout + _w11.stderr),
+              _w11.stdout[-600:] + _w11.stderr[-400:])
+        check("[-11] S6 the run reports the moves it performed, counted rather than implied",
+              "moved 4," in _w11.stdout, _w11.stdout[-400:])
+
+        # ---- AC8 + AC9: THE CLEAN RENAME THAT ALSO CHANGES CONTENT. This is the arm that fails against a
+        # ---- draft which moves the file and stamps the row forward without writing gov's new bytes — and
+        # ---- against one that defers the byte question to a post-move comparison, which freezes the file
+        # ---- at pre-rename content and prints `patched` for an adopter edit that never happened.
+        _c2 = "tools/demo/content2.txt"
+        _idx_c2 = gout(_t11, "ls-files", "-s", "--", _c2).split()
+        check("[-11] AC8 the renamed-and-edited row is in the index at its NEW path",
+              len(_idx_c2) >= 2, gout(_t11, "ls-files", "-s", "--", _c2))
+        check("[-11] AC8 ...holding gov's blob at the requested vintage for the NEW source, byte for byte",
+              len(_idx_c2) >= 2
+              and _idx_c2[1] == GK11.blob_oid(GK11.blob_at(_g11, _B11, "tools/demo/content2.txt")),
+              str(_idx_c2))
+        check("[-11] AC8 ...and NOT the pre-rename content, which is what a deferred byte decision leaves",
+              read_bytes11(_t11 / _c2) == _11_CONTENT_B.encode(), repr(read_bytes11(_t11 / _c2)))
+        check("[-11] AC8 the row's `commit` and `gov_oid` BOTH carry the --to vintage, never one without "
+              "the other", _row11b.get(_c2, {}).get("commit") == _B11
+              and _row11b.get(_c2, {}).get("gov_oid") == GK11.blob_oid(
+                  GK11.blob_at(_g11, _B11, "tools/demo/content2.txt")), str(_row11b.get(_c2))[:300])
+        check("[-11] AC9 that row's verdict was `renamed`, and the string `patched` appears NOWHERE in the "
+              "write run's output", verdict_of(_w11.stdout, "tools/demo/content.txt") == "renamed"
+              and "patched" not in _w11.stdout, _w11.stdout)
+        check("[-11] AC9 ...and its stored sha256 is gov's blob at --to, not the pre-rename content",
+              _row11b.get(_c2, {}).get("sha256") == GK11._sha(_11_CONTENT_B.encode()),
+              str(_row11b.get(_c2))[:300])
+
+        # ---- AC5: THE RENAMED ROW CARRYING A LOCAL DELTA. Moved, then three-way merged — asserted on
+        # ---- CONTENT and never on an exit code, because a wrong argument order to `git merge-file` emits
+        # ---- a plausible file with one side silently dropped and exits 0.
+        _d2 = "tools/demo/delta2.txt"
+        _idx_d2 = gout(_t11, "ls-files", "-s", "--", _d2).split()
+        check("[-11] AC5 the delta row moved to its new path", len(_idx_d2) >= 2, str(_idx_d2))
+        check("[-11] AC5 ...and what it holds is NOT gov's blob there, which is what proves no raw write",
+              len(_idx_d2) >= 2
+              and _idx_d2[1] != GK11.blob_oid(GK11.blob_at(_g11, _B11, "tools/demo/delta2.txt")),
+              str(_idx_d2))
+        check("[-11] AC5 ...it is the MERGE: gov's change landed and the adopter's edit survived",
+              read_bytes11(_t11 / _d2) == _11_DELTA_M.encode(), repr(read_bytes11(_t11 / _d2)))
+        check("[-11] AC5 the two identities SPLIT on that row — `oid` is what the target holds, `gov_oid` "
+              "is gov's own blob at the new source",
+              len(_idx_d2) >= 2 and _row11b.get(_d2, {}).get("oid") == _idx_d2[1]
+              and _row11b.get(_d2, {}).get("gov_oid") == GK11.blob_oid(
+                  GK11.blob_at(_g11, _B11, "tools/demo/delta2.txt")), str(_row11b.get(_d2))[:300])
+
+        # ---- AC11: S0b's reported-only line. A verdict word missing from that tuple falls through to a
+        # ---- bare `continue`, so the row's disposition — reported, never moved — is never stated.
+        check("[-11] AC11 S0b a `rendered` row whose gov source moved gets the reported-only line, naming "
+              "the new verdict", any(ln.startswith("  reported only") and "[rendered]" in ln
+                                     and "renamed" in ln and "tools/demo/rendered.txt" in ln
+                                     for ln in _w11.stdout.splitlines()), _w11.stdout)
+        check("[-11] AC11 ...in ADDITION to its verdict line, which is where the row is first named",
+              verdict_of(_w11.stdout, "tools/demo/rendered.txt") == "renamed", _w11.stdout)
+        check("[-11] AC11 ...and the adopter's own bytes are untouched: this role is never written",
+              read_bytes11(_t11 / "tools" / "demo" / "rendered.txt") == b"the adopter rendered this\n",
+              repr(read_bytes11(_t11 / "tools" / "demo" / "rendered.txt")))
+        check("[-11] AC10 S0c ...and the `seed` row is reported the same way, never written",
+              any(ln.startswith("  reported only") and "[seed]" in ln and "renamed" in ln
+                  for ln in _w11.stdout.splitlines())
+              and (_t11 / "tools" / "demo" / "seed.txt").is_file(), _w11.stdout)
+
+        # ---- THE NEXT RUN is what the four-fields-together stamp is FOR, so it is exercised rather than
+        # ---- argued. If `commit` and `gov_oid` disagreed after the move, `-7` S9's preamble would refuse
+        # ---- this whole run and the target could never be updated again.
+        settle(_t11, "after the rename update")
+        _w11b = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        check("[-11] S4 the run AFTER the rename is accepted by `-7`'s receipt-integrity preamble",
+              _w11b.returncode == 0 and "REFUSING" not in _w11b.stderr,
+              _w11b.stdout[-1200:] + _w11b.stderr[-800:])
+        check("[-11] S4 ...and every moved row now reads `current` at its new spelling",
+              verdict_of(_w11b.stdout, "tools/demo/renamed.txt") == "current"
+              and verdict_of(_w11b.stdout, _c2) == "current", _w11b.stdout)
+        check("[-11] S4 ...while the merged row reads `patched`, which is what a surviving edit IS",
+              verdict_of(_w11b.stdout, _d2) == "patched", _w11b.stdout)
+
+        # ---- AC4: the deletion, and the ONLY way to get one.
+        settle(_t11, "after the second update")
+        _files_pre_wd = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _wd11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write", "--write-withdrawals")
+        _files_post_wd = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        check("[-11] AC4 `--write-withdrawals` is accepted by the parser and the run exits 0",
+              _wd11.returncode == 0, _wd11.stdout[-1200:] + _wd11.stderr[-800:])
+        check("[-11] AC4 ...and THAT is when the withdrawn row is deleted: `ls-files` no longer names it",
+              "tools/demo/low.txt" not in _files_post_wd and not (_t11 / "tools/demo/low.txt").exists(),
+              str(sorted(set(_files_pre_wd) - set(_files_post_wd))))
+        check("[-11] AC4 ...its row is dropped from the receipt rather than left claiming a deleted file",
+              not any(f["path"] == "tools/demo/low.txt" for f in json.loads(
+                  (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
+        check("[-11] AC4 ...and an order is written under .governance/outbox/ either way",
+              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file()
+              and "It WAS deleted" in (_t11 / ".governance" / "outbox"
+                                       / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"),
+              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"))
+        check("[-11] AC6 LIVENESS the count DID fall on the run that was allowed to delete — the predicate "
+              "above measures a guard, not an inert fixture",
+              len(_files_post_wd) < len(_files_pre_wd),
+              f"{len(_files_pre_wd)} -> {len(_files_post_wd)}")
+        check("[-11] S9 the flag is a SCOPE flag: nothing gov still ships was touched by it",
+              (_t11 / "tools" / "demo" / "renamed.txt").is_file()
+              and (_t11 / "tools" / "demo" / "keep.txt").is_file(), "")
+
+        # ---- THE TWO WRITE REFUSALS. Both are reachable only with something IN THE WAY, so each gets a
+        # ---- target that has it. Neither is a `--force`-able state: the row is left exactly as it was.
+        _g11b = build_rename_gov("occupied")
+        _t11b = build_rename_target(_g11b, "rn-occupied-t")
+        (_t11b / "tools" / "demo" / "renamed.txt").write_text(
+            "the operator's own file, at the path gov is about to move something to\n",
+            encoding="utf-8", newline="\n")
+        settle(_t11b, "a file already sitting at the rename destination")
+        write_rename_vintage(_g11b)
+        check("[-11] the occupied fixture really holds a file at the destination gov renames into",
+              (_t11b / "tools" / "demo" / "renamed.txt").is_file()
+              and "tools/demo/renamed.txt" in gout(_t11b, "ls-files").split(), "")
+        _occ = run_in_gov(_g11b, "update", "--target", str(_t11b), "--write")
+        check("[-11] a rename whose destination the target ALREADY holds is a refusal by name",
+              _occ.returncode == 1 and "ALREADY holds a file there" in _occ.stdout, _occ.stdout[-1500:])
+        check("[-11] ...and it is a REFUSAL rather than an overwrite: those bytes are untouched",
+              read_bytes11(_t11b / "tools" / "demo" / "renamed.txt").startswith(b"the operator's own file"),
+              repr(read_bytes11(_t11b / "tools" / "demo" / "renamed.txt")))
+        check("[-11] ...and the row it refused is still at its old path, at its old vintage",
+              (_t11b / "tools" / "demo" / "moved.txt").is_file()
+              and [f for f in json.loads((_t11b / ".governance" / "install.json").read_text(
+                  encoding="utf-8"))["files"] if f["path"] == "tools/demo/moved.txt"], "")
+
+        _g11c = build_rename_gov("mvfail")
+        _t11c = build_rename_target(_g11c, "rn-mvfail-t")
+        (_t11c / "tools" / "demo" / "sub").write_text(
+            "a FILE where gov is about to want a directory\n", encoding="utf-8", newline="\n")
+        settle(_t11c, "a file where the rename needs a parent directory")
+        write_rename_vintage(_g11c)
+        check("[-11] the mv-failure fixture really holds a FILE at the new parent's path",
+              (_t11c / "tools" / "demo" / "sub").is_file(), "")
+        _mvf = run_in_gov(_g11c, "update", "--target", str(_t11c), "--write")
+        check("[-11] a move that cannot be performed is REPORTED, never half-applied",
+              _mvf.returncode == 1 and "could not be moved to" in _mvf.stdout, _mvf.stdout[-1500:])
+        check("[-11] ...with the row left exactly as it was, at its old path",
+              (_t11c / "tools" / "demo" / "sub.txt").is_file(), "")
+        check("[-11] ...and the receipt NOT re-stamped, so the next run re-attempts rather than forgetting",
+              json.loads((_t11c / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("gov_commit") != gout(_g11c, "rev-parse", "HEAD").strip(), "")
+        check("[-11] LIVENESS the same run still moved the rows it COULD, so one bad row strands nothing",
+              (_t11c / "tools" / "demo" / "renamed.txt").is_file(), _mvf.stdout[-1200:])
+
+        # ---- THE ESCAPING DESTINATION. The destination is composed from the TARGET's own answers, so a
+        # ---- `prefix` that climbs out of the tree is target-supplied data reaching a write path — the
+        # ---- same class the receipt-path guard beside it exists for, one field further along.
+        _g11d = build_rename_gov("escape")
+        _A11d = gout(_g11d, "rev-parse", "HEAD").strip()
+        _t11d = make_target(tmp / "rn-escape-t",
+                            'gov_source = "local"\nprefix = "../escape"\nkits = ["demo"]\n')
+        (_t11d / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+        (_t11d / "tools" / "demo" / "moved.txt").write_text(
+            _11_SRC["moved.txt"], encoding="utf-8", newline="\n")
+        settle(_t11d, "one installed file, at a sane path")
+        _idx11d = {}
+        for _ln in gout(_t11d, "ls-files", "-s").splitlines():
+            _meta, _p = _ln.split("\t", 1)
+            _idx11d[_p] = _meta.split()[1]
+        (_t11d / ".governance" / "install.json").write_text(json.dumps({
+            "schema": 3, "gov_source": "local", "gov_commit": _A11d, "kits": ["demo"],
+            "files": [{"path": "tools/demo/moved.txt", "source": "tools/demo/moved.txt", "role": "engine",
+                       "kit": "demo", "written": True, "commit": _A11d,
+                       "gov_oid": GK11.blob_oid(_11_SRC["moved.txt"].encode()),
+                       "oid": _idx11d.get("tools/demo/moved.txt"),
+                       "sha256": GK11._sha(_11_SRC["moved.txt"].encode())}]}, indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        settle(_t11d, "the receipt")
+        write_rename_vintage(_g11d)
+        check("[-11] the escape fixture's prefix really resolves the destination outside the target",
+              "../escape" in (_t11d / ".governance" / "deploy.toml").read_text(encoding="utf-8"), "")
+        _esc = run_in_gov(_g11d, "update", "--target", str(_t11d), "--write")
+        check("[-11] a rename destination OUTSIDE the target repository is refused by name",
+              _esc.returncode == 1 and "OUTSIDE the repository the operator named" in _esc.stdout,
+              _esc.stdout[-1500:])
+        check("[-11] ...and nothing was written anywhere: the row is untouched at its old path",
+              (_t11d / "tools" / "demo" / "moved.txt").is_file()
+              and not (_t11d.parent / "escape").exists(), "")
+
+        # ---- S11: THE CARRIED RENAME. A row DEPL-dCarriedReceipt-9 proves a rung for ALWAYS differs from
+        # ---- gov's blob at the old source, so every carried row in a renamed kit lands on the three-way —
+        # ---- with an UN-carried base, which is the one input a rung exists to correct. RED observed on
+        # ---- this fixture with the rung dropped from this unit's own merge call: every line naming a path
+        # ---- read as an operator edit, the merge conflicted, the run exited 1 and nothing moved.
+        _C11_A = "".join(f"tools/demo/pathy.txt line {i}\n" for i in range(1, 6))
+        _C11_T = _C11_A.replace("tools/demo", "scripts/demo")
+        _C11_B = _C11_A.replace("tools/demo/pathy.txt line 3",
+                                "GOV SEMANTIC CHANGE at tools/demo/pathy.txt")
+        _C11_WANT = _C11_B.replace("tools/demo", "scripts/demo")
+
+
+        def build_carry_rename_gov() -> pathlib.Path:
+            g = tmp / "rn-carry-gov"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            d = g / "tools" / "demo"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "kit.toml").write_text(
+                'id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
+            (d / "pathy.txt").write_text(_C11_A, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+
+        _gc11 = build_carry_rename_gov()
+        _Ac11 = gout(_gc11, "rev-parse", "HEAD").strip()
+        # The target is AUTHORED rather than applied: `apply` lands gov's own bytes at gov's own spelling,
+        # and what is under test is where an adopter ends up after installing at a `prefix` gov does not use.
+        _tc11 = tmp / "rn-carry-t"
+        _tc11.mkdir(parents=True)
+        git(_tc11, "init", "-q", "-b", "main")
+        git(_tc11, "config", "user.email", "t@e")
+        git(_tc11, "config", "user.name", "t")
+        git(_tc11, "config", "core.autocrlf", "false")
+        (_tc11 / ".governance").mkdir()
+        (_tc11 / ".governance" / "deploy.toml").write_text(
+            'gov_source = "local"\nprefix = "scripts"\nkits = ["demo"]\n', encoding="utf-8", newline="\n")
+        (_tc11 / "scripts" / "demo").mkdir(parents=True)
+        (_tc11 / "scripts" / "demo" / "pathy.txt").write_text(_C11_T, encoding="utf-8", newline="\n")
+        git(_tc11, "add", "-A")
+        git(_tc11, "commit", "-qm", "the relocated install")
+        _ic11 = {}
+        for _ln in gout(_tc11, "ls-files", "-s").splitlines():
+            _meta, _p = _ln.split("\t", 1)
+            _ic11[_p] = _meta.split()[1]
+        (_tc11 / ".governance" / "install.json").write_text(json.dumps({
+            "schema": 3, "gov_source": "local", "gov_commit": _Ac11, "kits": ["demo"],
+            "files": [{"path": "scripts/demo/pathy.txt", "source": "tools/demo/pathy.txt",
+                       "role": "engine", "kit": "demo", "written": True, "commit": _Ac11,
+                       "gov_oid": GK11.blob_oid(_C11_A.encode()),
+                       "oid": _ic11.get("scripts/demo/pathy.txt"),
+                       "sha256": GK11._sha(_C11_T.encode())}]}, indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        git(_tc11, "add", "-A")
+        git(_tc11, "commit", "-qm", "the receipt")
+        git(_gc11, "mv", "tools/demo/pathy.txt", "tools/demo/pathy2.txt")
+        (_gc11 / "tools" / "demo" / "pathy2.txt").write_text(_C11_B, encoding="utf-8", newline="\n")
+        git(_gc11, "add", "-A")
+        git(_gc11, "commit", "-qm", "B")
+        _Bc11 = gout(_gc11, "rev-parse", "HEAD").strip()
+
+        # ---- THE FIXTURE'S OWN PRECONDITIONS, and the second one is the whole premise of S11: this row
+        # ---- proves a rung, and its bytes therefore differ from gov's blob at the old source.
+        _recc11 = json.loads((_tc11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _idxc11, _ = GK11.index_read(_tc11, ["scripts/demo/pathy.txt"])
+        _ndc11, _pdc11, _ = GK11.derive_carry_map(
+            [(f.get("source"), f.get("path")) for f in _recc11["files"]])
+        _cc11 = GK11.classify_row(_gc11, _tc11, _recc11["files"][0], _Bc11, _idxc11, _ndc11)
+        check("[-11] S11 the carried fixture's row really proves the `relocate` rung",
+              _cc11.get("carry") == "relocate", str(_cc11.get("carry")))
+        check("[-11] S11 ...and therefore differs from gov's blob at the OLD source, which is why every "
+              "carried row in a renamed kit lands on the three-way",
+              read_bytes11(_tc11 / "scripts" / "demo" / "pathy.txt")
+              != GK11.blob_at(_gc11, _Ac11, "tools/demo/pathy.txt"),
+              repr(read_bytes11(_tc11 / "scripts" / "demo" / "pathy.txt")))
+        check("[-11] S11 the fixture's gov copy really moved AND changed between the two vintages",
+              GK11.blob_at(_gc11, _Bc11, "tools/demo/pathy.txt") is None
+              and GK11.blob_at(_gc11, _Bc11, "tools/demo/pathy2.txt") == _C11_B.encode(), "")
+        _wc11 = subprocess.run([sys.executable, str(_gc11 / "tools" / "govkit" / "govkit.py"),
+                                "update", "--target", str(_tc11), "--write"],
+                               capture_output=True, text=True)
+        check("[-11] S11 the carried rename RECONCILES rather than conflicting",
+              _wc11.returncode == 0, _wc11.stdout[-1500:] + _wc11.stderr[-900:])
+        check("[-11] S11 ...the file is at its new destination, in the TARGET's own prefix",
+              (_tc11 / "scripts" / "demo" / "pathy2.txt").is_file()
+              and not (_tc11 / "scripts" / "demo" / "pathy.txt").exists(), _wc11.stdout)
+        _bc11 = read_bytes11(_tc11 / "scripts" / "demo" / "pathy2.txt")
+        check("[-11] S11 ...carrying gov's semantic change at the target's spelling, on every line",
+              _bc11 == _C11_WANT.encode(), repr(_bc11))
+        check("[-11] S11 ...and spelling gov's own prefix NOWHERE",
+              b"tools/demo" not in _bc11, repr(_bc11))
+        _rowc11 = (json.loads(
+            (_tc11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"] or [{}])[0]
+        check("[-11] S11 the row is stamped per `-9` S12: `gov_oid` is gov's UN-carried blob at the new "
+              "source, `oid` is what the target now holds, and they DIFFER",
+              _rowc11.get("gov_oid") == GK11.blob_oid(_C11_B.encode())
+              and _rowc11.get("oid") != _rowc11.get("gov_oid")
+              and _rowc11.get("commit") == _Bc11, str(_rowc11)[:400])
+        check("[-11] S11 ...and `path` and `source` moved with them",
+              _rowc11.get("path") == "scripts/demo/pathy2.txt"
+              and _rowc11.get("source") == "tools/demo/pathy2.txt", str(_rowc11)[:400])
+
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
     # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written

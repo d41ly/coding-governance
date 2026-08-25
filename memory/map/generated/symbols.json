@@ -918,6 +918,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "derive_rename_map",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_rule_kind",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

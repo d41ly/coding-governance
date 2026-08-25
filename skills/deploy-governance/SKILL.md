@@ -84,6 +84,41 @@ Read-only. Reports each kit as not landed, landed but inert, or adopted, and RUN
 hole's discharge probe. Exit 0 from an adopter means "the adopter ran", never "the kit works", so
 `check` reds on an undischarged hole regardless of what any adopter exited with.
 
+```bash
+python tools/govkit/govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+```
+
+Moves an installed target forward to a newer gov commit. **Read-only by default**, because this
+verb's failure mode is silent data loss in a repository the operator owns and gov does not, so the
+muscle-memory invocation must not be the destructive one. `--write` performs what it printed.
+
+**Deletion is opt-in.** When gov stops shipping a file, `update` prints the row `withdrawn` and
+writes an order under `<target>/.governance/outbox/` naming the file, its last gov commit and why
+nothing happened — and the adopter's copy stays exactly where it is. Only `--write-withdrawals`
+performs the deletion. That flag is a SCOPE flag rather than a `--force`: it enables a narrower
+class of action, defaults off, and overrides no refusal. Before it existed, that branch was this
+engine's one unguarded delete — it removed a tracked file from a repository gov does not own, with
+no flag and no order.
+
+**A file gov RENAMED is not a withdrawal.** `update` runs one rename diff between the two vintages
+and prints the map it derived. A row whose source moved reads `renamed`, and `--write` performs
+`git mv` to the destination the target's OWN descriptor resolves for the new source — never a
+string edit of the old destination, because a rename that crosses a rule boundary changes the
+descriptor's answer. The bytes are decided BEFORE the move: a row the adopter never edited takes
+gov's blob at the new source, and one carrying a local edit takes a three-way merge, so the edit
+survives the move. Gov's rename detection is scored, so a rewrite too large to pair reads
+`withdrawn` and is reported rather than guessed at. So is a source that moved OUT of the kit's
+claimed surface, or one the descriptor now resolves to several destinations — both drop loudly,
+naming the source and the reason, because a report costs a line and a guess costs a file in the
+wrong place.
+
+The two roles `update` classifies but never writes — `seed` and `rendered` — get the `renamed`
+verdict AND a second line saying the row was reported rather than moved, so a template or a
+rendered document whose gov source moved is visible rather than silent. Performing that one is
+yours. The roles that never reach classification at all — `project-owned`, `generated`, `merged`,
+`gate-leg`, `ci`, `forked` — are unchanged by this: each still prints what its own disposition
+prints.
+
 ## What it will refuse, and what to do about it
 
 | refusal | what it means |

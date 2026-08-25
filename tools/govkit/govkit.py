@@ -3697,9 +3697,59 @@ def derive_carried_by_rung(rung: str | None, data: bytes, needles: dict[str, str
     return data
 
 
+# ------------------------------------------------ rename detection (DEPL-dCarriedReceipt-11 S1/S7)
+# THE SIMILARITY THRESHOLD, DECLARED. git's own default is 50% and this is that number — named here
+# rather than left implicit at the call site, because an undeclared default is a value nobody can
+# review, and this one decides whether an adopter's file is MOVED or REPORTED WITHDRAWN. Below it
+# there is no `R` pair, the verdict stays `withdrawn`, and nothing is invented (S7): a low-similarity
+# pair landed anyway would be attribution by guess — the new file has no receipt row, so its
+# `gov_oid` would be invented, which is the inversion DEPL-dCarriedReceipt-13 refuses.
+RENAME_SIMILARITY_PERCENT = 50
+
+
+def derive_rename_map(root: pathlib.Path, base_commit: str | None, to_commit: str) -> dict[str, str]:
+    """Gov's own renames between two vintages, as `old source -> new source`. ONE diff per run.
+
+    UNSCOPED, and that is the whole design rather than an omission. Pathspec-limiting the diff to the
+    receipt's own sources hides the DESTINATION half of every rename pair: git needs both sides in
+    the same diff to pair a deletion with an addition at all, so a scoped diff sees the delete and
+    reports it as a delete. Measured on this unit's own fixture, where gov moves a claimed file to
+    `docs/gone.txt` — outside the kit's `home` entirely, and invisible to any scope the receipt could
+    supply.
+
+    `-z` because a rename pair is three NUL-separated fields and the non-`-z` form QUOTES a path
+    containing a space or a quote — a quoted spelling matches no receipt row, so the rename silently
+    degrades to a withdrawal for exactly the paths hardest to notice.
+
+    ONLY the `R` rows. A `C` (copy) row means gov still ships the old source, so the row's `theirs`
+    resolves and there is nothing here to reconcile; taking one would move a file gov did not move.
+    A receipt carrying no `gov_commit` gets an empty map rather than a diff against a guessed base.
+    """
+    if not base_commit:
+        return {}
+    out = git(root, "diff", f"--find-renames={RENAME_SIMILARITY_PERCENT}%", "--name-status", "-z",
+              base_commit, to_commit)
+    fields = out.split("\0")
+    renames: dict[str, str] = {}
+    i = 0
+    while i < len(fields):
+        st = fields[i]
+        if not st:
+            i += 1
+            continue
+        if st[0] in ("R", "C") and i + 2 < len(fields):
+            if st[0] == "R":
+                renames[fields[i + 1]] = fields[i + 2]
+            i += 3
+            continue
+        i += 2
+    return renames
+
+
 def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
                  index: dict[str, tuple[str, str]],
-                 needles: dict[str, str] | None = None) -> dict:
+                 needles: dict[str, str] | None = None,
+                 rename=None) -> dict:
     """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
 
     OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
@@ -3727,6 +3777,12 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     `carry` (DEPL-dCarriedReceipt-9 S1) is computed here and is OUTPUT: it explains the difference
     the verdict reports, and it changes neither `o_state` nor the verdict nor which arm the row takes
     (S9). It is recomputed by PROOF on every run and a stored one is never read.
+
+    `renamed` (DEPL-dCarriedReceipt-11 S2) is the one verdict that does NOT come from the grid, and
+    it is decided before the grid is consulted rather than after — a row gov MOVED must never take
+    the `withdrawn` cell, whose write arm exists to remove files. `renamed_to` carries the new gov
+    source and the destination the caller resolved for it, and `theirs_new` gov's blob there; all
+    three are `None` on every other verdict.
     """
     src, base_commit = row.get("source"), row.get("commit")
     theirs = blob_at(root, to_commit, src) if src else None
@@ -3742,7 +3798,6 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
         o_state = "equal"
     else:
         o_state = "differs"
-    verdict = VERDICT_GRID[(o_state, t_state)]
 
     # ---- DEPL-dCarriedReceipt-9 S1. The rung, over the SAME two blobs the verdict came from, and
     # ---- it is computed here so there is one classifier rather than a second one beside it. The
@@ -3760,11 +3815,52 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     if base is not None and ours_oid is not None:
         carry = derive_carry_rung(base, needles or {}, read_ours,
                                   known_equal=(ours_oid == blob_oid(base)))
+
+    # ---- DEPL-dCarriedReceipt-11 S2. THE RENAME, DECIDED BEFORE THE GRID IS CONSULTED, so the
+    # ---- `("equal","absent")` cell never sees a row gov MOVED and answers `withdrawn` for it — the
+    # ---- cell whose write arm unlinked the adopter's file, `git rm`-ed it and dropped its row, at
+    # ---- exit 0, with the replacement never landed.
+    #
+    # THREE CONDITIONS, and each is load-bearing rather than defensive. `t_state == "absent"` is what
+    # a rename LOOKS like from a receipt row — gov holds no blob at the old source any more — and
+    # asking it keeps a stale map from stealing a row whose source still resolves. `o_state !=
+    # "absent"` is the target's half: it deleted its copy, so there is nothing to move, and both
+    # `absent` cells already grid to a verdict this verb acts on (`missing`, `converged`) rather than
+    # to a `git mv` of a file that is not there. And the CALLER's resolver has to name exactly one
+    # destination for the new source — a rename OUT of the kit's claimed surface is a withdrawal from
+    # the target's point of view, not a move, and inventing a destination for it is the class
+    # DEPL-dCarriedReceipt-1 closed.
+    #
+    # `rename` is a THUNK for the reason `read_ours` is one: the destination costs a full
+    # `resolve_entry` over the descriptor, and asking it per row for rows that did not move would pay
+    # that on every run. It is also where the descriptor knowledge lives — this classifier has no
+    # registry and no target descriptor, and giving it one would make it a second resolver.
+    moved = rename(row) if (rename is not None and src
+                            and t_state == "absent" and o_state != "absent") else None
+    theirs_new = blob_at(root, to_commit, moved[0]) if moved else None
+    if moved and theirs_new is None:
+        moved = None          # git named the pair and gov's tree has no blob there: not actionable
+    if moved and carry != "verbatim" and read_ours() is None:
+        # The one input the move's byte decision cannot be taken without. `verbatim` is settled from
+        # the two oids and needs no read; every other outcome is a three-way, and merging against a
+        # `b""` this verb could not obtain would drop the operator's whole side. Degrading to the
+        # grid leaves `withdrawn`, which after S8 is a report and an order — it deletes nothing.
+        #
+        # THIS IS ALSO WHAT MAKES THE WRITE ARM'S `ours` NON-NONE, and it is stated here because
+        # the guarantee is STRUCTURAL rather than a guard in front of the merge: a row that says
+        # `renamed` has either proved `verbatim` — which never reaches `three_way` — or read its
+        # bytes back successfully on this line. The `diverged` arm below carries an explicit
+        # `ours is None` refusal instead, because nothing degrades ITS verdict: the two are the
+        # same question answered at the two different places it can be answered.
+        moved = None
+    verdict = "renamed" if moved else VERDICT_GRID[(o_state, t_state)]
+
     if ours_oid and verdict == "diverged":
         read_ours()
     ours = fetched[0] if fetched else None
     return {"verdict": verdict, "ours": ours, "ours_oid": ours_oid, "theirs": theirs,
-            "base": base, "o_state": o_state, "t_state": t_state, "carry": carry}
+            "base": base, "o_state": o_state, "t_state": t_state, "carry": carry,
+            "renamed_to": moved, "theirs_new": theirs_new if moved else None}
 
 
 def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
@@ -3828,15 +3924,17 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
         return None, "conflict"
 
 
-def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
+def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
+               write_withdrawals: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals)
     finally:
         release_write_lock()
 
 
-def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
+def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
+                write_withdrawals: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -4009,6 +4107,70 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"{len(needles)} needle(s)")
 
     deploy = load_deploy(target)
+
+    # ---- DEPL-dCarriedReceipt-11 S1 + S3. GOV'S OWN RENAMES, once per run, and the resolver that
+    # ---- turns one into a destination. PRINTED before the first row is classified, for the reason
+    # ---- the carry map above is: a run that silently found nothing is indistinguishable from a gov
+    # ---- that renamed nothing, and the difference is whether an adopter's files are about to move.
+    renames = derive_rename_map(root, base_commit, to_commit)
+    print(f"govkit update — rename map: {len(renames)} gov source(s) moved between these two "
+          f"vintages, at >= {RENAME_SIMILARITY_PERCENT}% similarity")
+    rename_dests: dict[str, dict[str, list[str]]] = {}
+
+    def resolve_renamed(row: dict) -> tuple[str, str] | None:
+        """gov's new source for this row, and the ONE destination the descriptor puts it at.
+
+        S3: the destination is RECOMPUTED through `resolve_entry`, never derived by string-editing
+        the old one. A rename that crosses a rule boundary changes the descriptor's answer — gov's
+        own fixture moves a file from a `**` engine pool into a rule with an explicit `to` — and a
+        string edit would land it where the descriptor does not declare it. `resolve_entry` is the
+        answer `apply` uses, and DEPL-dCarriedReceipt-1 exists because this file already paid once
+        for a second spelling of it.
+
+        DROPS LOUDLY, in the shape DEPL-dCarriedReceipt-9's carry map drops an ambiguous directory.
+        Every `return None` here degrades the row to `withdrawn`, which after S8 deletes nothing —
+        so the cost of dropping is a report, and the cost of guessing is a file in the wrong place.
+        Both `writes` and `unlanded` are searched: a `rendered` or `forked` source is never written
+        by this verb, but its row still gets a verdict, and a role's disposition decides what happens
+        NEXT rather than whether the row moved.
+
+        WHAT IT DOES NOT ANSWER, because a structural check reads as a semantic one to everybody
+        who did not write it: it resolves the descriptor as it stands in THIS CHECKOUT, not as it
+        stood at `to_commit`. That is the same approximation `apply` makes — `read_descriptors`
+        reads the working tree — and it fails in the safe direction here: a new source this
+        checkout's descriptor does not claim resolves to nothing, the row degrades to `withdrawn`,
+        and after S8 a `withdrawn` row is a report and an order rather than a deletion.
+        """
+        old, eid = row.get("source"), row.get("kit")
+        new = renames.get(old or "")
+        if not new:
+            return None
+        if eid not in descs:
+            print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', and this row "
+                  f"names kit '{eid}', which no registry entry claims")
+            return None
+        if eid not in rename_dests:
+            d, _p = descs[eid]
+            res = resolve_entry(root, d, target_context(target, deploy, eid, d))
+            by_src: dict[str, list[str]] = {}
+            for _dest, _w in res["writes"].items():
+                if _w.get("src"):
+                    by_src.setdefault(_w["src"], []).append(_dest)
+            for _u in res["unlanded"]:
+                if _u.get("src"):
+                    by_src.setdefault(_u["src"], []).append(_u["dest"])
+            rename_dests[eid] = {k: sorted(set(v)) for k, v in by_src.items()}
+        dests = rename_dests[eid].get(new) or []
+        if len(dests) != 1:
+            print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', which kit "
+                  f"'{eid}' now resolves to "
+                  + (f"{len(dests)} destinations ({', '.join(dests)}) — one row cannot move to "
+                     f"several, and picking one would be a guess"
+                     if dests else "no destination at all: it has left this kit's claimed surface, "
+                                   "which from this receipt's side is a withdrawal and not a move"))
+            return None
+        return new, dests[0]
+
     tally: dict[str, int] = {}
     acted: list[dict] = []
     # S2's order, collected in the loop and written in the write phase below, where `outbox` exists.
@@ -4098,7 +4260,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 pins_order = _text
             continue
 
-        c = classify_row(root, target, row, to_commit, index0, needles)
+        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
 
         # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
         # above and is written back for REPORTING; a stale one left by an older run is DROPPED
@@ -4114,7 +4276,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
                 v = "reseed-available"
-            elif v not in ("missing",):
+            elif v not in ("missing", "renamed"):
+                # DEPL-dCarriedReceipt-11 S0c. `renamed` IS EXEMPT FROM THIS OVERRIDE, beside
+                # `missing`, and the exemption is the sharpest thing in that unit. This line rewrites
+                # any surviving verdict on a seed row to `current`/`patched` — which for a row whose
+                # gov SOURCE gov renamed means printing `current` over a source that no longer
+                # exists. Measured at 9ddcc5c9 on this unit's own fixture: the seed row read
+                # `t_state = "absent"`, gridded to `withdrawn`, and came out of this line as
+                # `current` while the file behind it had moved. That is a silent-green of exactly
+                # the kind the comment at the reported-only branch below records an incident for.
                 v = "current" if c["o_state"] == "equal" else "patched"
         if how == "adopter" and v in ("diverged", "stale"):
             v = "re-rendered"          # CAP at report; the adopter owns these bytes
@@ -4143,6 +4313,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
     changed, deleted, conflicts = [], [], 0
+    # DEPL-dCarriedReceipt-11 S6. BOTH SPELLINGS of every performed rename, in the shape `changed`
+    # and `deleted` already take. `git mv` stages both ends, so this is not a second `git add` and
+    # nothing below re-adds it: it exists because DEPL-dCarriedReceipt-14's pre-write snapshot and
+    # its touched-kit predicate read these lists, and a renamed row is invisible to both through
+    # `changed` and `deleted` alone.
+    renamed: list[str] = []
+    withheld = 0
     # DEPL-dCarriedReceipt-2 S2: an ORDER, not a write. `.gitattributes` is `apply`'s destination
     # and DEPL-dSettledRoster-1 is an open ask about how it writes them, so this verb states what
     # moved and stops. Written under `--write` only, matching every other order this verb emits.
@@ -4176,7 +4353,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # into an adopter tree at exit 0, and a `seed` the target had deleted was silently restored
         # from gov rather than left to the target that owns it.
         if a["how"] != "table":
-            if v in ("missing", "stale", "withdrawn", "diverged"):
+            # DEPL-dCarriedReceipt-11 S0b. `renamed` joins this tuple, and it has to: a verdict word
+            # absent from it falls through to the bare `continue` below, so a `rendered` or `seed`
+            # row whose gov source MOVED would get its verdict line and then nothing at all from the
+            # verb that just decided not to write it. The line is a SECOND line rather than the only
+            # one — every row in `acted` already printed its verdict above — and what it adds is the
+            # disposition: this role is reported, never moved.
+            if v in ("missing", "stale", "withdrawn", "diverged", "renamed"):
                 print(f"  reported only   [{row.get('role')}] {row['path']} — {v}; this role is "
                       f"never written by `update`")
             continue
@@ -4229,7 +4412,157 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if restored_carry:
                 row["carry"] = restored_carry
             changed.append(row["path"])
+        elif v == "renamed":
+            # ---- DEPL-dCarriedReceipt-11 S4 / S5 / S11. GOV MOVED THIS FILE, so the target's copy
+            # ---- moves with it. Everything that decides bytes happens BEFORE the move, and that
+            # ---- ordering is the unit rather than a style: `git mv` moves bytes unchanged, so a
+            # ---- post-move comparison would ask "does the target's copy match gov's blob at the new
+            # ---- source" of a file nobody has written yet, answer no, and freeze it at pre-rename
+            # ---- content while printing `patched` — the grid's word for an adopter edit that never
+            # ---- happened. Deciding first also means a conflict leaves the row EXACTLY as it was,
+            # ---- rather than half-applied at a new path.
+            new_src, new_dest = c["renamed_to"]
+            ndp = (target / new_dest).resolve()
+            try:
+                ndp.relative_to(target.resolve())
+            except ValueError:
+                r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which this target's own "
+                       f"descriptor resolves to '{new_dest}' — a path OUTSIDE the repository the "
+                       f"operator named. Refusing the move: the destination is composed from that "
+                       f"target's answers, so a `prefix` that climbs out of the tree is a write "
+                       f"this verb may not perform whatever the verdict says")
+                continue
+            # ASKED OF THE INDEX AND OF THE DISK, both. The preamble's batched read covers the
+            # RECEIPT's paths and a rename destination is by definition not one of them, so a
+            # tracked file there whose worktree copy the operator removed is invisible to `exists()`
+            # — and `git mv` would take its index entry without a word.
+            _, _at_dest = index_read(target, [new_dest])
+            if new_dest in _at_dest or ndp.exists():
+                r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
+                       f"than overwriting it: `update` moves one row and would be destroying "
+                       f"another file's bytes to do it. Move or remove '{new_dest}' and re-run")
+                continue
+
+            # THE BYTES, decided here and written after the move. `carry == "verbatim"` IS S4's
+            # no-delta question — the ladder proves it on BYTES, which is the same question the
+            # spec asks of the pre-move `oid` and strictly better than an oid comparison on a target
+            # whose object format is not gov's. No delta means gov's blob at the NEW source, raw,
+            # with `commit` and `gov_oid` advancing together beneath it.
+            #
+            # EVERYTHING ELSE TAKES THE THREE-WAY, and that includes a row DEPL-dCarriedReceipt-9
+            # proved a rung for (S11): a carried row's bytes never equal gov's blob at the old
+            # source, so it lands here by construction, and a proven rung must never open the raw
+            # arm or the target's own spelling is replaced by gov's at the new path. The rung is
+            # applied to BOTH sides exactly as the `diverged` arm below applies it, at the two
+            # vintages and the two sources this unit names: the OLD source at the row's own
+            # `commit`, and the NEW source at `to_commit`. It cancels in the base-to-theirs diff,
+            # so `git merge-file` sees only gov's semantic change.
+            byte_arm = "gov" if c["carry"] == "verbatim" else "merged"
+            if c["carry"] == "verbatim":
+                data = c["theirs_new"]
+            else:
+                merged, _how = three_way(
+                    c["ours"],
+                    derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
+                    derive_carried_by_rung(c["carry"], c["theirs_new"], needles))
+                if merged is None:
+                    conflicts += 1
+                    (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md"
+                     ).write_text(
+                        f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
+                        f"gov moved  {row.get('source')} -> {new_src}\n"
+                        f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
+                        f"base   {row.get('commit')} sha {_sha(c['base'])}\n"
+                        f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
+                        f"theirs {to_commit} sha {_sha(c['theirs_new'])}\n\n"
+                        f"NOTHING was moved and the file was left BYTE-IDENTICAL at its old path.\n"
+                        f"Resolve by hand, then re-run `update`.\n",
+                        encoding="utf-8", newline="\n")
+                    r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
+                           f"conflicts — left untouched at its old path, order written")
+                    continue
+                data = merged
+
+            # THE MOVE. The parent is created here because `git mv` does NOT create one — measured:
+            # a rename into a new subdirectory fails with `destination directory does not exist`,
+            # which would make every into-a-subdir rename a reported failure. Both failure modes are
+            # ONE report: the row is left exactly as it was, and nothing about it is rewritten.
+            old_path = row["path"]
+            mv_err: str | None = None
+            try:
+                ndp.parent.mkdir(parents=True, exist_ok=True)
+                mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
+                                    capture_output=True, text=True, check=False)
+                if mv.returncode != 0:
+                    mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
+            except OSError as e:
+                mv_err = str(e)
+            if mv_err:
+                r.fail(f"'{row['path']}' could not be moved to '{new_dest}': {mv_err} — the row is "
+                       f"left exactly as it was, at its old path and its old vintage")
+                continue
+
+            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0)
+            if oid is None:
+                # NO ARM REACHES THIS, and the skip announces itself rather than passing for
+                # coverage. `land_through_index` fails only when the TARGET's own git refuses —
+                # a rejected blob write, a mode `update-index` will not take, a worktree file
+                # `checkout-index` cannot replace — and this suite manufactures none of those; the
+                # two older call sites above are in exactly the same position. What it leaves is a
+                # moved file whose bytes are still the pre-move ones, reported and not re-stamped.
+                r.fail(f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
+                       f"landed: {why}. The move is staged and the row is NOT advanced, so a re-run "
+                       f"sees the file at its new path with its old vintage")
+                continue
+            # THE FOUR FIELDS, REWRITTEN TOGETHER. `path` and `source` carry the new spelling, which
+            # is what makes the NEXT run's classification correct; `commit` advances to `to_commit`
+            # and `gov_oid` becomes gov's blob at the NEW source there, because those two are
+            # meaningless apart and DEPL-dCarriedReceipt-7's preamble refuses a receipt that pairs
+            # one vintage's `commit` with another's `gov_oid`. `oid` records what the target now
+            # holds — equal to `gov_oid` on the raw arm by construction, and deliberately different
+            # on the merge arm, where it reads "this row carries something gov did not ship".
+            row["path"], row["source"] = new_dest, new_src
+            row["gov_oid"] = blob_oid(c["theirs_new"])
+            row["oid"] = oid
+            row["sha256"] = _sha(data)
+            row["commit"] = to_commit
+            renamed.extend([old_path, new_dest])
+            # The DESTINATION line. The verdict row above names the old path, which is the only
+            # spelling the receipt had when it was printed; where the file went is the other half,
+            # and it ends in the byte arm rather than in a path so that nothing parsing this output
+            # for a row's verdict can mistake this line for one.
+            print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
+                  f"bytes {byte_arm}")
         elif v == "withdrawn":
+            # ---- DEPL-dCarriedReceipt-11 S8 + S9. THE ENGINE'S ONLY UNGUARDED DELETE, CLOSED. What
+            # ---- stood here removed a tracked file from a repository gov does not own — unlinked
+            # ---- it, `git rm`-ed it and dropped its row — with no flag, no order and no way for
+            # ---- anything downstream to notice, and it did so on the same verdict a gov RENAME
+            # ---- produces, which is how the replacement was never landed either.
+            #
+            # The report and the ORDER are unconditional under `--write`; the DELETION needs
+            # `--write-withdrawals`, which defaults OFF. That flag is a SCOPE flag and not a
+            # `--force`: it enables a narrower class of action and overrides no refusal. The order is
+            # written either way, because a deletion that happened and a deletion that was withheld
+            # are both things the operator has to be able to read afterwards.
+            _why = ("It WAS deleted: this run carried --write-withdrawals."
+                    if write_withdrawals else
+                    "NOTHING was deleted. `update` no longer removes a tracked file from a "
+                    "repository gov does not own on the strength of a verdict alone. Re-run with "
+                    "--write-withdrawals if this file really should go.")
+            (outbox / f"update-withdrawn-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
+                f"# gov no longer ships {row['path']}\n\n"
+                f"source {row.get('source')}\n"
+                f"last gov commit {row.get('commit')}\n"
+                f"vintage asked for {to_commit}\n\n"
+                f"gov's tree holds no blob for that source at the requested vintage, and no rename "
+                f"pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a replacement for it.\n\n"
+                f"{_why}\n",
+                encoding="utf-8", newline="\n")
+            if not write_withdrawals:
+                withheld += 1
+                continue
             if dp.is_file():
                 dp.unlink()
             deleted.append(row["path"])
@@ -4331,7 +4664,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         (target / ".governance" / "install.sums").write_text(
             "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
             encoding="utf-8", newline="\n")
-        print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+        print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+              f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
               f"stamp would tell the next run that guards which fired here have already been passed")
         return r.emit()
@@ -4342,7 +4676,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
         encoding="utf-8", newline="\n")
-    print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+    print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+          f"deleted {len(deleted)}, withheld {withheld}, "
           f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
     return r.emit()
 
@@ -4519,11 +4854,16 @@ USAGE = """usage:
   govkit.py plan  --target <path> [--kits a,b | --all]
   govkit.py check --target <path>
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
 `plan`, `check` and `update` are READ-ONLY and none writes a byte; `update --write` performs what
-`update` printed. The default is read-only because that verb's failure mode is silent data loss in a
+`update` printed. `--write-withdrawals` is the ONLY way `update` deletes anything: without it a file
+gov has stopped shipping is REPORTED and an order is written under `.governance/outbox/`, and the
+adopter's copy stays exactly where it is. It defaults off and it is a scope flag rather than a
+`--force` — it enables a narrower class of action and overrides no refusal. A file gov RENAMED is
+not a withdrawal at all: `update --write` moves the target's copy to the new destination its own
+descriptor resolves, carrying any local edit through a three-way merge. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
 destructive one. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
@@ -4538,6 +4878,7 @@ def parse_args(argv: list[str]) -> tuple:
     mode, kits = "default", []
     resume = False
     write = False
+    write_withdrawals = False
     to_rev = "HEAD"
     answers: dict[str, str] = {}
     i = 1
@@ -4558,6 +4899,14 @@ def parse_args(argv: list[str]) -> tuple:
         elif a == "--write":
             write = True
             i += 1
+        elif a == "--write-withdrawals":
+            # DEPL-dCarriedReceipt-11 S9. Its OWN flag rather than a value on `--write`, and NOT a
+            # `deploy.toml` field: a descriptor field is a STANDING authorization, and the whole
+            # reason this flag exists is that a deletion used to happen without anyone deciding it
+            # once, let alone standing (§8 F1). It does nothing without `--write`, because the
+            # deletion it scopes lives in the write loop.
+            write_withdrawals = True
+            i += 1
         elif a == "--to" and i + 1 < len(argv):
             to_rev = argv[i + 1]
             i += 2
@@ -4569,7 +4918,7 @@ def parse_args(argv: list[str]) -> tuple:
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits, resume, answers, write, to_rev
+    return verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals
 
 
 def main(argv: list[str]) -> int:
@@ -4577,7 +4926,7 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV = parse_args(argv)
+        verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -4601,7 +4950,8 @@ def main(argv: list[str]) -> int:
             if verb == "intake":
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
-                return cmd_update(root, target, TO_REV, write=WRITE)
+                return cmd_update(root, target, TO_REV, write=WRITE,
+                                  write_withdrawals=WRITE_WD)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2
