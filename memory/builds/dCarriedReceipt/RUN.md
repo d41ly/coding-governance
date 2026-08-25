@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 671e953d9dcc3f79fa85ccb3ed5a97cf632ab847
-phase: REVIEWING
+witness: 8e98a381ea0043980eee0964bd7de9d2075a3836
+phase: FOLDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 91ed1be1
@@ -42,3 +42,19 @@ base: c97b8b90c0491acee8c227b51d4de9f05d452759
 2026-08-25T09:32:23Z dispatch · item 1678ced6 DEPL-dCarriedReceipt-7 · reason memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md
 
 2026-08-25T09:32:25Z dispatch · item 1678ced6 DEPL-dCarriedReceipt-2 · reason memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md memory/builds/dCarriedReceipt/README.md
+
+2026-08-25T10:18:35Z review · item DEPL-dCarriedReceipt-13 · reason verdict BLOCKED · blockers 1
+
+2026-08-25T10:18:36Z review · item DEPL-dCarriedReceipt-7 · reason verdict BLOCKED · blockers 1
+
+2026-08-25T10:18:36Z review · item DEPL-dCarriedReceipt-2 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T10:18:37Z review · item DEPL-dCarriedReceipt-5 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T10:18:37Z review · item DEPL-dCarriedReceipt-6 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T10:18:37Z review · item DEPL-dCarriedReceipt-10 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T10:18:38Z review · item DEPL-dCarriedReceipt-11 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T10:18:38Z review · item DEPL-dCarriedReceipt-12 · reason verdict BLOCKED · blockers 0 · CONVERGED
