@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T11:50:57+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
+last-audit: 2026-08-25T13:01:53+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 70df24ea1963afd7ee12749acb3bd323e5fa239a
@@ -100,7 +100,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **The read path is NOT full, and the ceiling measuring it is being retired.** The pin went
   135677 -> 161120 on 2026-08-25, leaving 25600 B — four days at the measured 6184 B/day. Do NOT
   raise it again by reflex: it moved 27 times in 17 days, 26 up, and the one drop was another
-  check's doing. `TOOL-dSpentCeiling` replaces it with a rate signal. Prune when it is terminal.
+  check's doing. `TOOL-dSpentCeiling` deletes it; check 6's caps were always the bound. Prune then.
 
 ### Pointer map (load the row(s) the task touches)
 

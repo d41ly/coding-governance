@@ -5,7 +5,6 @@ opened: 2026-08-25
 streams: tooling
 roster: TOOL
 ids: TOOL-dSpentCeiling-1
-status: OPEN
 ---
 
 # dSpentCeiling — the read-path budget becomes a rate signal, and rule 3 keeps its teeth
@@ -22,11 +21,11 @@ may not cite an uncapped `memory/` file — and it dies with the budget, because
 behind `if conf["READ_PATH_CEILING"]:`.
 
 ## Expected improvements
-- The instrument stops gating, and the question it asked is answered by a signal that derives both
-  operands and so cannot be raised.
-- Rule 3 survives with an arming condition of its own, so declining the budget no longer takes the
-  citation check down silently.
-- `TOOL-aRelaxedShard-3` closes: a rate over non-generated members stops reporting parallelism.
+- A gate that has cost 27 movements and bought no trim stops gating, and nothing replaces it: check
+  6's per-member caps were always the real bound.
+- Rule 3 survives as a structural check rather than a switch, so declining the budget no longer takes
+  the citation check down with it.
+- `TOOL-aRelaxedShard-3` closes by deletion — with no budget, nothing measures parallelism as growth.
 - Every memory-tree adopter inherits the fix rather than re-deriving it.
 
 ## Detriments if this is not built
@@ -37,40 +36,39 @@ behind `if conf["READ_PATH_CEILING"]:`.
   key, loses the citation check, and is given a green bar for it.
 
 ## Build-level rules
-- **The owner ruled twice on 2026-08-25, and both narrowed an opening proposal.** The opening
-  position was retire check 16 entirely; the ruling is KEEP it, replace the BUDGET half with a rate
-  signal, and keep rule 3 gating. The second ruling is blast radius: kit-wide, not gov's pin alone.
+- **The owner ruled three times on 2026-08-25, and each narrowed the one before.** Opening position:
+  retire check 16 entirely. Ruling 1: KEEP it, replace the budget with a rate signal, rule 3 stays
+  gating. Ruling 2: blast radius kit-wide. Ruling 3, on being shown that six specs for deleting one
+  variable is the tail wagging the dog: DROP the replacement signal. One unit, no successor.
+- **Nothing replaces the budget, and that is the finding rather than a concession.** Check 6 already
+  caps all six members at 61440 B each. Rule 1 was a second bound over an already-bounded population.
 - **The pin was raised first and deliberately**, at `18cc9b78`, `135677 -> 161120`. This build may
-  record decisions because of that raise; it does not get to treat the raise as evidence for its own
-  thesis.
-- **The rate signal derives both operands or it is not built.** An authored number in it is the
-  instrument being replaced, one indirection down. It carries a liveness assertion, so a derivation
-  that cannot move prints DEAD PROBE rather than a reassuring zero.
-- **Rule 3's arming condition is the load-bearing design question**, not a detail of the deletion.
-  Its acceptance must observe rule 3 firing with `READ_PATH_CEILING` absent from the conf entirely.
+  record decisions because of that raise; it does not treat the raise as evidence for its thesis.
+- **Rule 3 gets no new key.** It becomes structural via the capture-before-source idiom already
+  shipped for `SPEC10_CUTOFF`. A fourth blankable pin would be the defect this build closes, renamed.
 - **`read_set` does not move.** Which files count is out of scope.
-- **The append-only argument is REFUTED and must not be re-opened.** An earlier draft of this build
-  argued the breach was structurally guaranteed because `memory/DECISIONS.md` cannot shrink. It can:
-  it ROTATED on 2026-08-10, 79 rows to `memory/archive/`. The real argument is composition, above.
-- **drift-audit is undossiered and this build dossiers it.** Its keys sit in `memory/map/baseline.toml`
-  and the new signal lands there, so the map's convergence rule makes that a DoR item.
+- **The append-only argument is REFUTED and must not be re-opened.** An earlier draft argued the
+  breach was structurally guaranteed because `memory/DECISIONS.md` cannot shrink. It can: it ROTATED
+  on 2026-08-10, 79 rows to `memory/archive/`. The real argument is composition, above.
 
 ## Parked decisions
 None yet.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-08-25 · streams tooling
+**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dSpentCeiling-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dSpentCeiling-1 — retire check 16's byte budget, and make rules 3 and 4 structural](spec/2026-08-25-spec-TOOL-dSpentCeiling-1.md) | — | 2 | SPECCED | rev-1 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 0 record folder(s).
+Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dSpentCeiling-1.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dSpentCeiling-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
