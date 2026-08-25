@@ -2,13 +2,14 @@
 
 # TOOL-dPromptedSeam-2 — `read_object` cannot say WHY it returned nothing
 
-**Status:** OPEN · rev-3 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
+**Status:** WONTDO · rev-4 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling · superseded by TOOL-dPromptedSeam-3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-1.md) | spec-audit | TOOL-dPromptedSeam-1 |
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-spec-audit-round-2.md) | spec-audit | TOOL-dPromptedSeam-1 |
 
 <!-- /gen:spec-records -->
 
@@ -137,6 +138,12 @@ is.
   applied to the fallback itself.
 
 ## 9. Revision log
+
+- rev-4 · 2026-08-25 · node d · WONTDO, superseded by TOOL-dPromptedSeam-3. Spec-audit round 2
+  proved this unit PREMISE-FALSE: it asserts read_object returns empty for two reasons and that
+  both vanish from --brief. The function is four lines with no stopword test, no length test and no
+  stemmer; it returns empty for exactly one reason, and the other case is reported loudly and
+  wrongly. Retired as a status flip with a successor rather than deleted, per M2.
 
 - rev-3 · 2026-08-25 · node d · OPEN. Spec audit round 1 returned BLOCKED; four blockers were this
   unit's. §4 D1 was measured over 231 off-table SYMBOLS and described the empty cases as single-token
