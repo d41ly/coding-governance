@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-10 — role `forked`, report-only
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -28,7 +28,10 @@ report it instead of writing it.
   (`:843`) demand an `UPDATE_ROLE` row for it without that demand being written twice.
 - **S4** — `UPDATE_ROLE` (`:2857`) gains `"forked": "report"`, the disposition `-2` introduces. A
   forked row prints one line with its verdict and, WHEN THE ROW CARRIES ONE, its `direction`; it is
-  counted in the tally and is NEVER written in either direction. The printer TOLERATES an absent
+  counted in the tally and is NEVER written in either direction. That is `-2` S3's `report` shape —
+  one printed row, counted, no `r.fail` — with `direction` as an OPTIONAL trailing field rather than a
+  second line or a second row. `-2` defines the disposition and this unit is its second consumer; the
+  shape is not re-specified here, only the field appended to it. The printer TOLERATES an absent
   `direction`: `how = UPDATE_ROLE.get(role)` at `:2974` keys on the RECEIPT's role, so a row reaches
   this printer from receipts this unit never wrote — one stamped before the role existed, or one
   whose descriptor has since changed its keys — and a printer that raises `KeyError` on a
@@ -236,6 +239,7 @@ named beside it as that file's own convention requires.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-24 · round-4 fold: S4's print shape is bound to `-2` S3's `report` disposition explicitly — one counted row, no `r.fail`, with `direction` an optional trailing field rather than a second line. This unit is that disposition's second consumer and does not re-specify it.
 - rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason `-5` records.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every table
   and line number cited was opened at `9ddcc5c9`; the landmine was reproduced end to end rather than

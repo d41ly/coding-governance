@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -53,6 +53,31 @@ the vintage is half a guard, so both halves land here.
   `apply --resume`'s existing mechanism when it lands.
 
 ## 4. Design
+
+### The precondition order, stated once for the whole build
+
+This unit owns the FIRST gate a write passes, and three other units add their own further in. No spec
+composed them, so the order is declared here and the others cross-reference it rather than restating
+it. A `--write` run passes, in this sequence, and stops at the first refusal:
+
+| # | owner | what it decides | on failure |
+|---|---|---|---|
+| 1 | this unit, S1–S3 | is the target mid-operation (`MERGE_HEAD`, `REBASE_HEAD`, `CHERRY_PICK_HEAD`, an unresolved index)? | refuse, whole run |
+| 2 | this unit, S4–S5 | is any receipt-claimed path dirty, and can the lock be taken? | refuse, whole run |
+| 3 | this unit, S7–S8 | is `--to` a descendant of the receipt's `gov_commit`, and reachable from a ref? | refuse, whole run |
+| 4 | `-7` S9 | for a row carrying BOTH `commit` and `gov_oid`, do they agree? | refuse, whole run |
+| 5 | `-13` S7 | does this ROW carry `evidence: "unattributed"`? | print, count, skip the ROW, before `UPDATE_ROLE` |
+| 6 | `-9` S4–S6 | which `carry` rung, if any, explains this row? | no failure mode; it classifies |
+
+Two things in that table are load-bearing rather than arbitrary, and the first is easy to get
+backwards. **Step 4 is in the PREAMBLE and step 5 is inside the classification loop**, so the
+integrity check runs BEFORE the unattributed skip and cannot lean on it. That is precisely why `-7`
+S9 is scoped by FIELD PRESENCE rather than by `role` or by `evidence`: an unattributed row carries
+neither field, so S9 has nothing to assert about it and passes over it silently, and the row is
+skipped by name one step later. Scope S9 by role instead and it would have to know a classification
+that has not happened yet; scope it by nothing and it refuses on all 41 of inCMS's unattributable
+rows and no adopter ever updates. Second, **steps 1–3 precede everything per-row**, because a
+refusal that depends on which rows a receipt happens to hold is a refusal an operator cannot predict.
 
 ### Data model
 
@@ -147,6 +172,7 @@ every one needs an arm asserting it, which is the join's declared contract.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-24 · round-4 fold: §4 gains the build-wide PRECONDITION ORDER, which no spec composed. Six steps across four units, with the two load-bearing orderings named — `-7` S9 is in the PREAMBLE and `-13` S7's skip is in the LOOP, which is exactly why S9 is scoped by field presence and passes silently over a row carrying neither field.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold); the dead-guard
   mechanism verified in source against `9ddcc5c9` and reproduced in a live linked worktree.
 - rev-2 · 2026-08-24 · folded the pre-code review: adopted R4's two unowned `--to` preconditions as

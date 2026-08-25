@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -17,6 +17,21 @@ order.
 
 ## 2. Scope (IN)
 
+- **S0** — the two vintages this spec names, disambiguated once. `base_commit` is the PER-RUN field,
+  `receipt.get("gov_commit")` read at `:2938`, and it bounds the one rename diff S1 takes. A ROW's
+  base is `row["commit"]`, which a partial earlier update can leave behind the run's. Everywhere below
+  that says `blob_at(root, base_commit, <old source>)` means the ROW's base, `row["commit"]` — a
+  per-run vintage would compare a row against a tree it never came from, which is the class `-13` S3
+  refuses on the read side. S1 is the only per-run use in this spec.
+- **S0b** — the verdict is scoped to a role, because in this engine the ROLE decides. `renamed` is
+  produced only for a row whose dispatch is `how == "table"`; every other role reports and writes
+  nothing. This is not optional politeness: the write loop's guard at `:3059` is
+  `if a["how"] != "table":` followed by `if v in ("missing", "stale", "withdrawn", "diverged")`, so a
+  NEW verdict word falls through that tuple and hits the bare `continue` — no write, which is right,
+  but no printed line either, which is not. A `rendered` or `project-owned` row whose gov source was
+  renamed would vanish from the run's output entirely. `renamed` is therefore ADDED to that tuple in
+  the same change, so a non-`table` role says so out loud. The comment above that guard records the
+  measured incident this rule exists for; this unit does not become its sequel.
 - **S1** — one `git -C <gov> diff --find-renames --name-status <base_commit> <to_commit>` per run,
   producing a map from old source path to new source path over the `R` rows. It runs **unscoped**:
   pathspec-limiting the diff to the receipt's sources hides the destination half of every rename pair.
@@ -208,6 +223,7 @@ refusal branch has an arm. Adds nine arms and one standing predicate; adds no ne
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-24 · round-4 fold: the two vintages this spec names are disambiguated in a new S0 — `base_commit` is the PER-RUN receipt field bounding S1's one diff, while every per-ROW comparison means `row["commit"]`. And S0b scopes `renamed` to `how == "table"` and ADDS it to the write loop's reported-only tuple at `:3060`: a new verdict word falls through that tuple to a bare `continue`, so a `rendered` or `project-owned` row whose gov source moved would have vanished from the run's output.
 - rev-3 · 2026-08-24 · round-2 fold: the rename-by-rung intersection, which no unit owned. S11
   states it — a carried row ALWAYS differs from gov's blob at the old source, so S5's branch takes
   every one of them, and the rung is applied to `base` and `theirs` per `-9` S6 before the rename
