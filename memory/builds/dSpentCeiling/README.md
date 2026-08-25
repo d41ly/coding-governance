@@ -4,10 +4,11 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7
+ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7 TOOL-dSpentCeiling-8
 ---
 
 # dSpentCeiling — the read-path budget becomes a rate signal, and rule 3 keeps its teeth
+
 
 ## The problem this build exists to solve
 `READ_PATH_CEILING` gates a byte budget over the files `AGENTS.md` points a session at, and it has
@@ -54,9 +55,17 @@ behind `if conf["READ_PATH_CEILING"]:`.
 ## Parked decisions
 None yet.
 
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dSpentCeiling-1` | 2 | retire check 16's byte budget; rules 3 and 4 become structural |
+
+<!-- /roster:units -->
+
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7
+ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6 TOOL-dSpentCeiling-7 TOOL-dSpentCeiling-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
