@@ -1657,12 +1657,11 @@ hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every plann
 # away by the outer `grep -qF`, while a MALFORMED one already refused.
 reset_tree; readme tPlan
 mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
-python3 - "$PWD/memory/builds/tPlan/README.md" <<'PY'
-import io, re, sys
-p = sys.argv[1]; t = io.open(p, encoding="utf-8").read()
-io.open(p, "w", encoding="utf-8", newline="\n").write(
-    re.sub(r"<!-- /?gen:build-units -->\n", "", t))
-PY
+# NO PYTHON LAUNCHER. `check-python-resolver` bans a bare `python3` in a tracked script and this
+# suite has no resolver in scope, so the marker pair is stripped with grep instead.
+_tmp_rm=$(mktemp)
+grep -v 'gen:build-units' memory/builds/tPlan/README.md > "$_tmp_rm"
+mv "$_tmp_rm" memory/builds/tPlan/README.md
 fixture
 out=$(run --plan tPlan)
 hit "$out" "the build README carries no units marker at all, and this verb takes its unit SET and ORDER from that region:"
