@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = pathlib.Path(__file__).resolve().parent
 
@@ -119,6 +120,23 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 def git(cwd: pathlib.Path, *args: str) -> None:
     subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, check=False)
+
+
+def settle(t: pathlib.Path, msg: str = "fixture") -> None:
+    """Commit whatever a writing verb just left in the target.
+
+    DEPL-dCarriedReceipt-12 S4 refuses a writing verb when any RECEIPT-CLAIMED path is dirty,
+    and dirty is defined there as differing index-versus-HEAD or worktree-versus-index. `apply`
+    STAGES every path it lands, so a target that has been applied and not committed carries an
+    entire receipt's worth of dirty claimed paths. Every fixture below that runs a writing verb
+    a second time therefore commits in between — which is exactly what the refusal now asks an
+    operator to do, so the fixtures model the supported flow rather than working around it.
+
+    Without this, twelve arms went red and two more passed VACUOUSLY: their re-apply refused,
+    wrote nothing, and "the edit survived" was trivially true because nothing had run.
+    """
+    git(t, "add", "-A")
+    git(t, "commit", "-qm", msg)
 
 
 def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
@@ -317,6 +335,7 @@ def main() -> int:
 
         # --- AC2 idempotency: path-and-hash over the receipt, not porcelain. The second run must be
         # --- ALLOWED — the unqualified refuse-a-kitted-repo predicate made this unreachable.
+        settle(ap, "the first apply")     # -12 S4: the first apply's staged rows are dirty
         p = run("apply", "--target", str(ap), "--kits", "check-wiring")
         check("a second apply is NOT refused — the receipt authorises it", p.returncode == 0,
               p.stdout + p.stderr)
@@ -355,7 +374,12 @@ def main() -> int:
         # AC1b — a `seed` the target has since edited survives a re-apply, and the receipt row for it
         # is still there. The row surviving is the half that used to fail: serializing the receipt
         # from the write log dropped every seed row on the second run.
+        settle(cm, "the first apply")
         (cm / "tools" / "codebase-map" / "map_extractors.py").write_bytes(b"# TARGET EDITED\n")
+        # COMMITTED, not merely written. -12 S4 refuses a writing verb over an uncommitted edit
+        # to a claimed path, so an uncommitted edit here would make the re-apply refuse — and
+        # both arms below would then pass on an apply that never ran.
+        settle(cm, "the target edits its seed")
         p = run("apply", "--target", str(cm), "--kits", "codebase-map")
         check("a re-apply leaves an edited seed byte-identical",
               (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
@@ -497,6 +521,11 @@ def main() -> int:
                 f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
                 (t / f["path"]).write_bytes(b)
             rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+            # -12 S4: `apply` staged every row, and the loop above then rewound their bytes in
+            # the worktree. Both halves are dirty by that definition, so the fixture commits
+            # the stale state it just built — the target is legitimately AT an older vintage,
+            # which is a committed fact about it and not an operator's work-in-progress.
+            settle(t, "landed at the older vintage")
             return t
 
         up = stale_target("u2a")
@@ -528,6 +557,11 @@ def main() -> int:
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
         (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")
+        # COMMITTED. -12 S4 refuses over an UNCOMMITTED edit to a claimed path — a stronger
+        # protection than this arm asserts, and one that would stop the classifier ever being
+        # reached. The guarantee under test is the one that survives a commit: a local edit gov
+        # can SEE is reported, never overwritten.
+        settle(up2, "the operator edits a gov-owned file")
         p = run("update", "--target", str(up2), "--write")
         check("a locally edited file whose gov copy also moved is reported, never overwritten",
               (up2 / "tools" / "check-wiring.sh").read_bytes()
@@ -1299,6 +1333,7 @@ user_skills = "/tmp/gk-fake-skills"
         p = run("intake", "--target", str(ap), "--kits", "push-main")
         check("[-2] intake accepts push-main", p.returncode == 0, p.stdout + p.stderr)
         p = run("apply", "--target", str(ap), "--kits", "push-main")
+        settle(ap, "the push-main install")     # -12 S4, as everywhere below
         check("[-2] apply lands push-main and synthesizes the attributes row", p.returncode == 0,
               p.stdout + p.stderr)
         _rec = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -1329,6 +1364,7 @@ user_skills = "/tmp/gk-fake-skills"
             encoding="utf-8", newline="\n")
         check("[-2] the tamper really landed inside the block",
               "# TAMPERED" in _ga.read_text(encoding="utf-8"), "")
+        settle(ap, "the tampered pin block")    # .gitattributes is a CLAIMED path — -12 S4
         _before = _ga.read_bytes()
         p = run("update", "--target", str(ap), "--write")
         check("[-2] a moved block reports `pins-moved`", "pins-moved" in p.stdout, p.stdout)
@@ -1819,7 +1855,12 @@ user_skills = "/tmp/gk-fake-skills"
                   "drift_signals.template.py" in landed_before and "drift_report.py" in landed_before,
                   str(landed_before))
 
+            settle(t, "the drift-audit install")
             owned.write_text(owned.read_text(encoding="utf-8") + "\n# ADOPTER EDIT\n", encoding="utf-8")
+            # COMMITTED for the reason site 2 gives: an uncommitted edit to a claimed path
+            # makes the re-apply REFUSE, and "the edit survived" is then true because nothing
+            # ran — which is the exact vacuity the arm below was written to close.
+            settle(t, "the adopter edits a seeded file")
             seeded = t / "tools" / "drift-audit" / "drift_signals.py"
             second = run("apply", "--target", str(t), "--kits", "drift-audit")
             # THE RE-APPLY MUST HAVE SUCCEEDED. Both protection arms are satisfied by an apply that
@@ -2052,6 +2093,353 @@ user_skills = "/tmp/gk-fake-skills"
             row = next((l for l in blk.stdout.splitlines() if "demo-rendered.md" in l), "")
             check("a rendered rule whose entry has a blocks_adopt hole is an ORDER",
                   row.strip().startswith("ORDER"), row or blk.stdout)
+
+        # ========== DEPL-dCarriedReceipt-12: write preconditions and the outbox lock ==========
+        # EVERY arm below was observed RED on a real scratch target before the engine moved. At the
+        # base sha: in a LINKED WORKTREE both verbs walked straight through a live MERGE_HEAD,
+        # because `.git` is a file there and `target/.git/<marker>` resolves to nothing; a target
+        # declaring no `lf_pin` was unguarded even in a normal repo, because the probe sat inside
+        # `if pins:`; `update --write` over a path carrying three index stages collapsed them to
+        # ZERO through its own `git add`, measured 3 -> 0; `--to <older sha>` took the raw arm on
+        # every clean row, rewound the bytes and re-stamped `gov_commit` backwards; and `--to
+        # <sha no ref reaches>` landed the bytes of a deleted branch and stamped that sha in.
+        LOCK_REL = govkit_module().WRITE_LOCK_REL
+
+        def gout(cwd: pathlib.Path, *args: str) -> str:
+            """`git` with its stdout, which the harness's own `git()` throws away."""
+            return subprocess.run(["git", "-C", str(cwd), *args],
+                                  capture_output=True, text=True).stdout
+
+        def lock_of(t: pathlib.Path) -> pathlib.Path:
+            return t.joinpath(*LOCK_REL.split("/"))
+
+        def set_marker(t: pathlib.Path, marker: str) -> pathlib.Path:
+            """Plant an in-progress marker WHERE GIT KEEPS IT, which is the whole point.
+
+            Resolved with `--git-path` rather than written to `target/.git/<marker>`: in a linked
+            worktree the second spelling creates a file inside a DIRECTORY THAT DOES NOT EXIST as a
+            git dir, so the fixture would plant a marker git never reads and the arm would grade
+            nothing. Asserted below, not assumed.
+            """
+            p = t / gout(t, "rev-parse", "--git-path", marker).strip()
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(gout(t, "rev-parse", "HEAD").strip() + "\n", encoding="utf-8",
+                         newline="\n")
+            return p
+
+        def wt_target(name: str, kits: str) -> pathlib.Path:
+            """A target whose `.git` is a FILE — the linked-worktree layout adopters are told to use.
+
+            This is the fixture no existing one covered, and that is exactly why the dead probe
+            shipped: every arm written against a normal repo passes while the guard is inert.
+            """
+            host = tmp / f"{name}-host"
+            host.mkdir(parents=True)
+            git(host, "init", "-q", "-b", "main")
+            git(host, "config", "user.email", "t@e")
+            git(host, "config", "user.name", "t")
+            (host / "README.md").write_text("host\n", encoding="utf-8", newline="\n")
+            git(host, "add", "-A")
+            git(host, "commit", "-qm", "base")
+            wt = tmp / f"{name}-wt"
+            git(host, "worktree", "add", "-q", str(wt), "-b", f"{name}-feat")
+            run("intake", "--target", str(wt), "--kits", kits)
+            run("apply", "--target", str(wt), "--kits", kits)
+            settle(wt, "the install")
+            return wt
+
+        # ---- AC1: the linked worktree, on BOTH verbs. push-main is the kit on purpose — it DOES
+        # ---- declare lf_pins, so the old probe was reached and still could not see the marker.
+        # ---- This arm therefore grades the `--git-path` fix and nothing else.
+        w1 = wt_target("ac1", "push-main")
+        check("[-12] AC1 the fixture really is a linked worktree — .git is a FILE",
+              (w1 / ".git").is_file(), str(sorted(q.name for q in w1.iterdir())))
+        _rw1 = json.loads((w1 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-12] AC1 and it really declares pins, so the OLD probe was reached",
+              any(f.get("role") == "attributes" for f in _rw1["files"]),
+              str([f.get("role") for f in _rw1["files"]]))
+        _mh = set_marker(w1, "MERGE_HEAD")
+        check("[-12] AC1 the marker sits where git keeps it and NOT at target/.git/MERGE_HEAD",
+              _mh.is_file() and not (w1 / ".git" / "MERGE_HEAD").exists(), _mh.as_posix())
+        _pa = run("apply", "--target", str(w1), "--kits", "push-main")
+        check("[-12] AC1 apply refuses a mid-merge LINKED WORKTREE by name",
+              _pa.returncode == 2 and "MERGE_HEAD" in _pa.stderr and "in progress" in _pa.stderr,
+              _pa.stdout + _pa.stderr)
+        _pu = run("update", "--target", str(w1), "--write")
+        check("[-12] AC1 update --write refuses the same tree by name",
+              _pu.returncode == 2 and "MERGE_HEAD" in _pu.stderr and "in progress" in _pu.stderr,
+              _pu.stdout + _pu.stderr)
+        check("[-12] AC1 the refusal says what to do about it",
+              "Finish or abort that operation" in _pu.stderr, _pu.stderr)
+        # NEGATIVE half. Without it the arm cannot tell the fix from a verb that refuses always.
+        _mh.unlink()
+        _pa2 = run("apply", "--target", str(w1), "--kits", "push-main")
+        check("[-12] AC1 NEGATIVE: the same worktree with the marker gone proceeds",
+              _pa2.returncode == 0, _pa2.stdout + _pa2.stderr)
+
+        # ---- AC2: a NORMAL repo whose selection declares NO lf_pin. check-wiring is the kit for
+        # ---- the mirror-image reason: the path form works fine here, so the only thing this arm
+        # ---- can be measuring is that the probe left `if pins:`.
+        n2 = make_target(tmp / "ac2", None)
+        run("intake", "--target", str(n2), "--kits", "check-wiring")
+        run("apply", "--target", str(n2), "--kits", "check-wiring")
+        settle(n2, "the install")
+        check("[-12] AC2 the fixture is a NORMAL repo — .git is a directory",
+              (n2 / ".git").is_dir(), "")
+        _rn2 = json.loads((n2 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-12] AC2 and its receipt carries NO attributes row, so no pin was declared",
+              not any(f.get("role") == "attributes" for f in _rn2["files"]),
+              str([f.get("role") for f in _rn2["files"]]))
+        for _mk in govkit_module().IN_PROGRESS_MARKERS:
+            _p = set_marker(n2, _mk)
+            _r = run("apply", "--target", str(n2), "--kits", "check-wiring")
+            check(f"[-12] AC2 apply refuses {_mk} on a target that declares no lf_pin",
+                  _r.returncode == 2 and _mk in _r.stderr, _r.stdout + _r.stderr)
+            _p.unlink()
+        _r = run("apply", "--target", str(n2), "--kits", "check-wiring")
+        check("[-12] AC2 NEGATIVE: with every marker cleared the same target proceeds",
+              _r.returncode == 0, _r.stdout + _r.stderr)
+
+        # ---- AC3: an unresolved index, WITHOUT a marker. A real `git merge` conflict would also
+        # ---- leave MERGE_HEAD, so S1 would refuse first and this arm would grade that rule
+        # ---- instead of S3. The stages are injected directly, so the tree carries exactly the one
+        # ---- condition under test — asserted on the next two lines rather than assumed.
+        u3 = stale_target("ac3")
+        CW = "tools/check-wiring.sh"
+        _blob = gout(u3, "rev-parse", f"HEAD:{CW}").strip()
+        # BYTES, never `text=True`. Text mode wraps stdin in a TextIOWrapper whose default newline
+        # handling rewrites every "\n" as os.linesep, so on Windows git read a path with a trailing
+        # CR, matched nothing, and the fixture arrived with ZERO stages. The fixture assertion below
+        # is the only reason that was a red rather than a vacuous green.
+        subprocess.run(["git", "-C", str(u3), "update-index", "--index-info"],
+                       input=f"0 {'0' * 40}\t{CW}\n".encode(), capture_output=True)
+        subprocess.run(["git", "-C", str(u3), "update-index", "--index-info"],
+                       input="".join(f"100644 {_blob} {n}\t{CW}\n"
+                                     for n in (1, 2, 3)).encode(), capture_output=True)
+        _stages = len([ln for ln in gout(u3, "ls-files", "-u").splitlines() if ln.strip()])
+        check("[-12] AC3 the fixture really carries three index stages", _stages == 3, str(_stages))
+        check("[-12] AC3 and it carries NO in-progress marker, so S3 is the rule under test",
+              not any((u3 / gout(u3, "rev-parse", "--git-path", m).strip()).exists()
+                      for m in govkit_module().IN_PROGRESS_MARKERS), "")
+        _p3 = run("update", "--target", str(u3), "--write")
+        check("[-12] AC3 update --write refuses an unresolved index by name",
+              _p3.returncode == 2 and "unresolved merge stages" in _p3.stderr, _p3.stderr)
+        check("[-12] AC3 the refusal names the path that tripped it", CW in _p3.stderr, _p3.stderr)
+        _after = len([ln for ln in gout(u3, "ls-files", "-u").splitlines() if ln.strip()])
+        check("[-12] AC3 the index still shows three stages afterwards — nothing was collapsed",
+              _after == 3, f"{_stages} -> {_after}")
+        # AC6, half one, and it covers two claims rather than the one it looks like. The S3 refusal
+        # itself is raised BEFORE the lock is taken, so it creates none; the `apply` that BUILT this
+        # fixture did take one, so an absent lock here also says that run gave it back. What it does
+        # NOT grade is a refusal raised while holding — that is half two, under AC7. Measured:
+        # breaking the release reds both halves and eighteen arms after them.
+        check("[-12] AC6 an S3 refusal leaves no lock behind, and the apply before it gave one back",
+              not lock_of(u3).exists(), "")
+
+        # ---- AC4: dirty is scoped to the RECEIPT's population, and to nothing else.
+        u4 = stale_target("ac4")
+        _orig = (u4 / CW).read_bytes()
+        (u4 / CW).write_bytes(_orig + b"\n# LOCAL EDIT\n")
+        check("[-12] AC4 the fixture's claimed path really is dirty",
+              CW in gout(u4, "diff", "--name-only"), gout(u4, "diff", "--name-only"))
+        _p4 = run("update", "--target", str(u4), "--write")
+        check("[-12] AC4 update --write refuses over a dirty CLAIMED path",
+              _p4.returncode == 2 and "DIRTY" in _p4.stderr, _p4.stderr)
+        check("[-12] AC4 and names the path", CW in _p4.stderr, _p4.stderr)
+        check("[-12] AC4 the local edit is still there — the refusal wrote nothing",
+              (u4 / CW).read_bytes() == _orig + b"\n# LOCAL EDIT\n", "")
+        # NEGATIVE half: the same target, dirty OUTSIDE the receipt, proceeds. Without this the arm
+        # cannot tell a scoped refusal from a verb that refuses on any dirty tree at all.
+        (u4 / CW).write_bytes(_orig)
+        (u4 / "README.md").write_text("edited, and gov does not own this\n", encoding="utf-8",
+                                      newline="\n")
+        check("[-12] AC4 the fixture is now dirty ONLY outside the receipt",
+              gout(u4, "diff", "--name-only").split() == ["README.md"],
+              gout(u4, "diff", "--name-only"))
+        _p4b = run("update", "--target", str(u4), "--write")
+        check("[-12] AC4 NEGATIVE: a dirty path OUTSIDE the receipt does not block",
+              _p4b.returncode == 0, _p4b.stdout + _p4b.stderr)
+
+        # ---- AC5: two concurrent `update --write` runs, both of them real processes.
+        # memory-tree is the fixture kit because its receipt is large enough that a run holds the
+        # lock for about a second, which is what makes the contention observable rather than lucky.
+        # The loop does not sleep-and-hope: it WATCHES for the lock to appear and only then starts
+        # the second run, and if three attempts never catch the first run holding it, the arm FAILS
+        # rather than reporting a green it did not earn.
+        cc = make_target(tmp / "ac5", None)
+        run("intake", "--target", str(cc), "--kits", "memory-tree")
+        run("apply", "--target", str(cc), "--kits", "memory-tree")
+        settle(cc, "the install")
+        _lk = lock_of(cc)
+        _race = None
+        for _attempt in range(3):
+            _first = subprocess.Popen(
+                [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write"],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            _deadline = time.time() + 30
+            while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
+                time.sleep(0.002)
+            if not _lk.exists():
+                _first.communicate()
+                continue
+            _second = run("update", "--target", str(cc), "--write")
+            _fo, _fe = _first.communicate()
+            _race = (_second, _first.returncode, _fo + _fe)
+            break
+        check("[-12] AC5 the two runs really contended — the lock was observed HELD",
+              _race is not None,
+              "three attempts and the first run never held the lock long enough to be seen")
+        if _race is not None:
+            _second, _first_rc, _first_out = _race
+            check("[-12] AC5 the second concurrent update --write refuses ON THE LOCK",
+                  _second.returncode == 2 and ".update.lock" in _second.stderr
+                  and "another govkit write holds" in _second.stderr, _second.stderr)
+            check("[-12] AC5 the refusal names the holder and how to clear a stale lock",
+                  "pid " in _second.stderr and "rm " in _second.stderr, _second.stderr)
+            check("[-12] AC5 and the first run completed", _first_rc == 0, _first_out)
+        check("[-12] AC5 after both runs the lock file is gone", not _lk.exists(), "")
+
+        # ---- AC7 + AC8: the two vintage refusals, on a scratch gov with a real branch history.
+        # Built rather than borrowed: gov's own history has no dangling commit to point `--to` at,
+        # and manufacturing one would mean writing to the repository under test.
+        def vintage_gov() -> pathlib.Path:
+            g = tmp / "gov-vintage"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "tools/demo"\n'
+                'version_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = ["demo.txt"]\nrole = "engine"\n\n'
+                '[adopt]\nargv = []\nmutates_index = false\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "demo.txt").write_text("v1\n", encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def gov_run(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+                                  capture_output=True, text=True)
+
+        gv = vintage_gov()
+        VA = gout(gv, "rev-parse", "HEAD").strip()
+        (gv / "tools" / "demo" / "demo.txt").write_text("v2\n", encoding="utf-8", newline="\n")
+        git(gv, "add", "-A")
+        git(gv, "commit", "-qm", "B")
+        VB = gout(gv, "rev-parse", "HEAD").strip()
+
+        # The target installs at whatever gov's HEAD is, so it is built HERE — between B and D —
+        # which is how its receipt comes to record the MIDDLE vintage with history on both sides.
+        t7 = make_target(tmp / "ac7", None)
+        gov_run(gv, "intake", "--target", str(t7), "--kits", "demo")
+        gov_run(gv, "apply", "--target", str(t7), "--kits", "demo")
+        settle(t7, "the demo install")
+
+        (gv / "tools" / "demo" / "demo.txt").write_text("v3\n", encoding="utf-8", newline="\n")
+        git(gv, "add", "-A")
+        git(gv, "commit", "-qm", "D")
+        VD = gout(gv, "rev-parse", "HEAD").strip()
+        git(gv, "checkout", "-q", "-b", "gone")
+        (gv / "tools" / "demo" / "demo.txt").write_text("v9\n", encoding="utf-8", newline="\n")
+        git(gv, "add", "-A")
+        git(gv, "commit", "-qm", "C on a branch nobody keeps")
+        VC = gout(gv, "rev-parse", "HEAD").strip()
+        git(gv, "checkout", "-q", "main")
+        git(gv, "branch", "-q", "-D", "gone")
+
+        DEMO = "tools/demo/demo.txt"
+        check("[-12] AC7 the fixture's receipt records the MIDDLE vintage",
+              json.loads((t7 / ".governance" / "install.json").read_text(
+                  encoding="utf-8"))["gov_commit"] == VB, VB)
+        check("[-12] AC8 the fixture's dangling sha exists as an object",
+              gout(gv, "cat-file", "-t", VC).strip() == "commit", VC)
+        check("[-12] AC8 and no ref in that gov reaches it",
+              not gout(gv, "for-each-ref", "--contains", VC, "--count=1").strip(), VC)
+
+        _b7 = (t7 / DEMO).read_bytes()
+        _p7 = gov_run(gv, "update", "--target", str(t7), "--to", VA, "--write")
+        check("[-12] AC7 update refuses a --to that is not a descendant of the receipt's vintage",
+              _p7.returncode == 2 and "DOWNGRADE IS NOT AN UPDATE" in _p7.stderr, _p7.stderr)
+        check("[-12] AC7 the refusal prints BOTH shas",
+              VA in _p7.stderr and VB in _p7.stderr, _p7.stderr)
+        check("[-12] AC7 it wrote zero bytes", (t7 / DEMO).read_bytes() == _b7, "")
+        check("[-12] AC7 and left the receipt's gov_commit at the newer sha",
+              json.loads((t7 / ".governance" / "install.json").read_text(
+                  encoding="utf-8"))["gov_commit"] == VB, "")
+        # AC6, half two, and this is the half that grades the `finally`: the vintage refusal is
+        # raised with the lock ALREADY HELD, so a release that only runs on the success path would
+        # strand it here and every later run against this target would refuse on a stale lock.
+        check("[-12] AC6 a refusal raised WITH THE LOCK HELD still releases it",
+              not lock_of(t7).exists(), "")
+
+        _pe = gov_run(gv, "update", "--target", str(t7), "--to", VB, "--write")
+        check("[-12] AC7 NEGATIVE: a --to EQUAL to the receipt's vintage proceeds",
+              _pe.returncode == 0, _pe.stdout + _pe.stderr)
+        _pd = gov_run(gv, "update", "--target", str(t7), "--to", VD, "--write")
+        check("[-12] AC7 NEGATIVE: a --to that IS a descendant proceeds and lands its bytes",
+              _pd.returncode == 0 and (t7 / DEMO).read_bytes() == b"v3\n",
+              _pd.stdout + _pd.stderr)
+        settle(t7, "the forward update")     # -12 S4: that run staged what it wrote
+
+        _p8 = gov_run(gv, "update", "--target", str(t7), "--to", VC, "--write")
+        check("[-12] AC8 update refuses a --to no ref reaches",
+              _p8.returncode == 2 and "reach from NO ref" in _p8.stderr, _p8.stderr)
+        check("[-12] AC8 the refusal names the sha", VC in _p8.stderr, _p8.stderr)
+        check("[-12] AC8 it wrote zero bytes", (t7 / DEMO).read_bytes() == b"v3\n", "")
+        git(gv, "branch", "-q", "keeps-c", VC)
+        _p8b = gov_run(gv, "update", "--target", str(t7), "--to", VC, "--write")
+        check("[-12] AC8 NEGATIVE: the SAME sha proceeds once a ref contains it",
+              _p8b.returncode == 0 and (t7 / DEMO).read_bytes() == b"v9\n",
+              _p8b.stdout + _p8b.stderr)
+
+        # ---- AC9: S4's first carve-out, both sides of it. A STAGED deletion is an operator
+        # ---- decision and refuses; a COMMITTED one is not dirty, because there is nothing left to
+        # ---- diff, and reaches the `missing` cell. Neither state is reachable from AC4's arm,
+        # ---- which edits a path that still exists.
+        u9 = stale_target("ac9")
+        git(u9, "rm", "-q", "--", CW)
+        check("[-12] AC9 the fixture staged a deletion: gone from the index and the worktree",
+              CW not in gout(u9, "ls-files").split() and not (u9 / CW).exists(), "")
+        check("[-12] AC9 ...while HEAD still carries it, which is what makes it STAGED",
+              CW in gout(u9, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
+        _p9 = run("update", "--target", str(u9), "--write")
+        check("[-12] AC9 update --write refuses a staged deletion by name",
+              _p9.returncode == 2 and "DIRTY" in _p9.stderr
+              and "deleted from the index" in _p9.stderr, _p9.stderr)
+        check("[-12] AC9 the refusal names the path", CW in _p9.stderr, _p9.stderr)
+        check("[-12] AC9 and the deletion was left exactly as the operator staged it",
+              not (u9 / CW).exists(), "")
+        settle(u9, "the deletion is committed")
+        check("[-12] AC9 the committed deletion is gone from HEAD too",
+              CW not in gout(u9, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
+        _p9b = run("update", "--target", str(u9), "--write")
+        check("[-12] AC9 NEGATIVE: a COMMITTED deletion is not dirty and reaches `missing`",
+              _p9b.returncode == 0 and "missing" in _p9b.stdout, _p9b.stdout + _p9b.stderr)
+        check("[-12] AC9 ...and that cell restored the file from gov", (u9 / CW).is_file(), "")
+
+        # ---- S4's SECOND carve-out, which no AC names and the definition pins anyway: an untracked
+        # ---- file SHADOWING a claimed path absent from the index is NOT dirty here. That tree is
+        # ---- `-7` S4's refusal, and two units refusing one state would hand the operator two
+        # ---- different messages for it. Same precondition as the arm above — absent from the index
+        # ---- — and the opposite worktree state, so the pair grades the carve-out and not the path.
+        settle(u9, "the restored file")
+        git(u9, "rm", "-q", "--cached", "--", CW)
+        check("[-12] S4 the fixture is out of the index but present on disk",
+              CW not in gout(u9, "ls-files").split() and (u9 / CW).is_file(), "")
+        _p9c = run("update", "--target", str(u9), "--write")
+        check("[-12] S4 an untracked file shadowing a claimed path is NOT dirty here",
+              _p9c.returncode == 0, _p9c.stdout + _p9c.stderr)
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #

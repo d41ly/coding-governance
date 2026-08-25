@@ -33,6 +33,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import time
 
 KIT_GOVKIT_VERSION = "1.9"  # gov:kit govkit@1.9 — kit identity; set HERE, never from a conf
 
@@ -2266,8 +2267,268 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
     return found
 
 
+# ------------------------------------------------ write preconditions and the outbox write lock
+# DEPL-dCarriedReceipt-12. The FIRST gate a write passes, and it is SHARED because both writing
+# verbs have the same exposure: `apply` lands bytes and rewrites `.gitattributes`, `update` lands
+# bytes and re-stamps the receipt, and only one of them shipped a guard — a guard that was dead in
+# the linked-worktree layout adopters are told to use. Every refusal here names the condition, the
+# marker or path that tripped it, and what to do about it; there is deliberately no `--force`.
+
+IN_PROGRESS_MARKERS = ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD")
+
+# One spelling of where the lock lives. Both verbs take it and the refusal prints it, so a second
+# literal would be a second answer to the same question.
+WRITE_LOCK_REL = ".governance/outbox/.update.lock"
+
+# The lock THIS process created, and nothing else. A run that REFUSED on somebody else's lock must
+# never unlink the file it just refused over, which is the one way a lock becomes an amplifier.
+_HELD_LOCK: pathlib.Path | None = None
+
+
+def git_path(target: pathlib.Path, name: str) -> pathlib.Path:
+    """Where git ACTUALLY keeps <name> for this working tree.
+
+    Never `target/.git/<name>`. In a LINKED WORKTREE `.git` is a file and the per-worktree state
+    lives under the host repo's `.git/worktrees/<id>/`, so the path stat resolves to nothing and
+    every probe built on it reports a clean tree in the middle of a merge — reproduced live before
+    this was written. `--git-path` is the form `hook_probe` already uses; this is that same answer
+    rather than a second one. It returns a working-tree-relative path in a normal repo and an
+    ABSOLUTE one in a linked worktree, and joining an absolute right-hand side yields it unchanged.
+    """
+    out = subprocess.run(["git", "-C", str(target), "rev-parse", "--git-path", name],
+                         capture_output=True, text=True)
+    if out.returncode != 0:
+        raise Refusal(
+            f"git could not resolve --git-path {name} in {target.as_posix()}: "
+            f"{out.stderr.strip()} — refusing rather than falling back to .git/{name}, which is "
+            f"the guess that is wrong in every linked worktree")
+    return target / out.stdout.strip()
+
+
+def demand_no_operation_in_progress(target: pathlib.Path, verb: str) -> None:
+    """S1 + S2. Asked of BOTH verbs and conditioned on NOTHING.
+
+    It used to sit inside `if pins:`, so a target declaring no `lf_pin` was unguarded even in the
+    layout where the old path form happened to work.
+    """
+    for marker in IN_PROGRESS_MARKERS:
+        p = git_path(target, marker)
+        if p.exists():
+            raise Refusal(
+                f"the target has {marker} at {p.as_posix()} — a merge, rebase or cherry-pick is in "
+                f"progress. `{verb}` writes gov-owned paths and STAGES them, and a `git add` over a "
+                f"path carrying conflict stages collapses all three of them: both sides of your "
+                f"merge become unrecoverable, and renormalizing mid-conflict rewrites index stages "
+                f"nobody can reconstruct. Finish or abort that operation in the target, then re-run")
+
+
+def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
+    """S3. `ls-files -u` asks the question directly — which paths carry more than one index stage."""
+    out = subprocess.run(["git", "-C", str(target), "ls-files", "-u", "-z"],
+                         capture_output=True, text=True)
+    paths = sorted({row.split("\t", 1)[1] for row in out.stdout.split("\0") if "\t" in row})
+    if paths:
+        raise Refusal(
+            f"{len(paths)} path(s) in the target's index carry unresolved merge stages: "
+            + ", ".join(paths) +
+            f" — `{verb}` stages what it writes, and one `git add` over such a path collapses its "
+            f"three stages to one, with both sides of the merge unrecoverable afterwards. Resolve "
+            f"them in the target (or `git merge --abort`), then re-run")
+
+
+def dirty_claimed_paths(target: pathlib.Path, claimed: list[str]) -> list[str]:
+    """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
+
+    A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
+    --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
+    also flags `??`. Two carve-outs, and each of them is a state another unit owns:
+
+    - Absent from BOTH the index and the worktree: dirty when HEAD still carries it, because that
+      is a STAGED deletion and a staged deletion is an operator decision. NOT dirty when HEAD has
+      no copy either — that is the COMMITTED deletion `-9` restores, and there is nothing left to
+      diff.
+    - An untracked file SHADOWING a claimed path that is absent from the index is NOT dirty here.
+      That state is `-7` S4's refusal, which names the path and the risk, and two units refusing
+      one tree would give the operator two different messages for it.
+
+    Four git calls over the whole population rather than four per path: a hundred-row receipt would
+    otherwise pay four hundred process creations, and on the node that measured it every exec costs
+    about 22 ms whatever it does.
+    """
+    claimed = [c for c in dict.fromkeys(claimed) if c]
+    if not claimed:
+        return []
+
+    def _names(*args: str) -> set[str]:
+        out = subprocess.run(["git", "-C", str(target), *args, "--", *claimed],
+                             capture_output=True, text=True)
+        return {n for n in out.stdout.split("\0") if n}
+
+    in_index = _names("ls-files", "-z")
+    has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
+                              capture_output=True).returncode == 0
+    in_head = _names("ls-tree", "-r", "--name-only", "-z", "HEAD") if has_head else set()
+    # index-versus-HEAD is unanswerable before the first commit, and calling every staged path an
+    # addition there would report a fresh repository as entirely dirty. The worktree-versus-index
+    # half still answers, so that is the half that runs.
+    staged = _names("diff", "--cached", "--name-only", "-z", "HEAD") if has_head else set()
+    unstaged = _names("diff", "--name-only", "-z")
+
+    dirty: list[str] = []
+    for path in claimed:
+        if path not in in_index:
+            if (target / path).exists():
+                continue                        # carve-out 2 — `-7` S4 owns this tree
+            if path in in_head:
+                dirty.append(f"{path} (deleted from the index, still in HEAD)")
+            continue                            # carve-out 1 — a committed deletion is not dirty
+        if path in staged or path in unstaged:
+            dirty.append(path)
+    return dirty
+
+
+def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+    """S4's refusal, scoped to the receipt's own population.
+
+    A deployer that refuses over an unrelated edit in a repository it does not own is a deployer
+    people learn to work around, so a dirty path outside the receipt does not block.
+    """
+    dirty = dirty_claimed_paths(
+        target, [row.get("path") for row in ((receipt or {}).get("files") or [])])
+    if dirty:
+        raise Refusal(
+            f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
+            + f" — `{verb}` overwrites gov-owned paths, and a write onto an uncommitted local "
+            f"change is indistinguishable afterwards from a change you made. Commit or stash those "
+            f"paths in the target, then re-run. A dirty path OUTSIDE the receipt does not block")
+
+
+def describe_write_lock(lock: pathlib.Path) -> str:
+    """Who holds the lock and for how long — or the fact that the file cannot say.
+
+    An unreadable lock is reported as unreadable rather than described as anonymous: a stale lock
+    an operator cannot diagnose is indistinguishable from a live run they must wait for.
+    """
+    try:
+        held = json.loads(lock.read_text(encoding="utf-8"))
+        age = int(max(0.0, time.time() - float(held.get("started") or 0.0)))
+        return (f"pid {held.get('pid', '?')} running `{held.get('verb', '?')}`, started "
+                f"{held.get('started_utc', '?')}, {age}s ago")
+    except (OSError, ValueError, TypeError):
+        return "its lock file records no readable pid or start time, so it is almost certainly stale"
+
+
+def take_write_lock(target: pathlib.Path, verb: str) -> None:
+    """S5. `O_EXCL`, so the CREATION is the acquisition rather than a check followed by a create.
+
+    Per TARGET, not per (target, verb): `apply` and `update` both write the receipt, so letting the
+    two interleave is the case this exists for. The file records who holds it and since when,
+    because a lock that refuses without saying who holds it is a mystery rather than an error.
+    """
+    global _HELD_LOCK
+    lock = target.joinpath(*WRITE_LOCK_REL.split("/"))
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        raise Refusal(
+            f"another govkit write holds {lock.as_posix()} — {describe_write_lock(lock)}. Two "
+            f"writing runs against one target interleave on the receipt, which is exactly what "
+            f"this lock exists to prevent, so `{verb}` is refusing rather than joining in. Wait "
+            f"for that run to finish; if that process is gone the lock is STALE and `rm "
+            f"{lock.as_posix()}` clears it") from None
+    with os.fdopen(fd, "w", newline="\n") as fh:
+        fh.write(json.dumps({"pid": os.getpid(), "verb": verb, "started": time.time(),
+                             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
+                            indent=2) + "\n")
+    _HELD_LOCK = lock
+
+
+def release_write_lock() -> None:
+    """Run by every exit path of both writing verbs, refusals included — it is a `finally`, never a
+    line at the bottom of a success branch. A lock only a clean run releases is a lock that survives
+    the first refusal and then blocks every run after it."""
+    global _HELD_LOCK
+    if _HELD_LOCK is None:
+        return
+    try:
+        _HELD_LOCK.unlink()
+    except OSError:
+        pass
+    _HELD_LOCK = None
+
+
+def demand_writable_target(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+    """Steps 1 and 2 of the build's precondition order, in that order, for a run that WILL write.
+
+    A read-only run does not come here, on purpose: taking the lock creates `.governance/outbox/`
+    and a file inside it, and a read-only verb that leaves a byte behind is the whole risk
+    `update`'s default guards against. There is nothing for these preconditions to protect on a run
+    that writes nothing.
+    """
+    demand_no_operation_in_progress(target, verb)
+    demand_index_resolved(target, verb)
+    demand_claimed_paths_clean(target, verb, receipt)
+    take_write_lock(target, verb)
+
+
+def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str) -> None:
+    """S7. `--to` must be a DESCENDANT of the vintage the receipt records.
+
+    `--is-ancestor` holds reflexively, so a re-run at the same vintage stays legal, and a receipt
+    carrying no `gov_commit` skips the question entirely — the same carve-out the resolve-check
+    beside this one already makes. Asked of git rather than modelled here: a second model of the
+    commit graph inside govkit is a second answer to a question git already owns.
+    """
+    if not base_commit:
+        return
+    ok = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor",
+                         base_commit, to_commit], capture_output=True).returncode == 0
+    if not ok:
+        raise Refusal(
+            f"--to resolves to {to_commit} and this target's receipt records {base_commit}, which "
+            f"is not an ancestor of it. A DOWNGRADE IS NOT AN UPDATE: every clean row takes the raw "
+            f"arm rather than the three-way, so it would be rewound to the older bytes, and the "
+            f"receipt would be re-stamped backwards so that nothing afterwards records it happened. "
+            f"Pass a --to that descends from {base_commit}, or re-install deliberately if a "
+            f"rollback is really what you want")
+
+
+def demand_published_vintage(root: pathlib.Path, to_commit: str) -> None:
+    """S8. `--to` must be reachable from SOME ref in the gov checkout.
+
+    `rev-parse --verify` accepts any object that EXISTS — a dangling commit, a fetched-but-unmerged
+    tip — which is how a branch nobody shipped becomes an adopter's new baseline. It is the same
+    class the read side refuses by declining `git log --all`, and refusing it on the write side too
+    keeps one answer to the question of what vintage an adopter may be moved to.
+    """
+    out = subprocess.run(["git", "-C", str(root), "for-each-ref", "--contains", to_commit,
+                          "--count=1"], capture_output=True, text=True)
+    if out.returncode != 0 or not out.stdout.strip():
+        raise Refusal(
+            f"--to resolves to {to_commit}, which this gov checkout can reach from NO ref — a "
+            f"dangling commit, a deleted branch tip, or something fetched and never merged. The "
+            f"object existing is not the same as it having been shipped, and an adopter may only "
+            f"be moved to a vintage some ref names. Point --to at a branch or tag containing it")
+
+
 def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
               resume: bool) -> int:
+    """The verb. Its BODY is `_cmd_apply`, and the split exists for the lock's release path.
+
+    S5 wants the lock released on EVERY exit — the clean return, each report emit, and every
+    refusal — and a `finally` around the whole body is the only shape that also covers a
+    Refusal raised out of a helper three frames down. A release line at the bottom of the
+    success branch is the shape that leaves a stale lock behind after the first refusal.
+    """
+    try:
+        return _cmd_apply(root, target, mode, kits, resume)
+    finally:
+        release_write_lock()
+
+
+def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+               resume: bool) -> int:
     r = Report()
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
@@ -2297,6 +2558,13 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             "receipt does not claim it. Converging a repo that already has kits is a stated "
             "non-goal; refusing before writing anything"
         )
+
+    # ---- THE WRITE PRECONDITIONS (DEPL-dCarriedReceipt-12), steps 1 and 2 of the build's
+    # ---- declared order: is the target mid-operation, does its index carry unresolved merge
+    # ---- stages, is any receipt-claimed path dirty, and can the lock be taken. All of it
+    # ---- BEFORE the descriptor validation below, because a refusal about the state of the
+    # ---- repository must not queue behind a complaint about a kit descriptor.
+    demand_writable_target(target, "apply", receipt)
 
     # ---- validate every merged rule BEFORE writing. A source that cannot yield exactly one pair,
     # ---- or a marker style with no synthesizer, is a refusal — a block gov writes and can never
@@ -2388,15 +2656,14 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                    lambda e, dd: target_context(target, deploy, e, dd))
     ga_path = target / ".gitattributes"
     if pins:
-        # Cleanliness FIRST, and relative to HEAD so it covers staged, unstaged and both. Measured:
-        # `git add --renormalize` rewrites a DELIBERATELY STAGED blob, and a tracked path deleted in
-        # the worktree makes it abort entirely, staging nothing — which in this order would happen
-        # after the block was written, leaving gov's block in the file with no renormalize.
-        for marker in ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD"):
-            if (target / ".git" / marker).exists():
-                raise Refusal(f"the target has {marker} — a merge, rebase or cherry-pick is in "
-                              f"progress, and renormalizing mid-conflict rewrites index stages the "
-                              f"operator cannot reconstruct")
+        # The mid-operation probe that used to stand HERE moved to the preamble
+        # (DEPL-dCarriedReceipt-12 S1/S2). It was twice unreachable: conditioned on this very
+        # `if pins:`, so a target declaring no `lf_pin` was unguarded, and stat'ing
+        # `target/.git/<marker>`, which resolves to nothing in a linked worktree. WHY it
+        # existed is unchanged and still worth writing down: cleanliness must be established
+        # before this block is written, because `git add --renormalize` rewrites a
+        # DELIBERATELY STAGED blob, and a tracked path deleted in the worktree makes it abort
+        # entirely — staging nothing, after gov's block is already in the file.
         om, cm, block_text = lf_pin_block(pins)
         cur = ga_path.read_text(encoding="utf-8", errors="replace") if ga_path.is_file() else None
         new, mode = write_block(cur, om, cm, block_text, "append")
@@ -2972,6 +3239,14 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
+    """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
+    try:
+        return _cmd_update(root, target, to_rev, write)
+    finally:
+        release_write_lock()
+
+
+def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -3009,6 +3284,17 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                 f"fallback classifies every file as missing and overwrites every local edit in a "
                 f"repository gov does not own"
             )
+
+    # ---- THE WRITE PRECONDITIONS (DEPL-dCarriedReceipt-12), in the build's declared order.
+    # Steps 1 and 2 — mid-operation, unresolved index, dirty claimed paths, the lock — guard a
+    # WRITE, so a read-only run does not pay them and does not create the lock file. Step 3,
+    # the two vintage questions, runs on EVERY run: it grades the ARGUMENT rather than the
+    # tree, it sits beside the two resolve-checks it completes, and a read-only preview of a
+    # downgrade is a preview of something that will never be allowed to happen.
+    if write:
+        demand_writable_target(target, "update", receipt)
+    demand_forward_vintage(root, base_commit, to_commit)
+    demand_published_vintage(root, to_commit)
 
     claimed = receipt.get("kits") or []
     for eid in claimed:

@@ -798,6 +798,36 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "demand_claimed_paths_clean",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_forward_vintage",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_index_resolved",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_no_operation_in_progress",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_published_vintage",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_writable_target",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_ci_file",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -883,6 +913,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "describe_write_lock",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "destinations_for",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -891,6 +926,11 @@
       "id": "detect_collisions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "dirty_claimed_paths",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "discover",
@@ -1088,6 +1128,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "git_path",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "glob_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1098,7 +1143,17 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "govkit_module",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "govkit_steps",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "govkit_update_role",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
@@ -1221,6 +1276,11 @@
       "id": "lf",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "lf_pin_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "lf_pins",
@@ -1988,6 +2048,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "release_write_lock",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "remove_dead_regions",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2493,6 +2558,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "settle",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "settled",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2616,6 +2686,11 @@
       "id": "sweepTurns",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "take_write_lock",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "target_context",
