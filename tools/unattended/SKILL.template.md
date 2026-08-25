@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.9 -->
+<!-- gov:kit unattended@1.10 -->
 
 # Unattended runs
 
@@ -23,9 +23,9 @@ which is the key the merge bar re-derives and the driver records.
 | You were handed | Path | Declares |
 |---|---|---|
 | a build folder that already exists and names its units | [Start a run](#start-a-run) | `slug` |
-| prose, plus the authorizing parameter, and no build folder | [Start a run from a PROMPT](#start-a-run-from-a-prompt) | `prompt` |
+| prose or a prompt file, handed as `{{AUTH_PARAM}} <value>`, and no build folder | [Start a run from a PROMPT](#start-a-run-from-a-prompt) | `prompt` |
 | a PLAYBOOK that already exists, and a number of pieces to make from it | [Start a PLAYBOOK run](#start-a-playbook-run) | `recipe` |
-| a topic and no playbook — the playbook is what you are to produce | [Author a PLAYBOOK](#author-a-playbook--creation-and-owner-instructed-amendment) | `prompt` |
+| a topic and no playbook, handed the same way and bound by the same fence — the playbook is what you are to produce | [Author a PLAYBOOK](#author-a-playbook--creation-and-owner-instructed-amendment) | `prompt` |
 
 **The fourth row is the one a reader gets wrong.** Arriving with a topic and no playbook, the
 playbook-run path is the one that looks right and it is the one that cannot work: preflight refuses a
@@ -160,10 +160,29 @@ It is [below](#produce-pieces-attended), after the unattended paths it shares it
 
 ## Start a run from a PROMPT
 
-**Only when the invocation carries the authorizing parameter.** Prose alone is not an unattended
-build, however unattended it sounds — the parameter IS the authorization gesture, and inferring it
-from wording would let a description of a build start one. No parameter, no prompt path; use the slug
-path above or do ordinary attended work.
+**Only when the invocation carries `{{AUTH_PARAM}}`.** Prose alone is not an unattended build,
+however unattended it sounds — the parameter IS the authorization gesture, and inferring it from
+wording would let a description of a build start one. No `{{AUTH_PARAM}}`, no prompt path; use the
+slug path above or do ordinary attended work. The fourth routing row above is this path too, so this
+fence binds a playbook-authoring start exactly as it binds a code one.
+
+**THE VALUE IS THE BUILD.** `{{AUTH_PARAM}}` takes one argument, and it is everything after the token
+to the end of the invocation line, with one layer of surrounding quotes stripped before any test. It
+is either a path to a file holding the prompt, or the prompt itself. Test for the FILE FIRST — a
+relative path resolves against the repository root and never against wherever this session happens to
+be standing.
+
+| The value | What it is | What you do |
+|---|---|---|
+| no whitespace, names a readable file | a path | read it; the FILE'S CONTENT is the prompt |
+| no whitespace, names nothing readable | a refusal | say the path did not resolve, and stop |
+| has whitespace, names nothing readable | the prompt itself | take it verbatim |
+| has whitespace AND names a readable file | a refusal | say the value is ambiguous, and stop |
+
+The file test runs first because the whitespace rule is not symmetric. A prompt is multi-word in
+every case; a PATH is not single-word in every case, because a quoted path containing a space arrives
+as one argument with whitespace in it. Reading that as a prompt would make a real file silently
+become the whole scope of the build, so the ambiguous case is a refusal rather than a guess.
 
 **This project's anchor scope is `{{ANCHOR_SCOPE}}`, and this path needs `published`.** Under
 `default-branch` there is no anchor a build folder you author can resolve at, so every step below
@@ -202,8 +221,20 @@ rather than a claim in a transcript nobody reads.
    `<!-- gen:build-index -->` and its close, or preflight refuses at step 5 with *the build README's
    generated markers are malformed*: the unit list is DERIVED from that region, so an unpaired marker
    is not something the driver guesses around. Every one of these is checked AFTER the push, where
-   there is no owner turn left to ask about it. Carry the
-   owner's prose VERBATIM under its own heading, and every clarification with its answer. The roster
+   there is no owner turn left to ask about it.
+
+   **The prompt itself goes to a RECORD, never into this README.** Write it under
+   `{{MEMORY_ROOT}}/builds/<slug>/prompts/`, which is where this memory tree sanctions prompt-kind
+   files, carrying its `**Serves:**` line and — where the value was a path — the path it came from.
+   The bytes travel rather than the reference: the build folder IS the authorization, so it may not
+   point at a file that can be edited after the run starts. Three reasons it is not the README, and
+   none of them is tidiness. That file's heading canon is CLOSED and its slots carry byte ceilings,
+   so a prompt under a heading of its own is a refusal. That file is PARSED for the marker pair
+   above, by a matcher that reads column 1 and is blind to fencing, so a prompt quoting
+   `<!-- gen:build-index -->` plants a second marker and the refusal lands after the push. And a
+   malformed record reds the memory gate HERE, at step 3, where you can still fix it. The README
+   states the build in its own words and points at the record; clarifications and their answers ride
+   the record too. The roster
    may be provisional: a roster that grows after preflight draws no refusal on this anchor, because
    your own push re-satisfies the comparison.
 4. **Commit, then PUSH THE BRANCH.** Both, in that order. Skip the push and preflight refuses with

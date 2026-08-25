@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T22:02:05+03:00 @ 75d0a5f2f015f4b94475f71ca2bc9798caab4089
+last-audit: 2026-08-26T00:14:57+03:00 @ 7beeb4efe6cd6f625ea31625669faf209d8a5f00
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 75d0a5f2f015f4b94475f71ca2bc9798caab4089
+last-body-change: 7beeb4efe6cd6f625ea31625669faf209d8a5f00
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -87,13 +87,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   it; anything this session closes is inside it.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. On 2026-08-21 two
-  builds rewrote `tools/unattended/` concurrently — aBoundedVerdict on node `c` and dUnstalledConvoy
-  on node `d` — and neither noticed until the landing. The integration cost 25 conflicting files, 40
-  hunks, and a Tier-2 review that found FOUR merge-bar legs red on the merged tree and none red on
-  either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
-  rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
-  the cheap check is a `git log` at kickoff rather than a merge at landing.
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. Two builds rewrote
+  `tools/unattended/` concurrently on 2026-08-21 and neither noticed until the landing: 25 conflicting
+  files, and four merge-bar legs red on the merged tree with none red on either parent. §3's rule is
+  own STREAMS not files, and a kit is the unit that rule is about.
 
 - **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
   or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
