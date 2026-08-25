@@ -833,6 +833,26 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_carried",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_carried_by_rung",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_carry_map",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_carry_rung",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_ci_file",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -861,6 +881,11 @@
       "id": "derive_lexicon_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_lf",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_memory_disciplines",

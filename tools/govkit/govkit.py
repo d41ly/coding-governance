@@ -2328,9 +2328,12 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
 def index_blob(target: pathlib.Path, oid: str) -> bytes | None:
     """The bytes behind an index entry, from the target's object database and never from its disk.
 
-    Called ONLY where the bytes themselves are needed — the three-way merge and the order it writes
-    on a conflict. Every verdict is decided from the OID alone, which is why this is not one spawn
-    per row.
+    Called ONLY where the bytes themselves are needed — the three-way merge, the order it writes on
+    a conflict, and DEPL-dCarriedReceipt-9's rung ladder. Every VERDICT is still decided from the OID
+    alone, and a byte-identical row still costs nothing; what the rungs added is one spawn per row
+    whose index blob is NOT gov's own, because `eol` and `relocate` are questions about bytes and no
+    oid comparison can answer either. The spec's perf line claimed "no new subprocess" and that is
+    wrong on this arm — stated here rather than left for the next reader to discover.
     """
     out = subprocess.run(["git", "-C", str(target), "cat-file", "blob", oid],
                          capture_output=True, check=False)
@@ -3365,8 +3368,196 @@ def _sha(b: bytes | None) -> str | None:
     return hashlib.sha256(b).hexdigest() if b is not None else None
 
 
+# ------------------------------------------------------------ the carry rungs (DEPL-dCarriedReceipt-9)
+# A row whose two identities differ is NOT automatically a local delta. The difference may be a
+# CARRY — a transformation gov already knows about — and there are exactly three rungs: `verbatim`
+# (there is nothing to explain), `eol` (the target's checkout committed CRLF where gov ships LF), and
+# `relocate` (the adopter installed at a different `prefix`, so every file that SPELLS a path differs
+# on every line that spells one). The motivating measurement is NOT this tree's and cannot be
+# reproduced from it, so it is attributed rather than asserted: DEPL-dCarriedReceipt-9 §4 records
+# that on inCMS at 2cff5855, of the 52 rows whose recorded gov commit resolves, 21 are byte-identical,
+# 6 differ only in line endings and 5 differ only by the prefix relocation. Eleven rows carrying no
+# local edit at all, and the two-identity predicate on its own calls every one of them a local delta —
+# so the raw-write arm is closed to all of them forever and each is handed to a three-way whose
+# `base` still spells gov's prefix where the target's own copy does not.
+#
+# THE RUNG IS RECOMPUTED BY PROOF ON EVERY RUN AND IS NEVER READ BACK OFF THE RECEIPT (S2). A stored
+# rung is a claim about bytes that have moved since; the whole point of the two identities is that no
+# stored boolean stands between this tool and the blobs. `carry` is written into the row for
+# REPORTING, and the print loop is its only reader — asserted by an arm over this file's source
+# rather than left to discipline.
+#
+# WHAT A PROVEN RUNG DOES NOT BUY, stated here because a structural guarantee reads as a semantic one
+# to everybody who did not write it: it does NOT move `o_state`, does NOT touch `VERDICT_GRID`, and
+# CANNOT put a row on the raw-write arm. What it buys is the MERGE path — applied to `base` and to
+# `theirs` it cancels in the base-to-theirs diff, `git merge-file` sees only gov's semantic change,
+# and the row reconciles to the CARRIED bytes with no operator turn.
+CARRY_RUNGS = ("verbatim", "eol", "relocate")
+
+
+def derive_lf(data: bytes) -> bytes:
+    """CRLF to LF — the `eol` rung's whole transformation, spelled once because two spellings of one
+    rule is the class this file spends most of its comments on."""
+    return data.replace(b"\r\n", b"\n")
+
+
+def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[str, list[str]]]]:
+    """The needle map, DERIVED from a sequence of `(gov source, target destination)` pairs.
+
+    A SEQUENCE OF PAIRS rather than a receipt, because the derivation has two callers and only one
+    of them has a receipt to read. `cmd_update` feeds it the receipt's rows — the record of where
+    the target actually TOOK each file, which is what `update`'s whole job is to move. `adopt`
+    (DEPL-dCarriedReceipt-13 S4a) feeds it the planned `(src, dest)` pairs of its own run, because at
+    bootstrap there is no receipt yet.
+
+    THERE IS NO AUTHORED FORM AND NO OVERRIDE KEY. A hand-written map is a second answer to a
+    question the caller's own pairs already answer.
+
+    NOT re-resolved from the descriptors, and that is the reuse RESULT rather than an oversight.
+    `resolve_dests` and `rule_relpath` already know how a source maps to a destination and calling
+    them here would look like reuse — but they answer for the descriptor as it reads TODAY, while
+    this map must answer for what the target actually installed, possibly at a different gov commit
+    and a different `prefix`. Reusing them would make the map drift the moment a descriptor's `to`
+    changes, which is the two-spellings-of-one-fact class `-1` exists to close, re-created one layer
+    down.
+
+    THE LIFT IS ONE DIRNAME PAIR PER ROW. Stripping EQUAL TRAILING SEGMENTS was measured and is
+    wrong: it collapses `tools/unattended` into the bare gov directory `tools`, which then collides
+    with the hooks kit's `tools` and is dropped as ambiguous — taking the whole unattended kit's
+    relocation with it. The comparison is the spec's, over a population this tree does not hold, and
+    is cited rather than restated: DEPL-dCarriedReceipt-9 §4 measured both lifts against each other
+    and the dirname one yields strictly more surviving pairs. What THIS file's arms grade is the lift
+    itself, over a fixture they build.
+
+    A gov directory that yields two DIFFERENT target directories names no single destination and
+    cannot be a needle, so it is DROPPED and returned BY NAME (§8 F1 — drop loudly). Refusing would
+    make a perfectly installable target unupdatable over a map entry it never asked for, and a silent
+    drop is indistinguishable from a target that relocated nothing.
+
+    Needles emit in BOTH the `/` form and the `~` form, because gov flattens paths into fixture
+    filenames: `tools/unattended/check-playbook.test.sh` spells `tools~` while an adopter's own
+    fixture records are named `scripts~unattended~…`. The two forms COINCIDE for a directory with no
+    slash and the map then holds one of them, so the needle count is not two per pair and is not
+    written down anywhere — the caller prints what this returns.
+
+    WHAT THIS DOES NOT COVER: a gov directory whose own NAME contains a literal `~` can flatten onto
+    another directory's `~` form. The map is built in sorted order so the later one wins
+    deterministically. No arm exercises it, because nothing in this tree names a directory that way
+    and an arm nobody has ever seen fail is an assertion about nothing.
+
+    Returns `(needles, pairs, dropped)` — the substitution map, the surviving directory pairs, and
+    `(gov directory, [destinations])` for every one dropped.
+    """
+    lifted: dict[str, set[str]] = {}
+    for src, dest in pairs:
+        if not src or not dest:
+            continue                       # a row with no `source` contributes no pair, and is not
+        gd = str(src).rsplit("/", 1)[0] if "/" in str(src) else ""   # a reason to refuse the run
+        td = str(dest).rsplit("/", 1)[0] if "/" in str(dest) else ""
+        if not gd or not td:
+            continue                       # a root-level file lifts to the EMPTY needle, which would
+        lifted.setdefault(gd, set()).add(td)                    # match at every position in a file
+    dropped = [(gd, sorted(ds)) for gd, ds in sorted(lifted.items()) if len(ds) > 1]
+    pairs_out: dict[str, str] = {gd: next(iter(ds)) for gd, ds in sorted(lifted.items())
+                                 if len(ds) == 1}
+    needles: dict[str, str] = {}
+    for gd, td in pairs_out.items():
+        needles[gd] = td
+        needles[gd.replace("/", "~")] = td.replace("/", "~")
+    return needles, pairs_out, dropped
+
+
+def derive_carried(data: bytes, needles: dict[str, str]) -> bytes:
+    """Gov's bytes rewritten through the needle map — ONE left-to-right pass, longest needle first.
+
+    THE OUTPUT IS NEVER RESCANNED, and that is the property that keeps this a function of its input.
+    Rescanning, or matching longest-anywhere rather than leftmost, lets one substitution feed
+    another, so rewriting `tools` inside a path already rewritten to `scripts` becomes reachable.
+    `re.sub` over an alternation sorted longest-first is exactly the required pass: the alternation
+    is ORDERED, so the longest needle wins at each position, and `sub` takes the leftmost match and
+    resumes AFTER the replacement it just wrote.
+
+    A PROOF INSTRUMENT, NOT A WRITE-TIME TRANSFORM (§3). It is applied to gov's bytes to COMPARE
+    them, never to produce bytes landed on the strength of the map alone. Measured on
+    `tools/unattended/adopt-unattended.test.sh` at ce5dca99, landing the rewritten form corrupts six
+    lines: four `bash tools/land.sh` occurrences at lines 34, 63, 83 and 91, which name no prefix at
+    all, and lines 132-133, where the fixture builds a directory literally named
+    `my tools/unattended` and the bare needle turns it into `my scripts`. Under the proof gate that
+    row simply matches no rung, and none of those six lines is ever written. The ONE bounded
+    exception is the `missing` restore (S11), where the target holds no bytes to prove anything
+    against and the alternative is writing gov's prefix into a target that does not use it.
+
+    A blob that is not valid UTF-8 comes back UNCHANGED rather than being mangled into a false rung.
+    """
+    if not needles:
+        return data
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
+    pat = "|".join(re.escape(n) for n in sorted(needles, key=lambda n: (-len(n), n)))
+    return re.sub(pat, lambda m: needles[m.group(0)], text).encode("utf-8")
+
+
+def derive_carry_rung(base: bytes, needles: dict[str, str], read_ours,
+                      known_equal: bool = False) -> str | None:
+    """THE LADDER: `verbatim`, `eol`, `relocate`, tried in that order, and the first proof wins (S1).
+
+    A LADDER AND NOT A LATTICE (§8 F2). The rungs do not compose, so `relocate` is proved on RAW
+    bytes and never on eol-normalised ones. The spec's grounds, attributed: on the live target every
+    `relocate` row proves on raw bytes and none needs the composition, so composing buys nothing today
+    and adds a fourth rung's worth of surface. The cost is stated rather than hidden: an adopter whose
+    checkout is CRLF and whose prefix is ALSO non-default falls to local delta on those rows and gets
+    the three-way instead of a raw write.
+
+    WHOLE-FILE EQUALITY DECIDES A RUNG (S5). One residual byte and the rung does not match, the row
+    keeps exactly the verdict it would have had, and nothing is written. The residual risk runs the
+    other way and is accepted by design: a row like `adopt-unattended.test.sh` will never take an
+    automatic write, and that is the correct outcome rather than a gap.
+
+    `read_ours` is a THUNK, and that is a perf shape rather than a style. `verbatim` is settled from
+    the OIDs the caller already holds, so a byte-identical row never pays a blob read at all — and on
+    a real adopter that is most of the receipt. `known_equal` says the caller has already proved that
+    `ours` and `base` name the
+    same git blob — in which case `base` IS `ours`, byte for byte. The fall-through still re-proves
+    equality ON BYTES, so a target whose object format is not gov's (where no oid ever matches) still
+    reaches `verbatim` rather than being mislabelled `eol` by the rung below it.
+    """
+    ours = base if known_equal else read_ours()
+    if ours is None:
+        return None
+    if ours == base:
+        return "verbatim"
+    if derive_lf(ours) == derive_lf(base):
+        return "eol"
+    if ours == derive_carried(base, needles):
+        return "relocate"
+    return None
+
+
+def derive_carried_by_rung(rung: str | None, data: bytes, needles: dict[str, str]) -> bytes:
+    """The rung's own transformation, for S6: applied to BOTH `base` and `theirs` before the
+    three-way, so it CANCELS in the base-to-theirs diff and `git merge-file` sees only gov's semantic
+    change — which is how a carried row reconciles to the carried bytes with no operator turn.
+
+    WHAT EACH RUNG ACTUALLY DOES HERE, because two of the three are no-ops and a reader is owed that
+    rather than left to infer it. `relocate` is the load-bearing one. `eol` normalises GOV's own
+    bytes, which is a no-op wherever gov ships LF — it is written for the rung rather than for the
+    one rung that needs it, and an `eol` row's merge is therefore exactly what it would be with no
+    rung at all. `verbatim` is identity by construction and never reaches a three-way in any case:
+    `ours == base` means `o_state` is `equal`, which the grid routes to `current`, `stale` or
+    `withdrawn` and never to `diverged`.
+    """
+    if rung == "relocate":
+        return derive_carried(data, needles)
+    if rung == "eol":
+        return derive_lf(data)
+    return data
+
+
 def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
-                 index: dict[str, tuple[str, str]]) -> dict:
+                 index: dict[str, tuple[str, str]],
+                 needles: dict[str, str] | None = None) -> dict:
     """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
 
     OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
@@ -3385,9 +3576,15 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     `diverged`, and `diverged` additionally needs a THEIRS that moved, which needs the `source` and
     `commit` such a row does not have. No raw write sits on this state.
 
-    `ours` BYTES are fetched only where they are actually consumed — the three-way merge and the
-    order it writes on a conflict — so the batched index read stays one spawn per run rather than
-    one per row.
+    `ours` BYTES are fetched only where they are actually consumed — the three-way merge, the order
+    it writes on a conflict, and DEPL-dCarriedReceipt-9's rung ladder. That last one moves the cost:
+    a row whose index blob is not gov's own now pays one `cat-file` to find out WHY, which the
+    verdict alone could never answer. A byte-identical row still pays nothing, because `verbatim` is
+    settled from the two oids.
+
+    `carry` (DEPL-dCarriedReceipt-9 S1) is computed here and is OUTPUT: it explains the difference
+    the verdict reports, and it changes neither `o_state` nor the verdict nor which arm the row takes
+    (S9). It is recomputed by PROOF on every run and a stored one is never read.
     """
     src, base_commit = row.get("source"), row.get("commit")
     theirs = blob_at(root, to_commit, src) if src else None
@@ -3404,9 +3601,28 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
     else:
         o_state = "differs"
     verdict = VERDICT_GRID[(o_state, t_state)]
-    ours = index_blob(target, ours_oid) if (ours_oid and verdict == "diverged") else None
+
+    # ---- DEPL-dCarriedReceipt-9 S1. The rung, over the SAME two blobs the verdict came from, and
+    # ---- it is computed here so there is one classifier rather than a second one beside it. The
+    # ---- fetch is memoised because two readers want the same bytes: the ladder, and the three-way
+    # ---- on a `diverged` row. A row with no `base` — no `source`, no `commit`, or gov holding no
+    # ---- blob there — can prove nothing, and gets no rung rather than a guessed one.
+    fetched: list[bytes | None] = []
+
+    def read_ours() -> bytes | None:
+        if not fetched:
+            fetched.append(index_blob(target, ours_oid))
+        return fetched[0]
+
+    carry = None
+    if base is not None and ours_oid is not None:
+        carry = derive_carry_rung(base, needles or {}, read_ours,
+                                  known_equal=(ours_oid == blob_oid(base)))
+    if ours_oid and verdict == "diverged":
+        read_ours()
+    ours = fetched[0] if fetched else None
     return {"verdict": verdict, "ours": ours, "ours_oid": ours_oid, "theirs": theirs,
-            "base": base, "o_state": o_state, "t_state": t_state}
+            "base": base, "o_state": o_state, "t_state": t_state, "carry": carry}
 
 
 def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
@@ -3636,6 +3852,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — {base_commit[:8] if base_commit else '(none)'} -> {to_commit[:8]} · "
           f"receipt schema {schema} · {'WRITE' if write else 'read-only'}")
 
+    # ---- DEPL-dCarriedReceipt-9 S3 + S7. The needle map, DERIVED from the receipt's own
+    # ---- (source, path) pairs, and PRINTED before the first row is classified. A map that silently
+    # ---- collapsed is indistinguishable from a target that genuinely relocated nothing, and that is
+    # ---- the failure mode that would waste the most time. Neither number is written down anywhere:
+    # ---- both come off the derivation, on this run, over this receipt.
+    needles, carry_pairs, carry_dropped = derive_carry_map(
+        [(w.get("source"), w.get("path")) for w in rows_all])
+    for _gd, _dests in carry_dropped:
+        print(f"govkit update — carry map DROPPED the ambiguous gov directory '{_gd}': this receipt "
+              f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
+              f"needle")
+    print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
+          f"{len(needles)} needle(s)")
+
     deploy = load_deploy(target)
     tally: dict[str, int] = {}
     acted: list[dict] = []
@@ -3716,7 +3946,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 pins_order = _text
             continue
 
-        c = classify_row(root, target, row, to_commit, index0)
+        c = classify_row(root, target, row, to_commit, index0, needles)
+
+        # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
+        # above and is written back for REPORTING; a stale one left by an older run is DROPPED
+        # rather than believed, so the field can never be a claim about bytes that have moved since.
+        # No branch in either verb reads it back — asserted over this file's SOURCE by an arm,
+        # because "nobody will read it" is a discipline and this is a gate.
+        if c["carry"]:
+            row["carry"] = c["carry"]
+        else:
+            row.pop("carry", None)
+
         v = c["verdict"]
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
@@ -3725,6 +3966,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 v = "current" if c["o_state"] == "equal" else "patched"
         if how == "adopter" and v in ("diverged", "stale"):
             v = "re-rendered"          # CAP at report; the adopter owns these bytes
+        if v == "patched" and c["carry"] in ("eol", "relocate"):
+            # DEPL-dCarriedReceipt-9 S10. `("differs","equal")` grids to `patched`, which is a LIE
+            # for a carried row: the target edited NOTHING, it installed at a different prefix or
+            # committed different line endings. Sourced from `carry` and from nothing else, and the
+            # tally counts it under the label it printed rather than under the one it replaced.
+            v = f"carried ({c['carry']})"
         tally[v] = tally.get(v, 0) + 1
         print(f"  {v:<18} [{role:<13}] {row['path']}")
         acted.append({"row": row, "c": c, "verdict": v, "how": how})
@@ -3783,18 +4030,52 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             continue
 
         if v in RAW_WRITE_VERDICTS:
+            data = c["theirs"]
+            # ---- DEPL-dCarriedReceipt-9 S11. THE `missing` RESTORE CARRIES TOO, and it is the ONE
+            # ---- arm in this verb that writes bytes gov does not hold WITHOUT a bytes-proof —
+            # ---- because there are no `ours` bytes to prove a rung against: the target DELETED the
+            # ---- file. `classify_row` returns `o_state = "absent"`, both `absent` cells grid to
+            # ---- `missing`, and `missing` shares the raw arm right here, so without this a
+            # ---- rung-carrying row the target deleted comes back in gov's un-carried spelling.
+            # ---- Bounded twice over: it fires only on `missing`, and it applies the row's OWN
+            # ---- (dirname(source), dirname(path)) pair rather than the derived map — which needs
+            # ---- no bytes and is exactly S3's derivation over one pair — so a literal inside the
+            # ---- restored file can only be rewritten by that one row's own relocation. That
+            # ---- residual is accepted: the alternative on this arm is writing gov's prefix into a
+            # ---- target that demonstrably does not use it.
+            restored_carry = None
+            if v == "missing" and row.get("source"):
+                _one, _, _ = derive_carry_map([(row["source"], row["path"])])
+                _carried = derive_carried(data, _one)
+                if _carried != data:
+                    data, restored_carry = _carried, "relocate"
             oid, why = land_through_index(root, target, row["path"], row.get("source"),
-                                          c["theirs"], to_commit, index0)
+                                          data, to_commit, index0)
             if oid is None:
                 r.fail(f"'{row['path']}' could not be landed: {why}")
                 continue
-            # BOTH identities, and they agree here BY CONSTRUCTION: gov's blob went into the target's
-            # object database unchanged, so the name the target gave it is the name gov's tree gives
-            # it. `sha256` is written too and decides nothing — it is what `install.sums` lists.
+            # DEPL-dCarriedReceipt-9 S12, which NARROWS one cell of `-8`'s write table rather than
+            # contradicting it. ONE stamping rule: `oid` records the blob ACTUALLY WRITTEN, and
+            # `gov_oid` keeps the meaning `-8` gives it — gov's blob at the row's `commit`, which
+            # this write advances to `to_commit` two lines below.
+            #
+            # On the UN-CARRIED raw arm the two agree BY CONSTRUCTION, which is `-8`'s stamp
+            # unchanged: gov's blob went into the target's object database untouched, so the name the
+            # target gave it is the name gov's tree gives it. On a CARRIED restore they DIFFER, and
+            # that is the point — `oid != gov_oid` afterwards reads "this row carries a rung", not
+            # "local delta", because `carry` is re-proved from the blobs on the next run and
+            # re-explains the difference. Taking the un-narrowed stamp there is the corrupt pairing:
+            # two identities recorded EQUAL over bytes gov never shipped, which the next run reads as
+            # a clean gov-owned row and raw-overwrites straight back to gov's prefix.
+            #
+            # `sha256` follows the bytes that LANDED, because that is what `install.sums` lists and
+            # what a target verifies with bash alone. It decides nothing here.
             row["gov_oid"] = blob_oid(c["theirs"])
             row["oid"] = oid
-            row["sha256"] = _sha(c["theirs"])
+            row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            if restored_carry:
+                row["carry"] = restored_carry
             changed.append(row["path"])
         elif v == "withdrawn":
             if dp.is_file():
@@ -3815,11 +4096,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"does not read back from the target's object database — refusing to merge "
                        f"against bytes this verb could not obtain")
                 continue
-            merged, how = three_way(c["ours"], c["base"] or b"", c["theirs"])
+            # DEPL-dCarriedReceipt-9 S6. A row that PROVED a rung and has since diverged is
+            # reconciled rather than raw-written, and what makes that work is WHAT THE THREE-WAY IS
+            # HANDED: the rung applied to BOTH `base` and `theirs`, so it cancels in the
+            # base-to-theirs diff and `git merge-file` sees only gov's semantic change. `ours` is
+            # left alone — it is already in the target's own spelling, which is the spelling the
+            # merged result must come out in. Without this, a `relocate` row hands the merge a base
+            # that spells gov's prefix where the target's copy does not, so every line naming a path
+            # reads as an operator edit and the whole file conflicts.
+            merged, how = three_way(
+                c["ours"],
+                derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
+                derive_carried_by_rung(c["carry"], c["theirs"], needles))
             if merged is None:
                 conflicts += 1
                 (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
                     f"# update conflict — {row['path']}\n\n"
+                    f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
                     f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                     f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
@@ -3855,6 +4148,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # `patched` and `diverged` — neither of which is in `RAW_WRITE_VERDICTS`. An adopter
                 # who later reverts the edit by hand puts the index blob back to `gov_oid` and the
                 # row rejoins the raw arm on its own — what a stored boolean would get wrong.
+                #
+                # DEPL-dCarriedReceipt-9 S12, on the other arm that writes bytes gov does not hold.
+                # `c["theirs"]` here is gov's UN-CARRIED blob — S6 rewrote only what was handed to
+                # `three_way`, never the row's evidence — so `gov_oid` still names a blob gov's own
+                # tree holds at `to_commit`, and a carried row's `oid != gov_oid` afterwards reads
+                # "carries a rung" for the same reason the restore arm's does.
                 row["gov_oid"] = blob_oid(c["theirs"])
                 row["oid"] = oid
                 row["sha256"] = _sha(merged)

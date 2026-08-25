@@ -153,10 +153,10 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md) | — | 2 | SPECCED | rev-5 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | — | 2 | CLOSED | rev-7 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md) | — | 2 | CLOSED | rev-5 | 2026-08-25 |
-| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | SPECCED | rev-8 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | CLOSED | rev-9 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 3 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

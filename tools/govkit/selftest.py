@@ -3022,6 +3022,548 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-8] AC5 selfcheck carrying that arm still exits 0 over this repo",
               _s8.returncode == 0, _s8.stdout[-600:] + _s8.stderr[-400:])
 
+        # ===== DEPL-dCarriedReceipt-9: `carry` rungs, over a DERIVED needle map ==================
+        #
+        # WHAT THIS UNIT IS. A row whose two identities differ is not automatically a local delta.
+        # The difference may be a CARRY — line endings, or a prefix relocation because the adopter
+        # installed somewhere gov does not — and the rung that explains it is RECOMPUTED BY PROOF on
+        # every run and never read back off the receipt.
+        #
+        # THE RED-FIRST OBSERVATIONS, on the fixture built below and against the engine as it stood
+        # before this unit. `classify_row` returned a dict with NO `carry` key at all, and all six
+        # non-identical rows classified from `o_state` alone. The `relocate` row whose gov copy had
+        # moved did NOT reconcile: the three-way was handed a `base` spelling gov's prefix where the
+        # target's own copy did not, every line naming a path read as an operator edit, the merge
+        # CONFLICTED, the run exited 1 and a conflict order was written. The row the target had
+        # DELETED was restored as `gone refers to tools/demo/gone.txt` — gov's prefix, into a target
+        # that does not use it — and the stamp it left recorded `oid == gov_oid` over bytes gov never
+        # shipped, which is the pairing the next run reads as a clean gov-owned row.
+        #
+        # ONE OF THOSE IS A CORRECTION TO THE SPEC RATHER THAN A DETAIL. AC8 predicted its red as
+        # "takes the raw arm, lands gov's `tools/` spelling verbatim, and exits 0". That is the
+        # behaviour at 9ddcc5c9, which the spec cites; it is NOT reachable on `-8`'s tip, because a
+        # receipt claiming gov's blob IS the carried blob is exactly what `-7` S9's preamble refuses.
+        # The red that IS reachable there is the whole-file conflict above, and that is the one
+        # observed.
+        #
+        # WHAT THIS BLOCK DOES NOT CLOSE, said plainly rather than left implied by a green. S13's
+        # COMMITTED inCMS-derived receipt of the 52 rows at `2cff5855` is not in this tree, and AC1's
+        # and AC2's counts — 21/6/5 rungs, 13 pairs, 26 needles — are NOT reproduced anywhere below.
+        # Every arm here asserts either the RELATIONSHIP the spec states or a distribution MEASURED
+        # over the fixture it builds, and says which. AC2's two figures were already marked
+        # UNVERIFIED over their own stated population by the spec itself, so copying them into an
+        # assertion was never on the table.
+
+        GK9 = govkit_module()
+
+        # ---- THE DERIVATION AND THE SUBSTITUTER, DRIVEN DIRECTLY. Unit arms on purpose: they read
+        # ---- THIS repo's `govkit.py`, imported, so a break staged into it is reached on the next
+        # ---- run with no fixture copy in between. The end-to-end arms further down run a scratch
+        # ---- gov's COPY of the engine — fine when the whole file is re-run after a break is staged,
+        # ---- and a trap if it is not.
+        _pairs9 = [("tools/demo/a.txt", "scripts/demo/a.txt"),
+                   ("tools/demo/b.txt", "scripts/demo/b.txt"),
+                   ("tools/hooks/h.js", ".claude/hooks/h.js"),
+                   ("tools/top.txt", "data/top.txt"),
+                   ("tools/amb/x.txt", "one/x.txt"),
+                   ("tools/amb/y.txt", "two/y.txt"),
+                   ("README.md", "README.md"),
+                   (None, "scripts/demo/nope.txt")]
+        _n9, _p9, _d9 = GK9.derive_carry_map(_pairs9)
+
+        # ---- S3, and AC2 as the RELATIONSHIP rather than as the spec's two disclaimed numbers. The
+        # ---- pair set is asserted WHOLE, not counted: a count agrees with the wrong map as readily
+        # ---- as with the right one.
+        check("[-9] S3 the dirname lift gives one pair per gov directory, the ambiguous one dropped",
+              _p9 == {"tools/demo": "scripts/demo", "tools/hooks": ".claude/hooks",
+                      "tools": "data"}, str(_p9))
+        check("[-9] S3 an ambiguous gov directory is DROPPED and returned BY NAME, both destinations",
+              _d9 == [("tools/amb", ["one", "two"])], str(_d9))
+        check("[-9] S3 a root-level row lifts to the EMPTY needle and is skipped, never emitted",
+              "" not in _n9, str(sorted(_n9)))
+        check("[-9] S3 a row with no `source` contributes no pair and is not a reason to refuse",
+              "scripts/demo" not in _p9 and "scripts/demo" not in _n9, str(_p9))
+        # THE RELATIONSHIP S4 states: every surviving pair emits its `/` form AND its `~` form, and
+        # the two COINCIDE for a gov directory with no slash. Derived from `_p9` on the spot so the
+        # arm cannot drift from the map it grades. MEASURED here: 3 pairs, 5 needles.
+        _forms9 = 2 * len(_p9) - sum(1 for gd in _p9 if "/" not in gd)
+        check("[-9] S4 the needle count is two forms per pair, less the slashless ones that coincide",
+              len(_n9) == _forms9 == 5 and len(_p9) == 3,
+              f"{len(_p9)} pair(s), {len(_n9)} needle(s), relationship says {_forms9}")
+        check("[-9] S4 every surviving pair is present in BOTH forms",
+              all(_n9.get(gd) == td and _n9.get(gd.replace("/", "~")) == td.replace("/", "~")
+                  for gd, td in _p9.items()), str(_n9))
+
+        # ---- S4: LONGEST NEEDLE FIRST. `tools` and `tools/demo` are both needles here and they map
+        # ---- to DIFFERENT roots, so the order is observable rather than inferred.
+        check("[-9] S4 the longest needle wins at a position — `tools/demo` beats the bare `tools`",
+              GK9.derive_carried(b"tools/demo/x", _n9) == b"scripts/demo/x",
+              repr(GK9.derive_carried(b"tools/demo/x", _n9)))
+        check("[-9] S4 ...and the bare `tools` needle is genuinely live, so that arm CAN fail",
+              GK9.derive_carried(b"tools/other/x", _n9) == b"data/other/x",
+              repr(GK9.derive_carried(b"tools/other/x", _n9)))
+
+        # ---- AC4: the `~` form, load-bearing because gov FLATTENS paths into fixture filenames —
+        # ---- `tools/unattended/check-playbook.test.sh` spells `tools~` at lines 365, 479, 523, 570
+        # ---- and 582 while an adopter's own fixture records are named `scripts~unattended~…`. Its
+        # ---- own map, so the criterion's literal strings are the ones asserted.
+        _n4, _p4, _d4 = GK9.derive_carry_map(
+            [("tools/unattended/adopt.sh", "scripts/unattended/adopt.sh"),
+             ("tools/top.txt", "scripts/top.txt")])
+        check("[-9] AC4 the fixture map really carries BOTH `tools/unattended` and `tools`",
+              _p4 == {"tools/unattended": "scripts/unattended", "tools": "scripts"}, str(_p4))
+        check("[-9] AC4 ONE pass rewrites the `/` form and the `~` form of the same string",
+              GK9.derive_carried(b"tools/unattended/fixture-records/tools~a~b.md", _n4)
+              == b"scripts/unattended/fixture-records/scripts~a~b.md",
+              repr(GK9.derive_carried(b"tools/unattended/fixture-records/tools~a~b.md", _n4)))
+        check("[-9] AC4 ...and a string already reading `scripts/unattended` is rewritten not at all",
+              GK9.derive_carried(b"scripts/unattended/x", _n4) == b"scripts/unattended/x",
+              repr(GK9.derive_carried(b"scripts/unattended/x", _n4)))
+        # The `~` form's OWN discriminator. Above, `tools~a~b` is caught by the bare `tools` needle,
+        # so the two-form rule is not what makes that line pass. Here the flattened directory carries
+        # a destination the bare needle could never produce.
+        check("[-9] AC4 the `~` form reaches a destination no `/`-form needle could produce",
+              GK9.derive_carried(b"tools~hooks~probe.md", _n9) == b".claude~hooks~probe.md",
+              repr(GK9.derive_carried(b"tools~hooks~probe.md", _n9)))
+        check("[-9] AC4 LIVENESS: with the `~` needles dropped, that string lands somewhere WRONG",
+              GK9.derive_carried(b"tools~hooks~probe.md",
+                                 {k: v for k, v in _n9.items() if "~" not in k})
+              == b"data~hooks~probe.md",
+              repr(GK9.derive_carried(b"tools~hooks~probe.md",
+                                      {k: v for k, v in _n9.items() if "~" not in k})))
+
+        # ---- S4: THE OUTPUT IS NEVER RESCANNED. The fixture is built so a rescan WOULD visibly
+        # ---- change the answer — `tools` rewrites to `demo` and `demo` rewrites to `final` — and
+        # ---- that second step is asserted live FIRST, so this cannot pass by finding nothing.
+        _nr, _pr, _dr = GK9.derive_carry_map([("tools/a.txt", "demo/a.txt"),
+                                              ("demo/b.txt", "final/b.txt")])
+        check("[-9] S4 the no-rescan fixture really chains — `demo` on its own becomes `final`",
+              GK9.derive_carried(b"demo/x", _nr) == b"final/x",
+              repr(GK9.derive_carried(b"demo/x", _nr)))
+        check("[-9] S4 ...so one substitution never feeds another: `tools/x` stops at `demo/x`",
+              GK9.derive_carried(b"tools/x", _nr) == b"demo/x",
+              repr(GK9.derive_carried(b"tools/x", _nr)))
+
+        # ---- AC6: a blob that is not valid UTF-8 comes back UNCHANGED rather than being mangled
+        # ---- into a false rung. The precondition asserts the same needle DOES fire on decodable
+        # ---- bytes, so this grades the decode guard and not an empty map.
+        _bin9 = b"\xff\xfe\x00 tools/demo \x00"
+        check("[-9] AC6 the same needle fires on the decodable form, so the guard is what stops it",
+              GK9.derive_carried(b" tools/demo ", _n9) == b" scripts/demo ", "")
+        check("[-9] AC6 a non-UTF-8 blob returns byte-identical from the substituter",
+              GK9.derive_carried(_bin9, _n9) == _bin9, repr(GK9.derive_carried(_bin9, _n9)))
+
+        # ---- §5's empty-map state: no surviving pair is not a refusal, and it makes `relocate`
+        # ---- unprovable rather than making it fire on everything.
+        check("[-9] S3 a receipt yielding no pair produces an EMPTY map, not a raise",
+              GK9.derive_carry_map([]) == ({}, {}, []), str(GK9.derive_carry_map([])))
+        check("[-9] S3 ...and an empty map leaves bytes alone",
+              GK9.derive_carried(b"tools/demo/x", {}) == b"tools/demo/x", "")
+
+        # ---- S1 + S5: THE LADDER ITSELF, one arm per rung plus the rules that bound it.
+        check("[-9] S1 rung `verbatim` — ours and base are the same bytes",
+              GK9.derive_carry_rung(b"x\ny\n", _n9, lambda: b"x\ny\n") == "verbatim", "")
+        check("[-9] S1 rung `eol` — equal after CRLF-to-LF on BOTH sides",
+              GK9.derive_carry_rung(b"x\ny\n", _n9, lambda: b"x\r\ny\r\n") == "eol", "")
+        check("[-9] S1 rung `relocate` — ours is base rewritten through the map",
+              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+                                    lambda: b"see scripts/demo/x\n") == "relocate", "")
+        check("[-9] S5 WHOLE-FILE equality decides: one residual byte and NO rung matches",
+              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+                                    lambda: b"see scripts/demo/x\nMINE\n") is None, "")
+        check("[-9] F2 a ladder and not a lattice: `relocate` AND `eol` together prove nothing",
+              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+                                    lambda: b"see scripts/demo/x\r\n") is None, "")
+        check("[-9] S1 an unreadable `ours` yields no rung rather than a guessed one",
+              GK9.derive_carry_rung(b"x\n", _n9, lambda: None) is None, "")
+
+        def _boom9():
+            """The thunk this arm must never call. It RETURNS rather than raising, deliberately:
+            an exception here takes the whole harness down at this line instead of failing one arm,
+            and the arms below it then report nothing at all. Measured, staging the eager read: the
+            raising form exited 1 with a traceback and 30 later arms never ran. These bytes prove a
+            DIFFERENT rung, so a read that happens is visible as a red rather than as a crash."""
+            return b"x\r\ny\r\n"
+
+        check("[-9] S1 `verbatim` is settled from the oids — a byte-identical row pays no blob read",
+              GK9.derive_carry_rung(b"x\ny\n", _n9, _boom9, known_equal=True) == "verbatim", "")
+
+        # ---- S6's transformation, per rung. Two of the three are no-ops, which the engine says at
+        # ---- the site rather than leaving a reader to infer; these arms pin which is which.
+        check("[-9] S6 `relocate` applied to gov's bytes lands them in the target's spelling",
+              GK9.derive_carried_by_rung("relocate", b"see tools/demo/x\n", _n9)
+              == b"see scripts/demo/x\n", "")
+        check("[-9] S6 `eol` normalises gov's own bytes, a no-op wherever gov ships LF",
+              GK9.derive_carried_by_rung("eol", b"a\r\nb\n", _n9) == b"a\nb\n"
+              and GK9.derive_carried_by_rung("eol", b"a\nb\n", _n9) == b"a\nb\n", "")
+        check("[-9] S6 no rung leaves the bytes exactly as gov shipped them",
+              GK9.derive_carried_by_rung(None, b"see tools/demo/x\n", _n9)
+              == b"see tools/demo/x\n", "")
+
+        # ---- S2, AS A GATE RATHER THAN A DISCIPLINE. "No branch in either verb may read a stored
+        # ---- `carry`" is a claim about SOURCE, and a behavioural arm can only ever show that ONE
+        # ---- fixture's stored value went unread. This parses the engine and asserts that the only
+        # ---- name a `carry` is ever read off is the LIVE classification `classify_row` just
+        # ---- returned. WHAT IT DOES NOT CHECK: `pop` is counted as a write, because the engine
+        # ---- drops a stale value rather than consuming it — an arm cannot tell those apart from
+        # ---- the call shape alone, and the behavioural AC7 arms below cover the consuming case.
+        import ast as _ast9  # noqa: PLC0415
+        _src9 = (HERE / "govkit.py").read_text(encoding="utf-8")
+        _readers9: set[str] = set()
+        _writes9 = 0
+        for _node in _ast9.walk(_ast9.parse(_src9)):
+            if (isinstance(_node, _ast9.Call) and isinstance(_node.func, _ast9.Attribute)
+                    and _node.func.attr in ("get", "pop") and _node.args
+                    and isinstance(_node.args[0], _ast9.Constant)
+                    and _node.args[0].value == "carry"):
+                if _node.func.attr == "pop":
+                    _writes9 += 1
+                elif isinstance(_node.func.value, _ast9.Name):
+                    _readers9.add(_node.func.value.id)
+                else:
+                    _readers9.add("<expression>")
+            elif (isinstance(_node, _ast9.Subscript) and isinstance(_node.slice, _ast9.Constant)
+                    and _node.slice.value == "carry"):
+                if isinstance(_node.ctx, _ast9.Store):
+                    _writes9 += 1
+                elif isinstance(_node.value, _ast9.Name):
+                    _readers9.add(_node.value.id)
+                else:
+                    _readers9.add("<expression>")
+        check("[-9] S2 the engine really writes `carry` back onto rows, so this arm has a population",
+              _writes9 >= 3, f"{_writes9} write site(s)")
+        check("[-9] S2 the ONLY name a `carry` is read off is the live classification, never a row",
+              _readers9 == {"c"}, str(sorted(_readers9)))
+
+        # ---- THE END-TO-END FIXTURE. A scratch gov whose kit the target installed at a DIFFERENT
+        # ---- prefix, because every criterion below is about what `update` does to a real receipt
+        # ---- over a real index. Both sides of every rung are AUTHORED literals: deriving the
+        # ---- target's bytes by calling the substituter would make `ours == derive_carried(base)` a
+        # ---- tautology and every relocate arm would pass against a broken map.
+        _MOVED_A = ("tools/demo/moved.txt line 1\ntools/demo/moved.txt line 2\n"
+                    "tools/demo/moved.txt line 3\ntools/demo/moved.txt line 4\n"
+                    "tools/demo/moved.txt line 5\n")
+        _MOVED_B = ("tools/demo/moved.txt line 1\ntools/demo/moved.txt line 2\n"
+                    "GOV SEMANTIC CHANGE at tools/demo/moved.txt\ntools/demo/moved.txt line 4\n"
+                    "tools/demo/moved.txt line 5\n")
+        _MOVED_T = ("scripts/demo/moved.txt line 1\nscripts/demo/moved.txt line 2\n"
+                    "scripts/demo/moved.txt line 3\nscripts/demo/moved.txt line 4\n"
+                    "scripts/demo/moved.txt line 5\n")
+        # AC3's row, and the reason the whole design is a PROOF gate rather than a rewrite. `bash
+        # tools/land.sh` names no prefix at all, and `my tools/demo` is a directory the fixture
+        # BUILDS — the write-time alternative corrupts both. Re-opened at ce5dca99 in this tree's own
+        # `tools/unattended/adopt-unattended.test.sh`: four `bash tools/land.sh` lines at 34, 63, 83
+        # and 91, and the `my tools/unattended` construction at 132-133.
+        _HAZ_G = ("run bash tools/land.sh\nrun bash tools/land.sh\n"
+                  "mkdir 'my tools/demo'\nsee tools/demo/hazard.txt\n")
+        _HAZ_T = ("run bash tools/land.sh\nrun bash tools/land.sh\n"
+                  "mkdir 'my tools/demo'\nsee scripts/demo/hazard.txt\n")
+        _GOV9 = {
+            "tools/demo/plain.txt": b"plain one\nplain two\n",
+            "tools/demo/crlf.txt": b"c one\nc two\n",
+            "tools/demo/pathy.txt": b"see tools/demo/pathy.txt\nand tools/demo/other\n",
+            "tools/demo/moved.txt": _MOVED_A.encode(),
+            "tools/demo/gone.txt": b"gone refers to tools/demo/gone.txt\n",
+            "tools/demo/hazard.txt": _HAZ_G.encode(),
+            "tools/demo/binary.bin": b"\xff\xfe\x00tools/demo\x00",
+            "tools/top.txt": b"top level\n",
+            "tools/amb/a.txt": b"a\n",
+            "tools/amb/b.txt": b"b\n",
+        }
+        # (target path, gov source, the target's OWN bytes, the rung those two must prove)
+        _ROWS9 = [
+            ("scripts/demo/plain.txt", "tools/demo/plain.txt", b"plain one\nplain two\n",
+             "verbatim"),
+            ("scripts/demo/crlf.txt", "tools/demo/crlf.txt", b"c one\r\nc two\r\n", "eol"),
+            ("scripts/demo/pathy.txt", "tools/demo/pathy.txt",
+             b"see scripts/demo/pathy.txt\nand scripts/demo/other\n", "relocate"),
+            ("scripts/demo/moved.txt", "tools/demo/moved.txt", _MOVED_T.encode(), "relocate"),
+            ("scripts/demo/gone.txt", "tools/demo/gone.txt",
+             b"gone refers to scripts/demo/gone.txt\n", None),
+            ("scripts/demo/hazard.txt", "tools/demo/hazard.txt", _HAZ_T.encode(), None),
+            ("scripts/demo/binary.bin", "tools/demo/binary.bin", b"\xff\xfe\x00LOCAL\x00", None),
+            ("data/top.txt", "tools/top.txt", b"top level\n", "verbatim"),
+            ("one/a.txt", "tools/amb/a.txt", b"a\n", "verbatim"),
+            ("two/b.txt", "tools/amb/b.txt", b"b\n", "verbatim"),
+        ]
+        GONE9 = "scripts/demo/gone.txt"
+        HAZ9 = "scripts/demo/hazard.txt"
+        MOV9 = "scripts/demo/moved.txt"
+        PATH9 = "scripts/demo/pathy.txt"
+
+        def carry_gov(name: str) -> pathlib.Path:
+            """A scratch gov holding the kit under `tools/`, plus a copy of the engine to run it."""
+            g = tmp / f"{name}-gov"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+            (g / "tools" / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+                '[check]\nnone = "a fixture kit"\n\n'
+                '[[files]]\ninclude = ["*.txt"]\nrole = "engine"\n\n'
+                '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
+            for rel, data in _GOV9.items():
+                p = g / rel
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(data)
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def carry_target(g: pathlib.Path, name: str, mutate=None) -> pathlib.Path:
+            """The target, installed at a DIFFERENT prefix, hand-built rather than applied.
+
+            `apply` cannot produce this state: it lands gov's own bytes at gov's own spelling, and
+            what is under test is where an adopter ends up after installing at a `prefix` gov does
+            not use. The receipt is therefore AUTHORED — schema 3, `gov_oid` from gov's real blob at
+            A so `-7` S9's preamble accepts it, and `oid` from the target's own index.
+            """
+            t = tmp / name
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "scripts"\nkits = ["demo"]\n',
+                encoding="utf-8", newline="\n")
+            for path, _src, data, _rung in _ROWS9:
+                p = t / path
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(data)
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "the relocated install")
+            # AC9's deletion is COMMITTED on purpose: `-12` S4 calls a STAGED deletion dirty and
+            # refuses the run at its step 2, so the `missing` cell could never be reached over one.
+            # A path absent from the index, the worktree AND HEAD falls outside that definition.
+            (t / GONE9).unlink()
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "the operator deleted a carried row, and committed it")
+            A = gout(g, "rev-parse", "HEAD").strip()
+            idx = {}
+            for ln in gout(t, "ls-files", "-s").splitlines():
+                meta, path = ln.split("\t", 1)
+                idx[path] = meta.split()[1]
+            rec = {"schema": 3, "gov_source": "local", "gov_commit": A, "kits": ["demo"],
+                   "files": [{"path": path, "source": src, "role": "engine", "kit": "demo",
+                              "written": True, "commit": A,
+                              "gov_oid": GK9.blob_oid(_GOV9[src]), "oid": idx.get(path),
+                              "sha256": GK9._sha(data)}
+                             for path, src, data, _rung in _ROWS9]}
+            if mutate is not None:
+                mutate(rec)
+            (t / ".governance" / "install.json").write_text(
+                json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "the receipt")
+            return t
+
+        def carry_advance(g: pathlib.Path) -> str:
+            """Gov moves ONE file, semantically, under a target that is holding the relocation."""
+            (g / "tools" / "demo" / "moved.txt").write_bytes(_MOVED_B.encode())
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "B")
+            return gout(g, "rev-parse", "HEAD").strip()
+
+        def carry_update(g: pathlib.Path, t: pathlib.Path, *extra):
+            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+                                   "update", "--target", str(t), *extra],
+                                  capture_output=True, text=True)
+
+        g9 = carry_gov("c9")
+        A9 = gout(g9, "rev-parse", "HEAD").strip()
+        t9 = carry_target(g9, "c9-t")
+        B9 = carry_advance(g9)
+
+        # ---- THE FIXTURE'S OWN PRECONDITIONS, asserted BEFORE anything runs over it. A fixture that
+        # ---- does not trigger the rule proves nothing, and two of these rules are triggered by
+        # ---- state rather than by an edit.
+        check("[-9] the fixture's gov copy really MOVED between the two vintages",
+              gout(g9, "rev-parse", f"{A9}:tools/demo/moved.txt").strip()
+              != gout(g9, "rev-parse", f"{B9}:tools/demo/moved.txt").strip(),
+              gout(g9, "rev-parse", f"{A9}:tools/demo/moved.txt"))
+        check("[-9] the deleted row is absent from the target's index, worktree AND HEAD",
+              GONE9 not in gout(t9, "ls-files").split() and not (t9 / GONE9).exists()
+              and GONE9 not in gout(t9, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
+        check("[-9] the target really installed at a prefix gov does not use",
+              all(not p.startswith("tools/") for p, _s, _d, _r in _ROWS9), "")
+
+        # ---- AC1, restated over the fixture this file BUILDS rather than over inCMS's 52 rows.
+        # ---- `classify_row` is driven directly, through the derivation's own output, and the rung
+        # ---- it returns per row is compared against the rung the fixture was AUTHORED to prove —
+        # ---- so the arm grades the ladder against a table written beside the bytes rather than
+        # ---- against a count copied out of a document.
+        _rows9 = json.loads(
+            (t9 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]
+        _idx9, _ = GK9.index_read(t9, [r["path"] for r in _rows9])
+        _nd9, _pd9, _dd9 = GK9.derive_carry_map(
+            [(r.get("source"), r.get("path")) for r in _rows9])
+        _got9 = {r["path"]: GK9.classify_row(g9, t9, r, B9, _idx9, _nd9).get("carry")
+                 for r in _rows9}
+        _want9 = {path: rung for path, _s, _d, rung in _ROWS9}
+        check("[-9] AC1 the fixture spans every rung AND a row that proves none, or it grades nothing",
+              set(_want9.values()) == {"verbatim", "eol", "relocate", None},
+              str(sorted(str(v) for v in set(_want9.values()))))
+        check("[-9] AC1 classify_row returns the rung the fixture was authored to prove, per row",
+              _got9 == _want9,
+              str({k: (v, _want9[k]) for k, v in _got9.items() if v != _want9.get(k)}))
+        # MEASURED over this fixture and reported as measured: 4 verbatim, 1 eol, 2 relocate, 3 with
+        # no rung at all. inCMS's 21/6/5 belong to S13's committed receipt, which is not in this tree.
+        _dist9 = {k: sum(1 for v in _got9.values() if v == k)
+                  for k in ("verbatim", "eol", "relocate", None)}
+        check("[-9] AC1 the measured distribution here is 4 verbatim, 1 eol, 2 relocate, 3 delta",
+              _dist9 == {"verbatim": 4, "eol": 1, "relocate": 2, None: 3}, str(_dist9))
+
+        # ---- AC2's by-name half, on a RUN rather than on the helper: S7 says the drop is PRINTED,
+        # ---- because a silently collapsed map is indistinguishable from a target that relocated
+        # ---- nothing, and that is the failure mode that would waste the most time.
+        _ro9 = carry_update(g9, t9)
+        check("[-9] AC2 the run names the dropped ambiguous gov directory and both destinations",
+              "DROPPED the ambiguous gov directory 'tools/amb'" in _ro9.stdout
+              and "one, two" in _ro9.stdout, _ro9.stdout[:1200])
+        check("[-9] S7 ...and prints the pair count and the needle count it derived on this run",
+              "carry map: 2 directory pair(s), 3 needle(s)" in _ro9.stdout, _ro9.stdout[:1200])
+        check("[-9] S7 the printed counts are the derivation's own output, not a second spelling",
+              (len(_pd9), len(_nd9)) == (2, 3), f"{len(_pd9)} pair(s), {len(_nd9)} needle(s)")
+
+        # ---- S10: the label. `("differs","equal")` grids to `patched`, which is a LIE for a carried
+        # ---- row — the target edited nothing, it installed somewhere else.
+        check("[-9] S10 a carried row whose gov copy did not move prints `carried (relocate)`",
+              verdict_of(_ro9.stdout, PATH9) == "carried (relocate)", _ro9.stdout)
+        check("[-9] S10 ...and an `eol` row prints `carried (eol)` rather than `patched`",
+              verdict_of(_ro9.stdout, "scripts/demo/crlf.txt") == "carried (eol)", _ro9.stdout)
+        check("[-9] S10 ...while a row proving NO rung keeps exactly the verdict it already had",
+              verdict_of(_ro9.stdout, HAZ9) == "patched"
+              and verdict_of(_ro9.stdout, "scripts/demo/binary.bin") == "patched", _ro9.stdout)
+        check("[-9] S9 a proven rung moves no row onto the raw-write arm",
+              verdict_of(_ro9.stdout, PATH9) not in GK9.RAW_WRITE_VERDICTS
+              and verdict_of(_ro9.stdout, MOV9) == "diverged", _ro9.stdout)
+
+        # ---- AC8 + AC5: the RECONCILE. Red observed on this very fixture with the pre-unit engine —
+        # ---- the three-way took an un-carried base, every line naming a path read as an operator
+        # ---- edit, the merge conflicted, the run exited 1 and the file was left untouched.
+        _w9 = carry_update(g9, t9, "--write")
+        # AC3's evidence is CAPTURED HERE, before anything commits. Its arms read further down, and
+        # a `git diff HEAD` asked after the `settle` below is clean whether that run wrote the row
+        # or not — the settle committed it either way. Measured: staged with `patched` on the raw
+        # arm, the byte arm redded and the diff arm did not, which is a check that cannot fail.
+        _haz_bytes9 = (t9 / HAZ9).read_bytes()
+        _haz_diff9 = subprocess.run(
+            ["git", "-C", str(t9), "diff", "HEAD", "--exit-code", "--", HAZ9],
+            capture_output=True).returncode
+        check("[-9] AC8 the write run exits 0 — the carried row reconciles rather than conflicting",
+              _w9.returncode == 0, _w9.stdout[-1400:] + _w9.stderr[-800:])
+        _mi9 = gout(t9, "ls-files", "-s", "--", MOV9).split()[1]
+        _mb9 = subprocess.run(["git", "-C", str(t9), "cat-file", "blob", _mi9],
+                              capture_output=True).stdout
+        check("[-9] AC8 the TARGET's index blob for that row spells its own `scripts/` prefix",
+              b"scripts/demo/moved.txt" in _mb9 and b"tools/demo/moved.txt" not in _mb9,
+              repr(_mb9))
+        check("[-9] AC5 ...and carries gov's semantic change — asserted on CONTENT, never on rc",
+              b"GOV SEMANTIC CHANGE at scripts/demo/moved.txt" in _mb9, repr(_mb9))
+        check("[-9] AC5 ...and every untouched line came through at the target's spelling",
+              _mb9 == _MOVED_B.encode().replace(b"tools/demo", b"scripts/demo"), repr(_mb9))
+        _rec9 = json.loads((t9 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _rowm = [f for f in _rec9["files"] if f["path"] == MOV9][0]
+        check("[-9] S12 the reconciled row's `oid` is the blob the target now holds",
+              _rowm.get("oid") == _mi9, str(_rowm)[:300])
+        check("[-9] S12 ...and `gov_oid` is GOV's own blob at the advanced commit, not the merge",
+              _rowm.get("gov_oid") == GK9.blob_oid(_MOVED_B.encode())
+              and _rowm.get("commit") == B9, str(_rowm)[:300])
+
+        # ---- AC9: the DELETED carried row, restored. Red observed: the file came back as
+        # ---- `gone refers to tools/demo/gone.txt`, gov's prefix in a target that does not use it.
+        _gb9 = (t9 / GONE9).read_bytes()
+        check("[-9] AC9 a `missing` carried row is restored in the CARRIED form",
+              _gb9 == b"gone refers to scripts/demo/gone.txt\n", repr(_gb9))
+        check("[-9] AC9 ...and spells gov's own prefix nowhere", b"tools/" not in _gb9, repr(_gb9))
+        _gi9 = gout(t9, "ls-files", "-s", "--", GONE9).split()[1]
+        check("[-9] AC9 ...and its index blob is NOT gov's blob for that source",
+              _gi9 != GK9.blob_oid(_GOV9["tools/demo/gone.txt"]), _gi9)
+
+        # ---- AC10: THE STAMP the restore leaves, both halves together. This is the arm that fails
+        # ---- against a draft writing the carried bytes and then taking `-8`'s raw-arm stamp: the
+        # ---- two identities come back EQUAL over bytes gov never shipped, and the NEXT run reads
+        # ---- that row as clean and raw-overwrites it straight back to `tools/`.
+        _rowg = [f for f in _rec9["files"] if f["path"] == GONE9][0]
+        check("[-9] AC10 the restored row records `carry: relocate`",
+              _rowg.get("carry") == "relocate", str(_rowg)[:300])
+        check("[-9] AC10 ...`oid` is the blob the target's index actually holds",
+              _rowg.get("oid") == _gi9, str(_rowg)[:300])
+        check("[-9] AC10 ...`gov_oid` is gov's blob at the row's own commit",
+              _rowg.get("gov_oid") == GK9.blob_oid(_GOV9["tools/demo/gone.txt"])
+              and _rowg.get("commit") == B9, str(_rowg)[:300])
+        check("[-9] AC10 ...so the two identities DIFFER, which reads `this row carries a rung`",
+              _rowg.get("oid") != _rowg.get("gov_oid"), str(_rowg)[:300])
+        # THE SECOND RUN is what the stamp is FOR, so it is exercised rather than argued.
+        settle(t9, "after the carried update")
+        _w9b = carry_update(g9, t9, "--write")
+        check("[-9] AC10 the NEXT run re-proves the rung from the blobs and does not revert it",
+              _w9b.returncode == 0
+              and (t9 / GONE9).read_bytes() == b"gone refers to scripts/demo/gone.txt\n",
+              _w9b.stdout[-1200:] + repr((t9 / GONE9).read_bytes()))
+        check("[-9] AC10 ...and reports it as carried rather than as a local delta",
+              verdict_of(_w9b.stdout, GONE9) == "carried (relocate)", _w9b.stdout)
+
+        # ---- AC3: the row that must NEVER be written. A build that "fixes" this one has
+        # ---- re-introduced the write-time alternative §4 rejects.
+        check("[-9] AC3 the fixture triggers the hazard: the map DOES reach lines naming no prefix",
+              b"bash data/land.sh" in GK9.derive_carried(_HAZ_G.encode(), _nd9)
+              and b"my scripts/demo" in GK9.derive_carried(_HAZ_G.encode(), _nd9),
+              repr(GK9.derive_carried(_HAZ_G.encode(), _nd9)))
+        check("[-9] AC3 the hazard row proves NO rung", _got9[HAZ9] is None, str(_got9[HAZ9]))
+        check("[-9] AC3 ...and its bytes are unchanged after `update --write`",
+              _haz_bytes9 == _HAZ_T.encode(), repr(_haz_bytes9))
+        check("[-9] AC3 ...with nothing to diff against HEAD over that path, on that same run",
+              _haz_diff9 == 0, f"git diff HEAD exited {_haz_diff9}")
+
+        # ---- AC7: a STORED `carry` is never read. The value is planted on the row that provably
+        # ---- matches NO rung, so believing it would be visible in one line of output.
+        def _plant7(rec: dict) -> None:
+            for f in rec["files"]:
+                if f["path"] == HAZ9:
+                    f["carry"] = "relocate"
+
+        g7 = carry_gov("c9-ac7")
+        t7 = carry_target(g7, "c9-ac7-t", mutate=_plant7)
+        _r7 = json.loads((t7 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-9] AC7 the fixture really carries a hand-written `carry` on a no-rung row",
+              [f for f in _r7["files"] if f["path"] == HAZ9][0].get("carry") == "relocate", "")
+        _a7 = carry_update(g7, t7, "--write")
+        check("[-9] AC7 that row still classifies as a local delta, never as carried",
+              verdict_of(_a7.stdout, HAZ9) == "patched", _a7.stdout)
+        _r7b = json.loads((t7 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-9] AC7 ...and the stale value is DROPPED from the receipt rather than believed",
+              "carry" not in [f for f in _r7b["files"] if f["path"] == HAZ9][0],
+              str([f for f in _r7b["files"] if f["path"] == HAZ9][0]))
+        check("[-9] AC7 ...and the receipt still reads schema 3 — this unit moves no schema number",
+              _r7b.get("schema") == 3 == GK9.RECEIPT_SCHEMA, str(_r7b.get("schema")))
+        for _sch9 in (1, 2):
+            def _older(rec: dict, _s=_sch9) -> None:
+                rec["schema"] = _s
+                for f in rec["files"]:
+                    f.pop("gov_oid", None)
+                    f.pop("oid", None)
+
+            _go = carry_gov(f"c9-s{_sch9}")
+            _to = carry_target(_go, f"c9-s{_sch9}-t", mutate=_older)
+            _ao = carry_update(_go, _to)
+            check(f"[-9] AC7 a schema-{_sch9} receipt still classifies without a refusal",
+                  _ao.returncode != 2 and "REFUSING" not in _ao.stderr, _ao.stderr[:400])
+            check(f"[-9] AC7 ...and its carried row is still recognised as carried (schema {_sch9})",
+                  verdict_of(_ao.stdout, PATH9) == "carried (relocate)", _ao.stdout)
+
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
     # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written

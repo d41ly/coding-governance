@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-8 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-9 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-9-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-9-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
@@ -95,7 +96,13 @@ to the carried bytes with no operator turn (S9), and what the row is stamped wit
   bytes are not gov's. Taking the un-narrowed stamp is the corrupt pairing: two identities recorded
   EQUAL over bytes gov never shipped, which the next run reads as a clean gov-owned row and
   raw-overwrites back to gov's prefix.
-- **S13** — the inCMS-derived fixture is COMMITTED, not reconstructed per run: a checked-in receipt
+- **S13 — DEFERRED at rev-9, not buildable from this tree.** It asks for a committed receipt of
+  the 52 rows measured at inCMS `2cff5855`, and that repository is not reachable from here, so no
+  run in this tree can generate it. What S13 was ADDED for is met — round 5's M3 found AC1 and AC2
+  running on a fixture no scope item created, and there is now a fixture with an owner, authored in
+  `selftest.py` and asserted to trigger each rung it grades. What is NOT met is that the fixture be
+  the inCMS-derived one, so AC1's and AC2's figures are the synthetic fixture's and are MEASURED
+  rather than inherited. The original text follows, for whoever builds it where inCMS is reachable:
   JSON of the 52 rows measured at inCMS `2cff5855` against gov `9ddcc5c9`, generated once by a
   script recorded beside it, so AC1's and AC2's counts are re-runnable without either live target.
 
@@ -344,6 +351,17 @@ staying untouched in the diff is itself the assertion.
 
 ## 9. Revision log
 
+- rev-9 · 2026-08-25 · built. S13 is DEFERRED: the inCMS-derived fixture cannot be generated from
+  this tree, so AC1 and AC2 run over a synthetic fixture whose distribution is MEASURED (4 verbatim
+  / 1 eol / 2 relocate / 3 no rung) rather than over the spec's 21/6/5, which belong to S13's
+  fixture and are reproduced nowhere. AC2's `13` pairs and `26` needles were NOT asserted anywhere:
+  the spec already disclaimed them, and building DERIVED that `26` is wrong even over the 86-row
+  population — the `/` and `~` forms of a gov directory carrying no slash are the SAME string, and
+  §4's own Inventory says `tools` survives as a single pair, so 13 pairs cannot yield 26 distinct
+  needles. `-13` must re-derive rather than inherit either figure. Also corrected: §5's "No new
+  subprocess" is wrong — `eol` is a question about bytes, so a row whose index blob is not gov's
+  own now pays one `git cat-file`; the code says so at the site. And AC8's predicted red describes
+  `9ddcc5c9` and is unreachable on `-8`'s tip, the same correction `-8`'s own ledger recorded.
 - rev-8 · 2026-08-25 · round-6 fold: L5 — §10's reuse audit still summarised the derivation as
   reading the RECEIPT, after rev-7 rewrote S3 to take a SEQUENCE OF PAIRS because it has two
   callers. The polarity was reversed by that fold rather than pre-existing it, so the two
