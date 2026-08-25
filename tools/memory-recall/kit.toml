@@ -65,3 +65,17 @@ guard = []
 [[lf_pin]]
 pattern = ".claude/skills/memory-recall/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"
+
+# DEPL-dCarriedReceipt-10 S7 — the three sources gov FORKED from inCMS rather than authoring.
+# Each carries a `FORKED from` header naming its upstream and the width of the divergence, and each
+# would be DESTROYED by an ordinary `engine` update: gov's copy imports `recall_conf`, which the
+# adopter's tree does not have, so copying gov's bytes over the adopter's fork is a live
+# ModuleNotFoundError. Reproduced against a real inCMS checkout at DEPL-dCarriedReceipt-10 AC1.
+#
+# `forked` is report-only and written in NEITHER direction. The role is a claim this RULE makes and
+# is re-read here on every run, never inferred from what an attribution walk found.
+[[files]]
+include = ["extract.py", "query.py", "recall-opened.js"]
+role = "forked"
+direction = "gov-from-target"
+record = "TOOL-aQuarriedLantern-1"

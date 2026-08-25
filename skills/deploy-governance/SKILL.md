@@ -43,7 +43,9 @@ Read-only. Lists every destination the install TOUCHES, one row per path, with i
 the source commit, and leaves the target byte-identical. **Only a `write` row says govkit puts bytes
 there.** `SIDE` means a step `apply` runs produces it, `ORDER` means something outside `apply` must
 supply it, `COVER` means a sibling rule writes that same path, `BLOCK` means `apply` refuses the
-install over it, and `UNRES.` means the destination still carries an unanswered token and is not a
+install over it, `FORK` means gov's own copy is a DERIVATIVE of the target's — reported in
+both directions and written in NEITHER — and `UNRES.` means the destination still carries an
+unanswered token and is not a
 path. The legend prints above the rows. Read it before applying — this is the last cheap moment to
 notice a destination you did not expect, and the last cheap moment to notice one you expected and are
 not getting.

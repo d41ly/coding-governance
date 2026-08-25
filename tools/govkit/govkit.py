@@ -239,6 +239,12 @@ UNLANDED_REASON = {
     "generated": "produced in the target by its own tooling, never carried across",
     "rendered": "written by this kit's own adopter; a second renderer would race the real one",
     "merged": "a gov-owned region inside a target-owned file — no writer exists yet",
+    # DEPL-dCarriedReceipt-10 S3. gov's copy is a DERIVATIVE of the target's, so gov's bytes are
+    # wrong for that target BY CONSTRUCTION and are wrong there whether or not the target's own copy
+    # is absent. This line is what makes `selfcheck` arm 7g demand an `UPDATE_ROLE` row for the role
+    # without that demand being written a second time: 7g's `known_roles` is built from this table.
+    "forked": "gov's copy is a derivative of the target's — gov keeps these bytes for itself and "
+              "has no right to send them; reported in both directions, written in neither",
 }
 
 
@@ -628,6 +634,84 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 r.fail(f"entry '{eid}' declares role '{role}', which is not in ROLE_KINDS "
                        f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
                        f"table, so an unlisted role has no defined outcome in either verb")
+
+    # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
+    #          closed enum. DEPL-dCarriedReceipt-10 S5.
+    #
+    #          THE DEMAND IS ON THE DESCRIPTOR AND NOWHERE ELSE. A receipt row is READ by `update`'s
+    #          report printer and is never validated by it, because that printer keys on the
+    #          RECEIPT's role and therefore meets rows this unit never wrote. Required on write,
+    #          tolerated on read — the refusal lives where an operator can fix it, which is the rule
+    #          file, not somebody else's installed target.
+    #
+    #          Neither key defaults. An unstated direction is the same silence `version_from`
+    #          already refuses, and a fork with no ratifying record is a fork nobody agreed to.
+    #          `direction` is a LABEL on a report: nothing in either verb branches on its value, and
+    #          the enum exists so two descriptors cannot spell one answer two ways for the human who
+    #          reads it.
+    #
+    #          WHAT THIS DOES NOT CHECK: whether the file IS a fork. That is a claim about
+    #          provenance which no predicate over a descriptor can settle — this arm grades whether
+    #          the claim is stated completely, never whether it is true.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            if rule.get("role") != "forked":
+                continue
+            direction = rule.get("direction")
+            if not direction:
+                r.fail(f"entry '{eid}' declares a `forked` rule with no `direction` — a fork that "
+                       f"does not say which way the derivation runs tells the next reader nothing "
+                       f"about whose bytes are authoritative. Declare one of "
+                       f"{', '.join(FORK_DIRECTIONS)}")
+            elif direction not in FORK_DIRECTIONS:
+                r.fail(f"entry '{eid}' declares a `forked` rule with direction '{direction}', which "
+                       f"is outside the closed set {', '.join(FORK_DIRECTIONS)} — a free-form "
+                       f"direction is a field two descriptors spell two ways, and this one is read "
+                       f"by a person deciding whether to touch the file")
+            if not str(rule.get("record") or "").strip():
+                r.fail(f"entry '{eid}' declares a `forked` rule with no `record` — name the id that "
+                       f"ratified the fork. A fork nobody agreed to is a local edit wearing a role")
+
+    # ---- 3d: a kit source whose HEAD declares `FORKED from` is claimed by a `forked` rule.
+    #          DEPL-dCarriedReceipt-10 S6. The header is the author's own statement that gov's
+    #          copy is a derivative of somebody else's file; this arm makes that statement bind a
+    #          role, so the class is gated rather than the three instances fixed. Landing it
+    #          without S7 would red gov's own registry on the first run, which is why the spec
+    #          requires the same commit.
+    #
+    #          KEYED ON `rule_sources`, NOT REPO-WIDE, and the difference is measured: a repo-wide
+    #          grep returns FOUR files, and the fourth is gov's own `.claude/hooks/recall-opened.js`,
+    #          which NO descriptor claims as a destination. A repo-wide predicate would demand a
+    #          `forked` declaration from an entry that does not own the path and red gov for its
+    #          own hand-wired hook.
+    #
+    #          THE HEAD IS BOUNDED. A `FORKED from` deep inside a file is prose about something
+    #          else -- this repo's own specs and records discuss the header constantly -- and an
+    #          unbounded scan would grade them. The declaration is a header or it is not one.
+    FORK_HEADER_BYTES = 800
+    for eid, (d, _dpath) in descs.items():
+        _fctx = canonical_ctx(eid)
+        _fhome = (d.get('home') or '').rstrip('/')
+        for rule in d.get('files', []):
+            # THE EXPANDED POOL, not `rule_sources`. `rule_sources` skips any include carrying a glob
+            # character, and the rule that would swallow an undeclared fork is exactly the `**` one --
+            # so an arm keyed on it grades only literal includes and cannot fail on the case it exists
+            # for. Observed: undeclaring `extract.py` left selfcheck GREEN.
+            for src in resolve_rule_pool(root, d, rule, _fctx, _fhome):
+                sp = root / src
+                if not sp.is_file():
+                    continue
+                try:
+                    head = sp.read_bytes()[:FORK_HEADER_BYTES].decode('utf-8', 'replace')
+                except OSError:
+                    continue
+                if 'FORKED from' not in head:
+                    continue
+                if rule.get('role') != 'forked':
+                    r.fail(f"'{src}' declares `FORKED from` in its head but entry '{eid}' claims "
+                           f"it with role '{rule.get('role')}' — a forked source landed as an "
+                           f"engine row is overwritten by gov's copy on the next update, and the "
+                           f"target's own divergence is destroyed. Declare the rule `forked`")
 
     # ---- 4: no two file rules across the whole registry write the SAME destination.
     #         One source reaching two destinations is legal; two sources contending for one is not.
@@ -1299,6 +1383,18 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
 # a `.gitattributes` block or performs the renormalize that follows it — and `cmd_apply` refuses the
 # whole install over one. `rendered`/`generated` map to `side-effect` because a step `apply` runs
 # produces them; whether such a step EXISTS is a per-entry question and `derive_rule_kind` asks it.
+# `forked` maps to a kind of its OWN — DEPL-dCarriedReceipt-10 S1 — and reusing `blocked` was
+# rejected on two measured grounds rather than on taste. `planned_writes` previews a `blocked` rule
+# from `rule_destinations` alone and never from the source pool, so a forked rule derived from a `**`
+# include with no `to` would preview NOTHING; and `SKIP_REASONS["blocked"]` is a sentence about
+# gov-owned regions inside target-owned files, which is `merged`'s situation and is false of a fork.
+# The forked kind previews from the pool like every non-blocked role, prints its own mark, and
+# carries its own reason.
+#
+# WHAT `forked` IS, because the name invites the wrong reading: it is a claim the DESCRIPTOR RULE
+# makes about a file's PROVENANCE — gov's copy is derived from the target's — and it is re-read from
+# that rule on every run. It is never inferred from what an attribution walk found, and no
+# measurement of bytes can promote a row to it or demote a row out of it.
 ROLE_KINDS = {
     "engine": "write",
     "seed": "write",
@@ -1306,7 +1402,22 @@ ROLE_KINDS = {
     "generated": "side-effect",
     "project-owned": "order",
     "merged": "blocked",
+    "forked": "forked",
 }
+
+#: The closed enum a `forked` rule's `direction` is drawn from (DEPL-dCarriedReceipt-10 §8 F1). A
+#: free string is a field two descriptors spell two ways, and the value is read by a human deciding
+#: whether to touch the file. It is a LABEL on a report and never an instruction: nothing in either
+#: verb branches on it.
+FORK_DIRECTIONS = ("gov-from-target", "target-from-gov", "both")
+
+#: The keys a `forked` rule must declare. REQUIRED ON THE DESCRIPTOR, TOLERATED ON A RECEIPT ROW —
+#: one rule, two call sites. `selfcheck` refuses a descriptor that omits either, because that is
+#: where an operator can fix it; `update`'s printer keys on the RECEIPT's role and therefore meets
+#: rows this unit never wrote (one stamped before the role existed, one whose descriptor has since
+#: changed its keys), and a printer that raised on a missing key would convert a report into a crash
+#: on the single path that exists to avoid acting.
+FORK_RULE_KEYS = ("direction", "record")
 
 #: DERIVED, never declared beside the table. A role added with any kind other than `write` is
 #: automatically not landable and a role added as `write` is automatically landed, in BOTH verbs,
@@ -1316,7 +1427,7 @@ LANDABLE_ROLES = tuple(k for k, v in ROLE_KINDS.items() if v == "write")
 #: The plan marks, in the order `cmd_plan` prints them. Kept beside the table so a new kind cannot
 #: reach the printer without a mark.
 KIND_MARKS = {"write": "write ", "order": "ORDER ", "side-effect": "SIDE  ",
-              "covered": "COVER ", "blocked": "BLOCK "}
+              "covered": "COVER ", "blocked": "BLOCK ", "forked": "FORK  "}
 
 
 def check_entry_producer(desc: dict) -> bool:
@@ -1373,6 +1484,8 @@ SKIP_REASONS = {
     "order": "nothing in this install produces it — the target or its operator must supply it",
     "covered": "a sibling rule in this entry writes that same path in this run",
     "blocked": "no verb here can write a gov-owned region into a target-owned file",
+    "forked": "gov's copy is a derivative of this target's file — its bytes are wrong here by "
+              "construction, and that stays true when the target's own copy is absent",
 }
 
 
@@ -1502,7 +1615,8 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     # an operator has to infer is a mark that gets read as a write.
     print("govkit plan — marks: write = govkit writes it · SIDE = a step apply runs produces it · "
           "ORDER = something outside apply must supply it · COVER = a sibling rule writes that same "
-          "path · BLOCK = apply refuses the install over it · UNRES. = unresolved token, not a path")
+          "path · BLOCK = apply refuses the install over it · FORK = gov's copy is a derivative of "
+          "the target's, reported and never written · UNRES. = unresolved token, not a path")
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
@@ -1512,10 +1626,17 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     holes = [(eid, h.get("id")) for eid in selection for h in descs[eid][0].get("hole", [])]
     for eid, hid in holes:
         print(f"  ORDER  [hole         ] .governance/outbox/{hid}.md   <- {eid}")
+    # `n` is derived from KIND_MARKS and the summary HAND-NAMES its kinds, so a kind added to the
+    # table alone is counted here and never printed — measured, and DEPL-dCarriedReceipt-10 S2 is
+    # the unit that met it. The clause below is derived from the same table for that reason: every
+    # kind KIND_MARKS carries reaches the line, and a kind added tomorrow reaches it too.
     n = {k: sum(1 for x in rows if x["kind"] == k) for k in KIND_MARKS}
-    print(f"govkit plan — {n['write']} write(s), {n['side-effect']} side-effect(s), "
-          f"{n['order'] + len(holes)} order(s), {n['covered']} covered, {n['blocked']} blocked. "
-          f"NOTHING was written.")
+    named = {"write": "write(s)", "side-effect": "side-effect(s)", "order": "order(s)",
+             "covered": "covered", "blocked": "blocked", "forked": "forked"}
+    counts = {k: n[k] + (len(holes) if k == "order" else 0) for k in KIND_MARKS}
+    print("govkit plan — "
+          + ", ".join(f"{counts[k]} {named.get(k, k)}" for k in KIND_MARKS)
+          + ". NOTHING was written.")
     return r.emit()
 
 
@@ -2895,8 +3016,22 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # once, by the SKIPPED line the write path emits with the same role, destination, kit
             # and reason — printing it again here was two answers to one question in the output of
             # the verb built to end silent partial installs.
-            rows.append({"path": u["dest"], "role": u["role"], "kit": eid,
-                         "version": vers, "written": False, "source": u["src"], "why": why})
+            _row = {"path": u["dest"], "role": u["role"], "kit": eid,
+                    "version": vers, "written": False, "source": u["src"], "why": why}
+            # DEPL-dCarriedReceipt-10 S4/S5. A forked row COPIES its two keys from the RULE that
+            # produced it — the rule `resolve_entry` returned — and never from any measurement of
+            # bytes. `forked` is a claim about provenance the descriptor makes, so the receipt
+            # records what was declared and `update` re-reads the declaration on every run rather
+            # than trusting this copy. Copied with `.get` because arm 3c is the thing that demands
+            # them, and `apply` must not become a second, quieter place the same demand is written.
+            if u["role"] == "forked":
+                _rules = d.get("files", [])
+                _i = u.get("rule")
+                _rule = _rules[_i] if isinstance(_i, int) and 0 <= _i < len(_rules) else {}
+                for _k in FORK_RULE_KEYS:
+                    if _rule.get(_k):
+                        _row[_k] = _rule[_k]
+            rows.append(_row)
 
         for dest, w in sorted(res["writes"].items()):
             if w["missing"]:
@@ -3361,6 +3496,13 @@ UPDATE_ROLE = {
     "attributes": "pins",       # DEPL-dCarriedReceipt-2: recompute, compare, report; never write
     "gate-leg": "report",       # DEPL-dCarriedReceipt-2: one row each, tallied, no r.fail
     "ci": "report",             # DEPL-dCarriedReceipt-2: ditto -- `-6` owns emitting them
+    # DEPL-dCarriedReceipt-10 S4, the `report` disposition's SECOND consumer. A forked row prints
+    # one counted line and is written in NEITHER direction: gov's copy is a derivative of the
+    # target's, so sending gov's bytes over the target's is the destruction this role exists to
+    # stop, and `direction` is a LABEL on that report rather than an instruction to anything.
+    # NOT `refuse`, which `-2` exists to remove: one forked row would make every future `update` on
+    # that target exit non-zero and never re-stamp its receipt.
+    "forked": "report",
 }
 
 
@@ -3919,7 +4061,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # such row froze a target's `gov_commit` forever.
         if how == "report":
             tally[role + ":reported"] = tally.get(role + ":reported", 0) + 1
-            print(f"  {'report':<18} [{role:<13}] {row['path']}")
+            # DEPL-dCarriedReceipt-10 S4. `direction` is an OPTIONAL TRAILING FIELD on the one
+            # printed row, never a second line and never a second row — the `report` disposition's
+            # shape is `-2`'s and is not re-specified here. READ WITH `.get`, deliberately: `how` is
+            # resolved from the RECEIPT's role a few lines above, so this printer meets rows this
+            # unit never wrote — one stamped before the role existed, one whose descriptor has since
+            # changed its keys — and `row["direction"]` would raise `KeyError` on exactly those,
+            # turning the report disposition into a traceback on the one path that exists to avoid
+            # acting. The missing-key refusal is selfcheck arm 3c's, and it fires on DESCRIPTORS.
+            _dir = row.get("direction")
+            print(f"  {'report':<18} [{role:<13}] {row['path']}"
+                  + (f" · direction {_dir}" if _dir else ""))
             continue
 
         # DEPL-dCarriedReceipt-2 S2. The pins row is SYNTHESIZED by `apply`, not shipped by a kit,

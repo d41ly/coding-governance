@@ -3564,6 +3564,272 @@ user_skills = "/tmp/gk-fake-skills"
             check(f"[-9] AC7 ...and its carried row is still recognised as carried (schema {_sch9})",
                   verdict_of(_ao.stdout, PATH9) == "carried (relocate)", _ao.stdout)
 
+        # ================= DEPL-dCarriedReceipt-10 — role `forked`, report-only ==============
+        #
+        # WHAT THE ROLE IS, because every arm below turns on it: `forked` is a claim the DESCRIPTOR
+        # RULE makes about a file's PROVENANCE — gov's copy is derived from the target's — re-read
+        # from that rule on every run and NEVER inferred from what an attribution walk found. A
+        # forked row is report-only: written in NEITHER direction.
+        #
+        # THE LANDMINE THESE ARMS GATE AS A CLASS. gov's `tools/memory-recall/extract.py` is a fork
+        # of inCMS's `scripts/recall/extract.py`; it carries `import recall_conf` at its line 55 and
+        # inCMS's `scripts/` tree holds no `recall_conf` anywhere. inCMS's own `.governance/
+        # install.index` declares that file `engine`, so one automatic update writes gov's blob over
+        # it and `scripts/recall/query.py` — which that project's charter mandates every session run
+        # — dies at import with `ModuleNotFoundError`. Reproduced against both real trees, not
+        # predicted. The fix that gates the CLASS is a role that says "fork", not three excluded
+        # paths.
+        FORK_SRC = {
+            "forked-one.py": "# gov's own copy, derived from the target's\nimport gov_only\n",
+            "engine.txt": "gov A\n",
+        }
+
+        def fork_kit(direction: str | None = "gov-from-target",
+                     record: str | None = "DEPL-dCarriedReceipt-10",
+                     include: str = '["forked-one.py"]') -> str:
+            """A descriptor whose `**` engine pool has ONE source carved out by a `forked` rule.
+
+            Both keys are parameterised so the same builder produces the complete rule AND each
+            incomplete one — an arm whose negative fixture is built by different code from its
+            positive fixture is grading two descriptors rather than one omission.
+            """
+            rule = f'[[files]]\ninclude = {include}\nrole = "forked"\n'
+            if direction is not None:
+                rule += f'direction = "{direction}"\n'
+            if record is not None:
+                rule += f'record = "{record}"\n'
+            return ('id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    + rule + '\n[adopt]\nargv = []\nmutates_index = false\n')
+
+        def fork_gov(tag: str, kit_toml: str) -> pathlib.Path:
+            """A scratch gov carrying ONE `demo` entry, its sources, and a copy of the engine.
+
+            THE COPY IS TAKEN HERE, at fixture-build time. A break staged into this repo's
+            `govkit.py` AFTER the copy runs the UNPATCHED engine and the arm reports on nothing —
+            two earlier builders on this build lost time to exactly that, so it is written down
+            rather than remembered.
+            """
+            g = tmp / f"fork-{tag}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["tools/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                encoding="utf-8", newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8",
+                                                           newline="\n")
+            for rel, body in FORK_SRC.items():
+                (g / "tools" / "demo" / rel).write_text(body, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        # ---- THE FIXTURE'S OWN PRECONDITION. A fixture that does not trigger the rule proves
+        # ---- nothing, and "the descriptor declares a forked rule" is the entire premise of every
+        # ---- negative arm below.
+        _GKF = govkit_module()
+        check("[-10] the fixture descriptor really declares a rule whose role is `forked`",
+              'role = "forked"' in fork_kit(), fork_kit())
+        check("[-10] S1 `forked` is in ROLE_KINDS and maps to a kind of its own",
+              _GKF.ROLE_KINDS.get("forked") == "forked", str(_GKF.ROLE_KINDS))
+        check("[-10] S1 ...so the DERIVED LANDABLE_ROLES excludes it with no second list to remember",
+              "forked" not in _GKF.LANDABLE_ROLES, str(_GKF.LANDABLE_ROLES))
+        check("[-10] S2 the new kind has its own mark and its own skip reason",
+              "forked" in _GKF.KIND_MARKS and "forked" in _GKF.SKIP_REASONS,
+              str(sorted(_GKF.KIND_MARKS)) + " / " + str(sorted(_GKF.SKIP_REASONS)))
+        check("[-10] S2 ...and that reason is NOT `blocked`'s sentence about gov-owned regions",
+              _GKF.SKIP_REASONS["forked"] != _GKF.SKIP_REASONS["blocked"],
+              _GKF.SKIP_REASONS["forked"])
+        check("[-10] AC6 arm 7g's own enumeration reaches it: UNLANDED_REASON and UPDATE_ROLE agree",
+              "forked" in _GKF.UNLANDED_REASON and "forked" in govkit_update_role(),
+              str(sorted(govkit_update_role())))
+        check("[-10] S4 ...and its disposition is `-2`'s `report`, never a refusal",
+              govkit_update_role()["forked"] == "report", govkit_update_role().get("forked"))
+
+        # ---- S5 / AC4: the DESCRIPTOR refusals, by name. The positive fixture runs FIRST: without
+        # ---- it every negative below could be passing because the tool is broken rather than
+        # ---- because the input is bad.
+        _f_ok = run_in(fork_gov("ok", fork_kit()))
+        check("[-10] LIVENESS a complete `forked` rule is selfcheck-GREEN",
+              _f_ok.returncode == 0, _f_ok.stdout + _f_ok.stderr)
+
+        _f_nodir = run_in(fork_gov("nodir", fork_kit(direction=None)))
+        check("[-10] AC4 a `forked` rule with no `direction` reds selfcheck",
+              _f_nodir.returncode == 1, _f_nodir.stdout + _f_nodir.stderr)
+        check("[-10] AC4 ...by NAME on the missing key, not as an unknown role",
+              "`forked` rule with no `direction`" in _f_nodir.stdout, _f_nodir.stdout)
+
+        _f_baddir = run_in(fork_gov("baddir", fork_kit(direction="sideways")))
+        check("[-10] F1 a `direction` outside the closed enum reds selfcheck",
+              _f_baddir.returncode == 1, _f_baddir.stdout + _f_baddir.stderr)
+        check("[-10] F1 ...naming the closed set rather than accepting a free string",
+              "outside the closed set" in _f_baddir.stdout
+              and "gov-from-target" in _f_baddir.stdout, _f_baddir.stdout)
+
+        _f_norec = run_in(fork_gov("norec", fork_kit(record=None)))
+        check("[-10] AC4 a `forked` rule with no `record` reds selfcheck",
+              _f_norec.returncode == 1, _f_norec.stdout + _f_norec.stderr)
+        check("[-10] AC4 ...by NAME on the missing key",
+              "`forked` rule with no `record`" in _f_norec.stdout, _f_norec.stdout)
+
+        # ---- AC5: `plan` marks the forked source AND the summary COUNTS it. The second half is the
+        # ---- one the spec observed red: `n` is derived from KIND_MARKS while the summary used to
+        # ---- hand-name five kinds, so a kind added to the table alone was counted and never
+        # ---- printed. The summary clause is derived from the same table now.
+        _gp = fork_gov("plan", fork_kit())
+        _tp = make_target(tmp / "fork-plan-t",
+                          'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+        _pp = run_in_gov(_gp, "plan", "--target", str(_tp), "--kits", "demo")
+        _prows = _extract_plan_rows(_pp.stdout)
+        check("[-10] AC5 plan exits 0 over a descriptor carrying a forked rule",
+              _pp.returncode == 0, _pp.stdout + _pp.stderr)
+        check("[-10] AC5 the forked source is marked FORK, not `write`",
+              ("FORK", "tools/demo/forked-one.py") in _prows, str(_prows))
+        check("[-10] AC5 ...and no forked destination is previewed as a write",
+              "tools/demo/forked-one.py" not in extract_plan_writes(_pp.stdout),
+              str(extract_plan_writes(_pp.stdout)))
+        # `detail` IS STRINGIFIED HERE, and that is not tidiness. `check()` concatenates it onto
+        # its FAIL line, so a list argument raises `TypeError` on the failing path and takes the
+        # whole harness down instead of reporting a finding — an arm that crashes on the one
+        # outcome it exists to report. Caught by the break sweep, on the break this arm is for.
+        check("[-10] AC5 ...and the printed summary COUNTS it rather than dropping it",
+              "1 forked" in _pp.stdout,
+              str([ln for ln in _pp.stdout.splitlines() if "NOTHING was written" in ln]))
+        check("[-10] AC5 ...with the legend naming the mark it just printed",
+              "FORK = " in _pp.stdout, _pp.stdout)
+        check("[-10] S2 the `**` engine pool still ships everything the forked rule did not claim",
+              "tools/demo/engine.txt" in extract_plan_writes(_pp.stdout),
+              str(extract_plan_writes(_pp.stdout)))
+
+        # ---- AC2: `apply` then `update --write`, end to end, over a target holding its OWN copy of
+        # ---- the forked file. This is the shape the landmine has: the target's bytes are the
+        # ---- source, gov's are the derivative, and an `engine` role here destroys the target's.
+        FORK_TARGET_BYTES = "# the target's own copy — gov's is derived FROM this\nimport ok\n"
+
+        def fork_target(g: pathlib.Path, name: str) -> pathlib.Path:
+            t = make_target(tmp / name,
+                            'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+            p = t / "tools" / "demo" / "forked-one.py"
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(FORK_TARGET_BYTES, encoding="utf-8", newline="\n")
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "the target's own copy of the file gov forked")
+            return t
+
+        _ga = fork_gov("apply", fork_kit())
+        _ta = fork_target(_ga, "fork-apply-t")
+        check("[-10] the fixture triggers the rule: gov's bytes and the target's DIFFER",
+              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              != FORK_SRC["forked-one.py"], "")
+
+        _ap = run_in_gov(_ga, "apply", "--target", str(_ta), "--kits", "demo")
+        check("[-10] apply exits 0 over a descriptor carrying a forked rule",
+              _ap.returncode == 0, _ap.stdout + _ap.stderr)
+        check("[-10] apply SKIPPED the forked rule and said why, rather than skipping silently",
+              "SKIPPED [forked" in _ap.stdout and "derivative" in _ap.stdout, _ap.stdout)
+        check("[-10] apply left the target's own copy BYTE-IDENTICAL",
+              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              == FORK_TARGET_BYTES,
+              repr((_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")))
+        _reca = json.loads((_ta / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _fr = [f for f in _reca["files"] if f.get("role") == "forked"]
+        check("[-10] apply wrote ONE forked receipt row, marked unwritten",
+              len(_fr) == 1 and _fr[0].get("written") is False, str(_fr))
+        # BOTH GUARDED ON THE POPULATION, for the reason the break sweep measured: an unguarded
+        # `_fr[0]` raises `IndexError` the moment the row above it is missing, which truncates every
+        # arm below and reports their coverage as untested rather than as red.
+        check("[-10] S5 that row COPIED both keys from the rule that produced it",
+              len(_fr) == 1 and _fr[0].get("direction") == "gov-from-target"
+              and _fr[0].get("record") == "DEPL-dCarriedReceipt-10", str(_fr))
+        check("[-10] ...and carries NEITHER identity, so `-7`'s S9 preamble passes it over",
+              len(_fr) == 1 and "gov_oid" not in _fr[0] and "commit" not in _fr[0], str(_fr))
+
+        # Gov moves BOTH files. The engine row must still move — an arm where nothing updates
+        # cannot tell "the forked row was skipped" from "the whole run did nothing".
+        settle(_ta, "after apply")
+        (_ga / "tools" / "demo" / "forked-one.py").write_text(
+            "# gov's own copy, moved\nimport gov_only\nimport more_gov_only\n",
+            encoding="utf-8", newline="\n")
+        (_ga / "tools" / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
+                                                           newline="\n")
+        git(_ga, "add", "-A")
+        git(_ga, "commit", "-qm", "B")
+        _B = gout(_ga, "rev-parse", "HEAD").strip()
+
+        _up = run_in_gov(_ga, "update", "--target", str(_ta), "--write")
+        check("[-10] AC2 `update --write` exits 0 with a forked row in the receipt",
+              _up.returncode == 0, _up.stdout + _up.stderr)
+        check("[-10] AC2 ...printing ONE report line for it, naming its `direction`",
+              len([ln for ln in _up.stdout.splitlines()
+                   if ln.startswith("  report") and "[forked" in ln
+                   and "direction gov-from-target" in ln]) == 1, _up.stdout)
+        check("[-10] AC2 ...counted in the tally rather than dropped from it",
+              "forked:reported 1" in _up.stdout, _up.stdout)
+        check("[-10] AC2 ...writing NEITHER direction: the target's bytes are untouched",
+              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              == FORK_TARGET_BYTES,
+              repr((_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")))
+        check("[-10] AC2 ...and gov's own copy is untouched too — no reverse transform exists",
+              (_ga / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              != FORK_TARGET_BYTES, "")
+        check("[-10] AC2 LIVENESS the same run DID move the engine row, so nothing passed by "
+              "doing nothing",
+              (_ta / "tools" / "demo" / "engine.txt").read_text(encoding="utf-8") == "gov B\n",
+              repr((_ta / "tools" / "demo" / "engine.txt").read_text(encoding="utf-8")))
+        _recb = json.loads((_ta / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-10] AC2 ...and the receipt is RE-STAMPED rather than frozen by the forked row",
+              _recb.get("gov_commit") == _B, str(_recb.get("gov_commit")) + " want " + _B)
+
+        # ---- AC7: the row shape a receipt written BEFORE this unit produces, and the shape a
+        # ---- descriptor edit leaves behind. `UPDATE_ROLE` is keyed on the RECEIPT's role, so such
+        # ---- a row reaches this printer — and a printer reading `row["direction"]` raises
+        # ---- `KeyError` on it, turning the report disposition into a traceback on the one path
+        # ---- that exists to avoid acting.
+        _g7 = fork_gov("nodirrow", fork_kit())
+        _t7 = fork_target(_g7, "fork-nodirrow-t")
+        _a7 = run_in_gov(_g7, "apply", "--target", str(_t7), "--kits", "demo")
+        check("[-10] AC7 the fixture applied before the row is stripped", _a7.returncode == 0,
+              _a7.stdout + _a7.stderr)
+        _r7p = _t7 / ".governance" / "install.json"
+        _r7 = json.loads(_r7p.read_text(encoding="utf-8"))
+        for _f in _r7["files"]:
+            if _f.get("role") == "forked":
+                _f.pop("direction", None)
+                _f.pop("record", None)
+        _r7p.write_text(json.dumps(_r7, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(_t7, "a receipt whose forked row carries no direction")
+        check("[-10] AC7 the fixture really carries a forked row with NO `direction` key",
+              [f for f in json.loads(_r7p.read_text(encoding="utf-8"))["files"]
+               if f.get("role") == "forked" and "direction" not in f], _r7p.read_text())
+        (_g7 / "tools" / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
+                                                           newline="\n")
+        git(_g7, "add", "-A")
+        git(_g7, "commit", "-qm", "B")
+        _u7 = run_in_gov(_g7, "update", "--target", str(_t7), "--write")
+        check("[-10] AC7 the run exits 0 rather than raising on the absent key",
+              _u7.returncode == 0, _u7.stdout + _u7.stderr)
+        check("[-10] AC7 ...with no traceback anywhere in its output",
+              "Traceback" not in (_u7.stdout + _u7.stderr) and "KeyError" not in
+              (_u7.stdout + _u7.stderr), (_u7.stdout + _u7.stderr)[-800:])
+        check("[-10] AC7 ...and the row is PRINTED, with no direction clause and no invented one",
+              len([ln for ln in _u7.stdout.splitlines()
+                   if ln.startswith("  report") and "[forked" in ln
+                   and "direction" not in ln]) == 1, _u7.stdout)
+        check("[-10] AC7 ...and COUNTED, so a tolerated row is not a silent one",
+              "forked:reported 1" in _u7.stdout, _u7.stdout)
+        check("[-10] AC7 ...and still writes no bytes at that path",
+              (_t7 / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              == FORK_TARGET_BYTES, "")
+
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
     # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written

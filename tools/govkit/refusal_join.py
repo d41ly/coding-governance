@@ -38,7 +38,11 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 161    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 180    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 161 -> 180 (DEPL-dCarriedReceipt-7, -8, -10). Re-derived at the landing of the receipt build
+# rather than guessed: -7's S9 integrity assertion and its land-failure reports, -8's cmd_check
+# gov_oid mismatch and its verdict-grid cell arm, and -10's three `forked` rule refusals plus
+# its FORKED-header arm. Both values named, per this file's own convention.
 # 141 -> 161 (TOOL-dUnstalledConvoy-26). The pin had fallen 19 behind the population before
 # this build and 20 by the end of it, which is the state this file's own convention forbids:
 # `a floor that trails the population stops catching the matcher going blind`. Raised to the

@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-10 — role `forked`, report-only
 
-**Status:** SPECCED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-10-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-10-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
@@ -251,6 +252,14 @@ that file's own convention.
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-25 · built. §5's user-docs item names a role table in `WIRE-INTO-PROJECT.md`;
+  there is no such table in that file, so the sentence landed in `skills/deploy-governance/SKILL.md`
+  beside the other plan marks, which is where the marks are already documented for an operator.
+  S6's first draft was keyed on `rule_sources` as the Inventory describes, and that arm COULD NOT
+  FAIL: `rule_sources` skips any include carrying a glob character, and the rule that swallows an
+  undeclared fork is exactly the `**` one. Observed — undeclaring `extract.py` left selfcheck GREEN.
+  Re-aimed at `resolve_rule_pool`, the expanded pool, and re-observed RED. The Inventory's reasoning
+  about the repo-wide near-miss stands and is unchanged; only the enumerator moved.
 - rev-6 · 2026-08-25 · round-4 fold: L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
   an inline code identifier, and the repair round 3 claimed landed in one spec of four. It now
   carries `-9` §7's repaired shape, identifier inside the backticks and property in prose beside it,
