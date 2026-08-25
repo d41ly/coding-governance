@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: deployer
 roster: DEPL
-ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2
+ids: DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3
 ---
 
 # dCarriedReceipt — a receipt that carries provenance, and an update that can be trusted with it
@@ -127,7 +127,7 @@ The audit that grounds every number here, with its method and its own instrument
 <!-- gen:build-index -->
 **Build status:** SPECCED · 15 unit(s) · node d · opened 2026-08-24 · streams deployer
 ids DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12
-ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2
+ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL-dCarriedReceipt-16 TOOL-dCarriedReceipt-1 TOOL-dCarriedReceipt-2 TOOL-dCarriedReceipt-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
