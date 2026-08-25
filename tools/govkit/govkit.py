@@ -3,8 +3,11 @@
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. All five verbs: `selfcheck`, the read-only `plan`
-and `check`, `apply` / `apply --resume`, and `intake`. What it does NOT do is stated on every run
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `plan`,
+`check`, `update` and `adopt`, the writing `apply` / `apply --resume`, and `intake`. THE COUNT IS
+NOT SPELLED HERE and the list is not a second source: `USAGE` and `main`'s dispatch tuple own it
+between them, a selftest arm joins the two, and the sentence that used to say "all five" was wrong
+from the commit that landed the sixth. What it does NOT do is stated on every run
 rather than left to be discovered — see the two SKIPPED lines `apply` prints. A subcommand that
 parses and does nothing is indistinguishable, from the outside, from one that works, and this unit
 exists because that class of silence ships broken installs.
@@ -4326,6 +4329,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 pins_order = _text
             continue
 
+        # DEPL-dCarriedReceipt-13 S7. A BOOTSTRAPPED row that matched no gov vintage has no base,
+        # and every writing disposition needs one — so it is printed, counted and skipped HERE:
+        # after `how` resolves, before the verdict table it would otherwise feed. Written in
+        # neither direction until an operator supplies a base with `adopt --pin`.
+        #
+        # SCOPED TWO WAYS, and both halves are load-bearing rather than defensive. The predicate is
+        # `evidence == "unattributed"` and NEVER field-absence: every row `apply` writes through the
+        # unlanded channel carries neither `commit` nor `gov_oid`, and so does the synthesized
+        # `attributes` row, so a field-absence reading would swallow all of them ahead of the
+        # dispatch and silently delete four dispositions that exist for exactly those roles. And it
+        # is scoped to `table`, the ONLY disposition that can put bytes on disk: `seed` still
+        # reaches its reseed override and `attributes` still reaches `-2`'s pins arm, each of which
+        # reports against a `base` of `None` rather than needing one. AC14 grades both halves.
+        # THE ROW SHAPE IS `-2`'s AND ENDS AT THE PATH. The remedy sentence goes in the tally line
+        # below, once, rather than onto every row: the printed row is PARSED by name elsewhere —
+        # `-7`'s AC9 arm reads the verdict off a line whose last field is the path — and a trailing
+        # clause here made that arm read "(no row)" for a row this branch had just printed.
+        if how == "table" and row.get("evidence") == "unattributed":
+            tally["unattributed"] = tally.get("unattributed", 0) + 1
+            print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
+            continue
+
         c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
 
         # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
@@ -4371,6 +4396,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    # DEPL-dCarriedReceipt-13 S7's remedy, said ONCE and only when it applies. An operator who sees
+    # `unattributed` rows and no next step concludes the tool is broken; one who sees the sentence
+    # repeated per row learns to scroll past the whole block.
+    if tally.get("unattributed"):
+        print(f"govkit update — {tally['unattributed']} row(s) matched no gov vintage at adoption, "
+              f"so there is no base to write against and none was written. `govkit adopt --pin "
+              f"<path>=<rev>` supplies one")
 
     if not write:
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
@@ -4981,6 +5013,353 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     return r.emit()
 
 
+
+# ----------------------------------------------------------------- adopt (DEPL-dCarriedReceipt-13)
+# THE BOOTSTRAP. Every other verb here moves an install forward; this one writes the receipt an
+# already-installed tree never had, by MEASURING that tree against gov's own history. It is the first
+# documented path onto the engine for a repository somebody vendored kits into by hand, and the
+# audit that motivated it measured zero auto-syncable rows in either live target for exactly one
+# reason: `cmd_update` refuses without `.governance/install.json`, and neither target has one.
+#
+# `evidence` IS THIS UNIT'S FIELD, and it exists because a base an ENGINE INFERRED must never be
+# indistinguishable from one a write produced. `apply` stamps `"apply"`; this verb stamps
+# `"vintage-match"` for a row whose bytes it proved against a gov commit, `"pinned"` for one an
+# operator asserted, and `"unattributed"` for one that matched no vintage at all. The fifth state is
+# ABSENCE, on S11's two synthesized classes, and it is NOT a synonym for `"unattributed"` — S7's skip
+# keys on the string, so widening it to field-absence would swallow every unlanded row and silently
+# delete four dispositions. That reading was in an earlier rev of the spec and was destructive.
+EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed")
+
+
+def carry_matches(rung: str, ours: bytes, base: bytes, needles: dict[str, str]) -> bool:
+    """Does ONE named rung explain the difference between the target's bytes and gov's?
+
+    `derive_carry_rung` asks the ladder question — WHICH rung, first proof wins — over ONE base.
+    `adopt` asks the transposed one: hold the rung, walk the bases (S4). Both are the same three
+    proofs and they are spelled ONCE, here, with the ladder calling this rather than repeating it.
+
+    `eol` normalises BOTH sides and that is why this is not `derive_carried_by_rung`: that function
+    is the WRITE-path transform, applied to gov's bytes alone so the rung cancels in a three-way
+    diff. Normalising one side is the right answer there and the wrong answer to this question — a
+    CRLF target compared against an LF-normalised gov blob still differs on every line.
+    """
+    if rung == "verbatim":
+        return ours == base
+    if rung == "eol":
+        return derive_lf(ours) == derive_lf(base)
+    return ours == derive_carried(base, needles)
+
+
+def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str,
+                       needles: dict[str, str]) -> tuple[str, str, str] | None:
+    """S3 + S4. The vintage the target's bytes came from, as `(commit, gov_oid, rung)`, or `None`.
+
+    RUNG-MAJOR, NOT RECENCY-MAJOR, and it is load-bearing rather than a preference. Every commit is
+    tested at `verbatim` first, then `eol`, then `relocate`, and the NEWEST commit inside the FIRST
+    rung that matches wins. Preferring a newer commit at a lossier rung selects a base whose delta
+    was never applied to this target, and the three-way then re-applies work the adopter already
+    has. The inverse is in the spec's rejected alternatives for that reason.
+
+    `git log <to-rev> -- <src>` and NEVER `--all`. Measured at 9ddcc5c9: gov carries eight commits
+    reachable from a ref and not from `HEAD`, several on in-flight branches, and a walk that reaches
+    them attributes an adopter to a vintage nobody ever shipped.
+
+    ONE BLOB READ PER COMMIT, cached across all three rungs. The walk is this verb's dominant cost on
+    a real adopter — 143 planned writes on the target section 5 names — and re-reading the same blob
+    three times would triple it for nothing.
+    """
+    out = subprocess.run(
+        ["git", "-C", str(root), "log", "--format=%H", to_commit, "--", src],
+        capture_output=True, text=True, check=False)
+    commits = [c for c in out.stdout.split() if c]
+    cache: dict[str, bytes | None] = {}
+
+    def base_at(c: str) -> bytes | None:
+        if c not in cache:
+            cache[c] = blob_at(root, c, src)
+        return cache[c]
+
+    for rung in CARRY_RUNGS:
+        for c in commits:                      # `git log` emits newest-first, so this IS recency
+            base = base_at(c)
+            if base is None:
+                continue
+            if carry_matches(rung, ours, base, needles):
+                return c, blob_oid(base), rung
+    return None
+
+
+def demand_adopt_index_clean(target: pathlib.Path) -> None:
+    """S8's third refusal, and section 8 F1 decides its WIDTH: the index, never the worktree.
+
+    `adopt` reads every identity it records out of the index, so an index that disagrees with HEAD
+    means the receipt would record blobs no commit in the target carries. An UNSTAGED edit is a
+    different thing entirely — the operator's own work in a repository gov does not own — and
+    refusing over one is the shape adopters learn to route around. `-12` owns the worktree
+    preconditions, on the verbs that write bytes into the target; this verb writes one file under
+    `.governance/` and nothing else.
+    """
+    has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
+                              capture_output=True).returncode == 0
+    if not has_head:
+        return          # index-versus-HEAD is unanswerable before the first commit
+    out = subprocess.run(["git", "-C", str(target), "diff", "--cached", "--name-only", "-z", "HEAD"],
+                         capture_output=True, text=True, check=False)
+    staged = sorted({n for n in out.stdout.split("\0") if n})
+    if staged:
+        raise Refusal(
+            f"{len(staged)} path(s) in the target's index differ from HEAD: " + ", ".join(staged)
+            + " — `adopt` records each row's identity from the INDEX, so a staged-but-uncommitted "
+            "tree would be written into the receipt as the vintage this target holds, and no commit "
+            "here carries those blobs. Commit or reset them, then re-run. An UNSTAGED edit does not "
+            "block: this verb writes one file under `.governance/` and never touches your worktree"
+        )
+
+
+def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
+              pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+    """Write the receipt an already-installed tree never had, by measuring it against gov history.
+
+    READ-ONLY WITHOUT `--write`, matching `update` and for the same reason: the muscle-memory
+    invocation must not be the one that writes.
+    """
+    r = Report()
+    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    descs = read_descriptors(root, reg, r)
+    if r.problems:
+        return r.emit()
+
+    # ---- S8, the three refusals. Target IDENTITY first, before anything is read out of the tree:
+    # ---- a refusal about WHICH repository this is must not queue behind one about its contents.
+    if pathlib.Path(root).resolve() == target.resolve():
+        raise Refusal("--target resolves to the gov checkout itself; adopting this repo into itself "
+                      "is a stated non-goal and would be indistinguishable from a self-overwrite")
+    receipt_path = target / ".governance" / "install.json"
+    if receipt_path.is_file() and not re_adopt:
+        raise Refusal(
+            f"the target already carries a receipt at {receipt_path.as_posix()} — `adopt` writes one "
+            f"where there was none. Re-run with `--re-adopt` to re-measure from scratch. That flag "
+            f"is deliberately a second explicit invocation rather than a default: a receipt is a "
+            f"decision artefact, and `intake` refuses to silently rewrite the descriptor for the "
+            f"same reason"
+        )
+    demand_adopt_index_clean(target)
+
+    deploy = load_deploy(target)
+    selection = resolve_selection(reg, descs, "kits" if deploy.get("kits") else "default",
+                                  list(deploy.get("kits") or []))
+    out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", to_rev + "^{commit}"],
+                         capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
+    commit = out.stdout.strip()
+
+    print(f"govkit adopt — target {target.as_posix()} · selection: {', '.join(selection)}")
+    print(f"govkit adopt — measuring against gov {commit[:8]} "
+          f"({'--write' if write else 'READ-ONLY: pass --write to record the receipt'})")
+
+    # ---- THE DESTINATION SET (S2). BOTH of `resolve_entry`'s channels, because a `forked` rule's
+    # ---- rows arrive in the second one and a set built from `writes` alone leaves the receipt
+    # ---- silent about exactly the files that most need saying. `merged` entries are skipped on
+    # ---- this channel and re-synthesized in `apply`'s own shape by S11, exactly as `apply` skips
+    # ---- them in its own unlanded loop; the stripped unlanded shape is the one row `cmd_check`
+    # ---- cannot read.
+    plan: list[dict] = []                      # one entry per planned destination, in landing order
+    merged_rules: list[tuple[str, str, dict, dict]] = []      # (eid, version, descriptor, rule)
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        vers = entry_version(root, d)
+        res = resolve_entry(root, d, ctx)
+        for dest, w in sorted(res["writes"].items()):
+            if w["missing"] or w.get("scope") == "machine":
+                continue
+            rule = d.get("files", [])[w["rule"]]
+            if rule.get("scope") == "machine" or rule.get("link"):
+                continue
+            plan.append({"dest": dest, "role": w["role"], "kit": eid, "version": vers,
+                         "src": w["src"], "landable": True, "rule": rule})
+        for u in res["unlanded"]:
+            if u["role"] == "merged" or u.get("missing"):
+                continue                       # S11 writes the real merged row below
+            _rules = d.get("files", [])
+            _i = u.get("rule")
+            plan.append({"dest": u["dest"], "role": u["role"], "kit": eid, "version": vers,
+                         "src": u["src"], "landable": False,
+                         "rule": _rules[_i] if isinstance(_i, int) and 0 <= _i < len(_rules) else {}})
+        for rule in d.get("files", []):
+            if rule.get("role", "engine") == "merged" and rule.get("marker_style") != "json-pointer":
+                merged_rules.append((eid, vers, d, rule))
+
+    # ---- S4a. THE NEEDLE MAP, at bootstrap. `-9` F3's derivation reads a RECEIPT, and there is no
+    # ---- receipt yet — so the same function is fed this run's planned `(src, dest)` pairs, which
+    # ---- are the only record of where a file would land. Without it the `relocate` rung has no
+    # ---- map, the ladder collapses to `verbatim`/`eol`, and every relocated row bootstraps
+    # ---- `unattributed` and is skipped by S7 forever.
+    needles, dpairs, dropped = derive_carry_map([(p["src"], p["dest"]) for p in plan if p["src"]])
+    for gd, ds in dropped:
+        print(f"govkit adopt — dropped ambiguous gov directory '{gd}': it names "
+              f"{len(ds)} target directories ({', '.join(ds)}), so it is no single needle")
+    print(f"govkit adopt — needle map: {len(dpairs)} directory pair(s), {len(needles)} needle(s)")
+
+    # ---- THE INDEX, ONE batched read over every planned destination. A destination the target does
+    # ---- not track has no identity to record and gets no row at all.
+    idx, _present = index_read(target, [p["dest"] for p in plan]) if plan else ({}, set())
+
+    rows: list[dict] = []
+    tally: dict[str, int] = {}
+    for p in plan:
+        dest = p["dest"]
+        if dest not in idx:
+            tally["not-installed"] = tally.get("not-installed", 0) + 1
+            print(f"  {'not-installed':<15} [{p['role']:<13}] {dest}")
+            continue
+        ours = index_blob(target, idx[dest][1])
+        # THE ROW's `role` IS THE RULE'S, NEVER THE WALK'S (S5). A fork has a common ancestor BY
+        # CONSTRUCTION, so the walk attributes it at its pre-fork vintage and matches `verbatim`
+        # there; taking the role from that outcome adopts it as `engine` with the two identities
+        # AGREEING, which opens the raw-write arm and lets the first `update --write` land gov's
+        # fork over the target's working program. That is the measured landmine `-10` exists for,
+        # re-manufactured by the bootstrap written to record it.
+        row: dict = {"path": dest, "role": p["role"], "kit": p["kit"], "version": p["version"],
+                     "source": p["src"]}
+        if not p["landable"]:
+            row["written"] = False
+            why = UNLANDED_REASON.get(p["role"])
+            if why is not None:
+                row["why"] = why
+        if p["role"] == "forked":
+            for _k in FORK_RULE_KEYS:
+                if p["rule"].get(_k):
+                    row[_k] = p["rule"][_k]
+        # F5: `sha256` hashes the TARGET's own bytes at the moment the receipt is written, not gov's
+        # at `commit`. The two coincide only while every row is `verbatim`, and this is the first
+        # verb whose whole job is the rows where they do not. It is what `install.sums` lists, so
+        # `sha256sum -c` stays honest on a tree this verb did not touch.
+        if ours is not None:
+            row["sha256"] = hashlib.sha256(ours).hexdigest()
+            row["oid"] = idx[dest][1]
+
+        # THE RUNG IS A LOCAL, and never read back off the row it was just written to. `-9` S2 says
+        # no branch anywhere reads a stored `carry`, and an arm over this file's SOURCE enforces it
+        # by NAME: reading `row["carry"]` five lines after writing it is indistinguishable, to that
+        # arm and to a reader, from trusting one an older run left behind.
+        rung: str | None = None
+        pin = pins.get(dest)
+        if pin is not None:
+            pc = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify",
+                                 pin + "^{commit}"], capture_output=True, text=True, check=False)
+            if pc.returncode != 0:
+                raise Refusal(f"--pin {dest}={pin} does not resolve in this gov checkout")
+            pinned = pc.stdout.strip()
+            was = blob_at(root, pinned, p["src"]) if p["src"] else None
+            if was is None:
+                raise Refusal(f"--pin {dest}={pin}: gov holds no blob for '{p['src']}' at "
+                              f"{pinned[:12]}, so the assertion names a base that does not exist")
+            row["commit"] = pinned
+            row["gov_oid"] = blob_oid(was)
+            # RECOMPUTED, never asserted. `--pin` fixes the BASE; the rung stays a proof, so an
+            # operator who pins the wrong vintage gets a row with no rung rather than a claim.
+            row["evidence"] = "pinned"
+            rung = derive_carry_rung(was, needles, lambda: ours) if ours is not None else None
+            if rung:
+                row["carry"] = rung
+        else:
+            hit = derive_attribution(root, p["src"], ours, commit, needles) if (
+                p["src"] and ours is not None) else None
+            if hit is None:
+                # S7. Its OWN state, and NOT `forked`: that role is a claim the DESCRIPTOR makes,
+                # and the walk does not get to make it on the descriptor's behalf. No `commit`, no
+                # `gov_oid`, `role` untouched.
+                row["evidence"] = "unattributed"
+            else:
+                row["commit"], row["gov_oid"], rung = hit
+                row["carry"] = rung
+                row["evidence"] = "vintage-match"
+
+        ev = row["evidence"]
+        key = "forked" if p["role"] == "forked" else (rung or ev)
+        tally[key] = tally.get(key, 0) + 1
+        print(f"  {key:<15} [{p['role']:<13}] {dest}"
+              + (f" <- {row['commit'][:8]}" if row.get("commit") else ""))
+        rows.append(row)
+
+    # ---- S11. THE TWO CLASSES `resolve_entry` DOES NOT PRODUCE, in `apply`'s own shapes rather
+    # ---- than in a second one. Without them `-2`'s `pins` arm never dispatches and `cmd_check`'s
+    # ---- merged loop raises `KeyError` on `row['block_id']`. NEITHER carries `evidence`, `gov_oid`
+    # ---- or `oid`: both are measured from the target's own bytes rather than attributed to a gov
+    # ---- vintage, and `merged`'s exemption from `-7` S9's integrity preamble is by ROLE, which
+    # ---- this row inherits by being the same row `apply` writes.
+    pins_declared = lf_pins(descs, selection, lambda e, dd: target_context(target, deploy, e, dd))
+    if pins_declared:
+        _om, _cm, _text = lf_pin_block(pins_declared)
+        _ga = target / ".gitattributes"
+        _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
+        _span = find_block(_cur, _om, _cm)
+        _held = "\n".join(_cur.split("\n")[_span[0]:_span[1] + 1]) if _span else None
+        rows.append({"path": ".gitattributes", "role": "attributes", "kit": "(govkit)",
+                     "version": "(synthesized)", "block_id": GA_BLOCK_ID,
+                     "marker_style": "hash-comment", "mode": "append", "normalized": "lf",
+                     # The block the TARGET holds where it holds one, so `update`'s pins arm
+                     # compares against what is really there; gov's recomputed block otherwise,
+                     # which is the honest reading of a target that never had one.
+                     "block_sha256": hashlib.sha256(
+                         (_held if _held is not None else _text).encode("utf-8")).hexdigest(),
+                     "patterns": [p for p, _c, _w in pins_declared], "written": False})
+        tally["attributes"] = tally.get("attributes", 0) + 1
+
+    for eid, vers, d, rule in merged_rules:
+        ctx = target_context(target, deploy, eid, d)
+        om, cm = marker_pair(rule.get("marker_style"), rule["block_id"])
+        for src in rule_sources(d, rule):
+            if blob_at(root, commit, src) is None:
+                continue
+            for dest_t in (rule.get("to") if isinstance(rule.get("to"), list) else [rule.get("to")]):
+                dest, miss = resolve_tokens(dest_t, ctx)
+                if miss:
+                    continue
+                dp = target / dest
+                if not dp.is_file():
+                    continue
+                text = dp.read_text(encoding="utf-8", errors="replace")
+                held = find_block(text, om, cm)
+                if held is None:
+                    continue
+                block = "\n".join(text.split("\n")[held[0]:held[1] + 1])
+                rows.append({"path": dest, "role": "merged", "kit": eid, "version": vers,
+                             "block_id": rule["block_id"],
+                             "marker_style": rule.get("marker_style"),
+                             "block_sha256": hashlib.sha256(
+                                 block.replace(CR, "").encode("utf-8")).hexdigest(),
+                             "normalized": "lf", "mode": "append", "source": src,
+                             "commit": commit, "written": False})
+                tally["merged"] = tally.get("merged", 0) + 1
+
+    print("govkit adopt — " + (", ".join(f"{k} {v}" for k, v in sorted(tally.items())) or "0 rows"))
+    if not write:
+        print(f"govkit adopt — READ-ONLY: {len(rows)} row(s) would be recorded. "
+              f"Nothing was written; re-run with --write")
+        return r.emit()
+
+    # ---- S10. THE ENVELOPE, not just the rows. Three units read fields OUTSIDE `files`, and
+    # ---- omitting them degrades each of them SILENTLY: `-12` S7's vintage guard fails open by its
+    # ---- own words with no `gov_commit`, `-11`'s rename diff has no base and the unit is inert,
+    # ---- and `-2`'s pins arm reads an empty `kits` so every registry entry prints as "available
+    # ---- (not installed)". `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are NOT
+    # ---- written: each records what an install DID, and this verb installs nothing.
+    (target / ".governance").mkdir(exist_ok=True)
+    receipt_path.write_text(json.dumps(
+        {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+         "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows},
+        indent=2) + "\n", encoding="utf-8", newline="\n")
+    (target / ".governance" / "install.sums").write_text(
+        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
+        encoding="utf-8", newline="\n")
+    print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
+          f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
+    return r.emit()
+
+
 # ---------------------------------------------------------------------------------------- intake
 def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> list[str]:
     """Every token a selected kit's destinations and probes need that is not derived.
@@ -5154,10 +5533,14 @@ USAGE = """usage:
   govkit.py check --target <path>
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
   govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
-`plan`, `check` and `update` are READ-ONLY and none writes a byte; `update --write` performs what
-`update` printed. `--write-withdrawals` is the ONLY way `update` deletes anything: without it a file
+`plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
+what `update` printed. `adopt` is the BOOTSTRAP: it writes the receipt an already-installed tree
+never had, by measuring that tree against gov's own history, and `--write` is what records it. It
+puts no byte into the target's working tree ever — one file under `.governance/` and nothing else —
+and it refuses over an existing receipt unless `--re-adopt` says to re-measure from scratch. `--write-withdrawals` is the ONLY way `update` deletes anything: without it a file
 gov has stopped shipping is REPORTED and an order is written under `.governance/outbox/`, and the
 adopter's copy stays exactly where it is. It defaults off and it is a scope flag rather than a
 `--force` — it enables a narrower class of action and overrides no refusal. A file gov RENAMED is
@@ -5180,6 +5563,10 @@ def parse_args(argv: list[str]) -> tuple:
     write_withdrawals = False
     to_rev = "HEAD"
     answers: dict[str, str] = {}
+    # DEPL-dCarriedReceipt-13 S1. Both widen this function, which used to return a fixed 8-tuple.
+    # `--pin` is REPEATABLE and keyed by destination: one assertion per row, never a mode.
+    pins: dict[str, str] = {}
+    re_adopt = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -5206,6 +5593,18 @@ def parse_args(argv: list[str]) -> tuple:
             # deletion it scopes lives in the write loop.
             write_withdrawals = True
             i += 1
+        elif a == "--pin" and i + 1 < len(argv):
+            # DEPL-dCarriedReceipt-13 S6. `<path>=<rev>`, and the SAME key=value refusal `--answer`
+            # already makes: a `--pin` with no `=` is an operator naming a path and no vintage, and
+            # accepting it would silently pin nothing.
+            k, _eq, v = argv[i + 1].partition("=")
+            if not _eq:
+                raise Refusal(f"--pin needs <path>=<rev>, got: {argv[i + 1]}")
+            pins[k.strip()] = v.strip()
+            i += 2
+        elif a == "--re-adopt":
+            re_adopt = True
+            i += 1
         elif a == "--to" and i + 1 < len(argv):
             to_rev = argv[i + 1]
             i += 2
@@ -5217,7 +5616,8 @@ def parse_args(argv: list[str]) -> tuple:
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals
+    return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
+            pins, re_adopt)
 
 
 def main(argv: list[str]) -> int:
@@ -5225,7 +5625,8 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD = parse_args(argv)
+        (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
+         PINS, RE_ADOPT) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -5234,7 +5635,7 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
-        if verb in ("plan", "check", "apply", "intake", "update"):
+        if verb in ("plan", "check", "apply", "intake", "update", "adopt"):
             if target is None:
                 raise Refusal(
                     f"{verb} needs an explicit --target. Refusing to default it to the process cwd: "
@@ -5251,6 +5652,8 @@ def main(argv: list[str]) -> int:
             if verb == "update":
                 return cmd_update(root, target, TO_REV, write=WRITE,
                                   write_withdrawals=WRITE_WD)
+            if verb == "adopt":
+                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

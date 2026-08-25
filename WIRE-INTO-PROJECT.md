@@ -563,6 +563,54 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `bash <project>/tools/workflows/check-verifier-fanout.sh` · `bash <project>/tools/workflows/check-review-join.sh` ·
   `node <project>/tools/workflows/check-workflow-syntax.js` — each → exit 0.
 
+## 5b — A tree that already carries kits: bootstrap its receipt (`adopt`)
+
+Everything above is the FRESH path — a project with no gov bytes in it, where `apply` lands the files
+and writes the receipt as it goes. This section is the other one: a repository somebody already
+vendored kits into by hand, which has no `.governance/install.json` and therefore cannot be updated
+at all. `update` refuses without a receipt, by design, so such a tree is stuck until one exists.
+
+`adopt` writes it, by MEASURING the tree against gov's own history. It puts no byte into the working
+tree — one file under `.governance/`, and `install.sums` beside it — and it is read-only until
+`--write`.
+
+```bash
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits a,b,…   # the descriptor, once
+python <gov>/tools/govkit/govkit.py adopt  --target <project>                # READ-ONLY: read this
+python <gov>/tools/govkit/govkit.py adopt  --target <project> --write        # then record it
+python <gov>/tools/govkit/govkit.py update --target <project>                # now the tree is live
+```
+
+**Read the read-only run before you write it.** Each destination prints with its role and what the
+walk found, and the tally at the end is the answer to "is this tree adoptable":
+
+- `verbatim` — the target holds gov's bytes exactly. Nothing to explain.
+- `eol` / `relocate` — the bytes differ for a reason gov already knows about: a CRLF checkout, or an
+  install at a `prefix` other than the default. Both are PROVEN per row on every run, never read back
+  off the receipt.
+- `unattributed` — no gov vintage explains these bytes. The row is recorded with no base, and every
+  later `update` prints it and writes nothing to it. This is a REPORT, not a failure: partial
+  attribution is the normal state of a hand-vendored tree, and a bootstrap that demanded totality
+  would bootstrap nothing.
+- `forked` — the descriptor declares gov's copy a derivative of the target's. Report-only in both
+  directions, whatever the walk found.
+- `not-installed` — a destination the kit would write and this target does not track. No row.
+
+**`--pin <path>=<rev>` is how an operator corrects one row**, and only one: it fixes that
+destination's base by assertion, and the row records `evidence: "pinned"` so an assertion is never
+read back as a proof. Repeat the flag per path. Use it on an `unattributed` row you know the vintage
+of; a wrong pin makes a later merge noisier and never destructive, because the raw-write arm stays
+closed wherever the two identities differ.
+
+**`--re-adopt` re-measures from scratch** and is the only way past the refusal over an existing
+receipt. It preserves nothing the old one recorded — not the commit, not the rung, not the role,
+which is re-read from the descriptor on every run anyway.
+
+**The three refusals**, so you can tell them apart from a bug: `--target` resolving to the gov
+checkout itself; an existing `install.json` without `--re-adopt`; and a target index that differs
+from HEAD. That last one is the INDEX only — an unstaged edit in your own worktree does not block,
+because `adopt` reads identities out of the index and writes nothing you could lose.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

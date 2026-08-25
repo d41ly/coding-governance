@@ -38,7 +38,15 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 190    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 197    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 190 -> 197 (DEPL-dCarriedReceipt-13). Its SEVEN new refusals, all on the `adopt` path: `--pin`
+# with no `=` (in `parse_args`, so it is the one reachable without a target), `--target` resolving
+# to the gov checkout, an existing receipt without `--re-adopt`, a target index differing from HEAD,
+# a `--to` that does not resolve, a `--pin` revision that does not resolve, and a `--pin` naming a
+# revision where gov holds no blob for that source. ALL SEVEN are reached by a named selftest arm —
+# the first four and the `--pin` grammar directly under AC7 and AC8, the last two through the same
+# `--pin` fixture. 7/7 armed, which is rarer here than the two entries below and is stated rather
+# than assumed.
 # 185 -> 190 (DEPL-dCarriedReceipt-14). Its five new refusals, and this unit also RELOCATES four:
 # `cmd_check`'s existing check-arm failures moved into the extracted `run_kit_check`, which changes
 # their anchors and not their count. The five that are new: a check arm that cannot LAUNCH (armed by

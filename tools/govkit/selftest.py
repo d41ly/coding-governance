@@ -4913,8 +4913,16 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC8's second half: the S1 extraction changed `check`'s BEHAVIOUR nowhere. The
         # ---- comparison is against the engine as it stood before this unit, read out of git rather
         # ---- than remembered — a byte comparison of two live runs over one fixture target.
+        # AN IMMUTABLE SHA, never `HEAD`. Written against `HEAD` this arm was true for exactly as
+        # long as `-14` was unlanded: the moment its own commit became `HEAD`, `run_kit_check` was
+        # in the bytes it fetched and its own precondition went red. A base pinned to a moving ref
+        # is the class the playbook names in so many words, and this is what it looks like when the
+        # ref that moves is the one the unit is landing onto. `af9421d7` is `-14`'s parent, the last
+        # commit whose engine predates the extraction.
+        _PRE_EXTRACTION_SHA = "af9421d736d6cbd942e953c0159148b91cb425f8"
         _pe_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
-                                  "HEAD:tools/govkit/govkit.py"], capture_output=True).stdout
+                                  f"{_PRE_EXTRACTION_SHA}:tools/govkit/govkit.py"],
+                                 capture_output=True).stdout
         check("[-14] AC8 the pre-extraction engine really came out of git, and it is the engine "
               "BEFORE the helper existed",
               len(_pe_src) > 100000 and b"def cmd_check" in _pe_src
@@ -4935,6 +4943,422 @@ user_skills = "/tmp/gk-fake-skills"
               "identical empty strings would prove nothing",
               "govkit check — demo:" in _ac8_now.stdout and len(_ac8_now.stdout) > 100,
               _ac8_now.stdout)
+
+        # ============================================================ DEPL-dCarriedReceipt-13
+        # `govkit adopt` — the receipt bootstrap. Every arm below runs against a SCRATCH gov with a
+        # real multi-commit history, because attribution is a question about history and a
+        # single-commit fixture answers it vacuously: with one commit in the walk, rung-major and
+        # recency-major agree by construction and AC5 could not fail.
+        #
+        # THE ENGINE COPY IS TAKEN AT FIXTURE-BUILD TIME, as everywhere else in this file. A break
+        # staged into this repo's `govkit.py` after the copy runs the UNPATCHED engine and the arm
+        # reports on nothing.
+        A13_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+                   '[selection]\ndefault = ["demo"]\n\n'
+                   '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                   '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+
+        def a13_kit(extra: str = "") -> str:
+            """The fixture descriptor: a `**` engine rule, a `forked` rule, and whatever else the
+            caller adds. The forked rule is LAST so precedence elects it for its own source."""
+            return ('id = "demo"\nhome = "tools/demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[[files]]\ninclude = "forked-one.py"\nrole = "forked"\n'
+                    'direction = "gov-from-target"\nrecord = "DEPL-fixture-1"\n'
+                    + extra + '\n[adopt]\nargv = []\nmutates_index = false\n')
+
+        def a13_gov(tag: str, waves: list[dict[str, str]], kit_toml: str) -> tuple:
+            """A scratch gov whose history is ONE COMMIT PER WAVE, oldest first.
+
+            Returns `(path, [sha per wave])`. A wave is `{relpath under home: text}`; a relpath a
+            wave omits keeps whatever the previous wave left, so a file gov never touched again has
+            exactly one commit in its own walk — which is what AC4 needs and what a
+            rewrite-everything fixture would destroy.
+            """
+            g = tmp / f"a13-{tag}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(A13_REG, encoding="utf-8",
+                                                                  newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            # A SCAFFOLDING COMMIT BEFORE WAVE 1, so `<wave-1>^` is a revision that RESOLVES and
+            # carries no blob for any kit source. That is the third `--pin` refusal's only reachable
+            # fixture, and without it the arm would have to assert a state the tree cannot produce.
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "scaffold")
+            shas: list[str] = []
+            for i, wave in enumerate(waves):
+                for rel, body in wave.items():
+                    p = g / "tools" / "demo" / rel
+                    p.parent.mkdir(parents=True, exist_ok=True)
+                    p.write_text(body, encoding="utf-8", newline="\n")
+                git(g, "add", "-A")
+                git(g, "commit", "-qm", f"wave-{i}")
+                shas.append(subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"],
+                                           capture_output=True, text=True).stdout.strip())
+            return g, shas
+
+        def a13_target(tag: str, prefix: str, files: dict[str, bytes],
+                       kits: str = '["demo"]') -> pathlib.Path:
+            """A target that ALREADY holds the files — the state `adopt` exists for. Written as
+            BYTES so an arm can commit CRLF into the index deliberately, which is the whole `eol`
+            rung and is unreachable through a text write with `newline="\\n"`."""
+            t = tmp / f"a13t-{tag}"
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(
+                f'gov_source = "local"\nprefix = "{prefix}"\nkits = {kits}\n',
+                encoding="utf-8", newline="\n")
+            for rel, body in files.items():
+                p = t / rel
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(body)
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "base")
+            return t
+
+        def a13_receipt(t: pathlib.Path) -> dict:
+            return json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        def a13_row(rec: dict, path: str) -> dict:
+            return next((f for f in rec["files"] if f["path"] == path), {})
+
+        def a13_porcelain(t: pathlib.Path) -> str:
+            return subprocess.run(["git", "-C", str(t), "status", "--porcelain"],
+                                  capture_output=True, text=True).stdout.strip()
+
+        # ---- AC1's RED is HISTORICAL: it was observed before this verb existed and cannot be
+        # ---- re-observed now without deleting the verb. What survives it is the JOIN — the verb is
+        # ---- in `USAGE` and in `main`'s dispatch tuple, which are the two places §7 requires stay
+        # ---- honest together. The module docstring used to spell a COUNT of the verbs beside them,
+        # ---- which was wrong from the commit that landed the sixth; that is why this asserts
+        # ---- membership in both carriers and no total anywhere.
+        _g13src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("[-13] AC1 the verb is in USAGE",
+              "govkit.py adopt " in _g13src.split("USAGE = ", 1)[1][:900], "not in USAGE")
+        check("[-13] AC1 ...and in `main`'s dispatch tuple, so parsing and running cannot diverge",
+              '"intake", "update", "adopt"' in _g13src and 'if verb == "adopt":' in _g13src)
+        check("[-13] AC1 ...and the docstring no longer spells a verb COUNT beside that list",
+              "All five verbs" not in _g13src)
+
+        # ---- THE LADDER FIXTURE. Two waves. `moved-one.py` and `ladder.py` are written ONCE and
+        # ---- never touched again, so each has exactly one commit in its own walk; everything else
+        # ---- moves on in wave 2, so the target's copies attribute to wave 1 and the two vintages
+        # ---- are genuinely different. `ladder.py` is the AC5 discriminator, built below.
+        _W1 = {"verbatim-one.py": "v1\n", "eol-one.py": "e1\n",
+               "moved-one.py": "row: tools/demo/thing\n", "stranger.py": "s1\n",
+               "forked-one.py": "f1\n",
+               # AC5: at wave 1 this is BYTE-IDENTICAL to what the target holds (verbatim), and at
+               # wave 2 it is the same text spelling GOV's own directory, which the needle map
+               # rewrites onto the target's (relocate). Newest-first recency picks wave 2 at
+               # `relocate`; rung-major must pick wave 1 at `verbatim`.
+               "ladder.py": "row: scripts/demo/thing\n"}
+        _W2 = {"verbatim-one.py": "v2\n", "eol-one.py": "e2\n", "stranger.py": "s2\n",
+               "forked-one.py": "f2\n", "ladder.py": "row: tools/demo/thing\n"}
+        _g13, _sh13 = a13_gov("ladder", [_W1, _W2], a13_kit())
+        _t13 = a13_target("ladder", "scripts", {
+            "scripts/demo/verbatim-one.py": b"v1\n",
+            "scripts/demo/eol-one.py": b"e1\r\n",
+            "scripts/demo/moved-one.py": b"row: scripts/demo/thing\n",
+            "scripts/demo/stranger.py": b"nothing gov ever shipped\n",
+            "scripts/demo/forked-one.py": b"f1\n",
+            "scripts/demo/ladder.py": b"row: scripts/demo/thing\n"})
+
+        # ---- FIXTURE PRECONDITIONS. Each of the three states the arms below grade must actually be
+        # ---- present, or every one of them passes by finding nothing.
+        check("[-13] the ladder fixture really has two gov vintages",
+              len(_sh13) == 2 and _sh13[0] != _sh13[1], str(_sh13))
+        check("[-13] ...and `moved-one.py` was written in wave 1 and never touched again",
+              "moved-one.py" in _W1 and "moved-one.py" not in _W2)
+        check("[-13] ...and `ladder.py` DID move between the two, which is what AC5 needs",
+              _W1["ladder.py"] != _W2["ladder.py"])
+
+        # ---- AC2: READ-ONLY writes nothing and leaves the index alone.
+        _p = run_in_gov(_g13, "adopt", "--target", str(_t13))
+        check("[-13] AC2 adopt without --write exits 0", _p.returncode == 0, _p.stdout + _p.stderr)
+        check("[-13] AC2 ...and creates no receipt",
+              not (_t13 / ".governance" / "install.json").exists())
+        check("[-13] AC2 ...and leaves the target's index untouched",
+              a13_porcelain(_t13) == "", a13_porcelain(_t13))
+        check("[-13] AC2 ...and SAYS it wrote nothing rather than looking like it worked",
+              "READ-ONLY" in _p.stdout, _p.stdout)
+
+        # ---- AC12: the needle map exists AT BOOTSTRAP, derived from the planned pairs (S4a) and
+        # ---- not from a receipt that does not exist yet. The needle count is exactly twice the
+        # ---- pair count HERE because every surviving gov directory in this fixture carries a
+        # ---- slash, so its `/` and `~` forms differ; that condition is the arm's, not a general
+        # ---- law, and `-9`'s own parked decision is about a population where it does not hold.
+        _pairs13 = _re.search(r"needle map: (\d+) directory pair\(s\), (\d+) needle\(s\)", _p.stdout)
+        check("[-13] AC12 adopt prints its derived needle map", _pairs13 is not None, _p.stdout)
+        check("[-13] AC12 ...with a needle count exactly twice the pair count, every gov "
+              "directory here carrying a slash",
+              bool(_pairs13) and int(_pairs13.group(2)) == 2 * int(_pairs13.group(1))
+              and int(_pairs13.group(1)) > 0,
+              _pairs13.group(0) if _pairs13 else "")
+
+        # ---- AC5: RUNG-MAJOR. Observed on the ladder row, whose newest commit matches only at
+        # ---- `relocate` while the older one matches `verbatim`.
+        _p = run_in_gov(_g13, "adopt", "--target", str(_t13), "--write")
+        check("[-13] adopt --write exits 0 over a partially attributable tree", _p.returncode == 0,
+              _p.stdout + _p.stderr)
+        _rec13 = a13_receipt(_t13)
+        _ladder = a13_row(_rec13, "scripts/demo/ladder.py")
+        check("[-13] AC5 rung-major picks the OLDER commit that matches `verbatim`...",
+              _ladder.get("commit") == _sh13[0],
+              f"{_ladder.get('commit')} != wave-1 {_sh13[0]}")
+        check("[-13] AC5 ...rather than the newer one that matches only at `relocate`",
+              _ladder.get("carry") == "verbatim", str(_ladder.get("carry")))
+
+        # ---- AC3: a verbatim row records both identities AGREEING and a proven vintage.
+        _verb = a13_row(_rec13, "scripts/demo/verbatim-one.py")
+        check("[-13] AC3 a byte-identical row records carry `verbatim`",
+              _verb.get("carry") == "verbatim", str(_verb))
+        check("[-13] AC3 ...with the two identities AGREEING",
+              _verb.get("gov_oid") and _verb.get("gov_oid") == _verb.get("oid"), str(_verb))
+        check("[-13] AC3 ...and evidence `vintage-match`, never `apply`",
+              _verb.get("evidence") == "vintage-match", str(_verb.get("evidence")))
+
+        # ---- AC4: THE INVERSION GATE. This is the field the whole unit's safety rests on: `gov_oid`
+        # ---- is gov's blob at the row's commit and NEVER the bytes on the target's disk. Invert it
+        # ---- and the identities agree for every row, the local-delta predicate reads false, and the
+        # ---- first `update --write` raw-overwrites every carried edit at exit 0.
+        _rel = a13_row(_rec13, "scripts/demo/moved-one.py")
+        _gov_blob = subprocess.run(
+            ["git", "-C", str(_g13), "rev-parse", f"{_rel.get('commit')}:tools/demo/moved-one.py"],
+            capture_output=True, text=True).stdout.strip()
+        _tgt_blob = subprocess.run(
+            ["git", "-C", str(_t13), "rev-parse", ":scripts/demo/moved-one.py"],
+            capture_output=True, text=True).stdout.strip()
+        check("[-13] AC4 the relocated row proves the `relocate` rung",
+              _rel.get("carry") == "relocate", str(_rel))
+        check("[-13] AC4 ...its `gov_oid` is GOV's blob at the row's commit",
+              _rel.get("gov_oid") == _gov_blob and bool(_gov_blob),
+              f"{_rel.get('gov_oid')} != {_gov_blob}")
+        check("[-13] AC4 ...and is NOT the target's own index blob, which is the inversion",
+              _rel.get("gov_oid") != _tgt_blob and bool(_tgt_blob),
+              f"{_rel.get('gov_oid')} == {_tgt_blob}")
+
+        # ---- AC6 / AC9 / S7: the two states that must NOT be collapsed into each other.
+        _str = a13_row(_rec13, "scripts/demo/stranger.py")
+        check("[-13] AC6 a row matching no gov vintage records evidence `unattributed`",
+              _str.get("evidence") == "unattributed", str(_str))
+        check("[-13] AC6 ...carrying neither `commit` nor `gov_oid`",
+              "commit" not in _str and "gov_oid" not in _str, str(_str))
+        check("[-13] AC6 ...and KEEPS the role its rule declared, rather than becoming `forked`",
+              _str.get("role") == "engine", str(_str.get("role")))
+        _fork = a13_row(_rec13, "scripts/demo/forked-one.py")
+        check("[-13] AC9 a declared-forked row adopts as `forked` though the walk matched it",
+              _fork.get("role") == "forked" and _fork.get("commit") == _sh13[0], str(_fork))
+        check("[-13] AC9 ...carrying the RULE's direction and record",
+              _fork.get("direction") == "gov-from-target"
+              and _fork.get("record") == "DEPL-fixture-1", str(_fork))
+
+        # ---- THE TWO STANDING PREDICATES (§5), over the WHOLE receipt rather than one fixture row.
+        # ---- Left-shifted as predicates because both defects are classes: an inverted `gov_oid` and
+        # ---- a role taken from the attribution outcome are each destructive on EVERY row, and an
+        # ---- arm naming one path certifies coverage it does not have.
+        _bad_oid = [f["path"] for f in _rec13["files"] if f.get("commit") and f.get("gov_oid")
+                    and f.get("source") and f["gov_oid"] != subprocess.run(
+                        ["git", "-C", str(_g13), "rev-parse", f"{f['commit']}:{f['source']}"],
+                        capture_output=True, text=True).stdout.strip()]
+        check("[-13] STANDING every row carrying a commit has gov's OWN blob as its `gov_oid`",
+              not _bad_oid, "inverted on: " + ", ".join(_bad_oid))
+        check("[-13] STANDING every destination whose rule declares `forked` is written `forked`",
+              [f["path"] for f in _rec13["files"] if f.get("role") == "forked"]
+              == ["scripts/demo/forked-one.py"],
+              str([f["path"] for f in _rec13["files"] if f.get("role") == "forked"]))
+
+        # ---- AC10: THE ENVELOPE. Omitting a key here degrades three other units SILENTLY, which is
+        # ---- why the absent set is asserted as hard as the present one: a receipt carrying
+        # ---- `orders` or `gate_runner` would be claiming an install this verb never performed.
+        check("[-13] AC10 the envelope carries every key a later verb reads",
+              all(k in _rec13 for k in ("schema", "gov_source", "gov_commit", "prefix", "kits",
+                                        "files")), str(sorted(_rec13)))
+        check("[-13] AC10 ...and NONE of the keys that record what an install DID",
+              not any(k in _rec13 for k in ("orders", "baseline", "after", "hook_block",
+                                            "gate_runner")), str(sorted(_rec13)))
+        check("[-13] AC10 ...`gov_commit` is the resolved --to, so `-12`'s vintage guard has a base",
+              _rec13.get("gov_commit") == _sh13[1], str(_rec13.get("gov_commit")))
+        _sums13 = (_t13 / ".governance" / "install.sums").read_text(encoding="utf-8").splitlines()
+        _hashed13 = [f for f in _rec13["files"] if "sha256" in f]
+        check("[-13] AC10 install.sums is NON-EMPTY and holds one line per hashed row",
+              len(_sums13) == len(_hashed13) and len(_sums13) > 0,
+              f"{len(_sums13)} lines vs {len(_hashed13)} hashed rows")
+        _pc = run_in_gov(_g13, "check", "--target", str(_t13))
+        _sc = _re.search(r"sidecar: (\d+) line\(s\) compared against (\d+) hashed row\(s\)",
+                         _pc.stdout)
+        check("[-13] AC10 ...and `check` joins the two at the same N, greater than zero",
+              bool(_sc) and _sc.group(1) == _sc.group(2) and int(_sc.group(1)) > 0,
+              _sc.group(0) if _sc else _pc.stdout)
+
+        # ---- AC11: THE ENVELOPE IS LIVE, not merely present. Without `gov_commit` the `-12` S7
+        # ---- vintage guard skips itself BY ITS OWN WORDS and a backwards run raw-writes every
+        # ---- clean row. This is the arm that stops the envelope being written and never read.
+        settle(_t13, "receipt")
+        _pb = run_in_gov(_g13, "update", "--target", str(_t13), "--to", _sh13[0], "--write")
+        check("[-13] AC11 a backwards `update --to` REFUSES against the bootstrapped envelope",
+              _pb.returncode == 2, f"rc {_pb.returncode}: {_pb.stdout}{_pb.stderr}")
+        check("[-13] AC11 ...naming BOTH shas rather than refusing anonymously",
+              _sh13[0][:8] in (_pb.stdout + _pb.stderr)
+              and _sh13[1][:8] in (_pb.stdout + _pb.stderr), _pb.stderr)
+
+        # ---- S10's absent-optional-keys arm: a receipt carrying none of the five install-record
+        # ---- keys must CLASSIFY without refusal. Every reader tolerates absence via `.get`, and
+        # ---- this is what asserts that rather than trusting it.
+        _pu = run_in_gov(_g13, "update", "--target", str(_t13))
+        check("[-13] S10 a receipt with no orders/baseline/after/hook_block/gate_runner classifies",
+              _pu.returncode in (0, 1) and "Traceback" not in (_pu.stdout + _pu.stderr),
+              _pu.stdout + _pu.stderr)
+        check("[-13] AC6 ...and the unattributed row is PRINTED and skipped, never classified",
+              "unattributed" in _pu.stdout and "scripts/demo/stranger.py" in _pu.stdout,
+              _pu.stdout)
+
+        # ---- AC6 + AC9's write halves. `update --write` must put ZERO bytes at either path: the
+        # ---- unattributed one has no base to write against, and the forked one is report-only in
+        # ---- BOTH directions. Asserted on the INDEX rather than by reading the message, because a
+        # ---- printer saying "report" while the writer writes is exactly the class this checks.
+        _before = (_t13 / "scripts" / "demo" / "forked-one.py").read_bytes()
+        _before_s = (_t13 / "scripts" / "demo" / "stranger.py").read_bytes()
+        run_in_gov(_g13, "update", "--target", str(_t13), "--write")
+        check("[-13] AC9 `update --write` writes ZERO bytes to the forked destination",
+              (_t13 / "scripts" / "demo" / "forked-one.py").read_bytes() == _before)
+        check("[-13] AC6 ...and ZERO bytes to the unattributed one",
+              (_t13 / "scripts" / "demo" / "stranger.py").read_bytes() == _before_s)
+
+        # ---- AC4's second half, on its OWN fixture so the assertion is about the rung and not
+        # ---- about gov having stood still. `moved-one.py` never moved between the two waves, so an
+        # ---- update to the SAME vintage the row was adopted against has nothing to do — and a
+        # ---- `relocate` row that raw-wrote anyway would show up here as a modified path.
+        _t13b = a13_target("noop", "scripts", {
+            "scripts/demo/moved-one.py": b"row: scripts/demo/thing\n"})
+        run_in_gov(_g13, "adopt", "--target", str(_t13b), "--to", _sh13[1], "--write")
+        settle(_t13b, "receipt")
+        _pn = run_in_gov(_g13, "update", "--target", str(_t13b), "--to", _sh13[1], "--write")
+        check("[-13] AC4 an update to the ADOPTED vintage writes zero bytes to the relocated row",
+              "scripts/demo/moved-one.py" not in a13_porcelain(_t13b),
+              a13_porcelain(_t13b) + " | " + _pn.stdout)
+
+        # ---- AC7: `--pin` is an ASSERTION and is recorded as one. A pinned row is never read back
+        # ---- as a proof, which is the whole reason `evidence` distinguishes the two.
+        _t13c = a13_target("pin", "scripts", {
+            "scripts/demo/stranger.py": b"nothing gov ever shipped\n"})
+        _pp = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--write",
+                         "--pin", f"scripts/demo/stranger.py={_sh13[0]}")
+        check("[-13] AC7 --pin exits 0", _pp.returncode == 0, _pp.stdout + _pp.stderr)
+        _pinned = a13_row(a13_receipt(_t13c), "scripts/demo/stranger.py")
+        check("[-13] AC7 ...and the pinned row records evidence `pinned`, not `vintage-match`",
+              _pinned.get("evidence") == "pinned", str(_pinned))
+        check("[-13] AC7 ...at the commit the operator named, with gov's blob there",
+              _pinned.get("commit") == _sh13[0] and bool(_pinned.get("gov_oid")), str(_pinned))
+        check("[-13] AC7 ...and NO rung, because the pin fixes the base and never the proof",
+              "carry" not in _pinned, str(_pinned.get("carry")))
+        _pbad = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--re-adopt",
+                           "--pin", "scripts/demo/stranger.py")
+        check("[-13] AC7 a --pin with no `=` is refused rather than pinning nothing",
+              _pbad.returncode == 2 and "--pin needs <path>=<rev>" in _pbad.stderr, _pbad.stderr)
+        _pnorev = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--re-adopt",
+                             "--pin", "scripts/demo/stranger.py=no-such-rev")
+        check("[-13] AC7 a --pin naming a revision that does not resolve is refused BY NAME",
+              _pnorev.returncode == 2 and "--pin scripts/demo/stranger.py=no-such-rev does not "
+              "resolve" in _pnorev.stderr, _pnorev.stderr)
+        # A REVISION THAT RESOLVES AND CARRIES NO SUCH BLOB is a THIRD state, and it is the one an
+        # operator actually reaches: they pin a real commit that predates the file. Refusing here
+        # rather than recording `gov_oid: null` is what keeps an assertion from becoming a fiction.
+        _pnoblob = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--re-adopt",
+                              "--pin", f"scripts/demo/stranger.py={_sh13[0]}^")
+        check("[-13] AC7 ...and a revision holding no blob for that source is refused separately",
+              _pnoblob.returncode == 2 and "gov holds no blob" in _pnoblob.stderr, _pnoblob.stderr)
+        _pnoto = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--re-adopt",
+                            "--to", "no-such-rev")
+        check("[-13] AC8 a --to that does not resolve in this gov checkout is refused",
+              _pnoto.returncode == 2 and "does not resolve in this gov checkout" in _pnoto.stderr,
+              _pnoto.stderr)
+
+        # ---- AC8: THE THREE REFUSALS, each by name. The positive run above is the liveness half —
+        # ---- without it every refusal here could be firing because the verb is broken.
+        _pself = run_in_gov(_g13, "adopt", "--target", str(_g13))
+        check("[-13] AC8 adopt refuses a --target that IS the gov checkout",
+              _pself.returncode == 2 and "gov checkout itself" in _pself.stderr, _pself.stderr)
+        _pre = run_in_gov(_g13, "adopt", "--target", str(_t13c))
+        check("[-13] AC8 ...refuses over an existing receipt without --re-adopt",
+              _pre.returncode == 2 and "--re-adopt" in _pre.stderr, _pre.stderr)
+        _pok = run_in_gov(_g13, "adopt", "--target", str(_t13c), "--re-adopt")
+        check("[-13] AC8 ...and --re-adopt releases exactly that refusal and nothing else",
+              _pok.returncode == 0, _pok.stdout + _pok.stderr)
+        _t13d = a13_target("dirty", "scripts", {"scripts/demo/verbatim-one.py": b"v1\n"})
+        (_t13d / "scripts" / "demo" / "verbatim-one.py").write_bytes(b"edited\n")
+        git(_t13d, "add", "-A")
+        _pd = run_in_gov(_g13, "adopt", "--target", str(_t13d))
+        check("[-13] AC8 ...refuses a target whose INDEX differs from HEAD",
+              _pd.returncode == 2 and "differ from HEAD" in _pd.stderr, _pd.stderr)
+        git(_t13d, "reset", "-q", "--hard", "HEAD")
+        (_t13d / "scripts" / "demo" / "verbatim-one.py").write_bytes(b"unstaged\n")
+        _pw = run_in_gov(_g13, "adopt", "--target", str(_t13d))
+        check("[-13] F1 ...and does NOT refuse an UNSTAGED edit, which `-12` owns and this does not",
+              _pw.returncode == 0, _pw.stdout + _pw.stderr)
+
+        # ---- AC13 + AC14: the two row classes `resolve_entry` never produces (S11), and S7's
+        # ---- scoping in BOTH directions. One fixture, because the classes only exist together: a
+        # ---- descriptor declaring an `lf_pin` and a merged rule, adopted into a target that holds
+        # ---- both, plus a `seed` row that matched no vintage.
+        _S11_EXTRA = ('\n[[files]]\ninclude = "seed-one.py"\nrole = "seed"\n\n'
+                      '[[files]]\ninclude = "block.txt"\nrole = "merged"\n'
+                      'block_id = "demo:block"\nmarker_style = "hash-comment"\n'
+                      'to = "hooks/pre-commit"\n\n'
+                      '[[lf_pin]]\npattern = "*.sh"\n')
+        # THE MARKER PAIR IS `marker_pair`'s, not a shape invented here. It synthesizes
+        # `# <block_id>` / `# /<block_id>` for `hash-comment`, and a fixture spelling any other
+        # pair produces a source `find_block` cannot read — which reads as "the feature does not
+        # work" and is really "the fixture never triggered it". Cost one round here.
+        _BLOCK = "# demo:block\nechodemo\n# /demo:block\n"
+        _W1s = dict(_W1, **{"seed-one.py": "seed-v1\n", "block.txt": _BLOCK})
+        _g11, _sh11 = a13_gov("s11", [_W1s, _W2], a13_kit(_S11_EXTRA))
+        _t11 = a13_target("s11", "scripts", {
+            "scripts/demo/verbatim-one.py": b"v1\n",
+            "scripts/demo/seed-one.py": b"the target rewrote its own seed entirely\n",
+            "hooks/pre-commit": b"#!/bin/sh\n# demo:block\nechodemo\n# /demo:block\n",
+            ".gitattributes": b"*.sh text eol=lf\n"})
+        _p11 = run_in_gov(_g11, "adopt", "--target", str(_t11), "--write")
+        check("[-13] AC13 adopt exits 0 over a descriptor declaring an lf_pin and a merged rule",
+              _p11.returncode == 0, _p11.stdout + _p11.stderr)
+        _rec11 = a13_receipt(_t11)
+        _attr = [f for f in _rec11["files"] if f.get("role") == "attributes"]
+        check("[-13] AC13 the receipt carries EXACTLY ONE synthesized `attributes` row",
+              len(_attr) == 1 and _attr[0]["path"] == ".gitattributes",
+              str([f["path"] for f in _attr]))
+        check("[-13] AC13 ...carrying neither identity and no `evidence`, per S11",
+              not any(k in _attr[0] for k in ("gov_oid", "oid", "evidence")) if _attr else False,
+              str(_attr[0]) if _attr else "no row")
+        _mrg = [f for f in _rec11["files"] if f.get("role") == "merged"]
+        check("[-13] AC13 ...and a `merged` row in apply's shape, with the block_id `check` reads",
+              len(_mrg) == 1 and _mrg[0].get("block_id") == "demo:block", str(_mrg))
+        _pc11 = run_in_gov(_g11, "check", "--target", str(_t11))
+        check("[-13] AC13 ...so `check` reports the merged block rather than raising KeyError",
+              "Traceback" not in (_pc11.stdout + _pc11.stderr), _pc11.stdout + _pc11.stderr)
+        _seed = a13_row(_rec11, "scripts/demo/seed-one.py")
+        check("[-13] AC14 the fixture really produced an UNATTRIBUTED `seed` row",
+              _seed.get("role") == "seed" and _seed.get("evidence") == "unattributed", str(_seed))
+        settle(_t11, "receipt")
+        _before11 = (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes()
+        _pu11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        check("[-13] AC14 the unattributed SEED row reaches its own disposition, not S7's skip",
+              "[seed" in _pu11.stdout and "reseed" in _pu11.stdout.lower(), _pu11.stdout)
+        check("[-13] AC14 ...and the synthesized `attributes` row reaches `-2`'s pins arm",
+              "[attributes" in _pu11.stdout, _pu11.stdout)
+        check("[-13] AC14 ...and neither writes a byte",
+              (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes() == _before11)
+
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
