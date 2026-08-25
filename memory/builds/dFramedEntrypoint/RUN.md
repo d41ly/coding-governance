@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-dFramedEntrypoint-8 TOOL-dFramedEntrypoint-1 TOOL-dFramedEntrypoint-4 TOOL-dFramedEntrypoint-2 TOOL-dFramedEntrypoint-3 TOOL-dFramedEntrypoint-5 TOOL-dFramedEntrypoint-6 TOOL-dFramedEntrypoint-7
+unpushed-at-landing: 0
+landed-anchor: remote
 parked-surfaced: yes, 6 surfaced
 keepalive-reaped: yes
-witness: e3f006c9327f19e168ba17970329032e191e9c48
-phase: LANDING
+witness: 78eed3e8b4b90ab28d51b275708b1a5451e6d8ba
+phase: LANDED
 branch-sha: 470bb09ba977030f5c651c55e813bc6e5bd53b03
 branch-ref: refs/heads/branch/build-readme-governance-e1c044
 mode: slug
