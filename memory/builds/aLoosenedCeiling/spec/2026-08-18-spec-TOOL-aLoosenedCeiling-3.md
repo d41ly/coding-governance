@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-1 · base 5498254b · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](../reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 |
+| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](../reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-1 TOOL-aLoosenedCeiling-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Move this repo's `READ_PATH_CEILING` to the measured read path plus the headroom default unit 1

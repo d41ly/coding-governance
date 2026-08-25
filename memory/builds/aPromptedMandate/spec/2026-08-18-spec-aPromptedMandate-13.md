@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-18 · node a · Tier-2 · base 6517579f · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md](../reviews/2026-08-18-review-TOOL-aPromptedMandate-12-spec-audit.md) | spec-audit | TOOL-aPromptedMandate-12 |
+| [2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md](../reviews/2026-08-19-review-TOOL-aPromptedMandate-12-tier2-diff.md) | diff-review | TOOL-aPromptedMandate-12 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Stop the run-gates canary from reporting a starved host as a spinning clamp. Its clamp arm reads a

@@ -2,6 +2,14 @@
 
 **Status:** DEFERRED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · shrink to a LEXICON.md ruling; the spec itself is not the deliverable
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](../build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The only real gov adopter's primary language is invisible to this kit, and nobody decided that — it

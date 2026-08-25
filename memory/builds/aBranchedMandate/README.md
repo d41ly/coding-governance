@@ -251,55 +251,24 @@ it.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aBranchedMandate-1.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md)
-  - [2026-08-16-spec-TOOL-aBranchedMandate-2.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md)
-  - [2026-08-16-spec-TOOL-aBranchedMandate-3.md](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md)
-  - [2026-08-17-spec-TOOL-aBranchedMandate-4.md](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md)
-  - [2026-08-18-spec-TOOL-aBranchedMandate-12.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md)
-  - [2026-08-18-spec-TOOL-aBranchedMandate-13.md](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md)
-- **`build/`**
-  - [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh)
-  - [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md)
-  - [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md)
-  - [2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md](build/2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md)
-- **`reviews/`**
-  - [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md)
-  - [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md)
-<!-- /gen:build-docs -->
-
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-16 · streams tooling
 ids TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 TOOL-aBranchedMandate-3 TOOL-aBranchedMandate-4 TOOL-aBranchedMandate-5 TOOL-aBranchedMandate-6 TOOL-aBranchedMandate-8 TOOL-aBranchedMandate-9 TOOL-aBranchedMandate-10 TOOL-aBranchedMandate-11 TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | CLOSED | rev-5 | 2026-08-17 |
-| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | CLOSED | rev-7 | 2026-08-17 |
-| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | CLOSED | rev-4 | 2026-08-17 |
-| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | CLOSED | rev-2 | 2026-08-18 |
-| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | CLOSED | rev-2 | 2026-08-18 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBranchedMandate-1 — the memory-recall adopter stops reding the bar on a checkout artifact](spec/2026-08-16-spec-TOOL-aBranchedMandate-1.md) | — | 1 | CLOSED | rev-4 | 2026-08-17 |
+| [TOOL-aBranchedMandate-12 — a blocked --close names the leg that blocked it](spec/2026-08-18-spec-TOOL-aBranchedMandate-12.md) | — | 1 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-13 — build-complete says which region it could not find](spec/2026-08-18-spec-TOOL-aBranchedMandate-13.md) | — | 1 | CLOSED | rev-2 | 2026-08-18 |
+| [TOOL-aBranchedMandate-2 — a checkout artifact stops refusing every unattended run in a worktree](spec/2026-08-16-spec-TOOL-aBranchedMandate-2.md) | — | 2 | CLOSED | rev-5 | 2026-08-17 |
+| [TOOL-aBranchedMandate-3 — a build published on the run's own branch may authorize the run](spec/2026-08-16-spec-TOOL-aBranchedMandate-3.md) | — | 2 | CLOSED | rev-7 | 2026-08-17 |
+| [TOOL-aBranchedMandate-4 — the unattended adopter decides repo membership without comparing path strings](spec/2026-08-17-spec-TOOL-aBranchedMandate-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-17 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 8 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | TOOL-aBranchedMandate-3 |
-| [2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md](build/2026-08-16-build-aBranchedMandate-1-worktree-refusal-reproduction.md) | — | *none — a reproduction of the commissioning complaint; it PRECEDES the spec set and is what warranted it* |
-| [2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md](build/2026-08-18-build-TOOL-aBranchedMandate-12-measured-not-yet-rowed.md) | journal | TOOL-aBranchedMandate-12..13 |
-| [2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md](build/2026-08-18-build-TOOL-aBranchedMandate-5-handoff-open-rows.md) | — | *none — a handoff for a SEPARATE session; the six rows it details are OPEN backlog rows this build never specced, so it holds no spec to serve* |
-| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1..3 |
-| [2026-08-17-review-TOOL-aBranchedMandate-1.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-1..2 |
-| [2026-08-17-review-TOOL-aBranchedMandate-3.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md) | diff-review | TOOL-aBranchedMandate-3 |
-| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | TOOL-aBranchedMandate-4 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13.
 <!-- /gen:build-index -->

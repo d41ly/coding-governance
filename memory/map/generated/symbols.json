@@ -173,6 +173,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "add_spec_records_region",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "adopt",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -408,6 +413,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_spec_record_index",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_substitution",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -498,6 +508,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "check_contract_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -521,6 +536,11 @@
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_slot_table",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_target_reads_subject",
@@ -581,6 +601,11 @@
       "id": "cmd_apply",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_bump",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "cmd_check",
@@ -665,6 +690,11 @@
     {
       "id": "cmd_report",
       "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_report",
+      "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
     },
     {
@@ -696,6 +726,11 @@
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_survey",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "cmd_update",
@@ -1528,6 +1563,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "measure_slot_sizes",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "merge",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -1818,6 +1858,16 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_contract_registry",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_contract_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1878,6 +1928,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_slot_table",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1933,6 +1988,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "remove_dead_regions",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "remove_fenced",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1973,11 +2033,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "render_docs",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
       "id": "render_edges",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2014,6 +2069,11 @@
     },
     {
       "id": "render_shards",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
@@ -2151,6 +2211,11 @@
       "id": "resolve_shell_argv",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_slot_data_dir",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "resolve_template_path",
@@ -2343,6 +2408,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scan_canon",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "scan_claimed_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2361,6 +2431,16 @@
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_slot_budget",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_unarmed_slots",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "scan_unselective_rules",
@@ -2511,11 +2591,6 @@
       "id": "stripStrings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "strip_records_sentence",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "structure_identity",

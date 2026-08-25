@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-08 · node a · Tier-2 · base 42c3f4dc · ratified 2026-08-08
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-08-build-TOOL-aFoldedQuarry-2-1.md](../../build/2026-08-08-build-TOOL-aFoldedQuarry-2-1.md) | journal | — |
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-1.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-1.md) | spec-audit | TOOL-aFoldedQuarry-1 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-7.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-7.md) | diff-review | TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 TOOL-aFoldedQuarry-7 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Replace the string-echo verdict join in `tools/workflows/tier2-review.js` with an

@@ -96,19 +96,19 @@ Nothing is unassigned, and one of the four is discharged by being disproved.
 ids PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | CLOSED | rev-3 | 2026-08-16 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [PLAY-aDeclaredCeiling-1 — the refuted follow-up, recorded where it was asserted](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-1 — the size ceilings become one declaration with their history beside them](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-2 — the recall corpus reaches a constraint declared in a conf](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-aDeclaredCeiling-3 — a landed run's frozen region stops being compared to a moving source](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `reviews/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1..3 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -120,14 +120,3 @@ Records live under `spec/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-PLAY-aDeclaredCeiling-1.md](spec/2026-08-16-spec-PLAY-aDeclaredCeiling-1.md)
-  - [2026-08-16-spec-TOOL-aDeclaredCeiling-1.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-1.md)
-  - [2026-08-16-spec-TOOL-aDeclaredCeiling-2.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-2.md)
-  - [2026-08-16-spec-TOOL-aDeclaredCeiling-3.md](spec/2026-08-16-spec-TOOL-aDeclaredCeiling-3.md)
-- **`reviews/`**
-  - [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md)
-<!-- /gen:build-docs -->

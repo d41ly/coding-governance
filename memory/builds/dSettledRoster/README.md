@@ -85,12 +85,16 @@ Recorded because the value is in the misses, not the hits.
 ids DEPL-dSettledRoster-1 DEPL-dSettledRoster-2 TOOL-dSettledRoster-1 TOOL-dSettledRoster-2 TOOL-dSettledRoster-3 TOOL-dSettledRoster-4 TOOL-dSettledRoster-5 TOOL-dSettledRoster-6
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dSettledRoster-5 — name the bash executable, so a descriptor's leg stops running under WSL](spec/2026-08-20-spec-TOOL-dSettledRoster-5.md) | CLOSED | rev-1 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dSettledRoster-5 — name the bash executable, so a descriptor's leg stops running under WSL](spec/2026-08-20-spec-TOOL-dSettledRoster-5.md) | — | 2 | CLOSED | rev-1 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records: 0 bound to this build, across 1 record folder(s).
+
+Ids no record names: TOOL-dSettledRoster-5.
+
+Ids no `spec-audit` record has ever named: TOOL-dSettledRoster-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -102,9 +106,3 @@ Records live under `spec/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-20-spec-TOOL-dSettledRoster-5.md](spec/2026-08-20-spec-TOOL-dSettledRoster-5.md)
-<!-- /gen:build-docs -->

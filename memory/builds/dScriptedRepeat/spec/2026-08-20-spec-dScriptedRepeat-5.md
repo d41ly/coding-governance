@@ -2,6 +2,21 @@
 
 **Status:** CLOSED · rev-11 · 2026-08-22 · node d · Tier-2 · base d2a40aa8 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md](../build/2026-08-21-build-TOOL-dScriptedRepeat-5-11-acceptance-ledger.md) | journal | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md](../build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md) | journal | — |
+| [2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md](../reviews/2026-08-21-review-TOOL-dScriptedRepeat-5-diff-round1.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md](../reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round2.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md](../reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round3.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md](../reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round4.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md](../reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round5.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+| [2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md](../reviews/2026-08-22-review-TOOL-dScriptedRepeat-5-diff-round6.md) | diff-review | TOOL-dScriptedRepeat-6 TOOL-dScriptedRepeat-7 TOOL-dScriptedRepeat-9 TOOL-dScriptedRepeat-10 TOOL-dScriptedRepeat-11 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Define the per-piece evidence record as a TRACKED artifact hash-joined to the piece it describes, the

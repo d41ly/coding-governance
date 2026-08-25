@@ -2,6 +2,20 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-24 · node d · Tier-2 · base abd0f026 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-23-build-TOOL-dScriptedRepeat-13-acceptance.md](../build/2026-08-23-build-TOOL-dScriptedRepeat-13-acceptance.md) | journal | — |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md](../build/2026-08-24-build-TOOL-dScriptedRepeat-13-round8-fold.md) | journal | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md](../build/2026-08-24-build-TOOL-dScriptedRepeat-13-round9-fold.md) | journal | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round7.md) | diff-review | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-diff-round8.md) | diff-review | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md](../reviews/2026-08-23-review-TOOL-dScriptedRepeat-13-spec-audit-round1.md) | diff-review | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+| [2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md](../reviews/2026-08-24-review-TOOL-dScriptedRepeat-13-diff-round9.md) | diff-review | TOOL-dScriptedRepeat-14 TOOL-dScriptedRepeat-15 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Check 11 reds when a RUN-STATE file names the declared bypass flag, on the stated ground that a run

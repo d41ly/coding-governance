@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T04:50:12+03:00 @ 9ddcc5c944bdb92456ef031ee5f038842d016587
+last-audit: 2026-08-25T08:48:01+03:00 @ 9ddcc5c944bdb92456ef031ee5f038842d016587
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 48a88bf6967b7d236dc843c23a12b47bea2861e5
@@ -239,9 +239,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
 - A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
   prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
-- A build README's top level is a SLOT SEQUENCE gated by its own leg,
-  `gen_build_index.py --check-format`: authored content after the first generated marker reds it.
-  Detail in `memory/map/features/build-readme-surface.md`.
+- A build README is a slot SEQUENCE and, since `TOOL-dFramedEntrypoint`, a closed heading CANON with
+  per-slot byte budgets — both on `gen_build_index.py --check-format`, binding only what
+  `memory/project/readme-contract.txt` declares. Order is authored on the SPECS as `· order <n>`;
+  records render in the spec they serve. All of it: `memory/map/features/build-readme-surface.md`.
 - `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
 - `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed

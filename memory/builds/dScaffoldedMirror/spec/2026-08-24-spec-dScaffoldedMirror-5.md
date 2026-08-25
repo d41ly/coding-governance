@@ -2,6 +2,14 @@
 
 **Status:** WONTDO · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · S1 cut as specced-worthless; the S2-S4 repair re-files as a drift-audit unit
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](../build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `RATCHETS` at `drift_signals.py:264-276` holds eight rows and none of them is `.lexicon.conf`, while

@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-14 · node c · Tier-2 · base 790c1d24 · streams tooling · ratified 2026-08-14
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-14-review-TOOL-cSteadyMetronome-1-1.md](../reviews/2026-08-14-review-TOOL-cSteadyMetronome-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make the run-gates canary's concurrency arm assert how many legs the runner had IN FLIGHT AT ONCE, by

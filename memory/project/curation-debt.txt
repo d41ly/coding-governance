@@ -1,48 +1,42 @@
-# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
-# Two build READMEs entered the index set at TOOL-aRuledFrontispiece-5's tier (BUILD_README_CAP_BYTES / BUILD_README_ENTRY_CAP_CHARS)
-# already above it. Both are other builds' records, so slimming them is not this build's to do —
-# TOOL-aMouldedFolio-3 is the precedent that a build's own folder owns its own prose. Shrink-only:
-# each row drains when that build's owner curates it.
-memory/builds/cBriefedPilot/README.md
-memory/builds/aUnmannedHelm/README.md
-memory/builds/aBoundedVerdict/README.md
-memory/builds/aDrainedSluice/README.md
-# This build's own README: 11 units with long spec titles put three GENERATED unit-table rows
-# over the per-line tier and the file over the byte tier. Both are renderer-shaped problems
-# (the row carries the full title AND the path), not curation ones, and reshaping the renderer
-# during a merge is the wrong moment. Drains when the row shape is revisited.
-memory/builds/aRuledFrontispiece/README.md
-# memory/backlog/TOOL.md — a MERGE-INDUCED overflow, not a curation lapse. Both parents were legal
-# and within a hair of the cap (theirs 20435 B, ours 20479 B, cap 20480); the row driver unioned
-# them correctly to 86 rows / 21762 B. Rotation could NOT fix it when this was written: TERMINAL is
-# ("CLOSED","WONTDO") and exactly ONE row qualified, so rotating shed less than the rotation note
-# it must add.
+# curation-debt.txt - index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
 #
-# THAT PREMISE EXPIRED, 2026-08-21. Re-derived on the same tree: 159 rows, 71855 B against a cap
-# of 61440, and NINETEEN rows are terminal. aShardedFloor closed four of them in one landing.
-# Rotation is now the live remedy rather than a rejected one, and this row is no longer
-# describing why it cannot be drained — it is describing a drain nobody has performed. The count
-# is deliberately re-derived here rather than trusted: the original was true and stopped being
-# true without anyone editing it, which is the whole class this file exists to make visible.
-# This is
-# TOOL-cSettledDocket-16 arriving — "new rows are now paid for by shortening old ones" — and paying
-# that fee by trimming 1 KB of other builds' prose mid-merge is the wrong moment, on the same
-# reasoning the aRuledFrontispiece row above already carries.
+# FIVE ROWS DRAINED AT TOOL-dFramedEntrypoint-5, which removed the document-inventory region and the
+# records table from every build README. Every one of the five was RENDERER-SHAPED - a generated row
+# or a generated region blowing a cap on an authored-prose class - and each said so in its own text.
+# Drained: aPacedTurnstile, aDrainedSluice, dUnstalledConvoy, aRuledFrontispiece, dFramedEntrypoint.
+# Measured, not assumed: with the whole registry emptied, the hygiene gate reds on exactly the
+# subjects below and on nothing else, so the five carry no remaining load.
+#
+# TOOL-dUnstalledConvoy-13 IS CLOSED BY THIS. Its row said a build's spec-audit record cannot fit the
+# generated bindings row once a build passes about eleven units, because the row must spell every id
+# it serves and the binding grammar expands a range at authoring time. There is no bindings row now.
+#
+# WHAT IS LEFT is authored prose over an authored cap, which is what this registry was always for.
+
+# memory/builds/aBoundedVerdict/README.md - 38261 B against a 25600 cap, and five AUTHORED lines over
+# the 350-char tier. Not renderer-shaped: this is the largest authored half in the corpus and slimming
+# it is that build's own curation, not this one's. It fell from 44872 B when the two regions went, so
+# the removal helped and did not finish the job.
+memory/builds/aBoundedVerdict/README.md
+# memory/builds/cBriefedPilot/README.md - 27895 B against the same cap, down from 32023 B. Authored
+# prose again; same disposition as the row above.
+memory/builds/cBriefedPilot/README.md
+# memory/builds/aUnmannedHelm/README.md - ONE authored line at 419 chars against the 350 tier. The
+# file is 12158 B and comfortably inside the byte cap, so this row buys exactly one line.
+# BLAST RADIUS: listing it silences checks 6 AND 7 on the whole file to waive that single line. That
+# is wider than the fault and is the shape this registry keeps being criticised for; it stays only
+# because narrowing it needs a per-line waiver grammar this registry does not have.
+memory/builds/aUnmannedHelm/README.md
+# memory/backlog/TOOL.md - a MERGE-INDUCED overflow, not a curation lapse, and the one row here whose
+# subject is not a build README. Both parents were legal and within a hair of the cap; the row driver
+# unioned them correctly and the result was over.
+#
+# THE ORIGINAL PREMISE EXPIRED, 2026-08-21: rotation was rejected because exactly ONE row was
+# terminal, so rotating shed less than the rotation note it must add. Re-derived on the same tree,
+# nineteen rows were terminal. Rotation is the live remedy and this row now describes a drain nobody
+# has performed rather than one that cannot be.
 # BLAST RADIUS, stated because a debt row is wider than the failure that earned it: this silences
-# checks 6, 7 AND 8 on TOOL.md, not just the byte cap. MEASURED before listing it — the hygiene
-# run that caught check 6 reported neither 7 nor 8, and the longest row is exactly 300 chars
-# against a 300 budget. So nothing is hidden today, but that row is AT the limit and the check
-# that would catch it going over is now off. Drains when the TOOL index is curated or split.
+# checks 6, 7 AND 8 on TOOL.md, not just the byte cap. Check 8 is NOT idle here - with the registry
+# emptied it reds on line 34 - so this row is currently hiding one real status-token fault as well as
+# the width. Drains when the TOOL index is rotated or split.
 memory/backlog/TOOL.md
-# memory/builds/dUnstalledConvoy/README.md - a GENERATED record-bindings row that scales with the
-# UNIT COUNT. This build's spec audit legitimately serves all 13 units, so the Records-table row the
-# renderer emits carries 13 ids and measures 438 chars against the 350 tier. No authoring choice
-# inside the record shortens it: the binding grammar expands a contiguous range at authoring time,
-# so the record must spell every id, and splitting one review into two records to shorten a row
-# would be two answers to one question. Renderer-shaped, exactly like the aRuledFrontispiece row
-# above, and TOOL-dUnstalledConvoy-13 is the row that records the structural cause.
-# BLAST RADIUS, measured before listing: this silences checks 6 and 7 on this file. Check 8's
-# population is the backlog shards alone, so it never reached this path. Check 6 passes today with
-# room - 17996 B against a 25600 cap - and the longest line that is NOT the bindings row measures
-# 319 chars against the 350 tier. So nothing is hidden today. Drains when the row shape is revisited.
-memory/builds/dUnstalledConvoy/README.md

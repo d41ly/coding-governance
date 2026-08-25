@@ -233,65 +233,39 @@ ids TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 T
 ids TOOL-dUnstalledConvoy-37 TOOL-dUnstalledConvoy-38
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | CLOSED | rev-2 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | CLOSED | rev-6 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | CLOSED | rev-3 | 2026-08-20 |
-| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | CLOSED | rev-5 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | CLOSED | rev-3 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | CLOSED | rev-5 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | CLOSED | rev-4 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | WONTDO | rev-2 | 2026-08-21 |
-| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | CLOSED | rev-3 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | CLOSED | rev-2 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | CLOSED | rev-1 | 2026-08-24 |
-| [TOOL-dUnstalledConvoy-33 — a roster that grew before anybody recorded it can be recorded, because refusing is how a run gets wedged](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md) | CLOSED | rev-2 | 2026-08-24 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [PLAY-dUnstalledConvoy-1 — the charter drops a refuted premise while keeping the conclusion it happened to support](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md) | — | 2 | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-1 — `verb_landed` accepts a local-main witness, and records which kind it took](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-10 — the leg compares a declared write set against the paths the pass actually committed](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md) | — | 2 | CLOSED | rev-6 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-11 — a journal record gains an acceptance ledger, so a built unit says which criterion each observation satisfied](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-12 — a hygiene check asserts every acceptance criterion of a closed unit is evidenced or amended](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-2 — leg check 15 grades both witness kinds, and announces the case it cannot reach](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-23 — the dispatch write-set comparison becomes a REPORT, and is made accurate enough to be worth reading](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md) | — | 2 | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-24 — a LANDING evaluated in one tree has to travel, and the refusal has to say where it went](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-25 — RETIRED: a spec-base identifier gate that measurement could not justify](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md) | — | 2 | WONTDO | rev-2 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-26 — a gate leg declares whose subject it is, and a kit's own self-tests become owner-adjustable](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md) | — | 2 | CLOSED | rev-3 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-27 — the push boundary READS the stamp's switch field, or the field is a byte nobody consults](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-28 — this repo sets the self-test switch somewhere govkit does not ship to every adopter](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md) | — | 2 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-29 — a leg's subject cannot be flipped silently, because value correctness is not machine-decidable](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md) | — | 2 | CLOSED | rev-2 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-3 — the contract states the relaxed terminal, its two anchors, and what the weaker one cannot buy](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-30 — the boundary self-tests are subject `repo`, and the criterion says why](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-31 — an on-demand skip reaches the run total, so a partial bar cannot print a whole one](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-32 — a fully skipped chunk cannot close green, which is the shape its own comment refuses](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md) | — | 1 | CLOSED | rev-1 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-33 — a roster that grew before anybody recorded it can be recorded, because refusing is how a run gets wedged](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md) | — | 2 | CLOSED | rev-2 | 2026-08-24 |
+| [TOOL-dUnstalledConvoy-4 — M2 and M3 gain the amendment vocabulary, and a mandate delegates scope inside the build's stated goal](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md) | — | 2 | CLOSED | rev-3 | 2026-08-20 |
+| [TOOL-dUnstalledConvoy-5 — the `--rescope` verb records an amendment, and records it as a declaration rather than a summary](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md) | — | 2 | CLOSED | rev-5 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-6 — the leg refuses a roster amendment with no record behind it, and announces the case it cannot compare](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-7 — E3 and E4 are measured, and the verdict is recorded with the test that would have lost](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-8 — M6's default inverts to parallel-on-proof, and the directive stops naming the opposite of its own handle](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md) | — | 2 | CLOSED | rev-3 | 2026-08-21 |
+| [TOOL-dUnstalledConvoy-9 — the driver records a dispatch's declared write sets, and refuses the two disjointness conditions a machine can decide](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md) | — | 2 | CLOSED | rev-4 | 2026-08-21 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 24 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md) | journal | TOOL-dUnstalledConvoy-1..2 TOOL-dUnstalledConvoy-10..12 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-11 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..10 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md) | journal | TOOL-dUnstalledConvoy-23 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md) | journal | TOOL-dUnstalledConvoy-24 |
-| [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md) | journal | TOOL-dUnstalledConvoy-7..8 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md) | journal | TOOL-dUnstalledConvoy-26 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-26..32 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md) | journal | TOOL-dUnstalledConvoy-27 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md) | journal | TOOL-dUnstalledConvoy-28 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md) | journal | TOOL-dUnstalledConvoy-29 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md) | journal | TOOL-dUnstalledConvoy-31 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md) | journal | TOOL-dUnstalledConvoy-32 |
-| [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md) | journal | TOOL-dUnstalledConvoy-33 |
-| [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1..12 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md) | diff-review | TOOL-dUnstalledConvoy-23..25 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md) | diff-review | TOOL-dUnstalledConvoy-23..25 |
-| [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md) | diff-review | TOOL-dUnstalledConvoy-23..24 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-26..33 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md) | diff-review | TOOL-dUnstalledConvoy-26 |
-| [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md) | diff-review | TOOL-dUnstalledConvoy-26 |
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32
-TOOL-dUnstalledConvoy-33.
+Ids no `spec-audit` record has ever named: TOOL-dUnstalledConvoy-23 TOOL-dUnstalledConvoy-24 TOOL-dUnstalledConvoy-25 TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -303,58 +277,3 @@ TOOL-dUnstalledConvoy-33.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-20-spec-PLAY-dUnstalledConvoy-1.md](spec/2026-08-20-spec-PLAY-dUnstalledConvoy-1.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-1.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-1.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-10.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-10.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-11.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-11.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-12.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-12.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-2.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-2.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-3.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-3.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-4.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-4.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-5.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-5.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-6.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-6.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-7.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-8.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-8.md)
-  - [2026-08-20-spec-TOOL-dUnstalledConvoy-9.md](spec/2026-08-20-spec-TOOL-dUnstalledConvoy-9.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-23.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-23.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-24.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-24.md)
-  - [2026-08-21-spec-TOOL-dUnstalledConvoy-25.md](spec/2026-08-21-spec-TOOL-dUnstalledConvoy-25.md)
-  - [2026-08-23-spec-TOOL-dUnstalledConvoy-26.md](spec/2026-08-23-spec-TOOL-dUnstalledConvoy-26.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-27.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-27.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-28.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-28.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-29.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-29.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-30.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-30.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-31.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-31.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-32.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-32.md)
-  - [2026-08-24-spec-TOOL-dUnstalledConvoy-33.md](spec/2026-08-24-spec-TOOL-dUnstalledConvoy-33.md)
-- **`build/`**
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-23-1-red-first.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-24-1-red-first.md)
-  - [2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md](build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-27-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-31-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-32-1-red-first.md)
-  - [2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md](build/2026-08-24-build-TOOL-dUnstalledConvoy-33-1-red-first.md)
-- **`reviews/`**
-  - [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs-rev3.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-25-specs.md)
-  - [2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md](reviews/2026-08-21-review-TOOL-dUnstalledConvoy-23-24-specs.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md)
-  - [2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md](reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec.md)
-<!-- /gen:build-docs -->

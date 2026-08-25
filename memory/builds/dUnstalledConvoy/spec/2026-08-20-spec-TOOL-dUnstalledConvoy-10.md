@@ -2,6 +2,21 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-21 · node d · Tier-2 · base 2dc9df35 · streams tooling · ratified 2026-08-20
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md](../../aBoundedVerdict/reviews/2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-19 TOOL-aBoundedVerdict-22 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-aShardedFloor-4 |
+| [2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md](../build/2026-08-21-build-TOOL-dUnstalledConvoy-1-13-review-fold.md) | journal | TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md](../build/2026-08-21-build-TOOL-dUnstalledConvoy-11-1-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-11 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 |
+| [2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md](../reviews/2026-08-20-review-TOOL-dUnstalledConvoy-1-1.md) | spec-audit | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-cumulative.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-lib-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+| [2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md](../reviews/2026-08-21-review-TOOL-dUnstalledConvoy-1-12-round3-fix.md) | diff-review | PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-dUnstalledConvoy-9` records what a concurrently dispatched pass SAID it would write. This unit

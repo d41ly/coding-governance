@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-29-1-red-first.md) | journal | — |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-28 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-dUnstalledConvoy-26`'s cross-check grades that `subject` is PRESENT and that the descriptor and

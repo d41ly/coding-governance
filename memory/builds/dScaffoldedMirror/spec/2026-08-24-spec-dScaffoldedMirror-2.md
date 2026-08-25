@@ -2,6 +2,18 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](../build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md) | research | — |
+| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](../build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-3 TOOL-dScaffoldedMirror-4 TOOL-dScaffoldedMirror-5 TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-9 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-11 TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 |
+| [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](../build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md) | journal | — |
+| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](../reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md) | diff-review | TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
+| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md](../reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md) | diff-review | TOOL-dScaffoldedMirror-6 TOOL-dScaffoldedMirror-7 TOOL-dScaffoldedMirror-8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The lexicon gate cannot currently tell a reader whether it measured anything. It folds two

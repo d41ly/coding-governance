@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-15 · node c · Tier-2 · base 37c05e1b · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make `## 6. Acceptance criteria` name concrete artifacts by rule rather than by habit: once a spec's

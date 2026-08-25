@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling+playbook+kickoff · ratified 2026-08-11
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aStandingWrit-1-1.md](../reviews/2026-08-11-review-TOOL-aStandingWrit-1-1.md) | spec-audit | — |
+| [2026-08-11-review-TOOL-aStandingWrit-1-2.md](../reviews/2026-08-11-review-TOOL-aStandingWrit-1-2.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make `/unattended <slug>` the owner's only act by moving the unattended run's authorization off an

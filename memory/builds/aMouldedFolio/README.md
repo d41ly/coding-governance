@@ -47,20 +47,15 @@ do not hand-edit it.
 ids TOOL-aMouldedFolio-1 TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | CLOSED | rev-3 | 2026-08-11 |
-| [TOOL-aMouldedFolio-3 — the build README's folder claim becomes derived, because 15 of 17 are false](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md) | CLOSED | rev-2 | 2026-08-11 |
-| [TOOL-aMouldedFolio-4 — one marker contract across four readers, and a test that drives all four](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md) | CLOSED | rev-2 | 2026-08-11 |
-| [TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md) | CLOSED | rev-2 | 2026-08-11 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aMouldedFolio-2 — the build README's `ids:` becomes derived, and its mechanical prose joins the generated region](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md) | — | 2 | CLOSED | rev-3 | 2026-08-11 |
+| [TOOL-aMouldedFolio-3 — the build README's folder claim becomes derived, because 15 of 17 are false](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md) | — | 2 | CLOSED | rev-2 | 2026-08-11 |
+| [TOOL-aMouldedFolio-4 — one marker contract across four readers, and a test that drives all four](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md) | — | 2 | CLOSED | rev-2 | 2026-08-11 |
+| [TOOL-aMouldedFolio-5 — check 20 reuses the kit's fence reader, and refuses a fence it cannot close](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md) | — | 2 | CLOSED | rev-2 | 2026-08-11 |
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
-
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md) | — | *none — this census PRECEDES the specs it produced; TOOL-aMouldedFolio-1 has no spec, so there is no id to serve* |
-| [2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md](build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md) | journal | TOOL-aMouldedFolio-3 |
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5.
 
@@ -76,15 +71,3 @@ Ids no `spec-audit` record has ever named: TOOL-aMouldedFolio-2 TOOL-aMouldedFol
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-2-derived-ids.md)
-  - [2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-3-generated-prose.md)
-  - [2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-4-marker-conformance.md)
-  - [2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md](spec/2026-08-11-spec-TOOL-aMouldedFolio-5-check20-gaps.md)
-- **`build/`**
-  - [2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md](build/2026-08-11-build-TOOL-aMouldedFolio-1-doc-template-census.md)
-  - [2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md](build/2026-08-16-build-TOOL-aMouldedFolio-3-3-followups-controls.md)
-<!-- /gen:build-docs -->

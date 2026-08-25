@@ -144,38 +144,29 @@ ids TOOL-dScaffoldedMirror-1 TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-3 T
 ids TOOL-dScaffoldedMirror-12 TOOL-dScaffoldedMirror-13 TOOL-dScaffoldedMirror-14 TOOL-dScaffoldedMirror-15 TOOL-dScaffoldedMirror-16 TOOL-dScaffoldedMirror-17 TOOL-dScaffoldedMirror-18 TOOL-dScaffoldedMirror-19 TOOL-dScaffoldedMirror-20
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | CLOSED | rev-5 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-11 — the scoped extractor, and the one predicate it makes possible](spec/2026-08-24-spec-dScaffoldedMirror-11.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-12 — the consistency instrument, measured before it is believed](spec/2026-08-24-spec-dScaffoldedMirror-12.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-14 — the `t_` and `do_` renames, and `cmd` as a reserved row](spec/2026-08-24-spec-dScaffoldedMirror-14.md) | CLOSED | rev-2 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-15 — wire the runbook-parity gate, and pay what wiring it costs](spec/2026-08-24-spec-dScaffoldedMirror-15.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness](spec/2026-08-24-spec-dScaffoldedMirror-2.md) | CLOSED | rev-3 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-3 — corpus scoping derived from the install receipt](spec/2026-08-24-spec-dScaffoldedMirror-3.md) | WONTDO | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-4 — waiver keying and the mandatory reason](spec/2026-08-24-spec-dScaffoldedMirror-4.md) | DEFERRED | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-5 — the three RATCHETS rows and the delete-then-re-add repair](spec/2026-08-24-spec-dScaffoldedMirror-5.md) | WONTDO | rev-1 | 2026-08-24 |
-| [TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet](spec/2026-08-24-spec-dScaffoldedMirror-6.md) | CLOSED | rev-4 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal](spec/2026-08-24-spec-dScaffoldedMirror-7.md) | CLOSED | rev-4 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-8 — the shipped frozen canon, and `--probe`](spec/2026-08-24-spec-dScaffoldedMirror-8.md) | CLOSED | rev-3 | 2026-08-25 |
-| [TOOL-dScaffoldedMirror-9 — the grandfather set with a provenance assert, replacing all three pins](spec/2026-08-24-spec-dScaffoldedMirror-9.md) | DEFERRED | rev-1 | 2026-08-24 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dScaffoldedMirror-10 — supply the vocabulary to the author](spec/2026-08-24-spec-dScaffoldedMirror-10.md) | — | 2 | CLOSED | rev-5 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-11 — the scoped extractor, and the one predicate it makes possible](spec/2026-08-24-spec-dScaffoldedMirror-11.md) | — | 2 | DEFERRED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-12 — the consistency instrument, measured before it is believed](spec/2026-08-24-spec-dScaffoldedMirror-12.md) | — | 1 | DEFERRED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited](spec/2026-08-24-spec-dScaffoldedMirror-13.md) | — | 1 | DEFERRED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-14 — the `t_` and `do_` renames, and `cmd` as a reserved row](spec/2026-08-24-spec-dScaffoldedMirror-14.md) | — | 1 | CLOSED | rev-2 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-15 — wire the runbook-parity gate, and pay what wiring it costs](spec/2026-08-24-spec-dScaffoldedMirror-15.md) | — | 1 | DEFERRED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-2 — honest reporting and per-predicate liveness](spec/2026-08-24-spec-dScaffoldedMirror-2.md) | — | 1 | CLOSED | rev-3 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-3 — corpus scoping derived from the install receipt](spec/2026-08-24-spec-dScaffoldedMirror-3.md) | — | 1 | WONTDO | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-4 — waiver keying and the mandatory reason](spec/2026-08-24-spec-dScaffoldedMirror-4.md) | — | 1 | DEFERRED | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-5 — the three RATCHETS rows and the delete-then-re-add repair](spec/2026-08-24-spec-dScaffoldedMirror-5.md) | — | 1 | WONTDO | rev-1 | 2026-08-24 |
+| [TOOL-dScaffoldedMirror-6 — the coverage floor and the LANGS mode ratchet](spec/2026-08-24-spec-dScaffoldedMirror-6.md) | — | 1 | CLOSED | rev-4 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-7 — the marginal-offense-rate signal](spec/2026-08-24-spec-dScaffoldedMirror-7.md) | — | 1 | CLOSED | rev-4 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-8 — the shipped frozen canon, and `--probe`](spec/2026-08-24-spec-dScaffoldedMirror-8.md) | — | 2 | CLOSED | rev-3 | 2026-08-25 |
+| [TOOL-dScaffoldedMirror-9 — the grandfather set with a provenance assert, replacing all three pins](spec/2026-08-24-spec-dScaffoldedMirror-9.md) | — | 2 | DEFERRED | rev-1 | 2026-08-24 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 10 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md) | research | TOOL-dScaffoldedMirror-2 |
-| [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md) | spec-audit | TOOL-dScaffoldedMirror-2..15 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-10.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-10.md) | journal | TOOL-dScaffoldedMirror-10 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-14.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-14.md) | journal | TOOL-dScaffoldedMirror-14 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md) | journal | TOOL-dScaffoldedMirror-2 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md) | journal | TOOL-dScaffoldedMirror-6 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md) | journal | TOOL-dScaffoldedMirror-7 |
-| [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md) | journal | TOOL-dScaffoldedMirror-8 |
-| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md) | diff-review | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-6..8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
-| [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md) | diff-review | TOOL-dScaffoldedMirror-2 TOOL-dScaffoldedMirror-6..8 TOOL-dScaffoldedMirror-10 TOOL-dScaffoldedMirror-14 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -187,34 +178,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-24-spec-dScaffoldedMirror-10.md](spec/2026-08-24-spec-dScaffoldedMirror-10.md)
-  - [2026-08-24-spec-dScaffoldedMirror-11.md](spec/2026-08-24-spec-dScaffoldedMirror-11.md)
-  - [2026-08-24-spec-dScaffoldedMirror-12.md](spec/2026-08-24-spec-dScaffoldedMirror-12.md)
-  - [2026-08-24-spec-dScaffoldedMirror-13.md](spec/2026-08-24-spec-dScaffoldedMirror-13.md)
-  - [2026-08-24-spec-dScaffoldedMirror-14.md](spec/2026-08-24-spec-dScaffoldedMirror-14.md)
-  - [2026-08-24-spec-dScaffoldedMirror-15.md](spec/2026-08-24-spec-dScaffoldedMirror-15.md)
-  - [2026-08-24-spec-dScaffoldedMirror-2.md](spec/2026-08-24-spec-dScaffoldedMirror-2.md)
-  - [2026-08-24-spec-dScaffoldedMirror-3.md](spec/2026-08-24-spec-dScaffoldedMirror-3.md)
-  - [2026-08-24-spec-dScaffoldedMirror-4.md](spec/2026-08-24-spec-dScaffoldedMirror-4.md)
-  - [2026-08-24-spec-dScaffoldedMirror-5.md](spec/2026-08-24-spec-dScaffoldedMirror-5.md)
-  - [2026-08-24-spec-dScaffoldedMirror-6.md](spec/2026-08-24-spec-dScaffoldedMirror-6.md)
-  - [2026-08-24-spec-dScaffoldedMirror-7.md](spec/2026-08-24-spec-dScaffoldedMirror-7.md)
-  - [2026-08-24-spec-dScaffoldedMirror-8.md](spec/2026-08-24-spec-dScaffoldedMirror-8.md)
-  - [2026-08-24-spec-dScaffoldedMirror-9.md](spec/2026-08-24-spec-dScaffoldedMirror-9.md)
-- **`build/`**
-  - [2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-lexicon-usefulness-research.md)
-  - [2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md](build/2026-08-24-build-TOOL-dScaffoldedMirror-2-spec-set-review.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-10.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-10.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-14.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-14.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-2.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-2.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-6.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-6.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-7.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md)
-  - [2026-08-25-build-TOOL-dScaffoldedMirror-8.md](build/2026-08-25-build-TOOL-dScaffoldedMirror-8.md)
-- **`reviews/`**
-  - [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-cumulative.md)
-  - [2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md](reviews/2026-08-25-review-TOOL-dScaffoldedMirror-2-14-round-2.md)
-<!-- /gen:build-docs -->

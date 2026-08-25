@@ -1,8 +1,8 @@
-# build README surface — the slot contract and the four generated regions
+# build README surface — the slot contract, the heading canon and the three generated regions
 
 ```toml
 feature = "build-readme-surface"
-title = "A build README is mostly generated, and its authored slots are positional"
+title = "A build README is mostly generated, and its authored slots are positional and named"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -52,14 +52,18 @@ enclosing region's extent is byte-unchanged and the driver gets a name to read i
 guess. Consumers address it with `region()` like any other pair; it is not in `GEN_REGIONS` and must
 not be added there.
 
-**The `roster:units` pair is authored, this generator never writes into it, and it is being RETIRED.**
-`check_authorization` byte-compared that slice across a run's pinned BASE, so a renderer touching it
-would have invalidated every run authorized against the file — which is why it appears in the module
-only so the slot walk can find it. `TOOL-aBoundedVerdict-11` moves the frozen authorization scope to
-the GENERATED region's unit-ID SET (BASE ⊆ HEAD, never row bytes, because those carry status and rev
-and would refuse every run that built anything), and retires the authored pair by removing its
-readers rather than by editing the four build READMEs that carry one. A region nothing reads is
-inert.
+**The `roster:units` pair is authored, this generator never writes into it, and it is NARROWED — not
+retired.** `check_authorization` byte-compared that slice across a run's pinned BASE, so a renderer
+touching it would have invalidated every run authorized against the file, which is why it appears in
+the module only so the slot walk can find it. `TOOL-aBoundedVerdict-11` moves the frozen
+authorization scope to the GENERATED region's unit-ID SET (BASE ⊆ HEAD, never row bytes, because
+those carry status and rev and would refuse every run that built anything), and it moved FOUR of the
+pair's five readers. **The fifth is live and deliberate**: `roster_ids` in the unattended driver
+still reads the authored pair, because it answers a question the generated region cannot — which
+units are PLANNED but unspecced — and pointing it at the generated region was tried inside that same
+unit and reverted as a tautology. That spec was corrected at rev-8 to say so. Eleven build READMEs
+carry the pair, measured with `git ls-files 'memory/builds/*/README.md' | xargs grep -lF`; whether it
+becomes mandatory or its readers are deleted together is an open owner decision.
 
 **The roster is wrapped, never counted.** `TOOL-aMouldedFolio-2` renders the full roster here and only
 its count in `LIVE.md` and the ledger, and `render_region`'s own comment states that `unit(s)` and
@@ -71,6 +75,42 @@ node and red on another.
 leaves `LIVE.md` and both ledger shards byte-neutral. The child set is derived by inverting the parent
 declaration: authoring both directions would be two answers to one question, which is the shape
 `TOOL-aMouldedFolio-1` refused when it declined a front-matter schema.
+
+**The authored half is a CLOSED HEADING CANON, and it is OPT-IN per file.** `SLOT_CANON` declares
+five slots in order — the immutable description (which IS the goal bound M3's rescope rule reads),
+expected improvements, detriments if not built, build-level rules, parked decisions — with per-slot
+`empty_ok` and `bullets` flags. `slot_violations` grades the canon only when its caller passes
+`canon=True`, which `cmd_check_format` does for a path
+`memory/project/readme-contract.txt` declares BOUND. That registry is asserted in BOTH directions and
+its exempt pin is an EQUALITY, so a pin left high after a drain reds rather than going slack. One
+README is bound today and the leg names its own reach on every run; `--survey` grades every README
+regardless, and `--report` prints each slot's bytes against its declared ceiling and its recorded
+high-water. Ceilings live in `build-readme-slot-limits.txt` and high-waters in a separate file,
+because `--bump` writes the second and must never touch the first. Adopters receive the rows with no
+ceiling values, which is the announced UNARMED state; a MISSING row is a refusal.
+
+**Position is still the mechanism.** No slot has a marker pair. `TOOL-aRuledFrontispiece-1` refused
+per-slot markers for a reason that still holds — two more lines per README to solve what position
+already solves — and refused heading-DETECTION for a second reason that expired at
+`TOOL-aBoundedVerdict-11`. Reading those two refusals as one is how the live rule gets deleted with
+its dead neighbour.
+
+**The no-markers hole.** `slot_violations` returned `[]` unconditionally when it found no generated
+pair, so a README with no markers passed every trigger however much prose it held — measured on a
+45,185-byte fixture that reported clean. It is now a violation. No live file reaches it, which is why
+it went unseen.
+
+**Order is authored on the SPECS and computed here.** `· order <n>` in a status header is a positive
+integer, at most once; ties are the parallel group, gaps are permitted so a retired unit needs no
+renumber, and a malformed value REFUSES rather than rendering a plausible step. The roster carries
+Order and Tier and sorts by build order; the link cell stays first and status stays a whole delimited
+cell, because the unattended driver selects on both.
+
+**Records render in the SPEC they serve.** A `gen:spec-records` pair sits between the status header
+and `## 1. Goal` — the one place check 12 does not look, so no eleventh section and no cutoff. The
+build README's document inventory and its records table are GONE; the two coverage joins survive
+there and now render UNCONDITIONALLY, because each used to hide behind its own non-empty test and a
+fully-covered build rendered nothing at all.
 
 ## Shared seams
 
@@ -99,8 +139,8 @@ creation and rendering.
 - The roster-wrapping half of the corpus surgery never fired, and it is now MOOT rather than pending:
   `--check-format` cannot identify an authored plan that is not already wrapped, an unwrapped plan is
   legal, and twelve build READMEs carrying a roster table have no `roster:units` pair — but
-  `TOOL-aBoundedVerdict-11` retires that pair's readers instead of wrapping the corpus, so the
-  population stops mattering. **The deferral this bullet used to carry was stale**: it named
+  `TOOL-aBoundedVerdict-11` moved four of that pair's five readers instead of wrapping the corpus,
+  and the population still matters to the fifth. **The deferral this bullet used to carry was stale**: it named
   `TOOL-cBriefedPilot-18` as the owner of making the pair mandatory, and that unit is CLOSED with its
   own AC9 asserting a grep returns zero where it returns two — the requirement was never established.
   `TOOL-aPacedTurnstile-14` then hit the same gap from another node's live run and is closed by

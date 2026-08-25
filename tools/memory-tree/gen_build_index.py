@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
-    python tools/memory-tree/gen_build_index.py --check      # drift gate (writes nothing)
-    python tools/memory-tree/gen_build_index.py --write      # (re)render every artifact
-    python tools/memory-tree/gen_build_index.py --selftest    # fixtures, in a temp dir
+    python tools/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python tools/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python tools/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
+    python tools/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python tools/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
+
+WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
+closed heading canon — only for the ones the declared registry BINDS. It never grades what a slot
+SAYS, whether the description is the one first authored, or how large any slot is. Size is a separate
+declared budget; the description's immutability is a DOCUMENTED check in HYGIENE.md and deliberately
+not a gated one, because 26 of 61 description blocks already carry more than one commit and a
+history-based predicate would have no green starting state to land on.
 
 It replaces the retired directory-listing generator. A listing carried paths, which git already
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
@@ -46,10 +55,15 @@ RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 
-# The AUTHORED plan region. This generator NEVER writes between these two markers: the unattended
-# kit's check_authorization byte-compares that slice across a run's pinned BASE, so a renderer that
-# touched it would silently invalidate every run authorized against the file. It is listed here so
-# the slot walk can FIND it, not so anything can render into it.
+# The AUTHORED plan region. This generator NEVER writes between these two markers. The RULE still
+# holds; the reason it was first given has EXPIRED, and the pair is recorded here so the next reader
+# does not delete a live rule along with its dead justification. It WAS that check_authorization
+# byte-compared this slice across a run's pinned BASE. TOOL-aBoundedVerdict-11 moved that comparison
+# to the generated unit-ID set, so no byte-compare reaches here any more. What still reads the pair
+# is the unattended driver's roster_ids, which answers which units are PLANNED but unspecced — a
+# question the generated region cannot answer, because it is rendered from the specs that exist. A
+# renderer writing here would therefore corrupt a plan rather than invalidate an authorization. It is
+# listed so the slot walk can FIND it, not so anything can render into it.
 PLAN_OPEN = "<!-- roster:units -->"
 PLAN_CLOSE = "<!-- /roster:units -->"
 
@@ -70,8 +84,48 @@ GEN_REGIONS = (
     ("build-index", MARK_OPEN, MARK_CLOSE),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
-    ("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),
 )
+# TOOL-dFramedEntrypoint-5 — `build-docs` was the LAST entry and is gone. Removing the last entry
+# shifts no surviving index, which is why no sibling region moved; the selftest arms that addressed
+# it BY TUPLE INDEX did have to move, and a grep for the marker name could not have found them.
+# The orphaned marker pair is removed from every tracked build README in the SAME commit: a region
+# whose registration is gone but whose pair remains becomes authored content sitting after the first
+# generated marker, which is trigger 1 of the slot contract, measured at 750 violation lines.
+DEAD_REGIONS = (("build-docs", "<!-- gen:build-docs -->", "<!-- /gen:build-docs -->"),)
+
+# TOOL-dFramedEntrypoint-1 — the CLOSED heading canon for a build README's authored half. The slot
+# contract above constrains only WHERE authored content sits; this constrains WHAT it is. Position
+# stays the mechanism: no slot gets a marker pair of its own, which is what TOOL-aRuledFrontispiece-1
+# refused and what that refusal's surviving reason (two more lines per README to solve a problem
+# position already solves) still forbids. Its OTHER refusal — heading-detection, because
+# check_authorization byte-compared a marker-delimited region — expired at TOOL-aBoundedVerdict-11,
+# and reading the two as one refusal is how a live rule gets deleted with its dead neighbour.
+#
+# `(heading, empty_ok, bullets)`. The FIRST entry is also the build's GOAL BOUND, the sentence M3's
+# rescope rule may not amend: folded into the description rather than given a slot of its own,
+# because two slots that must agree are one fact in two places.
+SLOT_CANON = (
+    ("## The problem this build exists to solve", False, False),
+    ("## Expected improvements", False, True),
+    ("## Detriments if this is not built", False, True),
+    ("## Build-level rules", True, False),
+    ("## Parked decisions", True, False),
+)
+# The registry declaring which build READMEs the canon BINDS. Unit 3 writes the file; this reader
+# ships here so the predicate is complete before its population exists, and returns the EMPTY SET
+# when the file is absent — which unit 3 then replaces with a refusal. Until then an empty
+# population is legal and is ANNOUNCED on every run, because a rule binding nothing that reports
+# `clean` is the vacuous-selector class this repo names.
+CONTRACT_REGISTRY = "project/readme-contract.txt"
+
+# TOOL-dFramedEntrypoint-6 — records render inside the SPEC they serve. The pair sits between a
+# spec's status header and its first numbered section, which is the one place in a spec that hygiene
+# check 12 does not look: its section-equality compare collects `## ` headings and this is not one,
+# and its empty-body walk has not started. Measured on a scratch clone before the unit was written.
+# An eleventh `## ` section would have needed a new canon AND a dated cutoff, and would have left
+# every landed spec without the region.
+SPEC_RECORDS_OPEN = "<!-- gen:spec-records -->"
+SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # The stamped header names THIS install's prefix, derived from the module's own location rather
 # than spelled. It is written INTO the adopter's generated artifacts and committed there, so a
 # hardcoded prefix does not merely mislead — it lands a dead path in their tree, and the byte-compare
@@ -107,7 +161,15 @@ H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
 # the parallel group; the owner resolved against a second `group` verb, which would have needed its
 # own contradiction refusals to render an identical region.
-ORDER_RE = re.compile(r"·\s*order\s+(\d+)(?![0-9])")
+# TOOL-dFramedEntrypoint-4 S2 — ANCHORED on both sides. The shipped form ended `(?![0-9])`, which
+# rejects a longer number and nothing else: `order 0x2` matched `0` and rendered as step 0, and
+# `order 2x` matched `2` and rendered as step 2 — both probed on the shipped regex before this change.
+# A malformed value must be a REFUSAL rather than a plausible step, so the trailing context is now a
+# field separator or end-of-header, and `parse_spec` raises on a value that looks like the verb but
+# does not conform. That refusal is what makes the verb safe to require later; a silent misread is
+# the shape TOOL-aRuledFrontispiece-2's §4 specified and never shipped.
+ORDER_RE = re.compile(r"·\s*order\s+(\d+)\s*(?=·|$)")
+ORDER_LOOSE_RE = re.compile(r"·\s*order\s+(\S+)")
 SHARD_RE = re.compile(r"^\d{4}-\d{2}\.md$")
 REQUIRED_KEYS = ("slug", "node", "opened", "streams", "roster", "ids")
 
@@ -251,6 +313,29 @@ def parse_front_matter(path: str, slug: str) -> dict:
     return fm
 
 
+def _parse_order(header: str, path: str):
+    """The build-order verb, or None. A value that LOOKS like the verb but does not conform REFUSES.
+
+    Dropping a malformed value silently would be worse than the misread it replaces: the unit would
+    simply render as unordered, and an author who typed a bad value would see a plausible build order
+    with their unit missing from it.
+    """
+    # ORDER MATTERS HERE, and the first draft got it wrong: the duplicate check sat BELOW the
+    # early return, so a header whose FIRST occurrence was well-formed never reached it. The refusal
+    # existed, read correctly, and was unreachable. Caught by running it rather than by reading it.
+    if len(ORDER_LOOSE_RE.findall(header)) > 1:
+        raise Problem(f"{path}: status header carries the `order` verb more than once, so which step "
+                      f"this unit occupies has two answers")
+    ok = ORDER_RE.search(header)
+    if ok:
+        return int(ok.group(1))
+    loose = ORDER_LOOSE_RE.search(header)
+    if loose:
+        raise Problem(f"{path}: status header carries `order {loose.group(1)}`, which is not a "
+                      f"positive integer followed by a field separator or the end of the header")
+    return None
+
+
 def parse_spec(path: str) -> dict | None:
     """Return the unit record, or None when the file carries no parseable status header.
 
@@ -281,7 +366,11 @@ def parse_spec(path: str) -> dict | None:
         "date": hdr.group("date"),
         # PERMITTED, never required (fork 5). HDR_RE has no end anchor, so a header carrying this
         # verb parses identically with or without it and no landed spec goes retroactively red.
-        "order": (lambda mo: int(mo.group(1)) if mo else None)(ORDER_RE.search(hdr.string)),
+        "order": _parse_order(hdr.string, path),
+        # Tier was captured by HDR_RE and discarded here, one line after the match. The roster now
+        # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
+        # unit row always has a value and only the ORDER cell can be empty.
+        "tier": hdr.group("tier"),
     }
 
 
@@ -638,44 +727,55 @@ def render_region(build: dict) -> str:
     # now has an ADDRESS a reader can name instead of a shape it has to guess.
     out.append(UNITS_OPEN)
     if build["units"]:
-        out += ["| Unit | Status | Rev | Last change |", "|---|---|---|---|"]
-        for u in sorted(build["units"], key=lambda x: x["path"]):
+        # TOOL-dFramedEntrypoint-4 S4/S5 — ORDER and TIER join the roster, and the sort key becomes
+        # the BUILD order rather than the path. Both values were already parsed and thrown away: tier
+        # was a named group of HDR_RE discarded one line after the match, and order reached only the
+        # order region. The LINK CELL STAYS FIRST and STATUS STAYS A WHOLE |-DELIMITED CELL, because
+        # the unattended driver selects unit rows by `^| \[.*\]\(spec/` and terminal units by
+        # `| (CLOSED|WONTDO) |`; inserting columns between them is safe, moving either is not.
+        # Only ORDER can be empty — tier is mandatory in the header regex, so a row that exists has one.
+        out += ["| Unit | Order | Tier | Status | Rev | Last change |", "|---|---|---|---|---|---|"]
+        for u in sorted(build["units"], key=lambda x: (x.get("order") is None, x.get("order") or 0,
+                                                       x["id"])):
             rel = u["path"].split(f"/builds/{build['slug']}/", 1)[1]
             label = f"{u['id']} — {u['title']}" if u["title"] else u["id"]
-            out.append(f"| [{label}]({rel}) | {u['status']} | rev-{u['rev']} | {u['date']} |")
+            order = str(u["order"]) if u.get("order") is not None else "—"
+            out.append(f"| [{label}]({rel}) | {order} | {u.get('tier', '—')} | {u['status']} | "
+                       f"rev-{u['rev']} | {u['date']} |")
     else:
         out.append("*No spec under this build carries a status header; the status above is declared "
                    "in the front matter.*")
     out.append(UNITS_CLOSE)
-    if build["kinds"]:
-        ks = [f"`{k}/`" for k in build["kinds"]]
-        joined = ks[0] if len(ks) == 1 else ", ".join(ks[:-1]) + " and " + ks[-1]
-        out += ["", f"Records live under {joined}."]
-    # The records table and the two coverage joins. The sentence above is KEPT rather than replaced:
-    # `strip_records_sentence` manages it and several arms detect a mis-segmented record selector by
-    # noticing the sentence went missing, so replacing it would remove the thing they watch.
+    # TOOL-dFramedEntrypoint-5 S4b — the derived folder sentence is GONE, and it was the record
+    # selector's liveness assertion: nine arms detected a mis-segmented selector by noticing the
+    # sentence went missing. What replaces it is an explicit NON-EMPTY assertion over the selector,
+    # stated as a rendered fact rather than inferred from a sentence's presence. A build that holds
+    # records and shows a zero here is a mis-segmented selector, which is exactly what the sentence
+    # used to reveal by vanishing.
     recs = build.get("records") or []
-    if recs:
-        out += ["", "| Record | Kind | Serves |", "|---|---|---|"]
-        for r in sorted(recs, key=lambda x: x["path"]):
-            rel = r["path"].split(f"/builds/{build['slug']}/", 1)[1]
-            label = rel.rsplit("/", 1)[-1]
-            if r["state"] == "unbound":
-                out.append(f"| [{label}]({rel}) | — | *none — {r['reason']}* |")
-            else:
-                out.append(f"| [{label}]({rel}) | {r['kind']} | {_render_id_ranges(r['ids'])} |")
-        named = {i for r in recs for i in r.get("ids", [])}
-        audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
-        own = [u["id"] for u in build["units"]]
-        gap = [i for i in own if i not in named]
-        agap = [i for i in own if i not in audited]
-        if gap:
-            out += [""] + _render_wrapped_ids("Ids no record names:", gap)
-        if agap:
-            # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit
-            # record names EVER — a spec audited at rev-1 and since bumped does not appear here.
-            # An "unreviewed" label would be a coverage claim the data cannot support.
-            out += [""] + _render_wrapped_ids("Ids no `spec-audit` record has ever named:", agap)
+    out += ["", f"Records: {len(recs)} bound to this build, across "
+                f"{len(build['kinds'])} record folder(s)."]
+    # THE TABLE IS GONE — the owner ruled records belong in the specs they serve, and unit 6 renders
+    # them there. THE TWO COVERAGE JOINS STAY, and they are the only spec-to-record coverage signal in
+    # this repo: hygiene check 21 grades record-to-spec and does not cover this direction. They are
+    # COMPUTED from the build's records and units, never parsed from the table, so the data survived
+    # the deletion — but the emitting branch did not, and re-emitting it is the point of S3.
+    #
+    # UNCONDITIONAL. Each join used to hide behind its own non-empty test, so a build with FULL
+    # coverage rendered NOTHING and was indistinguishable from a build whose joins were never
+    # computed. That is the absence-reads-as-coverage class, and full coverage is the COMMON case,
+    # not the rare one.
+    named = {i for r in recs for i in r.get("ids", [])}
+    audited = {i for r in recs if r.get("kind") == "spec-audit" for i in r.get("ids", [])}
+    own = [u["id"] for u in build["units"]]
+    gap = [i for i in own if i not in named]
+    agap = [i for i in own if i not in audited]
+    out += ["", f"Ids no record names: {' '.join(gap) if gap else 'none — every unit id is named by a record'}."]
+    # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit record names
+    # EVER — a spec audited at rev-1 and since bumped does not appear here. An "unreviewed" label
+    # would be a coverage claim the data cannot support.
+    out += ["", f"Ids no `spec-audit` record has ever named: "
+                f"{' '.join(agap) if agap else 'none — every unit id has one'}."]
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
@@ -802,124 +902,19 @@ def render_edges(build: dict) -> str:
     return "\n".join(out)
 
 
-def render_docs(build: dict) -> str:
-    """The DOCUMENT INVENTORY region: every tracked record the build holds, linked."""
-    mo, mc = GEN_REGIONS[3][1], GEN_REGIONS[3][2]
-    out = [mo, ""]
-    if not build["docs"]:
-        out.append("*This build holds no records yet.*")
-    else:
-        by_kind = {}
-        for p in build["docs"]:
-            # index 3, not 4: memory / builds / <slug> / <kind> / <file>. Bucketing on 4 keyed every
-            # record by its own FILENAME, so no kind ever matched and the region rendered empty —
-            # between two markers, which reads as "this build holds nothing" rather than as a fault.
-            by_kind.setdefault(p.split("/")[3], []).append(p)
-        for kind in RECORD_KINDS:
-            if kind not in by_kind:
-                continue
-            out.append(f"- **`{kind}/`**")
-            for p in by_kind[kind]:
-                rel = p.split(f"/builds/{build['slug']}/", 1)[1]
-                out.append(f"  - [{os.path.basename(p)}]({rel})")
-    out.append(mc)
-    return "\n".join(out)
-
-
 REGION_RENDERERS = {
     "build-index": render_region,
     "build-order": render_order,
     "build-edges": render_edges,
-    "build-docs": render_docs,
 }
 
-
-# A period ends the sentence only when whitespace or end-of-line follows it. A dot INSIDE the claim
-# — `notes.md`, `(see AGENTS.md)` — is content. The first cut used `[^.]*` and stopped at the first
-# dot, deleting `Records live under `spec/` and `notes.` mid-token and writing the fragment back as
-# prose: the exact corruption this unit exists to prevent, one class narrower than the line-scoped
-# removal the review had already rejected.
-RECORDS_SENTENCE = re.compile(r"Records live under (?:[^.]|\.(?!\s|$))*\.[ ]?")
-RECORDS_ANCHOR = "Records live under"
-
-
-def strip_records_sentence(readme_text: str, readme: str) -> str:
-    """Remove the AUTHORED folder-claim sentence from the body, OUTSIDE the marker pair.
-
-    SENTENCE-scoped, never line-scoped: measured over the corpus, in 17 of 17 carriers the sentence
-    ENDS mid-line and the next sentence begins on the same line, so deleting the LINE destroys
-    unrelated prose in every file.
-
-    FENCE-AWARE, because a README documenting this very migration quotes the retired boilerplate
-    inside a code block — and the first cut rewrote that block. Unit 5 of this same build added the
-    fence reader precisely because a scanner that ignores fences is wrong by construction; the writer
-    has no excuse the reader did not.
-
-    THE WHOLE DOCUMENT outside the marked slice is in scope, not merely the text above it. Bounding
-    the scan at the opening marker left an authored claim below the close marker neither removed nor
-    refused, so the file shipped two contradicting sentences and `--check` was a stable fixed point
-    on that state.
-
-    TWO REFUSALS, not one. More than one match is a refusal, as before. And a line carrying the
-    anchor that the SENTENCE pattern does not match is also a refusal — a claim wrapped across lines
-    is exactly the case where the anchor is not identifying what it was reasoned about, and silently
-    leaving it produces the same two-answers state by a different route.
-    """
-    lines = readme_text.split("\n")
-    opens = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_OPEN]
-    closes = [i for i, l in enumerate(lines) if (l[:-1] if l.endswith(CR) else l) == MARK_CLOSE]
-    inside = range(opens[0], closes[0] + 1) if opens and closes and closes[0] >= opens[0] else range(0)
-    unfenced_no = {n for n, line in unfenced_lines(readme_text) if line is not None}
-    # FRONT MATTER IS NOT PROSE and is never edited here. `parse_front_matter` has already proved the
-    # block opens at line 1 and closes, so the index is available — and a key whose VALUE carries the
-    # anchor is legal input (the parser accepts arbitrary keys). Editing there would blank a
-    # structured value silently, and `--check` would then agree with the blanked file forever. A
-    # match inside the block is a refusal instead, because it means the anchor found something this
-    # remover was never reasoned about.
-    fm_end = 0
-    if lines and lines[0].rstrip("\r") == "---":
-        for i, l in enumerate(lines[1:], start=1):
-            if l.rstrip("\r") == "---":
-                fm_end = i
-                break
-
-    hits, anchored = [], []
-    for i, line in enumerate(lines):
-        if i <= fm_end and fm_end:
-            if RECORDS_ANCHOR in line:
-                raise Problem(f"{readme}:{i + 1}: the folder-claim anchor appears inside the front "
-                              f"matter, which this remover never edits — a structured value is not "
-                              f"prose, and blanking one silently is not a repair")
-            continue
-        if i in inside or (i + 1) not in unfenced_no:
-            continue
-        if RECORDS_SENTENCE.search(line):
-            hits.append(i)
-        elif RECORDS_ANCHOR in line:
-            anchored.append(i)
-    if anchored:
-        where = ", ".join(str(i + 1) for i in anchored)
-        raise Problem(f"{readme}: line(s) {where} carry the folder-claim anchor but no complete "
-                      f"sentence — a claim wrapped across lines is not identifying what this remover "
-                      f"was reasoned about, so nothing is removed")
-    if not hits:
-        return readme_text
-    if len(hits) > 1:
-        where = ", ".join(str(i + 1) for i in hits)
-        raise Problem(f"{readme}: the folder-claim sentence appears {len(hits)} times outside the "
-                      f"generated region, at lines {where} — the anchor is not identifying one "
-                      f"sentence, so nothing is removed")
-    i = hits[0]
-    rest = RECORDS_SENTENCE.sub("", lines[i], count=1)
-    # Only drop the physical line when the sentence WAS the whole of it; otherwise the surviving
-    # text stays exactly where the author put it.
-    if rest.strip():
-        lines[i] = rest
-    else:
-        del lines[i]
-    return "\n".join(lines)
-
-
+# TOOL-dFramedEntrypoint-5 S4c — `strip_records_sentence`, `RECORDS_SENTENCE` and `RECORDS_ANCHOR`
+# were RETIRED here. They existed to remove an AUTHORED copy of a sentence this generator also
+# rendered, so the tree carried one and not two. This unit stops rendering that sentence, and a
+# remover whose subject is no longer generated is not inert: it deletes an author's sentence and
+# writes nothing in its place, which is the prose-eating class the module's own `apply_region`
+# warning names. Retired in the same commit that removes its subject rather than left to be
+# rediscovered by whoever next writes the words "Records live under" in a build README.
 def apply_front_matter_ids(readme_text: str, roster: list, readme: str) -> str:
     """Rewrite the front matter's `ids:` line from the roster, in place.
 
@@ -1033,12 +1028,274 @@ def _marker_index(lines: list, mark: str):
     return None
 
 
-def slot_violations(readme_text: str, readme: str) -> list:
+SLOT_LIMITS = "build-readme-slot-limits.txt"
+SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
+
+# TOOL-dFramedEntrypoint, round-3 HIGH. Every reader of the two files above resolved them from
+# `__file__`, so nothing could point them at a fixture — and that is exactly why the arms covering
+# `cmd_bump` twice ended up RESTATING its filter inline instead of calling it: the verb writes into
+# the installed kit directory, so an arm that called it would have rewritten this repo's own
+# high-water file. One seam fixes the class. Production resolves from `__file__` as before; the
+# selftest sets the override, calls the real verb, and asserts on real bytes.
+_SLOT_DATA_DIR = None
+
+
+def resolve_slot_data_dir():
+    """Where the two slot declaration files live. Overridable ONLY so an arm can call the verbs."""
+    return pathlib.Path(_SLOT_DATA_DIR) if _SLOT_DATA_DIR \
+        else pathlib.Path(__file__).resolve().parent
+
+
+def read_slot_table(path: str) -> dict:
+    """`heading -> int | None` from a tab-separated declaration file. None is the UNARMED state.
+
+    A COMMENT IS A LINE WITH NO TAB, never a line starting with `#`. Every canonical slot heading
+    starts with `#`, so the obvious comment predicate ate every data row: the table parsed to empty
+    and the leg reported five slots UNARMED, which reads exactly like a deliberate configuration.
+    Found by running the verb, and it is the reason `check_slot_table` below exists — a data file
+    that parses to nothing must be a refusal, not a plausible state.
+    """
+    out = {}
+    for raw in read_text(path).split("\n"):
+        if not raw.strip() or "\t" not in raw:
+            continue
+        head, _tab, val = raw.partition("\t")
+        head, val = head.strip(), val.strip()
+        if not head:
+            continue
+        out[head] = int(val) if val.isdigit() else None
+    return out
+
+
+def check_slot_table(limits: dict, where: str) -> None:
+    """Both directions over the declared ceilings. Runs whether or not any README is BOUND.
+
+    An earlier cut checked this only while grading a bound file, so with an empty population a
+    completely unparsed limits file reported as deliberate UNARMED slots. A declaration's integrity
+    cannot depend on whether anything happens to be using it.
+    """
+    canon = [h for h, _e, _b in SLOT_CANON]
+    for h in canon:
+        if h not in limits:
+            raise Problem(f"{where} has NO ROW for the canonical slot `{h}`; a slot nobody priced is "
+                          f"a slot nobody decided about, which is not the same as one deliberately "
+                          f"left unarmed")
+    for h in limits:
+        if h not in canon:
+            raise Problem(f"{where} carries a row for `{h}`, which SLOT_CANON does not declare — a "
+                          f"ceiling outliving its slot silently widens what it was written to bound")
+
+
+def measure_slot_sizes(readme_text: str) -> list:
+    """`[(heading, bytes)]` over the AUTHORED slice of each canonical slot, in canon order.
+
+    A slot runs from its heading line to the line before the next canonical heading; the LAST slot
+    stops at the authored roster pair where one is present and at the first generated marker
+    otherwise. Stopping unconditionally at the generated marker would bill the roster table to the
+    parked-decisions slot, which unit 1's non-goals forbid touching.
+
+    BYTES, not characters — and the reason is not the one an earlier draft gave. The hygiene entry cap
+    is DECLARED in characters; what its own comment refuses to pin is awk's `length()`, which counts
+    bytes or characters depending on the build and the locale. This check is Python, where the choice
+    is explicit, and it picks bytes so the verdict is node-independent by construction.
+    """
+    lines = readme_text.split("\n")
+    stop = len(lines)
+    for _n, mo, _mc in GEN_REGIONS:
+        i = _marker_index(lines, mo)
+        if i is not None:
+            stop = min(stop, i)
+    po = _marker_index(lines, PLAN_OPEN)
+    if po is not None and po < stop:
+        stop = po
+    heads = {h: None for h, _e, _b in SLOT_CANON}
+    idx = []
+    for i in range(0, stop):
+        if lines[i] in heads:
+            idx.append((i, lines[i]))
+    out = []
+    for n, (i, h) in enumerate(idx):
+        end = idx[n + 1][0] if n + 1 < len(idx) else stop
+        out.append((h, len("\n".join(lines[i + 1:end]).strip().encode("utf-8"))))
+    return out
+
+
+def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
+    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
+    here = resolve_slot_data_dir()
+    limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
+    if not os.path.exists(limits_p):
+        raise Problem(f"{SLOT_LIMITS} is absent at {limits_p}; a slot budget with no declared "
+                      f"ceilings would grade nothing and report clean")
+    limits = read_slot_table(limits_p)
+    highs = read_slot_table(hw_p) if os.path.exists(hw_p) else {}
+    check_slot_table(limits, SLOT_LIMITS)
+    hard, adv = [], []
+    for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
+        cap, hw = limits.get(head), highs.get(head)
+        if cap is not None and size > cap:
+            hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B")
+        elif hw is not None and size > hw:
+            adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
+                       f"{hw} B and under its {cap} B ceiling")
+    return hard, adv
+
+
+def scan_unarmed_slots() -> list:
+    """Canonical slots whose declared ceiling is blank — the ANNOUNCED unarmed state."""
+    here = resolve_slot_data_dir()
+    p = str(here / SLOT_LIMITS)
+    if not os.path.exists(p):
+        return []
+    limits = read_slot_table(p)
+    return [h for h, _e, _b in SLOT_CANON if limits.get(h) is None]
+
+
+def read_contract_registry(root: str, conf: dict) -> set:
+    """The build READMEs the heading canon BINDS. Bound rows only; see `read_contract_rows` for both.
+
+    TOOL-dFramedEntrypoint-3 REPLACED unit 1's behaviour here: an absent registry was the empty set,
+    which is a pass, and is now a refusal. Unit 1 shipped the permissive form deliberately so it did
+    not depend on a file unit 3 had not written; this is the handover, and it is stated in both specs
+    rather than left as two specs disagreeing.
+    """
+    bound, _exempt, _pin = read_contract_rows(root, conf)
+    return bound
+
+
+def read_contract_rows(root: str, conf: dict) -> tuple:
+    """`(bound, exempt, declared_pin)` from the declared registry. An absent file REFUSES."""
+    rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
+    full = os.path.join(root, conf["MEMORY_ROOT"], CONTRACT_REGISTRY)
+    if not os.path.exists(full):
+        raise Problem(f"{rel} is absent; the heading canon and the slot budgets would then bind "
+                      f"nothing and report clean, which is coverage of nothing")
+    bound, exempt, pin = set(), {}, None
+    for n, raw in enumerate(read_text(full).split("\n"), 1):
+        s = raw.strip()
+        if not s or s.startswith("#"):
+            continue
+        if s.startswith("exempt-pin:"):
+            v = s.split(":", 1)[1].strip()
+            if not v.isdigit():
+                raise Problem(f"{rel}:{n}: exempt-pin is `{v}`, which is not a count")
+            pin = int(v)
+            continue
+        if s.startswith("!"):
+            path, _sep, why = s[1:].partition(" - ")
+            path = path.strip()
+            if not why.strip():
+                raise Problem(f"{rel}:{n}: exempt row `{path}` carries no reason; an exemption whose "
+                              f"reason lives elsewhere is one nobody can drain")
+            exempt[path] = why.strip()
+            continue
+        if " " in s:
+            raise Problem(f"{rel}:{n}: `{s}` is neither a bare bound path, an `!`-prefixed exempt "
+                          f"row with a reason, nor an `exempt-pin:` line")
+        bound.add(s)
+    if pin is None:
+        raise Problem(f"{rel}: no `exempt-pin:` line; the exempt list is shrink-only and a list with "
+                      f"no pin cannot report that it stopped shrinking")
+    return bound, exempt, pin
+
+
+def check_contract_registry(root: str, conf: dict, tracked: list) -> None:
+    """Both directions, plus the equality pin. Every failure names the row or the path."""
+    rel = os.path.join(conf["MEMORY_ROOT"], CONTRACT_REGISTRY).replace(os.sep, "/")
+    bound, exempt, pin = read_contract_rows(root, conf)
+    named, have = bound | set(exempt), set(tracked)
+    # FORWARD — a tracked build README nothing names cannot silently escape the contract.
+    for miss in sorted(have - named):
+        raise Problem(f"{rel} names neither a bound nor an exempt row for `{miss}`, so a new build "
+                      f"would escape the contract by existing")
+    # REVERSE — a row naming a path that is not a tracked build README widens what it narrowed.
+    for dead in sorted(named - have):
+        raise Problem(f"{rel} carries a row for `{dead}`, which is not a tracked build README; a "
+                      f"stale row silently widens the surface it was written to narrow")
+    # The pin is an EQUALITY in both directions: above the count is permanent slack after a drain.
+    if pin != len(exempt):
+        raise Problem(f"{rel}: exempt-pin is {pin} and the measured exempt count is {len(exempt)}; "
+                      f"the pin is an equality, because a pin left above the count after a drain is "
+                      f"slack nothing reports")
+
+
+def scan_canon(lines: list, first_open: int) -> list:
+    """The CLOSED heading canon over the authored half. Trigger 3 (TOOL-dFramedEntrypoint-1 S1).
+
+    The authored half runs from the title to whichever comes first: the authored plan pair's opening
+    marker, or the first generated marker. The plan pair belongs to NO slot — terminating at the
+    generated marker instead would bill its table to the last slot, which unit 2's budget then
+    charges to a block this unit's own non-goals forbid touching.
+    """
+    stop = first_open
+    po = _marker_index(lines, PLAN_OPEN)
+    if po is not None and po < stop:
+        stop = po
+    title = next((i for i, l in enumerate(lines) if l.startswith("# ")), None)
+    if title is None:
+        return [(1, "no `# ` title line, so the authored half has no start")]
+    out, seen = [], []
+    for i in range(title + 1, stop):
+        l = lines[i]
+        if l.startswith("## "):
+            seen.append((i, l.rstrip()))
+        elif l.strip() and not seen:
+            out.append((i + 1, "authored content between the title and the first canonical heading"))
+    # DUPLICATES FIRST. With a heading repeated, `got` no longer equals `want`, the sequence branch
+    # reports a missing/out-of-order slot and RETURNS — so every body check below is skipped and one
+    # appended line disabled the whole canon while the leg still printed clean. Refuse the duplicate
+    # by name instead of letting it fall through the equality.
+    canon_heads = [h for h, _e, _b in SLOT_CANON]
+    for i, h in seen:
+        # CANONICAL headings only. Scanning every `## ` heading reported a repeated NON-canonical one
+        # as a duplicated canonical slot AND suppressed the accurate `heading outside the canon`
+        # message through the early return below — two wrong answers out of one over-wide population.
+        if h in canon_heads and [x for _j, x in seen].count(h) > 1:
+            out.append((i + 1, f"canonical slot heading appears more than once: {h}"))
+    if out and any("more than once" in why for _l, why in out):
+        return sorted(set(out))
+    want = [h for h, _e, _b in SLOT_CANON]
+    got = [h for _i, h in seen]
+    if got != want:
+        for i, h in seen:
+            if h not in want:
+                out.append((i + 1, f"heading outside the canon: {h}"))
+        for n, h in enumerate(want):
+            if h not in got:
+                out.append((title + 1, f"canonical slot missing: {h}"))
+            elif [g for g in got if g in want].index(h) != n:
+                out.append((title + 1, f"canonical slot out of order: {h}"))
+        return sorted(set(out))
+    # Bodies. A slot runs to the next canonical heading, or to `stop` for the last.
+    for n, (idx, head) in enumerate(seen):
+        end = seen[n + 1][0] if n + 1 < len(seen) else stop
+        body = [l for l in lines[idx + 1:end] if l.strip()]
+        _h, empty_ok, bullets = SLOT_CANON[n]
+        if not body and not empty_ok:
+            out.append((idx + 1, f"canonical slot has an empty body and may not: {head}"))
+        if bullets:
+            for j in range(idx + 1, end):
+                s = lines[j].strip()
+                if s and not s.startswith(("- ", "* ")) and not lines[j].startswith("  "):
+                    out.append((j + 1, f"slot requires a bullet list: {head}"))
+    return sorted(set(out))
+
+
+def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     """Authored content sitting where the slot contract forbids it (TOOL-aRuledFrontispiece-1 S4).
 
-    TWO triggers, not one. An earlier draft of the owning spec named only the first, which would have
-    passed the one README in the corpus that already carries a plan pair — the exact file the surgery
-    unit exists to relocate.
+    THREE triggers since TOOL-dFramedEntrypoint-1, and the third is OPT-IN per file: the canon binds
+    only the READMEs the declared registry names, so a caller grading an unbound file passes
+    `canon=False` and gets the two position triggers alone.
+
+    **WHAT THIS DOES NOT CHECK.** It grades SHAPE — heading text, heading order, body emptiness, and
+    whether a body that must be a list is one. It never grades whether a slot says anything true,
+    whether the description is the one first authored, or whether the improvements are improvements.
+    The immutability of the description is a DOCUMENTED check in `memory/HYGIENE.md` and deliberately
+    not a gated one: 26 of 61 description blocks already carry more than one commit, so a
+    history-based predicate has no green starting state. Nor does it grade SIZE — that is
+    TOOL-dFramedEntrypoint-2's declared per-slot budget, kept separate so a shape failure and a size
+    failure are distinguishable to whoever reads the red.
     """
     lines = readme_text.split("\n")
     spans = []            # (open_index, close_index) of every registered generated region present
@@ -1047,7 +1304,12 @@ def slot_violations(readme_text: str, readme: str) -> list:
         if o is not None and c is not None and c > o:
             spans.append((o, c))
     if not spans:
-        return []
+        # TOOL-dFramedEntrypoint-1 S4 — the TOTAL-EXEMPTION hole. This returned [] unconditionally,
+        # so a README carrying no generated pair passed every trigger however much prose it held:
+        # measured on a 45,185-byte fixture with two invented sections, which reported clean. No file
+        # in the live corpus reaches it today, which is exactly why it went unnoticed.
+        return [(1, "no generated region pair, so every slot trigger would pass vacuously — "
+                    "run --write to create the pairs")]
     first_open = min(o for o, _c in spans)
     inside = {i for o, c in spans for i in range(o, c + 1)}
     out = []
@@ -1061,6 +1323,9 @@ def slot_violations(readme_text: str, readme: str) -> list:
         for i in range(pc + 1, first_open):
             if lines[i].strip():
                 out.append((i + 1, "authored content between the plan pair and the generated region"))
+    # Trigger 3 — the closed heading canon, only over a file the registry BINDS.
+    if canon:
+        out += scan_canon(lines, first_open)
     return sorted(set(out))
 
 
@@ -1085,6 +1350,82 @@ def insert_region(readme_text: str, mark_open: str, mark_close: str) -> str:
             return "\n".join(lines[:o] + [mark_open, mark_close, ""] + lines[o:])
     tail = lines if lines and lines[-1].strip() else lines[:-1] if lines else []
     return "\n".join(tail + ["", mark_open, mark_close, ""])
+
+
+def render_spec_records(spec_id: str, recs: list, spec_rel: str) -> str:
+    """The records naming `spec_id`, rendered for that spec. The empty case is EXPLICIT, never absent.
+
+    An absent region cannot be told from a spec nobody has recorded against, which is the
+    absence-reads-as-coverage class. The population is every tracked spec carrying a status header —
+    NOT only the ones a record names, which is the narrowing that made this unit's first draft
+    declare two opposite populations for one region.
+    """
+    out = [SPEC_RECORDS_OPEN, ""]
+    if not recs:
+        out.append("*No record names this unit.*")
+    else:
+        out += ["| Record | Kind | Also serves |", "|---|---|---|"]
+        for r in sorted(recs, key=lambda x: x["path"]):
+            # RELATIVE TO THE SPEC'S OWN DIRECTORY, computed rather than assembled. The first cut
+            # special-cased the same-build case and fell back to the repo-relative path for a
+            # cross-build record — which a markdown reader resolves against the SPEC's directory, so
+            # every one of the 17 cross-build edges rendered a link to nothing. Hygiene check 2 caught
+            # it; `os.path.relpath` is what should have been there from the start.
+            rel = os.path.relpath(r["path"], spec_rel.rsplit("/", 1)[0]).replace(os.sep, "/")
+            label = r["path"].rsplit("/", 1)[-1]
+            others = [i for i in r.get("ids", []) if i != spec_id]
+            out.append(f"| [{label}]({rel}) | {r.get('kind') or '—'} | "
+                       f"{' '.join(others) if others else '—'} |")
+    out += ["", SPEC_RECORDS_CLOSE]
+    return "\n".join(out)
+
+
+def build_spec_record_index(builds: list) -> dict:
+    """`spec id -> [record]`, inverted from the bindings every build already carries.
+
+    A record filed under one build folder may name a spec in ANOTHER; keying on the id rather than on
+    the folder is what puts a cross-build review at the spec a reader is actually looking at.
+    """
+    out = {}
+    for b in builds:
+        for r in b.get("records") or []:
+            for i in r.get("ids", []):
+                out.setdefault(i, []).append(r)
+    return out
+
+
+def add_spec_records_region(spec_text: str) -> str:
+    """Create the pair between the status header and the first `## ` section. Nothing else moves."""
+    lines = spec_text.split("\n")
+    at = next((i for i, l in enumerate(lines) if l.startswith("## ")), None)
+    if at is None:
+        at = len(lines)
+    while at > 0 and not lines[at - 1].strip():
+        at -= 1
+    return "\n".join(lines[:at] + ["", SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE] + lines[at:])
+
+
+def remove_dead_regions(readme_text: str) -> str:
+    """Delete a RETIRED region's marker pair and everything between it, leaving no authored byte.
+
+    A region whose registration is gone but whose pair remains is not inert: `slot_violations` counts
+    the orphaned markers and their content as authored material after the first generated marker,
+    which is trigger 1. Measured at 750 violation lines across the corpus if the surgery is split
+    from the tuple change, which is why they are one commit.
+    """
+    for _name, mo, mc in DEAD_REGIONS:
+        lines = readme_text.split("\n")
+        o, c = _marker_index(lines, mo), _marker_index(lines, mc)
+        if o is None or c is None or c < o:
+            continue
+        end = c + 1
+        while end < len(lines) and not lines[end].strip():
+            end += 1
+        start = o
+        while start > 0 and not lines[start - 1].strip():
+            start -= 1
+        readme_text = "\n".join(lines[:start] + lines[end:])
+    return readme_text
 
 
 def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
@@ -1133,7 +1474,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
-        text = strip_records_sentence(read_text(path), b["readme"])
+        text = remove_dead_regions(read_text(path))
         text = apply_front_matter_ids(text, b["roster"], b["readme"])
         if create_missing:
             for _name, mo, mc in GEN_REGIONS:
@@ -1156,6 +1497,32 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
                 continue  # a region this README has not adopted — S1c
             text = apply_region(text, renderer(b), b["readme"], mo, mc)
         artifacts[b["readme"]] = text
+    # TOOL-dFramedEntrypoint-6 — every record renders inside the SPEC it serves. The population is
+    # every tracked spec carrying a status header, not only the ones a record names: an unnamed spec
+    # renders an EXPLICIT empty case, because an absent region cannot be told from a spec nobody has
+    # recorded against. `--write` creates the pair, `--check` never demands one — the same asymmetry
+    # the build-README regions rely on, so this ships without demanding a corpus-wide render.
+    inverted = build_spec_record_index(builds)
+    for b in builds:
+        base = b["readme"].rsplit("/", 1)[0]
+        for u in b["units"]:
+            # `u["path"]` is ABSOLUTE and mixed-separator on Windows. Every other artifact key here
+            # is repo-relative, and `cmd_write` joins the key onto `root` — so an absolute key wrote
+            # the right file by luck and computed the wrong relative link. Re-derive it the way
+            # `render_region` already does, from the build root plus the tail.
+            marker = "/builds/" + b["slug"] + "/"
+            tail = u["path"].replace(os.sep, "/").split(marker, 1)[1]
+            rel = base + "/" + tail
+            stext = read_text(os.path.join(root, rel))
+            lines = stext.split("\n")
+            has = _marker_index(lines, SPEC_RECORDS_OPEN) is not None
+            if not has and not create_missing:
+                continue
+            if not has:
+                stext = add_spec_records_region(stext)
+            artifacts[rel] = apply_region(
+                stext, render_spec_records(u["id"], inverted.get(u["id"], []), rel), rel,
+                SPEC_RECORDS_OPEN, SPEC_RECORDS_CLOSE)
     artifacts[f"{m}/LIVE.md"] = render_live(builds, m)
     artifacts.update(render_shards(builds, m))
     # Orphans: a tracked file under ledger/ that this render does not produce. The DELETABLE set is
@@ -1198,20 +1565,135 @@ def cmd_check_format(root: str, conf: dict) -> int:
     Build READMEs violate the sequence at this unit's base, so a refusal on the render path would red
     hygiene check 9 across the corpus on this unit's own commit. The leg at the last build position
     is what makes this binding; the surgery unit before it is what makes it pass.
+
+    **WHAT THIS VERB DOES NOT CHECK**, stated here because a structural check reads as a semantic one
+    to everybody who did not write it. It grades POSITION for every tracked build README, and SHAPE —
+    the closed heading canon — only for the READMEs the declared registry BINDS. It does not grade
+    what a slot SAYS, whether the description is the one first authored, or how big any slot is. Size
+    is TOOL-dFramedEntrypoint-2's separate budget; immutability is a documented check in
+    `memory/HYGIENE.md` and not a gated one, because 26 of 61 description blocks already carry more
+    than one commit and a history predicate would have no green starting state.
     """
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
                if p.endswith("/README.md")]
-    bad = []
+    check_contract_registry(root, conf, tracked)
+    bound = read_contract_registry(root, conf)
+    # The declaration is asserted on EVERY run, bound population or not. Its integrity is not
+    # conditional on anything using it.
+    _here = resolve_slot_data_dir()
+    if not (_here / SLOT_LIMITS).exists():
+        raise Problem(f"{SLOT_LIMITS} is absent at {_here / SLOT_LIMITS}; a slot budget with no "
+                      f"declared ceilings would grade nothing and report clean")
+    check_slot_table(read_slot_table(str(_here / SLOT_LIMITS)), SLOT_LIMITS)
+    bad, adv = [], []
     for rel in sorted(tracked):
-        for line, why in slot_violations(read_text(os.path.join(root, rel)), rel):
+        for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
             bad.append(f"    {rel}:{line} — {why}")
+        if rel in bound:
+            h, a = scan_slot_budget(root, conf, rel)
+            bad += h
+            adv += a
+    # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
+    # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
+    for line in adv:
+        print("build-index ADVISORY — a slot passed its recorded high-water:")
+        print(line)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
         for line in bad:
             print(line)
         return 1
-    print(f"build-index: slot contract clean ({len(tracked)} build README(s))")
+    graded = len([r for r in tracked if r in bound])
+    unarmed = scan_unarmed_slots()
+    if unarmed:
+        print(f"build-index: NOTE {len(unarmed)} canonical slot(s) ship UNARMED — no declared "
+              f"ceiling: {', '.join(unarmed)}")
+    print(f"build-index: slot contract clean ({len(tracked)} build README(s); "
+          f"heading canon BOUND on {graded})")
+    if not graded:
+        # A rule binding nothing must SAY so. A green line over an empty declared population is
+        # indistinguishable from coverage, which is the class the charter names and the reason a
+        # date-keyed cutoff was refused for this contract in the first place.
+        print(f"build-index: NOTE the heading canon is bound on ZERO build READMEs — "
+              f"{m}/{CONTRACT_REGISTRY} declares none, so trigger 3 graded nothing this run")
+    return 0
+
+
+def cmd_report(root: str, conf: dict) -> int:
+    """Every bound README's slot sizes against both numbers. The margin, readable BEFORE a breach.
+
+    This exists because the runner prints one ok line for a passing leg and echoes leg stdout only on
+    failure, so an advisory inside a green leg reaches nobody. A warning nobody can read is a check
+    nobody runs.
+    """
+    m = conf["MEMORY_ROOT"]
+    here = resolve_slot_data_dir()
+    limits = read_slot_table(str(here / SLOT_LIMITS)) if (here / SLOT_LIMITS).exists() else {}
+    highs = read_slot_table(str(here / SLOT_HIGHWATER)) if (here / SLOT_HIGHWATER).exists() else {}
+    bound = sorted(read_contract_registry(root, conf))
+    if not bound:
+        print(f"build-index: no build README is BOUND — {m}/{CONTRACT_REGISTRY} declares none, so "
+              f"there is nothing to report sizes for. The ceilings below are declared and inert.")
+        for h, _e, _b in SLOT_CANON:
+            c = limits.get(h)
+            print(f"    {h} — ceiling {c if c is not None else 'UNARMED'}")
+        return 0
+    for rel in bound:
+        for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
+            c, hw = limits.get(head), highs.get(head)
+            print(f"    {rel} · {head} — {size} B · high-water {hw if hw is not None else '-'} · "
+                  f"ceiling {c if c is not None else 'UNARMED'}")
+    return 0
+
+
+def cmd_bump(root: str, conf: dict) -> int:
+    """Rewrite the HIGH-WATER file from the measured tree. It never writes the ceiling file."""
+    here = resolve_slot_data_dir()
+    bound = sorted(read_contract_registry(root, conf))
+    peak = {h: 0 for h, _e, _b in SLOT_CANON}
+    for rel in bound:
+        for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
+            peak[head] = max(peak.get(head, 0), size)
+    p = str(here / SLOT_HIGHWATER)
+    # A COMMENT IS A LINE WITH NO TAB — the same rule `read_slot_table` states, for the same reason,
+    # and getting it wrong here duplicated all five rows on every run: 5 -> 10 -> 15. The two
+    # functions parse ONE grammar, so they must agree about it; that agreement is now armed.
+    keep = [l for l in read_text(p).split("\n") if "\t" not in l] if os.path.exists(p) else []
+    while keep and not keep[-1].strip():
+        keep.pop()
+    rows = [f"{h}\t{peak[h]}" for h, _e, _b in SLOT_CANON]
+    write_text(p, "\n".join(keep + rows) + "\n")
+    print(f"build-index: high-water rewritten for {len(rows)} slot(s) over {len(bound)} bound "
+          f"README(s); {SLOT_LIMITS} untouched")
+    return 0
+
+
+def cmd_survey(root: str, conf: dict) -> int:
+    """Run the canon over EVERY tracked build README, bound or not, and report. Never fails.
+
+    This repo requires a new gate predicate to be run over the real tree before it is wired, printing
+    hits AND near-misses. It is a verb rather than a flag because `main()` ignores an unrecognised
+    argument, so an acceptance criterion naming a flag that does not exist would pass by printing the
+    ordinary clean line — which is precisely what this unit's first draft specified.
+    """
+    m = conf["MEMORY_ROOT"]
+    tracked = sorted(p for p in run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n")
+                     if p.endswith("/README.md"))
+    bound = read_contract_registry(root, conf)
+    hits = 0
+    for rel in tracked:
+        vs = slot_violations(read_text(os.path.join(root, rel)), rel, canon=True)
+        tag = "BOUND  " if rel in bound else "unbound"
+        if vs:
+            hits += 1
+            print(f"{tag} {rel} — {len(vs)} violation(s)")
+            for line, why in vs:
+                print(f"        :{line} — {why}")
+        else:
+            print(f"{tag} {rel} — conforms")
+    print(f"build-index: survey over {len(tracked)} build README(s) — {hits} would fail the canon, "
+          f"{len(tracked) - hits} conform; {len(bound)} are BOUND today")
     return 0
 
 
@@ -1311,141 +1793,17 @@ def cmd_selftest() -> int:
             lambda: plan(t2, conf2)[0]["memory/ledger/2026-08.md"])
 
         # AC2 — an unpaired marker is a NAMED error, not a silent departure.
-        t3 = os.path.join(base, "nomark"); os.makedirs(t3)
-        conf3 = _fixture(t3, marker=False)
-        # The message now NAMES the pair. With four registered regions, "expected exactly one marker
-        # pair" was no longer actionable — an operator could not tell which region was malformed.
-        arm("unpaired marker is named",
-            "expected exactly one '<!-- gen:build-index -->' marker pair, found 1 open and 0 close",
-            lambda: plan(t3, conf3))
-
-        # The derived roster. Each arm names one branch of `rosters()`. (The owning spec is
-        # deliberately NOT cited by id: a drift signal counts a non-terminal spec id appearing in
-        # product source, and it sits at its pin.)
-        def _roster_tree(name, extra=None, ids_line=None):
-            """A fixture whose spec defines ARCH-tOne-1, plus whatever `extra` writes."""
-            d = os.path.join(base, name); os.makedirs(d)
-            c = _fixture(d, spec_status="INPROGRESS")
-            if ids_line is not None:
-                p = os.path.join(d, "memory", "builds", "tOne", "README.md")
-                write_text(p, read_text(p).replace("ids: ARCH-tOne-1", ids_line))
-            for rel, text in (extra or {}).items():
-                full = os.path.join(d, rel.replace("/", os.sep))
-                os.makedirs(os.path.dirname(full), exist_ok=True)
-                write_text(full, text)
-            run("git", "add", "-A", cwd=d)
-            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=d)
-            return d, c
-
-        d1, c1 = _roster_tree("rosterbase", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"})
-        arm("the roster is DERIVED, not read from front matter", "ids ARCH-tOne-1 ARCH-tOne-4",
-            lambda: plan(d1, c1)[0]["memory/builds/tOne/README.md"])
-        arm("the roster sorts by NUMERIC sequence, not lexically",
-            "ARCH-tOne-2 ARCH-tOne-10",
-            lambda: plan(*_roster_tree("rostersort",
-                                       {"memory/DECISIONS.md": "- ARCH-tOne-10 · ten\n- ARCH-tOne-2 · two\n"}))[0]
-            ["memory/builds/tOne/README.md"])
-        # SELF-REFERENCE: the field must never be an input to itself, or a wrong value survives every
-        # regeneration and every gate agrees, because a fresh render reproduces it exactly.
-        d3, c3 = _roster_tree("rosterself", {"memory/DECISIONS.md": "- ARCH-tOne-4 · a decision\n"},
-                              ids_line="ids: ARCH-tOne-1 ARCH-tOne-99")
-        arm("an id present ONLY in the build's own front matter is dropped",
-            "ids: ARCH-tOne-1 ARCH-tOne-4\n",
-            lambda: plan(d3, c3)[0]["memory/builds/tOne/README.md"])
-        # A revision-suffixed anchor amends a decision; it is not an id of its own. Admitting them
-        # multiplied one real build's roster from 8 to 38.
-        d4, c4 = _roster_tree("rosterrev", {"memory/DECISIONS.md": "- ARCH-tOne-4b · an amendment\n"})
-        arm("a revision-suffixed anchor never joins a roster", "ids ARCH-tOne-1<",
-            lambda: plan(d4, c4)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
-        # The generated artifacts are rendered FROM the roster, so reading them is self-reference one
-        # hop out. LIVE.md carries a COUNT for the same reason the region carries the list: only one
-        # of the two files is inside check 7's entry budget.
-        d5, c5 = _roster_tree("rosterexcl", {"memory/LIVE.md": "ARCH-tOne-77\n",
-                                             "memory/ledger/2026-08.md": "ARCH-tOne-88\n"})
-        arm("an id present only in a GENERATED artifact never joins a roster", "ids ARCH-tOne-1<",
-            lambda: plan(d5, c5)[0]["memory/builds/tOne/README.md"].replace("\n", "<"))
-        arm("the capped artifacts carry a COUNT, never the id list", "| arch | 2 |",
-            lambda: plan(d1, c1)[0]["memory/LIVE.md"])
-
-        # ---- the folder-claim sentence. These are FIXTURE arms on purpose: once the corpus is
-        # ---- migrated the sentence is gone from it, so a control run against the live tree has
-        # ---- nothing left to catch and passes whatever the remover does.
-        def _rec(tmp, body):
-            c = _fixture(tmp, spec_status="INPROGRESS")
-            p = os.path.join(tmp, "memory", "builds", "tOne", "README.md")
-            t = read_text(p)
-            write_text(p, t.replace("# tOne\n", "# tOne\n\n" + body + "\n"))
-            run("git", "add", "-A", cwd=tmp)
-            run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=tmp)
-            return c
-
-        ta = os.path.join(base, "recsurv"); os.makedirs(ta)
-        ca = _rec(ta, "Records live under `spec/`. The table below is\nGENERATED from the header.")
-        arm("the text following the sentence SURVIVES the removal", "The table below is",
-            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
-        arm("the authored sentence leaves the body", "1",
-            lambda: str(plan(ta, ca)[0]["memory/builds/tOne/README.md"].count("Records live under")))
-        tb = os.path.join(base, "recwhole"); os.makedirs(tb)
-        cb = _rec(tb, "Records live under `spec/`.")
-        # ASSERT THE SHAPE, NOT A COUNT. The count `1` is satisfied by the DERIVED sentence alone, so
-        # it holds whether the whole-line branch deletes the line or leaves it empty — collapsing
-        # `del lines[i]` to `lines[i] = rest` passed the entire selftest while changing the render.
-        # The residual blank line is the only observable difference, so that is what is asserted.
-        # The sentence line sat between two blanks, so deleting it leaves exactly those two and the
-        # marker follows. Collapsing the branch to `lines[i] = rest` leaves a THIRD blank — the only
-        # observable difference, and the one a count could never see.
-        arm("a line that was ONLY the sentence is removed entirely, leaving no extra blank",
-            "# tOne" + chr(10) * 3 + MARK_OPEN,
-            lambda: plan(tb, cb)[0]["memory/builds/tOne/README.md"])
-        # and the mid-line case keeps ONE space where the sentence was, which pins the `[ ]?`
-        tb2 = os.path.join(base, "recmid"); os.makedirs(tb2)
-        cb2 = _rec(tb2, "Prefix text. Records live under `spec/`. Suffix text.")
-        arm("removing a mid-line sentence leaves exactly one space, not two",
-            "Prefix text. Suffix text.",
-            lambda: plan(tb2, cb2)[0]["memory/builds/tOne/README.md"])
-        # [6] front matter is structured input, not prose: a key whose value carries the anchor
-        # was silently BLANKED, and --check then agreed with the blanked file forever.
-        tfm = os.path.join(base, "recfm"); os.makedirs(tfm)
-        cfm = _fixture(tfm, spec_status="INPROGRESS")
-        _q = os.path.join(tfm, "memory", "builds", "tOne", "README.md")
-        write_text(_q, read_text(_q).replace("ids: ARCH-tOne-1",
-                    "ids: ARCH-tOne-1" + chr(10) + "notes: Records live under `spec/`."))
-        run("git", "add", "-A", cwd=tfm); run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=tfm)
-        arm("the anchor inside FRONT MATTER is refused, never blanked",
-            "a structured value is not prose", lambda: plan(tfm, cfm))
-        tc = os.path.join(base, "rectwice"); os.makedirs(tc)
-        cc = _rec(tc, "Records live under `spec/`. one\n\nRecords live under `build/`. two")
-        arm("the sentence appearing twice outside the region is a REFUSAL",
-            "is not identifying one sentence", lambda: plan(tc, cc))
-        arm("the derived sentence names only the folders that exist", "Records live under `spec/`.",
-            lambda: plan(ta, ca)[0]["memory/builds/tOne/README.md"])
-
-        # ---- the four shapes the closing review reproduced against the first cut. Each corrupted or
-        # ---- silently skipped an authored README, and each is now a fixture rather than a promise.
-        td = os.path.join(base, "recdot"); os.makedirs(td)
-        cd_ = _rec(td, "Records live under `spec/` and `notes.md`. The table below is\nGENERATED.")
-        # The surviving line must be EXACTLY the next sentence. Asserting merely that "The table
-        # below is" appears does NOT discriminate: the truncating pattern leaves `md`. The table
-        # below is`, which contains it — both first-cut arms passed over the corruption they were
-        # written to catch, and only the negative control exposed them.
-        arm("a dot INSIDE the claim does not truncate the match, leaving no fragment",
-            chr(10) + "The table below is" + chr(10),
-            lambda: plan(td, cd_)[0]["memory/builds/tOne/README.md"])
-        te = os.path.join(base, "recfence"); os.makedirs(te)
-        ce = _rec(te, "The old text read:\n\n```\nRecords live under `spec/`, `build/`. Quoted.\n```\n\nNow derived.")
-        arm("a fenced QUOTE of the sentence is left untouched", "Records live under `spec/`, `build/`. Quoted.",
-            lambda: plan(te, ce)[0]["memory/builds/tOne/README.md"])
-        tf = os.path.join(base, "recbelow"); os.makedirs(tf)
-        cf = _rec(tf, "intro")
-        _p = os.path.join(tf, "memory", "builds", "tOne", "README.md")
-        write_text(_p, read_text(_p) + "\n### later\n\nRecords live under `build/`. Read in order.\n")
-        run("git", "add", "-A", cwd=tf); run("git", "commit", "-q", "-m", "b", "--no-verify", cwd=tf)
-        arm("a claim BELOW the marker pair is removed too, not ignored", "1",
-            lambda: str(plan(tf, cf)[0]["memory/builds/tOne/README.md"].count("Records live under")))
-        tg = os.path.join(base, "recwrap"); os.makedirs(tg)
-        cg = _rec(tg, "Records live under `spec/`, `build/` and\n`reviews/`. The table below is GENERATED.")
-        arm("a claim WRAPPED across lines is a named refusal, not a silent skip",
-            "no complete sentence", lambda: plan(tg, cg))
+        # TOOL-dFramedEntrypoint-5 S4 class (c) — THE SENTENCE-REMOVAL ARMS ARE RETIRED, all of them,
+        # because their subject is. `strip_records_sentence` existed to delete an AUTHORED copy of a
+        # sentence this generator also rendered; this unit stops rendering it, so the remover was
+        # retired rather than left to delete an author's prose and write nothing back.
+        #
+        # WHAT THOSE ARMS WERE REALLY WATCHING is kept, not dropped. Two of them asserted the
+        # OCCURRENCE COUNT of the derived sentence, and the sentence was the record selector's
+        # liveness assertion — nine arms detected a mis-segmented selector by noticing it had gone
+        # missing. The replacement is the counted `Records: <n> bound to this build` line and its
+        # positive arm above: a build that holds records and reports zero is the same
+        # mis-segmentation, said out loud instead of inferred from an absence.
 
         # AC4 — an absent README is a named error on BOTH modes, never a traceback.
         t4 = os.path.join(base, "noreadme"); os.makedirs(t4)
@@ -1528,23 +1886,28 @@ def cmd_selftest() -> int:
         # WHOLE regions, markers and body together. Stripping only the marker lines orphans the
         # rendered body as loose authored text, which makes the fixture genuinely non-conforming and
         # reds a later arm for a reason that has nothing to do with what this one tests.
+        # ADDRESSED BY NAME, not by tuple index. The index form read `for _i in (3, 2, 1)` and
+        # raised IndexError the moment TOOL-dFramedEntrypoint-5 removed the last entry — a break no
+        # grep for the marker STRING could have predicted, which is why the spec names this as its
+        # own blast-radius class.
+        _TRAILING = [r for r in GEN_REGIONS if r[0] != "build-index"]
         _ls = read_text(rd12).split("\n")
-        for _i in (3, 2, 1):
-            _o, _c = _marker_index(_ls, GEN_REGIONS[_i][1]), _marker_index(_ls, GEN_REGIONS[_i][2])
+        for _n, _mo, _mc in reversed(_TRAILING):
+            _o, _c = _marker_index(_ls, _mo), _marker_index(_ls, _mc)
             if _o is not None and _c is not None:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
         arm("check does not CREATE an absent pair", "0", lambda: str(cmd_check(t12, conf12)))
-        arm("the three pairs really are absent for that arm", "3",
-            lambda: str(sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
+        arm("every trailing pair really is absent for that arm", str(len(GEN_REGIONS) - 1),
+            lambda: str(sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         cmd_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
-            sum(GEN_REGIONS[i][1] not in read_text(rd12) for i in (1, 2, 3))))
-        arm("write CREATED the three absent pairs", "3",
-            lambda: str(sum(GEN_REGIONS[i][1] in read_text(rd12) for i in (1, 2, 3))))
+            sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
+        arm("write CREATED every absent trailing pair", str(len(GEN_REGIONS) - 1),
+            lambda: str(sum(mo in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
-            read_text(rd12).index(GEN_REGIONS[1][1]) < read_text(rd12).index(GEN_REGIONS[2][1])
-            < read_text(rd12).index(GEN_REGIONS[3][1])))
+            all(read_text(rd12).index(_TRAILING[k][1]) < read_text(rd12).index(_TRAILING[k + 1][1])
+                for k in range(len(_TRAILING) - 1))))
 
         # S8 — over a README that VIOLATES the sequence, the pair still lands and no authored byte
         # moves. This is the branch the whole corpus takes until the surgery unit lands, so it is the
@@ -1557,7 +1920,7 @@ def cmd_selftest() -> int:
         arm("a violating README keeps its authored tail", "authored prose below the region.",
             lambda: read_text(rd13))
         arm("a violating README still gains its pairs", "True",
-            lambda: str(all(GEN_REGIONS[i][1] in read_text(rd13) for i in (1, 2, 3))))
+            lambda: str(all(mo in read_text(rd13) for _n, mo, _mc in _TRAILING)))
 
         # S4 — BOTH triggers. The second one is the arm an earlier draft of the spec had no rule for,
         # and it is the one the single corpus README carrying a plan pair actually trips.
@@ -1581,15 +1944,264 @@ def cmd_selftest() -> int:
         arm("a conforming README trips no trigger", "[]",
             lambda: str(slot_violations(read_text(rd12), "x")))
 
-        # S11 — the document inventory NAMES a record. This arm exists because the first cut bucketed
-        # each record by its own filename rather than by its kind folder, so no kind ever matched and
-        # the region rendered EMPTY between its two markers — which reads as "this build holds no
-        # records", not as a fault. A region whose population selector silently matches nothing is the
-        # vacuous-selector class, and only a positive arm catches it.
-        arm("the document inventory names a real record", "2026-08-01-spec-tOne-1.md",
-            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
-        arm("the document inventory buckets under its KIND folder", "**`spec/`**",
-            lambda: render_docs([b for b in collect(t12, conf12) if b["slug"] == "tOne"][0]))
+        # ---------------------------------------------------- TOOL-dFramedEntrypoint-1, trigger 3
+        # S4 — the TOTAL-EXEMPTION hole. This is the arm that FAILED before this unit: a README with
+        # no generated pair returned [] whatever it held. No live file reaches it, so it needs a
+        # fixture or it is never exercised at all.
+        arm("a README with no generated pair is a violation, not a pass",
+            "no generated region pair",
+            lambda: str(slot_violations("---\nslug: x\n---\n\n# x\n\n45 KB of prose.\n", "x")))
+        arm("the no-pair violation fires even with canon off", "1",
+            lambda: str(len(slot_violations("# x\n\nprose\n", "x", canon=False))))
+
+        def build_canon_readme(slots):
+            """A build README whose authored half is `slots`, plus a valid generated pair."""
+            head = ["---", "slug: tOne", "node: t", "opened: 2026-01-01", "streams: s",
+                    "roster: ARCH", "ids: ARCH-tOne-1", "---", "", "# tOne", ""]
+            return "\n".join(head + slots + ["", MARK_OPEN, MARK_CLOSE, ""])
+
+        GOOD = ["## The problem this build exists to solve", "", "It states the problem.", "",
+                "## Expected improvements", "", "- one improvement", "",
+                "## Detriments if this is not built", "", "- one detriment", "",
+                "## Build-level rules", "",
+                "## Parked decisions", ""]
+        arm("a canon-conforming README trips trigger 3 not at all", "[]",
+            lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
+        arm("the canon is OPT-IN — an unbound file is graded on position alone", "[]",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Afterword", "", "anything at all"]), "x", canon=False)))
+        arm("a heading outside the canon is named", "heading outside the canon: ## Afterword",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Afterword", "", "prose"]), "x", canon=True)))
+        arm("canonical slots out of order are named", "out of order",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD[4:] + GOOD[:4]), "x", canon=True)))
+        arm("prose above the first canonical heading is named",
+            "authored content between the title and the first canonical heading",
+            lambda: str(slot_violations(build_canon_readme(["stray sentence.", ""] + GOOD),
+                                        "x", canon=True)))
+        arm("a required slot with an empty body is named",
+            "empty body and may not: ## The problem this build exists to solve",
+            lambda: str(slot_violations(build_canon_readme(
+                ["## The problem this build exists to solve", ""] + GOOD[3:]), "x", canon=True)))
+        arm("an OPTIONAL slot with an empty body is legal", "[]",
+            lambda: str(slot_violations(build_canon_readme(GOOD), "x", canon=True)))
+        # D2 — a DUPLICATED heading made the sequence compare return before any body check ran, so
+        # one appended line disabled the entire canon while the leg printed clean.
+        # M3's SCOPING, which shipped with no arm: with `h in canon_heads and` deleted, a repeated
+        # NON-canonical heading is misreported as a duplicated canonical slot AND the accurate
+        # message is suppressed by the early return. This arm reaches that guard; the duplicate arm
+        # below does not, because a repeated CANONICAL heading trips both spellings identically.
+        arm("a repeated NON-canonical heading says `outside the canon`, not `more than once`",
+            "heading outside the canon: ## Notes",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p", "", "## Notes", "", "q"]), "x", canon=True)))
+        arm("...and does NOT claim a canonical slot was duplicated", "False",
+            lambda: str("more than once" in str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p", "", "## Notes", "", "q"]), "x", canon=True))))
+        arm("a canonical heading repeated is named, not silently disabling the body checks",
+            "appears more than once",
+            lambda: str(slot_violations(build_canon_readme(GOOD + ["", "## Build-level rules", ""]),
+                                        "x", canon=True)))
+        # D4 — --bump duplicated all five rows per run because its keep-filter read `## ` as a
+        # comment. The two functions parse ONE grammar and must AGREE about it; that is the arm.
+        # CALLS `cmd_bump` FOR REAL, twice, and asserts the row count is STABLE. Three rounds of
+        # review went by with this uncovered because every earlier attempt RESTATED cmd_bump's filter
+        # inline rather than running it — the verb wrote into the installed kit directory, so an arm
+        # that called it would have rewritten this repo's own high-water file. `_SLOT_DATA_DIR` is
+        # the seam that makes the real call possible; without it the only honest options were a
+        # copy (which drifts, and had already drifted) or no arm at all.
+        _bt = os.path.join(base, "bumpreal"); os.makedirs(_bt)
+        _bconf = _fixture(_bt, spec_status="OPEN")
+        _brd = "memory/builds/tOne/README.md"
+        write_text(os.path.join(_bt, "memory", CONTRACT_REGISTRY),
+                   "exempt-pin: 0\n" + _brd + "\n")
+        _bdir = os.path.join(base, "bumpdata"); os.makedirs(_bdir)
+        write_text(os.path.join(_bdir, SLOT_LIMITS),
+                   "# ceilings\n" + "\n".join(f"{h}\t9999" for h, _e, _b in SLOT_CANON) + "\n")
+        write_text(os.path.join(_bdir, SLOT_HIGHWATER), "# high-water, seeded empty\n")
+
+        def measure_bump_rows():
+            global _SLOT_DATA_DIR
+            _SLOT_DATA_DIR = _bdir
+            try:
+                cmd_bump(_bt, _bconf)
+                cmd_bump(_bt, _bconf)
+                return sum(1 for l in read_text(os.path.join(_bdir, SLOT_HIGHWATER)).split("\n")
+                           if "\t" in l)
+            finally:
+                _SLOT_DATA_DIR = None
+
+        arm("two --bump runs leave exactly one row per canonical slot, not two",
+            str(len(SLOT_CANON)), lambda: str(measure_bump_rows()))
+        arm("--bump keeps the file's comment lines across a round-trip", "high-water, seeded empty",
+            lambda: read_text(os.path.join(_bdir, SLOT_HIGHWATER)))
+
+        arm("a bullet slot carrying prose is named", "requires a bullet list: ## Expected improvements",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD[:6] + ["not a bullet."] + GOOD[7:]), "x", canon=True)))
+        # The plan pair belongs to NO slot: the authored half must STOP at it, or its table is read
+        # as body content of the last canonical slot.
+        arm("the authored plan pair does not become body of the last slot", "[]",
+            lambda: str(slot_violations("\n".join([
+                "# tOne", ""] + GOOD + ["", PLAN_OPEN, "| # | unit |", PLAN_CLOSE, "",
+                MARK_OPEN, MARK_CLOSE, ""]), "x", canon=True)))
+        # The registry reader: absent file is the EMPTY SET here, and unit 3 turns that into a
+        # refusal. Armed so the handover between the two units is visible rather than assumed.
+        t16 = os.path.join(base, "registry"); os.makedirs(t16)
+        conf16 = _fixture(t16, spec_status="OPEN")
+        # INVERTED BY TOOL-dFramedEntrypoint-3, deliberately and in the unit that changed it. Unit 1
+        # shipped an absent registry as the EMPTY SET — a pass — so that it did not depend on a file
+        # unit 3 had not written yet. Unit 3 makes it a refusal. Leaving unit 1's arm asserting the
+        # old behaviour would have been two arms disagreeing about one contract.
+        arm("an absent contract registry now REFUSES (was the empty set until unit 3)", "is absent",
+            lambda: read_contract_registry(t16, conf16))
+        os.makedirs(os.path.join(t16, "memory", "project"), exist_ok=True)
+        write_text(os.path.join(t16, "memory", CONTRACT_REGISTRY),
+                   "# a comment\nexempt-pin: 0\nmemory/builds/tOne/README.md\n")
+        arm("a registry row binds its path and comments are skipped",
+            "memory/builds/tOne/README.md",
+            lambda: str(read_contract_registry(t16, conf16)))
+
+        # ------------------------------------- TOOL-dFramedEntrypoint-6, records inside their specs
+        _R = {"path": "memory/builds/tOne/reviews/2026-08-01-review-tOne-1.md",
+              "kind": "spec-audit", "ids": ["ARCH-tOne-1", "ARCH-tTwo-9"]}
+        arm("the region renders a record RELATIVE to the spec's own directory",
+            "](../reviews/2026-08-01-review-tOne-1.md)",
+            lambda: render_spec_records("ARCH-tOne-1", [_R],
+                                        "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"))
+        # The first cut fell back to the REPO-relative path for a cross-build record, which a reader
+        # resolves against the spec's directory — so every cross-build edge linked to nothing.
+        arm("a CROSS-BUILD record still resolves, which the repo-relative fallback did not",
+            "](../../tOne/reviews/2026-08-01-review-tOne-1.md)",
+            lambda: render_spec_records("ARCH-tTwo-9", [_R],
+                                        "memory/builds/tTwo/spec/2026-08-01-spec-tTwo-9.md"))
+        arm("the region names the OTHER ids a shared record serves", "ARCH-tTwo-9",
+            lambda: render_spec_records("ARCH-tOne-1", [_R], "memory/builds/tOne/spec/x.md"))
+        arm("a spec no record names renders the EXPLICIT empty case", "*No record names this unit.*",
+            lambda: render_spec_records("ARCH-tOne-1", [], "memory/builds/tOne/spec/x.md"))
+        arm("the pair is created ABOVE the first numbered section, never inside one", "True",
+            lambda: str(add_spec_records_region("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+                        .index(SPEC_RECORDS_OPEN) <
+                        add_spec_records_region("# t\n\n**Status:** X\n\n## 1. Goal\n\nbody\n")
+                        .index("## 1. Goal")))
+        arm("the inversion keys a record on every id it names, not on its folder", "2",
+            lambda: str(len(build_spec_record_index([{"records": [_R]}]))))
+
+        # -------------------------------------------- TOOL-dFramedEntrypoint-3, the contract registry
+        t18 = os.path.join(base, "contract"); os.makedirs(t18)
+        conf18 = _fixture(t18, spec_status="OPEN")
+        reg18 = os.path.join(t18, "memory", CONTRACT_REGISTRY)
+        os.makedirs(os.path.dirname(reg18), exist_ok=True)
+        trk18 = ["memory/builds/tOne/README.md"]
+
+        def build_reg_check(body):
+            write_text(reg18, body)
+            return lambda: check_contract_registry(t18, conf18, trk18)
+
+        # An ABSENT registry is a REFUSAL here — the behaviour unit 1 shipped as the empty set, and
+        # this unit REPLACES it. Stated in both specs rather than left as two specs disagreeing.
+        os.path.exists(reg18) and os.remove(reg18)
+        arm("an absent registry refuses, replacing unit 1's empty set", "is absent",
+            lambda: check_contract_registry(t18, conf18, trk18))
+        arm("a registry with no pin refuses", "no `exempt-pin:` line",
+            build_reg_check("memory/builds/tOne/README.md\n"))
+        arm("a tracked README named by no row refuses", "names neither a bound nor an exempt row",
+            build_reg_check("exempt-pin: 0\n"))
+        arm("a row naming a path that is not a tracked README refuses", "stale row silently widens",
+            build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\nmemory/builds/ghost/README.md\n"))
+        arm("an exempt row with no reason refuses", "carries no reason",
+            build_reg_check("exempt-pin: 1\n!memory/builds/tOne/README.md\n"))
+        arm("the pin ABOVE the measured count refuses, not only below", "the pin is an equality",
+            build_reg_check("exempt-pin: 9\n!memory/builds/tOne/README.md - why\n"))
+        arm("a bound row and a matching pin pass", "None",
+            lambda: str(build_reg_check("exempt-pin: 0\nmemory/builds/tOne/README.md\n")()))
+        arm("a bound row is BOUND and an exempt row is not",
+            "{'memory/builds/tOne/README.md'}",
+            lambda: str(read_contract_rows(t18, conf18)[0]))
+
+        # ------------------------------------------------ TOOL-dFramedEntrypoint-2, the slot budget
+        # THE READER'S OWN TRAP, armed because it shipped broken for one commit: every canonical slot
+        # heading starts with `#`, so a comment predicate keyed on `#` ate every data row and the
+        # table parsed to EMPTY — which the leg then reported as five deliberate UNARMED slots.
+        _tbl = os.path.join(base, "tbl.txt")
+        write_text(_tbl, "# a real comment, no tab\n"
+                         "## The problem this build exists to solve\t900\n"
+                         "## Expected improvements\t\n")
+        arm("a heading row is DATA even though it starts with a hash", "900",
+            lambda: str(read_slot_table(_tbl).get("## The problem this build exists to solve")))
+        arm("a line with no tab is the comment, and is skipped", "1",
+            lambda: str(sum(1 for k in read_slot_table(_tbl) if "real comment" in k) + 1))
+        arm("a row with no value is the ANNOUNCED unarmed state, not a missing row", "None",
+            lambda: str(read_slot_table(_tbl)["## Expected improvements"]))
+        # Both directions over the declaration, asserted whether or not anything is BOUND.
+        arm("a limits table missing a canonical slot is a refusal", "has NO ROW for the canonical slot",
+            lambda: check_slot_table({"## Expected improvements": 1}, "t.txt"))
+        arm("a limits row for an unknown slot is a refusal", "which SLOT_CANON does not declare",
+            lambda: check_slot_table({h: 1 for h, _e, _b in SLOT_CANON} | {"## Nope": 1}, "t.txt"))
+        # The measured slice: authored only, and it STOPS at the roster pair.
+        _sz = dict(measure_slot_sizes("\n".join(
+            ["# t", ""] + GOOD + ["", PLAN_OPEN, "| # | a very wide authored roster row |", PLAN_CLOSE,
+             "", MARK_OPEN, "generated bytes that must not be billed to a slot", MARK_CLOSE, ""])))
+        arm("the last slot's slice stops at the roster pair, not the generated marker", "0",
+            lambda: str(_sz["## Parked decisions"]))
+        arm("a slot's size counts its authored body only", "22",
+            lambda: str(_sz["## The problem this build exists to solve"]))
+
+        # ------------------------------------------------ TOOL-dFramedEntrypoint-4, the order verb
+        # The shipped regex ended `(?![0-9])`, which rejects a longer NUMBER and nothing else. Both
+        # of these were PROBED against it before the change and both rendered a plausible step.
+        arm("a hex-looking order value is refused, not read as 0", "not a positive integer",
+            lambda: _parse_order("x · order 0x2 · y", "f.md"))
+        arm("a digit-then-letter order value is refused, not read as its digit",
+            "not a positive integer",
+            lambda: _parse_order("x · order 2x · y", "f.md"))
+        arm("a well-formed order value still parses", "3",
+            lambda: str(_parse_order("x · base ab · order 3 · streams s", "f.md")))
+        arm("an order value at the end of the header parses", "7",
+            lambda: str(_parse_order("x · base ab · order 7", "f.md")))
+        arm("an absent order verb is None, not an error", "None",
+            lambda: str(_parse_order("x · base ab · streams s", "f.md")))
+        # The duplicate refusal sat BELOW the early return in the first draft, so a header whose
+        # first occurrence was well-formed never reached it: present, correct, and unreachable.
+        arm("the order verb twice in one header is refused", "more than once",
+            lambda: _parse_order("x · order 2 · order 3 · y", "f.md"))
+
+        # S4/S5 — the roster carries ORDER and TIER, sorts by build order, and keeps the two cells
+        # the unattended driver selects on: the link FIRST and the status as a whole |-delimited cell.
+        t17 = os.path.join(base, "roster"); os.makedirs(t17)
+        conf17 = _fixture(t17, spec_status="OPEN")
+        sp17 = os.path.join(t17, "memory", "builds", "tOne", "spec")
+        write_text(os.path.join(sp17, "2026-01-02-spec-tOne-2.md"),
+                   "# ARCH-tOne-2 — second\n\n**Status:** OPEN · rev-1 · 2026-01-02 · node t · "
+                   "Tier-1 · base abcdef12 · order 1\n")
+        run("git", "add", "-A", cwd=t17)
+        run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t17)
+        reg17 = plan(t17, conf17)[0]["memory/builds/tOne/README.md"]
+        arm("the roster header carries Order and Tier", "| Unit | Order | Tier | Status |",
+            lambda: reg17)
+        # SCOPED TO THE ROWS. The first spelling compared `reg17.index(...)` over the whole region
+        # and read False on a correct sort, because both ids appear earlier in the `ids` roster line
+        # than in the table. An arm that measures the wrong string fails honestly and proves nothing.
+        _rows17 = [l for l in reg17.splitlines() if l.startswith("| [")]
+        arm("an ordered unit sorts ahead of an unordered one", "True",
+            lambda: str(_rows17[0].startswith("| [ARCH-tOne-2") and
+                        _rows17[1].startswith("| [ARCH-tOne-1")))
+        arm("a unit with no order verb renders an em-dash in that cell", "| — |", lambda: reg17)
+        arm("the tier cell always renders a value", "| 1 | OPEN |", lambda: reg17)
+        arm("the link cell stays FIRST, which the driver selects on", "True",
+            lambda: str(all(l.startswith("| [") for l in reg17.split("\n")
+                            if l.startswith("| [") or " — second](" in l)))
+
+        # TOOL-dFramedEntrypoint-5 — the document inventory is GONE, and so are the two arms that
+        # rendered it. What they were really watching is the record SELECTOR: the original defect
+        # bucketed each record by its own filename, so no kind matched and the region rendered EMPTY
+        # between two markers, which reads as "this build holds no records" rather than as a fault.
+        # That watch is KEPT, moved onto the counted line that replaced the derived sentence — a
+        # build holding records and reporting zero is the same mis-segmentation, said out loud.
+        arm("the document inventory region is no longer rendered at all", "False",
+            lambda: str("gen:build-docs" in render_region(
+                [b for b in collect(t12, conf12) if b["slug"] == "tOne"][0])))
 
         # S10 — an edge to a build that does not exist is a typo, not a relation.
         t15 = os.path.join(base, "badedge"); os.makedirs(t15)
@@ -1702,15 +2314,24 @@ def cmd_selftest() -> int:
             lambda: str(cmd_print_bindings(t13, conf13)))
 
         # ---- the rendered Records table and the two coverage joins.
-        arm("a build with a record renders it in the Records table",
-            "| [2026-08-01-review-tOne-1.md](reviews/2026-08-01-review-tOne-1.md) | spec-audit | ARCH-tOne-1 |",
+        # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
+        # SENTENCE arm both lose their subject here. The sentence was the record selector's liveness
+        # assertion — its absence is what nine arms watched for — so the watch moves onto the counted
+        # line that replaced it, over the fixture that actually HOLDS a record. A build holding one
+        # record and reporting zero is the same mis-segmentation the sentence used to reveal by
+        # vanishing, and this says it out loud instead of inferring it from an absence.
+        arm("the record selector reports a NON-ZERO count for a build that holds records",
+            "Records: 1 bound to this build",
             lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
-        arm("the derived folder sentence SURVIVES the table (nine arms depend on it)",
-            "Records live under", lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        arm("the record count names how many FOLDERS the records sit in", "record folder(s)",
+            lambda: plan(t13, conf13)[0]["memory/builds/tOne/README.md"])
+        arm("the records TABLE is no longer rendered", "False",
+            lambda: str("| Record | Kind | Serves |" in
+                        plan(t13, conf13)[0]["memory/builds/tOne/README.md"]))
         # The record above serves the build's only id, so neither join has anything to report. A
         # positive-population arm: an empty table rendering silently is the failure that matters.
-        arm("a fully-covered build renders no coverage line", "True",
-            lambda: str("Ids no record names:" not in
+        arm("a fully-covered build STILL renders both joins, saying none", "True",
+            lambda: str("Ids no record names: none" in
                         plan(t13, conf13)[0]["memory/builds/tOne/README.md"]))
         t14 = os.path.join(base, "gap"); os.makedirs(t14)
         conf14 = _fixture(t14)
@@ -1721,12 +2342,12 @@ def cmd_selftest() -> int:
         arm("a build whose only record is a journal names its id as never spec-audited",
             "Ids no `spec-audit` record has ever named: ARCH-tOne-1",
             lambda: plan(t14, conf14)[0]["memory/builds/tOne/README.md"])
-        arm("...and does NOT claim the id is unnamed, which a journal did name", "True",
-            lambda: str("Ids no record names:" not in
+        arm("...and its other join says `none`, because a journal DID name that id", "True",
+            lambda: str("Ids no record names: none" in
                         plan(t14, conf14)[0]["memory/builds/tOne/README.md"]))
         t15 = os.path.join(base, "norec"); os.makedirs(t15)
         conf15 = _fixture(t15)
-        arm("a build with NO records renders neither the table nor a coverage line", "True",
+        arm("a build with NO records renders no table, and BOTH joins saying none", "True",
             lambda: str("| Record | Kind | Serves |" not in
                         plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
 
@@ -1741,8 +2362,11 @@ def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return cmd_selftest()
-    if mode not in ("--check", "--write", "--check-format", "--print-bindings"):
-        print("usage: gen_build_index.py [--check|--write|--check-format|--print-bindings|--selftest]")
+    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
+                    "--report", "--bump"):
+        print("usage: gen_build_index.py "
+              "[--check|--write|--check-format|--survey|--report|--bump|"
+              "--print-bindings|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -1755,6 +2379,12 @@ def main(argv: list) -> int:
     try:
         if mode == "--check-format":
             return cmd_check_format(root, conf)
+        if mode == "--survey":
+            return cmd_survey(root, conf)
+        if mode == "--report":
+            return cmd_report(root, conf)
+        if mode == "--bump":
+            return cmd_bump(root, conf)
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

@@ -321,42 +321,36 @@ ids TOOL-cBriefedPilot-14 TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-16 TOOL-cBrie
 ids TOOL-cBriefedPilot-27 TOOL-cBriefedPilot-28 TOOL-cBriefedPilot-29 TOOL-cBriefedPilot-30 TOOL-cBriefedPilot-31 TOOL-cBriefedPilot-32 TOOL-cBriefedPilot-34 TOOL-cBriefedPilot-35 TOOL-cBriefedPilot-36 TOOL-cBriefedPilot-37 TOOL-cBriefedPilot-38
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | CLOSED | rev-4 | 2026-08-16 |
-| [TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster](spec/2026-08-14-spec-cBriefedPilot-11.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | CLOSED | rev-1 | 2026-08-16 |
-| [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | CLOSED | rev-1 | 2026-08-16 |
-| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | CLOSED | rev-5 | 2026-08-16 |
-| [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | CLOSED | rev-1 | 2026-08-16 |
-| [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | CLOSED | rev-6 | 2026-08-16 |
-| [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | CLOSED | rev-1 | 2026-08-16 |
-| [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | CLOSED | rev-4 | 2026-08-16 |
-| [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | CLOSED | rev-3 | 2026-08-16 |
-| [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | CLOSED | rev-2 | 2026-08-16 |
-| [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | CLOSED | rev-4 | 2026-08-16 |
-| [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | CLOSED | rev-2 | 2026-08-16 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cBriefedPilot-1 — the paired flag accumulator, and an `--override` that can be used twice](spec/2026-08-14-spec-cBriefedPilot-1.md) | — | 1 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-10 — the last owner turn, and why it is the last one](spec/2026-08-14-spec-cBriefedPilot-10.md) | — | 1 | CLOSED | rev-4 | 2026-08-16 |
+| [TOOL-cBriefedPilot-11 — the kickoff step, taken after preflight, and the README read as a roster](spec/2026-08-14-spec-cBriefedPilot-11.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-12 — leg check 16, the registry joined both ways and the pointers resolved](spec/2026-08-14-spec-cBriefedPilot-12.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-13 — leg check 17, a waiver names a declared handle and was there in the first commit](spec/2026-08-14-spec-cBriefedPilot-13.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-14 — leg check 18, the kickoff road asserted as an order and not as a mention](spec/2026-08-14-spec-cBriefedPilot-14.md) | — | 1 | CLOSED | rev-1 | 2026-08-16 |
+| [TOOL-cBriefedPilot-15 — M6's parallelism inversion, or the finding that it has no mechanism](spec/2026-08-14-spec-cBriefedPilot-15.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-16 — the method's pointers name the new layer](spec/2026-08-14-spec-cBriefedPilot-16.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-17 — the shipped protocol marker, paired to the constant it claims](spec/2026-08-14-spec-cBriefedPilot-17.md) | — | 1 | CLOSED | rev-1 | 2026-08-16 |
+| [TOOL-cBriefedPilot-18 — the contract describes the directive layer, and publishes only what exists](spec/2026-08-14-spec-cBriefedPilot-18.md) | — | 2 | CLOSED | rev-5 | 2026-08-16 |
+| [TOOL-cBriefedPilot-19 — the kit identifies as the version it now is](spec/2026-08-14-spec-cBriefedPilot-19.md) | — | 1 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-2 — the directive registry, eleven pointers and not one restated rule](spec/2026-08-14-spec-cBriefedPilot-2.md) | — | 1 | CLOSED | rev-1 | 2026-08-16 |
+| [TOOL-cBriefedPilot-20 — the records this build leaves, and one row it should not have had to close](spec/2026-08-14-spec-cBriefedPilot-20.md) | — | 1 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-21 — the parallelism mechanism hunt, and what would settle it](spec/2026-08-14-spec-cBriefedPilot-21.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-22 — check 16's join, extended to the protocol's own two tables](spec/2026-08-14-spec-cBriefedPilot-22.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-23 — the arms meta-gate grades EXECUTION, not text](spec/2026-08-16-spec-cBriefedPilot-23.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-3 — the owner's named, reasoned waiver, accepted at preflight and nowhere else](spec/2026-08-14-spec-cBriefedPilot-3.md) | — | 2 | CLOSED | rev-6 | 2026-08-16 |
+| [TOOL-cBriefedPilot-4 — preflight refuses to start a run with no method to run it under](spec/2026-08-14-spec-cBriefedPilot-4.md) | — | 1 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-5 — the BASE is pinned once, which is what the contract already claims](spec/2026-08-14-spec-cBriefedPilot-5.md) | — | 1 | CLOSED | rev-1 | 2026-08-16 |
+| [TOOL-cBriefedPilot-6 — `--plan` sees the planned unit that has no spec](spec/2026-08-14-spec-cBriefedPilot-6.md) | — | 2 | CLOSED | rev-4 | 2026-08-16 |
+| [TOOL-cBriefedPilot-7 — `build-complete`, and the roster every unattended build now owes](spec/2026-08-14-spec-cBriefedPilot-7.md) | — | 2 | CLOSED | rev-3 | 2026-08-16 |
+| [TOOL-cBriefedPilot-8 — `closing-review-recorded`, joined to the base the run pinned once](spec/2026-08-14-spec-cBriefedPilot-8.md) | — | 2 | CLOSED | rev-2 | 2026-08-16 |
+| [TOOL-cBriefedPilot-9 — the Skill's directive table, and a step 0 that is no longer a suggestion](spec/2026-08-14-spec-cBriefedPilot-9.md) | — | 1 | CLOSED | rev-4 | 2026-08-16 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md) | — | *none — a design pass that PRECEDES and produced this build's spec set* |
-| [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md) | journal | TOOL-cBriefedPilot-15 TOOL-cBriefedPilot-21 |
-| [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md) | spec-audit | TOOL-cBriefedPilot-1..22 |
-| [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md) | diff-review | TOOL-cBriefedPilot-1..22 |
-| [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md) | diff-review | TOOL-cBriefedPilot-5 TOOL-cBriefedPilot-7..8 TOOL-cBriefedPilot-13..14 TOOL-cBriefedPilot-22..23 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 <!-- /gen:build-index -->
@@ -370,38 +364,3 @@ Ids no `spec-audit` record has ever named: TOOL-cBriefedPilot-23.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-14-spec-cBriefedPilot-1.md](spec/2026-08-14-spec-cBriefedPilot-1.md)
-  - [2026-08-14-spec-cBriefedPilot-10.md](spec/2026-08-14-spec-cBriefedPilot-10.md)
-  - [2026-08-14-spec-cBriefedPilot-11.md](spec/2026-08-14-spec-cBriefedPilot-11.md)
-  - [2026-08-14-spec-cBriefedPilot-12.md](spec/2026-08-14-spec-cBriefedPilot-12.md)
-  - [2026-08-14-spec-cBriefedPilot-13.md](spec/2026-08-14-spec-cBriefedPilot-13.md)
-  - [2026-08-14-spec-cBriefedPilot-14.md](spec/2026-08-14-spec-cBriefedPilot-14.md)
-  - [2026-08-14-spec-cBriefedPilot-15.md](spec/2026-08-14-spec-cBriefedPilot-15.md)
-  - [2026-08-14-spec-cBriefedPilot-16.md](spec/2026-08-14-spec-cBriefedPilot-16.md)
-  - [2026-08-14-spec-cBriefedPilot-17.md](spec/2026-08-14-spec-cBriefedPilot-17.md)
-  - [2026-08-14-spec-cBriefedPilot-18.md](spec/2026-08-14-spec-cBriefedPilot-18.md)
-  - [2026-08-14-spec-cBriefedPilot-19.md](spec/2026-08-14-spec-cBriefedPilot-19.md)
-  - [2026-08-14-spec-cBriefedPilot-2.md](spec/2026-08-14-spec-cBriefedPilot-2.md)
-  - [2026-08-14-spec-cBriefedPilot-20.md](spec/2026-08-14-spec-cBriefedPilot-20.md)
-  - [2026-08-14-spec-cBriefedPilot-21.md](spec/2026-08-14-spec-cBriefedPilot-21.md)
-  - [2026-08-14-spec-cBriefedPilot-22.md](spec/2026-08-14-spec-cBriefedPilot-22.md)
-  - [2026-08-14-spec-cBriefedPilot-3.md](spec/2026-08-14-spec-cBriefedPilot-3.md)
-  - [2026-08-14-spec-cBriefedPilot-4.md](spec/2026-08-14-spec-cBriefedPilot-4.md)
-  - [2026-08-14-spec-cBriefedPilot-5.md](spec/2026-08-14-spec-cBriefedPilot-5.md)
-  - [2026-08-14-spec-cBriefedPilot-6.md](spec/2026-08-14-spec-cBriefedPilot-6.md)
-  - [2026-08-14-spec-cBriefedPilot-7.md](spec/2026-08-14-spec-cBriefedPilot-7.md)
-  - [2026-08-14-spec-cBriefedPilot-8.md](spec/2026-08-14-spec-cBriefedPilot-8.md)
-  - [2026-08-14-spec-cBriefedPilot-9.md](spec/2026-08-14-spec-cBriefedPilot-9.md)
-  - [2026-08-16-spec-cBriefedPilot-23.md](spec/2026-08-16-spec-cBriefedPilot-23.md)
-- **`build/`**
-  - [2026-08-14-build-cBriefedPilot-1-design-pass.md](build/2026-08-14-build-cBriefedPilot-1-design-pass.md)
-  - [2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md](build/2026-08-15-build-TOOL-cBriefedPilot-15-2-parallelism-routes.md)
-- **`reviews/`**
-  - [2026-08-15-review-TOOL-cBriefedPilot-1-1.md](reviews/2026-08-15-review-TOOL-cBriefedPilot-1-1.md)
-  - [2026-08-16-review-TOOL-cBriefedPilot-1-2.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md)
-  - [2026-08-16-review-TOOL-cBriefedPilot-5-3.md](reviews/2026-08-16-review-TOOL-cBriefedPilot-5-3.md)
-<!-- /gen:build-docs -->

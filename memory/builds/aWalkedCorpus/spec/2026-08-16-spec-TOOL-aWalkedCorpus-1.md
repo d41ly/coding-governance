@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-2 · base b4f0cf1c · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aWalkedCorpus-1-1.md](../reviews/2026-08-16-review-TOOL-aWalkedCorpus-1-1.md) | spec-audit | TOOL-aWalkedCorpus-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `memory-recall` walks its corpus in two places. Every widening has to teach both, and the last one

@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-16 · node a · Tier-2 · base 96141aed · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](../reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | PLAY-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-3 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The retrieval corpus is rooted at `MEMORY_ROOT`, so a constraint declared in a repo-root conf is

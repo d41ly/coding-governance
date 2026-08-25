@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-7 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh](../build/2026-08-16-build-TOOL-aBranchedMandate-3-repro-c3.sh) | journal | — |
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](../reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-2 |
+| [2026-08-17-review-TOOL-aBranchedMandate-3.md](../reviews/2026-08-17-review-TOOL-aBranchedMandate-3.md) | diff-review | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 The unattended authorization requires the build README to be reachable from the merge-base with the
