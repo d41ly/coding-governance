@@ -53,7 +53,16 @@ cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash tools/push-main.sh|g' \
-    -e 's|{{ANCHOR_SCOPE}}|published|g' "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+# TOOL-aNamedGesture-1 - this chain is a SECOND hand-kept renderer, and nothing downstream reads the
+# file it writes closely enough to notice a placeholder nobody added an entry for. So the fixture
+# asserts its own render, which is what turns an omission here into a failure instead of a silent
+# divergence from adopt-unattended.sh.
+if grep -qE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md; then
+  echo "FAIL the fixture render carries a surviving placeholder - this sed chain is missing an entry:"
+  grep -oE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md | sort -u | sed 's/^/    /'
+  exit 1
+fi
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     "$HERE/../../.unattended.conf" > .unattended.conf

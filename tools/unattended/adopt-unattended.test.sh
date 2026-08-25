@@ -110,6 +110,53 @@ n=$((n+1)); grep -qF '{{KEEPALIVE_INTERVAL}}' "$SK" && { echo "FAIL a dropped su
 out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh --check 2>&1); rc=$?
 same "--check agrees on a hostile conf" "$rc" "0"
 
+# ---- ARM 1c: AUTH_PARAM — the conf channel, and the four refusals.
+# ---- TOOL-aNamedGesture-1. The FIRST of these arms is the one that matters and the one this suite
+# ---- did not have: every other assertion in this file is satisfied by an adopter that hardcodes the
+# ---- default and never reads the conf, because the seed conf declares no AUTH_PARAM at all. The
+# ---- non-default arm is the only thing here that can fail against that implementation, and being
+# ---- able to set the token from the conf is the whole of what this key was asked for.
+authconf() { # dir · value  -> reseed with AUTH_PARAM set to exactly <value>
+  grep -v '^AUTH_PARAM=' "$1/.unattended.conf" > "$1/.conf.tmp"
+  printf 'AUTH_PARAM=%s\n' "$2" >> "$1/.conf.tmp"
+  mv "$1/.conf.tmp" "$1/.unattended.conf"
+}
+
+# BLANK derives the kit default. Delete the derivation in adopt-unattended.sh and this arm fails
+# while every placeholder arm above still passes — an empty substitution leaves no token behind.
+AB="$TMP/authblank"; seed "$AB"; authconf "$AB" '""'
+( cd "$AB" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+same "a blank AUTH_PARAM adopts" "$?" "0"
+hit "$(cat "$AB/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--prompt`'
+
+# A NON-DEFAULT value reaches the render, and the default does not survive anywhere in it.
+AV="$TMP/authvalue"; seed "$AV"; authconf "$AV" '"--build"'
+( cd "$AV" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+same "a non-default AUTH_PARAM adopts" "$?" "0"
+hit "$(cat "$AV/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--build`'
+same "a non-default AUTH_PARAM leaves no trace of the kit default" \
+  "$(grep -c -- '--prompt' "$AV/.claude/skills/unattended/SKILL.md" || true)" "0"
+
+# THE FOUR REFUSALS, each observed non-zero with nothing written. They are separately reachable: a
+# bare word trips the flag-shape arm, and the other three all begin with a hyphen and reach the
+# character arm. A guard arm that has only ever passed is an assertion about nothing.
+# SINGLE-QUOTED into the conf, and that is not cosmetic. A backtick inside a DOUBLE-quoted conf value
+# is command substitution the moment the adopter sources the file, so AUTH_PARAM="--pro`mpt"
+# arrives at the guard as --pro and adopts cleanly - measured, this arm failed exactly that way before
+# the quoting was fixed. Single quotes are the only declaration form that can carry a literal backtick
+# to the guard, so they are the only form that can exercise it.
+authrefuse() { # label · value
+  local d="$TMP/authbad$n"; seed "$d"; authconf "$d" "'$2'"
+  ( cd "$d" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+  local rc=$?
+  n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL $1: a malformed AUTH_PARAM adopted at exit 0"; st=1; }
+  absent "$d/.claude/skills/unattended/SKILL.md" "$1 wrote no Skill"
+}
+authrefuse "a bare word is refused"   'prompt'
+authrefuse "whitespace is refused"    '--prompt me'
+authrefuse "a pipe is refused"        '--pro|mpt'
+authrefuse "a backtick is refused"    '--pro`mpt'
+
 # ---- ARM 2: a FOREIGN repo. The kit lives in host A; the caller runs it from host B. Nothing may be
 # ---- written into EITHER tree — not the caller's, and not the kit owner's.
 B="$TMP/other"; mkdir -p "$B"

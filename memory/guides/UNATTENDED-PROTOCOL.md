@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.9 -->
+<!-- gov:kit unattended@1.10 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -21,8 +21,9 @@ check, not merely removed.
 The run is authorized by the **build folder itself** — a `<MEMORY_ROOT>/builds/<slug>/README.md`
 that resolves at the anchor the project declares. On the default-branch anchor that means committed
 before the run's branch existed. The owner's act is `/unattended <slug>`, or — where the project
-admits the second anchor — an invocation carrying the authorizing parameter and the prose the build
-is scoped by. They author nothing per run except the reason text of a directive waiver, which
+admits the second anchor — an invocation carrying the authorizing parameter, whose spelling the
+project declares as `AUTH_PARAM` (§8) and whose ARGUMENT is the prose the build is scoped by, or a
+path to a file holding it. They author nothing per run except the reason text of a directive waiver, which
 `--preflight` records on their behalf (§10), and on the prompt path the prose itself plus whatever
 the agent asks at its single opening turn. Four properties, all mechanical:
 
@@ -499,6 +500,7 @@ where this document says it may:
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
 | `ANCHOR_SCOPE` | which anchors may authorize a run: the CLOSED set `default-branch` and `published`. Absent, blank or outside the set keeps `default-branch`, so a typo grants nothing. Gates the DRIVER only — §1 cost 2 |
+| `AUTH_PARAM` | the token an invocation must carry to start a prompt-mode run, rendered into the Skill at its routing row and its opening fence. BLANK or absent is the kit default, which that render states verbatim rather than this table restating it. Its ARGUMENT is a prompt file path or the prompt itself. A value that is not a hyphen-led flag, or that carries whitespace, a pipe or a backtick, is refused at render time — it is interpolated into a table row and a code span, and each of those three characters ends one of them early. Gates NOTHING at run time: no script sees the invocation, so this is the gesture and never the authorization, which stays the pushed build folder (§1) |
 | `CORE_FLOOR` | `<phases>:<dod>`, the shrink-only SIZE of the kit's core sets. MANDATORY: undeclared or malformed leaves both pins unenforced, so both are refusals |
 | `DIRECTIVES_EXTRA` | project directive members, appended to the core set |
 | `DIRECTIVES_FLOOR` | the shrink-only SIZE of the kit's core directive set. MANDATORY, for the reason `CORE_FLOOR` is |

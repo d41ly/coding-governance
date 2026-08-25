@@ -1,11 +1,12 @@
 # TOOL-aNamedGesture-1 — the authorizing parameter is a declared conf key that carries the build
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
+**Status:** INPROGRESS · rev-4 · 2026-08-25 · node a · Tier-2 · base 381008a1 · streams tooling · order 1 · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-TOOL-aNamedGesture-1-acceptance-ledger.md](../build/2026-08-25-build-TOOL-aNamedGesture-1-acceptance-ledger.md) | journal | — |
 | [2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md](../reviews/2026-08-25-review-TOOL-aNamedGesture-1-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -134,6 +135,13 @@ Three characters and one prefix are refused, each for a reason that is not taste
 
 The refusal is an `echo` and an `exit`, matching the existing refusal for a kit path containing
 whitespace. It is not a `fail()` call and owes no arm.
+
+**The backtick arm is only reachable through a SINGLE-quoted declaration**, and the fixture that
+exercises it must use one. A backtick inside a double-quoted conf value is command substitution the
+moment the adopter sources the file, so a declaration reading `--pro``mpt` in double quotes arrives at
+the guard as `--pro` and adopts cleanly. Measured: the first version of that arm passed for exactly
+that reason, which is the `fixture-passes-by-finding-nothing` class this diff's own checklist
+selects.
 
 **What does NOT justify the leading-hyphen rule, recorded so nobody re-derives it.** Check 24 of
 `check-unattended.sh` reads the routing table for authorization modes, and an earlier revision of
@@ -346,6 +354,11 @@ codebase-map coverage and freshness legs · `govkit` selfcheck and selftest. The
 
 - rev-1 · 2026-08-25 · initial draft, after the owner replaced the opening thoroughness-word default
   with a mode-naming token and gave the parameter a path-or-prose argument.
+- rev-4 · 2026-08-25 · built. Two amendments the build itself forced. The backtick refusal is only
+  reachable through a single-quoted conf declaration, because a double-quoted backtick is command
+  substitution at source time — its first fixture passed by never triggering the rule. And the read-path
+  movement landed at a measured figure rather than the estimate S14 was written against, after the
+  decision row had to be trimmed under hygiene check 7's 300-character index cap.
 - rev-3 · 2026-08-25 · folded the M4 spec audit, workflow `wf_c6fdfda7-723` — four lenses, 40 raised,
   15 confirmed, 25 refuted, precision 0.38, verdict CLEAN WITH FIXES. The load-bearing corrections:
   no criterion rendered a NON-DEFAULT value, so the whole set was satisfiable by an implementation

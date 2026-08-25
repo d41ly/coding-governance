@@ -122,6 +122,11 @@ KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVA
 # placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
 # means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
 ANCHOR_SCOPE=""
+# TOOL-aNamedGesture-1 - AUTH_PARAM is the SECOND such key, and for the reason ANCHOR_SCOPE gives:
+# no adopter declares it today, so keeping the placeholder would red the placeholder arm for every
+# one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
+# in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
+AUTH_PARAM=""
 # shellcheck disable=SC1090
 . "$CONF"
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
@@ -131,6 +136,46 @@ ANCHOR_SCOPE=""
 case "$ANCHOR_SCOPE" in
   published) ANCHOR_EFFECTIVE=published ;;
   *)         ANCHOR_EFFECTIVE=default-branch ;;
+esac
+# TOOL-aNamedGesture-1 - the EFFECTIVE authorizing parameter, derived on the same terms and in the
+# same place. THE KIT DEFAULT IS WRITTEN HERE AND NOWHERE ELSE IN THE REPOSITORY: both shipped confs
+# declare the key BLANK, which is this layer's idiom for kit-owned, and the rendered Skill is where a
+# reader learns the value. Absent and blank are the same answer deliberately - an adopter who has
+# never heard of this key must receive a working Skill, not a hole in the sentence that authorizes
+# every prompt-mode run.
+case "$AUTH_PARAM" in
+  "") AUTH_EFFECTIVE="--prompt" ;;
+  *)  AUTH_EFFECTIVE="$AUTH_PARAM" ;;
+esac
+# A MALFORMED TOKEN, refused rather than rendered. Same shape as the kit-path refusal above and for
+# the same reason: the value is interpolated into prose an agent acts on, so a value that breaks the
+# prose breaks the authorization gesture. Four conditions, each with its own reason:
+#
+#   no leading hyphen  the token is an argv flag an owner types and an agent tests the invocation
+#                      for. A bare word reads as a positional argument and re-opens the inference
+#                      from prose that the prompt path's own non-goal forbids. NOTE it is NOT
+#                      justified by check 24 of check-unattended.sh, which binds its template path
+#                      and therefore never sees a rendered value - that reason was written once in a
+#                      draft of this unit and was false.
+#   whitespace         the token is one argv word; two words render a fence naming two things
+#   a pipe             the token renders inside a markdown table row, which a pipe closes
+#   a backtick         the token renders inside a code span, which a backtick closes
+#
+# `echo` and `exit`, never a `fail()`: this file deliberately defines no such helper, per the note at
+# its head, and defining one would put it in check-arms.py's population.
+case "$AUTH_EFFECTIVE" in
+  -*) ;;
+  *)  echo "unattended: AUTH_PARAM does not begin with a hyphen and so is not a flag: $AUTH_EFFECTIVE"
+      echo "  The rendered Skill would tell an agent to look for a positional argument, which is"
+      echo "  indistinguishable from ordinary prose. Declare a flag-shaped token."
+      exit 2 ;;
+esac
+case "$AUTH_EFFECTIVE" in
+  *[[:space:]]*|*"|"*|*'`'*)
+      echo "unattended: AUTH_PARAM contains whitespace, a pipe or a backtick: $AUTH_EFFECTIVE"
+      echo "  It is interpolated into a markdown table row and a code span in the rendered Skill,"
+      echo "  and each of those three characters ends one of them early."
+      exit 2 ;;
 esac
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
@@ -175,6 +220,11 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
   out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
   out=${out//\{\{ANCHOR_SCOPE\}\}/"$ANCHOR_EFFECTIVE"}
+  # LAST, deliberately. Substitutions run in sequence over one string, so a value carrying another
+  # key's placeholder text would be re-substituted by any pass that followed it. Appended here, such
+  # a value survives into the output as a brace shape, where the surviving-placeholder arm below reds
+  # it. The order is the fail-closed direction, not a preference.
+  out=${out//\{\{AUTH_PARAM\}\}/"$AUTH_EFFECTIVE"}
   printf '%s' "$out"
 }
 
