@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-24
 streams: tooling
 roster: TOOL
-ids: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2
+ids: TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3
 ---
 
 # dNarrowedAnchor — the second anchor becomes PER-MODE, so a `slug` run cannot reach it
@@ -54,7 +54,7 @@ the folder predates the run, so such a run has contradicted its own declaration 
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-08-24 · streams tooling
-ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2
+ids TOOL-dNarrowedAnchor-1 TOOL-dNarrowedAnchor-2 TOOL-dNarrowedAnchor-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

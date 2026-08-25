@@ -45,8 +45,8 @@ cd "$ROOT" || exit 2
 BUDGET_kit_gate=120           # measured 28 s
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
-BUDGET_gate_selftest=1800     # derived 1342 s after TOOL-dScriptedRepeat-15 — see the note below
-BUDGET_driver_selftest=900    # measured 841 s
+BUDGET_gate_selftest=3800     # MEASURED 3565 s end to end — TOOL-dNarrowedAnchor-1, see the note below
+BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowedAnchor-1 arms)
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
@@ -115,6 +115,18 @@ esac
 # WHY 1800 AND NOT 1342: the same reading taken under ambient load on this node ran 2.4x slower, and a
 # ceiling that reds on someone else's antivirus scan is a ceiling that gets ignored. 1800 has headroom
 # for that and still reds long before the 3200 s this suite used to cost.
+#
+# NOW OBSERVED, and the derivation above was WRONG (TOOL-dNarrowedAnchor-1). The paragraph below
+# closes with "nobody has run the suite end to end at this commit", and this is that run: 3565 s,
+# against a derived 1342 s and a 1800 s ceiling chosen to have headroom over it. The derivation was
+# low by 2.6x, and the sentence it ended with is the reason it went unnoticed — a pin nobody could
+# falsify is a pin nobody did.
+#
+# WHOSE COST: gov's own gate-legs.json records this suite at 3188 s before this build touched it, so
+# the great majority of the 3565 s predates TOOL-dNarrowedAnchor-1 and its four new arms are the
+# remainder. That split is stated rather than measured — separating them needs a baseline end-to-end
+# run, which is another hour of the thing this ceiling exists to bound, and the number that matters
+# for a ceiling is the total either way. 3800 keeps this file's own measured-plus-headroom habit.
 #
 # WHAT IS NOT OBSERVED, said plainly: nobody has run the suite end to end at this commit. The owner
 # stopped these suites after two days of re-runs and the instruction stands, so the 1342 s is DERIVED
