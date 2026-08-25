@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -58,7 +58,7 @@ No receipt-shape change. `pins` is a dispatch value only.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~10 lines), `tools/govkit/selftest.py` (3 arms).
+`tools/govkit/govkit.py` (~10 lines), `tools/govkit/selftest.py` (3 arms, 16 checks).
 
 ## 5. Production-readiness checklist
 
@@ -72,7 +72,7 @@ No receipt-shape change. `pins` is a dispatch value only.
 - risks — the one real risk is loosening a refusal that was load-bearing. It is not: the refusal
   runs after the write-eligibility branch and before any write, so no byte reachable today becomes
   reachable. Asserted by AC3.
-- testing + left-shift gates — three arms in `selftest.py`; the RED-first observation is AC1.
+- testing + left-shift gates — three arms in `selftest.py` carrying 16 checks — the attributes chain, the moved-block arm, and the dispatch table; the RED-first observation is AC1 and it was made on a live target.
 - migration / rollback — none; a receipt written before this unit reads identically after.
 - user docs — one line in `WIRE-INTO-PROJECT.md`'s update section naming the two dispositions.
 
@@ -92,7 +92,7 @@ No receipt-shape change. `pins` is a dispatch value only.
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and
-`govkit selfcheck` legs. Adds three arms to `tools/govkit/selftest.py`; adds no new leg.
+`govkit selfcheck` legs. Adds three arms (16 checks) to `tools/govkit/selftest.py`; adds no new leg.
 
 ## 8. Open questions
 

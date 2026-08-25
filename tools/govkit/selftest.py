@@ -47,6 +47,13 @@ def govkit_kind_marks() -> dict:
     sys.path.insert(0, str(HERE))
     import govkit  # noqa: E402
     return govkit.KIND_MARKS
+
+
+def govkit_update_role() -> dict:
+    """The engine's OWN update dispatch table, for the reason `govkit_kind_marks` gives."""
+    sys.path.insert(0, str(HERE))
+    import govkit  # noqa: E402
+    return govkit.UPDATE_ROLE
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -1274,6 +1281,69 @@ user_skills = "/tmp/gk-fake-skills"
               '"scripts/run-gates/run-gates.sh"' in _d6, _d6)
         check("no tools/ path survives in the descriptor's runner block",
               "tools/gate-legs.json" not in _d6, _d6)
+
+        # ================= DEPL-dCarriedReceipt-2: attributes, gate-leg and ci =================
+        # The defect: `UPDATE_ROLE` sent all three to `refuse`, which runs BEFORE `classify_row`
+        # and calls `r.fail` -- and a non-empty `r.problems` permanently skips the receipt
+        # re-stamp. So ONE `.gitattributes` row froze a target's `gov_commit` forever, and every
+        # kit selection carrying an lf_pin produces exactly such a row. Reproduced on a real target
+        # before the fix: `update --write` exited 1 and `gov_commit` never moved.
+        ap = make_target(tmp / "u2pins", None)
+        p = run("intake", "--target", str(ap), "--kits", "push-main")
+        check("[-2] intake accepts push-main", p.returncode == 0, p.stdout + p.stderr)
+        p = run("apply", "--target", str(ap), "--kits", "push-main")
+        check("[-2] apply lands push-main and synthesizes the attributes row", p.returncode == 0,
+              p.stdout + p.stderr)
+        _rec = json.loads((ap / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-2] the receipt really carries an attributes row",
+              any(f.get("role") == "attributes" for f in _rec["files"]),
+              str([f.get("role") for f in _rec["files"]]))
+
+        p = run("update", "--target", str(ap), "--write")
+        check("[-2] an attributes row no longer strands the run", p.returncode == 0,
+              p.stdout + p.stderr)
+        check("[-2] and it is no longer refused BY NAME",
+              "refusing by name" not in (p.stdout + p.stderr), p.stdout + p.stderr)
+        check("[-2] the pins row reports `current` when the block matches",
+              "current" in p.stdout and "attributes" in p.stdout, p.stdout)
+        check("[-2] the receipt re-stamped, which is what the refusal used to prevent",
+              json.loads((ap / ".governance" / "install.json").read_text(
+                  encoding="utf-8"))["gov_commit"] != "", p.stdout)
+
+        # The OTHER arm of the same predicate. A verdict that can only ever read one way is not a
+        # verdict, and this one shipped broken once already: `find_block` returns LINE indices and
+        # the first draft sliced the string with them, so `current` could never fire.
+        _ga = ap / ".gitattributes"
+        # INSIDE the marker pair. Appending after the close marker leaves the block itself
+        # byte-identical, so `current` is the right answer and the arm proves nothing.
+        _ga.write_text(
+            _ga.read_text(encoding="utf-8").replace(
+                "# /govkit:lf-pins", "# TAMPERED\n# /govkit:lf-pins"),
+            encoding="utf-8", newline="\n")
+        check("[-2] the tamper really landed inside the block",
+              "# TAMPERED" in _ga.read_text(encoding="utf-8"), "")
+        _before = _ga.read_bytes()
+        p = run("update", "--target", str(ap), "--write")
+        check("[-2] a moved block reports `pins-moved`", "pins-moved" in p.stdout, p.stdout)
+        check("[-2] and still exits 0 rather than stranding the receipt", p.returncode == 0,
+              p.stdout + p.stderr)
+        check("[-2] `update` NEVER edits .gitattributes -- that destination is apply's",
+              _ga.read_bytes() == _before, "")
+        check("[-2] it writes an ORDER instead",
+              (ap / ".governance" / "outbox" / "update-pins.md").is_file(), p.stdout)
+
+        # S3/S4. The dispatch table is the unit's actual subject, and `selfcheck` already asserts it
+        # covers the role enum -- this arm asserts WHICH disposition each of the three now takes, so
+        # a future edit that quietly restores `refuse` fails here rather than in an adopter.
+        _UR = govkit_update_role()
+        check("[-2] attributes dispatches to pins, not refuse",
+              _UR["attributes"] == "pins", str(_UR))
+        check("[-2] gate-leg reports rather than refusing",
+              _UR["gate-leg"] == "report", str(_UR))
+        check("[-2] ci reports rather than refusing",
+              _UR["ci"] == "report", str(_UR))
+        check("[-2] and no role is left on the refuse disposition by accident",
+              "refuse" not in _UR.values(), str(_UR))
 
         # ================= liveness of the two derived assertions =================
         # An assertion that finds nothing on a clean tree is indistinguishable from one that CANNOT
