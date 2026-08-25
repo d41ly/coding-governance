@@ -1,12 +1,13 @@
 # TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail
 
-**Status:** SPECCED · rev-2 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
+| [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonouredPark-4 |
 
 <!-- /gen:spec-records -->
 
@@ -46,26 +47,49 @@ README.** Non-goal 4 is withdrawn.
   match with no duplicate or order notion. An assertion built on the engine's helper would ACCEPT
   what the driver REJECTS, which is two answers to one question in the two tools that both read this
   marker.
-- **S5** — `roster_ids` stops discarding the refusal. It pipes `region … | grep -oE`
-  (`unattended.sh:1491-1492`) and takes GREP's status, so `region`'s exit 3 is swallowed and the lines
-  printed before the failure are parsed as ids. A malformed pair currently yields a partial id list
-  and no error.
+- **S5** — a malformed roster pair REFUSES, all the way to the caller. Three things are wrong today
+  and fixing only the first fixes nothing:
+  1. `roster_ids` pipes `region` into `grep -oE` into `sort -u`, so it takes SORT's status. `region`'s
+     refusal is discarded and the lines printed before it are parsed as ids. (rev-2 said it takes
+     grep's status; the terminal stage is `sort -u`.)
+  2. **No caller tests that status.** `missing_units` assigns into a variable and then tests the
+     variable for emptiness; `verb_plan` tests a command substitution for emptiness. The script sets
+     `set -u` and not `set -e`. So propagating a status out of `roster_ids` changes nothing observable
+     — round 2 established that rev-2's item would have gone green while the vacuous pass survived.
+     The callers are in scope.
+  3. The obvious fix is `set -o pipefail` on that pipeline, and it is WRONG on its own: a well-formed
+     but EMPTY pair legitimately produces no ids, and `grep -oE` exits 1 on no match, so `pipefail`
+     turns the legal empty case into a refusal. §5 declares the empty pair legal; AC6 pins it.
+
+  The refusal must therefore come from `region`'s own status, tested explicitly, with the empty result
+  distinguished from the malformed one.
 - **S6** — the build READMEs without a pair gain one, seeded at migration from that build's own
   tracked spec ids, so no planned-but-unspecced unit is invented and none is lost. **The set is
   DERIVED at migration time, not authored here**: it was 51 of 62 at BASE and 52 of 63 at HEAD,
   inflated by this build's own README, and it will move again before this unit lands.
-- **S7** — `build-complete` term 3's vacuous pass is removed at its actual location. rev-1's S4 said
-  to delete "the term's own early return"; there is no such construct — `unattended.sh:2716-2721` is
-  three lines with no early return. The guards are `[ -n "$want" ] || return 0` in `roster_ids`
-  (`:1489-1490`) and the same shape in `missing_units` (`:1513`), both shared with `--plan`. With the
-  pair mandatory everywhere, an absent pair is a refusal from S1 and those guards are unreachable —
-  but deleting either is behaviourally INERT (verified: `comm` emits one blank line, which command
-  substitution strips to length 0 and `for` word-splits to zero iterations). This unit deletes them
-  for the reason they are dead, and says so, rather than claiming a behaviour change it does not make.
+- **S7** — `build-complete` term 3 has no early return of its own, and rev-1's instruction to delete
+  one was unimplementable. There is exactly ONE guard of the `[ -n "$want" ] || return 0` shape, and it
+  is in `missing_units`. `roster_ids` has two guards of a DIFFERENT shape — a missing file and an
+  absent open marker — which rev-2 quoted as if they were the same construct.
+
+  With the pair mandatory everywhere, all three become unreachable: an absent file, an absent marker
+  and an empty roster are each a refusal from S1 before this code runs. Deleting them is behaviourally
+  INERT (verified: `comm` over an empty side emits one blank line, which command substitution strips to
+  length 0 and `for` word-splits to zero iterations). This unit deletes them because they are dead, and
+  says so, rather than claiming a behaviour change it does not make.
+
+  Locate all three by reading `roster_ids` and `missing_units`, not by line number: rev-2 gave
+  coordinates and they held different code.
 - **S8** — the term reports a planned-but-unspecced unit by ID. `verb_plan:1614-1616` and term 3's
   `DOD_OUT` at `:2719-2720` already do this; the item is kept as a regression guard and is marked as
   green at BASE rather than presented as new work.
 - **S9** — `TOOL-aPacedTurnstile-14` is closed in the same commit, with its row naming this unit.
+- **S11** — this unit prices its own read-path charge and moves `READ_PATH_CEILING` by it, per owner
+  ruling 2 and this build's rules slot. It charges its `memory/DECISIONS.md` row, and
+  `memory/guides/UNATTENDED-PROTOCOL.md` if the protocol states the pair's mandatory status — which is
+  checked, not assumed, and if it does then the edit goes to `tools/unattended/PROTOCOL.template.md`,
+  because the guide is a byte-identical RENDER whose drift check refuses a direct edit. rev-2 carried
+  this as a checklist bullet and an acceptance criterion; that is not declared scope.
 - **S10** — arms: a README with no pair, with a duplicated pair, with a transposed pair, with a pair
   naming an id no spec carries, and with a pair equal to its spec set. **The fourth is the one the
   term exists for and it is already armed** — `unattended.test.sh:1586-1600` and the term-3 arm at
@@ -85,9 +109,11 @@ README.** Non-goal 4 is withdrawn.
 - No movement of `exempt-pin`. It is 61 against 2 bound and 63 tracked, which is consistent; the
   migration adds pairs without touching contract membership, so no pin movement is owed. Stated so a
   builder does not helpfully adjust it.
-- No requirement that the contract's EXEMPT rows gain anything. The contract governs the canon and the
-  slot budgets and is untouched here; this unit's population is a different set that happens to
-  include all of it.
+- No change to `memory/project/readme-contract.txt` itself. That registry governs the canon and the
+  slot budgets, this unit's population is a different question, and the two are simply unrelated —
+  which is the whole content of ruling 1. rev-2 kept a bullet reading "No requirement that the
+  contract's EXEMPT rows gain anything", which is the withdrawn constraint under a new name and
+  contradicts S1 and S6 outright.
 
 ## 4. Design
 
@@ -101,11 +127,19 @@ Eleven build READMEs carry a well-formed pair. **A naive `grep -rln roster:units
 `aRuledFrontispiece` and `dFramedEntrypoint` name the marker in prose only — so the derivation is a
 pair scan, not a mention scan, and any figure built on 13 is wrong.
 
-Three of the eleven are degenerate and the migration must not treat them as populated. `aStandingWrit`'s
-pair wraps `S0..S8` handles rather than ids and yields ZERO ids under `roster_ids`' own pattern;
-`aMeteredTurnstile` and `dSettledRoster` yield ONE each against multi-unit builds. The first is inert
-and is migrated to ids like the rest with the inertness recorded as fixed; the other two are
-under-populated rather than broken and are re-seeded from their own spec ids.
+The migration must not assume a carried pair is a populated one, and rev-2's inventory of which are
+degenerate was wrong in both directions — so this section states the DERIVATION instead of a list.
+
+For each build carrying a pair, compare the ids `roster_ids` extracts against the ids its tracked specs
+define. `aStandingWrit` is the extreme case: its pair wraps `S0..S8` handles rather than ids and yields
+ZERO, so it is inert. `dUnstalledConvoy` is under-populated at a scale rev-2 missed entirely, its pair
+naming markedly fewer ids than its tracked specs. And the remedy rev-2 prescribed for two other builds
+is a NO-OP, because each has a single tracked spec: re-seeding returns the identical id and leaves the
+front-matter under-population it was meant to fix untouched.
+
+So: re-seed every pair from its build's tracked spec ids, compute the before/after id counts per build,
+and record which pairs actually changed. A list of degenerate builds authored here would be a fourth
+authored count of a derived population in a build whose whole subject is that they rot.
 
 The counts in this section are the BASE measurement and are re-derived at build time. AC8 asserts the
 derivation rather than the number, because this build's own README already moved 62 to 63 between the
@@ -113,11 +147,16 @@ spec's base and its fold.
 
 ### Migration
 
-Two commits. The engine and the gate first; the READMEs second, because their content is derived per
-build and the diff is mechanical and reviewable by re-running the derivation. **The gate lands AFTER
-the migration, or it reds every unpaired README on its own commit** — about fifty of them. Under
-rev-1's two-file population that rationale was false, which is how the audit found the population
-error; under the ruled population it is the operative reason, and it is the same ordering
+Two commits, **migration FIRST**:
+
+1. The READMEs gain their pairs, each seeded from that build's own tracked spec ids. Mechanical, and
+   reviewable by re-running the derivation.
+2. The engine and the gate.
+
+That order is the whole point and rev-1 and rev-2 both stated it backwards in the sentence before
+stating it forwards. A gate landing first reds every unpaired README on its own commit — about fifty
+of them. Under rev-1's two-file population that rationale was false, which is how the audit found the
+population error; under the ruled population it is the operative reason, and it is the same ordering
 `TOOL-aRuledFrontispiece-1` used for the slot contract.
 
 ### Alternatives rejected
@@ -178,28 +217,49 @@ derives.
 - **AC1** — When any tracked build README carries no `roster:units` pair, the slot leg exits 1 naming
   that file, observed RED against a staged deletion before the arm is written.
 - **AC2** — When a build README carries that marker duplicated or transposed, the leg exits 1 naming
-  which condition it found, in the same words `unattended.sh:1557` uses for the sibling region.
+  WHICH condition it found. This is deliberately stronger than the driver's sibling message, which
+  lists all three at once and distinguishes none because `region` collapses them into a single exit
+  status. S2's reuse is of the VOCABULARY — absent, duplicated, transposed — not of that one-line
+  message; rev-2 asked for both and they are incompatible.
 - **AC3** — When a build's pair names an id no tracked spec defines,
   `bash tools/unattended/unattended.sh --plan <slug>` reports that id as MISSING and `build-complete`
   does not pass. **Green at BASE** — `unattended.test.sh:1586-1600` and `:968-974` already assert it —
   and kept as a regression guard, not as evidence this unit added coverage.
-- **AC4** — When a build's pair equals its spec set, `build-complete` term 3 passes and says so.
+- **AC4** — When a build's pair equals its spec set, `build-complete` term 3 passes. **GREEN AT BASE**
+  by the same argument that marks AC3 — an equal pair makes the difference empty and the term passes
+  today — and kept as a regression guard. rev-2 added "and says so", which has no producer: the term's
+  success path is a bare return and its message variable is assigned only on failing branches.
 - **AC5** — When a pair's markers are duplicated, `roster_ids` exits non-zero rather than returning the
   ids printed before the refusal. Observed RED first: at BASE it returns a partial list and status 0.
-- **AC6** — When the migration is re-run, `git diff` shows every migrated pair's ids equal to that
+- **AC6** — When a build README carries a well-formed but EMPTY pair, the leg exits 0 and
+  `build-complete` term 3 passes: the build plans exactly its specced units. §5 declares this legal and
+  the obvious `pipefail` implementation of S5 refuses it, so this criterion is the guard against the
+  fix breaking the case it was not about.
+- **AC7** — When the migration is re-run, `git diff` shows every migrated pair's ids equal to that
   build's tracked spec ids, across the whole DERIVED set. The set is computed by the migration, not
   read from this document.
-- **AC7** — When `memory/backlog/TOOL.md` is read at HEAD, `TOOL-aPacedTurnstile-14` is CLOSED and
+- **AC8** — When `memory/backlog/TOOL.md` is read at HEAD, `TOOL-aPacedTurnstile-14` is CLOSED and
   names this unit.
-- **AC8** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, the bar is
-  green and the slot leg's own summary line reports the pair present on every tracked build README,
-  **printing the count it derived** rather than matching a figure written here. `do_check_format`
-  already prints `len(tracked)` at `gen_build_index.py:1553`; this criterion asserts that number and
-  the pair count agree, which is the only form that cannot go stale.
-- **AC9** — When `python tools/memory-tree/corpus_ids.py --report` runs before and after, both totals
-  are recorded and `.memory-tree.conf` carries this unit's own movement line.
+- **AC9** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, the bar is
+  green and the slot leg's summary line PRINTS A DERIVED PAIR COUNT alongside the tracked-README count
+  it already prints. The requirement is that the number is derived and shown, not that the two agree:
+  once S1's refusal exists a disagreement reds the leg before any summary prints, so rev-2's
+  "asserts that number and the pair count agree" was a tautology dressed as the cure for the
+  count-in-prose finding.
+- **AC10** — When `python tools/memory-tree/corpus_ids.py --report` runs before and after, both
+  totals are recorded in the commit message and `.memory-tree.conf` carries this unit's own movement
+  line, per S11.
 
 ## 7. Gates
+
+**Declared skip, with its compensating check.** S5's and S10's driver arms live in
+`tools/unattended/unattended.test.sh`, and NO command this spec names runs that file: the kit gate
+skips `*.test.sh` outright, the kit's test legs are absent from `tools/gate-legs.json`, and a standing
+owner instruction of 2026-08-23 forbids running those suites. Round 1 exonerated this unit on that
+finding because rev-1 named no test file; rev-2 created the dependency and declared nothing. The
+compensating check is unit 4's: each arm observed RED against a staged break at authoring time, with
+the staged diff recorded in this unit's build record, and the owner handed
+`bash tools/unattended/run-unattended-gates.sh` rather than `--selftests` being added below.
 
 `unattended kit gate` · `build README slot contract` · `memory hygiene` (incl. checks 9 and 16) ·
 `build-index selftest` · `check-arms.py` floors — this unit adds `fail` branches to the driver, which
@@ -218,6 +278,19 @@ units 3 and 4 both list and rev-1 omitted · `check-kit-versions.sh` · `check-v
 ## 9. Revision log
 
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s first park.
+- rev-3 · 2026-08-25 · round-2 fold. Fixed §4's commit ORDER, which rev-1 and rev-2 both stated
+  backwards in the sentence before stating it forwards. Deleted the non-goal that survived ruling 1's
+  withdrawal under a new name and contradicted S1 and S6. Rewrote S5 after round 2 established the fix
+  reached no consumer — no caller tests `roster_ids`' status, the pipeline ends in `sort` and not
+  `grep`, and the obvious `pipefail` remedy refuses the legal EMPTY pair, now pinned by AC6. Rewrote S7
+  against the code that is actually there: one guard of the quoted shape, in `missing_units`, and two
+  of a different shape in `roster_ids`. Replaced the degenerate-pair list with a derivation after round
+  2 found it wrong in both directions. Split AC2's incompatible halves, marked AC4 green at BASE and
+  dropped its unproducible clause, de-tautologised AC8, took the read-path charge as declared scope
+  (S11), and added the declared skip with its compensating check for arms no named command can run.
+  AC numbering was RESEQUENCED in this revision; AC labels in the entries below refer to the
+  numbering of the revision that wrote them, not to this one.
+
 - rev-2 · 2026-08-25 · spec-audit fold. **Population widened to every tracked build README on the
   owner's ruling of 2026-08-25**; non-goal 4 withdrawn as an unruled inference, and §4's migration
   ordering rationale — false under the two-file scoping — restored as the operative reason. Counts

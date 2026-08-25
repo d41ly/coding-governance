@@ -1,12 +1,13 @@
 # TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source
 
-**Status:** SPECCED · rev-2 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-2 · base 60ba1d60 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 |
+| [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 |
 
 <!-- /gen:spec-records -->
 
@@ -52,16 +53,34 @@ answering one question differently, with nothing to say which is authoritative. 
   `grep -qF -- "$UNITS_OPEN"`. This unit changes that guard's condition — which rev-1 did not
   acknowledge, having treated the whole refusal as new code.
 - **S6** — the two `NOT A UNIT` diagnostics are PRESERVED. `render_region` emits rows only from
-  `build["units"]`, i.e. specs whose status header parsed, while the spec walk at `:1592-1602` reports
-  a spec with no status header and a spec whose heading and header disagree. Five tracked specs
-  produce such a row today (`aDeployScout`, `aKitHardener`, `aLeanRework`, `aPortableWarden`,
-  `aRatchetForge`), so moving the enumeration onto the region would drop a live signal. `--plan` keeps
-  a spec-file walk for this purpose alone, reporting the same two conditions, and rev-1's "otherwise
-  identical" is withdrawn.
-- **S7** — arms: both verbs name the same next unit on a build with order values; both name the same
+  specs whose status header parsed, so the region cannot carry either. `verb_plan`'s spec walk reports
+  them, and they are:
+  1. **no status header** — the file has no `**Status:**` line at all. FIVE tracked specs produce this
+     row today: `aDeployScout`, `aKitHardener`, `aLeanRework`, `aPortableWarden`, `aRatchetForge`.
+  2. **heading id does not parse** — the `# ` heading's first token is not id-shaped. **ZERO tracked
+     specs produce this row**, which the driver's own comment beside the branch already states.
+
+  rev-2 described the second as "a spec whose heading and status header disagree". That is not what
+  the branch tests and could not be: the status header carries no id, so there is nothing for a
+  heading to disagree with. Round 2 parsed all 277 tracked specs with the driver's own two awk
+  programs to establish both counts.
+
+  Moving the enumeration onto the region would drop both signals, so `--plan` keeps a spec-file walk
+  for this purpose alone. rev-1's "otherwise identical" is withdrawn.
+- **S7** — a region row whose id has NO tracked spec is classified, rather than falling through. Today
+  the set comes from `git ls-files`, so such a row cannot arise and the harness's empty-plan build
+  reaches its refusal only for that reason; once S1 makes the region the SET, the row is representable
+  and needs a name. It reports as a unit whose spec is missing — distinct from the authored pair's
+  MISSING, which is about a PLANNED unit — and §4's "otherwise identical" is qualified accordingly.
+- **S8** — this unit prices its own read-path charge and moves `READ_PATH_CEILING` by it, per owner
+  ruling 2 and this build's rules slot. It charges `memory/guides/UNATTENDED-PROTOCOL.md`, a capped
+  member, and its own `memory/DECISIONS.md` row. rev-2 claimed both were "priced" and recorded no
+  measurement anywhere in the file — the round-1 finding WAS the missing measurement, and the fold
+  wrote the word instead of doing the work. The before/after totals go in the commit message.
+- **S9** — arms: both verbs name the same next unit on a build with order values; both name the same
   on a build with none; an absent region refuses; a malformed region still refuses; the MISSING join
-  still fires from the authored pair with the region present; the S4 divergence is pinned; and each of
-  the two `NOT A UNIT` conditions still reports.
+  still fires from the authored pair with the region present; the S4 divergence is pinned; a region row
+  with no tracked spec is classified; and each of the two `NOT A UNIT` conditions still reports.
 
 ## 3. Non-goals (OUT)
 
@@ -94,20 +113,30 @@ this unit" was wrong in both direction and count.
 ### Migration
 
 One commit. `--plan`'s output changes ORDER for any build carrying order values and is otherwise
-identical **except** for S6, which it preserves deliberately. Downstream readers: eleven assertions in
-`unattended.test.sh:1555-1644` and one description in `UNATTENDED-PROTOCOL.md:423`. rev-1's "nothing
-downstream parses it" was overstated; they parse the id, which S1 keeps as the join key.
+identical **except** for S6 and S7, which it preserves and adds deliberately.
 
-### The fixture this unit has to build
+Downstream readers exist and are not counted here. `unattended.test.sh` asserts on `--plan` output in
+several places and the protocol describes it in prose; the exact number is a derived population and
+rev-2 authored it as "eleven assertions", which round 2 found wrong under every reading. Derive it
+with a grep when you make the change. rev-1's "nothing downstream parses it" was overstated either
+way; they parse the id, which S1 keeps as the join key.
+
+### The fixture this unit has to build, and why it is not a small job
 
 `grep -n Order tools/unattended/unattended.test.sh` returns nothing. The `readme()` fixture renders a
 four-column units region (Unit · Status · Rev · Last change) while the live corpus renders six, with
 Order second. **AC1 quantifies over a build whose units carry order values, and no such build exists in
-the harness.** Building that fixture is part of this unit, not a precondition of it.
+the harness.**
+
+The fixture work is NOT additive, which rev-2 implied by naming only the column mismatch. `readme()`
+writes a single hardcoded row with status `OPEN`; `mkspec()` always writes the same `-1` filename; and
+`units()` only APPENDS a second marker pair, which trips the malformed refusal rather than adding a
+row. AC1 and AC8 need two or more units carrying order, and AC6 needs every row terminal — so each
+requires changing SHARED helpers that every `--plan`, `--status` and `--preflight` arm in the file
+depends on. Budget the regression risk accordingly; that is the real cost of this unit.
 
 The column mismatch itself is harmless and must not be "fixed" as a side effect: `nonterminal_units`
-selects with `grep -vE '\| (CLOSED|WONTDO) \|'` and `unit_rows` with `^\| \[.*\]\(spec/`, both
-column-count agnostic.
+and `unit_rows` both select with column-count-agnostic patterns.
 
 ### Alternatives rejected
 
@@ -119,12 +148,28 @@ two kits are separate streams.
 the two-answers-to-one-question class this build's parent spent itself removing. Note that S4 does
 document a divergence, but a strictly narrower one that survives by design rather than by neglect.
 
+### THREE copies of the sentence this unit falsifies, and only one is editable
+
+`--plan`'s behaviour is described in three tracked places, and two of them are RENDERS that a drift
+check refuses to see edited directly:
+
+- `tools/unattended/PROTOCOL.template.md` — the SOURCE. `memory/guides/UNATTENDED-PROTOCOL.md` is a
+  byte-identical copy of it (verified: same size, `diff` of both CR-stripped is empty), and
+  `adopt-unattended.sh` exits 1 on any divergence. That refusal is the `unattended skill wiring` leg
+  §7 names, so editing the rendered guide alone REDS a gate this spec lists as green.
+- `tools/unattended/SKILL.template.md` — the SOURCE for `.claude/skills/unattended/SKILL.md`, which
+  carries the same description at the same line and is diffed by the same check.
+
+So the edit is: change both TEMPLATES, re-render, and never touch a rendered copy. This is the same
+edit-the-template-first rule `TOOL-dHonouredPark-2` carries for `BUILD-METHOD.md`; rev-2 named only the
+rendered guide, and round 2 found both source files absent from every list.
+
 ### Files touched (estimate)
 
 `tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` including the new
-order-bearing fixture · the kit version sites · `memory/guides/UNATTENDED-PROTOCOL.md` only if it
-states what `--plan` reads, which is checked rather than assumed — and it does, at line 423, so the
-charge is real.
+order-bearing fixture and the shared-helper changes it forces · `tools/unattended/PROTOCOL.template.md`
+and `tools/unattended/SKILL.template.md` with their two renders · the kit version sites ·
+`.memory-tree.conf` for S8 · `memory/DECISIONS.md` for this unit's ruling row.
 
 ## 5. Production-readiness checklist
 
@@ -140,10 +185,10 @@ charge is real.
 - risks — the silent fallback, removed by S5. Second risk: S6. Reading the region is the obvious
   simplification and it silently drops a diagnostic that fires on five tracked specs today, which is
   precisely the kind of loss a green test suite would not notice.
-- read path — `memory/guides/UNATTENDED-PROTOCOL.md:423` states what `--plan` prints and is a capped
-  member at 48838 B; this unit charges it and its own `memory/DECISIONS.md` row. Both are priced and
-  the ceiling moved in the same commit, per this build's rules slot. rev-1 named the file as possibly
-  touched and never priced the charge.
+- read path — `memory/guides/UNATTENDED-PROTOCOL.md` describes what `--plan` prints and is a capped
+  member at 48838 B; this unit charges it and its own `memory/DECISIONS.md` row. S8 owns the
+  measurement and AC9 the record. rev-1 named the file and never priced it; rev-2 said it was priced
+  and still recorded no figure.
 - testing + left-shift gates — S7's arms, plus the order-bearing fixture they need.
 - migration / rollback — one commit, invertible.
 - user docs — the protocol, at the line that describes the source.
@@ -163,15 +208,25 @@ charge is real.
   `:1572-1576`, armed at `:1601-1611`); kept as a regression guard, not as evidence.
 - **AC5** — When a build's authored `roster:units` pair names an id no spec defines, `--plan` still
   reports it MISSING with the region present, proving S3's boundary held.
-- **AC6** — On a build whose specced units are ALL terminal and whose roster names an unspecced id,
+- **AC6** — On a build whose specced units are ALL terminal, whose roster names an unspecced id, and
+  whose run-state file declares a phase,
   `--plan` names the missing unit and `--status` reports no non-terminal unit, and an arm asserts
   exactly that pair of outputs. This is S4's pinned exception: the divergence is intended and is
   therefore tested, not asserted away.
-- **AC7** — When a tracked spec carries no status header, and when its heading and status header
-  disagree, `--plan` still reports each as `NOT A UNIT`. Observed against the five live instances.
+- **AC7** — When a tracked spec carries no status header, `--plan` still reports `NOT A UNIT (no
+  status header)`. Observed against the five live instances.
 - **AC8** — When `--plan` runs over a build carrying order values, its rows appear in build order.
 - **AC9** — When `python tools/memory-tree/corpus_ids.py --report` runs before and after, both totals
-  are recorded and `.memory-tree.conf` carries this unit's own movement line.
+  are recorded in the commit message and `.memory-tree.conf` carries this unit's own movement line.
+- **AC10** — When a spec's `# ` heading carries no id-shaped first token, `--plan` still reports
+  `NOT A UNIT (heading id does not parse)`. **This needs a staged fixture**: zero tracked specs produce
+  that row, which the driver's own comment states, so the five live instances cover AC7 and nothing
+  covers this one.
+- **AC11** — When a region row names an id no tracked spec defines, `--plan` classifies it by S7 rather
+  than falling through.
+- **AC12** — When `bash tools/unattended/adopt-unattended.sh --check` runs, it is green: both templates
+  and both renders agree. Observed RED first by editing a rendered copy alone, which is the state
+  rev-2 would have landed in.
 
 ## 7. Gates
 
@@ -208,6 +263,19 @@ this list. An exemption is not coverage, so the exemption is written down with w
 
 - rev-1 · 2026-08-25 · initial draft, from the owner's ruling on `dFramedEntrypoint`'s third park —
   the one park that was still unruled when the build landed.
+- rev-3 · 2026-08-25 · round-2 fold. Corrected S6's second diagnostic — the branch tests whether the
+  heading's id parses, not whether heading and status header disagree, which they cannot, since the
+  status header carries no id — and split AC7 in two after round 2 measured ZERO live instances of that
+  condition against five of the other. Added the three-copies section: the protocol guide and the
+  installed skill are RENDERS whose drift check refuses a direct edit, so both TEMPLATES are the
+  subject and rev-2 named neither. Took the read-path charge as declared scope with a real measurement
+  (S8, AC9) rather than the word "priced". Added S7 for a region row with no tracked spec, which S1
+  makes representable. Extended AC1/AC2/AC6's run-state precondition to the phase fact the verb also
+  demands, and recorded that the fixture work forces changes to shared helpers. Replaced the authored
+  downstream-reader count with a derivation, and dropped line-number citations.
+  AC numbering was RESEQUENCED in this revision; AC labels in the entries below refer to the
+  numbering of the revision that wrote them, not to this one.
+
 - rev-2 · 2026-08-25 · spec-audit fold. Corrected §1: `--plan` orders by lexical PATH, not by id. S1
   now records that `verb_plan` ALREADY reads the region and that rows join by id, not by link. Added
   S4 and AC6 for the divergence rev-1 claimed away, and S6 and AC7 for the two `NOT A UNIT`
