@@ -1888,6 +1888,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "raw_write_cells",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"

@@ -890,6 +890,27 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
                        f"name a verdict, including the one where both sides are gone")
 
+    # ---- 7i: DEPL-dCarriedReceipt-8 S4/AC5. THE NO-CLOBBER GUARANTEE, asserted STRUCTURALLY over
+    #          the grid rather than behaviourally over the one row that exposed it. `differs` on the
+    #          OURS axis means the target's index blob is not gov's blob at this row's `commit` — an
+    #          adopter's edit, or a carried copy `-9` proves a rung for. A cell that routed such a
+    #          row to a verdict in `RAW_WRITE_VERDICTS` would hand it to the arm that overwrites
+    #          with gov's raw bytes, which is precisely the destruction `-8` closed. Both sets are
+    #          READ from the module, so widening the write arm or repointing a cell reds HERE rather
+    #          than shipping.
+    #
+    #          WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one.
+    #          Not whether the delta predicate itself is right — that is `classify_row`'s
+    #          `gov_oid` comparison, graded behaviourally. Not whether the merge branch stamps
+    #          the right identity — S1, likewise behavioural. And nothing at all about the
+    #          `absent` OURS row: a carried row the target DELETED reaches `missing`
+    #          legitimately, and that cell is `-9` S11's rather than this arm's.
+    for o, t, v in raw_write_cells(VERDICT_GRID):
+        r.fail(f"the verdict grid maps (ours={o}, theirs={t}) to '{v}', which `update`'s write "
+               f"loop RAW-WRITES with gov's bytes. An OURS axis of `differs` says the target holds "
+               f"something gov did not ship, so that cell silently destroys it — the defect "
+               f"DEPL-dCarriedReceipt-8 closed. A delta row routes to the three-way merge, always")
+
     # ---- 7h: LEG correspondence, BOTH directions. The descriptors and
     #          gov's own leg manifest are two spellings of one fact, and before this nothing asserted
     #          they agree — the deployer's whole thesis, unapplied to the deployer. An exemption is
@@ -1559,11 +1580,36 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
         if src and commit:
             n_prov += 1
             blob = blob_at(root, commit, src)
+            # DEPL-dCarriedReceipt-8 S6. THE PROVENANCE QUESTION IS "did gov ship these bytes at
+            # this commit", and `gov_oid` is the field that answers it — the only one that does.
+            # This loop used to read `sha256`, which is a hash of the bytes that LANDED, and the two
+            # coincide only where the target holds gov's file untouched. On a merged row they never
+            # do: the file legitimately holds gov's bytes plus the adopter's edit, and this loop
+            # called that receipt corruption. Measured immediately after a successful three-way,
+            # `provenance: 1/2 resolved` plus a named hash mismatch, on a target nothing was wrong
+            # with. `sha256` still answers the INTEGRITY question above, unchanged; one field was
+            # being asked two questions and this is the reader that had the wrong one.
+            gov_oid = row.get("gov_oid")
             if blob is None:
                 r.fail(f"'{path}': its recorded source '{src}' does not resolve at commit "
                        f"{commit[:12]} in the gov checkout at {root.as_posix()} — either this is a "
                        f"different clone than the receipt recorded, or that commit is not fetched here")
+            elif gov_oid:
+                if blob_oid(blob) != gov_oid:
+                    r.fail(f"'{path}': the receipt's gov_oid does not name gov's own blob "
+                           f"at {commit[:12]} — recorded {gov_oid[:12]}, gov has "
+                           f"{blob_oid(blob)[:12]}. `gov_oid` is STORED, so this is a "
+                           f"receipt that no longer matches its own evidence rather than a "
+                           f"target that drifted")
+                else:
+                    n_prov_ok += 1
             elif want and _sha(blob) != want:
+                # A receipt below schema 3 carries no `gov_oid` at all, and `check` does not migrate
+                # — `update` does, once, from this same evidence. `sha256` is the only identity such
+                # a row has, so the legacy comparison is what is available rather than what is
+                # right, and it keeps its old message. A merged row in a schema-2 receipt therefore
+                # still reds here, truthfully: nothing in it distinguishes gov's bytes from the
+                # merge result until the migration runs.
                 r.fail(f"'{path}': the receipt's hash does not match gov's own bytes at "
                        f"{commit[:12]} — recorded {want[:12]}, gov has {_sha(blob)[:12]}")
             else:
@@ -3277,6 +3323,29 @@ VERDICT_GRID = {
     ("absent", "absent"): "converged",
 }
 
+# DEPL-dCarriedReceipt-8 S4. The verdicts whose write arm takes GOV'S RAW BYTES, over whatever the
+# target holds. Named HERE rather than spelled at the `if` in `_cmd_update`, because `selfcheck`
+# asserts that no grid cell on the `differs` OURS row reaches one of these — and an assertion that
+# retypes the set it grades stops grading it on the edit that widens the arm. One spelling, two
+# readers. A row whose OURS axis says `differs` carries something the target changed, so a raw write
+# over it destroys that change; the guarantee is STRUCTURAL — the cells simply do not map there —
+# rather than a guard in front of the write, because a guard reading the field the bug corrupts is
+# disabled by the bug it exists to catch.
+RAW_WRITE_VERDICTS = ("stale", "missing")
+
+
+def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
+    """Every cell of a verdict grid that would hand a DELTA row to the raw-write arm.
+
+    A function rather than a loop inside `selfcheck` so the harness can drive it over a hand-edited
+    COPY of the grid and watch it SPEAK. A structural assertion nobody has ever seen fire is an
+    assertion about nothing, and re-implementing the rule in the test to make it fire would leave
+    two spellings of it — the class this whole file is about.
+    """
+    return sorted((o, t, v) for (o, t), v in grid.items()
+                  if o == "differs" and v in RAW_WRITE_VERDICTS)
+
+
 # What `update` does per ROLE. A role whose row is a refusal is still a ROW: silence is what lets a
 # later unit add a role and leave it behind, and `selfcheck` asserts this covers the role enum.
 UPDATE_ROLE = {
@@ -3713,7 +3782,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                       f"never written by `update`")
             continue
 
-        if v == "stale" or v == "missing":
+        if v in RAW_WRITE_VERDICTS:
             oid, why = land_through_index(root, target, row["path"], row.get("source"),
                                           c["theirs"], to_commit, index0)
             if oid is None:
@@ -3764,11 +3833,29 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 if oid is None:
                     r.fail(f"'{row['path']}' merged cleanly and could not be landed: {why}")
                     continue
-                # DELIBERATELY UNCHANGED in shape: the merge RESULT is stamped into both identities,
-                # so `gov_oid` here names bytes gov never shipped. That is the corruption `-8` owns
-                # and fixes; renaming the field without moving the defect is what keeps `-8`'s own
-                # red-first observation reachable after this unit lands (§3, non-goals).
-                row["gov_oid"] = blob_oid(merged)
+                # DEPL-dCarriedReceipt-8 S1. THE TWO IDENTITIES SPLIT HERE, and this is the one
+                # branch where they must. `gov_oid` is GOV's blob at the row's `commit`, and
+                # `commit` advances to `to_commit` two lines below, so the only bytes that can name
+                # it are gov's own at that vintage — `c["theirs"]`, which `classify_row` already
+                # read through `blob_at`. `oid` is what the TARGET now holds, which is the merge
+                # result. Nothing the target produced may reach `gov_oid`, ever.
+                #
+                # WHY THIS IS THE WHOLE UNIT. Stamping the merge result into gov's identity made the
+                # NEXT run read `ours == gov_oid` — the target does hold the merged bytes — so
+                # `o_state` came back `equal`, the grid's `("equal", "differs")` cell said `stale`,
+                # and the raw arm above overwrote the adopter's edit and reported it as a clean
+                # write with zero conflicts. Reproduced end to end at 9ddcc5c9: local line count 1
+                # after the merge, 0 after the update that followed it, rc 0 and no finding printed.
+                # After `-7` the same stamp instead disagrees with its own evidence, so S9's
+                # preamble refuses the WHOLE run for good and the target can never be updated
+                # again — a different symptom of one defect, measured on `-7`'s tip before this.
+                #
+                # The permanence falls out rather than being flagged: these two now differ, so the
+                # row's OURS axis reads `differs` on every later run, and `differs` reaches only
+                # `patched` and `diverged` — neither of which is in `RAW_WRITE_VERDICTS`. An adopter
+                # who later reverts the edit by hand puts the index blob back to `gov_oid` and the
+                # row rejoins the raw arm on its own — what a stored boolean would get wrong.
+                row["gov_oid"] = blob_oid(c["theirs"])
                 row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit

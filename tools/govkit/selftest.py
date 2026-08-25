@@ -2860,6 +2860,168 @@ user_skills = "/tmp/gk-fake-skills"
               verdict_of(_a11.stdout, ".githooks/pre-commit") in ("current", "block-moved"),
               _a11.stdout)
 
+        # ===== DEPL-dCarriedReceipt-8: a merge result never overwrites `gov_oid` =================
+        #
+        # THE DEFECT, reproduced end to end before the fix and on TWO trees, because `-7` moved the
+        # symptom without moving the cause. At 9ddcc5c9 the merge stamped its own result into the
+        # one `sha256` field; the next run read the row `equal` to gov, called it `stale`, and the
+        # raw arm overwrote the adopter's line — `wrote 2, deleted 0, 0 conflict(s)` at rc 0, local
+        # line count 1 then 0, with no finding printed at all. On `-7`'s tip the same stamp lands in
+        # `gov_oid`, where it contradicts gov's own blob at the row's `commit`, so S9's preamble
+        # REFUSES the whole run at rc 2 — and keeps refusing, so that target can never be updated
+        # again. Both were measured on this fixture, in this order, before a line was changed.
+        #
+        # THE FIXTURE IS REAL GOV HISTORY, four vintages of one real file, because the guarantee is
+        # about a base that keeps moving under a delta the target keeps holding.
+        V8 = ("24f39915b3de86010a30d8698d0d4b317db015de",
+              "0f4d30843f2693dae9e9a69a348bf3390ad0ad3c",
+              "372e6b2a9a7d5b06001167b206c869f604c8a8af",
+              "9ddcc5c944bdb92456ef031ee5f038842d016587")
+        CWS, CWT = "tools/check-wiring.sh", "tools/check-wiring.test.sh"
+        MINE8 = b"# DEPL-dCarriedReceipt-8 OPERATOR LINE\n"
+        GK8 = govkit_module()
+
+        def gblob(commit: str, path: str) -> bytes:
+            return subprocess.run(["git", "-C", str(govroot), "show", f"{commit}:{path}"],
+                                  capture_output=True).stdout
+
+        # ASSERTED FIRST. A fixture that does not trigger the rule proves nothing, and this rule is
+        # triggered by gov's copy MOVING under a target that is holding an edit. If these vintages
+        # ever stop moving, every arm below passes by finding nothing.
+        _b8 = [gblob(v, CWS) for v in V8]
+        check("[-8] the four vintages of the fixture file all resolve in this gov checkout",
+              all(_b8), str([len(b) for b in _b8]))
+        check("[-8] ...and gov's copy really moves at every one of them",
+              len({bytes(b) for b in _b8}) == 4, str([GK8.blob_oid(b)[:8] for b in _b8]))
+
+        def delta_target(name: str) -> pathlib.Path:
+            """Installed, rewound to the OLDEST vintage, then given ONE committed operator line.
+
+            Committed, because `-12` S4 refuses a writing verb over a dirty claimed path — the
+            guarantee under test is the one that survives a commit, and an uncommitted edit never
+            reaches the classifier at all.
+            """
+            t = make_target(tmp / name, DEPLOY_FULL)
+            run("apply", "--target", str(t), "--kits", "check-wiring")
+            rp = t / ".governance" / "install.json"
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            rec["gov_commit"] = V8[0]
+            for f in rec["files"]:
+                if not f.get("source"):
+                    continue
+                b = gblob(V8[0], f["source"])
+                f["commit"] = V8[0]
+                # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption
+                # rather than an older install, and every run below refuses before it classifies.
+                f["sha256"] = GK8._sha(b)
+                f["gov_oid"] = GK8.blob_oid(b)
+                (t / f["path"]).write_bytes(b)
+            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+            settle(t, "landed at the oldest vintage")
+            (t / CWS).write_bytes((t / CWS).read_bytes() + MINE8)
+            settle(t, "the operator's line, committed")
+            return t
+
+        def mine_count(t: pathlib.Path) -> int:
+            return (t / CWS).read_bytes().count(MINE8.strip())
+
+        # ---- AC1: the sequence that destroyed the edit. Staged red twice over — see the header.
+        t8 = delta_target("d8-ac1")
+        check("[-8] AC1 the fixture holds the operator's line before any update",
+              mine_count(t8) == 1, repr((t8 / CWS).read_bytes()[-160:]))
+        _r81 = run("update", "--target", str(t8), "--to", V8[2], "--write")
+        check("[-8] AC1 the first update MERGES the delta row rather than overwriting it",
+              _r81.returncode == 0 and verdict_of(_r81.stdout, CWS) == "diverged",
+              _r81.stdout[-900:] + _r81.stderr[-600:])
+        check("[-8] AC1 ...and the operator's line survived it",
+              mine_count(t8) == 1, repr((t8 / CWS).read_bytes()[-160:]))
+
+        # ---- AC2: the two identities on the merged row, each against its own evidence.
+        _rec8 = json.loads((t8 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row8 = [f for f in _rec8["files"] if f["path"] == CWS][0]
+        _idx8 = gout(t8, "ls-files", "-s", "--", CWS).split()[1]
+        check("[-8] AC2 the merged row's gov_oid is GOV's blob at --to, not the merge result",
+              _row8.get("gov_oid") == GK8.blob_oid(gblob(V8[2], CWS)),
+              str(_row8.get("gov_oid")) + " vs " + GK8.blob_oid(gblob(V8[2], CWS)))
+        check("[-8] AC2 ...its oid is the blob the TARGET's index now holds",
+              _row8.get("oid") == _idx8, str(_row8.get("oid")) + " vs " + _idx8)
+        check("[-8] AC2 ...and the two DIFFER, which IS the local delta, recomputed per run",
+              _row8.get("gov_oid") != _row8.get("oid"), str(_row8)[:300])
+        check("[-8] AC2 ...while `commit` still advances to --to (§8 F1)",
+              _row8.get("commit") == V8[2], str(_row8.get("commit")))
+
+        # ---- AC3: the second symptom of the same overload. `check` reds on a target nothing is
+        # ---- wrong with, because its provenance loop read `sha256` as GOV's hash.
+        _c8 = run("check", "--target", str(t8))
+        check("[-8] AC3 check exits 0 immediately after the merged update",
+              _c8.returncode == 0, _c8.stdout[-1200:] + _c8.stderr[-400:])
+        check("[-8] AC3 ...and its provenance loop RESOLVED the merged row rather than skipping it",
+              "provenance: 2/2 resolved" in _c8.stdout, _c8.stdout[-600:])
+
+        # ---- AC1, second half: the run that used to destroy the edit.
+        settle(t8, "after the first update")
+        _r82 = run("update", "--target", str(t8), "--to", V8[3], "--write")
+        check("[-8] AC1 the SECOND update reports `diverged`, never `stale`",
+              _r82.returncode == 0 and verdict_of(_r82.stdout, CWS) == "diverged",
+              _r82.stdout[-900:] + _r82.stderr[-600:])
+        check("[-8] AC1 ...and the operator's line is STILL there — the destruction is closed",
+              mine_count(t8) == 1, repr((t8 / CWS).read_bytes()[-160:]))
+
+        # ---- AC4: PERMANENCE. A guarantee asserted once is a guarantee asserted for one run, so
+        # ---- the fourth vintage goes in between and the count is asserted after EVERY run.
+        t84 = delta_target("d8-ac4")
+        _seen8: list[tuple[str, int, int]] = []
+        for _i, _v in enumerate(V8[1:]):
+            _p8 = run("update", "--target", str(t84), "--to", _v, "--write")
+            _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
+            settle(t84, f"after update {_i + 1}")
+        _p8 = run("update", "--target", str(t84), "--write")
+        _seen8.append((verdict_of(_p8.stdout, CWS), _p8.returncode, mine_count(t84)))
+        check("[-8] AC4 all four updates exit 0",
+              all(rc == 0 for _v, rc, _n in _seen8), str(_seen8))
+        check("[-8] AC4 ...and not one of them ever calls the delta row `stale` or `missing`",
+              all(v in ("diverged", "patched") for v, _rc, _n in _seen8), str(_seen8))
+        check("[-8] AC4 ...and the operator's line is present after every single one",
+              all(n == 1 for _v, _rc, n in _seen8), str(_seen8))
+
+        # ---- AC6: THE NO-REGRESSION ARM, so the fix cannot quietly turn every update into a merge.
+        # ---- Asserted on the SECOND row of the same fixture — the one the operator never touched —
+        # ---- rather than inferred from a tally.
+        t86 = delta_target("d8-ac6")
+        check("[-8] AC6 the untouched row's gov copy really moved, so this arm CAN fail",
+              gblob(V8[0], CWT) != gblob(V8[2], CWT),
+              GK8.blob_oid(gblob(V8[0], CWT))[:8] + " vs " + GK8.blob_oid(gblob(V8[2], CWT))[:8])
+        _r86 = run("update", "--target", str(t86), "--to", V8[2], "--write")
+        check("[-8] AC6 a row with NO local delta still takes the RAW write and reads `stale`",
+              verdict_of(_r86.stdout, CWT) == "stale", _r86.stdout[-900:] + _r86.stderr[-600:])
+        check("[-8] AC6 ...and the target's index blob for it IS gov's blob at --to",
+              gout(t86, "ls-files", "-s", "--", CWT).split()[1]
+              == GK8.blob_oid(gblob(V8[2], CWT)), gout(t86, "ls-files", "-s", "--", CWT))
+        _row86 = [f for f in json.loads((t86 / ".governance" / "install.json")
+                                        .read_text(encoding="utf-8"))["files"]
+                  if f["path"] == CWT][0]
+        check("[-8] AC6 ...and on THAT arm the two identities agree, which is its definition",
+              _row86.get("oid") == _row86.get("gov_oid") == GK8.blob_oid(gblob(V8[2], CWT)),
+              str(_row86)[:300])
+
+        # ---- AC5: THE STRUCTURAL GATE, over the grid rather than over the row that exposed it.
+        # ---- Driven through the ENGINE's own predicate on a hand-edited COPY of the grid, so the
+        # ---- harness holds no second spelling of the rule it grades and the liveness half runs on
+        # ---- every invocation rather than once, by hand, on the day it was written.
+        check("[-8] AC5 the shipped grid routes no delta row to a raw write",
+              GK8.raw_write_cells(GK8.VERDICT_GRID) == [],
+              str(GK8.raw_write_cells(GK8.VERDICT_GRID)))
+        _grid8 = dict(GK8.VERDICT_GRID)
+        _grid8[("differs", "differs")] = "stale"
+        check("[-8] AC5 LIVENESS: mapping (differs, differs) to `stale` makes that arm SPEAK",
+              GK8.raw_write_cells(_grid8) == [("differs", "differs", "stale")],
+              str(GK8.raw_write_cells(_grid8)))
+        check("[-8] AC5 ...and the raw-write set is the one the write loop reads, not a copy",
+              GK8.RAW_WRITE_VERDICTS == ("stale", "missing"), str(GK8.RAW_WRITE_VERDICTS))
+        _s8 = run("selfcheck")
+        check("[-8] AC5 selfcheck carrying that arm still exits 0 over this repo",
+              _s8.returncode == 0, _s8.stdout[-600:] + _s8.stderr[-400:])
+
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
     # THE ARM THE BLOCKER ASKED FOR, and it is parameterised over the registry rather than written
