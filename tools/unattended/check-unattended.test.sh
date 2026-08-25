@@ -161,6 +161,43 @@ BASE0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRun/RUN.md
 sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRun/RUN.md
+# TOOL-dHonouredPark-4 fallout. Check 30 asserts its own LIVENESS — it refuses to report clean when
+# it walked no build whose `--plan` returned a verdict — and every fixture build here has an EMPTY
+# generated units region and no spec, so `--plan` refused for all of them and the check redded on a
+# population of zero. Five arms failed for a fixture that predates the check.
+#
+# A SEPARATE BUILD, not a reshape of tRun. Dozens of arms below assert against tRun's README and
+# run-state file; changing its shape to satisfy one check would put every one of them at risk. This
+# one exists only to be counted, and nothing else references it.
+#
+# SPECCED, NOT CLOSED, deliberately: check 30 separately flags a build whose every tracked spec is
+# TERMINAL, so the obvious status would trade this red for that one.
+mkdir -p memory/builds/tPlanOk/spec
+cat > memory/builds/tPlanOk/README.md <<'PLANOK'
+---
+slug: tPlanOk
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-tPlanOk-1
+---
+
+# tPlanOk
+
+<!-- gen:build-index -->
+**Build status:** SPECCED · 1 unit(s)
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tPlanOk-1 — the unit](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+PLANOK
+printf '# ARCH-tPlanOk-1 the unit
+
+**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture
+' > memory/builds/tPlanOk/spec/one.md
 git add -A && git commit -q -m facts --no-verify
 PRISTINE=$(git rev-parse HEAD)
 # RESETS THE REF NAMESPACE TOO, not just the work tree. Arms below repoint the anchor and add

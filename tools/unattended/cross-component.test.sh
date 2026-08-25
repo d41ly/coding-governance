@@ -70,8 +70,22 @@ mk() { # slug · optional extra front-matter line
     echo; echo '<!-- gen:build-index -->'
     # TOOL-aBoundedVerdict-11 S5 - the NESTED units pair. Check 21 requires it on every tracked build
     # README, so a fixture that omits it reds the leg on the fixture rather than on the kit.
-    echo '<!-- gen:build-units -->'; echo '<!-- /gen:build-units -->'
+    # TOOL-dHonouredPark-4 fallout: the region is POPULATED and a matching spec is written. An empty
+    # region plus no spec makes `--plan` refuse, so check 30 of the leg walked ZERO builds whose
+    # `--plan` returned a verdict and redded on its own liveness assertion — five arms here failed for
+    # a fixture that had never satisfied a check added after it. The status is deliberately NON
+    # terminal: check 30 flags a build whose every tracked spec is terminal, so `CLOSED` here would
+    # trade one red for another.
+    echo '<!-- gen:build-units -->'
+    echo '| Unit | Status | Rev | Last change |'; echo '|---|---|---|---|'
+    echo "| [ARCH-$1-1 — the unit](spec/one.md) | SPECCED | rev-1 | 2026-08-01 |"
+    echo '<!-- /gen:build-units -->'
     echo '<!-- /gen:build-index -->'; } > "memory/builds/$1/README.md"
+  mkdir -p "memory/builds/$1/spec"
+  printf '# ARCH-%s-1 the unit
+
+**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams tooling
+' "$1" > "memory/builds/$1/spec/one.md"
 }
 
 # ---- PRECONDITION: the fixture is COMPLETE before anything perturbs it. An arm that runs against a
