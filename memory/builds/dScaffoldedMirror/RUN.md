@@ -17,6 +17,7 @@ branch-sha: 500a5db6b8e056c11bbe1c3cd82a16bc186ada5a
 branch-ref: refs/heads/branch/lexicon-kit-overview-00de02
 mode: slug
 anchor-kind: run-branch
+landed-anchor: remote
 keepalive: 5ba175bf
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 9ddcc5c944bdb92456ef031ee5f038842d016587
