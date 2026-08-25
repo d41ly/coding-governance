@@ -54,7 +54,7 @@ ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonoure
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | SPECCED | rev-4 | 2026-08-25 |
+| [TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is](spec/2026-08-25-spec-dHonouredPark-2.md) | 1 | 1 | CLOSED | rev-5 | 2026-08-25 |
 | [TOOL-dHonouredPark-3 — the dead-path waiver registry keys on line TEXT plus an occurrence ordinal, not a line NUMBER](spec/2026-08-25-spec-dHonouredPark-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-08-25 |
 | [TOOL-dHonouredPark-1 — the authored roster pair becomes mandatory on every build README, and its Definition-of-Done term becomes a check that can fail](spec/2026-08-25-spec-dHonouredPark-1.md) | 3 | 2 | SPECCED | rev-4 | 2026-08-25 |
 | [TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-08-25 |

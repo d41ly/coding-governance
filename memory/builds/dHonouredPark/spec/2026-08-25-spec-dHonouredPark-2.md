@@ -1,6 +1,6 @@
 # TOOL-dHonouredPark-2 — the build method's declared line budget rises to 350, and the byte half stays where it is
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 60ba1d60 · order 1 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-25 · node d · Tier-1 · base 60ba1d60 · order 1 · streams tooling · ratified 2026-08-25
 
 <!-- gen:spec-records -->
 
@@ -210,6 +210,9 @@ confirmed against unit 3.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · BUILT and CLOSED at b7366549. All eight criteria met; check 16 observed RED
+  twice, once before each ceiling movement, the second forced by the manifest repair this unit's own
+  watched files triggered.
 - rev-4 · 2026-08-25 · M3 fork sweep. F1 split: whether THIS unit adds a gate is resolved (no, per
   §3), and whether one is ever added is PARKED under veto 2 as a governance-carrier change no
   delegated mandate reaches.
