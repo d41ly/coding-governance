@@ -79,8 +79,14 @@ sessions at does not, which is worth knowing before trusting a clean report to m
 - AC13 — OBSERVED SILENCE, and recorded as such: with both keys gone from the conf and a `RATCHETS`
   row naming `READ_PATH_CEILING` restored, `drift_report.py --check` produced ZERO findings
   mentioning it. Deleting that row was therefore a manual obligation and no gate covers the class.
-- AC14 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — GREEN, 85/85 legs, at
-  `4b26d2b0`. It took five runs. The four that redded are the point of the criterion and are
+- AC14 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — GREEN, 85/85 legs,
+  on the MERGED tree at `5ea86715`, which is the reading that counts: the pre-merge green at
+  `4b26d2b0` was measured against a base main had left 53 commits behind. Stated with its
+  caveat, because the criterion is weaker than it looks: two runs of that same merged tree
+  redded first `run-gates turnstile` and then `row-keyed merge driver replay`, with no commit
+  between them, and both pass standalone here and at main. The bar is nondeterministic under
+  its own concurrency (`TOOL-dSpentCeiling-8`), so this green is one sample and not a proof.
+  It took five pre-merge runs and three post-merge ones. It took five runs. The four that redded are the point of the criterion and are
   listed below, because a green reached on the first try would have proved only that the bar was
   not looking.
 
