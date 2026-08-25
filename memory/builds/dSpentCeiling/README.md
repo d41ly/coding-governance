@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5
+ids: TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6
 ---
 
 # dSpentCeiling — the read-path budget becomes a rate signal, and rule 3 keeps its teeth
@@ -56,7 +56,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5
+ids TOOL-dSpentCeiling-1 TOOL-dSpentCeiling-2 TOOL-dSpentCeiling-3 TOOL-dSpentCeiling-4 TOOL-dSpentCeiling-5 TOOL-dSpentCeiling-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
