@@ -976,6 +976,71 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
     check("...and says which file it could not read it from",
           "KIT_LEXICON_VERSION" in (_r.stdout + _r.stderr), (_r.stdout + _r.stderr)[:200])
 
+# ---- TOOL-dPromptedSeam-3 — read_object_state, and the false rows it exists to stop -------------
+#
+# FOUR STATE ARMS, and they are FOUR because two rules decide the verdict and either alone passes
+# half of them. `pin_of` dies by MEMBERSHIP; `boundedK` dies by LENGTH, and `k` is in no stopword
+# list. A predicate carrying only the membership half answers `pin_of` correctly and `boundedK`
+# wrong, which is the defect the spec's two-rule statement exists to make observable.
+check("read_object_state: an all-stopword object is dead (membership)",
+      lex.read_object_state("pin_of") == "dead", lex.read_object_state("pin_of"))
+# SYNTHETIC, and saying so is the point. The only identifier in this repo that exercises the length
+# rule is `boundedK` in tools/hooks/agent-cap.js, which is JavaScript and outside the Python corpus
+# every other arm here walks. An arm over a population of zero would be a fixture that passes by
+# finding nothing, so this one names its own syntheticity instead of implying coverage.
+check("read_object_state: a one-character object is dead (length, SYNTHETIC — no python instance)",
+      lex.read_object_state("boundedK") == "dead", lex.read_object_state("boundedK"))
+check("read_object_state: a real object is live (the control that stops 'everything is dead')",
+      lex.read_object_state("build_index") == "live", lex.read_object_state("build_index"))
+check("read_object_state: a single-token name has NO object, which is not the same as dead",
+      lex.read_object_state("main") == "none", lex.read_object_state("main"))
+# ...and the three states must be THREE. A two-valued helper that maps `none` onto `dead` passes
+# every arm above except this one, and that collapse is exactly what `run_brief`'s truthiness filter
+# used to do.
+check("...and the three states are distinct, so no two collapse",
+      len({lex.read_object_state(n) for n in ("pin_of", "build_index", "main")}) == 3,
+      str([lex.read_object_state(n) for n in ("pin_of", "build_index", "main")]))
+
+# THE SET EQUALS map_lib's, and nothing but this arm says so. The layer ban forbids importing
+# map_lib, so a parity gate cannot exist; the spec's Q1 records that and this asserts the count and
+# two members rather than pretending the equality is watched.
+check("the restated stopword set is 21 words, as map_lib declares",
+      len(lex.DEAD_TOKENS) == 21, str(len(lex.DEAD_TOKENS)))
+check("...and holds the members the corpus actually trips on",
+      {"of", "at", "in", "for", "with"} <= lex.DEAD_TOKENS, str(sorted(lex.DEAD_TOKENS)[:8]))
+
+# THE MARKER, both directions in one fixture. A dead shared object prints its row and must NOT claim
+# a shared concept; a live shared object must. One arm cannot pass while the other fails on a build
+# that suppresses the marker everywhere, which is the cheap wrong fix.
+_BRIEF_SRC = """def build_index():
+    pass
+
+
+def render_index():
+    pass
+
+
+def pin_of():
+    pass
+
+
+def cache_of():
+    pass
+
+
+def main():
+    pass
+"""
+_BRIEF = {"core/a.py": _BRIEF_SRC, **LAYER_SIDES}
+_c, _o = run_case(_BRIEF, BASE_CONF, args=("--brief", "core/a.py"))
+check("--brief keeps the marker on a LIVE shared object",
+      "index:" in _o and "SPELLED MORE THAN ONE WAY" in _o.split("index:")[1].split(chr(10))[0], _o)
+check("--brief WITHHOLDS the marker on a dead shared object, and still prints the row",
+      "of:" in _o and "SPELLED MORE THAN ONE WAY" not in _o.split("of:")[1].split(chr(10))[0]
+      and "STOPWORD" in _o.split("of:")[1].split(chr(10))[0], _o)
+check("--brief reports the definitions with no object at all, rather than dropping them",
+      "no object at all" in _o, _o)
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

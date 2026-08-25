@@ -853,6 +853,47 @@ def run_suggest(root: Path, name: str) -> int:
     return 0
 
 
+#: The 21 words `map_lib._STOPWORDS` holds, RESTATED rather than imported. `.lexicon.conf` declares
+#: `tools/lexicon/* -> tools/codebase-map/*` forbidden and gives self-containment as the reason, so
+#: the kit cannot read the authority it is copying. The set must EQUAL `map_lib`'s: a subset would
+#: make two kits disagree about the same word, silently. NOTHING GATES THAT EQUALITY — the same layer
+#: ban that forces the copy forbids the import a parity check would need — so this comment is the
+#: only carrier, and it says so rather than implying somebody is watching. TOOL-dPromptedSeam-3 Q1.
+DEAD_TOKENS = frozenset(
+    "a an the to of in on for and or is be as at by from into with it this that".split())
+
+#: A token shorter than this is dead whatever it spells. SEPARATE from membership, and the
+#: separation is load-bearing: `boundedK` yields the object `k`, which is in no stopword list and
+#: dies here. A predicate carrying only the membership half reports it usable, which is the defect
+#: the spec's two-rule statement exists to make observable.
+MIN_LIVE_TOKEN = 2
+
+
+def read_object_state(name: str) -> str:
+    """`live` | `dead` | `none` for an identifier — the question `read_object` cannot answer.
+
+    THE VERDICT IS ON THE IDENTIFIER, never on `read_object`'s return, and that is the whole reason
+    this is a separate function. `""` (no object) and `"of"` (an object of dead tokens) are both
+    falsy, so a caller testing the return collapses two states into one — which is exactly what
+    `run_brief` did, and why it called nine unrelated `_of` functions one concept spelled nine ways.
+
+    `dead` is not `none`. An identifier whose object is all stopwords HAS an object; it just cannot
+    be compared to anything. Reporting the two the same way is how the false rows got printed.
+    """
+    obj = read_object(name)
+    if not obj:
+        return "none"
+    toks = subtokens(obj)
+    return "live" if any(read_token_is_live(t) for t in toks) else "dead"
+
+
+def read_token_is_live(tok: str) -> bool:
+    """A token survives when it is neither too short nor a stopword — `map_lib.stems()`'s two rules,
+    applied to the RAW subtoken before any stemming, because this asks whether a token survives and
+    never what it reduces to."""
+    return len(tok) >= MIN_LIVE_TOKEN and tok not in DEAD_TOKENS
+
+
 def read_object(name: str) -> str:
     """The OBJECT of an identifier: its subtokens after the leading one, rejoined.
 
@@ -913,9 +954,18 @@ def run_brief(root: Path, target: str) -> int:
         # differently is the class; matching the pair is the fix. Found by the round-2 review.
         print(f"lexicon: {rel} cannot be read as source, so its objects cannot be listed: {exc}")
         return 2
-    here = sorted({read_object(n) for n, _ln in (got[0] if got else []) if read_object(n)})
+    names = [n for n, _ln in (got[0] if got else [])]
+    # THE THREE GROUPS ARE KEPT APART, and the filter that used to collapse them is gone. This line
+    # was `if read_object(n)`, which is truthiness — so a single-token definition and an
+    # all-stopword object were both dropped, and the reader was told about neither. S3.
+    states = {n: read_object_state(n) for n in names}
+    here = sorted({read_object(n) for n in names if states[n] != "none"})
+    noneless = sorted(n for n in names if states[n] == "none")
     if not here:
         print("this file names no multi-token definition, so there is no object to compare")
+        if noneless:
+            print(f"  {len(noneless)} definition(s) here have no object at all "
+                  f"(single-token names, e.g. {noneless[0]}) — nothing to compare them to")
         return 0
 
     live: dict = {}
@@ -944,8 +994,22 @@ def run_brief(root: Path, target: str) -> int:
         seen = live.get(obj) or {}
         shown = ", ".join(f"{v} x{c}" + ("" if v in verbs else " (off-table)")
                           for v, c in sorted(seen.items(), key=lambda kv: (-kv[1], kv[0])))
-        flag = "  <-- SPELLED MORE THAN ONE WAY" if len(seen) > 1 else ""
+        # THE MARKER IS WITHHELD FOR A DEAD OBJECT, and the ROW IS NOT. `pin_of`, `cache_of` and
+        # `token_of` do share the object `of`, and saying so is a true observation worth printing;
+        # calling them one concept spelled three ways is a false one. Measured before this changed:
+        # 11 of the 31 files whose `--brief` printed any multi-spelling row printed at least one
+        # that was false, `map_lib.py` two of them. S2, and D4 on why the row survives the marker.
+        dead = not any(read_token_is_live(t) for t in subtokens(obj))
+        if len(seen) > 1 and dead:
+            flag = "  (shared STOPWORD tail, not a shared concept)"
+        elif len(seen) > 1:
+            flag = "  <-- SPELLED MORE THAN ONE WAY"
+        else:
+            flag = ""
         print(f"  {obj}: {shown or 'no other definition names this object'}{flag}")
+    if noneless:
+        print(f"  {len(noneless)} definition(s) here have no object at all "
+              f"(single-token names, e.g. {noneless[0]}) — nothing to compare them to")
     return 0
 
 

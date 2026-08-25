@@ -2,7 +2,7 @@
 
 # TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud
 
-**Status:** OPEN · rev-1 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -118,8 +118,12 @@ concept. Deleting the row would hide a real observation to fix a wrong label.
 - **AC4** — When the length half of S1 is reverted in a scratch copy, `python tools/lexicon/selftest.py`
   reds naming the SYNTHETIC length arm; when the membership half is reverted it reds naming the
   membership arm. Two reverts, two distinct arms, so one rule cannot stand in for the other.
-- **AC5** — When `python tools/lexicon/lexicon.py --check` runs, `P1 verb graded=866` and the three
-  offender counts are unchanged from base `ee6554c3`, proving no predicate moved.
+- **AC5** — When `python tools/lexicon/lexicon.py --check` runs, the three OFFENDER counts are
+  unchanged from base `ee6554c3` (381 / 0 / 0), and `P1 verb graded` has risen by exactly the number
+  of definitions this unit adds — 866 to 868. rev-1 of this spec pinned `graded=866` as "unchanged",
+  which a unit that adds two functions can never satisfy: the criterion was false on the commit that
+  satisfied the unit. Offenders are what "no predicate moved" actually means; graded is a count of
+  the corpus and this unit grows it on purpose.
 
 ## 7. Gates
 
@@ -138,6 +142,11 @@ report a human reads, and gating a report's prose is how a report stops being ch
   without the marker, per D4. Deleting it would hide a true observation to fix a false label.
 
 ## 9. Revision log
+
+- rev-2 · 2026-08-25 · node d · OPEN. AC5 corrected DURING the build that satisfied it: it pinned
+  `graded=866` as unchanged, and this unit adds two definitions, so the criterion was false on the
+  very commit meant to pass it. Offenders unchanged is what "no predicate moved" means; graded is
+  a corpus count this unit grows deliberately. Caught by running the check rather than reading it.
 
 - rev-1 · 2026-08-25 · node d · OPEN. Supersedes `TOOL-dPromptedSeam-2`, which was retired WONTDO
   after spec-audit round 2 proved its premise false: it claimed `read_object` returns empty for two
