@@ -32,3 +32,11 @@ tools/unattended/unattended.sh	9	1	cannot stage the run-state file, and the gate
 #       filesystem fault. Trying to arm this is what FOUND the directory case.
 tools/unattended/unattended.sh	27	4	cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start
 tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved
+#
+# CHECK 29's SECOND BRANCH (TOOL-dHonouredPark). This check drives the REAL driver over the
+# real corpus, so its bad shape - a NOT A UNIT row beside a terminal verdict - exists only
+# when the DRIVER is wrong. No fixture can arrange that, which is the distinction this file's
+# header draws: not "an arm nobody wrote" but "an arm that cannot be written from here".
+# It WAS observed red, against a staged revert of the driver's `_graded` branch: it named all
+# five affected builds and went green on restore. Its sibling liveness branch IS armed.
+tools/unattended/check-unattended.sh	29	2	a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it

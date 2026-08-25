@@ -71,7 +71,7 @@ ids TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-3 TOOL-dHonoure
 | [TOOL-dHonouredPark-4 — `--plan` takes its unit SET and its ORDER from the rendered region, so both verbs answer from one source](spec/2026-08-25-spec-dHonouredPark-4.md) | 4 | 2 | CLOSED | rev-6 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1617,7 +1617,13 @@ verb_plan() { # slug
   # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
   # the second, which the driver's own comment below already states - so the second is armed by
   # fixture or not at all.
-  local _sid _renderable=0
+  # R3-M4 — the renderable count comes from `spec_ids`, which is this driver's OWN answer to "does
+  # this spec parse as a unit" and whose comment says it exists so two callers cannot disagree. The
+  # inline count that stood here was a third spelling of that predicate, looser than the generator's,
+  # so the stale-region refusal could name an inert repair. Latent — zero of 277 tracked specs
+  # disagree today — and removed rather than left to be discovered by the first one that does.
+  local _sid _renderable
+  _renderable=$(spec_ids "$dir" | grep -c . || true)
   for spec in $specs; do
     st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
     if [ -z "$st" ]; then
@@ -1625,11 +1631,7 @@ verb_plan() { # slug
       continue
     fi
     _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
-    if [ -z "$_sid" ]; then
-      printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
-      continue
-    fi
-    _renderable=$((_renderable+1))
+    [ -n "$_sid" ] || printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
   done
 
   # R2-H2 — the EMPTY-REGION guard, ordered HERE and conditioned on `_renderable`. Above the two
@@ -1662,7 +1664,7 @@ verb_plan() { # slug
   # a state this verb can SEE. Iterating the substitution directly made it indistinguishable from an
   # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
   # false all-clear on the one verb an agent reads to pick up work.
-  local _ids
+  local _ids _graded=0
   _ids=$(printf '%s
 ' "$_rows" | while IFS= read -r _row; do
         printf '%s
@@ -1692,6 +1694,7 @@ verb_plan() { # slug
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
     printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
+    _graded=1
     case "$state" in
       THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
       READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
@@ -1712,7 +1715,16 @@ verb_plan() { # slug
   else
     echo "roster: the generated units region, in build order (the authored pair names no id of this build)"
   fi
-  if [ -n "$next" ]; then echo "next: $next"; else echo "next: none - every tracked spec is terminal"; fi
+  # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
+  # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
+  # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
+  if [ -n "$next" ]; then
+    echo "next: $next"
+  elif [ "$_graded" = 0 ]; then
+    echo "next: none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"
+  else
+    echo "next: none - every tracked spec is terminal"
+  fi
   return 0
 }
 

@@ -1735,6 +1735,23 @@ fixture
 out=$(run --plan tPlan)
 hit "$out" "NOT A UNIT (no status header)"
 miss "$out" "so the region is stale"
+# R3-H1 — THE TAIL LINE IS PINNED. This arm asserted only the refusal's ABSENCE, so it stayed green
+# while the verb printed `next: none - every tracked spec is terminal` over a build it graded nothing
+# on. Both sibling arms carry this `miss`; this one dropped it, and a blocker shipped through the gap.
+miss "$out" "every tracked spec is terminal"
+hit "$out" "no tracked spec grades as a unit"
+
+# R3-H1, second shape — a spec that WAS meant to be one and failed to parse, which is the realistic
+# case. The fixture above uses a file that was never a spec at all, so it never exercised a build
+# whose author believed it had a unit.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+sed -i 's/^\*\*Status:\*\*/  **Status:**/' memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md
+setunits tPlan ""
+fixture
+out=$(run --plan tPlan)
+hit "$out" "NOT A UNIT (no status header)"
+miss "$out" "every tracked spec is terminal"
 
 # R2-H1 — rows that name no unit of THIS build. Before the fold the loop iterated a substitution, so
 # this was indistinguishable from an empty region and the verb answered `next: none - every tracked
@@ -1758,6 +1775,11 @@ fixture
 out=$(run --plan tPlan)
 hit "$out" "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice:"
 miss "$out" "the authored pair names no id of this build"
+# R3-M5 — THE ORDERING IS ASSERTED, not just the message. R2-M3 hoisted this guard above the listing
+# so a malformed pair stops producing a complete-looking table first; the arm pinned only the refusal
+# TEXT, so moving the guard back below the listing kept the suite green. With the guard at the top the
+# verb returns before any unit row prints, so the fixture's id appears nowhere.
+miss "$out" "ARCH-tPlan-1"
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ---- check 14: an unknown argument. The verbs are a closed set.

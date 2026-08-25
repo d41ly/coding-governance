@@ -1303,16 +1303,20 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     near = []
     for i, l in enumerate(lines):
         s = l[:-1] if l.endswith("\r") else l
+        st = s.strip()
         for m in (PLAN_OPEN, PLAN_CLOSE):
-            if s != m and (s.strip() == m or s.startswith(m)):
+            if s != m and (st == m or s.startswith(m) or st.startswith(m)):
                 near.append((i + 1, "a roster marker line is not the marker alone — the driver "
                                     "compares at column 0 with nothing before or after it: %r" % s[:60]))
-    if near:
-        out += near
-        return sorted(set(out))
+    # R3-M1 — ACCUMULATE, never return. The first cut returned here, and a canon-bound README with a
+    # perturbed marker lost all six of its canon findings — a trigger suppressing another inside a
+    # function whose whole contract is that its findings are a union.
+    out += near
     n_open = sum(1 for l in lines if check_marker_line(l, PLAN_OPEN))
     n_close = sum(1 for l in lines if check_marker_line(l, PLAN_CLOSE))
-    if n_open == 0 and n_close == 0:
+    if near:
+        pass  # a perturbed marker is already named above; do not also diagnose it as absent
+    elif n_open == 0 and n_close == 0:
         out.append((1, "no authored %s pair, which every build README must carry" % PLAN_OPEN))
     elif n_open != 1 or n_close != 1:
         out.append((1, "the authored roster pair is not exactly one open and one close marker — "
@@ -2031,9 +2035,20 @@ def do_selftest() -> int:
         arm("an INDENTED roster marker is named as not-the-marker-alone", "not the marker alone",
             lambda: str(slot_violations(build_canon_readme(GOOD)
                                         .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x")))
-        arm("...and is NOT reported as duplicated", "False",
-            lambda: str("DUPLICATED" in str(slot_violations(build_canon_readme(GOOD)
-                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x"))))
+        # R3-M3 — the control probes the phrase the module ACTUALLY emits. It probed "DUPLICATED",
+        # which R2-M2 had already retired, so it asserted the absence of a string nothing could
+        # produce: a fixture passing by finding nothing, which is on this diff's own checklist.
+        arm("...and is NOT also diagnosed by the marker-count branch", "False",
+            lambda: str("not exactly one open and one close" in str(
+                slot_violations(build_canon_readme(GOOD)
+                                .replace(PLAN_OPEN, "  " + PLAN_OPEN, 1), "x"))))
+        arm("a marker BOTH indented and trailed is still named", "not the marker alone",
+            lambda: str(slot_violations(build_canon_readme(GOOD)
+                                        .replace(PLAN_OPEN, "  " + PLAN_OPEN + " ", 1), "x")))
+        arm("a perturbed marker does NOT suppress the canon findings", "outside the canon",
+            lambda: str(slot_violations(build_canon_readme(
+                GOOD + ["", "## Notes", "", "p"]).replace(PLAN_OPEN, "  " + PLAN_OPEN, 1),
+                "x", canon=True)))
         arm("a TRAILING-SPACE roster marker is named the same way", "not the marker alone",
             lambda: str(slot_violations(build_canon_readme(GOOD)
                                         .replace(PLAN_OPEN, PLAN_OPEN + " ", 1), "x")))
