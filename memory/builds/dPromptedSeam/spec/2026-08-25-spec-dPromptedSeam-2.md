@@ -2,7 +2,7 @@
 
 # TOOL-dPromptedSeam-2 — `read_object` returns nothing usable for a third of the corpus
 
-**Status:** OPEN · rev-1 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -106,11 +106,16 @@ is.
   ban: the lexicon cannot read `map_lib`. It ships a minimal inline set whose provenance is recorded
   in the docstring, and the docstring states that `map_lib.stems()` is the larger authority the kit
   deliberately cannot reach.
-- **Q2 — should `--suggest` use the fallback too?** UNRESOLVED. It has no lookup to feed, so the
-  fallback has no consumer there today. It acquires one only if `-1` ever changes shape.
+- **Q2 — should `--suggest` use the fallback too?** RESOLVED (agent, 2026-08-25, delegated): NO.
+  `--suggest` has no lookup to feed, so the fallback would be a code path with no consumer — "delete
+  over disable" applies before it is written rather than after. The option also leaves MORE open than
+  its rival, which is M3's tie-break running the other way. It acquires a consumer only if `-1`
+  changes shape, and `-1`'s own Q2 is now resolved against that.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-25 · node d · OPEN. §8 Q2 RESOLVED under the standing mandate: a fallback with no
+  consumer is dead code, so it is refused before it is written. §10 gains the M5 recall terms.
 - rev-1 · 2026-08-25 · node d · OPEN. Surfaced by the spec audit of `TOOL-dPromptedSeam-1`, which
   measured the helper's output over the real population while testing a different claim. Specced as
   its own unit because it is a defect in the lexicon's own helper, improves `--brief` today, needs no
@@ -123,3 +128,9 @@ is.
 - `read_object()` — EXTENDED in place rather than replaced; its two existing callers keep working.
 - `map_lib.stems()` — NOT reused, and the reason is the layer ban rather than preference. Recorded in
   the docstring so the next reader does not "fix" it by importing.
+
+**Recall terms used**, shared with `-1` because M5 is satisfied once for the SET: `lexicon subtokens
+port self-contained layers import ban codebase-map map_lib kit independence adopter reuse seam`. The
+map probe's behaviour phrase was *"reduce an identifier to the concept it names, dropping the leading
+verb"*, and it returned `leading_verb` as the only seam in this area — which is the sibling of the
+function this unit fixes and confirms no third implementation exists to extend instead.

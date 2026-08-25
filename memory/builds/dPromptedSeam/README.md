@@ -55,8 +55,8 @@ ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | OPEN | rev-2 | 2026-08-25 |
-| [TOOL-dPromptedSeam-2 — `read_object` returns nothing usable for a third of the corpus](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | OPEN | rev-1 | 2026-08-25 |
+| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | OPEN | rev-3 | 2026-08-25 |
+| [TOOL-dPromptedSeam-2 — `read_object` returns nothing usable for a third of the corpus](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | OPEN | rev-2 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

@@ -2,7 +2,7 @@
 
 # TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt
 
-**Status:** OPEN · rev-2 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-25 · node d · Tier-1 · base 671e953d · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -114,14 +114,22 @@ untouched, and `LAYER_OFFENDER_PIN` stays `0` because nothing crosses the declar
   `reuse-lookup.agent.md`?** RESOLVED: name the script and let its own agent doc own the how. Two
   documents describing one invocation is the class this repo names, and the agent doc is the copy
   that stays current.
-- **Q2 — should `--suggest`'s output mention the Skill step?** UNRESOLVED, deliberately. It would
-  reintroduce a coupling between the engine's output and a document, and AC4 pins the engine's output
-  as unchanged. Revisit only if the Skill step is measured to go unread.
+- **Q2 — should `--suggest`'s output mention the Skill step?** RESOLVED (agent, 2026-08-25,
+  delegated): NO. Mentioning it fails AC4, which pins the engine's output byte-identical to base —
+  so the option is discarded by M3's veto 1 before any preference is needed, and a veto is not a
+  licence to take the vetoed option. It would also put a pointer to a document inside a command's
+  output, which is the coupling D1 exists to avoid. Revisit only if the Skill step is MEASURED to go
+  unread; that measurement does not exist and inventing one here would be a fork resolved by
+  assertion.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-25 · node d · OPEN. Proposed a subprocess from `lexicon.py` into
   `reuse_lookup.py` on the refusal path, keyed on `read_object()`.
+- rev-3 · 2026-08-25 · node d · OPEN. §8 Q2 RESOLVED under the standing mandate: discarded by veto
+  1 for failing AC4, not chosen on preference. §10 gains the recall terms M5 requires, which rev-2
+  omitted — the probes were run for the set and their terms were not written down, which is the half
+  M7 re-runs.
 - rev-2 · 2026-08-25 · node d · OPEN, Tier-2 → Tier-1. **rev-1's MECHANISM is withdrawn; its GOAL is
   kept.** A three-lens spec audit refuted it on three independent grounds, each re-verified by hand
   before acceptance. First, the 1.85 s cost that D4 called "the binding constraint" does not
@@ -147,3 +155,12 @@ untouched, and `LAYER_OFFENDER_PIN` stays `0` because nothing crosses the declar
 - The renderer's conditional-block mechanism — REUSED as-is for S3. No new conditional machinery.
 - `read_object()` — NOT used by this unit. rev-1's use of it is withdrawn, and its own defects are
   `TOOL-dPromptedSeam-2` rather than this unit's business.
+
+**Recall terms used**, recorded because composing them is the expensive half and M7 re-runs the
+query: `lexicon subtokens port self-contained layers import ban codebase-map map_lib kit
+independence adopter reuse seam`. The behaviour phrase for the map probe was *"reduce an identifier
+to the concept it names, dropping the leading verb"*. What came back that MATTERS: `leading_verb`
+(`tools/lexicon/subtokens.py`, fan-in 3, SEAM) is the only seam in this area, and
+`TOOL-aRootedPrefix-1` records that `codebase-map` once hardcoded its `<root>/codebase-map/` install
+convention — which is exactly the discovery problem rev-2 no longer has to solve, because it makes
+no cross-kit call at all.
