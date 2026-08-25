@@ -20,3 +20,4 @@ terminal status. Nothing here is edited by hand.
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 2 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 20 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |
+| [dTieredTribunal](builds/dTieredTribunal/README.md) | OPEN | d | 2026-08-25 | tooling | 0 |
