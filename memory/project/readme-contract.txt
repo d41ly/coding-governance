@@ -94,5 +94,6 @@ memory/builds/dPromptedSeam/README.md
 !memory/builds/dScriptedRepeat/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/dScrubbedConduit/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/dSettledRoster/README.md - predates the contract; drains when its build's owner conforms it
+memory/builds/dSpentCeiling/README.md
 memory/builds/dTieredTribunal/README.md
 !memory/builds/dUnstalledConvoy/README.md - predates the contract; drains when its build's owner conforms it

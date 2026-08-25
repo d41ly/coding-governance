@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.46   # gov:kit memory-tree@2.46 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.47   # gov:kit memory-tree@2.47 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -446,8 +446,9 @@ if [ -n "$sel6" ]; then
   # per project — the value that suits one corpus is not the value that suits another.
   #
   # A guide is prose the charter points a session at and reads end to end; for it a line limit is a
-  # PROXY for the read budget rather than the budget itself — check 16's `READ_PATH_CEILING` is the real
-  # one, measured in bytes, and it is not relaxed here. Every other class is a row set, and for a row set
+  # PROXY for the byte cap beside it. There is no SECOND, SUMMED budget over the read path any more —
+  # TOOL-dSpentCeiling-1 retired it, having measured that these per-class caps were always the real
+  # bound and the sum was a second one over an already-bounded population. Every other class is a row set, and for a row set
   # the line count was never the bound that bound: at check 7's declared entry budget a 250-line row
   # document may hold 75,000 B, so the byte figure decided every real case and the line figure needed
   # rows averaging under 82 B. Measured over this corpus's backlog rows: 253.7 B.
@@ -1043,15 +1044,20 @@ esac
 $bad12"
 fi
 
-# 13-16 — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
+# 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE
 # walk: this script owns the append-only and index sets and PRINTS them on demand; the classifier
 # owns the id grammar it imports from the recall kit. Neither transcribes the other. Every pin the
-# classifier reads is measured per corpus, and blank pins turn the whole unit off.
+# classifier reads is measured per corpus, and checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none.
 if [ "$STAGED" = 0 ]; then
-  if ! ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); then
-    printf '%s
-' "$ids"; status=1
-  fi
+  # PRINT WHATEVER IT SAID, then decide the status from the exit code. The classifier has a
+  # NON-GATING channel — check 16's not-asked, grace and retired-key notices all print at exit 0
+  # — and the old form captured stdout and threw it away unless the run was already red. Every
+  # one of those notices was computed and discarded, so the retirement had no notification
+  # channel at all and the grace was invisible for its whole life: a skip that looks like a pass.
+  ids=$("$_PY" "$HERE/corpus_ids.py" --check 2>&1); _idsrc=$?
+  [ -n "$ids" ] && printf '%s
+' "$ids"
+  [ "$_idsrc" -ne 0 ] && status=1
 fi
 
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is

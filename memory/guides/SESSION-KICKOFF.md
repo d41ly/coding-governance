@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T20:29:56+03:00 @ 8fb50d05cc563dacf3404c1b25073aeda26b3db3
+last-audit: 2026-08-25T22:02:05+03:00 @ 75d0a5f2f015f4b94475f71ca2bc9798caab4089
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 7cca313af857c780b2c42ccf9d81df4c6fa1f035
+last-body-change: 75d0a5f2f015f4b94475f71ca2bc9798caab4089
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -98,9 +98,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
   or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
   readme-contract's bound subset. Seed a new build's from its own spec ids.
-- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
-  `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
-  16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
+- **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
+  the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -307,7 +306,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   that name states a count.
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
-  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
-- A spent budget blocks RECORDING work, not doing it: the read path is spent on arrival, a movement
-  takes measured-plus-153 B, and a decision row's cost is its own prose. Measure with
-  `corpus_ids.py --report` before and after; never estimate. Every movement is recorded in `.memory-tree.conf`.
+  skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF` is the seam.
+- A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
+  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
+  before and after, never estimate, and record every movement beside the number.

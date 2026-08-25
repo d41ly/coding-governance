@@ -2,8 +2,10 @@
 #
 # GRAMMAR: `<repo-relative-path>\t<bytes>` per row. Comments carry the justification for a value and
 # every movement of it, because a number with no history beside it is a number nobody can question.
-# Modelled on `.memory-tree.conf`'s READ_PATH_CEILING, which is this tree's established answer to the
-# same problem: a budget whose every raise is argued in the conf next to the figure.
+# Modelled on `.memory-tree.conf`'s per-class caps, which are this tree's established answer to the
+# same problem: a budget whose every movement is argued in the conf next to the figure. The original
+# model was READ_PATH_CEILING, retired by TOOL-dSpentCeiling-1 after 27 movements bought no trim —
+# the LESSON kept here is the argued-in-place justification, not the summed budget.
 #
 # WHO WRITES THIS FILE: a person, deliberately. This is NOT the high-water record — that one is
 # `tools/template-size-highwater.txt`, which `--bump` WRITES as a side effect of measuring. Keeping

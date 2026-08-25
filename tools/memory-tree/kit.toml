@@ -5,7 +5,7 @@ home = "tools/memory-tree"
 scope = "repo"
 version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
 requires = []
-requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"], why = "corpus_ids.py arms checks 13-16 on any of these three pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged" }]
+requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"], why = "corpus_ids.py arms checks 13-15 on either of these pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged. Check 16 is NOT on this edge: it is structural since memory-tree 2.42 and reaches neither walk() nor the grammar, so it stays available to an adopter who took memory-tree alone" }]
 
 [[files]]
 path = "build-readme-slot-limits.txt"
@@ -45,7 +45,7 @@ owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT"]
 optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
-conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"]
+conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -95,8 +95,8 @@ id = "measured-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
-why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-16 are simply OFF, so the hygiene leg exits 0 with the hole wide open."
-discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN READ_PATH_CEILING; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
+why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
+discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

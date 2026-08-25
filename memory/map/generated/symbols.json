@@ -543,6 +543,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_read_path",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "check_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1871,6 +1876,11 @@
       "id": "read_contract_rows",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_declared_keys",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
     },
     {
       "id": "read_descriptors",
