@@ -732,6 +732,151 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
           stale["live"] is True, f"{stale}")
 
 
+def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
+    """The marginal-offense-rate signal: four states, and each one must be distinguishable.
+
+    THE ARM THAT MATTERS IS THE EMPTY WINDOW. A stretch in which nobody added a definition is a real
+    and common state — a records-only week — and reporting it as a rate of 0 is byte-identical to
+    reporting a clean one. Only the NOT ASKED arm separates them, and a version that returned 0 there
+    would pass every other check here.
+
+    THE SHALLOW ARM IS THE ONE THIS SIGNAL'S SPEC GOT WRONG. rev-2 asserted a `--depth 1` clone makes
+    the derived base unresolvable; measured, `git log --diff-filter=A` there returns the SHALLOW ROOT
+    as the adding commit and it resolves fine, so a resolves-check is armed against a case it cannot
+    see and the signal would report a rate over a one-commit window. The assertion that fires asks
+    whether the repository is truncated at all.
+    """
+    print("lexicon marginal-offense-rate (four states, each distinguishable)")
+    r = make_repo(tmp / "lexrate")
+    name = "lexicon_marginal_offense_rate"
+
+    absent = report(r)[name]
+    check("no .lexicon.conf: the rate is NOT ASKED, not a clean zero",
+          absent["gateable"] is False and absent["value"] == 0, f"{absent}")
+    check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
+
+    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
+    shutil.copytree(kit_src, r / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (r / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
+
+    # The adoption commit IS the derived base, so HEAD == base and the window is empty BY
+    # CONSTRUCTION. This is the state a rate of 0 would misreport as clean.
+    empty = report(r)[name]
+    # ASSERTS `not_asked`, not `value == 0`. A rate of 0 ALSO has value 0 and gateable False, so the
+    # obvious spelling of this arm stays green under exactly the break it exists to catch -- observed
+    # 2026-08-25 by staging that break and watching this line pass. `not_asked` is the field the
+    # renderer branches on to keep the three states three, so it is the field the arm must read.
+    check("empty window: NOT ASKED rather than a rate of 0",
+          empty.get("not_asked") is True, f"{empty}")
+    check("empty window: it names the reason, so 0 is never mistaken for clean",
+          "no definition was added" in str(empty["detail"]), f"{empty['detail']}")
+
+    # Two definitions added, exactly one of them off-table.
+    (r / "src" / "later.py").write_text(
+        "def build_ok():\n    pass\n\n\ndef frobnicate_bad():\n    pass\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "add two definitions, one off-table", "--no-verify"], r)
+    fired = report(r)[name]
+    check("a window with definitions added reports offenders over that population",
+          fired["value"] == 1 and fired["of"] == 2, f"{fired}")
+    check("...and is LIVE by derivation over a non-empty population",
+          fired["live"] is True, f"{fired}")
+    check("...and carries the fresh-versus-pre-existing split the kill-rule reads",
+          any("FRESH" in str(d.get("note", "")) for d in fired["detail"]), f"{fired['detail']}")
+
+    # UNGRADEABLE NAMES ARE IN NEITHER OPERAND. `leading_verb` returns "" for an identifier with no
+    # word characters, and the kit's own reuse note says plainly that a caller must treat that as
+    # ungradeable rather than as a violation. The signal did neither: "" is not in the declared
+    # table, so such a name counted as an offender AND stayed in the denominator, inflating the rate
+    # at both ends. Asserting BOTH operands is the point -- an arm reading only `value` would stay
+    # green against a version that merely stopped counting it as an offender while leaving it in
+    # `of`, which is the same rate wrong in the other direction. Closing review L4.
+    before = report(r)[name]
+    # A GRADEABLE CONTROL LANDS IN THE SAME COMMIT. Round 1 asserted `before["of"] > 0` as its
+    # non-vacuity guard, which is a property of the PREVIOUS window and says nothing about whether
+    # this commit reached the signal at all -- the round-2 review patched the extractor to skip
+    # word-character-free names entirely, an ordinary upstream change, and watched all three arms
+    # report ok. The control makes one assertion do both jobs: `of` must rise by exactly one, which
+    # proves the commit was seen, AND `value` must not move, which proves the ungradeable name left
+    # both operands. Neither can pass by finding nothing.
+    (r / "src" / "ungradeable.py").write_text(
+        "def __():" + chr(10) + "    pass" + chr(10) + chr(10) + chr(10)
+        + "def build_control():" + chr(10) + "    pass" + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "one ungradeable name and one gradeable control", "--no-verify"], r)
+    after = report(r)[name]
+    check("an ungradeable name is not counted as an offender",
+          after["value"] == before["value"], f"before={before['value']} after={after['value']}")
+    check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
+          after["of"] == before["of"] + 1, f"before={before['of']} after={after['of']}")
+
+    # ...and a window in which EVERY added definition is ungradeable must say so rather than read as
+    # a clean measured window. The round-1 L4 fix pointed every operand at `gradeable` and left the
+    # emptiness guard reading `added`, so that window returned value 0, of 0, live True and no
+    # `not_asked` -- and `0 > 0` is false, so it printed a plain `ok`. Found by the round-2 review.
+    #
+    # IT NEEDS ITS OWN REPO. The window runs from the declaration's adoption commit to HEAD and is
+    # cumulative, so appending an ungradeable file to the fixture above leaves the earlier gradeable
+    # definitions in it and the window is not all-ungradeable at all. The first spelling of this arm
+    # carried an `or of > 0` escape to paper over that, which made it satisfiable by the very
+    # population it was supposed to exclude -- observed staying green with the guard reverted.
+    b = make_repo(tmp, "lexblind")
+    shutil.copytree(kit_src, b / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (b / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
+        + 'VERB_OFFENDER_PIN="99"' + chr(10) + 'SUFFIX_OFFENDER_PIN="0"' + chr(10)
+        + 'LAYER_OFFENDER_PIN="0"' + chr(10) + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
+        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10) + chr(10)
+        + "LAYERS:" + chr(10) + "  src/* -> vendor/*" + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], b)
+    (b / "src" / "onlyblind.py").write_text(
+        "def __():" + chr(10) + "    pass" + chr(10), encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], b)
+    run(["git", "commit", "-q", "-m", "add only an ungradeable name", "--no-verify"], b)
+    _blind = report(b)[name]
+    check("an all-ungradeable window is NOT ASKED, never a clean zero",
+          _blind.get("not_asked") is True, f"{_blind}")
+    check("...and it says WHY, so the zero is never mistaken for a clean window",
+          "no word characters" in str(_blind["detail"]), f"{_blind['detail']}")
+
+    # ADMITTING the verb must move the rate. Without this the offender test could be reading a
+    # frozen table and nothing here would notice.
+    conf = r / ".lexicon.conf"
+    conf.write_text(conf.read_text(encoding="utf-8").replace(
+        "VERBS:\n  build  make a thing\n", "VERBS:\n  build  make a thing\n  frobnicate  do the thing\n"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "admit the verb", "--no-verify"], r)
+    admitted = report(r)[name]
+    check("admitting a verb lowers the rate, so the table is read at HEAD and not frozen",
+          admitted["value"] == 0 and admitted["of"] >= 2, f"{admitted}")
+
+    # THE SHALLOW ARM. A `--depth 1` clone still DERIVES a base — the shallow root — and it resolves,
+    # so only a truncation check can refuse it.
+    shallow = tmp / "lexrate-shallow"
+    run(["git", "clone", "-q", "--depth", "1", "file://" + str(r).replace("\\", "/"), str(shallow)], tmp)
+    if (shallow / ".git").exists():
+        deep = run(["git", "rev-parse", "--is-shallow-repository"], shallow).stdout.strip()
+        check("the fixture clone really is shallow (or this arm proves nothing)", deep == "true", deep)
+        got = report(shallow)[name]
+        check("shallow clone: DEAD PROBE rather than a rate over a one-commit window",
+              got["live"] is False and "shallow" in str(got["detail"]).lower(), f"{got}")
+    else:
+        skip("shallow-clone arm", "the fixture clone did not materialise on this platform")
+
+
 # ---------------------------------------------------------------------------------------------
 # 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (three directions)
 # ---------------------------------------------------------------------------------------------
@@ -1314,12 +1459,124 @@ def test_ratchet_message_states_its_window(tmp: pathlib.Path) -> None:
           bool(out_def) and f"within {dr.DEFAULT_RATCHET_LOOKBACK} lines" in out_def[0], str(out_def))
 
 
+def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
+    """The LANGS mode ratchet: a weakening move needs its reason beside it.
+
+    THE ARM THAT MATTERS IS THE JUSTIFIED ONE. A ratchet that only ever fires is a ratchet nobody can
+    satisfy, and it would be indistinguishable from one that fires unconditionally -- which is the
+    same could-not-fail shape one level up. Both directions are asserted over one fixture.
+
+    THE EXTENSION IS REQUIRED IN THE MARKER, and that has its own arm. One LANGS line carries every
+    extension, so a bare `parser -> dark` beside it would justify a move for whichever extension the
+    reader guessed.
+    """
+    print("LANGS mode ratchet (a weakening move needs its reason)")
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import drift_report as dr
+
+    class _Git:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="py:python-ast:parser js:js-regex:probe"\n'})()
+
+    root = tmp / "langmode"
+    root.mkdir(parents=True, exist_ok=True)
+    conf = root / ".lexicon.conf"
+
+    # UNJUSTIFIED: py falls parser -> dark with nothing beside it.
+    conf.write_text('LANGS="py:python-ast:dark js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    out = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an unjustified parser -> dark is a finding", bool(out), str(out))
+    check("mode ratchet: it names the extension and both modes",
+          bool(out) and ".py" in out[0] and "parser -> dark" in out[0], str(out))
+
+    # JUSTIFIED: the same move, with the marker above the LANGS line.
+    conf.write_text('# py: parser -> dark, because the extractor moved to another kit.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: the SAME move with its reason beside it is silent",
+          dr.build_lang_mode_findings(_Git(), root) == [], str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # The marker must name the EXTENSION, not just the two modes.
+    conf.write_text('# parser -> dark, and this comment names no extension.\n'
+                    'LANGS="py:python-ast:dark js:js-regex:probe"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a marker naming no extension does NOT justify the move",
+          bool(dr.build_lang_mode_findings(_Git(), root)),
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # AN EXTENSION WHOSE NAME IS NOT A WORD. `<none>` is what this repo declares for a dotless
+    # basename, and the marker was anchored with a word boundary on both sides of the extension --
+    # which sits before `<` and after `>` and can NEVER match there. So the one extension whose name
+    # is not a word had a justification clause nobody could satisfy: every weakening move on it would
+    # red forever with a correct marker sitting right above it. Gated as a CLASS rather than for
+    # `<none>` alone, because the next such name will not be spelled that way. Closing review M2.
+    class _GitNone:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="<none>::parser py:python-ast:parser"\n'})()
+
+    conf.write_text('LANGS="<none>::dark py:python-ast:parser"\n', encoding="utf-8", newline="\n")
+    _un = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: an unjustified move on a non-word extension is still a finding",
+          any("<none>" in f for f in _un), str(_un))
+    conf.write_text('# <none>: parser -> dark, because nothing extracts dotless files.\n'
+                    'LANGS="<none>::dark py:python-ast:parser"\n',
+                    encoding="utf-8", newline="\n")
+    _j = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: a non-word extension CAN be justified (the marker must be satisfiable)",
+          _j == [], str(_j))
+
+    # THE MARKER GRAMMAR IS A SUPERSET OF THE ONE IT REPLACED, and that is asserted rather than
+    # assumed. The round-1 M2 fix required whitespace-or-start before the extension, which fixed
+    # `<none>` and silently NARROWED every other shape: `#py:` with no space, a parenthesised marker,
+    # and `# js,py:` -- the natural way to justify one move for two extensions -- all stopped
+    # matching. That reintroduced M2's own symptom (a permanent red under a correct-looking marker)
+    # for the shapes that used to work, which is why the rows below are spellings and not one
+    # spelling. `pyx` is the negative: a longer name must never be justified by a shorter one's row.
+    for _marker, _want_ok in (
+            ("# py: parser -> dark", True),
+            ("#py: parser -> dark", True),
+            ("# (py: parser -> dark)", True),
+            ("# js,py: parser -> dark", True),
+            ("# ext=py: parser -> dark", True),
+            ("# pyx: parser -> dark", False),
+            ("# parser -> dark", False),
+    ):
+        conf.write_text(_marker + chr(10) + 'LANGS="py:python-ast:dark js:js-regex:probe"' + chr(10),
+                        encoding="utf-8", newline=chr(10))
+        _silent = dr.build_lang_mode_findings(_Git(), root) == []
+        check(f"mode ratchet: {'justifies' if _want_ok else 'refuses'} {_marker!r}",
+              _silent is _want_ok, f"silent={_silent} want_ok={_want_ok}")
+
+    # A STRENGTHENING move is free, and an extension that never moved is silent.
+    conf.write_text('LANGS="py:python-ast:parser js:js-regex:parser"\n',
+                    encoding="utf-8", newline="\n")
+    check("mode ratchet: a tightening move needs no justification",
+          dr.build_lang_mode_findings(_Git(), root) == [],
+          str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # An extension DROPPED from LANGS entirely is the strongest weakening: rank falls to absent.
+    conf.write_text('LANGS="js:js-regex:probe"\n', encoding="utf-8", newline="\n")
+    gone = dr.build_lang_mode_findings(_Git(), root)
+    check("mode ratchet: an extension DELETED from LANGS is a weakening, not an absence",
+          bool(gone) and "absent" in gone[0], str(gone))
+
+    # NOT ADOPTED: no declaration at all is silence, never a finding.
+    conf.unlink()
+    check("mode ratchet: a repo without the kit reports nothing",
+          dr.build_lang_mode_findings(_Git(), root) == [], "expected []")
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
+        test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
         test_readme_mechanism_drift(tmp)
@@ -1327,6 +1584,7 @@ def main() -> int:
         test_ratchet_guard(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
+        test_lang_mode_ratchet(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

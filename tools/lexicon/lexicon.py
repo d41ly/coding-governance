@@ -5,6 +5,9 @@
     python tools/lexicon/lexicon.py            # assert; non-zero on an unwaived offender
     python tools/lexicon/lexicon.py --list     # print every offender, waived or not (authoring aid)
     python tools/lexicon/lexicon.py --measure  # print the three pins THIS conf produces; decide nothing
+    python tools/lexicon/lexicon.py --suggest <name>   # one line for ONE identifier, no corpus pass
+    python tools/lexicon/lexicon.py --brief <path>     # how the corpus already spells this file's objects
+    python tools/lexicon/lexicon.py --probe            # what the canon would propose here; read-only, exits 0
 
 WHAT THIS IS FOR, since it is not typo-catching. A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility, so a name that will not fit the table is
@@ -78,7 +81,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lexicon_conf import ConfError, langs, load_conf  # noqa: E402
+from lexicon_conf import ConfError, langs, load_conf, build_negatives  # noqa: E402
+import canon  # noqa: E402
 from subtokens import leading_verb, subtokens  # noqa: E402
 
 KIT_LEXICON_VERSION = "1.1"
@@ -89,6 +93,15 @@ WAIVER_FILES = {
     "suffix": "lexicon-suffix-waivers.txt",
     "layer": "lexicon-layer-waivers.txt",
 }
+#: The extensions this kit can extract, and the ONE place they are declared. `scaffold_lexicon.py`
+#: imports this rather than keeping its own copy: the two had ALREADY diverged on the `py` pattern
+#: set (`""` here against `"python-ast"` there) within one build. The divergence was real; the
+#: CONSEQUENCE this comment first claimed was not. It said the two graded python through different
+#: code paths, and they do not — `extract_text` dispatches on `mode` alone and reads `pset` only
+#: under `probe`, so nothing anywhere compares a pattern-set id against `""`. A fix comment is read
+#: as provenance, so an overstated one is worse than none. Closing review M7, trimmed by round 2.
+KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe")}
+
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN", "layer": "LAYER_OFFENDER_PIN"}
 
 #: The shipped `probe` pattern sets. Each one MUST have a frozen sentinel fixture in `selftest.py`
@@ -106,6 +119,65 @@ PATTERN_SETS = {
         ],
     },
 }
+
+
+#: S2 — the COVERAGE SNIFFER. A deliberately BROAD, deliberately INCOMPLETE probe for "does this file
+#: define anything at all", run over every tracked text file regardless of its `LANGS` declaration.
+#:
+#: WHY IT CANNOT REUSE THE ARMED EXTRACTORS: they only run on declared-armed extensions, so a
+#: denominator built from them is the numerator. Measuring coverage needs a reading of the files the
+#: kit does NOT grade, which is exactly the population no armed extractor may touch.
+#:
+#: WHAT STOPS IT BECOMING A SECOND VOCABULARY: it answers ONE boolean per file and feeds ONE consumer,
+#: a printed fraction. It names nothing, grades nothing, and no predicate reads it. A regex here that
+#: is wrong costs an inaccurate percentage; a regex in `PATTERN_SETS` that is wrong costs a verdict.
+#: That asymmetry is the whole containment and it is structural rather than promised.
+#:
+#: It is a HEURISTIC and the README says so. It is not a lexer, it is not a step toward one, and
+#: `TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question.
+DEFINITION_SNIFF = re.compile(
+    r"""^[ \t]*(?:
+          (?:async[ \t]+)?def[ \t]+\w                     # python, ruby
+        | (?:export[ \t]+)?(?:async[ \t]+)?function[ \t]+\w   # js, ts, php, shell `function f`
+        | (?:export[ \t]+)?(?:abstract[ \t]+)?class[ \t]+\w   # js, ts, php, java, kotlin
+        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*[ \t]*=[ \t]*(?:async[ \t]*)?\(  # js arrow
+        | func[ \t]+\w                                    # go, swift
+        | fn[ \t]+\w                                      # rust
+        | (?:public|private|protected)[ \t]+[\w<>\[\]]+[ \t]+\w+[ \t]*\(   # java, c#
+        | \w[\w-]*[ \t]*\([ \t]*\)[ \t]*\{                # shell `f() {`
+        )""",
+    re.M | re.X,
+)
+
+#: Extensions the sniffer never opens. Not a vocabulary — a read-cost bound. A binary or a lockfile
+#: cannot carry a definition and reading it is wasted I/O; being wrong here can only UNDERCOUNT the
+#: denominator, which reports coverage as better than it is, so the list is kept short deliberately.
+SNIFF_SKIP = {
+    # Binary or generated: cannot carry a definition, and reading one is wasted I/O.
+    "png", "jpg", "jpeg", "gif", "ico", "pdf", "zip", "gz", "wasm", "lock", "svg",
+    # PROSE AND DATA, and this half is a judgement rather than a fact about bytes, so it is argued.
+    # A fenced code block inside documentation is an EXAMPLE, not a definition this kit could grade
+    # even if the extension were armed. Measured on this repo: including `.md` put 82 documentation
+    # files into the denominator and reported coverage as 25.7% against 42.9% — a number that moves
+    # when somebody writes a tutorial is not measuring coverage. Data formats are here for the same
+    # reason one step simpler: they declare no functions at all.
+    "md", "rst", "txt", "json", "toml", "yaml", "yml", "tsv", "csv", "ini", "cfg",
+}
+
+
+def scan_definition_carriers(root: Path, files: list[str]) -> set[str]:
+    """Tracked files the sniffer believes define something. S2."""
+    out = set()
+    for rel in files:
+        if ext_of(rel) in SNIFF_SKIP:
+            continue
+        try:
+            src = (root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if DEFINITION_SNIFF.search(src):
+            out.add(rel)
+    return out
 
 
 class Offender:
@@ -182,14 +254,27 @@ def _probe_defs(src: str, pset: str):
     return hits("functions"), hits("types"), hits("imports")
 
 
+def extract_text(src: str, mode: str, pset: str):
+    """`(functions, types, imports)` for SOURCE TEXT, or `None` when the mode declares no extractor.
+
+    Split out of `extract` so a caller holding BYTES rather than a path uses the SAME extractor.
+    `drift-audit`'s marginal-offense-rate signal derives its two operands from git blobs at two shas
+    and never writes a tree; a second implementation there would be the
+    `second-implementation-is-not-a-second-opinion` class inside the one instrument whose entire
+    value is that both of its operands come from one extractor. TOOL-dScaffoldedMirror-7 S4.
+    """
+    if mode == "dark":
+        return None
+    if mode == "parser":
+        return _python_defs(src)
+    return _probe_defs(src, pset)
+
+
 def extract(path: Path, mode: str, pset: str):
     """`(functions, types, imports)` for one file, or `None` when the mode declares no extractor."""
     if mode == "dark":
         return None
-    src = path.read_text(encoding="utf-8", errors="replace")
-    if mode == "parser":
-        return _python_defs(src)
-    return _probe_defs(src, pset)
+    return extract_text(path.read_text(encoding="utf-8", errors="replace"), mode, pset)
 
 
 def load_waivers(kit: Path, kind: str) -> dict[str, str]:
@@ -409,6 +494,30 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
 
     problems: list[str] = []
 
+    # --- S6 of TOOL-dScaffoldedMirror-8: the table's own shape --------------------------------
+    #
+    # These two run against the DECLARATION, not the corpus, and they are the only checks here that
+    # do. A row with no negative cannot tell two verbs apart — `build` alone says nothing that
+    # `create` does not — so the gate's whole message degrades to "not in the table", which names no
+    # replacement and teaches nothing. The kit's own README calls a table without negative
+    # definitions decoration, and this is that sentence made checkable.
+    neg = build_negatives(conf)
+    bare = sorted(v for v in verbs if not neg.get(v))
+    if bare:
+        problems.append(
+            "VERBS rows carrying no negative definition (write `NOT \\`<token>\\`` into the gloss): "
+            + ", ".join(bare) + ". A row that only says what it IS cannot draw a boundary, and the "
+            "boundary is the whole product.")
+
+    # A declared negative that is ALSO a row bans and permits one token at once. Satisfied today,
+    # and it earns its place forward: it is what stops a later unit admitting a verb some other row
+    # already banned — which is exactly how a closed table becomes a synonym list.
+    contradicted = sorted({t for ts in neg.values() for t in ts} & set(verbs))
+    if contradicted:
+        problems.append(
+            "VERBS declares as BANNED a token that is itself a row: " + ", ".join(contradicted)
+            + ". One token cannot be both the verb to use and the verb not to use.")
+
     # --- the declaration surface -------------------------------------------------------------
     present = sorted({ext_of(f) for f in files})
     missing = [e for e in present if e not in declared]
@@ -432,7 +541,12 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
 
     # --- extraction, with the vacuity arm ----------------------------------------------------
     offenders: dict[str, list[Offender]] = {"verb": [], "suffix": [], "layer": []}
-    populations: dict[str, int] = {}
+    # S1 — keyed on (extension, PREDICATE), never on extension alone. The fold this replaces
+    # summed functions and types into one number, so `.js` reported a healthy 89 while P2 graded
+    # ZERO JavaScript classes and nothing could say so. A population is per-predicate or it is
+    # not a population — the predicate is what decides which definitions were even eligible.
+    graded: dict[tuple[str, str], int] = {}
+    extractor_carriers: set[str] = set()   # files an ARMED extractor found a definition in
 
     for rel in files:
         ext = ext_of(rel)
@@ -452,7 +566,11 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         if got is None:
             continue
         funcs, types_, imports = got
-        populations[ext] = populations.get(ext, 0) + len(funcs) + len(types_)
+        graded[(ext, "verb")] = graded.get((ext, "verb"), 0) + len(funcs)
+        graded[(ext, "suffix")] = graded.get((ext, "suffix"), 0) + len(types_)
+        graded[(ext, "layer")] = graded.get((ext, "layer"), 0) + len(imports)
+        if funcs or types_:
+            extractor_carriers.add(rel)
 
         for name, lineno in funcs:
             verb = leading_verb(name)
@@ -487,7 +605,11 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     for ext, (pset, mode) in sorted(declared.items()):
         if mode == "dark":
             continue
-        if any(ext_of(f) == ext for f in files) and not populations.get(ext):
+        # UNCHANGED SEMANTICS, deliberately. This sums the VERB and SUFFIX populations because
+        # that is what the folded number was, and section 3 forbids this unit moving a verdict.
+        # Imports are excluded for the same reason: they were never in the fold.
+        ext_total = graded.get((ext, "verb"), 0) + graded.get((ext, "suffix"), 0)
+        if any(ext_of(f) == ext for f in files) and not ext_total:
             problems.append(f"DEAD PROBE — .{ext} is declared `{mode}`"
                             + (f" ({pset})" if pset else "")
                             + " and the corpus contains it, but the extractor found NO definitions. "
@@ -500,40 +622,79 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     # the only way to re-measure after curating was to read the failure output of a red gate. That is
     # how a pin ends up asserted rather than measured — and two of these three shipped as a hardcoded
     # `"0"` under a comment that called them MEASURED.
+    # HOISTED ABOVE `--measure`, and H1 of the closing review is why. The waiver load, the STALE
+    # detection and the pin parse used to live BELOW the `measure_mode` return, so two of the four
+    # conditions the comment there names could never reach `problems` on that path: `--measure`
+    # printed three pins and exited 0 over a tree carrying dead waivers, while `--check` on the same
+    # tree exited 1 naming them. An operator re-measuring after curation pasted a pin derived from a
+    # corpus whose silencers no longer matched anything. Same armed-but-unreachable shape as the
+    # DEAD SNIFFER defect, in the commit whose own comment claimed the opposite.
+    waived_by: dict[str, dict] = {}
+    unwaived_by: dict[str, list] = {}
+    # PARSED ONCE. The round-1 H1 hoist copied the `int(pin_raw)` parse up here for its exception
+    # side-effect and left the original below, so one fact had two readers that were identical that
+    # day and free to diverge on any edit after it -- the class three of round 1's own findings were
+    # about. The value is kept here and read below. Found by the round-2 review.
+    pins_by_kind: dict[str, int] = {}
+    for kind in ("verb", "suffix", "layer"):
+        waivers = load_waivers(kit, kind)
+        found = offenders[kind]
+        waived_by[kind] = waivers
+        unwaived_by[kind] = [o for o in found if o.text not in waivers]
+        stale = [w for w in waivers if w not in {o.text for o in found}]
+        if stale:
+            problems.append(f"STALE WAIVERS in {WAIVER_FILES[kind]} (the matched text is gone; "
+                            f"delete the row): {', '.join(sorted(stale))}")
+        pin_raw = conf.get(PIN_KEYS[kind], "")
+        try:
+            pins_by_kind[kind] = int(pin_raw) if str(pin_raw).strip() else 0
+        except ValueError:
+            pins_by_kind[kind] = 0
+            problems.append(f"{PIN_KEYS[kind]}={pin_raw!r} is not an integer")
+
+    # DEAD SNIFFER JOINS THE OTHER REFUSALS, and this is the SECOND hoist into this spot. Round 1
+    # moved the waiver, stale and pin refusals above this return and wrote an arm whose own comment
+    # claimed it "would have caught the DEAD SNIFFER defect as well". It would not have: DEAD SNIFFER
+    # set `exit_code` directly, seventy-nine lines BELOW this return, so it never entered `problems`
+    # and `--measure` exited 0 with three clean pins over a tree `--check` redded by name. A gate
+    # satisfied by its own comment prose, written into the fix for that very class. The scan moved up
+    # with it -- `--measure` now pays for one definition-carrier scan it did not before, which is the
+    # honest price of the two modes answering the same question. Found by the round-2 review.
+    carriers = scan_definition_carriers(root, files)
+    blind = sorted(extractor_carriers - carriers)
+    if blind:
+        problems.append(f"DEAD SNIFFER (the coverage sniffer found no definition in {len(blind)} "
+                        f"file(s) where an ARMED extractor did, e.g. {blind[0]}; the denominator is "
+                        f"undercounting, which reports coverage as BETTER than it is)")
+
     if measure_mode:
         for kind in ("verb", "suffix", "layer"):
-            waivers = load_waivers(kit, kind)
-            unwaived = [o for o in offenders[kind] if o.text not in waivers]
-            print(f'{PIN_KEYS[kind]}="{len(unwaived)}"')
+            print(f'{PIN_KEYS[kind]}="{len(unwaived_by[kind])}"')
         if problems:
             print("# NOTE: the run also reported problems that are not pin-counted:")
             for p in problems:
                 print(f"#   {p}")
-        return 0
+        # S4 — the exit code these four conditions always described. UNDECLARED EXTENSIONS, DEAD
+        # PROBE, UNSELECTIVE LAYERS RULE and STALE WAIVERS rode as `# NOTE:` comments under an
+        # unconditional 0, so `--measure` could not fail. Three later units use it as a discharge
+        # probe, and a probe that cannot fail discharges nothing.
+        return 1 if problems else 0
 
     # --- waivers, pins, verdict ---------------------------------------------------------------
     exit_code = 0
+    tally: dict[str, tuple[int, int, int]] = {}
     for kind in ("verb", "suffix", "layer"):
-        waivers = load_waivers(kit, kind)
+        waivers = waived_by[kind]
         found = offenders[kind]
-        seen_texts = {o.text for o in found}
-        unwaived = [o for o in found if o.text not in waivers]
-        stale = [w for w in waivers if w not in seen_texts]
+        unwaived = unwaived_by[kind]
 
         if list_mode:
             for o in found:
                 print(("  waived " if o.text in waivers else "  ") + str(o))
 
-        if stale:
-            problems.append(f"STALE WAIVERS in {WAIVER_FILES[kind]} (the matched text is gone; "
-                            f"delete the row): {', '.join(sorted(stale))}")
-
-        pin_raw = conf.get(PIN_KEYS[kind], "")
-        try:
-            pin = int(pin_raw) if str(pin_raw).strip() else 0
-        except ValueError:
-            problems.append(f"{PIN_KEYS[kind]}={pin_raw!r} is not an integer")
-            pin = 0
+        tally[kind] = (sum(v for (_e, k), v in graded.items() if k == kind),
+                       len(unwaived), len(found) - len(unwaived))
+        pin = pins_by_kind[kind]
         if len(unwaived) > pin:
             exit_code = 1
             print(f"lexicon: {kind} offenders {len(unwaived)} over pin {pin}:")
@@ -547,22 +708,358 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     if problems:
         exit_code = 1
 
+    # S3 — the counts, on GREEN as well as on RED. The green line used to print the file count and
+    # the coverage modes and NO population and NO offender count, so a reader could not tell this
+    # repo from one with nothing to find. A green row is a measurement or it is a mood.
+    label = {"verb": "P1 verb  ", "suffix": "P2 suffix", "layer": "P3 layer "}
+    for kind in ("verb", "suffix", "layer"):
+        g, off, wv = tally[kind]
+        print(f"lexicon: {label[kind]} graded={g} offenders={off} waived={wv}")
+
+    # S2 — a REPORT, not a refusal. An armed pair that grades nothing is NAMED so the zero is
+    # legible; it does not red. `.js` here is armed and has no classes at all, which is a repo
+    # that does not write JavaScript classes rather than an extractor that went inert — and the
+    # inert case is owned by the frozen SENTINELS fixture in this kit's own selftest, which can
+    # tell the two apart where a single tree cannot. See the spec's section 4.
+    # S1/S2 — the coverage fraction, on every run. The armed share of the files that actually
+    # carry a definition, which is the number a `LANGS` edit moves and nothing else reported.
+    armed_exts = {e for e, (ps, m) in declared.items()
+                  if m == "parser" or (m == "probe" and ps in PATTERN_SETS)}
+    armed_carriers = {f for f in carriers if ext_of(f) in armed_exts}
+    pct = (100.0 * len(armed_carriers) / len(carriers)) if carriers else 0.0
+    print(f"lexicon: coverage — armed {len(armed_carriers)} of {len(carriers)} "
+          f"definition-carrying file(s) ({pct:.1f}%)")
+
+    # S6 — the sniffer's liveness, and rev-3 corrects rev-1 on WHAT it asserts. rev-1 wanted "some
+    # dark extension carries a definition", which reds an honest adopter whose dark extensions are
+    # all data files — the same defect `TOOL-dScaffoldedMirror-2` had to fix in DEAD PREDICATE.
+    # What is falsifiable without that flaw is AGREEMENT: every file an ARMED extractor found a
+    # definition in must also sniff positive. Two independent readings of one population, and a
+    # sniffer that has gone blind contradicts the extractors rather than merely reporting zero.
+    # THE REFUSAL ITSELF IS RAISED ABOVE, with the other three, so `--check` and `--measure` agree
+    # on it. It was moved twice for the same reason and the history is worth keeping: the first cut
+    # appended to `problems` after that list had already been printed and folded into `exit_code`, so
+    # it could never fire; the second printed and set `exit_code` directly, which fixed `--check` and
+    # left `--measure` blind to it. Both were armed-but-unreachable, one round apart, and both were
+    # caught by observing a staged break rather than by reading the code.
+
+    empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
+    if empty:
+        print("lexicon: armed but grading nothing (reported, not a refusal): " + ", ".join(empty))
+
     if exit_code == 0:
         modes = ", ".join(f".{e}={m}" for e, (_, m) in sorted(declared.items()))
         print(f"lexicon OK — {len(files)} tracked file(s); coverage: {modes}")
     return exit_code
 
 
+
+# ============================================================================================
+# TOOL-dScaffoldedMirror-10 — SUPPLY. The half of this kit with a measured record.
+#
+# Since the declaration landed, this repo added 136 definitions and zero offenders over a window in
+# which the gate refused NOTHING. That half works by delivering context, and it was delivered by a
+# session happening to open the conf. These two verbs hand the table to the author instead.
+#
+# THE GUARDS ARE STRUCTURAL, NOT STATED (S6). Section 12 of the charter bans a GATE whose vocabulary
+# is a mirror of the code it grades. Neither verb below is a gate: neither can exit 1, neither prints
+# a pin, and nothing in `scaffold_lexicon.py` imports either — so what the corpus DOES can never
+# become what the corpus SHOULD do by a path anyone can take. A promise would not survive a refactor;
+# the absence of a return path does.
+# ============================================================================================
+
+
+def build_banned_index(conf: dict) -> dict:
+    """`{banned-token: verb}` — the inverse of the NOT clauses, so a refusal can name the REPLACEMENT.
+
+    Depends on `TOOL-dScaffoldedMirror-8`'s structured grammar and does not re-parse it. A verb may
+    ban several tokens; a token banned by two verbs keeps the first, which the two asserts in that
+    unit make impossible to reach.
+    """
+    out = {}
+    for verb, banned in build_negatives(conf).items():
+        for tok in banned:
+            out.setdefault(tok, verb)
+    return out
+
+
+def run_suggest(root: Path, name: str) -> int:
+    """S1 — one deterministic line for ONE identifier. Reads the declaration and nothing else.
+
+    NO CORPUS PASS, deliberately and measurably: the whole value is that an author can ask before
+    writing, and a verb that walks 900 files to answer one question is a verb nobody waits for.
+    """
+    try:
+        conf = load_conf(root / CONF_NAME)
+    except (ConfError, OSError) as exc:
+        print(f"lexicon: cannot read the declaration: {exc}")
+        return 2
+    verbs = conf.get("VERBS") or {}
+    if not verbs:
+        print("lexicon: no VERBS declared; nothing to suggest against")
+        return 2
+
+    verb = leading_verb(name)
+    if not verb:
+        print(f"lexicon: {name} has no word characters, so it is ungradeable rather than wrong")
+        return 0
+    if verb in verbs:
+        print(f"OK — {name} leads with `{verb}`, which the declaration carries")
+        return 0
+
+    banned = build_banned_index(conf)
+    # THE TAIL IS THE ORIGINAL SURFACE, SLICED. It is never re-derived, and two review rounds were
+    # needed to land on that. Round 1 found the tail sliced by `len(verb)` while `leading_verb` had
+    # stripped the leading underscores first, so the two disagreed about where the verb ended and
+    # `_fetch_conf` suggested `_load_h_conf`. Round 2 found that rebuilding the tail out of
+    # `subtokens()` -- the round-1 fix -- traded that for worse: the splitter lowercases, breaks
+    # acronym runs, splits digit boundaries and drops anything outside its character class, so
+    # `getUserURLs` came back as `readUserUrLs`, `fetch_v2_data` as `load_v_2_data` and `create$data`
+    # as `build_data` with the `$` silently gone. Three of those had been CORRECT before the fix.
+    #
+    # Slicing at the end of the FIRST SUBTOKEN's own surface is what both rounds were reaching for.
+    # The splitter decides where the verb ends, which is the half round 1 had right; nothing
+    # downstream re-spells a character the caller wrote, which is the half round 2 had right.
+    # Separator style, case, acronym runs, digit suffixes, trailing underscores and characters the
+    # splitter cannot even see all survive, because not one of them is ever regenerated.
+    lead = name[:len(name) - len(name.lstrip("_"))]
+    body = name[len(lead):]
+    _toks = subtokens(name)
+    _first = _toks[0] if _toks else ""
+    if not _first or body[:len(_first)].lower() != _first:
+        # The splitter and the surface disagree. `leading_verb`'s contract allows that for a name
+        # with no word characters; suggest the bare verb rather than invent a tail for it.
+        surface, rest = "", ""
+    else:
+        surface, rest = body[:len(_first)], body[len(_first):]
+    if verb in banned:
+        want = banned[verb]
+        gloss = (verbs.get(want) or "").strip()
+        # THE VERB INHERITS THE CASE OF THE TOKEN IT REPLACES, so a SCREAMING_SNAKE name is not
+        # answered in lower snake and a PascalCase one is not answered in camelCase. Round 1 answered
+        # every shape in the declaration's own lowercase, which is a second way of handing back a
+        # name whose only remaining defect is that the author must edit it before typing it.
+        if len(surface) > 1 and surface.isupper():
+            want_cased = want.upper()
+        elif surface[:1].isupper():
+            want_cased = want[:1].upper() + want[1:]
+        else:
+            want_cased = want
+        swap = lead + want_cased + rest
+        print(f"use `{swap}` — the declaration says `{want}`, NOT `{verb}`: {gloss}")
+    else:
+        print(f"`{verb}` is not in the declared table, and no row bans it by name. "
+              f"Declared verbs: {' '.join(sorted(verbs))}")
+    return 0
+
+
+def read_object(name: str) -> str:
+    """The OBJECT of an identifier: its subtokens after the leading one, rejoined.
+
+    `build_index` and `render_index` share the object `index`, which is what makes two spellings of
+    one concept comparable. A single-token name has no object and is not comparable to anything.
+    """
+    parts = subtokens(name)
+    return "_".join(parts[1:]) if len(parts) > 1 else ""
+
+
+def run_brief(root: Path, target: str) -> int:
+    """S2/S3 — for the objects THIS file names, which leading tokens are live across the corpus.
+
+    NOT A DIRECTORY HISTOGRAM, and the difference is not stylistic. A histogram of a directory's
+    off-table leading tokens is bounded by that directory's vocabulary: measured on one adopter test
+    directory, 750 distinct tokens and a 7,996-byte full list, so a top-nine line shows 1.2% of it and
+    the truncation that bounds the cost voids the signal. Keying on the objects the author's OWN file
+    already names is bounded by construction and surfaces the only drift class actually measured here
+    — one concept spelled two ways in two kits.
+
+    IT PRINTS WHAT THE CORPUS DOES, NEVER WHAT IT SHOULD DO. No verdict, no pin, no exit 1.
+    """
+    rel = target.replace("\\", "/")
+    p = root / rel
+    if not p.is_file():
+        print(f"lexicon: {rel} is not a file in this tree")
+        return 2
+
+    try:
+        conf = load_conf(root / CONF_NAME)
+    except (ConfError, OSError) as exc:
+        print(f"lexicon: cannot read the declaration: {exc}")
+        return 2
+    declared = {e: (ps, m) for e, ps, m in langs(conf)}
+    ext = ext_of(rel)
+    if ext not in declared:
+        print(f"COVERAGE: undeclared — .{ext} has no LANGS entry, so nothing is extracted for it")
+        return 2
+    pset, mode = declared[ext]
+    if mode == "dark" or (mode == "probe" and pset not in PATTERN_SETS):
+        print(f"COVERAGE: dark — .{ext} declares no extractor, so this file's definitions are not "
+              f"read at all. An empty section here would be indistinguishable from 'nothing is "
+              f"established, invent freely', which is why this refuses instead.")
+        return 2
+    print(f"COVERAGE: {mode} — .{ext}" + (f" ({pset})" if pset else "")
+          + ("; a probe is incomplete BY CONSTRUCTION" if mode == "probe" else ""))
+
+    # An unparseable target is a NAMED refusal. The corpus loop below already catches this and
+    # skips; the target could not, so `--brief` on a file mid-edit died with a traceback rather
+    # than saying which file and why. Exit 2, keeping 1 reserved for verdicts. Closing review M3.
+    try:
+        got = extract(p, mode, pset)
+    except (SyntaxError, OSError) as exc:
+        # THE SAME PAIR THE CORPUS LOOP CATCHES, which is the point of the guard. Round 1 caught
+        # `(SyntaxError, ValueError)`: it missed the unreadable-file case the loop handles, and it
+        # swallowed `ValueError` from anywhere inside the extractor, so an internal bug would have
+        # been reported to the user as "this file does not parse". Two modes answering one question
+        # differently is the class; matching the pair is the fix. Found by the round-2 review.
+        print(f"lexicon: {rel} cannot be read as source, so its objects cannot be listed: {exc}")
+        return 2
+    here = sorted({read_object(n) for n, _ln in (got[0] if got else []) if read_object(n)})
+    if not here:
+        print("this file names no multi-token definition, so there is no object to compare")
+        return 0
+
+    live: dict = {}
+    for f in tracked_files(root):
+        e = ext_of(f)
+        if e not in declared:
+            continue
+        ps, md = declared[e]
+        if md == "dark" or (md == "probe" and ps not in PATTERN_SETS):
+            continue
+        try:
+            g = extract(root / f, md, ps)
+        except (SyntaxError, OSError):
+            continue
+        if not g:
+            continue
+        for n, _ln in g[0]:
+            obj = read_object(n)
+            if obj:
+                live.setdefault(obj, {}).setdefault(leading_verb(n) or "?", 0)
+                live[obj][leading_verb(n) or "?"] += 1
+
+    verbs = conf.get("VERBS") or {}
+    print("this prints what the corpus DOES, never what it should do — it decides nothing")
+    for obj in here:
+        seen = live.get(obj) or {}
+        shown = ", ".join(f"{v} x{c}" + ("" if v in verbs else " (off-table)")
+                          for v, c in sorted(seen.items(), key=lambda kv: (-kv[1], kv[0])))
+        flag = "  <-- SPELLED MORE THAN ONE WAY" if len(seen) > 1 else ""
+        print(f"  {obj}: {shown or 'no other definition names this object'}{flag}")
+    return 0
+
+
+
+def run_probe(root: Path) -> int:
+    """S3 — what the canon would propose here, and what the corpus spells otherwise.
+
+    READ-ONLY, NO ARGUMENTS, NO STATE, EXITS 0 UNCONDITIONALLY, and legal against a repo with no
+    declaration at all. Those are properties, not manners: an adopter deciding whether to take this
+    kit needs to see what it would say BEFORE anything is written, and a probe that can fail or
+    write is one nobody runs on a repo they care about.
+
+    IT DECIDES NOTHING. The canon fixes the representative; the corpus only reports which concepts
+    are present and which spellings are debt. Reading this output cannot change what a proposal
+    would name, which is exactly the property a frequency ranking did not have.
+    """
+    forms = canon.build_form_index()
+    conf = None
+    try:
+        if (root / CONF_NAME).is_file():
+            conf = load_conf(root / CONF_NAME)
+    except ConfError:
+        conf = None
+    declared = {e: (ps, m) for e, ps, m in langs(conf)} if conf else dict(KNOWN_EXTS)
+
+    counts: dict = {}
+    files = tracked_files(root)
+    for rel in files:
+        ext = ext_of(rel)
+        if ext not in declared:
+            continue
+        pset, mode = declared[ext]
+        if mode == "dark" or (mode == "probe" and pset not in PATTERN_SETS):
+            continue
+        try:
+            got = extract(root / rel, mode, pset)
+        except (SyntaxError, OSError):
+            continue
+        if not got:
+            continue
+        for name, _ln in got[0]:
+            v = leading_verb(name)
+            if v:
+                counts[v] = counts.get(v, 0) + 1
+
+    total = sum(counts.values())
+    print(f"lexicon --probe — {total} definition(s) over {len(files)} tracked file(s)"
+          + ("" if conf else "; NO .lexicon.conf here, so this is what adoption would find"))
+    print("the canon decides what each concept is CALLED; this corpus only decides which appear")
+    print()
+
+    proposed, debt_rows, off = [], [], {}
+    for rep, _gloss, others in canon.CLUSTERS:
+        live = [(f, counts.get(f, 0)) for f in (rep,) + tuple(others) if counts.get(f)]
+        if not live:
+            continue
+        proposed.append(rep)
+        shown = ", ".join(f"{f} x{n}" + ("" if f == rep else " -> debt") for f, n in live)
+        print(f"  {rep:<9} {shown}")
+        debt_rows += [(f, n, rep) for f, n in live if f != rep]
+    for v, n in counts.items():
+        if v not in forms:
+            off[v] = n
+
+    print()
+    print(f"  would propose {len(proposed)} of {len(canon.CLUSTERS)} cluster(s): {' '.join(proposed)}")
+    if debt_rows:
+        cost = sum(n for _f, n, _r in debt_rows)
+        print(f"  convergence would cost {cost} rename(s) across {len(debt_rows)} spelling(s): "
+              + ", ".join(f"{f}->{r} x{n}" for f, n, r in sorted(debt_rows, key=lambda x: -x[1])[:8]))
+    else:
+        print("  no debt: every live site already uses its cluster's representative")
+    # A token in no cluster is not automatically debt. The canon bounds what a MACHINE may propose;
+    # it does not bound what an owner may RATIFY, and this repo's own table carries `seed`, `arm` and
+    # `cmd`, which no cluster holds. Reporting a ratified row as unnominatable would read as a
+    # finding against a decision somebody made deliberately.
+    ratified = set((conf or {}).get("VERBS") or {})
+    beyond = {v: n for v, n in off.items() if v in ratified}
+    unnamed = {v: n for v, n in off.items() if v not in ratified}
+    if beyond:
+        top = ", ".join(f"{v} x{n}" for v, n in sorted(beyond.items(), key=lambda kv: -kv[1])[:8])
+        print(f"  {sum(beyond.values())} definition(s) lead with a RATIFIED row outside the canon: {top}")
+        print("  legal: the canon bounds what a proposal may name, never what an owner may declare")
+    if unnamed:
+        top = ", ".join(f"{v} x{n}" for v, n in sorted(unnamed.items(), key=lambda kv: -kv[1])[:8])
+        print(f"  {sum(unnamed.values())} definition(s) lead with a token in NO cluster and NO row: {top}")
+        print("  unnominatable by absence — no proposal can ever name them")
+    return 0
+
+
 def main(argv: list[str]) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure"):
-        sys.stderr.write("usage: python tools/lexicon/lexicon.py [--check|--list|--measure]\n")
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--brief", "--probe"):
+        sys.stderr.write("usage: python tools/lexicon/lexicon.py "
+                         "[--check|--list|--measure|--suggest <name>|--brief <path>|--probe]\n")
+        return 2
+    if mode in ("--suggest", "--brief") and len(argv) < 3:
+        sys.stderr.write(f"usage: python tools/lexicon/lexicon.py {mode} "
+                         + ("<identifier>\n" if mode == "--suggest" else "<path>\n"))
         return 2
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")
         return 2
-    return run(Path(out.stdout.strip()), list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
+    root = Path(out.stdout.strip())
+    # The two SUPPLY verbs return before `run()`, which is what keeps them off the gate path: they
+    # cannot reach a pin, a waiver or an exit code of 1 even by accident.
+    if mode == "--suggest":
+        return run_suggest(root, argv[2])
+    if mode == "--brief":
+        return run_brief(root, argv[2])
+    if mode == "--probe":
+        return run_probe(root)
+    return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 
 if __name__ == "__main__":

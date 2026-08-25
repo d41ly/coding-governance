@@ -91,3 +91,7 @@
 
 *(none yet)*
 - TOOL-aTaperedSluice-1 · an Agent slot had no release path, so the budget counted LIFETIME per prompt, not concurrency — 5 sequential agents refused the 6th all turn. A 45-min expiry makes it a rolling window. Open: does Agent fire PostToolUse? That unlocks a real release
+- TOOL-dScaffoldedMirror-16 · F4 (retire P1 if unused across two adopters) SUPERSEDED: 136 definitions and ZERO offenders since the conf landed, and `incms/main` is 55.2% verb-led against a table it never saw. The declaration works; the enforcement is the zero → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-17 · F-A5 (opt-in BECAUSE unmeasurable) and its non-goal SUPERSEDED in writing BEFORE the pressure unit lands. Opt-in survives; the REASON does not — a mechanism resting on a premise its own records deny is two-answers-to-one-question → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-18 · gov TAKES the pressure it ships: the grandfather set is adopted here with a 459-row backfill. It buys this repo almost nothing (new code is at 0% marginal offense) and lands anyway: shipping an unexercised gate is how this kit got here → `builds/dScaffoldedMirror/`
+- TOOL-dScaffoldedMirror-19 · a NOUN-LED definition is legal only for `@property`, `@cached_property` and a zero-arg accessor — all detectable in `ast`, so it is a kit-owned structural exemption, never a waiver pile. ~288 of 463 offenders (62% of debt) were unruled → `builds/dScaffoldedMirror/`

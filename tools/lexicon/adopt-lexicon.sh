@@ -7,8 +7,11 @@
 # WHY THE SEED IS DERIVED AND THEN FROZEN. Companion §12 bans a gate whose vocabulary is a
 # hand-kept mirror of the codebase's own identifiers; a PRESCRIPTIVE verb table is the inverse and
 # is safe. But an adopter cannot author a closed vocabulary for a domain they have not read yet, so
-# `--scaffold` derives a proposal from their own corpus by leading-token frequency — which for one
-# moment IS the banned shape. The resolution is that the proposal is marked PROPOSED, a human
+# `--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's
+# corpus only which concepts are live in it, so the seed is prescriptive at the moment it is
+# written and is NOT the banned shape. It ranked the corpus's own leading tokens until
+# `TOOL-dScaffoldedMirror-8`, and that WAS the banned shape: a repo already calling everything
+# `get` was certified as calling it `get`.
 # curates it, and "was edited" is CHECKABLE: `--check` reds while `ratified` is empty, so an
 # unedited seed cannot reach the merge bar disguised as a curated vocabulary.
 #
@@ -54,8 +57,140 @@ resolve_python() {
 
 PY="$(resolve_python)" || { echo "$PY"; exit 2; }
 
+# REPO-RELATIVE, via git rather than by trimming ROOT off KIT_DIR. On Windows those two are
+# spelled differently -- `git rev-parse --show-toplevel` answers `C:/...` while `cd && pwd` under
+# MSYS answers `/c/...` -- so the trim silently does nothing and the ABSOLUTE path renders into a
+# committed artifact. Measured here: it shipped into the Skill description before this line
+# existed. memory-recall carries the same derivation and the same warning; this is the second
+# time that warning has been paid for.
+KITREL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)" || exit 2
+KITREL="${KITREL%/}"
+TEMPLATE="$KIT_DIR/SKILL.template.md"
+SKILL="$ROOT/.claude/skills/lexicon/SKILL.md"
+# CHECKED, because an empty value here is INVISIBLE downstream. The Skill's marker would render as
+# `gov:kit lexicon@` with nothing after the `@`, and `--check` would still report "Skill in sync":
+# its drift gate re-renders and byte-compares, so it compares a render against a render and both
+# carry the same empty version. Round 2 of the closing review renamed the constant in a sandbox and
+# watched exactly that happen. A pipeline takes its LAST command's status, so `head -1` succeeding
+# on empty input is a zero — the emptiness has to be tested for, not inferred from the exit code.
+KIT_VERSION="$(grep -oE 'KIT_LEXICON_VERSION = "[0-9.]+"' "$KIT_DIR/lexicon.py" | grep -oE '[0-9.]+' | head -1)"
+if [ -z "$KIT_VERSION" ]; then
+  echo "lexicon-adopt: cannot read KIT_LEXICON_VERSION from $KIT_DIR/lexicon.py — the Skill would"
+  echo "lexicon-adopt: render a version-less marker and its own drift gate could not tell." >&2
+  exit 2
+fi
+# ---- S4 of TOOL-dScaffoldedMirror-10: the rendered Skill -----------------------------------------
+#
+# WHY A RENDER AND NOT A POINTER. The charter can only POINT at the declaration -- it has 118 bytes of
+# headroom against a 1,787-byte table -- so the only way the table itself travels to an author is a
+# separate artifact. And an artifact that carries a copy of a declaration is a second carrier, which
+# this repo's own rule says drifts. The answer is that the copy is GENERATED and its gate re-renders
+# and byte-compares: a `.lexicon.conf` edit nobody re-rendered REDS. That is the one shape in which
+# two carriers are allowed, because only one of them is authored.
+#
+# THREE STATES, NOT TWO, copied deliberately from memory-recall. A missing template with no rendered
+# Skill is "not installed" and SKIPS -- a red an adopter cannot fix by editing their own repo trains
+# them to ignore the leg. A rendered Skill with no template is the one genuinely unverifiable state
+# and it REDS.
+render_skill() { # -> stdout
+  local out verbs
+  # The table, rendered from the declaration rather than retyped. Every row, in declaration order.
+  # THROUGH THE ONE READER, not a second parser. This block used to carry its own inline grammar
+  # for the VERBS: section, so `lexicon_conf.py` and the render disagreed on shapes both accept --
+  # and the drift gate could not see it, because it compares two outputs of THIS renderer. Closing
+  # review H2. `--print-rows` is that reader's own row form.
+  verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows "$CONF"           | while IFS=$'	' read -r v g; do [ -n "$v" ] && printf -- '- `%s` — %s
+' "$v" "$g"; done) || return 1
+  [ -n "$verbs" ] || return 1
+  out=$( cat "$TEMPLATE" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r'/}
+  out=${out//\{\{VERBS_TABLE\}\}/"$verbs"}
+  out=${out//\{\{SUGGEST_CLI\}\}/"python3 $KITREL/lexicon.py --suggest"}   # gov:literal-python
+  out=${out//\{\{BRIEF_CLI\}\}/"python3 $KITREL/lexicon.py --brief"}       # gov:literal-python
+  out=${out//\{\{GATE_CLI\}\}/"python3 $KITREL/lexicon.py"}                # gov:literal-python
+  out=${out//\{\{CONF\}\}/".lexicon.conf"}
+  out=${out//\{\{KIT_VERSION\}\}/"$KIT_VERSION"}
+  # STRIP CR AFTER SUBSTITUTION, not only from the template. Python's `print` writes CRLF to stdout
+  # on Windows, so `$verbs` arrives CR-bearing however clean the template is — measured here: the
+  # render carried \r\n on every verb row while the on-disk Skill carried \n, and `--check` reported
+  # DRIFTED against a file it had just written. memory-recall's adopter records the same class one
+  # seam earlier ("those CRs rendered straight into SKILL.md and broke its YAML frontmatter"); the
+  # lesson that transfers is that the strip belongs at the LAST point before emission, where it
+  # covers every value rather than the one the author remembered.
+  out=${out//$'\r'/}
+  printf '%s' "$out"
+}
+
+check_skill() {
+  local rendered
+  if [ ! -f "$TEMPLATE" ]; then
+    if [ -f "$SKILL" ]; then
+      echo "lexicon: $SKILL exists but $KITREL/SKILL.template.md does not — cannot verify drift"
+      return 1
+    fi
+    echo "skip     lexicon skill — $KITREL/SKILL.template.md not installed, nothing to render"
+    return 0
+  fi
+  rendered="$(render_skill)" || { echo "lexicon: the Skill render failed"; return 1; }
+  # AC7 — an EMPTY render must refuse rather than be compared against an equally empty Skill and
+  # pass. Two empty files are byte-identical, so the comparison itself cannot see this.
+  if [ -z "$rendered" ]; then
+    echo "lexicon: the Skill render produced NOTHING, so a byte-comparison against it would pass"
+    echo "lexicon: on emptiness rather than on agreement. Refusing instead."
+    return 1
+  fi
+  # An unsubstituted placeholder ships `{{...}}` into a Skill description and breaks its trigger.
+  local leftover
+  leftover="$(printf '%s' "$rendered" | grep -o '{{[A-Z_]*}}' | sort -u | tr '\n' ' ')"
+  if [ -n "$leftover" ]; then
+    echo "lexicon: the Skill template carries placeholders this script cannot fill: $leftover"
+    return 1
+  fi
+  if [ ! -f "$SKILL" ]; then
+    echo "lexicon: $SKILL is not rendered — run --scaffold"
+    return 1
+  fi
+  # TWO TEMP FILES, not a pipe into a process substitution. Git-Bash supports `<( )`, but a `diff -q`
+  # reading stdin AND a substitution is one of the shapes that fails opaquely there — it returned
+  # non-zero on a file it had just rendered, which reads as DRIFTED and is indistinguishable from a
+  # real drift. A comparison that cannot be wrong about equality is worth two mktemps.
+  local a b
+  a="$(mktemp)"; b="$(mktemp)"
+  printf '%s' "$rendered" > "$a"
+  tr -d '\r' < "$SKILL" > "$b"
+  if ! cmp -s "$a" "$b"; then
+    rm -f "$a" "$b"
+    echo "lexicon: DRIFTED — $SKILL does not match a fresh render of $KITREL/SKILL.template.md."
+    echo "lexicon: The declaration moved and nobody re-rendered, so the Skill is teaching a table"
+    echo "lexicon: this repo no longer declares. Re-run --render."
+    return 1
+  fi
+  rm -f "$a" "$b"
+  return 0
+}
+
+write_skill() {
+  local rendered
+  [ -f "$TEMPLATE" ] || return 0
+  rendered="$(render_skill)" || { echo "lexicon: the Skill render failed"; return 1; }
+  [ -n "$rendered" ] || { echo "lexicon: the Skill render produced nothing; refusing to write it"; return 1; }
+  mkdir -p "$(dirname "$SKILL")"
+  printf '%s' "$rendered" > "$SKILL"
+  echo "lexicon: rendered $SKILL"
+}
+
 MODE="${1:---check}"
-case "$MODE" in --scaffold|--check) ;; *) echo "usage: $(basename "$0") [--scaffold|--check]"; exit 2 ;; esac
+case "$MODE" in --scaffold|--check|--render) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render]"; exit 2 ;; esac
+
+# --render exists because --scaffold REFUSES on an existing declaration, so without it the only
+# remedy for a DRIFTED Skill would be deleting the conf and re-deriving the table. A refusal whose
+# only fix is destructive is a refusal people learn to bypass.
+if [ "$MODE" = "--render" ]; then
+  [ -f "$CONF" ] || { echo "lexicon-adopt: no .lexicon.conf; nothing to render from"; exit 1; }
+  write_skill || exit 1
+  exit 0
+fi
 
 if [ "$MODE" = "--check" ]; then
   fail=0
@@ -90,10 +225,11 @@ if [ "$MODE" = "--check" ]; then
   # NON-EMPTY value — and the unratified-seed refusal passes exactly when it should fire.
   ratified=$(tr -d '\r' < "$CONF" | grep -E '^ratified=' | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
   if [ -z "${ratified// /}" ]; then
-    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold DERIVES the verb"
-    echo "lexicon-adopt: table from your corpus and marks it PROPOSED; a derived table that nobody"
-    echo "lexicon-adopt: curated is a mirror of the code, which is the shape a naming gate must not"
-    echo "lexicon-adopt: have. Curate the table, then stamp \`ratified=\"<date> node <tag>\"\`."
+    echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold takes each verb's"
+    echo "lexicon-adopt: SPELLING from the kit's frozen canon and asks your corpus only which concepts"
+    echo "lexicon-adopt: are live, so the seed is prescriptive rather than a mirror of your code — but"
+    echo "lexicon-adopt: it is not CURATED: the negatives are generic and your domain rows are missing."
+    echo "lexicon-adopt: Read the table, edit it, then stamp \`ratified=\"<date> node <tag>\"\`."
     fail=1
   fi
   verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-verbs "$CONF" 2>/dev/null | grep -c . || true)
@@ -102,7 +238,8 @@ if [ "$MODE" = "--check" ]; then
     echo "lexicon-adopt: pin would absorb the whole corpus and the predicate would assert nothing."
     fail=1
   fi
-  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared"
+  check_skill || fail=1
+  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync"
   exit "$fail"
 fi
 
@@ -113,4 +250,14 @@ if [ -f "$CONF" ]; then
   exit 1
 fi
 "$PY" "$KIT_DIR/scaffold_lexicon.py" "$CONF" || exit 1
+# `|| exit 1`, matching the --render branch. Without it this script -- which runs under `set -u` and
+# NOT `-e` -- took the echo's status, so a failed render printed "wrote .lexicon.conf" and exited 0
+# with no Skill on disk. The adopter was then wedged: --check reds, --scaffold refuses because the
+# conf now exists, and --render is named only in the usage line. Closing review H3.
+write_skill || {
+  echo "lexicon-adopt: the declaration was written but the Skill was NOT rendered."
+  echo "lexicon-adopt: curate the VERBS: block in .lexicon.conf, then run:"
+  echo "lexicon-adopt:   bash $KITREL/adopt-lexicon.sh --render"
+  exit 1
+}
 echo "lexicon-adopt: wrote .lexicon.conf marked PROPOSED — curate the table, then stamp \`ratified=\`."

@@ -123,6 +123,7 @@
     ],
     "rendered-skills": [
       "drift-audit",
+      "lexicon",
       "memory-recall",
       "unattended"
     ],
@@ -177,6 +178,7 @@
       "arm",
       "build",
       "check",
+      "cmd",
       "derive",
       "extract",
       "init",

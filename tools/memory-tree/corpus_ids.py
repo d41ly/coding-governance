@@ -466,7 +466,7 @@ def checks(w: dict) -> list:
 
 
 # ------------------------------------------------------------------------------------------- report
-def do_report(root: str, conf: dict) -> int:
+def cmd_report(root: str, conf: dict) -> int:
     w = walk(root, conf)
     orphans = sorted(set(w["cites"]) - set(w["defs"]))
     coll = {i: s for i, s in w["def_builds"].items() if len(s) > 1}
@@ -504,7 +504,7 @@ def _measure_lines(root: str, conf: dict) -> list:
     ]
 
 
-def do_measure(root: str, conf: dict) -> int:
+def cmd_measure(root: str, conf: dict) -> int:
     """Print the pins to WRITE INTO .memory-tree.conf. Measured against THIS corpus — a pin copied
     from a larger tree is either vacuous or permanently red."""
     for line in _measure_lines(root, conf):
@@ -561,7 +561,7 @@ def _walk_continues() -> set:
     return {n.lineno + off for n in ast.walk(tree) if isinstance(n, ast.Continue)}
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     fails = []
     # EVERY `continue` IN walk() MUST BE REACHED BY A FIXTURE. This is the one arm that could catch
     # the tautological shape filter deleted in TOOL-aBatchedTribunal-4: that branch was
@@ -838,7 +838,7 @@ def do_selftest() -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
     except Exception:  # noqa: BLE001
@@ -847,9 +847,9 @@ def main(argv: list) -> int:
     conf = load_conf(root)
     try:
         if mode == "--report":
-            return do_report(root, conf)
+            return cmd_report(root, conf)
         if mode == "--measure":
-            return do_measure(root, conf)
+            return cmd_measure(root, conf)
         if mode != "--check":
             print("usage: corpus_ids.py [--check|--report|--measure|--selftest]")
             return 2

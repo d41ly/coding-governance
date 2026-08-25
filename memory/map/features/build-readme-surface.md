@@ -80,7 +80,7 @@ declaration: authoring both directions would be two answers to one question, whi
 five slots in order — the immutable description (which IS the goal bound M3's rescope rule reads),
 expected improvements, detriments if not built, build-level rules, parked decisions — with per-slot
 `empty_ok` and `bullets` flags. `slot_violations` grades the canon only when its caller passes
-`canon=True`, which `do_check_format` does for a path
+`canon=True`, which `cmd_check_format` does for a path
 `memory/project/readme-contract.txt` declares BOUND. That registry is asserted in BOTH directions and
 its exempt pin is an EQUALITY, so a pin left high after a drain reds rather than going slack. One
 README is bound today and the leg names its own reach on every run; `--survey` grades every README

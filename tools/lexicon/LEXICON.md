@@ -29,15 +29,37 @@ set     assign a known value — NOT `update`, which implies a diff against prio
 The pair is what makes the boundary checkable by a reader. Without it, two verbs drift into synonyms
 and the table stops being closed in any sense that matters.
 
+## How the table reaches whoever is writing the name
+
+A gate that only REFUSES teaches the table one rejected commit at a time. The failure mode this kit
+actually attacks is ABSENCE — an author who would have used your verb if they had known it — so the
+declaration is delivered three ways, and none of them is the gate.
+
+- **The rendered Skill.** `adopt-lexicon.sh --render` writes `.claude/skills/lexicon/SKILL.md` from
+  the declaration, rows and negatives included, so an agent carries the table without opening the
+  conf. Its own gate re-renders and byte-compares, so an edit nobody re-rendered reds.
+- **`python tools/lexicon/lexicon.py --suggest <name>`** answers ONE identifier from the declaration
+  alone: whether its leading verb is declared, and if not, which row's NOT clause names it and what
+  that row means. The suggestion keeps your separator, case, acronyms and digits — it hands back a
+  name you can type, not one you have to edit.
+- **`python tools/lexicon/lexicon.py --brief <file>`** lists the OBJECTS a file already defines, so a
+  new function in it can be named alongside its neighbours rather than against the whole repo.
+
+Read the table when you are naming something, not when a gate stops you.
+
 ## Do not inherit somebody else's table
 
-`--scaffold` derives a proposal from YOUR corpus. That is not because derivation is good — for one
-moment a derived table is exactly the hand-kept mirror of the code that a naming gate must not be —
-but because you cannot author a closed vocabulary for a domain you have not read yet. Derive, then
-delete what you did not mean, then write the negative definitions, then stamp `ratified`.
+`--scaffold` reads YOUR corpus to decide which concepts are live in it, and takes what each concept
+is CALLED from the kit's frozen canon. Inheriting another repo's ratified table skips the first half:
+you get somebody else's concept set, which is a vocabulary for a domain you are not in. Seed from
+your own corpus, delete what you did not mean, write the negative definitions your domain needs, then
+stamp `ratified`.
 
-Twenty-five verbs is the seed size. If you find yourself past forty, the table is describing the code
-rather than constraining it.
+The seed cannot exceed the canon's cluster count, and is usually well under it — only a concept with
+a live definition site enters. That ceiling is `CLUSTERS` in `tools/lexicon/canon.py`; this sentence
+deliberately does not restate the number, because the sentence it replaced said "twenty-five verbs is
+the seed size" and the canon has never held twenty-five. If curation takes you past forty rows, the
+table is describing the code rather than constraining it.
 
 ## Banned suffixes
 

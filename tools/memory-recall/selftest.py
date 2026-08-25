@@ -181,7 +181,7 @@ def cleanup(root: pathlib.Path) -> None:
 
 
 @check("conf parser == bash (the grammar's documented cases)")
-def t_parser_vs_bash():
+def test_parser_vs_bash():
     """Asserted against BASH, never against a second Python parser.
 
     `recall_conf.load_conf` is a copy of codebase-map's twenty-line parser (kits are copied into
@@ -222,7 +222,7 @@ def t_parser_vs_bash():
 
 
 @check("no conf: query.py refuses, names memory-tree, prints a usable stub, creates nothing")
-def t_no_conf_query():
+def test_no_conf_query():
     root, kitdir = make_repo()
     try:
         (root / ".memory-tree.conf").unlink()
@@ -252,7 +252,7 @@ def t_no_conf_query():
 
 
 @check("no conf: adopt-memory-recall.sh refuses and creates nothing")
-def t_no_conf_adopt():
+def test_no_conf_adopt():
     bash = shutil.which("bash")
     if not bash:
         raise _Skip("no bash on PATH")
@@ -273,7 +273,7 @@ def t_no_conf_adopt():
 
 
 @check("index builds and ranks with NO alias data (the empty-alias path is first class)")
-def t_empty_alias():
+def test_empty_alias():
     root, kitdir = make_repo()
     try:
         proc = run(root, kitdir, *Q)
@@ -292,7 +292,7 @@ def t_empty_alias():
 
 
 @check("mis-declared FAMILIES is LOUD: zero records diagnosed, not reported as success")
-def t_zero_records_is_loud():
+def test_zero_records_is_loud():
     root, kitdir = make_repo(conf='MEMORY_ROOT=memory\nFAMILIES="tooling:ZZZZ"\n')
     try:
         proc = run(root, kitdir, *Q)
@@ -323,7 +323,7 @@ def t_zero_records_is_loud():
 
 
 @check("an EMPTY corpus is diagnosed too, and names MEMORY_ROOT — FAMILIES cannot cause it")
-def t_empty_corpus_names_memory_root():
+def test_empty_corpus_names_memory_root():
     """A one-character MEMORY_ROOT typo produced 0 records + 0 chunks, 0 hits and exit 0.
 
     The old guard read `if n_records or not n_chunks: return None`, so the one state the record
@@ -346,7 +346,7 @@ def t_empty_corpus_names_memory_root():
 
 
 @check("conf_digest joins freshness: a FAMILIES edit rebuilds, and the repair rebuilds back")
-def t_conf_digest_both_directions():
+def test_conf_digest_both_directions():
     """The blocker. The corpus digest is mtime+size over the tree's .md files, so a conf edit never
     enters it; without conf_digest in the manifest the S7 remediation is a silent no-op in BOTH
     directions — the diagnosis fires, the adopter fixes the conf, and the cache keeps answering.
@@ -373,7 +373,7 @@ def t_conf_digest_both_directions():
 
 
 @check("the KIT VERSION is inside conf_digest, so a grammar edit cannot leave a cache warm")
-def t_digest_covers_kit_version():
+def test_digest_covers_kit_version():
     """`digest()`'s docstring promises "an id-grammar or corpus-root edit invalidates a warm cache".
 
     The blob hashed `memory_root`, `families` and `node_tag_class` — and the ERAS, which are half the
@@ -406,7 +406,7 @@ def t_digest_covers_kit_version():
 
 
 @check("a query writes NOTHING in the worktree — asserted by path, with no ignore rule present")
-def t_writes_nothing_in_worktree():
+def test_writes_nothing_in_worktree():
     root, kitdir = make_repo()
     try:
         assert not (root / ".gitignore").exists(), "fixture must carry no ignore rule"
@@ -430,7 +430,7 @@ def t_writes_nothing_in_worktree():
 
 
 @check("an alias file dropped in the kit dir rebuilds the cache and lands in the manifest")
-def t_alias_rebuild():
+def test_alias_rebuild():
     root, kitdir = make_repo()
     try:
         run(root, kitdir, *Q)
@@ -459,7 +459,7 @@ def t_alias_rebuild():
 
 
 @check("an alias layer that joins to ZERO records is diagnosed, not silently dead")
-def t_dead_alias_is_loud():
+def test_dead_alias_is_loud():
     """`query.py` discarded `join_aliases`' return, so a 100%-dead alias column was reported
     NOWHERE — the dead-plumbing class one layer inside the tool built to close it. An adopter
     authoring aliases against the wrong id family gets a silently empty third FTS5 column whose
@@ -505,7 +505,7 @@ def t_dead_alias_is_loud():
 
 
 @check("cache eviction: dead worktree evicted, live worktree kept, no-manifest NEVER evicted")
-def t_eviction():
+def test_eviction():
     """One predicate read in two directions: rebuild MINE, never delete THEIRS.
 
     The builder writes both .db files BEFORE the manifest, deliberately and atomically, so a
@@ -583,7 +583,7 @@ def _budget_conf(mb: str) -> str:
 
 
 @check("the cache budget evicts least-recently-built first and stops at the budget")
-def t_budget_lru():
+def test_budget_lru():
     root, kitdir = make_repo(conf=_budget_conf("0.4"))
     try:
         run(root, kitdir, *Q)
@@ -603,7 +603,7 @@ def t_budget_lru():
 
 
 @check("a mid-build and a built_at-less cache survive a run that DID evict something")
-def t_budget_protections():
+def test_budget_protections():
     root, kitdir = make_repo(conf=_budget_conf("0.5"))
     try:
         run(root, kitdir, *Q)
@@ -624,7 +624,7 @@ def t_budget_protections():
 
 
 @check("a real build WRITES the marker and removes it when it finishes")
-def t_build_marker_lifecycle():
+def test_build_marker_lifecycle():
     """THE PRODUCER, armed. Every other marker arm plants the file by hand, so replacing
     `marker.write_text(...)` with `pass` left the whole suite green — the consumer was covered and the
     thing that feeds it was not. Both halves are asserted from ONE real build: the marker exists while
@@ -661,7 +661,7 @@ def t_build_marker_lifecycle():
 
 
 @check("a build in flight survives, in every phase the mtime test cannot see")
-def t_budget_build_in_flight():
+def test_budget_build_in_flight():
     """THE STATE TABLE. The mtime predicate is True only from the first new database byte until the
     manifest is replaced. Measured phase-by-phase against a real rebuild, it is FALSE during
     extraction (31% of the build), FALSE in the window where _write_set has unlinked a database and
@@ -694,7 +694,7 @@ def t_budget_build_in_flight():
 
 
 @check("an ABANDONED build stops protecting its directory")
-def t_budget_marker_ttl():
+def test_budget_marker_ttl():
     """Without a TTL a killed builder's marker would protect that directory forever, and the budget
     would quietly stop being a budget. The two siblings differ ONLY in marker age."""
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
@@ -715,7 +715,7 @@ def t_budget_marker_ttl():
 
 
 @check("an unsatisfiable budget reports the shortfall and deletes NOTHING")
-def t_budget_cannot_satisfy():
+def test_budget_cannot_satisfy():
     root, kitdir = make_repo(conf=_budget_conf("0.3"))
     try:
         run(root, kitdir, *Q)
@@ -734,7 +734,7 @@ def t_budget_cannot_satisfy():
 
 
 @check("a build that starts AFTER the plan is made is not deleted by it")
-def t_budget_recheck_before_delete():
+def test_budget_recheck_before_delete():
     """THE DELETION-TIME RE-CHECK, actually reached.
 
     The first cut planted the marker before the run, which excludes the directory at the CANDIDATE
@@ -784,7 +784,7 @@ def t_budget_recheck_before_delete():
 
 
 @check("a blank RECALL_CACHE_BUDGET_MB runs no size-based eviction at all")
-def t_budget_blank():
+def test_budget_blank():
     root, kitdir = make_repo(conf=_budget_conf(""))
     try:
         run(root, kitdir, *Q)
@@ -835,7 +835,7 @@ def settings_merge_src() -> pathlib.Path | None:
 
 
 @check("every invocation the CLI and the --with-hook remedy print resolves to a real file")
-def t_printed_invocations_resolve():
+def test_printed_invocations_resolve():
     """The fixture kit dir is spelled like NEITHER layout, so a baked-in path cannot pass by luck.
 
     Not `memory-recall`: WIRE §3c step 1 mandates exactly that name in an adopter, so a fixture
@@ -894,7 +894,7 @@ def t_printed_invocations_resolve():
 
 
 @check("adopt --check runs with `python` off PATH and only `python3` available")
-def t_python3_only():
+def test_python3_only():
     """A node with both binaries can never see this defect, so PATH is cut down to prove it."""
     bash = shutil.which("bash")
     git = shutil.which("git")
@@ -943,7 +943,7 @@ def t_python3_only():
 
 
 @check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
-def t_scaffold_converges():
+def test_scaffold_converges():
     """AC8 and the opt-in half of AC13.
 
     A hook file copied in but never merged into settings.json reads as UNWIRED forever, in the repo
@@ -975,7 +975,7 @@ def t_scaffold_converges():
 
 
 @check("a FAMILIES edit nobody re-rendered reds --check and shows the stale description")
-def t_skill_drift_reds():
+def test_skill_drift_reds():
     root, kitdir = make_repo()
     try:
         copy_extra(kitdir, *SURFACE)
@@ -1046,7 +1046,7 @@ def test_crlf_working_copy_is_not_drift():
 
 
 @check("the rendered Skill augments grep, prints only real flags, and claims no kickoff step")
-def t_skill_description_invariants():
+def test_skill_description_invariants():
     """AC18's three invariants, all of one class: the description is the whole trigger mechanism.
 
     The flag set is imported from query.py rather than restated here — a second copy of that tuple
@@ -1106,7 +1106,7 @@ def t_skill_description_invariants():
 
 
 @check("recall-opened.test.sh: the hook records a rank on ANY corpus root")
-def t_hook_test():
+def test_hook_test():
     bash = shutil.which("bash")
     if not bash:
         raise _Skip("no bash on PATH")
@@ -1121,7 +1121,7 @@ def t_hook_test():
 
 
 @check("kit version constant and the gov:kit marker agree")
-def t_version_marker():
+def test_version_marker():
     v = recall_conf.KIT_MEMORY_RECALL_VERSION
     assert re.fullmatch(r"\d+\.\d+", v), f"version {v!r} is not the house two-part X.Y"
     hits = []
@@ -1136,7 +1136,7 @@ def t_version_marker():
 
 
 @check("bench.py and union.py are byte-identical to the upstream copies they were taken from")
-def t_verbatim_files():
+def test_verbatim_files():
     """Not a diff against upstream (no adopter has that repo) — a diff against the recorded digest.
 
     These two carry no coupling on the query path, so they are re-pulled WHOLESALE on an upstream
@@ -1154,7 +1154,7 @@ def t_verbatim_files():
 
 
 @check("the whole selftest passes from the ADOPTER layout (kit at <root>/memory-recall/)")
-def t_adopter_layout():
+def test_adopter_layout():
     """The layout the runbook ships, on the merge bar — because a gate green only in the repo that
     authored it is the third-shape defect this kit exists to prevent.
 
@@ -1192,10 +1192,6 @@ def t_adopter_layout():
 # ------------------------------------------------------------------------------------ the runner
 
 
-# These three are `test_*` where every sibling is `t_*`, and the inconsistency is deliberate.
-# The lexicon gate pins verb offenders shrink-only, `t` is not in the declared VERBS table and
-# `test` is, so the existing arms sit UNDER the pin as legacy and three more would push it over.
-# Renaming the siblings is that kit's shrink work, not this unit's.
 @check("a DECLARED conf source reaches the corpus as chunks, and un-declaring returns it")
 def test_declared_sources_reach_the_corpus():
     """S6's reproduction, as an arm. The corpus is rooted at MEMORY_ROOT, so a constraint DECLARED in
@@ -1310,17 +1306,17 @@ def main() -> int:
         live, before = None, "(absent)"
 
     order = [
-        t_parser_vs_bash, t_no_conf_query, t_no_conf_adopt, t_empty_alias,
-        t_zero_records_is_loud, t_empty_corpus_names_memory_root,
-        t_conf_digest_both_directions, t_digest_covers_kit_version, t_writes_nothing_in_worktree,
-        t_alias_rebuild, t_dead_alias_is_loud, t_eviction, t_printed_invocations_resolve,
-        t_budget_lru, t_budget_protections, t_build_marker_lifecycle,
-        t_budget_build_in_flight, t_budget_marker_ttl,
-        t_budget_cannot_satisfy, t_budget_recheck_before_delete, t_budget_blank,
-        t_python3_only,
-        t_scaffold_converges, t_skill_drift_reds, test_crlf_working_copy_is_not_drift,
-        t_skill_description_invariants, t_hook_test,
-        t_version_marker, t_verbatim_files, t_adopter_layout,
+        test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
+        test_zero_records_is_loud, test_empty_corpus_names_memory_root,
+        test_conf_digest_both_directions, test_digest_covers_kit_version, test_writes_nothing_in_worktree,
+        test_alias_rebuild, test_dead_alias_is_loud, test_eviction, test_printed_invocations_resolve,
+        test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
+        test_budget_build_in_flight, test_budget_marker_ttl,
+        test_budget_cannot_satisfy, test_budget_recheck_before_delete, test_budget_blank,
+        test_python3_only,
+        test_scaffold_converges, test_skill_drift_reds, test_crlf_working_copy_is_not_drift,
+        test_skill_description_invariants, test_hook_test,
+        test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
     ]

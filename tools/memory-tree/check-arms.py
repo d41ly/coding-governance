@@ -235,7 +235,7 @@ def classify(root: str, conf: dict, pairs=None) -> dict:
             "pairs": pairs, "m": m}
 
 
-def do_check(root: str, conf: dict) -> int:
+def cmd_check(root: str, conf: dict) -> int:
     st = classify(root, conf)
     brs, pinned, m = st["branches"], st["pinned"], st["m"]
     bad = list(st["errors"])
@@ -267,7 +267,7 @@ def do_check(root: str, conf: dict) -> int:
     floors = parse_floors(conf)
     # A FLOOR NAMING A GATE THAT IS NOT IN THE POPULATION IS A FAILURE, not a skip. The loop below
     # walks the DISCOVERED gates and looks each floor up by key, so a floor whose gate vanished was
-    # simply never consulted: `do_check` returned 0 with no output. Measured — reformatting one gate's
+    # simply never consulted: `cmd_check` returned 0 with no output. Measured — reformatting one gate's
     # helper from `fail() {` to `fail () {` drops it out of discovery entirely, taking 14 branches and
     # 14 arms with it, and every floor stayed green. The pin has this guard already (above); the
     # floors did not, and with the pin empty by design the floors are the only backstop left.
@@ -294,7 +294,7 @@ def do_check(root: str, conf: dict) -> int:
     return 1 if bad else 0
 
 
-def do_report(root: str, conf: dict) -> int:
+def cmd_report(root: str, conf: dict) -> int:
     st = classify(root, conf)
     floors = parse_floors(conf)
     for gate_rel, test_rel in st["pairs"]:
@@ -312,7 +312,7 @@ def do_report(root: str, conf: dict) -> int:
     return 0
 
 
-def do_emit_pin(root: str, conf: dict) -> int:
+def cmd_emit_pin(root: str, conf: dict) -> int:
     """Print the pin file for the CURRENT unarmed set — the measurement, not a guess."""
     st = classify(root, conf)
     print("# unarmed-branches.txt — `fail` branches with no positive assertion naming their own")
@@ -335,7 +335,7 @@ def _w(path, text):
         fh.write(text.encode("utf-8"))
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     fails = []
 
     def arm(label, want, fn):
@@ -400,7 +400,7 @@ def do_selftest() -> int:
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p", "--no-verify", cwd=root)
-        arm("a fully pinned + armed population passes", None, lambda: do_check(root, conf))
+        arm("a fully pinned + armed population passes", None, lambda: cmd_check(root, conf))
         # gate A's (1,1) pinned must NOT exempt gate B's (1,1)
         _w(os.path.join(root, "tools", "gate-b.test.sh"), "# no arm here\n")
         _w(pin, "tools/gate-a.sh\t1\t1\talpha branch message here\n"
@@ -410,12 +410,12 @@ def do_selftest() -> int:
         out = []
         arm("a pin for gate A does not exempt gate B's same key",
             "tools/gate-b.sh:2 check 1 branch 1 has no POSITIVE",
-            lambda: _capture(do_check, root, conf, out))
+            lambda: _capture(cmd_check, root, conf, out))
         arm("...and raises no stale-signature line against gate B", "[rc=0]",
             lambda: 0 if not any("gate-b" in l and "stale signature" in l for l in out) else 1)
         arm("...and gate A's own armed branch is reported as wrongly pinned",
             "pins tools/gate-a.sh check 1 branch 1, which IS armed now",
-            lambda: _capture(do_check, root, conf, []))
+            lambda: _capture(cmd_check, root, conf, []))
 
         # a missing sibling test is a NAMED failure, and it does not abort the other gate
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
@@ -423,7 +423,7 @@ def do_selftest() -> int:
         os.remove(os.path.join(root, "tools", "gate-b.test.sh"))
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "rm", "--no-verify", cwd=root)
         arm("a gate with no sibling test is named", "gate-b.test.sh is missing, but its gate has",
-            lambda: do_check(root, conf))
+            lambda: cmd_check(root, conf))
         out2 = []
         _w(pin, "")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "e", "--no-verify", cwd=root)
@@ -431,27 +431,27 @@ def do_selftest() -> int:
         # where in that gate the branch happens to sit.
         arm("one gate's error does not hide the other gate's branches",
             "tools/gate-a.sh:4 check 1 branch 2 has no POSITIVE",
-            lambda: _capture(do_check, root, conf, out2))
+            lambda: _capture(cmd_check, root, conf, out2))
 
         # restore gate B, then the per-gate floors
         _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
         _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=root)
-        arm("restored population passes", None, lambda: do_check(root, conf))
+        arm("restored population passes", None, lambda: cmd_check(root, conf))
         confh = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1")
         arm("a per-gate branch floor catches a deleted guard",
             "tools/gate-a.sh has 3 fail branch(es) against a floor of 4",
-            lambda: do_check(root, confh))
+            lambda: cmd_check(root, confh))
         confa = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:2")
         arm("a per-gate armed floor catches a dropped assertion",
             "tools/gate-a.sh has 1 armed branch(es) against a floor of 2",
-            lambda: do_check(root, confa))
+            lambda: cmd_check(root, confa))
         # CROSS-GATE COMPENSATION: an aggregate floor would be satisfied here; a per-gate one is not.
         confc = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1 tools/gate-b.sh:0:0")
         arm("a per-gate floor is not satisfied by another gate's growth",
             "tools/gate-a.sh has 3 fail branch(es)",
-            lambda: do_check(root, confc))
+            lambda: cmd_check(root, confc))
 
         # A FLOOR whose gate is gone. The floors loop walks the DISCOVERED gates and looks each floor
         # up by key, so before this guard a floor for a vanished gate was never consulted at all:
@@ -459,11 +459,11 @@ def do_selftest() -> int:
         # hypothetical — reformatting `fail() {` to `fail () {` drops a gate out of discovery.
         confz = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-gone.sh:9:9")
         arm("a floor naming a gate outside the population is a failure",
-            "which is NOT in the discovered population", lambda: do_check(root, confz))
+            "which is NOT in the discovered population", lambda: cmd_check(root, confz))
         # ...and the same floor set with the gate PRESENT is silent, so the arm above is not passing
-        # because do_check reds on everything.
+        # because cmd_check reds on everything.
         arm("...and a floor whose gate IS discovered stays silent", "[rc=0]",
-            lambda: do_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
+            lambda: cmd_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
 
         # a pin whose GATE is gone names that, not "the guard was deleted"
         _w(pin, "tools/gate-z.sh\t1\t1\tvanished gate message here\n"
@@ -471,7 +471,7 @@ def do_selftest() -> int:
                 "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "z", "--no-verify", cwd=root)
         arm("a pin for a gate outside the population says so",
-            "the gate is no longer in the population", lambda: do_check(root, conf))
+            "the gate is no longer in the population", lambda: cmd_check(root, conf))
 
         # a signature present only in the PIN arms nothing
         arm("a signature present only in the PIN arms nothing", "[rc=0]",
@@ -486,7 +486,7 @@ def do_selftest() -> int:
         _w(pin, "")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "c", "--no-verify", cwd=root)
         outc = []
-        _capture(do_check, root, conf, outc)
+        _capture(cmd_check, root, conf, outc)
         arm("a comment naming the message does not arm", "[rc=0]",
             lambda: 0 if any("check 2 branch 1 has no POSITIVE" in l for l in outc) else 1)
         arm("an absence assertion does not arm", "[rc=0]",
@@ -496,7 +496,7 @@ def do_selftest() -> int:
         _w(os.path.join(root, "tools", "gate-a.sh"), HELPER + '[ -n "$a" ] && fail 1 "$X:\n"\n')
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "x", "--no-verify", cwd=root)
         arm("a message with no literal run is named", "no literal run long enough",
-            lambda: do_check(root, conf))
+            lambda: cmd_check(root, conf))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
@@ -522,7 +522,7 @@ def _capture(fn, root, conf, sink):
 def main(argv):
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
     except Exception:  # noqa: BLE001
@@ -531,11 +531,11 @@ def main(argv):
     conf = load_conf(root)
     try:
         if mode == "--check":
-            return do_check(root, conf)
+            return cmd_check(root, conf)
         if mode == "--report":
-            return do_report(root, conf)
+            return cmd_report(root, conf)
         if mode == "--emit-pin":
-            return do_emit_pin(root, conf)
+            return cmd_emit_pin(root, conf)
         print("usage: check-arms.py [--check|--report|--emit-pin|--selftest]")
         return 2
     except Problem as exc:

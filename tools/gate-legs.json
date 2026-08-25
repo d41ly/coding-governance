@@ -862,9 +862,7 @@
       "tools/lexicon/adopt-lexicon.sh",
       "--check"
     ],
-    "guard": [
-      "tools/lexicon/"
-    ],
+    "guard": [],
     "chunk": "wiring",
     "subject": "repo"
   },

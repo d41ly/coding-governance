@@ -85,6 +85,7 @@ tools/line-length-limits.txt text eol=lf
 # population, which is DERIVED from tracked `.claude/` paths carrying this attribute — so the pin is
 # the whole of that wiring and the script needs no edit.
 .claude/skills/unattended/SKILL.md text eol=lf
+.claude/skills/lexicon/SKILL.md text eol=lf
 
 # The /session-kickoff engine. Pinned because a GATE now reads it — check 12 of the unattended leg
 # greps its text, which nothing did before. That leg strips CR anyway, and both halves are the point:

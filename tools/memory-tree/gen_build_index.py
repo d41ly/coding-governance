@@ -529,7 +529,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     return out
 
 
-def do_print_bindings(root: str, conf: dict) -> int:
+def cmd_print_bindings(root: str, conf: dict) -> int:
     """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
 
     It is the retrofit's own checklist AND the predicate the gate reads, so a seed list and a gate
@@ -783,6 +783,64 @@ def render_region(build: dict) -> str:
 IDS_WRAP = 300
 
 
+def _render_id_ranges(ids: list) -> str:
+    """`FAMILY-slug-2 … FAMILY-slug-15` as `FAMILY-slug-2..15`, contiguous runs only.
+
+    A TABLE cell cannot wrap the way `_render_wrapped_ids` wraps a paragraph, so the bindings row needs
+    a shorter spelling rather than more lines. This is `TOOL-dUnstalledConvoy-13`: a record serving
+    a build past about eleven units cannot fit the row under the entry cap BY CONSTRUCTION, because
+    the row carries the filename, the path AND every id it serves. Measured at 505 characters for a
+    fourteen-unit spec audit, against a 350 ceiling.
+
+    The range spelling is not invented here — it is the one the AUTHORING grammar already accepts and
+    expands, so a reader of the generated row and a reader of a hand-written `Serves:` line are
+    reading the same notation. Only a run of consecutive ordinals sharing a family and slug collapses;
+    anything else is emitted verbatim, so a gap can never be swallowed by the abbreviation.
+    """
+    if not ids:
+        return ""
+    out, i = [], 0
+    while i < len(ids):
+        head = ids[i]
+        stem, _, num = head.rpartition("-")
+        if not num.isdigit():
+            out.append(head)
+            i += 1
+            continue
+        j, last = i, int(num)
+        while j + 1 < len(ids):
+            nstem, _, nnum = ids[j + 1].rpartition("-")
+            if nstem != stem or not nnum.isdigit() or int(nnum) != last + 1:
+                break
+            j += 1
+            last = int(nnum)
+        out.append(head if j == i else f"{stem}-{int(num)}..{last}")
+        i = j + 1
+    return " ".join(out)
+
+
+def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
+    """`<prefix> <id> <id> ….` as one or more lines, none wider than `cap`.
+
+    Consecutive non-blank lines join into ONE markdown paragraph, so the wrap is invisible to a
+    reader and the rendered text is unchanged — while every emitted line stays under the per-line
+    entry cap check 7 enforces. Hit for real by a thirteen-unit build: the `spec-audit` gap line
+    reached 399 characters against a 350 ceiling and the build could not be committed. The remedy
+    must never be raising that ceiling, because this population grows with every unit a build
+    carries, so a raise buys one build and reds the next. Same renderer-shaped class as
+    `TOOL-dUnstalledConvoy-13` and NOT a fix for it: that row is the generated record-BINDINGS row,
+    a different line with a different grammar, and it stays open.
+    """
+    lines, cur = [], prefix
+    for i in ids:
+        if cur not in ("", prefix) and len(cur) + 1 + len(i) > cap:
+            lines.append(cur)
+            cur = ""
+        cur += (" " if cur else "") + i
+    lines.append(cur + ".")
+    return lines
+
+
 def _wrap_ids(roster: list) -> list:
     """`ids` as one or more lines, none wider than IDS_WRAP. Empty roster renders no line at all."""
     if not roster:
@@ -975,7 +1033,7 @@ SLOT_HIGHWATER = "build-readme-slot-highwater.txt"
 
 # TOOL-dFramedEntrypoint, round-3 HIGH. Every reader of the two files above resolved them from
 # `__file__`, so nothing could point them at a fixture — and that is exactly why the arms covering
-# `do_bump` twice ended up RESTATING its filter inline instead of calling it: the verb writes into
+# `cmd_bump` twice ended up RESTATING its filter inline instead of calling it: the verb writes into
 # the installed kit directory, so an arm that called it would have rewritten this repo's own
 # high-water file. One seam fixes the class. Production resolves from `__file__` as before; the
 # selftest sets the override, calls the real verb, and asserts on real bytes.
@@ -1449,7 +1507,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
         base = b["readme"].rsplit("/", 1)[0]
         for u in b["units"]:
             # `u["path"]` is ABSOLUTE and mixed-separator on Windows. Every other artifact key here
-            # is repo-relative, and `do_write` joins the key onto `root` — so an absolute key wrote
+            # is repo-relative, and `cmd_write` joins the key onto `root` — so an absolute key wrote
             # the right file by luck and computed the wrong relative link. Re-derive it the way
             # `render_region` already does, from the build root plus the tail.
             marker = "/builds/" + b["slug"] + "/"
@@ -1479,7 +1537,7 @@ def plan(root: str, conf: dict, create_missing: bool = False) -> tuple:
 
 
 # -------------------------------------------------------------------------------------------- modes
-def do_check(root: str, conf: dict) -> int:
+def cmd_check(root: str, conf: dict) -> int:
     artifacts, orphans, unmanaged = plan(root, conf)
     bad = []
     for rel, want in sorted(artifacts.items()):
@@ -1501,7 +1559,7 @@ def do_check(root: str, conf: dict) -> int:
     return 0
 
 
-def do_check_format(root: str, conf: dict) -> int:
+def cmd_check_format(root: str, conf: dict) -> int:
     """The SLOT CONTRACT verb — deliberately NOT reachable from plan(), --write or --check (S1a).
 
     Build READMEs violate the sequence at this unit's base, so a refusal on the render path would red
@@ -1562,7 +1620,7 @@ def do_check_format(root: str, conf: dict) -> int:
     return 0
 
 
-def do_report(root: str, conf: dict) -> int:
+def cmd_report(root: str, conf: dict) -> int:
     """Every bound README's slot sizes against both numbers. The margin, readable BEFORE a breach.
 
     This exists because the runner prints one ok line for a passing leg and echoes leg stdout only on
@@ -1589,7 +1647,7 @@ def do_report(root: str, conf: dict) -> int:
     return 0
 
 
-def do_bump(root: str, conf: dict) -> int:
+def cmd_bump(root: str, conf: dict) -> int:
     """Rewrite the HIGH-WATER file from the measured tree. It never writes the ceiling file."""
     here = resolve_slot_data_dir()
     bound = sorted(read_contract_registry(root, conf))
@@ -1611,7 +1669,7 @@ def do_bump(root: str, conf: dict) -> int:
     return 0
 
 
-def do_survey(root: str, conf: dict) -> int:
+def cmd_survey(root: str, conf: dict) -> int:
     """Run the canon over EVERY tracked build README, bound or not, and report. Never fails.
 
     This repo requires a new gate predicate to be run over the real tree before it is wired, printing
@@ -1639,7 +1697,7 @@ def do_survey(root: str, conf: dict) -> int:
     return 0
 
 
-def do_write(root: str, conf: dict) -> int:
+def cmd_write(root: str, conf: dict) -> int:
     artifacts, orphans, unmanaged = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
@@ -1684,7 +1742,7 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     return load_conf(tmp)
 
 
-def do_selftest() -> int:
+def cmd_selftest() -> int:
     fails = []
 
     def arm(label, want, fn):
@@ -1699,6 +1757,27 @@ def do_selftest() -> int:
         else:
             fails.append(label)
             print(f"arm FAIL  {label} — expected to see: {want}\n      got: {got}")
+
+    # `_render_id_ranges` — the bindings row's cap remedy (TOOL-dUnstalledConvoy-13). The COLLAPSING arm
+    # alone is the fixture-passes-by-finding-nothing shape: a stub returning its input joined would
+    # fail it, but so would a greedy version that swallows a gap, and only the second arm can tell
+    # those apart. The third holds the boundary at two, where a range is not shorter than the pair.
+    arm("a contiguous run collapses to a range", "TOOL-dX-2..4",
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-4"]))
+    arm("a GAP is never swallowed by the range", "TOOL-dX-2..3 TOOL-dX-7",
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dX-3", "TOOL-dX-7"]))
+    arm("a differing slug does not join a run", "TOOL-dX-2 TOOL-dY-3",
+        lambda: _render_id_ranges(["TOOL-dX-2", "TOOL-dY-3"]))
+    arm("a non-numeric tail is emitted verbatim", "TOOL-dX-head",
+        lambda: _render_id_ranges(["TOOL-dX-head"]))
+
+    # `_render_wrapped_ids` — the gap lines' cap remedy. The arm asserts the WRAP, not the content: a
+    # version that never wraps returns one line and fails on the count, which is the property the
+    # 399-character overflow was about.
+    arm("a long id list wraps below the cap", "True", lambda: str(
+        len(_render_wrapped_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
+        and max(len(x) for x in _render_wrapped_ids(
+            "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
 
     with tempfile.TemporaryDirectory() as base:
         # AC5 — a build leaves LIVE.md when its units go terminal, with nothing edited by hand.
@@ -1757,7 +1836,7 @@ def do_selftest() -> int:
             lambda: str(plan(t8, conf8)[1]))
         arm("a non-shard file under ledger/ is NOT deletable", "memory/ledger/notes.md",
             lambda: str(plan(t8, conf8)[2]))
-        do_write(t8, conf8)
+        cmd_write(t8, conf8)
         arm("--write removed the orphan", "False",
             lambda: str(os.path.exists(os.path.join(t8, "memory", "ledger", "1999-01.md"))))
         arm("--write kept the unmanaged file", "True",
@@ -1780,8 +1859,8 @@ def do_selftest() -> int:
         # and red forever after.
         t11 = os.path.join(base, "roundtrip"); os.makedirs(t11)
         conf11 = _fixture(t11, spec_status="OPEN")
-        do_write(t11, conf11)
-        arm("write then check is a fixed point", "0", lambda: str(do_check(t11, conf11)))
+        cmd_write(t11, conf11)
+        arm("write then check is a fixed point", "0", lambda: str(cmd_check(t11, conf11)))
 
         # ---- TOOL-aRuledFrontispiece-1: the slot contract, region creation, and the ASYMMETRY.
         # A fixture whose README carries ONLY the build-index pair: the other three are absent.
@@ -1791,19 +1870,19 @@ def do_selftest() -> int:
 
         # S1c — the ASYMMETRY. --check must be SILENT about the three absent pairs.
         #
-        # ORDER IS THE WHOLE ARM. This ran AFTER do_write, which had just created the three pairs, so
+        # ORDER IS THE WHOLE ARM. This ran AFTER cmd_write, which had just created the three pairs, so
         # there was no absent pair left to be silent about and the arm could not fail: mutation-proved
-        # by patching do_check to pass create_missing=True — the exact regression it claims to catch —
+        # by patching cmd_check to pass create_missing=True — the exact regression it claims to catch —
         # and watching the suite still report PASS. It runs BEFORE the write now, on a fixture that
         # genuinely lacks the pairs, and asserts the render directly rather than an exit code.
-        # THE ARM MUST RUN THROUGH do_check, not through plan(). Two earlier spellings did not, and
-        # both were mutation-proved useless: one ran after do_write so no pair was absent, and one
-        # called plan() directly so patching do_check — the site that actually carries the defect —
+        # THE ARM MUST RUN THROUGH cmd_check, not through plan(). Two earlier spellings did not, and
+        # both were mutation-proved useless: one ran after cmd_write so no pair was absent, and one
+        # called plan() directly so patching cmd_check — the site that actually carries the defect —
         # left the suite green. The fixture is rendered FIRST so the build-index region is fresh, then
-        # the three other pairs are removed. Now the only thing that can make do_check report stale is
+        # the three other pairs are removed. Now the only thing that can make cmd_check report stale is
         # create_missing leaking into it, which is exactly S1c.
         rd12 = os.path.join(t12, "memory", "builds", "tOne", "README.md")
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         # WHOLE regions, markers and body together. Stripping only the marker lines orphans the
         # rendered body as loose authored text, which makes the fixture genuinely non-conforming and
         # reds a later arm for a reason that has nothing to do with what this one tests.
@@ -1818,10 +1897,10 @@ def do_selftest() -> int:
             if _o is not None and _c is not None:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
-        arm("check does not CREATE an absent pair", "0", lambda: str(do_check(t12, conf12)))
+        arm("check does not CREATE an absent pair", "0", lambda: str(cmd_check(t12, conf12)))
         arm("every trailing pair really is absent for that arm", str(len(GEN_REGIONS) - 1),
             lambda: str(sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
             sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         arm("write CREATED every absent trailing pair", str(len(GEN_REGIONS) - 1),
@@ -1837,7 +1916,7 @@ def do_selftest() -> int:
         conf13 = _fixture(t13, spec_status="OPEN")
         rd13 = os.path.join(t13, "memory", "builds", "tOne", "README.md")
         write_text(rd13, read_text(rd13) + "\n## Afterword\n\nauthored prose below the region.\n")
-        do_write(t13, conf13)
+        cmd_write(t13, conf13)
         arm("a violating README keeps its authored tail", "authored prose below the region.",
             lambda: read_text(rd13))
         arm("a violating README still gains its pairs", "True",
@@ -1857,7 +1936,7 @@ def do_selftest() -> int:
             "authored content between the plan pair and the generated region",
             lambda: str(slot_violations(read_text(rd14), "x")))
         # S2 — the generator NEVER writes between the plan markers.
-        do_write(t14, conf14)
+        cmd_write(t14, conf14)
         arm("the authored plan region survives a write verbatim", "| # | unit |",
             lambda: read_text(rd14))
 
@@ -1926,8 +2005,8 @@ def do_selftest() -> int:
                                         "x", canon=True)))
         # D4 — --bump duplicated all five rows per run because its keep-filter read `## ` as a
         # comment. The two functions parse ONE grammar and must AGREE about it; that is the arm.
-        # CALLS `do_bump` FOR REAL, twice, and asserts the row count is STABLE. Three rounds of
-        # review went by with this uncovered because every earlier attempt RESTATED do_bump's filter
+        # CALLS `cmd_bump` FOR REAL, twice, and asserts the row count is STABLE. Three rounds of
+        # review went by with this uncovered because every earlier attempt RESTATED cmd_bump's filter
         # inline rather than running it — the verb wrote into the installed kit directory, so an arm
         # that called it would have rewritten this repo's own high-water file. `_SLOT_DATA_DIR` is
         # the seam that makes the real call possible; without it the only honest options were a
@@ -1946,8 +2025,8 @@ def do_selftest() -> int:
             global _SLOT_DATA_DIR
             _SLOT_DATA_DIR = _bdir
             try:
-                do_bump(_bt, _bconf)
-                do_bump(_bt, _bconf)
+                cmd_bump(_bt, _bconf)
+                cmd_bump(_bt, _bconf)
                 return sum(1 for l in read_text(os.path.join(_bdir, SLOT_HIGHWATER)).split("\n")
                            if "\t" in l)
             finally:
@@ -2206,10 +2285,10 @@ def do_selftest() -> int:
         # read-only verb that writes is the whole risk of that verb.
         t12 = os.path.join(base, "ro"); os.makedirs(t12)
         conf12 = _fixture(t12)
-        do_write(t12, conf12)
+        cmd_write(t12, conf12)
         _before = {p: read_text(os.path.join(t12, p)) for p in
                    ("memory/LIVE.md", "memory/builds/tOne/README.md")}
-        do_print_bindings(t12, conf12)
+        cmd_print_bindings(t12, conf12)
         arm("--print-bindings leaves every generated artifact byte-identical", "True",
             lambda: str(all(read_text(os.path.join(t12, p)) == v for p, v in _before.items())))
 
@@ -2219,7 +2298,7 @@ def do_selftest() -> int:
             import io as _io, contextlib as _cl
             buf = _io.StringIO()
             with _cl.redirect_stdout(buf):
-                do_print_bindings(tree, cf)
+                cmd_print_bindings(tree, cf)
             return buf.getvalue()
 
         t13 = os.path.join(base, "srow"); os.makedirs(t13)
@@ -2232,7 +2311,7 @@ def do_selftest() -> int:
             "S\tmemory/builds/tOne/reviews/2026-08-01-review-tOne-1.md\tspec-audit\tARCH-tOne-1",
             lambda: _rows(t13, conf13))
         arm("--print-bindings still exits 0 with an S row present", "0",
-            lambda: str(do_print_bindings(t13, conf13)))
+            lambda: str(cmd_print_bindings(t13, conf13)))
 
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
@@ -2282,7 +2361,7 @@ def do_selftest() -> int:
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
-        return do_selftest()
+        return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
                     "--report", "--bump"):
         print("usage: gen_build_index.py "
@@ -2296,17 +2375,17 @@ def main(argv: list) -> int:
         return 2
     conf = load_conf(root)
     if mode == "--print-bindings":
-        return do_print_bindings(root, conf)
+        return cmd_print_bindings(root, conf)
     try:
         if mode == "--check-format":
-            return do_check_format(root, conf)
+            return cmd_check_format(root, conf)
         if mode == "--survey":
-            return do_survey(root, conf)
+            return cmd_survey(root, conf)
         if mode == "--report":
-            return do_report(root, conf)
+            return cmd_report(root, conf)
         if mode == "--bump":
-            return do_bump(root, conf)
-        return do_check(root, conf) if mode == "--check" else do_write(root, conf)
+            return cmd_bump(root, conf)
+        return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")
         return 1

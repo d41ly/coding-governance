@@ -1,10 +1,12 @@
 """lexicon_conf.py — the ONE reader of `.lexicon.conf`.
 
-Three consumers need this file: the engine (`tools/lexicon/lexicon.py`), the adopter script
-(`tools/lexicon/adopt-lexicon.sh`, in bash), and — when its unit unparks — this repo's
-`map_extractors.py`. Two or three hand-written parsers for one file is the
-two-answers-to-one-question class, so the bash side calls `--print-verbs` here rather than
-reimplementing the grammar, and any other consumer imports `load_conf`.
+FOUR consumers need this file: the engine (`tools/lexicon/lexicon.py`), the adopter script
+(`tools/lexicon/adopt-lexicon.sh`, in bash), this repo's `map_extractors.py`, and `drift-audit`'s
+signals. Two hand-written parsers for one file is the two-answers-to-one-question class, so the bash
+side calls `--print-verbs` here rather than reimplementing the grammar, and every Python consumer
+imports `load_conf`. The count above read "three" and hedged the third with "when its unit unparks"
+long after it unparked, while the map dossier said four and listed them correctly — two carriers of
+one count, disagreeing, in a file whose whole subject is not having two of something.
 
 THE GRAMMAR, and why it is not exactly the sibling one. `.memory-tree.conf` and
 `.codebase-map.conf` are a RESTRICTED line-based `KEY=VALUE` that bash can `source` and Python can
@@ -117,6 +119,23 @@ def _parse_block(key: str, rows: list[tuple[int, str]], p: Path):
     return pairs
 
 
+
+def build_negatives(conf: dict) -> dict:
+    r"""`{verb: {banned-token, ...}}` from the NOT clauses in each VERBS gloss.
+
+    THE BACKTICKS ARE THE GRAMMAR, not decoration. Measured against the table this landed on: the
+    pattern ``NOT\s+`([A-Za-z]+)` `` matches exactly the rows a bare `\bNOT\b` word match does, so
+    there is no un-backticked `NOT` anywhere in the corpus this must govern — it parses every
+    existing row with zero rewrites and zero false positives. A looser pattern would have to guess
+    where the token ends, and the prose after the comma is the half a reader actually needs.
+
+    A row may carry SEVERAL build_negatives. The gloss keeps its prose; only the tokens are extracted.
+    """
+    out = {}
+    for verb, gloss in (conf.get("VERBS") or {}).items():
+        out[verb] = set(re.findall(r"NOT\s+`([A-Za-z][A-Za-z0-9_]*)`", gloss or ""))
+    return out
+
 def langs(conf: dict) -> list[tuple[str, str, str]]:
     """`LANGS` as `(ext, pattern_set_id, mode)` triples. An empty pattern-set id is legal and is
     what a `dark` declaration looks like — it names no extractor on purpose."""
@@ -133,17 +152,31 @@ def langs(conf: dict) -> list[tuple[str, str, str]]:
 
 
 def _main(argv: list[str]) -> int:
-    """`--print-verbs <conf>` — one verb per line, for the bash side. Anything else is a usage
+    """`--print-verbs <conf>` one verb per line, `--print-rows <conf>` verb+TAB+gloss.
+
+    `--print-rows` exists because the Skill render needs the GLOSS, and rendering it any other way
+    means a second parser for the block grammar. That was the shape the closing review found (H2):
+    the render carried its own inline parser, so the two disagreed on a continuation line and on a
+    row whose gloss contained a colon, and the drift gate could not see it — it compared two outputs
+    of the SAME renderer. One reader, two output shapes.
+
+    Anything else is a usage
     refusal: this module is a library first and a CLI only for the one consumer that cannot import."""
-    if len(argv) != 3 or argv[1] != "--print-verbs":
-        sys.stderr.write("usage: python tools/lexicon/lexicon_conf.py --print-verbs <conf>\n")
+    if len(argv) != 3 or argv[1] not in ("--print-verbs", "--print-rows"):
+        sys.stderr.write("usage: python tools/lexicon/lexicon_conf.py "
+                         "--print-verbs|--print-rows <conf>\n")
         return 2
     try:
         conf = load_conf(argv[2])
     except ConfError as e:
         sys.stderr.write(f"lexicon-conf: {e}\n")
         return 1
-    for verb in sorted(conf.get("VERBS") or {}):
+    verbs = conf.get("VERBS") or {}
+    if argv[1] == "--print-rows":
+        for verb, gloss in verbs.items():          # DECLARATION order, which the Skill preserves
+            print(f"{verb}	{(gloss or '').strip()}")
+        return 0
+    for verb in sorted(verbs):
         print(verb)
     return 0
 
