@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T04:27:19+03:00 @ 9ddcc5c944bdb92456ef031ee5f038842d016587
+last-audit: 2026-08-25T04:35:56+03:00 @ 9ddcc5c944bdb92456ef031ee5f038842d016587
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2b69704015b739a1736f79d5c35c661ddd8bb148
+last-body-change: 48a88bf6967b7d236dc843c23a12b47bea2861e5
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -53,11 +53,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   parallel-where-proven with sequence as the fallback. The conditions and the two bounds on that
   authority are M3's and M6's; they are not restated here, for the reason the directives bullet
   below gives. What is NOT in force is the VERIFICATION of that parallelism: `--dispatch` records a
-  pass's declared write set, but grading it against what the pass committed ships DARK behind
-  any run carrying dispatch rows. `TOOL-dUnstalledConvoy-23` redesigned it: the comparison now
-  RUNS on every leg and REPORTS to stdout, and it never fails the bar — a gate here and a
-  stall-free unattended run were shown to be the same choice. Declare your write
-  sets anyway — a redesign reads them — but do not treat a green leg as a disjointness proof.
+  pass's declared write set, and the comparison REPORTS to stdout without ever failing the bar
+  (`TOOL-dUnstalledConvoy-23`). Declare write sets anyway; a green leg is not a disjointness proof.
 
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
@@ -98,6 +95,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   either parent. Nothing was lost, because the work turned out largely orthogonal, but that was luck
   rather than design. §3's rule is own STREAMS not files; a kit is the unit that rule is about, and
   the cheap check is a `git log` at kickoff rather than a merge at landing.
+
+- **The charter's read path is FULL.** A `DECISIONS.md` row costs ~295 B and the margin under
+  `READ_PATH_CEILING` is smaller than that, so recording a new ratified decision reds hygiene check
+  16 until the path is trimmed. `python tools/memory-tree/corpus_ids.py --measure` prints the live pair.
 
 ### Pointer map (load the row(s) the task touches)
 
