@@ -12,7 +12,9 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 witness: 5697917a3071a2282cc5ce75aff80e5013c81d51
-phase: LANDING
+phase: LANDED
+landed-anchor: remote
+unpushed-at-landing: 0
 mode: slug
 anchor-kind: default-branch
 keepalive: 5e8e6047
