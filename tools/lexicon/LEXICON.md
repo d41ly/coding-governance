@@ -46,8 +46,8 @@ declaration is delivered three ways, and none of them is the gate.
   new function in it can be named alongside its neighbours rather than against the whole repo. Two
   groups are NOT concept drift and are labelled so you do not read them as such: definitions with no
   object at all (single-token names) are counted rather than dropped, and names sharing only a
-  stopword tail — `pin_of`, `cache_of`, `token_of` — are marked a shared STOPWORD tail rather than a
-  shared concept. Until `TOOL-dPromptedSeam-3` they were reported as one concept spelled many ways.
+  dead tail — `pin_of`, `cache_of`, `token_of`, or a one-character object — are marked a shared DEAD
+  tail rather than a shared concept. Until `TOOL-dPromptedSeam-3` they were reported as one concept spelled many ways.
 
 Read the table when you are naming something, not when a gate stops you.
 

@@ -60,7 +60,7 @@ ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
 | [TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud](spec/2026-08-25-spec-dPromptedSeam-3.md) | — | 1 | CLOSED | rev-4 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

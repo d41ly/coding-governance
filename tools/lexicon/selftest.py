@@ -1001,13 +1001,20 @@ check("...and the three states are distinct, so no two collapse",
       len({lex.read_object_state(n) for n in ("pin_of", "build_index", "main")}) == 3,
       str([lex.read_object_state(n) for n in ("pin_of", "build_index", "main")]))
 
-# THE SET EQUALS map_lib's, and nothing but this arm says so. The layer ban forbids importing
-# map_lib, so a parity gate cannot exist; the spec's Q1 records that and this asserts the count and
-# two members rather than pretending the equality is watched.
+# THE SET EQUALS map_lib's, and the REAL parity arm is in `tools/codebase-map/selftest.py`, which
+# may import both kits because the layer ban is directional and file-scoped. These two arms assert
+# only the SHAPE — a count and the members this corpus trips on — because this file cannot import
+# map_lib and must not pretend to. An earlier version of this comment said a parity gate could not
+# exist at all, which was false and closed the spec question that would have built it.
 check("the restated stopword set is 21 words, as map_lib declares",
       len(lex.DEAD_TOKENS) == 21, str(len(lex.DEAD_TOKENS)))
 check("...and holds the members the corpus actually trips on",
       {"of", "at", "in", "for", "with"} <= lex.DEAD_TOKENS, str(sorted(lex.DEAD_TOKENS)[:8]))
+# THE LENGTH HALF IS COPIED TOO, and it was ungated while the membership half was not. `map_lib`
+# drops tokens shorter than two characters by a rule separate from its stopword set, so the constant
+# restating it is a second copied fact and deserves the same arm. Round-2 M2.
+check("the restated minimum token length is map_lib's 2, not a number of this kit's own",
+      lex.MIN_LIVE_TOKEN == 2, str(lex.MIN_LIVE_TOKEN))
 
 # THE MARKER, both directions in one fixture. A dead shared object prints its row and must NOT claim
 # a shared concept; a live shared object must. One arm cannot pass while the other fails on a build

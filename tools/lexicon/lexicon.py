@@ -858,7 +858,12 @@ def run_suggest(root: Path, name: str) -> int:
 #: the kit cannot read the authority it is copying. The set must EQUAL `map_lib`'s: a subset would
 #: make two kits disagree about the same word, silently.
 #:
-#: THE EQUALITY IS GATED, and the first draft of this comment said it could not be. That was false and
+#: THE EQUALITY IS GATED ON DEMAND, not at the push boundary, and both halves of that sentence
+#: matter. The arm lives on `codebase-map kit selftest`, a `subject: kit` leg that `run-gates.sh`
+#: HOLDS unless `GATE_SELFTESTS=1`; `.githooks/pre-push` sets `GATE_FULL` and not that, so a push
+#: does not run it. Its guard now names `tools/lexicon/` so the edit that CAUSES the drift at least
+#: selects the leg. An earlier draft of this comment said flatly "gated", which overclaimed, and the
+#: draft before THAT said no such gate could exist, which was false. That was false and
 #: the falsehood mattered, because it closed the spec's own open question as RESOLVED and foreclosed
 #: the repair. The `LAYERS` rule is DIRECTIONAL and FILE-SCOPED — `tools/lexicon/* -> tools/codebase-map/*`
 #: forbids THIS kit importing THAT one, and says nothing about a third file importing both.
@@ -976,7 +981,17 @@ def run_brief(root: Path, target: str) -> int:
         return 0
 
     live: dict = {}
+    # SEEDED FROM THE TARGET FIRST, and that is not an optimisation. The corpus loop below walks
+    # `tracked_files(root)`, so a target that is not tracked contributes nothing to this index — and
+    # `--brief` on an uncommitted file is the lexicon Skill's PRIMARY path, since the whole point is
+    # naming something before you commit it. Keying the verdict on this index alone made that path
+    # die with `KeyError`, exit 1, colliding with the code this function reserves for verdicts.
+    # Round-2 B1, introduced by round 1's own L4 fix.
     spellings_of: dict = {}
+    for n in names:
+        o = read_object(n)
+        if o:
+            spellings_of.setdefault(o, set()).add(n)
     for f in tracked_files(root):
         e = ext_of(f)
         if e not in declared:
@@ -1014,7 +1029,11 @@ def run_brief(root: Path, target: str) -> int:
         # here, three lines from the helper that exists to answer exactly this — so the same rule had
         # two spellings and the second would have drifted. `read_object_state` takes the IDENTIFIER,
         # and every name sharing this object yields it, so any one of them answers for the row. L4.
-        dead = read_object_state(next(iter(sorted(spellings_of[obj])))) == "dead"
+        # `.get`, never `[]`: every object in `here` came from the target, so the seed above covers
+        # it — but a defensive lookup is what keeps a future caller that builds `here` differently
+        # from re-earning B1. An object with no known spelling cannot be judged, so it is not dead.
+        _spell = sorted(spellings_of.get(obj) or ())
+        dead = bool(_spell) and read_object_state(_spell[0]) == "dead"
         if len(seen) > 1 and dead:
             # NOT "STOPWORD": a token dies by membership OR by being shorter than two characters, and
             # this branch fires for both. Naming only the first would print a reason that is wrong for

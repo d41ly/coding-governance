@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-1.md) | diff-review | TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 |
+| [2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-2.md](../reviews/2026-08-25-review-TOOL-dPromptedSeam-1-2-3-diff-review-round-2.md) | diff-review | TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 |
 
 <!-- /gen:spec-records -->
 
@@ -181,8 +182,10 @@ report a human reads, and gating a report's prose is how a report stops being ch
 - `read_object()` (`tools/lexicon/lexicon.py:856`) — READ, not changed. Its contract is a §3 non-goal.
 - `subtokens()` (`tools/lexicon/subtokens.py`) — REUSED unchanged; the predicate reads its output.
 - `map_lib._STOPWORDS` + the `len(t) >= 2` rule (`tools/codebase-map/map_lib.py:583-628`) — RESTATED,
-  not imported, because `.lexicon.conf` forbids that direction. Q1 records that nothing can gate the
-  restatement and why.
+  not imported, because `.lexicon.conf` forbids that direction — which is a rule about THIS kit
+  importing THAT one and not about a third file importing both. The real parity arm lives in
+  `tools/codebase-map/selftest.py`, which already imports both. Q1 carries the correction; this
+  sentence carried the original false claim and was the fourth carrier of it, named by no lens.
 - `run_brief` (`lexicon.py:910-945`) — EXTENDED at its two existing join points rather than rewritten.
 
 **Recall terms used**, shared with the build's other units per M5: `lexicon subtokens port
