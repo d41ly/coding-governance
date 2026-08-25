@@ -10,6 +10,7 @@
 | [2026-08-25-review-TOOL-dHonouredPark-1-diff-review-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-diff-review-round1.md) | diff-review | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round1.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
 | [2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md](../reviews/2026-08-25-review-TOOL-dHonouredPark-1-spec-audit-round2.md) | spec-audit | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
+| [2026-08-26-review-TOOL-dHonouredPark-1-diff-review-round2.md](../reviews/2026-08-26-review-TOOL-dHonouredPark-1-diff-review-round2.md) | diff-review | TOOL-dHonouredPark-1 TOOL-dHonouredPark-2 TOOL-dHonouredPark-4 |
 
 <!-- /gen:spec-records -->
 
