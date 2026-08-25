@@ -11,15 +11,15 @@ status: OPEN
 # dSpentCeiling — the read-path budget becomes a rate signal, and rule 3 keeps its teeth
 
 ## The problem this build exists to solve
-`READ_PATH_CEILING` gates a byte budget over the files `AGENTS.md` points a session at, and as a
-budget it does not work. Measured against each commit's first parent, the pin moved 26 times between
-2026-08-08 and 2026-08-25 — 25 up, 1 down — and the one drop was forced by a different check. It
-cannot cause a trim: `memory/DECISIONS.md` is append-only by charter section 6, so one member is
-forbidden to shrink and a breach is guaranteed. `memory/LIVE.md` is generated and tracks open-build
-count, so part of the budget measures parallelism (`TOOL-aRelaxedShard-3`). And the check fails only
-when the total EXCEEDS the pin, so a ceiling left high is green forever (`cKeyedLaunchpad` H6). The
-half that works is rule 3 — the charter may not cite an uncapped `memory/` file — and it dies with
-the budget, because all of check 16 sits behind `if conf["READ_PATH_CEILING"]:`.
+`READ_PATH_CEILING` gates a byte budget over the files `AGENTS.md` points a session at, and it has
+never caused a trim: 27 movements since 2026-08-08, 26 of them up, and the one drop forced by a
+different check. It was always a SECOND bound — check 6 already caps all six members at 61440 B
+each, 368640 B of first bounds against the 135694 B held — and it bound earlier only because it
+summed six incommensurable things. Worse, 54.0% of what it measures is RENDERED FROM KIT TEMPLATES
+(`memory-tree@2.41`, `unattended@1.8`) and cannot be trimmed by this repo at all, so most raises were
+pricing other kits' releases against this kit's budget. The half that works is rule 3 — the charter
+may not cite an uncapped `memory/` file — and it dies with the budget, because all of check 16 sits
+behind `if conf["READ_PATH_CEILING"]:`.
 
 ## Expected improvements
 - The instrument stops gating, and the question it asked is answered by a signal that derives both
@@ -49,6 +49,9 @@ the budget, because all of check 16 sits behind `if conf["READ_PATH_CEILING"]:`.
 - **Rule 3's arming condition is the load-bearing design question**, not a detail of the deletion.
   Its acceptance must observe rule 3 firing with `READ_PATH_CEILING` absent from the conf entirely.
 - **`read_set` does not move.** Which files count is out of scope.
+- **The append-only argument is REFUTED and must not be re-opened.** An earlier draft of this build
+  argued the breach was structurally guaranteed because `memory/DECISIONS.md` cannot shrink. It can:
+  it ROTATED on 2026-08-10, 79 rows to `memory/archive/`. The real argument is composition, above.
 - **drift-audit is undossiered and this build dossiers it.** Its keys sit in `memory/map/baseline.toml`
   and the new signal lands there, so the map's convergence rule makes that a DoR item.
 

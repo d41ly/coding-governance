@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-25T10:52:51+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
+last-audit: 2026-08-25T11:50:57+03:00 @ 70df24ea1963afd7ee12749acb3bd323e5fa239a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 70df24ea1963afd7ee12749acb3bd323e5fa239a
@@ -99,7 +99,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 - **The read path is NOT full, and the ceiling measuring it is being retired.** The pin went
   135677 -> 161120 on 2026-08-25, leaving 25600 B — four days at the measured 6184 B/day. Do NOT
-  raise it again by reflex: it moved 26 times in 17 days, 25 up, and the one drop was another
+  raise it again by reflex: it moved 27 times in 17 days, 26 up, and the one drop was another
   check's doing. `TOOL-dSpentCeiling` replaces it with a rate signal. Prune when it is terminal.
 
 ### Pointer map (load the row(s) the task touches)
@@ -307,7 +307,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   that name states a count.
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
-  skippable needs re-normalising AFTER the source; `_resolve_cap` is the seam.
+  skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF` is the seam.
 - A spent budget blocks RECORDING work, not doing it, and this repo hit it twice in one session: the
   TOOL backlog with nothing terminal to rotate, and `READ_PATH_CEILING` breached by ONE build's row in
   the generated `memory/LIVE.md`. Measure headroom in DAYS — 93.5% read survivable at 0.65 days left.
