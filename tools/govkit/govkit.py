@@ -3197,13 +3197,17 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             " and none was supplied. Refusing to invent one: an answer this tool guesses is one the "
             "operator never made and cannot audit. Supply them as --answer key=value"
         )
+    # DEPL-dCarriedReceipt-3 S1: resolved ONCE, and every spelling below reads this. `or` rather
+    # than a presence test, so `--answer prefix=` with an empty value takes the default instead of
+    # emitting an empty prefix that would resolve every destination to a bare relative path.
+    pfx = answers.get("prefix") or "tools"
     body = ['# deploy.toml — written once by `govkit intake`. Committed, it is the standing',
             '# authorization for an unattended re-run: it carries every owner decision, so a later',
             '# `apply` reads answers rather than asking for them again.',
             '',
             f'gov_source = "{root.as_posix()}"',
             f'gov_commit = "{git(root, "rev-parse", "HEAD").strip()}"',
-            'prefix = "tools"',
+            f'prefix = "{pfx}"',
             'kits = [' + ", ".join(f'"{k}"' for k in selection) + ']',
             '',
             '[answers]']
@@ -3227,7 +3231,7 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         )
     if seeds:
         eid, seed = seeds[0]
-        gctx = {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}"}
+        gctx = {"prefix": pfx, "kit_id": eid, "kit": f"{pfx}/{eid}"}
 
         def resolve_seed_value(v):
             if isinstance(v, str):
@@ -3274,7 +3278,8 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(body), encoding="utf-8", newline="\n")
     print(f"govkit intake — wrote {out.as_posix()} for {len(selection)} kit(s); "
-          f"{len(need)} answer(s) recorded")
+          f"{len(need)} answer(s) recorded; "
+          f'prefix "{pfx}" ({"from --answer" if answers.get("prefix") else "default"})')
     return r.emit()
 
 

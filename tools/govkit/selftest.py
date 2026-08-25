@@ -1225,6 +1225,56 @@ user_skills = "/tmp/gk-fake-skills"
         check("that refusal calls it the standing authorization",
               "standing authorization" in p.stderr, p.stderr)
 
+        # --- DEPL-dCarriedReceipt-3: `intake` honours `--answer prefix=`, on every branch.
+        # The pre-unit behaviour emitted the literal `tools` whatever was supplied, so the one
+        # committed non-default descriptor in the fleet was a file the tool that owns it could not
+        # have written. Each arm below fails against that draft.
+        ik3 = make_target(tmp / "i3", None)
+        p = run("intake", "--target", str(ik3), "--kits", "gate-lint",
+                "--answer", "prefix=scripts")
+        check("intake with --answer prefix= exits 0", p.returncode == 0, p.stdout + p.stderr)
+        check("the descriptor carries the SUPPLIED prefix",
+              'prefix = "scripts"' in (ik3 / ".governance" / "deploy.toml").read_text(
+                  encoding="utf-8"), p.stdout)
+        check("the run reports the prefix and names its source",
+              'prefix "scripts" (from --answer)' in p.stdout, p.stdout)
+
+        ik4 = make_target(tmp / "i4", None)
+        p = run("intake", "--target", str(ik4), "--kits", "gate-lint")
+        check("an OMITTED prefix still defaults to tools",
+              'prefix = "tools"' in (ik4 / ".governance" / "deploy.toml").read_text(
+                  encoding="utf-8"), p.stdout)
+        check("the default is reported as a default, not as an answer",
+              'prefix "tools" (default)' in p.stdout, p.stdout)
+
+        # An EMPTY value is the default, never an empty prefix: `prefix = ""` would resolve every
+        # destination to a bare relative path, which is a silent mis-install rather than a refusal.
+        ik5 = make_target(tmp / "i5", None)
+        p = run("intake", "--target", str(ik5), "--kits", "gate-lint", "--answer", "prefix=")
+        check("an EMPTY --answer prefix= falls back to tools",
+              'prefix = "tools"' in (ik5 / ".governance" / "deploy.toml").read_text(
+                  encoding="utf-8"), p.stdout)
+        check("an empty prefix is never emitted",
+              'prefix = ""' not in (ik5 / ".governance" / "deploy.toml").read_text(
+                  encoding="utf-8"), p.stdout)
+
+        # The prefix has THREE readers in `cmd_intake` and they all land in this one file. The
+        # [gate_runner] block is emitted from a seed whose {prefix} and {kit} tokens resolve here,
+        # so a draft that fixes only the `prefix = ` line writes a descriptor declaring one prefix
+        # whose runner paths spell another. Observed as a staged break before this arm was written.
+        ik6 = make_target(tmp / "i6", None)
+        p = run("intake", "--target", str(ik6), "--kits", "run-gates",
+                "--answer", "prefix=scripts")
+        check("intake emits a [gate_runner] under a non-default prefix", p.returncode == 0,
+              p.stdout + p.stderr)
+        _d6 = (ik6 / ".governance" / "deploy.toml").read_text(encoding="utf-8")
+        check("the emitted [gate_runner] follows the SUPPLIED prefix",
+              'file = "scripts/gate-legs.json"' in _d6, _d6)
+        check("the [gate_runner] command follows it too",
+              '"scripts/run-gates/run-gates.sh"' in _d6, _d6)
+        check("no tools/ path survives in the descriptor's runner block",
+              "tools/gate-legs.json" not in _d6, _d6)
+
         # ================= liveness of the two derived assertions =================
         # An assertion that finds nothing on a clean tree is indistinguishable from one that CANNOT
         # find anything. These arms build a scratch gov tree — a copy of the engine plus a minimal
