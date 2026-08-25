@@ -2,7 +2,7 @@
 
 # TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud
 
-**Status:** OPEN · rev-2 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-08-25 · node d · Tier-1 · base ee6554c3 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -142,6 +142,12 @@ report a human reads, and gating a report's prose is how a report stops being ch
   without the marker, per D4. Deleting it would hide a true observation to fix a false label.
 
 ## 9. Revision log
+
+- rev-3 · 2026-08-25 · node d · CLOSED. S1-S4 built and every criterion observed: AC1 the  row
+  loses the marker while four live rows keep it, AC2 three distinct states, AC3 six no-object
+  definitions named, AC4 each rule reverted independently reds its own arm, AC5 offenders 381/0/0
+  unchanged with graded 866 to 868. Across the corpus: 0 false markers survive on the eleven files
+  that carried them.
 
 - rev-2 · 2026-08-25 · node d · OPEN. AC5 corrected DURING the build that satisfied it: it pinned
   `graded=866` as unchanged, and this unit adds two definitions, so the criterion was false on the

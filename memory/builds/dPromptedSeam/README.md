@@ -49,7 +49,7 @@ make `build_index` and `render_index` comparable as one concept, and today only 
   loss away. If the Skill step is measured to go unread, `-1` Q2 reopens.
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
 
 <!-- gen:build-units -->
@@ -57,7 +57,7 @@ ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2 TOOL-dPromptedSeam-3
 |---|---|---|---|---|---|
 | [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | WONTDO | rev-5 | 2026-08-25 |
 | [TOOL-dPromptedSeam-2 — `read_object` cannot say WHY it returned nothing](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | WONTDO | rev-4 | 2026-08-25 |
-| [TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud](spec/2026-08-25-spec-dPromptedSeam-3.md) | — | 1 | OPEN | rev-2 | 2026-08-25 |
+| [TOOL-dPromptedSeam-3 — `--brief` calls nine unrelated concepts one concept, out loud](spec/2026-08-25-spec-dPromptedSeam-3.md) | — | 1 | CLOSED | rev-3 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 2 record folder(s).
