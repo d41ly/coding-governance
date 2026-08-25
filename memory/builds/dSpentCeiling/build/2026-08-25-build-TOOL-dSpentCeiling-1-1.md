@@ -79,8 +79,10 @@ sessions at does not, which is worth knowing before trusting a clean report to m
 - AC13 — OBSERVED SILENCE, and recorded as such: with both keys gone from the conf and a `RATCHETS`
   row naming `READ_PATH_CEILING` restored, `drift_report.py --check` produced ZERO findings
   mentioning it. Deleting that row was therefore a manual obligation and no gate covers the class.
-- AC14 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — see the closing line of
-  this record.
+- AC14 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — GREEN, 85/85 legs, at
+  `4b26d2b0`. It took five runs. The four that redded are the point of the criterion and are
+  listed below, because a green reached on the first try would have proved only that the bar was
+  not looking.
 
 ## Staged breaks, run against the shipped code
 
@@ -89,3 +91,27 @@ time: the grace comparison made unconditional failed `at or above the flip versi
 GATES`; rule 4's message given back its `check 12` clause failed the misattribution arm; and the
 retired ceiling put back into `armed()`'s tuple failed `a retired key alone does not arm checks
 13-15`. Each was restored and the suite re-run green.
+
+## What the DoD bar caught, across five runs
+
+None of these were visible to the guard-scoped bar, and all four legs that matter here are
+`subject: kit` and held by default — a plain green over this change really would have proved close to
+nothing.
+
+1. **`memory-hygiene self-test`** — `adopt-memory-tree.sh --scaffold` writes no `CHARTER` and no
+   `AGENTS.md`, so making check 16 unconditional redded every adopter on the day they adopted. The
+   grace did not cover it because the charter finding gated unconditionally. Fixed by
+   `read_declared_keys()` and by moving the grace decision into `_resolve_sink()`, shared by all
+   three arms.
+2. **`verdict epoch`** — twice. First for the bump this build owed, which was observed deliberately.
+   Then again when the closing fix moved the engine after the bump: the gate is topological, so a
+   bump that is older than the change it dates is refused. Bumping to 2.43 collided with
+   `READ_PATH_GATES_FROM = (2, 43)` and would have ended the grace on the release that ships the
+   retirement — the flip moved to 2.44 in the same commit.
+3. **`drift-audit records`** — `closed_specs_with_no_product_commit` keys on the build SLUG appearing
+   in a product commit's SUBJECT. Three product commits, none naming `dSpentCeiling`. The convention
+   is that a product commit says which build it serves.
+4. **`install-prefix` and `dead-path carriers`** — both registries pin LINE NUMBERS, and this build
+   moved lines in `corpus_ids.py` four times. Re-pinned three times for install-prefix and once for
+   dead-path, in every case without the waived thing or its reason changing. Filed as
+   `TOOL-dSpentCeiling-6`.
