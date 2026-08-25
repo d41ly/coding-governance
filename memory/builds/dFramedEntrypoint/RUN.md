@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 6 surfaced
+keepalive-reaped: yes
 witness: e3f006c9327f19e168ba17970329032e191e9c48
-phase: BUILDING
+phase: LANDING
 branch-sha: 470bb09ba977030f5c651c55e813bc6e5bd53b03
 branch-ref: refs/heads/branch/build-readme-governance-e1c044
 mode: slug
@@ -42,3 +44,5 @@ base: 470bb09ba977030f5c651c55e813bc6e5bd53b03
 2026-08-24T22:54:10Z review · item dFramedEntrypoint · reason verdict BLOCKED · blockers 1
 
 2026-08-24T23:45:37Z review · item dFramedEntrypoint · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T00:01:51Z decision · item CORRECTION to this run's earlier park about the lexicon naming leg: that park was WRONG and is superseded. · reason The earlier entry recorded the lexicon leg as RED at this build's BASE and therefore not this build's to fix. That was measured with git stash on a tree whose work was already COMMITTED, so stash dropped nothing and the measurement was of HEAD, read as BASE. Re-measured properly in an isolated worktree: BASE 470bb09b exits 0 and is GREEN; HEAD was red at 473 offenders over a pin of 463, and gen_build_index.py alone went 30 to 40. The entire overage was this build's own new functions. It was fixed by renaming twelve of them onto verbs the table declares, across three commits, with no pin ever raised. Nothing is owed to the owner here; the park is corrected because a run that leaves a false claim in its own record has not surfaced a decision, it has planted one.
