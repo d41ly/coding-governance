@@ -267,7 +267,13 @@ def _check_mode_justified(text: str, ext: str, old: str, new: str, lookback: int
     at = next((i for i, ln in enumerate(lines) if ln.startswith("LANGS=")), None)
     if at is None:
         return False
-    want = re.compile(r"\b" + re.escape(ext) + r"\b\s*:?\s*\b" + re.escape(old)
+    # BOUNDARY LOOKAROUNDS, not `\b`, around the EXTENSION. `\b` is a word-character boundary, so for
+    # the `<none>` extension -- the one this repo declares for a dotless basename -- it sits before a
+    # `<` and after a `>` and can never match. The marker was unsatisfiable for exactly the extension
+    # whose name is not a word, so a weakening move on it could never be justified and would red
+    # forever. Closing review M2.
+    want = re.compile(r"(?:(?<=\s)|^)" + re.escape(ext) + r"(?=\s|:|,|$)"
+                      + r"\s*:?\s*\b" + re.escape(old)
                       + r"\b\s*(?:->|\u2192|to)\s*\b" + re.escape(new) + r"\b")
     return any(want.search(ln) for ln in lines[max(0, at - lookback): at + 1])
 
@@ -1006,21 +1012,26 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
         return _build_not_asked(name, "no definition was added between the declaration's adoption "
                                       "commit and HEAD; there is no marginal rate to report")
 
-    offenders = {(p, n) for p, n in added if (lex.leading_verb(n) or "") not in verbs}
+    # UNGRADEABLE NAMES LEAVE BOTH OPERANDS. `leading_verb` returns "" for an identifier with no word
+    # characters, and `subtokens.py` says plainly that the caller must treat that as ungradeable
+    # rather than as a violation -- but "" is not in `verbs`, so it counted as an offender AND stayed
+    # in the denominator, inflating the rate at both ends. Closing review L4.
+    gradeable = {(p, n) for p, n in added if lex.leading_verb(n)}
+    offenders = {(p, n) for p, n in gradeable if lex.leading_verb(n) not in verbs}
     base_files = {p for p, _ in at_base}
-    fresh = [x for x in added if x[0] not in base_files]
+    fresh = [x for x in gradeable if x[0] not in base_files]
     fresh_off = [x for x in fresh if x in offenders]
-    pre = [x for x in added if x[0] in base_files]
+    pre = [x for x in gradeable if x[0] in base_files]
     pre_off = [x for x in pre if x in offenders]
 
     def _measure_pct(a, b):
         return round(100.0 * len(a) / len(b), 1) if b else 0.0
 
-    return {"signal": name, "value": len(offenders), "of": len(added), "tolerance": 0,
+    return {"signal": name, "value": len(offenders), "of": len(gradeable), "tolerance": 0,
             "gateable": False, "live": bool(at_base and at_head), "unjudgeable": 0,
             "detail": [
                 {"note": "offenders added per definition added since the declaration was adopted",
-                 "base": base[:8], "head": head[:8], "rate_pct": _measure_pct(offenders, added)},
+                 "base": base[:8], "head": head[:8], "rate_pct": _measure_pct(offenders, gradeable)},
                 {"note": "files written FRESH in the window — the reading the kill-rule watches",
                  "added": len(fresh), "offenders": len(fresh_off), "rate_pct": _measure_pct(fresh_off, fresh)},
                 {"note": "files that predate the declaration",

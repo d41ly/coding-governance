@@ -792,6 +792,26 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     check("...and carries the fresh-versus-pre-existing split the kill-rule reads",
           any("FRESH" in str(d.get("note", "")) for d in fired["detail"]), f"{fired['detail']}")
 
+    # UNGRADEABLE NAMES ARE IN NEITHER OPERAND. `leading_verb` returns "" for an identifier with no
+    # word characters, and the kit's own reuse note says plainly that a caller must treat that as
+    # ungradeable rather than as a violation. The signal did neither: "" is not in the declared
+    # table, so such a name counted as an offender AND stayed in the denominator, inflating the rate
+    # at both ends. Asserting BOTH operands is the point -- an arm reading only `value` would stay
+    # green against a version that merely stopped counting it as an offender while leaving it in
+    # `of`, which is the same rate wrong in the other direction. Closing review L4.
+    before = report(r)[name]
+    (r / "src" / "ungradeable.py").write_text(
+        "def __():\n    pass\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "add a name with no word characters", "--no-verify"], r)
+    after = report(r)[name]
+    check("an ungradeable name is not counted as an offender",
+          after["value"] == before["value"], f"before={before['value']} after={after['value']}")
+    check("...and is not counted in the population it would be graded against either",
+          after["of"] == before["of"], f"before={before['of']} after={after['of']}")
+    check("...and the arm is non-vacuous: the population it compares is non-empty",
+          before["of"] > 0, f"{before}")
+
     # ADMITTING the verb must move the rate. Without this the offender test could be reading a
     # frozen table and nothing here would notice.
     conf = r / ".lexicon.conf"
@@ -1446,6 +1466,29 @@ def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
     check("mode ratchet: a marker naming no extension does NOT justify the move",
           bool(dr.build_lang_mode_findings(_Git(), root)),
           str(dr.build_lang_mode_findings(_Git(), root)))
+
+    # AN EXTENSION WHOSE NAME IS NOT A WORD. `<none>` is what this repo declares for a dotless
+    # basename, and the marker was anchored with a word boundary on both sides of the extension --
+    # which sits before `<` and after `>` and can NEVER match there. So the one extension whose name
+    # is not a word had a justification clause nobody could satisfy: every weakening move on it would
+    # red forever with a correct marker sitting right above it. Gated as a CLASS rather than for
+    # `<none>` alone, because the next such name will not be spelled that way. Closing review M2.
+    class _GitNone:
+        base_ref = "BASE"
+        def run(self, *a):
+            return type("R", (), {"returncode": 0,
+                                  "stdout": 'LANGS="<none>::parser py:python-ast:parser"\n'})()
+
+    conf.write_text('LANGS="<none>::dark py:python-ast:parser"\n', encoding="utf-8", newline="\n")
+    _un = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: an unjustified move on a non-word extension is still a finding",
+          any("<none>" in f for f in _un), str(_un))
+    conf.write_text('# <none>: parser -> dark, because nothing extracts dotless files.\n'
+                    'LANGS="<none>::dark py:python-ast:parser"\n',
+                    encoding="utf-8", newline="\n")
+    _j = dr.build_lang_mode_findings(_GitNone(), root)
+    check("mode ratchet: a non-word extension CAN be justified (the marker must be satisfiable)",
+          _j == [], str(_j))
 
     # A STRENGTHENING move is free, and an extension that never moved is silent.
     conf.write_text('LANGS="py:python-ast:parser js:js-regex:parser"\n',

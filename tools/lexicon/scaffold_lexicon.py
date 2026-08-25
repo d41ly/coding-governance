@@ -3,11 +3,15 @@
 
 Called by `tools/lexicon/adopt-lexicon.sh --scaffold`; not a user-facing entry point.
 
-The seed is derived and then FROZEN. For one moment a derived table is exactly the hand-kept mirror
-companion §12 bans, and the resolution is procedural rather than clever: mark it PROPOSED, leave
-`ratified` empty, and let `--check` red until a human has curated it. What this file must NOT do is
-pretend the derivation is the answer — the frequency ranking is a starting vocabulary, and the rows
-that make a verb table worth having are the NEGATIVE definitions a human writes.
+WHAT IS DERIVED HERE IS MEMBERSHIP, NOT SPELLING. The corpus is asked one question per cluster —
+does any form of this concept have a live definition site — and the answer seeds the cluster's
+representative from `canon.py`, which is element 0 unconditionally. A frequency ranking was the
+first cut and was the defect: it adopted whatever the repo already did most, so the gate certified
+the habit it was installed to change, and all six of the owner's deliberately-bad names passed.
+
+The seed is still marked PROPOSED with `ratified` empty, because a canon-sourced table is a
+starting vocabulary and not a curated one — but it is no longer the hand-kept mirror companion §12
+bans, because its vocabulary comes from outside the tree it grades.
 
 `LAYERS` is deliberately seeded EMPTY. There is no `--scaffold` proposal for P3: an import-direction
 map is a statement about intended architecture, and a frequency count cannot observe intent. An
@@ -26,12 +30,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import canon
 import lexicon as lex  # noqa: E402
 
-#: How many leading tokens to propose. Not a tuning knob so much as a legibility bound: a table
-#: nobody reads is not closed in any sense that matters.
-
-#: Extensions this kit can extract today. Everything else present in the corpus is seeded `dark`,
-#: which is a DECLARATION, not a gap — it is named on every run rather than silently absent.
-KNOWN = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe")}
+#: Extensions this kit can extract today, READ FROM THE ENGINE rather than restated. Everything else
+#: present in the corpus is seeded `dark`, which is a DECLARATION, not a gap — it is named on every
+#: run rather than silently absent. The two copies had already diverged on the `py` pattern-set id
+#: within one build, so a `--probe` against an undeclared repo graded python through a different code
+#: path than the `--scaffold` that would adopt it. Closing review M7.
+KNOWN = lex.KNOWN_EXTS
 
 HEADER = """\
 # .lexicon.conf — the naming lexicon this repo declares. Read by tools/lexicon/lexicon.py through
@@ -41,18 +45,26 @@ HEADER = """\
 # ) — a value with spaces is double-quoted and no comment follows it on the line. Block keys are a
 # `KEY:` header followed by INDENTED rows, ending at the first non-indented line.
 #
-# THIS FILE WAS DERIVED AND IS MARKED **PROPOSED**. The verb table below is a frequency ranking of
-# what this corpus already does, which is a mirror of the code, not a vocabulary. Curate it: delete
-# the verbs you do not mean, and give the ones you keep their NEGATIVE definitions — `build` not
-# `create`, `load` not `fetch`. Those are the rows that make the table worth gating. Then stamp
-# `ratified=` and the gate stops refusing.
+# THIS FILE WAS DERIVED AND IS MARKED **PROPOSED** — but the table below is NOT a ranking of what
+# this corpus already does. Every row is a representative from the kit's frozen canon, carrying the
+# negative definition the canon states. The corpus only VOTED on which concepts are live here; it
+# could not promote a spelling it happens to prefer, and it could not nominate a verb the canon does
+# not hold. That is the whole difference between a vocabulary and a mirror. Curate it anyway: delete
+# the rows you do not mean, add the ones your domain needs, then stamp `ratified=` and the gate
+# stops refusing.
 """
 
 
 
+#: Authored ONCE. This tuple and the `BANNED_SUFFIXES=` line the scaffold emits were two copies of
+#: one list, so a curated eighth entry here would have measured a pin against a set the emitted
+#: declaration did not carry. Closing review L2.
+BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
+
+
 def _measure_suffix_offenders(root, files) -> int:
     """Type definitions ending in a banned suffix, over the same corpus the verb pin uses."""
-    banned = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
+    banned = BANNED_SUFFIXES
     n = 0
     for rel in files:
         ext = lex.ext_of(rel)
@@ -126,7 +138,7 @@ def main(argv: list[str]) -> int:
     body = [HEADER, ""]
     body.append('# Type-name suffixes that name a responsibility nobody scoped. Seeded from the source')
     body.append('# charter\'s eight; edit freely — this one is safe to inherit because it is prescriptive.')
-    body.append('BANNED_SUFFIXES="Manager Helper Util Utils Handler Processor Data Info"')
+    body.append('BANNED_SUFFIXES="%s"' % " ".join(BANNED_SUFFIXES))
     body.append("")
     body.append("# <ext>:<pattern-set-id>:<mode>, one per extension PRESENT in this corpus. An extension")
     body.append("# here with no declaration is a named refusal, never a silent skip.")
@@ -163,6 +175,23 @@ def main(argv: list[str]) -> int:
     body.append("VERBS:")
     for v in seeded:
         body.append(f"  {v:<9} {canon.read_gloss(v)}{canon.render_negative(v)}")
+    body.append("")
+    # THE DEBT IS EMITTED. It was measured and dropped on the floor, which made it a variable that
+    # could not be wrong because nothing read it. It is the one thing this corpus can say that the
+    # canon cannot: which live sites are spelled as a non-representative form, i.e. exactly the
+    # renames adopting this table will owe. Closing review L3.
+    if debt:
+        owed = sum(n for _v, n in debt)
+        body.append(f"# RENAMES THIS TABLE WILL OWE: {owed} definition(s) across {len(debt)} spelling(s)")
+        body.append("# already use a non-representative form of a seeded concept. Highest first; this is a")
+        body.append("# work list, not a declaration, and deleting these lines changes nothing the gate reads.")
+        for v, n in debt[:12]:
+            body.append(f"#   {v} -> {forms[v]}  ({n} site(s))")
+        if len(debt) > 12:
+            body.append(f"#   ...and {len(debt) - 12} more; `--measure` prints the live count.")
+    else:
+        body.append("# RENAMES THIS TABLE WILL OWE: none. Every live site of a seeded concept already")
+        body.append("# uses the representative spelling.")
     body.append("")
     body.append("# FORBIDDEN import directions, `<glob> -> <glob>`. Seeded EMPTY and the gate REDS until")
     body.append("# you declare one: a frequency count cannot observe intended architecture, so there is")

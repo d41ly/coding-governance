@@ -93,7 +93,12 @@ WAIVER_FILES = {
     "suffix": "lexicon-suffix-waivers.txt",
     "layer": "lexicon-layer-waivers.txt",
 }
-SCAFFOLD_KNOWN = {"py": ("", "parser"), "js": ("js-regex", "probe")}
+#: The extensions this kit can extract, and the ONE place they are declared. `scaffold_lexicon.py`
+#: imports this rather than keeping its own copy: the two had ALREADY diverged on the `py` pattern
+#: set (`""` here against `"python-ast"` there) within one build, so a probe against a repo with no
+#: declaration graded python through a different code path than the scaffold that would adopt it.
+#: Closing review M7.
+KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe")}
 
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN", "layer": "LAYER_OFFENDER_PIN"}
 
@@ -790,11 +795,26 @@ def run_suggest(root: Path, name: str) -> int:
         return 0
 
     banned = build_banned_index(conf)
-    rest = name[len(verb):].lstrip("_") if name.lower().startswith(verb) else ""
+    # THE TAIL COMES FROM THE SAME SPLITTER THE VERB DID. Slicing the raw name by `len(verb)` is
+    # wrong whenever the two disagree about where the verb starts: `leading_verb` strips leading
+    # underscores first, so `_fetch_conf` sliced to `h_conf` and the suggestion dropped the object
+    # entirely. And the rejoin followed no convention: `getUserData` came back as `read_UserData`,
+    # gluing a camelCase tail after an underscore. Closing review M4 and M5.
+    lead = name[:len(name) - len(name.lstrip("_"))]
+    tail_tokens = subtokens(name)[1:]
+    body = name.lstrip("_")
+    camel = "_" not in body and body != body.lower()
+    if not tail_tokens:
+        rest = ""
+    elif camel:
+        rest = "".join(t[:1].upper() + t[1:] for t in tail_tokens)
+    else:
+        rest = "_".join(tail_tokens)
     if verb in banned:
         want = banned[verb]
         gloss = (verbs.get(want) or "").strip()
-        swap = f"{want}_{rest}" if rest else want
+        swap = (lead + want + rest) if camel and rest else (
+            f"{lead}{want}_{rest}" if rest else lead + want)
         print(f"use `{swap}` — the declaration says `{want}`, NOT `{verb}`: {gloss}")
     else:
         print(f"`{verb}` is not in the declared table, and no row bans it by name. "
@@ -849,7 +869,14 @@ def run_brief(root: Path, target: str) -> int:
     print(f"COVERAGE: {mode} — .{ext}" + (f" ({pset})" if pset else "")
           + ("; a probe is incomplete BY CONSTRUCTION" if mode == "probe" else ""))
 
-    got = extract(p, mode, pset)
+    # An unparseable target is a NAMED refusal. The corpus loop below already catches this and
+    # skips; the target could not, so `--brief` on a file mid-edit died with a traceback rather
+    # than saying which file and why. Exit 2, keeping 1 reserved for verdicts. Closing review M3.
+    try:
+        got = extract(p, mode, pset)
+    except (SyntaxError, ValueError) as exc:
+        print(f"lexicon: {rel} does not parse, so its objects cannot be read: {exc}")
+        return 2
     here = sorted({read_object(n) for n, _ln in (got[0] if got else []) if read_object(n)})
     if not here:
         print("this file names no multi-token definition, so there is no object to compare")
@@ -906,7 +933,7 @@ def run_probe(root: Path) -> int:
             conf = load_conf(root / CONF_NAME)
     except ConfError:
         conf = None
-    declared = {e: (ps, m) for e, ps, m in langs(conf)} if conf else dict(SCAFFOLD_KNOWN)
+    declared = {e: (ps, m) for e, ps, m in langs(conf)} if conf else dict(KNOWN_EXTS)
 
     counts: dict = {}
     files = tracked_files(root)

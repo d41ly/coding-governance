@@ -520,7 +520,14 @@ check("--measure on a clean tree still exits 0", code == 0 and "VERB_OFFENDER_PI
 code, out = run_case({**_U2, "notes.R": "x <- 1\n"}, BASE_CONF, args=("--measure",))
 check("--measure exits NON-ZERO over an undeclared extension", code != 0, out)
 check("--measure still prints the pins it was asked for", "VERB_OFFENDER_PIN" in out, out)
-check("--measure names the undeclared extension", "UNDECLARED EXTENSIONS" in out and "R" in out, out)
+# THE EXTENSION IS ASSERTED AS A TOKEN IN THE LIST, not as a substring of the output. A bare "R" is
+# satisfied by the R inside UNDECLA-R-ED, so the conjunct could not independently fail and the arm
+# was half decoration -- and the first fix, `": R"`, was no better: it is satisfied by the header's
+# own `): R...` whenever the value happens to start with an R. Parsing the line is what makes the
+# break observable. Closing review L1.
+_undec = [ln for ln in out.splitlines() if "UNDECLARED EXTENSIONS" in ln]
+check("--measure names the undeclared extension",
+      len(_undec) == 1 and "R" in [t.strip() for t in _undec[0].rsplit(":", 1)[-1].split(",")], out)
 
 # ---- TOOL-dScaffoldedMirror-6: the coverage sniffer, its fraction, and its liveness --------------
 
@@ -787,6 +794,61 @@ check("every write_skill/render_skill CALL is status-checked (set -u, no -e)",
       not _unchecked, "; ".join(_unchecked))
 check("...and the arm sees the real call sites (or it proves nothing)",
       _sh.count("write_skill") >= 3, f"only {_sh.count('write_skill')} mentions")
+
+# ---- closing-review left-shifts (round 1, second batch) ------------------------------------------
+#
+# M4 + M5 — THE SUGGESTION IS GATED AS A CLASS, over a table of NAME SHAPES, not on the two names the
+# review happened to try. Both defects were in the rejoin: `_fetch_conf` came back as `_load` with
+# the object silently gone (the raw slice disagreed with `leading_verb` about where the verb starts),
+# and `getUserData` came back as `read_UserData` (an underscore glued in front of a camelCase tail).
+# Each row asserts the two properties a rename must preserve whatever the shape: every non-verb
+# subtoken survives, and the separator style the caller wrote is the one they get back.
+for _bad, _want in (
+        ("fetch_remote", "load_remote"),
+        ("_fetch_conf", "_load_conf"),
+        ("__fetch_conf", "__load_conf"),
+        ("fetchRemoteThing", "loadRemoteThing"),
+        ("_fetchRemoteThing", "_loadRemoteThing"),
+        ("fetch", "load"),
+        ("_fetch", "_load"),
+):
+    _c, _o = run_case(_U10, BASE_CONF, args=("--suggest", _bad))
+    # EVERY ROW MUST ACTUALLY REACH THE REJOIN. `BASE_CONF` declares three verbs and bans exactly
+    # one token, so a row naming any other off-table token gets "no row bans it by name" and its
+    # negative sibling below would then pass by finding nothing -- this repo's own
+    # `fixture-passes-by-finding-nothing` class, inside the fix for a different one. Asserting the
+    # suggestion was PRODUCED is what stops that.
+    check(f"--suggest preserves shape and object: {_bad} -> {_want}",
+          _c == 0 and _o.startswith("use ") and f"`{_want}`" in _o, _o)
+
+# ...and the table is only worth anything if it can FAIL. A shape spelled the way the DEFECT spelled
+# it must not be satisfiable, or every row above is decoration.
+_c, _o = run_case(_U10, BASE_CONF, args=("--suggest", "fetchRemoteThing"))
+check("...and the camelCase row rejects the underscore-glued form the defect produced",
+      _o.startswith("use ") and "`load_RemoteThing`" not in _o, _o)
+_c, _o = run_case(_U10, BASE_CONF, args=("--suggest", "_fetch_conf"))
+check("...and the underscore row rejects the object-dropping form the defect produced",
+      _o.startswith("use ") and "`_load`" not in _o.replace("`_load_conf`", ""), _o)
+
+# M3 — an unparseable target is a NAMED refusal with its own exit code, never a traceback. `--brief`
+# called the extractor with no guard while the corpus loop beside it caught and skipped, so the one
+# mode pointed at a single file was the one mode that died on a file mid-edit.
+_c, _o = run_case({"core/broken.py": "def build_x(:" + chr(10)}, BASE_CONF,
+                  args=("--brief", "core/broken.py"))
+check("--brief on an unparseable file refuses by name and exits 2 (not 1, not a traceback)",
+      _c == 2 and "core/broken.py" in _o and "does not parse" in _o, f"exit={_c} {_o[:200]}")
+check("...and exit 1 stays reserved for VERDICTS, so a refusal cannot read as a finding",
+      "Traceback" not in _o, _o[:200])
+
+# M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
+# pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
+# future re-fork that happens to start equal would pass it and drift on the next edit.
+import scaffold_lexicon as _scaf  # noqa: E402
+check("the scaffold and the engine share ONE extension catalog object",
+      _scaf.KNOWN is lex.KNOWN_EXTS,
+      f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
+check("...and that catalog is non-empty, or the identity above holds vacuously",
+      len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
