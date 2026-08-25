@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -25,8 +25,22 @@ the vintage is half a guard, so both halves land here.
 - **S2** — apply that probe **unconditionally** in both `cmd_apply` and `cmd_update`. Today it sits
   inside `if pins:`, so a target declaring no `lf_pin` is unguarded even where the path form works.
 - **S3** — refuse on `git ls-files -u` returning any row (an unresolved merge in the index).
-- **S4** — refuse when any path the receipt claims is dirty in the target's worktree or index,
-  naming the paths. A dirty file outside the receipt's population does not block.
+- **S4** — refuse when any path the receipt claims is dirty, naming the paths. A dirty file outside
+  the receipt's population does not block.
+
+  **DIRTY IS DEFINED HERE, once, because three acceptance criteria in two other units depend on the
+  answer and two of them need it in opposite directions.** A claimed path is dirty when it differs
+  index-versus-HEAD or worktree-versus-index — `git diff --cached` and `git diff` over that path, and
+  deliberately NOT `git status --porcelain`, which also flags `??`. Two carve-outs, each bought by a
+  criterion elsewhere:
+  - A claimed path absent from BOTH the index and the worktree is **not dirty**. There is nothing to
+    compare, and the row's own verdict is `missing` — which is `-9` S11's restore case. Without this
+    carve-out `-9` AC9 and AC10 can never go green: they require `--write` to reach the `missing`
+    cell for a row the target deleted, this unit lands at step 2 of the README order and `-9` at step
+    4, so a builder would land `-12` and then be unable to red `-9`'s own RED-first observation.
+  - An untracked file SHADOWING a claimed path that is absent from the index is **not dirty** here.
+    That state is `-7` S4's refusal, which names the path and the risk; two units refusing the same
+    state gives the operator two different messages for one tree.
 - **S5** — an `O_EXCL` lock at `.governance/outbox/.update.lock`, taken by both writing verbs,
   released on every exit path including refusal, and carrying the pid and start time so a stale lock
   is diagnosable rather than mysterious.
@@ -56,9 +70,11 @@ the vintage is half a guard, so both halves land here.
 
 ### The precondition order, stated once for the whole build
 
-This unit owns the FIRST gate a write passes, and three other units add their own further in. No spec
+This unit owns the FIRST gate a write passes, and FIVE other units add their own further in. No spec
 composed them, so the order is declared here and the others cross-reference it rather than restating
-it. A `--write` run passes, in this sequence, and stops at the first refusal:
+it. A `--write` run passes in this sequence and stops at the first refusal. The table runs from the
+preamble to the write; `-14`'s post-write verification is step 9 and is the only entry AFTER bytes
+land, which is why its failure mode is a rollback rather than a refusal.
 
 | # | owner | what it decides | on failure |
 |---|---|---|---|
@@ -67,7 +83,11 @@ it. A `--write` run passes, in this sequence, and stops at the first refusal:
 | 3 | this unit, S7–S8 | is `--to` a descendant of the receipt's `gov_commit`, and reachable from a ref? | refuse, whole run |
 | 4 | `-7` S9 | for a row carrying BOTH `commit` and `gov_oid`, do they agree? | refuse, whole run |
 | 5 | `-13` S7 | does this ROW carry `evidence: "unattributed"`? | print, count, skip the ROW, before `UPDATE_ROLE` |
-| 6 | `-9` S4–S6 | which `carry` rung, if any, explains this row? | no failure mode; it classifies |
+| 4b | `-7` S4 | is a claimed path present in the worktree and absent from the index? | refuse, whole run |
+| 6 | `-9` S1/S5 | which `carry` rung, if any, proves itself over the whole file? | no failure mode; it classifies |
+| 7 | `-11` S2 | did gov rename this row's source between the two vintages? | verdict `renamed`; `-11`'s own two refusals |
+| 8 | `-9` S6 | apply the proven rung to `base` and `theirs` before `three_way` | no failure mode; it feeds the merge |
+| 9 | `-14` | re-run each touched kit's own `[check].argv` AFTER the write | roll back from the recorded OIDs; `r.fail` |
 
 Two things in that table are load-bearing rather than arbitrary, and the first is easy to get
 backwards. **Step 4 is in the PREAMBLE and step 5 is inside the classification loop**, so the
@@ -172,7 +192,14 @@ every one needs an arm asserting it, which is the join's declared contract.
 
 ## 9. Revision log
 
-- rev-3 · 2026-08-24 · round-4 fold: §4 gains the build-wide PRECONDITION ORDER, which no spec composed. Six steps across four units, with the two load-bearing orderings named — `-7` S9 is in the PREAMBLE and `-13` S7's skip is in the LOOP, which is exactly why S9 is scoped by field presence and passes silently over a row carrying neither field.
+- rev-4 · 2026-08-25 · round-5 fold: `dirty` is DEFINED in S4, with the two carve-outs three
+  acceptance criteria in two other units depend on. §4's table is corrected and completed — step
+  6's owner was wrong, `-7` S4, `-11` and `-9` S6 were missing, `-14`'s post-write rollback is now
+  step 9, and "three other units" was five.
+- rev-3 · 2026-08-24 · round-4 fold: §4 gains the build-wide PRECONDITION ORDER, which no spec
+  composed. Six steps across four units, with the two load-bearing orderings named — `-7` S9 is in
+  the PREAMBLE and `-13` S7's skip is in the LOOP, which is exactly why S9 is scoped by field
+  presence and passes silently over a row carrying neither field.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold); the dead-guard
   mechanism verified in source against `9ddcc5c9` and reproduced in a live linked worktree.
 - rev-2 · 2026-08-24 · folded the pre-code review: adopted R4's two unowned `--to` preconditions as

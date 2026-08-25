@@ -242,7 +242,8 @@ manifest.
   followed by `/`, `*` or a space is no hit — which makes the true residual row 0 rather than 3, so
   AC5 now asserts that S4 deletes the row and records the pre-fix reading of 4. The `534` figure is
   withdrawn consistently: §4's alternatives and §8 F1 were still asserting it as live fact after §4
-  withdrew it, and both now size the debt by the artifact, which is the claim AC1 already makes. §4's carrier paragraph is corrected in two places — `tools/check-kit-versions.sh` IS
+  withdrew it, and both now size the debt by the artifact, which is the claim AC1 already makes.
+  §4's carrier paragraph is corrected in two places — `tools/check-kit-versions.sh` IS
   resolve_entry-resolved and `WIRE-INTO-PROJECT.md` is NOT — and S2 therefore declares
   `WIRE-INTO-PROJECT.md` as one named addition to the derived population, without which F2's ratchet
   answer would be false and its 27 hit lines would be graded by neither arm.

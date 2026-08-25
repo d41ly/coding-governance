@@ -132,19 +132,19 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 |---|---|---|---|
 | [DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes](spec/2026-08-24-spec-DEPL-dCarriedReceipt-1.md) | SPECCED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-10 — role `forked`, report-only](spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md) | SPECCED | rev-5 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | SPECCED | rev-4 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | SPECCED | rev-3 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | SPECCED | rev-3 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently](spec/2026-08-24-spec-DEPL-dCarriedReceipt-11.md) | SPECCED | rev-5 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs](spec/2026-08-24-spec-DEPL-dCarriedReceipt-12.md) | SPECCED | rev-4 | 2026-08-25 |
+| [DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap](spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md) | SPECCED | rev-4 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-14 — post-write verification, with index rollback](spec/2026-08-24-spec-DEPL-dCarriedReceipt-14.md) | SPECCED | rev-4 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-15 — gov stops shipping its own prefix inside kit bodies](spec/2026-08-24-spec-DEPL-dCarriedReceipt-15.md) | SPECCED | rev-4 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm](spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md) | SPECCED | rev-2 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-3 — `intake` honours `--answer prefix=`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-3.md) | SPECCED | rev-1 | 2026-08-24 |
 | [DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md) | SPECCED | rev-3 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | SPECCED | rev-2 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | SPECCED | rev-3 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md) | SPECCED | rev-4 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | SPECCED | rev-3 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | SPECCED | rev-4 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md) | SPECCED | rev-4 | 2026-08-24 |
-| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | SPECCED | rev-4 | 2026-08-24 |
+| [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | SPECCED | rev-5 | 2026-08-25 |
 <!-- /gen:build-units -->
 
 Records live under `spec/`, `build/` and `reviews/`.

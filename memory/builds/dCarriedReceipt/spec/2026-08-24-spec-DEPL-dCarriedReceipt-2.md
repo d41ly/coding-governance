@@ -90,7 +90,8 @@ No receipt-shape change. `pins` is a dispatch value only.
 
 ## 9. Revision log
 
-- rev-2 · 2026-08-24 · round-3 fold: the re-stamp guard citation: `:3111` is that guard's explanatory comment; the `if r.problems:` it names is `:3115`.
+- rev-2 · 2026-08-24 · round-3 fold: the re-stamp guard citation: `:3111` is that guard's
+  explanatory comment; the `if r.problems:` it names is `:3115`.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold).
 
 ## 10. Reuse audit

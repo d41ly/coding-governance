@@ -189,7 +189,8 @@ reds at the baseline as well.
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs, plus `tools/govkit/refusal_join.py`. Adds eight arms, the AC8 extraction-parity
-assertion and AC9's pre-existing-red arm; adds no new leg file. The `refusal_join.py` anchor set moves because S1 relocates
+assertion and AC9's pre-existing-red arm; adds no new leg file. The `refusal_join.py` anchor set
+moves because S1 relocates
 `cmd_check`'s existing `r.fail` calls into a helper, and that shift is re-pinned in the same commit
 rather than waived.
 

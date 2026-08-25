@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -39,9 +39,14 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
   against `sha256`. `oid != gov_oid` is the local-delta predicate, evaluated per run from the live
   read, and no boolean anywhere stores its answer. Stored field, live comparison — S9 is what keeps
   the stored half honest.
-- **S4** — a receipt-claimed path that is tracked in the target but carries no index entry is a
+- **S4** — a receipt-claimed path that is PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX is a
   REFUSAL naming the path. Without it the index read's own `absent` routes to `missing` and then to
   the raw write at `:3069`, which would overwrite whatever untracked file the operator has there.
+  The predicate is stated in those terms deliberately. An earlier rev said "tracked in the target but
+  carries no index entry", which describes nothing: `tracked()` at `:111-112` IS `git ls-files`, a
+  read of the index, so tracked-and-not-indexed is empty except for an unmerged path — and an
+  unmerged path is `-12` S3's refusal, one step earlier. `-12` S4's dirty check carves this state out
+  explicitly so the two units do not both refuse it with different messages.
 - **S5** — writes go `git hash-object -w --stdin`, then `git update-index --cacheinfo`, then
   `git checkout-index -f --`, so the TARGET's own filters decide its worktree bytes. The mode comes
   from the row's existing index entry, and from gov's tree entry at `commit` for a row with none.
@@ -58,9 +63,12 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
   `gov_oid` is asserted: `gov_oid == blob_at(root, row["commit"], row["source"])`, and a row that
   fails refuses by name, naming the path and both oids, rather than being classified against a field
   the file no longer earns. A row carrying NEITHER field is passed over here, because it is not a
-  failed integrity check. It is `-13` S7's `evidence: "unattributed"` state, which a `forked` row
-  lands in whenever the walk found nothing, and `-13` S7 prints, counts and skips it inside the
-  classification loop. A row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
+  failed integrity check — there is nothing to compare. Note what that row is NOT: it is not
+  necessarily `-13` S7's `evidence: "unattributed"` state. Every row `apply` writes through the
+  `unlanded` channel at `:2440` also carries neither field, which is `project-owned`, `generated` and
+  `rendered`. S9 passes over all of them for the one reason that covers every case — no operand — and
+  what happens next is the ROLE's business, in the classification loop, not this preamble's.
+  A row carrying exactly ONE of the two is its own REFUSAL. That pairing is the
   corruption shape this unit exists to catch, because `-11` rewrites `path`, `source`, `commit` and
   `gov_oid` together on a rename and a text merge of `install.json` is what splits them. **The
   ordering is fixed, and the two preconditions are sequential rather than competing.** S9 runs first,
@@ -242,6 +250,11 @@ and `refusal_join` legs. Adds arms and three refusal anchors; adds no new leg.
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · round-5 fold: S4's predicate was unsatisfiable as written — `tracked()` at
+  `:111-112` IS `git ls-files`, so tracked-and-not-indexed is empty but for an unmerged path,
+  which `-12` S3 refuses first. Restated as present-in-worktree/absent-from-index, and §10's false
+  `tracked` seam claim removed. S9 no longer calls a field-absent row `-13` S7's state: every
+  `unlanded` row at `:2440` carries neither field too.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every cited
   line was opened at `9ddcc5c9`. Three brief citations were off by a little and are corrected here:
   the OURS comparison is `:2889` and not `:2886`, the merge stamp is `:3098` and not `:3096`, and
@@ -281,7 +294,8 @@ Wires through seams that already exist rather than adding any. `blob_at` (`:2148
 target side; S9's per-row assertion calls that same function rather than adding a second reader of
 gov's trees. The batched index read joins the `ls-files` form already spelled at `:112` (`tracked`),
 `:1790`, `:2642` and `:2673` rather than adding a fourth spelling, and `tracked` itself is the seam
-for the tracked-versus-indexed distinction S4 needs. `VERDICT_GRID` (`:2843`), `UPDATE_ROLE`
+as the population reader it already is; S4's predicate is worktree-versus-index and needs no
+distinction this function does not draw. `VERDICT_GRID` (`:2843`), `UPDATE_ROLE`
 (`:2857`) and the `classify_row` (`:2874`) and `three_way` (`:2897`) pair are untouched in shape;
 only which identity the OURS axis reads changes. Refusals reuse `Refusal` (`:78`) and `Report`
 (`:565`) and are counted by the existing `refusal_join.py` contract rather than a new counter.

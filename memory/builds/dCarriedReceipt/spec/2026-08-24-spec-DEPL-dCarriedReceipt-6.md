@@ -203,7 +203,8 @@ move and no adopter holds the withdrawn leg.
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selfcheck`, `govkit selftest`,
 `govkit acceptance matrix` and `govkit refusal join`. The join is an obligation, not a mention: this
-unit adds refusal branches and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
+unit adds refusal branches and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing
+rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
 shrink-only, so it is re-derived and moved in the SAME commit with both values named, and every new
 branch gets an arm asserting it. The `kit version markers` leg stays green untouched, for the reason
 given in §4.
@@ -229,7 +230,9 @@ given in §4.
 
 ## 9. Revision log
 
-- rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason `-5` records; and the README's deps cell now mirrors this spec's own §3 rather than contradicting it.
+- rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason
+  `-5` records; and the README's deps cell now mirrors this spec's own §3 rather than
+  contradicting it.
 - rev-3 · 2026-08-24 · round-2 fold: §3's land-alone bullet states the `-1` dependency as an ORDER
   rather than a conflict, matching what AC6 and §4 already assert and using the vocabulary `-14` §8
   F3 ratifies; it also says plainly that `-2` is not a landing order for this unit, because §3's

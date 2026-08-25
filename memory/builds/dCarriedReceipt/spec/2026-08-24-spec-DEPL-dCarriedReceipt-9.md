@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -254,18 +254,24 @@ directory, a `relocate` row whose gov copy moved, and a `relocate` row the targe
   classifies exactly as it does at `9ddcc5c9`.
 - **AC7** — A fixture receipt carrying a hand-written `"carry": "relocate"` on a row that provably
   matches no rung classifies as a local delta anyway, and `python tools/govkit/govkit.py update`
-  never reads the stored value. After `--write` that receipt reads `"schema": 4`, and a schema-3
-  fixture still classifies without refusal.
+  never reads the stored value. After `--write` that receipt reads `"schema": 3` — this unit moves no
+  schema number, `-7` S6 owns the build's only move — and a schema-1 and a schema-2 fixture both
+  still classify without refusal.
 - **AC8** — A fixture `relocate` row whose gov copy MOVED between the row's `commit` and `to_commit`
   RECONCILES rather than reverts: after `python tools/govkit/govkit.py update --write`, the blob the
   TARGET's index holds for that path — read with `git -C <target> rev-parse :<path>` — spells the
   target's `scripts/` prefix AND carries gov's new semantic line. Observe RED first: at `9ddcc5c9`
   that row takes the raw arm at `:3069-3071`, lands gov's `tools/` spelling verbatim, and exits 0.
-- **AC9** — A fixture `relocate` row the target DELETED classifies `missing` and is restored in the
+- **AC9** — A fixture `relocate` row the target deleted AND COMMITTED classifies `missing` and is
+  restored in the
   CARRIED form: the restored file spells `scripts/`, and its index blob is NOT gov's blob for that
   source. Observe RED first: at `9ddcc5c9` the same row is restored from `c["theirs"]` at `:3071`
   with gov's `tools/` spelling, because `o_state` is `absent` (`:2887-2888`) and there are no `ours`
   bytes to prove a rung against.
+  The deletion is COMMITTED in the fixture on purpose: `-12` S4 refuses a run over a dirty claimed
+  path, and its definition carves out a path absent from BOTH index and worktree precisely so this
+  cell stays reachable — an uncommitted deletion is refused at `-12`'s step 2 and this AC could
+  never go red.
 - **AC10** — the STAMP that restore leaves, over the AC9 fixture, asserting both halves together.
   After `python tools/govkit/govkit.py update --write` the restored file spells the target's
   `scripts/` prefix and spells gov's `tools/` nowhere, AND the row it left behind reads
@@ -281,7 +287,8 @@ directory, a `relocate` row whose gov copy moved, and a `relocate` row the targe
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs. Adds ten arms and one fixture; adds no new leg file. It adds NO refusal branch —
 the ambiguity drop reports through `r.note` and a print rather than `r.fail` — so
-`tools/govkit/refusal_join.py` and its shrink-only `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` are unmoved, and that pin
+`tools/govkit/refusal_join.py` and its `BRANCH_PIN` are unmoved. That constant is a shrink-only
+FLOOR, so it is re-derived at landing rather than pinned to a literal here, and that pin
 staying untouched in the diff is itself the assertion.
 
 ## 8. Open questions
@@ -306,6 +313,9 @@ staying untouched in the diff is itself the assertion.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · round-5 fold: AC7 still demanded `"schema": 4`, the one surviving instance
+  of the bump rev-4 withdrew everywhere else — it now asserts schema 3. AC9's fixture COMMITS its
+  deletion, because `-12` S4 would otherwise refuse the run before the `missing` cell is reached.
 - rev-4 · 2026-08-24 · round-3 fold: the schema bump is WITHDRAWN. `-7` S6 owns the build's single
   move, 2 to 3, and `-13` §4 defines schema 3 as the generation carrying every field this build adds,
   `carry` included. Three rev-3 specs disagreed about the number and two acceptance criteria were

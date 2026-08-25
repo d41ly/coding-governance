@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-13 — `govkit adopt`, the receipt bootstrap
 
-**Status:** SPECCED · rev-3 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
@@ -54,18 +54,57 @@ reaches either target without it.
   attribution failure is not a fork — `forked` is a descriptor's declaration about a file's
   provenance, and reusing it for the walk's report of its own failure gives one token two meanings,
   which is how `-10`'s printer and this unit's writer came to disagree about the same row. `cmd_update`
-  gains one precondition ahead of its dispatch: a row carrying `evidence: "unattributed"` —
-  equivalently, a row carrying neither `commit` nor `gov_oid` — is printed, counted and skipped
-  BEFORE `UPDATE_ROLE.get(role)` at `:2974` is consulted, because every writing disposition needs a
-  base and this row has none. Written in neither direction until an operator supplies one with
-  `--pin`. This precondition and `-7` S9's integrity assertion are SEQUENTIAL rather than competing.
-  S9 runs first, in `cmd_update`'s preamble over the whole receipt, and is scoped by field presence,
+  gains one precondition ahead of its dispatch: a row carrying `evidence: "unattributed"` is printed,
+  counted and skipped BEFORE `UPDATE_ROLE.get(role)` at `:2974` is consulted, because every writing
+  disposition needs a base and this row has none. Written in neither direction until an operator
+  supplies one with `--pin`.
+
+  **`evidence: "unattributed"` is the SOLE predicate, and field-absence is deliberately not an
+  equivalent form of it.** An earlier rev said "equivalently, a row carrying neither `commit` nor
+  `gov_oid`", and that clause was false and destructive. Every row `apply` writes through the
+  `unlanded` channel at `:2440` carries `path`, `role`, `kit`, `version`, `written`, `source` and
+  `why` and NO `commit` and no hash — that is `UNLANDED_REASON`'s population at `:236`, meaning
+  `project-owned`, `generated` and `rendered`. Under the field-absence reading this precondition
+  would swallow all of them ahead of the dispatch and silently delete four dispositions that exist
+  for exactly those roles: `skip` at `:3006-3008` (13 rows on inCMS alone), the `adopter` re-render
+  report at `:3021`, `block`'s block-hash compare, and `-10`'s `report` — so `-10`'s printer would
+  never run for the forked rows it was written for, and the operator would be told to `--pin` a base
+  for a file that is report-only forever. The skip is therefore scoped to rows whose role carries a
+  WRITING disposition; `skip`, `adopter`, `block` and `report` roles continue to dispatch through
+  `UPDATE_ROLE` exactly as they do today. §4's own inventory already knew these were different
+  things: it excludes the 13 `project-owned` rows from the 41 unattributable ones.
+
+  This precondition and `-7` S9's integrity assertion are SEQUENTIAL rather than competing. S9 runs
+  first, in `cmd_update`'s preamble over the whole receipt, and is scoped by field presence,
   so it passes over a row carrying neither field rather than refusing on it; this precondition then
   catches that row inside the classification loop.
 - **S8** — three refusals: `--target` resolving to the gov checkout (the form at `:2930`); an existing
   `install.json` without `--re-adopt`, on `cmd_intake`'s stated reasoning (`:3186-3191`) that a
   committed authorization is not something a verb silently rewrites; and a dirty target index.
 - **S9** — `selftest.py` arms per branch and a `refusal_join.py` arm per refusal.
+- **S10** — the receipt ENVELOPE, not just the rows. Every scope item above describes a `files` row,
+  and three other units read fields OUTSIDE that array. `adopt` writes the envelope `cmd_apply`
+  writes at `:2820-2827`, minus the keys that record an install this verb did not perform:
+
+  | key | value `adopt` writes | who reads it |
+  |---|---|---|
+  | `schema` | `RECEIPT_SCHEMA`, whatever `-7` S6 set | `cmd_update`'s schema-1 role-distrust arm |
+  | `gov_source` | the gov checkout's path | operator diagnostics |
+  | `gov_commit` | the resolved `--to` | `-12` S7/S8's vintage refusals; `-11` S0/S1's rename base at `:2938` |
+  | `prefix` | `deploy["prefix"]` | destination resolution on a later `apply` |
+  | `kits` | the claimed selection | `-2`'s pins arm; `:2957`'s `claimed` list |
+  | `files` | the rows S1–S7 describe | everything |
+
+  `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are NOT written: each records what an
+  install DID, and this verb installs nothing. Every one of their readers already tolerates absence
+  via `.get`, and S9's arms assert that a receipt without them classifies without refusal.
+
+  **Why this is a scope item rather than an implementation detail.** Omit `gov_commit` and `-12` S7
+  fails OPEN by its own words — "a receipt carrying no `gov_commit` skips the check" — on precisely
+  the population the vintage guard was written for; `-11`'s rename diff has no base and the unit is
+  inert; and `-2`'s pins arm and `:2957`'s `claimed` read an empty list, so every registry entry
+  prints as "available (not installed)". Three units silently degrade on every receipt this verb
+  writes, which is every real adopter.
 
 ## 3. Non-goals (OUT)
 
@@ -229,6 +268,16 @@ AC9 needs.
   gov_oid`, the raw-write arm is open on it, and the update lands gov's fork over the target's working
   program.
 
+- **AC10** — The envelope. After `python tools/govkit/govkit.py adopt --write --target <fixture>`,
+  `install.json` carries `schema`, `gov_source`, `gov_commit`, `prefix`, `kits` and `files`, and
+  carries none of `orders`, `baseline`, `after`, `hook_block`, `gate_runner`. The value of
+  `gov_commit` equals the resolved `--to`.
+- **AC11** — The envelope is LIVE, not merely present: immediately after that `adopt --write`,
+  `govkit.py update --to <an older sha> --write` REFUSES by `-12` S7, naming both shas. Observe RED
+  first: with `gov_commit` absent, `-12` S7 skips its own check by its own words and the run proceeds
+  to raw-write every clean row backwards. This is the AC that stops the envelope from being written
+  and never read.
+
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
@@ -269,6 +318,12 @@ file. The `selfcheck` verb-coverage arm must also see the new verb, so its asser
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-25 · round-5 fold: S10 adds the receipt ENVELOPE, which no scope item covered
+  while three units read it — without `gov_commit` the `-12` S7 vintage guard fails OPEN by its
+  own words, `-11` has no rename base and `-2` no kit list, on every receipt this verb writes.
+  AC10 and AC11 assert it, AC11 by requiring a backwards `--to` to refuse right after an adopt.
+  S7's "equivalently, a row carrying neither field" clause is DELETED: it would have swallowed
+  every `unlanded` row and deleted four dispositions.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). `cmd_update`'s
   no-receipt refusal, `resolve_entry`'s return shape, `blob_at`'s index-side contract, `parse_args`'
   8-tuple and `main`'s verb dispatch were each read in source at `9ddcc5c9`. **Two brief corrections.**

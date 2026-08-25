@@ -215,7 +215,8 @@ dispatch), `tools/memory-recall/kit.toml` (one rule), `tools/govkit/selftest.py`
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs. This unit adds refusal branches — S5's two missing-key refusals and S6's — so
 `tools/govkit/refusal_join.py` applies: every branch needs an arm asserting it, and the shrink-only
-`BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` is raised to the new live count in the same commit, with the old and new values
+`BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal
+here)` is raised to the new live count in the same commit, with the old and new values
 named beside it as that file's own convention requires.
 
 ## 8. Open questions
@@ -239,7 +240,9 @@ named beside it as that file's own convention requires.
 
 ## 9. Revision log
 
-- rev-5 · 2026-08-24 · round-4 fold: S4's print shape is bound to `-2` S3's `report` disposition explicitly — one counted row, no `r.fail`, with `direction` an optional trailing field rather than a second line. This unit is that disposition's second consumer and does not re-specify it.
+- rev-5 · 2026-08-24 · round-4 fold: S4's print shape is bound to `-2` S3's `report` disposition
+  explicitly — one counted row, no `r.fail`, with `direction` an optional trailing field rather
+  than a second line. This unit is that disposition's second consumer and does not re-specify it.
 - rev-4 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn, for the reason `-5` records.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold). Every table
   and line number cited was opened at `9ddcc5c9`; the landmine was reproduced end to end rather than

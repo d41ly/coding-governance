@@ -130,7 +130,7 @@ has left the gap set entirely.
   what "no coverage measurement exists in this tool" looks like from the outside.
 - **AC2** — After the change, the FULL command against NicoCares — `python tools/govkit/govkit.py
   plan --target <NC> --coverage --kits
-  check-install-prefix,gate-lint,kickoff-manifest,lexicon,memory-tree,playbook,run-gates,settings-merge,agent-cap,codebase-map,drift-audit,memory-recall,playbook-render,unattended,review-harness`
+check-install-prefix,gate-lint,kickoff-manifest,lexicon,memory-tree,playbook,run-gates,settings-merge,agent-cap,codebase-map,drift-audit,memory-recall,playbook-render,unattended,review-harness`
   — reports `181` plan rows, `143` write rows and `gap 0`, and exits 0. The `--kits` list is not
   decoration: `resolve_selection` (`:410-429`) branches on `all` / `kits` / `default_kits(reg)` and
   never reads `deploy["kits"]`, so the same command without it resolves the registry default set and

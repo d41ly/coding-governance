@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** SPECCED · rev-2 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 ## 1. Goal
 
 A coverage report with no way to say "we deliberately did not take that" is a report an operator
-reads once. inCMS's 55-row gap contains 11 rows the adopter took under another name or folded into
+reads once. inCMS's 54-row gap (55 before `-1` lands) contains 11 rows the adopter took under
+another name or folded into
 another file, so a run that keeps naming them is crying wolf, and the only way to quiet it is to
 stop running it. The design problem this unit solves is distinguishing **deliberately not taken**
 from **missed** — and it must solve it without creating the thing it is preventing, because an
@@ -150,14 +151,16 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
   undischarged; carrying an unresolved `{token}` refuses and names the key, matching `:1669-1672`.
 - **AC9** — A row carrying both `taken_as` and `consumed_into` reds on the one-evidence-field rule
   before either is evaluated.
-- **AC10** — Over a fixture seeded with inCMS's measured 55 gap rows, declaring the 11 declarable
+- **AC10** — Over a fixture seeded with the pre-`-1` measurement at `9ddcc5c9`, 55 gap rows,
+  frozen as a fixture, declaring the 11 declarable
   ones leaves `plan --coverage` reporting `44` gap rows and `11` declined, with the total unchanged.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selftest`, `govkit selfcheck` and
 `govkit refusal join`. That last one is a real obligation rather than a mention: this unit adds
-roughly seven refusal branches, and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
+roughly seven refusal branches, and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at
+landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
 shrink-only, so it is re-derived and moved in the SAME commit with both values named beside it, per
 that file's own convention. Every new branch also needs an arm asserting it, which is the join's
 declared contract and is why the arm count in §4 tracks the branch count.
@@ -178,7 +181,12 @@ declared contract and is why the arm count in §4 tracks the branch count.
 
 ## 9. Revision log
 
-- rev-2 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn — it is a shrink-only FLOOR and the build's own landing order falsifies any number pinned here before this unit lands.
+- rev-3 · 2026-08-25 · round-5 fold: §1's coverage figure carried the pre-`-1` vintage flat, which
+  `-4` rev-2 arms as a regression alarm. It now reads 54 with 55 labelled as the pre-`-1`
+  measurement, and AC10's fixture is labelled frozen rather than live.
+- rev-2 · 2026-08-24 · round-3 fold: the literal `BRANCH_PIN` value is withdrawn — it is a
+  shrink-only FLOOR and the build's own landing order falsifies any number pinned here before this
+  unit lands.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass. Every cited site was read at
   `9ddcc5c9` and three brief citations are corrected here rather than repeated. The hole-discharge
   runner the `discharge` field reuses is at `:1657-1679`, not the `[check].argv` runner at
