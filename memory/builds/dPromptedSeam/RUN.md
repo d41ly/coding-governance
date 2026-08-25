@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: ee6554c3821bad569d7de47d5556f62700ea7dd2
-phase: RUNNING
+witness: 332d2e012b02b0621d8f6ce7acf2f4e37a242921
+phase: SPECCING
 mode: slug
 anchor-kind: default-branch
 keepalive: 5e8e6047
@@ -20,3 +20,5 @@ anchor-ref: refs/heads/main
 base: ee6554c3821bad569d7de47d5556f62700ea7dd2
 
 ## Parked
+
+2026-08-25T09:38:11Z review · item TOOL-dPromptedSeam-1 · reason verdict BLOCKED · blockers 6

@@ -55,15 +55,15 @@ ids TOOL-dPromptedSeam-1 TOOL-dPromptedSeam-2
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | OPEN | rev-3 | 2026-08-25 |
-| [TOOL-dPromptedSeam-2 — `read_object` returns nothing usable for a third of the corpus](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | OPEN | rev-2 | 2026-08-25 |
+| [TOOL-dPromptedSeam-1 — a refused name carries a reuse prompt](spec/2026-08-25-spec-dPromptedSeam-1.md) | — | 1 | OPEN | rev-4 | 2026-08-25 |
+| [TOOL-dPromptedSeam-2 — `read_object` cannot say WHY it returned nothing](spec/2026-08-25-spec-dPromptedSeam-2.md) | — | 1 | OPEN | rev-3 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dPromptedSeam-2.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dPromptedSeam-2.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
