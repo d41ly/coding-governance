@@ -20,3 +20,15 @@ anchor-ref: refs/heads/main
 base: c97b8b90c0491acee8c227b51d4de9f05d452759
 
 ## Parked
+
+2026-08-25T09:30:38Z review · item DEPL-dCarriedReceipt-13 · reason verdict BLOCKED · blockers 2
+
+2026-08-25T09:30:39Z review · item DEPL-dCarriedReceipt-14 · reason verdict BLOCKED · blockers 1
+
+2026-08-25T09:30:39Z review · item DEPL-dCarriedReceipt-1 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T09:30:39Z review · item DEPL-dCarriedReceipt-3 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T09:30:39Z review · item DEPL-dCarriedReceipt-8 · reason verdict BLOCKED · blockers 0 · CONVERGED
+
+2026-08-25T09:30:40Z review · item DEPL-dCarriedReceipt-15 · reason verdict BLOCKED · blockers 0 · CONVERGED
