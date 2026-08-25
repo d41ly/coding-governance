@@ -19,17 +19,14 @@ GENERATED from the status header of every spec in this folder — do not hand-ed
 ids TOOL-aGuardedTally-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | CLOSED | rev-4 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGuardedTally-1 — a dead reviewer must never read as a clean one](spec/2026-08-03-spec-aGuardedTally-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `reviews/` and `prompts/`.
+Records: 2 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md) | research | TOOL-aGuardedTally-1 |
-| [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md) | diff-review | TOOL-aGuardedTally-1 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aGuardedTally-1.
 <!-- /gen:build-index -->
@@ -43,13 +40,3 @@ Ids no `spec-audit` record has ever named: TOOL-aGuardedTally-1.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-03-spec-aGuardedTally-1.md](spec/2026-08-03-spec-aGuardedTally-1.md)
-- **`reviews/`**
-  - [2026-08-04-review-TOOL-aGuardedTally-1-1.md](reviews/2026-08-04-review-TOOL-aGuardedTally-1-1.md)
-- **`prompts/`**
-  - [2026-08-03-prompt-TOOL-aGuardedTally-1-1.md](prompts/2026-08-03-prompt-TOOL-aGuardedTally-1-1.md)
-<!-- /gen:build-docs -->

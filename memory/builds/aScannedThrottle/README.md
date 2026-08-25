@@ -42,19 +42,16 @@ recommendation against an existing backlog id or a new one; landing any of them 
 ids TOOL-aScannedThrottle-1 TOOL-aScannedThrottle-2 TOOL-aScannedThrottle-3 TOOL-aScannedThrottle-4 TOOL-aScannedThrottle-5 TOOL-aScannedThrottle-6 TOOL-aScannedThrottle-7 TOOL-aScannedThrottle-8 TOOL-aScannedThrottle-9 TOOL-aScannedThrottle-10 TOOL-aScannedThrottle-11
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | CLOSED | rev-3 | 2026-08-21 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aScannedThrottle-1 — measure the lander, find what actually binds its wall clock](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md) | — | 1 | CLOSED | rev-3 | 2026-08-21 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 4 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md) | journal | TOOL-aScannedThrottle-1 |
-| [2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md) | diff-review | TOOL-aScannedThrottle-1 |
-| [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md) | diff-review | TOOL-aScannedThrottle-1 |
-| [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md) | spec-audit | TOOL-aScannedThrottle-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -66,15 +63,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-20-spec-TOOL-aScannedThrottle-1.md](spec/2026-08-20-spec-TOOL-aScannedThrottle-1.md)
-- **`build/`**
-  - [2026-08-20-build-TOOL-aScannedThrottle-1.md](build/2026-08-20-build-TOOL-aScannedThrottle-1.md)
-- **`reviews/`**
-  - [2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff-2.md)
-  - [2026-08-21-review-TOOL-aScannedThrottle-1-diff.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1-diff.md)
-  - [2026-08-21-review-TOOL-aScannedThrottle-1.md](reviews/2026-08-21-review-TOOL-aScannedThrottle-1.md)
-<!-- /gen:build-docs -->

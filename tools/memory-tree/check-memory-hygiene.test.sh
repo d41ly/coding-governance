@@ -1182,6 +1182,36 @@ for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unr
   [ -f "$A/memory/project/$r" ] || { echo "FAIL adopt-memory-tree.sh did not scaffold memory/project/$r"; st=1; }
 done
 n=$((n+1))
+# TOOL-dFramedEntrypoint, round-2 M1/B1 — the KIT COPY the scaffolder writes into, which nothing
+# asserted. The block above runs the adopter with the kit OUTSIDE the target tree, which is the flow
+# where the ceiling strip must NOT fire; that arm alone is byte-identical whether the strip works, is
+# inverted, or is deleted. This is the other half: copy the kit INTO the target and assert the strip
+# DID fire there, and that the source kit it was copied from is untouched.
+#
+# The positive branch of that guard had never been observed before this arm existed. Its first
+# spelling compared $HERE against the raw $ROOT — `C:/...` from git against `/c/...` from `cd && pwd`
+# — so it never matched on any node in the registry and the strip was dead everywhere while the bar
+# stayed green, because a blank ceiling is the legal UNARMED state and a blank one reads the same.
+n=$((n+1))
+B=$TMP/scaffolded-inside
+mkdir -p "$B/tools"
+cp -r "$HERE" "$B/tools/" 2>/dev/null
+( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  bash "tools/$(basename "$HERE")/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
+_lim="$B/tools/$(basename "$HERE")/build-readme-slot-limits.txt"
+if [ -f "$_lim" ]; then
+  _valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$_lim")
+  _rows=$(grep -c '^## ' "$_lim" || true)
+  [ "$_valued" = 0 ] || { echo "FAIL adopt --scaffold left $_valued ceiling value(s) in the kit copy it installed; an adopter inherits a pin they never measured"; st=1; }
+  [ "$_rows" -gt 0 ] || { echo "FAIL adopt --scaffold stripped the ROWS as well as the values; a missing row is a refusal, not the announced unarmed state"; st=1; }
+else
+  echo "FAIL adopt --scaffold did not install build-readme-slot-limits.txt into the kit copy"; st=1
+fi
+n=$((n+1))
+_src_valued=$(awk -F'\t' '/^## /{ if ($2 ~ /^[0-9]+$/) c++ } END{ print c+0 }' "$HERE/build-readme-slot-limits.txt" 2>/dev/null || echo 0)
+[ "$_src_valued" -gt 0 ] || { echo "FAIL adopt --scaffold blanked the SOURCE kit's ceilings; the only write in that script may land under \$ROOT and this one did not"; st=1; }
+
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null); rca=$?
 [ "$rca" = 0 ] || { echo "FAIL a tree built by adopt-memory-tree.sh --scaffold is not hygiene-clean (rc=$rca):"; printf '%s\n' "$outa" | sed 's/^/      /'; st=1; }
 

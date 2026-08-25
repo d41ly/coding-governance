@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-16 · node a · Tier-1 · base 96141aed · streams playbook
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md](../reviews/2026-08-16-review-PLAY-aDeclaredCeiling-1-1.md) | spec-audit | TOOL-aDeclaredCeiling-1 TOOL-aDeclaredCeiling-2 TOOL-aDeclaredCeiling-3 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Two landed `aSiftedPlaybook` records assert a defect at `WIRE-INTO-PROJECT.md:464` that does not

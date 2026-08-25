@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-aBranchedMandate-1-1.md](../reviews/2026-08-16-review-TOOL-aBranchedMandate-1-1.md) | spec-audit | TOOL-aBranchedMandate-1 TOOL-aBranchedMandate-3 |
+| [2026-08-17-review-TOOL-aBranchedMandate-1.md](../reviews/2026-08-17-review-TOOL-aBranchedMandate-1.md) | diff-review | TOOL-aBranchedMandate-1 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/check-wiring.sh --check` exits non-zero when a worktree carries CRLF on an `eol=lf`-pinned

@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-2 · 2026-08-16 · node c · Tier-2 · base 1da67d9c · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-16-review-TOOL-cSettledDocket-1-1.md](../reviews/2026-08-16-review-TOOL-cSettledDocket-1-1.md) | spec-audit | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-6 |
+| [2026-08-17-review-TOOL-cSettledDocket-1-2.md](../reviews/2026-08-17-review-TOOL-cSettledDocket-1-2.md) | diff-review | TOOL-cSettledDocket-1 TOOL-cSettledDocket-2 TOOL-cSettledDocket-3 TOOL-cSettledDocket-4 TOOL-cSettledDocket-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 rev-1 of this spec said `skills/session-kickoff/manifest-check.test.sh` "prints no assertion summary

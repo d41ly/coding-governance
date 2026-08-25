@@ -8,6 +8,16 @@ requires = []
 requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "READ_PATH_CEILING"], why = "corpus_ids.py arms checks 13-16 on any of these three pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged" }]
 
 [[files]]
+path = "build-readme-slot-limits.txt"
+role = "seed"
+why = "the declared per-slot byte ceilings for a build README's authored half. Copied to an adopter with its rows and WITHOUT gov's values; see the slot-budget-ceilings hole."
+
+[[files]]
+path = "build-readme-slot-highwater.txt"
+role = "seed"
+why = "the advisory high-water per slot, rewritten by `gen_build_index.py --bump` and never by hand. Split from the ceilings file because --bump writes this one, and a ceiling inside the write path of the thing that must not move it is guarded only by a diff reader."
+
+[[files]]
 include = "**"
 role = "engine"
 
@@ -71,6 +81,14 @@ blocks_adopt = false
 blocks_gate = false
 why = "DISCIPLINES and FAMILIES ship as the example's DEMO values rather than blank, so an un-edited conf scaffolds another project's enum into the target and every gate stays green. Neither flag set: measured, the adopter exits 0 and the hygiene leg exits 0."
 discharge = { command = ["bash", "-c", "! diff -q <(grep -E '^(DISCIPLINES|FAMILIES)=' .memory-tree.conf) <(grep -E '^(DISCIPLINES|FAMILIES)=' {kit}/.memory-tree.conf.example) >/dev/null"] }
+
+[[hole]]
+id = "slot-budget-ceilings"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "build-readme-slot-limits.txt ships to an adopter with its canonical rows and NO ceiling values. A ceiling measured against gov's corpus and inherited by a tree that never measured its own is either vacuous or permanently red — the same reason measured-pins exists, one file over. A row present with no value is the ANNOUNCED unarmed state and is legal; the leg names how many slots are unarmed on every run, so an unmeasured tree says so rather than reporting a clean bar. A MISSING row stays a refusal, because that is a slot nobody decided about."
+discharge = { command = ["bash", "-c", "awk -F'\t' '/^## /{ if ($2 !~ /^[0-9]+$/) exit 1 } END{ }' {kit}/build-readme-slot-limits.txt"] }
 
 [[hole]]
 id = "measured-pins"
@@ -198,6 +216,12 @@ why = "the same gates read them as data"
 [[lf_pin]]
 pattern = "{memory_root}/**/*.txt"
 why = "the waiver registries are read line by line"
+[[lf_pin]]
+pattern = "{kit}/build-readme-slot-limits.txt"
+why = "a tab-separated declaration read line by line; a CR would land inside the value field"
+[[lf_pin]]
+pattern = "{kit}/build-readme-slot-highwater.txt"
+why = "written by --bump and read line by line, same reason as the ceilings beside it"
 [[lf_pin]]
 pattern = ".memory-tree.conf"
 why = "a sourced conf: a CR reaches the shell as part of the value"

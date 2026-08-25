@@ -10,7 +10,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.30   # gov:kit memory-tree@2.30 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.40   # gov:kit memory-tree@2.40 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -302,6 +302,10 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   F:id-orphan-waiver.txt|F:corpus-path-unresolved.txt|F:unarmed-branches.txt) ;;
   F:method-carriers.txt|F:testsuite-count-waivers.txt) ;;
   F:trace-waiver.txt) ;;
+  # TOOL-dFramedEntrypoint-3 - the build-README contract registry. Same shape as
+  # method-carriers.txt above: a declared population asserted in both directions by a script
+  # other than this one.
+  F:readme-contract.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then

@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-17 · node a · Tier-2 · base 96141aed · streams tooling · ratified 2026-08-17
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-17-review-TOOL-aBranchedMandate-4-2.md](../reviews/2026-08-17-review-TOOL-aBranchedMandate-4-2.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/unattended/adopt-unattended.sh` derives the kit's relative path by stripping `$ROOT` off

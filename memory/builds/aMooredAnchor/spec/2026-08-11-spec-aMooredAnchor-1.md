@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-5 · 2026-08-11 · node a · Tier-2 · base af6de231 · streams tooling · review wf_cc04b49a-8d3
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md](../build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.md) | journal | — |
+| [2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh](../build/2026-08-11-build-TOOL-aMooredAnchor-1-1-repro.sh) | journal | — |
+| [2026-08-11-review-TOOL-aMooredAnchor-1-1.md](../reviews/2026-08-11-review-TOOL-aMooredAnchor-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Close the five reproduced defeats in the unattended kit that do **not** depend on which commit the

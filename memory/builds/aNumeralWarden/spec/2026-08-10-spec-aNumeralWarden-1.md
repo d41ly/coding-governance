@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-6 · 2026-08-10 · node a · Tier-2 · base 289daf72 · streams tooling · review wf_154599e2 · landed 990f07b
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aNumeralWarden-1-1.md](../reviews/2026-08-10-review-TOOL-aNumeralWarden-1-1.md) | spec-audit | — |
+| [2026-08-10-review-TOOL-aNumeralWarden-1-2.md](../reviews/2026-08-10-review-TOOL-aNumeralWarden-1-2.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/hooks/agent-cap.js` enforces that fan-out routes through the bounded helpers but never reads

@@ -125,24 +125,20 @@ a BINDING protocol an agent is instructed to obey.
 ids TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 TOOL-aDeclaredBound-6
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | CLOSED | rev-3 | 2026-08-18 |
-| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | OPEN | rev-4 | 2026-08-18 |
-| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | CLOSED | rev-5 | 2026-08-18 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aDeclaredBound-1 — check 7's entry budget becomes a declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aDeclaredBound-2 — SPEC10_CUTOFF joins its three sibling cutoffs in the conf](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aDeclaredBound-3 — the ratchet lookback becomes a project-layer declaration](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md) | — | 2 | CLOSED | rev-3 | 2026-08-18 |
+| [TOOL-aDeclaredBound-4 — agent-cap reads a declaration: lowering is free, raising is attributed](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md) | — | 2 | OPEN | rev-4 | 2026-08-18 |
+| [TOOL-aDeclaredBound-5 — the agent-cap number is single-sourced before it becomes adjustable](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md) | — | 2 | CLOSED | rev-5 | 2026-08-18 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md) | research | TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-2.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md) | diff-review | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
-| [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md) | spec-audit | TOOL-aDeclaredBound-1 TOOL-aDeclaredBound-2 TOOL-aDeclaredBound-3 TOOL-aDeclaredBound-4 TOOL-aDeclaredBound-5 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -154,20 +150,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-18-spec-TOOL-aDeclaredBound-1.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-1.md)
-  - [2026-08-18-spec-TOOL-aDeclaredBound-2.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-2.md)
-  - [2026-08-18-spec-TOOL-aDeclaredBound-3.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-3.md)
-  - [2026-08-18-spec-TOOL-aDeclaredBound-4.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-4.md)
-  - [2026-08-18-spec-TOOL-aDeclaredBound-5.md](spec/2026-08-18-spec-TOOL-aDeclaredBound-5.md)
-- **`build/`**
-  - [2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md](build/2026-08-18-build-TOOL-aDeclaredBound-5-gate-measurement.md)
-- **`reviews/`**
-  - [2026-08-18-review-TOOL-aDeclaredBound-1-2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-2.md)
-  - [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative-round2.md)
-  - [2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1-5-cumulative.md)
-  - [2026-08-18-review-TOOL-aDeclaredBound-1.md](reviews/2026-08-18-review-TOOL-aDeclaredBound-1.md)
-<!-- /gen:build-docs -->

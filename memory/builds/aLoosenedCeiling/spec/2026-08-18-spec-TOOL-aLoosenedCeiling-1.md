@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-18 · node a · Tier-2 · base 6382c564 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-18-review-TOOL-aLoosenedCeiling-1.md](../reviews/2026-08-18-review-TOOL-aLoosenedCeiling-1.md) | spec-audit | TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+| [2026-08-18-review-TOOL-aLoosenedCeiling-2.md](../reviews/2026-08-18-review-TOOL-aLoosenedCeiling-2.md) | diff-review | TOOL-aLoosenedCeiling-2 TOOL-aLoosenedCeiling-3 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `corpus_ids.py --measure` tells every adopter what to write into `READ_PATH_CEILING`, and the

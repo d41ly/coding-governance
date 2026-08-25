@@ -7,6 +7,14 @@ directory, written by tool calls of the shape `... > ~/.merge-bar.log 2>&1`. No 
 no script can catch it, and the charter rule it violates was already loaded in the sessions that
 violated it. The only surface that sees the offending bytes is the tool call.
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-20-review-TOOL-aTetheredScratch-1-2.md](../reviews/2026-08-20-review-TOOL-aTetheredScratch-1-2.md) | spec-audit | TOOL-aTetheredScratch-2 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Deny, at the tool call, any shell command whose text names a write target under the operator's home

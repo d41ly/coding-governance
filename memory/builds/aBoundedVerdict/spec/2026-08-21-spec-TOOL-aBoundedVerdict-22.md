@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-21 · node c · Tier-2 · base 43a6c13e · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md](../build/2026-08-22-build-TOOL-aBoundedVerdict-22-acceptance-ledger.md) | journal | — |
+| [2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md](../reviews/2026-08-22-review-TOOL-aBoundedVerdict-1-merge.md) | diff-review | TOOL-aBoundedVerdict-1 TOOL-aBoundedVerdict-2 TOOL-aBoundedVerdict-13 TOOL-aBoundedVerdict-19 PLAY-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-1 TOOL-dUnstalledConvoy-2 TOOL-dUnstalledConvoy-3 TOOL-dUnstalledConvoy-4 TOOL-dUnstalledConvoy-5 TOOL-dUnstalledConvoy-6 TOOL-dUnstalledConvoy-7 TOOL-dUnstalledConvoy-8 TOOL-dUnstalledConvoy-9 TOOL-dUnstalledConvoy-10 TOOL-dUnstalledConvoy-11 TOOL-dUnstalledConvoy-12 TOOL-aShardedFloor-4 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 This unit exists because the convergence predicate this build shipped fired on this build. Recorded

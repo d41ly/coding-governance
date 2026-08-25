@@ -2,6 +2,15 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-08 · node a · Tier-2 · base 42c3f4dc · streams tooling · ratified 2026-08-08
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-08-review-TOOL-aFoldedQuarry-1-7.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-1-7.md) | diff-review | TOOL-aFoldedQuarry-1 TOOL-aFoldedQuarry-2 TOOL-aFoldedQuarry-3 TOOL-aFoldedQuarry-4 TOOL-aFoldedQuarry-5 TOOL-aFoldedQuarry-6 |
+| [2026-08-08-review-TOOL-aFoldedQuarry-7-6.md](../../reviews/2026-08-08-review-TOOL-aFoldedQuarry-7-6.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Turn the transferable harness disciplines into a gate rather than advice: every `fail` branch in the

@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-24 · node d · Tier-2 · base b164a296 · streams tooling
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-26-2-acceptance-ledger.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 |
+| [2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md](../build/2026-08-24-build-TOOL-dUnstalledConvoy-28-1-red-first.md) | journal | — |
+| [2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md](../reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-closing-diff.md) | journal | TOOL-dUnstalledConvoy-26 TOOL-dUnstalledConvoy-27 TOOL-dUnstalledConvoy-29 TOOL-dUnstalledConvoy-30 TOOL-dUnstalledConvoy-31 TOOL-dUnstalledConvoy-32 TOOL-dUnstalledConvoy-33 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `TOOL-dUnstalledConvoy-26` rev-2 resolved "where does this repo set `GATE_SELFTESTS`?" with "in

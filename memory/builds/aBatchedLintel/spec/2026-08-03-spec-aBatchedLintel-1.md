@@ -2,6 +2,15 @@
 
 **Status:** INPROGRESS · rev-3 · 2026-08-03 · node a · Tier-2 · base e8d046cc
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-03-build-TOOL-aBatchedLintel-1-1.md](../build/2026-08-03-build-TOOL-aBatchedLintel-1-1.md) | journal | — |
+| [2026-08-03-review-TOOL-aBatchedLintel-1-1.md](../reviews/2026-08-03-review-TOOL-aBatchedLintel-1-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/memory-tree/check-memory-hygiene.sh` spends roughly thirteen forks per spec file in check 12

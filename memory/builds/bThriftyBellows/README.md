@@ -27,11 +27,11 @@ ids TOOL-bThriftyBellows-1 TOOL-bThriftyBellows-2
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records live under `build/`.
+Records: 1 bound to this build, across 1 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-07-16-build-bThriftyBellows-1.md](build/2026-07-16-build-bThriftyBellows-1.md) | — | *none — this build shipped before the spec-format ratchet reached it and holds no spec at all, so there is no id to serve* |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -43,9 +43,3 @@ Records live under `build/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`build/`**
-  - [2026-07-16-build-bThriftyBellows-1.md](build/2026-07-16-build-bThriftyBellows-1.md)
-<!-- /gen:build-docs -->

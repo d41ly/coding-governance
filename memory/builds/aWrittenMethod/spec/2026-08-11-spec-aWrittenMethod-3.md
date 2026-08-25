@@ -2,6 +2,16 @@
 
 **Status:** CLOSED · rev-3 · 2026-08-11 · node a · Tier-1 · base 7f614a17 · streams tooling · review wf_eb978bb2-f98
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](../reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `memory/guides/BUILD-METHOD.md` renders at 247 lines against hygiene check 6's 250-line cap. Three

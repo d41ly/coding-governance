@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.30 -->
+<!-- gov:kit memory-tree@2.40 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -38,6 +38,19 @@ present, on either tier. It is REQUIRED for specs whose FILENAME date is on or a
 `STREAMS_CUTOFF`, which is set strictly ahead of the corpus at adoption so no landed spec is
 retroactively red — and which means every spec written from that date onward must carry it.
 
+## The records region (GENERATED — do not hand-edit, do not move)
+
+A `<!-- gen:spec-records -->` pair sits between the status header and `## 1. Goal`, listing every
+record whose `**Serves:**` line names this spec's id, with its kind and the other ids it also serves.
+`gen_build_index.py --write` creates and fills it; `--check` never demands one, so a spec that has
+not been rendered yet is legal and nothing has to be back-filled.
+
+It is ABOVE the first numbered section deliberately. Check 12 collects `## ` headings for its
+section-equality compare and this pair is not one, and its empty-body walk has not started there — so
+the region needs no eleventh section, no new canon and no dated cutoff, and every landed spec can
+carry it. A spec no record names renders an explicit empty line rather than an absent region, because
+an absent region cannot be told from a spec nobody has recorded against.
+
 ## The status header (required, within the first 5 unfenced lines)
 
 ```
@@ -56,7 +69,15 @@ retroactively red — and which means every spec written from that date onward m
 - `base` is the immutable default-branch sha (8+ hex chars) the design was grounded against.
 - `streams` names the discipline(s) this spec served, `+`-joined, each one a legal `DISCIPLINES`
   value. See the cutoff section above for when it becomes mandatory.
-- The tail holds POINTERS only — a review workflow id, `ratified <date>` — never prose.
+- The tail holds POINTERS and DECLARED VERBS only — a review workflow id, `ratified <date>`,
+  `order <n>` — never prose.
+- `order <n>` is the BUILD-ORDER verb: a positive integer, at most once, declaring this unit's step
+  within its build. Units sharing a value are the parallel group; gaps are permitted, because a gap
+  is how a retired unit leaves an order without renumbering the rest. It is PERMITTED, never
+  required, so no landed spec goes retroactively red — and a malformed value is a REFUSAL rather
+  than a silent misread: the generator anchors the verb on both sides and raises on anything that
+  looks like it and does not conform. The build README's roster and its build-order region are both
+  DERIVED from this field, which is why the order belongs on the spec and not in README prose.
 - Fleet inventory (merged state only — unpushed specs on other nodes are invisible):
   `git grep -lE '^\*\*Status:\*\* (SPECCED|INPROGRESS)' -- '<MEMORY_ROOT>/builds/*/spec/'` lists
   every open spec; swap the token set to taste.

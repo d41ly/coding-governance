@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-10 · node a · Tier-2 · base 20f8082e · streams tooling · ratified 2026-08-10 · review wf_077104e6
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-10-review-TOOL-aUnmannedHelm-1-2.md](../reviews/2026-08-10-review-TOOL-aUnmannedHelm-1-2.md) | diff-review | TOOL-aUnmannedHelm-1 TOOL-aUnmannedHelm-4 TOOL-aUnmannedHelm-5 TOOL-aUnmannedHelm-7 TOOL-aUnmannedHelm-8 TOOL-aUnmannedHelm-9 |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make every claim units 2 and 3 make checkable on the merge bar. This is unit 4 of seven; the master

@@ -27,11 +27,11 @@ ids DEPL-aKitHardener-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records live under `spec/` and `build/`.
+Records: 1 bound to this build, across 2 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md) | journal | DEPL-aKitHardener-1 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -43,11 +43,3 @@ Records live under `spec/` and `build/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-07-14-spec-aKitHardener-1.md](spec/2026-07-14-spec-aKitHardener-1.md)
-- **`build/`**
-  - [2026-07-14-build-DEPL-aKitHardener-1-1.md](build/2026-07-14-build-DEPL-aKitHardener-1-1.md)
-<!-- /gen:build-docs -->

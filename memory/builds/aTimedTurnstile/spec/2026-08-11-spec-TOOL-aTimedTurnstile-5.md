@@ -2,6 +2,14 @@
 
 **Status:** CLOSED · rev-4 · 2026-08-20 · node a · Tier-2 · base af6de231 · streams tooling · review aTimedTurnstile-1
 
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-11-review-TOOL-aTimedTurnstile-5-1.md](../reviews/2026-08-11-review-TOOL-aTimedTurnstile-5-1.md) | spec-audit | — |
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 `tools/run-gates.sh` runs all 47 legs serially, so the bar's wall clock is the sum of its legs:

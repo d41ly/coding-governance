@@ -22,12 +22,16 @@ because the generated index needs it.
 ids TOOL-cSightedPlumb-1
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-cSightedPlumb-1 — the drift-audit kit: port record-vs-reality auditing out of inCMS](spec/2026-08-05-spec-cSightedPlumb-1.md) | CLOSED | rev-1 | 2026-08-05 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-cSightedPlumb-1 — the drift-audit kit: port record-vs-reality auditing out of inCMS](spec/2026-08-05-spec-cSightedPlumb-1.md) | — | 2 | CLOSED | rev-1 | 2026-08-05 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`.
+Records: 0 bound to this build, across 1 record folder(s).
+
+Ids no record names: TOOL-cSightedPlumb-1.
+
+Ids no `spec-audit` record has ever named: TOOL-cSightedPlumb-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -39,9 +43,3 @@ Records live under `spec/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-05-spec-cSightedPlumb-1.md](spec/2026-08-05-spec-cSightedPlumb-1.md)
-<!-- /gen:build-docs -->

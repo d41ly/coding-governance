@@ -15,7 +15,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # substitutes nothing and looks like it worked.
 ROOT_N="$(cd "$ROOT" && pwd)"
 KIT_REL=${HERE#"$ROOT_N"/}
+# CAPTURED, because the branch below REASSIGNS KIT_REL and the fact is needed again further down.
+# Comparing $HERE against the raw $ROOT instead is the two-spellings trap this file's own header
+# warns about twelve lines up: $ROOT is `C:/...` from `git rev-parse` and $HERE is `/c/...` from
+# `cd && pwd`, so `case "$HERE/" in "$ROOT"/*)` never matches on any node in the registry. It shipped
+# that way for one commit and made the ceiling strip DEAD everywhere while printing an else-arm
+# instruction telling the operator to do what they had just done.
+KIT_INSIDE=yes
 if [ "$KIT_REL" = "$HERE" ]; then
+  KIT_INSIDE=no
   # The kit dir is OUTSIDE the tree being scaffolded — the legitimate "run the shipped adopter from
   # the governance checkout against a fresh repo" flow, which the runbook's copy-then-run order does
   # not cover but people use. Scaffolding is still correct: every asset is read from $HERE and every
@@ -135,6 +143,63 @@ printf '# unarmed-branches.txt — `fail` branches with no positive assertion na
 # fixture can reach, and it carries the REASON — "not yet written" and "cannot be written from here"
 # are indistinguishable in a bare pin and only one of them is acceptable.
 ' > "$M/project/unarmed-branches.txt"
+# build-readme-slot-limits.txt ships with its ROWS and without the origin repo's VALUES. A ceiling
+# measured against one corpus is a pin the adopter never measured, which is vacuous or permanently
+# red — the same reasoning as the measured-pins hole, and the reason `slot-budget-ceilings` exists
+# beside it. A row with no value is the ANNOUNCED unarmed state; a MISSING row is a refusal, so the
+# rows survive and only the numbers go.
+#
+# GUARDED ON THE KIT LIVING INSIDE $ROOT, and that guard is the whole correction. The first cut wrote
+# to "$HERE" unconditionally — the only write in this script landing outside $ROOT, against the
+# invariant its own header states — so running the scaffolder FROM a governance checkout blanked that
+# checkout's ceilings rather than an adopter's copy. It did exactly that here: five values were lost
+# in a landed commit, and the bar kept printing "slot contract clean" because a blank ceiling is the
+# legal unarmed state. The kit's own self-test re-triggered it on every run.
+#
+# Inside $ROOT the kit IS the adopter's copy and stripping it is the intended install step. Outside
+# $ROOT it is somebody's source tree and must not be touched; that is the same case the KIT_REL
+# branch above already detects and prints about.
+case "$KIT_INSIDE" in
+  yes)
+    if [ -f "$HERE/build-readme-slot-limits.txt" ]; then
+      awk -F'\t' 'BEGIN{OFS="\t"} /^## /{ print $1, ""; next } { print }' \
+        "$HERE/build-readme-slot-limits.txt" > "$HERE/.slot-limits.tmp" \
+        && mv "$HERE/.slot-limits.tmp" "$HERE/build-readme-slot-limits.txt"
+    fi
+    ;;
+  *)
+    echo "memory-tree: kit dir is outside the tree being scaffolded — leaving its \
+build-readme-slot-limits.txt alone. The ceilings are stripped when the kit is copied INTO the target \
+tree and the adopter runs it from there, which is the runbook order." >&2
+    ;;
+esac
+
+# readme-contract.txt is SEEDED with every build README EXEMPT and none bound, because an absent
+# registry is a refusal and an empty one reds the adopter's first run on the FORWARD assertion.
+# Every row carries its reason inline and the pin equals the count, so the file the adopter receives
+# already satisfies both directions and the equality.
+#
+# EVERY PROBE HERE IS TERMINATED. A no-match `grep` exits 1, and under `set -eu` that aborts the whole
+# scaffold silently — which is exactly what happened: this block landed unterminated, the script died
+# before rendering LIVE.md, and the adopter self-test caught it as a broken relative link rather than
+# as a dead scaffolder. The charter names this class; the fix is `|| true`, not a cleverer pipeline.
+_rc=$({ git ls-files 2>/dev/null || true; find . -type f -not -path './.git/*' 2>/dev/null | sed 's|^\./||' || true; } \
+      | sort -u | grep -E "^$M/builds/[^/]+/README\.md$" || true)
+_rn=$(printf '%s\n' "$_rc" | grep -c . || true)
+{
+  printf '# readme-contract.txt - which build READMEs the heading canon and the slot budgets BIND.\n'
+  printf '# Asserted BOTH ways: a tracked build README named by no row refuses, and a row naming a\n'
+  printf '# path that is not one refuses. A bare path is BOUND; an `!`-prefixed path is EXEMPT and\n'
+  printf '# carries its reason after " - ". `exempt-pin:` is an EQUALITY with the measured count.\n'
+  printf '# SEEDED at adoption: every build README present starts EXEMPT, so the contract binds\n'
+  printf '# nothing on day one and the leg says so on every run. Convert a row to bound when you\n'
+  printf '# conform that README.\n\n'
+  printf 'exempt-pin: %s\n\n' "$_rn"
+  printf '%s\n' "$_rc" | grep . | while IFS= read -r f; do
+    printf '!%s - predates the contract in this tree; drains when its build is conformed\n' "$f"
+  done || true
+} > "$M/project/readme-contract.txt"
+
 # method-carriers.txt is SEEDED, not written empty, and that is the whole point. The kit itself ships
 # files that POINT AT the build method — this adopter is one, the kit README is another — so an
 # adopter handed an empty registry reds on install with carriers they never wrote. The seed is

@@ -2,6 +2,12 @@
 
 **Status:** CLOSED · rev-1 · 2026-08-11 · node d · Tier-2 · base 7f614a17 · streams tooling
 
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
 ## 1. Goal
 
 Make a failing leg's own output survive on disk, so a caller who pipes, backgrounds or scrolls away

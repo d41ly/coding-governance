@@ -131,25 +131,19 @@ spec in this folder — do not hand-edit it.
 ids TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | CLOSED | rev-4 | 2026-08-11 |
-| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | CLOSED | rev-5 | 2026-08-11 |
-| [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | CLOSED | rev-3 | 2026-08-11 |
-| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | CLOSED | rev-6 | 2026-08-11 |
-| [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | CLOSED | rev-3 | 2026-08-11 |
-| [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | CLOSED | rev-4 | 2026-08-11 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aWrittenMethod-1 — the build method, rendered and delivered](spec/2026-08-11-spec-aWrittenMethod-1.md) | — | 2 | CLOSED | rev-4 | 2026-08-11 |
+| [TOOL-aWrittenMethod-2 — the mandate BASE the run cannot steer](spec/2026-08-11-spec-aWrittenMethod-2.md) | — | 2 | CLOSED | rev-5 | 2026-08-11 |
+| [TOOL-aWrittenMethod-3 — the method's displacement, at 247 of 250 lines](spec/2026-08-11-spec-aWrittenMethod-3.md) | — | 1 | CLOSED | rev-3 | 2026-08-11 |
+| [TOOL-aWrittenMethod-4 — a gate for the sixth carrier](spec/2026-08-11-spec-aWrittenMethod-4.md) | — | 2 | CLOSED | rev-6 | 2026-08-11 |
+| [TOOL-aWrittenMethod-5 — the method in the manifest's watch set](spec/2026-08-11-spec-aWrittenMethod-5.md) | — | 1 | CLOSED | rev-3 | 2026-08-11 |
+| [TOOL-aWrittenMethod-6 — escaping conf values before substitution](spec/2026-08-11-spec-aWrittenMethod-6.md) | — | 2 | CLOSED | rev-4 | 2026-08-11 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 5 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md](build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md) | journal | TOOL-aWrittenMethod-1 |
-| [2026-08-11-build-aWrittenMethod-1-enforcement-pass.md](build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md) | — | *none — a design pass the build README grades REJECTED for scope; it warranted no spec and none was minted* |
-| [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
-| [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
-| [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md) | diff-review | TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6 |
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aWrittenMethod-1 TOOL-aWrittenMethod-2 TOOL-aWrittenMethod-3 TOOL-aWrittenMethod-4 TOOL-aWrittenMethod-5 TOOL-aWrittenMethod-6.
 <!-- /gen:build-index -->
@@ -163,21 +157,3 @@ Ids no `spec-audit` record has ever named: TOOL-aWrittenMethod-1 TOOL-aWrittenMe
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-11-spec-aWrittenMethod-1.md](spec/2026-08-11-spec-aWrittenMethod-1.md)
-  - [2026-08-11-spec-aWrittenMethod-2.md](spec/2026-08-11-spec-aWrittenMethod-2.md)
-  - [2026-08-11-spec-aWrittenMethod-3.md](spec/2026-08-11-spec-aWrittenMethod-3.md)
-  - [2026-08-11-spec-aWrittenMethod-4.md](spec/2026-08-11-spec-aWrittenMethod-4.md)
-  - [2026-08-11-spec-aWrittenMethod-5.md](spec/2026-08-11-spec-aWrittenMethod-5.md)
-  - [2026-08-11-spec-aWrittenMethod-6.md](spec/2026-08-11-spec-aWrittenMethod-6.md)
-- **`build/`**
-  - [2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md](build/2026-08-11-build-TOOL-aWrittenMethod-1-1-method-pass.md)
-  - [2026-08-11-build-aWrittenMethod-1-enforcement-pass.md](build/2026-08-11-build-aWrittenMethod-1-enforcement-pass.md)
-- **`reviews/`**
-  - [2026-08-11-review-TOOL-aWrittenMethod-1-1.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-1.md)
-  - [2026-08-11-review-TOOL-aWrittenMethod-1-2.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-2.md)
-  - [2026-08-11-review-TOOL-aWrittenMethod-1-3.md](reviews/2026-08-11-review-TOOL-aWrittenMethod-1-3.md)
-<!-- /gen:build-docs -->

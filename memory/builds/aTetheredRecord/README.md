@@ -125,23 +125,22 @@ adversarial pass has yet tried to break it.
 ids TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7
 
 <!-- gen:build-units -->
-| Unit | Status | Rev | Last change |
-|---|---|---|---|
-| [TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md) | CLOSED | rev-2 | 2026-08-20 |
-| [TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser](spec/2026-08-16-spec-TOOL-aTetheredRecord-2.md) | CLOSED | rev-3 | 2026-08-20 |
-| [TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line](spec/2026-08-16-spec-TOOL-aTetheredRecord-3.md) | CLOSED | rev-4 | 2026-08-20 |
-| [TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md) | CLOSED | rev-4 | 2026-08-20 |
-| [TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join](spec/2026-08-16-spec-TOOL-aTetheredRecord-5.md) | CLOSED | rev-4 | 2026-08-20 |
-| [TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it](spec/2026-08-16-spec-TOOL-aTetheredRecord-6.md) | CLOSED | rev-3 | 2026-08-20 |
-| [TOOL-aTetheredRecord-7 — the rename: every record filename names a spec](spec/2026-08-17-spec-TOOL-aTetheredRecord-7.md) | CLOSED | rev-2 | 2026-08-20 |
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aTetheredRecord-1 — mint the five missing spec ids, and drain the orphan waiver](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md) | — | 1 | CLOSED | rev-2 | 2026-08-20 |
+| [TOOL-aTetheredRecord-2 — the binding grammar and its read-only parser](spec/2026-08-16-spec-TOOL-aTetheredRecord-2.md) | — | 2 | CLOSED | rev-3 | 2026-08-20 |
+| [TOOL-aTetheredRecord-3 — the retrofit: all 76 records gain a binding line](spec/2026-08-16-spec-TOOL-aTetheredRecord-3.md) | — | 1 | CLOSED | rev-4 | 2026-08-20 |
+| [TOOL-aTetheredRecord-4 — check 21: the binding becomes the merge bar](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [TOOL-aTetheredRecord-5 — the rendered Records table and the coverage join](spec/2026-08-16-spec-TOOL-aTetheredRecord-5.md) | — | 2 | CLOSED | rev-4 | 2026-08-20 |
+| [TOOL-aTetheredRecord-6 — the adopter path: the obligation ships with the step that arms it](spec/2026-08-16-spec-TOOL-aTetheredRecord-6.md) | — | 2 | CLOSED | rev-3 | 2026-08-20 |
+| [TOOL-aTetheredRecord-7 — the rename: every record filename names a spec](spec/2026-08-17-spec-TOOL-aTetheredRecord-7.md) | — | 1 | CLOSED | rev-2 | 2026-08-20 |
 <!-- /gen:build-units -->
 
-Records live under `spec/`, `build/` and `reviews/`.
+Records: 2 bound to this build, across 3 record folder(s).
 
-| Record | Kind | Serves |
-|---|---|---|
-| [2026-08-16-build-aTetheredRecord-1-design-pass.md](build/2026-08-16-build-aTetheredRecord-1-design-pass.md) | — | *none — this record PRECEDES the spec set and commissioned it; it is the class-4 case the* |
-| [2026-08-17-review-TOOL-aTetheredRecord-1-1.md](reviews/2026-08-17-review-TOOL-aTetheredRecord-1-1.md) | spec-audit | TOOL-aTetheredRecord-1 TOOL-aTetheredRecord-2 TOOL-aTetheredRecord-3 TOOL-aTetheredRecord-4 TOOL-aTetheredRecord-5 TOOL-aTetheredRecord-6 TOOL-aTetheredRecord-7 |
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -153,19 +152,3 @@ Records live under `spec/`, `build/` and `reviews/`.
 
 *This build declares no parent and no build declares it as one.*
 <!-- /gen:build-edges -->
-
-<!-- gen:build-docs -->
-
-- **`spec/`**
-  - [2026-08-16-spec-TOOL-aTetheredRecord-1.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-1.md)
-  - [2026-08-16-spec-TOOL-aTetheredRecord-2.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-2.md)
-  - [2026-08-16-spec-TOOL-aTetheredRecord-3.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-3.md)
-  - [2026-08-16-spec-TOOL-aTetheredRecord-4.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-4.md)
-  - [2026-08-16-spec-TOOL-aTetheredRecord-5.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-5.md)
-  - [2026-08-16-spec-TOOL-aTetheredRecord-6.md](spec/2026-08-16-spec-TOOL-aTetheredRecord-6.md)
-  - [2026-08-17-spec-TOOL-aTetheredRecord-7.md](spec/2026-08-17-spec-TOOL-aTetheredRecord-7.md)
-- **`build/`**
-  - [2026-08-16-build-aTetheredRecord-1-design-pass.md](build/2026-08-16-build-aTetheredRecord-1-design-pass.md)
-- **`reviews/`**
-  - [2026-08-17-review-TOOL-aTetheredRecord-1-1.md](reviews/2026-08-17-review-TOOL-aTetheredRecord-1-1.md)
-<!-- /gen:build-docs -->
