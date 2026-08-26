@@ -1,13 +1,14 @@
 # TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-5 |
+| [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
+| [2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md) | spec-audit | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 
 <!-- /gen:spec-records -->
 
@@ -35,8 +36,6 @@ at the place legs actually run.
 - **S6** — a static declaration check: every leg in a manifest that already carries at least one
   `ceiling` must carry one. Scoped that way on purpose, per §4's rollout rule.
 - **S7** — the canary's pinned leg-key set gains `ceiling`, at BOTH of its two sites.
-- **S8** — the three `BUDGET_*` lines in `tools/unattended/run-unattended-gates.sh` whose suites are
-  also manifest legs are deleted, because those three ceilings now live in the manifest.
 
 ## 3. Non-goals (OUT)
 
@@ -50,6 +49,13 @@ at the place legs actually run.
   `TOOL-aBoundedCeiling-5` and cannot be done from inside the runner.
 - **N5** — the ceiling is not graded against `<git-dir>/gate-ledger.tsv` at run time. That file is
   per-clone and per-machine, so a verdict read from it would be a fact about the node.
+- **N6** — no `BUDGET_*` line in `tools/unattended/run-unattended-gates.sh` is deleted, and that file
+  is not touched at all. rev-1 scoped exactly that deletion and the spec audit refuted it: `run_one`
+  resolves `bkey="BUDGET_$(printf '%s' "$label" | tr ' -' '__')"` and then treats an EMPTY value as a
+  failure — *"A MISSING BUDGET IS ITSELF A FAILURE"* — so deleting a line makes `--checks` print
+  `OVER BUDGET  <label> declares no ceiling` and exit 1 forever. A leg may hold a ceiling in the
+  manifest AND a `BUDGET_*` beside its suite; the two bound different things and neither is a copy of
+  the other.
 
 ## 4. Design
 
@@ -77,6 +83,23 @@ that nothing but a true hang could reach it.
 
 Tightening the factor later is a one-line edit per leg with a reason beside it, which is the same
 discipline `tools/unattended/run-unattended-gates.sh` already applies to its own eight ceilings.
+
+**The formula does NOT apply to a leg that already carries a declared ceiling.** Three legs do, in
+`run-unattended-gates.sh`'s `BUDGET_*` block, and applying `3 × current cost` to them would raise a
+number somebody set on purpose by reference to the cost it was set to catch. `unattended kit gate` is
+the case that proves it: its declared ceiling is `BUDGET_kit_gate=120  # measured 28 s`, its current
+cost is 533 s on node `a`, and the formula would ship 1600 s — a thirteenfold raise, in a file whose
+own header reads *"Raising one is fine; raising one silently is not."*
+
+That breach is not news and it is not mine to discover. `TOOL-aCollapsedScan-3` is a RATIFIED
+decision recording it — *"The ceiling worked and nothing on the bar reads it"* — and
+`TOOL-aCollapsedScan-4` is OPEN against it, offering two candidates. **This unit takes candidate (2),
+re-declare the ceiling with the reason beside it**, and the reason is this one: the leg's cost rose
+from 305 s to about 164 s after the spawn fix and then to 533 s under the load this node now carries,
+so 120 s describes a machine that no longer exists. The manifest ceiling for that leg ships at
+**1600 s** as a HANG bound, the `BUDGET_kit_gate` declaration stays at 120 s as a COST bound, and
+`TOOL-aCollapsedScan-4` closes only when someone rules on the cost half. Two numbers, two questions,
+and saying so is what keeps the raise from being silent.
 
 ### Why `PROF_TIMEOUT` must stay zero
 
@@ -126,9 +149,8 @@ scoping stops mattering on its own, with no cutoff date to retire.
 | `run-gates.sh` row loader (~:721) | a `ceilings` array parallel to `names` |
 | `run-gates.sh` `runleg()` (~:890) | wrap in the leg's own bound when it declares one |
 | `run-gates.sh` `report_one()` (~:966) | attribute 124 and 137 to the leg's own ceiling |
-| `run-gates.sh` liveness (~:349) | say so when `timeout` will not run and ceilings exist |
+| `run-gates.sh` liveness (~:349) | say so when `timeout` will not run |
 | `run-gates.test.sh` (:96 and :125) | `ceiling` joins the pinned `KNOWN` set, both copies |
-| `run-unattended-gates.sh` | drop `BUDGET_kit_gate`, `BUDGET_playbook_validity_gate`, `BUDGET_skill_wiring` |
 
 ### Alternatives rejected
 
@@ -151,8 +173,9 @@ deliberately does not, because a killed suite prints no verdict and the kill the
   in the per-leg log the runner already persists.
 - **risks** — a ceiling set too tight reds a healthy leg on a slow node. Priced by the 3× factor and
   the 60 s floor, both argued in §4. The rollback is one integer.
-- **testing + left-shift gates** — AC1 through AC7 below, all in `run-gates.test.sh`, whose failing
-  case is observed before landing per charter §7.
+- **testing + left-shift gates** — AC1 to AC4 and AC6 live in `run-gates.test.sh`, which IS the
+  `run-gates canary` leg and therefore may name no leg of this corpus. AC5 is a whole-bar run and
+  belongs to no suite. Every failing case is observed before landing, per charter §7.
 - **migration / rollback** — deleting every `ceiling` key restores today's behaviour exactly; the
   reader `.get`-defaults the field and the wrapper is skipped when it is absent.
 - **user docs** — `tools/run-gates/README.md` gains the field and the derivation rule. The TTL
@@ -175,19 +198,19 @@ deliberately does not, because a killed suite prints no verdict and the kill the
 - **AC5** — When `ceiling` is added to `tools/gate-legs.json`, `bash tools/run-gates/run-gates.sh`
   under `GATE_SELFTESTS=1` is GREEN, including the `run-gates canary` leg whose pinned `KNOWN` set
   the field would otherwise break.
-- **AC6** — When a leg's argv is unchanged and only its `ceiling` moves, `input_key` returns the
-  same value, so the reuse cache is not invalidated — asserted directly in `run-gates.test.sh`.
-- **AC7** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs, it reports the three
-  suites with no ceiling of its own and does not print `OVER BUDGET  ... declares no ceiling`,
-  because those three are no longer in its `BUDGET_*` set.
+- **AC6** — When a leg's argv is unchanged, `input_key` returns the same value whether or not the
+  leg declares a `ceiling` — asserted in `run-gates.test.sh` with the TREE HELD CONSTANT. The claim
+  is only that the ceiling never enters the key, NOT that the reuse cache survives a manifest edit:
+  it does not, because an unguarded leg's key is `FPRINT_START`, which digests the tree and moves on
+  any edit to `tools/gate-legs.json`. 48 of the 85 legs lose their key on the commit that lands this
+  unit, once, by design.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` with `GATE_SELFTESTS=1`, which is the only run that exercises
 `run-gates canary`, `run-gates turnstile` and `run-gates evidence` — all three are held on a default
-bar and all three read what this unit changes. Plus `bash tools/unattended/run-unattended-gates.sh
---checks` for AC7. No new gate LEG is added: the ceilings are enforced by the runner every leg
-already goes through.
+bar and all three read what this unit changes. No new gate LEG is added: the ceilings are enforced by
+the runner every leg already goes through.
 
 ## 8. Open questions
 
@@ -202,16 +225,21 @@ already goes through.
   after the parse. A missing ceiling is a declaration defect, not an unparseable manifest, and the
   parser's existing hard-subscript behaviour already produces `cannot parse` and zero legs — reusing
   that path would make a one-row omission indistinguishable from a corrupt file.
-- **F3 — whether the three deleted `BUDGET_*` lines should instead be read from the manifest** so
-  `run-unattended-gates.sh` keeps reporting a ceiling for them. RESOLVED (agent, 2026-08-27,
-  delegated): delete them. Its remaining five suites are not manifest legs at all, so a shared
-  declaration site would have to exist anyway, and the two enforcement mechanisms differ on exactly
-  the behaviour they would be sharing.
+- **F3 — what happens to the three `BUDGET_*` lines whose suites are also manifest legs.** RESOLVED
+  (agent, 2026-08-27, delegated): NOTHING happens to them, and rev-1's answer here was wrong in the
+  dangerous direction. It resolved to delete them, which `run_one`'s empty-value refusal turns into a
+  permanent RED on `--checks`. They stay. See N6.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft, grounded on five read-only probes of `run-gates.sh`, the
   turnstile suite, the canary's pinned key set and `govkit`'s leg emitter.
+- rev-2 · 2026-08-27 · folded the round-1 spec audit. Dropped S8 and AC7, which were INVERTED — the
+  deletion they scoped causes the failure AC7 asserted it prevents; added N6 saying so. Excluded the
+  three already-declared ceilings from the 3x formula and took `TOOL-aCollapsedScan-4`'s candidate
+  (2) explicitly. Cited `TOOL-aCollapsedScan-3` and `-4` in §10. Re-routed §5's acceptance homes,
+  which contradicted §7. Narrowed AC6, whose reuse-cache clause was false for 48 of 85 legs. Dropped
+  a misplaced Inventory condition.
 
 ## 10. Reuse audit
 
@@ -234,6 +262,13 @@ Recall terms used, because M7 re-runs the query: `leg ceiling timeout deadline h
 guard bar budget verdict spawn profile runner`. It returned `TOOL-aCollapsedScan-5`, which proposes
 this exact field and whose closure this unit is, and `TOOL-aBoundedVerdict-10`, whose per-leg
 deadline half it closes.
+
+**Two governing records the first draft missed, and the audit found.** `TOOL-aCollapsedScan-3` is a
+RATIFIED decision in `memory/DECISIONS.md` about the very ceiling this unit nearly overwrote, and
+`TOOL-aCollapsedScan-4` is an OPEN backlog row against the same breach. §4 above takes `-4`'s
+candidate (2) by name. The recall query returned neither, because it was phrased about deadlines and
+hangs while both records are phrased about a BUDGET and a leg cost — a reminder that a probe answers
+the question asked and the miss is the querier's, not the corpus's.
 
 **Where a hit was STALE.** `TOOL-aCollapsedScan-5` suggests grading the ceiling against
 `<git-dir>/gate-ledger.tsv` because "the measurement half already exists". Verified against source

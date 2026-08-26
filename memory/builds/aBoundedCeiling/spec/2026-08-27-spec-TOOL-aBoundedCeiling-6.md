@@ -1,12 +1,14 @@
 # TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |
+| [2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md) | spec-audit | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |
 
 <!-- /gen:spec-records -->
 
@@ -22,8 +24,15 @@ recorded in
 ## 2. Scope (IN)
 
 - **S1** — `.unattended.conf` gains `GATE_BOUND`, seconds, the wall-clock bound on `$GATE_CMD`.
-- **S2** — the `gates-green` arm of `dod_met` runs `$GATE_CMD` under `timeout -k`, capturing to a
-  FILE and not through a command substitution.
+- **S2** — ONE bounded-run helper in `unattended.sh`, applied at BOTH unbounded command seams in
+  that file: the `gates-green` arm of `dod_met` running `$GATE_CMD`, and `check_wiring` running
+  `$WIRING_CHECK`. Each runs under `timeout -k`, capturing to a FILE and never through a command
+  substitution. One function, two call sites — which is the lazier diff AND the one that does not
+  reproduce the class the target line's own comment records: *"Sibling of the seam check_wiring
+  already uses for $WIRING_CHECK -- TOOL-aBranchedMandate-2 fixed that call site and did not grep for
+  this one."* Bounding one of two siblings for a second time would be that defect, third instance.
+  It also closes `TOOL-aPromptedMandate-9`, which measured `check-wiring.sh --check` at 1m22s and
+  concluded that nothing in the driver's precondition chain has a timeout.
 - **S3** — a breach makes the item UNMET and says so, naming the bound and the elapsed time. It is
   never a pass, and it is never silently indistinguishable from a red bar.
 - **S4** — an announced default when the project declares nothing, so an adopter who has never heard
@@ -33,8 +42,10 @@ recorded in
 
 ## 3. Non-goals (OUT)
 
-- **N1** — no other `$GATE_CMD` caller is bounded here. `.githooks/pre-push` runs the bar at the push
-  boundary and is a different kit with a different owner.
+- **N1** — `.githooks/pre-push` is not bounded here. It runs the bar at the push boundary and is a
+  different kit with a different owner. Every unbounded seam INSIDE `unattended.sh` is in scope, which
+  is S2's widening: rev-1 scoped only `$GATE_CMD` and left `$WIRING_CHECK` unbounded one function
+  away, which is the fix-one-call-site class this repo has already recorded twice.
 - **N2** — nothing kills a process this driver did not start. An orphan whose parent is already gone
   is outside this unit and outside this run's mandate.
 - **N3** — the bound is not a per-leg ceiling and does not replace one. `TOOL-aBoundedCeiling-1`
@@ -104,11 +115,20 @@ file carries.
 | site | change |
 |---|---|
 | `.unattended.conf` | `GATE_BOUND`, with its derivation in the comment |
+| `tools/unattended/.unattended.conf.example` | the same key with its default — check 22 reds without it |
 | `tools/unattended/PROTOCOL.template.md` | the key joins the declared-key table |
+| `memory/guides/UNATTENDED-PROTOCOL.md` | RE-RENDER in the same commit — check 10 byte-diffs the pair |
 | `unattended.sh` conf defaults (~:212) | `GATE_BOUND` beside `GATE_CMD` |
-| `unattended.sh` `dod_met` `gates-green` (~:2694) | `timeout -k`, file capture, breach message |
+| `unattended.sh` the new bounded-run helper | `timeout -k`, file capture, elapsed, breach message |
+| `unattended.sh` `dod_met` `gates-green` (~:2695) | call site one |
+| `unattended.sh` `check_wiring` (~:988) | call site two, closing `TOOL-aPromptedMandate-9` |
 | `unattended.sh` liveness (~:143) | the existing `timeout` probe covers this bound too |
-| `tools/unattended/check-unattended.sh` | the key joins the conf-declaration leg |
+
+`tools/unattended/check-unattended.sh` takes NO edit. It is listed nowhere above on purpose: its
+check 22 joins the kit's example conf against the rendered protocol and its check 10 byte-diffs the
+template against that render, so the three files it reads are the ones edited above. rev-1 listed it
+as an edit site, which would have led a builder to the required-key loop — exactly the "make it
+required" move §4 rejects.
 
 ### Alternatives rejected
 
@@ -148,13 +168,17 @@ bound that kills it mid-write leaves a run-state file nobody can resume.
   default and prints which number it used, observed on stderr.
 - **AC4** — When `timeout` will not run on the host, `--close` prints that the bound is INERT and
   the gate still runs, with the item's verdict unchanged against a control.
+- **AC5** — When `$WIRING_CHECK` is a script that sleeps past the bound, `--preflight` refuses in
+  seconds naming the bound, asserted as elapsed time. Without this the helper has one exercised call
+  site and one asserted only by inspection, which is how the sibling seam went unbounded the first
+  time.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` for the `unattended kit gate` leg, which reads the conf
-declarations this unit adds a key to. Plus `bash tools/unattended/run-unattended-gates.sh
---selftests`, which is where `unattended.test.sh` lives and is the only thing that runs it, since
-that suite is deliberately not a bar leg.
+`bash tools/run-gates/run-gates.sh` for the `unattended kit gate` leg, whose checks 22 and 10 read
+the conf example and the rendered protocol this unit edits — the two the Inventory note names. Plus
+`bash tools/unattended/run-unattended-gates.sh --selftests`, which is where `unattended.test.sh`
+lives and is the only thing that runs it, since that suite is deliberately not a bar leg.
 
 ## 8. Open questions
 
@@ -173,6 +197,11 @@ that suite is deliberately not a bar leg.
 
 - rev-1 · 2026-08-27 · initial draft, forced by a live three-hour `--close` hang observed on node
   `a` while the other two units of this build were being specced.
+- rev-2 · 2026-08-27 · folded the round-1 spec audit. Widened S2 from one call site to a helper at
+  both unbounded seams in the file, which closes `TOOL-aPromptedMandate-9` and avoids repeating the
+  fix-one-sibling class the target line's own comment records. Added the conf EXAMPLE and the
+  protocol RE-RENDER to the Inventory, without which this unit reds its own gate twice, and removed
+  `check-unattended.sh` as an edit site. Added AC5 so the second call site is exercised.
 
 ## 10. Reuse audit
 
@@ -195,6 +224,12 @@ profile runner`. The decisive return was
 `memory/gotchas/bounded-through-a-pipe-is-unbounded.md`, which names this driver as one of the two
 places the class has bitten and states that its remote-observation fix was caught before shipping by
 the recall probe the build method requires — the same probe, on the same file, one caller over.
+
+**The sibling seam, which rev-1 missed and the audit named.** `unattended.sh:988` is
+`wout=$($WIRING_CHECK 2>&1) && return 0` — the same unbounded substitution over the same kind of
+project-declared command, one function away from the line this unit was written about, and already
+measured OPEN as `TOOL-aPromptedMandate-9`. The target line's own comment predicted this exact miss.
+S2 now covers both, which is why this unit gets smaller rather than larger by fixing the class.
 
 **Where a hit was STALE.** None. Every claim about `dod_met`, `REMOTE_BOUND` and the conf key set was
 read from `tools/unattended/unattended.sh` at writing time rather than taken from a record.

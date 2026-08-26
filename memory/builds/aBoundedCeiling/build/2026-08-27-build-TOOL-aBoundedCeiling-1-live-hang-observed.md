@@ -1,6 +1,6 @@
 # A live `--close` hang, observed on node `a` while speccing the fix for it
 
-**Serves:** research TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5
+**Serves:** research TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6
 
 Observed 2026-08-27 01:45 local, node `a`, while this build's own commits were running slowly.
 Nothing here was staged or reproduced: it was already running.

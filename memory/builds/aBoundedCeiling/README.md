@@ -33,10 +33,10 @@ creation on an antivirus-fronted machine, which is a property of the node and no
 class is already catalogued and it says outright that no portable gate for it can exist. Speeding one
 suite is instance work; it does not stop the ninth suite arriving unbounded.
 
-**Not "arm the profile-wide `timeout=`."** One number must cover a 1 s leg and an 1320 s leg. To let
-the longest live, the bound has to sit near 2000 s — which converts an infinite hang into a
-thirty-three-minute hang and catches nothing else. It fails the one recorded symptom it would have to
-catch: a leg silent at 240 s that normally finishes in 812 s.
+**Not "arm the profile-wide `timeout=`."** One number must cover a one-second leg and a 1320-second
+one, so it catches almost nothing and breaks the turnstile suite besides. The arithmetic and the
+turnstile evidence are in `TOOL-aBoundedCeiling-1` §4 and are not restated here, because a number
+stated in two places is the drift class this build is otherwise about.
 
 **Not "delete more legs."** That is the move that produced this situation, and it is the move an
 adopter cannot audit.
@@ -99,8 +99,9 @@ units. The refusal is correct and the record belongs here instead.
   `run-unattended-gates.sh`'s eight suites can never be manifest legs under the standing constraint
   above, so a second declaration site exists regardless; and the two enforcements differ on exactly
   the behaviour they would share, since one kills at the bound and the other must not, because a
-  killed suite prints no verdict and the kill then reads as silence. The residue — three `BUILD_*`
-  lines whose suites ARE legs — folds into `TOOL-aBoundedCeiling-1` S8.
+  killed suite prints no verdict and the kill then reads as silence. Its three `BUDGET_*` lines whose suites
+  ARE legs were to have folded into `TOOL-aBoundedCeiling-1`, and the spec audit refuted that too:
+  deleting one makes `run_one` resolve an empty budget and reds `--checks` permanently. They stay.
 - **`TOOL-aBoundedCeiling-6` was ADDED** on the strength of a live observation, not a plan. See the
   build record named above.
 
@@ -121,16 +122,16 @@ ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aB
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | OPEN | rev-1 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | OPEN | rev-1 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-2 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
