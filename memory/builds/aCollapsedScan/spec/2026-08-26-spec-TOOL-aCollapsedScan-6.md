@@ -1,6 +1,6 @@
 # TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness
 
-**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 4
+**Status:** WONTDO · rev-2 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 4 · superseded by hygiene check 20, which already existed
 
 <!-- gen:spec-records -->
 
