@@ -51,7 +51,11 @@ else
   # The population is DERIVED, and naming one file is exactly how a half-bumped pair passed here for
   # the THIRD time. `TOOL-dTieredTribunal-14` took the kit to 1.8 in both agent-cap copies and left
   # both scratch-guard copies at 1.7; this block greped agent-cap.js alone and exited 0 over one kit
-  # advertising two versions. Asserting a marker EXISTS somewhere is not asserting the carriers
+  # advertising two versions. The population is every tracked `*.js` and NOT every tracked file:
+  # that pathspec is load-bearing rather than decorative, because this checker's own source carries
+  # the marker string in the grep below and a tree-wide sweep would grade the checker by its own
+  # predicate. A carrier introduced in another language would go unseen, which is the honest limit.
+  # Asserting a marker EXISTS somewhere is not asserting the carriers
   # agree. Every tracked carrier of the marker is compared to the constant now.
   accarriers=$(git grep -lE "gov:kit agent-cap@" -- '*.js' | sort)
   if [ -z "$accarriers" ]; then

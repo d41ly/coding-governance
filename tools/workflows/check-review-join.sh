@@ -4,7 +4,13 @@
 #   bash tools/workflows/check-review-join.sh          # every *.js under tools/ that git can see
 #   bash tools/workflows/check-review-join.sh <file>…  # explicit files (the self-test's fixtures)
 #
-# Exit 0 = clean · 1 = a ref-keyed join reappeared · 2 = not a git repo.
+# Exit 0 = clean · 1 = a ref-keyed join reappeared · 2 = THIS GATE REFUSED.
+#
+# A 2 is never a finding about the code under it. It means this gate declined to return a verdict:
+# not a git repo, the predicate absent, node missing, the predicate returning a status this gate
+# cannot classify, or the predicate exiting 2 without naming a line, which is its own refusal being
+# handed up rather than a join. The last two arrived with the delegation and this line did not move
+# with them - a stale exit-code contract is the same defect class as a stale pointer.
 #
 # WHAT THIS BANS AND WHY. A Tier-2 review harness joins each finding to its skeptic verdict. Keying
 # that join on a `file:line` STRING the skeptic has to reproduce byte-for-byte has two failure modes,

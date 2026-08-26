@@ -34,3 +34,7 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T13:27:36Z dispatch · item fb2d692e TOOL-dTieredTribunal-11 · reason tools/workflows/tier2-review.js memory/map/features tools/check-agent-cap-restatement.sh memory/builds/dTieredTribunal/README.md
 
 2026-08-26T13:47:59Z dispatch · item f96738b7 TOOL-dTieredTribunal-12 · reason memory/guides/BUILD-METHOD.md tools/memory-tree/BUILD-METHOD.template.md memory/map/features
+
+2026-08-26T17:24:29Z review · item dTieredTribunal-run2-fold · reason verdict BLOCKED · blockers 2
+
+2026-08-26T17:24:56Z review · item dTieredTribunal-run2-fold · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT

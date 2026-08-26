@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-6 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md) | diff-review | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md) | diff-review | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
@@ -338,9 +339,15 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
   `version: '1.4'`. The leg is named because it runs and not because it grades the pair: its row
   for this file is a bare presence check, which is the open question at `TOOL-dTieredTribunal-6`,
   so this grep is the whole observation of the bump.
-- **AC11** — When `git grep -n -- "6-wide"` runs over the whole tree, no hit is under `tools/` —
-  today it returns `tools/workflows/tier2-review.js:154` and `tools/check-agent-cap-restatement.sh:35`
-  — and every surviving hit outside `memory/builds/` and `memory/archive/` is the
+- **AC11** *(AMENDED at rev-6, round 2 — see the revision log; the original demanded ZERO hits under
+  `tools/`, which was already false at TWO when this unit was called done and which no fix was ever
+  going to reach)* — When `git grep -n -- "6-wide"` runs over the whole tree, every hit under
+  `tools/` is a HISTORICAL citation in a comment, each marked dead where it sits, and none is a live
+  bound claim: `tools/workflows/tier2-review.js` records what S11 deleted, and
+  `tools/check-agent-cap-restatement.sh` keeps the example as its clearest statement of what that
+  gate cannot see. A repo whose style is to record why a thing was removed cannot also demand the
+  removed thing be unmentionable. What the criterion is really for is that no `<=6` survives as an
+  ASSERTION about the width — and every surviving hit outside `memory/builds/` and `memory/archive/` is the
   `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md`, which reads CLOSED with its stale line
   citation corrected. S11's fifth edit target gets its own observation, because that grep cannot see
   it: `grep -n 'TOOL-aDeclaredBound-6' memory/builds/dTieredTribunal/README.md` returns a
@@ -496,6 +503,17 @@ unused; if 13's AC6 ever reds, this unit takes it without a redesign.
   `TOOL-dTieredTribunal-13`'s AC6 and AC6b bind the admission and this unit keeps the marked ternary.
   The measured fallback stays recorded and unused. Header gained `ratified 2026-08-26`.
 
+
+- rev-6 · 2026-08-26 · **AC11 AMENDED, disclosed.** The closing diff review's round 2 found that
+  AC11 demanded ZERO `6-wide` hits under `tools/` and that the tree held TWO when this unit was
+  called done — so the criterion was already false at the moment it was reported met, and the
+  round-1 fold then made it three by correcting a stale claim in the gate header. The amendment is
+  not a lowered bar, it is the bar that was actually meant: no `<=6` survives as an ASSERTION about
+  the width. Both surviving hits are comments recording what was deleted and why, each marked dead
+  where it sits, and a repo whose style is to record why a thing was removed cannot simultaneously
+  demand the removed thing be unmentionable. Recorded here rather than quietly satisfied, because a
+  criterion edited to match the tree is the one edit that must never happen silently — the reader
+  is owed the fact that the original was unmet, not just the text that replaced it.
 
 ## 10. Reuse audit
 

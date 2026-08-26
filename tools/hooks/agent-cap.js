@@ -219,16 +219,36 @@ function boundedBranch(br, name, consts, ok) {
   // inside a predicate body are not chain links: `.filter((L) => a.lenses.includes(L.slug))` is
   // the shipped user, and counting its `.includes(` would deny it. `.map` is denied too although
   // it preserves length - the qualifying forms are a closed list, and widening it is an edit.
+  // ROUND 2 - the first cut of this walk counted links and returned `links > 0`, which asked only
+  // whether a shrink call APPEARED. It never required the tail to be CONSUMED, so everything after
+  // the last link went unexamined and an unbalanced tail was fine. That was a NET REGRESSION on the
+  // regex it replaced, measured: `const LENSES = ALL.filter( // gov:fixed-verifiers` continued on
+  // the next line was DENIED at eb4b0660 and ADMITTED at the tip, fanning agent() over whatever the
+  // continuation built. The regex it replaced ended in `\)$`, and dropping that anchor is what cost
+  // the property. Three separate escapes shared the one root, so the walk is now CONSUMING: each
+  // segment must be a shrink call, each must CLOSE, and the tail must end with the last one.
   const SHRINK = ['filter', 'slice']
-  let depth = 0
+  let i = 0
   let links = 0
-  for (let i = 0; i < tail.length; i++) {
-    const ch = tail[i]
-    if (ch === '(' || ch === '[' || ch === '{') { depth++; continue }
-    if (ch === ')' || ch === ']' || ch === '}') { depth--; continue }
-    if (depth !== 0 || ch !== '.') continue
+  while (i < tail.length) {
+    if (/\s/.test(tail[i])) { i++; continue }
+    // A segment that is not `.<name>(` at all - a computed `["concat"](…)` member, a trailing
+    // `|| args.big`, an operator, anything - ends the walk in a refusal rather than being skipped.
     const call = /^\.\s*([A-Za-z_$][\w$]*)\s*\(/.exec(tail.slice(i))
     if (!call || SHRINK.indexOf(call[1]) === -1) return false
+    let j = i + call[0].length
+    let d = 1
+    while (j < tail.length && d > 0) {
+      const c = tail[j]
+      if (c === '(' || c === '[' || c === '{') d++
+      else if (c === ')' || c === ']' || c === '}') d--
+      j++
+    }
+    // An unclosed segment is REFUSED, never assumed closed. `stripStrings` blanks '' and "" but not
+    // a template literal, so a stray `(` inside one strands this counter - and the safe reading of
+    // "this file cannot tell where the chain ends" is that it cannot prove the receiver bounded.
+    if (d !== 0) return false
+    i = j
     links++
   }
   return links > 0
@@ -341,7 +361,13 @@ function fanoutFindings(script) {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
       if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
+        // ROUND 2 - the reason was written for EVERY reassigned name, including names this file had
+        // never bounded, so a refusal could announce that a bound was taken back that was never
+        // granted. That is D10's own failure mode inverted: right verdict, false reason. Only a name
+        // actually in `ok` had a bound to lose, so only that name gets this explanation.
+        const hadBound = ok.has(m[1])
         ok.delete(m[1])
+        if (!hadBound) return
         // ...and this sweep runs AFTER both passes, so it states its own reason too. Without that, a
         // name accepted on pass 2 and taken back here falls through to whatever pass 1 happened to
         // write, or to the generic fan-out text - neither of which names the reassignment.
@@ -872,7 +898,14 @@ function scanJoinFindings(script) {
     // positives: a mention inside a plain string stays out of scope and both fixtures still hold.
     // A nested `${}` closes the span early; that costs reach on a shape none of these harnesses
     // writes, and the outer views still carry the identifier ban.
-    const views = [l].concat(raw.match(/\$\{[^}]*\}/g) || [])
+    // ROUND 2 - this took its spans from the RAW line, so the second view reached into COMMENTS and
+    // into plain quoted strings and rule 5 started firing on prose. That refuted this rule's own
+    // narrowing doctrine two lines above, and check-review-join.sh's, in the same commit that wrote
+    // them both down. The span view is comment-stripped and quote-blanked first: `stripStrings`
+    // leaves backticks alone, which is the whole point - a `${…}` is only an interpolation inside a
+    // template literal, and inside a '' or "" string it is three characters of text.
+    const interp = stripStrings(raw).split('//')[0]
+    const views = [l].concat(interp.match(/\$\{[^}]*\}/g) || [])
     let why = null
     for (const b of BANS) {
       if (views.some((v) => b[0].test(v))) { why = b[1]; break }
