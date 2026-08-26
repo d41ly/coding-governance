@@ -136,6 +136,7 @@
       "bounded-through-a-pipe-is-unbounded.md",
       "concurrency-is-not-a-budget.md",
       "containment-tested-one-way.md",
+      "degradation-known-but-unreported.md",
       "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
       "fixture-passes-by-finding-nothing.md",

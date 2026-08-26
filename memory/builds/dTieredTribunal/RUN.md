@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 136cdb701470bfd749a957b16eb07d93ea2606bb
-phase: FOLDING
+witness: c6f320bd70416888fd3cc44347245216d439ddaa
+phase: BUILDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 7071b8ff
@@ -24,3 +24,5 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T10:18:21Z review · item dTieredTribunal-run2-specs · reason verdict BLOCKED · blockers 1
 
 2026-08-26T11:17:18Z review · item dTieredTribunal-run2-specs · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-26T11:48:38Z dispatch · item c6f320bd TOOL-dTieredTribunal-15 · reason memory/gotchas memory/map/features memory/map/generated

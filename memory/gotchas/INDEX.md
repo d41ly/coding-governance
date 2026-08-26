@@ -22,6 +22,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 6 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 3 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 5 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
+| [degradation-known-but-unreported](degradation-known-but-unreported.md) | class | 5 |  | a pipeline computes how badly its own run degraded and then fails to say so where it matters, so a degraded run produces a clean bill |
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 2 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 1 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
@@ -48,6 +49,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-33 record(s): 33 class, 0 note, 0 superseded · 4 universal · 0 unanchored
+34 record(s): 34 class, 0 note, 0 superseded · 4 universal · 0 unanchored
 
 <!-- END GENERATED -->

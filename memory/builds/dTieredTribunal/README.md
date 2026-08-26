@@ -93,7 +93,7 @@ owner's turn from.
 
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node d · opened 2026-08-25 · streams tooling
+**Build status:** INPROGRESS · 8 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12
 ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15
 
@@ -101,7 +101,7 @@ ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-26 |
-| [TOOL-dTieredTribunal-15 — the false-clean family enters the catalogue](spec/2026-08-26-spec-dTieredTribunal-15.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-26 |
+| [TOOL-dTieredTribunal-15 — the false-clean family enters the catalogue](spec/2026-08-26-spec-dTieredTribunal-15.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-26 |
 | [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | CLOSED | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded](spec/2026-08-26-spec-dTieredTribunal-13.md) | 2 | 2 | SPECCED | rev-3 | 2026-08-26 |
 | [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-26 |

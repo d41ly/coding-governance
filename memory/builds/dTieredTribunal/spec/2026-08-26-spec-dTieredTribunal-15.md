@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-15 — the false-clean family enters the catalogue
 
-**Status:** SPECCED · rev-1 · 2026-08-26 · node a · Tier-1 · base cd971285 · order 1 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-08-26 · node a · Tier-1 · base cd971285 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 

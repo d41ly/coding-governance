@@ -23,7 +23,7 @@ workflow-scripts = [
 ]
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["degradation-known-but-unreported.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
