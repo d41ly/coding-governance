@@ -18,12 +18,17 @@ on node `a` at `da9e4cd2`, over the 70 tracked builds of this repo:
 
 Per-build cost rose with SPEC count, not with anything check 30 does:
 
-| Build | Specs | Before | After |
+| Build | Specs | Before | After (rev-2) |
 |---|---|---|---|
-| `aNamedGesture` | 1 | 1533 ms | — |
-| `aRuledFrontispiece` | 11 | 5937 ms | — |
-| `cBriefedPilot` | 23 | 15956 ms | — |
-| `dUnstalledConvoy` | 24 | 16599 ms | 2093 ms |
+| `aNamedGesture` | 1 | 1533 ms | 1842 ms |
+| `aRuledFrontispiece` | 11 | 5937 ms | 2126 ms |
+| `cBriefedPilot` | 23 | 15956 ms | 2556 ms |
+| `dUnstalledConvoy` | 24 | 16599 ms | 3060 ms |
+
+THE SHAPE IS THE RESULT, not any single row. Before, cost rose 10.8x from the one-spec build to
+the 24-spec build; after, it rises 1.7x. The superlinear term is gone. A one-spec build is 300 ms
+SLOWER, because `spec_ids` keeps its own `git ls-files` and awk after the rev-2 correctness fix,
+and that is the trade: a fixed cost on the smallest builds against 5.4x on the largest.
 
 `verb_plan` resolved a region id to its spec with an `awk` per (unit, spec) pair, and read each
 spec's status and heading with two more per spec in the pass above it. The diagnosis and the fix are
@@ -141,7 +146,13 @@ waiver registry is empty and shrink-only.
 - AC4 — `check-unattended.sh` — MET. `bash tools/unattended/run-unattended-gates.sh --checks`
   reports `ok    kit gate    187s`, so the leg exits 0 and check 30's `_pv_seen` liveness assertion
   is satisfied over the same population. The leg went 305 s to 187 s, a 118 s cut.
-- AC5 — `run-gates.sh` — recorded below.
+- AC5 — `run-gates.sh` — MET. `gates GREEN — 39/39 legs passed (7 skipped) (39 held: kit
+  selftests, GATE_SELFTESTS=1 runs them)`, 645 s. The seven skips are all `unchanged vs main`
+  guards. THREE legs redded on the way there and each was a real obligation rather than noise:
+  the new build README was named by no row in `memory/project/readme-contract.txt` (bound, not
+  exempted); three `DECISIONS.md` rows ran past the 300-char index cap and the fixture ids in the
+  table above were ids cited and never defined; and `drift-audit records` refused a CLOSED spec
+  with no product commit until the work was committed.
 
 ### The budget, after
 
