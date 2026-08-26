@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-26
 streams: tooling
 roster: TOOL
-ids: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 TOOL-aCollapsedScan-8
+ids: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 TOOL-aCollapsedScan-8 TOOL-aCollapsedScan-9
 ---
 
 # aCollapsedScan — `--plan` stops paying a process per (unit, spec)
@@ -50,11 +50,15 @@ without that ceiling being re-measured.
   break confirmed that check RED before the spec was written.
 
 ## Parked decisions
-- **Change-scoping check 30 to the touched builds.** Deferred until this unit is measured. If the
-  leg still misses `BUDGET_kit_gate` afterwards, the follow-up walks only builds whose `README.md`
-  or `spec/*.md` moved since the recorded green, full corpus under `GATE_FULL=1`, with the
-  `_pv_seen` liveness assertion restated over the scoped population. Not built here, because a
-  policy change bought to fix a performance bug is the wrong purchase in the wrong order.
+- **Change-scoping check 30 to the touched builds. RESOLVED as a REFUSAL, owner-delegated,
+  2026-08-26 (`TOOL-aCollapsedScan-4`).** It was deferred until `TOOL-aCollapsedScan-1` was
+  measured; the leg still missed its ceiling at 187 s, which reopened it. Refused on the trade: the
+  scoping saves roughly 100 s of a 650 s bar, about 15%, and buys it by narrowing the only check
+  that ever saw the five defective builds — check 30's own header says it is a corpus check
+  deliberately, for exactly that reason. A scoped walk is also blind to a DRIVER change that breaks
+  the property everywhere at once, and the driver is what `-1` had just rewritten. The ceiling was
+  re-declared against a node-`a` measurement instead, which the runner's own header names as the
+  other legitimate outcome.
 - **Scoping check 30 to builds with a `RUN.md`.** REJECTED, 2026-08-26, on measurement rather than
   taste: all five builds that render a `NOT A UNIT` row today have no run-state file, so that
   filter walks zero of them while `_pv_seen` stays satisfied by the other 19.
@@ -72,14 +76,14 @@ without that ceiling being re-measured.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-08-26 · streams tooling
-ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 TOOL-aCollapsedScan-8
+ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 TOOL-aCollapsedScan-8 TOOL-aCollapsedScan-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aCollapsedScan-1 — one awk pass per build, and `--plan` stops spawning per (unit, spec)](spec/2026-08-26-spec-TOOL-aCollapsedScan-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-08-26 |
 | [TOOL-aCollapsedScan-7 — `repo_root()` takes the walk-up govkit already took for this defect](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-08-26 |
-| [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | INPROGRESS | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | INPROGRESS | rev-3 | 2026-08-26 |
 | [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | INPROGRESS | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->
 

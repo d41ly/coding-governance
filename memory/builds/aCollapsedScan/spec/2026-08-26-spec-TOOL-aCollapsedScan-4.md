@@ -1,6 +1,6 @@
 # TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused
 
-**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -63,9 +63,15 @@ The 120 s figure was declared 2026-08-23 against a 28 s reading on node `d`. The
 work, and 28 × 2.5 is 70. The ceiling was never wrong about node `d`; it was never a statement about
 node `a` at all.
 
-The new value is **240 s** — the 187 s measurement plus headroom for the ambient-load factor this
-same file already documents at 2.4× for a different suite. It reds well before the 305 s the leg
-cost when nobody was watching, which is the property a ceiling has to keep.
+The new value is **240 s**, and it is calibrated IDLE. The AC3 breach probe measured the same leg
+at **362 s** while a concurrent session ran a full bar with self-tests on the same box, so a busy
+node breaches it. Raising it to absorb that is the obvious move and it is wrong: this file prices
+ambient load at 2.4×, which puts the load-tolerant figure near 450 s — ABOVE the 305 s the leg cost
+when check 30 landed unmeasured, so the exact regression this build exists to have caught would
+pass. A single integer cannot separate a regressed leg from a busy box. 240 s catches the former
+and is expected to fire on the latter, and the declaration says so beside itself, with the rule
+that a breach is re-run on an idle box before it is believed. The shape, rather than the integer,
+is what needs fixing; that is `TOOL-aCollapsedScan-9`.
 
 ### Why the scoping alternative was refused
 
@@ -137,6 +143,11 @@ gate: the ceiling is itself the check, and it already exists.
   true once S1 landed, and the file's line 42 carried the same claim), S4 added so the README's
   parked deferral is amended rather than silently reversed, and AC4/AC5 added for the `--selftests`
   Definition of Done the edited file declares in its own header.
+- rev-3 · 2026-08-26 · the AC3 breach probe measured the leg at 362 s under a concurrent full bar
+  against 187 s idle, which changes what the declared integer MEANS rather than what it should be.
+  §4 now records both readings and the reason the load-tolerant figure is refused: it would sit
+  above the 305 s regression this build exists to have caught. `TOOL-aCollapsedScan-9` files the
+  load-aware shape.
 
 ## 10. Reuse audit
 
