@@ -1,13 +1,17 @@
 # DEPL-dCarriedReceipt-1 — `{relpath}` resolves through `rule_relpath` in the seam that writes
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-1 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md](../build/2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md) | research | DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-12 |
+| [2026-08-25-build-DEPL-dCarriedReceipt-1-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-1-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md) | spec-audit | DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 
 <!-- /gen:spec-records -->
 
@@ -56,7 +60,7 @@ whole defect stated as a virtue.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (~4 lines), `tools/govkit/selftest.py` (2 arms),
+`tools/govkit/govkit.py` (~4 lines), `tools/govkit/selftest.py` (5 checks across 2 arms),
 `tools/govkit/govkit.py` selfcheck section (1 arm).
 
 ## 5. Production-readiness checklist
@@ -95,7 +99,7 @@ whole defect stated as a virtue.
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
-selfcheck` legs. Adds three arms and one standing `selfcheck` predicate; adds no new leg file.
+selfcheck` legs. Adds two selftest arms (5 checks) and one standing `selfcheck` predicate, arm 4b; adds no new leg file. Both the arms and the predicate were observed RED against the staged defect.
 
 ## 8. Open questions
 

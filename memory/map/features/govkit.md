@@ -78,10 +78,19 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
 
 - `tools/govkit/registry.toml` — the population: entries with their descriptor paths, the surface
   globs, and the exemptions with their reasons.
-- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan` and `check`, and `apply` /
-  `apply --resume` with the receipt, and `intake`. All five verbs. `apply` lands the roles it can
+- `tools/govkit/govkit.py` — `selfcheck`, the read-only `plan`, `check`, `update` and `adopt`, the
+  writing `apply` / `apply --resume` with the receipt, and `intake`. **The COUNT is not spelled**,
+  here or in that file's docstring: this line read "all five verbs" from the commit that landed the
+  sixth until `DEPL-dCarriedReceipt-13` landed the seventh, and `USAGE` and `main`'s dispatch tuple
+  own the set between them with a selftest arm joining the two. `apply` lands the roles it can
   honour and refuses the others BY NAME, and reports the two steps of the hard order it cannot
-  perform on every run rather than skipping them quietly.
+  perform on every run rather than skipping them quietly. `adopt` is the BOOTSTRAP — it writes the
+  receipt an already-installed tree never had by measuring that tree against gov's own history, and
+  it is the only path onto the engine for a repo somebody vendored kits into by hand.
+- `tools/check-install-prefix.sh` — TWO arms over two populations and two prefixes: the ROOT
+  spelling over a glob-derived shipped surface, and the SHIPPING spelling inside the set the
+  descriptors declare shippable, ratcheted per file at `tools/install-prefix-carried.txt`. The
+  second is inert where the repo is not a kit source and says so rather than passing silently.
 - `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
   arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
   six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.

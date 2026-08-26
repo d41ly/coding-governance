@@ -69,6 +69,7 @@ mkdir -p "$M/project" "$M/builds" "$M/backlog" "$M/guides"
 # RENDERED, not copied: these two land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
+# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
@@ -84,6 +85,7 @@ render_doc() {
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
   printf '%s' "$out"
 }
+# <<< render_doc
 if [ -f "$HERE/HYGIENE.template.md" ]; then render_doc "$HERE/HYGIENE.template.md" > "$M/HYGIENE.md"; else echo "# ${M}/ retention & hygiene" > "$M/HYGIENE.md"; fi
 if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLATE.template.md" > "$M/TEMPLATE-SPEC.md"; fi
 # The build method joins the same rendered set: an adopter that receives the spec format and the

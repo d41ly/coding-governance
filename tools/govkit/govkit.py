@@ -3,8 +3,11 @@
 
 Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/
 
-WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. All five verbs: `selfcheck`, the read-only `plan`
-and `check`, `apply` / `apply --resume`, and `intake`. What it does NOT do is stated on every run
+WHAT THIS FILE DOES TODAY, AND WHAT IT DOES NOT. The verbs are `selfcheck`, the read-only `plan`,
+`check`, `update` and `adopt`, the writing `apply` / `apply --resume`, and `intake`. THE COUNT IS
+NOT SPELLED HERE and the list is not a second source: `USAGE` and `main`'s dispatch tuple own it
+between them, a selftest arm joins the two, and the sentence that used to say "all five" was wrong
+from the commit that landed the sixth. What it does NOT do is stated on every run
 rather than left to be discovered — see the two SKIPPED lines `apply` prints. A subcommand that
 parses and does nothing is indistinguishable, from the outside, from one that works, and this unit
 exists because that class of silence ships broken installs.
@@ -28,15 +31,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import ntpath
 import os
 import pathlib
+import posixpath
 import re
 import subprocess
 import sys
+import time
 
 KIT_GOVKIT_VERSION = "1.9"  # gov:kit govkit@1.9 — kit identity; set HERE, never from a conf
 
-RECEIPT_SCHEMA = 2  # bumped by any unit that adds a per-role row field; readers accept 1 and 2
+RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
@@ -238,6 +244,12 @@ UNLANDED_REASON = {
     "generated": "produced in the target by its own tooling, never carried across",
     "rendered": "written by this kit's own adopter; a second renderer would race the real one",
     "merged": "a gov-owned region inside a target-owned file — no writer exists yet",
+    # DEPL-dCarriedReceipt-10 S3. gov's copy is a DERIVATIVE of the target's, so gov's bytes are
+    # wrong for that target BY CONSTRUCTION and are wrong there whether or not the target's own copy
+    # is absent. This line is what makes `selfcheck` arm 7g demand an `UPDATE_ROLE` row for the role
+    # without that demand being written a second time: 7g's `known_roles` is built from this table.
+    "forked": "gov's copy is a derivative of the target's — gov keeps these bytes for itself and "
+              "has no right to send them; reported in both directions, written in neither",
 }
 
 
@@ -532,9 +544,157 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
     return TOKEN_RX.sub(sub, s), missing
 
 
+# THE ONE PLACE TARGET-SUPPLIED TEXT BECOMES PART OF A COMMAND, so it is the one place to refuse.
+#
+# Every token value below comes out of the TARGET's `.governance/deploy.toml`, a file in a repository
+# gov does not own. Those values are interpolated by `resolve_tokens` into argv templates GOV wrote —
+# `[check].argv`, `[[hole]].discharge.command`, `[[gate_leg]].argv` — several of which are
+# `["bash", "-c", "... {kit} ..."]` or `["python", "-c", "... sys.path.insert(0, '{kit}') ..."]`.
+# A shell metacharacter or a quote break in a value therefore becomes CODE.
+#
+# REPRODUCED, twice, on this engine before this guard existed: a target whose `deploy.toml` carried
+# `prefix = "tools; touch PWNED-BY-CHECK ;"` made a READ-ONLY `govkit check` — no `--write`, no
+# `--run-discharge`, nothing printed — create that file in the target. A second reproduction broke
+# out of a `python -c` string the same way. `resolve_shell_argv` is no defence: it rewrites argv[0]
+# and nothing else.
+#
+# WHY IT WAS MISSED, stated because the miss is the interesting part. The fold before this one
+# labelled each spawn by WHO AUTHORED THE ARGV TEMPLATE and concluded these sites were gov's. That is
+# the wrong question. The template is gov's and the VALUES SUBSTITUTED INTO IT are the target's, so
+# the resulting command is target-influenced wherever a token appears — and the declaration asserting
+# otherwise was itself the artifact written to stop this class recurring.
+#
+# A CHARACTER CLASS, not an escaper. Escaping is per-consumer — a value safe in argv is not safe
+# inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
+# descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
+# to be correct.
+TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+# THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
+# `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
+# primary node runs on -- with a message about command injection naming nothing the operator did
+# wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is `{user_skills}/session-kickoff`,
+# so that sat on the common path for every Windows adopter. No arm caught it: both fixtures spell the
+# answer in forms that pass (`~/.claude/skills`, `/tmp/gk-fake-skills`).
+#
+# WHY THIS IS A NARROW WIDENING AND NOT A HOLE. The threat the class exists for is a value leaving its
+# argument inside a `bash -c` or `python -c` template, which needs a shell metacharacter: `;` `|` `&`
+# `$` a backtick, a quote, a newline, a redirect. `:` is none of those -- it is bash's null command and
+# is inert as argument text. What a colon CAN do is make a path absolute on Windows, and that is a
+# containment question, answered one function down by `demand_contained_dest`, which reds a
+# drive-lettered DESTINATION. So the two guards keep their own jobs: this one grades characters, that
+# one grades escape.
+#
+# ANCHORED AT POSITION 1 AND REQUIRING A FORWARD SLASH. `C:/x` passes; `C:x`, `C:\x`, `a:b` and
+# `C:/a;b` do not -- the remainder after the drive is graded by the class above exactly as before, so
+# an interior colon or any metacharacter still refuses. Backslash stays refused deliberately: §11
+# pins forward slashes on this platform, and admitting both spellings would double the surface for
+# nothing.
+DRIVE_PREFIX_RE = re.compile(r"^[A-Za-z]:/")
+
+
+def demand_contained_dest(dest: str, where: str) -> str:
+    """Refuse a resolved destination that leaves the target repository (round 3, REPRODUCED).
+
+    `demand_safe_token` bounds a token value to path-fragment CHARACTERS, and `.` and `/` are both
+    in that class because every legitimate value here is a path fragment. So `prefix = "../../x"`
+    passes it cleanly, and nothing downstream disagreed: `plan` printed 26 rows rooted at
+    `../../PWNED/`, and `apply` WROTE all 26 of them outside the target. Reproduced in a sandbox
+    before this was written -- the escape landed in a scratch directory and the files were counted.
+
+    THE CONTAINMENT CHECK ALREADY EXISTED, IN THE WRONG VERB. `cmd_update`'s write loop resolves the
+    row against the target root and refuses on `ValueError`, with a comment calling this "the one
+    boundary this whole tool is built around". `apply` had no such check on the path it derives from
+    the target's own `prefix`, which is the same class as B1/B2 one operation over: a target-supplied
+    value reaching a dangerous operation because the guard was written for a different caller.
+
+    HERE, AND NOT IN THE WRITE LOOP, on purpose. Every verb that resolves a destination routes
+    through `resolve_dests`, so a refusal here reaches `plan` as well as `apply` -- and a `plan` that
+    cheerfully PREVIEWS 26 escaping writes is its own defect, because the preview is what an operator
+    approves. A guard in the write loop alone would leave the preview lying.
+
+    PURE STRING CONTAINMENT, no target root needed and none taken: a destination is a repo-relative
+    POSIX path, so it escapes exactly when it normalises to `..`-leading or is absolute. A drive
+    letter counts as absolute -- this tool's own node runs on Windows, where `C:/x` is not relative
+    and `ntpath` is the only thing that knows it.
+    """
+    norm = posixpath.normpath(dest.replace("\\", "/"))
+    if (norm == ".." or norm.startswith("../") or posixpath.isabs(norm)
+            or ntpath.isabs(dest) or (len(dest) > 1 and dest[1] == ":")):
+        raise Refusal(
+            f"the resolved destination {dest!r} leaves the target repository (normalises to "
+            f"{norm!r}) -- refusing the whole run. Destinations are repo-relative by construction, "
+            f"and one that escapes is a write into a tree the operator did not name. Source: "
+            f"{where}. This is almost always a `prefix` in the target's .governance/deploy.toml "
+            f"carrying `..` or an absolute path")
+    return dest
+
+
+# ---- TWO CLASSES, BECAUSE THERE ARE TWO KINDS OF VALUE AND ONE CLASS GRADED BOTH.
+# ---- The strict class above was written for `prefix` -- which becomes a PATH and is interpolated
+# ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
+# ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
+# ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
+# ---- spaces by nature: `gate_runner = "bash tools/run-gates/run-gates.sh"` is a command a reader
+# ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
+# ----
+# ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
+# ---- leg from the commit that introduced it, and it stayed red across two commits because no full
+# ---- bar ran in between. The live adopter's answers happen to be all path-shaped, so nothing else
+# ---- noticed. That is the same mistake as the drive letter, twice: writing one character class for
+# ---- `prefix` and applying it to every value that passes through the same function.
+# ----
+# ---- THE PROSE CLASS IS STILL AN ALLOWLIST, and it still refuses every injection vector this build
+# ---- reproduced. It adds space, comma, equals and colon -- none of which can end an argument or
+# ---- start a command -- and admits nothing that can: no `;` `|` `&` `$`, no backtick, no quote, no
+# ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
+# ---- PWNED ;` and `$(id)` are refused by it exactly as before.
+# ----
+# ---- WHAT THE PROSE CLASS DOES NOT PROMISE, stated rather than implied: a value carrying a space
+# ---- that reaches a `bash -c` template will WORD-SPLIT there. That is a correctness bug for the
+# ---- operator who wrote it, visible immediately, and it is not code execution. The escape half is
+# ---- owned by `demand_contained_dest`, which grades destinations regardless of which class the
+# ---- value came through.
+ANSWER_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+:, =-]*$")
+
+
+def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
+    """Refuse a target-supplied token value that could leave its argument and become code.
+
+    `prose=False` (the default) is the STRICT class, for a value that becomes a path or is
+    interpolated into an argv this engine runs. A leading `<letter>:/` is dropped before grading and
+    the REMAINDER graded normally, so a Windows drive letter is admitted and an interior colon is
+    not.
+
+    `prose=True` is for a value whose only consumer renders it into a document. See the block above
+    `ANSWER_VALUE_RE` for what it admits, what it still refuses, and what it deliberately does not
+    promise.
+    """
+    rx = ANSWER_VALUE_RE if prose else TOKEN_VALUE_RE
+    body = value if prose else (value[2:] if DRIVE_PREFIX_RE.match(value) else value)
+    if not rx.match(body):
+        bad = "".join(sorted({c for c in body if not rx.match(c)}))
+        raise Refusal(
+            f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
+            f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
+            f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
+            f"become code. Refusing to resolve it ({where}). "
+            + ("This value is rendered into a document, so spaces and commas are fine here and "
+               "shell metacharacters are not"
+               if prose else
+               "Every legitimate value here is a path fragment, optionally behind a `C:/` drive "
+               "letter")
+            + "; if you need one that is not, that is a change to this rule and not to a descriptor")
+    return value
+
+
 def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> dict[str, str]:
-    """The token values for one entry, from the target descriptor's answers."""
-    prefix = (deploy.get("prefix") or "tools").strip("/")
+    """The token values for one entry, from the target descriptor's answers.
+
+    EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
+    consumed. See `demand_safe_token` for what was reproduced without it.
+    """
+    prefix = demand_safe_token("prefix", (deploy.get("prefix") or "tools").strip("/"),
+                               f"entry '{eid}'")
     ctx: dict[str, str] = {
         "prefix": prefix,
         "kit_id": eid,
@@ -542,10 +702,10 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
     }
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
-            ctx[k] = v
+            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
     for k, v in ((deploy.get("kit") or {}).get(eid) or {}).items():
         if isinstance(v, str):
-            ctx[k] = v
+            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
     ctx.setdefault("memory_root", "memory")
     return ctx
 
@@ -628,6 +788,84 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
                        f"table, so an unlisted role has no defined outcome in either verb")
 
+    # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
+    #          closed enum. DEPL-dCarriedReceipt-10 S5.
+    #
+    #          THE DEMAND IS ON THE DESCRIPTOR AND NOWHERE ELSE. A receipt row is READ by `update`'s
+    #          report printer and is never validated by it, because that printer keys on the
+    #          RECEIPT's role and therefore meets rows this unit never wrote. Required on write,
+    #          tolerated on read — the refusal lives where an operator can fix it, which is the rule
+    #          file, not somebody else's installed target.
+    #
+    #          Neither key defaults. An unstated direction is the same silence `version_from`
+    #          already refuses, and a fork with no ratifying record is a fork nobody agreed to.
+    #          `direction` is a LABEL on a report: nothing in either verb branches on its value, and
+    #          the enum exists so two descriptors cannot spell one answer two ways for the human who
+    #          reads it.
+    #
+    #          WHAT THIS DOES NOT CHECK: whether the file IS a fork. That is a claim about
+    #          provenance which no predicate over a descriptor can settle — this arm grades whether
+    #          the claim is stated completely, never whether it is true.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            if rule.get("role") != "forked":
+                continue
+            direction = rule.get("direction")
+            if not direction:
+                r.fail(f"entry '{eid}' declares a `forked` rule with no `direction` — a fork that "
+                       f"does not say which way the derivation runs tells the next reader nothing "
+                       f"about whose bytes are authoritative. Declare one of "
+                       f"{', '.join(FORK_DIRECTIONS)}")
+            elif direction not in FORK_DIRECTIONS:
+                r.fail(f"entry '{eid}' declares a `forked` rule with direction '{direction}', which "
+                       f"is outside the closed set {', '.join(FORK_DIRECTIONS)} — a free-form "
+                       f"direction is a field two descriptors spell two ways, and this one is read "
+                       f"by a person deciding whether to touch the file")
+            if not str(rule.get("record") or "").strip():
+                r.fail(f"entry '{eid}' declares a `forked` rule with no `record` — name the id that "
+                       f"ratified the fork. A fork nobody agreed to is a local edit wearing a role")
+
+    # ---- 3d: a kit source whose HEAD declares `FORKED from` is claimed by a `forked` rule.
+    #          DEPL-dCarriedReceipt-10 S6. The header is the author's own statement that gov's
+    #          copy is a derivative of somebody else's file; this arm makes that statement bind a
+    #          role, so the class is gated rather than the three instances fixed. Landing it
+    #          without S7 would red gov's own registry on the first run, which is why the spec
+    #          requires the same commit.
+    #
+    #          KEYED ON `rule_sources`, NOT REPO-WIDE, and the difference is measured: a repo-wide
+    #          grep returns FOUR files, and the fourth is gov's own `.claude/hooks/recall-opened.js`,
+    #          which NO descriptor claims as a destination. A repo-wide predicate would demand a
+    #          `forked` declaration from an entry that does not own the path and red gov for its
+    #          own hand-wired hook.
+    #
+    #          THE HEAD IS BOUNDED. A `FORKED from` deep inside a file is prose about something
+    #          else -- this repo's own specs and records discuss the header constantly -- and an
+    #          unbounded scan would grade them. The declaration is a header or it is not one.
+    FORK_HEADER_BYTES = 800
+    for eid, (d, _dpath) in descs.items():
+        _fctx = canonical_ctx(eid)
+        _fhome = (d.get('home') or '').rstrip('/')
+        for rule in d.get('files', []):
+            # THE EXPANDED POOL, not `rule_sources`. `rule_sources` skips any include carrying a glob
+            # character, and the rule that would swallow an undeclared fork is exactly the `**` one --
+            # so an arm keyed on it grades only literal includes and cannot fail on the case it exists
+            # for. Observed: undeclaring `extract.py` left selfcheck GREEN.
+            for src in resolve_rule_pool(root, d, rule, _fctx, _fhome):
+                sp = root / src
+                if not sp.is_file():
+                    continue
+                try:
+                    head = sp.read_bytes()[:FORK_HEADER_BYTES].decode('utf-8', 'replace')
+                except OSError:
+                    continue
+                if 'FORKED from' not in head:
+                    continue
+                if rule.get('role') != 'forked':
+                    r.fail(f"'{src}' declares `FORKED from` in its head but entry '{eid}' claims "
+                           f"it with role '{rule.get('role')}' — a forked source landed as an "
+                           f"engine row is overwritten by gov's copy on the next update, and the "
+                           f"target's own divergence is destroyed. Declare the rule `forked`")
+
     # ---- 4: no two file rules across the whole registry write the SAME destination.
     #         One source reaching two destinations is legal; two sources contending for one is not.
     dest_owner: dict[str, str] = {}
@@ -638,6 +876,44 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     r.fail(f"two entries write the same destination '{dest}': "
                            f"'{dest_owner[dest]}' and '{eid}'")
                 dest_owner[dest] = eid
+
+    # ---- 4b: a rule declaring BOTH `to` and `claims` resolves `to` INTO its own claims.
+    #          DEPL-dCarriedReceipt-1 S4. The unit's defect was `{relpath}` resolving to a basename
+    #          in the seam that writes while `destinations_for` resolved it through `rule_relpath`,
+    #          so push-main's hook rule landed a bare `pre-push` at the target ROOT while the same
+    #          rule's `claims` spelled `.githooks/pre-push`. Two spellings of one destination inside
+    #          one rule. This arm gates the CLASS: fixing the instance and scanning only the instance
+    #          certifies coverage that does not exist, and the next token to go wrong is not
+    #          necessarily `{relpath}`.
+    #
+    #          Scoped to rules declaring BOTH keys, because `claims` is what makes the disagreement
+    #          decidable -- a rule declaring no claims states no second opinion to contradict. A
+    #          destination still carrying an unresolved `{...}` token is SKIPPED rather than failed:
+    #          those are answer keys a target supplies, `claims` are written without them, and
+    #          comparing the two spellings would red every templated rule in the registry.
+    for eid, (d, _dpath) in descs.items():
+        for rule in d.get("files", []):
+            claims = rule.get("claims")
+            if not rule.get("to") or not claims:
+                continue
+            # THROUGH `resolve_dests`, which is what `plan`, the write loop and the wildcard
+            # exclusion all call. The first draft of this arm asked `rule_destinations`, which
+            # routes through `destinations_for` -- the resolver that was already correct -- so
+            # staging the defect back in left selfcheck GREEN. An arm that reads a different value
+            # from the one the writer uses cannot fail on the writer's bug.
+            _ctx = canonical_ctx(eid)
+            _home = (d.get("home") or "").rstrip("/")
+            _dests: list[str] = []
+            for _s in rule_sources(d, rule):
+                _dests.extend(dest for dest, _m in resolve_dests(d, rule, _s, _ctx, _home))
+            for dest in _dests:
+                if "{" in dest:
+                    continue
+                if dest not in claims:
+                    r.fail(f"entry '{eid}' declares a rule whose destination '{dest}' is not among "
+                           f"its own claims ({', '.join(sorted(claims))}) — one rule spelling one "
+                           f"destination two ways, which is the shape that landed a bare basename "
+                           f"at a target root while the claims named the real path")
 
     # ---- 5: version_from resolves to EXACTLY one line, or declares an explicit `none` with a reason.
     for eid, (d, _dpath) in descs.items():
@@ -850,6 +1126,27 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             if (o, t) not in VERDICT_GRID:
                 r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
                        f"name a verdict, including the one where both sides are gone")
+
+    # ---- 7i: DEPL-dCarriedReceipt-8 S4/AC5. THE NO-CLOBBER GUARANTEE, asserted STRUCTURALLY over
+    #          the grid rather than behaviourally over the one row that exposed it. `differs` on the
+    #          OURS axis means the target's index blob is not gov's blob at this row's `commit` — an
+    #          adopter's edit, or a carried copy `-9` proves a rung for. A cell that routed such a
+    #          row to a verdict in `RAW_WRITE_VERDICTS` would hand it to the arm that overwrites
+    #          with gov's raw bytes, which is precisely the destruction `-8` closed. Both sets are
+    #          READ from the module, so widening the write arm or repointing a cell reds HERE rather
+    #          than shipping.
+    #
+    #          WHAT THIS DOES NOT CHECK, because a structural check reads as a semantic one.
+    #          Not whether the delta predicate itself is right — that is `classify_row`'s
+    #          `gov_oid` comparison, graded behaviourally. Not whether the merge branch stamps
+    #          the right identity — S1, likewise behavioural. And nothing at all about the
+    #          `absent` OURS row: a carried row the target DELETED reaches `missing`
+    #          legitimately, and that cell is `-9` S11's rather than this arm's.
+    for o, t, v in raw_write_cells(VERDICT_GRID):
+        r.fail(f"the verdict grid maps (ours={o}, theirs={t}) to '{v}', which `update`'s write "
+               f"loop RAW-WRITES with gov's bytes. An OURS axis of `differs` says the target holds "
+               f"something gov did not ship, so that cell silently destroys it — the defect "
+               f"DEPL-dCarriedReceipt-8 closed. A delta row routes to the three-way merge, always")
 
     # ---- 7h: LEG correspondence, BOTH directions. The descriptors and
     #          gov's own leg manifest are two spellings of one fact, and before this nothing asserted
@@ -1101,6 +1398,43 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
+    # ---- DEPL-dCarriedReceipt-6 S4. THE GOV-SIDE ARM, and this is where the class is actually
+    # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
+    # ---- already shipped; this catches it here, before any adopter can receive it.
+    #
+    # THE POPULATION IS `shipped_owner`, the map arm 7h3 already builds — derived from the file
+    # rules the way `apply` resolves them, not from `claims`, which covers a fraction of the rules
+    # in this tree and would have quantified over a third of the payload while reporting a confident
+    # zero over the rest.
+    #
+    # `{prefix}/x` IS A TARGET-SIDE DESTINATION and the map is keyed by GOV SOURCE, so the two are
+    # compared by TAIL rather than by substitution. Substituting `tools` for the token was tried
+    # first and run over the real tree before being wired — the standing rule here — and it redded
+    # an innocent leg: the kickoff kit's own ratchet argv spells `{prefix}/manifest-check.sh` while
+    # gov's copy lives under `skills/session-kickoff/`, so the substituted form named a file that
+    # was never gov's spelling of it. A tail match asks the question the spec actually poses: does
+    # SOME kit ship this file. An element carrying no `{prefix}` is a gov-relative path already and
+    # is compared whole.
+    _shipped = set(shipped_owner)
+    _leg_hits = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        for leg in d.get("gate_leg", []):
+            for a in leg.get("argv", []):
+                if "/" not in a or "{" in a.replace("{prefix}", ""):
+                    continue          # not a path, or carries a token this arm cannot resolve
+                if a.startswith("{prefix}/"):
+                    _tail = a[len("{prefix}/"):]
+                    if any(s == _tail or s.endswith("/" + _tail) for s in _shipped):
+                        continue
+                elif a in _shipped:
+                    continue
+                _leg_hits += 1
+                r.fail(f"entry '{eid}' declares gate leg '{leg.get('name')}' whose argv names "
+                       f"'{a}', which no kit ships — so no adopter can ever receive the engine this "
+                       f"leg runs. `apply` would emit the row and the receipt would record it as "
+                       f"coverage for a leg that cannot run. Withdraw the leg, or ship the file")
+    r.note(f"gate legs: every argv path checked against the shipped map · {_leg_hits} unshippable")
+
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
     #          that home would red on every tracked file under it — hundreds — rather than on the one
@@ -1239,6 +1573,18 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
 # a `.gitattributes` block or performs the renormalize that follows it — and `cmd_apply` refuses the
 # whole install over one. `rendered`/`generated` map to `side-effect` because a step `apply` runs
 # produces them; whether such a step EXISTS is a per-entry question and `derive_rule_kind` asks it.
+# `forked` maps to a kind of its OWN — DEPL-dCarriedReceipt-10 S1 — and reusing `blocked` was
+# rejected on two measured grounds rather than on taste. `planned_writes` previews a `blocked` rule
+# from `rule_destinations` alone and never from the source pool, so a forked rule derived from a `**`
+# include with no `to` would preview NOTHING; and `SKIP_REASONS["blocked"]` is a sentence about
+# gov-owned regions inside target-owned files, which is `merged`'s situation and is false of a fork.
+# The forked kind previews from the pool like every non-blocked role, prints its own mark, and
+# carries its own reason.
+#
+# WHAT `forked` IS, because the name invites the wrong reading: it is a claim the DESCRIPTOR RULE
+# makes about a file's PROVENANCE — gov's copy is derived from the target's — and it is re-read from
+# that rule on every run. It is never inferred from what an attribution walk found, and no
+# measurement of bytes can promote a row to it or demote a row out of it.
 ROLE_KINDS = {
     "engine": "write",
     "seed": "write",
@@ -1246,7 +1592,22 @@ ROLE_KINDS = {
     "generated": "side-effect",
     "project-owned": "order",
     "merged": "blocked",
+    "forked": "forked",
 }
+
+#: The closed enum a `forked` rule's `direction` is drawn from (DEPL-dCarriedReceipt-10 §8 F1). A
+#: free string is a field two descriptors spell two ways, and the value is read by a human deciding
+#: whether to touch the file. It is a LABEL on a report and never an instruction: nothing in either
+#: verb branches on it.
+FORK_DIRECTIONS = ("gov-from-target", "target-from-gov", "both")
+
+#: The keys a `forked` rule must declare. REQUIRED ON THE DESCRIPTOR, TOLERATED ON A RECEIPT ROW —
+#: one rule, two call sites. `selfcheck` refuses a descriptor that omits either, because that is
+#: where an operator can fix it; `update`'s printer keys on the RECEIPT's role and therefore meets
+#: rows this unit never wrote (one stamped before the role existed, one whose descriptor has since
+#: changed its keys), and a printer that raised on a missing key would convert a report into a crash
+#: on the single path that exists to avoid acting.
+FORK_RULE_KEYS = ("direction", "record")
 
 #: DERIVED, never declared beside the table. A role added with any kind other than `write` is
 #: automatically not landable and a role added as `write` is automatically landed, in BOTH verbs,
@@ -1256,7 +1617,7 @@ LANDABLE_ROLES = tuple(k for k, v in ROLE_KINDS.items() if v == "write")
 #: The plan marks, in the order `cmd_plan` prints them. Kept beside the table so a new kind cannot
 #: reach the printer without a mark.
 KIND_MARKS = {"write": "write ", "order": "ORDER ", "side-effect": "SIDE  ",
-              "covered": "COVER ", "blocked": "BLOCK "}
+              "covered": "COVER ", "blocked": "BLOCK ", "forked": "FORK  "}
 
 
 def check_entry_producer(desc: dict) -> bool:
@@ -1313,6 +1674,8 @@ SKIP_REASONS = {
     "order": "nothing in this install produces it — the target or its operator must supply it",
     "covered": "a sibling rule in this entry writes that same path in this run",
     "blocked": "no verb here can write a gov-owned region into a target-owned file",
+    "forked": "gov's copy is a derivative of this target's file — its bytes are wrong here by "
+              "construction, and that stays true when the target's own copy is absent",
 }
 
 
@@ -1356,6 +1719,44 @@ def derive_rule_kind(eid: str, desc: dict, rule: dict, dest: str, written: set[s
 
 
 # ----------------------------------------------------------------------------------------- plan
+# ---- WHERE THE CONTAINMENT GUARD LIVES, and it took three placements to get right.
+# ---- Round 3 REPRODUCED an arbitrary file write: a target's own `prefix = "../../PWNED"` made
+# ---- `plan` preview 26 rows rooted outside the target and `apply` WRITE all 26 of them.
+# ---- `demand_safe_token` cannot catch it -- `.` and `/` are legal token characters, because every
+# ---- legitimate value there is a path fragment.
+# ----
+# ---- FIRST PLACEMENT, `resolve_dests`: eight call sites, so a whole-run Refusal from inside it hit
+# ---- `-11`'s escaping-rename fixture and PRE-EMPTED that unit's own refusal -- the "two units
+# ---- refusing one state with two messages" defect this codebase keeps recording, introduced by the
+# ---- fix for a different one.
+# ---- SECOND PLACEMENT, `resolve_entry`: measured, and it is the WRONG SEAM. `plan` does not route
+# ---- through it at all (it has `planned_writes`, the seam `resolve_rule_pool`'s docstring already
+# ---- records), while `update`, `adopt` and `selfcheck` all do. Exactly backwards: the verb that
+# ---- needed the guard did not get it and the verbs that own their own refusals did.
+# ---- THIRD, AND HERE: the two row producers of the two verbs that had NO guard, named explicitly.
+# ---- `update` contains every row in its write loop and `-11` reports an escaping rename per row;
+# ---- both keep their behaviour and their message.
+# ----
+# ---- A machine-scoped or linked rule lands outside by design and `apply` writes NOTHING for it (it
+# ---- emits an order), so those are exempt. Run over all 46 declared destinations in this tree
+# ---- before wiring, per S7: zero false positives, zero near-misses, and the exemption is
+# ---- load-bearing -- kickoff-manifest's `{user_skills}/session-kickoff` is absolute by design.
+def demand_contained_rows(rows, files, where: str) -> None:
+    """Refuse the run if any planned row lands outside the target. One reader, two callers."""
+    for row in rows:
+        ri = row.get("rule")
+        rule = files[ri] if isinstance(ri, int) and 0 <= ri < len(files) else {}
+        if rule.get("scope") == "machine" or rule.get("link"):
+            continue
+        dest = row.get("dest") or ""
+        # An `attributes` plan row spells `.gitattributes:<pattern>`; the pattern is not a path and
+        # the file it names is contained by construction. Grade the destination, not the pin.
+        if row.get("role") == "attributes" and dest.startswith(".gitattributes:"):
+            continue
+        if dest:
+            demand_contained_dest(dest, where)
+
+
 def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                    descs: dict[str, tuple[dict, str]], selection: list[str],
                    r: Report) -> list[dict]:
@@ -1410,6 +1811,14 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                     kind = derive_rule_kind(eid, d, rule, resolved, written, produced, r)
                     if kind is None:
                         continue
+                    # CONTAINMENT, inside the loop because the RULE is in hand here and a plan row
+                    # does not carry one. The first cut checked at the return over `out` and read
+                    # `row["rule"]`, which plan rows have never had -- so the machine/link exemption
+                    # could not fire and `kickoff-manifest`'s `{user_skills}/session-kickoff` would
+                    # have been refused on every plan. Caught by reading the row shape rather than
+                    # by the suite, which is cheaper by about ten minutes a round.
+                    if not (rule.get("scope") == "machine" or rule.get("link")):
+                        demand_contained_dest(resolved, f"entry '{eid}' (plan)")
                     out.append({"kit": eid, "role": role, "kind": kind,
                                 "dest": resolved, "missing": missing, "src": src,
                                 "commit": commit})
@@ -1426,7 +1835,372 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
     return out
 
 
-def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str]) -> int:
+def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], target: pathlib.Path,
+                  deploy: dict, have: set[str]) -> list[tuple[str, str, list[str]]]:
+    """Gate legs whose argv names a path the target does not hold (DEPL-dCarriedReceipt-6 S1).
+
+    `apply` emits a target's gate legs and refuses only on an UNRESOLVED TOKEN in the argv. Four
+    lines later it asks precisely THIS question of the leg's GUARDS, dropping one that matches no
+    tracked path. The same question aimed at the thing the leg actually EXECUTES was never asked —
+    so gov could hand an adopter a leg row naming a file gov never ships, record it in the receipt
+    as emitted coverage, and nobody would notice. Measured before this was wired, the rule fired on
+    exactly one leg at each live target, and that leg is a gov defect rather than an adopter's.
+
+    THE `/` RULE IS THE WHOLE PREDICATE, deliberately. An argv element containing a slash is a path;
+    everything else is a flag, a binary name or a number. Widening it to "anything that is not a
+    flag and not an integer" was considered and rejected: it grades argument STRINGS by guessing
+    what they are, which is how a predicate starts reporting a byte count as a missing file. What
+    the rule leaves uncovered is a leg naming a repo-ROOT file with no slash, and that gap is pinned
+    in the spec rather than implied away.
+
+    IT DOES NOT TELL AN ENGINE FROM A LEG'S SUBJECT, and the finding is shaped for that: it is
+    reported per LEG and names every offending element, rather than claiming each is a missing
+    engine. A path the leg merely READS and the target does not hold is still a true hit — the leg
+    cannot run — it is simply not an engine absence.
+
+    `have` IS THE CALLER'S, and that is the design rather than a parameter that got away. `apply`
+    passes the target's index AFTER its own stage step, so this run's writes count as present;
+    `plan` passes the index UNION this plan's own write destinations, because at plan time nothing
+    has been written and the tracked-only predicate would red every first install.
+    """
+    hits: list[tuple[str, str, list[str]]] = []
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        for leg in d.get("gate_leg", []):
+            bad = []
+            for a in leg.get("argv", []):
+                s, miss = resolve_tokens(a, ctx)
+                if miss or "/" not in s:
+                    continue          # an unresolved token is the sibling branch's finding, not this
+                if s not in have:
+                    bad.append(s)
+            if bad:
+                hits.append((eid, str(leg.get("name")), bad))
+    return hits
+
+
+def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                  descs: dict[str, tuple[dict, str]], selection: list[str],
+                  r: Report, rows: list[dict] | None = None) -> list[dict]:
+    """PARTIAL adoption: which files gov would write that this target does not hold
+    (DEPL-dCarriedReceipt-4 S1).
+
+    THE ONLY PARTIAL-ADOPTION SIGNAL THIS ENGINE HAD WAS WHOLE-KIT — `update`'s
+    `available (not installed)` line, which needs a receipt. So a target that took 80 files of a kit
+    and left 20 read exactly like one that took all 100. This is the read-only join that needs no
+    receipt, writes nothing, and returns a number for a real adopter today.
+
+    THE POPULATION IS `kind == "write"` AND NOTHING ELSE (S2). `order`, `side-effect`, `covered` and
+    `blocked` are each a promise gov does NOT make, so counting one as a gap reports a target for a
+    file gov never ships. The predicate is written against the kind rather than the role, over the
+    whole `ROLE_KINDS` table, because a role added tomorrow gets its kind from that table and this
+    join inherits the answer.
+
+    A ROW WITH AN UNRESOLVED TOKEN IS NOT A COVERAGE ROW (S3). `planned_writes` has already turned
+    that into an `r.fail`, and a destination still carrying a brace is not a path — reporting it as
+    absent would say the target is missing a file whose name nobody knows.
+
+    THE INDEX ANSWERS, NEVER THE WORKTREE. An untracked file sitting at the destination is not a
+    file the target HOLDS, and this engine already decided that once, where a leg guard drops on
+    tracked-ness rather than existence. Two answers to "does the target have this" is the class this
+    file spends most of its comments on.
+
+    ROWS, NEVER UNIQUE DESTINATIONS (S4). Two rules resolving to one `dest` are two triage items,
+    and a destination-keyed tally is exactly what hid the one collision measured at NicoCares.
+
+    `rows` IS AN OPTIONAL ALREADY-COMPUTED PLAN, and it exists so the spec's own perf line stays
+    true. That line promises ONE `git ls-files` on top of the walk `planned_writes` already
+    performs; the only caller is `cmd_plan`, which has just walked the descriptors for its own
+    output, so without this the coverage flag would silently double the run's dominant cost on a
+    181-row target. Called without it, this function is self-contained and does the walk itself —
+    which is what any future caller gets, and what the arms exercise.
+    """
+    if rows is None:
+        rows = planned_writes(root, target, deploy, descs, selection, r)
+    have = set(tracked(target))
+    return [{"kit": row["kit"], "dest": row["dest"], "src": row["src"]}
+            for row in rows
+            if row["kind"] == "write" and not row["missing"] and row["dest"] not in have]
+
+
+
+# ------------------------------------------------------- the decline contract (DEPL-dCarriedReceipt-5)
+# A coverage report with no way to say "we deliberately did not take that" is a report an operator
+# reads ONCE. The live target's gap set contains rows the adopter took under another name or folded
+# into another file, and a run that keeps naming them is crying wolf — the only way to quiet it is
+# to stop running it, which loses the whole signal.
+#
+# THE DESIGN PROBLEM IS DISTINGUISHING "deliberately not taken" FROM "missed", and it must be solved
+# without creating the thing it prevents: an exclusion list nobody grades is a fork with a friendlier
+# name. So a row asks for two different things at once. `why` is for the human who reads the report
+# next year and is graded ONLY FOR EXISTENCE, because grading prose is how a gate starts lying —
+# every content predicate (length, an id, a pattern) is satisfiable by typing something. The evidence
+# field is for the machine and is graded for truth.
+#
+# A row may carry `why` alone. That is the honest "we chose not to take it", and it is exactly the
+# row the three staleness arms exist for: with no evidence field, the only thing keeping it from
+# becoming permanent fiction is that it REDS the day the file arrives, and REDS the day gov stops
+# shipping it.
+DECLINE_EVIDENCE = ("taken_as", "consumed_into", "discharge")
+
+# ---------------------------------------------------------------- the executing surface, DECLARED
+# EVERY PLACE THIS ENGINE RUNS A SHELL COMMAND, keyed by enclosing function, with WHO CONTROLS the
+# argv. Asserted in both directions by a selftest arm, AND — the half that matters — the `target`
+# label is DERIVED from the call graph rather than typed here.
+#
+# THE FIRST VERSION OF THIS TABLE LABELLED BY WHO AUTHORED THE TEMPLATE, and that is the wrong
+# question. It read `run_kit_check` and `cmd_check` as "gov" because gov writes their argv templates
+# — and the VALUES substituted into those templates come from the TARGET's `deploy.toml`, through
+# `target_context`. Several shipped templates are `bash -c` and `python -c` strings, so a
+# metacharacter in a target's `prefix` becomes code. Both were REPRODUCED: a read-only `govkit check`
+# created a file in a hostile target. The declaration written to make that class un-recurrable was
+# green over it the whole time, because it never asked those two sites anything.
+#
+# So the rule is now: a site is TARGET-controlled when its function reaches `target_context` or
+# `resolve_tokens`, and the arm DERIVES that and reds on any row typed `gov` that does. A label that
+# a human maintains is a label that disagrees with the code exactly when it matters.
+# M2, from ROUND 2: the census walked `resolve_shell_argv` CALLS, which is six of roughly forty-five
+# spawn sites — while its header said "EVERY PLACE". A guarantee narrower than the sentence selling
+# it is the false confidence that let the blocker ship, so the population is now every
+# `subprocess.run`/`Popen`, minus an allowlist of literal `git` plumbing argv.
+#
+# `git hook run` IS NOT PLUMBING and is excluded from that allowlist by name. It wears a literal git
+# argv and it executes a script the TARGET wrote, which is the same class one disguise over — and it
+# is exactly what a coarser allowlist hid.
+SHELL_EXEC_SITES = {
+    "run_kit_check": "target",       # `[check].argv` — gov's template, the TARGET's token values
+    "cmd_check": "target",           # `[[hole]].discharge.command` — same shape, same exposure
+    "exempt_leg": "target",          # a hole probe re-run to decide a leg exemption — same shape
+    "_cmd_apply": "target",          # the configure-step adopter argv — same shape, writing verb
+    "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
+    "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
+    "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
+    "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
+}
+# THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
+# wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
+# metacharacter would become code. `target-code`: the argv is entirely gov's and what it RUNS is the
+# target's — `git hook run` executes their hook script. What bounds `target-code` is being reachable
+# from a writing verb only.
+#
+# WHAT BOUNDS `target` IS `demand_safe_token`, AND SAYING ANYTHING ELSE HERE HAS ALREADY COST ONCE.
+# This comment used to say a `target` site "owes an announcement and an opt-in", and round 2 measured
+# both halves false: of the six `target` sites exactly ONE prints its resolved argv before spawning
+# it, and `cmd_check` — which is on this list — is reachable from the read-only `check` verb with no
+# opt-in at all, by design, because running `[check].argv` is what `check` DOES. The selftest arm
+# that appeared to assert the announcement was a `print(` substring scan over the whole function
+# body and could not red for any of them.
+#
+# So the guarantee is stated where it actually lives: every target-supplied value entering one of
+# these argvs passes `demand_safe_token` at the boundary, which is armed, reproduced-against, and
+# does not depend on six call sites each remembering to be careful. The announcement is a courtesy
+# `decline_findings` pays and the others do not; the selftest names the five that do not, on every
+# run, rather than implying coverage this table cannot deliver.
+#
+# `_cmd_update` is deliberately ABSENT: every spawn in it is literal `git` plumbing, so the widened
+# census does not see it, and declaring a row the census cannot find would red the both-directions
+# arm. That arm catching it is the arm working.
+SHELL_EXEC_LABELS = ("gov", "target", "target-code")
+
+
+def _sha_nocr(data: bytes | None) -> str | None:
+    """A hash with `\\r` removed, so a CRLF checkout is not a different file (S3, AC6).
+
+    Its own function rather than a flag on `_sha`, because the two answer different questions and a
+    boolean parameter would let a caller ask the wrong one by accident. `_sha` hashes the bytes a
+    receipt RECORDS; this hashes bytes for a comparison across two checkouts whose eol filters
+    disagree. Deliberately NOT applied to `cmd_check`'s existing merged-block hash, which computes a
+    value stored in receipts — re-spelling that is a different unit's risk for no gain here.
+    """
+    return hashlib.sha256(data.replace(CR.encode(), b"")).hexdigest() if data is not None else None
+
+
+def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                     descs: dict[str, tuple[dict, str]], selection: list[str],
+                     commit: str, gaps: list[dict], r: Report,
+                     run_discharge: bool = False) -> dict[tuple[str, str], str]:
+    """Grade every `[[decline]]` and return `{(kit, dest): state}` for the rows it excuses (S6, S7).
+
+    ONE PREDICATE, TWO CALL SITES — `cmd_check` and `plan --coverage`. **A decline may only hide a
+    gap row in a run that also grades it**, which is why this returns the map rather than letting
+    each caller decide: a reader that filtered on presence alone would be an exclusion list again.
+
+    THE THREE STALENESS ARMS mirror the exemption hygiene `selfcheck` already runs over
+    `[[exempt]]`, in the same words, because it is the same class one level out. An empty `why`
+    reds. A `dest` now PRESENT in the target reds — the file arrived, and the message says so rather
+    than calling the row malformed. A `dest` no claimed kit ships at the measured revision reds:
+    that is the arm making the list self-cleaning when gov withdraws a file, and without it a
+    decline outlives the thing it declined and quietly widens the surface it was written to narrow.
+
+    `taken_as` MISMATCHING IS NOT A FAILURE, and that is the load-bearing choice. Redding it would
+    red the honest adopter who relocated a file and then edited it, whose only route back to green
+    is DELETING the decline — the exclusion list eating the evidence that made it trustworthy. The
+    row reclassifies to `diverged` instead: it keeps the row, keeps the reason, and names the state
+    `VERDICT_GRID` already has for exactly this.
+
+    Returns `{(kit, dest): state}` where state is one of `declined`, `diverged`, `discharged`,
+    `undischarged` or `probe-not-run`. A row that RED any arm is absent from the map, so a stale
+    decline hides nothing.
+
+    KEYED ON THE PAIR, not on `dest` alone (D8, from this build's closing review). `coverage_rows`
+    returns ROWS carrying both `kit` and `dest`, and its own docstring insists on rows never unique
+    destinations because a destination-keyed tally is what hid a collision at a live target. This
+    function validated the `kit` field twice and then threw it away, so a `[[decline]]` naming kit A
+    for a destination only kit B ships passed every arm -- `dest not in planned` cannot fire, since
+    `planned` was itself dest-keyed and B's own gap row supplied it -- and then hid B's genuine gap
+    and mis-attributed it in the per-kit tally.
+    """
+    out: dict[tuple[str, str], str] = {}
+    declines = deploy.get("decline") or []
+    if not declines:
+        return out
+    have = set(tracked(target))
+    # WHAT GOV SHIPS AT THIS REVISION, derived from the same plan the caller measured rather than
+    # re-walked: the gap list is a subset of it, so a `dest` outside the union of "planned" and
+    # "already held" is one no claimed kit ships. Passing the gaps in keeps this function from
+    # owning a second answer to "what would gov write here".
+    # PAIR-KEYED for the gap half (D8): `dest not in planned` could not fire for a decline naming
+    # kit A over a destination only kit B ships, because B's own gap row supplied the bare dest.
+    # `have` stays dest-keyed on purpose -- "the target already tracks this path" is a fact about
+    # the path and about no kit, and pairing it would red every decline for a file that IS present.
+    planned = {(g["kit"], g["dest"]) for g in gaps}
+    idx, _present = index_read(target, [str(d.get("taken_as") or "") for d in declines
+                                        if d.get("taken_as")]) if declines else ({}, set())
+
+    for row in declines:
+        kit, dest = row.get("kit"), row.get("dest")
+        why = str(row.get("why", "")).strip()
+        if not kit or not dest:
+            r.fail(f"a [[decline]] row carries no kit or no dest: {row!r}")
+            continue
+        # TWO DIFFERENT QUESTIONS ABOUT THE SAME FIELD, and collapsing them was a defect this
+        # unit's own closing review found. A kit outside the REGISTRY is stale: nothing ships it,
+        # the decline excuses a row that cannot exist, and it reds like the other staleness arms. A
+        # kit inside the registry but outside THIS RUN's selection is simply not this run's
+        # business — an operator narrowing `--kits` must not be redded over a decline for a kit
+        # they did not ask about. It is announced rather than dropped, because a decline that
+        # vanishes from the report without saying why is the failure mode the whole unit is
+        # written against.
+        if kit not in descs:
+            r.fail(f"[[decline]] for '{dest}' names kit '{kit}', which is not a registry entry — "
+                   f"nothing ships that kit, so this row excuses a gap that cannot exist. Delete it")
+            continue
+        if kit not in selection:
+            print(f"govkit: [[decline]] {kit} '{dest}' is OUTSIDE this run's selection and was "
+                  f"neither graded nor applied — narrow selections grade narrowly")
+            continue
+        if not why:
+            r.fail(f"[[decline]] {kit} '{dest}' carries an empty reason — an exemption without one "
+                   f"is an omission wearing a label")
+            continue
+        evidence = [k for k in DECLINE_EVIDENCE if row.get(k) is not None]
+        if len(evidence) > 1:
+            # BEFORE either is evaluated (S2, AC9). A row asserting two different things about one
+            # destination is two rows, and a reader that has to pick between them picks wrong.
+            r.fail(f"[[decline]] {kit} '{dest}' carries {len(evidence)} evidence fields "
+                   f"({', '.join(evidence)}) and at most one is allowed — a row asserting two "
+                   f"different things about one destination is two rows")
+            continue
+        if dest in have:
+            r.fail(f"[[decline]] {kit} '{dest}' is STALE: the target now tracks that path, so the "
+                   f"file arrived and the decline no longer describes anything. Delete the row")
+            continue
+        if (kit, dest) not in planned and dest not in have:
+            r.fail(f"[[decline]] {kit} '{dest}' is STALE: that kit ships no such destination at "
+                   f"{commit[:8]}, so gov has withdrawn it and the decline outlives what it "
+                   f"declined. Delete the row")
+            continue
+
+        state = "declined"
+        if row.get("taken_as"):
+            ta = str(row["taken_as"])
+            # THE SAME PAIR, so a two-kit collision cannot resolve the comparison source from
+            # whichever gap row happened to be first.
+            src = next((g["src"] for g in gaps
+                        if g["dest"] == dest and g["kit"] == kit), None)
+            theirs = blob_at(root, commit, src) if src else None
+            ours = index_blob(target, idx[ta][1]) if ta in idx else None
+            if ours is None:
+                r.fail(f"[[decline]] {kit} '{dest}' declares taken_as '{ta}', which the target does "
+                       f"not track — the evidence names a file that is not there")
+                continue
+            # CR-STRIPPED ON BOTH SIDES (AC6). A relocated file in a CRLF checkout is the same file,
+            # and a plain hash comparison calls it a different one — which is the arm this helper
+            # exists for.
+            if _sha_nocr(theirs) != _sha_nocr(ours):
+                state = "diverged"
+        elif row.get("consumed_into"):
+            ci = str(row["consumed_into"])
+            # DELIBERATELY WEAK (S4). Gov cannot know what "folded into" means byte-wise, and a
+            # predicate that pretended to would pass on everything — the could-not-fail shape. All
+            # this asserts is that the named path exists in the target's index.
+            if ci not in have:
+                r.fail(f"[[decline]] {kit} '{dest}' declares consumed_into '{ci}', which the target "
+                       f"does not track — a fold into a file that is not there is not a fold")
+                continue
+        elif row.get("discharge"):
+            cmd = (row.get("discharge") or {}).get("command")
+            if not cmd:
+                r.fail(f"[[decline]] {kit} '{dest}' declares a discharge with no command, so "
+                       f"'discharged' is undefined for it and this check cannot answer the question")
+                continue
+            if not isinstance(cmd, list):
+                # A STRING IS NOT AN ARGV, and iterating one yields its CHARACTERS. `validate_gate_runner`
+                # refuses exactly this shape by name for `[gate_runner].command`, and this branch had
+                # no equivalent -- so a `command = "bash probe.sh"` resolved to a per-character argv.
+                # Refused at the same boundary, in the same spirit.
+                r.fail(f"[[decline]] {kit} '{dest}' declares discharge.command as a "
+                       f"{type(cmd).__name__}; it must be an argv ARRAY. Splitting a string here "
+                       f"would iterate its characters, which is how a probe becomes a spawn of 'b'")
+                continue
+            # ---- THE TRUST BOUNDARY, and it is the whole reason this branch has a flag.
+            # This argv comes out of the TARGET's `.governance/deploy.toml` WHOLE — a file in a
+            # repository gov does not own. That is a wider exposure than the other spawns, whose
+            # templates are gov's, but it is a DIFFERENCE OF DEGREE and not of kind: those templates
+            # interpolate target-supplied token values, so the target influences them too. Round 2
+            # of this build's closing review reproduced a read-only `check` running target-chosen
+            # text through exactly that route. `demand_safe_token` is the boundary that closes it;
+            # this opt-in is the second layer, for the one argv the target writes end to end.
+            #
+            # The `-5` spec cleared this branch by asserting that `[[hole]].discharge` "already does
+            # exactly this ... against the same file". A hole's TEMPLATE is gov's, so the sentence
+            # was wrong about the file — and it was also the wrong comparison to be making, because
+            # what mattered was not whose file it was but whose VALUES reach the shell.
+            #
+            # DEFAULT OFF, and the not-run row is a STATE rather than a silent skip: a decline whose
+            # probe did not run must not be indistinguishable from one that passed.
+            if not run_discharge:
+                out[(kit, dest)] = "probe-not-run"
+                continue
+            # PRINTED BEFORE IT IS SPAWNED, the way `apply` already prints the one other
+            # target-authored argv. An operator who opted in is still owed the chance to see what
+            # they opted into.
+            ctx = target_context(target, deploy, kit, descs[kit][0]) if kit in descs else {}
+            resolved, unresolved = [], []
+            for a in cmd:
+                s, miss = resolve_tokens(a, ctx)
+                resolved.append(s)
+                unresolved += miss
+            if unresolved:
+                r.fail(f"[[decline]] {kit} '{dest}' probe needs answer(s) "
+                       f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
+                continue
+            print(f"govkit: [[decline]] {kit} '{dest}' RUNNING a target-authored probe "
+                  f"(--run-discharge): {' '.join(resolved)}")
+            try:
+                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
+                                    capture_output=True, text=True).returncode
+            except OSError as e:
+                r.fail(f"[[decline]] {kit} '{dest}' probe could not run: {e}")
+                continue
+            state = "discharged" if rc == 0 else "undischarged"
+        out[(kit, dest)] = state
+    return out
+
+def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+             coverage: bool = False, emit_declines: bool = False,
+             run_discharge: bool = False) -> int:
     r = Report()
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
@@ -1442,25 +2216,152 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     # an operator has to infer is a mark that gets read as a write.
     print("govkit plan — marks: write = govkit writes it · SIDE = a step apply runs produces it · "
           "ORDER = something outside apply must supply it · COVER = a sibling rule writes that same "
-          "path · BLOCK = apply refuses the install over it · UNRES. = unresolved token, not a path")
+          "path · BLOCK = apply refuses the install over it · FORK = gov's copy is a derivative of "
+          "the target's, reported and never written · UNRES. = unresolved token, not a path")
     for row in rows:
         # A destination still carrying a brace is NOT a path, and printing it under `write` would
         # promise a write this tool cannot perform — the row is marked UNRESOLVED so the plan never
         # reads as a file set anyone can rely on.
         mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")
+    # DEPL-dCarriedReceipt-6 S3. The SAME predicate `apply` runs, over the union of what the target
+    # already tracks and what THIS PLAN would write — because at plan time nothing has been written
+    # and the tracked-only predicate reds every first install. That union IS the difference between
+    # a preview that warns about a real gov defect and one that warns about being new.
+    for _eid, _nm, _bad in silenced_legs(
+            descs, selection, target, deploy,
+            set(tracked(target)) | {x["dest"] for x in rows if x["kind"] == "write"}):
+        print(f"  SILENT [{_eid:<13}] leg '{_nm}' names {', '.join(_bad)}, which no kit ships here")
     holes = [(eid, h.get("id")) for eid in selection for h in descs[eid][0].get("hole", [])]
     for eid, hid in holes:
         print(f"  ORDER  [hole         ] .governance/outbox/{hid}.md   <- {eid}")
+    # `n` is derived from KIND_MARKS and the summary HAND-NAMES its kinds, so a kind added to the
+    # table alone is counted here and never printed — measured, and DEPL-dCarriedReceipt-10 S2 is
+    # the unit that met it. The clause below is derived from the same table for that reason: every
+    # kind KIND_MARKS carries reaches the line, and a kind added tomorrow reaches it too.
     n = {k: sum(1 for x in rows if x["kind"] == k) for k in KIND_MARKS}
-    print(f"govkit plan — {n['write']} write(s), {n['side-effect']} side-effect(s), "
-          f"{n['order'] + len(holes)} order(s), {n['covered']} covered, {n['blocked']} blocked. "
-          f"NOTHING was written.")
+    named = {"write": "write(s)", "side-effect": "side-effect(s)", "order": "order(s)",
+             "covered": "covered", "blocked": "blocked", "forked": "forked"}
+    counts = {k: n[k] + (len(holes) if k == "order" else 0) for k in KIND_MARKS}
+    print("govkit plan — "
+          + ", ".join(f"{counts[k]} {named.get(k, k)}" for k in KIND_MARKS)
+          + ". NOTHING was written.")
+
+    # ---- DEPL-dCarriedReceipt-4 S4. ADDITIVE (§8 F2): the plan rows above are what a reader needs
+    # ---- to interpret a gap row, and a mode that hid them would make the operator run the verb
+    # ---- twice. REPORT-ONLY (§8 F1): a gap is a state of the world, not a fault in the run, and a
+    # ---- first honest run that exits 1 reads as a broken tool.
+    # `--emit-declines` IMPLIES `--coverage` rather than refusing without it. The skeletons are one
+    # per GAP row, so without the join there is no gap set — and a flag that printed nothing in that
+    # case is the skip-that-looks-like-a-pass shape this whole unit is written against. Implying it
+    # is also why this adds no refusal branch, which is what §7 promises about `BRANCH_PIN`.
+    if coverage or emit_declines:
+        gaps = coverage_rows(root, target, deploy, descs, selection, r, rows)
+        # DEPL-dCarriedReceipt-5 S7, call site one of two. A decline may only hide a gap row in a
+        # run that ALSO GRADES it, which is why the map comes back from the grader rather than
+        # being read off the descriptor here — filtering on presence alone would make this an
+        # exclusion list again, which is the whole thing that unit exists to avoid becoming.
+        commit_now = git(root, "rev-parse", "HEAD").strip()
+        declined = decline_findings(root, target, deploy, descs, selection, commit_now, gaps, r,
+                                    run_discharge=run_discharge)
+        for g in gaps:
+            if declined.get((g["kit"], g["dest"])) is None:
+                print(f"  GAP    [{g['kit']:<13}] {g['dest']}   <- {g['src']}")
+        # DECLINED ROWS PRINT, never vanish. A gap that disappears from a report without saying why
+        # is the failure mode of every exclusion list, so each one prints with its state and its
+        # reason and is counted apart rather than subtracted in silence.
+        for row in (deploy.get("decline") or []):
+            st = declined.get((row.get("kit"), row.get("dest")))
+            if st is not None:
+                print(f"  {st:<6} [{str(row.get('kit')):<13}] {row.get('dest')}   "
+                      f"· {str(row.get('why', '')).splitlines()[0]}")
+        gaps = [g for g in gaps if (g["kit"], g["dest"]) not in declined]
+        per_kit = {k: sum(1 for g in gaps if g["kit"] == k) for k in selection}
+        # `gap 0` PRINTS. A clean run that printed nothing is indistinguishable from a coverage
+        # check that never ran, and this whole unit exists because an absent signal read as a
+        # present one for two live targets.
+        print(f"govkit plan — coverage: gap {len(gaps)} of {counts['write']} write row(s)"
+              + (f", {len(declined)} declined" if declined else "")
+              + (" · " + ", ".join(f"{k} {v}" for k, v in per_kit.items() if v) if gaps else "")
+              + ". Coverage answers PRESENCE only: a present-but-hand-edited file reads as covered.")
+        if emit_declines:
+            # STDOUT, never the target's own file (§3). A deployer that edits the document carrying
+            # the owner's decisions has made one for them. This is paste-ready text and nothing else.
+            for g in gaps:
+                print(f'\n[[decline]]\nkit = "{g["kit"]}"\ndest = "{g["dest"]}"\nwhy = ""')
     return r.emit()
 
 
 # ---------------------------------------------------------------------------------------- check
-def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
+def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
+                  r: "Report | None" = None) -> tuple[str, str, int | None]:
+    """RUN one kit's own declared `[check]` and report the state it MEASURED (`-14` S1).
+
+    ONE runner, and this is the whole of it: `check` calls it per claimed kit, and `update` calls it
+    twice per TOUCHED kit — once before the first byte moves and once after the write loop. A second
+    implementation is the duplicate-answer class this build spends units removing, and a verifier
+    that graded a write by a different predicate than `check` uses would disagree with `check` the
+    first time either one changed.
+
+    RETURNS `(state, detail, rc)`. `state` is one of the three states a check that RAN can produce —
+    `adopted`, `landed-but-inert`, `landed-unmeasured` — and NOTHING here returns `not-run`: a kit
+    nothing executed has no check result, and that state is owned by the caller that decided not to
+    call. `rc` is the exit code, or None wherever no subprocess ran, which is every
+    `landed-unmeasured` spelling.
+
+    `r` IS THE FINDING CHANNEL AND IT IS OPTIONAL, deliberately. `check` passes its own report and
+    keeps every message it printed before this extraction, byte for byte. `update` passes None and
+    owns its own disposition, because `-14` S6 turns on a distinction no single run can make: a kit
+    red at BOTH runs is pre-existing red and must NOT `r.fail`, and a runner that reported for the
+    caller would decide that question here, one call too early.
+    """
+    chk = (desc.get("check") or {})
+    if chk.get("argv"):
+        pairs = [resolve_tokens(a, ctx) for a in chk["argv"]]
+        if any(m for _a, m in pairs):
+            if r is not None:
+                r.fail(f"kit '{eid}' check argv carries an unresolved token")
+            return "landed-unmeasured", " (its check argv does not resolve)", None
+        try:
+            rc = subprocess.run(resolve_shell_argv([a for a, _m in pairs]), cwd=str(target),
+                                capture_output=True, text=True).returncode
+        except OSError as e:
+            # A check that cannot LAUNCH is red, never unmeasured and never a traceback. The hole
+            # loop below has had this shape since it was written; the check arm had not, so a
+            # descriptor naming a binary the target does not have took `update` down mid-write
+            # rather than reporting the kit. `landed-but-inert` is the honest state: something was
+            # asked and it did not work.
+            if r is not None:
+                r.fail(f"kit '{eid}': its own adopter check arm could not run: {e}")
+            return "landed-but-inert", f" (its check arm could not run: {e})", None
+        if rc != 0 and r is not None:
+            r.fail(f"kit '{eid}': its own adopter check arm exits {rc}, so the kit is landed "
+                   f"but not working — surfaced rather than swallowed")
+        return ("adopted" if rc == 0 else "landed-but-inert"), "", rc
+    if "none" in chk:
+        reason = str(chk.get("none", "")).strip()
+        if not reason and r is not None:
+            r.fail(f"kit '{eid}' declares `[check] = {{ none }}` with an empty reason")
+        return "landed-unmeasured", (f" — {reason}" if reason else ""), None
+    if r is not None:
+        r.fail(f"kit '{eid}' declares neither `[check].argv` nor `[check] = {{ none = \"…\" }}`, "
+               f"so nothing measured it and nothing said why — declare the absence with a "
+               f"reason; silence is not a third option")
+    return "landed-unmeasured", "", None
+
+
+def check_argv_of(desc: dict, ctx: dict[str, str]) -> str:
+    """The kit's check argv as the operator would type it, for an order to name (`-14` S7).
+
+    Resolved through the same `resolve_tokens` the runner uses, so an order cannot name a different
+    command than the one that ran. Unresolved tokens are left standing — an order about a check that
+    could not resolve should show the brace that stopped it.
+    """
+    argv = (desc.get("check") or {}).get("argv") or []
+    return " ".join(resolve_tokens(a, ctx)[0] for a in argv)
+
+
+def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = False) -> int:
     """Read-only verification of an installed target, over one owned state vocabulary.
 
     Every state is a MEASUREMENT and none is a placeholder. `not-landed` is a kit the receipt claims
@@ -1487,6 +2388,23 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
+
+    # ---- DEPL-dCarriedReceipt-5 S7, call site two of two. The SAME predicate `plan --coverage`
+    # ---- runs, so the two verbs cannot disagree about whether a decline is stale. The gap list is
+    # ---- computed here rather than passed, because `check` has no plan of its own — and it is what
+    # ---- the withdrawal arm needs: a `dest` outside the union of "planned" and "already held" is
+    # ---- one no claimed kit ships any more. Every declined row prints; a stale one reds and hides
+    # ---- nothing, which is the property that keeps the list from becoming a fork.
+    if deploy.get("decline"):
+        _dsel = [e for e in selection if e in descs]
+        _dcommit = git(root, "rev-parse", "HEAD").strip()
+        _dgaps = coverage_rows(root, target, deploy, descs, _dsel, r)
+        for (_kit, _dest), _st in decline_findings(
+                root, target, deploy, descs, _dsel, _dcommit, _dgaps, r,
+                run_discharge=run_discharge).items():
+            _why = next((str(x.get("why", "")).splitlines()[0] for x in deploy["decline"]
+                         if x.get("dest") == _dest and x.get("kit") == _kit), "")
+            print(f"govkit check — decline {_st}: {_kit} {_dest} · {_why}")
 
     # ---- EVIDENCE, role-scoped. Before this, `check` contained ONE
     # ---- filesystem test — on the receipt's own path — and never opened the file list, never read
@@ -1520,11 +2438,36 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
         if src and commit:
             n_prov += 1
             blob = blob_at(root, commit, src)
+            # DEPL-dCarriedReceipt-8 S6. THE PROVENANCE QUESTION IS "did gov ship these bytes at
+            # this commit", and `gov_oid` is the field that answers it — the only one that does.
+            # This loop used to read `sha256`, which is a hash of the bytes that LANDED, and the two
+            # coincide only where the target holds gov's file untouched. On a merged row they never
+            # do: the file legitimately holds gov's bytes plus the adopter's edit, and this loop
+            # called that receipt corruption. Measured immediately after a successful three-way,
+            # `provenance: 1/2 resolved` plus a named hash mismatch, on a target nothing was wrong
+            # with. `sha256` still answers the INTEGRITY question above, unchanged; one field was
+            # being asked two questions and this is the reader that had the wrong one.
+            gov_oid = row.get("gov_oid")
             if blob is None:
                 r.fail(f"'{path}': its recorded source '{src}' does not resolve at commit "
                        f"{commit[:12]} in the gov checkout at {root.as_posix()} — either this is a "
                        f"different clone than the receipt recorded, or that commit is not fetched here")
+            elif gov_oid:
+                if blob_oid(blob) != gov_oid:
+                    r.fail(f"'{path}': the receipt's gov_oid does not name gov's own blob "
+                           f"at {commit[:12]} — recorded {gov_oid[:12]}, gov has "
+                           f"{blob_oid(blob)[:12]}. `gov_oid` is STORED, so this is a "
+                           f"receipt that no longer matches its own evidence rather than a "
+                           f"target that drifted")
+                else:
+                    n_prov_ok += 1
             elif want and _sha(blob) != want:
+                # A receipt below schema 3 carries no `gov_oid` at all, and `check` does not migrate
+                # — `update` does, once, from this same evidence. `sha256` is the only identity such
+                # a row has, so the legacy comparison is what is available rather than what is
+                # right, and it keeps its old message. A merged row in a schema-2 receipt therefore
+                # still reds here, truthfully: nothing in it distinguishes gov's bytes from the
+                # merge result until the migration runs.
                 r.fail(f"'{path}': the receipt's hash does not match gov's own bytes at "
                        f"{commit[:12]} — recorded {want[:12]}, gov has {_sha(blob)[:12]}")
             else:
@@ -1627,31 +2570,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
                    f"descriptor declares at least one landable rule")
             continue
 
-        chk = (d.get("check") or {})
-        state, detail = None, ""
-        if chk.get("argv"):
-            pairs = [resolve_tokens(a, ctx) for a in chk["argv"]]
-            if any(m for _a, m in pairs):
-                r.fail(f"kit '{eid}' check argv carries an unresolved token")
-                state = "landed-unmeasured"
-                detail = " (its check argv does not resolve)"
-            else:
-                rc = subprocess.run(resolve_shell_argv([a for a, _m in pairs]), cwd=str(target),
-                                    capture_output=True, text=True).returncode
-                state = "adopted" if rc == 0 else "landed-but-inert"
-                if rc != 0:
-                    r.fail(f"kit '{eid}': its own adopter check arm exits {rc}, so the kit is landed "
-                           f"but not working — surfaced rather than swallowed")
-        elif "none" in chk:
-            reason = str(chk.get("none", "")).strip()
-            if not reason:
-                r.fail(f"kit '{eid}' declares `[check] = {{ none }}` with an empty reason")
-            state, detail = "landed-unmeasured", f" — {reason}" if reason else ""
-        else:
-            state = "landed-unmeasured"
-            r.fail(f"kit '{eid}' declares neither `[check].argv` nor `[check] = {{ none = \"…\" }}`, "
-                   f"so nothing measured it and nothing said why — declare the absence with a "
-                   f"reason; silence is not a third option")
+        state, detail, _rc = run_kit_check(eid, d, ctx, target, r)
         print(f"govkit check — {eid}: {state}{detail}")
 
         for h in d.get("hole", []):
@@ -1778,6 +2697,23 @@ def fnmatchcase_path(path: str, pattern: str) -> bool:
 GA_BLOCK_ID = "govkit:lf-pins"
 
 
+def lf_pin_block(pins: list[tuple[str, str, str]]) -> tuple[str, str, str]:
+    """(open-marker, close-marker, block text) for a resolved pin set.
+
+    DEPL-dCarriedReceipt-2 S2. `apply` WRITES this block and `update` RECOMPUTES it to decide
+    whether gov's pins have moved, so the construction lives in one place. Two copies would drift
+    and the comparison would fail open -- reporting `pins-moved` forever, or `current` forever, and
+    neither is distinguishable from a correct answer without reading both copies.
+    """
+    om, cm = marker_pair("hash-comment", GA_BLOCK_ID)
+    body = [om, "# GENERATED by govkit apply. Edit the kits' descriptors, not this block."]
+    for pat, claimant, why in pins:
+        body.append(f"# {claimant}" + (f" — {why}" if why else ""))
+        body.append(f"{pat} text eol=lf")
+    body.append(cm)
+    return om, cm, "\n".join(body)
+
+
 def eol_population(target: pathlib.Path) -> dict[str, str]:
     """Ask GIT which tracked paths resolve to which `eol` value. Never a pattern match.
 
@@ -1881,6 +2817,24 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
     if missing:
         r.fail(f"[gate_runner] declares kind = 'manifest' and is a PARTIAL promotion: "
                f"{', '.join(missing)} absent. A complete promotion supplies {', '.join(GR_REQUIRED)}")
+    # ---- B1's SECOND SITE, and the one that exits 0. `[gate_runner].file` is a TARGET-supplied
+    # ---- path that `apply` joins onto the target root and WRITES (`_cmd_apply`, `target / gr["file"]`).
+    # ---- Nothing checked it. REPRODUCED: a descriptor declaring `file = "../../ESCAPED.json"` made
+    # ---- `apply` write that file outside the target repository and exit 0 — a clean success while
+    # ---- writing into a tree the operator never named. The `prefix` escape B1 closed at least
+    # ---- exited non-zero for unrelated reasons; this one reported nothing at all.
+    # ----
+    # ---- FOUND BY ENUMERATING, not by reading around the first fix. Every `target / <non-literal>`
+    # ---- join in the engine was listed and classified; this was the one write among them fed
+    # ---- straight from the target descriptor. Fixing the site B1 named and stopping there would
+    # ---- have left the CLASS open at a site that fails silently, which is §7's `gate the CLASS,
+    # ---- not the instance` — the rule this build has now broken twice in one review round.
+    # ----
+    # ---- HERE, in the PRE-WRITE pass, for the reason this function's own docstring already gives:
+    # ---- legs are emitted last, so a bad declaration caught at emission time refuses after
+    # ---- everything else has landed.
+    if gr.get("file"):
+        demand_contained_dest(str(gr["file"]), "[gate_runner].file in the target's deploy.toml")
     if gr.get("grammar") not in (None, "json-array"):
         r.fail(f"[gate_runner].grammar = '{gr.get('grammar')}' — only 'json-array' is implemented")
     if gr.get("dedupe_key") not in (None, "name"):
@@ -2069,7 +3023,12 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
 
     ONE spelling, called by `plan`, by the write loop, and by the wildcard exclusion — each has to
     ask the same question the writer will answer, and two computations of one thing is the class this
-    repo keeps a record about.
+    repo keeps a record about. DEPL-dCarriedReceipt-1: that claim was false for `{relpath}`, which
+    this function resolved as a BASENAME while `destinations_for` resolved it through
+    `rule_relpath`. push-main's hook rule declares `to = "{relpath}"` over `.githooks/pre-push`, so
+    the writer landed a bare `pre-push` at the target ROOT while the same rule's own `claims` spelled
+    `.githooks/pre-push`. Both now call `rule_relpath`, and `selfcheck` asserts the CLASS: every
+    rule declaring both `to` and `claims` must resolve into its own claims.
 
     THE `missing` LIST IS RETURNED, not dropped. An earlier cut called `resolve_tokens(...)[0]` and
     discarded it, so `apply --kits kickoff-manifest` with no `manifest_path` answer wrote a file
@@ -2081,7 +3040,8 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
     not have. The default applies only where the rule declared no destination.
     """
     if rule.get("to"):
-        return [resolve_tokens(x.replace("{relpath}", pathlib.PurePosixPath(src).name), ctx)
+        rel = rule_relpath(desc, rule, src)
+        return [resolve_tokens(x.replace("{relpath}", rel), ctx)
                 for x in (rule["to"] if isinstance(rule["to"], list) else [rule["to"]])]
     rel = src[len(home) + 1:] if home and src.startswith(home + "/") else \
         pathlib.PurePosixPath(src).name
@@ -2157,6 +3117,95 @@ def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
     return out.stdout if out.returncode == 0 else None
 
 
+# ---------------------------------------------------------------- the two identities (DEPL-dCarriedReceipt-7)
+# `gov_oid` is the git blob GOV shipped at a row's `commit`. `oid` is the git blob the TARGET holds,
+# read from its INDEX. One receipt field was being asked to be both: `classify_row` compared `sha256`
+# against the target's WORKTREE bytes while `check` compared the same field against gov's blob, and
+# both claims hold only where the target's worktree is byte-identical to what gov shipped — false for
+# any adopter whose clone applies a line-ending filter. Measured on a `core.autocrlf=true` clone of a
+# memory-tree install: 23 of 24 engine rows read `patched` with nothing edited.
+def blob_oid(data: bytes) -> str:
+    """Git's object name for these bytes — the string `git hash-object --stdin` would print.
+
+    Computed rather than spawned, because both callers already hold the bytes: `apply` has gov's
+    blob in hand and `update` has just read it through `blob_at`. The rule is git's own and not a
+    hash of this tool's choosing — the header is `blob <byte-length>` and a NUL.
+
+    WHAT THIS DOES NOT COVER, stated because a structural check reads as a semantic one: a
+    repository on the sha256 object format names the same bytes differently, and gov is sha1 like
+    every repo this deployer has met. A target on the other format would read every identity as
+    DIFFERING, which is the safe direction — `differs` reaches only `patched` and `diverged`, and no
+    raw write sits on either.
+    """
+    return hashlib.sha1(b"blob %d\0" % len(data) + data,  # noqa: S324 - git's object name, not a MAC
+                        usedforsecurity=False).hexdigest()
+
+
+def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[str, str]], set[str]]:
+    """The TARGET's index, batched: `(path -> (mode, oid))` at STAGE 0, and every path at ANY stage.
+
+    ONE `ls-files -s -z` over the receipt's whole path list rather than one read per row (§8 F2).
+    Chunked, because a receipt can outgrow a command line and this one is measured in the hundreds
+    on a live adopter.
+
+    TWO return values because two questions need different populations. The map answers "what blob
+    does the target hold", and only a stage-0 entry answers it: an unmerged path carries stages 1-3
+    and no stage 0, and reading a merge stage as the target's blob answers a question nobody asked.
+    The SET is every path with any entry at all, so `-7` S4's absent-from-the-index refusal does not
+    fire on a path that is merely unmerged — that state is `-12` S3's refusal, one step earlier, and
+    two units refusing one state hand the operator two different messages for it.
+    """
+    at_stage0: dict[str, tuple[str, str]] = {}
+    present: set[str] = set()
+    for i in range(0, len(paths), 400):
+        chunk = paths[i:i + 400]
+        if not chunk:
+            continue
+        out = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "-z", "--", *chunk],
+                             capture_output=True, text=True, check=False)
+        for rec in out.stdout.split("\0"):
+            if not rec.strip():
+                continue
+            meta, _tab, pth = rec.partition("\t")
+            bits = meta.split()
+            if len(bits) < 3 or not pth:
+                continue
+            mode, oid, stage = bits[0], bits[1], bits[2]
+            present.add(pth)
+            if stage == "0":
+                at_stage0[pth] = (mode, oid)
+    return at_stage0, present
+
+
+def index_blob(target: pathlib.Path, oid: str) -> bytes | None:
+    """The bytes behind an index entry, from the target's object database and never from its disk.
+
+    Called ONLY where the bytes themselves are needed — the three-way merge, the order it writes on
+    a conflict, and DEPL-dCarriedReceipt-9's rung ladder. Every VERDICT is still decided from the OID
+    alone, and a byte-identical row still costs nothing; what the rungs added is one spawn per row
+    whose index blob is NOT gov's own, because `eol` and `relocate` are questions about bytes and no
+    oid comparison can answer either. The spec's perf line claimed "no new subprocess" and that is
+    wrong on this arm — stated here rather than left for the next reader to discover.
+    """
+    out = subprocess.run(["git", "-C", str(target), "cat-file", "blob", oid],
+                         capture_output=True, check=False)
+    return out.stdout if out.returncode == 0 else None
+
+
+def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
+    """The file mode gov's own tree records for a path at a commit.
+
+    §8 F1: a row with no existing index entry in the target takes THIS mode rather than a literal
+    `100644`. A hook that lands non-executable is a hook that does not run.
+    """
+    out = subprocess.run(["git", "-C", str(root), "ls-tree", commit, "--", path],
+                         capture_output=True, text=True, check=False)
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    mode = out.stdout.split()[0]
+    return mode if mode in ("100644", "100755", "120000") else None
+
+
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
                         receipt: dict | None) -> list[str]:
     """Registry entries resolvable in the target that THIS target's receipt does not claim.
@@ -2205,8 +3254,312 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
     return found
 
 
+# ------------------------------------------------ write preconditions and the outbox write lock
+# DEPL-dCarriedReceipt-12. The FIRST gate a write passes, and it is SHARED because both writing
+# verbs have the same exposure: `apply` lands bytes and rewrites `.gitattributes`, `update` lands
+# bytes and re-stamps the receipt, and only one of them shipped a guard — a guard that was dead in
+# the linked-worktree layout adopters are told to use. Every refusal here names the condition, the
+# marker or path that tripped it, and what to do about it; there is deliberately no `--force`.
+
+IN_PROGRESS_MARKERS = ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD")
+
+# One spelling of where the lock lives. Both verbs take it and the refusal prints it, so a second
+# literal would be a second answer to the same question.
+WRITE_LOCK_REL = ".governance/outbox/.update.lock"
+
+# The lock THIS process created, and nothing else. A run that REFUSED on somebody else's lock must
+# never unlink the file it just refused over, which is the one way a lock becomes an amplifier.
+_HELD_LOCK: pathlib.Path | None = None
+
+
+def git_path(target: pathlib.Path, name: str) -> pathlib.Path:
+    """Where git ACTUALLY keeps <name> for this working tree.
+
+    Never `target/.git/<name>`. In a LINKED WORKTREE `.git` is a file and the per-worktree state
+    lives under the host repo's `.git/worktrees/<id>/`, so the path stat resolves to nothing and
+    every probe built on it reports a clean tree in the middle of a merge — reproduced live before
+    this was written. `--git-path` is the form `hook_probe` already uses; this is that same answer
+    rather than a second one. It returns a working-tree-relative path in a normal repo and an
+    ABSOLUTE one in a linked worktree, and joining an absolute right-hand side yields it unchanged.
+    """
+    out = subprocess.run(["git", "-C", str(target), "rev-parse", "--git-path", name],
+                         capture_output=True, text=True)
+    if out.returncode != 0:
+        raise Refusal(
+            f"git could not resolve --git-path {name} in {target.as_posix()}: "
+            f"{out.stderr.strip()} — refusing rather than falling back to .git/{name}, which is "
+            f"the guess that is wrong in every linked worktree")
+    return target / out.stdout.strip()
+
+
+def demand_no_operation_in_progress(target: pathlib.Path, verb: str) -> None:
+    """S1 + S2. Asked of BOTH verbs and conditioned on NOTHING.
+
+    It used to sit inside `if pins:`, so a target declaring no `lf_pin` was unguarded even in the
+    layout where the old path form happened to work.
+    """
+    for marker in IN_PROGRESS_MARKERS:
+        p = git_path(target, marker)
+        if p.exists():
+            raise Refusal(
+                f"the target has {marker} at {p.as_posix()} — a merge, rebase or cherry-pick is in "
+                f"progress. `{verb}` writes gov-owned paths and STAGES them, and a `git add` over a "
+                f"path carrying conflict stages collapses all three of them: both sides of your "
+                f"merge become unrecoverable, and renormalizing mid-conflict rewrites index stages "
+                f"nobody can reconstruct. Finish or abort that operation in the target, then re-run")
+
+
+def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
+    """S3. `ls-files -u` asks the question directly — which paths carry more than one index stage."""
+    out = subprocess.run(["git", "-C", str(target), "ls-files", "-u", "-z"],
+                         capture_output=True, text=True)
+    paths = sorted({row.split("\t", 1)[1] for row in out.stdout.split("\0") if "\t" in row})
+    if paths:
+        raise Refusal(
+            f"{len(paths)} path(s) in the target's index carry unresolved merge stages: "
+            + ", ".join(paths) +
+            f" — `{verb}` stages what it writes, and one `git add` over such a path collapses its "
+            f"three stages to one, with both sides of the merge unrecoverable afterwards. Resolve "
+            f"them in the target (or `git merge --abort`), then re-run")
+
+
+def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
+                        landed_oids: dict[str, str] | None = None) -> list[str]:
+    """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
+
+    A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
+    --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
+    also flags `??`. THREE carve-outs, and each of them is a state another unit owns:
+
+    - Absent from BOTH the index and the worktree: dirty when HEAD still carries it, because that
+      is a STAGED deletion and a staged deletion is an operator decision. NOT dirty when HEAD has
+      no copy either — that is the COMMITTED deletion `-9` restores, and there is nothing left to
+      diff.
+    - An untracked file SHADOWING a claimed path that is absent from the index is NOT dirty here.
+      That state is `-7` S4's refusal, which names the path and the risk, and two units refusing
+      one tree would give the operator two different messages for it.
+    - GOV'S OWN STAGING IS NOT SOMEBODY'S WORK IN PROGRESS. A path whose ONLY difference is
+      index-versus-HEAD, and whose index blob is the exact oid the receipt recorded landing there,
+      was staged by this tool and by nothing else. `landed_oids` supplies those, and a path absent
+      from it takes no carve-out.
+
+    THAT THIRD ONE IS AN OWNER RULING (2026-08-26) AND IT CLOSES A HOLE S4 DUG UNDER ITSELF. `apply`
+    STAGES everything it lands, so the instant a successful apply finished, every receipt-claimed
+    path differed index-versus-HEAD and was dirty by this function's own definition. A second
+    `apply` refused, `update --write` straight after `apply` refused, and `apply --resume` refused
+    STRUCTURALLY — it needs a receipt, a receipt needs a completed apply, and a completed apply
+    leaves the target dirty, so that path could not be reached without an unrelated commit in
+    between. The unit parked it and shipped fixtures that commit at seven sites to model the flow.
+    THE OID COMPARISON IS WHY THIS IS NOT A WEAKENING, and it is the whole reason the carve-out is
+    written this way rather than as "skip paths this run staged": an operator's staged edit to a
+    gov-owned path produces a DIFFERENT index blob and stays dirty, which is the case S4 exists for.
+    An unstaged worktree edit is untouched by this and stays dirty too.
+
+    Four git calls over the whole population rather than four per path: a hundred-row receipt would
+    otherwise pay four hundred process creations, and on the node that measured it every exec costs
+    about 22 ms whatever it does. The fifth read only happens when a carve-out could apply.
+    """
+    claimed = [c for c in dict.fromkeys(claimed) if c]
+    if not claimed:
+        return []
+
+    def _names(*args: str) -> set[str]:
+        out = subprocess.run(["git", "-C", str(target), *args, "--", *claimed],
+                             capture_output=True, text=True)
+        return {n for n in out.stdout.split("\0") if n}
+
+    in_index = _names("ls-files", "-z")
+    has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
+                              capture_output=True).returncode == 0
+    in_head = _names("ls-tree", "-r", "--name-only", "-z", "HEAD") if has_head else set()
+    # index-versus-HEAD is unanswerable before the first commit, and calling every staged path an
+    # addition there would report a fresh repository as entirely dirty. The worktree-versus-index
+    # half still answers, so that is the half that runs.
+    staged = _names("diff", "--cached", "--name-only", "-z", "HEAD") if has_head else set()
+    unstaged = _names("diff", "--name-only", "-z")
+
+    # Carve-out 3 needs the index BLOBS, not just the names, and only for paths that could take it:
+    # staged, not unstaged, and carrying a recorded oid. Read once, and skipped entirely when the
+    # caller passed no oids — which is every caller that has no receipt in hand.
+    ours = {p for p in staged
+            if p not in unstaged and (landed_oids or {}).get(p)}
+    if ours:
+        _idx, _ = index_read(target, sorted(ours))
+        ours = {p for p in ours if _idx.get(p, (None, None))[1] == landed_oids[p]}
+
+    dirty: list[str] = []
+    for path in claimed:
+        if path not in in_index:
+            if (target / path).exists():
+                continue                        # carve-out 2 — `-7` S4 owns this tree
+            if path in in_head:
+                dirty.append(f"{path} (deleted from the index, still in HEAD)")
+            continue                            # carve-out 1 — a committed deletion is not dirty
+        if path in ours:
+            continue                            # carve-out 3 — gov staged exactly this blob
+        if path in staged or path in unstaged:
+            dirty.append(path)
+    return dirty
+
+
+def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+    """S4's refusal, scoped to the receipt's own population.
+
+    A deployer that refuses over an unrelated edit in a repository it does not own is a deployer
+    people learn to work around, so a dirty path outside the receipt does not block.
+    """
+    # A ROW THIS VERB CANNOT WRITE CANNOT MEET S4'S HAZARD. S4 refuses because "a write onto an
+    # uncommitted local change is indistinguishable afterwards from a change you made" -- so the
+    # population is the rows a writing verb can actually write. `UPDATE_ROLE["attributes"]` is
+    # `pins`, documented in that table as `recompute, compare, report; never write`, so a
+    # `.gitattributes` row can never be that write.
+    #
+    # IT IS ALSO THE ONE ROW THE `-12` CARVE-OUT CANNOT REACH, which is how this was found rather
+    # than reasoned to: `-7` S9 requires an `attributes` row to carry NEITHER identity, so it has no
+    # `oid`, so the carve-out has nothing to compare and `.gitattributes` stayed DIRTY after every
+    # apply -- leaving `update --write` refusing straight after `apply` over exactly one path, which
+    # is the burden the ruling was taken to remove. Excluding it here needs no new field and breaks
+    # no criterion, and it is the same reasoning the owner already applied to `-7` S4: scope the
+    # refusal to where the hazard is.
+    _rows = [row for row in ((receipt or {}).get("files") or [])
+             if UPDATE_ROLE.get(row.get("role", "engine")) != "pins"]
+    dirty = dirty_claimed_paths(
+        target, [row.get("path") for row in _rows],
+        {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")})
+    if dirty:
+        raise Refusal(
+            f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
+            + f" — `{verb}` overwrites gov-owned paths, and a write onto an uncommitted local "
+            f"change is indistinguishable afterwards from a change you made. Commit or stash those "
+            f"paths in the target, then re-run. A dirty path OUTSIDE the receipt does not block")
+
+
+def describe_write_lock(lock: pathlib.Path) -> str:
+    """Who holds the lock and for how long — or the fact that the file cannot say.
+
+    An unreadable lock is reported as unreadable rather than described as anonymous: a stale lock
+    an operator cannot diagnose is indistinguishable from a live run they must wait for.
+    """
+    try:
+        held = json.loads(lock.read_text(encoding="utf-8"))
+        age = int(max(0.0, time.time() - float(held.get("started") or 0.0)))
+        return (f"pid {held.get('pid', '?')} running `{held.get('verb', '?')}`, started "
+                f"{held.get('started_utc', '?')}, {age}s ago")
+    except (OSError, ValueError, TypeError):
+        return "its lock file records no readable pid or start time, so it is almost certainly stale"
+
+
+def take_write_lock(target: pathlib.Path, verb: str) -> None:
+    """S5. `O_EXCL`, so the CREATION is the acquisition rather than a check followed by a create.
+
+    Per TARGET, not per (target, verb): `apply` and `update` both write the receipt, so letting the
+    two interleave is the case this exists for. The file records who holds it and since when,
+    because a lock that refuses without saying who holds it is a mystery rather than an error.
+    """
+    global _HELD_LOCK
+    lock = target.joinpath(*WRITE_LOCK_REL.split("/"))
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        raise Refusal(
+            f"another govkit write holds {lock.as_posix()} — {describe_write_lock(lock)}. Two "
+            f"writing runs against one target interleave on the receipt, which is exactly what "
+            f"this lock exists to prevent, so `{verb}` is refusing rather than joining in. Wait "
+            f"for that run to finish; if that process is gone the lock is STALE and `rm "
+            f"{lock.as_posix()}` clears it") from None
+    with os.fdopen(fd, "w", newline="\n") as fh:
+        fh.write(json.dumps({"pid": os.getpid(), "verb": verb, "started": time.time(),
+                             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
+                            indent=2) + "\n")
+    _HELD_LOCK = lock
+
+
+def release_write_lock() -> None:
+    """Run by every exit path of both writing verbs, refusals included — it is a `finally`, never a
+    line at the bottom of a success branch. A lock only a clean run releases is a lock that survives
+    the first refusal and then blocks every run after it."""
+    global _HELD_LOCK
+    if _HELD_LOCK is None:
+        return
+    try:
+        _HELD_LOCK.unlink()
+    except OSError:
+        pass
+    _HELD_LOCK = None
+
+
+def demand_writable_target(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+    """Steps 1 and 2 of the build's precondition order, in that order, for a run that WILL write.
+
+    A read-only run does not come here, on purpose: taking the lock creates `.governance/outbox/`
+    and a file inside it, and a read-only verb that leaves a byte behind is the whole risk
+    `update`'s default guards against. There is nothing for these preconditions to protect on a run
+    that writes nothing.
+    """
+    demand_no_operation_in_progress(target, verb)
+    demand_index_resolved(target, verb)
+    demand_claimed_paths_clean(target, verb, receipt)
+    take_write_lock(target, verb)
+
+
+def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str) -> None:
+    """S7. `--to` must be a DESCENDANT of the vintage the receipt records.
+
+    `--is-ancestor` holds reflexively, so a re-run at the same vintage stays legal, and a receipt
+    carrying no `gov_commit` skips the question entirely — the same carve-out the resolve-check
+    beside this one already makes. Asked of git rather than modelled here: a second model of the
+    commit graph inside govkit is a second answer to a question git already owns.
+    """
+    if not base_commit:
+        return
+    ok = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor",
+                         base_commit, to_commit], capture_output=True).returncode == 0
+    if not ok:
+        raise Refusal(
+            f"--to resolves to {to_commit} and this target's receipt records {base_commit}, which "
+            f"is not an ancestor of it. A DOWNGRADE IS NOT AN UPDATE: every clean row takes the raw "
+            f"arm rather than the three-way, so it would be rewound to the older bytes, and the "
+            f"receipt would be re-stamped backwards so that nothing afterwards records it happened. "
+            f"Pass a --to that descends from {base_commit}, or re-install deliberately if a "
+            f"rollback is really what you want")
+
+
+def demand_published_vintage(root: pathlib.Path, to_commit: str) -> None:
+    """S8. `--to` must be reachable from SOME ref in the gov checkout.
+
+    `rev-parse --verify` accepts any object that EXISTS — a dangling commit, a fetched-but-unmerged
+    tip — which is how a branch nobody shipped becomes an adopter's new baseline. It is the same
+    class the read side refuses by declining `git log --all`, and refusing it on the write side too
+    keeps one answer to the question of what vintage an adopter may be moved to.
+    """
+    out = subprocess.run(["git", "-C", str(root), "for-each-ref", "--contains", to_commit,
+                          "--count=1"], capture_output=True, text=True)
+    if out.returncode != 0 or not out.stdout.strip():
+        raise Refusal(
+            f"--to resolves to {to_commit}, which this gov checkout can reach from NO ref — a "
+            f"dangling commit, a deleted branch tip, or something fetched and never merged. The "
+            f"object existing is not the same as it having been shipped, and an adopter may only "
+            f"be moved to a vintage some ref names. Point --to at a branch or tag containing it")
+
+
 def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
               resume: bool) -> int:
+    """The verb. Its BODY is `_cmd_apply`, and the split exists for the lock's release path.
+
+    S5 wants the lock released on EVERY exit — the clean return, each report emit, and every
+    refusal — and a `finally` around the whole body is the only shape that also covers a
+    Refusal raised out of a helper three frames down. A release line at the bottom of the
+    success branch is the shape that leaves a stale lock behind after the first refusal.
+    """
+    try:
+        return _cmd_apply(root, target, mode, kits, resume)
+    finally:
+        release_write_lock()
+
+
+def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+               resume: bool) -> int:
     r = Report()
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
@@ -2236,6 +3589,13 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             "receipt does not claim it. Converging a repo that already has kits is a stated "
             "non-goal; refusing before writing anything"
         )
+
+    # ---- THE WRITE PRECONDITIONS (DEPL-dCarriedReceipt-12), steps 1 and 2 of the build's
+    # ---- declared order: is the target mid-operation, does its index carry unresolved merge
+    # ---- stages, is any receipt-claimed path dirty, and can the lock be taken. All of it
+    # ---- BEFORE the descriptor validation below, because a refusal about the state of the
+    # ---- repository must not queue behind a complaint about a kit descriptor.
+    demand_writable_target(target, "apply", receipt)
 
     # ---- validate every merged rule BEFORE writing. A source that cannot yield exactly one pair,
     # ---- or a marker style with no synthesizer, is a refusal — a block gov writes and can never
@@ -2310,7 +3670,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
         step(STEP_BASELINE, "no runner declared" if gr.get("kind") == "none"
              else "this target's descriptor declares no [gate_runner] at all")
 
-    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 2
+    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 3
     staged: list[str] = []      # only what this run actually wrote
 
     # ---- ATTRIBUTES. The pin block is written EARLY — before any content — because it is what the
@@ -2327,23 +3687,17 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                    lambda e, dd: target_context(target, deploy, e, dd))
     ga_path = target / ".gitattributes"
     if pins:
-        # Cleanliness FIRST, and relative to HEAD so it covers staged, unstaged and both. Measured:
-        # `git add --renormalize` rewrites a DELIBERATELY STAGED blob, and a tracked path deleted in
-        # the worktree makes it abort entirely, staging nothing — which in this order would happen
-        # after the block was written, leaving gov's block in the file with no renormalize.
-        for marker in ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD"):
-            if (target / ".git" / marker).exists():
-                raise Refusal(f"the target has {marker} — a merge, rebase or cherry-pick is in "
-                              f"progress, and renormalizing mid-conflict rewrites index stages the "
-                              f"operator cannot reconstruct")
-        om, cm = marker_pair("hash-comment", GA_BLOCK_ID)
-        body = [om, "# GENERATED by govkit apply. Edit the kits' descriptors, not this block."]
-        for pat, claimant, why in pins:
-            body.append(f"# {claimant}" + (f" — {why}" if why else ""))
-            body.append(f"{pat} text eol=lf")
-        body.append(cm)
+        # The mid-operation probe that used to stand HERE moved to the preamble
+        # (DEPL-dCarriedReceipt-12 S1/S2). It was twice unreachable: conditioned on this very
+        # `if pins:`, so a target declaring no `lf_pin` was unguarded, and stat'ing
+        # `target/.git/<marker>`, which resolves to nothing in a linked worktree. WHY it
+        # existed is unchanged and still worth writing down: cleanliness must be established
+        # before this block is written, because `git add --renormalize` rewrites a
+        # DELIBERATELY STAGED blob, and a tracked path deleted in the worktree makes it abort
+        # entirely — staging nothing, after gov's block is already in the file.
+        om, cm, block_text = lf_pin_block(pins)
         cur = ga_path.read_text(encoding="utf-8", errors="replace") if ga_path.is_file() else None
-        new, mode = write_block(cur, om, cm, "\n".join(body), "append")
+        new, mode = write_block(cur, om, cm, block_text, "append")
         ga_path.write_text(new, encoding="utf-8", newline="\n")
         subprocess.run(["git", "-C", str(target), "add", "--", ".gitattributes"],
                        capture_output=True, check=False)
@@ -2351,7 +3705,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                      "version": "(synthesized)", "block_id": GA_BLOCK_ID,
                      "marker_style": "hash-comment", "mode": mode, "normalized": "lf",
                      "block_sha256": hashlib.sha256(
-                         "\n".join(body).encode("utf-8")).hexdigest(),
+                         block_text.encode("utf-8")).hexdigest(),
                      "patterns": [p for p, _c, _w in pins], "written": True})
         step(STEP_ATTRIBUTES, f"{len(pins)} pin(s) [{mode}]")
     else:
@@ -2377,6 +3731,8 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                     print(f"govkit apply — SKIPPED [{role:<13}] {dest} <- {eid}: "
                           f"{SKIP_REASONS.get(kind, 'not a role this verb lands')}")
         res = resolve_entry(root, d, ctx)
+        demand_contained_rows(list(res["writes"].values()) + res["unlanded"],
+                              d.get("files", []), f"entry '{eid}' (apply)")
         vers = entry_version(root, d)
 
         # Every rule that does NOT land says so, by role, naming who does produce it. The silent
@@ -2437,8 +3793,22 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             # once, by the SKIPPED line the write path emits with the same role, destination, kit
             # and reason — printing it again here was two answers to one question in the output of
             # the verb built to end silent partial installs.
-            rows.append({"path": u["dest"], "role": u["role"], "kit": eid,
-                         "version": vers, "written": False, "source": u["src"], "why": why})
+            _row = {"path": u["dest"], "role": u["role"], "kit": eid,
+                    "version": vers, "written": False, "source": u["src"], "why": why}
+            # DEPL-dCarriedReceipt-10 S4/S5. A forked row COPIES its two keys from the RULE that
+            # produced it — the rule `resolve_entry` returned — and never from any measurement of
+            # bytes. `forked` is a claim about provenance the descriptor makes, so the receipt
+            # records what was declared and `update` re-reads the declaration on every run rather
+            # than trusting this copy. Copied with `.get` because arm 3c is the thing that demands
+            # them, and `apply` must not become a second, quieter place the same demand is written.
+            if u["role"] == "forked":
+                _rules = d.get("files", [])
+                _i = u.get("rule")
+                _rule = _rules[_i] if isinstance(_i, int) and 0 <= _i < len(_rules) else {}
+                for _k in FORK_RULE_KEYS:
+                    if _rule.get(_k):
+                        _row[_k] = _rule[_k]
+            rows.append(_row)
 
         for dest, w in sorted(res["writes"].items()):
             if w["missing"]:
@@ -2455,8 +3825,14 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                 r.fail(f"entry '{eid}': {w['src']} does not resolve at {commit[:8]}")
                 continue
             dp = target / dest
+            # BOTH IDENTITIES, on this channel only (S1, S7). `gov_oid` is the blob gov shipped at
+            # `commit` and means that forever; `oid` is the blob the TARGET's index holds and is
+            # filled after the stage below, because it does not exist until this run stages it. The
+            # other three producers — the `merged` row, the `attributes` row and the `unlanded`
+            # rows — take NEITHER, and each for its own stated reason: there is no whole-file gov
+            # blob at those destinations to name.
             row = {"path": dest, "role": w["role"], "kit": eid, "version": vers,
-                   "sha256": hashlib.sha256(data).hexdigest(),
+                   "sha256": hashlib.sha256(data).hexdigest(), "gov_oid": blob_oid(data),
                    "source": w["src"], "commit": commit}
             if w["role"] == "seed" and dp.exists():
                 # seed: copied ONCE, then the target owns it. The ROW is recorded either way —
@@ -2477,6 +3853,16 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     if staged:
         subprocess.run(["git", "-C", str(target), "add", "--"] + staged,
                        capture_output=True, check=False)
+    # S7's second half: `oid` is read from each row's INDEX ENTRY, once the stage above has made one.
+    # ONE batched read over the writes channel's paths, per row and not per stage — that one `git
+    # add` covers every channel, and a seed the target already owned was never staged by this run at
+    # all. A row whose path the target does not track gets no `oid`, which is a true statement about
+    # a target that holds no index entry for it.
+    _landed = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES]
+    _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    for w in rows:
+        if w.get("role") in LANDABLE_ROLES and w["path"] in _idx:
+            w["oid"] = _idx[w["path"]][1]
     step(STEP_STAGE, f"{len(staged)} path(s)")
 
     # ---- HOOK PROBE. After the stage, because the question is whether the OPERATOR's landing commit
@@ -2654,12 +4040,64 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             if row.get("role") == "attributes":
                 row["renormalized"] = lf_paths
 
+    # ---- RE-STAMP `oid` AFTER THE RENORMALIZE, over every row the target tracks. Two defects close
+    # ---- here and the second is the one worth the paragraph.
+    # ----
+    # ---- FIRST, the narrow one: the stamp above is restricted to `LANDABLE_ROLES`, so an
+    # ---- `attributes` row -- `.gitattributes`, which this verb WRITES and STAGES -- carried no
+    # ---- `oid` at all. `-12` S4's third carve-out reads that field to tell gov's own staging from
+    # ---- an operator's, so the one path with no record was the one path that stayed DIRTY, and
+    # ---- `update --write` straight after `apply` still refused over it. Found by that carve-out's
+    # ---- own arm, which is the arm working.
+    # ----
+    # ---- SECOND, and it is a correctness bug rather than a burden: `git add --renormalize` REWRITES
+    # ---- the index blob of every LF-pinned path, and it runs AFTER the stamp above. Every affected
+    # ---- row therefore recorded a blob the target does not hold. Invisible in this tree because gov
+    # ---- already ships LF, so the renormalize is a no-op here -- and squarely live at exactly the
+    # ---- adopter `-7` exists for, the one whose checkout applies a line-ending filter. `oid` means
+    # ---- "the blob actually written" (`-9` S12); a value stamped before the last thing that writes
+    # ---- is not that.
+    # ----
+    # ---- STILL RESTRICTED TO `LANDABLE_ROLES`, and the first cut of this was NOT. Making it
+    # ---- role-blind regressed `-7` S9: an `attributes` row must carry NEITHER identity -- that is
+    # ---- its "exactly-one shape" -- and AC5 and AC11 both assert it. Stamping `oid` there broke two
+    # ---- ratified criteria to reach one path. The arms caught it on the next run, which is the arms
+    # ---- working; `.gitattributes` is unblocked at the dirty check instead, where the reason it is
+    # ---- not a hazard is stated by the dispatch table rather than invented here.
+    if staged:
+        _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
+        _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        for w in rows:
+            if w.get("role") in LANDABLE_ROLES and w.get("path") in _idx2:
+                w["oid"] = _idx2[w["path"]][1]
+
     # ---- LEGS. The last CONTENT step of the hard order. Guards are RENDERED against the target's
     # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:
     # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
     # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
     emitted: list[dict] = []
     step(STEP_LEGS, gr.get("kind", "absent"))
+    # D7, from this build's closing review. `-6`'s bar was built INSIDE the manifest branch, so the
+    # `else:` below — taken whenever `[gate_runner].kind` is `none` or absent, which is the normal
+    # state of a target that has not promoted a runner — looped the same legs and wrote every one
+    # into `.governance/outbox/gate-legs.md` as a written INSTRUCTION to the adopter, unfiltered and
+    # with no finding anywhere. On a manifest target the same leg reds and is withheld. That is
+    # `gate the CLASS, not the instance` broken one branch over from the unit that closed the class,
+    # and no `-6` arm could see it because every fixture declared `kind = "manifest"`.
+    #
+    # HOISTED so both branches read ONE answer. `tracked(target)` is correct for both: the stage
+    # step above has already run in either case.
+    #
+    # S6, and it now covers the bar too. The index is read ONCE for this whole function and handed
+    # to both consumers. Round 2's L6: the hoist above re-introduced the second full `ls-files` walk
+    # that S6's own comment three lines below claims does not exist, so the comment described a
+    # state the code had stopped holding. Nothing between them mutates the index, so this is wall
+    # clock and a misinforming comment rather than a correctness bug — but a comment asserting `ONE
+    # index reader` beside two of them is the class this build keeps finding.
+    tracked_target = set(tracked(target))
+    _silenced = {(eid, nm): bad for eid, nm, bad in
+                 silenced_legs(descs, selection, target, deploy, tracked_target)}
+    _silenced_found: list[str] = []
     if gr.get("kind") == "manifest":
         rf = target / gr["file"]
         try:
@@ -2670,8 +4108,19 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
             raise Refusal(f"the declared runner file {gr['file']} is not a JSON list")
         owned = {e["name"] for e in ((receipt or {}).get("gate_runner") or {}).get("emitted", [])}
         by_name = {e.get("name"): i for i, e in enumerate(existing)}
-        tracked_target = set(subprocess.run(["git", "-C", str(target), "ls-files"],
-                                            capture_output=True, text=True).stdout.split("\n"))
+        # S6. ONE index reader for the bar and for the guard branch, hoisted above the kind split
+        # so this branch READS it rather than taking it again. This was an inline `ls-files`
+        # splitting on newlines beside a `tracked()` that already existed — two spellings of one
+        # question, in the one function where they have to agree.
+        # S1/S2. THE BAR RUNS AFTER THE STAGE STEP AND NOWHERE EARLIER, and the placement is load-
+        # bearing rather than incidental: `apply` stages everything it wrote above, so the index
+        # already includes this run's own writes. The identical predicate at preflight would red
+        # every first install at every adopter.
+        #
+        # THE FINDINGS ARE HELD AND RAISED AFTER THE WRITE-BACK, which is guarded by
+        # `if not r.problems:` below. Calling `r.fail` inside the loop suppressed the manifest write
+        # for EVERY leg, so one defective leg silently took the healthy ones with it — the install
+        # "stood" while the target's runner stayed empty.
         for eid in selection:
             d, _p = descs[eid]
             ctx = target_context(target, deploy, eid, d)
@@ -2686,6 +4135,19 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
                     r.fail(f"leg '{nm}' argv still carries {miss[0]} after rendering — a leg wired "
                            f"to an unresolved token is broken forever; a dropped GUARD only costs "
                            f"an unnecessary run, which is why the two are not symmetric")
+                    continue
+                # S2. The SILENCED-LEG bar, doing exactly what the sibling branch above does: name
+                # the kit, the leg and every offending element, then `continue` without writing the
+                # row. NOT a `Refusal` — the condition is a defect in a GOV-authored descriptor, and
+                # aborting the adopter's whole install over it hands them a failure with no local
+                # fix. `r.fail` already yields a named problem and exit 1 with the install intact.
+                _bad = _silenced.get((eid, nm))
+                if _bad:
+                    _silenced_found.append(
+                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
+                        f"{', '.join(_bad)}, which this target does not hold — emitting it would "
+                        f"record coverage in the receipt for a leg that cannot run. The leg is "
+                        f"NOT written; the rest of the install stands")
                     continue
                 guards, dropped = [], []
                 for g in leg.get("guard", []) or []:
@@ -2771,13 +4233,32 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
     else:
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]
+        _withheld: list[str] = []
         for eid in selection:
             d, _p = descs[eid]
             ctx = target_context(target, deploy, eid, d)
             for leg in d.get("gate_leg", []):
-                lines.append(f"- {leg.get('name')}: "
-                             f"{' '.join(resolve_tokens(a, ctx)[0] for a in leg.get('argv', []))}")
+                nm = leg.get("name")
+                _argv = ' '.join(resolve_tokens(a, ctx)[0] for a in leg.get("argv", []))
+                # D7. The SAME bar the manifest branch runs. Writing a leg into an adopter's ORDER
+                # is telling them to wire it by hand; doing that for a leg whose engine gov never
+                # ships is worse than emitting it into a runner, because a human then does the work.
+                _bad = _silenced.get((eid, nm))
+                if _bad:
+                    _withheld.append(f"- {nm}: {_argv}\n  WITHHELD — names {', '.join(_bad)}, "
+                                     f"which this target does not hold and no kit ships here")
+                    _silenced_found.append(
+                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
+                        f"{', '.join(_bad)}, which this target does not hold — ordering it would "
+                        f"tell the adopter to wire a leg that cannot run. It is listed under "
+                        f"WITHHELD in the order rather than as an instruction")
+                    continue
+                lines.append(f"- {nm}: {_argv}")
         lines += ["", "Nothing in this target runs these yet."]
+        if _withheld:
+            # LISTED, never dropped. An order that silently omits a leg is indistinguishable from a
+            # kit that declares none, and the adopter is the one who has to notice.
+            lines += ["", "## WITHHELD — gov does not ship the engine these run", ""] + _withheld
         (target / ".governance" / "outbox" / "gate-legs.md").write_text(
             "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
         orders.append({"kind": "gate-legs", "id": "gate-legs",
@@ -2786,6 +4267,13 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
               + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
                  else "this target's deploy.toml declares no [gate_runner]")
               + " (see .governance/outbox/gate-legs.md)")
+
+    # RAISED HERE, outside the kind split, so BOTH branches report. Deferred past the manifest
+    # write-back deliberately: that write is guarded on `not r.problems`, and failing inside the
+    # loop suppressed the manifest for every leg — one defective leg silently taking the healthy
+    # ones with it. The order branch has no such guard, but the findings belong in one place.
+    for _f in _silenced_found:
+        r.fail(_f)
 
     # ---- AFTER. The same function, the same regime, so the two maps are comparable.
     after_map: dict[str, str] = {}
@@ -2852,6 +4340,51 @@ VERDICT_GRID = {
     ("absent", "absent"): "converged",
 }
 
+# DEPL-dCarriedReceipt-8 S4. The verdicts whose write arm takes GOV'S RAW BYTES, over whatever the
+# target holds. Named HERE rather than spelled at the `if` in `_cmd_update`, because `selfcheck`
+# asserts that no grid cell on the `differs` OURS row reaches one of these — and an assertion that
+# retypes the set it grades stops grading it on the edit that widens the arm. One spelling, two
+# readers. A row whose OURS axis says `differs` carries something the target changed, so a raw write
+# over it destroys that change; the guarantee is STRUCTURAL — the cells simply do not map there —
+# rather than a guard in front of the write, because a guard reading the field the bug corrupts is
+# disabled by the bug it exists to catch.
+RAW_WRITE_VERDICTS = ("stale", "missing")
+
+# DEPL-dCarriedReceipt-14 S2 + S4. THE TOUCHED SET, decided from the CLASSIFICATION and therefore
+# known before the first byte moves — which is the only place it can be decided, because the
+# pre-write snapshot depends on the same fact. Every verdict the write loop acts on under
+# `how == "table"` is here: the two raw-write words, `-11`'s `renamed`, and `diverged`, whose arm
+# is the three-way that motivates this whole unit. `withdrawn` joins it only under
+# `--write-withdrawals`, because without that flag its arm deletes nothing and writes only an order.
+#
+# WHAT THIS IS NOT, stated because a structural predicate reads as a semantic one to everybody who
+# did not write it: it is what the loop will act on, not what the loop DID. A row that reaches its
+# arm and is refused there — a conflicting three-way, an occupied rename destination — leaves its
+# kit in this set, so that kit is checked twice and snapshotted for a byte that never moved. The
+# restore is keyed on the snapshot, so rolling one of those back re-writes the entry it already
+# has; the cost is a wasted check and the alternative is a post-hoc population the snapshot could
+# not have been taken from.
+TOUCHING_VERDICTS = tuple(RAW_WRITE_VERDICTS) + ("diverged", "renamed")
+
+# DEPL-dCarriedReceipt-14 S3. The six fields `-11` S4 rewrites AS A SET, snapshotted together and
+# restored together. `path` and `source` are in it because a rolled-back rename that kept its
+# post-rename spelling beside pre-rename identities is exactly the split `-7` S9 refuses the whole
+# next run on; `sha256` and `oid` because a row stamped forward over reverted bytes re-creates `-8`.
+ROLLBACK_FIELDS = ("path", "source", "sha256", "commit", "gov_oid", "oid")
+
+
+def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
+    """Every cell of a verdict grid that would hand a DELTA row to the raw-write arm.
+
+    A function rather than a loop inside `selfcheck` so the harness can drive it over a hand-edited
+    COPY of the grid and watch it SPEAK. A structural assertion nobody has ever seen fire is an
+    assertion about nothing, and re-implementing the rule in the test to make it fire would leave
+    two spellings of it — the class this whole file is about.
+    """
+    return sorted((o, t, v) for (o, t), v in grid.items()
+                  if o == "differs" and v in RAW_WRITE_VERDICTS)
+
+
 # What `update` does per ROLE. A role whose row is a refusal is still a ROW: silence is what lets a
 # later unit add a role and leave it behind, and `selfcheck` asserts this covers the role enum.
 UPDATE_ROLE = {
@@ -2861,9 +4394,16 @@ UPDATE_ROLE = {
     "generated": "skip",
     "rendered": "adopter",      # re-run the adopter, compare, CAP at report
     "merged": "block",          # compare the BLOCK hash; never a three-way
-    "attributes": "refuse",     # unit 6
-    "gate-leg": "refuse",       # unit 4
-    "ci": "refuse",             # unit 4
+    "attributes": "pins",       # DEPL-dCarriedReceipt-2: recompute, compare, report; never write
+    "gate-leg": "report",       # DEPL-dCarriedReceipt-2: one row each, tallied, no r.fail
+    "ci": "report",             # DEPL-dCarriedReceipt-2: ditto -- `-6` owns emitting them
+    # DEPL-dCarriedReceipt-10 S4, the `report` disposition's SECOND consumer. A forked row prints
+    # one counted line and is written in NEITHER direction: gov's copy is a derivative of the
+    # target's, so sending gov's bytes over the target's is the destruction this role exists to
+    # stop, and `direction` is a LABEL on that report rather than an instruction to anything.
+    # NOT `refuse`, which `-2` exists to remove: one forked row would make every future `update` on
+    # that target exit non-zero and never re-stamp its receipt.
+    "forked": "report",
 }
 
 
@@ -2871,27 +4411,397 @@ def _sha(b: bytes | None) -> str | None:
     return hashlib.sha256(b).hexdigest() if b is not None else None
 
 
-def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str) -> dict:
-    """One receipt row's verdict, from three blobs. `ours` is compared to the RECEIPT's hash.
+# ------------------------------------------------------------ the carry rungs (DEPL-dCarriedReceipt-9)
+# A row whose two identities differ is NOT automatically a local delta. The difference may be a
+# CARRY — a transformation gov already knows about — and there are exactly three rungs: `verbatim`
+# (there is nothing to explain), `eol` (the target's checkout committed CRLF where gov ships LF), and
+# `relocate` (the adopter installed at a different `prefix`, so every file that SPELLS a path differs
+# on every line that spells one). The motivating measurement is NOT this tree's and cannot be
+# reproduced from it, so it is attributed rather than asserted: DEPL-dCarriedReceipt-9 §4 records
+# that on inCMS at 2cff5855, of the 52 rows whose recorded gov commit resolves, 21 are byte-identical,
+# 6 differ only in line endings and 5 differ only by the prefix relocation. Eleven rows carrying no
+# local edit at all, and the two-identity predicate on its own calls every one of them a local delta —
+# so the raw-write arm is closed to all of them forever and each is handed to a three-way whose
+# `base` still spells gov's prefix where the target's own copy does not.
+#
+# THE RUNG IS RECOMPUTED BY PROOF ON EVERY RUN AND IS NEVER READ BACK OFF THE RECEIPT (S2). A stored
+# rung is a claim about bytes that have moved since; the whole point of the two identities is that no
+# stored boolean stands between this tool and the blobs. `carry` is written into the row for
+# REPORTING, and the print loop is its only reader — asserted by an arm over this file's source
+# rather than left to discipline.
+#
+# WHAT A PROVEN RUNG DOES NOT BUY, stated here because a structural guarantee reads as a semantic one
+# to everybody who did not write it: it does NOT move `o_state`, does NOT touch `VERDICT_GRID`, and
+# CANNOT put a row on the raw-write arm. What it buys is the MERGE path — applied to `base` and to
+# `theirs` it cancels in the base-to-theirs diff, `git merge-file` sees only gov's semantic change,
+# and the row reconciles to the CARRIED bytes with no operator turn.
+CARRY_RUNGS = ("verbatim", "eol", "relocate")
 
-    Not to `base`: for a rendered row those differ by construction, and for every row the receipt's
-    hash is what gov actually wrote.
+
+def derive_lf(data: bytes) -> bytes:
+    """CRLF to LF — the `eol` rung's whole transformation, spelled once because two spellings of one
+    rule is the class this file spends most of its comments on."""
+    return data.replace(b"\r\n", b"\n")
+
+
+def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[str, list[str]]]]:
+    """The needle map, DERIVED from a sequence of `(gov source, target destination)` pairs.
+
+    A SEQUENCE OF PAIRS rather than a receipt, because the derivation has two callers and only one
+    of them has a receipt to read. `cmd_update` feeds it the receipt's rows — the record of where
+    the target actually TOOK each file, which is what `update`'s whole job is to move. `adopt`
+    (DEPL-dCarriedReceipt-13 S4a) feeds it the planned `(src, dest)` pairs of its own run, because at
+    bootstrap there is no receipt yet.
+
+    THERE IS NO AUTHORED FORM AND NO OVERRIDE KEY. A hand-written map is a second answer to a
+    question the caller's own pairs already answer.
+
+    NOT re-resolved from the descriptors, and that is the reuse RESULT rather than an oversight.
+    `resolve_dests` and `rule_relpath` already know how a source maps to a destination and calling
+    them here would look like reuse — but they answer for the descriptor as it reads TODAY, while
+    this map must answer for what the target actually installed, possibly at a different gov commit
+    and a different `prefix`. Reusing them would make the map drift the moment a descriptor's `to`
+    changes, which is the two-spellings-of-one-fact class `-1` exists to close, re-created one layer
+    down.
+
+    THE LIFT IS ONE DIRNAME PAIR PER ROW. Stripping EQUAL TRAILING SEGMENTS was measured and is
+    wrong: it collapses `tools/unattended` into the bare gov directory `tools`, which then collides
+    with the hooks kit's `tools` and is dropped as ambiguous — taking the whole unattended kit's
+    relocation with it. The comparison is the spec's, over a population this tree does not hold, and
+    is cited rather than restated: DEPL-dCarriedReceipt-9 §4 measured both lifts against each other
+    and the dirname one yields strictly more surviving pairs. What THIS file's arms grade is the lift
+    itself, over a fixture they build.
+
+    A gov directory that yields two DIFFERENT target directories names no single destination and
+    cannot be a needle, so it is DROPPED and returned BY NAME (§8 F1 — drop loudly). Refusing would
+    make a perfectly installable target unupdatable over a map entry it never asked for, and a silent
+    drop is indistinguishable from a target that relocated nothing.
+
+    Needles emit in BOTH the `/` form and the `~` form, because gov flattens paths into fixture
+    filenames: `tools/unattended/check-playbook.test.sh` spells `tools~` while an adopter's own
+    fixture records are named `scripts~unattended~…`. The two forms COINCIDE for a directory with no
+    slash and the map then holds one of them, so the needle count is not two per pair and is not
+    written down anywhere — the caller prints what this returns.
+
+    WHAT THIS DOES NOT COVER: a gov directory whose own NAME contains a literal `~` can flatten onto
+    another directory's `~` form. The map is built in sorted order so the later one wins
+    deterministically. No arm exercises it, because nothing in this tree names a directory that way
+    and an arm nobody has ever seen fail is an assertion about nothing.
+
+    Returns `(needles, pairs, dropped)` — the substitution map, the surviving directory pairs, and
+    `(gov directory, [destinations])` for every one dropped.
+    """
+    lifted: dict[str, set[str]] = {}
+    for src, dest in pairs:
+        if not src or not dest:
+            continue                       # a row with no `source` contributes no pair, and is not
+        gd = str(src).rsplit("/", 1)[0] if "/" in str(src) else ""   # a reason to refuse the run
+        td = str(dest).rsplit("/", 1)[0] if "/" in str(dest) else ""
+        if not gd or not td:
+            continue                       # a root-level file lifts to the EMPTY needle, which would
+        lifted.setdefault(gd, set()).add(td)                    # match at every position in a file
+    dropped = [(gd, sorted(ds)) for gd, ds in sorted(lifted.items()) if len(ds) > 1]
+    pairs_out: dict[str, str] = {gd: next(iter(ds)) for gd, ds in sorted(lifted.items())
+                                 if len(ds) == 1}
+    needles: dict[str, str] = {}
+    for gd, td in pairs_out.items():
+        needles[gd] = td
+        needles[gd.replace("/", "~")] = td.replace("/", "~")
+    return needles, pairs_out, dropped
+
+
+def derive_carried(data: bytes, needles: dict[str, str]) -> bytes:
+    """Gov's bytes rewritten through the needle map — ONE left-to-right pass, longest needle first.
+
+    THE OUTPUT IS NEVER RESCANNED, and that is the property that keeps this a function of its input.
+    Rescanning, or matching longest-anywhere rather than leftmost, lets one substitution feed
+    another, so rewriting `tools` inside a path already rewritten to `scripts` becomes reachable.
+    `re.sub` over an alternation sorted longest-first is exactly the required pass: the alternation
+    is ORDERED, so the longest needle wins at each position, and `sub` takes the leftmost match and
+    resumes AFTER the replacement it just wrote.
+
+    A PROOF INSTRUMENT, NOT A WRITE-TIME TRANSFORM (§3). It is applied to gov's bytes to COMPARE
+    them, never to produce bytes landed on the strength of the map alone. Measured on
+    `tools/unattended/adopt-unattended.test.sh` at ce5dca99, landing the rewritten form corrupts six
+    lines: four `bash tools/land.sh` occurrences at lines 34, 63, 83 and 91, which name no prefix at
+    all, and lines 132-133, where the fixture builds a directory literally named
+    `my tools/unattended` and the bare needle turns it into `my scripts`. Under the proof gate that
+    row simply matches no rung, and none of those six lines is ever written. The ONE bounded
+    exception is the `missing` restore (S11), where the target holds no bytes to prove anything
+    against and the alternative is writing gov's prefix into a target that does not use it.
+
+    A blob that is not valid UTF-8 comes back UNCHANGED rather than being mangled into a false rung.
+    """
+    if not needles:
+        return data
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
+    pat = "|".join(re.escape(n) for n in sorted(needles, key=lambda n: (-len(n), n)))
+    return re.sub(pat, lambda m: needles[m.group(0)], text).encode("utf-8")
+
+
+def derive_carry_rung(base: bytes, needles: dict[str, str], read_ours,
+                      known_equal: bool = False) -> str | None:
+    """THE LADDER: `verbatim`, `eol`, `relocate`, tried in that order, and the first proof wins (S1).
+
+    A LADDER AND NOT A LATTICE (§8 F2). The rungs do not compose, so `relocate` is proved on RAW
+    bytes and never on eol-normalised ones. The spec's grounds, attributed: on the live target every
+    `relocate` row proves on raw bytes and none needs the composition, so composing buys nothing today
+    and adds a fourth rung's worth of surface. The cost is stated rather than hidden: an adopter whose
+    checkout is CRLF and whose prefix is ALSO non-default falls to local delta on those rows and gets
+    the three-way instead of a raw write.
+
+    WHOLE-FILE EQUALITY DECIDES A RUNG (S5). One residual byte and the rung does not match, the row
+    keeps exactly the verdict it would have had, and nothing is written. The residual risk runs the
+    other way and is accepted by design: a row like `adopt-unattended.test.sh` will never take an
+    automatic write, and that is the correct outcome rather than a gap.
+
+    `read_ours` is a THUNK, and that is a perf shape rather than a style. `verbatim` is settled from
+    the OIDs the caller already holds, so a byte-identical row never pays a blob read at all — and on
+    a real adopter that is most of the receipt. `known_equal` says the caller has already proved that
+    `ours` and `base` name the
+    same git blob — in which case `base` IS `ours`, byte for byte. The fall-through still re-proves
+    equality ON BYTES, so a target whose object format is not gov's (where no oid ever matches) still
+    reaches `verbatim` rather than being mislabelled `eol` by the rung below it.
+    """
+    ours = base if known_equal else read_ours()
+    if ours is None:
+        return None
+    if ours == base:
+        return "verbatim"
+    if derive_lf(ours) == derive_lf(base):
+        return "eol"
+    if ours == derive_carried(base, needles):
+        return "relocate"
+    return None
+
+
+def derive_carried_by_rung(rung: str | None, data: bytes, needles: dict[str, str]) -> bytes:
+    """The rung's own transformation, for S6: applied to BOTH `base` and `theirs` before the
+    three-way, so it CANCELS in the base-to-theirs diff and `git merge-file` sees only gov's semantic
+    change — which is how a carried row reconciles to the carried bytes with no operator turn.
+
+    WHAT EACH RUNG ACTUALLY DOES HERE, because two of the three are no-ops and a reader is owed that
+    rather than left to infer it. `relocate` is the load-bearing one. `eol` normalises GOV's own
+    bytes, which is a no-op wherever gov ships LF — it is written for the rung rather than for the
+    one rung that needs it, and an `eol` row's merge is therefore exactly what it would be with no
+    rung at all. `verbatim` is identity by construction and never reaches a three-way in any case:
+    `ours == base` means `o_state` is `equal`, which the grid routes to `current`, `stale` or
+    `withdrawn` and never to `diverged`.
+    """
+    if rung == "relocate":
+        return derive_carried(data, needles)
+    if rung == "eol":
+        return derive_lf(data)
+    return data
+
+
+# ------------------------------------------------ rename detection (DEPL-dCarriedReceipt-11 S1/S7)
+# THE SIMILARITY THRESHOLD, DECLARED. git's own default is 50% and this is that number — named here
+# rather than left implicit at the call site, because an undeclared default is a value nobody can
+# review, and this one decides whether an adopter's file is MOVED or REPORTED WITHDRAWN. Below it
+# there is no `R` pair, the verdict stays `withdrawn`, and nothing is invented (S7): a low-similarity
+# pair landed anyway would be attribution by guess — the new file has no receipt row, so its
+# `gov_oid` would be invented, which is the inversion DEPL-dCarriedReceipt-13 refuses.
+RENAME_SIMILARITY_PERCENT = 50
+
+
+def derive_rename_map(root: pathlib.Path, base_commit: str | None, to_commit: str) -> dict[str, str]:
+    """Gov's own renames between two vintages, as `old source -> new source`. ONE diff per run.
+
+    UNSCOPED, and that is the whole design rather than an omission. Pathspec-limiting the diff to the
+    receipt's own sources hides the DESTINATION half of every rename pair: git needs both sides in
+    the same diff to pair a deletion with an addition at all, so a scoped diff sees the delete and
+    reports it as a delete. Measured on this unit's own fixture, where gov moves a claimed file to
+    `docs/gone.txt` — outside the kit's `home` entirely, and invisible to any scope the receipt could
+    supply.
+
+    `-z` because a rename pair is three NUL-separated fields and the non-`-z` form QUOTES a path
+    containing a space or a quote — a quoted spelling matches no receipt row, so the rename silently
+    degrades to a withdrawal for exactly the paths hardest to notice.
+
+    ONLY the `R` rows. A `C` (copy) row means gov still ships the old source, so the row's `theirs`
+    resolves and there is nothing here to reconcile; taking one would move a file gov did not move.
+    A receipt carrying no `gov_commit` gets an empty map rather than a diff against a guessed base.
+    """
+    if not base_commit:
+        return {}
+    out = git(root, "diff", f"--find-renames={RENAME_SIMILARITY_PERCENT}%", "--name-status", "-z",
+              base_commit, to_commit)
+    fields = out.split("\0")
+    renames: dict[str, str] = {}
+    i = 0
+    while i < len(fields):
+        st = fields[i]
+        if not st:
+            i += 1
+            continue
+        if st[0] in ("R", "C") and i + 2 < len(fields):
+            if st[0] == "R":
+                renames[fields[i + 1]] = fields[i + 2]
+            i += 3
+            continue
+        i += 2
+    return renames
+
+
+def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit: str,
+                 index: dict[str, tuple[str, str]],
+                 needles: dict[str, str] | None = None,
+                 rename=None) -> dict:
+    """One receipt row's verdict, from three identities. TWO of them are git blob OIDs.
+
+    OURS is the blob the TARGET's index holds, compared to the row's STORED `gov_oid` — the blob gov
+    shipped at this row's `commit`. Not to `sha256`, and not to the target's WORKTREE: `sha256` is a
+    hash of bytes at write time, the worktree is whatever that target's own filters produced from
+    the blob, and asking either of them "did the operator change this file" answers a different
+    question. On a `core.autocrlf=true` clone the worktree read called 23 of 24 untouched engine
+    rows `patched`.
+
+    Both fields are STORED and only the COMPARISON is live: `gov_oid` is read back off the receipt
+    and never recomputed here — S9's preamble asserts it instead — while the target's oid is read
+    fresh on every run. No boolean anywhere stores the answer.
+
+    A row carrying no `gov_oid` cannot be called equal to anything, so a present index entry reads
+    `differs`. That is the SAFE direction by construction: `differs` reaches only `patched` and
+    `diverged`, and `diverged` additionally needs a THEIRS that moved, which needs the `source` and
+    `commit` such a row does not have. No raw write sits on this state.
+
+    `ours` BYTES are fetched only where they are actually consumed — the three-way merge, the order
+    it writes on a conflict, and DEPL-dCarriedReceipt-9's rung ladder. That last one moves the cost:
+    a row whose index blob is not gov's own now pays one `cat-file` to find out WHY, which the
+    verdict alone could never answer. A byte-identical row still pays nothing, because `verbatim` is
+    settled from the two oids.
+
+    `carry` (DEPL-dCarriedReceipt-9 S1) is computed here and is OUTPUT: it explains the difference
+    the verdict reports, and it changes neither `o_state` nor the verdict nor which arm the row takes
+    (S9). It is recomputed by PROOF on every run and a stored one is never read.
+
+    `renamed` (DEPL-dCarriedReceipt-11 S2) is the one verdict that does NOT come from the grid, and
+    it is decided before the grid is consulted rather than after — a row gov MOVED must never take
+    the `withdrawn` cell, whose write arm exists to remove files. `renamed_to` carries the new gov
+    source and the destination the caller resolved for it, and `theirs_new` gov's blob there; all
+    three are `None` on every other verdict.
     """
     src, base_commit = row.get("source"), row.get("commit")
     theirs = blob_at(root, to_commit, src) if src else None
     base = blob_at(root, base_commit, src) if (src and base_commit) else None
-    dp = target / row["path"]
-    ours = dp.read_bytes() if dp.is_file() else None
+    entry = index.get(row["path"])
+    ours_oid = entry[1] if entry else None
+    gov_oid = row.get("gov_oid")
 
     t_state = "absent" if theirs is None else ("equal" if _sha(theirs) == _sha(base) else "differs")
-    if ours is None:
+    if ours_oid is None:
         o_state = "absent"
-    elif _sha(ours) == row.get("sha256"):
+    elif gov_oid and ours_oid == gov_oid:
         o_state = "equal"
     else:
         o_state = "differs"
-    return {"verdict": VERDICT_GRID[(o_state, t_state)], "ours": ours, "theirs": theirs,
-            "base": base, "o_state": o_state, "t_state": t_state}
+
+    # ---- DEPL-dCarriedReceipt-9 S1. The rung, over the SAME two blobs the verdict came from, and
+    # ---- it is computed here so there is one classifier rather than a second one beside it. The
+    # ---- fetch is memoised because two readers want the same bytes: the ladder, and the three-way
+    # ---- on a `diverged` row. A row with no `base` — no `source`, no `commit`, or gov holding no
+    # ---- blob there — can prove nothing, and gets no rung rather than a guessed one.
+    fetched: list[bytes | None] = []
+
+    def read_ours() -> bytes | None:
+        if not fetched:
+            fetched.append(index_blob(target, ours_oid))
+        return fetched[0]
+
+    carry = None
+    if base is not None and ours_oid is not None:
+        carry = derive_carry_rung(base, needles or {}, read_ours,
+                                  known_equal=(ours_oid == blob_oid(base)))
+
+    # ---- DEPL-dCarriedReceipt-11 S2. THE RENAME, DECIDED BEFORE THE GRID IS CONSULTED, so the
+    # ---- `("equal","absent")` cell never sees a row gov MOVED and answers `withdrawn` for it — the
+    # ---- cell whose write arm unlinked the adopter's file, `git rm`-ed it and dropped its row, at
+    # ---- exit 0, with the replacement never landed.
+    #
+    # THREE CONDITIONS, and each is load-bearing rather than defensive. `t_state == "absent"` is what
+    # a rename LOOKS like from a receipt row — gov holds no blob at the old source any more — and
+    # asking it keeps a stale map from stealing a row whose source still resolves. `o_state !=
+    # "absent"` is the target's half: it deleted its copy, so there is nothing to move, and both
+    # `absent` cells already grid to a verdict this verb acts on (`missing`, `converged`) rather than
+    # to a `git mv` of a file that is not there. And the CALLER's resolver has to name exactly one
+    # destination for the new source — a rename OUT of the kit's claimed surface is a withdrawal from
+    # the target's point of view, not a move, and inventing a destination for it is the class
+    # DEPL-dCarriedReceipt-1 closed.
+    #
+    # `rename` is a THUNK for the reason `read_ours` is one: the destination costs a full
+    # `resolve_entry` over the descriptor, and asking it per row for rows that did not move would pay
+    # that on every run. It is also where the descriptor knowledge lives — this classifier has no
+    # registry and no target descriptor, and giving it one would make it a second resolver.
+    moved = rename(row) if (rename is not None and src
+                            and t_state == "absent" and o_state != "absent") else None
+    theirs_new = blob_at(root, to_commit, moved[0]) if moved else None
+    if moved and theirs_new is None:
+        moved = None          # git named the pair and gov's tree has no blob there: not actionable
+    if moved and carry != "verbatim" and read_ours() is None:
+        # The one input the move's byte decision cannot be taken without. `verbatim` is settled from
+        # the two oids and needs no read; every other outcome is a three-way, and merging against a
+        # `b""` this verb could not obtain would drop the operator's whole side. Degrading to the
+        # grid leaves `withdrawn`, which after S8 is a report and an order — it deletes nothing.
+        #
+        # THIS IS ALSO WHAT MAKES THE WRITE ARM'S `ours` NON-NONE, and it is stated here because
+        # the guarantee is STRUCTURAL rather than a guard in front of the merge: a row that says
+        # `renamed` has either proved `verbatim` — which never reaches `three_way` — or read its
+        # bytes back successfully on this line. The `diverged` arm below carries an explicit
+        # `ours is None` refusal instead, because nothing degrades ITS verdict: the two are the
+        # same question answered at the two different places it can be answered.
+        moved = None
+    verdict = "renamed" if moved else VERDICT_GRID[(o_state, t_state)]
+
+    if ours_oid and verdict == "diverged":
+        read_ours()
+    ours = fetched[0] if fetched else None
+    return {"verdict": verdict, "ours": ours, "ours_oid": ours_oid, "theirs": theirs,
+            "base": base, "o_state": o_state, "t_state": t_state, "carry": carry,
+            "renamed_to": moved, "theirs_new": theirs_new if moved else None}
+
+
+def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src: str | None,
+                       data: bytes, to_commit: str,
+                       index: dict[str, tuple[str, str]]) -> tuple[str | None, str | None]:
+    """Put bytes into the target THROUGH ITS OWN INDEX, and let its filters decide the worktree (S5).
+
+    Three plumbing calls, in this order and for this reason. `hash-object -w --stdin` puts the blob
+    in the TARGET's object database unchanged — no clean filter runs, so what lands is what gov
+    shipped, byte for byte. `update-index --cacheinfo` names it at the row's path. `checkout-index
+    -f` materialises the worktree file, which is the ONLY step that runs the target's smudge filter.
+
+    The replaced `write_bytes` had this exactly backwards: it decided the WORKTREE bytes from here
+    and left the index to catch up, so on a clone with a line-ending filter every file gov landed was
+    immediately `modified` in the target's own `git status`.
+
+    MODE from the row's existing index entry, and from gov's tree entry at `commit` for a row with
+    none (§8 F1) — a hook that lands non-executable is a hook that does not run.
+
+    Returns `(oid, None)` on success and `(None, why)` on failure. A failure LEAVES the index entry
+    rather than half-writing; rolling one back is `-14`'s.
+    """
+    out = subprocess.run(["git", "-C", str(target), "hash-object", "-w", "--stdin"],
+                         input=data, capture_output=True, check=False)
+    if out.returncode != 0:
+        return None, f"git hash-object refused the bytes: {out.stderr.decode('utf-8', 'replace').strip()}"
+    oid = out.stdout.decode("utf-8", "replace").strip()
+    entry = index.get(path)
+    mode = entry[0] if entry else ((gov_tree_mode(root, to_commit, src) if src else None) or "100644")
+    up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                         f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
+    if up.returncode != 0:
+        return None, f"git update-index refused {mode},{oid[:12]},{path}: {up.stderr.strip()}"
+    (target / path).parent.mkdir(parents=True, exist_ok=True)
+    co = subprocess.run(["git", "-C", str(target), "checkout-index", "-f", "--", path],
+                        capture_output=True, text=True, check=False)
+    if co.returncode != 0:
+        return None, (f"the index now names {oid[:12]} at '{path}' and `git checkout-index` could "
+                      f"not write the worktree file: {co.stderr.strip()}")
+    return oid, None
 
 
 def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, str]:
@@ -2915,7 +4825,17 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
         return None, "conflict"
 
 
-def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool) -> int:
+def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
+               write_withdrawals: bool = False) -> int:
+    """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
+    try:
+        return _cmd_update(root, target, to_rev, write, write_withdrawals)
+    finally:
+        release_write_lock()
+
+
+def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
+                write_withdrawals: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -2954,6 +4874,17 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                 f"repository gov does not own"
             )
 
+    # ---- THE WRITE PRECONDITIONS (DEPL-dCarriedReceipt-12), in the build's declared order.
+    # Steps 1 and 2 — mid-operation, unresolved index, dirty claimed paths, the lock — guard a
+    # WRITE, so a read-only run does not pay them and does not create the lock file. Step 3,
+    # the two vintage questions, runs on EVERY run: it grades the ARGUMENT rather than the
+    # tree, it sits beside the two resolve-checks it completes, and a read-only preview of a
+    # downgrade is a preview of something that will never be allowed to happen.
+    if write:
+        demand_writable_target(target, "update", receipt)
+    demand_forward_vintage(root, base_commit, to_commit)
+    demand_published_vintage(root, to_commit)
+
     claimed = receipt.get("kits") or []
     for eid in claimed:
         if eid not in descs:
@@ -2962,14 +4893,204 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                           f"nobody")
     available = [e for e in all_kits(descs) if e not in claimed]
 
+    # ---- THE PRECONDITIONS THIS UNIT ADDS (DEPL-dCarriedReceipt-7), steps 4 and 5 of the build's
+    # ---- declared preamble order: after `-12`'s three and before any row is classified.
+    # THE WHOLE LIST, unfiltered. A row with no `path` key is malformed and has always raised out of
+    # the classification loop; filtering it out here would turn that into a silent drop, which is a
+    # skip that looks like a pass — one row of a receipt quietly ungraded and nothing saying so.
+    rows_all = receipt.get("files", [])
+
+    # ---- SCHEMA MIGRATION, and it runs before S9 because S9's third arm grades a field this fills.
+    # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
+    # read as S9's half-populated pair. Fill it ONCE, from EVIDENCE — gov's own blob at the row's
+    # recorded `commit` — and never from `sha256`, which hashes the bytes that landed and is not an
+    # object name. SCOPED TO `schema < RECEIPT_SCHEMA`: a schema-3 receipt is NEVER back-filled,
+    # because a schema-3 row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists
+    # to catch, and filling it in is how a text-merged receipt gets laundered into a plausible one.
+    # Scoped to LANDABLE_ROLES for S1's reason: those are the only rows whose destination holds a
+    # whole-file gov blob. A `merged` row's gov bytes are a BLOCK inside a file the target owns and
+    # an `attributes` row's are a block `lf_pins` composes — neither has a blob to name, and neither
+    # gets one invented for it here.
+    if schema < RECEIPT_SCHEMA:
+        for row in rows_all:
+            if row.get("role", "engine") not in LANDABLE_ROLES or row.get("gov_oid"):
+                continue
+            if not (row.get("source") and row.get("commit")):
+                continue
+            was = blob_at(root, row["commit"], row["source"])
+            if was is not None:
+                row["gov_oid"] = blob_oid(was)
+
+    # ---- S9. THE RECEIPT'S OWN INTEGRITY, over EVERY row, before any of them is classified.
+    # `gov_oid` is a STORED field and this is what a stored field costs. `install.json` is committed,
+    # `-11` rewrites `path`, `source`, `commit` and `gov_oid` together on a rename, and a TEXT merge
+    # of that file can pair `commit` from one side with `gov_oid` from the other. A stale `gov_oid`
+    # that happens to equal the target's live index blob reads the delta predicate FALSE and opens
+    # the raw-write arm on a row carrying a local edit.
+    # SCOPED BY FIELD PRESENCE, in three arms, plus ONE exemption by ROLE.
+    for row in rows_all:
+        # §8 F4, RATIFIED. A row whose `role` is `merged` is passed over BY ROLE, whatever `commit`
+        # it carries: that commit names the vintage the BLOCK was taken from, `UPDATE_ROLE['merged']`
+        # is its reader, and S9 has no whole-file gov blob to assert against. The arm reads `role`
+        # rather than `evidence` deliberately — `role` is on every row `apply` and `adopt` write, so
+        # it needs no later precondition to have run. Without it the FIRST update against any target
+        # that ever applied a hash-comment merged rule refuses everything: measured on a `push-main`
+        # receipt, whose merged row carries `commit`, `source` and `block_sha256` and NEITHER
+        # identity — which is the exactly-one shape two arms below.
+        if row.get("role") == "merged":
+            continue
+        has_commit, has_gov = bool(row.get("commit")), bool(row.get("gov_oid"))
+        if not has_commit and not has_gov:
+            # Nothing to compare, so this is not a failed integrity check. NOTE WHAT THIS ROW IS
+            # NOT: it is not necessarily `-13` S7's `evidence: "unattributed"` state. Every row
+            # `apply` writes through the `unlanded` channel carries neither field, and so does the
+            # synthesized `attributes` row. What happens to it next is its ROLE's business, in the
+            # classification loop, not this preamble's.
+            continue
+        if has_commit and has_gov:
+            was = blob_at(root, row["commit"], row["source"]) if row.get("source") else None
+            now = blob_oid(was) if was is not None else None
+            if now != row["gov_oid"]:
+                raise Refusal(
+                    f"receipt row '{row['path']}' records gov_oid {row['gov_oid']} for "
+                    f"'{row.get('source')}' at {str(row.get('commit'))[:12]}, and gov's blob there "
+                    f"is {now or '(no such blob)'}. REFUSING the whole run rather than classifying "
+                    f"this row against an identity the file no longer earns: `gov_oid` is stored, "
+                    f"and a stored identity that disagrees with its own evidence is how a "
+                    f"text-merged receipt opens the raw-write arm on a locally edited file"
+                )
+            continue
+        raise Refusal(
+            f"receipt row '{row['path']}' carries "
+            + ("`commit` and no `gov_oid`" if has_commit else "`gov_oid` and no `commit`")
+            + ". The two are written together and are meaningless apart, so this pairing is the "
+              "corruption shape a text merge of `install.json` produces — REFUSING the whole run "
+              "rather than acting on half of it. A receipt below schema "
+            + f"{RECEIPT_SCHEMA} has `gov_oid` filled from gov's blob at the row's own `commit` "
+              "before this check, so a row that still lacks it either could not be upgraded — gov "
+              "has no blob for that source at that commit — or was written at schema "
+            + f"{RECEIPT_SCHEMA} and has since been split"
+        )
+
+    # ---- S4. A claimed path PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX, over the same
+    # ---- batched read S2 classifies from. Without this, the index read's own `absent` routes to
+    # ---- `missing` and then to the write arm, which would overwrite whatever untracked file the
+    # ---- operator has there. Evaluated HERE, in the preamble: it is a whole-run refusal and must
+    # ---- not depend on which rows the loop has already reached.
+    #
+    # ---- SCOPED TO ROWS THE DISPATCH SENDS TO THE TABLE, by owner ruling (2026-08-26). The
+    # ---- predicate was unqualified by role and this unit parked that: the raw-write hazard the
+    # ---- paragraph above NAMES is reachable only from the `table` disposition, so a `generated`,
+    # ---- `project-owned`, `rendered` or `gate-leg` row whose destination happened to be present
+    # ---- but untracked refused the ENTIRE run for a write that could never have happened — and
+    # ---- the operator's only route back to green was `git add` on a file gov will never write.
+    # ---- Nothing in this build's fixtures tripped it, so nothing would have warned first.
+    # ----
+    # ---- This is a NARROWING and it is worth being plain about what it gives up: an untracked file
+    # ---- shadowing a non-table row now passes unremarked, exactly as it did before `-7` landed.
+    # ---- What it buys is that the refusal fires only where the hazard is, which is the difference
+    # ---- between a guard and a tax.
+    index0, index_present = index_read(target, [w["path"] for w in rows_all])
+    shadowed = sorted(w["path"] for w in rows_all
+                      if UPDATE_ROLE.get(w.get("role", "engine")) == "table"
+                      and w["path"] not in index_present and (target / w["path"]).is_file())
+    if shadowed:
+        raise Refusal(
+            "these receipt-claimed path(s) are present in the target's WORKTREE and absent from its "
+            "INDEX: " + ", ".join(shadowed) + ". `update` reads ours from the index, so an untracked "
+            "file there classifies as `missing` and the write arm would overwrite it with gov's "
+            "bytes. REFUSING: track it (`git add`) if it is meant to be gov's, or move it aside if "
+            "it is yours"
+        )
+
     print(f"govkit update — {target.as_posix()}")
     print(f"govkit update — {base_commit[:8] if base_commit else '(none)'} -> {to_commit[:8]} · "
           f"receipt schema {schema} · {'WRITE' if write else 'read-only'}")
 
+    # ---- DEPL-dCarriedReceipt-9 S3 + S7. The needle map, DERIVED from the receipt's own
+    # ---- (source, path) pairs, and PRINTED before the first row is classified. A map that silently
+    # ---- collapsed is indistinguishable from a target that genuinely relocated nothing, and that is
+    # ---- the failure mode that would waste the most time. Neither number is written down anywhere:
+    # ---- both come off the derivation, on this run, over this receipt.
+    needles, carry_pairs, carry_dropped = derive_carry_map(
+        [(w.get("source"), w.get("path")) for w in rows_all])
+    for _gd, _dests in carry_dropped:
+        print(f"govkit update — carry map DROPPED the ambiguous gov directory '{_gd}': this receipt "
+              f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
+              f"needle")
+    print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
+          f"{len(needles)} needle(s)")
+
     deploy = load_deploy(target)
+
+    # ---- DEPL-dCarriedReceipt-11 S1 + S3. GOV'S OWN RENAMES, once per run, and the resolver that
+    # ---- turns one into a destination. PRINTED before the first row is classified, for the reason
+    # ---- the carry map above is: a run that silently found nothing is indistinguishable from a gov
+    # ---- that renamed nothing, and the difference is whether an adopter's files are about to move.
+    renames = derive_rename_map(root, base_commit, to_commit)
+    print(f"govkit update — rename map: {len(renames)} gov source(s) moved between these two "
+          f"vintages, at >= {RENAME_SIMILARITY_PERCENT}% similarity")
+    rename_dests: dict[str, dict[str, list[str]]] = {}
+
+    def resolve_renamed(row: dict) -> tuple[str, str] | None:
+        """gov's new source for this row, and the ONE destination the descriptor puts it at.
+
+        S3: the destination is RECOMPUTED through `resolve_entry`, never derived by string-editing
+        the old one. A rename that crosses a rule boundary changes the descriptor's answer — gov's
+        own fixture moves a file from a `**` engine pool into a rule with an explicit `to` — and a
+        string edit would land it where the descriptor does not declare it. `resolve_entry` is the
+        answer `apply` uses, and DEPL-dCarriedReceipt-1 exists because this file already paid once
+        for a second spelling of it.
+
+        DROPS LOUDLY, in the shape DEPL-dCarriedReceipt-9's carry map drops an ambiguous directory.
+        Every `return None` here degrades the row to `withdrawn`, which after S8 deletes nothing —
+        so the cost of dropping is a report, and the cost of guessing is a file in the wrong place.
+        Both `writes` and `unlanded` are searched: a `rendered` or `forked` source is never written
+        by this verb, but its row still gets a verdict, and a role's disposition decides what happens
+        NEXT rather than whether the row moved.
+
+        WHAT IT DOES NOT ANSWER, because a structural check reads as a semantic one to everybody
+        who did not write it: it resolves the descriptor as it stands in THIS CHECKOUT, not as it
+        stood at `to_commit`. That is the same approximation `apply` makes — `read_descriptors`
+        reads the working tree — and it fails in the safe direction here: a new source this
+        checkout's descriptor does not claim resolves to nothing, the row degrades to `withdrawn`,
+        and after S8 a `withdrawn` row is a report and an order rather than a deletion.
+        """
+        old, eid = row.get("source"), row.get("kit")
+        new = renames.get(old or "")
+        if not new:
+            return None
+        if eid not in descs:
+            print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', and this row "
+                  f"names kit '{eid}', which no registry entry claims")
+            return None
+        if eid not in rename_dests:
+            d, _p = descs[eid]
+            res = resolve_entry(root, d, target_context(target, deploy, eid, d))
+            by_src: dict[str, list[str]] = {}
+            for _dest, _w in res["writes"].items():
+                if _w.get("src"):
+                    by_src.setdefault(_w["src"], []).append(_dest)
+            for _u in res["unlanded"]:
+                if _u.get("src"):
+                    by_src.setdefault(_u["src"], []).append(_u["dest"])
+            rename_dests[eid] = {k: sorted(set(v)) for k, v in by_src.items()}
+        dests = rename_dests[eid].get(new) or []
+        if len(dests) != 1:
+            print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', which kit "
+                  f"'{eid}' now resolves to "
+                  + (f"{len(dests)} destinations ({', '.join(dests)}) — one row cannot move to "
+                     f"several, and picking one would be a guess"
+                     if dests else "no destination at all: it has left this kit's claimed surface, "
+                                   "which from this receipt's side is a withdrawal and not a move"))
+            return None
+        return new, dests[0]
+
     tally: dict[str, int] = {}
     acted: list[dict] = []
-    for row in receipt.get("files", []):
+    # S2's order, collected in the loop and written in the write phase below, where `outbox` exists.
+    pins_order: str | None = None
+    for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
         if how is None:
@@ -3011,15 +5132,107 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
                    f"move yet — refusing by name rather than guessing")
             continue
 
-        c = classify_row(root, target, row, to_commit)
+        # DEPL-dCarriedReceipt-2 S3. REPORT, never refuse: these roles have no writer yet, but a
+        # role without a writer is not a reason to strand the whole receipt. `r.fail` here set
+        # `r.problems`, which permanently skips the re-stamp at the end of this function, so one
+        # such row froze a target's `gov_commit` forever.
+        if how == "report":
+            tally[role + ":reported"] = tally.get(role + ":reported", 0) + 1
+            # DEPL-dCarriedReceipt-10 S4. `direction` is an OPTIONAL TRAILING FIELD on the one
+            # printed row, never a second line and never a second row — the `report` disposition's
+            # shape is `-2`'s and is not re-specified here. READ WITH `.get`, deliberately: `how` is
+            # resolved from the RECEIPT's role a few lines above, so this printer meets rows this
+            # unit never wrote — one stamped before the role existed, one whose descriptor has since
+            # changed its keys — and `row["direction"]` would raise `KeyError` on exactly those,
+            # turning the report disposition into a traceback on the one path that exists to avoid
+            # acting. The missing-key refusal is selfcheck arm 3c's, and it fires on DESCRIPTORS.
+            _dir = row.get("direction")
+            print(f"  {'report':<18} [{role:<13}] {row['path']}"
+                  + (f" · direction {_dir}" if _dir else ""))
+            continue
+
+        # DEPL-dCarriedReceipt-2 S2. The pins row is SYNTHESIZED by `apply`, not shipped by a kit,
+        # so it has no gov blob and `classify_row` has nothing to compare. Recompute what `apply`
+        # would write now, and compare it against the block the target actually holds. This arm
+        # never merges and never edits `.gitattributes`: that destination belongs to `apply`.
+        if how == "pins":
+            _pins = lf_pins(descs, [e for e in claimed if e in descs],
+                            lambda e, dd: target_context(target, deploy, e, dd))
+            _om, _cm, _text = lf_pin_block(_pins) if _pins else ("", "", "")
+            _ga = target / row["path"]
+            _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
+            # LINE indices, inclusive of both markers -- not character offsets. Slicing the string
+            # with them silently produced a prefix that never matched, so the `current` arm could
+            # not fire and every target read `pins-moved` forever. Caught by observing the arm on a
+            # target whose block was known to be correct.
+            _span = find_block(_cur, _om, _cm) if _pins else None
+            _held = "\n".join(
+                _cur.split("\n")[_span[0]:_span[1] + 1]) if _span else None
+            v = "current" if (_held is not None and _held.strip() == _text.strip()) else "pins-moved"
+            tally[v] = tally.get(v, 0) + 1
+            print(f"  {v:<18} [{role:<13}] {row['path']}")
+            if v == "pins-moved":
+                pins_order = _text
+            continue
+
+        # DEPL-dCarriedReceipt-13 S7. A BOOTSTRAPPED row that matched no gov vintage has no base,
+        # and every writing disposition needs one — so it is printed, counted and skipped HERE:
+        # after `how` resolves, before the verdict table it would otherwise feed. Written in
+        # neither direction until an operator supplies a base with
+        # `adopt --re-adopt --pin <path>=<rev> --write` (D14: the bare `--pin` form always refuses,
+        # because such a row exists only in a receipt and adopt refuses over one).
+        #
+        # SCOPED TWO WAYS, and both halves are load-bearing rather than defensive. The predicate is
+        # `evidence == "unattributed"` and NEVER field-absence: every row `apply` writes through the
+        # unlanded channel carries neither `commit` nor `gov_oid`, and so does the synthesized
+        # `attributes` row, so a field-absence reading would swallow all of them ahead of the
+        # dispatch and silently delete four dispositions that exist for exactly those roles. And it
+        # is scoped to `table`, the ONLY disposition that can put bytes on disk: `seed` still
+        # reaches its reseed override and `attributes` still reaches `-2`'s pins arm, each of which
+        # reports against a `base` of `None` rather than needing one. AC14 grades both halves.
+        # THE ROW SHAPE IS `-2`'s AND ENDS AT THE PATH. The remedy sentence goes in the tally line
+        # below, once, rather than onto every row: the printed row is PARSED by name elsewhere —
+        # `-7`'s AC9 arm reads the verdict off a line whose last field is the path — and a trailing
+        # clause here made that arm read "(no row)" for a row this branch had just printed.
+        if how == "table" and row.get("evidence") == "unattributed":
+            tally["unattributed"] = tally.get("unattributed", 0) + 1
+            print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
+            continue
+
+        c = classify_row(root, target, row, to_commit, index0, needles, resolve_renamed)
+
+        # DEPL-dCarriedReceipt-9 S2. `carry` is OUTPUT. It was recomputed from the blobs one line
+        # above and is written back for REPORTING; a stale one left by an older run is DROPPED
+        # rather than believed, so the field can never be a claim about bytes that have moved since.
+        # No branch in either verb reads it back — asserted over this file's SOURCE by an arm,
+        # because "nobody will read it" is a discipline and this is a gate.
+        if c["carry"]:
+            row["carry"] = c["carry"]
+        else:
+            row.pop("carry", None)
+
         v = c["verdict"]
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
                 v = "reseed-available"
-            elif v not in ("missing",):
+            elif v not in ("missing", "renamed"):
+                # DEPL-dCarriedReceipt-11 S0c. `renamed` IS EXEMPT FROM THIS OVERRIDE, beside
+                # `missing`, and the exemption is the sharpest thing in that unit. This line rewrites
+                # any surviving verdict on a seed row to `current`/`patched` — which for a row whose
+                # gov SOURCE gov renamed means printing `current` over a source that no longer
+                # exists. Measured at 9ddcc5c9 on this unit's own fixture: the seed row read
+                # `t_state = "absent"`, gridded to `withdrawn`, and came out of this line as
+                # `current` while the file behind it had moved. That is a silent-green of exactly
+                # the kind the comment at the reported-only branch below records an incident for.
                 v = "current" if c["o_state"] == "equal" else "patched"
         if how == "adopter" and v in ("diverged", "stale"):
             v = "re-rendered"          # CAP at report; the adopter owns these bytes
+        if v == "patched" and c["carry"] in ("eol", "relocate"):
+            # DEPL-dCarriedReceipt-9 S10. `("differs","equal")` grids to `patched`, which is a LIE
+            # for a carried row: the target edited NOTHING, it installed at a different prefix or
+            # committed different line endings. Sourced from `carry` and from nothing else, and the
+            # tally counts it under the label it printed rather than under the one it replaced.
+            v = f"carried ({c['carry']})"
         tally[v] = tally.get(v, 0) + 1
         print(f"  {v:<18} [{role:<13}] {row['path']}")
         acted.append({"row": row, "c": c, "verdict": v, "how": how})
@@ -3031,6 +5244,19 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
               "`update` does not install them: widening a target's governance surface is an owner "
               "decision, and `--add-kits` is the flag that would")
     print("govkit update — " + " · ".join(f"{k} {v}" for k, v in sorted(tally.items())))
+    # DEPL-dCarriedReceipt-13 S7's remedy, said ONCE and only when it applies. An operator who sees
+    # `unattributed` rows and no next step concludes the tool is broken; one who sees the sentence
+    # repeated per row learns to scroll past the whole block.
+    if tally.get("unattributed"):
+        # D14, from this build's closing review: the remedy named an invocation `adopt` ALWAYS
+        # refuses. An `evidence: "unattributed"` row exists only inside a receipt, so any target
+        # holding one has `install.json` on disk by construction — and `adopt` refuses over an
+        # existing receipt before `--pin` is ever consulted. The working form needs `--re-adopt`
+        # and `--write`. This is the one sentence that exists to stop an operator concluding the
+        # tool is broken, so it naming a command that cannot work was the worst place for it.
+        print(f"govkit update — {tally['unattributed']} row(s) matched no gov vintage at adoption, "
+              f"so there is no base to write against and none was written. "
+              f"`govkit adopt --re-adopt --pin <path>=<rev> --write` supplies one")
 
     if not write:
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
@@ -3039,6 +5265,70 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
     changed, deleted, conflicts = [], [], 0
+    # DEPL-dCarriedReceipt-11 S6. BOTH SPELLINGS of every performed rename, in the shape `changed`
+    # and `deleted` already take. `git mv` stages both ends, so this is not a second `git add` and
+    # nothing below re-adds it: it exists because DEPL-dCarriedReceipt-14's pre-write snapshot and
+    # its touched-kit predicate read these lists, and a renamed row is invisible to both through
+    # `changed` and `deleted` alone.
+    renamed: list[str] = []
+    withheld = 0
+    # DEPL-dCarriedReceipt-2 S2: an ORDER, not a write. `.gitattributes` is `apply`'s destination
+    # and DEPL-dSettledRoster-1 is an open ask about how it writes them, so this verb states what
+    # moved and stops. Written under `--write` only, matching every other order this verb emits.
+    if pins_order is not None:
+        (outbox / "update-pins.md").write_text(
+            "# gov's LF pins have moved\n\n"
+            "The govkit-owned block in this target's `.gitattributes` no longer matches what the\n"
+            "claimed kits declare at the requested vintage. `update` does NOT write that file:\n"
+            "the destination is `apply`'s. Re-run `govkit apply` to move the block.\n\n"
+            "The block gov would write now:\n\n```\n" + pins_order + "\n```\n",
+            encoding="utf-8", newline="\n")
+    # ---- DEPL-dCarriedReceipt-14 S2 + S3 + S4. THE PRE-WRITE SNAPSHOT AND THE BASELINE, in that
+    # ---- order and BEFORE the first byte of any kit path moves. Everything below this block is a
+    # ---- write; everything in it is a read.
+    #
+    # THE SNAPSHOT IS KEYED ON THE ROW, never on a path string. A `renamed` row occupies TWO
+    # spellings — the old one it is about to leave and the new one it is about to land at — and the
+    # new one's pre-write index state is `absent`, which under a path key sits behind a key the old
+    # spelling never reaches. So a path-keyed snapshot cannot restore a rename at all: it would put
+    # the old path back and leave gov's bytes staged at the new one, which is both halves of the
+    # rename standing at once.
+    _touching = set(TOUCHING_VERDICTS) | ({"withdrawn"} if write_withdrawals else set())
+    snap_rows: list[dict] = []
+    for a in acted:
+        if a["how"] != "table" or a["verdict"] not in _touching:
+            continue
+        _paths = [a["row"]["path"]]
+        if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
+            _paths.append(a["c"]["renamed_to"][1])
+        snap_rows.append({"kit": a["row"].get("kit"), "row": a["row"], "paths": _paths,
+                          "fields": {k: a["row"][k] for k in ROLLBACK_FIELDS if k in a["row"]}})
+
+    # THE INDEX SIDE IS `-7`'s READER, not a second one. `index0` is the batched read the preamble
+    # already took over every receipt path; a rename DESTINATION is by definition not one of those,
+    # so the only paths that need a second call are those, and they go through the same
+    # `index_read`. A path with no entry is stored as None — the marker `absent` — and that is a
+    # DIFFERENT fact from "not looked up", which is why the lookup is materialised per row here
+    # rather than deferred to a `.get` at restore time.
+    _receipt_paths = {w["path"] for w in rows_all}
+    _extra = sorted({p for s in snap_rows for p in s["paths"] if p not in _receipt_paths})
+    _index_extra: dict[str, tuple[str, str]] = {}
+    if _extra:
+        _index_extra, _ = index_read(target, _extra)
+    for s in snap_rows:
+        s["index"] = {p: (index0.get(p) if p in _receipt_paths else _index_extra.get(p))
+                      for p in s["paths"]}
+
+    # S4's POPULATION, and the reason the baseline is affordable: exactly the kits this run is about
+    # to write to, which is exactly the set the after-pass will check. Baselining every CLAIMED kit
+    # would run checks for kits the run never touches, which is the whole-bar behaviour §3 refuses.
+    touched_kits = [e for e in claimed if any(s["kit"] == e for s in snap_rows)]
+    orphan_kits = sorted({(s["kit"] or "(no kit)") for s in snap_rows if s["kit"] not in claimed})
+    baseline: dict[str, tuple[str, str, int | None]] = {}
+    for _eid in touched_kits:
+        _d, _ = descs[_eid]
+        baseline[_eid] = run_kit_check(_eid, _d, target_context(target, deploy, _eid, _d), target)
+
     withdrawn_rows: list[dict] = []
     for a in acted:
         row, c, v = a["row"], a["c"], a["verdict"]
@@ -3061,18 +5351,216 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
         # into an adopter tree at exit 0, and a `seed` the target had deleted was silently restored
         # from gov rather than left to the target that owns it.
         if a["how"] != "table":
-            if v in ("missing", "stale", "withdrawn", "diverged"):
+            # DEPL-dCarriedReceipt-11 S0b. `renamed` joins this tuple, and it has to: a verdict word
+            # absent from it falls through to the bare `continue` below, so a `rendered` or `seed`
+            # row whose gov source MOVED would get its verdict line and then nothing at all from the
+            # verb that just decided not to write it. The line is a SECOND line rather than the only
+            # one — every row in `acted` already printed its verdict above — and what it adds is the
+            # disposition: this role is reported, never moved.
+            if v in ("missing", "stale", "withdrawn", "diverged", "renamed"):
                 print(f"  reported only   [{row.get('role')}] {row['path']} — {v}; this role is "
                       f"never written by `update`")
             continue
 
-        if v == "stale" or v == "missing":
-            dp.parent.mkdir(parents=True, exist_ok=True)
-            dp.write_bytes(c["theirs"])
-            row["sha256"] = _sha(c["theirs"])
+        if v in RAW_WRITE_VERDICTS:
+            data = c["theirs"]
+            # ---- DEPL-dCarriedReceipt-9 S11. THE `missing` RESTORE CARRIES TOO, and it is the ONE
+            # ---- arm in this verb that writes bytes gov does not hold WITHOUT a bytes-proof —
+            # ---- because there are no `ours` bytes to prove a rung against: the target DELETED the
+            # ---- file. `classify_row` returns `o_state = "absent"`, both `absent` cells grid to
+            # ---- `missing`, and `missing` shares the raw arm right here, so without this a
+            # ---- rung-carrying row the target deleted comes back in gov's un-carried spelling.
+            # ---- Bounded twice over: it fires only on `missing`, and it applies the row's OWN
+            # ---- (dirname(source), dirname(path)) pair rather than the derived map — which needs
+            # ---- no bytes and is exactly S3's derivation over one pair — so a literal inside the
+            # ---- restored file can only be rewritten by that one row's own relocation. That
+            # ---- residual is accepted: the alternative on this arm is writing gov's prefix into a
+            # ---- target that demonstrably does not use it.
+            restored_carry = None
+            if v == "missing" and row.get("source"):
+                _one, _, _ = derive_carry_map([(row["source"], row["path"])])
+                _carried = derive_carried(data, _one)
+                if _carried != data:
+                    data, restored_carry = _carried, "relocate"
+            oid, why = land_through_index(root, target, row["path"], row.get("source"),
+                                          data, to_commit, index0)
+            if oid is None:
+                r.fail(f"'{row['path']}' could not be landed: {why}")
+                continue
+            # DEPL-dCarriedReceipt-9 S12, which NARROWS one cell of `-8`'s write table rather than
+            # contradicting it. ONE stamping rule: `oid` records the blob ACTUALLY WRITTEN, and
+            # `gov_oid` keeps the meaning `-8` gives it — gov's blob at the row's `commit`, which
+            # this write advances to `to_commit` two lines below.
+            #
+            # On the UN-CARRIED raw arm the two agree BY CONSTRUCTION, which is `-8`'s stamp
+            # unchanged: gov's blob went into the target's object database untouched, so the name the
+            # target gave it is the name gov's tree gives it. On a CARRIED restore they DIFFER, and
+            # that is the point — `oid != gov_oid` afterwards reads "this row carries a rung", not
+            # "local delta", because `carry` is re-proved from the blobs on the next run and
+            # re-explains the difference. Taking the un-narrowed stamp there is the corrupt pairing:
+            # two identities recorded EQUAL over bytes gov never shipped, which the next run reads as
+            # a clean gov-owned row and raw-overwrites straight back to gov's prefix.
+            #
+            # `sha256` follows the bytes that LANDED, because that is what `install.sums` lists and
+            # what a target verifies with bash alone. It decides nothing here.
+            row["gov_oid"] = blob_oid(c["theirs"])
+            row["oid"] = oid
+            row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            if restored_carry:
+                row["carry"] = restored_carry
             changed.append(row["path"])
+        elif v == "renamed":
+            # ---- DEPL-dCarriedReceipt-11 S4 / S5 / S11. GOV MOVED THIS FILE, so the target's copy
+            # ---- moves with it. Everything that decides bytes happens BEFORE the move, and that
+            # ---- ordering is the unit rather than a style: `git mv` moves bytes unchanged, so a
+            # ---- post-move comparison would ask "does the target's copy match gov's blob at the new
+            # ---- source" of a file nobody has written yet, answer no, and freeze it at pre-rename
+            # ---- content while printing `patched` — the grid's word for an adopter edit that never
+            # ---- happened. Deciding first also means a conflict leaves the row EXACTLY as it was,
+            # ---- rather than half-applied at a new path.
+            new_src, new_dest = c["renamed_to"]
+            ndp = (target / new_dest).resolve()
+            try:
+                ndp.relative_to(target.resolve())
+            except ValueError:
+                r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which this target's own "
+                       f"descriptor resolves to '{new_dest}' — a path OUTSIDE the repository the "
+                       f"operator named. Refusing the move: the destination is composed from that "
+                       f"target's answers, so a `prefix` that climbs out of the tree is a write "
+                       f"this verb may not perform whatever the verdict says")
+                continue
+            # ASKED OF THE INDEX AND OF THE DISK, both. The preamble's batched read covers the
+            # RECEIPT's paths and a rename destination is by definition not one of them, so a
+            # tracked file there whose worktree copy the operator removed is invisible to `exists()`
+            # — and `git mv` would take its index entry without a word.
+            _, _at_dest = index_read(target, [new_dest])
+            if new_dest in _at_dest or ndp.exists():
+                r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
+                       f"than overwriting it: `update` moves one row and would be destroying "
+                       f"another file's bytes to do it. Move or remove '{new_dest}' and re-run")
+                continue
+
+            # THE BYTES, decided here and written after the move. `carry == "verbatim"` IS S4's
+            # no-delta question — the ladder proves it on BYTES, which is the same question the
+            # spec asks of the pre-move `oid` and strictly better than an oid comparison on a target
+            # whose object format is not gov's. No delta means gov's blob at the NEW source, raw,
+            # with `commit` and `gov_oid` advancing together beneath it.
+            #
+            # EVERYTHING ELSE TAKES THE THREE-WAY, and that includes a row DEPL-dCarriedReceipt-9
+            # proved a rung for (S11): a carried row's bytes never equal gov's blob at the old
+            # source, so it lands here by construction, and a proven rung must never open the raw
+            # arm or the target's own spelling is replaced by gov's at the new path. The rung is
+            # applied to BOTH sides exactly as the `diverged` arm below applies it, at the two
+            # vintages and the two sources this unit names: the OLD source at the row's own
+            # `commit`, and the NEW source at `to_commit`. It cancels in the base-to-theirs diff,
+            # so `git merge-file` sees only gov's semantic change.
+            byte_arm = "gov" if c["carry"] == "verbatim" else "merged"
+            if c["carry"] == "verbatim":
+                data = c["theirs_new"]
+            else:
+                merged, _how = three_way(
+                    c["ours"],
+                    derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
+                    derive_carried_by_rung(c["carry"], c["theirs_new"], needles))
+                if merged is None:
+                    conflicts += 1
+                    (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md"
+                     ).write_text(
+                        f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
+                        f"gov moved  {row.get('source')} -> {new_src}\n"
+                        f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
+                        f"base   {row.get('commit')} sha {_sha(c['base'])}\n"
+                        f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
+                        f"theirs {to_commit} sha {_sha(c['theirs_new'])}\n\n"
+                        f"NOTHING was moved and the file was left BYTE-IDENTICAL at its old path.\n"
+                        f"Resolve by hand, then re-run `update`.\n",
+                        encoding="utf-8", newline="\n")
+                    r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
+                           f"conflicts — left untouched at its old path, order written")
+                    continue
+                data = merged
+
+            # THE MOVE. The parent is created here because `git mv` does NOT create one — measured:
+            # a rename into a new subdirectory fails with `destination directory does not exist`,
+            # which would make every into-a-subdir rename a reported failure. Both failure modes are
+            # ONE report: the row is left exactly as it was, and nothing about it is rewritten.
+            old_path = row["path"]
+            mv_err: str | None = None
+            try:
+                ndp.parent.mkdir(parents=True, exist_ok=True)
+                mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
+                                    capture_output=True, text=True, check=False)
+                if mv.returncode != 0:
+                    mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
+            except OSError as e:
+                mv_err = str(e)
+            if mv_err:
+                r.fail(f"'{row['path']}' could not be moved to '{new_dest}': {mv_err} — the row is "
+                       f"left exactly as it was, at its old path and its old vintage")
+                continue
+
+            oid, why = land_through_index(root, target, new_dest, new_src, data, to_commit, index0)
+            if oid is None:
+                # NO ARM REACHES THIS, and the skip announces itself rather than passing for
+                # coverage. `land_through_index` fails only when the TARGET's own git refuses —
+                # a rejected blob write, a mode `update-index` will not take, a worktree file
+                # `checkout-index` cannot replace — and this suite manufactures none of those; the
+                # two older call sites above are in exactly the same position. What it leaves is a
+                # moved file whose bytes are still the pre-move ones, reported and not re-stamped.
+                r.fail(f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
+                       f"landed: {why}. The move is staged and the row is NOT advanced, so a re-run "
+                       f"sees the file at its new path with its old vintage")
+                continue
+            # THE FOUR FIELDS, REWRITTEN TOGETHER. `path` and `source` carry the new spelling, which
+            # is what makes the NEXT run's classification correct; `commit` advances to `to_commit`
+            # and `gov_oid` becomes gov's blob at the NEW source there, because those two are
+            # meaningless apart and DEPL-dCarriedReceipt-7's preamble refuses a receipt that pairs
+            # one vintage's `commit` with another's `gov_oid`. `oid` records what the target now
+            # holds — equal to `gov_oid` on the raw arm by construction, and deliberately different
+            # on the merge arm, where it reads "this row carries something gov did not ship".
+            row["path"], row["source"] = new_dest, new_src
+            row["gov_oid"] = blob_oid(c["theirs_new"])
+            row["oid"] = oid
+            row["sha256"] = _sha(data)
+            row["commit"] = to_commit
+            renamed.extend([old_path, new_dest])
+            # The DESTINATION line. The verdict row above names the old path, which is the only
+            # spelling the receipt had when it was printed; where the file went is the other half,
+            # and it ends in the byte arm rather than in a path so that nothing parsing this output
+            # for a row's verdict can mistake this line for one.
+            print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
+                  f"bytes {byte_arm}")
         elif v == "withdrawn":
+            # ---- DEPL-dCarriedReceipt-11 S8 + S9. THE ENGINE'S ONLY UNGUARDED DELETE, CLOSED. What
+            # ---- stood here removed a tracked file from a repository gov does not own — unlinked
+            # ---- it, `git rm`-ed it and dropped its row — with no flag, no order and no way for
+            # ---- anything downstream to notice, and it did so on the same verdict a gov RENAME
+            # ---- produces, which is how the replacement was never landed either.
+            #
+            # The report and the ORDER are unconditional under `--write`; the DELETION needs
+            # `--write-withdrawals`, which defaults OFF. That flag is a SCOPE flag and not a
+            # `--force`: it enables a narrower class of action and overrides no refusal. The order is
+            # written either way, because a deletion that happened and a deletion that was withheld
+            # are both things the operator has to be able to read afterwards.
+            _why = ("It WAS deleted: this run carried --write-withdrawals."
+                    if write_withdrawals else
+                    "NOTHING was deleted. `update` no longer removes a tracked file from a "
+                    "repository gov does not own on the strength of a verdict alone. Re-run with "
+                    "--write-withdrawals if this file really should go.")
+            (outbox / f"update-withdrawn-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
+                f"# gov no longer ships {row['path']}\n\n"
+                f"source {row.get('source')}\n"
+                f"last gov commit {row.get('commit')}\n"
+                f"vintage asked for {to_commit}\n\n"
+                f"gov's tree holds no blob for that source at the requested vintage, and no rename "
+                f"pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a replacement for it.\n\n"
+                f"{_why}\n",
+                encoding="utf-8", newline="\n")
+            if not write_withdrawals:
+                withheld += 1
+                continue
             if dp.is_file():
                 dp.unlink()
             deleted.append(row["path"])
@@ -3081,30 +5569,287 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
             # forever — every updated target permanently red, from a successful update.
             withdrawn_rows.append(row)
         elif v == "diverged":
-            merged, how = three_way(c["ours"], c["base"] or b"", c["theirs"])
+            if c["ours"] is None:
+                # OURS is now read from the target's object database rather than off its disk, so
+                # this is the one new way it can be missing: the index names a blob the odb does not
+                # hold. NO ARM REACHES THIS, and the skip announces itself rather than passing for
+                # coverage — manufacturing a corrupt object database is not something this suite
+                # does, and merging against a silent `b""` would drop the operator's whole side.
+                r.fail(f"'{row['path']}' is diverged and its index blob {str(c['ours_oid'])[:12]} "
+                       f"does not read back from the target's object database — refusing to merge "
+                       f"against bytes this verb could not obtain")
+                continue
+            # DEPL-dCarriedReceipt-9 S6. A row that PROVED a rung and has since diverged is
+            # reconciled rather than raw-written, and what makes that work is WHAT THE THREE-WAY IS
+            # HANDED: the rung applied to BOTH `base` and `theirs`, so it cancels in the
+            # base-to-theirs diff and `git merge-file` sees only gov's semantic change. `ours` is
+            # left alone — it is already in the target's own spelling, which is the spelling the
+            # merged result must come out in. Without this, a `relocate` row hands the merge a base
+            # that spells gov's prefix where the target's copy does not, so every line naming a path
+            # reads as an operator edit and the whole file conflicts.
+            merged, how = three_way(
+                c["ours"],
+                derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
+                derive_carried_by_rung(c["carry"], c["theirs"], needles))
             if merged is None:
                 conflicts += 1
                 (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
                     f"# update conflict — {row['path']}\n\n"
+                    f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
-                    f"ours   on disk       sha {_sha(c['ours'])}\n"
+                    f"ours   target index  sha {_sha(c['ours'])} oid {c['ours_oid']}\n"
                     f"theirs {to_commit} sha {_sha(c['theirs'])}\n\n"
                     f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n",
                     encoding="utf-8", newline="\n")
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
             else:
-                dp.write_bytes(merged)
+                oid, why = land_through_index(root, target, row["path"], row.get("source"),
+                                              merged, to_commit, index0)
+                if oid is None:
+                    r.fail(f"'{row['path']}' merged cleanly and could not be landed: {why}")
+                    continue
+                # DEPL-dCarriedReceipt-8 S1. THE TWO IDENTITIES SPLIT HERE, and this is the one
+                # branch where they must. `gov_oid` is GOV's blob at the row's `commit`, and
+                # `commit` advances to `to_commit` two lines below, so the only bytes that can name
+                # it are gov's own at that vintage — `c["theirs"]`, which `classify_row` already
+                # read through `blob_at`. `oid` is what the TARGET now holds, which is the merge
+                # result. Nothing the target produced may reach `gov_oid`, ever.
+                #
+                # WHY THIS IS THE WHOLE UNIT. Stamping the merge result into gov's identity made the
+                # NEXT run read `ours == gov_oid` — the target does hold the merged bytes — so
+                # `o_state` came back `equal`, the grid's `("equal", "differs")` cell said `stale`,
+                # and the raw arm above overwrote the adopter's edit and reported it as a clean
+                # write with zero conflicts. Reproduced end to end at 9ddcc5c9: local line count 1
+                # after the merge, 0 after the update that followed it, rc 0 and no finding printed.
+                # After `-7` the same stamp instead disagrees with its own evidence, so S9's
+                # preamble refuses the WHOLE run for good and the target can never be updated
+                # again — a different symptom of one defect, measured on `-7`'s tip before this.
+                #
+                # The permanence falls out rather than being flagged: these two now differ, so the
+                # row's OURS axis reads `differs` on every later run, and `differs` reaches only
+                # `patched` and `diverged` — neither of which is in `RAW_WRITE_VERDICTS`. An adopter
+                # who later reverts the edit by hand puts the index blob back to `gov_oid` and the
+                # row rejoins the raw arm on its own — what a stored boolean would get wrong.
+                #
+                # DEPL-dCarriedReceipt-9 S12, on the other arm that writes bytes gov does not hold.
+                # `c["theirs"]` here is gov's UN-CARRIED blob — S6 rewrote only what was handed to
+                # `three_way`, never the row's evidence — so `gov_oid` still names a blob gov's own
+                # tree holds at `to_commit`, and a carried row's `oid != gov_oid` afterwards reads
+                # "carries a rung" for the same reason the restore arm's does.
+                row["gov_oid"] = blob_oid(c["theirs"])
+                row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit
                 changed.append(row["path"])
 
-    if changed:
-        subprocess.run(["git", "-C", str(target), "add", "--"] + changed,
-                       capture_output=True, check=False)
+    # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
+    # re-adding them would re-CLEAN what the smudge filter just produced, and a filter pair that does
+    # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
+    # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
         subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
                        capture_output=True, check=False)
+
+    # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
+    # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
+    # already knows how to answer about itself — its own `[check].argv`, the same declaration
+    # `cmd_check` runs — and compare that answer against the BASELINE taken before the write.
+    #
+    # THE ROLLBACK KEYS ON THE TRANSITION, never on the after-state alone, and that is the whole
+    # difference between a verifier and a wedge. On the after-state alone, an adopter carrying ONE
+    # unrelated local red in a touched kit reverts every correct write on EVERY run, forever: the
+    # `r.fail` below reaches the `if r.problems` arm, `gov_commit` never advances, and §3 refuses
+    # the `--force` that would otherwise be the way out. Red-before-and-red-after is reported as
+    # pre-existing and left alone. What that trade costs is narrower and is stated rather than
+    # implied: a kit already red keeps its writes, so a genuinely broken merge inside THAT kit lands
+    # unobserved, because a binary check cannot tell "still broken" from "newly broken".
+    #
+    # IT RUNS UNCONDITIONALLY UNDER `--write`. There is no flag, in any spelling, because an opt-in
+    # verifier verifies the runs that were already careful.
+
+    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
+    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
+    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
+    # first and not the second, and rolling one of those back is not merely wasted: the occupied
+    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
+    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
+    written_paths = set(changed) | set(renamed) | set(deleted)
+    n_verified = n_unverified = n_rolled = n_preexisting = 0
+    for eid in touched_kits:
+        d, _ = descs[eid]
+        ctx_v = target_context(target, deploy, eid, d)
+        was, _was_detail, was_rc = baseline[eid]
+        now, now_detail, now_rc = run_kit_check(eid, d, ctx_v, target)
+        exits = f"exit {'no-launch' if was_rc is None else was_rc} -> " \
+                f"{'no-launch' if now_rc is None else now_rc}"
+
+        # S8. THE SKIP ANNOUNCES ITSELF. A `[check] = { none = "…" }` and an argv carrying an
+        # unresolved token both land here, and a check that could not run is not a pass — so it is
+        # counted apart from verified rather than swelling it.
+        if now == "landed-unmeasured":
+            n_unverified += 1
+            print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
+                  f"measured this kit's writes, which is not the same as measuring them green")
+            continue
+
+        # S6. PRE-EXISTING RED, the only escape from the wedge. Its writes stand, nothing is rolled
+        # back, and no `r.fail` — so the run completes and the receipt re-stamps.
+        if was == "landed-but-inert" and now == "landed-but-inert":
+            n_preexisting += 1
+            (outbox / f"update-preexisting-red-{eid}.md").write_text(
+                f"# {eid} was already red before this update\n\n"
+                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                f"{exits}\n"
+                f"vintage {base_commit} -> {to_commit}\n\n"
+                f"This kit's own check failed BEFORE this run wrote anything and failed again "
+                f"after, so this run did not break it and nothing was rolled back. Its writes "
+                f"stand and the receipt re-stamps.\n\n"
+                f"WHAT THIS DOES NOT SAY: a binary check cannot tell `still broken` from `newly "
+                f"broken`, so a bad merge inside THIS kit would land unobserved. Fix the standing "
+                f"red, then re-run `update` to get this kit verified again.\n",
+                encoding="utf-8", newline="\n")
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · PRE-EXISTING RED: not "
+                  f"rolled back, and this run is not what broke it")
+            continue
+
+        # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
+        if was == "adopted" and now == "landed-but-inert":
+            n_rolled += 1
+            # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
+            # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
+            # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
+            # replace, an index `git rm --cached` will not touch — and this suite manufactures none
+            # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
+            # position and says so where it stands. What each of them leaves is a PART-restored
+            # target, and each says that in its own message, because a silent partial restore is
+            # worse than the write it was undoing.
+            restored: list[str] = []
+            untouched: list[str] = []
+            for s in [x for x in snap_rows if x["kit"] == eid]:
+                for p in s["paths"]:
+                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
+                    # built from `acted` BEFORE the write loop's own containment check, and this
+                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
+                    # `../../x` that the write loop refused could still be reached here, on the
+                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
+                    # check goes red after the run) and not reproduced, which is stated rather than
+                    # dressed up: it is guarded because the class is the same and the cost is one
+                    # condition, not because a fixture demonstrated it.
+                    try:
+                        demand_contained_dest(p, f"rollback of kit '{eid}'")
+                    except Refusal as _esc:
+                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                        continue
+                    if p not in written_paths:
+                        untouched.append(p)
+                        continue
+                    entry = s["index"].get(p)
+                    if entry is None:
+                        # `absent` before the write. The bytes at this path are ones this run put
+                        # there — a rename destination, or a `missing` restore — so unstaging and
+                        # unlinking returns the target to what it had, which was nothing.
+                        rmv = subprocess.run(
+                            ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
+                             "--", p], capture_output=True, text=True, check=False)
+                        if rmv.returncode != 0:
+                            r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
+                                   f"before this run and `git rm --cached` would not unstage it: "
+                                   f"{rmv.stderr.strip()}. The target is now PART restored — say so "
+                                   f"rather than reporting a rollback that did not happen")
+                            continue
+                        if (target / p).is_file():
+                            (target / p).unlink()
+                        restored.append(p)
+                        continue
+                    mode, oid = entry
+                    upx = subprocess.run(
+                        ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                         f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
+                    if upx.returncode != 0:
+                        r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
+                               f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
+                               f"PART restored")
+                        continue
+                    (target / p).parent.mkdir(parents=True, exist_ok=True)
+                    cox = subprocess.run(
+                        ["git", "-C", str(target), "checkout-index", "-f", "--", p],
+                        capture_output=True, text=True, check=False)
+                    if cox.returncode != 0:
+                        r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
+                               f"and `git checkout-index` could not write the worktree file: "
+                               f"{cox.stderr.strip()}. The target is now PART restored — a silent "
+                               f"partial restore is worse than the write it was undoing")
+                        continue
+                    restored.append(p)
+
+                # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
+                # row stamped forward re-creates `-8` exactly — the next run reads the row as
+                # `equal` against bytes that were reverted — and restoring only some of the six is
+                # the split `-7` S9 refuses the whole next run on.
+                for k in ROLLBACK_FIELDS:
+                    if k in s["fields"]:
+                        s["row"][k] = s["fields"][k]
+                    else:
+                        s["row"].pop(k, None)
+                if s["row"] in withdrawn_rows:
+                    withdrawn_rows.remove(s["row"])
+
+            # The three lists are what the closing line counts, and a rolled-back path is not a
+            # write that stands. Both spellings of a restored rename leave `renamed` together, so
+            # its `// 2` stays a pair count.
+            for p in restored:
+                for lst in (changed, deleted, renamed):
+                    while p in lst:
+                        lst.remove(p)
+
+            (outbox / f"update-rollback-{eid}.md").write_text(
+                f"# {eid} was rolled back — its own check reds on what this run wrote\n\n"
+                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                f"{exits}\n"
+                f"vintage {base_commit} -> {to_commit}\n\n"
+                f"This kit's check PASSED before this run and FAILS after it, so this run is what "
+                f"broke it. Every path below was restored to the index entry it had before the "
+                f"first byte moved, and this kit's receipt rows were restored with them. No other "
+                f"kit was touched: a green kit's write is correct and reverting it to punish a "
+                f"sibling discards a good result.\n\n"
+                + "".join(f"restored  {p}\n" for p in restored)
+                + ("(nothing to restore: every path this kit owns was refused before it was "
+                   "written)\n" if not restored else "")
+                + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
+                          f"undo\n" for p in untouched)
+                + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
+                  f"the vintage they are actually at. Resolve by hand — most often the clean "
+                  f"three-way merge that produced this is plausible and wrong — then re-run "
+                  f"`update`.\n",
+                encoding="utf-8", newline="\n")
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
+                  + (" ".join(restored) if restored else "(no path restored)"))
+            r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
+                   f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
+                   f"order was written under .governance/outbox/")
+            continue
+
+        n_verified += 1
+        print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · verified")
+
+    for eid in orphan_kits:
+        print(f"govkit update — verify {eid}: NOT VERIFIED — this run moved rows the receipt "
+              f"attributes to that kit and its own `kits` list does not claim it, so there is no "
+              f"descriptor to ask and no check to run")
+
+    # S4's `not-run`, bounded to CLAIMED kits. An unclaimed registry entry is NOT one of these:
+    # `available (not installed)` above already printed it, and a second line about the same kit is
+    # two answers to one question in the output of the verb built to end silent partial installs.
+    not_run = [e for e in claimed if e not in touched_kits]
+    for eid in not_run:
+        print(f"govkit update — verify {eid}: not-run — this run moved no path this kit owns, so "
+              f"its check was executed neither before nor after")
+    # EVERY COUNT PRINTS, including the zeros. An absence is never coverage, and a silent
+    # pre-existing-red tally would hide exactly the kits nothing verified.
+    print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
+          f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
+
     if withdrawn_rows:
         receipt["files"] = [f for f in receipt["files"] if f not in withdrawn_rows]
 
@@ -3117,7 +5862,8 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
         (target / ".governance" / "install.sums").write_text(
             "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
             encoding="utf-8", newline="\n")
-        print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+        print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+              f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
               f"stamp would tell the next run that guards which fired here have already been passed")
         return r.emit()
@@ -3128,8 +5874,459 @@ def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: boo
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
         encoding="utf-8", newline="\n")
-    print(f"govkit update — wrote {len(changed)}, deleted {len(deleted)}, "
+    print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+          f"deleted {len(deleted)}, withheld {withheld}, "
           f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+    return r.emit()
+
+
+
+# ----------------------------------------------------------------- adopt (DEPL-dCarriedReceipt-13)
+# THE BOOTSTRAP. Every other verb here moves an install forward; this one writes the receipt an
+# already-installed tree never had, by MEASURING that tree against gov's own history. It is the first
+# documented path onto the engine for a repository somebody vendored kits into by hand, and the
+# audit that motivated it measured zero auto-syncable rows in either live target for exactly one
+# reason: `cmd_update` refuses without `.governance/install.json`, and neither target has one.
+#
+# `evidence` IS THIS UNIT'S FIELD, and it exists because a base an ENGINE INFERRED must never be
+# indistinguishable from one a write produced. `apply` stamps `"apply"`; this verb stamps
+# `"vintage-match"` for a row whose bytes it proved against a gov commit, `"pinned"` for one an
+# operator asserted, and `"unattributed"` for one that matched no vintage at all. The fifth state is
+# ABSENCE, on S11's two synthesized classes, and it is NOT a synonym for `"unattributed"` — S7's skip
+# keys on the string, so widening it to field-absence would swallow every unlanded row and silently
+# delete four dispositions. That reading was in an earlier rev of the spec and was destructive.
+EVIDENCE_STATES = ("apply", "vintage-match", "pinned", "unattributed")
+
+
+def carry_matches(rung: str, ours: bytes, base: bytes, needles: dict[str, str]) -> bool:
+    """Does ONE named rung explain the difference between the target's bytes and gov's?
+
+    `derive_carry_rung` asks the ladder question — WHICH rung, first proof wins — over ONE base.
+    `adopt` asks the transposed one: hold the rung, walk the bases (S4). Both are the same three
+    proofs and they are spelled ONCE, here, with the ladder calling this rather than repeating it.
+
+    `eol` normalises BOTH sides and that is why this is not `derive_carried_by_rung`: that function
+    is the WRITE-path transform, applied to gov's bytes alone so the rung cancels in a three-way
+    diff. Normalising one side is the right answer there and the wrong answer to this question — a
+    CRLF target compared against an LF-normalised gov blob still differs on every line.
+    """
+    if rung == "verbatim":
+        return ours == base
+    if rung == "eol":
+        return derive_lf(ours) == derive_lf(base)
+    return ours == derive_carried(base, needles)
+
+
+def derive_attribution(root: pathlib.Path, src: str, ours: bytes, to_commit: str,
+                       needles: dict[str, str]) -> tuple[str, str, str] | None:
+    """S3 + S4. The vintage the target's bytes came from, as `(commit, gov_oid, rung)`, or `None`.
+
+    RUNG-MAJOR, NOT RECENCY-MAJOR, and it is load-bearing rather than a preference. Every commit is
+    tested at `verbatim` first, then `eol`, then `relocate`, and the NEWEST commit inside the FIRST
+    rung that matches wins. Preferring a newer commit at a lossier rung selects a base whose delta
+    was never applied to this target, and the three-way then re-applies work the adopter already
+    has. The inverse is in the spec's rejected alternatives for that reason.
+
+    `git log <to-rev> -- <src>` and NEVER `--all`. Measured at 9ddcc5c9: gov carries eight commits
+    reachable from a ref and not from `HEAD`, several on in-flight branches, and a walk that reaches
+    them attributes an adopter to a vintage nobody ever shipped.
+
+    ONE BLOB READ PER COMMIT, cached across all three rungs. The walk is this verb's dominant cost on
+    a real adopter — 143 planned writes on the target section 5 names — and re-reading the same blob
+    three times would triple it for nothing.
+    """
+    out = subprocess.run(
+        ["git", "-C", str(root), "log", "--format=%H", to_commit, "--", src],
+        capture_output=True, text=True, check=False)
+    commits = [c for c in out.stdout.split() if c]
+    cache: dict[str, bytes | None] = {}
+
+    def base_at(c: str) -> bytes | None:
+        if c not in cache:
+            cache[c] = blob_at(root, c, src)
+        return cache[c]
+
+    for rung in CARRY_RUNGS:
+        for c in commits:                      # `git log` emits newest-first, so this IS recency
+            base = base_at(c)
+            if base is None:
+                continue
+            if carry_matches(rung, ours, base, needles):
+                return c, blob_oid(base), rung
+    return None
+
+
+def demand_adopt_index_clean(target: pathlib.Path) -> None:
+    """S8's third refusal, and section 8 F1 decides its WIDTH: the index, never the worktree.
+
+    `adopt` reads every identity it records out of the index, so an index that disagrees with HEAD
+    means the receipt would record blobs no commit in the target carries. An UNSTAGED edit is a
+    different thing entirely — the operator's own work in a repository gov does not own — and
+    refusing over one is the shape adopters learn to route around. `-12` owns the worktree
+    preconditions, on the verbs that write bytes into the target; this verb writes one file under
+    `.governance/` and nothing else.
+    """
+    has_head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "-q", "HEAD"],
+                              capture_output=True).returncode == 0
+    if not has_head:
+        return          # index-versus-HEAD is unanswerable before the first commit
+    out = subprocess.run(["git", "-C", str(target), "diff", "--cached", "--name-only", "-z", "HEAD"],
+                         capture_output=True, text=True, check=False)
+    staged = sorted({n for n in out.stdout.split("\0") if n})
+    if staged:
+        raise Refusal(
+            f"{len(staged)} path(s) in the target's index differ from HEAD: " + ", ".join(staged)
+            + " — `adopt` records each row's identity from the INDEX, so a staged-but-uncommitted "
+            "tree would be written into the receipt as the vintage this target holds, and no commit "
+            "here carries those blobs. Commit or reset them, then re-run. An UNSTAGED edit does not "
+            "block: this verb writes one file under `.governance/` and never touches your worktree"
+        )
+
+
+def cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
+              pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+    """The verb. Its BODY is `_cmd_adopt`; see `cmd_apply` for why the split exists.
+
+    D5, from this build's closing review: `adopt --write` is the THIRD writer of
+    `.governance/install.json` and it stood outside the per-target write lock that exists because
+    two of them must not interleave. The lock is bundled inside `demand_writable_target`, so opting
+    out of `-12`'s WORKTREE preconditions -- correct for a verb that puts no bytes in the target's
+    tree -- silently opted out of the lock as well. The window is minutes wide, not theoretical:
+    `derive_attribution` spawns one `git log` per planned destination. The loser's receipt is the
+    file that governs every future destructive `update --write`.
+    """
+    try:
+        return _cmd_adopt(root, target, to_rev, pins, re_adopt, write)
+    finally:
+        release_write_lock()
+
+
+def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
+               pins: dict[str, str], re_adopt: bool, write: bool) -> int:
+    """Write the receipt an already-installed tree never had, by measuring it against gov history.
+
+    READ-ONLY WITHOUT `--write`, matching `update` and for the same reason: the muscle-memory
+    invocation must not be the one that writes.
+    """
+    r = Report()
+    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    descs = read_descriptors(root, reg, r)
+    if r.problems:
+        return r.emit()
+
+    # ---- S8, the three refusals. Target IDENTITY first, before anything is read out of the tree:
+    # ---- a refusal about WHICH repository this is must not queue behind one about its contents.
+    if pathlib.Path(root).resolve() == target.resolve():
+        raise Refusal("--target resolves to the gov checkout itself; adopting this repo into itself "
+                      "is a stated non-goal and would be indistinguishable from a self-overwrite")
+    receipt_path = target / ".governance" / "install.json"
+    # D5. THE LOCK IS TAKEN ON THE `--write` PATH ONLY, matching the rule a read-only run pays
+    # nothing, and BEFORE the existence guard below -- so that guard stops being a check-then-mutate
+    # against a concurrent writer. Released in `cmd_adopt`'s `finally`.
+    if write:
+        take_write_lock(target, "adopt")
+    if receipt_path.is_file() and not re_adopt:
+        raise Refusal(
+            f"the target already carries a receipt at {receipt_path.as_posix()} — `adopt` writes one "
+            f"where there was none. Re-run with `--re-adopt` to re-measure from scratch. That flag "
+            f"is deliberately a second explicit invocation rather than a default: a receipt is a "
+            f"decision artefact, and `intake` refuses to silently rewrite the descriptor for the "
+            f"same reason"
+        )
+    demand_adopt_index_clean(target)
+
+    deploy = load_deploy(target)
+    selection = resolve_selection(reg, descs, "kits" if deploy.get("kits") else "default",
+                                  list(deploy.get("kits") or []))
+    out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", to_rev + "^{commit}"],
+                         capture_output=True, text=True, check=False)
+    if out.returncode != 0:
+        raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
+    commit = out.stdout.strip()
+
+    print(f"govkit adopt — target {target.as_posix()} · selection: {', '.join(selection)}")
+    print(f"govkit adopt — measuring against gov {commit[:8]} "
+          f"({'--write' if write else 'READ-ONLY: pass --write to record the receipt'})")
+
+    # ---- THE DESTINATION SET (S2). BOTH of `resolve_entry`'s channels, because a `forked` rule's
+    # ---- rows arrive in the second one and a set built from `writes` alone leaves the receipt
+    # ---- silent about exactly the files that most need saying. `merged` entries are skipped on
+    # ---- this channel and re-synthesized in `apply`'s own shape by S11, exactly as `apply` skips
+    # ---- them in its own unlanded loop; the stripped unlanded shape is the one row `cmd_check`
+    # ---- cannot read.
+    plan: list[dict] = []                      # one entry per planned destination, in landing order
+    merged_rules: list[tuple[str, str, dict, dict]] = []      # (eid, version, descriptor, rule)
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        vers = entry_version(root, d)
+        res = resolve_entry(root, d, ctx)
+        for dest, w in sorted(res["writes"].items()):
+            if w["missing"] or w.get("scope") == "machine":
+                continue
+            rule = d.get("files", [])[w["rule"]]
+            if rule.get("scope") == "machine" or rule.get("link"):
+                continue
+            plan.append({"dest": dest, "role": w["role"], "kit": eid, "version": vers,
+                         "src": w["src"], "landable": True, "rule": rule})
+        for u in res["unlanded"]:
+            if u["role"] == "merged" or u.get("missing"):
+                continue                       # S11 writes the real merged row below
+            _rules = d.get("files", [])
+            _i = u.get("rule")
+            plan.append({"dest": u["dest"], "role": u["role"], "kit": eid, "version": vers,
+                         "src": u["src"], "landable": False,
+                         "rule": _rules[_i] if isinstance(_i, int) and 0 <= _i < len(_rules) else {}})
+        for rule in d.get("files", []):
+            if rule.get("role", "engine") == "merged" and rule.get("marker_style") != "json-pointer":
+                merged_rules.append((eid, vers, d, rule))
+
+    # ---- S4a. THE NEEDLE MAP, at bootstrap. `-9` F3's derivation reads a RECEIPT, and there is no
+    # ---- receipt yet — so the same function is fed this run's planned `(src, dest)` pairs, which
+    # ---- are the only record of where a file would land. Without it the `relocate` rung has no
+    # ---- map, the ladder collapses to `verbatim`/`eol`, and every relocated row bootstraps
+    # ---- `unattributed` and is skipped by S7 forever.
+    needles, dpairs, dropped = derive_carry_map([(p["src"], p["dest"]) for p in plan if p["src"]])
+    for gd, ds in dropped:
+        print(f"govkit adopt — dropped ambiguous gov directory '{gd}': it names "
+              f"{len(ds)} target directories ({', '.join(ds)}), so it is no single needle")
+    print(f"govkit adopt — needle map: {len(dpairs)} directory pair(s), {len(needles)} needle(s)")
+
+    # ---- THE INDEX, ONE batched read over every planned destination. A destination the target does
+    # ---- not track has no identity to record and gets no row at all.
+    idx, _present = index_read(target, [p["dest"] for p in plan]) if plan else ({}, set())
+
+    rows: list[dict] = []
+    tally: dict[str, int] = {}
+    # D6, from this build's closing review. `--pin` was consumed by LOOKUP and nothing checked that
+    # any lookup hit, so a typo, a backslashed path, or a dest the target does not track did nothing
+    # and said nothing -- closing a loop on the operator, because the row it was meant to rescue
+    # keeps `unattributed` and `update`'s remedy then names the command they just ran to no effect.
+    # The same flag already refuses loudly on its other two error classes, and the parser refuses a
+    # missing `=` with the words "accepting it would silently pin nothing".
+    pins_used: set[str] = set()
+    for p in plan:
+        dest = p["dest"]
+        if dest not in idx:
+            tally["not-installed"] = tally.get("not-installed", 0) + 1
+            print(f"  {'not-installed':<15} [{p['role']:<13}] {dest}")
+            continue
+        ours = index_blob(target, idx[dest][1])
+        # THE ROW's `role` IS THE RULE'S, NEVER THE WALK'S (S5). A fork has a common ancestor BY
+        # CONSTRUCTION, so the walk attributes it at its pre-fork vintage and matches `verbatim`
+        # there; taking the role from that outcome adopts it as `engine` with the two identities
+        # AGREEING, which opens the raw-write arm and lets the first `update --write` land gov's
+        # fork over the target's working program. That is the measured landmine `-10` exists for,
+        # re-manufactured by the bootstrap written to record it.
+        row: dict = {"path": dest, "role": p["role"], "kit": p["kit"], "version": p["version"],
+                     "source": p["src"]}
+        if not p["landable"]:
+            row["written"] = False
+            why = UNLANDED_REASON.get(p["role"])
+            if why is not None:
+                row["why"] = why
+        if p["role"] == "forked":
+            for _k in FORK_RULE_KEYS:
+                if p["rule"].get(_k):
+                    row[_k] = p["rule"][_k]
+        # F5: `sha256` hashes the TARGET's own bytes, not gov's at `commit`. The two coincide only
+        # while every row is `verbatim`, and this is the first verb whose whole job is the rows
+        # where they do not.
+        #
+        # D9, from this build's closing review: WHICH of the target's bytes was the question nobody
+        # asked. This stamped the INDEX blob while `cmd_check`'s integrity arm compares the field
+        # against `dp.read_bytes()` -- the WORKTREE -- and `install.sums` is verified with a bare
+        # `sha256sum -c`, which also reads the worktree. The two populations are documented to
+        # differ: `demand_adopt_index_clean` deliberately permits unstaged edits, and any
+        # `core.autocrlf=true` clone diverges on every text file. So `adopt --write` followed by
+        # `check` reported a mismatch for rows nothing was wrong with, precisely on the trees this
+        # verb exists for. The irony is exact and worth keeping: the `gov_oid`/target-bytes
+        # discipline was applied so carefully that `sha256`'s own population question went unasked.
+        #
+        # WORKTREE for `sha256`, INDEX for `oid`. Each field now answers the question its readers
+        # ask. A path absent from the worktree keeps the index bytes, which is the honest fallback:
+        # the row is still hashed, and `check` reports the absence itself rather than a mismatch.
+        if ours is not None:
+            _dp = target / dest
+            try:
+                _bytes = _dp.read_bytes() if _dp.is_file() else ours
+            except OSError:
+                _bytes = ours
+            row["sha256"] = hashlib.sha256(_bytes).hexdigest()
+            row["oid"] = idx[dest][1]
+
+        # THE RUNG IS A LOCAL, and never read back off the row it was just written to. `-9` S2 says
+        # no branch anywhere reads a stored `carry`, and an arm over this file's SOURCE enforces it
+        # by NAME: reading `row["carry"]` five lines after writing it is indistinguishable, to that
+        # arm and to a reader, from trusting one an older run left behind.
+        rung: str | None = None
+        pin = pins.get(dest)
+        if pin is not None:
+            pins_used.add(dest)
+            pc = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify",
+                                 pin + "^{commit}"], capture_output=True, text=True, check=False)
+            if pc.returncode != 0:
+                raise Refusal(f"--pin {dest}={pin} does not resolve in this gov checkout")
+            pinned = pc.stdout.strip()
+            was = blob_at(root, pinned, p["src"]) if p["src"] else None
+            if was is None:
+                raise Refusal(f"--pin {dest}={pin}: gov holds no blob for '{p['src']}' at "
+                              f"{pinned[:12]}, so the assertion names a base that does not exist")
+            row["commit"] = pinned
+            row["gov_oid"] = blob_oid(was)
+            # RECOMPUTED, never asserted. `--pin` fixes the BASE; the rung stays a proof, so an
+            # operator who pins the wrong vintage gets a row with no rung rather than a claim.
+            row["evidence"] = "pinned"
+            rung = derive_carry_rung(was, needles, lambda: ours) if ours is not None else None
+            if rung:
+                row["carry"] = rung
+        else:
+            hit = derive_attribution(root, p["src"], ours, commit, needles) if (
+                p["src"] and ours is not None) else None
+            if hit is None:
+                # S7. Its OWN state, and NOT `forked`: that role is a claim the DESCRIPTOR makes,
+                # and the walk does not get to make it on the descriptor's behalf. No `commit`, no
+                # `gov_oid`, `role` untouched.
+                row["evidence"] = "unattributed"
+            else:
+                row["commit"], row["gov_oid"], rung = hit
+                row["carry"] = rung
+                row["evidence"] = "vintage-match"
+
+        ev = row["evidence"]
+        key = "forked" if p["role"] == "forked" else (rung or ev)
+        tally[key] = tally.get(key, 0) + 1
+        print(f"  {key:<15} [{p['role']:<13}] {dest}"
+              + (f" <- {row['commit'][:8]}" if row.get("commit") else ""))
+        rows.append(row)
+
+    # D6's refusal, AFTER the loop so it can name the whole measured population. Listing what was
+    # measured is the half that makes a typo legible: a bare "no such pin" reads as a tool bug.
+    _unmatched = sorted(set(pins) - pins_used)
+    if _unmatched:
+        _seen = sorted({x["dest"] for x in plan})
+        raise Refusal(
+            f"{len(_unmatched)} --pin key(s) matched no planned destination that this target "
+            f"tracks: " + ", ".join(_unmatched) + ". A pin consumed by lookup with nothing checking "
+            f"that any lookup hit is a pin that silently did nothing, which is the state the row it "
+            f"names is stuck in. The destinations measured were: " +
+            (", ".join(_seen[:12]) + (f" (and {len(_seen) - 12} more)" if len(_seen) > 12 else "")
+             if _seen else "(none — this target tracks no planned destination)"))
+
+    # ---- S11. THE TWO CLASSES `resolve_entry` DOES NOT PRODUCE, in `apply`'s own shapes rather
+    # ---- than in a second one. Without them `-2`'s `pins` arm never dispatches and `cmd_check`'s
+    # ---- merged loop raises `KeyError` on `row['block_id']`. NEITHER carries `evidence`, `gov_oid`
+    # ---- or `oid`: both are measured from the target's own bytes rather than attributed to a gov
+    # ---- vintage, and `merged`'s exemption from `-7` S9's integrity preamble is by ROLE, which
+    # ---- this row inherits by being the same row `apply` writes.
+    pins_declared = lf_pins(descs, selection, lambda e, dd: target_context(target, deploy, e, dd))
+    if pins_declared:
+        _om, _cm, _text = lf_pin_block(pins_declared)
+        _ga = target / ".gitattributes"
+        _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
+        _span = find_block(_cur, _om, _cm)
+        _held = "\n".join(_cur.split("\n")[_span[0]:_span[1] + 1]) if _span else None
+        rows.append({"path": ".gitattributes", "role": "attributes", "kit": "(govkit)",
+                     "version": "(synthesized)", "block_id": GA_BLOCK_ID,
+                     "marker_style": "hash-comment", "mode": "append", "normalized": "lf",
+                     # The block the TARGET holds where it holds one, so `update`'s pins arm
+                     # compares against what is really there; gov's recomputed block otherwise,
+                     # which is the honest reading of a target that never had one.
+                     "block_sha256": hashlib.sha256(
+                         (_held if _held is not None else _text).encode("utf-8")).hexdigest(),
+                     "patterns": [p for p, _c, _w in pins_declared], "written": False})
+        tally["attributes"] = tally.get("attributes", 0) + 1
+
+    for eid, vers, d, rule in merged_rules:
+        ctx = target_context(target, deploy, eid, d)
+        om, cm = marker_pair(rule.get("marker_style"), rule["block_id"])
+        for src in rule_sources(d, rule):
+            if blob_at(root, commit, src) is None:
+                continue
+            for dest_t in (rule.get("to") if isinstance(rule.get("to"), list) else [rule.get("to")]):
+                dest, miss = resolve_tokens(dest_t, ctx)
+                if miss:
+                    continue
+                dp = target / dest
+                if not dp.is_file():
+                    continue
+                text = dp.read_text(encoding="utf-8", errors="replace")
+                held = find_block(text, om, cm)
+                if held is None:
+                    continue
+                block = "\n".join(text.split("\n")[held[0]:held[1] + 1])
+                rows.append({"path": dest, "role": "merged", "kit": eid, "version": vers,
+                             "block_id": rule["block_id"],
+                             "marker_style": rule.get("marker_style"),
+                             "block_sha256": hashlib.sha256(
+                                 block.replace(CR, "").encode("utf-8")).hexdigest(),
+                             "normalized": "lf", "mode": "append", "source": src,
+                             "commit": commit, "written": False})
+                tally["merged"] = tally.get("merged", 0) + 1
+
+    print("govkit adopt — " + (", ".join(f"{k} {v}" for k, v in sorted(tally.items())) or "0 rows"))
+    if not write:
+        print(f"govkit adopt — READ-ONLY: {len(rows)} row(s) would be recorded. "
+              f"Nothing was written; re-run with --write")
+        return r.emit()
+
+    # ---- S10. THE ENVELOPE, not just the rows. Three units read fields OUTSIDE `files`, and
+    # ---- omitting them degrades each of them SILENTLY: `-12` S7's vintage guard fails open by its
+    # ---- own words with no `gov_commit`, `-11`'s rename diff has no base and the unit is inert,
+    # ---- and `-2`'s pins arm reads an empty `kits` so every registry entry prints as "available
+    # ---- (not installed)". `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are not
+    # ---- MEASURED here — each records what an install DID and this verb installs nothing — but on
+    # ---- `--re-adopt` they are CARRIED FORWARD verbatim from the receipt being replaced, which is
+    # ---- D2 below. This sentence used to say they are "NOT written", four lines above the block
+    # ---- that writes them.
+    (target / ".governance").mkdir(exist_ok=True)
+    envelope = {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+                "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows}
+    # ---- D2, from this build's closing review. S10's "this verb installs nothing" is true and was
+    # ---- the wrong reason to DROP these five keys: `--re-adopt` runs over a receipt somebody else
+    # ---- wrote, and `apply` writes exactly these to record what an INSTALL DID. Re-measuring
+    # ---- provenance does not un-perform an install.
+    # ----
+    # ---- The consequence was not cosmetic. `_cmd_apply` derives `owned` from
+    # ---- `gate_runner.emitted`; with that emptied, the first leg name already in the target's
+    # ---- runner hits the "already has a leg named ... and this target's receipt does not claim it"
+    # ---- Refusal and the whole install aborts — permanently, until someone hand-edits the runner.
+    # ---- `cmd_check`'s outbox arm went quiet the same way, and the refusal text steered the
+    # ---- operator straight into it: "Re-run with `--re-adopt`".
+    # ----
+    # ---- CARRIED VERBATIM, never re-measured: these record an EVENT, and this verb did not witness
+    # ---- it. A fresh adopt has no prior receipt and simply omits them, which is S10 unchanged.
+    if re_adopt and receipt_path.is_file():
+        try:
+            _prior = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            _prior = {}
+        if not isinstance(_prior, dict):
+            # M3, from ROUND 2, found four times independently. `null`, `123`, `["orders"]` and a
+            # bare JSON string all pass a `k in _prior` test or a `_prior[k]` index and then raise a
+            # TypeError, which `main` does not catch — a raw traceback instead of a named refusal.
+            # Refused rather than coerced: a receipt that is not an object is not a receipt, and
+            # silently treating it as an empty one would carry nothing forward while claiming to.
+            raise Refusal(
+                f"the receipt at {receipt_path.as_posix()} parses as "
+                f"{type(_prior).__name__}, not an object. `--re-adopt` carries the install-record "
+                f"keys forward from it, and there is nothing to carry. That file is committed and "
+                f"text-mergeable, so a bad merge is the usual cause: fix or delete it, then re-run")
+        _carried = [k for k in ("orders", "baseline", "after", "hook_block", "gate_runner")
+                    if k in _prior]
+        for _k in _carried:
+            envelope[_k] = _prior[_k]
+        if _carried:
+            print(f"govkit adopt — carried {len(_carried)} install-record key(s) forward from the "
+                  f"receipt being replaced: {', '.join(_carried)}. Re-measuring provenance does not "
+                  f"un-perform an install, and dropping these bricks the next `apply`")
+    receipt_path.write_text(json.dumps(envelope, indent=2) + "\n",
+                            encoding="utf-8", newline="\n")
+    (target / ".governance" / "install.sums").write_text(
+        "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
+        encoding="utf-8", newline="\n")
+    print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
+          f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
     return r.emit()
 
 
@@ -3197,13 +6394,17 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             " and none was supplied. Refusing to invent one: an answer this tool guesses is one the "
             "operator never made and cannot audit. Supply them as --answer key=value"
         )
+    # DEPL-dCarriedReceipt-3 S1: resolved ONCE, and every spelling below reads this. `or` rather
+    # than a presence test, so `--answer prefix=` with an empty value takes the default instead of
+    # emitting an empty prefix that would resolve every destination to a bare relative path.
+    pfx = answers.get("prefix") or "tools"
     body = ['# deploy.toml — written once by `govkit intake`. Committed, it is the standing',
             '# authorization for an unattended re-run: it carries every owner decision, so a later',
             '# `apply` reads answers rather than asking for them again.',
             '',
             f'gov_source = "{root.as_posix()}"',
             f'gov_commit = "{git(root, "rev-parse", "HEAD").strip()}"',
-            'prefix = "tools"',
+            f'prefix = "{pfx}"',
             'kits = [' + ", ".join(f'"{k}"' for k in selection) + ']',
             '',
             '[answers]']
@@ -3227,7 +6428,7 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         )
     if seeds:
         eid, seed = seeds[0]
-        gctx = {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}"}
+        gctx = {"prefix": pfx, "kit_id": eid, "kit": f"{pfx}/{eid}"}
 
         def resolve_seed_value(v):
             if isinstance(v, str):
@@ -3274,7 +6475,8 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(body), encoding="utf-8", newline="\n")
     print(f"govkit intake — wrote {out.as_posix()} for {len(selection)} kit(s); "
-          f"{len(need)} answer(s) recorded")
+          f"{len(need)} answer(s) recorded; "
+          f'prefix "{pfx}" ({"from --answer" if answers.get("prefix") else "default"})')
     return r.emit()
 
 
@@ -3297,14 +6499,23 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck
-  govkit.py plan  --target <path> [--kits a,b | --all]
-  govkit.py check --target <path>
+  govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
+  govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
-`plan`, `check` and `update` are READ-ONLY and none writes a byte; `update --write` performs what
-`update` printed. The default is read-only because that verb's failure mode is silent data loss in a
+`plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
+what `update` printed. `adopt` is the BOOTSTRAP: it writes the receipt an already-installed tree
+never had, by measuring that tree against gov's own history, and `--write` is what records it. It
+puts no byte into the target's working tree ever — one file under `.governance/` and nothing else —
+and it refuses over an existing receipt unless `--re-adopt` says to re-measure from scratch. `--write-withdrawals` is the ONLY way `update` deletes anything: without it a file
+gov has stopped shipping is REPORTED and an order is written under `.governance/outbox/`, and the
+adopter's copy stays exactly where it is. It defaults off and it is a scope flag rather than a
+`--force` — it enables a narrower class of action and overrides no refusal. A file gov RENAMED is
+not a withdrawal at all: `update --write` moves the target's copy to the new destination its own
+descriptor resolves, carrying any local edit through a three-way merge. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
 destructive one. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
@@ -3319,8 +6530,23 @@ def parse_args(argv: list[str]) -> tuple:
     mode, kits = "default", []
     resume = False
     write = False
+    write_withdrawals = False
     to_rev = "HEAD"
     answers: dict[str, str] = {}
+    # DEPL-dCarriedReceipt-13 S1. Both widen this function, which used to return a fixed 8-tuple.
+    # `--pin` is REPEATABLE and keyed by destination: one assertion per row, never a mode.
+    pins: dict[str, str] = {}
+    re_adopt = False
+    # DEPL-dCarriedReceipt-4 S6. `--emit-declines` implies `--coverage` in `cmd_plan`, so the two
+    # are parsed independently and joined there rather than here: a parser that silently switched
+    # another flag on would make `parse_args`'s return the second place the rule is written.
+    coverage = False
+    emit_declines = False
+    # DEPL-dCarriedReceipt-5, corrected by this build's closing review. OPT-IN, because the argv it
+    # releases comes out of the TARGET's own descriptor and every other spawn in this engine is
+    # gov-authored. It is a scope flag by the test `-11` and `-12` share: it enables a NARROWER class
+    # of action, defaults OFF, and overrides no refusal.
+    run_discharge = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -3339,6 +6565,35 @@ def parse_args(argv: list[str]) -> tuple:
         elif a == "--write":
             write = True
             i += 1
+        elif a == "--write-withdrawals":
+            # DEPL-dCarriedReceipt-11 S9. Its OWN flag rather than a value on `--write`, and NOT a
+            # `deploy.toml` field: a descriptor field is a STANDING authorization, and the whole
+            # reason this flag exists is that a deletion used to happen without anyone deciding it
+            # once, let alone standing (§8 F1). It does nothing without `--write`, because the
+            # deletion it scopes lives in the write loop.
+            write_withdrawals = True
+            i += 1
+        elif a == "--pin" and i + 1 < len(argv):
+            # DEPL-dCarriedReceipt-13 S6. `<path>=<rev>`, and the SAME key=value refusal `--answer`
+            # already makes: a `--pin` with no `=` is an operator naming a path and no vintage, and
+            # accepting it would silently pin nothing.
+            k, _eq, v = argv[i + 1].partition("=")
+            if not _eq:
+                raise Refusal(f"--pin needs <path>=<rev>, got: {argv[i + 1]}")
+            pins[k.strip()] = v.strip()
+            i += 2
+        elif a == "--re-adopt":
+            re_adopt = True
+            i += 1
+        elif a == "--coverage":
+            coverage = True
+            i += 1
+        elif a == "--run-discharge":
+            run_discharge = True
+            i += 1
+        elif a == "--emit-declines":
+            emit_declines = True
+            i += 1
         elif a == "--to" and i + 1 < len(argv):
             to_rev = argv[i + 1]
             i += 2
@@ -3350,7 +6605,8 @@ def parse_args(argv: list[str]) -> tuple:
             i += 2
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
-    return verb, target, mode, kits, resume, answers, write, to_rev
+    return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
+            pins, re_adopt, coverage, emit_declines, run_discharge)
 
 
 def main(argv: list[str]) -> int:
@@ -3358,7 +6614,8 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
-        verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV = parse_args(argv)
+        (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -3367,7 +6624,7 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
-        if verb in ("plan", "check", "apply", "intake", "update"):
+        if verb in ("plan", "check", "apply", "intake", "update", "adopt"):
             if target is None:
                 raise Refusal(
                     f"{verb} needs an explicit --target. Refusing to default it to the process cwd: "
@@ -3376,13 +6633,17 @@ def main(argv: list[str]) -> int:
             if not (target / ".git").exists():
                 raise Refusal(f"--target {target.as_posix()} is not a git repository")
             if verb == "plan":
-                return cmd_plan(root, target, mode, kits)
+                return cmd_plan(root, target, mode, kits, coverage=COVERAGE,
+                                emit_declines=EMIT_DECLINES, run_discharge=RUN_DISCHARGE)
             if verb == "check":
-                return cmd_check(root, target)
+                return cmd_check(root, target, run_discharge=RUN_DISCHARGE)
             if verb == "intake":
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
-                return cmd_update(root, target, TO_REV, write=WRITE)
+                return cmd_update(root, target, TO_REV, write=WRITE,
+                                  write_withdrawals=WRITE_WD)
+            if verb == "adopt":
+                return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
         sys.stderr.write(f"govkit: unknown subcommand '{verb}'\n\n{USAGE}")
         return 2

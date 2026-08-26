@@ -1,12 +1,17 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-10 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-9-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-9-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md) | spec-audit | DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-12-diff-review-round3.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-12-diff-review-round3.md) | diff-review | DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-7 |
 
 <!-- /gen:spec-records -->
 
@@ -36,10 +41,14 @@ to the carried bytes with no operator turn (S9), and what the row is stamped wit
 - **S2** — `carry` is RECOMPUTED on every run and never trusted from the receipt. It is written into
   the row for reporting, and the reader is the print loop only. No branch in either verb may read a
   stored `carry`, which is asserted by an arm rather than left to discipline.
-- **S3** — `alpha` is DERIVED from the receipt and never authored. Each row contributes one pair,
-  `(dirname(source), dirname(path))`; the pairs are deduplicated; any gov directory that yields two
-  DIFFERENT target directories is DROPPED and reported by name. There is no override key and no
-  descriptor field: an authored map is a second answer to a question the receipt already answers.
+- **S3** — `alpha` is DERIVED, never authored, and the derivation takes a SEQUENCE OF PAIRS
+  rather than a receipt, because it has two callers. `cmd_update` feeds it the receipt: each row
+  contributes one pair, `(dirname(source), dirname(path))`. `adopt` feeds it the planned
+  `(src, dest)` pairs of its own run, lifted the same way — `-13` S4a, and §8 F3 records
+  why that is not a re-opening of the fork. The pairs are deduplicated; any gov directory that
+  yields two DIFFERENT target directories is DROPPED and reported by name. There is no override
+  key and no AUTHORED descriptor field: a hand-written map is a second answer to a question the
+  caller's own pairs already answer.
 - **S4** — needles emit in both the `/` form and the `~` form, because gov flattens paths into
   fixture filenames. Substitution is a single left-to-right pass, longest needle first, and the
   output is never rescanned, so one substitution can never feed another.
@@ -88,6 +97,32 @@ to the carried bytes with no operator turn (S9), and what the row is stamped wit
   bytes are not gov's. Taking the un-narrowed stamp is the corrupt pairing: two identities recorded
   EQUAL over bytes gov never shipped, which the next run reads as a clean gov-owned row and
   raw-overwrites back to gov's prefix.
+- **S13 — BUILT at rev-10, on node `a`, by owner ruling 2026-08-26.** It asks for a committed
+  receipt of the 52 rows measured at inCMS `2cff5855`, generated once by a script recorded beside
+  it, so AC1's and AC2's counts are re-runnable without either live target. That is what now ships:
+  `tools/govkit/fixtures/incms-2cff5855.receipt.json` (52 rows, 30 KiB) and its generator
+  `tools/govkit/fixtures/make_incms_receipt.py`.
+
+  **It was DEFERRED at rev-9 and the reason was real** — the unit was built on node `d`, where the
+  inCMS checkout is not reachable, so no run there could generate it. Node `a` has both live adopter
+  checkouts and the pinned revision resolves, which is the precondition the rev-9 park named.
+
+  **inCMS carries no govkit receipt, so the fixture is RECONSTRUCTED.** At `2cff5855` its
+  `.governance/` holds a GENERATED `install.index` written by its own `check_kit_sync.py` — the same
+  evidence in a different shape, under a different owner. Each row's gov SOURCE is resolved through
+  gov's own `registry.toml` at the recorded commit rather than by a basename guess; the first cut
+  used the guess and left 13 of 54 rows unresolved, because five kits do not live at `tools/<kit>/`.
+  Measured: 92 index rows, 38 carrying `unverified`, 54 with a resolvable commit, and exactly **52**
+  of those also resolving a gov source. S13's own figure, arrived at independently.
+
+  **The fixture stores identities, never answers.** `verbatim` and `relocate` are proved by
+  transforming gov's bytes and comparing the resulting blob oid to the target's recorded `oid`.
+  `eol` cannot be — the rung normalises BOTH sides and an oid cannot be un-hashed — so each row also
+  carries `lf_oid`, one measurement of the target taken where inCMS was reachable, which the arm
+  reproduces from gov's side. That is what keeps the fixture at 30 KiB instead of a 540 KiB pack of
+  another project's source vendored into this repo, and it is not circular: the same function is
+  applied to opposite inputs, which is exactly the equality the rung claims. Cross-checked at build
+  time against inCMS's real object store — all 52 rows agree, zero disagreements.
 
 ## 3. Non-goals (OUT)
 
@@ -191,9 +226,10 @@ the row holds, so a schema-3 receipt written before this unit lands reads identi
 
 `tools/govkit/govkit.py` (~90 lines: the derivation, the substituter, the rung ladder inside
 `classify_row`, S10's label, S11's restore arm, S12's stamp on both carried arms, the two report
-lines), `tools/govkit/selftest.py` (10 arms), and one fixture receipt carrying a non-default prefix,
-a deliberately ambiguous gov
-directory, a `relocate` row whose gov copy moved, and a `relocate` row the target deleted.
+lines), `tools/govkit/selftest.py` (10 arms), and TWO fixtures. The first is a hand-built receipt
+carrying a non-default prefix, a deliberately ambiguous gov directory, a `relocate` row whose gov
+copy moved, and a `relocate` row the target deleted. The second is S13's committed inCMS-derived
+receipt of the 52 resolvable rows, checked in beside the script that generated it.
 
 ## 5. Production-readiness checklist
 
@@ -239,11 +275,29 @@ directory, a `relocate` row whose gov copy moved, and a `relocate` row the targe
 
 ## 6. Acceptance criteria
 
-- **AC1** — Over a fixture receipt built from inCMS's 52 resolvable rows, `classify_row` reports
-  `verbatim` on 21, `eol` on 6 and `relocate` on 5. Observe RED first: at `9ddcc5c9` the returned
-  dict has no `carry` key at all and all 32 non-identical rows classify with `o_state` as `differs`.
-- **AC2** — The derivation over that same receipt yields exactly `13` directory pairs and `26`
-  needles, and DROPS `tools/memory-recall` and `tools/workflows` by name in the printed report.
+- **AC1** — Over S13's committed fixture receipt, built from the 52 rows of inCMS at `2cff5855`
+  whose recorded gov commit resolves against gov `9ddcc5c9`, `classify_row` reports `verbatim` on
+  21, `eol` on 6 and `relocate` on 5. Observe RED first: at `9ddcc5c9` the returned dict has no
+  `carry` key at all and all 31 non-identical rows classify with `o_state` as `differs` — 52
+  resolvable rows less the 21 §4 records as `verbatim`, which is the same 6 + 5 + 20 that table
+  sums.
+- **AC2 — RESTATED at rev-10 against the 86-row population, as this criterion's own text
+  instructed.** The derivation over the rows whose gov SOURCE resolves — 86 of inCMS's 92 at
+  `2cff5855` — yields exactly `13` directory pairs and **`25`** needles, and DROPS
+  `tools/memory-recall` and `tools/workflows` by name in the printed report.
+
+  **Two populations, because they answer different questions**, and conflating them is why this
+  criterion's figures never reproduced. AC1 grades the 52 rows whose recorded COMMIT resolves,
+  because a rung is proved against gov's bytes AT that commit. The needle map needs no commit at all
+  — it derives from `(source, destination)` pairs — so its population is the 86 whose SOURCE
+  resolves. §4's Inventory measured over the 86; the criterion was written against the 52. Over the
+  52 the derivation gives 14 pairs and 27 needles, and drops nothing.
+
+  **`26` was wrong by exactly one, and this build derived why before it measured it.** Needles emit
+  in a `/` form and a `~` form; for a gov directory carrying NO slash those two strings are the
+  SAME, so such a pair contributes one needle rather than two. Exactly one of the 13 — `tools` —
+  carries no slash, so `2×13 − 1 = 25`. The arm asserts that RELATION rather than the literal, which
+  is also what `-13`'s AC12 was warned not to inherit.
 - **AC3** — `scripts/unattended/adopt-unattended.test.sh` matches NO rung, keeps its current verdict,
   and its bytes are unchanged after a `govkit.py update --write` against the fixture, asserted with
   `git diff --exit-code` over that path. This is the `my tools` row; a build that "fixes" it has
@@ -277,9 +331,9 @@ directory, a `relocate` row whose gov copy moved, and a `relocate` row the targe
   with gov's `tools/` spelling, because `o_state` is `absent` (`:2887-2888`) and there are no `ours`
   bytes to prove a rung against.
   The deletion is COMMITTED in the fixture on purpose: `-12` S4 refuses a run over a dirty claimed
-  path, and its definition carves out a path absent from BOTH index and worktree precisely so this
-  cell stays reachable — an uncommitted deletion is refused at `-12`'s step 2 and this AC could
-  never go red.
+  path, and a path absent from the index, the worktree AND HEAD falls outside that definition, so
+  this cell stays reachable — a STAGED but uncommitted deletion is dirty by `-12` S4, refuses at its
+  step 2, and this AC could never go red over one.
 - **AC10** — the STAMP that restore leaves, over the AC9 fixture, asserting both halves together.
   After `python tools/govkit/govkit.py update --write` the restored file spells the target's
   `scripts/` prefix and spells gov's `tools/` nowhere, AND the row it left behind reads
@@ -293,7 +347,7 @@ directory, a `relocate` row whose gov copy moved, and a `relocate` row the targe
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
-selfcheck` legs. Adds ten arms and one fixture; adds no new leg file. It adds NO refusal branch —
+selfcheck` legs. Adds ten arms and two fixtures; adds no new leg file. It adds NO refusal branch —
 the ambiguity drop reports through `r.note` and a print rather than `r.fail` — so
 `tools/govkit/refusal_join.py` and its `BRANCH_PIN` are unmoved. That constant is a shrink-only
 FLOOR, so it is re-derived at landing rather than pinned to a literal here, and that pin
@@ -317,10 +371,57 @@ staying untouched in the diff is itself the assertion.
   The descriptor says where gov would put a file today; the receipt says where the target actually
   took it, and `update`'s whole job is to move what was taken. Re-resolving would also make the map
   drift the moment a descriptor's `to` changes, which is the class `-1` closes elsewhere.
+  `adopt` is the derivation's SECOND caller and reads the descriptor pairs instead, because at
+  bootstrap there is no receipt to read; the drift objection above is about `update`, where a
+  receipt exists.
   RESOLVED (agent, 2026-08-24, delegated): from the receipt.
 
 ## 9. Revision log
 
+- rev-10 · 2026-08-26 · node a · S13 BUILT, and AC2 RESTATED. Reopened by owner ruling after the
+  rev-9 park recorded that its blocking precondition -- an inCMS checkout in hand -- is satisfied on
+  node `a`. The committed fixture and its recorded generator now ship under
+  `tools/govkit/fixtures/`, and AC1's 21 verbatim / 6 eol / 5 relocate REPRODUCES exactly over the
+  real 52-row population, cross-checked against inCMS's own object store at zero disagreements. AC2
+  did NOT reproduce and was restated rather than fitted, which is what its own text asked for: its
+  population is the 86 rows whose gov SOURCE resolves, not the 52 whose COMMIT does, and the needle
+  count there is 25 rather than 26. The missing one is the `/` and `~` forms of `tools` coinciding
+  because that directory carries no slash -- the derivation this build recorded as a park before it
+  had any way to measure it, now measured.
+
+- rev-9 · 2026-08-25 · built. S13 is DEFERRED: the inCMS-derived fixture cannot be generated from
+  this tree, so AC1 and AC2 run over a synthetic fixture whose distribution is MEASURED (4 verbatim
+  / 1 eol / 2 relocate / 3 no rung) rather than over the spec's 21/6/5, which belong to S13's
+  fixture and are reproduced nowhere. AC2's `13` pairs and `26` needles were NOT asserted anywhere:
+  the spec already disclaimed them, and building DERIVED that `26` is wrong even over the 86-row
+  population — the `/` and `~` forms of a gov directory carrying no slash are the SAME string, and
+  §4's own Inventory says `tools` survives as a single pair, so 13 pairs cannot yield 26 distinct
+  needles. `-13` must re-derive rather than inherit either figure. Also corrected: §5's "No new
+  subprocess" is wrong — `eol` is a question about bytes, so a row whose index blob is not gov's
+  own now pays one `git cat-file`; the code says so at the site. And AC8's predicted red describes
+  `9ddcc5c9` and is unreachable on `-8`'s tip, the same correction `-8`'s own ledger recorded.
+- rev-8 · 2026-08-25 · round-6 fold: L5 — §10's reuse audit still summarised the derivation as
+  reading the RECEIPT, after rev-7 rewrote S3 to take a SEQUENCE OF PAIRS because it has two
+  callers. The polarity was reversed by that fold rather than pre-existing it, so the two
+  sentences answered one question two ways. §10 now says `alpha` reads what its CALLER supplies:
+  the receipt from `cmd_update`, the run's own planned pairs from `adopt`. Same
+  one-sentence-left-behind shape rev-7's own M4 filed, one section over.
+- rev-7 · 2026-08-25 · round-5 fold: M4 — S3 still said the map is derived from the RECEIPT
+  after the round-4 fold gave the derivation a second caller in §8 F3 and §10. It is the
+  normative scope item `-13` S4a cites, so a builder read it and wrote a helper taking receipt
+  rows, which `adopt` has none of. S3 now states the input as a SEQUENCE OF PAIRS with the two
+  callers named, and its closing sentence forbids what it actually forbids — an AUTHORED map,
+  not the caller's own pairs.
+- rev-6 · 2026-08-25 · round-4 fold: B1's half lands in §8 F3 and §10 — `adopt` is the derivation's
+  SECOND caller and reads the descriptor pairs, because at bootstrap there is no receipt, and §10
+  now names both callers instead of one. M2 corrects AC1's RED-first population from 32 to 31, with
+  the derivation stated. M3 adds S13, the COMMITTED inCMS-derived fixture and its generator script,
+  names the vintage inside AC1 and AC2, moves §4 Files touched and §7 to two fixtures, and records
+  that AC2's `13` pairs and `26` needles were measured over §4's 86 source-resolving rows rather
+  than the 52 this criterion names — so they are UNVERIFIED over its own population and must be
+  re-measured before the arm is written. AC9's justification is restated to match `-12` S4 after
+  H5: a committed deletion is outside `dirty` because HEAD does not carry it either, and a staged
+  one refuses.
 - rev-5 · 2026-08-25 · round-5 fold: AC7 still demanded `"schema": 4`, the one surviving instance
   of the bump rev-4 withdrew everywhere else — it now asserts schema 3. AC9's fixture COMMITS its
   deletion, because `-12` S4 would otherwise refuse the run before the `missing` cell is reached.
@@ -374,6 +475,10 @@ and `rule_relpath` (`:172`) already know how a source maps to a destination, and
 would look like reuse. They answer for the descriptor as it reads TODAY, while `alpha` must answer
 for what the target actually installed, possibly at a different gov commit and a different `prefix`.
 Reusing them would make the map drift with the registry — the same two-spellings-of-one-fact class
-`-1` exists to close, re-created one layer down. `alpha` therefore reads the receipt, which is the
-only record of what was taken, and no new seam is created: the derivation is a private helper with
-one caller inside `cmd_update`.
+`-1` exists to close, re-created one layer down. `alpha` therefore reads what its CALLER supplies
+rather than re-resolving the descriptors — the receipt from `cmd_update`, since it is the only
+record of what was taken, and the run's own planned pairs from `adopt`, which has no receipt yet
+(S3). No new seam is created: the derivation is a private helper with two callers. The first is
+`cmd_update` (`:2918`), which feeds it the receipt. The second is the `adopt` verb `-13` adds,
+which feeds it the planned descriptor pairs of that run, because at bootstrap no receipt
+exists yet — §8 F3 records why that is not a re-opening of the fork.

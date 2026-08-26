@@ -563,6 +563,138 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `bash <project>/tools/workflows/check-verifier-fanout.sh` · `bash <project>/tools/workflows/check-review-join.sh` ·
   `node <project>/tools/workflows/check-workflow-syntax.js` — each → exit 0.
 
+## 5b — A tree that already carries kits: bootstrap its receipt (`adopt`)
+
+Everything above is the FRESH path — a project with no gov bytes in it, where `apply` lands the files
+and writes the receipt as it goes. This section is the other one: a repository somebody already
+vendored kits into by hand, which has no `.governance/install.json` and therefore cannot be updated
+at all. `update` refuses without a receipt, by design, so such a tree is stuck until one exists.
+
+`adopt` writes it, by MEASURING the tree against gov's own history. It puts no byte into the working
+tree — one file under `.governance/`, and `install.sums` beside it — and it is read-only until
+`--write`.
+
+```bash
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits a,b,…   # the descriptor, once
+python <gov>/tools/govkit/govkit.py adopt  --target <project>                # READ-ONLY: read this
+python <gov>/tools/govkit/govkit.py adopt  --target <project> --write        # then record it
+python <gov>/tools/govkit/govkit.py update --target <project>                # now the tree is live
+```
+
+**Read the read-only run before you write it.** Each destination prints with its role and what the
+walk found, and the tally at the end is the answer to "is this tree adoptable":
+
+- `verbatim` — the target holds gov's bytes exactly. Nothing to explain.
+- `eol` / `relocate` — the bytes differ for a reason gov already knows about: a CRLF checkout, or an
+  install at a `prefix` other than the default. Both are PROVEN per row on every run, never read back
+  off the receipt.
+- `unattributed` — no gov vintage explains these bytes. The row is recorded with no base, and every
+  later `update` prints it and writes nothing to it. This is a REPORT, not a failure: partial
+  attribution is the normal state of a hand-vendored tree, and a bootstrap that demanded totality
+  would bootstrap nothing.
+- `forked` — the descriptor declares gov's copy a derivative of the target's. Report-only in both
+  directions, whatever the walk found.
+- `not-installed` — a destination the kit would write and this target does not track. No row.
+
+**`--pin <path>=<rev>` is how an operator corrects one row**, and only one: it fixes that
+destination's base by assertion, and the row records `evidence: "pinned"` so an assertion is never
+read back as a proof. Repeat the flag per path. Use it on an `unattributed` row you know the vintage
+of; a wrong pin makes a later merge noisier and never destructive, because the raw-write arm stays
+closed wherever the two identities differ.
+
+**`--re-adopt` re-measures from scratch** and is the only way past the refusal over an existing
+receipt. It preserves nothing the old one recorded — not the commit, not the rung, not the role,
+which is re-read from the descriptor on every run anyway.
+
+**The three refusals**, so you can tell them apart from a bug: `--target` resolving to the gov
+checkout itself; an existing `install.json` without `--re-adopt`; and a target index that differs
+from HEAD. That last one is the INDEX only — an unstaged edit in your own worktree does not block,
+because `adopt` reads identities out of the index and writes nothing you could lose.
+
+### One thing `apply` will refuse to hand you
+
+A kit can declare a gate leg whose argv runs an engine gov does not actually ship — and until this
+was gated, `apply` would emit that leg into your runner and record it in the receipt as coverage for
+a check that can never run. It now names the kit, the leg and the offending path, withholds THAT leg
+and emits the rest, and exits 1. **The install still stands and the receipt is still written**: the
+condition is a defect in a gov-authored descriptor, not something you can fix in your own tree.
+
+`plan` previews the same condition, over what you already track plus what the plan itself would
+write — so a first install is not warned about being new.
+
+If you see one, it is gov's to fix: either the leg is withdrawn or the file starts shipping.
+
+### Before any of that: how much of each kit did this tree actually take?
+
+`adopt` measures the files a target HOLDS. It says nothing about the ones it never took, and the
+only signal this engine had for that was whole-kit — `update`'s `available (not installed)` line,
+which needs the receipt you are trying to create. So a tree that took 80 files of a kit and left 20
+read exactly like one that took all 100.
+
+`plan --coverage` is the read-only join that answers it, and it needs no receipt — only
+`.governance/deploy.toml`:
+
+```bash
+python <gov>/tools/govkit/govkit.py plan --target <project> --coverage --kits a,b,…
+python <gov>/tools/govkit/govkit.py plan --target <project> --coverage --emit-declines --kits a,b,…
+```
+
+**Pass `--kits` deliberately.** The selection resolver branches on `--all`, `--kits` and the
+registry's own default set, and it never reads `deploy.toml`'s `kits` — so the same command without
+the flag answers a different question, correctly. Ask the one you meant.
+
+It prints one `GAP` row per missing planned write, naming the kit and the gov source it came from,
+then a per-kit tally and a total. `gap 0` prints out loud: a clean run that printed nothing is
+indistinguishable from a check that never ran. **A gap never changes the exit code** — it is a state
+of the world, not a fault in the run.
+
+**Coverage answers PRESENCE only.** A file the target holds and has hand-edited reads as covered
+here; that is what `adopt`'s two identities measure instead. And a file the target took under a
+different name reads as absent, because rename detection for coverage is a stated non-goal —
+`--emit-declines` prints paste-ready `[[decline]]` skeletons to STDOUT, one per gap row, for you to
+paste into `deploy.toml` yourself. It never opens that file: a deployer that edits the document
+carrying your decisions has made one for you.
+
+### Saying "we deliberately did not take that" — the `[[decline]]` contract
+
+A coverage report with no way to record a deliberate omission is one you read once. The rows you
+chose not to take keep being named, the run starts crying wolf, and the only way to quiet it is to
+stop running it — which loses the whole signal.
+
+A `[[decline]]` block in the target's own `.governance/deploy.toml` records the decision. It is
+graded on every run, and it dies when the world moves underneath it, which is the difference between
+a declaration and a fork with a friendlier name.
+
+```toml
+[[decline]]
+kit  = "review-harness"
+dest = "scripts/review-harness/tier2-review.js"
+why  = "we vendored this kit under .claude/workflows/ years before adopting gov"
+taken_as = ".claude/workflows/tier2-review-indexed.js"   # at most ONE evidence field
+```
+
+`kit`, `dest` and `why` are required. **`why` is graded for EXISTENCE only** — grading prose is how
+a gate starts lying, and every content predicate is satisfiable by typing something.
+
+**At most one evidence field**, from three: `taken_as` (gov's bytes live at this path instead —
+hash-graded against gov's blob, CR-stripped, so a CRLF checkout is not a different file);
+`consumed_into` (folded into this tracked file — deliberately weak, because gov cannot know what a
+fold means byte-wise); `discharge = { command = [...] }` (this probe proves it is handled, exit 0).
+Two evidence fields on one row is two rows, and it reds before either is evaluated.
+
+**A `taken_as` mismatch is not a failure.** The row reclassifies to `diverged`, keeps its reason,
+and the run's exit code does not move. Redding it would red the honest adopter who relocated a file
+and then edited it, whose only route back to green would be deleting the decline.
+
+**Three staleness arms red, and they are the point.** An empty `why`. A `dest` the target now
+tracks — the file arrived, so delete the row. A `dest` no claimed kit ships any more — gov withdrew
+it, so delete the row. A row that reds excuses nothing, so a stale decline can never hide a gap.
+Both `check` and `plan --coverage` run the same predicate: a decline may only hide a gap row in a
+run that also grades it.
+
+Declined rows PRINT, with their state and their reason. A gap that vanishes from a report without
+saying why is the failure mode of every exclusion list.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

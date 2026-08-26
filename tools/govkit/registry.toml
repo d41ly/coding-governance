@@ -232,6 +232,10 @@ path = "skills/session-kickoff/manifest-check.test.sh"
 why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
 
 [[exempt_leg]]
+name = "kickoff engine size <=18KiB"
+why = "it measures THIS repo's own kickoff engine against a row in tools/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The kickoff-manifest descriptor used to declare this as a gate_leg, so `apply` would have emitted an adopter a row running an engine gov never ships and recorded it in the receipt as coverage. DEPL-dCarriedReceipt-6 withdrew the leg and this row is where it went."
+
+[[exempt_leg]]
 name = "charter size"
 why = "it measures THIS repo's own rendered charter against a row in tools/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
 
