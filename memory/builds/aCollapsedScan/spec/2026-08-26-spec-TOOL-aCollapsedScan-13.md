@@ -1,10 +1,14 @@
 # TOOL-aCollapsedScan-13 — checks 23 and 21 stop shelling out to read data they already hold
 
-**Status:** INPROGRESS · rev-3 · 2026-08-26 · node a · Tier-2 · base 3c37a1fb · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-08-26 · node a · Tier-2 · base 3c37a1fb · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-build-TOOL-aCollapsedScan-13-equivalence-harness.sh](../build/2026-08-26-build-TOOL-aCollapsedScan-13-equivalence-harness.sh) | journal | — |
+| [2026-08-27-build-TOOL-aCollapsedScan-13-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aCollapsedScan-13-acceptance-ledger.md) | journal | — |
+| [2026-08-26-review-TOOL-aCollapsedScan-13-closing-diff.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-13-closing-diff.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

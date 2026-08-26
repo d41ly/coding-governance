@@ -701,15 +701,32 @@ $over21"
       # `<FAMILY>-<slug>-<digits>` where FAMILY is one of the declared alternation, the slug is
       # `[A-Za-z0-9]+` and the ordinal is the leading digit RUN, which is what `[0-9]+` matched.
       claimed=""
-      _f=${rest%%-*}
-      case "|$FAM_ALT|" in
-        *"|$_f|"*)
-          _r2=${rest#*-}
+      # LONGEST DECLARED PREFIX, not the first segment (closing review round 3). `${rest%%-*}` stops
+      # at the first hyphen, so a declared family that CONTAINS one - nothing forbids it, and the
+      # sibling Python builds the same alternation into a regex that accepts it - stopped matching,
+      # and a correctly named, correctly bound record in such an adopter's tree flipped from pass to
+      # fail with a message pointing at the filename rather than at the conf. Dark here, live there.
+      _f=""
+      for _fp in $FAMILIES; do
+        _fc=${_fp#*:}
+        case "$rest" in "$_fc-"*) [ ${#_fc} -gt ${#_f} ] && _f=$_fc ;; esac
+      done
+      case "${_f:+x}" in
+        x)
+          # STRIP THE MATCHED FAMILY, not "up to the first hyphen": with a hyphenated family
+          # the two are different strings, which is the whole reason the loop above exists.
+          _r2=${rest#"$_f"-}
           _slug=${_r2%%-*}
           case "$_slug" in
             ''|*[!A-Za-z0-9]*) ;;
             *)
-              _r3=${_r2#*-}
+              # THE HYPHEN GUARD IS LOAD-BEARING (closing review round 3). `${var#*-}` returns the
+              # string UNCHANGED when there is no hyphen, so a two-segment tail like `TOOL-1` had
+              # its SLUG segment re-read as the ordinal and `claimed` came out `TOOL-1-1` - an id
+              # that appears in no filename, no Serves line and no spec. The regex this replaced
+              # required a second hyphen and simply did not match. Measured over 8796 synthetic
+              # stems: 12 divergences, every one of this class and none of any other.
+              case "$_r2" in *-*) _r3=${_r2#*-} ;; *) _r3='' ;; esac
               # the LEADING digit run of the next segment, as `[0-9]+` takes it
               _num=""; _tail=${_r3%%-*}
               while [ -n "$_tail" ]; do
@@ -1184,7 +1201,12 @@ EOF
     [ "$sdate" \> "$alcut" ] || [ "$sdate" = "$alcut" ] || continue
     # `sed -n 1,6p | grep -m1` read the head twice through two processes. One bounded read does it.
     hdr=""; _n=0
-    while [ "$_n" -lt 6 ] && IFS= read -r _l; do
+    # `read` RETURNS NON-ZERO ON A FINAL LINE WITH NO NEWLINE, having already assigned it, so in
+    # the loop condition that line was read and discarded where `sed -n '1,6p'` printed it
+    # (closing review round 3, confirmed directly: a spec ending `**Status:** ...` with no trailing
+    # LF gave the header under the old code and nothing under the new). At a clean EOF `read` sets
+    # `_l` empty, so the added test still terminates the loop.
+    while [ "$_n" -lt 6 ] && { IFS= read -r _l || [ -n "$_l" ]; }; do
       _n=$((_n + 1))
       case "$_l" in '**Status:**'*) hdr=$_l; break ;; esac
     done < "$sp"

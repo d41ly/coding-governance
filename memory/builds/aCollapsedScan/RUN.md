@@ -38,3 +38,5 @@ base: 3c37a1fbd2ac54449e98386dd5a6b047e0dbfbaf
 2026-08-26T15:36:55Z review · item aCollapsedScan · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-08-26T18:04:35Z rescope · item add TOOL-aCollapsedScan-13 · reason owner-instructed 2026-08-26: the memory hygiene leg is spawn-bound, the same class this build removed from --plan, and it is the leg gating every commit in this run
+
+2026-08-26T22:18:03Z review · item TOOL-aCollapsedScan-13 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
