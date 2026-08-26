@@ -5574,10 +5574,30 @@ user_skills = "/tmp/gk-fake-skills"
                     return node.name
             return "(module)"
 
+        # M2, from ROUND 2. This walked `resolve_shell_argv` CALLS — six of roughly forty-five spawn
+        # sites — while the declaration's header claimed EVERY PLACE. A guarantee narrower than the
+        # sentence selling it is the false confidence that let the blocker ship. The population is
+        # now every `subprocess.run`/`Popen`, minus literal `git` plumbing — and `git hook run` is
+        # excluded from that allowlist BY NAME, because it wears a git argv and executes the
+        # target's own script. Run over the real tree before wiring, hits and near-misses both:
+        # eight hit functions, thirty-four allowlisted git calls across twenty-one functions.
+        def _git_plumbing1(call) -> bool:
+            a0 = call.args[0] if call.args else None
+            while isinstance(a0, _ast1.BinOp):        # `["git", ...] + paths`
+                a0 = a0.left
+            if not (isinstance(a0, _ast1.List) and a0.elts
+                    and isinstance(a0.elts[0], _ast1.Constant)
+                    and a0.elts[0].value == "git"):
+                return False
+            _words = [e.value for e in a0.elts if isinstance(e, _ast1.Constant)]
+            return not ("hook" in _words and "run" in _words)
+
         _exec_found = set()
         for _n in _ast1.walk(_t1):
-            if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Name) \
-                    and _n.func.id == "resolve_shell_argv":
+            if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Attribute) \
+                    and _n.func.attr in ("run", "Popen") \
+                    and isinstance(_n.func.value, _ast1.Name) \
+                    and _n.func.value.id == "subprocess" and not _git_plumbing1(_n):
                 _exec_found.add(_enclosing1(_n))
         _declared = set(govkit_module().SHELL_EXEC_SITES)
         check("[-5] D1 LIVENESS the AST walk really finds shell-executing call sites",
@@ -5593,8 +5613,101 @@ user_skills = "/tmp/gk-fake-skills"
         # and the second is the one D1 violated: it must not be reachable from a verb that runs by
         # default. Asserted on the source of each such function rather than on a claim about it.
         _tgt_sites = [k for k, v in govkit_module().SHELL_EXEC_SITES.items() if v == "target"]
+        check("[-5] M2 every declared label is in the closed set",
+              set(govkit_module().SHELL_EXEC_SITES.values())
+              <= set(govkit_module().SHELL_EXEC_LABELS),
+              str(sorted(set(govkit_module().SHELL_EXEC_SITES.values()))))
+        # `target-code` is bounded by being reachable from a WRITING verb only, which is the property
+        # that actually protects it -- announcing `git hook run pre-commit` tells nobody anything.
+        _code_sites = [k for k, v in govkit_module().SHELL_EXEC_SITES.items() if v == "target-code"]
+        check("[-5] M2 LIVENESS the declaration really marks a target-CODE site",
+              len(_code_sites) >= 1, str(_code_sites))
+        for _cs in _code_sites:
+            _callers = {_enclosing1(_n) for _n in _ast1.walk(_t1)
+                        if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Name)
+                        and _n.func.id == _cs}
+            check(f"[-5] M2 target-code site '{_cs}' is reached only from a writing verb",
+                  _callers and all("apply" in c or "update" in c for c in _callers),
+                  f"reached from: {sorted(_callers)}")
         check("[-5] D1 LIVENESS the declaration really marks some sites target-authored",
               len(_tgt_sites) >= 2, str(_tgt_sites))
+        # ---- B1/B2, from ROUND 2, and they must be FIXTURE arms rather than source-shape ones:
+        # ---- the source-shape arm written for D1 was green over both of these the whole time.
+        # ---- A read-only `govkit check` ran target-chosen text, because `target_context` handed
+        # ---- the TARGET's `prefix` to `resolve_tokens` and several shipped probes are `bash -c`
+        # ---- and `python -c` strings. Reproduced before the fix; asserted on a SENTINEL FILE
+        # ---- here, because an exit code cannot tell 'refused' from 'ran and returned 0'.
+        def a_evil_target(tag: str, prefix_value: str, kit: str) -> pathlib.Path:
+            t = tmp / f'evil-{tag}'
+            (t / '.governance').mkdir(parents=True)
+            git(t, 'init', '-q', '-b', 'main')
+            git(t, 'config', 'user.email', 't@e')
+            git(t, 'config', 'user.name', 't')
+            (t / '.governance' / 'deploy.toml').write_text(
+                'gov_source = "local"\nprefix = ' + json.dumps(prefix_value) +
+                '\nkits = [' + json.dumps(kit) + ']\n\n[answers]\nmemory_root = "memory"\n',
+                encoding='utf-8', newline='\n')
+            (t / '.governance' / 'install.json').write_text(json.dumps({
+                'schema': 3, 'prefix': 'tools',
+                'kits': [kit],
+                'files': [{'path': 'x.txt', 'role': 'seed', 'kit': kit, 'written': False}],
+            }), encoding='utf-8', newline='\n')
+            (t / 'x.txt').write_text('x\n', encoding='utf-8', newline='\n')
+            git(t, 'add', '-A')
+            git(t, 'commit', '-qm', 'base')
+            return t
+
+        _ev1 = a_evil_target('semi', 'tools; touch PWNED-BY-CHECK ;', 'drift-audit')
+        run('check', '--target', str(_ev1))
+        check('[-5] B2 a read-only `check` does NOT execute a metacharacter in the target prefix',
+              not (_ev1 / 'PWNED-BY-CHECK').exists(),
+              'SENTINEL EXISTS — read-only check ran target-chosen text')
+        _pev1 = run('check', '--target', str(_ev1))
+        check('[-5] B2 ...it REFUSES by name at the token boundary rather than passing quietly',
+              'can leave its argument and become code' in (_pev1.stdout + _pev1.stderr),
+              (_pev1.stdout + _pev1.stderr)[-600:])
+        # THE PAYLOAD IS CONSTRUCTED, never spelled. Written as a literal it broke out of its own
+        # string in THIS file and became executable source — the injection injecting into the test
+        # for the injection, which is funny once and a corrupted suite every time after.
+        _q = chr(39)
+        _payload = ('x' + _q + '); import pathlib; pathlib.Path(' + _q + 'PWNED' + _q +
+                    ').write_text(' + _q + 'o' + _q + '); (' + _q)
+        _ev2 = a_evil_target('quote', _payload, 'codebase-map')
+        run('check', '--target', str(_ev2))
+        check('[-5] B1 ...and a quote break out of a `python -c` probe is closed the same way',
+              not (_ev2 / 'PWNED').exists(),
+              'SENTINEL EXISTS — the python -c route is still open')
+        # LIVENESS: an ORDINARY prefix must still resolve, or these three pass because the engine
+        # refuses everything and every other fixture in this file would be redding too.
+        _evok = a_evil_target('clean', 'scripts', 'drift-audit')
+        _pevok = run('check', '--target', str(_evok))
+        check('[-5] B1 LIVENESS an ordinary path-shaped prefix still resolves',
+              'can leave its argument and become code' not in (_pevok.stdout + _pevok.stderr),
+              (_pevok.stdout + _pevok.stderr)[-500:])
+        # ---- H1, from ROUND 2. The label was TYPED, and it was typed by asking who authored the
+        # ---- argv TEMPLATE — so `run_kit_check` and `cmd_check` read "gov" and the two properties
+        # ---- below were never asked of them, while a read-only `check` ran target-chosen text.
+        # ---- The gate written to make the class un-recurrable was green over a live injection.
+        # ----
+        # ---- DERIVED NOW: a site is target-controlled when its function reaches `target_context`
+        # ---- or `resolve_tokens`, because that is where the TARGET's values enter a gov template.
+        # ---- The arm reds on any row typed `gov` that does, so the next spawn cannot be
+        # ---- mislabelled by hand.
+        _fnsrc1 = {}
+        for _n in _ast1.walk(_t1):
+            if isinstance(_n, _ast1.FunctionDef):
+                _fnsrc1[_n.name] = _ast1.get_source_segment(_g5src, _n) or ""
+        _derived_target = {k for k in govkit_module().SHELL_EXEC_SITES
+                           if "target_context" in _fnsrc1.get(k, "")
+                           or "resolve_tokens" in _fnsrc1.get(k, "")}
+        check("[-5] H1 LIVENESS the derivation really finds token-resolving spawn sites",
+              len(_derived_target) >= 3, str(sorted(_derived_target)))
+        _mislabelled = sorted(k for k in _derived_target
+                              if govkit_module().SHELL_EXEC_SITES.get(k) != "target")
+        check("[-5] H1 no spawn site whose argv resolves TARGET token values is labelled `gov`",
+              not _mislabelled,
+              "typed `gov` but reaches target_context/resolve_tokens: " + ", ".join(_mislabelled))
+
         # THE ANNOUNCEMENT MAY LIVE IN THE FUNCTION OR AT ITS CALL SITE, and the arm has to admit
         # both or it is asserting a code SHAPE rather than the property. `decline_findings` prints
         # inside itself; `read_gate_verdicts` is announced by `apply` before it calls it, which is
@@ -5722,9 +5835,31 @@ user_skills = "/tmp/gk-fake-skills"
               "SENTINEL EXISTS — a read-only preview ran a command the target wrote")
         check("[-5] D1 ...and the row reports `probe-not-run`, a STATE rather than a silent skip",
               "probe-not-run" in _p5sent.stdout, _p5sent.stdout)
+        # M1, from ROUND 2: this arm passed by FINDING NOTHING. `a5_target` writes only a
+        # `deploy.toml`, so `cmd_check` returned at its no-receipt guard long before the decline
+        # block — and reverting the whole `check` half of the fix left the suite green. That is how
+        # B1's second call site shipped. The fixture gets a receipt now, and the arm has the
+        # positive twin it lacked: a negative arm with no positive twin proves nothing.
+        # A MINIMAL RECEIPT, not an `apply`. Applying lands the very destination the decline
+        # excuses, which makes the row STALE ("the file arrived") and routes it away from the
+        # discharge branch — so the positive twins went red for a reason that had nothing to do
+        # with the mechanism. The fixture needs `check` to get PAST its no-receipt guard and
+        # nothing more.
+        (_t5sent / ".governance" / "install.json").write_text(json.dumps({
+            "schema": 3, "gov_source": "local", "prefix": "scripts", "kits": ["demo"],
+            "files": [{"path": "scripts/demo/one.py", "role": "seed", "kit": "demo",
+                       "written": False}],
+        }, indent=2) + "\n", encoding="utf-8", newline="\n")
         _p5sentc = run_in_gov(_g4, "check", "--target", str(_t5sent))
+        check("[-5] M1 LIVENESS the sentinel fixture now REACHES the decline block in `check`",
+              "NOT LANDED" not in _p5sentc.stdout, _p5sentc.stdout[-500:])
         check("[-5] D1 ...and `check` does not execute it either",
               not _sent.exists(), "SENTINEL EXISTS after `check`")
+        _p5sentcy = run_in_gov(_g4, "check", "--target", str(_t5sent), "--run-discharge")
+        check("[-5] M1 ...while `check --run-discharge` DOES run it — the positive twin, without "
+              "which the arm above is satisfied by any code path that simply never gets there",
+              _sent.exists(), "SENTINEL ABSENT with --run-discharge: the check half is untested")
+        _sent.unlink(missing_ok=True)
         # LIVENESS: the same fixture WITH the opt-in must actually run it, or the three arms above
         # pass because the mechanism is broken rather than because the guard works.
         _p5sento = a5_cov_flag(_t5sent, "--run-discharge")

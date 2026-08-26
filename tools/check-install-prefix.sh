@@ -153,6 +153,19 @@ print("\n".join(sorted(srcs)))
 PYEOF
 }
 
+carried_live() {
+  # L1, from ROUND 2. The liveness assertion used to sit on `rows`, the HIT set -- so a live
+  # derivation over a repo that genuinely carries zero literals was indistinguishable from a dead
+  # one, and on the day this repo reaches DEPL-dCarriedReceipt-15's own stated goal the leg would
+  # red with a false statement and no override short of editing the gate. Reproduced with a positive
+  # control: one shipped file carrying one literal writes a row and exits 0; change that literal to
+  # the placeholder form arm 9 blesses and the identical run claims the derivation DIED.
+  #
+  # The population is what proves the probe can move. The hit count is the answer and is free to be
+  # zero.
+  carried_population | tr -d '\r' | grep -c . || true
+}
+
 carried_rows() {
   # THE ONE EMITTER. `--list`'s section and the ratchet file are the same rows from the same call, so
   # a report that disagrees with the artifact is not reachable. The count is hit LINES per path: a
@@ -188,12 +201,13 @@ elif [ "$MODE" = --write-ratchet ]; then
   # SLACK message says to re-run this very mode.
   #
   # The class is not hypothetical here: this build's own first `--write-ratchet` wrote zero rows for
-  # a CR reason and reported it cheerfully. That INSTANCE was fixed with `tr -d ''`; this is the
+  # a CR reason and reported it cheerfully. That INSTANCE was fixed with `tr -d '\r'`; this is
   # CLASS. The first arm of this same script already guards the identical shape twice, by name.
+  [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the carried-prefix POPULATION is empty — that is not a pass.
+install-prefix: the derivation resolved no shippable sources at all, which means it DIED rather than
+install-prefix: that this repo ships nothing. Refusing to truncate $CARRIED over a probe that cannot
+install-prefix: move. A zero HIT count is fine and is the goal; a zero population is a dead probe."; exit 1; }
   rows=$(carried_rows)
-  [ -n "$rows" ] || { echo "install-prefix: the carried-prefix population is empty — that is not a pass.
-install-prefix: the derivation produced no rows at all, which means it DIED rather than that this
-install-prefix: repo ships nothing. Refusing to truncate $CARRIED over a probe that cannot move."; exit 1; }
   printf '%s
 ' "$rows" > "$CARRIED.tmp" && mv "$CARRIED.tmp" "$CARRIED"
   echo "install-prefix: wrote $(grep -c . "$CARRIED" || true) carried-prefix row(s) to $CARRIED"
@@ -202,18 +216,23 @@ elif [ "$MODE" = --list ]; then
   echo "install-prefix: carried-prefix rows (the shipping spelling, inside the shippable set):"
   carried_rows | sed 's/^/  /'
 else
+  # D3's other half: the same liveness assertion on the CHECK path, so a dead derivation cannot
+  # report a clean empty population against an empty ratchet either. It is FIRST because everything
+  # below reads a population this proves can move.
+  [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the carried-prefix POPULATION is empty — that is not a pass.
+install-prefix: the derivation resolved no shippable sources, which means it DIED rather than that
+install-prefix: this repo ships nothing. A zero HIT count is fine; a zero population is a dead probe."; exit 1; }
+  rows=$(carried_rows)
   # `-s` not `-f` (D4): an empty-but-present file passed an existence check and then met the awk.
-  if [ ! -s "$CARRIED" ]; then
+  # L1's other half: once the hit set legitimately reaches zero, an EMPTY ratchet is the correct
+  # committed state, so it is only "missing" while something still carries a literal. This sits
+  # AFTER the assignment for the reason `set -u` gives: the first cut read `$rows` one line above
+  # the line that sets it.
+  if [ ! -s "$CARRIED" ] && [ -n "$rows" ]; then
     echo "install-prefix: no $CARRIED — run --write-ratchet once and commit it. A missing ratchet is"
     echo "install-prefix: not a clean one."
     exit 1
   fi
-  # D3's other half: the same liveness assertion on the CHECK path, so a dead derivation cannot
-  # report a clean empty population against an empty ratchet either.
-  rows=$(carried_rows)
-  [ -n "$rows" ] || { echo "install-prefix: the carried-prefix population is empty — that is not a pass.
-install-prefix: the derivation produced no rows, which means it DIED rather than that this repo
-install-prefix: ships nothing. A probe that cannot move does not get to report clean."; exit 1; }
   # SHRINK-ONLY, PER FILE. The existing arm's `<path>:<line>` shape goes stale on every edit above a
   # waived line, and one row per hit line would rot within a week; per file trades swap-blindness for
   # a ratchet that survives ordinary editing. ONE awk over both sides, reporting all four conditions,
@@ -233,6 +252,9 @@ install-prefix: ships nothing. A probe that cannot move does not get to report c
     # verdict UNRECORDED never printed. `FILENAME == pinf` cannot swap the roles, and it finally
     # READS the `-v pinf` this program was already being passed and never used (D13).
     FILENAME == pinf { if ($0 !~ /^[[:space:]]*(#|$)/) pin[$1]=$2; next }
+    $1 == "" { next }   # an EMPTY hit set writes one blank line; without this the
+                        # awk read it as a path and reported UNRECORDED for the empty
+                        # string, so the zero goal state redded on a phantom row
     { now[$1]=$2 }
     END {
       bad=0

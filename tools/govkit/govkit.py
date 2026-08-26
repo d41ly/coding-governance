@@ -542,9 +542,55 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
     return TOKEN_RX.sub(sub, s), missing
 
 
+# THE ONE PLACE TARGET-SUPPLIED TEXT BECOMES PART OF A COMMAND, so it is the one place to refuse.
+#
+# Every token value below comes out of the TARGET's `.governance/deploy.toml`, a file in a repository
+# gov does not own. Those values are interpolated by `resolve_tokens` into argv templates GOV wrote —
+# `[check].argv`, `[[hole]].discharge.command`, `[[gate_leg]].argv` — several of which are
+# `["bash", "-c", "... {kit} ..."]` or `["python", "-c", "... sys.path.insert(0, '{kit}') ..."]`.
+# A shell metacharacter or a quote break in a value therefore becomes CODE.
+#
+# REPRODUCED, twice, on this engine before this guard existed: a target whose `deploy.toml` carried
+# `prefix = "tools; touch PWNED-BY-CHECK ;"` made a READ-ONLY `govkit check` — no `--write`, no
+# `--run-discharge`, nothing printed — create that file in the target. A second reproduction broke
+# out of a `python -c` string the same way. `resolve_shell_argv` is no defence: it rewrites argv[0]
+# and nothing else.
+#
+# WHY IT WAS MISSED, stated because the miss is the interesting part. The fold before this one
+# labelled each spawn by WHO AUTHORED THE ARGV TEMPLATE and concluded these sites were gov's. That is
+# the wrong question. The template is gov's and the VALUES SUBSTITUTED INTO IT are the target's, so
+# the resulting command is target-influenced wherever a token appears — and the declaration asserting
+# otherwise was itself the artifact written to stop this class recurring.
+#
+# A CHARACTER CLASS, not an escaper. Escaping is per-consumer — a value safe in argv is not safe
+# inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
+# descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
+# to be correct.
+TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+
+
+def demand_safe_token(key: str, value: str, where: str) -> str:
+    """Refuse a target-supplied token value that could leave its argument and become code."""
+    if not TOKEN_VALUE_RE.match(value):
+        bad = "".join(sorted({c for c in value if not TOKEN_VALUE_RE.match(c)}))
+        raise Refusal(
+            f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
+            f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
+            f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
+            f"become code. Refusing to resolve it ({where}). Every legitimate value here is a path "
+            f"fragment; if you need one that is not, that is a change to this rule and not to a "
+            f"descriptor")
+    return value
+
+
 def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> dict[str, str]:
-    """The token values for one entry, from the target descriptor's answers."""
-    prefix = (deploy.get("prefix") or "tools").strip("/")
+    """The token values for one entry, from the target descriptor's answers.
+
+    EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
+    consumed. See `demand_safe_token` for what was reproduced without it.
+    """
+    prefix = demand_safe_token("prefix", (deploy.get("prefix") or "tools").strip("/"),
+                               f"entry '{eid}'")
     ctx: dict[str, str] = {
         "prefix": prefix,
         "kit_id": eid,
@@ -552,10 +598,10 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
     }
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
-            ctx[k] = v
+            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'")
     for k, v in ((deploy.get("kit") or {}).get(eid) or {}).items():
         if isinstance(v, str):
-            ctx[k] = v
+            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'")
     ctx.setdefault("memory_root", "memory")
     return ctx
 
@@ -1749,30 +1795,50 @@ def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
 DECLINE_EVIDENCE = ("taken_as", "consumed_into", "discharge")
 
 # ---------------------------------------------------------------- the executing surface, DECLARED
-# EVERY PLACE THIS ENGINE RUNS A SHELL COMMAND, keyed by enclosing function, with WHO AUTHORED the
-# argv. It is a declared population rather than a directory listing, asserted in BOTH directions by
-# a selftest arm: a new `resolve_shell_argv` spawn reds until a row claims it, and a row naming a
-# function that no longer spawns reds too.
+# EVERY PLACE THIS ENGINE RUNS A SHELL COMMAND, keyed by enclosing function, with WHO CONTROLS the
+# argv. Asserted in both directions by a selftest arm, AND — the half that matters — the `target`
+# label is DERIVED from the call graph rather than typed here.
 #
-# WHY THIS EXISTS, and it is not a tidy-up. `decline_findings` was written to run an argv out of the
-# TARGET's own `.governance/deploy.toml` and was reachable from `plan --coverage` — a verb needing no
-# receipt and no `--write`, which prints `NOTHING was written.` on the same run. The spec bullet that
-# cleared it claimed `[[hole]].discharge` "already does exactly this", which is false in both halves:
-# holes are read from `read_descriptors(root, ...)`, gov's own tree. So a trust boundary moved and
-# the review that should have caught it was reading a sentence instead of the call graph. THIS is the
-# artifact that makes the call graph the thing you read.
+# THE FIRST VERSION OF THIS TABLE LABELLED BY WHO AUTHORED THE TEMPLATE, and that is the wrong
+# question. It read `run_kit_check` and `cmd_check` as "gov" because gov writes their argv templates
+# — and the VALUES substituted into those templates come from the TARGET's `deploy.toml`, through
+# `target_context`. Several shipped templates are `bash -c` and `python -c` strings, so a
+# metacharacter in a target's `prefix` becomes code. Both were REPRODUCED: a read-only `govkit check`
+# created a file in a hostile target. The declaration written to make that class un-recurrable was
+# green over it the whole time, because it never asked those two sites anything.
 #
-# `target` means the argv is authored in a repository gov does not own. Such a site owes TWO
-# properties, and the arm asserts both: it prints the argv before spawning, and it is not reachable
-# from a verb that runs by default without an explicit opt-in.
+# So the rule is now: a site is TARGET-controlled when its function reaches `target_context` or
+# `resolve_tokens`, and the arm DERIVES that and reds on any row typed `gov` that does. A label that
+# a human maintains is a label that disagrees with the code exactly when it matters.
+# M2, from ROUND 2: the census walked `resolve_shell_argv` CALLS, which is six of roughly forty-five
+# spawn sites — while its header said "EVERY PLACE". A guarantee narrower than the sentence selling
+# it is the false confidence that let the blocker ship, so the population is now every
+# `subprocess.run`/`Popen`, minus an allowlist of literal `git` plumbing argv.
+#
+# `git hook run` IS NOT PLUMBING and is excluded from that allowlist by name. It wears a literal git
+# argv and it executes a script the TARGET wrote, which is the same class one disguise over — and it
+# is exactly what a coarser allowlist hid.
 SHELL_EXEC_SITES = {
-    "run_kit_check": "gov",          # `[check].argv` from the kit descriptor
-    "cmd_check": "gov",              # `[[hole]].discharge.command` from the kit descriptor
-    "exempt_leg": "gov",             # a hole probe, re-run to decide a leg exemption
-    "_cmd_apply": "gov",             # the configure-step adopter argv from the kit descriptor
+    "run_kit_check": "target",       # `[check].argv` — gov's template, the TARGET's token values
+    "cmd_check": "target",           # `[[hole]].discharge.command` — same shape, same exposure
+    "exempt_leg": "target",          # a hole probe re-run to decide a leg exemption — same shape
+    "_cmd_apply": "target",          # the configure-step adopter argv — same shape, writing verb
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
+    "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
+    "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
 }
+# THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
+# wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
+# metacharacter becomes code and the site owes an announcement and an opt-in. `target-code`: the argv
+# is entirely gov's and what it RUNS is the target's — `git hook run` executes their hook script.
+# Announcing `git hook run pre-commit` would tell an operator nothing, so that property is asked of
+# `target` alone; what bounds `target-code` is being reachable from a writing verb only.
+#
+# `_cmd_update` is deliberately ABSENT: every spawn in it is literal `git` plumbing, so the widened
+# census does not see it, and declaring a row the census cannot find would red the both-directions
+# arm. That arm catching it is the arm working.
+SHELL_EXEC_LABELS = ("gov", "target", "target-code")
 
 
 def _sha_nocr(data: bytes | None) -> str | None:
@@ -1790,8 +1856,8 @@ def _sha_nocr(data: bytes | None) -> str | None:
 def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                      descs: dict[str, tuple[dict, str]], selection: list[str],
                      commit: str, gaps: list[dict], r: Report,
-                     run_discharge: bool = False) -> dict[str, str]:
-    """Grade every `[[decline]]` and return `{dest: state}` for the rows it excuses (S6, S7).
+                     run_discharge: bool = False) -> dict[tuple[str, str], str]:
+    """Grade every `[[decline]]` and return `{(kit, dest): state}` for the rows it excuses (S6, S7).
 
     ONE PREDICATE, TWO CALL SITES — `cmd_check` and `plan --coverage`. **A decline may only hide a
     gap row in a run that also grades it**, which is why this returns the map rather than letting
@@ -1926,19 +1992,18 @@ def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                        f"would iterate its characters, which is how a probe becomes a spawn of 'b'")
                 continue
             # ---- THE TRUST BOUNDARY, and it is the whole reason this branch has a flag.
-            # This argv comes out of the TARGET's `.governance/deploy.toml` — a file in a repository
-            # gov does not own and whose contents anyone who can land a commit there controls. Every
-            # other command this engine spawns is GOV-authored: `[[hole]].discharge` and `[check]`
-            # argv are read from `read_descriptors(root, ...)`, which is gov's own tree. The single
-            # pre-existing target-authored spawn is `read_gate_verdicts`, which runs inside `apply`
-            # alone and PRINTS its argv before spawning.
+            # This argv comes out of the TARGET's `.governance/deploy.toml` WHOLE — a file in a
+            # repository gov does not own. That is a wider exposure than the other spawns, whose
+            # templates are gov's, but it is a DIFFERENCE OF DEGREE and not of kind: those templates
+            # interpolate target-supplied token values, so the target influences them too. Round 2
+            # of this build's closing review reproduced a read-only `check` running target-chosen
+            # text through exactly that route. `demand_safe_token` is the boundary that closes it;
+            # this opt-in is the second layer, for the one argv the target writes end to end.
             #
             # The `-5` spec cleared this branch by asserting that `[[hole]].discharge` "already does
-            # exactly this ... against the same file". That is FALSE IN BOTH HALVES, it was written
-            # into the spec and it was believed, so nobody weighed the actual exposure: running
-            # `plan --coverage` to PREVIEW an untrusted repository executed whatever that repository
-            # asked for, on the previewer's machine, under a verb that prints `NOTHING was written.`
-            # on the same run. Found by this build's own closing review; the spec is corrected.
+            # exactly this ... against the same file". A hole's TEMPLATE is gov's, so the sentence
+            # was wrong about the file — and it was also the wrong comparison to be making, because
+            # what mattered was not whose file it was but whose VALUES reach the shell.
             #
             # DEFAULT OFF, and the not-run row is a STATE rather than a silent skip: a decline whose
             # probe did not run must not be indistinguishable from one that passed.
@@ -5916,8 +5981,11 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # ---- omitting them degrades each of them SILENTLY: `-12` S7's vintage guard fails open by its
     # ---- own words with no `gov_commit`, `-11`'s rename diff has no base and the unit is inert,
     # ---- and `-2`'s pins arm reads an empty `kits` so every registry entry prints as "available
-    # ---- (not installed)". `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are NOT
-    # ---- written: each records what an install DID, and this verb installs nothing.
+    # ---- (not installed)". `orders`, `baseline`, `after`, `hook_block` and `gate_runner` are not
+    # ---- MEASURED here — each records what an install DID and this verb installs nothing — but on
+    # ---- `--re-adopt` they are CARRIED FORWARD verbatim from the receipt being replaced, which is
+    # ---- D2 below. This sentence used to say they are "NOT written", four lines above the block
+    # ---- that writes them.
     (target / ".governance").mkdir(exist_ok=True)
     envelope = {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
                 "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows}
@@ -5940,6 +6008,17 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             _prior = json.loads(receipt_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             _prior = {}
+        if not isinstance(_prior, dict):
+            # M3, from ROUND 2, found four times independently. `null`, `123`, `["orders"]` and a
+            # bare JSON string all pass a `k in _prior` test or a `_prior[k]` index and then raise a
+            # TypeError, which `main` does not catch — a raw traceback instead of a named refusal.
+            # Refused rather than coerced: a receipt that is not an object is not a receipt, and
+            # silently treating it as an empty one would carry nothing forward while claiming to.
+            raise Refusal(
+                f"the receipt at {receipt_path.as_posix()} parses as "
+                f"{type(_prior).__name__}, not an object. `--re-adopt` carries the install-record "
+                f"keys forward from it, and there is nothing to carry. That file is committed and "
+                f"text-mergeable, so a bad merge is the usual cause: fix or delete it, then re-run")
         _carried = [k for k in ("orders", "baseline", "after", "hook_block", "gate_runner")
                     if k in _prior]
         for _k in _carried:

@@ -868,6 +868,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "demand_safe_token",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "demand_writable_target",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

@@ -240,6 +240,32 @@ else
   good "D3 ...and --check reds rather than reporting a clean empty population"
 fi
 
+# --- L1: THE GOAL STATE, GATED. DEPL-dCarriedReceipt-15's stated direction is to shrink these
+# counts to zero, and the liveness assertion used to sit on the HIT set — so a live derivation over
+# a repo that genuinely carries no literals was indistinguishable from a dead one, and on the day
+# the repo reached its own goal this leg would red with a false statement and no override short of
+# editing the gate. Asserted here as the endpoint rather than as today's tree.
+Z="$TMP/src-goal"; mkfix_source "$Z" 'The engine lives at {{TOOL_ROOT}}demo/thing.sh in this repo.'
+printf '#!/usr/bin/env bash
+# see {{TOOL_ROOT}}demo/README.md for what this does
+' > "$Z/tools/demo/thing.sh"
+git -C "$Z" add -A >/dev/null 2>&1
+(cd "$Z" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+git -C "$Z" add -A >/dev/null 2>&1
+zout=$(cd "$Z" && bash tools/check-install-prefix.sh 2>&1); zrc=$?
+if [ "$zrc" = 0 ]; then
+  good "L1 a kit source carrying ZERO literals is CLEAN — the goal state passes"
+  CARRIED_ARMS=$((CARRIED_ARMS+1))
+else
+  bad "L1: the goal state reds — a repo that reached zero cannot pass its own gate"
+  printf '%s
+' "$zout" | sed 's/^/      /' | head -8
+fi
+case "$zout" in
+  *"POPULATION is empty"*) bad "L1: a live derivation over a zero-hit repo was called DEAD" ;;
+  *) good "L1 ...and the liveness assertion does not misreport it as a dead probe" ;;
+esac
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm
