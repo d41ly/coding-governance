@@ -44,6 +44,11 @@ without that ceiling being re-measured.
   and `run-unattended-gates.sh` carries its measurement: one spawn costs 0.019–0.039 s on a node
   with an on-access scanner, against roughly a millisecond without one.
 
+- **The 2026-08-26 follow-up set, classified per M2 before acting.** `TOOL-aCollapsedScan-4`, `-6`
+  and `-7` all entered MISSING and were authored this run. `-6` was authored straight to `WONTDO`:
+  the reuse probe found hygiene check 20 already asserts what it proposed to build, and a staged
+  break confirmed that check RED before the spec was written.
+
 ## Parked decisions
 - **Change-scoping check 30 to the touched builds.** Deferred until this unit is measured. If the
   leg still misses `BUDGET_kit_gate` afterwards, the follow-up walks only builds whose `README.md`
@@ -59,24 +64,30 @@ without that ceiling being re-measured.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aCollapsedScan-1` | 1 | one `awk` pass per build fills path/id/status maps; every per-spec lookup becomes a bash map read |
+| 2 | `TOOL-aCollapsedScan-7` | 2 | `repo_root()` scrubs the inherited git env before `rev-parse`, so a kit invoked as a merge driver resolves the real root |
+| 3 | `TOOL-aCollapsedScan-4` | 1 | `BUDGET_kit_gate` re-declared against a node-`a` measurement, with the scoping alternative refused in writing |
+| 4 | `TOOL-aCollapsedScan-6` | 1 | RETIRED — hygiene check 20 already gates per-file id uniqueness; the unit corrects the records that said otherwise |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-26 · streams tooling
+**Build status:** INPROGRESS · 4 unit(s) · node a · opened 2026-08-26 · streams tooling
 ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aCollapsedScan-1 — one awk pass per build, and `--plan` stops spawning per (unit, spec)](spec/2026-08-26-spec-TOOL-aCollapsedScan-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-7 — `repo_root()` scrubs the inherited git environment before it asks git](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-08-26 |
+| [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-08-26 |
+| [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | WONTDO | rev-1 | 2026-08-26 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7.
 
-Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1.
+Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -84,6 +95,9 @@ Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aCollapsedScan-1` | no |
+| 2 | `TOOL-aCollapsedScan-7` | no |
+| 3 | `TOOL-aCollapsedScan-4` | no |
+| 4 | `TOOL-aCollapsedScan-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
