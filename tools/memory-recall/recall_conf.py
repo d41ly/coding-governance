@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.3
+gov:kit memory-recall@1.4
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.3"
+KIT_MEMORY_RECALL_VERSION = "1.4"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
@@ -53,8 +53,35 @@ def repo_root() -> pathlib.Path:
     The kit directory lives inside the adopting repo (`memory-recall/` at the root in an adopter,
     `tools/memory-recall/` in this one), so the anchor is exact from any cwd, and a throwaway-repo
     test that copies the kit in resolves to that repo rather than to wherever the runner stood.
+
+    WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice
+    `tools/govkit/govkit.py:83` already made for the same measured reason. `git -C <dir> rev-parse
+    --show-toplevel` returns <dir> ITSELF when an absolute GIT_DIR is inherited and no
+    GIT_WORK_TREE names a tree, because git then treats the current directory as the work tree.
+    That is exactly what git exports to a merge driver inside a LINKED WORKTREE, and it is how the
+    row-keyed merge driver was found inert here: this function answered `<root>/tools/memory-recall`,
+    `resolve()` looked for the conf beside the kit, `extract.py`'s import-time CONF raised, and
+    every `memory/DECISIONS.md` and `memory/backlog/*.md` merge got conflict markers instead of a
+    merge. Measured with a control: in an ordinary clone git exports no GIT_DIR and the defect is
+    ABSENT, so the precondition is the worktree and not the merge.
+
+    THE ALTERNATIVE WAS AN ENVIRONMENT SCRUB and it lost on being a DENYLIST. `.githooks/pre-push`
+    already pins eight names for that job under `TOOL-dScrubbedConduit-1`, with one deliberate
+    exclusion; a second list here would be a ninth thing to keep current. The walk inherits nothing.
+
+    The two answers coincide by construction: `resolve()` refuses a root that does not hold
+    `.memory-tree.conf`, so the nearest ancestor holding it IS the only root this kit can use.
     """
-    here = pathlib.Path(__file__).resolve().parent
+    here = pathlib.Path(__file__).resolve()
+    for parent in here.parents:
+        if (parent / CONF_NAME).is_file():
+            return parent
+    # NO CONF ABOVE THE KIT: keep the old git answer, so `resolve()` raises ITS refusal - the one
+    # carrying the copy-pasteable conf stub an adopter needs. This is NOT a fallback that
+    # fabricates a passing value: the path it returns is by definition one with no conf on it, so
+    # `resolve()` refuses on the very next line. It also cannot mask the defect above, because that
+    # defect only reaches a tree where a conf DOES exist and the walk-up therefore wins first.
+    here = here.parent
     try:
         out = subprocess.run(
             ["git", "-C", str(here), "rev-parse", "--show-toplevel"],
