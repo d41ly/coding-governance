@@ -1,13 +1,15 @@
 # TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script
 
-**Status:** INPROGRESS · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md) | diff-review | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md) | diff-review | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 
@@ -36,6 +38,14 @@ see an inline script catches the defect.
   `main()` carries it with no new plumbing. The three bans and their `why` strings are pinned in
   section 4 Data model, because the gate's self-test asserts those exact strings and this port must
   not change one byte of them.
+- **S2b** *(ADDED at rev-5 by the post-acceptance spec audit — the spec described ONE view and the
+  landed rule reads TWO)* — the predicate also scans the `${…}` interpolation SPANS of each line,
+  taken from a quote-blanked, comment-stripped view. `blankLiterals` blanks template CONTENTS, so a
+  join written inside an interpolation was invisible to the view S2 names — a reach regression against
+  the scanner this rule replaced, in the exact construct these harnesses use to render every report.
+  Both pinned fixtures assert ABSENCE, so neither could have caught it, and the round-2 closing review
+  did. The second view is deliberately NOT the raw line: taken raw it reached into comments and plain
+  strings and the rule began firing on prose, which is the narrowing S2 exists to protect.
 - **S2** — the predicate reads `blankLiterals(script)`, the literal-blanked view already defined at
   `tools/hooks/agent-cap.js:372`, rather than a second character scanner. That is a measured
   behaviour change and section 4 Migration states exactly what it changes and what it does not.
@@ -75,7 +85,13 @@ see an inline script catches the defect.
   The payload is built by node, copied from the shape at `tools/workflows/check-verifier-fanout.sh:72-77`,
   and the invocation is `node "$HOOK" --only=join`. Everything else about that gate is KEPT: the
   population selector at `:43-44`, which takes every `tools/**/*.js` with no `export const meta =`
-  filter, both explicit-path and discovery modes, exit 1 for a ban and exit 2 for misconfiguration,
+  filter, both explicit-path and discovery modes, exit 1 for a ban and exit 2 for misconfiguration
+  — where MISCONFIGURATION is a closed set the delegating loop must classify rather than infer, added
+  at rev-5 because the spec named the two exit codes and never said how the caller tells them apart:
+  the pipeline runs under `pipefail` so a failing payload builder cannot be read as a clean hook, any
+  status other than 0 and 2 is refused outright, and a hook exit of 2 carrying no `  L` line is the
+  hook's OWN refusal handed up, not a ban. Without that classification the gate false-RED with an
+  empty reason whenever the hook refused its environment, and could false-GREEN when the builder threw,
   and all three of its own refusal messages. The gate also keeps a missing-hook and a missing-node
   refusal, matching `tools/workflows/check-verifier-fanout.sh:24-25`, because a gate whose predicate
   is absent must say so rather than pass.
@@ -154,7 +170,10 @@ see an inline script catches the defect.
 
 - **The `unverified` whitelist.** The research prices it as low false-positive and cheap, and it is
   refused here on merit rather than on cost. Section 8 F1 carries the argument and resolves it.
-- **The uncounted-`filter(Boolean)` predicate.** The research measured it reddening two shipped
+- **The uncounted-`filter(Boolean)` predicate** *(follow-up now carried by `TOOL-dTieredTribunal-22`,
+  named at rev-5 — the post-acceptance audit found this non-goal promising a follow-up that no backlog
+  row carried, and an id-minting obstacle the charter forecloses: this session mints its own ids and
+  did so three times over.)* The research measured it reddening two shipped
   harnesses as live instances rather than as false positives, which makes it a fix-the-tree unit and
   not a port. `TOOL-dTieredTribunal-3` section 8 F1 already deferred it with the words that the hook
   work is its own unit. This IS that unit and it still declines, because wiring a predicate that reds
@@ -446,16 +465,27 @@ The review-harness kit version is NOT bumped. `tools/workflows/kit.toml` declare
   README bullet that states a bound as a digit reds that gate.
 - **AC15** — Three observations over `tools/workflows/check-verifier-fanout.sh`, each of which fails
   at the pinned base, where the measured values are `0`, `1` and `1` — run, not assumed.
-  `grep -n 'ref-keyed' tools/workflows/check-verifier-fanout.sh` returns hits on BOTH line 2 and
-  line 7, so the subject line and the exit legend each name the join ban beside the verifier cap;
-  today it returns nothing at all. `grep -cF '1 = a per-item verify fan-out survives'` returns `0`,
+  `grep -n 'ref-keyed' tools/workflows/check-verifier-fanout.sh` returns at least one hit, and the
+  subject line and the exit legend each cover the join ban rather than naming only the verifier cap;
+  today it returns nothing at all. *(AMENDED at rev-4, round 2: the original pinned the hits to
+  lines 2 and 7. The gate GENERALISED instead — its subject reads `obey every rule agent-cap.js
+  enforces` and its legend `1 = a rule the hook enforces is broken`, which covers the join ban and
+  every future rule without naming any, and is strictly better than the enumeration this criterion
+  asked for. A criterion pinned to LINE NUMBERS in a file the unit is also editing grades position
+  rather than property; the surviving `ref-keyed` hit sits at `:4`.)* `grep -cF '1 = a per-item verify fan-out survives'` returns `0`,
   because a legend offering one route to exit 1 on a gate with two is the defect and not a wording
   preference. `grep -cF "obey the review protocol's verifier cap"` returns `0` for the same reason on
   the subject line. The token is `ref-keyed` and not `ref-keyed join`, deliberately: the gate's own
   clean message spells it `ref-keyed verdict join`, and a criterion that reds the natural spelling
   would be a gate on wording. This is the ONLY criterion in this unit that grades a file section 3
   otherwise forbids editing — the carve-out there authorizes it, S3 is what makes it owed, and neither
-  half is optional.
+  half is optional. *(AMENDED at rev-5: the rev-4 amendment above accepted a generalised subject line
+  and exit legend, which is a SEVEN-line edit to that file where S3's carve-out authorizes two. The
+  carve-out is widened here, deliberately and in the open, to the subject paragraph and the exit
+  legend of `tools/workflows/check-verifier-fanout.sh` — not by citing a criterion that happens to
+  need it, which is authorization by side effect. The post-acceptance audit filed this as one of four
+  instances of one class: an amendment landed against the criterion and not against the scope item
+  that gates it.)*
 
 ## 7. Gates
 
@@ -565,6 +595,27 @@ runs. This unit changes no protocol text, so it must stay green untouched.
   implementation — caught by running the grep, not by reading it. Section 7 is unchanged and owes
   nothing: `verifier fan-out` is unguarded `subject: repo` and `verifier fan-out self-test` is guarded
   on `tools/workflows/`, which this unit already edits, both read from `tools/gate-legs.json` at HEAD.
+
+- rev-4 · 2026-08-26 · **AC10 SATISFIED LATE, AC5 and AC12 REPAIRED, AC15 AMENDED — all disclosed.**
+  The acceptance pass found that this unit's section 4 declared ten self-test arms and the unit
+  landed without any of them: `git show --stat fb2d692e` never touched `tools/hooks/agent-cap.test.sh`,
+  and rule 5 was covered only indirectly through the file gate that delegates to it, so the hook's own
+  suite could not tell whether its own rule worked. All ten are written now, from that table, and each
+  was observed GREEN at HEAD and RED against the pre-rule-5 hook at `91c5d3ac`; the suite goes 71 to
+  81. AC5's `awk` count was 1, a prose survivor naming the retired scanner, now removed. AC12's two
+  `kit.toml` guards spelled a literal `tools/hooks/` where the sibling descriptor uses `{prefix}/hooks/`
+  — a real portability defect for an adopter, not a wording nit. AC15 is amended: the gate generalised
+  its subject and legend to cover every rule the hook enforces rather than enumerating the join ban at
+  two pinned line numbers, which is better than what the criterion asked for.
+
+- rev-5 · 2026-08-26 · **post-acceptance spec audit fold.** Three gaps, none of them a lowered bar.
+  S2b ADDED: this spec described ONE scanning view and the landed rule reads two, the second being the
+  `${…}` interpolation spans that the round-2 closing review found missing — both pinned fixtures
+  assert absence, so neither could have caught it. The delegated gate's exit-code contract is now
+  STATED rather than left to the caller to infer, which is what let it false-red with an empty reason.
+  AC15's carve-out is widened explicitly instead of by citation, because authorizing a seven-line edit
+  through a criterion that happens to need it is authorization by side effect. AC10's ten arms, which
+  this unit declared and never wrote, landed at rev-4 and are green.
 
 ## 10. Reuse audit
 

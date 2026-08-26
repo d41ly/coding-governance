@@ -38,3 +38,13 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T17:24:29Z review · item dTieredTribunal-run2-fold · reason verdict BLOCKED · blockers 2
 
 2026-08-26T17:24:56Z review · item dTieredTribunal-run2-fold · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
+
+2026-08-26T21:16:50Z rescope · item add TOOL-dTieredTribunal-11 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
+
+2026-08-26T21:17:12Z rescope · item add TOOL-dTieredTribunal-12 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
+
+2026-08-26T21:17:31Z rescope · item add TOOL-dTieredTribunal-13 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
+
+2026-08-26T21:17:48Z rescope · item add TOOL-dTieredTribunal-14 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
+
+2026-08-26T21:18:06Z rescope · item add TOOL-dTieredTribunal-15 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so

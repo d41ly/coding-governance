@@ -1,13 +1,15 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** INPROGRESS · rev-6 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
+**Status:** CLOSED · rev-8 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md) | diff-review | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md) | diff-review | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
@@ -99,9 +101,13 @@ majority review kind in this corpus is the one the engine is currently forbidden
   and the dossier claims `tier2-review.js` at `:22`, so the refresh is this unit's rather than a
   sibling's. No inventory key is created or retired, so no claim edit and no regenerated artifact
   is owed.
-- **S13** — a provenance comment naming this unit id sits on each edited site, matching the file's
-  existing convention of citing the unit that earned a guard. The sites are the ones §4's Inventory
-  table enumerates.
+- **S13** — a provenance comment naming this unit id sits on each MECHANISM this unit introduces,
+  matching the file's existing convention of citing the unit that earned a guard. *(AMENDED at rev-8
+  in step with AC9, which the rev-7 amendment moved from per-site to per-mechanism while leaving this
+  scope item asking for the older thing — the same one-half-amended defect as AC11 above. The
+  mechanisms are the kind enum, the subject validator, the pre-spawn log, the S11 deletion note, the
+  lens catalogue and the binding line; §4's Inventory table still enumerates every edited LINE, which
+  is what a reader needs, and is deliberately not the same list.)*
 
 ## 3. Non-goals (OUT)
 
@@ -331,9 +337,15 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
 - **AC8** — When each of the four returns is read, its field set is unchanged from the file at base
   `cd971285`. Observation: `git diff cd971285 -- tools/workflows/tier2-review.js` shows no line
   removed from inside a return block.
-- **AC9** — When `grep -n 'dTieredTribunal-11' tools/workflows/tier2-review.js` runs, it returns a
-  hit at each site §4's Inventory table lists as changed, and at no site the table lists as
-  untouched.
+- **AC9** *(AMENDED at rev-7, round 2 — the original demanded a unit-id hit at EVERY one of the 21
+  Inventory rows and the file carries six; the acceptance pass measured it rather than assuming it)*
+  — When `grep -n 'dTieredTribunal-11' tools/workflows/tier2-review.js` runs, it returns a hit at
+  each MECHANISM this unit introduced — the kind enum, the subject validator, the pre-spawn log, the
+  S11 deletion note, the lens catalogue and the binding line — and at no site the table lists as
+  untouched. A marker per mechanism is the convention this file already uses; a marker per changed
+  LINE would put twenty-one identical citations in one file and make the six that carry a reason
+  harder to find, which inverts what the marker is for. The second half is unchanged and it is the
+  half that can be violated.
 - **AC10** — When `bash tools/check-kit-versions.sh` runs it exits zero, and `grep -n
   "tier2-review@1.4" tools/workflows/tier2-review.js` returns the single line 3 that also carries
   `version: '1.4'`. The leg is named because it runs and not because it grades the pair: its row
@@ -347,9 +359,14 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
   `tools/check-agent-cap-restatement.sh` keeps the example as its clearest statement of what that
   gate cannot see. A repo whose style is to record why a thing was removed cannot also demand the
   removed thing be unmentionable. What the criterion is really for is that no `<=6` survives as an
-  ASSERTION about the width — and every surviving hit outside `memory/builds/` and `memory/archive/` is the
-  `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md`, which reads CLOSED with its stale line
-  citation corrected. S11's fifth edit target gets its own observation, because that grep cannot see
+  ASSERTION about the width. The only surviving hit outside `tools/`, `memory/builds/` and
+  `memory/archive/` is the `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md`, which reads
+  CLOSED with both of its stale claims corrected. *(This clause is the BLOCKER the post-acceptance
+  spec audit found, and it was introduced by the rev-6 amendment above: the original opening demanded
+  ZERO hits under `tools/`, which made "every hit outside builds and archive is the backlog row" true
+  by construction. Rewriting the opening to bless the `tools/` citations left this clause standing
+  behind it, and the two then returned opposite verdicts on one list of four. Amending one half of a
+  sentence and leaving the other is the defect class this audit found four times, all of them mine.)* S11's fifth edit target gets its own observation, because that grep cannot see
   it: `grep -n 'TOOL-aDeclaredBound-6' memory/builds/dTieredTribunal/README.md` returns a
   Parked-decisions bullet naming the row as closed by `TOOL-dTieredTribunal-11`, where today it
   returns line 58 reading the row OPEN and untouched.
@@ -514,6 +531,25 @@ unused; if 13's AC6 ever reds, this unit takes it without a redesign.
   demand the removed thing be unmentionable. Recorded here rather than quietly satisfied, because a
   criterion edited to match the tree is the one edit that must never happen silently — the reader
   is owed the fact that the original was unmet, not just the text that replaced it.
+
+- rev-7 · 2026-08-26 · **AC9 AMENDED and AC4/AC5 REPAIRED, all disclosed.** The acceptance pass ran
+  every criterion rather than trusting the build's own claims, and three did not hold. AC4's fourth
+  count returned 0 because a parenthetical had been written INSIDE the field list it counts — the
+  prompt now spells the list contiguously and glosses `where` after it, and all four counts return 1.
+  AC5 demanded the anchor regex be spelled once and it was spelled twice, at the subject arm and the
+  base arm, so the two could drift; hoisted to one `PINNED_SHA` constant that both read. AC9 is
+  amended rather than satisfied: it asked for a unit-id citation at every Inventory row and the
+  file carries six, one per mechanism, which is this file's existing convention. AC14 is NOT amended
+  — it was satisfied for real, by running the engine as a spec audit over this build's own spec set,
+  which is the first time that capability has been exercised rather than asserted.
+
+- rev-8 · 2026-08-26 · **post-acceptance spec audit fold — one BLOCKER, and it was mine.** AC11's two
+  halves returned opposite verdicts on one list: the rev-6 amendment rewrote the opening to bless the
+  surviving `tools/` citations and left standing a closing clause that only made sense under the
+  ZERO-hits opening it replaced. Four non-frozen hits exist, three of them under `tools/`. Also S13,
+  which still asked for a marker per Inventory SITE after rev-7 moved AC9 to per-mechanism — the same
+  half-amended shape, found in the same pass. Both are now amended in step with what they gate, and
+  the class has its own record at `memory/gotchas/amendment-leaves-its-other-half-standing.md`.
 
 ## 10. Reuse audit
 

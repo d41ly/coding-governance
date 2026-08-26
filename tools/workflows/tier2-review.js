@@ -117,6 +117,10 @@ const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings
 // satisfy any string test - a check that cannot fail, in a unit whose subject is checks that cannot
 // fail. The orchestrator cannot tell a commit sha from a blob sha, so S6 pushes the VERIFICATION
 // into the lens, which is the only actor here holding a filesystem.
+// AC5 - ONE spelling of the anchor shape, because two arms testing the same property from two
+// copies of one regex is the drift this build spent a unit on. Both the per-subject blob and the
+// `base` sha are "an immutable 7-40 hex object id", which is one question with one answer.
+const PINNED_SHA = /^[0-9a-f]{7,40}$/
 const subjects = Array.isArray(a.subjects) ? a.subjects : []
 if (isSpec) {
   // D6 - `find(pred) || null` collapsed a FALSY offender back onto the pass sentinel, so the `!x`
@@ -127,7 +131,7 @@ if (isSpec) {
   // cannot collide with a value the predicate is allowed to select, which is the general shape:
   // never sentinel on a value the thing you are testing may legitimately return.
   const badIdx = subjects.findIndex(
-    (x) => !x || typeof x !== 'object' || typeof x.path !== 'string' || !/^[0-9a-f]{7,40}$/.test(String(x.blob))
+    (x) => !x || typeof x !== 'object' || typeof x.path !== 'string' || !PINNED_SHA.test(String(x.blob))
   )
   // ...and the BRANCH is on the index, never on the value. Restoring a `badSubject !== null` test
   // here would have reintroduced the identical collapse one line further down, because a `[null]`
@@ -156,7 +160,7 @@ if (isSpec) {
     log('WARNING: ' + why)
   }
 }
-const baseLooksPinned = isSpec || /^[0-9a-f]{7,40}$/.test(String(base))
+const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
     'tier2-review: `base` must be an immutable sha (7-40 hex), not a moving ref. Got ' +
@@ -341,7 +345,7 @@ const finderResults = await boundedParallel(
           : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.\n\n`) +
         `LENS: ${L.brief}\n\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where (the section address, e.g. "section 2 S5"), severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n` +
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n` +
             `Return JSON {lens:"${L.key}", findings:[{file,where,severity,claim,impact,fix}]}.`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n` +
             `Return JSON {lens:"${L.key}", findings:[{file,line,severity,claim,impact,fix}]}.`),

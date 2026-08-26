@@ -1,13 +1,15 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** CLOSED · rev-6 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-11-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff-round2.md) | diff-review | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-closing-diff.md) | diff-review | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-post-acceptance-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
@@ -357,11 +359,24 @@ and the generated artifacts carry claims rather than prose.
   deleting the old bullet outright satisfies the third and reds the second. A build that ships the
   predicate and never touches the README passes the first half and fails the other two, which is the
   point of adding them.
-- **AC12** — When `memory/map/features/agent-cap.md` is read at HEAD, its prose names the marked
-  derivation and the per-branch rule, and `git diff cd971285 -- memory/map/features/agent-cap.md`
-  shows no added and no removed line between the `## Gaps` heading and the `## Reuse affordance`
-  heading. A dossier that gained a gap describing this hole fails the second half, because the hole
-  is closed rather than disclosed.
+- **AC12b** *(ADDED at rev-6 by the post-acceptance spec audit)* — The array-LITERAL branch is
+  graded for its OVERSIZE case, not only its accepted one. When the hook is handed a marked assignment
+  whose literal holds more than `MAX_LENSES` elements it DENIES, and the same holds unmarked. Measured
+  at this rev against `tools/hooks/agent-cap.js`: a marked literal of 5 returns 0, of 6 returns 2, of
+  12 returns 2, and an unmarked literal of 9 returns 2. The arm at `tools/hooks/agent-cap.test.sh:170`
+  already pins the marked-oversize case; this criterion is what makes the unit GRADE it. The audit
+  filed this as a fail-open re-opening the cap — it is not, the code refuses correctly, and the defect
+  was that nothing in this spec said so. A branch whose accepted case is graded and whose refused case
+  is not is a criterion that cannot fail.
+- **AC12** *(AMENDED at rev-5, round 2 — the second half was written to catch THIS unit disclosing
+  its own hole instead of closing it, and it fired instead on a SIBLING unit legitimately adding its
+  own gap to the same span)* — When `memory/map/features/agent-cap.md` is read at HEAD, its prose
+  names the marked derivation and the per-branch rule, and no line added between the `## Gaps`
+  heading and the `## Reuse affordance` heading describes the marked-derivation hole THIS unit
+  closes. `TOOL-dTieredTribunal-14`'s join-rule bullet lands in that span and is not this unit's to
+  suppress. A dossier that gained a gap describing this unit's own hole still fails, because the
+  hole is closed rather than disclosed — which is the property the criterion was always for, and
+  span-level byte equality was only ever a proxy for it.
 - **AC13** — When every tracked `.js` file is fed to the rebuilt `tools/hooks/agent-cap.js` and to the
   copy at the pinned base, using `git ls-files '*.js'` for the population, every file returns the same
   exit code from both. This is the charter's run-it-over-the-real-tree rule made observable, and it is
@@ -499,11 +514,24 @@ wired copy moves.
   because a green row misread as a verified one is the whole class: the empty-branch arm is already
   GREEN at base, so AC14's fails-today half is the deny REASON and its exit-code half is what reds
   against a candidate with the guard removed.
+- rev-6 · 2026-08-26 · post-acceptance spec audit. AC12b ADDED so the array-LITERAL branch grades its
+  OVERSIZE case and not only its accepted one — the code refuses correctly, measured, and nothing in
+  this spec said so, which is a criterion that cannot fail. AC12 amended at rev-5 stands. F1's
+  follow-up now names `TOOL-dTieredTribunal-23`, because the audit found it promising a record that
+  no backlog row carried.
 - rev-4 · 2026-08-26 · M3 fork sweep. F1 RESOLVED to leave the gate arm and record it as a follow-up:
   a new arm is a mechanism, and M8's left-shift is already discharged by `TOOL-dTieredTribunal-15`.
   F2 RESOLVED to bump, as S7 specifies, because `tools/hooks/kit.toml` takes `version_from` from that
   constant. F3 stays PARKED for the owner under M3 veto 2 and is untouched. Header gained `ratified`.
 
+
+- rev-5 · 2026-08-26 · **AC11 REPAIRED and AC12 AMENDED, both disclosed.** The acceptance pass found
+  AC11's `gov:fixed-verifiers` count at 1 where the criterion demands 2: the marked-derivation bullet
+  this unit added to `tools/hooks/README.md` documented the marker without ever spelling it, which is
+  the one thing a bullet about a marker must do. Spelled now, together with the consuming-chain rule
+  round 2 added. AC12's second half was a byte-equality proxy over the dossier's `## Gaps` span; it
+  fired on `TOOL-dTieredTribunal-14` adding its OWN gap there, which is not this unit's to suppress,
+  so the criterion now grades the property it was always for.
 
 ## 10. Reuse audit
 

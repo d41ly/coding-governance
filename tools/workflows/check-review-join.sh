@@ -68,7 +68,9 @@ fi
 # so this gate covered the already-compliant committed harnesses and none of the observed failures.
 # The hook sees that string. Its three bans, and the `why` text this gate's own self-test asserts,
 # are pinned in that rule; the stripper is the hook's `blankLiterals`, which BLANKS string contents
-# where the awk kept them, and that narrowing is recorded in the unit's section 4 Migration.
+# where the retired in-file scanner kept them, and that narrowing is recorded in section 4 Migration.
+# The retired tool's NAME is deliberately not written under this path: this gate has one predicate
+# and it is the hook's, so a reader grepping for the old one should find nothing here.
 SCAN=()
 while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && SCAN+=("$f"); done <<<"$FILES"
 if [ "${#SCAN[@]}" = 0 ]; then

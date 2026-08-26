@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 34 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 86 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 35 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -88,6 +88,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `template size gate selftest` | playbook |
 | `testsuite counts (every bar self-test prints one)` | testsuite-counts |
 | `testsuite counts self-test` | testsuite-counts |
+| `tier2-review self-test` | review-harnesses |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
@@ -155,6 +156,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 |---|---|
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
+| `amendment-leaves-its-other-half-standing.md` | build-method |
 | `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |

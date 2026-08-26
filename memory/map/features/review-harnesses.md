@@ -12,6 +12,7 @@ gate-legs = [
   "workflow script syntax",
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
+  "tier2-review self-test",
 ]
 kits = []
 git-hooks = []

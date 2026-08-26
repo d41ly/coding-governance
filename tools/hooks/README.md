@@ -33,8 +33,11 @@ which is the configuration this hook was rewritten to stop shipping.
   marked assignment may derive its receiver from something already proven bounded — a `.filter()` or
   a `.slice()`, which cannot grow an array — and the bound is inherited. Mentioning a bounded name is
   not enough: the whole right-hand side is still vetoed if it can grow, and the derivation must be
-  ROOTED on the bounded value rather than merely referring to one. Accepted only WITH the marker, so
-  it stays a deliberate claim rather than something inferred from a name.
+  ROOTED on the bounded value rather than merely referring to one. Accepted only WITH the marker —
+  spelled `gov:fixed-verifiers`, on the assignment line — so it stays a deliberate claim rather than
+  something inferred from a name. Every top-level branch of that right-hand side is judged on its own
+  text, and the chain after a bounded root must CONSUME to a close: a tail this file cannot delimit
+  is refused rather than assumed shrink-only.
 - Any `K` it cannot resolve to an integer ≤5. It RESOLVES a bound wherever it is written — the call
   site, a helper's default parameter, or a `gov:bounded-fanout` slice width — and the burden is on
   the fan-out.
