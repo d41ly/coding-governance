@@ -5382,6 +5382,206 @@ user_skills = "/tmp/gk-fake-skills"
               _lit13 and _lit13 <= set(_GK13.EVIDENCE_STATES),
               f"{sorted(_lit13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
 
+        # ============================================================= DEPL-dCarriedReceipt-4
+        # `coverage_rows()` and `plan --coverage`. AC2 and AC3 are LIVE-TARGET readings and are
+        # evidenced in the acceptance ledger, not here — this suite has no NicoCares and no inCMS,
+        # and an arm that pretended to measure one would be asserting nothing. What IS gateable is
+        # the shape of the join: which rows are eligible, what answers "does the target have it",
+        # and that a clean run says `gap 0` out loud.
+        A4_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+                  '[selection]\ndefault = ["demo"]\n\n'
+                  '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                  '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+
+        def a4_gov(tag: str, kit_toml: str, srcs: dict[str, str]) -> pathlib.Path:
+            g = tmp / f"a4-{tag}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(A4_REG, encoding="utf-8",
+                                                                  newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
+            for rel, body in srcs.items():
+                pth = g / "tools" / "demo" / rel
+                pth.parent.mkdir(parents=True, exist_ok=True)
+                pth.write_text(body, encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def a4_gaps(out: str) -> list[str]:
+            """The gap DESTINATIONS the run printed, in order. Parsed off the `GAP` mark rather
+            than off the tally, so an arm cannot pass on a summary line that disagrees with the
+            rows above it."""
+            return [ln.split("]", 1)[1].split("<-")[0].strip()
+                    for ln in out.splitlines() if ln.startswith("  GAP ")]
+
+        def a4_gap_total(out: str) -> int | None:
+            m = _re.search(r"coverage: gap (\d+) of (\d+) write row\(s\)", out)
+            return int(m.group(1)) if m else None
+
+        _A4_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+                   'version_from = { none = "fixture" }\n\n'
+                   '[check]\nnone = "a fixture kit"\n\n'
+                   '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                   '[adopt]\nargv = []\nmutates_index = false\n')
+        _g4 = a4_gov("basic", _A4_KIT, {"one.py": "1\n", "two.py": "2\n", "three.py": "3\n"})
+
+        # ---- AC1's RED is HISTORICAL — `parse_args` refused `--coverage` as an unknown argument
+        # ---- before this unit, and cannot be made to refuse it again without removing the flag.
+        # ---- What survives it is that BOTH flags are named in `USAGE`, which is the carrier §5
+        # ---- promises gains them; the arms below are the behaviour.
+        _g4src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("[-4] S6 both flags are named in USAGE",
+              "--coverage" in _g4src.split("USAGE = ", 1)[1][:900]
+              and "--emit-declines" in _g4src.split("USAGE = ", 1)[1][:900])
+
+        # ---- THE CLEAN READING FIRST. Without it every gap arm below could be passing because the
+        # ---- join reports everything rather than because the fixture is missing something — and
+        # ---- `gap 0` printing OUT LOUD is itself S4, because a clean run that printed nothing is
+        # ---- indistinguishable from a coverage check that never ran.
+        _t4full = a13_target("cov-full", "scripts", {
+            "scripts/demo/one.py": b"1\n", "scripts/demo/two.py": b"2\n",
+            "scripts/demo/three.py": b"3\n", "scripts/demo/kit.toml": b"x\n"})
+        _p4 = run_in_gov(_g4, "plan", "--target", str(_t4full), "--coverage", "--kits", "demo")
+        check("[-4] a target holding every planned write reports gap 0", _p4.returncode == 0
+              and a4_gap_total(_p4.stdout) == 0, _p4.stdout + _p4.stderr)
+        check("[-4] S4 ...and SAYS `gap 0` rather than printing nothing",
+              "gap 0 of" in _p4.stdout, _p4.stdout)
+        check("[-4] F2 ...additively: the ordinary plan rows are still printed above it",
+              "govkit plan — marks:" in _p4.stdout and "  write  [" in _p4.stdout, _p4.stdout)
+        check("[-4] LIVENESS ...over a NON-EMPTY write population, so gap 0 is not vacuous",
+              (a4_gap_total(_p4.stdout) == 0
+               and int(_re.search(r"gap \d+ of (\d+) write", _p4.stdout).group(1)) > 0), _p4.stdout)
+
+        # ---- AC6: exactly one missing planned write is reported, and the INDEX is what answers.
+        _t4gap = a13_target("cov-gap", "scripts", {
+            "scripts/demo/one.py": b"1\n", "scripts/demo/three.py": b"3\n",
+            "scripts/demo/kit.toml": b"x\n"})
+        _p4g = run_in_gov(_g4, "plan", "--target", str(_t4gap), "--coverage", "--kits", "demo")
+        check("[-4] AC6 a target missing one planned write reports exactly that dest",
+              a4_gaps(_p4g.stdout) == ["scripts/demo/two.py"], str(a4_gaps(_p4g.stdout)))
+        check("[-4] F1 ...and a nonzero gap does NOT change the exit code",
+              _p4g.returncode == 0, f"rc {_p4g.returncode}")
+        check("[-4] S1 ...and the row names the gov source it came from, so a rename reads apart "
+              "from an absence",
+              "<- tools/demo/two.py" in _p4g.stdout, _p4g.stdout)
+        # THE INDEX, NOT THE WORKTREE. An untracked file sitting at the destination is not a file
+        # the target holds, and this is the arm that says which of the two answers.
+        (_t4gap / "scripts" / "demo" / "two.py").write_bytes(b"2\n")
+        _p4u = run_in_gov(_g4, "plan", "--target", str(_t4gap), "--coverage", "--kits", "demo")
+        check("[-4] AC6 an UNTRACKED file at the destination is still a gap — the index answers",
+              a4_gaps(_p4u.stdout) == ["scripts/demo/two.py"], str(a4_gaps(_p4u.stdout)))
+        git(_t4gap, "add", "-A")
+        git(_t4gap, "commit", "-qm", "took it")
+        _p4t = run_in_gov(_g4, "plan", "--target", str(_t4gap), "--coverage", "--kits", "demo")
+        check("[-4] AC6 ...and it stops being a gap once the target TRACKS it",
+              a4_gap_total(_p4t.stdout) == 0, _p4t.stdout)
+
+        # ---- AC5: THE FALSE-POSITIVE ARM, and the left-shift. The class is "a non-`write` kind
+        # ---- counted as a gap", gated over the WHOLE `ROLE_KINDS` table rather than over the one
+        # ---- role that exposed it: a role added tomorrow takes its kind from that table and this
+        # ---- assertion inherits the answer.
+        _A4_KIND_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+                        'version_from = { none = "fixture" }\n\n'
+                        '[check]\nnone = "a fixture kit"\n\n'
+                        '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                        '[[files]]\ninclude = "owned.py"\nrole = "project-owned"\n\n'
+                        '[[files]]\ninclude = "block.txt"\nrole = "merged"\n'
+                        'block_id = "demo:block"\nmarker_style = "hash-comment"\n'
+                        'to = "hooks/pre-commit"\n\n'
+                        '[adopt]\nargv = []\nmutates_index = false\n')
+        _g4k = a4_gov("kinds", _A4_KIND_KIT, {
+            "one.py": "1\n", "owned.py": "owned\n",
+            "block.txt": "# demo:block\nechodemo\n# /demo:block\n"})
+        # The target holds every ENGINE destination and NEITHER of the other two kinds'. Under a
+        # join over every `planned_writes` row that is two gaps; under S2's it is none.
+        #
+        # `block.txt` AND `owned.py` ARE BOTH HELD, and the first of those cost a round. The `**`
+        # engine rule pools every tracked file under `home`, so the merged rule's own SOURCE also
+        # lands at `scripts/demo/block.txt` as a genuine write row — a target missing it has a real
+        # gap, and the arm redded on a correct answer because the fixture had not held up its end.
+        # A false-positive arm has to be missing ONLY the kinds it is about.
+        _t4k = a13_target("cov-kinds", "scripts", {
+            "scripts/demo/one.py": b"1\n", "scripts/demo/kit.toml": b"x\n",
+            "scripts/demo/block.txt": b"# demo:block\nechodemo\n# /demo:block\n"})
+        _p4k = run_in_gov(_g4k, "plan", "--target", str(_t4k), "--coverage", "--kits", "demo")
+        check("[-4] AC5 the fixture really declares a non-`write` kind whose destination is absent",
+              "  ORDER  [" in _p4k.stdout or "  BLOCK  [" in _p4k.stdout, _p4k.stdout)
+        check("[-4] AC5 ...and NONE of them is counted as a gap",
+              a4_gap_total(_p4k.stdout) == 0, str(a4_gaps(_p4k.stdout)))
+        # THE LEFT-SHIFT, over the table rather than over this fixture: the eligible set is exactly
+        # the kinds that mean "govkit puts bytes here", and it is read off `ROLE_KINDS` so a role
+        # added later cannot quietly join it.
+        _GK4 = govkit_module()
+        check("[-4] AC5 left-shift: `write` is the only kind in ROLE_KINDS that means gov writes it",
+              {k for k in _GK4.ROLE_KINDS.values() if k == "write"} == {"write"}
+              and "write" in set(_GK4.ROLE_KINDS.values()), str(sorted(set(
+                  _GK4.ROLE_KINDS.values()))))
+        check("[-4] AC5 ...and the join's predicate is spelled against that kind, not against a "
+              "role list it would have to keep in step",
+              'row["kind"] == "write"' in _g4src, "predicate not found in source")
+
+        # ---- AC4: `--emit-declines`. STDOUT ONLY — a deployer that edits the document carrying the
+        # ---- owner's decisions has made one for them.
+        _p4d = run_in_gov(_g4, "plan", "--target", str(_t4full), "--coverage", "--emit-declines",
+                          "--kits", "demo")
+        check("[-4] AC4 a target with no gaps emits no decline skeletons",
+              "[[decline]]" not in _p4d.stdout, _p4d.stdout)
+        _t4d = a13_target("cov-decl", "scripts", {"scripts/demo/one.py": b"1\n"})
+        _p4d2 = run_in_gov(_g4, "plan", "--target", str(_t4d), "--coverage", "--emit-declines",
+                           "--kits", "demo")
+        check("[-4] AC4 one `[[decline]]` block per gap row, with an empty `why`",
+              _p4d2.stdout.count("[[decline]]") == a4_gap_total(_p4d2.stdout)
+              and a4_gap_total(_p4d2.stdout) > 0
+              and _p4d2.stdout.count('why = ""') == a4_gap_total(_p4d2.stdout), _p4d2.stdout)
+        check("[-4] AC4 ...and the target's own descriptor is untouched afterwards",
+              subprocess.run(["git", "-C", str(_t4d), "status", "--porcelain",
+                              ".governance/deploy.toml"], capture_output=True,
+                             text=True).stdout.strip() == "", "deploy.toml was modified")
+        # `--emit-declines` ALONE implies the join rather than printing nothing, which is why this
+        # unit adds no refusal branch and `BRANCH_PIN` does not move (§7).
+        _p4d3 = run_in_gov(_g4, "plan", "--target", str(_t4d), "--emit-declines", "--kits", "demo")
+        check("[-4] `--emit-declines` alone implies `--coverage` rather than emitting nothing",
+              _p4d3.stdout.count("[[decline]]") == _p4d2.stdout.count("[[decline]]")
+              and _p4d3.returncode == 0, _p4d3.stdout)
+
+        # ---- S3: a destination still carrying an unresolved token is NOT a coverage row. It is
+        # ---- already an `r.fail`, and reporting it as absent would say the target is missing a
+        # ---- file whose name nobody knows.
+        _A4_TOK_KIT = _A4_KIT.replace('include = "**"\nrole = "engine"',
+                                      'include = "**"\nrole = "engine"\nto = "{nowhere}/{relpath}"')
+        _g4t = a4_gov("token", _A4_TOK_KIT, {"one.py": "1\n"})
+        _t4t = a13_target("cov-token", "scripts", {"scripts/demo/one.py": b"1\n"})
+        _p4t2 = run_in_gov(_g4t, "plan", "--target", str(_t4t), "--coverage", "--kits", "demo")
+        check("[-4] S3 the fixture really produces an UNRESOLVED destination",
+              "UNRES." in _p4t2.stdout, _p4t2.stdout)
+        check("[-4] S3 ...and it is not counted as a gap, because a brace is not a path",
+              a4_gap_total(_p4t2.stdout) == 0, str(a4_gaps(_p4t2.stdout)))
+
+        # ---- S4: ROWS, never unique destinations. Two rules resolving to ONE dest are two triage
+        # ---- items, and a destination-keyed tally is what hid the single collision measured at
+        # ---- the live target this unit was built for.
+        _A4_DUP_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+                       'version_from = { none = "fixture" }\n\n'
+                       '[check]\nnone = "a fixture kit"\n\n'
+                       '[[files]]\ninclude = "one.py"\nrole = "engine"\nto = "shared/collide.py"\n\n'
+                       '[[files]]\ninclude = "two.py"\nrole = "engine"\nto = "shared/collide.py"\n\n'
+                       '[adopt]\nargv = []\nmutates_index = false\n')
+        _g4dup = a4_gov("dup", _A4_DUP_KIT, {"one.py": "1\n", "two.py": "2\n"})
+        _t4dup = a13_target("cov-dup", "scripts", {"scripts/demo/keep.txt": b"k\n"})
+        _p4dup = run_in_gov(_g4dup, "plan", "--target", str(_t4dup), "--coverage", "--kits", "demo")
+        _g4rows = a4_gaps(_p4dup.stdout)
+        check("[-4] S4 the fixture really has two rules resolving to ONE destination",
+              len(set(_g4rows)) == 1 and len(_g4rows) >= 1, str(_g4rows))
+        check("[-4] S4 ...and the tally counts ROWS, so the collision is two triage items not one",
+              a4_gap_total(_p4dup.stdout) == len(_g4rows) and len(_g4rows) == 2, str(_g4rows))
+
+
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #

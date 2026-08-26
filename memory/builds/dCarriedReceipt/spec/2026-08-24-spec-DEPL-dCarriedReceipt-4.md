@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-26 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-DEPL-dCarriedReceipt-4-acceptance-ledger.md](../build/2026-08-26-build-DEPL-dCarriedReceipt-4-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
@@ -145,15 +146,31 @@ has left the gap set entirely.
   — reports `181` plan rows, `143` write rows and `gap 0`, and exits 0. The `--kits` list is not
   decoration: `resolve_selection` (`:410-429`) branches on `all` / `kits` / `default_kits(reg)` and
   never reads `deploy["kits"]`, so the same command without it resolves the registry default set and
-  reports `69` write rows — a different question, correctly answered. Zero is the calibration
-  reading, so it is an acceptance criterion.
+  reports a different write-row count — a different question, correctly answered.
+
+  **AMENDED at rev-6.** The three figures above are measurements at `9ddcc5c9` and are kept as
+  history; they are not what the criterion asserts, because gov has shipped files since and a
+  target that was complete then is behind now. What it asserts is the CALIBRATION: the command
+  runs against the live target, the gap set is derivable, and every gap row it prints names a file
+  gov ships today and the target does not track — checked row by row against `git ls-files` on both
+  sides, which is the claim `gap 0` was standing in for. A gap row that survives that check is a
+  real finding about the target rather than a fault in the join, and the reading of the day is
+  recorded in the acceptance ledger with its date and both shas.
 - **AC3** — Against inCMS with a `deploy.toml` declaring its 14 kits at `prefix = "scripts"` and
-  the same `--kits` treatment, the command reports `54` gap rows over `135` write rows; the one
-  surviving `push-main` gap row is `.githooks/pre-push.test.sh`, sitting under `.githooks/` and NOT
-  at the target root, and `.githooks/pre-push` is absent from the gap set because inCMS tracks it.
-  The pre-`-1` reading was `55` with both rows at the root; that is a historical measurement at
-  `9ddcc5c9`, and this unit lands after `-1`, so `54` is what the command prints. A reading of `55`
-  after `-1` means `-1` regressed, which is the assertion this AC is for.
+  the same `--kits` treatment, the one surviving `push-main` gap row is `.githooks/pre-push.test.sh`,
+  sitting under `.githooks/` and NOT at the target root, and `.githooks/pre-push` is absent from the
+  gap set because inCMS tracks it. That pair IS the criterion: it is `-1`'s resolver fix seen from
+  the coverage side, and a reading that puts either row at the target root means `-1` regressed.
+
+  **AMENDED at rev-6.** The gap and write-row counts are struck from the assertion and kept as
+  history. `54` over `135` was measured at `9ddcc5c9`, and `55` before `-1`; gov has shipped files
+  since, so the count moves with gov's own tree and pinning it would make this criterion red on
+  every unrelated landing. The structural pair above does not move, which is why it is what
+  survives. The reading of the day, its date and both shas go in the acceptance ledger.
+  A target-side prerequisite stands unchanged: `load_deploy` refuses without
+  `.governance/deploy.toml`, which inCMS does not carry and which the adopter-side build writes.
+  A run taken before it lands must say, in the ledger, that it reconstructed one — from inCMS's own
+  declared kit list and never from an invented one — and must not write it into that repository.
 - **AC4** — `plan --target <t> --coverage --emit-declines` writes one `[[decline]]` block per gap
   row to stdout with an empty `why`, and `git -C <t> status --porcelain .governance/deploy.toml`
   is empty afterwards.
@@ -183,6 +200,18 @@ a measurement, not a finding, which is F1 below.
   RESOLVED (agent, 2026-08-24, delegated): additive.
 
 ## 9. Revision log
+
+- rev-6 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. TWO criteria AMENDED,
+  and both for one reason: AC2 and AC3 pinned gap and write-row COUNTS measured against the two
+  live targets at a gov vintage that has since moved 83 commits. A count of what gov ships is not
+  a property of this join, so pinning one made these criteria red on every unrelated landing — the
+  value-in-prose-beside-the-source-that-owns-it class, one layer out. What each now asserts is the
+  claim the count was standing in for: for AC2 the calibration, that every gap row names a file gov
+  ships and the target does not track, checked on both sides; for AC3 the `-1` regression pair,
+  which does not move. The struck figures are kept as history in place. Also AMENDED into AC3: a
+  run taken before the adopter-side descriptor lands must record that it reconstructed one from
+  inCMS's own declared kit list, and must not write it into that repository. Readings, dates and
+  shas are in the acceptance ledger under `build/`.
 
 - rev-5 · 2026-08-25 · round-5 fold: L1 — the rev-4 entry below recorded as done the one
   edit its own commit undid. It claimed AC2's `--kits` value is split at a comma across two

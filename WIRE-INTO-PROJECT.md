@@ -611,6 +611,37 @@ checkout itself; an existing `install.json` without `--re-adopt`; and a target i
 from HEAD. That last one is the INDEX only — an unstaged edit in your own worktree does not block,
 because `adopt` reads identities out of the index and writes nothing you could lose.
 
+### Before any of that: how much of each kit did this tree actually take?
+
+`adopt` measures the files a target HOLDS. It says nothing about the ones it never took, and the
+only signal this engine had for that was whole-kit — `update`'s `available (not installed)` line,
+which needs the receipt you are trying to create. So a tree that took 80 files of a kit and left 20
+read exactly like one that took all 100.
+
+`plan --coverage` is the read-only join that answers it, and it needs no receipt — only
+`.governance/deploy.toml`:
+
+```bash
+python <gov>/tools/govkit/govkit.py plan --target <project> --coverage --kits a,b,…
+python <gov>/tools/govkit/govkit.py plan --target <project> --coverage --emit-declines --kits a,b,…
+```
+
+**Pass `--kits` deliberately.** The selection resolver branches on `--all`, `--kits` and the
+registry's own default set, and it never reads `deploy.toml`'s `kits` — so the same command without
+the flag answers a different question, correctly. Ask the one you meant.
+
+It prints one `GAP` row per missing planned write, naming the kit and the gov source it came from,
+then a per-kit tally and a total. `gap 0` prints out loud: a clean run that printed nothing is
+indistinguishable from a check that never ran. **A gap never changes the exit code** — it is a state
+of the world, not a fault in the run.
+
+**Coverage answers PRESENCE only.** A file the target holds and has hand-edited reads as covered
+here; that is what `adopt`'s two identities measure instead. And a file the target took under a
+different name reads as absent, because rename detection for coverage is a stated non-goal —
+`--emit-declines` prints paste-ready `[[decline]]` skeletons to STDOUT, one per gap row, for you to
+paste into `deploy.toml` yourself. It never opens that file: a deployer that edits the document
+carrying your decisions has made one for you.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

@@ -1602,7 +1602,52 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
     return out
 
 
-def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str]) -> int:
+def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                  descs: dict[str, tuple[dict, str]], selection: list[str],
+                  r: Report, rows: list[dict] | None = None) -> list[dict]:
+    """PARTIAL adoption: which files gov would write that this target does not hold
+    (DEPL-dCarriedReceipt-4 S1).
+
+    THE ONLY PARTIAL-ADOPTION SIGNAL THIS ENGINE HAD WAS WHOLE-KIT — `update`'s
+    `available (not installed)` line, which needs a receipt. So a target that took 80 files of a kit
+    and left 20 read exactly like one that took all 100. This is the read-only join that needs no
+    receipt, writes nothing, and returns a number for a real adopter today.
+
+    THE POPULATION IS `kind == "write"` AND NOTHING ELSE (S2). `order`, `side-effect`, `covered` and
+    `blocked` are each a promise gov does NOT make, so counting one as a gap reports a target for a
+    file gov never ships. The predicate is written against the kind rather than the role, over the
+    whole `ROLE_KINDS` table, because a role added tomorrow gets its kind from that table and this
+    join inherits the answer.
+
+    A ROW WITH AN UNRESOLVED TOKEN IS NOT A COVERAGE ROW (S3). `planned_writes` has already turned
+    that into an `r.fail`, and a destination still carrying a brace is not a path — reporting it as
+    absent would say the target is missing a file whose name nobody knows.
+
+    THE INDEX ANSWERS, NEVER THE WORKTREE. An untracked file sitting at the destination is not a
+    file the target HOLDS, and this engine already decided that once, where a leg guard drops on
+    tracked-ness rather than existence. Two answers to "does the target have this" is the class this
+    file spends most of its comments on.
+
+    ROWS, NEVER UNIQUE DESTINATIONS (S4). Two rules resolving to one `dest` are two triage items,
+    and a destination-keyed tally is exactly what hid the one collision measured at NicoCares.
+
+    `rows` IS AN OPTIONAL ALREADY-COMPUTED PLAN, and it exists so the spec's own perf line stays
+    true. That line promises ONE `git ls-files` on top of the walk `planned_writes` already
+    performs; the only caller is `cmd_plan`, which has just walked the descriptors for its own
+    output, so without this the coverage flag would silently double the run's dominant cost on a
+    181-row target. Called without it, this function is self-contained and does the walk itself —
+    which is what any future caller gets, and what the arms exercise.
+    """
+    if rows is None:
+        rows = planned_writes(root, target, deploy, descs, selection, r)
+    have = set(tracked(target))
+    return [{"kit": row["kit"], "dest": row["dest"], "src": row["src"]}
+            for row in rows
+            if row["kind"] == "write" and not row["missing"] and row["dest"] not in have]
+
+
+def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
+             coverage: bool = False, emit_declines: bool = False) -> int:
     r = Report()
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
@@ -1640,6 +1685,31 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     print("govkit plan — "
           + ", ".join(f"{counts[k]} {named.get(k, k)}" for k in KIND_MARKS)
           + ". NOTHING was written.")
+
+    # ---- DEPL-dCarriedReceipt-4 S4. ADDITIVE (§8 F2): the plan rows above are what a reader needs
+    # ---- to interpret a gap row, and a mode that hid them would make the operator run the verb
+    # ---- twice. REPORT-ONLY (§8 F1): a gap is a state of the world, not a fault in the run, and a
+    # ---- first honest run that exits 1 reads as a broken tool.
+    # `--emit-declines` IMPLIES `--coverage` rather than refusing without it. The skeletons are one
+    # per GAP row, so without the join there is no gap set — and a flag that printed nothing in that
+    # case is the skip-that-looks-like-a-pass shape this whole unit is written against. Implying it
+    # is also why this adds no refusal branch, which is what §7 promises about `BRANCH_PIN`.
+    if coverage or emit_declines:
+        gaps = coverage_rows(root, target, deploy, descs, selection, r, rows)
+        for g in gaps:
+            print(f"  GAP    [{g['kit']:<13}] {g['dest']}   <- {g['src']}")
+        per_kit = {k: sum(1 for g in gaps if g["kit"] == k) for k in selection}
+        # `gap 0` PRINTS. A clean run that printed nothing is indistinguishable from a coverage
+        # check that never ran, and this whole unit exists because an absent signal read as a
+        # present one for two live targets.
+        print(f"govkit plan — coverage: gap {len(gaps)} of {counts['write']} write row(s)"
+              + (" · " + ", ".join(f"{k} {v}" for k, v in per_kit.items() if v) if gaps else "")
+              + ". Coverage answers PRESENCE only: a present-but-hand-edited file reads as covered.")
+        if emit_declines:
+            # STDOUT, never the target's own file (§3). A deployer that edits the document carrying
+            # the owner's decisions has made one for them. This is paste-ready text and nothing else.
+            for g in gaps:
+                print(f'\n[[decline]]\nkit = "{g["kit"]}"\ndest = "{g["dest"]}"\nwhy = ""')
     return r.emit()
 
 
@@ -5529,7 +5599,7 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
   govkit.py selfcheck
-  govkit.py plan  --target <path> [--kits a,b | --all]
+  govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines]
   govkit.py check --target <path>
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
   govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
@@ -5567,6 +5637,11 @@ def parse_args(argv: list[str]) -> tuple:
     # `--pin` is REPEATABLE and keyed by destination: one assertion per row, never a mode.
     pins: dict[str, str] = {}
     re_adopt = False
+    # DEPL-dCarriedReceipt-4 S6. `--emit-declines` implies `--coverage` in `cmd_plan`, so the two
+    # are parsed independently and joined there rather than here: a parser that silently switched
+    # another flag on would make `parse_args`'s return the second place the rule is written.
+    coverage = False
+    emit_declines = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -5605,6 +5680,12 @@ def parse_args(argv: list[str]) -> tuple:
         elif a == "--re-adopt":
             re_adopt = True
             i += 1
+        elif a == "--coverage":
+            coverage = True
+            i += 1
+        elif a == "--emit-declines":
+            emit_declines = True
+            i += 1
         elif a == "--to" and i + 1 < len(argv):
             to_rev = argv[i + 1]
             i += 2
@@ -5617,7 +5698,7 @@ def parse_args(argv: list[str]) -> tuple:
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
-            pins, re_adopt)
+            pins, re_adopt, coverage, emit_declines)
 
 
 def main(argv: list[str]) -> int:
@@ -5626,7 +5707,7 @@ def main(argv: list[str]) -> int:
         return 0 if argv else 2
     try:
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
-         PINS, RE_ADOPT) = parse_args(argv)
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -5644,7 +5725,8 @@ def main(argv: list[str]) -> int:
             if not (target / ".git").exists():
                 raise Refusal(f"--target {target.as_posix()} is not a git repository")
             if verb == "plan":
-                return cmd_plan(root, target, mode, kits)
+                return cmd_plan(root, target, mode, kits, coverage=COVERAGE,
+                                emit_declines=EMIT_DECLINES)
             if verb == "check":
                 return cmd_check(root, target)
             if verb == "intake":
