@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 3b5f9b1165d6b6deb4a32c9785ce222261c5d96d
-phase: FOLDING
+witness: 93312e05af758351738bab5d83193b4c4100a9bd
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: 91052d0a
@@ -36,3 +36,7 @@ base: da9e4cd28072501cd4fe87a81db36c01b9a80f9e
 2026-08-26T00:38:43Z decision · item P10 — should a review record gain a round axis and a reviewed-rev axis, stamped by the driver rather than typed? · reason Options seen: build it now; build it after P4 gives the rounds a driver; leave it. Refused because the value depends on a program emitting the fields and nothing runs the rounds on the attended path today, so it waits on P4, which is itself parked. The binding grammar already admits a trailing rev qualifier and exactly one record in the corpus uses it, so the data half exists and the driver half does not.
 
 2026-08-26T00:38:44Z decision · item P11 — should agent-cap.js's marked-derivation branch require EVERY non-self reference to be bounded rather than just one, closing the reproduced hole where a caller-supplied array reaches agent() once per element? · reason Options seen: tighten it now; tighten it as part of whatever P1 becomes, since P1's dialect sits directly on the hole; leave it. Refused because the research calls it a prerequisite for P1's dialect and P1 is parked, and because its one shipped user is drift-audit-state.js:224 — the same file TOOL-dTieredTribunal-3 is re-shaping — so the two units would contend for one file. The hole is REAL and reproduced, not theoretical.
+
+2026-08-26T01:18:58Z review · item dTieredTribunal-specs · reason verdict BLOCKED · blockers 2
+
+2026-08-26T01:25:12Z decision · item F2 on TOOL-dTieredTribunal-1 — should tools/check-kit-versions.sh gain an assertion pairing tier2-review.js's meta.version with its same-line gov:kit tier2-review@ marker, the way it already pairs both drift-audit siblings? · reason Round 2 finding 35 established the asymmetry from source: check-kit-versions.sh:24 is a bare presence check that this file carries SOME version-shaped token, while :180-193 holds the full constant-to-marker-to-meta.version chain for both drift-audit harnesses. So a bump that moves one of tier2-review.js's two same-line tokens and not the other is invisible to the bar. Options seen: add the assertion inside TOOL-dTieredTribunal-1; add it as a separate gate unit; leave the asymmetry. Refused to decide because a gate is a MECHANISM and folding one into a spec-text review round smuggles it past the round meant to price it, which is the disposition round 1 already gave finding 45. A new gate also owes its failing case observed before it lands, which is work this run did not scope.

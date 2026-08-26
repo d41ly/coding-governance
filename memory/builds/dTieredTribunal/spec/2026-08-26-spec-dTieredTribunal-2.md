@@ -1,12 +1,13 @@
 # TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue
 
-**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
+**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
+| [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 
 <!-- /gen:spec-records -->
 
@@ -81,17 +82,38 @@ record is a checklist entry and not a carrier of obligations.
   exits non-zero with no output.
 - **AC2** — When `python tools/memory-tree/gotchas.py --check` runs, it exits zero, which covers both
   the record's own shape checks and `INDEX.md` freshness.
-- **AC3** — When `python tools/memory-tree/gotchas.py --for-paths memory/builds/dFramedEntrypoint/spec/`
+- **AC3** — When
+  `python tools/memory-tree/gotchas.py --for-paths memory/builds/dFramedEntrypoint/spec/2026-08-24-spec-dFramedEntrypoint-1.md`
   runs, the new class name appears in its stdout and the summary line counts it as anchor-selected.
-  The range is a real fold round's write surface, so the criterion observes the population §1 names
-  instead of restating an anchor S2 declared. Today that same command prints
-  `0 class(es) selected by an anchor + 4 universal`, which is how the criterion can fail.
-- **AC4** — When `python tools/codebase-map/test_codebase_map.py` runs, it exits zero. That script is
-  the `codebase-map coverage + freshness` leg, and it is what adjudicates both halves: that the new
-  `gotcha-classes` key is claimed by a dossier, and that it no longer sits unclaimed in
-  `memory/map/baseline.toml`.
+  Today that same command prints `0 class(es) selected by an anchor + 4 universal`, which is how the
+  criterion can fail. The argument is a FILE and must stay one. `normalise_paths` strips a trailing
+  slash, so a directory argument arrives as a slashless string that none of `selectable()`'s three
+  arms can match against a `/spec/` anchor. Proven by importing the shipped module: the anchor
+  returns the empty set against `memory/builds/dFramedEntrypoint/spec` and returns the path itself
+  against the file above. A directory argument would make this criterion's pass output byte-identical
+  to its failure output, which is the could-not-fail shape this whole unit is about.
+- **AC3b** — When that same command is run against a spec file under a DIFFERENT build, the class is
+  selected there too. One file could be selected by accident; two under different builds is the
+  anchor working. This is the negative F1's noise argument owes: when
+  `python tools/memory-tree/gotchas.py --for-paths memory/DECISIONS.md` runs, the new class is NOT
+  selected, because a decision log is not a fold surface and `memory/builds/` would have taken it.
+- **AC4** — Three observations, because one command does not make all three. First, when
+  `python tools/codebase-map/test_codebase_map.py` runs it exits zero, which is the
+  `codebase-map coverage + freshness` leg and which fails on any inventory key that is neither
+  claimed by a dossier nor present in the baseline. Second, when
+  `grep -n fold-text-is-unreviewed-surface memory/map/features/build-method.md` runs it returns the
+  claim. Third, when the same grep runs over `memory/map/baseline.toml` it returns nothing. The
+  baseline half is stated as an ABSENCE and not as a removal: a key created by this unit was never in
+  that file, so nothing can stop sitting there, and the header of `memory/map/baseline.toml` reserves
+  it for the initial backfill in as many words.
 - **AC5** — When the full bar runs with the record staged, the `memory hygiene` leg and the
   `codebase-map coverage + freshness` leg are both green.
+- **AC6** — When `grep -n 'dFramedEntrypoint' memory/gotchas/fold-text-is-unreviewed-surface.md`
+  runs, it returns the citation S5 requires, and the file it names resolves under `git ls-files`.
+  S5's whole point is that the evidence is TRACKED, and no other criterion here reads the record's
+  body: AC1 is a filename test, AC2 grades shape and index freshness, and AC3 grades selection.
+  Numbered last rather than inserted, because two live sentences and a revision-log line already
+  cite AC5 and renumbering would strand all three.
 
 ## 6. Gates
 
@@ -116,10 +138,13 @@ Round 1 of this build's spec audit measured that the record as first scoped coul
 on the one diff class §1 says it exists to serve. Two arms were available, and only one survives.
 
 *The anchor arm, taken.* Add a backticked `/spec/` token to the record body. Measured with the
-shipped predicate, `selectable()` in `tools/memory-tree/gotchas.py`, over the 1024 tracked paths:
+shipped predicate, `selectable()` in `tools/memory-tree/gotchas.py`, over the tracked path set:
 `/spec/` selects 316 of them, and every one sits under a spec directory. The arm therefore buys the
-fold surface and no noise. The spelling refused alongside it is `memory/builds/`, which selects 689
-of 1024 with 373 of those outside any spec directory. That is near-universal selection bought under
+fold surface and no noise. The spelling refused alongside it is `memory/builds/`, which selects
+roughly two thirds of the tree, most of it outside any spec directory. Neither figure is written as
+an absolute here: both are derived, both moved between the measurement and the commit that recorded
+it, and AC3b is where the difference is OBSERVED rather than asserted. That is near-universal
+selection bought under
 an anchor's name, and noise on a checklist is how reviewers learn to skip the checklist.
 
 *The `universal: true` arm, refused on two independent grounds.* It is semantically wrong first: the
@@ -141,7 +166,7 @@ vetoes on its own evidence, so the fork resolves here rather than waiting on an 
   fix: §1 now names the fold diff as the population, S2 adds the `/spec/` anchor, AC3 observes a real
   fold range, and §7 F1 records the fork RESOLVED with both arms and their evidence. The trio's own
   proposed anchor was `memory/builds/`; the fold took `/spec/` instead, because re-measuring the
-  proposal with the shipped predicate showed 373 non-spec hits, and the finding's parenthetical did
+  proposal with the shipped predicate showed the non-spec majority, and the finding's parenthetical did
   not price that. 2 replaced AC4's `reuse_lookup.py` with `test_codebase_map.py`, which is the leg
   that actually adjudicates claim coverage — `reuse_lookup.py` takes a required query positional and
   returns 0 unconditionally, so it could not answer AC4 as written. 10 and 51 are one defect and
@@ -156,6 +181,22 @@ vetoes on its own evidence, so the fork resolves here rather than waiting on an 
   because F1 resolved under the mandate. Refused: finding 27, the `node a` header token, which is
   true — this run authored the spec on node a while the build folder is node d's — so the difference
   belongs in the build README, not in a falsified header.
+
+- rev-3 · 2026-08-26 · folded spec-audit round 2, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md`.
+  Six findings folded, five of them created by the rev-2 fold itself. The BLOCKER, findings 1 and 10,
+  is one line: AC3's `--for-paths` argument was the DIRECTORY `memory/builds/dFramedEntrypoint/spec/`,
+  and `normalise_paths` strips the trailing slash, so none of `selectable()`'s three arms could match
+  the `/spec/` anchor against the result. The criterion's pass output was byte-identical to its
+  failure output. Re-derived by importing the shipped module before fixing: the anchor returns the
+  empty set against the slashless directory and returns the path against the file. AC3 now names a
+  FILE and says why it must stay one. AC3b is new and is the negative F1's noise argument owed —
+  a decision log must NOT select. 25 and 37 are one rewrite: AC4 claimed the coverage leg adjudicates
+  a baseline REMOVAL, but a key this unit creates was never in `baseline.toml`, so the claim is now
+  three direct observations and the baseline half is stated as an absence. 16 added AC6, the only
+  criterion that reads the record's own body for the tracked citation S5 requires. 9 and 14 deleted
+  three derived counts from §7 F1 prose — 1024, 689 and 373 were all stale at HEAD, staled by the very
+  commit that wrote them, so the argument now names the ratio and lets AC3b observe it.
 
 ## 9. Reuse audit
 

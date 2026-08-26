@@ -1,12 +1,13 @@
 # TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries
 
-**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
+| [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 
 <!-- /gen:spec-records -->
 
@@ -62,12 +63,22 @@ unported and is named in section 3, so this unit claims the accounting rather th
   the two tokens that disagreed: today a finding absent from `vmap` renders
   `reason: 'no verdict returned'` at `drift-audit-state.js:316`, which is false of a demotion, where
   two verdicts did return, and that false reason is serialized into the synthesis prompt and into
-  the report. A `severityCorrection` carried by a demoted verdict is discarded with it; that is
-  stated here so the loss is recorded rather than silent, and no field is added to carry it.
+  the report. A `severityCorrection` carried by a demoted verdict is discarded with it. That loss is
+  stated rather than left silent, and this unit adds no field to carry it. It has a downstream
+  consequence worth naming, because a demotion is new behaviour: `drift-audit-code.js:309` derives
+  `downgrades` by counting `judged` entries whose verdict is `partial` and which carry a
+  `severityCorrection`, and returns that as `severityCorrections`, which is interpolated into the
+  synthesis prompt. A `partial` demoted to unverified therefore leaves that count, correctly, because
+  the verdict was withdrawn. It is stated here so a builder does not read the drop as a bug.
 - **S6** — both siblings gain the synthesis-death log: when the synthesis agent returns null, log
   every confirmed and unverified finding before returning, so the findings are not lost silently.
-- **S7** — both return blocks carry the same field set on the success path AND on the new early
-  path: `lensesRun`, `lensesDead`, `skepticsDead`, `conflicts`, `duplicates`, `spurious` and `note`.
+- **S7** — every return block carries the same field set. There are FOUR exits per sibling after
+  this unit, not two, and each carries `lensesRun`, `lensesDead`, `skepticsDead`, `conflicts`,
+  `duplicates`, `spurious` and `note`. They are the success return, the all-lenses-dead return S4
+  adds, the zero-configured-lenses return S4 adds beside it, and the synthesis-death path, which S6
+  makes loud but which falls through to the success return rather than exiting on its own. An earlier
+  revision of this bullet said "the success path AND the new early path" and counted one new exit
+  where S4 creates two, which is exactly the asymmetry this unit exists to remove.
   Each file's `note` distinguishes a complete run from a degraded one, in the shape
   `tools/workflows/tier2-review.js` already uses.
 - **S8** — each ported guard carries a comment naming the unit that originally earned it in
@@ -80,11 +91,24 @@ unported and is named in section 3, so this unit claims the accounting rather th
   sibling's `meta.version` equals the kit constant and that its own inline marker equals its
   `meta.version`, so a partial bump reds the unguarded `kit version markers` leg. The bump is owed
   because the harnesses ship the kit's return contract and this unit changes it.
+  The README edit is NOT the marker byte alone. `tools/drift-audit/README.md:7` carries a
+  `Migrating 1.0 to 1.1` paragraph stating what an adopter must change and why, which is this kit's
+  established convention for a contract move, and a bump that skips it leaves an adopter reading a
+  migration note for a version two behind. S9 adds the matching paragraph. Its content is what an
+  adopter has to know and no more: the return objects gain seven fields, every one additive, so an
+  adopter passing the same `args` needs no edit, and the one observable behaviour change is that a
+  run whose lenses all died now returns early instead of synthesizing a report over nothing.
 - **S10** — `memory/map/features/review-harnesses.md` has its Gaps section refreshed in the same
   commit as the code. Its first bullet states this unit's delta as live fact, and landing this unit
-  falsifies every clause of it. The three remaining gaps stay standing with their evidence: the
-  absent `args` parse, the absent review-KIND parameter, and the inline-script modality no file gate
-  can see.
+  falsifies every clause of it, including the two an earlier revision of this bullet did not
+  enumerate: that `drift-audit-code.js` returns no lens information at all, and that both siblings
+  resolve a disagreeing repeat by keeping whichever arrived first. Three gaps stay standing, and one
+  of them is CORRECTED rather than frozen. The `args` parse bullet currently names only
+  `drift-audit-state.js`. The defect is live in BOTH siblings, at `drift-audit-state.js:47` and
+  `drift-audit-code.js:48`, which are byte-identical, and which is what section 3 and backlog row
+  `TOOL-dTieredTribunal-4` both record. The refresh widens that bullet to both files. The other two
+  stay verbatim: the absent review-KIND parameter, and the inline-script modality no file gate can
+  see.
 
 ## 3. Non-goals (OUT)
 
@@ -130,6 +154,12 @@ here, and section 3 records why it is excluded.
 | contradictory repeat demotes to unverified | `:281` and `:283` | absent, first write wins |
 | synthesis-death log | `:381` | absent |
 | surviving lens count on the return | `:400` | `state.js` returns the configured set, `code.js` returns none |
+
+TWO further absences are out of scope, and both are named, because a completeness disclosure that
+names one of two is worse than none at all. The first is the `args`-must-be-an-object guard, carried
+by section 3 and by backlog row `TOOL-dTieredTribunal-4`. The second is `tier2-review.js:220-225`,
+the nothing-raised early return, which neither sibling has and which this unit does not add. It fires
+when the lenses lived and raised nothing, a state distinct from every exit S4 adds.
 
 Two guards are already present in both siblings and are NOT in scope: the orchestrator-assigned
 integer join key, and the rule that a finding with no verdict is unverified rather than refuted.
@@ -237,9 +267,11 @@ marker that both siblings carry and must keep.
   which was run rather than assumed. This criterion observes presence only; AC8 is the one that binds
   the fields to a return block.
 - **AC2** — When `drift-audit-state.js` is read, its return no longer contains
-  `lensesRun: LENSES.map((L) => L.slug)`, and the value it returns for `lensesRun` is an integer
-  derived from the length of the post-`filter(Boolean)` survivor array rather than from any `r.lens`
-  string.
+  `lensesRun: LENSES.map((L) => L.slug)`. When EACH sibling is read, the value it returns for
+  `lensesRun` is an integer derived from the length of the post-`filter(Boolean)` survivor array
+  rather than from any `r.lens` string. Both files, because `drift-audit-code.js` returns no lens
+  information today and gains the field new, so a criterion scoped to its sibling alone would let it
+  ship the configured count. That is the precise defect this unit ports a guard to prevent.
 - **AC3** — When each sibling's verdict-join loop is read, a verdict carrying an id the run never
   assigned increments a `spurious` counter; a repeat whose token equals the standing one increments
   `duplicates`; and a repeat whose token differs from the standing one removes that finding from the
@@ -262,14 +294,26 @@ marker that both siblings carry and must keep.
   each names all seven of `lensesRun`, `lensesDead`, `skepticsDead`, `conflicts`, `duplicates`,
   `spurious` and `note`. A field present in one block and absent from the other fails this
   criterion, because that asymmetry is the defect this unit ports the guards to prevent.
+- **AC8b** — When
+  `grep -c 'dTieredTribunal-3' tools/workflows/drift-audit-state.js tools/workflows/drift-audit-code.js`
+  runs, each file returns a hit at every guard S8 covers, and each such comment names the unit that
+  originally earned that guard in `tier2-review.js`. S8 was the only scope item in this spec no
+  criterion observed, and section 10 rests the whole port on that provenance travelling with the code.
 - **AC9** — When `bash tools/check-kit-versions.sh` runs, it exits zero, and
   `grep -rn 'drift-audit@1\.6' tools/drift-audit/ tools/workflows/` returns no hits.
+- **AC9b** — When `tools/drift-audit/README.md` is read at HEAD, it carries a migration paragraph
+  naming the move to the new version, in the shape its existing `Migrating 1.0 to 1.1` paragraph
+  uses, and that paragraph states that the added return fields are additive and names the early
+  return as the one observable behaviour change. A marker byte moved without it satisfies
+  `check-kit-versions.sh` and still leaves the adopter reading a note for the wrong version.
 - **AC10** — When `memory/map/features/review-harnesses.md` is read at HEAD after this unit lands,
-  its Gaps section no longer claims that the two siblings lack the dead-lens count, the
-  all-lenses-dead early return, the dead-skeptic count, the trust counters or the synthesis-death
-  log, and no longer claims that `drift-audit-state.js` returns the configured lens set. Its
-  remaining gaps still name the absent `args` parse, the absent review-KIND parameter and the
-  inline-script modality, each with the evidence it carries today.
+  its Gaps section no longer claims ANY of the eight clauses S10 enumerates: that the two siblings
+  lack the dead-lens count, the all-lenses-dead early return, the dead-skeptic count, the spurious
+  counter, the duplicate counter, the conflict counter or the synthesis-death log; that
+  `drift-audit-state.js` returns the configured lens set; that `drift-audit-code.js` returns no lens
+  information at all; and that both resolve a disagreeing repeat by keeping whichever arrived first.
+  Its `args` bullet names BOTH siblings and both line numbers. Its other two remaining gaps, the
+  absent review-KIND parameter and the inline-script modality, are unchanged from today.
 
 ## 7. Gates
 
@@ -339,11 +383,33 @@ still leaves it held until `GATE_SELFTESTS=1`.
   says the list is not the run's full leg set. Finding 39's version half is REFUSED as it was
   written: it asked section 4 to record no bump, and S9 records a bump from `1.6` to `1.7` instead,
   at every site `tools/check-kit-versions.sh:169-194` binds, with AC9 observing it — this unit
-  changes the return contract the harnesses ship, and the unguarded `kit version markers` leg reds
-  on a contract change that leaves the version behind. `drift-audit selftest` is KEPT rather than
+  changes the return contract the harnesses ship. The rationale is narrower than an earlier revision
+  of this sentence claimed, and the difference matters. `check-kit-versions.sh` asserts internal
+  CONSISTENCY only, so a behavioural change carrying NO bump at all leaves the constant, the README
+  marker and both siblings' pairs equal, and the leg green. What it catches is a PARTIAL bump, which
+  is what S9's own sentence says. The bump is owed by the contract change, not by the gate. `drift-audit selftest` is KEPT rather than
   removed, which is the one place this fold departs from the ratified decision set: the removal was
   derived for a diff confined to `tools/workflows/`, and S9 puts two files under
   `tools/drift-audit/` in scope, which arms that leg.
+
+- rev-3 · 2026-08-26 · folded spec-audit round 2, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md`.
+  Eight edits, seven of them answering defects the rev-2 fold itself created. 3 and 20 are one defect:
+  rev-2 gave S4 two new exits and left S7, section 4 and AC8 each governing one, so S7 now enumerates
+  FOUR exits per sibling and names the synthesis-death path among them. 12 widened AC2 to both
+  siblings — it was scoped to `drift-audit-state.js` alone, which would have let `drift-audit-code.js`
+  ship the configured count, the exact defect being ported against. 4 and 15 added AC8b: S8, the
+  provenance-comment obligation section 10 rests the whole port on, was the only scope item no
+  criterion observed. 7 and 36 corrected S10, which had FROZEN a dossier bullet that is itself wrong —
+  the `args` defect is live in both siblings, not just one — so the refresh now widens it rather than
+  preserving it. 21 widened AC10 from six clauses to the eight S10 enumerates. 6 corrected the
+  finding-39 rationale: `check-kit-versions.sh` asserts internal CONSISTENCY, so a change with NO bump
+  leaves it green, and only a PARTIAL bump reds. 28 named the second out-of-scope absence,
+  `tier2-review.js:220-225`. 31's headline was a misreading and is recorded as such, but its
+  underlying point stands and S5 now names `severityCorrections` and rules on a demoted `partial`.
+  32 widened S9 beyond the marker byte: `tools/drift-audit/README.md` carries a migration paragraph
+  per contract move as this kit's convention, and a bump skipping it leaves an adopter reading a note
+  for the wrong version. AC9b observes it.
 
 ## 10. Reuse audit
 

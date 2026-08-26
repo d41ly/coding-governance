@@ -22,8 +22,8 @@ one a document asks a human to remember in 5–27%.
 
 ## Expected improvements
 
-- `TOOL-dTieredTribunal-1` — the confirmed-blocker count the M4 loop is bounded by stops being
-  hand-typed and becomes a value `tier2-review.js` returns.
+- `TOOL-dTieredTribunal-1` — a diff review's confirmed-blocker count becomes a value the harness
+  returns. The M4 spec-audit loop keeps hand-typing until P1 is ratified.
 - `TOOL-dTieredTribunal-2` — the fold class enters `memory/gotchas/`, so the checklist a reviewer is
   handed can name it.
 - `TOOL-dTieredTribunal-3` — the two drift-audit siblings stop reporting a clean bill for a run whose
@@ -32,7 +32,7 @@ one a document asks a human to remember in 5–27%.
 
 - A drift audit whose every lens died still returns a clean bill, over a green bar.
 - A disagreeing repeat verdict keeps resolving to whichever arrived first.
-- The M4 loop's own exit condition keeps resting on a number a human retyped.
+- A diff review's blocker count keeps resting on a number a human retyped.
 - The fold class stays invisible to `gotchas.py`, which is the only thing that emits it.
 ## Build-level rules
 - **This session delivers RESEARCH ONLY.** No spec, no kit edit, no rule edit. The owner narrows the
@@ -89,12 +89,12 @@ ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dT
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-26 |
-| [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | SPECCED | rev-2 | 2026-08-26 |
-| [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-26 |
+| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-26 |
+| [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | SPECCED | rev-3 | 2026-08-26 |
+| [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | SPECCED | rev-3 | 2026-08-26 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
