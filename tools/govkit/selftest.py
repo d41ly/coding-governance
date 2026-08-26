@@ -5359,6 +5359,29 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-13] AC14 ...and neither writes a byte",
               (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes() == _before11)
 
+        # ---- `EVIDENCE_STATES` IS LOAD-BEARING OR IT IS A SECOND SPELLING. A tuple nothing reads
+        # ---- is exactly the two-answers-to-one-question shape: the real enum would live in the
+        # ---- branches that assign the field, and the constant would drift beside them saying
+        # ---- nothing. These two arms make it the answer. The first joins it to the values a real
+        # ---- run WROTE; the second to every literal the engine can assign, so a fourth state added
+        # ---- in a branch reds here rather than shipping undeclared.
+        _GK13 = govkit_module()
+        # THE PINNED ROW IS CARRIED IN EXPLICITLY. Its receipt belongs to a fixture the AC8 arms
+        # re-adopt READ-ONLY afterwards, so re-reading it here would work today and stop working the
+        # first time somebody adds a `--write` to one of those arms. The row object is the evidence.
+        _seen13 = {f["evidence"] for f in (_rec13["files"] + _rec11["files"] + [_pinned])
+                   if "evidence" in f}
+        check("[-13] every `evidence` value a real run wrote is a declared state",
+              _seen13 <= set(_GK13.EVIDENCE_STATES),
+              f"{sorted(_seen13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
+        check("[-13] LIVENESS ...over a population carrying THREE of them, not one",
+              len(_seen13) >= 3, str(sorted(_seen13)))
+        _lit13 = set(_re.findall(r'\["evidence"\]\s*=\s*"([a-z-]+)"', _g13src)) | set(
+            _re.findall(r'"evidence":\s*"([a-z-]+)"', _g13src))
+        check("[-13] ...and every literal the ENGINE can assign to `evidence` is declared too",
+              _lit13 and _lit13 <= set(_GK13.EVIDENCE_STATES),
+              f"{sorted(_lit13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
+
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------
     #
