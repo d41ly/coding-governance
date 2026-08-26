@@ -568,7 +568,11 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
 # inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
 # descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
 # to be correct.
-TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+# `\Z` AND NOT `$`: Python's `$` matches BEFORE a final newline, so "tools\n" passed this class
+# for as long as it has existed. Round 4 measured it. A trailing newline in a value spliced into a
+# `bash -c` string ends the command and starts another one, which is the exact escape the class
+# was written to stop.
+TOKEN_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+-]*\Z")
 # THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
 # `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
 # primary node runs on -- with a message about command injection naming nothing the operator did
@@ -649,12 +653,46 @@ def demand_contained_dest(dest: str, where: str) -> str:
 # ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
 # ---- PWNED ;` and `$(id)` are refused by it exactly as before.
 # ----
-# ---- WHAT THE PROSE CLASS DOES NOT PROMISE, stated rather than implied: a value carrying a space
-# ---- that reaches a `bash -c` template will WORD-SPLIT there. That is a correctness bug for the
-# ---- operator who wrote it, visible immediately, and it is not code execution. The escape half is
-# ---- owned by `demand_contained_dest`, which grades destinations regardless of which class the
-# ---- value came through.
-ANSWER_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+:, =-]*$")
+# ---- WHAT THE PROSE CLASS DOES NOT PROMISE. An earlier version of this comment said a spaced value
+# ---- reaching a `bash -c` template merely WORD-SPLITS, that this is "a correctness bug for the
+# ---- operator who wrote it" and "not code execution". THAT WAS FALSE and round 4 proved it: for a
+# ---- `python {kit}/<script>` template the injected word becomes the script python runs. A comment
+# ---- asserting a guarantee the code does not hold is worse than no comment, because the next reader
+# ---- budgets against it.
+# ---- The prose class is sound ONLY for a value whose sole consumer is a rendered document, and
+# ---- nothing here establishes that per key. What makes it safe today is `SEEDED_TOKENS` above:
+# ---- every token that reaches an argv is gov's own and a target cannot supply one. The escape half
+# ---- is owned by `demand_contained_dest`, which grades destinations whichever class they came
+# ---- through.
+# ---- THE KEYS GOV COMPUTES FOR ITSELF, and which a TARGET may therefore never supply.
+# ---- ROUND 4's blocker, and it is round 2's blocker reopened by round 2's own fix. `target_context`
+# ---- seeds `prefix`, `kit_id` and `kit` from a `prefix` graded by the STRICT class, then walked the
+# ---- target's `[answers]` and `[kit.<eid>]` tables and assigned `ctx[k]` UNCONDITIONALLY through
+# ---- the PROSE class -- which admits a space. Nothing stopped a target routing a document-class
+# ---- value into a shell-class key.
+# ----
+# ---- REPRODUCED: `[answers] kit = "-m pwned "` makes `ctx["kit"]` that string, and drift-audit's
+# ---- shipped hole probe resolves to `python -m pwned /drift_report.py --check` with ZERO
+# ---- unresolved tokens. Six shipped descriptors interpolate `{kit}` inside a `-c` string, and
+# ---- `cmd_check` spawns every one of them from a READ-ONLY verb with no opt-in flag.
+# ----
+# ---- THE ENGINE ALREADY KNEW THE SET. `needed_answers` declares exactly these five and refuses to
+# ---- ask an operator for any of them, while `target_context` let a target supply all five: two
+# ---- functions, one set, opposite answers. That is what this constant ends -- it is READ by both.
+# ---- THE SET IS THE THREE KEYS SEEDED ABOVE THE LOOPS, and it is NOT `needed_answers`' five.
+# ---- Measured before narrowing, because widening a refusal without enumerating its population is
+# ---- the mistake this whole review round is about. `memory_root` is applied by `ctx.setdefault`
+# ---- AFTER the loops, so a target that supplies it legitimately wins -- and gov's OWN selftest
+# ---- fixtures supply it in `[answers]` at four sites, as does a live adopter. Refusing it would
+# ---- have broken the suite and every real install to close a hole it is not part of. `relpath` is
+# ---- never a ctx key at all: `resolve_dests` substitutes it per rule with `.replace`, so a target
+# ---- supplying it reaches nothing.
+# ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
+# ---- Different questions, and collapsing them was the first cut of this fix.
+SEEDED_TOKENS = ("prefix", "kit_id", "kit")
+
+
+ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
 
 
 def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
@@ -700,6 +738,20 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
         "kit_id": eid,
         "kit": f"{prefix}/{eid}",
     }
+    # REFUSED BY NAME, not dropped silently. Dropping the key also closes the hole and hides an
+    # operator's mistake; this engine's whole posture is to say what it refuses and why.
+    for _tbl, _label in ((deploy.get("answers") or {}, "answers"),
+                         ((deploy.get("kit") or {}).get(eid) or {}, f"kit.{eid}")):
+        for k in _tbl:
+            if k in SEEDED_TOKENS:
+                raise Refusal(
+                    f"the target descriptor supplies '{_label}.{k}', which is a token this engine "
+                    f"DERIVES for itself ({', '.join(SEEDED_TOKENS)}). Accepting it would let a "
+                    f"target overwrite the value the strict character class exists to guard, and "
+                    f"those tokens are interpolated into argv this engine RUNS -- a `{{{k}}}` inside "
+                    f"a `bash -c` or `python -c` template becomes the command. `intake` already "
+                    f"refuses to ASK for these; refusing to READ them is the same rule, one door "
+                    f"over. Remove the key: {_label}.{k}")
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
             ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
@@ -3421,8 +3473,23 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     # is the burden the ruling was taken to remove. Excluding it here needs no new field and breaks
     # no criterion, and it is the same reasoning the owner already applied to `-7` S4: scope the
     # refusal to where the hazard is.
+    # ROUND 4's H2 and M1, which are one defect. This excluded `pins` ALONE, and every other
+    # non-writing disposition fell through it. A `merged` row is the live case: `apply` stages its
+    # destination and deliberately gives it no `oid` (`ROLE_KINDS["merged"]` is `blocked`, so neither
+    # stamping loop reaches it), so carve-out 3 has nothing to compare and the row reads DIRTY
+    # forever. REPRODUCED on two kits: `apply --kits pytest-parallel-guardrails` exits 0 staging
+    # `pyproject.toml`, then `update --write` exits 2 calling that path dirty, and a second `apply`
+    # does the same -- so `apply --resume` is blocked identically. The operator's only way back to
+    # green is committing a file gov just wrote, which is verbatim the burden ruling A was taken to
+    # remove. Three shipped descriptors declare `merged`; the ruling-A arms use `memory-tree`, which
+    # declares none, so the class passed by finding nothing.
+    #
+    # SCOPED TO `table` NOW, which is the same narrowing this diff already made for `_cmd_update`'s
+    # shadow guard, and for the same stated reason: `block`, `report`, `skip`, `adopter` and `pins`
+    # can no more meet S4's raw-write hazard than each other. NOT by stamping `oid` on merged rows --
+    # making that stamp role-blind regressed `-7` S9's exactly-one-identity shape and cost a round.
     _rows = [row for row in ((receipt or {}).get("files") or [])
-             if UPDATE_ROLE.get(row.get("role", "engine")) != "pins"]
+             if UPDATE_ROLE.get(row.get("role", "engine")) == "table"]
     dirty = dirty_claimed_paths(
         target, [row.get("path") for row in _rows],
         {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")})
@@ -3637,6 +3704,24 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     if r.problems:
         return r.emit()
 
+    # ---- CONTAINMENT, HOISTED (round 4's H3). It used to run one entry above that entry's own
+    # ---- write loop, so a refusal for entry N fired only after entries 1..N-1 were already written
+    # ---- and staged. REPRODUCED: an escaping `[answers] memory_root` in the SECOND entry of a
+    # ---- two-kit selection exited 2 having written the first entry's files, created and staged
+    # ---- `.gitattributes`, made `.governance/outbox/` -- and written NO `install.json`, so a
+    # ---- following `check` answered `NOT LANDED` across a half-installed tree the operator then
+    # ---- cleans up by hand.
+    # ----
+    # ---- THE SIBLING IS THE ARGUMENT: `validate_gate_runner`, three lines up, is in this pass for
+    # ---- exactly this reason and its own comment says so. That guard landed in the right pass and
+    # ---- this one did not. Every entry is resolved and graded here, before the BASELINE runs and
+    # ---- before ATTRIBUTES writes a byte.
+    for _eid in selection:
+        _d, _ = descs[_eid]
+        _res = resolve_entry(root, _d, target_context(target, deploy, _eid, _d))
+        demand_contained_rows(list(_res["writes"].values()) + _res["unlanded"],
+                              _d.get("files", []), f"entry '{_eid}' (apply, pre-write)")
+
     # ---- BASELINE. The target's OWN runner, read before any write. It EXECUTES target-authored
     # ---- code: the command comes from a file committed in the target repo, so anyone with commit
     # ---- access there chooses what runs on the operator's machine. The argv and the descriptor it
@@ -3731,8 +3816,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                     print(f"govkit apply — SKIPPED [{role:<13}] {dest} <- {eid}: "
                           f"{SKIP_REASONS.get(kind, 'not a role this verb lands')}")
         res = resolve_entry(root, d, ctx)
-        demand_contained_rows(list(res["writes"].values()) + res["unlanded"],
-                              d.get("files", []), f"entry '{eid}' (apply)")
+        # Containment is NOT re-checked here: it ran over every entry in the pre-write pass above,
+        # which is the whole point of H3's fix. A second call would be two answers to one question.
         vers = entry_version(root, d)
 
         # Every rule that does NOT land says so, by role, naming who does produce it. The silent
@@ -6337,7 +6422,7 @@ def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> 
     Derived from the descriptors, never listed: a hand-kept question list is how `intake` stops
     asking for something a kit started needing.
     """
-    derived = {"prefix", "kit", "kit_id", "relpath", "memory_root"}
+    derived = set(SEEDED_TOKENS) | {"relpath", "memory_root"}
     want: set[str] = set()
     for eid in selection:
         d, _p = descs[eid]
