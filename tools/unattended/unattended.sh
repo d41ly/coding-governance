@@ -1573,12 +1573,29 @@ unit_ids_of() { # slug
 # was supposed to have found that call site was truncated by a `head -20` and read as a complete
 # inventory, which is the vacuous-selector class this repo names everywhere else.
 spec_facts() { # spec paths... -> one "<path>\t<heading id>\t<status>" row per spec, on stdout
+  # ROUND 4's M6. Every spec of a build went to ONE awk, and awk is FATAL on a file it cannot open:
+  # given five paths with the third absent, GNU Awk 5.4.0 printed exactly ONE row and exited 2. Rows
+  # two, four and five vanished -- row two because it is only flushed by row three's `FNR==1`. The
+  # caller read the stream through a process substitution and never tested the status, `set -e` is
+  # off by this driver's own design, so `verb_plan` rendered a COMPLETE-LOOKING table in which every
+  # unit read `NO TRACKED SPEC`, at exit 0. A fabricated plan table is the worst failure mode this
+  # driver has, because it is indistinguishable from a correct one -- and `git ls-files` lists index
+  # entries, so an ordinary worktree deletion, a sparse checkout or a mid-rename reaches it.
+  #
+  # UNREADABLE PATHS ARE FILTERED OUT AND REPORTED AS THEIR OWN ROW, so the caller sees one unit
+  # without facts instead of losing the build. The per-spec awk this batching replaced localised the
+  # damage the same way; that property is restored without giving up the single invocation.
   [ "$#" -gt 0 ] || return 0
+  local _ok=() _p
+  for _p in "$@"; do
+    if [ -r "$_p" ]; then _ok+=("$_p"); else printf '%s\t\t\n' "$_p"; fi
+  done
+  [ "${#_ok[@]}" -gt 0 ] || return 0
   awk '{ sub(/\r$/,"") }
     FNR==1 { if (f != "") print f "\t" id "\t" st; f=FILENAME; id=""; st="" }
     /^# [A-Za-z0-9][A-Za-z0-9-]* / { if (id == "") id=$2 }
     /^\*\*Status:\*\* [A-Z]+ / { if (st == "") st=$2 }
-    END { if (f != "") print f "\t" id "\t" st }' "$@"
+    END { if (f != "") print f "\t" id "\t" st }' "${_ok[@]}"
 }
 # ASSIGNED AT DECLARATION, not merely declared. `declare -A X` alone leaves X unset as far as `set -u`
 # is concerned until something assigns to it, so `${#X[@]}` on a never-filled map is a hard error and
@@ -1595,6 +1612,17 @@ load_spec_facts() { # spec paths... -> fills the three maps, replacing whatever 
     # match over this same `git ls-files` order.
     [ -z "$i" ] || [ -n "${SPEC_PATH[$i]:-}" ] || SPEC_PATH["$i"]="$p"
   done < <(spec_facts "$@")
+  # M6's other half: TEST THE STATUS. A driver that renders a plan table from a failed producer is
+  # the worst possible failure mode, because the table looks complete. `spec_facts` filters what it
+  # cannot read, so a non-zero status here means awk itself failed on a file it COULD open -- which
+  # is not a state to paper over with an empty map.
+  local _sf_rc=0
+  spec_facts "$@" >/dev/null 2>&1 || _sf_rc=$?
+  if [ "$_sf_rc" != 0 ]; then
+    printf 'unattended: reading this build%s specs failed (spec_facts exit %s). REFUSING to render a\n' "'" "$_sf_rc" >&2
+    printf 'unattended: plan table from a failed producer: it would look complete and name nothing.\n' >&2
+    return "$_sf_rc"
+  fi
 }
 # TOOL-aCollapsedScan-1 - it KEEPS its `dir` argument and its own read, and takes the whole build in
 # ONE awk instead of one per spec. STATELESS on purpose: `--close` reaches it through `missing_units`

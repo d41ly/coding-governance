@@ -738,7 +738,23 @@ for ((i=0; i<total; i++)); do
   # without them — and it is the very bypass that made `guard = ["{kit}/"]` ineffective here.
   # Deciding in the dispatch loop instead would leave an index with no result, which the reporting
   # pass reports as `(no result)`. TOOL-dUnstalledConvoy-26.
-  if [ "${subjects[$i]}" = kit ] && [ -z "${GATE_SELFTESTS:-}" ]; then
+  #
+  # THE CHUNK IS HELD TOO, by owner ruling 2026-08-26: EVERY self-test is on demand, not just the
+  # kit-subject ones. The `subject = kit` predicate alone left SIX legs in the `selftests` chunk
+  # running on every bar, because they carry `subject = repo` — the two hook self-tests, the
+  # push-main self-test, the recall floor arms and the two run-gates canaries. Each is a `.test.sh`
+  # or `test_*.py` that exercises a checker's own source, which is the thing this hold is for, and
+  # the split by subject was grading WHOSE source rather than WHAT KIND of leg it is.
+  #
+  # WHAT THIS COSTS, stated rather than discovered later: the two run-gates canaries are the bar's
+  # own liveness assertion — the arms that catch a guard naming an untracked path, which would
+  # otherwise skip forever and silently. Holding them means a default bar no longer proves it can
+  # move. That is a real reduction in what a green means, it is the owner's call, and
+  # `GATE_SELFTESTS=1` remains the way to ask for it. The push boundary is where it matters, and
+  # `.githooks/pre-push` decides there against a recorded green whose `selftests` key says whether
+  # the recorded run had them held.
+  if { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } \
+     && [ -z "${GATE_SELFTESTS:-}" ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
   [ -z "${guards[$i]}" ] && continue
@@ -936,7 +952,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
     # would silence the stamp and pin `.githooks/pre-push` into forcing a full run forever.
     ondemands=$((ondemands+1)); c_ondemand=$((c_ondemand+1))
-    printf 'GATE held  %s  (kit self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
+    printf 'GATE held  %s  (self-test, set GATE_SELFTESTS=1 to run)\n' "${names[$i]}"
   elif [ "$rc" = skip ]; then
     skips=$((skips+1)); c_skip=$((c_skip+1)); printf 'GATE skip  %s  (unchanged vs %s)\n' "${names[$i]}" "${DEFBR:-baseline}"
   elif [ "$rc" = reuse ]; then
@@ -1103,7 +1119,7 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # THE HELD LEGS ARE NAMED, exactly as a guard-skip and a reuse are, and for the same reason: a
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
-[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: kit self-tests, GATE_SELFTESTS=1 runs them)"
+[ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: every self-test, GATE_SELFTESTS=1 runs them)"
 
 # THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is

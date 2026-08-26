@@ -2491,9 +2491,15 @@ user_skills = "/tmp/gk-fake-skills"
               bool(gout(_oa, "diff", "--cached", "--name-only", "HEAD").split()),
               gout(_oa, "diff", "--cached", "--name-only", "HEAD")[:300])
         _poa2 = run("update", "--target", str(_oa), "--write")
+        # ROUND 4's M5: this asserted an ABSENCE and never touched the return code, while its
+        # negative twin below asserts `returncode == 2 and "DIRTY" in ...` -- a one-token asymmetry
+        # inside one fixture. The blind spot needs a failure that refuses on the clean post-apply
+        # tree but gets DIRTY-masked on the dirtied one; narrow, and this is the third absence-only
+        # arm this build has produced, so it is fixed rather than argued about.
         check("[-12] RULING-A a writing verb straight after `apply` is NOT blocked by apply's own "
               "staging",
-              "DIRTY" not in _poa2.stderr, _poa2.stdout[-400:] + _poa2.stderr[-400:])
+              _poa2.returncode == 0 and "DIRTY" not in _poa2.stderr,
+              f"rc {_poa2.returncode}: " + _poa2.stdout[-400:] + _poa2.stderr[-400:])
         # ---- THE RECEIPT RECORDS WHAT THE INDEX HOLDS, over every LANDABLE row the target tracks.
         # ---- The stamp used to run BEFORE `git add --renormalize`, which rewrites the index blob of
         # ---- every LF-pinned path, so each affected row recorded a blob the target does not hold.
@@ -2758,6 +2764,78 @@ user_skills = "/tmp/gk-fake-skills"
         _admitted = [m for m in _metas if _check_token(f"a{m}b", True)]
         check("[-12] TOKEN the PROSE class admits no shell metacharacter at all",
               not _admitted, "admitted: " + repr(_admitted))
+        # ---- ROUND 4 H1: THE SPACE WAS MISSING FROM THAT LIST, and the space is the one character
+        # ---- the prose class deliberately admits -- so the property arm asserted the class is safe
+        # ---- for every character except the one it is unsafe for. It is asserted as a PAIR now,
+        # ---- because neither half means anything alone: the class admits a space, AND no shipped
+        # ---- descriptor may interpolate a prose-graded token inside a `-c` string.
+        check("[-12] TOKEN the prose class DOES admit a space -- stated, not left to the gap above",
+              _check_token("a b", True) and not _check_token("a b", False),
+              f'prose={_check_token("a b", True)} strict={_check_token("a b", False)}')
+        check("[-12] TOKEN ...and a space is refused in the STRICT class, which is what keeps it "
+              "out of every argv-bound token",
+              not _check_token("a b", False), "")
+
+        # ---- THE STRUCTURAL ARM, and it gates the CLASS rather than any instance. Round 4's
+        # ---- blocker rode a SHIPPED descriptor template: `tools/drift-audit/kit.toml` spells
+        # ---- `command = ["bash", "-c", "python {kit}/drift_report.py --check"]`, and five more
+        # ---- descriptors interpolate a token inside a `-c` STRING. Inside such a string a token is
+        # ---- not an argv element -- it is source the shell or python parses -- so whether it is
+        # ---- safe depends entirely on the CHARACTER CLASS that graded it.
+        # ----
+        # ---- SO THE RULE IS: a token interpolated inside a `-c` argument must be one a target
+        # ---- CANNOT supply. `SEEDED_TOKENS` is exactly that set, and this arm asserts the join
+        # ---- rather than trusting it -- it reds when someone adds a seventh such template using a
+        # ---- token a target CAN reach, which is the door nobody is watching.
+        # ----
+        # ---- IT SCANS THE REAL SHIPPED DESCRIPTORS, not a fixture, because the population that
+        # ---- matters is what gov actually ships to adopters.
+        _gkd2 = govkit_module()
+        _seeded = set(_gkd2.SEEDED_TOKENS)
+        # `(?<!\$)` because `${k}` is a SHELL variable, not a govkit token. Measured: without
+        # it this predicate reported memory-tree's `for k in ...; do grep "^${k}=" ...` loop as
+        # a hit, which is a predicate redding an innocent file -- the near-miss S7 says to print
+        # BEFORE wiring an arm, and the reason that step is a rule rather than a courtesy.
+        _tok_re = __import__("re").compile(r"(?<!\$)\{([a-z_]+)\}")
+        _dangerous = []
+        _scanned = 0
+        _templates = 0
+        for _kt in sorted(pathlib.Path(HERE.parents[1]).glob("tools/*/kit.toml")) + sorted(
+                pathlib.Path(HERE.parents[1]).glob("tools/govkit/entries/*.kit.toml")):
+            try:
+                _d2 = govkit_module().load_toml(_kt)
+            except Exception:
+                continue
+            _scanned += 1
+
+            def _scan_argvs(node, where):
+                out = []
+                if isinstance(node, dict):
+                    for k, v in node.items():
+                        out += _scan_argvs(v, f"{where}.{k}")
+                elif isinstance(node, list):
+                    # An argv. A `-c` flag makes the NEXT element a script rather than an argument.
+                    for i, v in enumerate(node):
+                        if isinstance(v, str) and v == "-c" and i + 1 < len(node):
+                            nxt = node[i + 1]
+                            if isinstance(nxt, str):
+                                out.append((where, nxt))
+                        out += _scan_argvs(v, f"{where}[{i}]")
+                return out
+
+            for _where, _script in _scan_argvs(_d2, _kt.name):
+                _templates += 1
+                for _tok in _tok_re.findall(_script):
+                    if _tok not in _seeded:
+                        _dangerous.append(f"{_kt.name}:{_where} interpolates {{{_tok}}} in a -c string")
+
+        check("[-12] DESC-SCAN LIVENESS the scan reaches the real shipped descriptors and finds "
+              "`-c` templates to grade",
+              _scanned >= 10 and _templates >= 5,
+              f"{_scanned} descriptor(s), {_templates} `-c` template(s)")
+        check("[-12] DESC-SCAN no shipped descriptor interpolates a TARGET-SUPPLIABLE token inside "
+              "a `-c` string -- the door round 4's blocker came through",
+              not _dangerous, "; ".join(sorted(set(_dangerous))[:6]))
         # And the traversal is NOT this guard's job, in either class -- containment owns it. Asserted
         # so a later reader does not add it here and leave two answers to one question.
         check("[-12] TOKEN neither class grades a traversal -- `demand_contained_dest` owns that",
@@ -2806,9 +2884,10 @@ user_skills = "/tmp/gk-fake-skills"
             check("[-12] RULING-B LIVENESS ...and it is now out of the index, still on disk",
                   _obnt[0] not in gout(_ob, "ls-files").split() and (_ob / _obnt[0]).is_file(), "")
             _pob = run("update", "--target", str(_ob), "--write")
+            # M5, same shape, same fix: an absence with no return code beside it.
             check("[-12] RULING-B a NON-table row shadowed by an untracked file does not refuse the "
                   "whole run -- that row can never reach the raw write the refusal exists to stop",
-                  "absent from its INDEX" not in _pob.stderr,
+                  _pob.returncode == 0 and "absent from its INDEX" not in _pob.stderr,
                   f"rc {_pob.returncode}: " + _pob.stdout[-400:] + _pob.stderr[-400:])
 
         # ---- DEPL-dCarriedReceipt-7: TWO IDENTITIES, READ INDEX-SIDE -------------------------
@@ -6002,16 +6081,51 @@ user_skills = "/tmp/gk-fake-skills"
         # target's own script. Run over the real tree before wiring, hits and near-misses both:
         # eight hit functions, thirty-four allowlisted git calls across twenty-one functions.
         def _git_plumbing1(call) -> bool:
-            a0 = call.args[0] if call.args else None
-            while isinstance(a0, _ast1.BinOp):        # `["git", ...] + paths`
-                a0 = a0.left
-            if not (isinstance(a0, _ast1.List) and a0.elts
-                    and isinstance(a0.elts[0], _ast1.Constant)
-                    and a0.elts[0].value == "git"):
-                return False
-            _words = [e.value for e in a0.elts if isinstance(e, _ast1.Constant)]
-            return not ("hook" in _words and "run" in _words)
+            """Is this spawn literal `git` plumbing, and therefore outside the census?
 
+            ROUND 4's M4. This read the argv's literal elements and asked whether `hook`/`run` were
+            among them, so `govkit.git`'s own `["git", "-C", str(root), *args]` presented as
+            `['git', '-C']` -- no subcommand at all -- and was allowlisted unconditionally. The
+            by-name exclusion of `git hook run` IS the guarantee the declaration's header sells, and
+            the module's own primary git wrapper defeated it: one future
+            `git(target, "hook", "run", "pre-commit")` would spawn target-authored hook code with
+            zero census rows and a green both-directions arm. No live exploit -- all callers pass
+            gov's own root with literal subcommands -- so it is a latent gate gap, and it is round
+            3's M2 shape (a guarantee narrower than the sentence selling it) reintroduced inside the
+            fix for it.
+
+            THE PROPERTY IS WHETHER THE SUBCOMMAND IS RESOLVABLE HERE, not whether every element is
+            a literal. Measured: rejecting any non-`Constant` element admits twenty legitimate
+            plumbing sites into the census, because `str(target)` is a `Call` and appears in almost
+            all of them. So `-C`/`-c` and their value are skipped, and the NEXT element must be a
+            string constant naming the subcommand. Starred, non-constant or absent means unknowable,
+            and an allowlist that cannot see what it is allowing is allowing everything.
+            """
+            _elts = getattr(call.args[0], "elts", None) if call.args else None
+            if not _elts:
+                return False
+            _first = _elts[0]
+            if not (isinstance(_first, _ast1.Constant) and _first.value == "git"):
+                return False
+            _i = 1
+            while _i < len(_elts):
+                _e = _elts[_i]
+                if isinstance(_e, _ast1.Constant) and _e.value in ("-C", "-c"):
+                    _i += 2                      # the flag and its value, whatever shape it is
+                    continue
+                break
+            if _i >= len(_elts):
+                return False                     # `git` with no subcommand -> census HIT
+            _sub = _elts[_i]
+            if isinstance(_sub, _ast1.Starred) or not isinstance(_sub, _ast1.Constant):
+                return False                     # unresolvable subcommand -> census HIT
+            if not isinstance(_sub.value, str):
+                return False
+            _words = [e.value for e in _elts
+                      if isinstance(e, _ast1.Constant) and isinstance(e.value, str)]
+            if "hook" in _words and "run" in _words:
+                return False                     # runs the TARGET's script; excluded BY NAME
+            return True
         _exec_found = set()
         for _n in _ast1.walk(_t1):
             if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Attribute) \
@@ -6057,16 +6171,40 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- the TARGET's `prefix` to `resolve_tokens` and several shipped probes are `bash -c`
         # ---- and `python -c` strings. Reproduced before the fix; asserted on a SENTINEL FILE
         # ---- here, because an exit code cannot tell 'refused' from 'ran and returned 0'.
-        def a_evil_target(tag: str, prefix_value: str, kit: str) -> pathlib.Path:
+        # ---- ROUND 4's H1, and it is why ROUND 4's BLOCKER shipped. This fixture varied exactly
+        # ---- ONE thing -- the top-level `prefix` -- and hard-coded the `[answers]` table as a
+        # ---- literal. A target supplies token values through THREE doors, and the arms tested one.
+        # ---- So a target answer that OVERWRITES `ctx["kit"]` walked straight past a suite written
+        # ---- to close this exact class, and stayed green for two commits.
+        # ----
+        # ---- THE DOOR IS NOW A PARAMETER, and the arms below iterate a (door, payload) table. A
+        # ---- fourth door added to `target_context` without a row here is what reds -- the property
+        # ---- shape rather than three copies, which is the same lesson round 2 recorded for the
+        # ---- `print(` substring scan. Third time in this build, so it is a table and not a copy.
+        def a_evil_target(tag: str, prefix_value: str, kit: str,
+                          door: str = 'prefix', key: str = 'prefix') -> pathlib.Path:
             t = tmp / f'evil-{tag}'
             (t / '.governance').mkdir(parents=True)
             git(t, 'init', '-q', '-b', 'main')
             git(t, 'config', 'user.email', 't@e')
             git(t, 'config', 'user.name', 't')
+            # The hostile value goes through the door under test; the other two stay benign, so a
+            # refusal can only have come from the door this row names.
+            _pfx = prefix_value if door == 'prefix' else 'tools'
+            _ans = {'memory_root': 'memory'}
+            _kit_tbl = {}
+            if door == 'answers':
+                _ans[key] = prefix_value
+            elif door == 'kit':
+                _kit_tbl[key] = prefix_value
+            _body = ('gov_source = "local"\nprefix = ' + json.dumps(_pfx) +
+                     '\nkits = [' + json.dumps(kit) + ']\n\n[answers]\n'
+                     + ''.join(f'{k} = {json.dumps(v)}\n' for k, v in _ans.items()))
+            if _kit_tbl:
+                _body += ('\n[kit.' + kit + ']\n'
+                          + ''.join(f'{k} = {json.dumps(v)}\n' for k, v in _kit_tbl.items()))
             (t / '.governance' / 'deploy.toml').write_text(
-                'gov_source = "local"\nprefix = ' + json.dumps(prefix_value) +
-                '\nkits = [' + json.dumps(kit) + ']\n\n[answers]\nmemory_root = "memory"\n',
-                encoding='utf-8', newline='\n')
+                _body, encoding='utf-8', newline='\n')
             (t / '.governance' / 'install.json').write_text(json.dumps({
                 'schema': 3, 'prefix': 'tools',
                 'kits': [kit],
@@ -6104,6 +6242,123 @@ user_skills = "/tmp/gk-fake-skills"
         check('[-5] B1 LIVENESS an ordinary path-shaped prefix still resolves',
               'can leave its argument and become code' not in (_pevok.stdout + _pevok.stderr),
               (_pevok.stdout + _pevok.stderr)[-500:])
+
+        # ---- ROUND 4 B1 + H1 -- THE SAME PAYLOAD THROUGH EVERY DOOR, asserted on a SENTINEL FILE.
+        # ---- An exit code cannot tell `refused` from `executed and then reported normally`, which
+        # ---- is exactly what the blocker did: the poisoned run printed an ordinary report and
+        # ---- exited 1 with the sentinel already on disk. Only the filesystem answers this.
+        # ----
+        # ---- REPRODUCED BEFORE THE FIX, both ways: with the reserved-key guard reverted, a
+        # ---- READ-ONLY `check` -- no `--write`, no flag of any kind -- ran the target's own script
+        # ---- and wrote the sentinel. With it live, the same fixture refuses by name.
+        _DOORS = (
+            ('prefix',  'prefix',      'the top-level prefix, the only door the old arms tested'),
+            ('answers', 'kit',         'a target ANSWER overwriting the key gov seeds for itself'),
+            ('answers', 'kit_id',      'the same, one key over'),
+            ('answers', 'prefix',      'and the strict-class key itself, through the prose door'),
+            ('kit',     'kit',         'the per-entry table, which is a third door onto one dict'),
+        )
+        # `pwn.py` is the script the payload aims at: `{kit}` is interpolated into a shipped
+        # `python {kit}/...` template, so a value of `pwn.py z` makes python run THAT file.
+        for _i, (_door, _key, _why) in enumerate(_DOORS):
+            _et = a_evil_target(f'door{_i}', 'pwn.py z', 'drift-audit', door=_door, key=_key)
+            (_et / 'pwn.py').write_text(
+                'import pathlib; pathlib.Path("PWNED-BY-CHECK").write_text("x")\n',
+                encoding='utf-8', newline='\n')
+            git(_et, 'add', '-A')
+            git(_et, 'commit', '-qm', 'payload')
+            _ep = run('check', '--target', str(_et))
+            check(f'[-5] R4-B1 door {_door}.{_key}: a read-only `check` writes NO sentinel -- {_why}',
+                  not (_et / 'PWNED-BY-CHECK').exists(),
+                  f'SENTINEL EXISTS — rc {_ep.returncode}: '
+                  + (_ep.stdout + _ep.stderr)[-500:])
+        # THE LIVENESS HALF OF THE TABLE: the doors must actually be REACHED. A row whose fixture
+        # never gets as far as the probe loop passes by finding nothing, which is how the first two
+        # reproduction attempts for this defect proved nothing at all.
+        _reached = a_evil_target('doorlive', 'pwn.py z', 'drift-audit', door='answers', key='kit')
+        _preach = run('check', '--target', str(_reached))
+        check('[-5] R4-B1 LIVENESS the answers door is REACHED -- the run refuses at the reserved '
+              'key rather than dying earlier on a receipt or a TOML error',
+              'DERIVES for itself' in (_preach.stdout + _preach.stderr),
+              f'rc {_preach.returncode}: ' + (_preach.stdout + _preach.stderr)[-600:])
+        # AND A LEGITIMATE ANSWER THROUGH THE SAME DOOR still resolves, or the table above passes
+        # because the engine refuses every answer there is.
+        _okans = a_evil_target('doorok', 'docs/mem', 'drift-audit',
+                               door='answers', key='memory_root')
+        _pokans = run('check', '--target', str(_okans))
+        check('[-5] R4-B1 LIVENESS a NON-reserved answer through the same door is still accepted',
+              'DERIVES for itself' not in (_pokans.stdout + _pokans.stderr),
+              (_pokans.stdout + _pokans.stderr)[-400:])
+
+        # ---- ROUND 4 H2 + M1 -- A `merged` ROW LEFT THE TARGET DIRTY FOREVER. `apply` stages a
+        # ---- merged destination and deliberately gives it no `oid` (`ROLE_KINDS["merged"]` is
+        # ---- `blocked`, so neither stamping loop reaches it), so ruling A's carve-out has nothing
+        # ---- to compare. The dirty population excluded `pins` ALONE, so the row fell through and
+        # ---- read dirty -- and the operator's only route back to green was committing a file gov
+        # ---- had just written, which is verbatim the burden ruling A was taken to remove.
+        # ----
+        # ---- THE RULING-A ARMS USE `memory-tree`, WHICH DECLARES NO MERGED RULE, so the class
+        # ---- passed by finding nothing -- the same shape as H1 two blocks up. Three shipped
+        # ---- descriptors declare `merged`; this arm drives one of them.
+        # ----
+        # ---- Graded on the POPULATION rather than through a second `update` run, because the
+        # ---- population IS the fix and a run would also have to clear `-7` S4 and the lock to say
+        # ---- anything -- a fixture that cannot reach the case is how this build lost two rounds.
+        _mgt = make_target(tmp / 'merged-dirty', None)
+        (_mgt / 'pyproject.toml').write_text('[tool.x]\nk = 1\n', encoding='utf-8', newline='\n')
+        settle(_mgt, 'a target owning a pyproject')
+        run('intake', '--target', str(_mgt), '--kits', 'pytest-parallel-guardrails')
+        run('apply', '--target', str(_mgt), '--kits', 'pytest-parallel-guardrails')
+        _mgrec_p = _mgt / '.governance' / 'install.json'
+        check('[-12] R4-H2 LIVENESS the fixture really lands a `merged` row carrying NO oid',
+              _mgrec_p.is_file()
+              and any(w.get('role') == 'merged' and not w.get('oid')
+                      for w in json.loads(_mgrec_p.read_text(encoding='utf-8'))['files']),
+              'no merged row, or it carries an oid — this arm would grade nothing')
+        if _mgrec_p.is_file():
+            _mgrec = json.loads(_mgrec_p.read_text(encoding='utf-8'))
+            _gk_h2 = govkit_module()
+            _pop = [w for w in _mgrec['files']
+                    if _gk_h2.UPDATE_ROLE.get(w.get('role', 'engine')) == 'table']
+            check('[-12] R4-H2 a `merged` row is OUT of the dirty population -- its disposition is '
+                  '`block`, which can no more meet S4\'s raw-write hazard than `pins` can',
+                  not any(w.get('role') == 'merged' for w in _pop),
+                  str([w['path'] for w in _pop if w.get('role') == 'merged']))
+            _dirty_now = _gk_h2.dirty_claimed_paths(
+                _mgt, [w.get('path') for w in _pop],
+                {w['path']: w['oid'] for w in _pop if w.get('path') and w.get('oid')})
+            check('[-12] R4-H2 ...so a post-apply target reports NOTHING dirty, which is what '
+                  'unblocks the next writing verb',
+                  not _dirty_now, str(_dirty_now[:4]))
+
+        # ---- ROUND 4 H3 -- CONTAINMENT RAN INSIDE THE WRITE LOOP, so a refusal for entry N fired
+        # ---- only after entries 1..N-1 were already written and staged. The arm that existed tested
+        # ---- a SINGLE-kit selection, where the offending entry is necessarily the first -- it
+        # ---- structurally could not see an ordering bug.
+        # ----
+        # ---- TWO KITS, THE ESCAPE IN THE LAST ONE, and the assertion is the PROPERTY rather than
+        # ---- the message: after the refusal the target holds no gov-written file at all. Measured
+        # ---- with the hoist reverted, the same fixture left 33 dirty paths behind.
+        _h3t = make_target(tmp / 'h3-order', None)
+        (_h3t / '.governance').mkdir(parents=True, exist_ok=True)
+        (_h3t / '.governance' / 'deploy.toml').write_text(
+            'gov_source = "local"\nprefix = "tools"\n'
+            'kits = ["check-wiring", "memory-tree"]\n\n[answers]\n'
+            'memory_root = "../../ESCAPED"\n', encoding='utf-8', newline='\n')
+        settle(_h3t, 'a two-kit selection escaping on the SECOND entry')
+        _ph3 = run('apply', '--target', str(_h3t), '--kits', 'check-wiring,memory-tree')
+        check('[-12] R4-H3 an escape in the LAST entry refuses the run',
+              _ph3.returncode == 2
+              and 'leaves the target repository' in (_ph3.stdout + _ph3.stderr),
+              f'rc {_ph3.returncode}: ' + (_ph3.stdout + _ph3.stderr)[-500:])
+        check('[-12] R4-H3 ...and the target is UNTOUCHED -- no gov file written, nothing staged, '
+              'which is the property the exit code cannot express',
+              not gout(_h3t, 'status', '--porcelain').strip(),
+              'target was dirtied before the refusal: '
+              + gout(_h3t, 'status', '--porcelain')[:300])
+        check('[-12] R4-H3 ...and nothing landed above the target either',
+              not (_h3t.parent / 'ESCAPED').exists() and not (tmp / 'ESCAPED').exists(),
+              str(sorted(x.name for x in tmp.glob('ESCAPED*'))))
         # ---- H1, from ROUND 2. The label was TYPED, and it was typed by asking who authored the
         # ---- argv TEMPLATE — so `run_kit_check` and `cmd_check` read "gov" and the two properties
         # ---- below were never asked of them, while a read-only `check` ran target-chosen text.
@@ -6117,16 +6372,45 @@ user_skills = "/tmp/gk-fake-skills"
         for _n in _ast1.walk(_t1):
             if isinstance(_n, _ast1.FunctionDef):
                 _fnsrc1[_n.name] = _ast1.get_source_segment(_g5src, _n) or ""
+        # ROUND 4's L3. This was a flat substring test over each site's OWN source, so it was not
+        # transitive -- measured, it derived only FIVE of the eight declared sites.
+        # `read_gate_verdicts` is labelled `target` BY HAND, contains neither name, and spawns the
+        # TARGET's own `[gate_runner].command` through a helper. So the comment's claim that the
+        # label is DERIVED "so the next spawn cannot be mislabelled by hand" was already false for
+        # one live site. Closed one hop: a site counts as target-controlled if its own body resolves,
+        # or if it CALLS something whose body does.
+        _resolvers = ("target_context", "resolve_tokens", "resolve_shell_argv")
+        def _resolves_directly(_name):
+            _src = _fnsrc1.get(_name, "")
+            return any(_r in _src for _r in _resolvers)
+        _callees1 = {}
+        for _n2 in _ast1.walk(_t1):
+            if isinstance(_n2, _ast1.FunctionDef):
+                _callees1[_n2.name] = {c.func.id for c in _ast1.walk(_n2)
+                                       if isinstance(c, _ast1.Call)
+                                       and isinstance(c.func, _ast1.Name)}
         _derived_target = {k for k in govkit_module().SHELL_EXEC_SITES
-                           if "target_context" in _fnsrc1.get(k, "")
-                           or "resolve_tokens" in _fnsrc1.get(k, "")}
+                           if _resolves_directly(k)
+                           or any(_resolves_directly(c) for c in _callees1.get(k, ()))}
         check("[-5] H1 LIVENESS the derivation really finds token-resolving spawn sites",
               len(_derived_target) >= 3, str(sorted(_derived_target)))
         _mislabelled = sorted(k for k in _derived_target
                               if govkit_module().SHELL_EXEC_SITES.get(k) != "target")
         check("[-5] H1 no spawn site whose argv resolves TARGET token values is labelled `gov`",
               not _mislabelled,
-              "typed `gov` but reaches target_context/resolve_tokens: " + ", ".join(_mislabelled))
+              "typed `gov` but reaches a resolver: " + ", ".join(_mislabelled))
+        # ROUND 4 L3: A ONE-DIRECTIONAL DERIVATION CHECK IS HALF A GATE. The arm above only reds a
+        # derived-target row typed `gov`. The other direction -- a row typed `target` that derives as
+        # `gov` -- is what would have caught `read_gate_verdicts` on the day it was hand-labelled.
+        # `target-code` is exempt: its argv is entirely gov's and what it RUNS is the target's, which
+        # no resolver-reachability test can see.
+        _overlabelled = sorted(k for k, v in govkit_module().SHELL_EXEC_SITES.items()
+                               if v == "target" and k not in _derived_target)
+        check("[-5] R4-L3 ...and no site is hand-labelled `target` without deriving as one -- the "
+              "check is bidirectional now, which is what makes the label DERIVED rather than typed",
+              not _overlabelled,
+              "typed `target` but reaches no resolver, directly or one hop: "
+              + ", ".join(_overlabelled))
 
         # ---- ROUND 2's M4 AND L4, and what they cost. The arm that stood here asserted a SOURCE
         # ---- SHAPE: `"print(" in _body`, over the whole function, plus a twelve-line window above
@@ -6155,6 +6439,10 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
+            "_cmd_update": None,         # `git rm ... + deleted`: the paths come from the receipt,
+                                         # so the target influences the argv and the row is `target`
+                                         # -- but the verb prints its withdrawal decisions, never
+                                         # this argv. Unasserted, and named below like the rest.
         }
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),

@@ -568,7 +568,11 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
 # inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
 # descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
 # to be correct.
-TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+# `\Z` AND NOT `$`: Python's `$` matches BEFORE a final newline, so "tools\n" passed this class
+# for as long as it has existed. Round 4 measured it. A trailing newline in a value spliced into a
+# `bash -c` string ends the command and starts another one, which is the exact escape the class
+# was written to stop.
+TOKEN_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+-]*\Z")
 # THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
 # `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
 # primary node runs on -- with a message about command injection naming nothing the operator did
@@ -649,12 +653,46 @@ def demand_contained_dest(dest: str, where: str) -> str:
 # ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
 # ---- PWNED ;` and `$(id)` are refused by it exactly as before.
 # ----
-# ---- WHAT THE PROSE CLASS DOES NOT PROMISE, stated rather than implied: a value carrying a space
-# ---- that reaches a `bash -c` template will WORD-SPLIT there. That is a correctness bug for the
-# ---- operator who wrote it, visible immediately, and it is not code execution. The escape half is
-# ---- owned by `demand_contained_dest`, which grades destinations regardless of which class the
-# ---- value came through.
-ANSWER_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+:, =-]*$")
+# ---- WHAT THE PROSE CLASS DOES NOT PROMISE. An earlier version of this comment said a spaced value
+# ---- reaching a `bash -c` template merely WORD-SPLITS, that this is "a correctness bug for the
+# ---- operator who wrote it" and "not code execution". THAT WAS FALSE and round 4 proved it: for a
+# ---- `python {kit}/<script>` template the injected word becomes the script python runs. A comment
+# ---- asserting a guarantee the code does not hold is worse than no comment, because the next reader
+# ---- budgets against it.
+# ---- The prose class is sound ONLY for a value whose sole consumer is a rendered document, and
+# ---- nothing here establishes that per key. What makes it safe today is `SEEDED_TOKENS` above:
+# ---- every token that reaches an argv is gov's own and a target cannot supply one. The escape half
+# ---- is owned by `demand_contained_dest`, which grades destinations whichever class they came
+# ---- through.
+# ---- THE KEYS GOV COMPUTES FOR ITSELF, and which a TARGET may therefore never supply.
+# ---- ROUND 4's blocker, and it is round 2's blocker reopened by round 2's own fix. `target_context`
+# ---- seeds `prefix`, `kit_id` and `kit` from a `prefix` graded by the STRICT class, then walked the
+# ---- target's `[answers]` and `[kit.<eid>]` tables and assigned `ctx[k]` UNCONDITIONALLY through
+# ---- the PROSE class -- which admits a space. Nothing stopped a target routing a document-class
+# ---- value into a shell-class key.
+# ----
+# ---- REPRODUCED: `[answers] kit = "-m pwned "` makes `ctx["kit"]` that string, and drift-audit's
+# ---- shipped hole probe resolves to `python -m pwned /drift_report.py --check` with ZERO
+# ---- unresolved tokens. Six shipped descriptors interpolate `{kit}` inside a `-c` string, and
+# ---- `cmd_check` spawns every one of them from a READ-ONLY verb with no opt-in flag.
+# ----
+# ---- THE ENGINE ALREADY KNEW THE SET. `needed_answers` declares exactly these five and refuses to
+# ---- ask an operator for any of them, while `target_context` let a target supply all five: two
+# ---- functions, one set, opposite answers. That is what this constant ends -- it is READ by both.
+# ---- THE SET IS THE THREE KEYS SEEDED ABOVE THE LOOPS, and it is NOT `needed_answers`' five.
+# ---- Measured before narrowing, because widening a refusal without enumerating its population is
+# ---- the mistake this whole review round is about. `memory_root` is applied by `ctx.setdefault`
+# ---- AFTER the loops, so a target that supplies it legitimately wins -- and gov's OWN selftest
+# ---- fixtures supply it in `[answers]` at four sites, as does a live adopter. Refusing it would
+# ---- have broken the suite and every real install to close a hole it is not part of. `relpath` is
+# ---- never a ctx key at all: `resolve_dests` substitutes it per rule with `.replace`, so a target
+# ---- supplying it reaches nothing.
+# ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
+# ---- Different questions, and collapsing them was the first cut of this fix.
+SEEDED_TOKENS = ("prefix", "kit_id", "kit")
+
+
+ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
 
 
 def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
@@ -700,6 +738,20 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
         "kit_id": eid,
         "kit": f"{prefix}/{eid}",
     }
+    # REFUSED BY NAME, not dropped silently. Dropping the key also closes the hole and hides an
+    # operator's mistake; this engine's whole posture is to say what it refuses and why.
+    for _tbl, _label in ((deploy.get("answers") or {}, "answers"),
+                         ((deploy.get("kit") or {}).get(eid) or {}, f"kit.{eid}")):
+        for k in _tbl:
+            if k in SEEDED_TOKENS:
+                raise Refusal(
+                    f"the target descriptor supplies '{_label}.{k}', which is a token this engine "
+                    f"DERIVES for itself ({', '.join(SEEDED_TOKENS)}). Accepting it would let a "
+                    f"target overwrite the value the strict character class exists to guard, and "
+                    f"those tokens are interpolated into argv this engine RUNS -- a `{{{k}}}` inside "
+                    f"a `bash -c` or `python -c` template becomes the command. `intake` already "
+                    f"refuses to ASK for these; refusing to READ them is the same rule, one door "
+                    f"over. Remove the key: {_label}.{k}")
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
             ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
@@ -1742,17 +1794,24 @@ def derive_rule_kind(eid: str, desc: dict, rule: dict, dest: str, written: set[s
 # ---- before wiring, per S7: zero false positives, zero near-misses, and the exemption is
 # ---- load-bearing -- kickoff-manifest's `{user_skills}/session-kickoff` is absolute by design.
 def demand_contained_rows(rows, files, where: str) -> None:
-    """Refuse the run if any planned row lands outside the target. One reader, two callers."""
+    """Refuse the run if any planned row lands outside the target. ONE caller: `_cmd_apply`.
+
+    ROUND 4's L4. This said "two callers" and there has only ever been one. The intended second
+    producer, `planned_writes`, inlines `demand_contained_dest` instead, with its own comment
+    explaining why -- plan rows never carried `row["rule"]`, so the machine/link exemption could not
+    fire there. An `attributes` exemption also stood here and was DEAD from the sole caller:
+    `.gitattributes:<pattern>` destinations are minted only inside `planned_writes`, while this
+    caller's rows come from `resolve_entry`, whose roles come from descriptor `[[files]]` rules --
+    and `attributes` is not in `ROLE_KINDS`, which selfcheck arm 3b refuses. Deleted rather than
+    routed: making the claim true by threading a rule index through `planned_writes` is a refactor
+    wearing a comment fix's clothes.
+    """
     for row in rows:
         ri = row.get("rule")
         rule = files[ri] if isinstance(ri, int) and 0 <= ri < len(files) else {}
         if rule.get("scope") == "machine" or rule.get("link"):
             continue
         dest = row.get("dest") or ""
-        # An `attributes` plan row spells `.gitattributes:<pattern>`; the pattern is not a path and
-        # the file it names is contained by construction. Grade the destination, not the pin.
-        if row.get("role") == "attributes" and dest.startswith(".gitattributes:"):
-            continue
         if dest:
             demand_contained_dest(dest, where)
 
@@ -1977,6 +2036,29 @@ SHELL_EXEC_SITES = {
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
     "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
     "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
+    # ---- ROUND 4's M4 admitted these five. Each is a spawn whose SUBCOMMAND this census cannot
+    # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
+    # ---- old predicate read literal elements only, so gov's own `git` wrapper presented as
+    # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
+    # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
+    # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
+                                     # `*args` is what the census cannot read. A future
+                                     # `git(target, "hook", "run", ...)` must move this to
+                                     # `target-code` -- that is the whole point of the row.
+    "_names": "gov",                 # `["git", "-C", ..., *args, "--", *claimed]` inside
+                                     # `dirty_claimed_paths`; the `*args` is what the census cannot
+                                     # read. Gov's own verbs choose it. NOT `dirty_claimed_paths`:
+                                     # the census keys on the INNERMOST enclosing function, which my
+                                     # first cut got wrong by attributing nested calls to the outer
+                                     # one too. Same reason `check_runs` above covers the bash probe
+                                     # rather than its enclosing `resolve_bash`.
+    "_cmd_update": "target",         # `[...literal git rm...] + deleted` — a BinOp the census
+                                     # cannot destructure. Labelled `target` and not `gov`: `deleted`
+                                     # is receipt paths, so the TARGET influences this argv, which is
+                                     # this table's own definition of the label. They arrive after
+                                     # `--` as path operands and are contained upstream, but the
+                                     # label describes WHO CHOOSES the bytes, not how safe they are.
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -3421,8 +3503,23 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     # is the burden the ruling was taken to remove. Excluding it here needs no new field and breaks
     # no criterion, and it is the same reasoning the owner already applied to `-7` S4: scope the
     # refusal to where the hazard is.
+    # ROUND 4's H2 and M1, which are one defect. This excluded `pins` ALONE, and every other
+    # non-writing disposition fell through it. A `merged` row is the live case: `apply` stages its
+    # destination and deliberately gives it no `oid` (`ROLE_KINDS["merged"]` is `blocked`, so neither
+    # stamping loop reaches it), so carve-out 3 has nothing to compare and the row reads DIRTY
+    # forever. REPRODUCED on two kits: `apply --kits pytest-parallel-guardrails` exits 0 staging
+    # `pyproject.toml`, then `update --write` exits 2 calling that path dirty, and a second `apply`
+    # does the same -- so `apply --resume` is blocked identically. The operator's only way back to
+    # green is committing a file gov just wrote, which is verbatim the burden ruling A was taken to
+    # remove. Three shipped descriptors declare `merged`; the ruling-A arms use `memory-tree`, which
+    # declares none, so the class passed by finding nothing.
+    #
+    # SCOPED TO `table` NOW, which is the same narrowing this diff already made for `_cmd_update`'s
+    # shadow guard, and for the same stated reason: `block`, `report`, `skip`, `adopter` and `pins`
+    # can no more meet S4's raw-write hazard than each other. NOT by stamping `oid` on merged rows --
+    # making that stamp role-blind regressed `-7` S9's exactly-one-identity shape and cost a round.
     _rows = [row for row in ((receipt or {}).get("files") or [])
-             if UPDATE_ROLE.get(row.get("role", "engine")) != "pins"]
+             if UPDATE_ROLE.get(row.get("role", "engine")) == "table"]
     dirty = dirty_claimed_paths(
         target, [row.get("path") for row in _rows],
         {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")})
@@ -3637,6 +3734,24 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     if r.problems:
         return r.emit()
 
+    # ---- CONTAINMENT, HOISTED (round 4's H3). It used to run one entry above that entry's own
+    # ---- write loop, so a refusal for entry N fired only after entries 1..N-1 were already written
+    # ---- and staged. REPRODUCED: an escaping `[answers] memory_root` in the SECOND entry of a
+    # ---- two-kit selection exited 2 having written the first entry's files, created and staged
+    # ---- `.gitattributes`, made `.governance/outbox/` -- and written NO `install.json`, so a
+    # ---- following `check` answered `NOT LANDED` across a half-installed tree the operator then
+    # ---- cleans up by hand.
+    # ----
+    # ---- THE SIBLING IS THE ARGUMENT: `validate_gate_runner`, three lines up, is in this pass for
+    # ---- exactly this reason and its own comment says so. That guard landed in the right pass and
+    # ---- this one did not. Every entry is resolved and graded here, before the BASELINE runs and
+    # ---- before ATTRIBUTES writes a byte.
+    for _eid in selection:
+        _d, _ = descs[_eid]
+        _res = resolve_entry(root, _d, target_context(target, deploy, _eid, _d))
+        demand_contained_rows(list(_res["writes"].values()) + _res["unlanded"],
+                              _d.get("files", []), f"entry '{_eid}' (apply, pre-write)")
+
     # ---- BASELINE. The target's OWN runner, read before any write. It EXECUTES target-authored
     # ---- code: the command comes from a file committed in the target repo, so anyone with commit
     # ---- access there chooses what runs on the operator's machine. The argv and the descriptor it
@@ -3731,8 +3846,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                     print(f"govkit apply — SKIPPED [{role:<13}] {dest} <- {eid}: "
                           f"{SKIP_REASONS.get(kind, 'not a role this verb lands')}")
         res = resolve_entry(root, d, ctx)
-        demand_contained_rows(list(res["writes"].values()) + res["unlanded"],
-                              d.get("files", []), f"entry '{eid}' (apply)")
+        # Containment is NOT re-checked here: it ran over every entry in the pre-write pass above,
+        # which is the whole point of H3's fix. A second call would be two answers to one question.
         vers = entry_version(root, d)
 
         # Every rule that does NOT land says so, by role, naming who does produce it. The silent
@@ -3997,6 +4112,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                               "sha256": hashlib.sha256((target / conf).read_bytes()).hexdigest()}]
     print(f"govkit apply — observed {n_rendered} rendered destination(s)")
 
+    _renormalized = False   # M3: set only where `git add --renormalize` actually runs
     # ---- RENORMALIZE, after CONFIGURE and not beside the block. This DEPARTS from the contract's
     # ---- stated order, deliberately and for a measured reason: before the adopters have run, the
     # ---- pinned population is empty.
@@ -4024,6 +4140,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             else:
                 subprocess.run(["git", "-C", str(target), "add", "--renormalize", "--"] + lf_paths,
                                capture_output=True, check=False)
+                _renormalized = True   # M3: the re-stamp below keys on THIS, not on `staged`
         after = eol_population(target)
         idx = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "--"] + lf_paths,
                              capture_output=True, text=True).stdout if lf_paths else ""
@@ -4064,7 +4181,17 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- ratified criteria to reach one path. The arms caught it on the next run, which is the arms
     # ---- working; `.gitattributes` is unblocked at the dirty check instead, where the reason it is
     # ---- not a hazard is stated by the dispatch table rather than invented here.
-    if staged:
+    # ROUND 4's M3: this was gated on `if staged:` -- "the LAND step wrote something" -- while the
+    # renormalize that invalidates the stamp is gated on `pins`, which is the union of this selection
+    # and every kit the receipt already claims. Different conditions. A re-`apply` of an all-`seed`
+    # selection whose files already exist lands nothing new, so `staged` is empty, while `pins` is not
+    # and `git add --renormalize` still rewrites index blobs -- leaving rows claiming blobs the target
+    # no longer holds, in the field ruling A's carve-out compares. Two shipped entries declare exactly
+    # one seed rule each. The obvious refutation, that the dirty guard above the renormalize would
+    # refuse first, was TESTED by the reviewer and fails: `git diff --name-only HEAD` prints nothing
+    # for a committed CRLF file under a newly added `eol=lf` pin, which is precisely the population
+    # the renormalize moves.
+    if staged or _renormalized:
         _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
         _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
         for w in rows:
@@ -6337,7 +6464,7 @@ def needed_answers(descs: dict[str, tuple[dict, str]], selection: list[str]) -> 
     Derived from the descriptors, never listed: a hand-kept question list is how `intake` stops
     asking for something a kit started needing.
     """
-    derived = {"prefix", "kit", "kit_id", "relpath", "memory_root"}
+    derived = set(SEEDED_TOKENS) | {"relpath", "memory_root"}
     want: set[str] = set()
     for eid in selection:
         d, _p = descs[eid]

@@ -38,7 +38,13 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 216    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 216 -> 217 at ROUND 4's fold. ONE new refusal, from the round's BLOCKER: the reserved-key guard in
+# `target_context`, which refuses a target `[answers]` or `[kit.<eid>]` key naming one of the three
+# tokens gov seeds for itself. Armed by SEVEN arms -- five doors, plus the liveness pair that proves
+# the door is reached and that a non-reserved answer through it is still accepted -- and its failing
+# case was observed END TO END: with the guard reverted, a READ-ONLY `check` ran the target's own
+# script and wrote a sentinel file while exiting 1 with an ordinary report.
 # 215 -> 216 at ROUND 3's B1 CLOSE-OUT. One new refusal: the rollback loop's containment guard,
 # B1's third site. It is NOT armed and says so in its own branch -- reaching it needs a receipt row
 # spelling an escape AND a kit whose check goes red after the run, and this suite manufactures no
