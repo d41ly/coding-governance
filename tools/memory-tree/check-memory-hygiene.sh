@@ -694,11 +694,36 @@ $over21"
         *) echo "  $p — the name carries no date, so no id can be read from it"; continue ;;
       esac
       rest=${stem#*-}
-      claimed=$(printf '%s\n' "$rest" | grep -oE "^($FAM_ALT)-[A-Za-z0-9]+-[0-9]+" || true)
+      # TOOL-aCollapsedScan-13 - BUILTINS, not four processes per record. This ran `grep -oE` over
+      # a string already in a variable and then `printf | tr | grep -qxF` to ask whether one word
+      # appears in another string also already in a variable: measured 277 records x 4 spawns, and
+      # 12% of the whole hygiene leg. The predicate is unchanged - a leading
+      # `<FAMILY>-<slug>-<digits>` where FAMILY is one of the declared alternation, the slug is
+      # `[A-Za-z0-9]+` and the ordinal is the leading digit RUN, which is what `[0-9]+` matched.
+      claimed=""
+      _f=${rest%%-*}
+      case "|$FAM_ALT|" in
+        *"|$_f|"*)
+          _r2=${rest#*-}
+          _slug=${_r2%%-*}
+          case "$_slug" in
+            ''|*[!A-Za-z0-9]*) ;;
+            *)
+              _r3=${_r2#*-}
+              # the LEADING digit run of the next segment, as `[0-9]+` takes it
+              _num=""; _tail=${_r3%%-*}
+              while [ -n "$_tail" ]; do
+                case "$_tail" in [0-9]*) _num=$_num${_tail%"${_tail#?}"}; _tail=${_tail#?} ;; *) break ;; esac
+              done
+              [ -z "$_num" ] || claimed="$_f-$_slug-$_num"
+              ;;
+          esac
+          ;;
+      esac
       if [ -z "$claimed" ]; then
         echo "  $p — bound, but the name carries no family-qualified id"
       else
-        printf '%s\n' "$ids" | tr ' ' '\n' | grep -qxF "$claimed" || echo "  $p — the name claims $claimed"
+        case " $ids " in *" $claimed "*) ;; *) echo "  $p — the name claims $claimed" ;; esac
       fi
     done)
   [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
@@ -1133,13 +1158,36 @@ if [ -n "$alcut" ]; then
   # difference between an announced skip and a check that is dark and looks identical to green.
   pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
 ' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
+  # TOOL-aCollapsedScan-13 - ONE pass over the ledger rows into a map keyed "<uid> <lab>". Each
+  # row is "<uid> <lab> <form>", so the key is everything before the last space and the value is the
+  # last field. Built here, read in the label loop below.
+  declare -A ALROW=()
+  while IFS= read -r _r; do
+    [ -n "$_r" ] || continue
+    [ -n "${ALROW["${_r% *}"]:-}" ] || ALROW["${_r% *}"]=${_r##* }
+  done <<EOF
+$alledger
+EOF
+
   for sp in $alspecs; do
-    case "$(basename "$sp")" in
-      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) sdate=$(basename "$sp" | cut -c1-10) ;;
+    # TOOL-aCollapsedScan-13 - BUILTINS. This spent about seven processes per spec deciding whether
+    # the spec was in scope at all, and 263 of 320 are not: two `basename`, a `cut`, a `printf` into
+    # `sort -C`, and a `sed` into `grep`. Measured at 81% of the whole hygiene leg. Nothing about
+    # WHICH specs are graded changes - the same three tests in the same order.
+    _spbase=${sp##*/}
+    case "$_spbase" in
+      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) sdate=${_spbase:0:10} ;;
       *) continue ;;
     esac
-    printf '%s\n%s\n' "$alcut" "$sdate" | sort -C || continue
-    hdr=$(sed -n '1,6p' "$sp" | grep -m1 '^\*\*Status:\*\*')
+    # `printf | sort -C` succeeded when the two lines were already ordered, i.e. cutoff <= date.
+    # ISO dates sort lexically, so a string compare is the same test without the two processes.
+    [ "$sdate" \> "$alcut" ] || [ "$sdate" = "$alcut" ] || continue
+    # `sed -n 1,6p | grep -m1` read the head twice through two processes. One bounded read does it.
+    hdr=""; _n=0
+    while [ "$_n" -lt 6 ] && IFS= read -r _l; do
+      _n=$((_n + 1))
+      case "$_l" in '**Status:**'*) hdr=$_l; break ;; esac
+    done < "$sp"
     case "$hdr" in *" CLOSED "*) ;; *) continue ;; esac
     case "$hdr" in *"Tier-2"*) ;; *) continue ;; esac
     grep -qE '^## [0-9]+[.] Acceptance criteria[ 	]*$' "$sp" || continue
@@ -1166,9 +1214,12 @@ if [ -n "$alcut" ]; then
       continue
     fi
     for lab in $labs; do
-      row=$(printf '%s\n' "$alledger" | grep -m1 -E "^$uid $lab (obs|amd|bad)$" || true)
-      if [ -z "$row" ]; then algap="$algap $uid/$lab"
-      else case "$row" in *" bad") albad="$albad $uid/$lab" ;; esac
+      # TOOL-aCollapsedScan-13 - a map read, not `printf | grep -m1` over a variable this shell is
+      # already holding. Measured 1323 (unit, label) pairs at two processes each. FIRST WINS, which
+      # is what `grep -m1` did, so the map is filled only where a key is still unset.
+      _form=${ALROW["$uid $lab"]:-}
+      if [ -z "$_form" ]; then algap="$algap $uid/$lab"
+      elif [ "$_form" = bad ]; then albad="$albad $uid/$lab"
       fi
     done
   done

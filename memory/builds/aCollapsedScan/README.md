@@ -86,7 +86,7 @@ ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aColl
 | [TOOL-aCollapsedScan-7 — `repo_root()` takes the walk-up govkit already took for this defect](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | CLOSED | rev-2 | 2026-08-26 |
 | [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | CLOSED | rev-3 | 2026-08-26 |
 | [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | WONTDO | rev-2 | 2026-08-26 |
-| [TOOL-aCollapsedScan-13 — the hygiene gate stops spawning a process per file, and per criterion](spec/2026-08-26-spec-TOOL-aCollapsedScan-13.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-13 — checks 23 and 21 stop shelling out to read data they already hold](spec/2026-08-26-spec-TOOL-aCollapsedScan-13.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-08-26 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 3 record folder(s).
