@@ -1,10 +1,12 @@
 # TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do
 
-**Status:** SPECCED · rev-1 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 5 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 5 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -38,9 +40,10 @@ spec was authored on, not copied from the research record, whose own citations h
   file is the authored source and the live guide is its render, and the two are paired in `PAIRS` at
   `tools/memory-tree/kit-dogfood-parity.test.sh:53`. Line 116 carries no `{{KIT_DIR}}` or
   `{{TOOL_ROOT}}` placeholder, so the two edits are byte-identical.
-- **S3** — `--render` is NOT run. The build rule pinned for this run forbids it, and the recorded
-  reason is finding F3 of the aBoundedVerdict round-3 record, where the leg's own printed remedy
-  would have deleted the live-only fix it was reporting. Both files are edited by hand and
+- **S3** — `--render` is NOT run. The ground is finding F3 of
+  `memory/builds/aBoundedVerdict/reviews/2026-08-21-review-TOOL-aBoundedVerdict-1-round3.md`, which
+  measured that `--render` copies template over live, so reaching for it as the remedy for a
+  live-only edit deletes the fix being reported. Both files are edited by hand and
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` is the check that they agree.
 - **S4** — the net byte delta is MEASURED before the commit and stated in the commit message. The
   measured candidate is +161 bytes, which lands the live guide at 24546 and the template at 24557
@@ -104,7 +107,7 @@ spec was authored on, not copied from the research record, whose own citations h
 
 ### The replacement
 
-Three lines replace one. The candidate wording, measured at 274 bytes:
+Three lines replace one. The candidate wording, measured at 275 bytes:
 
 ```
 **The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
@@ -235,12 +238,10 @@ the parity check before anything else.
   inside M4.
 - **AC2** — When the same two greps run over `tools/memory-tree/BUILD-METHOD.template.md`, they
   return the same results, and `sed -n '116,118p'` over each of the two files yields identical bytes.
-- **AC3** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, it exits zero. The
-  `--render` mode is not invoked at any point in this unit.
+- **AC3** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, it exits zero.
 - **AC4** — When `git diff -U0 cd971285 -- memory/guides/BUILD-METHOD.md` runs, it shows exactly one
   hunk and that hunk is the rule paragraph. This is the tripwire for a whole-file rewrite. It proves
-  no other line moved; it does not by itself prove `--render` was never run, and AC3's second
-  sentence is the claim about that.
+  no other line moved; it does not by itself prove `--render` was never run.
 - **AC5** — When `wc -c memory/guides/BUILD-METHOD.md tools/memory-tree/BUILD-METHOD.template.md`
   runs, both figures are at or under 24576, and `wc -l` on the same pair is at or under 350 for both.
 - **AC6** — When `git grep -n "Not the harness" -- ':!memory/builds' ':!memory/DECISIONS.md'` runs,
@@ -307,6 +308,11 @@ not answer that.
 - rev-1 · 2026-08-26 · initial draft. Citations re-derived against `96f11c0e`; the header base is the
   default-branch sha the build is pinned to. The replacement wording was measured before it was
   written down, so §4's byte table is an observation and not an estimate.
+- rev-2 · 2026-08-26 · spec-audit round 1 fold. Closes 19 and 32: S3's ground is now finding F3 of
+  the aBoundedVerdict round-3 record rather than a build rule no carrier holds, and AC3's
+  unobservable second sentence is deleted along with AC4's cross-reference to it. Closes 8: the
+  replacement block's label reads 275 bytes, re-measured with `wc -c` over the extracted lines,
+  which is the figure §4's +161 delta already used.
 
 ## 10. Reuse audit
 

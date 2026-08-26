@@ -1,10 +1,12 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** SPECCED · rev-1 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -70,19 +72,18 @@ also passes. One predicate closes both, and section 4 carries the run.
   `tools/hooks/agent-cap.js` and nothing else, so three of the four sites are moved by reading. The
   bump is owed because `tools/hooks/kit.toml` takes the entry's `version_from` from that constant, and
   an adopter holding 1.6 cannot otherwise tell that the grammar their scripts must satisfy has moved.
-- **S8** — the grammar gains its third receiver in prose, in the two places that enumerate it. The
-  derivation branch has been undocumented since it shipped, which the 2026-08-08 review recorded as
-  part of the same finding. `tools/hooks/README.md:24-26` gains a bullet, and
-  `memory/guides/REVIEW-PROTOCOL.md:111-120` gains one beside its two existing receivers so its
-  `Everything else is denied` sentence stops being false. The protocol edit is made in
-  `tools/workflows/REVIEW-PROTOCOL.template.md` FIRST — section 4 Migration says why — and no new
-  prose states a bound as a digit beside a noun, because `tools/check-agent-cap-restatement.sh` scans
-  both files and neither is under a frozen prefix.
+- **S8** — the grammar gains its third receiver in prose at `tools/hooks/README.md:24-26`, which
+  gains a bullet. The derivation branch has been undocumented since it shipped, which the 2026-08-08
+  review recorded as part of the same finding. The parallel bullet in
+  `memory/guides/REVIEW-PROTOCOL.md` is a governance carrier this run holds no grant to edit, and it
+  is fork F3 in section 8 rather than scope. The new bullet states no bound as a digit beside a noun,
+  because `tools/check-agent-cap-restatement.sh` scans that README and it is not under a frozen
+  prefix.
 - **S9** — `memory/map/features/agent-cap.md` has its prose refreshed in the same commit as the code.
   Its paragraph on the retired `<expr> || <int>` binder is where this belongs: the two are one class,
   and the dossier currently describes the marked receivers without naming the derivation branch at
-  all. Its Gaps section at `:132` gains nothing, because this unit closes rather than discloses, and
-  the three gaps it lists are untouched.
+  all. Its Gaps section at `:132` gains and loses no bullet, because this unit closes rather than
+  discloses.
 
 ## 3. Non-goals (OUT)
 
@@ -175,8 +176,10 @@ AND near-misses. It was, at the pinned base.
 
 Ten tracked `.js` files exist. Each was fed to the base hook and to the candidate: `HEAD=rc` against
 `CAND=rc`, with zero differences. Two of the ten deny under both, and they are the two copies of
-`agent-cap.js` itself, which spell the banned primitives in block comments — the file's own declared
-fail-closed ceiling, unrelated to this change.
+`agent-cap.js` itself, which spell a `batches.map((g) => () => agent(…))` fan-out inside their own
+remediation TEMPLATE LITERALS and so trip rule 2 at `L796` and `L816` — the file's own declared
+fail-closed ceiling, unrelated to this change. Unit 14's alternatives-rejected entry names the same
+cause; the block-comment case is rule 1 and a separate gap in the dossier.
 
 The near-misses are the marked lines themselves, because a file with no marked line cannot be moved
 by this predicate whatever it contains. Four marked lines ship in this repo's harnesses, and the
@@ -204,20 +207,6 @@ the hook admits, and that is the intended break: a script relying on the loose f
 tool call from the moment the wired copy moves. No such script ships here, and the run above is the
 evidence rather than an assertion.
 
-TWO parity traps sit on this unit's path and both destroy work if the remedy string is followed
-blind. `tools/workflows/check-protocol-parity.test.sh:45` reads
-`render "$SHIP" > "$LIVE"`, so `--render` writes `memory/guides/REVIEW-PROTOCOL.md` FROM
-`tools/workflows/REVIEW-PROTOCOL.template.md`. The header at `:6` of that same file says the
-opposite, that `--render` rewrites the shipped copy. The header is wrong, the code decides, and the
-consequence is that S8's protocol bullet is authored in the TEMPLATE and rendered down — an edit made
-in the live guide and followed by the leg's own printed fix is destroyed by it. The second trap is
-the same shape and is already recorded for the memory-tree kit's document pair, so it is named here
-rather than rediscovered.
-
-The parity leg substitutes `{{TOOL_ROOT}}` for the install prefix, so a new bullet naming a path
-under `tools/` is written `{{TOOL_ROOT}}hooks/agent-cap.js` in the template and appears as
-`tools/hooks/agent-cap.js` in the live copy. A bullet naming no path needs no placeholder.
-
 ### Files touched (estimate)
 
 - `tools/hooks/agent-cap.js` and `.claude/hooks/agent-cap.js` — the predicate, the helper, the deny
@@ -225,8 +214,6 @@ under `tools/` is written `{{TOOL_ROOT}}hooks/agent-cap.js` in the template and 
 - `tools/hooks/agent-cap.test.sh` — the four new arms.
 - `tools/hooks/scratch-guard.js` and `.claude/hooks/scratch-guard.js` — the sibling kit marker only.
 - `tools/hooks/README.md` — the third receiver.
-- `tools/workflows/REVIEW-PROTOCOL.template.md` and `memory/guides/REVIEW-PROTOCOL.md` — the same
-  bullet, template first.
 - `memory/map/features/agent-cap.md` — the dossier prose the code change touches.
 
 No regeneration of `memory/map/generated/` is owed. The dossier's `[claims]` block is untouched
@@ -249,8 +236,6 @@ and the generated artifacts carry claims rather than prose.
   never reaches an `agent()` call harms nobody, and denying it would red files this hook has no
   business grading. S4 keeps the deny where the fan-out is and moves the EXPLANATION back to the
   assignment, which is the half that was missing.
-- **Documenting the third receiver in one carrier and pointing the other at it.** Rejected because
-  both carriers enumerate the receivers as a complete list, and a reader of either uses it as one.
 
 ## 5. Production-readiness checklist
 
@@ -274,9 +259,9 @@ and the generated artifacts carry claims rather than prose.
   never examines the rest`, and it is left-shifted into the hook's own self-test across BOTH branches
   rather than into the branch the research named. No `memory/gotchas/` record is owed, because a
   gate covers the class; that is the charter's own order of preference.
-- migration / rollback — revert the six code and doc files named under Files touched together. The
+- migration / rollback — revert every file named under Files touched together. The
   two `agent-cap.js` copies must never be reverted singly.
-- user docs — S8 is the doc work, and both files it touches are agent-facing. No `help/` page exists
+- user docs — S8 is the doc work, and `tools/hooks/README.md` is agent-facing. No `help/` page exists
   for a hook and none is owed.
 
 ## 6. Acceptance criteria
@@ -319,18 +304,14 @@ and the generated artifacts carry claims rather than prose.
   `grep -rn 'agent-cap@1\.6' tools/hooks/ .claude/hooks/` returns no hits. The second half is the one
   that binds: the gate reconciles only the pair inside `tools/hooks/agent-cap.js`, so three of the
   four carriers are observable only by grep.
-- **AC10** — When `bash tools/workflows/check-protocol-parity.test.sh` runs it exits 0, and
-  `grep -c 'gov:fixed-verifiers' memory/guides/REVIEW-PROTOCOL.md` returns a count one higher than at
-  the pinned base, with the same increase in
-  `tools/workflows/REVIEW-PROTOCOL.template.md`. Equal counts in the two files with the leg green is
-  not sufficient on its own, because parity is satisfiable by neither file carrying the bullet.
-- **AC11** — When `bash tools/check-agent-cap-restatement.sh` runs after S8, it exits 0. Both edited
-  documents are live markdown outside the frozen prefixes, so a new bullet stating a bound as a digit
-  beside a noun reds this leg.
+- **AC11** — When `bash tools/check-agent-cap-restatement.sh` runs after S8, it exits 0. The edited
+  `tools/hooks/README.md` is live markdown outside the frozen prefixes, so a new bullet stating a
+  bound as a digit beside a noun reds this leg.
 - **AC12** — When `memory/map/features/agent-cap.md` is read at HEAD, its prose names the marked
-  derivation and the per-branch rule, and its Gaps section still lists the same three gaps it lists
-  at the pinned base. A dossier that gained a gap describing this hole fails this criterion, because
-  the hole is closed rather than disclosed.
+  derivation and the per-branch rule, and `git diff cd971285 -- memory/map/features/agent-cap.md`
+  shows no added and no removed line between the `## Gaps` heading and the `## Reuse affordance`
+  heading. A dossier that gained a gap describing this hole fails the second half, because the hole
+  is closed rather than disclosed.
 - **AC13** — When every tracked `.js` file is fed to the rebuilt `tools/hooks/agent-cap.js` and to the
   copy at the pinned base, using `git ls-files '*.js'` for the population, every file returns the same
   exit code from both. This is the charter's run-it-over-the-real-tree rule made observable, and it is
@@ -352,10 +333,12 @@ Carrying no guard and `subject: repo`, so they run on every bar and this unit mu
 `verifier fan-out`, `review-join ban (no ref-keyed join)`, `agent-cap restatement`,
 `kit version markers`, `codebase-map coverage + freshness` and `memory hygiene`.
 
-Armed by this diff and `subject: repo`, so they run: `lexicon naming predicates`, guarded on `tools/`
-and `.claude/` among others, which is why S2 names the helper against the declared verb table; and
-`review-protocol parity (kit vs dogfood)`, guarded on `memory/guides/REVIEW-PROTOCOL.md`, `tools/lib/` and
-`tools/workflows/`, both of which S8 edits.
+Armed by this diff and `subject: repo`, so it runs: `lexicon naming predicates`, guarded on `tools/`
+and `.claude/` among others, which is why S2 names the helper against the declared verb table.
+`review-protocol parity (kit vs dogfood)` is NOT armed — its guard is
+`memory/guides/REVIEW-PROTOCOL.md`, `tools/lib/` and `tools/workflows/`, and this unit touches none of
+them once the protocol bullet becomes fork F3 — but the `GATE_FULL=1` run this unit's Definition of
+Done needs bypasses that guard, so the leg must stay GREEN with neither carrier touched.
 
 Armed by this diff and HELD by `subject: kit`: `agent-cap self-test`, guarded on `tools/hooks/` and
 `tools/lib/`, which holds every arm in S5 and the two-copy parity arm S6 depends on; and
@@ -383,12 +366,39 @@ wired copy moves.
   that the grammar moved; or skip, on the ground that nothing forces it and the sibling markers are
   ungated hand work. Recommendation: bump, as S7 specifies. The precedent is
   `TOOL-aNumeralWarden-1` S10, which moved the same pair for a change to the same file.
+- **F3 — should `memory/guides/REVIEW-PROTOCOL.md` gain the third receiver too?** Its predicate lists
+  two receivers at `:113-116` and then says `Everything else is denied` at `:118`, which is false
+  while the derivation branch goes unnamed — the same defect S8 closes in the kit README. This run
+  holds no grant to fix it. That document declares itself BINDING at `:1`,
+  `memory/guides/BUILD-METHOD.md:84` makes a change to a governance carrier an owner turn the
+  delegation does not reach, and this build's README at `:46` puts `REVIEW-PROTOCOL.md` in scope as a
+  PROPOSAL and not as an edit; the first run parked its own headline proposal on that same rule, at
+  `RUN.LANDED.3584b586.md:29`. Neither ruling this run holds — `TOOL-dTieredTribunal-7` and
+  `TOOL-dTieredTribunal-8` — names either protocol carrier. Options seen: ruled IN, in which case the
+  bullet is authored in `tools/workflows/REVIEW-PROTOCOL.template.md` and rendered down, because
+  `tools/workflows/check-protocol-parity.test.sh:45` runs `render "$SHIP" > "$LIVE"` while that
+  file's `:6` header claims the opposite direction, so a bullet typed into the live guide is
+  destroyed by the leg's own printed remedy; or left parked, and the `Everything else is denied`
+  sentence stays false until someone with the grant takes it. NO recommendation is offered, because a
+  run cannot ratify its own authorization. If it is ruled in, S8 cites the ruling by id the way unit
+  12 cites `TOOL-dTieredTribunal-7` at `memory/DECISIONS.md:107`.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-26 · initial draft. Every line citation re-derived against `tools/hooks/agent-cap.js`
   and its siblings at the pinned base; the two holes, the shipped-shape allow and the whole-tree sweep
   were run rather than quoted from the research record.
+- rev-2 · 2026-08-26 · spec-audit round 1 folded. Findings 23, 31 and 37: S9 and AC12 drop the
+  three-gaps count — `memory/map/features/agent-cap.md` holds six Gaps bullets at both the pinned base
+  and HEAD — and AC12 becomes a diff observation over the `## Gaps` span. Finding 35: §4's self-denial
+  row now names rule 2 over the two copies' own remediation template literals, reproduced at `L796`
+  and `L816`, which is what unit 14 already says. Finding 28, the blocker, takes the PARK arm: S8
+  keeps only the `tools/hooks/README.md` bullet, the `REVIEW-PROTOCOL.md` and
+  `REVIEW-PROTOCOL.template.md` half moves to fork F3 with its veto-2 ground, both carriers leave §4
+  Files touched and the Migration trap paragraphs that existed only for them, AC10 is dropped while
+  the remaining criteria keep their labels so the audit's citations still resolve, and §7 restates
+  `review-protocol parity (kit vs dogfood)` as must-stay-green-untouched. The OWNER arm of 28 is not
+  folded and is not this run's to resolve.
 
 ## 10. Reuse audit
 

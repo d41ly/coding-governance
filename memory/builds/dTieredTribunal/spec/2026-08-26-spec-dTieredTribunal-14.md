@@ -1,10 +1,12 @@
 # TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script
 
-**Status:** SPECCED · rev-1 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -34,18 +36,29 @@ see an inline script catches the defect.
 - **S2** — the predicate reads `blankLiterals(script)`, the literal-blanked view already defined at
   `tools/hooks/agent-cap.js:372`, rather than a second character scanner. That is a measured
   behaviour change and section 4 Migration states exactly what it changes and what it does not.
-- **S3** — the new rule is the LAST script rule in `main()`, after the `offendingLines` block that
-  begins at `tools/hooks/agent-cap.js:821`. The three rules above it all prevent a BURST, which is
-  the expensive failure this hook exists for; a ref-keyed join is a wrong verdict, which is cheap to
-  re-run. `main()` exits on the first rule that fires, so the order decides which message an operator
-  sees and nothing else.
+- **S3** — the new rule is the LAST script rule in `main()`, and reaching it requires INVERTING the
+  `offendingLines` block that begins at `tools/hooks/agent-cap.js:821`. That block alone is written
+  as an early exit — `:822` is `if (bad.length === 0) process.exit(0)` — so a rule merely appended
+  after it never runs for a script carrying no raw `parallel(`/`pipeline(`, which is every script the
+  join ban exists to judge. It becomes `if (bad.length) { <the existing message>; process.exit(2) }`
+  with a single `process.exit(0)` moved to the end of `main()` after `scanJoinFindings`. The two
+  rules above it, `fan` at `:786` and `caps` at `:806`, already use that additive shape and are
+  untouched. The three rules above it all prevent a BURST, which is the expensive failure this hook
+  exists for; a ref-keyed join is a wrong verdict, which is cheap to re-run. `main()` still exits on
+  the first rule that fires, so the order decides which message an operator sees and nothing else.
 - **S4** — the hook gains an `--only=<rule>` argv selector over a CLOSED set whose only member today
   is `join`. Absent, every rule runs, which is the wiring's invocation and is unchanged. Present and
   equal to `join`, only the S1 rule runs. Present and anything else, the hook REFUSES with exit 2 and
   a message naming the closed set. A selector that silently matched nothing would be this repo's own
   vacuous-selector-empty-population class, arriving in the file whose job is to refuse what it cannot
   resolve.
-- **S5** — `tools/workflows/check-review-join.sh` deletes its awk block at `:72-92` and delegates.
+- **S5** — `tools/workflows/check-review-join.sh` deletes its awk block at `:72-92`, the ban-list
+  comment at `:53-59` and the stripper note at `:67-71`, and delegates. Those two comment paragraphs
+  describe the awk's own `//`-tail rule and its string-surviving behaviour, both of which S2 removes,
+  so they are replaced by one short comment naming the hook's `blankLiterals` as the stripper and
+  section 4 Migration as the record of the narrowing; the three ban descriptions now live in the
+  hook's own rule, where section 4 Data model pins them. The `SCAN` build and its
+  `none of the named files exist` refusal at `:60-65` are KEPT.
   The payload is built by node, copied from the shape at `tools/workflows/check-verifier-fanout.sh:72-77`,
   and the invocation is `node "$HOOK" --only=join`. Everything else about that gate is KEPT: the
   population selector at `:43-44`, which takes every `tools/**/*.js` with no `export const meta =`
@@ -68,6 +81,12 @@ see an inline script catches the defect.
 - **S8** — the failing case is OBSERVED before this lands, as new arms in `tools/hooks/agent-cap.test.sh`,
   in that file's existing `js <name> <expected-exit>` heredoc style. The arms are enumerated in
   section 4 Inventory and include the two fixtures that pin S2's deliberate narrowing.
+  `tools/workflows/check-review-join.test.sh` also gains `tools/hooks/agent-cap.js` copied into its
+  `$TMP/discover` and `$TMP/emptyrepo` scratch repos, after `:133` and after `:163`, copying
+  `tools/workflows/check-verifier-fanout.test.sh:63` verbatim — the arms at `:141`, `:153` and `:165`
+  run the gate inside those repos, which hold no hook, so S5's missing-hook refusal fires there
+  otherwise. It also gains a third scratch repo holding no hook and one arm asserting that refusal,
+  copying the sibling's `:74-79`, so the new refusal's own failing case is observed.
 - **S9** — `.claude/hooks/agent-cap.js` is refreshed from the kit copy in the same commit. It is the
   WIRED copy, the parity arm at `tools/hooks/agent-cap.test.sh:501-508` compares them, and that arm
   fails outright when the wired copy is absent.
@@ -160,7 +179,7 @@ observed" means for this unit:
 
 | Arm | Fixture | Expected |
 |---|---|---|
-| the bracket ban fires | `verdicts[v.ref] = v` | exit 2 |
+| the bracket ban fires with no raw primitive present | `verdicts[v.ref] = v` and no `parallel(`/`pipeline(` | exit 2 |
 | the Map ban fires | `m.set(f.ref, v)` | exit 2 |
 | the retired identifier fires | `const verdictByRef = new Map()` | exit 2 |
 | a comment documenting the join is prose | the gate's own `comment-only` fixture | exit 0 |
@@ -217,8 +236,9 @@ rather than incidental.
 
 **No live verdict moves.** Over the ten files probed, the awk and the candidate agree everywhere: the
 single near-miss is a `//` comment, which both strippers drop. So this unit changes no verdict on any
-file in the tree today, and every pre-existing arm in `tools/workflows/check-review-join.test.sh`
-holds unedited. Each of the five fixtures those arms use was traced through `blankLiterals` by hand
+file in the tree today, and no pre-existing arm in `tools/workflows/check-review-join.test.sh` has
+its EXPECTED STRING edited. Three of those arms do need their SETUP changed, which is what S8 copies
+the hook into their two scratch repos for. Each of the five fixtures those arms use was traced through `blankLiterals` by hand
 and reaches the same verdict, including the two whose point is that a `//` inside a URL must not
 truncate the code line.
 
@@ -242,12 +262,15 @@ rather than developing beside it.
 ### Files touched (estimate)
 
 - `tools/hooks/agent-cap.js` — S1 through S4, and the S10 version line.
-- `.claude/hooks/agent-cap.js` — the S9 mirror refresh.
+- `.claude/hooks/agent-cap.js` — the S9 mirror refresh, and the S10 version line.
+- `tools/hooks/scratch-guard.js` and `.claude/hooks/scratch-guard.js` — the S10 marker line each
+  carries at `:41`. `tools/check-kit-versions.sh` reads neither, so AC11's greps are their only witness.
 - `tools/hooks/agent-cap.test.sh` — the S8 arms.
 - `tools/hooks/README.md` — S11.
 - `tools/workflows/check-review-join.sh` — S5 and S6.
-- `tools/workflows/check-review-join.test.sh` — the two S8 divergence arms, appended; every existing
-  arm unedited.
+- `tools/workflows/check-review-join.test.sh` — the two S8 divergence arms and the S8 no-hook arm,
+  appended; the hook copied into the two scratch repos after `:133` and `:163`; no existing arm's
+  expected string edited.
 - `tools/check-wiring.sh` and `tools/check-wiring.test.sh` — S7.
 - `tools/gate-legs.json` and `tools/workflows/kit.toml` — S12.
 - `memory/map/features/review-harnesses.md` and `memory/map/features/agent-cap.md` — S13.
@@ -315,7 +338,8 @@ The review-harness kit version is NOT bumped. `tools/workflows/kit.toml` declare
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a `Workflow` payload whose script contains `verdicts[v.ref] = v` is piped to
+- **AC1** — When a `Workflow` payload whose script contains `verdicts[v.ref] = v` and no raw
+  `parallel(` or `pipeline(` is piped to
   `node tools/hooks/agent-cap.js`, it exits 2 and stderr carries
   `object/Map literal keyed by a .ref string`. The same holds for `m.set(f.ref, v)` with
   `Map keyed by a .ref string`, and for a bare `verdictByRef` with
@@ -335,9 +359,11 @@ The review-harness kit version is NOT bumped. `tools/workflows/kit.toml` declare
   `grep -F -- '--only=join' tools/workflows/check-review-join.sh` runs it returns a hit. The gate has
   one predicate and it is the hook's.
 - **AC6** — When `bash tools/workflows/check-review-join.test.sh` runs it prints
-  `PASS — review-join + workflow-syntax gates: all arms held` and exits 0, with every arm that
-  existed at the pinned base UNEDITED. An arm whose expected string had to be changed to make this
-  pass is a verdict change and fails this criterion.
+  `PASS — review-join + workflow-syntax gates: all arms held` and exits 0, and when
+  `git diff cd971285 -- tools/workflows/check-review-join.test.sh` is read, no `arm '…' '…'` line
+  that existed at the pinned base has a changed expected string — the only edits to pre-existing
+  lines are scratch-repo setup. An arm whose expected string had to be changed to make this pass is a
+  verdict change and fails this criterion.
 - **AC7** — When the reproduction fixture from section 4 Inventory is written to a file, then
   `bash tools/workflows/check-review-join.sh <that file>` exits 1 and a `Workflow` payload built from
   the identical bytes piped to `node tools/hooks/agent-cap.js` also exits 2. The two entry points
@@ -356,9 +382,13 @@ The review-harness kit version is NOT bumped. `tools/workflows/kit.toml` declare
 - **AC10** — When `bash tools/hooks/agent-cap.test.sh` runs it exits 0, and every arm listed in the
   section 4 Inventory table is present in that file. When
   `diff tools/hooks/agent-cap.js .claude/hooks/agent-cap.js` runs it prints nothing.
-- **AC11** — When `bash tools/check-kit-versions.sh` runs it exits 0, and
-  `grep -c 'agent-cap@1\.6' tools/hooks/agent-cap.js` returns 0. A constant moved without its
-  same-line marker reds that gate, which is what `tools/check-kit-versions.sh:46-47` exists for.
+- **AC11** — When `grep -rn 'agent-cap@1\.7' tools/hooks/ .claude/hooks/` runs it returns no hits,
+  and when `grep -rln 'agent-cap@1\.8' tools/hooks/ .claude/hooks/` runs it names all four carriers,
+  and when `bash tools/check-kit-versions.sh` runs it exits 0. The greps are what bind: that leg
+  grades CONSISTENCY and not movement, because `tools/check-kit-versions.sh:46-47` asserts the
+  constant and its same-line marker are EQUAL, and it reads neither `scratch-guard.js` copy at all.
+  Both halves fail at this unit's own base, where `TOOL-dTieredTribunal-13` has left all four
+  carriers at `1.7`.
 - **AC12** — When the `review-join self-test` and `verifier fan-out self-test` rows are read in
   `tools/gate-legs.json`, each `guard` names `tools/hooks/`, and the matching `[[gate_leg]]` blocks
   in `tools/workflows/kit.toml` name `{prefix}/hooks/`. One file edited and not the other fails this
@@ -443,6 +473,15 @@ runs. This unit changes no protocol text, so it must stay green untouched.
   hook's self-denial, the predicate's self-match on its own retired-identifier ban, the
   awk-against-`blankLiterals` divergence and the two leg timings were each measured rather than
   quoted.
+- rev-2 · 2026-08-26 · spec-audit round 1 fold, closing findings 1, 11, 14, 21, 22, 24, 33, 36 and
+  41. AC11 re-pointed from the string unit 13 removes to `1.7`/`1.8` over both hook directories, with
+  both `scratch-guard.js` carriers added to Files touched and the consistency-not-movement limit of
+  `check-kit-versions.sh` stated — 1, 11, 24, 36 and the Files-touched half of 33. S3 states the
+  `offendingLines` inversion and its moved `process.exit(0)`, and AC1 plus the first Inventory arm
+  pin a fixture with no raw primitive, which is the observation that fails if the rule is merely
+  appended — 21. S8, Files touched, section 4 Migration and AC6 carry the hook copy into both scratch
+  repos and the no-hook arm for the new refusal's own failing case — 22. S5 widens its deletion to
+  the ban-list comment and the stripper note, which is what makes AC5 satisfiable — 14 and 41.
 
 ## 10. Reuse audit
 

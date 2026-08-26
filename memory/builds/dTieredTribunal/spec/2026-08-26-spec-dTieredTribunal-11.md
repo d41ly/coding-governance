@@ -1,10 +1,12 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** SPECCED · rev-1 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -67,8 +69,11 @@ majority review kind in this corpus is the one the engine is currently forbidden
   vocabulary without S1's refusal firing first.
 - **S9** — the remaining diff-shaped prompt strings become per-kind. They are enumerated in §4's
   Inventory table, which is the authoritative list for this unit, and they are the round sentence
-  at `:184`, the out-of-diff clause at `:194`, the skeptic's read instruction at `:245`, the report
-  instruction at `:345`, the range line at `:353`, and the pre-spawn log at `:103`.
+  at `:184`, the round-1 no-prior-findings sentence at `:192`, which reads `the whole diff` and must read the
+  subject the kind names, the out-of-diff clause at `:194`, the finder's return-shape line at
+  `:195`, the
+  skeptic's read instruction at `:245`, the report instruction at `:345`, the range line at `:353`,
+  the binding line's id clause at `:376`, and the pre-spawn log at `:103`.
 - **S10** — no exit path is added, and no field is removed from any of the four returns. The exit
   paths are the all-lenses-dead return at `:215-219`, the nothing-raised return at `:227`, the
   everything-refuted return at `:315-324`, and the success return at `:419-458`, which is also the
@@ -80,7 +85,12 @@ majority review kind in this corpus is the one the engine is currently forbidden
   header edit, `:154`'s claim of a six-wide find wave is corrected to the width the code actually
   fans at, which closes `TOOL-aDeclaredBound-6` (`memory/backlog/TOOL.md:148`). That row's own
   citation is stale — it names line 128 and the text lives at `:154` — so the row is corrected as
-  it is closed.
+  it is closed. A third live carrier is `tools/check-agent-cap-restatement.sh:34-36`, a merge-bar
+  gate whose executable-files-are-out-of-scope bullet quotes that same sentence as a live example
+  and records the row as filed; it is rewritten as a past observation closed by this unit. The
+  bullet keeps its point and its widening argument, which rest on the remedy-string carrier named
+  beneath the example rather than on the example. `memory/builds/dTieredTribunal/README.md:58`,
+  which calls the row OPEN and untouched here, is amended in the same commit.
 - **S12** — `memory/map/features/review-harnesses.md` is refreshed in the same commit. Its bullet
   at `:84`, which asserts that no harness takes a review-kind parameter, is falsified by this unit,
   and the dossier claims `tier2-review.js` at `:22`, so the refresh is this unit's rather than a
@@ -196,11 +206,13 @@ which is the loop the first run's unit could not reach.
 | `:182` | the acquire sentence | per-kind, with S6's blob verification on the spec arm |
 | `:184` | the round sentence names the diff | per-kind |
 | `:194` | the out-of-diff clause | per-kind |
+| `:195` | the return-shape line names `file,line` | per-kind field list, matching the schema selected for the same kind |
 | `:210` | `ref` is path and line | per-kind |
 | `:245` | skeptics read the cited file, line and callers | per-kind |
 | `:345` | the report instruction names a file and line | per-kind |
 | `:353` | the range line | per-kind, naming the subject set and its blobs on the spec arm |
 | `:375` | `**Serves:** diff-review` | the value of `kind` |
+| `:376` | the id clause names every unit id in the diff | per-kind, naming the audited unit set on the spec arm |
 
 Untouched on purpose: the `args` parse-and-validate guard at `:32-60`, the `priorFindings` split at
 `:70-76`, the round inference at `:79`, the integer verdict join at `:265-285`, the batching line
@@ -228,8 +240,10 @@ instead of promised behaviour.
 
 ### Files touched (estimate)
 
-`tools/workflows/tier2-review.js` and `memory/map/features/review-harnesses.md`. Two files. The
-backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and is bookkeeping.
+`tools/workflows/tier2-review.js`, `memory/map/features/review-harnesses.md`, and
+`tools/check-agent-cap-restatement.sh`, whose header example S11 re-points. The bookkeeping edits
+are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-decisions bullet at
+`memory/builds/dTieredTribunal/README.md:58`.
 
 ### Alternatives rejected
 
@@ -262,8 +276,10 @@ backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and i
   and a warning at round 1, matching the diff arm exactly. An unrecognised `kind` is a refusal at
   parse time, before any agent spawns.
 - observability — this unit is what makes a spec audit's shape program-emitted. The kind token, the
-  review-shape line, the subject anchor and the trust counters all reach a spec-audit record by the
-  same path they already reach a diff-review one.
+  review-shape line and the subject anchor reach a spec-audit record by the same path they already
+  reach a diff-review one. The liveness counters do NOT: they reach the CALLER on every exit path,
+  which S10 preserves, and the synthesis prompt at `:346` interpolates finding counts only.
+  `TOOL-dTieredTribunal-15`'s record is that disclosure.
 - risks — one, and it is a cross-unit risk rather than a runtime one. This unit's selector sits on
   the branch of `tools/hooks/agent-cap.js` that `TOOL-dTieredTribunal-13` tightens, and a naive
   tightening denies it. It is measured in §8 rather than described, and the fallback is measured
@@ -271,7 +287,7 @@ backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and i
 - testing + left-shift gates — the three shipped scanners over this file stay green, and
   `check-verifier-fanout.sh` is the observation that the fan-out still passes the hook, because
   that gate delegates to the hook rather than re-implementing it. No new leg, per §3.
-- migration / rollback — revert two files. Nothing persists between runs and no artifact is
+- migration / rollback — revert the files section 4 names. Nothing persists between runs and no artifact is
   generated.
 - user docs — none. The harness is agent-facing. Its own header comment and the dossier refreshed
   by S12 are its documentation.
@@ -292,7 +308,9 @@ backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and i
 - **AC4** — When the schema region is read, two schemas exist, the diff one requires `line` and the
   spec one requires `where`, and neither requires both. Observation: `grep -n "where"
   tools/workflows/tier2-review.js` returns a hit inside a `required` array and a hit inside a
-  `properties` object.
+  `properties` object. The finder's return-shape line at `:195` names the SAME address field as the
+  schema passed on that arm: `grep -c "file,line,severity"` and `grep -c "file,where,severity"` each
+  return 1, and the arm spelling `where` is the arm passing `SPEC_FINDING_SCHEMA`.
 - **AC5** — When the anchor block is read, the spec arm grades `subjects`, refuses an empty array,
   and applies the SAME hex expression the diff arm applies to `base`. Observation: `grep -c
   "0-9a-f]{7,40}" tools/workflows/tier2-review.js` shows the pattern spelled once rather than
@@ -314,8 +332,10 @@ backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and i
   `version: '1.4'`. The leg is named because it runs and not because it grades the pair: its row
   for this file is a bare presence check, which is the open question at `TOOL-dTieredTribunal-6`,
   so this grep is the whole observation of the bump.
-- **AC11** — When `grep -n "6-wide" tools/workflows/tier2-review.js` runs it returns no match, and
-  the `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md` reads CLOSED with its stale line
+- **AC11** — When `git grep -n -- "6-wide"` runs over the whole tree, no hit is under `tools/` —
+  today it returns `tools/workflows/tier2-review.js:154` and `tools/check-agent-cap-restatement.sh:35`
+  — and every surviving hit outside `memory/builds/` and `memory/archive/` is the
+  `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md`, which reads CLOSED with its stale line
   citation corrected.
 - **AC12** — When `memory/map/features/review-harnesses.md` is read, the bullet asserting that no
   harness takes a review-kind parameter is gone rather than negated beside its replacement.
@@ -328,13 +348,25 @@ backlog row closed by S11 is a third edit, under `memory/backlog/TOOL.md`, and i
   by unit ids, and `python tools/memory-tree/gen_build_index.py --check` classifies the record
   under that kind. This is the criterion that proves the unit rather than the diff: a kind token
   nothing ever emitted is a parameter, not a capability.
+- **AC15** — S7's witness. When the harness is invoked with a `kind` of `spec-audit` and no
+  `context`, the default it interpolates names the spec set and carries no `diff`. Observation:
+  `grep -n "the cumulative diff landing on main" tools/workflows/tier2-review.js` returns a hit only
+  on the diff arm of the per-kind expression at `:68`, where today that string is unconditional.
+- **AC16** — S4's witness. When the display `ref` at `:210` is built for a spec-kind finding, it
+  ends with that finding's own `where` value and contains no `:undefined`. Observation: a synthetic
+  spec-kind finding carrying a `where` of `§2 S4` renders a `ref` whose tail is that string, where
+  the shipped `${f.file}:${f.line}` renders `:undefined`.
+- **AC17** — S9's witness. When `grep -n "diff" tools/workflows/tier2-review.js` runs, every hit
+  inside a prompt string sits on a diff-arm selection, on `diffCmd`, or on the `diff-review` kind
+  token itself. The range line at `:353` spelling `${base}...${head}` with no kind selection fails
+  this, which is its state today.
 
 ## 7. Gates
 
 The named legs this unit must keep green are `workflow script syntax`, `review-join ban (no
 ref-keyed join)`, `verifier fan-out`, `agent-cap restatement`, `kit version markers`, `codebase-map
 coverage + freshness`, `memory hygiene`, `review-protocol parity (kit vs dogfood)`, `review-join
-self-test` and `verifier fan-out self-test`.
+self-test`, `verifier fan-out self-test` and `agent-cap restatement self-test`.
 
 No count of them is written here. `tools/gate-legs.json` owns the population, and a number typed
 beside a manifest is wrong on the next commit.
@@ -344,10 +376,11 @@ cap rule; it feeds each workflow script to `tools/hooks/agent-cap.js` and report
 says. So it is simultaneously the gate this unit must pass and the instrument that answers §8's
 fork, which is why AC2 names it instead of naming a grep over the selector line.
 
-Two of the named legs carry `subject: kit` and are HELD by `tools/run-gates/run-gates.sh` unless
-`GATE_SELFTESTS=1` is set. They are `verifier fan-out self-test`, `review-join self-test` and
-`agent-cap restatement self-test`. A guarded leg arming is not the same as a leg running, so this
-unit's Definition of Done needs the run that sets both that variable and `GATE_FULL=1`.
+The named legs carrying `subject: kit` are `verifier fan-out self-test`, `review-join self-test` and
+`agent-cap restatement self-test`, and all three are HELD by `tools/run-gates/run-gates.sh` unless
+`GATE_SELFTESTS=1` is set. The first two are guarded on `tools/lib/` and `tools/workflows/`; the
+third carries no guard at all. A guarded leg arming is not the same as a leg running, so this unit's
+Definition of Done needs the run that sets both that variable and `GATE_FULL=1`.
 
 This unit adds no gate leg, per §3.
 
@@ -391,6 +424,26 @@ that settles this once order 1 lands, and the fallback above is what this unit t
   `tools/workflows/tier2-review.js` at base `cd971285`, which `git diff --stat cd971285 96f11c0e`
   confirms is byte-identical to HEAD for that file. The research record's citations were not
   copied.
+- rev-2 · 2026-08-26 · spec-audit round 1 fold, closing findings 3, 9, 13, 15, 16, 25, 27, 29, 30,
+  34 and 40. §4's Inventory and S9 gained the two omitted prompt sites `:195` and `:376`, and AC4
+  gained the assertion that the finder's return-shape line names the same address field as the
+  schema on that arm (29). S4, S7 and S9 gained one falsifiable observation each as AC15, AC16 and
+  AC17, where §6 previously witnessed none of them (3). §5's observability bullet now says the
+  liveness counters reach the caller and not the record, citing `TOOL-dTieredTribunal-15`, because
+  the synthesis prompt at `:346` interpolates finding counts only (13). S11, §4's Files touched and
+  AC11 gained the third live `6-wide` carrier `tools/check-agent-cap-restatement.sh:34-36` plus the
+  build README's Parked-decisions bullet, and AC11 became a tree-wide grep (15, 25, 30). §7's
+  `subject: kit` sentence lost its numeral and gained `agent-cap restatement self-test`, reconciled
+  against `tools/gate-legs.json`, which reads all three of the named self-test legs as `subject: kit`
+  with only the first two guarded (9, 16, 27, 34, 40). Every line citation re-derived against the
+  tree at HEAD.
+- rev-3 · 2026-08-26 · repaired two defects the rev-2 fold itself created, both caught by that
+  fold's own adversarial verify stage before any code. `:192` — a finder-prompt sentence reading
+  `the whole diff` — satisfies AC17's population and was absent from section 4's Inventory, which S9
+  declares authoritative, so a builder implementing the Inventory exactly would have redded AC17.
+  It is a genuine per-kind site and the Inventory now carries it. Section 5's rollback bullet still
+  said `two files` after section 4 grew to three; the numeral is deleted rather than corrected,
+  because a count of a derived population does not belong in prose beside the section that owns it.
 
 ## 10. Reuse audit
 
