@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -422,6 +422,13 @@ wired copy moves.
   whoever takes it mint the row, because this build's own precedent
   (`TOOL-dTieredTribunal-6`) is that a gate arm found during a spec round is a unit rather than a
   fold. This is a fork the owner can close either way without changing anything else in this spec.
+  **RESOLVED (agent, 2026-08-26, delegated): leave it, and record it as a follow-up.** A new gate
+  arm is a MECHANISM, and folding a mechanism into a unit that is not about it is the shape round 1
+  of this build's audit refused when it parked the protocol edit. M8's left-shift obligation is
+  discharged for this build by `TOOL-dTieredTribunal-15`'s record, so nothing is left uncovered by
+  taking the cheaper arm. Under M3 the option that adds the arm trips no veto but leaves the same
+  follow-ups open at strictly higher cost, so it is not the more feature-rich survivor.
+
 - **F2 — does the version bump belong to this unit at all?** `tools/check-kit-versions.sh` asserts
   internal CONSISTENCY only, so a behavioural change carrying NO bump leaves every carrier equal and
   the leg green; only a PARTIAL bump reds. Options seen: bump, on the ground that
@@ -429,6 +436,13 @@ wired copy moves.
   that the grammar moved; or skip, on the ground that nothing forces it and the sibling markers are
   ungated hand work. Recommendation: bump, as S7 specifies. The precedent is
   `TOOL-aNumeralWarden-1` S10, which moved the same pair for a change to the same file.
+  **RESOLVED (agent, 2026-08-26, delegated): bump, exactly as S7 specifies.** `tools/hooks/kit.toml`
+  takes its `version_from` from that constant, so the constant IS the kit's version and an adopter
+  has no other signal that the grammar moved. The precedent is `TOOL-aNumeralWarden-1` S10, which
+  moved the same pair for a change to the same file. The skip arm rests on the gate not forcing it,
+  which is true and is not a reason: `check-kit-versions.sh` grades consistency, not movement, and a
+  version that never moves is consistent and useless.
+
 - **F3 — should `memory/guides/REVIEW-PROTOCOL.md` gain the third receiver too?** Its predicate lists
   two receivers at `:113-116` and then says `Everything else is denied` at `:118`, which is false
   while the derivation branch goes unnamed — the same defect S8 closes in the kit README. This run
@@ -483,6 +497,11 @@ wired copy moves.
   because a green row misread as a verified one is the whole class: the empty-branch arm is already
   GREEN at base, so AC14's fails-today half is the deny REASON and its exit-code half is what reds
   against a candidate with the guard removed.
+- rev-4 · 2026-08-26 · M3 fork sweep. F1 RESOLVED to leave the gate arm and record it as a follow-up:
+  a new arm is a mechanism, and M8's left-shift is already discharged by `TOOL-dTieredTribunal-15`.
+  F2 RESOLVED to bump, as S7 specifies, because `tools/hooks/kit.toml` takes `version_from` from that
+  constant. F3 stays PARKED for the owner under M3 veto 2 and is untouched. Header gained `ratified`.
+
 
 ## 10. Reuse audit
 

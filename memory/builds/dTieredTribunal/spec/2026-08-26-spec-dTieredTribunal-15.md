@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-15 — the false-clean family enters the catalogue
 
-**Status:** INPROGRESS · rev-1 · 2026-08-26 · node a · Tier-1 · base cd971285 · order 1 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-26 · node a · Tier-1 · base cd971285 · order 1 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -50,6 +50,10 @@ written and not after.
   same commit as the S6 claim edit. `tools/codebase-map/test_codebase_map.py` byte-compares the
   committed artifacts against a live re-render, so a claim landed without a render reds the very leg
   AC9 asserts is green.
+- **S9** — a new backlog row `TOOL-dTieredTribunal-16` in `memory/backlog/TOOL.md` records the live
+  REACH instance in `tools/workflows/tier2-review.js`, whose synthesis prompt hands the agent no
+  liveness counter, so the record that harness writes cannot state that half its lenses died.
+  Section 8's F1 resolves to writing it, on the ground that no unit of this build closes it.
 - **S8** — the backlog row `TOOL-dTieredTribunal-5` in `memory/backlog/TOOL.md` flips from `OPEN` to
   `CLOSED`. That row says in as many words that writing the record closes it.
 
@@ -201,6 +205,9 @@ a class about a ban that greps whole file text.
   `codebase-map coverage + freshness` leg are both green.
 - **AC10** — When `grep -n 'TOOL-dTieredTribunal-5 · CLOSED' memory/backlog/TOOL.md` runs, it returns
   the row. Today that row reads `OPEN`, which is how this criterion fails.
+- **AC11** — When `grep -n 'TOOL-dTieredTribunal-16' memory/backlog/TOOL.md` runs, it returns the S9
+  row, and that row names `tools/workflows/tier2-review.js` as the file carrying the instance.
+  Today the grep returns nothing, which is how this criterion fails.
 
 ## 6. Gates
 
@@ -237,11 +244,26 @@ adds no leg.
   outside the id range this run was given. If the owner wants the fix scheduled rather than merely
   named, B costs one row and this unit's scope does not change either way.
 
+
+  **RESOLVED (agent, 2026-08-26, delegated): the residual earns a row, and this unit writes it.**
+  The fork turned on whether anything else in this build closes it. Nothing does, and that is now
+  checkable rather than assumed: `TOOL-dTieredTribunal-11` section 5 states in as many words that the
+  liveness counters reach the caller and not the record, that the synthesis prompt interpolates
+  finding counts only, and that this unit's record IS that disclosure. So the residual survives the
+  whole build. A gotcha record describes a CLASS and a backlog row tracks an INSTANCE; the instance
+  outlives the build and nothing drains a paragraph. Under M3 the row is the more feature-rich
+  survivor — it leaves fewer follow-ups open at the same cost — and it trips no veto, being an
+  ordinary record rather than a dependency, a surface or a carrier.
 ## 8. Revision log
 
 - rev-1 · 2026-08-26 · initial draft. Every claim about existing code re-derived against source at
   base; `tools/`, `memory/gotchas/` and `memory/map/` are byte-identical between `cd971285` and the
   tip this was written at, so the line citations hold at the declared base.
+- rev-2 · 2026-08-26 · M3 fork sweep. F1 RESOLVED to write the backlog row rather than let the record
+  carry the instance alone, because `TOOL-dTieredTribunal-11` section 5 declines the residual
+  explicitly, so no unit of this build closes it. S9 and AC11 are that row and its observation. The
+  header gained `ratified 2026-08-26`.
+
 
 ## 9. Reuse audit
 

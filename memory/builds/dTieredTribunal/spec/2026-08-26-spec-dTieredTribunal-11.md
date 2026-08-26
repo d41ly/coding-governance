@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling
+**Status:** SPECCED · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -410,7 +410,7 @@ parity pair is itself the defect.
 
 ## 8. Open questions
 
-**F1 — does `TOOL-dTieredTribunal-13`'s tightened predicate admit this unit's selector?**
+- **F1 — does `TOOL-dTieredTribunal-13`'s tightened predicate admit this unit's selector?**
 
 The two units meet on one line. `TOOL-dTieredTribunal-13` tightens the marked-derivation branch of
 `tools/hooks/agent-cap.js` to require every non-self reference bounded rather than merely one, and
@@ -435,6 +435,16 @@ the dialect the hook's own comments describe as the sanctioned derivation. AC2 i
 that settles this once order 1 lands, and the fallback above is what this unit takes if it does not
 — a build decision at that point, not a redesign.
 
+
+**RESOLVED (agent, 2026-08-26, delegated): keep the marked ternary; the sibling unit binds its
+admission.** This is a FACT-QUESTION and the probe already ran during spec authoring: the naive
+tightening, `refs.some` rewritten to `refs.every`, denies BOTH this selector and
+`tools/workflows/drift-audit-state.js`, which the owner's ruling at `TOOL-dTieredTribunal-8` says
+must keep passing. So the naive form is refused by the sibling unit's own constraint rather than by
+preference. `TOOL-dTieredTribunal-13` is order 2 and lands first, and its AC6 pins this exact
+selector while its AC6b pins the shipped user, so the admission is an acceptance criterion of that
+unit rather than an assumption of this one. The measured fallback shape stays recorded above and
+unused; if 13's AC6 ever reds, this unit takes it without a redesign.
 ## 9. Revision log
 
 - rev-1 · 2026-08-26 · initial draft. Every line citation re-derived against
@@ -480,6 +490,11 @@ that settles this once order 1 lands, and the fallback above is what this unit t
   than restated, because `TOOL-dTieredTribunal-14` S12 moves those guards at order 3 and this unit is
   order 4 (12). Every grep in this entry was run against the tree at HEAD, and every line citation
   re-derived there.
+- rev-5 · 2026-08-26 · M3 fork sweep. F1 RESOLVED as a FACT-QUESTION whose probe already ran: the
+  naive tightening denies both this selector and the one shipped user the owner's ruling protects, so
+  `TOOL-dTieredTribunal-13`'s AC6 and AC6b bind the admission and this unit keeps the marked ternary.
+  The measured fallback stays recorded and unused. Header gained `ratified 2026-08-26`.
+
 
 ## 10. Reuse audit
 
