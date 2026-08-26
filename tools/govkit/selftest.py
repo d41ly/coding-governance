@@ -5814,6 +5814,178 @@ user_skills = "/tmp/gk-fake-skills"
               ", 2 declined" in _p5both.stdout and ", 1 declined" in _p5one.stdout,
               _p5both.stdout)
 
+        # ============================================================= DEPL-dCarriedReceipt-6
+        # The silenced-gate-leg bar. `apply` emitted a target's gate legs and asked, of the leg's
+        # GUARDS, whether they matched a tracked path — while never asking the same question of the
+        # thing the leg actually EXECUTES. So gov could hand an adopter a leg row naming a file gov
+        # never ships, record it in the receipt as emitted coverage, and nothing would say so.
+        A6_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+                  '[selection]\ndefault = ["demo"]\n\n'
+                  '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                  '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+
+        def a6_kit(leg_argv: str) -> str:
+            """The fixture kit: one engine rule, a `[gate_runner]` seed so the target gets a
+            manifest to emit into, and ONE gate leg whose argv the caller writes."""
+            return ('id = "demo"\nhome = "tools/demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[[gate_leg]]\nname = "demo leg"\nsubject = "repo"\n'
+                    f'argv = {leg_argv}\nguard = []\n\n'
+                    '[[gate_leg]]\nname = "demo sibling"\nsubject = "repo"\n'
+                    'argv = ["bash", "{prefix}/demo/present-engine.sh"]\nguard = []\n\n'
+                    '[adopt]\nargv = []\nmutates_index = false\n')
+
+        def a6_gov(tag: str, leg_argv: str) -> pathlib.Path:
+            g = tmp / f"a6-{tag}"
+            (g / "tools" / "govkit").mkdir(parents=True)
+            (g / "tools" / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(A6_REG, encoding="utf-8",
+                                                                  newline="\n")
+            (g / "tools" / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",
+                                                           newline="\n")
+            (g / "tools" / "demo" / "present-engine.sh").write_text("exit 0\n", encoding="utf-8",
+                                                                    newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def a6_target(tag: str) -> pathlib.Path:
+            t = tmp / f"a6t-{tag}"
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "scripts"\nkits = ["demo"]\n\n'
+                # EVERY KEY A COMPLETE PROMOTION NEEDS. A partial `[gate_runner]` is refused by
+                # name, which is correct and which made the first cut of this fixture fail four
+                # arms for a reason that had nothing to do with the leg bar.
+                '[gate_runner]\nkind = "manifest"\nfile = "scripts/gate-legs.json"\n'
+                'grammar = "json-array"\ndedupe_key = "name"\n'
+                'command = ["bash", "scripts/run-gates.sh"]\n'
+                'run_all_env = { GATE_FULL = "1" }\n'
+                'observed_ran = ["GATE ok    {name}"]\n'
+                'observed_failed = ["GATE FAIL  {name}"]\n',
+                encoding="utf-8", newline="\n")
+            (t / "scripts").mkdir()
+            (t / "scripts" / "gate-legs.json").write_text("[]\n", encoding="utf-8", newline="\n")
+            (t / "README.md").write_text("t\n", encoding="utf-8", newline="\n")
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "base")
+            return t
+
+        def a6_legs(t: pathlib.Path) -> list[str]:
+            f = t / "scripts" / "gate-legs.json"
+            return [e.get("name") for e in json.loads(f.read_text(encoding="utf-8"))] \
+                if f.is_file() else []
+
+        # ---- AC1's RED is HISTORICAL: `selfcheck` exited 0 over a descriptor declaring a leg whose
+        # ---- engine the registry exempts from shipping, which is the green-on-a-defect the unit
+        # ---- exists for. It cannot be re-observed now without removing the arm. AC2's BOTH HALVES
+        # ---- were observed on this repo while building — red by name before S5 was applied, green
+        # ---- after — and what is gated here is the SHIPPED STATE: this repo's own descriptors
+        # ---- declare no unshippable leg engine.
+        _p6self = run("selfcheck")
+        check("[-6] AC2 selfcheck is GREEN over gov's own descriptors after the S5 withdrawal",
+              _p6self.returncode == 0, _p6self.stdout[-1200:] + _p6self.stderr[-600:])
+        check("[-6] S4 ...and it SAYS what it checked, with a derived count rather than silence",
+              "gate legs: every argv path checked against the shipped map · 0 unshippable"
+              in _p6self.stdout, _p6self.stdout[-800:])
+        # S5, ASSERTED ON THE TREE rather than on the run: the leg is gone from the descriptor and
+        # the exemption that replaced it names it. Without this pair the arm above passes on any
+        # tree where the leg was deleted and nothing recorded why.
+        _kmk = (HERE.parent / "govkit" / "entries" / "kickoff-manifest.kit.toml").read_text(
+            encoding="utf-8")
+        _regs = (HERE / "registry.toml").read_text(encoding="utf-8")
+        check("[-6] S5 the unshippable leg is gone from the kickoff-manifest descriptor",
+              "kickoff engine size" not in _kmk, "the gate_leg block is still declared")
+        check("[-6] S5 ...and an [[exempt_leg]] row carries it, with a reason",
+              'name = "kickoff engine size <=18KiB"' in _regs
+              and "check-template-size.sh" in _regs.split(
+                  'name = "kickoff engine size <=18KiB"', 1)[1][:900], "no exempt_leg row")
+
+        # ---- S4's OWN LIVENESS. An arm that has only ever been seen passing is an assertion about
+        # ---- nothing, so the predicate is staged RED on a scratch gov whose descriptor declares a
+        # ---- leg engine no rule ships — the same shape S5 just removed from this repo.
+        _g6bad = a6_gov("unshipped", '["bash", "{prefix}/demo/absent-engine.sh"]')
+        _p6bad = run_in(_g6bad)
+        check("[-6] S4 LIVENESS a descriptor declaring an unshippable leg engine REDS selfcheck",
+              _p6bad.returncode == 1, _p6bad.stdout[-900:] + _p6bad.stderr[-400:])
+        check("[-6] S4 ...naming the entry, the leg and the element rather than refusing anonymously",
+              "demo leg" in _p6bad.stdout and "absent-engine.sh" in _p6bad.stdout, _p6bad.stdout)
+        _g6ok = a6_gov("shipped", '["bash", "{prefix}/demo/present-engine.sh"]')
+        check("[-6] S4 ...while a leg whose engine IS shipped stays green",
+              run_in(_g6ok).returncode == 0, run_in(_g6ok).stdout[-900:])
+
+        # ---- AC4: THE FALSE-POSITIVE GUARD, and it is the arm that fails if the bar is evaluated
+        # ---- before the STAGE step. On a first install NOTHING is tracked in the target yet; by
+        # ---- the time the legs step runs, `apply` has staged its own writes, so a kit shipping its
+        # ---- own leg engine emits the leg and exits 0. Moving the predicate earlier reds every
+        # ---- first install at every adopter, which is why the placement is written down.
+        _t6ok = a6_target("ok")
+        _a6ok = run_in_gov(_g6ok, "apply", "--target", str(_t6ok), "--kits", "demo")
+        check("[-6] AC4 a kit shipping its own leg engine emits the leg and exits 0",
+              _a6ok.returncode == 0 and "demo leg" in a6_legs(_t6ok),
+              f"rc {_a6ok.returncode} legs {a6_legs(_t6ok)}\n" + _a6ok.stdout[-900:])
+        check("[-6] AC4 LIVENESS ...over a manifest that really gained rows, so this is not vacuous",
+              len(a6_legs(_t6ok)) >= 2, str(a6_legs(_t6ok)))
+
+        # ---- AC5: the bar itself. Exactly one finding, no row, exit 1 — and NOT a Refusal: the
+        # ---- receipt is still written and the sibling leg is still emitted, because the condition
+        # ---- is a defect in a GOV-authored descriptor and aborting an adopter's install over it
+        # ---- hands them a failure with no local fix.
+        _t6bad = a6_target("bad")
+        _a6bad = run_in_gov(_g6bad, "apply", "--target", str(_t6bad), "--kits", "demo")
+        check("[-6] AC5 a leg naming an absent engine produces a finding and exit 1",
+              _a6bad.returncode == 1 and "which this target does not hold" in _a6bad.stdout,
+              _a6bad.stdout[-1200:])
+        check("[-6] AC5 ...the leg is NOT written into the target's runner",
+              "demo leg" not in a6_legs(_t6bad), str(a6_legs(_t6bad)))
+        check("[-6] AC5 ...but the SIBLING leg still is, so the install was not aborted",
+              "demo sibling" in a6_legs(_t6bad), str(a6_legs(_t6bad)))
+        check("[-6] AC5 ...and the receipt was still written — a finding, never a Refusal",
+              (_t6bad / ".governance" / "install.json").is_file(),
+              "no receipt: the run aborted instead of reporting")
+
+        # ---- AC3's SHAPE, on a fixture rather than on a live submodule clone: the row a defective
+        # ---- leg would have emitted is absent from the target's runner AND the run says why. The
+        # ---- live measurement that motivated it is in the acceptance ledger.
+        check("[-6] AC3 the run NAMES the withheld leg rather than dropping it silently",
+              "demo leg" in _a6bad.stdout and "is NOT written" in _a6bad.stdout,
+              _a6bad.stdout[-900:])
+
+        # ---- S3: `plan` reports the same hits, over the UNION of what the target tracks and what
+        # ---- THIS plan would write. Without the union a preview reds every first install — the
+        # ---- same trap AC4 guards on the apply side, one verb over.
+        _t6plan = a6_target("plan")
+        _p6plan = run_in_gov(_g6ok, "plan", "--target", str(_t6plan), "--kits", "demo")
+        check("[-6] S3 a plan for a FIRST install reports no silenced leg, because the union counts "
+              "what this plan would write",
+              "SILENT" not in _p6plan.stdout, _p6plan.stdout)
+        _p6planbad = run_in_gov(_g6bad, "plan", "--target", str(_t6plan), "--kits", "demo")
+        check("[-6] S3 ...while a leg no plan row would satisfy IS previewed as silenced",
+              "SILENT" in _p6planbad.stdout and "absent-engine.sh" in _p6planbad.stdout,
+              _p6planbad.stdout)
+
+        # ---- S6: ONE index reader. The legs step used an inline `git ls-files` split on newlines
+        # ---- beside a `tracked()` that already existed — two spellings of one question, in the one
+        # ---- function where they have to agree.
+        _g6src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("[-6] S6 the legs step reads the target index through `tracked()`, not an inline "
+              "ls-files beside it",
+              'tracked_target = set(tracked(target))' in _g6src
+              and 'tracked_target = set(subprocess.run' not in _g6src, "inline reader still present")
+
+
 
 
 

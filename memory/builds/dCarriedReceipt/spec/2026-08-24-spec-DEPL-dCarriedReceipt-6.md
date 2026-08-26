@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-DEPL-dCarriedReceipt-6-acceptance-ledger.md](../build/2026-08-26-build-DEPL-dCarriedReceipt-6-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
@@ -246,6 +247,19 @@ an arm asserting it. The `kit version markers` leg stays green untouched, for th
   RESOLVED (agent, 2026-08-24, delegated): no bump.
 
 ## 9. Revision log
+
+- rev-6 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. NO criterion amended:
+  every one of the seven was observed as written, AC2 and AC3 in both halves and AC6 against the
+  reconstructed inCMS descriptor `-4` also used. Two things the spec did not foresee, both recorded
+  in the acceptance ledger and neither a design change. First, S4's predicate as first written —
+  substituting the install prefix into the argv and looking the result up in the shipped map —
+  redded an INNOCENT leg, the kickoff kit's own ratchet, whose gov copy lives outside `tools/`;
+  it was run over the real tree before being wired, which is this repo's standing rule for a
+  candidate gate, and the comparison became a tail match. Second, S2's finding suppressed the
+  manifest write for EVERY leg, because the write-back is guarded on the report being clean — so
+  one defective leg silently took the healthy ones with it, which is the opposite of what S2 says.
+  The findings are now raised after the write-back. `BRANCH_PIN` re-derived at landing, 208 -> 210,
+  both values named, 2/2 armed.
 
 - rev-5 · 2026-08-25 · round-4 fold: H6 — AC6 named a command `load_deploy` (`:553`) refuses on,
   because inCMS carries no `.governance/deploy.toml` at `9ddcc5c9` and no scope item here creates

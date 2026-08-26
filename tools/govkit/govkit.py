@@ -1248,6 +1248,43 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
+    # ---- DEPL-dCarriedReceipt-6 S4. THE GOV-SIDE ARM, and this is where the class is actually
+    # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
+    # ---- already shipped; this catches it here, before any adopter can receive it.
+    #
+    # THE POPULATION IS `shipped_owner`, the map arm 7h3 already builds — derived from the file
+    # rules the way `apply` resolves them, not from `claims`, which covers a fraction of the rules
+    # in this tree and would have quantified over a third of the payload while reporting a confident
+    # zero over the rest.
+    #
+    # `{prefix}/x` IS A TARGET-SIDE DESTINATION and the map is keyed by GOV SOURCE, so the two are
+    # compared by TAIL rather than by substitution. Substituting `tools` for the token was tried
+    # first and run over the real tree before being wired — the standing rule here — and it redded
+    # an innocent leg: the kickoff kit's own ratchet argv spells `{prefix}/manifest-check.sh` while
+    # gov's copy lives under `skills/session-kickoff/`, so the substituted form named a file that
+    # was never gov's spelling of it. A tail match asks the question the spec actually poses: does
+    # SOME kit ship this file. An element carrying no `{prefix}` is a gov-relative path already and
+    # is compared whole.
+    _shipped = set(shipped_owner)
+    _leg_hits = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        for leg in d.get("gate_leg", []):
+            for a in leg.get("argv", []):
+                if "/" not in a or "{" in a.replace("{prefix}", ""):
+                    continue          # not a path, or carries a token this arm cannot resolve
+                if a.startswith("{prefix}/"):
+                    _tail = a[len("{prefix}/"):]
+                    if any(s == _tail or s.endswith("/" + _tail) for s in _shipped):
+                        continue
+                elif a in _shipped:
+                    continue
+                _leg_hits += 1
+                r.fail(f"entry '{eid}' declares gate leg '{leg.get('name')}' whose argv names "
+                       f"'{a}', which no kit ships — so no adopter can ever receive the engine this "
+                       f"leg runs. `apply` would emit the row and the receipt would record it as "
+                       f"coverage for a leg that cannot run. Withdraw the leg, or ship the file")
+    r.note(f"gate legs: every argv path checked against the shipped map · {_leg_hits} unshippable")
+
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
     #          that home would red on every tracked file under it — hundreds — rather than on the one
@@ -1602,6 +1639,51 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
     return out
 
 
+def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], target: pathlib.Path,
+                  deploy: dict, have: set[str]) -> list[tuple[str, str, list[str]]]:
+    """Gate legs whose argv names a path the target does not hold (DEPL-dCarriedReceipt-6 S1).
+
+    `apply` emits a target's gate legs and refuses only on an UNRESOLVED TOKEN in the argv. Four
+    lines later it asks precisely THIS question of the leg's GUARDS, dropping one that matches no
+    tracked path. The same question aimed at the thing the leg actually EXECUTES was never asked —
+    so gov could hand an adopter a leg row naming a file gov never ships, record it in the receipt
+    as emitted coverage, and nobody would notice. Measured before this was wired, the rule fired on
+    exactly one leg at each live target, and that leg is a gov defect rather than an adopter's.
+
+    THE `/` RULE IS THE WHOLE PREDICATE, deliberately. An argv element containing a slash is a path;
+    everything else is a flag, a binary name or a number. Widening it to "anything that is not a
+    flag and not an integer" was considered and rejected: it grades argument STRINGS by guessing
+    what they are, which is how a predicate starts reporting a byte count as a missing file. What
+    the rule leaves uncovered is a leg naming a repo-ROOT file with no slash, and that gap is pinned
+    in the spec rather than implied away.
+
+    IT DOES NOT TELL AN ENGINE FROM A LEG'S SUBJECT, and the finding is shaped for that: it is
+    reported per LEG and names every offending element, rather than claiming each is a missing
+    engine. A path the leg merely READS and the target does not hold is still a true hit — the leg
+    cannot run — it is simply not an engine absence.
+
+    `have` IS THE CALLER'S, and that is the design rather than a parameter that got away. `apply`
+    passes the target's index AFTER its own stage step, so this run's writes count as present;
+    `plan` passes the index UNION this plan's own write destinations, because at plan time nothing
+    has been written and the tracked-only predicate would red every first install.
+    """
+    hits: list[tuple[str, str, list[str]]] = []
+    for eid in selection:
+        d, _p = descs[eid]
+        ctx = target_context(target, deploy, eid, d)
+        for leg in d.get("gate_leg", []):
+            bad = []
+            for a in leg.get("argv", []):
+                s, miss = resolve_tokens(a, ctx)
+                if miss or "/" not in s:
+                    continue          # an unresolved token is the sibling branch's finding, not this
+                if s not in have:
+                    bad.append(s)
+            if bad:
+                hits.append((eid, str(leg.get("name")), bad))
+    return hits
+
+
 def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                   descs: dict[str, tuple[dict, str]], selection: list[str],
                   r: Report, rows: list[dict] | None = None) -> list[dict]:
@@ -1827,6 +1909,14 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
         # reads as a file set anyone can rely on.
         mark = "UNRES." if row["missing"] else KIND_MARKS.get(row["kind"], "?????")
         print(f"  {mark} [{row['role']:<13}] {row['dest']}   <- {row['kit']}")
+    # DEPL-dCarriedReceipt-6 S3. The SAME predicate `apply` runs, over the union of what the target
+    # already tracks and what THIS PLAN would write — because at plan time nothing has been written
+    # and the tracked-only predicate reds every first install. That union IS the difference between
+    # a preview that warns about a real gov defect and one that warns about being new.
+    for _eid, _nm, _bad in silenced_legs(
+            descs, selection, target, deploy,
+            set(tracked(target)) | {x["dest"] for x in rows if x["kind"] == "write"}):
+        print(f"  SILENT [{_eid:<13}] leg '{_nm}' names {', '.join(_bad)}, which no kit ships here")
     holes = [(eid, h.get("id")) for eid in selection for h in descs[eid][0].get("hole", [])]
     for eid, hid in holes:
         print(f"  ORDER  [hole         ] .governance/outbox/{hid}.md   <- {eid}")
@@ -3586,8 +3676,24 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             raise Refusal(f"the declared runner file {gr['file']} is not a JSON list")
         owned = {e["name"] for e in ((receipt or {}).get("gate_runner") or {}).get("emitted", [])}
         by_name = {e.get("name"): i for i, e in enumerate(existing)}
-        tracked_target = set(subprocess.run(["git", "-C", str(target), "ls-files"],
-                                            capture_output=True, text=True).stdout.split("\n"))
+        # S6. ONE index reader for the bar and for the guard branch. This was an inline `ls-files`
+        # splitting on newlines beside a `tracked()` that already existed — two spellings of one
+        # question, in the one function where they have to agree.
+        tracked_target = set(tracked(target))
+        # DEPL-dCarriedReceipt-6 S1/S2. THE BAR RUNS HERE AND NOWHERE EARLIER, and the placement is
+        # load-bearing rather than incidental: `apply` stages everything it wrote in the STAGE step
+        # ABOVE this one, so `tracked_target` already includes this run's own writes. The identical
+        # predicate at preflight would red every first install at every adopter. It is stated here
+        # because it is the single change a later reader is most likely to make while tidying.
+        _silenced = {(eid, nm): bad for eid, nm, bad in
+                     silenced_legs(descs, selection, target, deploy, tracked_target)}
+        # THE FINDINGS ARE HELD AND RAISED AFTER THE WRITE-BACK, which is guarded by
+        # `if not r.problems:` a hundred lines below. Calling `r.fail` inside the loop suppressed
+        # the manifest write for EVERY leg, so one defective leg silently took the healthy ones with
+        # it — the install "stood" while the target's runner stayed empty, which is the opposite of
+        # what S2 says and of what an adopter would see. Deferring only THESE findings leaves that
+        # guard doing its real job: withholding the manifest when something else went wrong.
+        _silenced_found: list[str] = []
         for eid in selection:
             d, _p = descs[eid]
             ctx = target_context(target, deploy, eid, d)
@@ -3602,6 +3708,19 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                     r.fail(f"leg '{nm}' argv still carries {miss[0]} after rendering — a leg wired "
                            f"to an unresolved token is broken forever; a dropped GUARD only costs "
                            f"an unnecessary run, which is why the two are not symmetric")
+                    continue
+                # S2. The SILENCED-LEG bar, doing exactly what the sibling branch above does: name
+                # the kit, the leg and every offending element, then `continue` without writing the
+                # row. NOT a `Refusal` — the condition is a defect in a GOV-authored descriptor, and
+                # aborting the adopter's whole install over it hands them a failure with no local
+                # fix. `r.fail` already yields a named problem and exit 1 with the install intact.
+                _bad = _silenced.get((eid, nm))
+                if _bad:
+                    _silenced_found.append(
+                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
+                        f"{', '.join(_bad)}, which this target does not hold — emitting it would "
+                        f"record coverage in the receipt for a leg that cannot run. The leg is "
+                        f"NOT written; the rest of the install stands")
                     continue
                 guards, dropped = [], []
                 for g in leg.get("guard", []) or []:
@@ -3684,6 +3803,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
                       f"kit's own tests are not a guard. A green bar without that variable says "
                       f"nothing about the kits themselves.")
+        # AFTER the write-back, for the reason stated where they were collected. The run still
+        # exits 1 with each one named; what changed is that the healthy legs reached the target.
+        for _f in _silenced_found:
+            r.fail(_f)
     else:
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]

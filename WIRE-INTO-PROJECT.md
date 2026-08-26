@@ -611,6 +611,19 @@ checkout itself; an existing `install.json` without `--re-adopt`; and a target i
 from HEAD. That last one is the INDEX only — an unstaged edit in your own worktree does not block,
 because `adopt` reads identities out of the index and writes nothing you could lose.
 
+### One thing `apply` will refuse to hand you
+
+A kit can declare a gate leg whose argv runs an engine gov does not actually ship — and until this
+was gated, `apply` would emit that leg into your runner and record it in the receipt as coverage for
+a check that can never run. It now names the kit, the leg and the offending path, withholds THAT leg
+and emits the rest, and exits 1. **The install still stands and the receipt is still written**: the
+condition is a defect in a gov-authored descriptor, not something you can fix in your own tree.
+
+`plan` previews the same condition, over what you already track plus what the plan itself would
+write — so a first install is not warned about being new.
+
+If you see one, it is gov's to fix: either the leg is withdrawn or the file starts shipping.
+
 ### Before any of that: how much of each kit did this tree actually take?
 
 `adopt` measures the files a target HOLDS. It says nothing about the ones it never took, and the
