@@ -2,12 +2,11 @@
 # gov:kit lexicon@1.1
 """lexicon.py — three naming predicates over a DECLARED vocabulary.
 
-    python tools/lexicon/lexicon.py            # assert; non-zero on an unwaived offender
-    python tools/lexicon/lexicon.py --list     # print every offender, waived or not (authoring aid)
-    python tools/lexicon/lexicon.py --measure  # print the three pins THIS conf produces; decide nothing
-    python tools/lexicon/lexicon.py --suggest <name>   # one line for ONE identifier, no corpus pass
-    python tools/lexicon/lexicon.py --brief <path>     # how the corpus already spells this file's objects
-    python tools/lexicon/lexicon.py --probe            # what the canon would propose here; read-only, exits 0
+THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
+its own path DERIVED rather than spelled — because this kit installs at whatever prefix an adopter
+chose and `apply` writes gov's bytes VERBATIM, so a literal path in this docstring arrives unchanged
+in a tree where it resolves to nothing. A usage block in a docstring is also the second spelling of
+what the program already prints, and it is the copy nobody re-renders. DEPL-dCarriedReceipt-15 S5.
 
 WHAT THIS IS FOR, since it is not typo-catching. A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility, so a name that will not fit the table is
@@ -1137,14 +1136,49 @@ def run_probe(root: Path) -> int:
     return 0
 
 
+def resolve_self_path() -> str:
+    """This file's path AS THE OPERATOR WOULD TYPE IT, derived from `__file__` (S5).
+
+    THE ONE HOME FOR THE LITERAL, and it is not a literal. This kit installs at whatever prefix an
+    adopter chose, and `apply` writes gov's bytes VERBATIM — nothing substitutes into a file body
+    anywhere — so a spelled `<prefix>/lexicon/lexicon.py` arrives unchanged in a tree that has no
+    such path. Every usage string in this file routes through here, and the docstring's copy of the
+    block was DELETED rather than fixed: two spellings of one invocation is the same defect with the
+    harder half hidden in a comment.
+
+    Relative to the repo root where that resolves, and to the file's own NAME where it does not — a
+    file run from outside a checkout still prints something a reader can act on, rather than an
+    absolute path from somebody else's disk.
+    """
+    here = Path(__file__).resolve()
+    try:
+        out = subprocess.run(["git", "-C", str(here.parent), "rev-parse", "--show-toplevel"],
+                             capture_output=True, text=True)
+        if out.returncode == 0:
+            return here.relative_to(Path(out.stdout.strip()).resolve()).as_posix()
+    except (OSError, ValueError):
+        pass
+    return here.name
+
+
 def main(argv: list[str]) -> int:
+    me = resolve_self_path()
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode not in ("--check", "--list", "--measure", "--suggest", "--brief", "--probe"):
-        sys.stderr.write("usage: python tools/lexicon/lexicon.py "
-                         "[--check|--list|--measure|--suggest <name>|--brief <path>|--probe]\n")
+        # THE USAGE BLOCK LIVES HERE AND NOWHERE ELSE. It moved out of the module docstring, whose
+        # copy spelled the install prefix six times and reached every adopter unchanged.
+        sys.stderr.write(
+            f"usage: python {me} "
+            "[--check|--list|--measure|--suggest <name>|--brief <path>|--probe]\n"
+            "  --check            assert; non-zero on an unwaived offender\n"
+            "  --list             print every offender, waived or not (authoring aid)\n"
+            "  --measure          print the three pins THIS conf produces; decide nothing\n"
+            "  --suggest <name>   one line for ONE identifier, no corpus pass\n"
+            "  --brief <path>     how the corpus already spells this file's objects\n"
+            "  --probe            what the canon would propose here; read-only, exits 0\n")
         return 2
     if mode in ("--suggest", "--brief") and len(argv) < 3:
-        sys.stderr.write(f"usage: python tools/lexicon/lexicon.py {mode} "
+        sys.stderr.write(f"usage: python {me} {mode} "
                          + ("<identifier>\n" if mode == "--suggest" else "<path>\n"))
         return 2
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
