@@ -56,8 +56,8 @@ one a document asks a human to remember in 5–27%.
   session authored them under this build's slug and the mandate.
 ## Parked decisions
 - **`TOOL-aBoundedVerdict-20`** is OPEN and untouched here. `TOOL-aDeclaredBound-6` was OPEN when
-  this build opened and is CLOSED by `TOOL-dTieredTribunal-11`, which deleted both disagreeing digits
-  rather than reconciling them.
+  this build opened and is CLOSED by `TOOL-dTieredTribunal-11`, which deleted the disagreeing
+  carrier. The surviving `<=5` agrees with the default, so the pair no longer contradicts.
 - **P1 against P9 — the owner turn this build turns on.** P1 is the subject descriptor that IS this
   build's goal; it makes M4's "Not the harness" rule false, so M3 veto 2 reserves it. P9 is the
   record-shape gate the research names as its substitute. They park together because building P9
@@ -112,7 +112,7 @@ ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL
 | [TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do](spec/2026-08-26-spec-dTieredTribunal-12.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
