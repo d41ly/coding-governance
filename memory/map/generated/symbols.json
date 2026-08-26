@@ -453,6 +453,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "carry_matches",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "case_collisions",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
@@ -616,6 +621,11 @@
       "id": "cleanup",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "cmd_adopt",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "cmd_apply",
@@ -803,6 +813,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "coverage_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "dead_alias_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -813,7 +828,17 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "decline_findings",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "default_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "demand_adopt_index_clean",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -844,6 +869,11 @@
     },
     {
       "id": "demand_writable_target",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_attribution",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
@@ -2363,6 +2393,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_self_path",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "resolve_shell_argv",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2711,6 +2746,11 @@
       "id": "signature",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "silenced_legs",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "skeleton",
