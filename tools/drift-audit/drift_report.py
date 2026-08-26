@@ -48,7 +48,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.6"
+KIT_DRIFT_AUDIT_VERSION = "1.7"
 
 CONF_NAME = ".memory-tree.conf"
 

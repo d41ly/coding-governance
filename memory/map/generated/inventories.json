@@ -139,6 +139,7 @@
       "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
       "fixture-passes-by-finding-nothing.md",
+      "fold-text-is-unreviewed-surface.md",
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
