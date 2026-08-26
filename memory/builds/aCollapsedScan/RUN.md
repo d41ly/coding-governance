@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 3c37a1fbd2ac54449e98386dd5a6b047e0dbfbaf
-phase: RUNNING
+witness: fccea10f5322c19ea4d6c94f87396a5c99a7575f
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: dc48400e
@@ -26,3 +26,9 @@ base: 3c37a1fbd2ac54449e98386dd5a6b047e0dbfbaf
 2026-08-26T09:47:49Z rescope · item add TOOL-aCollapsedScan-6 · reason filed as an ungated duplicate-id hole; hygiene check 20 already gates it per-file and the staged break was observed RED, so the unit exists to retire the finding and correct the records that carry it
 
 2026-08-26T09:47:50Z rescope · item add TOOL-aCollapsedScan-7 · reason the row-keyed merge driver aborts on every backlog and decision-log merge on this node; root cause reproduced
+
+2026-08-26T10:18:56Z review · item TOOL-aCollapsedScan-4 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-26T10:18:58Z review · item TOOL-aCollapsedScan-6 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-26T10:18:59Z review · item TOOL-aCollapsedScan-7 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

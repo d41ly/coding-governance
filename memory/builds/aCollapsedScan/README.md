@@ -64,9 +64,9 @@ without that ceiling being re-measured.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aCollapsedScan-1` | 1 | one `awk` pass per build fills path/id/status maps; every per-spec lookup becomes a bash map read |
-| 2 | `TOOL-aCollapsedScan-7` | 2 | `repo_root()` scrubs the inherited git env before `rev-parse`, so a kit invoked as a merge driver resolves the real root |
+| 2 | `TOOL-aCollapsedScan-7` | 2 | `repo_root()` walks up for the conf instead of asking git, as `govkit.py` already does for this defect; the kit's second resolver goes |
 | 3 | `TOOL-aCollapsedScan-4` | 1 | `BUDGET_kit_gate` re-declared against a node-`a` measurement, with the scoping alternative refused in writing |
-| 4 | `TOOL-aCollapsedScan-6` | 1 | RETIRED — hygiene check 20 already gates per-file id uniqueness; the unit corrects the records that said otherwise |
+| 4 | `TOOL-aCollapsedScan-6` | 1 | retires the finding — hygiene check 20 already gates per-file id uniqueness; flips to WONTDO only after its record corrections are observed |
 
 <!-- /roster:units -->
 
@@ -78,16 +78,16 @@ ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aColl
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aCollapsedScan-1 — one awk pass per build, and `--plan` stops spawning per (unit, spec)](spec/2026-08-26-spec-TOOL-aCollapsedScan-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-08-26 |
-| [TOOL-aCollapsedScan-7 — `repo_root()` scrubs the inherited git environment before it asks git](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-08-26 |
-| [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-08-26 |
-| [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | WONTDO | rev-1 | 2026-08-26 |
+| [TOOL-aCollapsedScan-7 — `repo_root()` takes the walk-up govkit already took for this defect](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | INPROGRESS | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | INPROGRESS | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7.
+Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

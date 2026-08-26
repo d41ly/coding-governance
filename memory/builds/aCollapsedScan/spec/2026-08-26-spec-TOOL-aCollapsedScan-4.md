@@ -1,10 +1,12 @@
 # TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused
 
-**Status:** INPROGRESS · rev-1 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md) | spec-audit | TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -20,11 +22,17 @@ ceiling silently.
 - **S1** — `BUDGET_kit_gate` in `tools/unattended/run-unattended-gates.sh` re-declared, with the
   node-`a` measurement and the reason in the comment that sits beside it, in the same idiom the
   seven sibling ceilings use.
-- **S2** — The NODE-RELATIVITY stated where the ceilings are declared: every figure in that block
-  is a node-`d` reading, the same leg costs 2.5× more on node `a`, and a single global integer
-  cannot be right for both. Stated as a known limit of the mechanism, not fixed here.
+- **S2** — The NODE-RELATIVITY stated where the ceilings are declared: the seven ceilings this
+  unit does not touch are node-`d` readings, `BUDGET_kit_gate` becomes a node-`a` one, and a
+  single global integer cannot be right for both. The file's own line 42 says the whole block is
+  'generous against the 2026-08-23 readings on node d', which S1 makes false for one of the eight
+  — so that sentence is in S1's edit set too, or the block carries two node attributions and one
+  of them is stale.
 - **S3** — The refusal of the scoping alternative recorded in `memory/DECISIONS.md`, with the
   measurement that decided it.
+- **S4** — The build README's parked entry amended IN PLACE to record that the deferral was
+  resolved as a refusal on 2026-08-26. Leaving it as `Deferred until this unit is measured` while
+  §8 refuses it is two documents disagreeing about the same decision.
 
 ## 3. Non-goals (OUT)
 
@@ -98,7 +106,13 @@ different narrowing of the same check on measurement.
 - **AC3** — When the ceiling is deliberately breached by lowering it in a scratch copy,
   `--checks` prints `OVER BUDGET` and exits 1, so the mechanism is observed still armed rather than
   assumed.
-- **AC4** — When `bash tools/run-gates/run-gates.sh` runs, the bar is green.
+- **AC4** — When `bash tools/unattended/run-unattended-gates.sh --selftests` runs, it is GREEN and
+  the verdict is pasted into the landing report. The file this unit edits declares that in its own
+  header as the Definition of Done for any work under `tools/unattended/`, and rev-1 named neither
+  the obligation nor a waiver for it.
+- **AC5** — When `memory/builds/aCollapsedScan/README.md` is read, its parked entry records the
+  refusal rather than the deferral, so no two documents disagree about it.
+- **AC6** — When `bash tools/run-gates/run-gates.sh` runs, the bar is green.
 
 ## 7. Gates
 
@@ -119,6 +133,10 @@ gate: the ceiling is itself the check, and it already exists.
 ## 9. Revision log
 
 - rev-1 · 2026-08-26 · initial draft.
+- rev-2 · 2026-08-26 · folded the round-1 spec audit: S2 reworded (S1 and S2 could not both be
+  true once S1 landed, and the file's line 42 carried the same claim), S4 added so the README's
+  parked deferral is amended rather than silently reversed, and AC4/AC5 added for the `--selftests`
+  Definition of Done the edited file declares in its own header.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness
 
-**Status:** WONTDO · rev-1 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 4 · superseded by hygiene check 20, which already exists
+**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md) | spec-audit | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -16,7 +18,10 @@ merge bar, and it was observed catching exactly the duplicate that provoked the 
 
 ## 2. Scope (IN)
 
-- **S1** — This spec, at `WONTDO`, carrying the evidence that retires the finding.
+- **S1** — This spec, carrying the evidence that retires the finding. It flips to `WONTDO` at
+  close, AFTER AC2 and AC3 are observed — not before. rev-1 opened at `WONTDO`, and a terminal
+  status over unmet acceptance criteria is what would have let the stale backlog row outlive the
+  record that retires it, since no M6 pass builds a terminal unit.
 - **S2** — The backlog row `TOOL-aCollapsedScan-6` flipped to `WONTDO` with the correction, in
   place, since a backlog row is mutable and its status is updated where it stands.
 - **S3** — A `memory/DECISIONS.md` row recording the correction, because the false claim reached
@@ -119,6 +124,8 @@ This spec, `memory/backlog/TOOL.md`, `memory/DECISIONS.md`.
 ## 9. Revision log
 
 - rev-1 · 2026-08-26 · authored straight to `WONTDO` after the reuse probe and the staged break.
+- rev-2 · 2026-08-26 · folded the round-1 spec audit: held at `INPROGRESS` until its own S2 and S3
+  are observed, because a terminal status carries live deliverables no pass would ever build.
 
 ## 10. Reuse audit
 
