@@ -28,7 +28,16 @@ function chunk(a, n) {
 // { base: "<immutable SHA>", head: "HEAD", repo: "/path/to/worktree",
 //   context: "what this diff does + the security model + what's by-design",
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
-//   reviewDir: "where synth writes the report (repo-relative)" }
+//   reviewDir: "where synth writes the report (repo-relative)",
+//   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
+//   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
+//   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
+//   priorFindings: [ ... ] }              // a previous round's confirmed set
+// D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
+// reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
+// header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
+// spec, reported as a review. A pointer is only as true as the block it points at, and this one is
+// asserted against the fields actually read, in tools/workflows/tier2-review.test.sh.
 // S5 (TOOL-aGuardedTally-1): args MUST be a structured object. Passing a prose string used to
 // degrade silently to `repo = '.'`, i.e. "review whatever directory this process happens to be
 // standing in" -- which twice made this harness audit a DIFFERENT repository than the one it was
@@ -110,16 +119,39 @@ const round = Number.isInteger(a.round) && a.round > 0 ? a.round : priorFindings
 // into the lens, which is the only actor here holding a filesystem.
 const subjects = Array.isArray(a.subjects) ? a.subjects : []
 if (isSpec) {
-  const badSubject =
-    subjects.length === 0
-      ? 'none supplied'
-      : (subjects.find((x) => !x || typeof x.path !== 'string' || !/^[0-9a-f]{7,40}$/.test(String(x.blob))) || null)
-  if (badSubject !== null) {
+  // D6 - `find(pred) || null` collapsed a FALSY offender back onto the pass sentinel, so the `!x`
+  // arm - the only arm of this predicate that can return a falsy value - could never fire the
+  // refusal it was written for. `[null]`, `[undefined]`, `[0]`, `['']` and `[false]` all skipped
+  // both the round-1 warning and the round>1 throw, and because `find` returns the FIRST match, a
+  // genuinely bad subject sitting after a falsy one was masked along with them. An INDEX sentinel
+  // cannot collide with a value the predicate is allowed to select, which is the general shape:
+  // never sentinel on a value the thing you are testing may legitimately return.
+  const badIdx = subjects.findIndex(
+    (x) => !x || typeof x !== 'object' || typeof x.path !== 'string' || !/^[0-9a-f]{7,40}$/.test(String(x.blob))
+  )
+  // ...and the BRANCH is on the index, never on the value. Restoring a `badSubject !== null` test
+  // here would have reintroduced the identical collapse one line further down, because a `[null]`
+  // element makes that value null all over again - which is exactly the shape the review that
+  // found the original defect proposed as its fix. The self-test's two null arms caught it on the
+  // first run. The value below is carried for the MESSAGE and decides nothing.
+  const noSubjects = subjects.length === 0
+  if (noSubjects || badIdx !== -1) {
+    const badSubject = noSubjects ? 'none supplied' : subjects[badIdx]
     const why =
       'tier2-review: a spec-audit needs `subjects`, a non-empty array of {path, blob}, where blob is ' +
       'an immutable 7-40 hex object id. Got ' + JSON.stringify(badSubject) + '. The anchor is what ' +
       'makes "which rev was reviewed" answerable from the record; a spec header base is the same on ' +
       'every rev and would prove nothing. Resolve one: git hash-object <path>.'
+    // M8 closing review, BLOCKER: an EMPTY subject set is not a degraded run, it is an empty one,
+    // and the round-1 warn let it through. Four lenses were then handed nothing to read, found
+    // nothing, and the run returned `clean: 0 findings` - a degraded run reporting a clean bill,
+    // which is the degradation-known-but-unreported family this same diff added to the catalogue,
+    // inside one of that record's own anchors. A MALFORMED blob keeps the warn-then-refuse ladder,
+    // because there a caller has named a subject and got its anchor wrong, and round 1 is where a
+    // caller is still resolving them. Nothing to review at all is refused at every round.
+    if (noSubjects) {
+      throw new Error(why + ' A spec audit with no subject reviews nothing, and a run that reviewed nothing may not report a clean bill.')
+    }
     if (round > 1) throw new Error(why)
     log('WARNING: ' + why)
   }

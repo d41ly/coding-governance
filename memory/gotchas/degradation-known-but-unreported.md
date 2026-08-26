@@ -29,7 +29,7 @@ carry the degradation, or only the thing that RETURNS?**
 ## Where it bit
 
 Both shapes were confirmed by the closing diff review of build `dTieredTribunal`, whose record is
-`memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md` and
+memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md and
 which states them as its two HIGH findings.
 
 The ORDERING shape was live in all three review harnesses at once —
@@ -73,7 +73,11 @@ Two practices, one per shape:
 ## The anchors, and the width that was refused
 
 The taken set is the harness surface: the directory token `tools/workflows/` plus the three harness
-citations above, which are subsets of it. Measured by importing the shipped module and calling
+citations above, which are subsets of it. The review record cited at the top is deliberately NOT
+backticked, for the same reason the refused `tools` token below is not: in this tree a backticked
+path IS an anchor, whatever the sentence around it meant, so a citation written as evidence would
+have quietly selected this class on every diff touching one build's review folder. Four declared,
+four derived. Measured by importing the shipped module and calling
 `selectable()` over `git ls-files`, the set selects a little over one percent of the tracked tree.
 
 The spelling refused is the bare tools directory — written here WITHOUT backticks on purpose, since

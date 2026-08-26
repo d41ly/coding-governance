@@ -140,7 +140,13 @@ check_agentcap() {
     # hook that still looks wired. That is the class of the AGENT_CAP environment knob this file
     # deleted, whose own header records that it survived two releases by appearing to work.
     # matchers_of() discards the command, so the command text is read here rather than there.
-    if grep -o '"command"[^"]*"[^"]*agent-cap\.js[^"]*"' .claude/settings.json 2>/dev/null | grep -q -- '--only'; then
+    # M8 closing review, BLOCKER: the first spelling of this guard could never fire. Every class was
+    # bounded with [^"]*, and the command settings.json actually ships is
+    #   "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+    # so no class could cross the ESCAPED quote and the match was always empty. The only declared
+    # control on a bypass this same build introduced was itself a check that could not fail. Scoped
+    # to the LINE now, which no quoting defeats, and the test file observes the failing case.
+    if grep 'agent-cap\.js' .claude/settings.json 2>/dev/null | grep -q -- '--only'; then
       echo "UNWIRED  agent-cap — the wired command carries --only, which runs ONE rule and silently disables the rest. Remove the flag from .claude/settings.json."
       unwired=$((unwired+1))
       return

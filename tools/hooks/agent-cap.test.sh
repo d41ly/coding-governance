@@ -343,6 +343,19 @@ const b = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers
 const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
 EOF
 
+# D10 - a REASSIGNED receiver must SAY so. The reason map is written by both scan passes and was
+# never cleared on accept, so a name refused on pass 1 for declaration order and then accepted on
+# pass 2 kept the pass-1 text; the sweep below took the name back and the refusal printed an
+# explanation of a branch pass 2 had just blessed. The verdict was right and the reason was wrong,
+# which is precisely the "operator fixes it by guessing" failure the map was added to remove. This
+# arm asserts the TEXT, because an exit-code arm cannot tell a right reason from a wrong one.
+msg "rule2: a reassigned marked receiver -> deny NAMING the reassignment" 2   'was REASSIGNED after its bounded assignment' <<'EOF'
+let LENSES = ALL.filter((L) => L.on) // gov:fixed-verifiers
+const ALL = [1, 2, 3]
+LENSES = args.custom
+const r = await boundedParallel(LENSES.map((L) => () => agent(L)), 5)
+EOF
+
 # S4 — `gov:bounded-fanout` is a CLAIM about a width, checked like its sibling. It used to exempt its
 # line outright, so a line slicing fifty wide returned before any shape check.
 msg "rule3: marked line slicing 50 wide → deny naming the width" 2 \

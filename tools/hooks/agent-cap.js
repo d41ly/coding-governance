@@ -207,8 +207,31 @@ function boundedBranch(br, name, consts, ok) {
   const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
   if ((c && boundedK(c[1], consts)) || (sp && boundedK(sp[1], consts))) return true
   if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
-  const m = /^([A-Za-z_$][\w$]*)((?:\s*\.\s*(?:filter|slice)\s*\([\s\S]*\))?)$/.exec(t)
-  return !!m && m[1] !== name && ok.has(m[1])
+  const m = /^([A-Za-z_$][\w$]*)([\s\S]*)$/.exec(t)
+  if (!m || m[1] === name || !ok.has(m[1])) return false
+  const tail = m[2].trim()
+  if (tail === '') return true
+  // M8 closing review, HIGH: the tail used to be one greedy `[\s\S]*` inside an optional
+  // filter/slice group. It matched the FIRST call and then swallowed the whole rest of the chain,
+  // so `ALL.filter(x).reduce((a, b) => args.big, [])` was ADMITTED - and that returns a caller
+  // array of any length. A bound escape through the very tightening written to close the class.
+  // Every TOP-LEVEL call on the chain must now be shrink-only. Depth-aware, because the calls
+  // inside a predicate body are not chain links: `.filter((L) => a.lenses.includes(L.slug))` is
+  // the shipped user, and counting its `.includes(` would deny it. `.map` is denied too although
+  // it preserves length - the qualifying forms are a closed list, and widening it is an edit.
+  const SHRINK = ['filter', 'slice']
+  let depth = 0
+  let links = 0
+  for (let i = 0; i < tail.length; i++) {
+    const ch = tail[i]
+    if (ch === '(' || ch === '[' || ch === '{') { depth++; continue }
+    if (ch === ')' || ch === ']' || ch === '}') { depth--; continue }
+    if (depth !== 0 || ch !== '.') continue
+    const call = /^\.\s*([A-Za-z_$][\w$]*)\s*\(/.exec(tail.slice(i))
+    if (!call || SHRINK.indexOf(call[1]) === -1) return false
+    links++
+  }
+  return links > 0
 }
 
 function fanoutFindings(script) {
@@ -245,6 +268,12 @@ function fanoutFindings(script) {
       const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
       if (!grows && branches.length && bad0 === undefined) {
         ok.add(name)
+        // D10 - the reason is a CACHE and both scan passes write it. A name refused on pass 1 for a
+        // declaration-order reason and ACCEPTED on pass 2 kept the pass-1 text, so a later refusal
+        // printed an explanation of a branch this pass had just blessed. Clear it on accept: a
+        // guard whose stated reason is wrong is a guard an operator cannot act on, which is the
+        // exact failure the S4 note below says this map was added to remove.
+        markedWhy.delete(name)
         return
       }
       // S4 - record WHY, keyed by the name bound. The refusal a caller saw was emitted at the
@@ -311,7 +340,13 @@ function fanoutFindings(script) {
   code.forEach((l) => {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
-      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) ok.delete(m[1])
+      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
+        ok.delete(m[1])
+        // ...and this sweep runs AFTER both passes, so it states its own reason too. Without that, a
+        // name accepted on pass 2 and taken back here falls through to whatever pass 1 happened to
+        // write, or to the generic fan-out text - neither of which names the reassignment.
+        markedWhy.set(m[1], `\`${m[1]}\` was REASSIGNED after its bounded assignment, which takes the bound back`)
+      }
     }
   })
 
@@ -818,13 +853,31 @@ function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
   const code = blankLiterals(script)
   const out = []
+  // S3 - one ban table, tested against every view of the line. It was three inline conditions per
+  // view until the M8 closing review found the second view missing; duplicating them per view would
+  // have been two answers to one question, which is the class this build spent a unit on.
+  const BANS = [
+    [/\[[A-Za-z_$][A-Za-z0-9_$.]*\.ref\]/, "object/Map literal keyed by a .ref string"],
+    [/\.(get|set|has|delete)\([A-Za-z_$][A-Za-z0-9_$.]*\.ref[),]/, "Map keyed by a .ref string"],
+    [/verdictByRef/, "the retired verdictByRef identifier"],
+  ]
   for (let i = 0; i < code.length; i++) {
     const l = code[i]
+    const raw = raws[i] === undefined ? l : raws[i]
+    // M8 closing review, HIGH: `blankLiterals` blanks template CONTENTS, so a join written inside a
+    // `${...}` interpolation was invisible - a coverage regression against the awk this rule
+    // replaced, which kept string contents. These harnesses render every report through template
+    // literals, so that is exactly where such an expression lives. The interpolation SPANS are
+    // scanned as a second view, which restores the reach without restoring the awk's false
+    // positives: a mention inside a plain string stays out of scope and both fixtures still hold.
+    // A nested `${}` closes the span early; that costs reach on a shape none of these harnesses
+    // writes, and the outer views still carry the identifier ban.
+    const views = [l].concat(raw.match(/\$\{[^}]*\}/g) || [])
     let why = null
-    if (/\[[A-Za-z_$][A-Za-z0-9_$.]*\.ref\]/.test(l)) why = "object/Map literal keyed by a .ref string"
-    else if (/\.(get|set|has|delete)\([A-Za-z_$][A-Za-z0-9_$.]*\.ref[),]/.test(l)) why = "Map keyed by a .ref string"
-    else if (/verdictByRef/.test(l)) why = "the retired verdictByRef identifier"
-    if (why) out.push({ n: i + 1, line: raws[i] === undefined ? l : raws[i], why })
+    for (const b of BANS) {
+      if (views.some((v) => b[0].test(v))) { why = b[1]; break }
+    }
+    if (why) out.push({ n: i + 1, line: raw, why })
   }
   return out
 }

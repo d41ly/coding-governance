@@ -25,6 +25,7 @@
 # verbatim in order to search for it. The population is `*.js`; this is `.sh`; and SELF_EXCLUDE below
 # keeps that true if the gate is ever rewritten in JavaScript.
 set -u
+set -o pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "review-join: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
@@ -77,14 +78,34 @@ hits=""
 for f in "${SCAN[@]}"; do
   # The payload is built by node itself: a JSON encoder written in shell is one more place for a
   # backslash or a backtick in a script under judgement to change the meaning of the thing judged.
-  if ! out=$(node -e '
+  out=$(node -e '
       const fs = require("fs")
       process.stdout.write(JSON.stringify({
         tool_name: "Workflow",
         tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
-      }))' "$f" | node "$HOOK" --only=join 2>&1); then
+      }))' "$f" | node "$HOOK" --only=join 2>&1) && rc=0 || rc=$?
+  # This loop used to read "the pipeline exited non-zero" as "rule 5 fired". Two symptoms, one root.
+  # The hook exits 2 on its OWN environment refusal before any rule runs, and that message carries
+  # no line starting with two spaces and L, so the sed emptied it and the gate printed a ref-keyed
+  # join with a blank body - sending an operator off to rewrite a join that is not there. And with
+  # no pipefail only the hook's status was read, so a builder that threw fed empty stdin to a
+  # JSON.parse whose catch exits 0 and the file was recorded CLEAN. A status this gate cannot
+  # interpret is a refusal, never a verdict: its own header preaches that a probe which cannot move
+  # must say so, and it was the counterexample.
+  if [ "$rc" != 0 ] && [ "$rc" != 2 ]; then
+    echo "review-join: the predicate returned $rc on $f, which is neither clean nor a rule hit - refusing rather than reporting"
+    printf '%s\n' "$out" | sed 's/^/    /'
+    exit 2
+  fi
+  if [ "$rc" = 2 ]; then
+    body=$(printf '%s' "$out" | sed -n '/^  L/,$p')
+    if [ -z "$body" ]; then
+      echo "review-join: the predicate exited 2 on $f without naming a line, so that is its own refusal and not a join"
+      printf '%s\n' "$out" | sed 's/^/    /'
+      exit 2
+    fi
     hits="$hits$f:
-$(printf '%s' "$out" | sed -n '/^  L/,$p')
+$body
 "
   fi
 done

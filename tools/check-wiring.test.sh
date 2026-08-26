@@ -140,6 +140,24 @@ JSON
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
     && ck "AC7b the widened matcher -> ok, exit 0" 1 || ck "AC7b the widened matcher -> ok, exit 0" 0
+  # AC7d — THE --only BYPASS, and the arm that should have landed with the guard. `--only=<rule>`
+  # narrows agent-cap to one rule, so a wired command carrying `--only=join` turns the three cap
+  # rules off with no diff and a hook that still looks wired. The guard's FIRST spelling bounded
+  # every character class with [^"]*, which cannot cross the escaped quote this settings.json
+  # actually ships, so it matched nothing and printed `ok` over a live bypass — a check that could
+  # not fail, guarding a bypass the same build introduced. This arm fails against that spelling.
+  sed -i 's|agent-cap\.js\\"|agent-cap.js\\" --only=join|' .claude/settings.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
+      && printf '%s' "$out" | grep -q -- '--only'; } \
+    && ck "AC7d a wired command carrying --only -> UNWIRED" 1 \
+    || ck "AC7d a wired command carrying --only -> UNWIRED" 0
+  # ...and it goes back to ok when the flag leaves. Without this half the arm is satisfied by a
+  # checker that denies every wired command there is.
+  sed -i 's| --only=join||' .claude/settings.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       agent-cap'; } \
+    && ck "AC7d the flag removed -> ok, exit 0" 1 || ck "AC7d the flag removed -> ok, exit 0" 0
   cleanup
 else
   echo "skip agent-cap cases — settings-merge.py not found next to script"

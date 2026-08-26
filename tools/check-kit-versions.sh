@@ -44,9 +44,26 @@ fi
 # and a half-bumped pair therefore passed. Assert they agree like every other pair; "same line" is
 # not "same value", and the marker is what a deployer greps in an adopting tree.
 ac=$(grep -oE "KIT_AGENT_CAP_VERSION = '$V'" tools/hooks/agent-cap.js | head -1 | grep -oE "$V")
-if [ -z "$ac" ] || ! grep -qE "gov:kit agent-cap@$ac([^0-9.]|\$)" tools/hooks/agent-cap.js; then
-  echo "kit-versions: agent-cap.js gov:kit marker != KIT_AGENT_CAP_VERSION (${ac:-unreadable})"
+if [ -z "$ac" ]; then
+  echo "kit-versions: KIT_AGENT_CAP_VERSION is unreadable in tools/hooks/agent-cap.js"
   fails=$((fails+1))
+else
+  # The population is DERIVED, and naming one file is exactly how a half-bumped pair passed here for
+  # the THIRD time. `TOOL-dTieredTribunal-14` took the kit to 1.8 in both agent-cap copies and left
+  # both scratch-guard copies at 1.7; this block greped agent-cap.js alone and exited 0 over one kit
+  # advertising two versions. Asserting a marker EXISTS somewhere is not asserting the carriers
+  # agree. Every tracked carrier of the marker is compared to the constant now.
+  accarriers=$(git grep -lE "gov:kit agent-cap@" -- '*.js' | sort)
+  if [ -z "$accarriers" ]; then
+    echo "kit-versions: no tracked file carries a gov:kit agent-cap@ marker — the probe cannot move, which is not a pass"
+    fails=$((fails+1))
+  fi
+  for acf in $accarriers; do
+    if ! grep -qE "gov:kit agent-cap@$ac([^0-9.]|\$)" "$acf"; then
+      echo "kit-versions: $acf carries a gov:kit agent-cap@ marker that is not $ac (KIT_AGENT_CAP_VERSION)"
+      fails=$((fails+1))
+    fi
+  done
 fi
 need "KIT_SETTINGS_MERGE_VERSION" tools/settings-merge.py                   "KIT_SETTINGS_MERGE_VERSION = \"$V\""
 need "KIT_RUN_GATES_VERSION"      tools/run-gates/run-gates.sh              "^KIT_RUN_GATES_VERSION=$V([[:space:]]|\$)"

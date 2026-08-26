@@ -85,6 +85,29 @@ arm 'comments describing the retired join are prose, not code' 'clean — no ref
 arm 'the shipped tree is clean' 'clean — no ref-keyed verdict join' \
   bash "$GATE"
 
+# ---- D7: a status this gate cannot interpret is a REFUSAL, never a verdict -----------------------
+# Both halves of one root: the loop read "the pipeline exited non-zero" as "rule 5 fired".
+# The false RED. agent-cap exits 2 on its own environment refusal BEFORE any rule runs, and that
+# message has no line starting with two spaces and L, so the sed emptied it and the gate reported a
+# ref-keyed verdict join with a blank body - sending an operator off to rewrite a join that is not
+# there. Reproduced exactly this way against the shipped tree.
+arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   env AGENT_CAP=7 bash "$GATE"
+
+# The false GREEN, and the reason `set -o pipefail` is now set beside `set -u`: only the hook's
+# status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and
+# the file was recorded clean. A stub predicate returning an unclassifiable status stands in for
+# every such shape. The gate's own header preaches that a probe which cannot move must say so.
+BS="$TMP/badstatus"; mkdir -p "$BS/tools/workflows" "$BS/tools/hooks"
+( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf "export const meta = { name: 'x' }
+await log('hi')
+" > tools/workflows/w.js
+  printf 'process.exit(3)
+' > tools/hooks/agent-cap.js
+  git add -A && git commit -qm badstatus --no-verify )
+cp "$GATE" "$BS/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./gate.sh' _ "$BS"
+
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
   bash "$GATE" "$TMP/does-not-exist.js"

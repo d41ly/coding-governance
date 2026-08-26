@@ -60,6 +60,12 @@ argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 
 [[gate_leg]]
+name = "tier2-review self-test"
+subject = "kit"
+argv = ["bash", "{kit}/tier2-review.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
 name = "review-join self-test"
 subject = "kit"
 argv = ["bash", "{kit}/check-review-join.test.sh"]

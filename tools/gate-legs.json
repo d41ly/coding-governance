@@ -472,6 +472,18 @@
     "subject": "repo"
   },
   {
+    "name": "tier2-review self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/tier2-review.test.sh"
+    ],
+    "guard": [
+      "tools/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit"
+  },
+  {
     "name": "review-join self-test",
     "argv": [
       "bash",
