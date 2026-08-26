@@ -2613,10 +2613,72 @@ user_skills = "/tmp/gk-fake-skills"
             'prefix = "C:/PWNED"\n', encoding="utf-8", newline="\n")
         settle(_tv, "a drive-letter absolute prefix")
         _tvp3 = run("plan", "--target", str(_tv), "--kits", "memory-tree")
-        check("[-12] TRAVERSAL a DRIVE-LETTER absolute prefix is REFUSED -- by the token class here, "
-              "since `:` never reaches the containment guard",
-              _tvp3.returncode == 2 and "PWNED" not in _tvp3.stdout.replace("C:/PWNED", ""),
-              f"rc {_tvp3.returncode}: " + _tvp3.stdout[-300:] + _tvp3.stderr[-300:])
+        # ---- THE ONE ADMITTED COLON. Round 3 parked this and the owner said resolve it. The token
+        # ---- class refused `user_skills = "C:/Users/x/.claude/skills"` -- a CORRECT answer on the
+        # ---- platform this project's primary node runs on -- with a message about command injection
+        # ---- naming nothing the operator did wrong. `kickoff-manifest` is in the DEFAULT selection
+        # ---- and its rule is `{user_skills}/session-kickoff`, so it sat on the common path for
+        # ---- every Windows adopter. No arm caught it: both existing fixtures spell that answer in
+        # ---- forms that already passed (`~/.claude/skills` at :176, `/tmp/gk-fake-skills` at :820),
+        # ---- which is `fixture-passes-by-finding-nothing` aimed at a platform rather than a branch.
+        # ----
+        # ---- THE PAIR IS THE POINT: the character grader admits the drive letter, and the ESCAPE
+        # ---- grader still reds a drive-lettered destination. Two guards, two jobs, asserted apart.
+        _dvt = make_target(tmp / "drive-win", None)
+        (_dvt / ".governance").mkdir(parents=True, exist_ok=True)
+        (_dvt / ".governance" / "deploy.toml").write_text(
+            'prefix = "tools"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
+            'user_skills = "C:/Users/x/.claude/skills"\n', encoding="utf-8", newline="\n")
+        settle(_dvt, "a Windows machine-path answer")
+        _dvp = run("plan", "--target", str(_dvt), "--kits", "kickoff-manifest")
+        check("[-12] DRIVE a Windows drive-letter machine path is a LEGITIMATE answer and plans",
+              _dvp.returncode == 0
+              and "C:/Users/x/.claude/skills/session-kickoff" in _dvp.stdout,
+              f"rc {_dvp.returncode}: " + _dvp.stdout[-500:] + _dvp.stderr[-400:])
+        check("[-12] DRIVE ...and it is an ORDER, never a write -- the machine-scoped row is why "
+              "the containment guard must not see it",
+              any(l.strip().startswith("ORDER") and "session-kickoff" in l
+                  for l in _dvp.stdout.splitlines()),
+              _dvp.stdout[-500:])
+
+        # THE ESCAPE HALF, unchanged in outcome and changed in OWNER. A drive-lettered `prefix` on a
+        # repo-scoped kit now passes the character class and is caught one function down, so the arm
+        # names WHICH guard spoke: that division of labour is the whole design and a silent swap
+        # back would leave both arms green while the class widened.
+        (_dvt / ".governance" / "deploy.toml").write_text(
+            'prefix = "C:/PWNED"\n', encoding="utf-8", newline="\n")
+        settle(_dvt, "a drive-lettered prefix")
+        _dve = run("plan", "--target", str(_dvt), "--kits", "memory-tree")
+        check("[-12] DRIVE a drive-lettered PREFIX is still refused, by the CONTAINMENT guard now",
+              _dve.returncode == 2
+              and "leaves the target repository" in (_dve.stdout + _dve.stderr),
+              f"rc {_dve.returncode}: " + _dve.stdout[-400:] + _dve.stderr[-400:])
+        _dva = run("apply", "--target", str(_dvt), "--kits", "memory-tree")
+        check("[-12] DRIVE ...and `apply` writes nothing at that drive path",
+              _dva.returncode == 2 and not pathlib.Path("C:/PWNED").exists(),
+              f"rc {_dva.returncode}: " + _dva.stdout[-300:] + _dva.stderr[-300:])
+
+        # AND THE WIDENING IS EXACTLY ONE COLON WIDE. Graded on the FUNCTION rather than through a
+        # verb, because these are character-class questions and routing each through a fixture would
+        # cost six installs to assert what one table asserts.
+        _gkd = govkit_module()
+        for _v, _want, _why in (
+                ("C:/Users/x/.claude/skills", True,  "the legitimate answer"),
+                ("~/.claude/skills",          True,  "the form the other fixtures use"),
+                ("d:/proj/skills",            True,  "lowercase drive letter"),
+                ("C:/a;b",                    False, "a metacharacter AFTER the drive letter"),
+                ("C:/a$(id)",                 False, "command substitution after the drive"),
+                ("a:b",                       False, "an interior colon is not a drive"),
+                ("C:x",                       False, "a drive with no slash"),
+                ("CC:/x",                     False, "a two-letter drive is not a drive"),
+                ("tools; touch PWNED ;",      False, "round 2's own injection reproduction")):
+            try:
+                _gkd.demand_safe_token("prefix", _v, "arm")
+                _got = True
+            except _gkd.Refusal:
+                _got = False
+            check(f"[-12] DRIVE token class: {'accepts' if _want else 'refuses'} {_v!r} -- {_why}",
+                  _got == _want, f"accepted={_got}, wanted={_want}")
 
         # ---- OWNER RULING B (2026-08-26) -- `-7` S4's shadow refusal is SCOPED TO THE TABLE.
         # ---- The predicate was unqualified by role, so a row the dispatch never sends to the raw

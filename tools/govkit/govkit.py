@@ -569,6 +569,27 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
 # descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
 # to be correct.
 TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+# THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
+# `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
+# primary node runs on -- with a message about command injection naming nothing the operator did
+# wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is `{user_skills}/session-kickoff`,
+# so that sat on the common path for every Windows adopter. No arm caught it: both fixtures spell the
+# answer in forms that pass (`~/.claude/skills`, `/tmp/gk-fake-skills`).
+#
+# WHY THIS IS A NARROW WIDENING AND NOT A HOLE. The threat the class exists for is a value leaving its
+# argument inside a `bash -c` or `python -c` template, which needs a shell metacharacter: `;` `|` `&`
+# `$` a backtick, a quote, a newline, a redirect. `:` is none of those -- it is bash's null command and
+# is inert as argument text. What a colon CAN do is make a path absolute on Windows, and that is a
+# containment question, answered one function down by `demand_contained_dest`, which reds a
+# drive-lettered DESTINATION. So the two guards keep their own jobs: this one grades characters, that
+# one grades escape.
+#
+# ANCHORED AT POSITION 1 AND REQUIRING A FORWARD SLASH. `C:/x` passes; `C:x`, `C:\x`, `a:b` and
+# `C:/a;b` do not -- the remainder after the drive is graded by the class above exactly as before, so
+# an interior colon or any metacharacter still refuses. Backslash stays refused deliberately: §11
+# pins forward slashes on this platform, and admitting both spellings would double the surface for
+# nothing.
+DRIVE_PREFIX_RE = re.compile(r"^[A-Za-z]:/")
 
 
 def demand_contained_dest(dest: str, where: str) -> str:
@@ -609,16 +630,22 @@ def demand_contained_dest(dest: str, where: str) -> str:
 
 
 def demand_safe_token(key: str, value: str, where: str) -> str:
-    """Refuse a target-supplied token value that could leave its argument and become code."""
-    if not TOKEN_VALUE_RE.match(value):
-        bad = "".join(sorted({c for c in value if not TOKEN_VALUE_RE.match(c)}))
+    """Refuse a target-supplied token value that could leave its argument and become code.
+
+    A leading `<letter>:/` is dropped before grading and the REMAINDER is graded normally, so a
+    Windows drive letter is admitted and an interior colon is not. See `DRIVE_PREFIX_RE` for why that
+    is a narrow widening rather than a hole, and which guard owns the half this one does not.
+    """
+    body = value[2:] if DRIVE_PREFIX_RE.match(value) else value
+    if not TOKEN_VALUE_RE.match(body):
+        bad = "".join(sorted({c for c in body if not TOKEN_VALUE_RE.match(c)}))
         raise Refusal(
             f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
             f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
             f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
             f"become code. Refusing to resolve it ({where}). Every legitimate value here is a path "
-            f"fragment; if you need one that is not, that is a change to this rule and not to a "
-            f"descriptor")
+            f"fragment, optionally behind a `C:/` drive letter; if you need one that is not, that is "
+            f"a change to this rule and not to a descriptor")
     return value
 
 

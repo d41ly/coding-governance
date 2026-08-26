@@ -19,10 +19,15 @@ pass over one diff found, and it is not a substitute for the fan.
 
 ## Verdict: BLOCKED
 
-One reproduced defect of the same class as round 2's blockers, plus three defects in the FIX for it,
-plus three of my own arms asserting things that were not true. All folded. The verdict is BLOCKED
-rather than CLEAN because the confirmed-blocker count did not fall — round 2 had two, round 3 has
-one, and one of them is an arbitrary file write.
+TWO blockers. **B1** — a reproduced arbitrary file write, same class as round 2's. **B2** — the
+round-2 token guard refusing a legitimate Windows install, raised here as a park and RESOLVED on
+owner instruction rather than handed over. Around them: three defects in B1's own fix, and three of
+my own arms asserting things that were not true.
+
+All folded, all armed, both failing cases observed. The verdict stays BLOCKED because round 2 had
+two confirmed blockers and round 3 also has two — M8 re-arms a round only when that count strictly
+FALLS, and it did not. A fourth round over this fold is owed before the count can be called
+converged; nothing in this record is an argument that it has been.
 
 ---
 
@@ -119,9 +124,9 @@ Recorded because a wrong arm that names a real file is the most expensive kind.
 
 - **`/etc/govkit` is not a hazard.** `target_context` does `.strip("/")`, so it becomes `etc/govkit`,
   an ordinary relative path inside the target. My arm asserted a refusal — it was asserting a bug.
-- **`C:/PWNED` is refused, but by `demand_safe_token`**, because `:` is outside the token class. The
-  containment guard never sees it. Both arms now assert the OUTCOME — did anything land outside —
-  rather than which guard spoke.
+- **`C:/PWNED` was refused by `demand_safe_token`**, not by the containment guard, because `:` was
+  outside the token class — so my arm credited the wrong guard. Superseded by B2: the class now
+  admits an anchored drive letter, so containment owns that refusal and the arm names it.
 - **The receipt-invariant arm compared apply's receipt against an index two `update --write` runs
   later**, one of which was my own negative-half arm deliberately staging an operator edit to that
   very file. It reported a real-looking defect naming a real file. Now re-reads the receipt and runs
@@ -131,19 +136,47 @@ All three came from reasoning about the call graph instead of reading it.
 
 ---
 
+## B2 — the token class refused a legitimate Windows answer (RESOLVED, owner instruction)
+
+Raised in this round as a park; the owner said resolve it rather than hand it over.
+
+`demand_safe_token`'s class excluded `:`, so a target whose `deploy.toml` says
+`user_skills = "C:/Users/x/.claude/skills"` was refused — a CORRECT answer on the platform this
+project's own primary node runs on — with a message about command injection naming nothing the
+operator did wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is
+`{user_skills}/session-kickoff`, so this sat on the common path for every Windows adopter. No arm
+caught it: both fixtures spell that answer in forms that already passed (`~/.claude/skills`,
+`/tmp/gk-fake-skills`) — `fixture-passes-by-finding-nothing`, aimed at a platform rather than a
+branch.
+
+**Fix: exactly one colon wide.** A leading `<letter>:/` is dropped before grading and the REMAINDER
+is graded by the unchanged class, so `C:/Users/x` passes while `C:/a;b`, `a:b`, `C:x`, `CC:/x` and
+backslash spellings all still refuse.
+
+**Why this is not a hole**, stated because widening a guard that closes a reproduced ACE deserves
+it. The threat is a value leaving its argument inside a `bash -c` or `python -c` template, which
+needs a shell metacharacter: `;` `|` `&` `$`, a backtick, a quote, a newline, a redirect. A colon is
+none of those — it is bash's null command and inert as argument text. What a colon CAN do is make a
+path absolute on Windows, and that is a **containment** question, owned one function down by
+`demand_contained_dest`. Verified: `prefix = "C:/PWNED"` now passes the character grader and is
+refused by the escape grader instead, with **zero files written**. Two guards, two jobs, and the
+arms assert which one spoke — a silent swap back would otherwise leave both green while the class
+widened.
+
+**Left-shift gate.** A twelve-row truth table on the function, plus four arms through the verbs.
+**Failing case observed:** reverting the widening refuses the legitimate Windows answer again.
+
 ## Parked for the owner
 
-**`demand_safe_token`'s class excludes `:`, so a Windows drive-letter answer refuses a legitimate
-install.** A target whose `deploy.toml` says `user_skills = "C:/Users/x/.claude/skills"` is refused,
+**RESOLVED — see B2 above.** `demand_safe_token`'s class excluded `:`, so a Windows drive-letter
+answer refused a legitimate install. A target whose `deploy.toml` says `user_skills = "C:/Users/x/.claude/skills"` is refused,
 with a message about command injection that names nothing the operator did wrong. `kickoff-manifest`
 is in the DEFAULT selection and its rule is `to = "{user_skills}/session-kickoff"`, so this sits on
 the common path for a Windows adopter. No arm catches it: both fixtures use forms that pass
 (`~/.claude/skills`, `/tmp/gk-fake-skills`).
 
-The guard is doing its job — a `:` in a value interpolated into a `bash -c` template is exactly the
-reproduced injection — so this is a blast-radius question, not a bug report. Widening a guard that
-closes a reproduced ACE is an owner decision and this run has no owner turn. Options are in the
-run-state park.
+The owner instructed that this be resolved rather than parked. Option (a) taken; nothing remains
+open here.
 
 ## What this round says about the method
 
