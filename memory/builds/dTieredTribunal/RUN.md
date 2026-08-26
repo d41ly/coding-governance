@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: ac57d4a25e005fd2e8ae17bc5521550baacfedf0
-phase: BUILDING
+witness: 668eb2e3174f2fd62d13a7ab6895883d5338f4b7
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: 91052d0a
@@ -48,3 +48,7 @@ base: da9e4cd28072501cd4fe87a81db36c01b9a80f9e
 2026-08-26T02:20:28Z dispatch · item 4c9f752f TOOL-dTieredTribunal-2 · reason memory/gotchas/fold-text-is-unreviewed-surface.md memory/gotchas/INDEX.md memory/map/features/build-method.md memory/map/generated
 
 2026-08-26T02:26:42Z dispatch · item 7ce98b64 TOOL-dTieredTribunal-3 · reason tools/workflows/drift-audit-state.js tools/workflows/drift-audit-code.js tools/drift-audit/drift_report.py tools/drift-audit/README.md memory/map/features/review-harnesses.md
+
+2026-08-26T03:16:30Z review · item dTieredTribunal · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-26T03:18:53Z decision · item The closing review's D1 and D2 were FIXED but not LEFT-SHIFTED. Should the false-clean family they belong to get a memory/gotchas/ record, or a scanner, or neither? · reason BUILD-METHOD M8 requires every confirmed finding left-shifted into a gate or a gotchas class, and says plainly that a finding fixed and not left-shifted returns. I fixed both in place — D1 at three files, D2 at two — and did NOT left-shift either. Options seen: write the gotcha record now; write a scanner asserting a returned counter also reaches a prompt; do neither and carry the backlog row. Refused to take the first because this build MEASURED that fold prose written after a review is the dominant source of the next round's defects, at 20 of 29 and then 20 of 32, and a new record authored after the closing review is exactly that surface with no round left to catch it. Refused the second because a new gate owes its failing case observed before it lands and that is a unit, not a fold. Recorded as TOOL-dTieredTribunal-5 with both candidate mechanisms and the reason each is not obviously safe. This is a deliberate incompleteness against a binding rule, surfaced rather than skipped.

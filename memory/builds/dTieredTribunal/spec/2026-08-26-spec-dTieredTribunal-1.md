@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line
 
-**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
+**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md) | diff-review | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
@@ -47,7 +48,10 @@ That is a real narrowing of this unit's value and it is stated here rather than 
   verdict line's existence. The prompt already mandates a first line at `:357`, so a second
   first-line instruction would be resolved by the agent rather than by this spec. The order is the
   `**Serves:**` binding line, then the record's title and provenance, then the literal
-  `## Verdict:` heading carrying one token from the closed set. The prompt states the set and states
+  `## Verdict:` heading carrying one token from the closed set. FOUR elements precede the body, not
+  three: closing-review D4 found the sentence saying three and then listing four, a count carried
+  over from a comment that was counting the three sentences which CLAIM the opening rather than the
+  elements they order. The prompt states the set and states
   that it is closed. A THIRD sentence claims the opening and the order must place it too:
   `tools/workflows/tier2-review.js:349` reads "Open the report with a line naming the reviewed
   range", and it sits after the title-and-provenance block and before the `## Verdict:` heading.
@@ -73,6 +77,12 @@ That is a real narrowing of this unit's value and it is stated here rather than 
   earlier revision of this bullet said five and named only the code sites, which is false of this
   unit's own scope. The version line of S7 is excluded, because its inline comment is the deployer's
   own version marker and is not a place to add provenance prose.
+- **S8** — the `note` ternary tests `!synth` FIRST. Closing-review D1 confirmed the same ordering
+  defect here that `TOOL-dTieredTribunal-3` was porting into its two siblings: a dead synthesis was
+  tested THIRD, so the note naming it was emitted only when nothing else was degraded, and the most
+  serious outcome this harness reports was its least reachable message. Pre-existing rather than
+  introduced by this unit, and fixed here because a confirmed finding left unfixed because it
+  predates the diff is a finding that survives the one review that found it.
 - **S7** — `meta.version` moves from `1.2` to `1.3` at `tools/workflows/tier2-review.js:3`, and the
   same-line `gov:kit tier2-review@` marker moves with it. `tools/workflows/kit.toml:6` declares
   `version_from = { file = "tier2-review.js", pattern = "version: " }`, so that field IS the
@@ -204,6 +214,8 @@ finding, and execution continues into the success return one block below it.
 - **AC7** — When `grep -n 'dTieredTribunal-1' tools/workflows/tier2-review.js` runs, it returns a
   hit at each of the seven sites S6 enumerates: the schema, the success return, the three early
   returns, and the two synthesis-prompt edits.
+- **AC11** — When the `note` ternary is read, its FIRST tested condition is `!synth`, and the
+  synthesis-death arm is therefore reachable whatever else degraded on the run.
 - **AC8** — When `bash tools/check-kit-versions.sh` runs, it exits zero, and
   `grep -n "tier2-review@1.3" tools/workflows/tier2-review.js` returns the single line 3 that also
   carries `version: '1.3'`.
@@ -342,6 +354,16 @@ this build's run-state file.
   holds at INPROGRESS until the owner rules.
   21: this log and spec-3's rev-3 log both headlined a count that disagreed with their own
   enumerations. Both are restated from the enumeration.
+
+- rev-5 · 2026-08-26 · folded the CLOSING DIFF REVIEW, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md`.
+  Two edits, closing D1 and D4. D1 became S8 and AC11 and is PRE-EXISTING in this file rather than
+  introduced by this unit: the `note` ternary tested a dead synthesis third, so the harness's most
+  serious message was reachable only when nothing else had degraded. It is fixed here because the
+  same defect was being ported into two sibling files by `TOOL-dTieredTribunal-3`, and a confirmed
+  finding left unfixed on the ground that it predates the diff is one that outlives the only review
+  that ever found it. D4 corrected S4: the prompt sentence said three elements precede the body and
+  then listed four, a count carried from a comment counting three CLAIMING sentences.
 
 ## 10. Reuse audit
 

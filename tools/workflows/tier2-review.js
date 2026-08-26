@@ -359,7 +359,7 @@ const synth = await agent(
     // S4b - the token set is READ from the carrier that ENFORCES it on a diff-review record, which
     // is hygiene check 22 in check-memory-hygiene.sh (gated by REVIEW_VERDICT_CUTOFF). It is not a
     // new rule invented here, and the build method is not the enforcing carrier for this kind.
-    `THE RECORD'S OPENING IS ORDERED, and these are the only three things that may precede the body. ` +
+    `THE RECORD'S OPENING IS ORDERED, and these four things precede the body, in this order. ` +
     `First the \`**Serves:**\` binding line described below. Then the report's title and provenance. ` +
     `Then the range line named above. Then, as a heading of its own, the literal \`## Verdict: \` ` +
     `followed by exactly ONE token from the CLOSED set CLEAN, CLEAN WITH FIXES, BLOCKED. ` +
@@ -441,13 +441,17 @@ return {
   // required and a returned 0 is a result. So: the value when a synthesis ran, null when none did.
   blockers: synth ? synth.blockers : null,
   highs: synth ? synth.highs : null,
+  // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
+  // reportable only when nothing else was degraded and the most serious note was the least reachable
+  // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
+  // the two drift-audit siblings, where the same ordering had been copied.
   note:
-    judged === 0
-      ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
-      : lensesDead || skepticsDead || unverified.length
-        ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-        : !synth
-          ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+    !synth
+      ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+      : judged === 0
+        ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
+        : lensesDead || skepticsDead || unverified.length
+          ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
           : 'complete',
   round,
   priorFindings: priorFindings.length,

@@ -249,7 +249,7 @@ if (LENSES.length === 0) {
     confirmedTop: [], unverifiedList: [],
   }
 }
-if (lensesDead === LENSES.length) {
+if (LENSES.length > 0 && lensesDead === LENSES.length) {
   const note = `UNVERIFIED: all ${LENSES.length} lens(es) died, so NOTHING was reviewed`
   log(note)
   return {
@@ -410,7 +410,10 @@ than silently picking one.
 Return {path, summary} only — the prose goes in the file. Forward slashes in the path.
 
 DATA:
-counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}, severity corrections ${downgrades}
+counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}
+RUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:
+lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified.
+If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. Say so where you would otherwise call a zero positive evidence., severity corrections ${downgrades}
 lens writeups: ${JSON.stringify(lensOut.map((r) => ({ lens: r.lens, path: r.path, summary: r.summary })), null, 1)}
 judged findings: ${JSON.stringify(judged, null, 1)}`,
   {
@@ -443,10 +446,15 @@ return {
   conflicts: conflictIds.size,
   duplicates,
   spurious,
-  note: lensesDead || skepticsDead || unverified.length
-    ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-    : !synth
-      ? 'UNVERIFIED: the synthesis agent died, so NO report was written'
+  // TOOL-dTieredTribunal-3, closing-review D1 - ORDER MATTERS HERE and it was wrong. A dead
+  // synthesis is the WORST outcome this function can report, so it is tested FIRST. Tested last, it
+  // was reachable only when nothing else was degraded, which made the most serious note the least
+  // reachable one. This unit's own demote-on-conflict rule makes `unverified.length` non-zero more
+  // often, so the port had quietly narrowed the path to its own honest message.
+  note: !synth
+    ? `UNVERIFIED: the synthesis agent DIED, so NO report was written (${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) also died, ${unverified.length} finding(s) unverified)`
+    : lensesDead || skepticsDead || unverified.length
+      ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
       : 'complete',
   counts: {
     raw: indexed.length,

@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries
 
-**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md) | diff-review | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
@@ -41,7 +42,11 @@ unported and is named in section 3, so this unit claims the accounting rather th
 - **S4** — both siblings gain the all-lenses-dead early return: when every configured lens failed to
   return, log that nothing was reviewed and return with the counters, rather than proceeding to
   synthesize a report over an empty finding set. The predicate is
-  `LENSES.length > 0 && lensesDead === LENSES.length`, never `lensesDead === LENSES.length` alone.
+  `LENSES.length > 0 && lensesDead === LENSES.length`, never `lensesDead === LENSES.length` alone,
+  and it is SPELLED as that conjunction in both files rather than left correct by branch order.
+  Closing-review D3: the first cut relied on an earlier `LENSES.length === 0` branch returning first,
+  which is a property a later edit removes silently, while this bullet and AC4 both described a
+  conjunction no condition contained.
   `drift-audit-state.js:224` builds `LENSES` by filtering `ALL_LENSES` against a caller-supplied slug
   list, so a caller passing a typo'd slug yields an empty array and the bare predicate reads
   `0 === 0`. That reports a misconfiguration as a degraded run, which is this repo's own
@@ -103,6 +108,18 @@ unported and is named in section 3, so this unit claims the accounting rather th
   passing the same `args` needs no edit. Third, a run whose lenses all died now returns early instead
   of synthesizing a report over nothing. An earlier revision of this bullet called the whole move
   additive, which contradicted section 4 Migration of this same spec.
+- **S11** — the `note` ternary tests `!synth` FIRST. Closing-review D1: written with the
+  degraded-otherwise case first, a run whose synthesis DIED reported `PARTIAL` and never said no
+  report was written, so the most serious message this function can emit was reachable only when
+  nothing else was degraded. S5's own demote-on-conflict rule makes `unverified.length` non-zero more
+  often, so the port had narrowed the path to its own honest message. Worst outcome first.
+- **S12** — every counter S7 returns is also INTERPOLATED into the synthesis DATA block. Closing-review
+  D2: the seven counters reached the CALLER and none reached the REPORT, so a run with four of five
+  lenses dead wrote a durable report whose prompt tells it to describe a zero unverified count as
+  positive evidence. That is a clean bill for a degraded run, written down, in the unit whose whole
+  subject is that absence is not cleanliness. The block states the lens and skeptic survival, the
+  spurious and duplicate and conflict counts, and instructs the agent not to call a zero positive
+  evidence when lenses died.
 - **S10** — `memory/map/features/review-harnesses.md` has its Gaps section refreshed in the same
   commit as the code. Its first bullet states this unit's delta as live fact, and landing this unit
   falsifies every clause of it, including the two an earlier revision of this bullet did not
@@ -328,6 +345,13 @@ marker that both siblings carry and must keep.
   provenance travelling with the code.
 - **AC9** — When `bash tools/check-kit-versions.sh` runs, it exits zero, and
   `grep -rn 'drift-audit@1\.6' tools/drift-audit/ tools/workflows/` returns no hits.
+- **AC11** — When each sibling's `note` ternary is read, its FIRST tested condition is `!synth`. A
+  ternary whose synthesis-death arm sits below the degraded-otherwise arm fails this criterion, because
+  the arm is then unreachable in exactly the runs that need it.
+- **AC12** — When each sibling's synthesis prompt is read, the DATA block interpolates `lensesDead`,
+  `skepticsDead`, `spurious`, `duplicates` and the conflict count, and instructs the agent not to
+  describe a zero as positive evidence when lenses died. A counter present on the return and absent
+  from the prompt fails this criterion.
 - **AC9b** — When `tools/drift-audit/README.md` is read at HEAD, it carries a migration paragraph
   naming the move to the new version, in the shape its existing `Migrating 1.0 to 1.1` paragraph
   uses, and that paragraph is marked BREAKING and states all three clauses S9 requires: the
@@ -460,6 +484,18 @@ still leaves it held until `GATE_SELFTESTS=1`.
   about placement. It is `grep -n` now, matching spec-1's AC7 for the identical obligation.
   4 and 27: AC10 said eight clauses over a list of ten. 5, 14, 17 and 26: section 5 said three empty
   states while section 4 named a fourth, in a unit whose subject is exit-path accounting.
+
+- rev-5 · 2026-08-26 · folded the CLOSING DIFF REVIEW, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md`.
+  Verdict CLEAN WITH FIXES, zero blockers, 4/4 lenses and 5/5 skeptic batches live. Three of its four
+  distinct defects are this unit's, and two of them are the unit's own subject turned on the unit.
+  D1 became S11 and AC11: the `note` ternary tested the degraded-otherwise case before `!synth`, so
+  the most serious message was the least reachable one — and S5's demote-on-conflict made that worse.
+  D2 became S12 and AC12: all seven counters reached the caller and none reached the REPORT, so a
+  four-of-five-lenses-dead run would have written a durable clean bill. That is precisely the class
+  this unit exists to remove, one layer further out than the port looked.
+  D3 tightened S4 and AC4: the guard was correct by BRANCH ORDER while both this spec and its comment
+  described a conjunction no condition spelled. It is spelled now.
 
 ## 10. Reuse audit
 
