@@ -89,12 +89,12 @@ ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dT
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-26 |
-| [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | SPECCED | rev-3 | 2026-08-26 |
-| [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | SPECCED | rev-3 | 2026-08-26 |
+| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-08-26 |
+| [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | SPECCED | rev-4 | 2026-08-26 |
+| [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-08-26 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

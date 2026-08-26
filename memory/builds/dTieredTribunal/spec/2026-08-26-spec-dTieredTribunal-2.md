@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
+**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
+| [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 
 <!-- /gen:spec-records -->
 
@@ -92,11 +93,18 @@ record is a checklist entry and not a carrier of obligations.
   returns the empty set against `memory/builds/dFramedEntrypoint/spec` and returns the path itself
   against the file above. A directory argument would make this criterion's pass output byte-identical
   to its failure output, which is the could-not-fail shape this whole unit is about.
-- **AC3b** — When that same command is run against a spec file under a DIFFERENT build, the class is
-  selected there too. One file could be selected by accident; two under different builds is the
-  anchor working. This is the negative F1's noise argument owes: when
-  `python tools/memory-tree/gotchas.py --for-paths memory/DECISIONS.md` runs, the new class is NOT
-  selected, because a decision log is not a fold surface and `memory/builds/` would have taken it.
+- **AC3b** — The positive arm, widened. When
+  `python tools/memory-tree/gotchas.py --for-paths memory/builds/dHonouredPark/spec/2026-08-25-spec-dHonouredPark-1.md`
+  runs, the class is selected there too. One file could be selected by accident; two under different
+  builds is the anchor working.
+- **AC3c** — The negative, and it is what makes F1's width argument observable rather than asserted.
+  When `python tools/memory-tree/gotchas.py --for-paths memory/builds/dTieredTribunal/README.md`
+  runs, the new class is NOT selected. That path is the discriminating case: it is a build record and
+  not a fold surface, the REFUSED anchor `memory/builds/` selects it, and the TAKEN anchor `/spec/`
+  does not. Re-derived with the shipped `selectable()` before this criterion was written, because an
+  earlier revision named `memory/DECISIONS.md` here, which NEITHER anchor selects — so it could not
+  fail under either arm and the reason given for it was false. A negative that both arms pass
+  discriminates nothing, which is this unit's own subject turned on its own acceptance set.
 - **AC4** — Three observations, because one command does not make all three. First, when
   `python tools/codebase-map/test_codebase_map.py` runs it exits zero, which is the
   `codebase-map coverage + freshness` leg and which fails on any inventory key that is neither
@@ -112,8 +120,8 @@ record is a checklist entry and not a carrier of obligations.
   runs, it returns the citation S5 requires, and the file it names resolves under `git ls-files`.
   S5's whole point is that the evidence is TRACKED, and no other criterion here reads the record's
   body: AC1 is a filename test, AC2 grades shape and index freshness, and AC3 grades selection.
-  Numbered last rather than inserted, because two live sentences and a revision-log line already
-  cite AC5 and renumbering would strand all three.
+  Numbered last rather than inserted, because one live sentence in section 2 and one revision-log
+  line already cite AC5, and renumbering would strand both.
 
 ## 6. Gates
 
@@ -139,13 +147,19 @@ on the one diff class §1 says it exists to serve. Two arms were available, and 
 
 *The anchor arm, taken.* Add a backticked `/spec/` token to the record body. Measured with the
 shipped predicate, `selectable()` in `tools/memory-tree/gotchas.py`, over the tracked path set:
-`/spec/` selects 316 of them, and every one sits under a spec directory. The arm therefore buys the
-fold surface and no noise. The spelling refused alongside it is `memory/builds/`, which selects
-roughly two thirds of the tree, most of it outside any spec directory. Neither figure is written as
-an absolute here: both are derived, both moved between the measurement and the commit that recorded
-it, and AC3b is where the difference is OBSERVED rather than asserted. That is near-universal
-selection bought under
-an anchor's name, and noise on a checklist is how reviewers learn to skip the checklist.
+`/spec/` selects only paths that sit under a spec directory, and it selects every one of them. The
+arm therefore buys the fold surface and no noise. The spelling refused alongside it is
+`memory/builds/`, which selects roughly two thirds of the tree, most of it outside any spec
+directory. That is near-universal selection bought under an anchor's name, and noise on a checklist
+is how reviewers learn to skip the checklist.
+
+NO ABSOLUTE COUNT IS WRITTEN IN THIS PARAGRAPH, and the reason is the same rule the rest of this
+corpus follows: every one of them is derived from the tracked path set, all three moved between the
+measurement and the commit that recorded them, and a number typed beside a source that owns it is
+wrong on the next commit. The WIDTH claim is therefore stated as a ratio and OBSERVED by AC3c, which
+names a path the refused anchor selects and the taken one does not. An earlier revision of this
+paragraph deleted three such absolutes, asserted that none remained, and left a fourth standing two
+sentences above the assertion.
 
 *The `universal: true` arm, refused on two independent grounds.* It is semantically wrong first: the
 flag marks the always-emitted core, and this class binds a FOLD pass rather than every diff, so the
@@ -197,6 +211,24 @@ vetoes on its own evidence, so the fork resolves here rather than waiting on an 
   criterion that reads the record's own body for the tracked citation S5 requires. 9 and 14 deleted
   three derived counts from §7 F1 prose — 1024, 689 and 373 were all stale at HEAD, staled by the very
   commit that wrote them, so the argument now names the ratio and lets AC3b observe it.
+
+- rev-4 · 2026-08-26 · folded spec-audit round 3, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md`.
+  Round 3 CONVERGED at zero blockers. Three edits here, closing round-3 findings 3, 8, 12, 13, 16,
+  20, 23, 25, 30 and 33. Counted from that enumeration and not beside it: three edits, ten findings.
+  20 is the third: AC6's own justification claimed two live sentences cite AC5 where one does, which
+  is the same narrate-your-own-history class spec-1 carried three instances of.
+  23 with 3, 12, 16 and 30 is one defect and it is this unit's own subject turned on its acceptance
+  set. AC3b's negative named `memory/DECISIONS.md`, which NEITHER anchor selects, so it could not
+  fail under either arm and the stated reason for it was false. The predicate was re-run before the
+  fix rather than after: `memory/builds/` HITS a build README and a review record and MISSES a
+  decision log, and `/spec/` misses all three. The negative is now a build README, split out as AC3c
+  so the positive arm keeps its own criterion, and AC3b's positive arm gained the backticked file it
+  never named. Round-2 finding 14's width half, which rev-3 recorded as folded and did not fold,
+  lands here as AC3c.
+  8, 13, 25 and 33: the rev-3 fold deleted three absolute counts from section 7 F1 and then wrote
+  that neither figure was written as an absolute, while one still stood two sentences above. The
+  width claim is a ratio now and AC3c observes it.
 
 ## 9. Reuse audit
 

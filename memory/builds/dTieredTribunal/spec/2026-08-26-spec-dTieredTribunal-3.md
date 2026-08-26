@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
+| [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 
 <!-- /gen:spec-records -->
 
@@ -94,10 +95,14 @@ unported and is named in section 3, so this unit claims the accounting rather th
   The README edit is NOT the marker byte alone. `tools/drift-audit/README.md:7` carries a
   `Migrating 1.0 to 1.1` paragraph stating what an adopter must change and why, which is this kit's
   established convention for a contract move, and a bump that skips it leaves an adopter reading a
-  migration note for a version two behind. S9 adds the matching paragraph. Its content is what an
-  adopter has to know and no more: the return objects gain seven fields, every one additive, so an
-  adopter passing the same `args` needs no edit, and the one observable behaviour change is that a
-  run whose lenses all died now returns early instead of synthesizing a report over nothing.
+  migration note for a version two behind. S9 adds the matching paragraph, and it is headed BREAKING,
+  because this move is. Its content is what an adopter has to know and no more, in this order. First,
+  `lensesRun` in `drift-audit-state.js` was an ARRAY of slug strings and becomes an INTEGER, so a
+  caller reading it as a list breaks; section 4 Migration carries the evidence that no tracked caller
+  does. Second, the return objects gain the other six fields and those are additive, so an adopter
+  passing the same `args` needs no edit. Third, a run whose lenses all died now returns early instead
+  of synthesizing a report over nothing. An earlier revision of this bullet called the whole move
+  additive, which contradicted section 4 Migration of this same spec.
 - **S10** — `memory/map/features/review-harnesses.md` has its Gaps section refreshed in the same
   commit as the code. Its first bullet states this unit's delta as live fact, and landing this unit
   falsifies every clause of it, including the two an earlier revision of this bullet did not
@@ -181,9 +186,21 @@ wanting the survivor identities computes them from position before the filter an
 a distinct key; overloading `lensesRun` with them is the echo-drift shape the integer join exists to
 kill.
 
-The new early return carries the same fields, with the report and summary null. This is the property
-the prior-art refusal insists on: every counter on every exit path, or the port is the same refusal
-on a different filename.
+BOTH new early returns carry those seven fields, not one. S4 creates two branches and they are not
+interchangeable. On the all-lenses-dead branch `lensesRun` is zero, `lensesDead` equals the
+configured count, `skepticsDead` is zero because no skeptic ran, and `note` names the lens deaths. On
+the zero-configured-lenses branch all three counts are zero and `note` names the MISCONFIGURATION
+instead, because reporting a typo'd slug list as a degraded run is the vacuous-selector class S4
+exists to refuse. Both carry the report and summary null.
+
+One field is deliberately NOT in the seven and is named here so the omission is not read as an
+oversight. `drift-audit-code.js:369` returns `severityCorrections`, derived from `downgrades` at
+`:309`, and it belongs to that sibling alone. It stays where it is, on the success return only,
+because it counts an adjudication that cannot have happened on any path where the pipeline exited
+early. S7's seven-field list is closed over the fields BOTH siblings share.
+
+This is the property the prior-art refusal insists on: every counter on every exit path, or the port
+is the same refusal on a different filename.
 
 ### Migration
 
@@ -246,8 +263,11 @@ marker that both siblings carry and must keep.
 - a11y — N/A. These are workflow scripts with no user interface.
 - i18n — N/A. Same reason.
 - error / empty / loading states — this unit IS the empty-state work. The all-lenses-dead path, the
-  zero-configured-lens path and the dead-synthesis path are the three empty states, and none of them
-  is currently handled.
+  zero-configured-lens path and the dead-synthesis path are three of the FOUR empty states this
+  subject has, and none of the three is currently handled. The fourth is the nothing-raised path —
+  the lenses lived and returned no findings — which `tier2-review.js:220-225` handles and neither
+  sibling has. It is named in section 4 as out of scope and is named here too, because a unit whose
+  whole subject is exit-path accounting may not count its own subject differently in two sections.
 - observability — the counters ARE the observability. A caller can currently not tell a full audit
   from one where half the lenses died.
 - risks — the demote-to-unverified rule can move a finding out of the confirmed set that the
@@ -290,24 +310,34 @@ marker that both siblings carry and must keep.
   edited files.
 - **AC7** — When `bash tools/workflows/check-review-join.sh` and
   `bash tools/workflows/check-verifier-fanout.sh` run, both stay green over both edited files.
-- **AC8** — When the success return block and the new early return block of each sibling are read,
-  each names all seven of `lensesRun`, `lensesDead`, `skepticsDead`, `conflicts`, `duplicates`,
-  `spurious` and `note`. A field present in one block and absent from the other fails this
-  criterion, because that asymmetry is the defect this unit ports the guards to prevent.
+- **AC8** — When the THREE return blocks of each sibling are read — the success return, the
+  all-lenses-dead return and the zero-configured-lenses return — each names all seven of
+  `lensesRun`, `lensesDead`, `skepticsDead`, `conflicts`, `duplicates`, `spurious` and `note`. A
+  field present in one block and absent from another fails this criterion, because that asymmetry is
+  the defect this unit ports the guards to prevent. Three blocks and not two: S4 creates two early
+  branches, and a criterion naming one of them leaves six of the seven fields unbound on the other.
+  `severityCorrections` is outside this criterion by section 4's Data model, which says why.
 - **AC8b** — When
-  `grep -c 'dTieredTribunal-3' tools/workflows/drift-audit-state.js tools/workflows/drift-audit-code.js`
-  runs, each file returns a hit at every guard S8 covers, and each such comment names the unit that
-  originally earned that guard in `tier2-review.js`. S8 was the only scope item in this spec no
-  criterion observed, and section 10 rests the whole port on that provenance travelling with the code.
+  `grep -n 'dTieredTribunal-3' tools/workflows/drift-audit-state.js tools/workflows/drift-audit-code.js`
+  runs, it returns a hit adjacent to every guard S8 covers in both files, and reading each hit shows
+  the comment naming the unit that originally earned that guard in `tier2-review.js`. `grep -n` and
+  not `grep -c`: a count per file cannot show WHERE the comments are, and the criterion is about
+  their placement, which is also why the second clause is an act of reading rather than something the
+  grep itself asserts. Spec-1's AC7 states the identical obligation the identical way. S8 was the
+  only scope item in this spec no criterion observed, and section 10 rests the whole port on that
+  provenance travelling with the code.
 - **AC9** — When `bash tools/check-kit-versions.sh` runs, it exits zero, and
   `grep -rn 'drift-audit@1\.6' tools/drift-audit/ tools/workflows/` returns no hits.
 - **AC9b** — When `tools/drift-audit/README.md` is read at HEAD, it carries a migration paragraph
   naming the move to the new version, in the shape its existing `Migrating 1.0 to 1.1` paragraph
-  uses, and that paragraph states that the added return fields are additive and names the early
-  return as the one observable behaviour change. A marker byte moved without it satisfies
+  uses, and that paragraph is marked BREAKING and states all three clauses S9 requires: the
+  `lensesRun` array-to-integer change first, then that the other six added fields are additive, then
+  the new early return. A paragraph calling the move additive fails this criterion, because section 4
+  Migration of this spec says the opposite. A marker byte moved without any paragraph satisfies
   `check-kit-versions.sh` and still leaves the adopter reading a note for the wrong version.
 - **AC10** — When `memory/map/features/review-harnesses.md` is read at HEAD after this unit lands,
-  its Gaps section no longer claims ANY of the eight clauses S10 enumerates: that the two siblings
+  its Gaps section no longer claims ANY of the ten clauses below, which are S10's enumeration
+  expanded to one clause per claim: that the two siblings
   lack the dead-lens count, the all-lenses-dead early return, the dead-skeptic count, the spurious
   counter, the duplicate counter, the conflict counter or the synthesis-death log; that
   `drift-audit-state.js` returns the configured lens set; that `drift-audit-code.js` returns no lens
@@ -394,7 +424,8 @@ still leaves it held until `GATE_SELFTESTS=1`.
 
 - rev-3 · 2026-08-26 · folded spec-audit round 2, the record at
   `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md`.
-  Eight edits, seven of them answering defects the rev-2 fold itself created. 3 and 20 are one defect:
+  Eight edits closing round-2 findings 3, 4, 6, 7, 12, 15, 20, 21, 28, 31, 32 and 36. Counted from
+  that enumeration and not beside it: eight edits, twelve findings. 3 and 20 are one defect:
   rev-2 gave S4 two new exits and left S7, section 4 and AC8 each governing one, so S7 now enumerates
   FOUR exits per sibling and names the synthesis-death path among them. 12 widened AC2 to both
   siblings — it was scoped to `drift-audit-state.js` alone, which would have let `drift-audit-code.js`
@@ -410,6 +441,25 @@ still leaves it held until `GATE_SELFTESTS=1`.
   32 widened S9 beyond the marker byte: `tools/drift-audit/README.md` carries a migration paragraph
   per contract move as this kit's convention, and a bump skipping it leaves an adopter reading a note
   for the wrong version. AC9b observes it.
+
+- rev-4 · 2026-08-26 · folded spec-audit round 3, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md`.
+  Round 3 CONVERGED at zero blockers, the sequence being 3 then 2 then 0, so this is the last fold the
+  count-bounded rule asks for. Seven edits here, closing round-3 findings 1, 2, 4, 5, 6, 9, 10, 14,
+  15, 17, 22, 24, 26, 27 and 29. Stated from the enumeration rather than beside it: seven edits,
+  fifteen findings, and the two numbers are counted from the list in this sentence.
+  1, 9, 15, 22 and 29 are five lenses on one defect and it is a FOLD_WRONG of my own: rev-3 widened
+  S7 to four exits and left section 4 Data model and AC8 each governing one, so six of the seven
+  fields were unbound on the zero-configured branch. Both now name all three return blocks, and the
+  Data model states what differs between the two early branches rather than calling them the same.
+  The `severityCorrections` rider is answered in the same edit: it belongs to `drift-audit-code.js`
+  alone, stays on the success return, and is named as deliberately outside S7's closed seven.
+  2 and 10: S9's mandated migration text called the move additive while section 4 Migration of this
+  same spec names `lensesRun` array-to-integer as BREAKING. S9 and AC9b now lead with the break.
+  6 and 24: AC8b used `grep -c`, which prints one count per file and no positions, for a criterion
+  about placement. It is `grep -n` now, matching spec-1's AC7 for the identical obligation.
+  4 and 27: AC10 said eight clauses over a list of ten. 5, 14, 17 and 26: section 5 said three empty
+  states while section 4 named a fourth, in a unit whose subject is exit-path accounting.
 
 ## 10. Reuse audit
 

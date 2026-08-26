@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
+| [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 
 <!-- /gen:spec-records -->
 
@@ -59,9 +60,13 @@ That is a real narrowing of this unit's value and it is stated here rather than 
   the enforcing carrier for this record kind.
 - **S5** — the synthesis prompt defines BOTH new integer fields, not only one. `blockers` is the
   count of CONFIRMED blocker-severity findings and `highs` the count at high severity, and in both
-  cases the severity meant is the one the synthesis pass adjudicated. The returned integers and the
-  written record then agree by construction. S1 makes both fields REQUIRED, so a definition for one
-  and silence on the other ships a mandatory integer with no stated population.
+  cases the severity meant is the one the synthesis pass adjudicated. What that buys, stated exactly
+  rather than generously: ONE agent both writes the record and returns the integers, from one
+  adjudication, in one turn. Nothing MAKES the two agree — no code re-counts the record — so the
+  agreement is a property of the prompt and not of a mechanism, and an earlier revision of this
+  sentence claimed it held "by construction", which would have made it a check nobody performs. S1
+  makes both fields REQUIRED, so a definition for one and silence on the other ships a mandatory
+  integer with no stated population.
 - **S6** — a comment on each edit naming this unit id, matching the file's existing convention of
   citing the unit that introduced a hardening. The edited sites are the schema, the success return,
   the three early returns, and the two synthesis-prompt edits S4 and S5 make — seven in all. An
@@ -190,9 +195,9 @@ finding, and execution continues into the success return one block below it.
   prompt still contains the binding-line sentence at `:357` unchanged in its first-line role.
 - **AC5b** — When the synthesis prompt is read, it states the closed verdict set and states that the
   set is closed, and the tokens it lists are the same three hygiene check 22 grades in
-  `tools/memory-tree/check-memory-hygiene.sh`. The rev-2 fold rewrote this criterion into an ORDER
-  assertion and dropped the set observation with it, leaving S4's second sentence and all of S4b
-  unobserved.
+  `tools/memory-tree/check-memory-hygiene.sh`. This criterion is separate from AC5 because AC5
+  observes ORDER and this one observes the SET, and a single criterion covering both was what let the
+  set observation go missing when the order rule was written.
 - **AC6** — When the synthesis prompt is read, it states that `blockers` is the count of CONFIRMED
   findings at blocker severity AND that `highs` is the count at high severity, and that the severity
   meant is the one the synthesis pass adjudicated. Both, because S1 makes both required.
@@ -213,9 +218,9 @@ The named legs this unit must keep green are `workflow script syntax`,
 `review-protocol parity (kit vs dogfood)`, `kit version markers`, `review-join self-test` and
 `verifier fan-out self-test`.
 
-Several of those are unguarded in `tools/gate-legs.json` and run on every bar. No count is written
-here: `tools/gate-legs.json` owns it and a number typed beside a manifest is wrong on the next
-commit. They are
+Some of those are unguarded in `tools/gate-legs.json` and run on every bar. No count of them is
+written here or below: `tools/gate-legs.json` owns the population and a number typed beside a
+manifest is wrong on the next commit. The unguarded ones are
 `workflow script syntax`, `review-join ban (no ref-keyed join)`, `verifier fan-out` and
 `agent-cap restatement`, joined by `kit version markers`. That last leg is named because it runs,
 NOT because it grades S7: `tools/check-kit-versions.sh:24` is a bare presence check that this file
@@ -224,7 +229,7 @@ same-line `gov:kit tier2-review@` marker. So it stays green whether or not S7 la
 is the whole observation of the bump. Adding that pair assertion is a gate change rather than spec
 text and is recorded in §8 as a fork.
 
-Three are guarded on `tools/workflows/` and therefore arm for this diff:
+The rest are guarded on `tools/workflows/` and therefore arm for this diff:
 `review-protocol parity (kit vs dogfood)`, `review-join self-test` and `verifier fan-out self-test`.
 The last two carry `subject: kit`, so `tools/run-gates/run-gates.sh` HOLDS them unless
 `GATE_SELFTESTS=1` is set. A guarded leg arming is not the same as a leg running, and a Definition of
@@ -242,10 +247,9 @@ any later report claiming it closed without a gate or a parity pair is itself th
 
 ## 8. Open questions
 
-This section carries ONE open fork and it is stated first. An earlier revision opened with `none` and
-then listed a fork beneath it, which is the shape `memory/TEMPLATE-SPEC.md` pins as undetectable by
-either reader: both grade the section as one squeezed string, so a leading `none` is not a vote and
-an open item under it goes unseen.
+This section carries ONE open fork and it is stated first, never beneath a `none` line.
+`memory/TEMPLATE-SPEC.md` pins that shape as undetectable by either reader: both grade the section as
+one squeezed string, so a leading `none` is not a vote and an open item under it goes unseen.
 
 - **F2 — should `tools/check-kit-versions.sh` gain an assertion pairing `tier2-review.js`'s
   `meta.version` with its same-line `gov:kit tier2-review@` marker?** Round 2's finding 35 established
@@ -256,6 +260,15 @@ an open item under it goes unseen.
   mechanism, and folding one into a spec-text round smuggles it past the round meant to price it,
   which is the same disposition round 1 gave finding 45. Parked for the owner through the verb, so it
   reaches the wrap-up with the rest of the set rather than living only in this section.
+
+**How this section discharges, stated now rather than discovered at the close.** Hygiene check 12
+requires a resolved section 8 before a spec may take a terminal status, and F2 is reserved to the
+owner, so this unit CANNOT reach CLOSED while F2 stands open. That is not a deadlock and it is not a
+reason to resolve F2 in place. The unit builds, its acceptance criteria are answered, and it holds at
+INPROGRESS until the owner rules on F2 — at which point the ruling is marked here in the documented
+shape and the status moves. A run that resolved F2 itself to unblock its own close would be signing
+the owner's name to a decision the owner did not make, which section 3's non-goals and the build
+method's fork rule both refuse.
 
 The review-KIND parameter is NOT a fork of this unit. It is parked at the BUILD level, with P9, in
 this build's run-state file.
@@ -290,7 +303,9 @@ this build's run-state file.
 
 - rev-3 · 2026-08-26 · folded spec-audit round 2, the record at
   `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md`.
-  Ten edits, eight of them answering defects the rev-2 fold itself created. 11 restored what rev-2
+  Ten edits closing round-2 findings 8, 11, 13, 17, 24, 30, 35 and 38. Counted from that
+  enumeration and not beside it: eight findings, of which 13 and 38 are ROUND1_MISSED and the other
+  six were created by the rev-2 fold. 11 restored what rev-2
   DELETED: rewriting AC4 into an order assertion dropped the closed-set observation, leaving S4's
   second sentence and all of S4b unobserved; AC5b is that observation, added rather than merged so
   the order assertion stays readable. 30 placed the third opening-claim sentence — `:349`, the range
@@ -305,6 +320,28 @@ this build's run-state file.
   which was refused once, on the three-carrier ground. 35's TEXT arm landed — §7 no longer calls
   `kit version markers` the reason to care about S7, because `check-kit-versions.sh:24` is a bare
   presence check that cannot see the bump — and its GATE arm is recorded as F2 rather than folded.
+
+- rev-4 · 2026-08-26 · folded spec-audit round 3, the record at
+  `memory/builds/dTieredTribunal/reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round3.md`.
+  Round 3 CONVERGED at zero blockers, the sequence being 3 then 2 then 0, so this is the last fold the
+  count-bounded rule asks for. Five edits here, closing round-3 findings 7, 18, 19, 20, 21, 28, 31 and
+  34. Counted from that enumeration and not beside it: five edits, eight findings.
+  7 and 18: section 7's own disclaimer forbade writing a count and a numeral survived two sentences
+  below it. Both are gone now, and neither sentence names a number.
+  19, 20 and 34 are one class and it is worth naming as a class: three fold-written sentences each
+  asserted a revision history that did not happen. AC5b said the rev-2 fold rewrote it, when rev-3
+  created it. AC6 said two live sentences cite AC5, when one does. Section 8's preamble described an
+  earlier revision that opened with `none` above a fork, which no COMMITTED revision ever did — that
+  shape existed only inside an uncommitted working tree. A justification that narrates its own past is
+  unverifiable by the reader and was wrong all three times; all three now state the rule instead.
+  28 is an EARLIER_MISSED and the sharpest finding of the round: S5 claimed the returned integers and
+  the written record agree "by construction", and nothing constructs it. One agent writes both from
+  one adjudication, which is a property of the prompt, not a mechanism. Said plainly now.
+  31: section 8 now states how it discharges at close, so the close does not meet check 12's
+  terminal-status rule for the first time at the end of the run. F2 is NOT resolved in place; the unit
+  holds at INPROGRESS until the owner rules.
+  21: this log and spec-3's rev-3 log both headlined a count that disagreed with their own
+  enumerations. Both are restated from the enumeration.
 
 ## 10. Reuse audit
 
