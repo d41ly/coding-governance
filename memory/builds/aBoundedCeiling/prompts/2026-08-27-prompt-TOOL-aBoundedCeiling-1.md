@@ -1,6 +1,6 @@
 # The owner's prompt — the bar is slow, it hangs, and a landing pays for it twice
 
-**Serves:** research TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4
+**Serves:** research TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6
 
 Handed to `/unattended --prompt` on 2026-08-27, node `a`. The value carried whitespace and named no
 readable file, so it is the prompt itself and is recorded here verbatim. The bytes travel rather than

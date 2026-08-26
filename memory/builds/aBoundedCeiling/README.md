@@ -4,9 +4,8 @@ node: a
 opened: 2026-08-27
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
-ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4
+ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8
 ---
 
 # aBoundedCeiling — a leg that cannot hang forever, and a landing that pays for the bar once
@@ -55,65 +54,91 @@ instead of twice, and about a forced run keeping the guards that scope it.
 | id | delivers | tier | deps |
 |---|---|---|---|
 | TOOL-aBoundedCeiling-1 | per-leg wall-clock ceilings in the leg manifest, enforced by the runner | 2 | — |
-| TOOL-aBoundedCeiling-2 | one landing pays for one bar, not two | 2 | — |
-| TOOL-aBoundedCeiling-3 | a forced full run stops meaning "bypass every guard" | 2 | 2 |
-| TOOL-aBoundedCeiling-4 | one ceiling implementation in the tree, not two | 1 | 1 |
+| TOOL-aBoundedCeiling-5 | the ceiling travels to adopters through the deployer | 2 | 1 |
+| TOOL-aBoundedCeiling-6 | the close's gate run cannot outlive a declared bound | 2 | — |
 
-**TOOL-aBoundedCeiling-1** is the spine. A leg declares its ceiling in `tools/gate-legs.json`; the
-runner passes it to the per-leg deadline it already implements; a breach is a RED naming the leg and
-its declared ceiling, never a skip and never a green; a leg with no ceiling reds by that fact. This
-closes the open half of `TOOL-aBoundedVerdict-10` and implements charter §7's already-written rule at
-the place legs actually run.
+**TOOL-aBoundedCeiling-6 is the one that reaches the failure the prompt names.** It bounds the
+`$GATE_CMD` invocation inside `tools/unattended/unattended.sh`, which is where an unattended
+`--close` waits, and it binds whatever gate command a project declares. The hang recorded in
+`build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md` runs `scripts/gate.sh` — a
+runner gov neither ships nor can reach — so no ceiling inside gov's own runner would have ended it.
 
-**TOOL-aBoundedCeiling-2** — `--close` records a green the push boundary is structurally unable to
-accept, so every unattended landing runs the bar twice and the second run is the expensive one.
+**TOOL-aBoundedCeiling-1** is the spine for gov's own bar. A leg declares its ceiling in
+`tools/gate-legs.json`; the runner enforces it as that leg's deadline; a breach is a RED naming the
+leg and the number it broke. It closes `TOOL-aCollapsedScan-5` and the still-open per-leg-deadline
+half of `TOOL-aBoundedVerdict-10`.
 
-**TOOL-aBoundedCeiling-3** — `GATE_FULL=1` switches off all 47 guards, so a landing that touched only
-`memory/` still pays 45 kit self-test legs. Forcing should select the leg SET; the guards should still
-scope it.
-
-**TOOL-aBoundedCeiling-4** — `run-unattended-gates.sh` implements declare-a-ceiling-and-red-on-breach
-for eight suites, and unit 1 implements it for eighty-five. Two implementations of one rule is the
-drift class this repo gates elsewhere; whether the answer is a shared seam or a deletion is that
-spec's to resolve.
+**TOOL-aBoundedCeiling-5** carries that field to adopters. `tools/gate-legs.json` is not shipped —
+an adopter's manifest is machine-emitted by `govkit apply` — so without this unit the prompt's "and
+its adopters" is half delivered.
 
 ## BUILD-LEVEL RULES
 
-Classification per M2 is written here as each unit is classified. All four are MISSING at open — no
-spec exists yet.
-
 **Standing constraint, from the prompt record and not re-argued:** no unit may return the unattended
 kit's `*.test.sh` legs to `tools/gate-legs.json`. That removal was an owner ruling of 2026-08-23.
+
+### Classification (M2)
+
+All three live units were MISSING at open and are now SPECCED, authored this run and therefore
+unreviewed by definition until M4 runs.
+
+### Three planned units were dropped before any spec existed, and one was added
+
+Recorded here rather than as `--rescope` acts: the driver refuses to retire an id its GENERATED units
+region never carried, and at BASE that region was empty, so these three were plan entries and never
+units. The refusal is correct and the record belongs here instead.
+
+- **`TOOL-aBoundedCeiling-2`, one landing pays for one bar** — DROPPED to a park. The double bar is
+  real and measured, but removing it requires relaxing `.githooks/pre-push` predicate 5, which widens
+  what can land unverified. That is M3 veto 3 and an owner turn a standing mandate does not delegate.
+- **`TOOL-aBoundedCeiling-3`, a forced full run stops bypassing guards** — DROPPED, premise REFUTED.
+  `GATE_FULL` and `GATE_SELFTESTS` are orthogonal and `GATE_FULL` never unlocked kit-subject legs.
+  The all-or-nothing guard bypass is load-bearing: the `gate-full-green` stamp requires `skips == 0`,
+  so guard-scoping a forced run would kill the stamp and pin the push boundary into forcing forever.
+- **`TOOL-aBoundedCeiling-4`, one ceiling implementation** — DROPPED. Five of
+  `run-unattended-gates.sh`'s eight suites can never be manifest legs under the standing constraint
+  above, so a second declaration site exists regardless; and the two enforcements differ on exactly
+  the behaviour they would share, since one kills at the bound and the other must not, because a
+  killed suite prints no verdict and the kill then reads as silence. The residue — three `BUILD_*`
+  lines whose suites ARE legs — folds into `TOOL-aBoundedCeiling-1` S8.
+- **`TOOL-aBoundedCeiling-6` was ADDED** on the strength of a live observation, not a plan. See the
+  build record named above.
 
 <!-- roster:units -->
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aBoundedCeiling-1` | 2 | per-leg wall-clock ceilings in the leg manifest, enforced by the runner |
-| 2 | `TOOL-aBoundedCeiling-2` | 2 | one landing pays for one bar, not two |
-| 3 | `TOOL-aBoundedCeiling-3` | 2 | a forced full run stops meaning "bypass every guard" |
-| 4 | `TOOL-aBoundedCeiling-4` | 1 | one ceiling implementation in the tree, not two |
+| 2 | `TOOL-aBoundedCeiling-5` | 2 | the ceiling travels to adopters through the deployer |
+| 3 | `TOOL-aBoundedCeiling-6` | 2 | the close's gate run cannot outlive a declared bound |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4
+**Build status:** OPEN · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aBoundedCeiling-1`, `TOOL-aBoundedCeiling-6` | yes |
+| 2 | `TOOL-aBoundedCeiling-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
