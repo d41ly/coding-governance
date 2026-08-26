@@ -39,6 +39,25 @@ which is the configuration this hook was rewritten to stop shipping.
   site, a helper's default parameter, or a `gov:bounded-fanout` slice width — and the burden is on
   the fan-out.
 
+- A REF-KEYED VERDICT JOIN. A review harness that joins each finding to its skeptic verdict on a
+  `file:line` STRING loses findings to echo drift, and COLLAPSES two findings at one location so both
+  inherit whichever verdict landed last. The class has no runtime signal — a mis-keyed harness reports
+  a clean bill. Three spellings are refused: an object or Map literal indexed by a `.ref` string,
+  `.get`/`.set`/`.has`/`.delete` called on one, and the retired `verdictByRef` identifier in any
+  position. Key the join on the integer id the orchestrator assigns before the skeptic sees the
+  finding. This rule reads the literal-blanked view, so a mention inside a string is not a hit, and a
+  REGEX literal is — which is why a gate holding the ban table excludes itself from its own
+  population.
+
+## Running ONE rule
+
+`--only=<rule>` narrows the hook to a single rule, over a closed set whose only member today is
+`join`. Anything outside the set is REFUSED with the set named, rather than silently matching
+nothing. It exists so a file gate can share this predicate instead of re-implementing it.
+
+**A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
+rules off with no diff and a hook that still looks wired. `tools/check-wiring.sh` asserts its absence.
+
 An array LITERAL of ≤5 elements — the finder-lens fan — passes unmarked and needs no helper.
 
 ## Direct spawns are COUNTED, not parsed

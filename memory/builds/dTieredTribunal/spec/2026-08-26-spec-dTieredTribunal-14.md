@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
+**Status:** INPROGRESS · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 

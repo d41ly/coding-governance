@@ -105,7 +105,7 @@ ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL
 | [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | CLOSED | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded](spec/2026-08-26-spec-dTieredTribunal-13.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-26 |
-| [TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script](spec/2026-08-26-spec-dTieredTribunal-14.md) | 3 | 2 | SPECCED | rev-3 | 2026-08-26 |
+| [TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script](spec/2026-08-26-spec-dTieredTribunal-14.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-08-26 |
 | [TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too](spec/2026-08-26-spec-dTieredTribunal-11.md) | 4 | 2 | SPECCED | rev-5 | 2026-08-26 |
 | [TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do](spec/2026-08-26-spec-dTieredTribunal-12.md) | 5 | 2 | SPECCED | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->

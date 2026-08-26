@@ -85,11 +85,13 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
   audit, which is the majority review kind in this corpus, so every spec audit is driven by a script
   authored from scratch in the session that needs it. The measured consequence is that a field a
   program emits reaches the record far more often than one a document asks a human to remember.
-- **A file gate cannot see the modality where the defect actually happens.** An ad-hoc review harness
-  is an inline `script` string on a `Workflow` call and is never a file, so every scanner in this
-  directory covers the already-compliant committed harnesses and none of the observed failures. Only
-  the PreToolUse hook reaches that modality, and the two enforcement points currently disagree: a
-  cap-compliant inline script carrying a ref-keyed join passes the hook and fails the file gate.
+- **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
+  `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
+  rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one
+  predicate and an inline `script` string on a `Workflow` call is judged by it. What remains true is
+  the general shape: every OTHER file-scoped scanner in this directory still covers the committed
+  harnesses only, and a rule that lives in a gate rather than in the hook is still blind to the
+  modality where the defect happens.
 - **NEITHER sibling parses `args`.** Both are `const a = args || {}` with no JSON parse, at
   `drift-audit-state.js:47` and `drift-audit-code.js:48`, so a caller handing either a string falls
   back to the current directory — the wrong-repository defect `tier2-review.js` was hardened against
@@ -101,9 +103,11 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
 seam: tier2-review.js — reuse as the reference implementation of the pipeline and of every trust
 counter; extend by copying a guard together with the comment naming the unit that earned it, because
 the provenance is the only thing that stops the guard being deleted as noise later.
-seam: check-review-join.sh — reuse for a source-level absence assertion over the harness population;
-extend by adding a predicate to its awk, and note that comment stripping is load-bearing because the
-reference harness necessarily spells the banned expression while documenting it.
+seam: check-review-join.sh — reuse for a source-level absence assertion over the harness population.
+It no longer HOLDS a predicate: it selects the population and delegates to `agent-cap.js --only=join`,
+so extend it by adding a rule to the hook and a member to that closed set, never by re-implementing
+one here. Literal blanking is load-bearing and lives in the hook, because the reference harness
+necessarily spells the banned expression while documenting it.
 seam: agent-cap.js — reuse as the single predicate for any fan-out rule that must reach an inline
 script; extend by delegating from a file gate rather than re-implementing, the way
 check-verifier-fanout.sh already does.

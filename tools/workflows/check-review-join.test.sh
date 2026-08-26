@@ -131,6 +131,9 @@ mkdir -p "$D/tools/workflows"
     > tools/workflows/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
 cp "$GATE" "$D/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+# TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
+# without one meets the missing-predicate refusal instead of the verdict this arm asserts.
+mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"
 
 # never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
 cat >"$D/tools/workflows/scratch-join.js" <<'EOF'
@@ -161,8 +164,22 @@ E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
 cp "$GATE" "$E/gate.sh"
+# S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
+# not bound until this block, so a `$D` spelling here would judge the wrong repo.
+mkdir -p "$E/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$E/tools/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
+
+# TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
+# predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
+# assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
+N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
+( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > tools/workflows/w.js
+  git add -A && git commit -qm nohook --no-verify )
+cp "$GATE" "$N/gate.sh"
+arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
+  bash -c 'cd "$1" && bash ./gate.sh' _ "$N"
 
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi

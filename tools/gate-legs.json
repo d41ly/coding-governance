@@ -432,6 +432,7 @@
       "tools/workflows/check-verifier-fanout.test.sh"
     ],
     "guard": [
+      "tools/hooks/",
       "tools/lib/",
       "tools/workflows/"
     ],
@@ -477,6 +478,7 @@
       "tools/workflows/check-review-join.test.sh"
     ],
     "guard": [
+      "tools/hooks/",
       "tools/lib/",
       "tools/workflows/"
     ],

@@ -28,7 +28,12 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "review-join: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-SELF_EXCLUDE='^tools/workflows/check-review-join\.(sh|js|test\.sh)$'
+SELF_EXCLUDE='^tools/(workflows/check-review-join\.(sh|js|test\.sh)|hooks/agent-cap\.js)$'
+# TOOL-dTieredTribunal-14 S6 - the hook joins the exclusion because it now HOLDS the ban table.
+# Measured, not defensive: the retired-identifier ban is a bare regex literal, a regex literal
+# survives the hook's own literal blanking, and the predicate run over the hook returns one hit on
+# exactly the table's line. This file's header already declared the doctrine and said SELF_EXCLUDE
+# keeps it true if the predicate is ever written in JavaScript. After S1 it is.
 
 if [ "$#" -gt 0 ]; then
   FILES=$(printf '%s\n' "$@")
@@ -50,13 +55,13 @@ if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
   exit 1
 fi
 
-# One awk over the whole population. Per line: drop a /* … */ span (including one that opens here and
-# closes later), then drop a // tail — but only when the // is at the start or follows whitespace and
-# is NOT preceded by a colon, so `https://…` inside a string survives as code. Then match the bans.
-#
-#   BAN 1  obj[<something>.ref]          — an object or Map literal keyed by a ref string
-#   BAN 2  .get/.set/.has/.delete(x.ref) — the same defect wearing a Map's clothes
-#   BAN 3  verdictByRef                  — the retired identifier itself, in any position
+# TOOL-dTieredTribunal-14 S5 - THE PREDICATE MOVED. It lives in tools/hooks/agent-cap.js as rule 5,
+# and this gate delegates to it so both entry points share one predicate. The reason is the modality:
+# an ad-hoc review harness is an inline `script` string on a Workflow tool call and is NEVER a file,
+# so this gate covered the already-compliant committed harnesses and none of the observed failures.
+# The hook sees that string. Its three bans, and the `why` text this gate's own self-test asserts,
+# are pinned in that rule; the stripper is the hook's `blankLiterals`, which BLANKS string contents
+# where the awk kept them, and that narrowing is recorded in the unit's section 4 Migration.
 SCAN=()
 while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && SCAN+=("$f"); done <<<"$FILES"
 if [ "${#SCAN[@]}" = 0 ]; then
@@ -64,32 +69,25 @@ if [ "${#SCAN[@]}" = 0 ]; then
   exit 1
 fi
 
-# The stripper is a CHARACTER scan, not a regex. A `match(/\/\//)` on the raw line cannot tell the
-# `//` that opens a comment from the one inside `"https://…"`, and cutting on the wrong one turns a
-# code line into prose and the ban into a no-op. Quote state carries across lines (template
-# literals), block-comment state carries across lines, and a backslash escape consumes its next
-# character so a regex literal's `\/` is not read as a delimiter. Both states reset per file.
-hits=$(awk '
-  function strip(s,   n, i, c, d, out) {
-    n = length(s); out = ""; i = 1
-    while (i <= n) {
-      c = substr(s, i, 1); d = substr(s, i, 2)
-      if (inblk)  { if (d == "*/") { inblk = 0; i += 2 } else i++; continue }
-      if (c == "\\") { out = out substr(s, i, 2); i += 2; continue }
-      if (q != "") { if (c == q) q = ""; out = out c; i++; continue }
-      if (d == "/*") { inblk = 1; i += 2; continue }
-      if (d == "//") break
-      if (c == "\"" || c == "'"'"'" || c == "`") { q = c }
-      out = out c; i++
-    }
-    return out
-  }
-  FNR == 1 { inblk = 0; q = "" }
-  { code = strip($0)
-    if (code ~ /\[[A-Za-z_$][A-Za-z0-9_$.]*\.ref\]/)                       print FILENAME ":" FNR ": object/Map literal keyed by a .ref string"
-    else if (code ~ /\.(get|set|has|delete)\([A-Za-z_$][A-Za-z0-9_$.]*\.ref[),]/) print FILENAME ":" FNR ": Map keyed by a .ref string"
-    else if (code ~ /verdictByRef/)                                         print FILENAME ":" FNR ": the retired verdictByRef identifier"
-  }' "${SCAN[@]}")
+HOOK="$ROOT/tools/hooks/agent-cap.js"
+[ -f "$HOOK" ] || { echo "review-join: the predicate is at $HOOK and it is not there — a gate whose predicate is absent must say so, not pass"; exit 2; }
+command -v node >/dev/null 2>&1 || { echo "review-join: node is not on PATH, so the predicate cannot run — refusing rather than passing"; exit 2; }
+
+hits=""
+for f in "${SCAN[@]}"; do
+  # The payload is built by node itself: a JSON encoder written in shell is one more place for a
+  # backslash or a backtick in a script under judgement to change the meaning of the thing judged.
+  if ! out=$(node -e '
+      const fs = require("fs")
+      process.stdout.write(JSON.stringify({
+        tool_name: "Workflow",
+        tool_input: { script: fs.readFileSync(process.argv[1], "utf8") },
+      }))' "$f" | node "$HOOK" --only=join 2>&1); then
+    hits="$hits$f:
+$(printf '%s' "$out" | sed -n '/^  L/,$p')
+"
+  fi
+done
 
 if [ -n "$hits" ]; then
   echo "review-join: FAILED — a ref-keyed verdict join reappeared. Key the join on the integer id the"

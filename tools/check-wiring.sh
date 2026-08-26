@@ -135,6 +135,16 @@ check_agentcap() {
     return
   fi
   if wired "agent-cap.js" "$AGENTCAP_MATCHER"; then
+    # TOOL-dTieredTribunal-14 S7 - a WIRED command may never carry --only. The flag narrows the hook
+    # to one rule, so `--only=join` in settings.json turns the three cap rules off with no diff and a
+    # hook that still looks wired. That is the class of the AGENT_CAP environment knob this file
+    # deleted, whose own header records that it survived two releases by appearing to work.
+    # matchers_of() discards the command, so the command text is read here rather than there.
+    if grep -o '"command"[^"]*"[^"]*agent-cap\.js[^"]*"' .claude/settings.json 2>/dev/null | grep -q -- '--only'; then
+      echo "UNWIRED  agent-cap — the wired command carries --only, which runs ONE rule and silently disables the rest. Remove the flag from .claude/settings.json."
+      unwired=$((unwired+1))
+      return
+    fi
     echo "ok       agent-cap — PreToolUse hook wired in .claude/settings.json (matcher '$AGENTCAP_MATCHER')"
     return
   fi

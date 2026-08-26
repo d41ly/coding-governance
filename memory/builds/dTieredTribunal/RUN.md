@@ -28,3 +28,5 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T11:48:38Z dispatch · item c6f320bd TOOL-dTieredTribunal-15 · reason memory/gotchas memory/map/features memory/map/generated
 
 2026-08-26T12:26:39Z dispatch · item 7b0999a4 TOOL-dTieredTribunal-13 · reason tools/hooks .claude/hooks memory/map/features memory/map/generated
+
+2026-08-26T13:00:50Z dispatch · item 91c5d3ac TOOL-dTieredTribunal-14 · reason tools/hooks .claude/hooks tools/workflows

@@ -129,8 +129,21 @@ mentions `agent-cap.js`.
 modulo the install prefix, and asserts the cap's NUMBER so parity cannot hold over a document that
 stopped stating the rule.
 
+The FIFTH rule is the ref-keyed verdict join, lifted from `tools/workflows/check-review-join.sh` by
+`TOOL-dTieredTribunal-14`. It is last because it is the cheapest failure to recover from: the four
+rules above it prevent a BURST, while a mis-keyed join is a wrong verdict that costs a re-run. Adding
+it required INVERTING the raw-primitive block, which alone was written as an early exit-0 and so made
+any later rule unreachable for the scripts the join ban exists to judge. A `--only=<rule>` selector
+over a closed set lets the file gate share this predicate instead of re-implementing it, and a WIRED
+command may never carry it — `tools/check-wiring.sh` asserts that, because narrowing a wired hook
+turns the cap rules off with no diff.
+
 ## Gaps
 
+- **The join rule reads a blanked view, and a regex literal survives it.** So a file holding the ban
+  table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
+  The exclusion is measured rather than defensive, and it is the kind of row that silently widens if
+  the table ever moves.
 - **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** That script runs
   with no hooks, so no process observes those spawns. Declared here and in the protocol rather than
   implied away; it is the reason the `Workflow` half is static.

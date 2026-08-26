@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.7' // gov:kit agent-cap@1.7 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.8' // gov:kit agent-cap@1.8 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -801,7 +801,52 @@ function guardAgentSpawn(data) {
   )
 }
 
+// TOOL-dTieredTribunal-14 S1 - RULE 5, the ref-keyed verdict join. Ported from the awk in
+// tools/workflows/check-review-join.sh, which is a FILE gate and therefore blind to the modality
+// where this defect actually happens: an ad-hoc review harness is an inline `script` string on a
+// Workflow tool call and is never a file. That gate covered four already-compliant committed
+// harnesses and none of the observed failures. The three `why` strings are FROZEN at the bytes that
+// gate's self-test asserts - those arms are this port's regression suite, and an unedited arm
+// proving an unchanged verdict is worth more than a prettier string.
+//
+// S2 - the view is `blankLiterals`, the one this file already defines, rather than a second
+// character scanner. That is a deliberate NARROWING: the awk kept string CONTENTS and only stripped
+// comments, so it matched the retired identifier inside a string. Two fixtures in the self-test pin
+// the difference in both directions. A regex LITERAL survives the blanking, which is why the gate
+// excludes this file from its own population - the ban table below would otherwise match itself.
+function scanJoinFindings(script) {
+  const raws = script.split(/\r?\n/)
+  const code = blankLiterals(script)
+  const out = []
+  for (let i = 0; i < code.length; i++) {
+    const l = code[i]
+    let why = null
+    if (/\[[A-Za-z_$][A-Za-z0-9_$.]*\.ref\]/.test(l)) why = "object/Map literal keyed by a .ref string"
+    else if (/\.(get|set|has|delete)\([A-Za-z_$][A-Za-z0-9_$.]*\.ref[),]/.test(l)) why = "Map keyed by a .ref string"
+    else if (/verdictByRef/.test(l)) why = "the retired verdictByRef identifier"
+    if (why) out.push({ n: i + 1, line: raws[i] === undefined ? l : raws[i], why })
+  }
+  return out
+}
+
 function main() {
+  // TOOL-dTieredTribunal-14 S4 - a rule selector over a CLOSED set, so a second entry point can ask
+  // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
+  // Anything outside the set REFUSES rather than silently matching nothing, which would be this
+  // repo's vacuous-selector-empty-population class arriving in the file whose job is to refuse what
+  // it cannot resolve. A WIRED command must never carry it: tools/check-wiring.sh asserts that,
+  // because `--only=join` in settings.json would turn the three cap rules off with no diff.
+  const ONLY_RULES = ["join"]
+  const onlyArg = process.argv.slice(2).find((a) => a.startsWith("--only="))
+  const ONLY = onlyArg === undefined ? null : onlyArg.slice("--only=".length)
+  if (ONLY !== null && ONLY_RULES.indexOf(ONLY) === -1) {
+    process.stderr.write(
+      "agent-cap: --only=" + ONLY + " names no rule this hook has. The closed set is: " +
+        ONLY_RULES.join(", ") + ". Omit the flag to run every rule.\n",
+    )
+    process.exit(2)
+  }
+
   let data
   try {
     data = JSON.parse(readStdin())
@@ -854,7 +899,7 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = fanoutFindings(script)
+  const fan = ONLY === null ? fanoutFindings(script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
@@ -874,7 +919,7 @@ function main() {
   // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
   // both, and the arity message is the one that names the defect an operator has to fix; reversing
   // the order would retitle the rule-2 corpus without changing a verdict.
-  const caps = capFindings(script)
+  const caps = ONLY === null ? capFindings(script) : []
   if (caps.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
@@ -889,9 +934,14 @@ function main() {
     process.exit(2)
   }
 
-  const bad = offendingLines(script)
-  if (bad.length === 0) process.exit(0)
-
+  // TOOL-dTieredTribunal-14 S3 - INVERTED. This block alone was written as an early exit-0, so any
+  // rule appended after it never ran for a script carrying no raw parallel()/pipeline() - which is
+  // every script the join ban exists to judge. The two rules above already use this additive shape.
+  // Order is unchanged and still decides which message an operator sees: the three rules above all
+  // prevent a BURST, the expensive failure this hook exists for, while a ref-keyed join is a wrong
+  // verdict, which is cheap to re-run.
+  const bad = ONLY === null ? offendingLines(script) : []
+  if (bad.length) {
   const shown = bad
     .slice(0, 6)
     .map(({ n, line }) => `  L${n}: ${line.trim()}`)
@@ -918,6 +968,24 @@ function main() {
       `\n`,
   )
   process.exit(2)
+  }
+
+  // RULE 5 - the ref-keyed verdict join. LAST because it is the cheapest failure to recover from.
+  const joins = scanJoinFindings(script)
+  if (joins.length) {
+    process.stderr.write(
+      `BLOCKED by agent-cap: a ref-keyed verdict join. A review harness that joins each finding to ` +
+        `its skeptic verdict on a \`file:line\` STRING loses findings to echo drift and COLLAPSES two ` +
+        `findings at one location, so both inherit whichever verdict landed last. The class has no ` +
+        `runtime signal - a mis-keyed harness reports a clean bill.\n\n` +
+        joins.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
+        `\n\nKey the join on the integer id the orchestrator assigns, never on a string the skeptic ` +
+        `reproduces. Ready-made: tools/workflows/tier2-review.js.\n`,
+    )
+    process.exit(2)
+  }
+
+  process.exit(0)
 }
 
 main()

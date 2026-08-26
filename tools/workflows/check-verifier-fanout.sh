@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-# check-verifier-fanout.sh — the COMMITTED workflow harnesses obey the review protocol's verifier cap.
+# check-verifier-fanout.sh — the COMMITTED workflow harnesses obey every rule agent-cap.js enforces.
+# TOOL-dTieredTribunal-14 S3: this gate pipes each harness to the hook with NO --only flag, so once
+# the hook's raw-primitive early exit was inverted it began enforcing the ref-keyed-join rule too.
+# No verdict moved — its population is a SUBSET of the join gate's and the wider set was measured
+# clean — but a header describing a one-rule gate would be a structural check reading as a
+# semantic one, which is the class the charter names. Disclosed rather than widened silently.
 #
 #   bash tools/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash tools/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
 #
-# Exit 0 = clean · 1 = a per-item verify fan-out survives · 2 = misconfigured.
+# Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
 #
 # THIS GATE DOES NOT IMPLEMENT THE RULE. It feeds each script to `tools/hooks/agent-cap.js` — the
 # same predicate the `PreToolUse` hook applies at the `Workflow` tool call — and reports what the hook

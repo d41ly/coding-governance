@@ -2438,6 +2438,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "scanJoinFindings",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
