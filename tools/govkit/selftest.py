@@ -2491,9 +2491,15 @@ user_skills = "/tmp/gk-fake-skills"
               bool(gout(_oa, "diff", "--cached", "--name-only", "HEAD").split()),
               gout(_oa, "diff", "--cached", "--name-only", "HEAD")[:300])
         _poa2 = run("update", "--target", str(_oa), "--write")
+        # ROUND 4's M5: this asserted an ABSENCE and never touched the return code, while its
+        # negative twin below asserts `returncode == 2 and "DIRTY" in ...` -- a one-token asymmetry
+        # inside one fixture. The blind spot needs a failure that refuses on the clean post-apply
+        # tree but gets DIRTY-masked on the dirtied one; narrow, and this is the third absence-only
+        # arm this build has produced, so it is fixed rather than argued about.
         check("[-12] RULING-A a writing verb straight after `apply` is NOT blocked by apply's own "
               "staging",
-              "DIRTY" not in _poa2.stderr, _poa2.stdout[-400:] + _poa2.stderr[-400:])
+              _poa2.returncode == 0 and "DIRTY" not in _poa2.stderr,
+              f"rc {_poa2.returncode}: " + _poa2.stdout[-400:] + _poa2.stderr[-400:])
         # ---- THE RECEIPT RECORDS WHAT THE INDEX HOLDS, over every LANDABLE row the target tracks.
         # ---- The stamp used to run BEFORE `git add --renormalize`, which rewrites the index blob of
         # ---- every LF-pinned path, so each affected row recorded a blob the target does not hold.
@@ -2878,9 +2884,10 @@ user_skills = "/tmp/gk-fake-skills"
             check("[-12] RULING-B LIVENESS ...and it is now out of the index, still on disk",
                   _obnt[0] not in gout(_ob, "ls-files").split() and (_ob / _obnt[0]).is_file(), "")
             _pob = run("update", "--target", str(_ob), "--write")
+            # M5, same shape, same fix: an absence with no return code beside it.
             check("[-12] RULING-B a NON-table row shadowed by an untracked file does not refuse the "
                   "whole run -- that row can never reach the raw write the refusal exists to stop",
-                  "absent from its INDEX" not in _pob.stderr,
+                  _pob.returncode == 0 and "absent from its INDEX" not in _pob.stderr,
                   f"rc {_pob.returncode}: " + _pob.stdout[-400:] + _pob.stderr[-400:])
 
         # ---- DEPL-dCarriedReceipt-7: TWO IDENTITIES, READ INDEX-SIDE -------------------------
@@ -6074,16 +6081,51 @@ user_skills = "/tmp/gk-fake-skills"
         # target's own script. Run over the real tree before wiring, hits and near-misses both:
         # eight hit functions, thirty-four allowlisted git calls across twenty-one functions.
         def _git_plumbing1(call) -> bool:
-            a0 = call.args[0] if call.args else None
-            while isinstance(a0, _ast1.BinOp):        # `["git", ...] + paths`
-                a0 = a0.left
-            if not (isinstance(a0, _ast1.List) and a0.elts
-                    and isinstance(a0.elts[0], _ast1.Constant)
-                    and a0.elts[0].value == "git"):
-                return False
-            _words = [e.value for e in a0.elts if isinstance(e, _ast1.Constant)]
-            return not ("hook" in _words and "run" in _words)
+            """Is this spawn literal `git` plumbing, and therefore outside the census?
 
+            ROUND 4's M4. This read the argv's literal elements and asked whether `hook`/`run` were
+            among them, so `govkit.git`'s own `["git", "-C", str(root), *args]` presented as
+            `['git', '-C']` -- no subcommand at all -- and was allowlisted unconditionally. The
+            by-name exclusion of `git hook run` IS the guarantee the declaration's header sells, and
+            the module's own primary git wrapper defeated it: one future
+            `git(target, "hook", "run", "pre-commit")` would spawn target-authored hook code with
+            zero census rows and a green both-directions arm. No live exploit -- all callers pass
+            gov's own root with literal subcommands -- so it is a latent gate gap, and it is round
+            3's M2 shape (a guarantee narrower than the sentence selling it) reintroduced inside the
+            fix for it.
+
+            THE PROPERTY IS WHETHER THE SUBCOMMAND IS RESOLVABLE HERE, not whether every element is
+            a literal. Measured: rejecting any non-`Constant` element admits twenty legitimate
+            plumbing sites into the census, because `str(target)` is a `Call` and appears in almost
+            all of them. So `-C`/`-c` and their value are skipped, and the NEXT element must be a
+            string constant naming the subcommand. Starred, non-constant or absent means unknowable,
+            and an allowlist that cannot see what it is allowing is allowing everything.
+            """
+            _elts = getattr(call.args[0], "elts", None) if call.args else None
+            if not _elts:
+                return False
+            _first = _elts[0]
+            if not (isinstance(_first, _ast1.Constant) and _first.value == "git"):
+                return False
+            _i = 1
+            while _i < len(_elts):
+                _e = _elts[_i]
+                if isinstance(_e, _ast1.Constant) and _e.value in ("-C", "-c"):
+                    _i += 2                      # the flag and its value, whatever shape it is
+                    continue
+                break
+            if _i >= len(_elts):
+                return False                     # `git` with no subcommand -> census HIT
+            _sub = _elts[_i]
+            if isinstance(_sub, _ast1.Starred) or not isinstance(_sub, _ast1.Constant):
+                return False                     # unresolvable subcommand -> census HIT
+            if not isinstance(_sub.value, str):
+                return False
+            _words = [e.value for e in _elts
+                      if isinstance(e, _ast1.Constant) and isinstance(e.value, str)]
+            if "hook" in _words and "run" in _words:
+                return False                     # runs the TARGET's script; excluded BY NAME
+            return True
         _exec_found = set()
         for _n in _ast1.walk(_t1):
             if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Attribute) \
@@ -6330,16 +6372,45 @@ user_skills = "/tmp/gk-fake-skills"
         for _n in _ast1.walk(_t1):
             if isinstance(_n, _ast1.FunctionDef):
                 _fnsrc1[_n.name] = _ast1.get_source_segment(_g5src, _n) or ""
+        # ROUND 4's L3. This was a flat substring test over each site's OWN source, so it was not
+        # transitive -- measured, it derived only FIVE of the eight declared sites.
+        # `read_gate_verdicts` is labelled `target` BY HAND, contains neither name, and spawns the
+        # TARGET's own `[gate_runner].command` through a helper. So the comment's claim that the
+        # label is DERIVED "so the next spawn cannot be mislabelled by hand" was already false for
+        # one live site. Closed one hop: a site counts as target-controlled if its own body resolves,
+        # or if it CALLS something whose body does.
+        _resolvers = ("target_context", "resolve_tokens", "resolve_shell_argv")
+        def _resolves_directly(_name):
+            _src = _fnsrc1.get(_name, "")
+            return any(_r in _src for _r in _resolvers)
+        _callees1 = {}
+        for _n2 in _ast1.walk(_t1):
+            if isinstance(_n2, _ast1.FunctionDef):
+                _callees1[_n2.name] = {c.func.id for c in _ast1.walk(_n2)
+                                       if isinstance(c, _ast1.Call)
+                                       and isinstance(c.func, _ast1.Name)}
         _derived_target = {k for k in govkit_module().SHELL_EXEC_SITES
-                           if "target_context" in _fnsrc1.get(k, "")
-                           or "resolve_tokens" in _fnsrc1.get(k, "")}
+                           if _resolves_directly(k)
+                           or any(_resolves_directly(c) for c in _callees1.get(k, ()))}
         check("[-5] H1 LIVENESS the derivation really finds token-resolving spawn sites",
               len(_derived_target) >= 3, str(sorted(_derived_target)))
         _mislabelled = sorted(k for k in _derived_target
                               if govkit_module().SHELL_EXEC_SITES.get(k) != "target")
         check("[-5] H1 no spawn site whose argv resolves TARGET token values is labelled `gov`",
               not _mislabelled,
-              "typed `gov` but reaches target_context/resolve_tokens: " + ", ".join(_mislabelled))
+              "typed `gov` but reaches a resolver: " + ", ".join(_mislabelled))
+        # ROUND 4 L3: A ONE-DIRECTIONAL DERIVATION CHECK IS HALF A GATE. The arm above only reds a
+        # derived-target row typed `gov`. The other direction -- a row typed `target` that derives as
+        # `gov` -- is what would have caught `read_gate_verdicts` on the day it was hand-labelled.
+        # `target-code` is exempt: its argv is entirely gov's and what it RUNS is the target's, which
+        # no resolver-reachability test can see.
+        _overlabelled = sorted(k for k, v in govkit_module().SHELL_EXEC_SITES.items()
+                               if v == "target" and k not in _derived_target)
+        check("[-5] R4-L3 ...and no site is hand-labelled `target` without deriving as one -- the "
+              "check is bidirectional now, which is what makes the label DERIVED rather than typed",
+              not _overlabelled,
+              "typed `target` but reaches no resolver, directly or one hop: "
+              + ", ".join(_overlabelled))
 
         # ---- ROUND 2's M4 AND L4, and what they cost. The arm that stood here asserted a SOURCE
         # ---- SHAPE: `"print(" in _body`, over the whole function, plus a twelve-line window above
@@ -6368,6 +6439,10 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
+            "_cmd_update": None,         # `git rm ... + deleted`: the paths come from the receipt,
+                                         # so the target influences the argv and the row is `target`
+                                         # -- but the verb prints its withdrawal decisions, never
+                                         # this argv. Unasserted, and named below like the rest.
         }
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),

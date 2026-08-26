@@ -1794,17 +1794,24 @@ def derive_rule_kind(eid: str, desc: dict, rule: dict, dest: str, written: set[s
 # ---- before wiring, per S7: zero false positives, zero near-misses, and the exemption is
 # ---- load-bearing -- kickoff-manifest's `{user_skills}/session-kickoff` is absolute by design.
 def demand_contained_rows(rows, files, where: str) -> None:
-    """Refuse the run if any planned row lands outside the target. One reader, two callers."""
+    """Refuse the run if any planned row lands outside the target. ONE caller: `_cmd_apply`.
+
+    ROUND 4's L4. This said "two callers" and there has only ever been one. The intended second
+    producer, `planned_writes`, inlines `demand_contained_dest` instead, with its own comment
+    explaining why -- plan rows never carried `row["rule"]`, so the machine/link exemption could not
+    fire there. An `attributes` exemption also stood here and was DEAD from the sole caller:
+    `.gitattributes:<pattern>` destinations are minted only inside `planned_writes`, while this
+    caller's rows come from `resolve_entry`, whose roles come from descriptor `[[files]]` rules --
+    and `attributes` is not in `ROLE_KINDS`, which selfcheck arm 3b refuses. Deleted rather than
+    routed: making the claim true by threading a rule index through `planned_writes` is a refactor
+    wearing a comment fix's clothes.
+    """
     for row in rows:
         ri = row.get("rule")
         rule = files[ri] if isinstance(ri, int) and 0 <= ri < len(files) else {}
         if rule.get("scope") == "machine" or rule.get("link"):
             continue
         dest = row.get("dest") or ""
-        # An `attributes` plan row spells `.gitattributes:<pattern>`; the pattern is not a path and
-        # the file it names is contained by construction. Grade the destination, not the pin.
-        if row.get("role") == "attributes" and dest.startswith(".gitattributes:"):
-            continue
         if dest:
             demand_contained_dest(dest, where)
 
@@ -2029,6 +2036,29 @@ SHELL_EXEC_SITES = {
     "decline_findings": "target",    # `[[decline]].discharge.command` — opt-in, printed
     "hook_probe": "target-code",     # `git hook run pre-commit` — gov's ARGV, the TARGET's SCRIPT
     "check_runs": "gov",             # a bash candidate probed with `-c :` — gov's own candidate list
+    # ---- ROUND 4's M4 admitted these five. Each is a spawn whose SUBCOMMAND this census cannot
+    # ---- resolve from the argv node, which is now a HIT rather than a silent allowlist entry: the
+    # ---- old predicate read literal elements only, so gov's own `git` wrapper presented as
+    # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
+    # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
+    # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
+                                     # `*args` is what the census cannot read. A future
+                                     # `git(target, "hook", "run", ...)` must move this to
+                                     # `target-code` -- that is the whole point of the row.
+    "_names": "gov",                 # `["git", "-C", ..., *args, "--", *claimed]` inside
+                                     # `dirty_claimed_paths`; the `*args` is what the census cannot
+                                     # read. Gov's own verbs choose it. NOT `dirty_claimed_paths`:
+                                     # the census keys on the INNERMOST enclosing function, which my
+                                     # first cut got wrong by attributing nested calls to the outer
+                                     # one too. Same reason `check_runs` above covers the bash probe
+                                     # rather than its enclosing `resolve_bash`.
+    "_cmd_update": "target",         # `[...literal git rm...] + deleted` — a BinOp the census
+                                     # cannot destructure. Labelled `target` and not `gov`: `deleted`
+                                     # is receipt paths, so the TARGET influences this argv, which is
+                                     # this table's own definition of the label. They arrive after
+                                     # `--` as path operands and are contained upstream, but the
+                                     # label describes WHO CHOOSES the bytes, not how safe they are.
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -4082,6 +4112,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                               "sha256": hashlib.sha256((target / conf).read_bytes()).hexdigest()}]
     print(f"govkit apply — observed {n_rendered} rendered destination(s)")
 
+    _renormalized = False   # M3: set only where `git add --renormalize` actually runs
     # ---- RENORMALIZE, after CONFIGURE and not beside the block. This DEPARTS from the contract's
     # ---- stated order, deliberately and for a measured reason: before the adopters have run, the
     # ---- pinned population is empty.
@@ -4109,6 +4140,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             else:
                 subprocess.run(["git", "-C", str(target), "add", "--renormalize", "--"] + lf_paths,
                                capture_output=True, check=False)
+                _renormalized = True   # M3: the re-stamp below keys on THIS, not on `staged`
         after = eol_population(target)
         idx = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "--"] + lf_paths,
                              capture_output=True, text=True).stdout if lf_paths else ""
@@ -4149,7 +4181,17 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- ratified criteria to reach one path. The arms caught it on the next run, which is the arms
     # ---- working; `.gitattributes` is unblocked at the dirty check instead, where the reason it is
     # ---- not a hazard is stated by the dispatch table rather than invented here.
-    if staged:
+    # ROUND 4's M3: this was gated on `if staged:` -- "the LAND step wrote something" -- while the
+    # renormalize that invalidates the stamp is gated on `pins`, which is the union of this selection
+    # and every kit the receipt already claims. Different conditions. A re-`apply` of an all-`seed`
+    # selection whose files already exist lands nothing new, so `staged` is empty, while `pins` is not
+    # and `git add --renormalize` still rewrites index blobs -- leaving rows claiming blobs the target
+    # no longer holds, in the field ruling A's carve-out compares. Two shipped entries declare exactly
+    # one seed rule each. The obvious refutation, that the dirty guard above the renormalize would
+    # refuse first, was TESTED by the reviewer and fails: `git diff --name-only HEAD` prints nothing
+    # for a committed CRLF file under a newly added `eol=lf` pin, which is precisely the population
+    # the renormalize moves.
+    if staged or _renormalized:
         _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
         _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
         for w in rows:

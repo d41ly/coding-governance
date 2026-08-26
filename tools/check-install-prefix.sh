@@ -228,9 +228,21 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
   # committed state, so it is only "missing" while something still carries a literal. This sits
   # AFTER the assignment for the reason `set -u` gives: the first cut read `$rows` one line above
   # the line that sets it.
-  if [ ! -s "$CARRIED" ] && [ -n "$rows" ]; then
+  # ROUND 4's L2: these are TWO states and one condition was grading both. Narrowing the guard to
+  # `-s AND rows non-empty` meant a genuinely MISSING file fell through whenever the hit set was
+  # zero -- which is exactly the goal state L1 was added to permit -- and the awk below then could
+  # not open its first file, exiting 2 and printing the carried-literal remedy instead of this one.
+  # The gate still redded, so it taught the operator the wrong repair rather than passing wrongly.
+  # MISSING is unconditional; EMPTY-BUT-PRESENT keeps the narrowing, which is what D4 bought.
+  if [ ! -e "$CARRIED" ]; then
     echo "install-prefix: no $CARRIED — run --write-ratchet once and commit it. A missing ratchet is"
     echo "install-prefix: not a clean one."
+    exit 1
+  fi
+  if [ ! -s "$CARRIED" ] && [ -n "$rows" ]; then
+    echo "install-prefix: $CARRIED is EMPTY while $(printf '%s
+' "$rows" | grep -c .) file(s) still"
+    echo "install-prefix: carry a literal — run --write-ratchet once and commit it."
     exit 1
   fi
   # SHRINK-ONLY, PER FILE. The existing arm's `<path>:<line>` shape goes stale on every edit above a
