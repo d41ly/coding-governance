@@ -44,3 +44,5 @@ base: da9e4cd28072501cd4fe87a81db36c01b9a80f9e
 2026-08-26T02:06:53Z review · item dTieredTribunal-specs · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-08-26T02:16:47Z dispatch · item ac57d4a2 TOOL-dTieredTribunal-1 · reason tools/workflows/tier2-review.js
+
+2026-08-26T02:20:28Z dispatch · item 4c9f752f TOOL-dTieredTribunal-2 · reason memory/gotchas/fold-text-is-unreviewed-surface.md memory/gotchas/INDEX.md memory/map/features/build-method.md memory/map/generated

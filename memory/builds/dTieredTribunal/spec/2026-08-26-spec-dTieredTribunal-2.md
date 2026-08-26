@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue
 
-**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
