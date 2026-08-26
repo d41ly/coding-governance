@@ -77,6 +77,38 @@ in — not against the vintage the spec was written on.
   `-2`'s pins arm, and neither writes a byte. This is the arm that would red under a skip scoped by
   field absence, or by anything wider than the `table` disposition.
 
+## The verb run against a REAL adopter, which no fixture substitutes for
+
+Node `a` reaches both live adopter checkouts and node `d` did not, so this is evidence the unit's
+own build could not have produced. Read-only against `C:/projects/nicocares/main` first: **155 rows
+would be recorded**, the target's `git status --porcelain` stayed empty afterwards, and no
+`install.json` appeared — AC2's promise, kept on a repository gov does not own.
+
+Then `--write` against an INDEX-ONLY MIRROR of that repository, built with
+`git clone --shared --no-checkout` from its real gitdir plus `read-tree HEAD`, so the receipt could
+be inspected without a byte reaching the live tree. **Nothing was written into
+`C:/projects/nicocares`.** Over the resulting 155-row receipt:
+
+- **The inversion gate, over 125 real rows carrying `commit` and `gov_oid`: ZERO mismatches.** Every
+  one equals `git rev-parse <commit>:<source>` in gov. This is AC4's standing predicate measured on
+  an adopter rather than on a fixture, and it is the field the entire unit's safety rests on.
+- **Carried rows whose two identities AGREE: ZERO.** The raw-write arm is closed exactly where it
+  must be.
+- **`evidence` came out 125 `vintage-match`, 29 `unattributed`, 1 ABSENT** — and the one absence is
+  the synthesized `attributes` row, which is precisely the class S11 says carries no `evidence`. The
+  four-states-plus-absence model, observed rather than asserted.
+- **`role` came out 133 `engine`, 9 `rendered`, 7 `seed`, 3 `forked`, 2 `project-owned`, 1
+  `attributes`.** The three `forked` rows are the descriptor's claim, carried through a walk that
+  found matches for other rows in the same run.
+- **`install.sums` holds 154 lines against 154 rows carrying `sha256`.** The filter agrees on both
+  sides, and the single row without one is the `attributes` row — exactly the split S5 states.
+- **The 29 unattributed rows are GENUINE, not a walk failure.** Five were sampled and each was asked
+  the question directly: does the target's index blob equal gov's blob at ANY commit in that path's
+  own history? All five: NONE, over histories of 8 to 108 commits. The liveness control ran the same
+  question against an attributed row and got an exact match. So partial attribution proceeded, each
+  unattributable row took its own state, and no base was invented for any of them — which is §3's
+  non-goal and AC6's behaviour, on a real tree.
+
 ## Two things found while building, neither of them this unit's
 
 - **`-14`'s AC8 arm was pinned to a MOVING REF and had gone vacuous.** It fetched
