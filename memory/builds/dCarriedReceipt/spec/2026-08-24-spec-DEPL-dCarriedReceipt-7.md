@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-7 — two identities, read index-side
 
-**Status:** CLOSED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-8 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -66,7 +66,19 @@ its worktree. `sha256` is retained so a schema-2 reader keeps working, and stops
   against `sha256`. `oid != gov_oid` is the local-delta predicate, evaluated per run from the live
   read, and no boolean anywhere stores its answer. Stored field, live comparison — S9 is what keeps
   the stored half honest.
-- **S4** — a receipt-claimed path that is PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX is a
+- **S4 — SCOPED TO TABLE-DISPATCHED ROWS at rev-8, by owner ruling 2026-08-26.** The predicate below
+  applies to a row whose role dispatches to the `table` disposition, and to no other. It shipped
+  UNQUALIFIED by role and this unit parked that: the raw-write hazard the sentence after it NAMES is
+  reachable only from the table arm, so a `generated`, `project-owned`, `rendered` or `gate-leg` row
+  whose destination happened to be present-but-untracked refused the ENTIRE run for a write that
+  could never have happened -- and the operator's only route back to green was `git add` on a file
+  gov will never write. No fixture in this build tripped it, so nothing would have warned first.
+  What the narrowing gives up is stated rather than implied: an untracked file shadowing a non-table
+  row now passes unremarked, exactly as it did before this unit landed. What it buys is that the
+  refusal fires where the hazard is, which is the difference between a guard and a tax. Armed as a
+  pair -- an engine row still refuses, a non-table row does not.
+
+  A receipt-claimed path that is PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX is a
   REFUSAL naming the path. Without it the index read's own `absent` routes to `missing` and then to
   the raw write at `:3069`, which would overwrite whatever untracked file the operator has there.
   The predicate is stated in those terms deliberately. An earlier rev said "tracked in the target but
@@ -326,6 +338,10 @@ and `refusal_join` legs. Adds arms and three refusal anchors; adds no new leg.
   under "The fork B1 raises, and how it was resolved".
 
 ## 9. Revision log
+
+- rev-8 · 2026-08-26 · node a · owner ruling: S4's shadow refusal is SCOPED to rows the update
+  dispatch sends to the `table` disposition, which is the hazard the scope item's own text names.
+  Closes the unqualified-by-role refusal this unit parked at build time.
 
 - rev-7 · 2026-08-25 · round-6 fold: M1, M2, M3, L1, L2 and L3. M1 — S1 enumerated THREE of
   `cmd_apply`'s four row producers and now names all four, the `attributes` row at `:2350`

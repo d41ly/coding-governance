@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-12 — write preconditions and a lock, on both writing verbs
 
-**Status:** CLOSED · rev-6 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-7 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -54,6 +54,18 @@ the vintage is half a guard, so both halves land here.
   - An untracked file SHADOWING a claimed path that is absent from the index is **not dirty** here.
     That state is `-7` S4's refusal, which names the path and the risk; two units refusing the same
     state gives the operator two different messages for one tree.
+  - **A THIRD CARVE-OUT, added at rev-7 by owner ruling 2026-08-26: gov's OWN staging.** A path whose
+    only difference is index-versus-HEAD, and whose index blob is the exact `oid` the receipt
+    recorded landing there, was staged by this tool and by nothing else. This unit shipped without
+    it and PARKED the consequence: `apply` STAGES everything it lands, so a completed apply made
+    every receipt-claimed path dirty by the definition above. A second `apply` refused, `update
+    --write` straight after `apply` refused, and `apply --resume` refused STRUCTURALLY -- it needs a
+    receipt, a receipt needs a completed apply, and a completed apply leaves the target dirty, so
+    that path was unreachable without an unrelated commit in between. THE OID COMPARISON IS WHY THIS
+    IS NOT A WEAKENING: an operator's staged edit to a gov-owned path produces a DIFFERENT index
+    blob and stays dirty, which is the case S4 exists for, and an unstaged worktree edit is
+    untouched. Armed as a PAIR -- the post-apply run proceeds, the operator's staged edit still
+    refuses -- because either arm alone is indistinguishable from deleting the guard.
 - **S5** — an `O_EXCL` lock at `.governance/outbox/.update.lock`, taken by both writing verbs,
   released on every exit path including refusal, and carrying the pid and start time so a stale lock
   is diagnosable rather than mysterious.
@@ -213,6 +225,12 @@ every one needs an arm asserting it, which is the join's declared contract.
   RESOLVED (agent, 2026-08-24, delegated): per target.
 
 ## 9. Revision log
+
+- rev-7 · 2026-08-26 · node a · owner ruling: S4 takes a THIRD carve-out for gov's own staging,
+  keyed on the recorded `oid` rather than on the fact of being staged. Closes the operator burden
+  this unit parked at build time, and the `apply --resume` path it made structurally unreachable.
+  The `settle()` helper and the seven fixture sites that call it STAY -- committing between writing
+  verbs is still the modelled flow, and those arms assert what they always did.
 
 - rev-6 · 2026-08-25 · round-6 fold: H1 — §4's ordering prose still argued that `-7` S9 CANNOT
   be scoped by `role`, which is exactly what S9's fourth arm now does. The round-5 narrowing

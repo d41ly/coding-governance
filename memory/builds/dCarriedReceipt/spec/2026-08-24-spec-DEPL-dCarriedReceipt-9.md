@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map
 
-**Status:** CLOSED · rev-9 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-10 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -96,15 +96,32 @@ to the carried bytes with no operator turn (S9), and what the row is stamped wit
   bytes are not gov's. Taking the un-narrowed stamp is the corrupt pairing: two identities recorded
   EQUAL over bytes gov never shipped, which the next run reads as a clean gov-owned row and
   raw-overwrites back to gov's prefix.
-- **S13 — DEFERRED at rev-9, not buildable from this tree.** It asks for a committed receipt of
-  the 52 rows measured at inCMS `2cff5855`, and that repository is not reachable from here, so no
-  run in this tree can generate it. What S13 was ADDED for is met — round 5's M3 found AC1 and AC2
-  running on a fixture no scope item created, and there is now a fixture with an owner, authored in
-  `selftest.py` and asserted to trigger each rung it grades. What is NOT met is that the fixture be
-  the inCMS-derived one, so AC1's and AC2's figures are the synthetic fixture's and are MEASURED
-  rather than inherited. The original text follows, for whoever builds it where inCMS is reachable:
-  JSON of the 52 rows measured at inCMS `2cff5855` against gov `9ddcc5c9`, generated once by a
-  script recorded beside it, so AC1's and AC2's counts are re-runnable without either live target.
+- **S13 — BUILT at rev-10, on node `a`, by owner ruling 2026-08-26.** It asks for a committed
+  receipt of the 52 rows measured at inCMS `2cff5855`, generated once by a script recorded beside
+  it, so AC1's and AC2's counts are re-runnable without either live target. That is what now ships:
+  `tools/govkit/fixtures/incms-2cff5855.receipt.json` (52 rows, 30 KiB) and its generator
+  `tools/govkit/fixtures/make_incms_receipt.py`.
+
+  **It was DEFERRED at rev-9 and the reason was real** — the unit was built on node `d`, where the
+  inCMS checkout is not reachable, so no run there could generate it. Node `a` has both live adopter
+  checkouts and the pinned revision resolves, which is the precondition the rev-9 park named.
+
+  **inCMS carries no govkit receipt, so the fixture is RECONSTRUCTED.** At `2cff5855` its
+  `.governance/` holds a GENERATED `install.index` written by its own `check_kit_sync.py` — the same
+  evidence in a different shape, under a different owner. Each row's gov SOURCE is resolved through
+  gov's own `registry.toml` at the recorded commit rather than by a basename guess; the first cut
+  used the guess and left 13 of 54 rows unresolved, because five kits do not live at `tools/<kit>/`.
+  Measured: 92 index rows, 38 carrying `unverified`, 54 with a resolvable commit, and exactly **52**
+  of those also resolving a gov source. S13's own figure, arrived at independently.
+
+  **The fixture stores identities, never answers.** `verbatim` and `relocate` are proved by
+  transforming gov's bytes and comparing the resulting blob oid to the target's recorded `oid`.
+  `eol` cannot be — the rung normalises BOTH sides and an oid cannot be un-hashed — so each row also
+  carries `lf_oid`, one measurement of the target taken where inCMS was reachable, which the arm
+  reproduces from gov's side. That is what keeps the fixture at 30 KiB instead of a 540 KiB pack of
+  another project's source vendored into this repo, and it is not circular: the same function is
+  applied to opposite inputs, which is exactly the equality the rung claims. Cross-checked at build
+  time against inCMS's real object store — all 52 rows agree, zero disagreements.
 
 ## 3. Non-goals (OUT)
 
@@ -263,14 +280,23 @@ receipt of the 52 resolvable rows, checked in beside the script that generated i
   `carry` key at all and all 31 non-identical rows classify with `o_state` as `differs` — 52
   resolvable rows less the 21 §4 records as `verbatim`, which is the same 6 + 5 + 20 that table
   sums.
-- **AC2** — The derivation over that same fixture — inCMS `2cff5855` against gov `9ddcc5c9` —
-  yields exactly `13` directory pairs and `26` needles, and DROPS `tools/memory-recall` and
-  `tools/workflows` by name in the printed report. Those two figures are UNVERIFIED over this
-  population and must be re-measured before the arm is written: §4's Inventory measured them over
-  the 86 rows whose gov SOURCE resolves, not the 52 whose recorded COMMIT resolves, and neither the
-  round-4 review nor this fold re-derived them over either. If they do not reproduce over the 52,
-  restate this criterion against the 86-row population explicitly rather than editing the numbers
-  until they fit.
+- **AC2 — RESTATED at rev-10 against the 86-row population, as this criterion's own text
+  instructed.** The derivation over the rows whose gov SOURCE resolves — 86 of inCMS's 92 at
+  `2cff5855` — yields exactly `13` directory pairs and **`25`** needles, and DROPS
+  `tools/memory-recall` and `tools/workflows` by name in the printed report.
+
+  **Two populations, because they answer different questions**, and conflating them is why this
+  criterion's figures never reproduced. AC1 grades the 52 rows whose recorded COMMIT resolves,
+  because a rung is proved against gov's bytes AT that commit. The needle map needs no commit at all
+  — it derives from `(source, destination)` pairs — so its population is the 86 whose SOURCE
+  resolves. §4's Inventory measured over the 86; the criterion was written against the 52. Over the
+  52 the derivation gives 14 pairs and 27 needles, and drops nothing.
+
+  **`26` was wrong by exactly one, and this build derived why before it measured it.** Needles emit
+  in a `/` form and a `~` form; for a gov directory carrying NO slash those two strings are the
+  SAME, so such a pair contributes one needle rather than two. Exactly one of the 13 — `tools` —
+  carries no slash, so `2×13 − 1 = 25`. The arm asserts that RELATION rather than the literal, which
+  is also what `-13`'s AC12 was warned not to inherit.
 - **AC3** — `scripts/unattended/adopt-unattended.test.sh` matches NO rung, keeps its current verdict,
   and its bytes are unchanged after a `govkit.py update --write` against the fixture, asserted with
   `git diff --exit-code` over that path. This is the `my tools` row; a build that "fixes" it has
@@ -350,6 +376,17 @@ staying untouched in the diff is itself the assertion.
   RESOLVED (agent, 2026-08-24, delegated): from the receipt.
 
 ## 9. Revision log
+
+- rev-10 · 2026-08-26 · node a · S13 BUILT, and AC2 RESTATED. Reopened by owner ruling after the
+  rev-9 park recorded that its blocking precondition -- an inCMS checkout in hand -- is satisfied on
+  node `a`. The committed fixture and its recorded generator now ship under
+  `tools/govkit/fixtures/`, and AC1's 21 verbatim / 6 eol / 5 relocate REPRODUCES exactly over the
+  real 52-row population, cross-checked against inCMS's own object store at zero disagreements. AC2
+  did NOT reproduce and was restated rather than fitted, which is what its own text asked for: its
+  population is the 86 rows whose gov SOURCE resolves, not the 52 whose COMMIT does, and the needle
+  count there is 25 rather than 26. The missing one is the `/` and `~` forms of `tools` coinciding
+  because that directory carries no slash -- the derivation this build recorded as a park before it
+  had any way to measure it, now measured.
 
 - rev-9 · 2026-08-25 · built. S13 is DEFERRED: the inCMS-derived fixture cannot be generated from
   this tree, so AC1 and AC2 run over a synthetic fixture whose distribution is MEASURED (4 verbatim

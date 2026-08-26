@@ -2468,6 +2468,182 @@ user_skills = "/tmp/gk-fake-skills"
               _p9c.returncode == 2 and "absent from its INDEX" in _p9c.stderr,
               _p9c.stdout + _p9c.stderr)
 
+        # ---- OWNER RULING A (2026-08-26) -- GOV'S OWN STAGING IS NOT SOMEBODY'S WORK IN PROGRESS.
+        # ---- `-12` S4 parked this: `apply` STAGES every path it lands, so a completed apply makes
+        # ---- every receipt-claimed path differ index-versus-HEAD and therefore dirty by S4's own
+        # ---- definition. A second `apply` refused, `update --write` straight after `apply`
+        # ---- refused, and `apply --resume` refused STRUCTURALLY -- it needs a receipt, a receipt
+        # ---- needs a completed apply, and a completed apply leaves the target dirty. The carve-out
+        # ---- compares the INDEX BLOB against the oid the receipt recorded, so it excuses gov's own
+        # ---- staging and nothing else. The negative half below is what makes that a carve-out and
+        # ---- not a hole, and it is the reason this is asserted as a PAIR.
+        _oa = make_target(tmp / "owner-a", None)
+        run("intake", "--target", str(_oa), "--kits", "memory-tree")
+        _poa = run("apply", "--target", str(_oa), "--kits", "memory-tree")
+        _oarec = json.loads((_oa / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _oaeng = [f["path"] for f in _oarec["files"]
+                  if f.get("role", "engine") == "engine" and f.get("oid")]
+        check("[-12] RULING-A LIVENESS the apply landed engine rows carrying a recorded oid",
+              _poa.returncode == 0 and len(_oaeng) >= 3,
+              f"rc {_poa.returncode}: {len(_oaeng)} row(s)")
+        # DELIBERATELY NO settle() -- the uncommitted post-apply target IS the subject.
+        check("[-12] RULING-A LIVENESS ...and left them STAGED, which is the state under test",
+              bool(gout(_oa, "diff", "--cached", "--name-only", "HEAD").split()),
+              gout(_oa, "diff", "--cached", "--name-only", "HEAD")[:300])
+        _poa2 = run("update", "--target", str(_oa), "--write")
+        check("[-12] RULING-A a writing verb straight after `apply` is NOT blocked by apply's own "
+              "staging",
+              "DIRTY" not in _poa2.stderr, _poa2.stdout[-400:] + _poa2.stderr[-400:])
+        # ---- THE RECEIPT RECORDS WHAT THE INDEX HOLDS, over every LANDABLE row the target tracks.
+        # ---- The stamp used to run BEFORE `git add --renormalize`, which rewrites the index blob of
+        # ---- every LF-pinned path, so each affected row recorded a blob the target does not hold.
+        # ---- `-9` S12 defines `oid` as the blob ACTUALLY WRITTEN; a value stamped before the last
+        # ---- thing that writes is not that.
+        # ----
+        # ---- WHAT THIS DOES NOT EXERCISE, stated so a green row is not misread as a verified one:
+        # ---- gov ships LF, so the renormalize is a NO-OP in this fixture and the specific trigger
+        # ---- goes untested here. Reaching it needs an apply onto a target whose CHECKOUT applies a
+        # ---- line-ending filter, and no fixture in this suite builds one -- `clone_crlf` clones a
+        # ---- target that was already applied to. The invariant below is the one that holds either
+        # ---- way, and it is what the fix restores.
+        _oaidx = {}
+        for _ln in gout(_oa, "ls-files", "-s").splitlines():
+            _meta, _tab, _pth = _ln.partition("\t")
+            _bits = _meta.split()
+            if len(_bits) >= 3 and _pth and _bits[2] == "0":
+                _oaidx[_pth] = _bits[1]
+        # THE RECEIPT IS RE-READ HERE, and the first cut did not do that. It compared the receipt
+        # `apply` wrote against the index as it stood after TWO later `update --write` runs, so a row
+        # the second run legitimately re-staged read as a stale stamp. The arm was wrong, not the
+        # engine -- and it reported a real-looking defect naming a real file, which is the most
+        # expensive kind of wrong arm.
+        _oarec2 = json.loads((_oa / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _oaland = [w for w in _oarec2["files"]
+                   if w.get("role") in govkit_module().LANDABLE_ROLES and w.get("path") in _oaidx]
+        check("[-12] RULING-A LIVENESS the invariant runs over a population big enough to mean "
+              "something",
+              len(_oaland) >= 10, f"{len(_oaland)} landable row(s) the target tracks")
+        _oastale = [w["path"] for w in _oaland if w.get("oid") != _oaidx[w["path"]]]
+        check("[-12] RULING-A every landable receipt row records the blob the target's index holds",
+              not _oastale,
+              "recorded oid is not the index blob (or is absent): " + ", ".join(_oastale[:6]))
+
+        # ---- AND THE ROW THE CARVE-OUT CANNOT REACH IS EXCLUDED AT THE OTHER END. `-7` S9 requires
+        # ---- an `attributes` row to carry NEITHER identity, so `.gitattributes` has no `oid` and
+        # ---- the oid carve-out has nothing to compare. It is dropped from the dirty POPULATION
+        # ---- instead, because `UPDATE_ROLE["attributes"]` is `pins` -- `recompute, compare, report;
+        # ---- never write` -- so that row can never be the write S4's hazard is about. Asserted on
+        # ---- the two facts that make the exclusion legal rather than on the exclusion itself.
+        check("[-12] RULING-A `.gitattributes` is receipt-claimed and carries NEITHER identity, "
+              "which is `-7` S9's shape and why the oid carve-out cannot reach it",
+              any(w.get("path") == ".gitattributes"
+                  and not w.get("oid") and not w.get("gov_oid") for w in _oarec2["files"]),
+              str([w for w in _oarec2["files"] if w.get("path") == ".gitattributes"][:1]))
+        check("[-12] RULING-A ...and its role dispatches to `pins`, which never writes",
+              govkit_module().UPDATE_ROLE.get("attributes") == "pins",
+              str(govkit_module().UPDATE_ROLE.get("attributes")))
+
+        # NEGATIVE HALF. An operator's staged edit to a gov-owned path produces a DIFFERENT index
+        # blob, so it stays dirty. Without this the carve-out is indistinguishable from deleting S4.
+        _oap = _oa / _oaeng[0]
+        _oap.write_bytes(_oap.read_bytes() + b"\n# OPERATOR EDIT, staged\n")
+        git(_oa, "add", "--", _oaeng[0])
+        _poa3 = run("update", "--target", str(_oa), "--write")
+        check("[-12] RULING-A NEGATIVE: an operator's OWN staged edit to a gov-owned path is still "
+              "DIRTY -- the carve-out reads the oid, not the fact of being staged",
+              _poa3.returncode == 2 and "DIRTY" in _poa3.stderr,
+              f"rc {_poa3.returncode}: " + _poa3.stdout[-400:] + _poa3.stderr[-400:])
+        check("[-12] RULING-A ...and names that path",
+              _oaeng[0] in _poa3.stderr, _poa3.stderr[-400:])
+
+        # ---- ROUND 3, REPRODUCED BEFORE IT WAS FIXED: a target-supplied `prefix` carrying `..`
+        # ---- escaped the target repository. `demand_safe_token` bounds token values to path-
+        # ---- fragment CHARACTERS and `.` and `/` are both legal there, so `../../PWNED` passed it
+        # ---- cleanly; `plan` then previewed 26 rows rooted outside the target and `apply` WROTE all
+        # ---- 26 of them. Measured in a sandbox: the escape landed in a scratch directory and the
+        # ---- files were counted before the guard existed.
+        # ----
+        # ---- THE CONTAINMENT CHECK ALREADY EXISTED, IN THE WRONG VERB -- `cmd_update`'s write loop,
+        # ---- under a comment calling it "the one boundary this whole tool is built around". Same
+        # ---- class as this build's blockers one operation over: a target-supplied value reaching a
+        # ---- dangerous operation because the guard was written for a different caller.
+        # ----
+        # ---- BOTH VERBS ARE ARMED, because a `plan` that cheerfully previews escaping writes is its
+        # ---- own defect: the preview is what an operator approves.
+        _tv = make_target(tmp / "traversal", None)
+        (_tv / ".governance").mkdir(parents=True, exist_ok=True)
+        (_tv / ".governance" / "deploy.toml").write_text(
+            'prefix = "../../PWNED"\n', encoding="utf-8", newline="\n")
+        settle(_tv, "a hostile prefix")
+        _tvp = run("plan", "--target", str(_tv), "--kits", "memory-tree")
+        check("[-12] TRAVERSAL `plan` REFUSES a destination that leaves the target repository",
+              _tvp.returncode == 2
+              and "leaves the target repository" in (_tvp.stdout + _tvp.stderr),
+              f"rc {_tvp.returncode}: " + (_tvp.stdout[-400:] + _tvp.stderr[-400:]))
+        _tva = run("apply", "--target", str(_tv), "--kits", "memory-tree")
+        check("[-12] TRAVERSAL ...and so does `apply`, which is the one that WROTE 26 files",
+              _tva.returncode == 2
+              and "leaves the target repository" in (_tva.stdout + _tva.stderr),
+              f"rc {_tva.returncode}: " + (_tva.stdout[-400:] + _tva.stderr[-400:]))
+        # THE OBSERVABLE, not the exit code: nothing may exist above the target. Asserted on the
+        # filesystem, because a refusal that still wrote is the failure this arm is actually for.
+        check("[-12] TRAVERSAL ...and NOTHING landed above the target directory",
+              not (tmp / "PWNED").exists(),
+              str(sorted(p.name for p in (tmp / "PWNED").rglob("*"))[:6])
+              if (tmp / "PWNED").exists() else "")
+        # AN ABSOLUTE PREFIX IS A DIFFERENT STORY IN EACH SPELLING, and the first cut of these two
+        # arms asserted one mechanism for both and was wrong about each. MEASURED, then written:
+        #   `/etc/govkit`  -- `target_context` does `.strip("/")`, so it becomes `etc/govkit`, an
+        #                     ordinary RELATIVE path inside the target. Nothing escapes and nothing
+        #                     should refuse. Asserting a refusal here was asserting a bug.
+        #   `C:/PWNED`     -- refused, but by `demand_safe_token`, because `:` is outside the token
+        #                     character class. The containment guard never sees it.
+        # Both are asserted on the OUTCOME an operator cares about -- did anything land outside --
+        # rather than on which guard spoke, so neither arm breaks if the division of labour moves.
+        (_tv / ".governance" / "deploy.toml").write_text(
+            'prefix = "/etc/govkit"\n', encoding="utf-8", newline="\n")
+        settle(_tv, "a posix-absolute prefix")
+        _tvp2 = run("plan", "--target", str(_tv), "--kits", "memory-tree")
+        check("[-12] TRAVERSAL a POSIX-absolute prefix is NEUTRALISED by target_context's strip, "
+              "not refused -- it resolves to an ordinary relative path inside the target",
+              _tvp2.returncode == 0 and "etc/govkit/memory-tree/" in _tvp2.stdout
+              and "/etc/govkit/memory-tree/" not in _tvp2.stdout,
+              f"rc {_tvp2.returncode}: " + _tvp2.stdout[-400:] + _tvp2.stderr[-300:])
+        (_tv / ".governance" / "deploy.toml").write_text(
+            'prefix = "C:/PWNED"\n', encoding="utf-8", newline="\n")
+        settle(_tv, "a drive-letter absolute prefix")
+        _tvp3 = run("plan", "--target", str(_tv), "--kits", "memory-tree")
+        check("[-12] TRAVERSAL a DRIVE-LETTER absolute prefix is REFUSED -- by the token class here, "
+              "since `:` never reaches the containment guard",
+              _tvp3.returncode == 2 and "PWNED" not in _tvp3.stdout.replace("C:/PWNED", ""),
+              f"rc {_tvp3.returncode}: " + _tvp3.stdout[-300:] + _tvp3.stderr[-300:])
+
+        # ---- OWNER RULING B (2026-08-26) -- `-7` S4's shadow refusal is SCOPED TO THE TABLE.
+        # ---- The predicate was unqualified by role, so a row the dispatch never sends to the raw
+        # ---- write could stop an entire run, and the operator's only route back to green was
+        # ---- `git add` on a file gov will never write. The arm above already holds the POSITIVE
+        # ---- half on an engine row; this is the negative one, and it is the half that was missing.
+        _ob = make_target(tmp / "owner-b", None)
+        run("intake", "--target", str(_ob), "--kits", "memory-tree")
+        run("apply", "--target", str(_ob), "--kits", "memory-tree")
+        settle(_ob, "the install")
+        _obrec = json.loads((_ob / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _obnt = [f["path"] for f in _obrec["files"]
+                 if govkit_module().UPDATE_ROLE.get(f.get("role", "engine")) != "table"
+                 and (_ob / f["path"]).is_file()]
+        check("[-12] RULING-B LIVENESS the fixture really carries a NON-table receipt row on disk",
+              bool(_obnt),
+              "roles present: " + str(sorted({f.get("role", "engine") for f in _obrec["files"]})))
+        if _obnt:
+            git(_ob, "rm", "-q", "--cached", "--", _obnt[0])
+            check("[-12] RULING-B LIVENESS ...and it is now out of the index, still on disk",
+                  _obnt[0] not in gout(_ob, "ls-files").split() and (_ob / _obnt[0]).is_file(), "")
+            _pob = run("update", "--target", str(_ob), "--write")
+            check("[-12] RULING-B a NON-table row shadowed by an untracked file does not refuse the "
+                  "whole run -- that row can never reach the raw write the refusal exists to stop",
+                  "absent from its INDEX" not in _pob.stderr,
+                  f"rc {_pob.returncode}: " + _pob.stdout[-400:] + _pob.stderr[-400:])
+
         # ---- DEPL-dCarriedReceipt-7: TWO IDENTITIES, READ INDEX-SIDE -------------------------
         #
         # WHAT WENT WRONG, measured rather than argued. One receipt field was asked to be two things
@@ -3437,6 +3613,83 @@ user_skills = "/tmp/gk-fake-skills"
               "carry map: 2 directory pair(s), 3 needle(s)" in _ro9.stdout, _ro9.stdout[:1200])
         check("[-9] S7 the printed counts are the derivation's own output, not a second spelling",
               (len(_pd9), len(_nd9)) == (2, 3), f"{len(_pd9)} pair(s), {len(_nd9)} needle(s)")
+
+        # ---- DEPL-dCarriedReceipt-9 S13 -- THE COMMITTED INCMS FIXTURE, BUILT AT LAST.
+        # ---- Deferred when this unit was built on node `d`, where the inCMS checkout is not
+        # ---- reachable; reopened by owner ruling 2026-08-26 on node `a`, where it is. Generated
+        # ---- once by `tools/govkit/fixtures/make_incms_receipt.py` from inCMS's own
+        # ---- `.governance/install.index` at `2cff5855` against gov `ce5dca99`, and committed, so
+        # ---- everything below runs with NEITHER live repository present.
+        # ----
+        # ---- THE ARMS DERIVE RATHER THAN READ. Nothing here compares against a rung stored in the
+        # ---- fixture -- a fixture holding the ANSWER grades nothing. `verbatim` and `relocate` are
+        # ---- proved by transforming GOV's bytes and comparing the resulting blob oid to the
+        # ---- TARGET's recorded oid. `eol` cannot be: the rung normalises BOTH sides, and an oid
+        # ---- cannot be un-hashed, so the fixture carries `lf_oid` -- one measurement of the target
+        # ---- taken where inCMS was reachable -- and the arm reproduces it from gov's side.
+        _fx9 = json.loads((GOVKIT.parent / "fixtures" / "incms-2cff5855.receipt.json")
+                          .read_text(encoding="utf-8"))
+        _fx9rows = _fx9["files"]
+        check("[-9] S13 LIVENESS the committed inCMS fixture carries the 52-row population",
+              len(_fx9rows) == 52, f"{len(_fx9rows)} row(s)")
+        check("[-9] S13 LIVENESS ...and every row carries the three identities a rung is proved from",
+              all(w.get("gov_oid") and w.get("oid") and w.get("lf_oid") for w in _fx9rows),
+              str([w["path"] for w in _fx9rows
+                   if not (w.get("gov_oid") and w.get("oid") and w.get("lf_oid"))][:4]))
+
+        _gk9 = govkit_module()
+        _n9s, _p9s, _d9s = _gk9.derive_carry_map(
+            [(w.get("source"), w.get("path")) for w in _fx9rows])
+
+        def _derive_fx9_rung(w: dict) -> str | None:
+            """The ladder, re-derived from gov's bytes. Same order as `derive_carry_rung`."""
+            base = subprocess.run(["git", "-C", str(HERE.parents[1]), "cat-file", "blob", w["gov_oid"]],
+                                  capture_output=True).stdout
+            if w["oid"] == _gk9.blob_oid(base):
+                return "verbatim"
+            if w["lf_oid"] == _gk9.blob_oid(_gk9.derive_lf(base)):
+                return "eol"
+            if w["oid"] == _gk9.blob_oid(_gk9.derive_carried(base, _n9s)):
+                return "relocate"
+            return None
+
+        _fx9dist = {k: 0 for k in ("verbatim", "eol", "relocate", None)}
+        for _w in _fx9rows:
+            _fx9dist[_derive_fx9_rung(_w)] += 1
+        check("[-9] AC1 over the REAL inCMS population: 21 verbatim, 6 eol, 5 relocate, 20 no rung",
+              _fx9dist == {"verbatim": 21, "eol": 6, "relocate": 5, None: 20}, str(_fx9dist))
+        check("[-9] AC1 ...and the four buckets account for every row, so none was skipped",
+              sum(_fx9dist.values()) == len(_fx9rows),
+              f"{sum(_fx9dist.values())} vs {len(_fx9rows)}")
+
+        # ---- AC2, RESTATED AGAINST THE POPULATION IT ACTUALLY DESCRIBES, and the spec's own
+        # ---- instruction was to restate rather than to edit the numbers until they fit. AC1's
+        # ---- population is the 52 rows whose recorded COMMIT resolves, because a rung is proved
+        # ---- against gov's bytes at that commit. The needle map needs no commit at all -- it is
+        # ---- derived from (source, destination) pairs -- so its population is the 86 rows whose
+        # ---- gov SOURCE resolves. The spec measured its Inventory over the 86 and wrote AC2's
+        # ---- criterion against the 52, which is why its figures never reproduced anywhere.
+        _fx9pairs = [tuple(p) for p in _fx9["carry_map_population"]]
+        check("[-9] S13 LIVENESS the fixture carries AC2's own 86-row pair population",
+              len(_fx9pairs) == 86, f"{len(_fx9pairs)} pair(s)")
+        _n86, _p86, _d86 = _gk9.derive_carry_map(_fx9pairs)
+        check("[-9] AC2 the 86-row population yields 13 directory pairs",
+              len(_p86) == 13, f"{len(_p86)}: {sorted(_p86)}")
+        check("[-9] AC2 ...and DROPS `tools/memory-recall` and `tools/workflows` BY NAME",
+              sorted(g for g, _ in _d86) == ["tools/memory-recall", "tools/workflows"],
+              str([g for g, _ in _d86]))
+        # THE NEEDLE COUNT IS 25 AND THE SPEC SAYS 26. The spec's figure is wrong by exactly one and
+        # this build DERIVED why before measuring it: needles emit in a `/` form and a `~` form, and
+        # for a gov directory carrying NO slash those two strings are the SAME, so such a pair
+        # contributes one needle rather than two. Exactly one of the 13 -- `tools` -- has no slash.
+        # 2*13 - 1 = 25. Asserted as the RELATION and not as a literal, because a literal here is
+        # the class this whole build keeps finding.
+        _noslash = [g for g in _p86 if "/" not in g]
+        check("[-9] AC2 exactly one surviving gov directory carries no slash, and it is `tools`",
+              _noslash == ["tools"], str(_noslash))
+        check("[-9] AC2 the needle count is the RELATION 2*pairs - (pairs with no slash) = 25",
+              len(_n86) == 2 * len(_p86) - len(_noslash) == 25,
+              f"{len(_n86)} needle(s) over {len(_p86)} pair(s), {len(_noslash)} slashless")
 
         # ---- S10: the label. `("differs","equal")` grids to `patched`, which is a LIE for a carried
         # ---- row — the target edited nothing, it installed somewhere else.
@@ -5708,26 +5961,43 @@ user_skills = "/tmp/gk-fake-skills"
               not _mislabelled,
               "typed `gov` but reaches target_context/resolve_tokens: " + ", ".join(_mislabelled))
 
-        # THE ANNOUNCEMENT MAY LIVE IN THE FUNCTION OR AT ITS CALL SITE, and the arm has to admit
-        # both or it is asserting a code SHAPE rather than the property. `decline_findings` prints
-        # inside itself; `read_gate_verdicts` is announced by `apply` before it calls it, which is
-        # the older idiom and is equally honest. Asserting only the first would have redded a
-        # correct pre-existing site — the near-miss this arm was run over the real tree to find.
-        _g5lines = _g5src.split("\n")
-        for _fn in sorted(_tgt_sites):
-            _body = next((_ast1.get_source_segment(_g5src, _n) or "" for _n in _ast1.walk(_t1)
-                          if isinstance(_n, _ast1.FunctionDef) and _n.name == _fn), "")
-            _inside = "print(" in _body
-            _callsites = [_n.lineno for _n in _ast1.walk(_t1)
-                          if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Name)
-                          and _n.func.id == _fn]
-            _announced = any(
-                any("print(" in _g5lines[j] for j in range(max(0, ln - 12), ln))
-                for ln in _callsites)
-            check(f"[-5] D1 target-authored site '{_fn}' announces its argv — in the function or "
-                  f"at its call site — before spawning it",
-                  _inside or _announced,
-                  f"neither: body-print={_inside} callsites={_callsites}")
+        # ---- ROUND 2's M4 AND L4, and what they cost. The arm that stood here asserted a SOURCE
+        # ---- SHAPE: `"print(" in _body`, over the whole function, plus a twelve-line window above
+        # ---- each call site. Both are satisfied by any unrelated print. `decline_findings` already
+        # ---- held one at `govkit.py:1861` before D1 added the announcement, so deleting the
+        # ---- announcement left the arm green — verified by AST simulation in review. And the outer
+        # ---- `any` over call sites let ONE announcing site satisfy the arm for every other, so
+        # ---- `read_gate_verdicts`' silent second spawn passed on its noisy first one's behalf.
+        # ----
+        # ---- MEASURED WHEN THE SUBSTRING WAS REPLACED BY THE QUESTION: of the six `target` sites,
+        # ---- exactly ONE prints its resolved argv before spawning it. The generic arm was reporting
+        # ---- a property five sites do not have. That is this repo's could-not-fail class arriving
+        # ---- inside the arms written to close a could-not-fail finding, which is round 2's verdict
+        # ---- in one arm.
+        # ----
+        # ---- SO THE CLAIM IS NARROWED TO WHAT IS OBSERVED. `_D1_ANNOUNCED` names, per target site,
+        # ---- the LIVE stdout needle that proves the announcement, or `None` with the reason it is
+        # ---- unasserted. A `None` row is PRINTED on every run rather than passing quietly: per §7 a
+        # ---- skip that looks like a pass is indistinguishable from coverage. The map is asserted
+        # ---- against the declaration in both directions, so a new `target` site cannot be added
+        # ---- without landing in it.
+        _D1_ANNOUNCED = {
+            "decline_findings": "RUNNING a target-authored probe",
+            "cmd_check": None,           # prints per-hole verdicts, never the discharge argv
+            "run_kit_check": None,       # silent; the `[check].argv` is bounded by demand_safe_token
+            "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
+            "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
+            "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
+        }
+        check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
+              set(_D1_ANNOUNCED) == set(_tgt_sites),
+              f"map {sorted(_D1_ANNOUNCED)} vs declared {sorted(_tgt_sites)}")
+        _d1_unasserted = sorted(k for k, v in _D1_ANNOUNCED.items() if v is None)
+        print(f"    NOTE  [-5] D1 {len(_d1_unasserted)} of {len(_D1_ANNOUNCED)} target-controlled "
+              f"spawn site(s) do NOT announce their resolved argv and are asserted by NO arm here: "
+              + ", ".join(_d1_unasserted))
+        print("    NOTE  [-5] D1 what bounds those is `demand_safe_token` at the token boundary, "
+              "which IS armed below — not an announcement, and this suite no longer claims one.")
         check("[-5] S2 the evidence set is a CLOSED constant, not a check spelled per call site",
               tuple(govkit_module().DECLINE_EVIDENCE) == ("taken_as", "consumed_into", "discharge"),
               str(govkit_module().DECLINE_EVIDENCE))
@@ -6056,9 +6326,20 @@ user_skills = "/tmp/gk-fake-skills"
                          '--kits', 'demo,sib')
         check('[-5] D8 LIVENESS the two-kit fixture really plans a sib destination',
               'scripts/sib/one.py' in _p8.stdout, _p8.stdout[-800:])
+        # ROUND 2's L3. The predicate here used to be
+        # `'GAP' in stdout and 'scripts/sib/one.py' in stdout.split('coverage:')[0]`, and BOTH
+        # conjuncts were satisfied with D8 reverted: the fixture's own unrelated `demo` gaps supply
+        # a GAP anywhere in stdout, and the plan-row loop prints every `write` row -- the sib one
+        # included -- above the summary line that supplies the split token. Under the dest-keyed map
+        # that hid B's gap entirely, this arm still reported green. The arm that NAMED the defect was
+        # not the arm that caught it; only its sibling below discriminated.
+        #
+        # Anchored now on the GAP LINE ITSELF, which only the gap emitter produces: false under the
+        # dest-keyed map, true under the pair-keyed one.
+        _p8gap = [l for l in _p8.stdout.splitlines()
+                  if l.startswith('  GAP') and 'scripts/sib/one.py' in l]
         check('[-5] D8 a decline naming the WRONG kit for a destination does not excuse it',
-              'GAP' in _p8.stdout and 'scripts/sib/one.py' in _p8.stdout.split('coverage:')[0],
-              _p8.stdout[-900:])
+              bool(_p8gap), _p8.stdout[-900:])
         check('[-5] D8 ...and reds as stale, naming the kit that ships no such destination',
               _p8.returncode == 1 and 'ships no such destination' in _p8.stdout,
               f'rc {_p8.returncode}: ' + _p8.stdout[-900:])
@@ -6108,10 +6389,29 @@ user_skills = "/tmp/gk-fake-skills"
               "writers that already stood inside it",
               _p5l.returncode == 2 and "lock" in (_p5l.stdout + _p5l.stderr).lower(),
               f"rc {_p5l.returncode}: {_p5l.stdout[-400:]}{_p5l.stderr[-400:]}")
-        check("[-13] D5 ...and wrote no receipt while refusing, so the lock is taken BEFORE the "
-              "existence guard rather than after it",
+        check("[-13] D5 ...and wrote no receipt while refusing",
               not (_t5l / ".governance" / "install.json").is_file(),
               "a receipt exists: the refusal came after the write")
+        # ROUND 2's L2, and the arm above is why it was found. That arm CLAIMED the lock is taken
+        # before the existence guard, and it observed nothing of the kind: this fixture carries no
+        # `install.json`, so the guard at `govkit.py:5743` is inert for it and EITHER ordering
+        # refuses at the lock and writes no receipt. Moving `take_write_lock` back below the guard
+        # left the arm green. The check-then-mutate window D5 identified was guarded by nothing.
+        #
+        # THE ORDERING IS ONLY OBSERVABLE WHERE THE TWO REFUSALS DISAGREE. Plant BOTH the held lock
+        # and a receipt, then run `--write` WITHOUT `--re-adopt`: both guards now want to fire, and
+        # WHICH message comes back names the order. Lock first is the fix; receipt first is the
+        # defect, and it is a check-then-mutate because the guard would have read a receipt a
+        # concurrent writer is mid-way through replacing.
+        (_t5l / ".governance").mkdir(parents=True, exist_ok=True)
+        (_t5l / ".governance" / "install.json").write_text("{}\n", encoding="utf-8", newline="\n")
+        _p5ord = run_in_gov(_g4, "adopt", "--target", str(_t5l), "--write")
+        _ord_out = (_p5ord.stdout + _p5ord.stderr).lower()
+        check("[-13] D5 ...and with a receipt ALSO present the LOCK refusal is the one that fires, "
+              "which is the only observation that distinguishes the two orderings",
+              "holds" in _ord_out and "already carries a receipt" not in _ord_out,
+              f"rc {_p5ord.returncode}: {_p5ord.stdout[-500:]}{_p5ord.stderr[-500:]}")
+        (_t5l / ".governance" / "install.json").unlink()
         _lockp.unlink()
 
         # D9: `sha256` must answer the question `check` and `sha256sum -c` ASK, which is about the

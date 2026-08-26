@@ -38,7 +38,15 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 214    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 215    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 214 -> 215 at ROUND 3's fold. ONE new refusal, from a REPRODUCED defect: `demand_contained_dest`,
+# the path-containment guard. A target's own `prefix = "../../PWNED"` made `plan` preview 26 rows
+# rooted outside the target and `apply` WRITE all 26 -- measured in a sandbox, the files counted,
+# before the guard was written. Armed by four arms on `plan` and `apply`, and its failing case was
+# observed: neutering the guard puts all 29 escaping rows back.
+# NOTE the FILE count also moved, 2 -> 3, and that is the second pin doing its job rather than a
+# surprise: `tools/govkit/fixtures/make_incms_receipt.py` is tracked Python under the deployer's own
+# directory, so the DISCOVERED population picked it up. It contributes no refusal branches.
 # 212 -> 214 at ROUND 2's fold. Two new refusals, both from confirmed blockers: the
 # token-value guard `demand_safe_token` (a target-supplied `prefix` or answer outside
 # [A-Za-z0-9_./~@+-], which is the command injection two reproductions demonstrated), and a

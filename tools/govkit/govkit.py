@@ -31,8 +31,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import ntpath
 import os
 import pathlib
+import posixpath
 import re
 import subprocess
 import sys
@@ -567,6 +569,43 @@ def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
 # descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
 # to be correct.
 TOKEN_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+-]*$")
+
+
+def demand_contained_dest(dest: str, where: str) -> str:
+    """Refuse a resolved destination that leaves the target repository (round 3, REPRODUCED).
+
+    `demand_safe_token` bounds a token value to path-fragment CHARACTERS, and `.` and `/` are both
+    in that class because every legitimate value here is a path fragment. So `prefix = "../../x"`
+    passes it cleanly, and nothing downstream disagreed: `plan` printed 26 rows rooted at
+    `../../PWNED/`, and `apply` WROTE all 26 of them outside the target. Reproduced in a sandbox
+    before this was written -- the escape landed in a scratch directory and the files were counted.
+
+    THE CONTAINMENT CHECK ALREADY EXISTED, IN THE WRONG VERB. `cmd_update`'s write loop resolves the
+    row against the target root and refuses on `ValueError`, with a comment calling this "the one
+    boundary this whole tool is built around". `apply` had no such check on the path it derives from
+    the target's own `prefix`, which is the same class as B1/B2 one operation over: a target-supplied
+    value reaching a dangerous operation because the guard was written for a different caller.
+
+    HERE, AND NOT IN THE WRITE LOOP, on purpose. Every verb that resolves a destination routes
+    through `resolve_dests`, so a refusal here reaches `plan` as well as `apply` -- and a `plan` that
+    cheerfully PREVIEWS 26 escaping writes is its own defect, because the preview is what an operator
+    approves. A guard in the write loop alone would leave the preview lying.
+
+    PURE STRING CONTAINMENT, no target root needed and none taken: a destination is a repo-relative
+    POSIX path, so it escapes exactly when it normalises to `..`-leading or is absolute. A drive
+    letter counts as absolute -- this tool's own node runs on Windows, where `C:/x` is not relative
+    and `ntpath` is the only thing that knows it.
+    """
+    norm = posixpath.normpath(dest.replace("\\", "/"))
+    if (norm == ".." or norm.startswith("../") or posixpath.isabs(norm)
+            or ntpath.isabs(dest) or (len(dest) > 1 and dest[1] == ":")):
+        raise Refusal(
+            f"the resolved destination {dest!r} leaves the target repository (normalises to "
+            f"{norm!r}) -- refusing the whole run. Destinations are repo-relative by construction, "
+            f"and one that escapes is a write into a tree the operator did not name. Source: "
+            f"{where}. This is almost always a `prefix` in the target's .governance/deploy.toml "
+            f"carrying `..` or an absolute path")
+    return dest
 
 
 def demand_safe_token(key: str, value: str, where: str) -> str:
@@ -1615,6 +1654,44 @@ def derive_rule_kind(eid: str, desc: dict, rule: dict, dest: str, written: set[s
 
 
 # ----------------------------------------------------------------------------------------- plan
+# ---- WHERE THE CONTAINMENT GUARD LIVES, and it took three placements to get right.
+# ---- Round 3 REPRODUCED an arbitrary file write: a target's own `prefix = "../../PWNED"` made
+# ---- `plan` preview 26 rows rooted outside the target and `apply` WRITE all 26 of them.
+# ---- `demand_safe_token` cannot catch it -- `.` and `/` are legal token characters, because every
+# ---- legitimate value there is a path fragment.
+# ----
+# ---- FIRST PLACEMENT, `resolve_dests`: eight call sites, so a whole-run Refusal from inside it hit
+# ---- `-11`'s escaping-rename fixture and PRE-EMPTED that unit's own refusal -- the "two units
+# ---- refusing one state with two messages" defect this codebase keeps recording, introduced by the
+# ---- fix for a different one.
+# ---- SECOND PLACEMENT, `resolve_entry`: measured, and it is the WRONG SEAM. `plan` does not route
+# ---- through it at all (it has `planned_writes`, the seam `resolve_rule_pool`'s docstring already
+# ---- records), while `update`, `adopt` and `selfcheck` all do. Exactly backwards: the verb that
+# ---- needed the guard did not get it and the verbs that own their own refusals did.
+# ---- THIRD, AND HERE: the two row producers of the two verbs that had NO guard, named explicitly.
+# ---- `update` contains every row in its write loop and `-11` reports an escaping rename per row;
+# ---- both keep their behaviour and their message.
+# ----
+# ---- A machine-scoped or linked rule lands outside by design and `apply` writes NOTHING for it (it
+# ---- emits an order), so those are exempt. Run over all 46 declared destinations in this tree
+# ---- before wiring, per S7: zero false positives, zero near-misses, and the exemption is
+# ---- load-bearing -- kickoff-manifest's `{user_skills}/session-kickoff` is absolute by design.
+def demand_contained_rows(rows, files, where: str) -> None:
+    """Refuse the run if any planned row lands outside the target. One reader, two callers."""
+    for row in rows:
+        ri = row.get("rule")
+        rule = files[ri] if isinstance(ri, int) and 0 <= ri < len(files) else {}
+        if rule.get("scope") == "machine" or rule.get("link"):
+            continue
+        dest = row.get("dest") or ""
+        # An `attributes` plan row spells `.gitattributes:<pattern>`; the pattern is not a path and
+        # the file it names is contained by construction. Grade the destination, not the pin.
+        if row.get("role") == "attributes" and dest.startswith(".gitattributes:"):
+            continue
+        if dest:
+            demand_contained_dest(dest, where)
+
+
 def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                    descs: dict[str, tuple[dict, str]], selection: list[str],
                    r: Report) -> list[dict]:
@@ -1669,6 +1746,14 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                     kind = derive_rule_kind(eid, d, rule, resolved, written, produced, r)
                     if kind is None:
                         continue
+                    # CONTAINMENT, inside the loop because the RULE is in hand here and a plan row
+                    # does not carry one. The first cut checked at the return over `out` and read
+                    # `row["rule"]`, which plan rows have never had -- so the machine/link exemption
+                    # could not fire and `kickoff-manifest`'s `{user_skills}/session-kickoff` would
+                    # have been refused on every plan. Caught by reading the row shape rather than
+                    # by the suite, which is cheaper by about ten minutes a round.
+                    if not (rule.get("scope") == "machine" or rule.get("link")):
+                        demand_contained_dest(resolved, f"entry '{eid}' (plan)")
                     out.append({"kit": eid, "role": role, "kind": kind,
                                 "dest": resolved, "missing": missing, "src": src,
                                 "commit": commit})
@@ -1830,10 +1915,23 @@ SHELL_EXEC_SITES = {
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
-# metacharacter becomes code and the site owes an announcement and an opt-in. `target-code`: the argv
-# is entirely gov's and what it RUNS is the target's — `git hook run` executes their hook script.
-# Announcing `git hook run pre-commit` would tell an operator nothing, so that property is asked of
-# `target` alone; what bounds `target-code` is being reachable from a writing verb only.
+# metacharacter would become code. `target-code`: the argv is entirely gov's and what it RUNS is the
+# target's — `git hook run` executes their hook script. What bounds `target-code` is being reachable
+# from a writing verb only.
+#
+# WHAT BOUNDS `target` IS `demand_safe_token`, AND SAYING ANYTHING ELSE HERE HAS ALREADY COST ONCE.
+# This comment used to say a `target` site "owes an announcement and an opt-in", and round 2 measured
+# both halves false: of the six `target` sites exactly ONE prints its resolved argv before spawning
+# it, and `cmd_check` — which is on this list — is reachable from the read-only `check` verb with no
+# opt-in at all, by design, because running `[check].argv` is what `check` DOES. The selftest arm
+# that appeared to assert the announcement was a `print(` substring scan over the whole function
+# body and could not red for any of them.
+#
+# So the guarantee is stated where it actually lives: every target-supplied value entering one of
+# these argvs passes `demand_safe_token` at the boundary, which is armed, reproduced-against, and
+# does not depend on six call sites each remembering to be careful. The announcement is a courtesy
+# `decline_findings` pays and the others do not; the selftest names the five that do not, on every
+# run, rather than implying coverage this table cannot deliver.
 #
 # `_cmd_update` is deliberately ABSENT: every spawn in it is literal `git` plumbing, so the widened
 # census does not see it, and declaring a row the census cannot find would red the both-directions
@@ -3142,12 +3240,13 @@ def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
             f"them in the target (or `git merge --abort`), then re-run")
 
 
-def dirty_claimed_paths(target: pathlib.Path, claimed: list[str]) -> list[str]:
+def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
+                        landed_oids: dict[str, str] | None = None) -> list[str]:
     """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
 
     A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
     --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
-    also flags `??`. Two carve-outs, and each of them is a state another unit owns:
+    also flags `??`. THREE carve-outs, and each of them is a state another unit owns:
 
     - Absent from BOTH the index and the worktree: dirty when HEAD still carries it, because that
       is a STAGED deletion and a staged deletion is an operator decision. NOT dirty when HEAD has
@@ -3156,10 +3255,26 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str]) -> list[str]:
     - An untracked file SHADOWING a claimed path that is absent from the index is NOT dirty here.
       That state is `-7` S4's refusal, which names the path and the risk, and two units refusing
       one tree would give the operator two different messages for it.
+    - GOV'S OWN STAGING IS NOT SOMEBODY'S WORK IN PROGRESS. A path whose ONLY difference is
+      index-versus-HEAD, and whose index blob is the exact oid the receipt recorded landing there,
+      was staged by this tool and by nothing else. `landed_oids` supplies those, and a path absent
+      from it takes no carve-out.
+
+    THAT THIRD ONE IS AN OWNER RULING (2026-08-26) AND IT CLOSES A HOLE S4 DUG UNDER ITSELF. `apply`
+    STAGES everything it lands, so the instant a successful apply finished, every receipt-claimed
+    path differed index-versus-HEAD and was dirty by this function's own definition. A second
+    `apply` refused, `update --write` straight after `apply` refused, and `apply --resume` refused
+    STRUCTURALLY — it needs a receipt, a receipt needs a completed apply, and a completed apply
+    leaves the target dirty, so that path could not be reached without an unrelated commit in
+    between. The unit parked it and shipped fixtures that commit at seven sites to model the flow.
+    THE OID COMPARISON IS WHY THIS IS NOT A WEAKENING, and it is the whole reason the carve-out is
+    written this way rather than as "skip paths this run staged": an operator's staged edit to a
+    gov-owned path produces a DIFFERENT index blob and stays dirty, which is the case S4 exists for.
+    An unstaged worktree edit is untouched by this and stays dirty too.
 
     Four git calls over the whole population rather than four per path: a hundred-row receipt would
     otherwise pay four hundred process creations, and on the node that measured it every exec costs
-    about 22 ms whatever it does.
+    about 22 ms whatever it does. The fifth read only happens when a carve-out could apply.
     """
     claimed = [c for c in dict.fromkeys(claimed) if c]
     if not claimed:
@@ -3180,6 +3295,15 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str]) -> list[str]:
     staged = _names("diff", "--cached", "--name-only", "-z", "HEAD") if has_head else set()
     unstaged = _names("diff", "--name-only", "-z")
 
+    # Carve-out 3 needs the index BLOBS, not just the names, and only for paths that could take it:
+    # staged, not unstaged, and carrying a recorded oid. Read once, and skipped entirely when the
+    # caller passed no oids — which is every caller that has no receipt in hand.
+    ours = {p for p in staged
+            if p not in unstaged and (landed_oids or {}).get(p)}
+    if ours:
+        _idx, _ = index_read(target, sorted(ours))
+        ours = {p for p in ours if _idx.get(p, (None, None))[1] == landed_oids[p]}
+
     dirty: list[str] = []
     for path in claimed:
         if path not in in_index:
@@ -3188,6 +3312,8 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str]) -> list[str]:
             if path in in_head:
                 dirty.append(f"{path} (deleted from the index, still in HEAD)")
             continue                            # carve-out 1 — a committed deletion is not dirty
+        if path in ours:
+            continue                            # carve-out 3 — gov staged exactly this blob
         if path in staged or path in unstaged:
             dirty.append(path)
     return dirty
@@ -3199,8 +3325,24 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     A deployer that refuses over an unrelated edit in a repository it does not own is a deployer
     people learn to work around, so a dirty path outside the receipt does not block.
     """
+    # A ROW THIS VERB CANNOT WRITE CANNOT MEET S4'S HAZARD. S4 refuses because "a write onto an
+    # uncommitted local change is indistinguishable afterwards from a change you made" -- so the
+    # population is the rows a writing verb can actually write. `UPDATE_ROLE["attributes"]` is
+    # `pins`, documented in that table as `recompute, compare, report; never write`, so a
+    # `.gitattributes` row can never be that write.
+    #
+    # IT IS ALSO THE ONE ROW THE `-12` CARVE-OUT CANNOT REACH, which is how this was found rather
+    # than reasoned to: `-7` S9 requires an `attributes` row to carry NEITHER identity, so it has no
+    # `oid`, so the carve-out has nothing to compare and `.gitattributes` stayed DIRTY after every
+    # apply -- leaving `update --write` refusing straight after `apply` over exactly one path, which
+    # is the burden the ruling was taken to remove. Excluding it here needs no new field and breaks
+    # no criterion, and it is the same reasoning the owner already applied to `-7` S4: scope the
+    # refusal to where the hazard is.
+    _rows = [row for row in ((receipt or {}).get("files") or [])
+             if UPDATE_ROLE.get(row.get("role", "engine")) != "pins"]
     dirty = dirty_claimed_paths(
-        target, [row.get("path") for row in ((receipt or {}).get("files") or [])])
+        target, [row.get("path") for row in _rows],
+        {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")})
     if dirty:
         raise Refusal(
             f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
@@ -3506,6 +3648,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                     print(f"govkit apply — SKIPPED [{role:<13}] {dest} <- {eid}: "
                           f"{SKIP_REASONS.get(kind, 'not a role this verb lands')}")
         res = resolve_entry(root, d, ctx)
+        demand_contained_rows(list(res["writes"].values()) + res["unlanded"],
+                              d.get("files", []), f"entry '{eid}' (apply)")
         vers = entry_version(root, d)
 
         # Every rule that does NOT land says so, by role, naming who does produce it. The silent
@@ -3813,6 +3957,37 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             if row.get("role") == "attributes":
                 row["renormalized"] = lf_paths
 
+    # ---- RE-STAMP `oid` AFTER THE RENORMALIZE, over every row the target tracks. Two defects close
+    # ---- here and the second is the one worth the paragraph.
+    # ----
+    # ---- FIRST, the narrow one: the stamp above is restricted to `LANDABLE_ROLES`, so an
+    # ---- `attributes` row -- `.gitattributes`, which this verb WRITES and STAGES -- carried no
+    # ---- `oid` at all. `-12` S4's third carve-out reads that field to tell gov's own staging from
+    # ---- an operator's, so the one path with no record was the one path that stayed DIRTY, and
+    # ---- `update --write` straight after `apply` still refused over it. Found by that carve-out's
+    # ---- own arm, which is the arm working.
+    # ----
+    # ---- SECOND, and it is a correctness bug rather than a burden: `git add --renormalize` REWRITES
+    # ---- the index blob of every LF-pinned path, and it runs AFTER the stamp above. Every affected
+    # ---- row therefore recorded a blob the target does not hold. Invisible in this tree because gov
+    # ---- already ships LF, so the renormalize is a no-op here -- and squarely live at exactly the
+    # ---- adopter `-7` exists for, the one whose checkout applies a line-ending filter. `oid` means
+    # ---- "the blob actually written" (`-9` S12); a value stamped before the last thing that writes
+    # ---- is not that.
+    # ----
+    # ---- STILL RESTRICTED TO `LANDABLE_ROLES`, and the first cut of this was NOT. Making it
+    # ---- role-blind regressed `-7` S9: an `attributes` row must carry NEITHER identity -- that is
+    # ---- its "exactly-one shape" -- and AC5 and AC11 both assert it. Stamping `oid` there broke two
+    # ---- ratified criteria to reach one path. The arms caught it on the next run, which is the arms
+    # ---- working; `.gitattributes` is unblocked at the dirty check instead, where the reason it is
+    # ---- not a hazard is stated by the dispatch table rather than invented here.
+    if staged:
+        _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
+        _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        for w in rows:
+            if w.get("role") in LANDABLE_ROLES and w.get("path") in _idx2:
+                w["oid"] = _idx2[w["path"]][1]
+
     # ---- LEGS. The last CONTENT step of the hard order. Guards are RENDERED against the target's
     # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:
     # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
@@ -3829,8 +4004,16 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     #
     # HOISTED so both branches read ONE answer. `tracked(target)` is correct for both: the stage
     # step above has already run in either case.
+    #
+    # S6, and it now covers the bar too. The index is read ONCE for this whole function and handed
+    # to both consumers. Round 2's L6: the hoist above re-introduced the second full `ls-files` walk
+    # that S6's own comment three lines below claims does not exist, so the comment described a
+    # state the code had stopped holding. Nothing between them mutates the index, so this is wall
+    # clock and a misinforming comment rather than a correctness bug — but a comment asserting `ONE
+    # index reader` beside two of them is the class this build keeps finding.
+    tracked_target = set(tracked(target))
     _silenced = {(eid, nm): bad for eid, nm, bad in
-                 silenced_legs(descs, selection, target, deploy, set(tracked(target)))}
+                 silenced_legs(descs, selection, target, deploy, tracked_target)}
     _silenced_found: list[str] = []
     if gr.get("kind") == "manifest":
         rf = target / gr["file"]
@@ -3842,10 +4025,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             raise Refusal(f"the declared runner file {gr['file']} is not a JSON list")
         owned = {e["name"] for e in ((receipt or {}).get("gate_runner") or {}).get("emitted", [])}
         by_name = {e.get("name"): i for i, e in enumerate(existing)}
-        # S6. ONE index reader for the bar and for the guard branch. This was an inline `ls-files`
+        # S6. ONE index reader for the bar and for the guard branch, hoisted above the kind split
+        # so this branch READS it rather than taking it again. This was an inline `ls-files`
         # splitting on newlines beside a `tracked()` that already existed — two spellings of one
         # question, in the one function where they have to agree.
-        tracked_target = set(tracked(target))
         # S1/S2. THE BAR RUNS AFTER THE STAGE STEP AND NOWHERE EARLIER, and the placement is load-
         # bearing rather than incidental: `apply` stages everything it wrote above, so the index
         # already includes this run's own writes. The identical predicate at preflight would red
@@ -4711,9 +4894,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- `missing` and then to the write arm, which would overwrite whatever untracked file the
     # ---- operator has there. Evaluated HERE, in the preamble: it is a whole-run refusal and must
     # ---- not depend on which rows the loop has already reached.
+    #
+    # ---- SCOPED TO ROWS THE DISPATCH SENDS TO THE TABLE, by owner ruling (2026-08-26). The
+    # ---- predicate was unqualified by role and this unit parked that: the raw-write hazard the
+    # ---- paragraph above NAMES is reachable only from the `table` disposition, so a `generated`,
+    # ---- `project-owned`, `rendered` or `gate-leg` row whose destination happened to be present
+    # ---- but untracked refused the ENTIRE run for a write that could never have happened — and
+    # ---- the operator's only route back to green was `git add` on a file gov will never write.
+    # ---- Nothing in this build's fixtures tripped it, so nothing would have warned first.
+    # ----
+    # ---- This is a NARROWING and it is worth being plain about what it gives up: an untracked file
+    # ---- shadowing a non-table row now passes unremarked, exactly as it did before `-7` landed.
+    # ---- What it buys is that the refusal fires only where the hazard is, which is the difference
+    # ---- between a guard and a tax.
     index0, index_present = index_read(target, [w["path"] for w in rows_all])
     shadowed = sorted(w["path"] for w in rows_all
-                      if w["path"] not in index_present and (target / w["path"]).is_file())
+                      if UPDATE_ROLE.get(w.get("role", "engine")) == "table"
+                      and w["path"] not in index_present and (target / w["path"]).is_file())
     if shadowed:
         raise Refusal(
             "these receipt-claimed path(s) are present in the target's WORKTREE and absent from its "

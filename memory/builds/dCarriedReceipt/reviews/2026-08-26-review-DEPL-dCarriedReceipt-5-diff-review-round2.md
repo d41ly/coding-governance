@@ -423,3 +423,43 @@ The second lesson is narrower and sharper. `SHELL_EXEC_SITES` is a hand-typed tr
 H1 and M2 are all one defect wearing four hats: **a declared population whose labels a human types will
 be wrong, and a gate that reads those labels inherits the error.** Derive the label from the call graph
 and the whole cluster closes at once.
+
+---
+
+## FOLD RECORD — round 2 closed, 2026-08-26, node `a`
+
+All twenty-one findings are folded. The blockers went first and were folded before this record was
+written; what follows is the six that remained, and the method note above is why they are recorded
+with the break each arm was watched to fail on rather than with a claim that they hold.
+
+- **M4 + L4 — the source-substring arms are DELETED, not repaired.** Replacing the predicate with
+  the question it was pretending to ask produced a measurement worth more than the fix: of the six
+  `target` spawn sites, exactly ONE prints its resolved argv before spawning it. The generic arm was
+  reporting a property five sites do not have. So the claim is narrowed to what is observed —
+  `_D1_ANNOUNCED` names, per site, the live stdout needle that proves the announcement or `None`
+  with the reason it is unasserted, asserted against the declaration in both directions, and the
+  five unasserted sites are PRINTED on every run. The engine's own header claimed a `target` site
+  "owes an announcement and an opt-in"; both halves were false — `cmd_check` is on that list and is
+  reachable from the read-only `check` verb by design — and the header now says what actually bounds
+  those sites, which is `demand_safe_token` at the token boundary.
+- **L2 — the D5 lock-ordering arm now observes an ordering.** The old fixture carried no
+  `install.json`, so the existence guard was inert and EITHER ordering refused at the lock. The new
+  arm plants the lock AND a receipt and runs `--write` without `--re-adopt`, so both guards want to
+  fire and WHICH message returns names the order.
+- **L3 — anchored on the GAP line.** `'GAP' in stdout` was satisfied by the fixture's unrelated demo
+  gaps and the dest-substring by the plan-row loop above the split token. Now: a line that starts
+  `  GAP` and names the sib destination, which only the gap emitter produces.
+- **L5 — the awk role rule is armed, and its failing case was OBSERVED.** The arm extracts the awk
+  program from the gate rather than copying it, and feeds it the one input the two spellings disagree
+  on: a zero-record file 1. Staged the break (`FILENAME == pinf` → `NR==FNR`), ran the suite, saw
+  exit 1 with exactly that one arm RED and no other, restored, re-verified clean.
+- **L6 — one index read.** `tracked_target` is hoisted above the kind split and both consumers read
+  it, so the S6 comment asserting `ONE index reader` is true again three lines below itself.
+
+**On the method note.** It is right, and the escape rate on this fold is the evidence: four separate
+shell-heredoc quoting escapes reached disk while folding these six. A \r inside a `tr -d` became a
+literal carriage return; an awk backreference \1 became byte 0x01; a `$rows` was read one line above
+its own assignment under `set -u`; and a \n inside a Python string literal became a real newline and
+broke the parse. Each was caught by compiling the file or reading its bytes back, never by trusting
+the write. The cheap fix is the one now in force: author anything containing a backslash with a file
+write, never through a shell heredoc.

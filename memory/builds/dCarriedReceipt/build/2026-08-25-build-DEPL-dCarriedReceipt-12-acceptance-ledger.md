@@ -61,3 +61,55 @@ every claimed path differs index-versus-HEAD. A second `apply`, an `apply --resu
 rather than resolved here: narrowing S4 to `update` alone is a one-sentence spec change, and the
 unit is titled "on both writing verbs" while S7 and S8 say "update" where they mean it, so the spec
 distinguishes the two deliberately.
+
+## Owner ruling 2026-08-26 — S4 takes a third carve-out, and the park is closed
+
+This unit shipped S4 as written and PARKED what it cost: `apply` STAGES everything it lands, so a
+completed apply made every receipt-claimed path dirty by S4's own definition. A second `apply`
+refused, `update --write` straight after `apply` refused, and `apply --resume` refused
+STRUCTURALLY — it needs a receipt, a receipt needs a completed apply, and a completed apply leaves
+the target dirty. That last one is a path no operator could reach without an unrelated commit in
+between, which is nearer a defect than a burden.
+
+**The ruling took the carve-out keyed on the recorded `oid`**, not the option this unit's own park
+described. The park read a carve-out as "weakens the guard in exactly the direction an operator's
+own staged work lives"; that is true of a carve-out for *paths this run staged*, and false of one
+that compares the index blob against the `oid` the receipt recorded. An operator's staged edit to a
+gov-owned path produces a different blob and stays dirty. An unstaged worktree edit is untouched.
+
+**Armed as a PAIR, because either arm alone is indistinguishable from deleting the guard.**
+- `[-12] RULING-A` — a writing verb straight after `apply`, with no intervening commit, is not
+  blocked by apply's own staging. Two liveness arms first: the apply landed engine rows carrying a
+  recorded `oid`, and it left them staged.
+- `[-12] RULING-A NEGATIVE` — an operator's own staged edit to a gov-owned path still refuses as
+  DIRTY, and the refusal names that path.
+
+`settle()` and its seven fixture sites STAY. Committing between writing verbs is still the modelled
+flow and every one of those arms asserts what it always did; what changed is that it is no longer
+compulsory.
+
+### The carve-out's arm found a correctness bug that was not the carve-out's
+
+RULING-A's arm went RED on its first run, naming one path: `.gitattributes`. Two defects sat behind
+it, and only the first is about this unit.
+
+**The narrow one.** `apply` stamps `oid` only on rows whose role is in `LANDABLE_ROLES`. An
+`attributes` row is not, so `.gitattributes` — a path this verb WRITES and STAGES — carried no `oid`
+at all. The carve-out reads that field to tell gov's staging from an operator's, so the one row with
+no record was the one row that stayed DIRTY, and `update --write` straight after `apply` still
+refused over it. The ruling would have shipped 95% delivered and reported as done.
+
+**The one worth more.** `git add --renormalize` REWRITES the index blob of every LF-pinned path, and
+it runs AFTER that stamp. Every affected row therefore recorded a blob the target does not hold.
+This is invisible in gov's own tree because gov already ships LF, so the renormalize is a no-op
+here — and it is live at exactly the adopter `-7` exists for, the one whose checkout applies a
+line-ending filter. `-9` S12 defines `oid` as the blob ACTUALLY WRITTEN; a value stamped before the
+last thing that writes is not that.
+
+**Fix:** one role-blind re-stamp after the renormalize, over every row the target tracks. Role-blind
+on purpose — restricting by role is what caused the first defect — and safe because no reader
+classifies from this field: `classify_row` takes `ours` from the LIVE index, never from the receipt.
+A row whose path the target does not track still gets no `oid`.
+
+Recorded here rather than folded silently, because the arm that found it was written to assert
+something else entirely, and that is the argument for writing the negative half of every pair.

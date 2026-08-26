@@ -68,3 +68,26 @@ S9 adds one `git show` per identity-carrying row and recomputes what `classify_r
 not write it — the file was outside its permitted edit set — and the charter makes a user-facing
 change undone until its page is updated. An adopter reads that page to learn what lands in their
 repo, and a receipt whose schema moved is exactly that kind of change.
+
+## Owner ruling 2026-08-26 — S4's shadow refusal is scoped to the table, and the park is closed
+
+S4 refuses a receipt-claimed path present in the WORKTREE and absent from the INDEX. Its own text
+names the hazard: without it the index read's `absent` routes to `missing` and then to the raw write
+at `:3069`, which would overwrite an operator's untracked file. Only rows the update dispatch sends
+to the `table` disposition reach that write. The predicate was UNQUALIFIED by role, so a
+`generated`, `project-owned`, `rendered` or `gate-leg` row whose destination happened to be
+present-but-untracked refused the ENTIRE run — for a write that could never have happened, and with
+the operator's only route back to green being `git add` on a file gov will never write.
+
+**Scoped to `UPDATE_ROLE[role] == "table"`**, one condition, matching the stated hazard exactly.
+What the narrowing gives up is recorded rather than implied: an untracked file shadowing a non-table
+row now passes unremarked, as it did before this unit landed.
+
+**Armed as a pair.** The positive half already existed — `[-12] S4 ...it is `-7` S4's refusal that
+owns that tree now`, on an engine row. The negative half is new and is the one that was missing:
+- `[-12] RULING-B` — a NON-table receipt row shadowed by an untracked file does not refuse the run,
+  with two liveness arms first (the fixture really carries such a row on disk; it really is out of
+  the index and still present).
+
+Nothing in this build's fixtures tripped the unqualified form, which is why nothing warned first —
+recorded here because that absence is the finding, not the reassurance.

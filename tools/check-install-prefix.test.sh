@@ -266,6 +266,43 @@ case "$zout" in
   *) good "L1 ...and the liveness assertion does not misreport it as a dead probe" ;;
 esac
 
+# --- L5: THE `FILENAME == pinf` ROLE RULE, ARMED DIRECTLY ---------------------------------------
+# Round 2's L5 measured this: swapping `FILENAME == pinf` back to `NR==FNR` in the gate left all 22
+# arms green. The unreachability is structural rather than lucky — the roles only diverge when file
+# 1 has ZERO records, and the sibling `-s` guard exits before awk ever runs on an empty ratchet — so
+# no arm routed through the gate can reach the divergent input. Per §7, a rule whose failing case has
+# never been observed is an assertion about nothing, and the next person tidying that awk undoes it
+# silently.
+#
+# So this arm skips the gate and feeds the awk PROGRAM ITSELF the one input the roles disagree on.
+# The program text is EXTRACTED from the gate rather than copied here: a copy would be two answers to
+# one question, and an edit to the real awk has to reach this arm or the arm grades a fossil.
+_awkprog="$TMP/role.awk"
+awk '/^  awk -F/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
+  tools/check-install-prefix.sh > "$_awkprog"
+if [ ! -s "$_awkprog" ] || ! grep -q 'UNRECORDED' "$_awkprog"; then
+  bad "L5: could not EXTRACT the awk program from the gate — this arm is grading nothing, which is the exact class it exists to close"
+else
+  # File 1 is the ratchet and is EMPTY (zero records). File 2 carries one measured row.
+  : > "$TMP/role-pin.tsv"
+  printf 'tools/demo/thing.sh\t2\n' > "$TMP/role-now.tsv"
+  _rout=$(awk -F'\t' -v pinf="$TMP/role-pin.tsv" -f "$_awkprog" \
+            "$TMP/role-pin.tsv" "$TMP/role-now.tsv" 2>&1)
+  # `FILENAME == pinf` — pin[] stays empty, now[] takes the row, so UNRECORDED, which is the truth.
+  # `NR==FNR`          — pin[] takes FILE 2's row, now[] stays empty, so `SLACK … -> 0 (delete the
+  #                      row)`: telling the operator to delete a ratchet that records nothing, while
+  #                      the correct verdict never prints. That is D4/D13's original defect verbatim.
+  case "$_rout" in
+    *UNRECORDED*)
+      good "L5 a ZERO-RECORD ratchet keeps the awk roles straight — UNRECORDED, the true verdict"
+      CARRIED_ARMS=$((CARRIED_ARMS+1)) ;;
+    *SLACK*)
+      bad "L5: the awk roles INVERTED on a zero-record file 1 — it read the MEASURED file as the pin and printed SLACK. This is the D4/D13 defect back, and it is what NR==FNR does on this input" ;;
+    *)
+      bad "L5: the awk printed neither verdict on a zero-record file 1, so this arm observed nothing: $_rout" ;;
+  esac
+fi
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm
