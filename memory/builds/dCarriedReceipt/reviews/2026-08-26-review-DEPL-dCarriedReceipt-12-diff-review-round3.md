@@ -1,6 +1,6 @@
 # Closing diff review, ROUND 3 — the fold's own fold
 
-**Serves:** review DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-9
+**Serves:** diff-review DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-9
 
 Node `a` · 2026-08-26 · base `267b598f` (round 2's recorded tip) · head = working tree.
 
@@ -19,15 +19,24 @@ pass over one diff found, and it is not a substitute for the fan.
 
 ## Verdict: BLOCKED
 
-TWO blockers. **B1** — a reproduced arbitrary file write, same class as round 2's. **B2** — the
-round-2 token guard refusing a legitimate Windows install, raised here as a park and RESOLVED on
-owner instruction rather than handed over. Around them: three defects in B1's own fix, and three of
-my own arms asserting things that were not true.
+THREE blockers, and the count went UP.
 
-All folded, all armed, both failing cases observed. The verdict stays BLOCKED because round 2 had
-two confirmed blockers and round 3 also has two — M8 re-arms a round only when that count strictly
-FALLS, and it did not. A fourth round over this fold is owed before the count can be called
-converged; nothing in this record is an argument that it has been.
+- **B1** — a reproduced arbitrary file write. Needed THREE sites, not the one it named: `prefix`,
+  `[gate_runner].file` (which exited 0), and the rollback loop.
+- **B2** — the round-2 token guard refusing a legitimate Windows install.
+- **B3** — the same token guard, red on a merge-bar leg for TWO COMMITS, because one character class
+  was grading both paths and prose.
+
+All folded, all armed, every reproduction re-run against the fix. **B2 and B3 are one mistake made
+twice**, and B1's second site is that mistake's cousin: I wrote a guard for the case in front of me
+and applied it to a population I had not enumerated.
+
+The verdict stays BLOCKED and the case is now stronger than it was. Round 2 had two confirmed
+blockers; round 3 has three. M8 re-arms a round only when that count strictly FALLS — it ROSE. A
+fourth round over this fold is owed, and the two findings that came from the FULL BAR rather than
+from this review are the argument for it: the govkit selftest does not cover the acceptance-matrix
+leg, so a green suite sat on top of a red bar for two commits and this review would not have found
+it either.
 
 ---
 
@@ -177,6 +186,65 @@ the common path for a Windows adopter. No arm catches it: both fixtures use form
 
 The owner instructed that this be resolved rather than parked. Option (a) taken; nothing remains
 open here.
+
+## B1's CLOSE-OUT — two more sites, found by enumeration
+
+Raised when the owner asked for B1 to be resolved rather than reported. Fixing the site the finding
+NAMED and stopping there is `gate the INSTANCE, not the class` — the rule this round had already
+broken once. So every write-capable operation in the engine was listed by AST (72 across 19
+functions) and every `target / <non-literal>` join classified by where its path comes from.
+
+**Site 2 — `[gate_runner].file`, and it exits 0.** A TARGET-supplied path that `apply` joins onto the
+target root and WRITES. Nothing checked it. REPRODUCED: a descriptor declaring
+`file = "../../ESCAPED.json"` made `apply` write that file outside the target repository and **exit
+0** — a clean success while writing into a tree the operator never named. The `prefix` escape at
+least exited non-zero for unrelated reasons. Guarded in `validate_gate_runner`, the PRE-WRITE pass,
+for the reason that function's own docstring already gives: legs are emitted last, so a bad
+declaration caught at emission time refuses after everything else has landed. Four arms, one of them
+asserting on the FILESYSTEM rather than the exit code, because exiting 0 was this site's danger.
+
+**Site 3 — the rollback loop, guarded WITHOUT a reproduction and labelled as such.** `snap_rows` is
+built from `acted` BEFORE the write loop's containment check, and the rollback `unlink()`s and
+`checkout-index`es each path. Reaching it needs a receipt row spelling an escape AND a kit whose
+check goes red after the run; this suite manufactures no way to produce the pair. Guarded anyway —
+same class, one condition — and the refusal branch DECLARES ITSELF UNARMED rather than being counted
+as coverage.
+
+**The other eight joins are classified and clean:** gov-authored (`[config].file`), git-derived
+(`eol_population`, `git_path`), receipt rows already contained by `cmd_update`'s two `relative_to`
+checks, or read-only (`_cmd_adopt`, `check_target_reads_subject`).
+
+**A mid-way error worth recording:** an `rc=2` I first read as the new guard firing was actually
+"target already carries memory-tree" from a previous apply on the same fixture. Rebuilt clean before
+believing it. Reading a refusal without checking WHICH check produced it is this round's recurring
+mistake in miniature.
+
+## B3 — one token class was doing two jobs, and it had been red for two commits
+
+Surfaced by the FULL BAR, which had not run since round 2's commit: `govkit acceptance matrix` was
+RED at `3dee7112` and stayed red through `a2186f20`. The govkit selftest does not cover that leg, so
+a green suite sat on top of a red bar for two commits.
+
+`demand_safe_token`'s strict class was written for `prefix` — a PATH, interpolated into `bash -c` and
+`python -c` argv — and was then applied to every `answers.*` and `kit.<eid>.*` value. Those are not
+all paths. The playbook charter's placeholders are rendered into a MARKDOWN DOCUMENT, and a
+legitimate override carries spaces by nature: `gate_runner = "bash tools/run-gates/run-gates.sh"`,
+`id_families = "PLAY KICK TOOL DEPL"`. The live adopter's answers happen to be all path-shaped, which
+is why nothing else noticed.
+
+**This is B2's mistake a second time** — one character class written for `prefix` and applied to
+every value passing through the same function. B2 was the Windows drive letter; B3 is prose.
+
+**Fix: two classes, named for what they guard.** Strict for a value that becomes a path or reaches an
+argv; prose for one whose only consumer renders it into a document. The prose class is still an
+ALLOWLIST — it adds space, comma, equals and colon and admits nothing that can end an argument or
+start a command. Fifteen rows graded on both classes side by side, plus a PROPERTY arm asserting the
+prose class admits no shell metacharacter at all, plus one asserting neither class grades a traversal
+because `demand_contained_dest` owns that. Matrix leg green, 35 arms.
+
+**What the prose class does not promise, stated rather than implied:** a value carrying a space that
+reaches a `bash -c` template will WORD-SPLIT there. That is a correctness bug for the operator who
+wrote it, visible immediately, and it is not code execution.
 
 ## What this round says about the method
 

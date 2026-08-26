@@ -38,7 +38,12 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 215    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 216    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 215 -> 216 at ROUND 3's B1 CLOSE-OUT. One new refusal: the rollback loop's containment guard,
+# B1's third site. It is NOT armed and says so in its own branch -- reaching it needs a receipt row
+# spelling an escape AND a kit whose check goes red after the run, and this suite manufactures no
+# way to produce the pair. Declared unarmed rather than rounded up, on the same convention the
+# `land_through_index` plumbing failures use two entries below. 0/1 armed.
 # 214 -> 215 at ROUND 3's fold. ONE new refusal, from a REPRODUCED defect: `demand_contained_dest`,
 # the path-containment guard. A target's own `prefix = "../../PWNED"` made `plan` preview 26 rows
 # rooted outside the target and `apply` WRITE all 26 -- measured in a sandbox, the files counted,

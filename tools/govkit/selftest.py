@@ -2658,6 +2658,111 @@ user_skills = "/tmp/gk-fake-skills"
               _dva.returncode == 2 and not pathlib.Path("C:/PWNED").exists(),
               f"rc {_dva.returncode}: " + _dva.stdout[-300:] + _dva.stderr[-300:])
 
+        # ---- B1's SECOND SITE, and the one that exited 0. `[gate_runner].file` is a TARGET-supplied
+        # ---- path that `apply` joins onto the target root and WRITES, and nothing checked it.
+        # ---- REPRODUCED before the fix: a descriptor declaring `file = "../../ESCAPED.json"` made
+        # ---- `apply` write that file OUTSIDE the target repository and exit 0 -- a clean success
+        # ---- while writing into a tree the operator never named. The `prefix` escape at least
+        # ---- exited non-zero for unrelated reasons; this one reported nothing.
+        # ----
+        # ---- FOUND BY ENUMERATING every `target / <non-literal>` join in the engine and classifying
+        # ---- each, rather than by reading around the first fix. Fixing the site the finding named
+        # ---- and stopping there would have left the CLASS open at a site that fails SILENTLY,
+        # ---- which is exactly the rule this build had already broken once in the same round.
+        def build_gr_target(tag: str, runner_file: str) -> pathlib.Path:
+            _t = make_target(tmp / f"gr-{tag}", None)
+            (_t / ".governance").mkdir(parents=True, exist_ok=True)
+            (_t / ".governance" / "deploy.toml").write_text(
+                'prefix = "tools"\n\n[gate_runner]\nkind = "manifest"\n'
+                f'file = "{runner_file}"\n'
+                'grammar = "json-array"\ndedupe_key = "name"\n'
+                'command = ["bash", "run.sh"]\nrun_all_env = "GATE_ALL"\n'
+                'observed_ran = ["ran {name}"]\nobserved_failed = ["failed {name}"]\n',
+                encoding="utf-8", newline="\n")
+            settle(_t, f"a gate_runner declaring {runner_file}")
+            return _t
+
+        _gre = build_gr_target("escape", "../../ESCAPED.json")
+        _grp = run("apply", "--target", str(_gre), "--kits", "memory-tree")
+        check("[-12] RUNNER-FILE an escaping `[gate_runner].file` REFUSES the run",
+              _grp.returncode == 2
+              and "leaves the target repository" in (_grp.stdout + _grp.stderr),
+              f"rc {_grp.returncode}: " + _grp.stdout[-400:] + _grp.stderr[-400:])
+        check("[-12] RUNNER-FILE ...and the refusal NAMES the declaration it came from, not `prefix`",
+              "[gate_runner].file" in (_grp.stdout + _grp.stderr),
+              _grp.stdout[-400:] + _grp.stderr[-400:])
+        # THE OBSERVABLE. This site's whole danger was that it exited 0, so the arm asserts on the
+        # filesystem and not on the exit code alone.
+        check("[-12] RUNNER-FILE ...and NOTHING was written above the target",
+              not (_gre.parent / "ESCAPED.json").exists()
+              and not (tmp / "ESCAPED.json").exists(),
+              str(sorted(p.name for p in tmp.glob("ESCAPED*"))))
+
+        # THE POSITIVE TWIN, because a guard with no accepted case is indistinguishable from one that
+        # refuses everything -- and this one sits in the pre-write pass, where refusing everything
+        # would block every promoted target.
+        _grok = build_gr_target("ok", "gates/legs.json")
+        _grq = run("apply", "--target", str(_grok), "--kits", "memory-tree")
+        check("[-12] RUNNER-FILE a repo-relative `[gate_runner].file` still lands, inside the target",
+              _grq.returncode == 0 and (_grok / "gates" / "legs.json").is_file(),
+              f"rc {_grq.returncode}: " + _grq.stdout[-400:] + _grq.stderr[-400:])
+
+        # ---- TWO TOKEN CLASSES, ONE TABLE. The strict class was written for `prefix` -- a PATH,
+        # ---- interpolated into `bash -c` and `python -c` argv -- and was then applied to every
+        # ---- `answers.*` and `kit.<eid>.*` value as well. Those are not all paths: the playbook
+        # ---- charter's placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate
+        # ---- override for one carries spaces by nature.
+        # ----
+        # ---- MEASURED RATHER THAN ARGUED: the single class red the `govkit acceptance matrix` leg
+        # ---- from the commit that introduced it and it STAYED red for two commits, because no full
+        # ---- bar ran in between and this suite does not cover that leg. The live adopter's answers
+        # ---- are all path-shaped, so nothing else noticed either.
+        # ----
+        # ---- The prose class is still an ALLOWLIST and still refuses every injection vector this
+        # ---- build reproduced. Graded on the FUNCTION, both classes side by side, because the whole
+        # ---- property is that they DIFFER on prose and AGREE on every metacharacter.
+        _gkp = govkit_module()
+
+        def _check_token(_v, _prose):
+            try:
+                _gkp.demand_safe_token("k", _v, "arm", prose=_prose)
+                return True
+            except _gkp.Refusal:
+                return False
+
+        _BS = chr(92)
+        for _v, _want_strict, _want_prose, _why in (
+                ("tools",                              True,  True,  "the default prefix"),
+                ("C:/Users/x/.claude/skills",          True,  True,  "a Windows machine path"),
+                ("stated for the scratch install",     False, True,  "the matrix fixture's stub"),
+                ("bash tools/run-gates/run-gates.sh",  False, True,  "a gate_runner override"),
+                ("PLAY KICK TOOL DEPL",                False, True,  "an id_families override"),
+                ("tools; touch PWNED ;",               False, False, "round 2's reproduction"),
+                ("$(id)",                              False, False, "command substitution"),
+                ("a`id`b",                             False, False, "backtick substitution"),
+                ("a|b",                                False, False, "a pipe"),
+                ("a&b",                                False, False, "a chain operator"),
+                ("a>b",                                False, False, "a redirect"),
+                ("a'b",                                False, False, "a quote"),
+                ('a"b',                                False, False, "a double quote"),
+                ("a" + _BS + "b",                      False, False, "a backslash"),
+                ("a\nb",                               False, False, "a newline")):
+            _gs, _gp = _check_token(_v, False), _check_token(_v, True)
+            check(f"[-12] TOKEN strict={_want_strict} prose={_want_prose} for {_v!r} -- {_why}",
+                  (_gs, _gp) == (_want_strict, _want_prose),
+                  f"strict={_gs} prose={_gp}, wanted {_want_strict}/{_want_prose}")
+        # THE TWO CLASSES MUST AGREE ON EVERY METACHARACTER, asserted as a PROPERTY rather than row
+        # by row: if the prose class ever admits one, the loop above stops being the whole guarantee.
+        _metas = [";", "|", "&", "$", "`", "'", '"', "<", ">", "(", ")", "{", "}",
+                  "*", "?", "!", _BS, "\n", "\r", "\t"]
+        _admitted = [m for m in _metas if _check_token(f"a{m}b", True)]
+        check("[-12] TOKEN the PROSE class admits no shell metacharacter at all",
+              not _admitted, "admitted: " + repr(_admitted))
+        # And the traversal is NOT this guard's job, in either class -- containment owns it. Asserted
+        # so a later reader does not add it here and leave two answers to one question.
+        check("[-12] TOKEN neither class grades a traversal -- `demand_contained_dest` owns that",
+              _check_token("../../PWNED", False) and _check_token("../../PWNED", True), "")
+
         # AND THE WIDENING IS EXACTLY ONE COLON WIDE. Graded on the FUNCTION rather than through a
         # verb, because these are character-class questions and routing each through a fixture would
         # cost six installs to assert what one table asserts.

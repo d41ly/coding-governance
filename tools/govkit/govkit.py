@@ -629,23 +629,61 @@ def demand_contained_dest(dest: str, where: str) -> str:
     return dest
 
 
-def demand_safe_token(key: str, value: str, where: str) -> str:
+# ---- TWO CLASSES, BECAUSE THERE ARE TWO KINDS OF VALUE AND ONE CLASS GRADED BOTH.
+# ---- The strict class above was written for `prefix` -- which becomes a PATH and is interpolated
+# ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
+# ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
+# ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
+# ---- spaces by nature: `gate_runner = "bash tools/run-gates/run-gates.sh"` is a command a reader
+# ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
+# ----
+# ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
+# ---- leg from the commit that introduced it, and it stayed red across two commits because no full
+# ---- bar ran in between. The live adopter's answers happen to be all path-shaped, so nothing else
+# ---- noticed. That is the same mistake as the drive letter, twice: writing one character class for
+# ---- `prefix` and applying it to every value that passes through the same function.
+# ----
+# ---- THE PROSE CLASS IS STILL AN ALLOWLIST, and it still refuses every injection vector this build
+# ---- reproduced. It adds space, comma, equals and colon -- none of which can end an argument or
+# ---- start a command -- and admits nothing that can: no `;` `|` `&` `$`, no backtick, no quote, no
+# ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
+# ---- PWNED ;` and `$(id)` are refused by it exactly as before.
+# ----
+# ---- WHAT THE PROSE CLASS DOES NOT PROMISE, stated rather than implied: a value carrying a space
+# ---- that reaches a `bash -c` template will WORD-SPLIT there. That is a correctness bug for the
+# ---- operator who wrote it, visible immediately, and it is not code execution. The escape half is
+# ---- owned by `demand_contained_dest`, which grades destinations regardless of which class the
+# ---- value came through.
+ANSWER_VALUE_RE = re.compile(r"^[A-Za-z0-9_./~@+:, =-]*$")
+
+
+def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
     """Refuse a target-supplied token value that could leave its argument and become code.
 
-    A leading `<letter>:/` is dropped before grading and the REMAINDER is graded normally, so a
-    Windows drive letter is admitted and an interior colon is not. See `DRIVE_PREFIX_RE` for why that
-    is a narrow widening rather than a hole, and which guard owns the half this one does not.
+    `prose=False` (the default) is the STRICT class, for a value that becomes a path or is
+    interpolated into an argv this engine runs. A leading `<letter>:/` is dropped before grading and
+    the REMAINDER graded normally, so a Windows drive letter is admitted and an interior colon is
+    not.
+
+    `prose=True` is for a value whose only consumer renders it into a document. See the block above
+    `ANSWER_VALUE_RE` for what it admits, what it still refuses, and what it deliberately does not
+    promise.
     """
-    body = value[2:] if DRIVE_PREFIX_RE.match(value) else value
-    if not TOKEN_VALUE_RE.match(body):
-        bad = "".join(sorted({c for c in body if not TOKEN_VALUE_RE.match(c)}))
+    rx = ANSWER_VALUE_RE if prose else TOKEN_VALUE_RE
+    body = value if prose else (value[2:] if DRIVE_PREFIX_RE.match(value) else value)
+    if not rx.match(body):
+        bad = "".join(sorted({c for c in body if not rx.match(c)}))
         raise Refusal(
             f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
             f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
             f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
-            f"become code. Refusing to resolve it ({where}). Every legitimate value here is a path "
-            f"fragment, optionally behind a `C:/` drive letter; if you need one that is not, that is "
-            f"a change to this rule and not to a descriptor")
+            f"become code. Refusing to resolve it ({where}). "
+            + ("This value is rendered into a document, so spaces and commas are fine here and "
+               "shell metacharacters are not"
+               if prose else
+               "Every legitimate value here is a path fragment, optionally behind a `C:/` drive "
+               "letter")
+            + "; if you need one that is not, that is a change to this rule and not to a descriptor")
     return value
 
 
@@ -664,10 +702,10 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
     }
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
-            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'")
+            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
     for k, v in ((deploy.get("kit") or {}).get(eid) or {}).items():
         if isinstance(v, str):
-            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'")
+            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
     ctx.setdefault("memory_root", "memory")
     return ctx
 
@@ -2779,6 +2817,24 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
     if missing:
         r.fail(f"[gate_runner] declares kind = 'manifest' and is a PARTIAL promotion: "
                f"{', '.join(missing)} absent. A complete promotion supplies {', '.join(GR_REQUIRED)}")
+    # ---- B1's SECOND SITE, and the one that exits 0. `[gate_runner].file` is a TARGET-supplied
+    # ---- path that `apply` joins onto the target root and WRITES (`_cmd_apply`, `target / gr["file"]`).
+    # ---- Nothing checked it. REPRODUCED: a descriptor declaring `file = "../../ESCAPED.json"` made
+    # ---- `apply` write that file outside the target repository and exit 0 — a clean success while
+    # ---- writing into a tree the operator never named. The `prefix` escape B1 closed at least
+    # ---- exited non-zero for unrelated reasons; this one reported nothing at all.
+    # ----
+    # ---- FOUND BY ENUMERATING, not by reading around the first fix. Every `target / <non-literal>`
+    # ---- join in the engine was listed and classified; this was the one write among them fed
+    # ---- straight from the target descriptor. Fixing the site B1 named and stopping there would
+    # ---- have left the CLASS open at a site that fails silently, which is §7's `gate the CLASS,
+    # ---- not the instance` — the rule this build has now broken twice in one review round.
+    # ----
+    # ---- HERE, in the PRE-WRITE pass, for the reason this function's own docstring already gives:
+    # ---- legs are emitted last, so a bad declaration caught at emission time refuses after
+    # ---- everything else has landed.
+    if gr.get("file"):
+        demand_contained_dest(str(gr["file"]), "[gate_runner].file in the target's deploy.toml")
     if gr.get("grammar") not in (None, "json-array"):
         r.fail(f"[gate_runner].grammar = '{gr.get('grammar')}' — only 'json-array' is implemented")
     if gr.get("dedupe_key") not in (None, "name"):
@@ -5672,6 +5728,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             untouched: list[str] = []
             for s in [x for x in snap_rows if x["kit"] == eid]:
                 for p in s["paths"]:
+                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
+                    # built from `acted` BEFORE the write loop's own containment check, and this
+                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
+                    # `../../x` that the write loop refused could still be reached here, on the
+                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
+                    # check goes red after the run) and not reproduced, which is stated rather than
+                    # dressed up: it is guarded because the class is the same and the cost is one
+                    # condition, not because a fixture demonstrated it.
+                    try:
+                        demand_contained_dest(p, f"rollback of kit '{eid}'")
+                    except Refusal as _esc:
+                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                        continue
                     if p not in written_paths:
                         untouched.append(p)
                         continue
