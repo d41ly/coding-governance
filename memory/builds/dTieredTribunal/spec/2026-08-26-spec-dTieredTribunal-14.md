@@ -1,12 +1,13 @@
 # TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script
 
-**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -46,6 +47,16 @@ see an inline script catches the defect.
   untouched. The three rules above it all prevent a BURST, which is the expensive failure this hook
   exists for; a ref-keyed join is a wrong verdict, which is cheap to re-run. `main()` still exits on
   the first rule that fires, so the order decides which message an operator sees and nothing else.
+  **The inversion also reaches a file this unit does not otherwise edit, and that is DISCLOSED here
+  rather than left to be discovered.** `tools/workflows/check-verifier-fanout.sh:72-77` pipes each
+  harness to `node "$HOOK"` with no `--only` flag, so once the early exit is gone that gate enforces
+  the S1 join ban too and stops being a one-rule gate. No verdict moves: its population is a SUBSET of
+  the join gate's, and section 4 measured zero live hits over the wider set. What it costs instead is
+  a merge-bar leg whose own header describes a gate it no longer is, which is a structural check
+  reading as a semantic one — the class the charter names. Two lines carry that false description, the
+  subject line at `:2` and the exit legend at `:7`. Section 3 therefore carves exactly those two out
+  of its own Non-goal, AC15 grades the corrected pair, and section 9 rev-3 records the amendment.
+  A silent widening was the alternative and it is refused.
 - **S4** — the hook gains an `--only=<rule>` argv selector over a CLOSED set whose only member today
   is `join`. Absent, every rule runs, which is the wiring's invocation and is unchanged. Present and
   equal to `join`, only the S1 rule runs. Present and anything else, the hook REFUSES with exit 2 and
@@ -82,11 +93,30 @@ see an inline script catches the defect.
   in that file's existing `js <name> <expected-exit>` heredoc style. The arms are enumerated in
   section 4 Inventory and include the two fixtures that pin S2's deliberate narrowing.
   `tools/workflows/check-review-join.test.sh` also gains `tools/hooks/agent-cap.js` copied into its
-  `$TMP/discover` and `$TMP/emptyrepo` scratch repos, after `:133` and after `:163`, copying
-  `tools/workflows/check-verifier-fanout.test.sh:63` verbatim — the arms at `:141`, `:153` and `:165`
-  run the gate inside those repos, which hold no hook, so S5's missing-hook refusal fires there
-  otherwise. It also gains a third scratch repo holding no hook and one arm asserting that refusal,
-  copying the sibling's `:74-79`, so the new refusal's own failing case is observed.
+  `$TMP/discover` and `$TMP/emptyrepo` scratch repos, after `:133` and after `:163` — the arms at
+  `:141`, `:153` and `:165` run the gate inside those repos, which hold no hook, so S5's missing-hook
+  refusal fires there otherwise. **Those two lines are SPELLED below rather than pointed at.** The
+  sibling's `tools/workflows/check-verifier-fanout.test.sh:63` resolves the hook through a `$HERE`
+  that this file never binds, and this file sets `set -u` at `:14`, so lifting it as it stands aborts
+  the WHOLE self-test in the main shell rather than failing one `cp`: run, it prints
+  `E: unbound variable`, returns rc=1, and nothing after the line executes. Write instead, after
+  `:133`:
+  `mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"`,
+  and after `:163` the same line with `$E` in place of `$D`. `ROOT` is this file's own repo-root
+  resolver, bound and `cd`-ed to at `:15-16`, which is what `:17` already resolves the gate against.
+  The scratch variable is
+  per SITE and not shared: `E` is not bound until `:160`, so an `$E` spelling at the `:133` site is
+  the abort above and not a typo.
+  S6 is load-bearing for the second of those two lines, not merely defensive. The `$E` copy puts a
+  `.js` into the one repo whose whole point is an EMPTY population; run at base without S6's
+  `SELF_EXCLUDE` row that arm reds with `clean — no ref-keyed verdict join under tools/`, and with the
+  row the population is empty again and the refusal fires. Both halves were run.
+  This file also gains a third scratch repo holding no hook and one arm asserting S5's missing-hook
+  refusal, copying the sibling's `:74-79` SHAPE, so the new refusal's own failing case is observed.
+  That repo is NOT named `D`, which `:121` already binds to `$TMP/discover`; this unit spells it
+  `N="$TMP/nohook"`. Run at base the arm reds with
+  `review-join: no JavaScript under tools/ — the population is empty, which is not a pass`, because
+  the refusal it asserts is the one S5 adds — which is the failing case, observed.
 - **S9** — `.claude/hooks/agent-cap.js` is refreshed from the kit copy in the same commit. It is the
   WIRED copy, the parity arm at `tools/hooks/agent-cap.test.sh:501-508` compares them, and that arm
   fails outright when the wired copy is absent.
@@ -138,8 +168,14 @@ see an inline script catches the defect.
   against only the files carrying `export const meta =` — and that difference is recorded as a real
   selection seam in `memory/map/features/review-harnesses.md`. Collapsing them narrows the join ban
   from seven files to three.
-- **Any change to `tools/workflows/check-verifier-fanout.sh` beyond its guard row.** It is the shape
-  being copied, not a thing being edited.
+- **Any change to `tools/workflows/check-verifier-fanout.sh` beyond its guard row AND its two header
+  lines.** It is the shape being copied, not a thing being edited. The two-line CARVE-OUT is `:2`'s
+  subject line and `:7`'s exit legend, it is an amendment to this non-goal rather than an exception
+  hiding inside it, and it is owed rather than optional: S3's inversion hands that gate the join ban
+  as well, so leaving its header alone ships a merge-bar leg whose own description is false. AC15
+  grades the corrected pair and section 9 rev-3 logs the amendment. Nothing else in that file moves —
+  not the population selector, not the delegation block at `:72-77`, and not the clean message at
+  `:84`, which its own self-test reads.
 - **Widening either gate's population beyond `tools/`.** A script saved under
   `memory/builds/<slug>/` stays invisible to the file gate. The hook is what reaches it, and only
   when it is run rather than when it is written.
@@ -268,6 +304,9 @@ rather than developing beside it.
 - `tools/hooks/agent-cap.test.sh` — the S8 arms.
 - `tools/hooks/README.md` — S11.
 - `tools/workflows/check-review-join.sh` — S5 and S6.
+- `tools/workflows/check-verifier-fanout.sh` — its two header lines ONLY, `:2` and `:7`, under the
+  section 3 carve-out S3 discloses. Listed here because a scope item with no row in this table is the
+  omission this build's own audit rounds keep finding.
 - `tools/workflows/check-review-join.test.sh` — the two S8 divergence arms and the S8 no-hook arm,
   appended; the hook copied into the two scratch repos after `:133` and `:163`; no existing arm's
   expected string edited.
@@ -403,6 +442,18 @@ The review-harness kit version is NOT bumped. `tools/workflows/kit.toml` declare
 - **AC14** — When the denial list in `tools/hooks/README.md` is read, it names the ref-keyed join and
   the `--only` selector, and when `bash tools/check-agent-cap-restatement.sh` runs it exits 0. A
   README bullet that states a bound as a digit reds that gate.
+- **AC15** — Three observations over `tools/workflows/check-verifier-fanout.sh`, each of which fails
+  at the pinned base, where the measured values are `0`, `1` and `1` — run, not assumed.
+  `grep -n 'ref-keyed' tools/workflows/check-verifier-fanout.sh` returns hits on BOTH line 2 and
+  line 7, so the subject line and the exit legend each name the join ban beside the verifier cap;
+  today it returns nothing at all. `grep -cF '1 = a per-item verify fan-out survives'` returns `0`,
+  because a legend offering one route to exit 1 on a gate with two is the defect and not a wording
+  preference. `grep -cF "obey the review protocol's verifier cap"` returns `0` for the same reason on
+  the subject line. The token is `ref-keyed` and not `ref-keyed join`, deliberately: the gate's own
+  clean message spells it `ref-keyed verdict join`, and a criterion that reds the natural spelling
+  would be a gate on wording. This is the ONLY criterion in this unit that grades a file section 3
+  otherwise forbids editing — the carve-out there authorizes it, S3 is what makes it owed, and neither
+  half is optional.
 
 ## 7. Gates
 
@@ -482,6 +533,36 @@ runs. This unit changes no protocol text, so it must stay green untouched.
   appended — 21. S8, Files touched, section 4 Migration and AC6 carry the hook copy into both scratch
   repos and the no-hook arm for the new refusal's own failing case — 22. S5 widens its deletion to
   the ban-list comment and the stripper note, which is what makes AC5 satisfiable — 14 and 41.
+- rev-3 · 2026-08-26 · spec-audit round 2 fold, closing findings 3, 15 and 17. Every claim below was
+  read back out of this file's BODY after the edit, not asserted from this entry.
+  **Findings 3 and 17 — the verbatim hook copy.** S8 no longer says `verbatim` and no longer cites
+  `check-verifier-fanout.test.sh:63`; that instruction is DELETED rather than negated beside. In its
+  place S8 spells the two adapted lines in this file's own idiom, resolving the hook from `$ROOT`
+  (`:15-16`) and using the scratch variable in scope at each SITE — `$D` after `:133`, `$E` after
+  `:163`. The stronger reading the round-2 record flags is taken and reproduced rather than quoted:
+  under `set -u` the `$E` spelling at the `:133` site aborts the whole self-test in the main shell,
+  measured as `E: unbound variable` with rc=1 and no line after it executing. The third scratch repo
+  is renamed off `D`, which `:121` already binds, to `N="$TMP/nohook"`. One thing NOT in either
+  filing and found by running the patched file: the `$E` copy puts a `.js` into the repo whose arm
+  asserts an EMPTY population, so that arm reds at base with `clean — no ref-keyed verdict join under
+  tools/` and holds only once S6's `SELF_EXCLUDE` row lands. Both halves were run and S8 now states
+  that S6 is load-bearing for it. No acceptance criterion moved; AC6's "scratch-repo setup only"
+  clause already binds these edits.
+  **Finding 15 — the undisclosed sibling-gate widening.** S3 gains a disclosure paragraph: inverting
+  the `offendingLines` early exit hands `tools/workflows/check-verifier-fanout.sh` the join ban too,
+  because its delegation at `:72-77` pipes to `node "$HOOK"` with no `--only` flag — re-derived at
+  HEAD. This is the one fix in this round that AMENDS A NON-GOAL, and it lands as a visible carve-out
+  rather than a silent widening: section 3's `check-verifier-fanout.sh` bullet now reads `beyond its
+  guard row AND its two header lines`, names `:2` and `:7` as the whole of the carve-out, and pins
+  what still does not move — the population selector, the delegation block, and the `:84` clean
+  message its own self-test reads. Section 4's Files touched gains the matching row, because a scope
+  item with no table row is the defect class that dominated this round. AC15 is new and grades the
+  corrected legend on three observations whose base values were measured at `0`, `1` and `1`, so all
+  three fail today. Its token is `ref-keyed` and not `ref-keyed join`, because the gate's own clean
+  message spells it `ref-keyed verdict join` and the narrower token would have redded a correct
+  implementation — caught by running the grep, not by reading it. Section 7 is unchanged and owes
+  nothing: `verifier fan-out` is unguarded `subject: repo` and `verifier fan-out self-test` is guarded
+  on `tools/workflows/`, which this unit already edits, both read from `tools/gate-legs.json` at HEAD.
 
 ## 10. Reuse audit
 

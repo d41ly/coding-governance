@@ -1,12 +1,13 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling
+**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -53,12 +54,17 @@ also passes. One predicate closes both, and section 4 carries the run.
   marker and the branch that did not qualify. This is the convention `why()` at `:458-467` already
   applies to every unresolvable `K` — one explanation per refusal, naming the FORM, because an
   operator who cannot tell which spelling was refused fixes it by guessing.
-- **S5** — `tools/hooks/agent-cap.test.sh` gains four arms, three DENY and one ALLOW, and each DENY
-  arm is the failing case observed before the predicate is trusted. They are the caller-supplied
-  ternary arm, the caller-rooted `.filter` whose predicate merely mentions a bounded name, the
-  bounded-split ternary whose other arm is caller-supplied, and the two-sibling-literal ternary that
+- **S5** — `tools/hooks/agent-cap.test.sh` gains SIX arms, five DENY and one ALLOW, and each DENY
+  arm is a failing case that has been SEEN rather than assumed. Three of the five are the holes: the
+  caller-supplied ternary arm, the caller-rooted `.filter` whose predicate merely mentions a bounded
+  name, and the bounded-split ternary whose other arm is caller-supplied. The other two are the
+  guards inside the new predicate, which had no arm at all — a marked line whose right-hand side
+  yields NO branch, and a marked ternary whose `:` is not on the line. Those two are what stop the
+  tightening from vacuously admitting the exact shapes it was written to deny, and a guard nobody
+  has watched fail is an assertion about nothing. The ALLOW is the two-sibling-literal ternary that
   must keep passing. The existing arm at `:195-198` covers the shipped derivation and stays byte
-  identical.
+  identical. Section 4 records what each guard arm was measured to do at the pinned base, because
+  the two are NOT both red there and an arm that is already green is trusted for a different reason.
 - **S6** — `.claude/hooks/agent-cap.js` is updated in the SAME commit. It is the copy
   `.claude/settings.json` actually invokes for the `Workflow|Agent` matcher, so a fix landing only in
   `tools/hooks/agent-cap.js` is inert in this repo. Nothing on a default bar catches that: the only
@@ -72,13 +78,24 @@ also passes. One predicate closes both, and section 4 carries the run.
   `tools/hooks/agent-cap.js` and nothing else, so three of the four sites are moved by reading. The
   bump is owed because `tools/hooks/kit.toml` takes the entry's `version_from` from that constant, and
   an adopter holding 1.6 cannot otherwise tell that the grammar their scripts must satisfy has moved.
-- **S8** — the grammar gains its third receiver in prose at `tools/hooks/README.md:24-26`, which
-  gains a bullet. The derivation branch has been undocumented since it shipped, which the 2026-08-08
-  review recorded as part of the same finding. The parallel bullet in
+- **S8** — the `tools/hooks/README.md:24-26` bullet is REWRITTEN, and the third receiver is
+  documented in a bullet added after it. The rewrite is not optional and appending alone is refused.
+  That bullet today reads that the batching assignment "carries a `gov:fixed-verifiers` marker and
+  must spell `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)`" — an absolute the derivation
+  receiver contradicts and this unit widens further. Appending a third bullet beneath it leaves two
+  adjacent sentences in the kit's own grammar document disagreeing about what a marked line may
+  spell, with nothing on the bar able to tell an adopter which one is live, and that is the
+  append-a-negation-beside-the-text-it-contradicts class recorded at
+  `memory/gotchas/fold-text-is-unreviewed-surface.md`. The replacement says that every top-level
+  value branch of the marked assignment must qualify on its own, and names the three qualifying
+  forms of S3 rather than two spellings. The added bullet documents the marked-derivation receiver,
+  undocumented since it shipped, which the 2026-08-08 review recorded as part of the same finding.
+  Neither bullet states a bound as a digit beside a noun, because
+  `tools/check-agent-cap-restatement.sh` scans this README and it is not under a frozen prefix. The
+  array-LITERAL sentence at `:31` stays byte identical: that is `TOOL-dFramedEntrypoint-1`'s
+  sentence and section 3 keeps it out of this unit. The parallel bullet in
   `memory/guides/REVIEW-PROTOCOL.md` is a governance carrier this run holds no grant to edit, and it
-  is fork F3 in section 8 rather than scope. The new bullet states no bound as a digit beside a noun,
-  because `tools/check-agent-cap-restatement.sh` scans that README and it is not under a frozen
-  prefix.
+  is fork F3 in section 8 rather than scope.
 - **S9** — `memory/map/features/agent-cap.md` has its prose refreshed in the same commit as the code.
   Its paragraph on the retired `<expr> || <int>` binder is where this belongs: the two are one class,
   and the dossier currently describes the marked receivers without naming the derivation branch at
@@ -100,9 +117,11 @@ also passes. One predicate closes both, and section 4 carries the run.
   between the `.map` and the `agent(` call defeat it. That is the fan-out detector, a different
   mechanism, and this unit changes nothing about which calls it looks at.
 - **`TOOL-dFramedEntrypoint-1`, the two documents that read as an exemption from the raw-primitive
-  ban.** This unit edits one of those two documents and must not fold that row's fix into the same
-  bullet. The row is about the array-literal allowance being described as if it exempted a raw
-  primitive; a fold would smuggle a second correction past the round that prices it.
+  ban.** This unit edits one of those two documents and must not fold that row's fix into its own
+  edit. The row is about the array-literal allowance being described as if it exempted a raw
+  primitive; a fold would smuggle a second correction past the round that prices it. The carrier is
+  the standalone sentence at `tools/hooks/README.md:31`, a different sentence from the `:24-26`
+  bullet S8 rewrites, and it stays byte identical.
 - **A new gate leg.** The hook's own self-test already rides the bar as `agent-cap self-test`, and
   the failing cases this unit owes are arms in it. Nothing here needs a leg that does not exist.
 - **The doc-completeness gate arm the 2026-08-08 review proposed** — every branch in `scan` that can
@@ -167,7 +186,22 @@ if (!grows && branches.length && branches.every(okBranch)) ok.add(name)
 
 `branches.length` is load-bearing and is not decoration. `Array.prototype.every` is TRUE over an
 empty array, so a walk that returned nothing would admit the assignment — the vacuous-predicate shape
-this repo gates against, inside the guard being hardened.
+this repo gates against, inside the guard being hardened. The null branch is the same argument for
+the ternary the walk cannot delimit.
+
+Both guards were RUN at the pinned base, by the same method as the table above, because a guard
+whose failing case nobody has watched is an assertion about nothing. The two payloads are the two
+new S5 arms and the two new criteria AC14 and AC15.
+
+| Guard fixture | At base | Required after | Reds if the guard is dropped |
+|---|---|---|---|
+| a marked line whose right-hand side is only the trailing marker comment, the assignment continuing on the next line | `rc=2`, on the generic `agent() fanned over LENSES, which this file does not show to be bounded` | `rc=2`, on S4's marked-branch reason | drop `branches.length &&` and `[].every` is true, so the name is admitted and the arm reads `rc=0` |
+| a marked ternary whose `:` sits on the NEXT line | `rc=0` | `rc=2` | return the first arm instead of a null branch and its `.filter` qualifies, so the arm reads `rc=0` |
+
+The first arm is GREEN at base, and it is said plainly rather than left to be misread as a verified
+row: its failing case is the guard's ABSENCE, not the base hook, and the half of AC14 that fails
+today is the deny REASON, which at base is the generic fan-out line quoted above. The second arm is
+red at base and red again against a walk that swallows an unclosed ternary, so it is armed twice.
 
 ### The candidate run over the real tree, with near-misses
 
@@ -211,9 +245,9 @@ evidence rather than an assertion.
 
 - `tools/hooks/agent-cap.js` and `.claude/hooks/agent-cap.js` — the predicate, the helper, the deny
   reason and the version pair. The two files stay byte identical.
-- `tools/hooks/agent-cap.test.sh` — the four new arms.
+- `tools/hooks/agent-cap.test.sh` — the six new arms.
 - `tools/hooks/scratch-guard.js` and `.claude/hooks/scratch-guard.js` — the sibling kit marker only.
-- `tools/hooks/README.md` — the third receiver.
+- `tools/hooks/README.md` — the rewritten `:24-26` bullet and the third receiver added after it.
 - `memory/map/features/agent-cap.md` — the dossier prose the code change touches.
 
 No regeneration of `memory/map/generated/` is owed. The dossier's `[claims]` block is untouched
@@ -248,7 +282,8 @@ and the generated artifacts carry claims rather than prose.
 - i18n — N/A. Same reason.
 - error / empty / loading states — the empty case is the one that matters and it is handled
   explicitly: an empty branch list denies rather than passing vacuously, and a ternary whose `:` is
-  not found yields a null branch that never qualifies.
+  not found yields a null branch that never qualifies. Both are S5 arms and both are graded, by AC14
+  and AC15, so neither guard ships never having been seen to fail.
 - observability — the deny message. S4 exists because a refusal an author cannot satisfy is the
   failure mode the hooks kit descriptor names for this exact file.
 - risks — the real risk is a false REFUSAL of a legitimate script, since the hook denies at a tool
@@ -280,7 +315,8 @@ and the generated artifacts carry claims rather than prose.
   `tools/workflows/drift-audit-state.js:224` and the three other marked lines still pass.
 - **AC5** — When `bash tools/hooks/agent-cap.test.sh` runs, it prints no line beginning `FAIL`, exits
   0, and its trailing count line reports strictly more passing arms than the 64 it reports at the
-  pinned base. Four arms are added by S5 and none is removed.
+  pinned base. Six arms are added by S5 and none is removed. The 64 was re-run at fold time:
+  `---- 64 passed, 0 failed ----`, rc=0, zero `FAIL` lines.
 - **AC6** — When the EXACT selector `TOOL-dTieredTribunal-11` ships —
   `const LENSES = kind === 'spec-audit' ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers`, a marked
   ternary between two IDENTIFIERS each bound from a top-level array literal at or under
@@ -304,9 +340,21 @@ and the generated artifacts carry claims rather than prose.
   `grep -rn 'agent-cap@1\.6' tools/hooks/ .claude/hooks/` returns no hits. The second half is the one
   that binds: the gate reconciles only the pair inside `tools/hooks/agent-cap.js`, so three of the
   four carriers are observable only by grep.
-- **AC11** — When `bash tools/check-agent-cap-restatement.sh` runs after S8, it exits 0. The edited
-  `tools/hooks/README.md` is live markdown outside the frozen prefixes, so a new bullet stating a
-  bound as a digit beside a noun reds this leg.
+- **AC11** — Three observations over `tools/hooks/README.md`, one absence and two presence. First,
+  `bash tools/check-agent-cap-restatement.sh` exits 0 after S8. That README is live markdown outside
+  the gate's frozen `memory/(builds|archive|gotchas|backlog)/` prefixes, so a bullet stating a bound
+  as a digit beside a noun reds this leg. That half is TRUE at the pinned base and stays true if the
+  README is never touched — it is kept as the no-digit-beside-a-noun check it already is, and the
+  two halves below are what carries the presence assertion AC10 took with it when the park dropped
+  it. Second, `grep -c 'gov:fixed-verifiers' tools/hooks/README.md` returns 2, one higher than the 1
+  it returns at `cd971285`, where the single hit is `tools/hooks/README.md:25`; the added hit is the
+  new bullet naming the marked-derivation receiver. Third, `grep -c 'must spell'
+  tools/hooks/README.md` returns 0, where it returns 1 today at that same `:25` — the `:24-26`
+  bullet was rewritten rather than appended beside, and its replacement names the three qualifying
+  forms of S3 and the every-branch rule instead of two admissible spellings. The two greps interlock:
+  deleting the old bullet outright satisfies the third and reds the second. A build that ships the
+  predicate and never touches the README passes the first half and fails the other two, which is the
+  point of adding them.
 - **AC12** — When `memory/map/features/agent-cap.md` is read at HEAD, its prose names the marked
   derivation and the per-branch rule, and `git diff cd971285 -- memory/map/features/agent-cap.md`
   shows no added and no removed line between the `## Gaps` heading and the `## Reuse affordance`
@@ -316,6 +364,21 @@ and the generated artifacts carry claims rather than prose.
   copy at the pinned base, using `git ls-files '*.js'` for the population, every file returns the same
   exit code from both. This is the charter's run-it-over-the-real-tree rule made observable, and it is
   the criterion that fails if the predicate reds an innocent file.
+- **AC14** — When a `Workflow` payload whose marked assignment carries nothing after the `=` but the
+  `gov:fixed-verifiers` comment, its right-hand side continuing on the NEXT line, is piped to
+  `node tools/hooks/agent-cap.js`, it exits 2 AND its stderr names the marker and reports that the
+  marked line yielded no qualifying branch. The exit code is already 2 at the pinned base, which was
+  run rather than assumed; what fails today is the reason, which reads only
+  `agent() fanned over LENSES, which this file does not show to be bounded`. The exit half is not
+  decoration either: it is the arm that reds against a candidate with `branches.length &&` removed,
+  where `[].every` admits the assignment and the payload exits 0. This is `branches.length`'s
+  failing case, seen rather than argued.
+- **AC15** — When a `Workflow` payload whose marked ternary has its `:` on the NEXT line — the first
+  arm a `.filter` over a bounded literal, the second `args.customLenses` — is piped to
+  `node tools/hooks/agent-cap.js`, it exits 2. The identical payload exits 0 at the pinned base,
+  which was run rather than assumed. This is S2's null-branch rule made observable: a walk that
+  returned the first arm instead of a single null branch admits the line on a `.filter` that
+  qualifies, and reds this criterion.
 
 ## 7. Gates
 
@@ -399,6 +462,27 @@ wired copy moves.
   the remaining criteria keep their labels so the audit's citations still resolve, and §7 restates
   `review-protocol parity (kit vs dogfood)` as must-stay-green-untouched. The OWNER arm of 28 is not
   folded and is not this run's to resolve.
+- rev-3 · 2026-08-26 · spec-audit round 2 folded — findings 6, 16 and 20, this spec's three. Every
+  claim below was made by editing the body first and reading the edited body back, never by writing
+  the intent down. Finding 6: AC11 was unfailable after the park. Re-run at fold time,
+  `bash tools/check-agent-cap-restatement.sh` exits 0 at the pinned base and stays 0 whether or not
+  S8's bullet is ever written, so AC11 now carries two presence halves over the carrier that stayed
+  in scope. `grep -c 'gov:fixed-verifiers' tools/hooks/README.md` counts 1 at `cd971285` and 1 at
+  HEAD, at `:25` both times, and the criterion requires 2; `grep -c 'must spell'` counts 1 at both
+  and the criterion requires 0. Fork F3 stays PARKED — this is bookkeeping the park owes, not an
+  unpark, and a run cannot ratify its own authorization. Finding 16: S8 now REWRITES the `:24-26`
+  bullet, whose `must spell` absolute contradicts what this unit ships, rather than appending a
+  third bullet beside it, §4's Files touched names the rewrite, and §3's `TOOL-dFramedEntrypoint-1`
+  non-goal now names `:31` as the sentence that stays byte identical. Finding 20: the two
+  vacuous-predicate guards shipped unarmed, since deleting `branches.length &&` left every S5 arm
+  and every criterion passing. S5 becomes SIX arms, five DENY and one ALLOW; §4 gains the two guard
+  fixtures RUN at the pinned base against the shipped hook — `rc=2` on the generic refusal for the
+  empty-branch line, `rc=0` for the ternary whose `:` sits on the next line; §6 gains AC14 and AC15;
+  AC5 reads six arms added and its 64 was re-run at fold time as `---- 64 passed, 0 failed ----`;
+  §4's Files touched row for the self-test reads six. One thing is stated rather than hidden,
+  because a green row misread as a verified one is the whole class: the empty-branch arm is already
+  GREEN at base, so AC14's fails-today half is the deny REASON and its exit-code half is what reds
+  against a candidate with the guard removed.
 
 ## 10. Reuse audit
 

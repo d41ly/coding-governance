@@ -1,12 +1,13 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** SPECCED · rev-3 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling
+**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
+| [2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-11-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 |
 
 <!-- /gen:spec-records -->
 
@@ -205,7 +206,8 @@ which is the loop the first run's unit could not reach.
 | `:156-177` | one lens catalogue | two sibling literals plus a marked selector |
 | `:182` | the acquire sentence | per-kind, with S6's blob verification on the spec arm |
 | `:184` | the round sentence names the diff | per-kind |
-| `:194` | the out-of-diff clause | per-kind |
+| `:192` | the round-1 no-prior-findings sentence names the whole diff | per-kind |
+| `:194` | the address field list and the out-of-diff clause | per-kind on both halves |
 | `:195` | the return-shape line names `file,line` | per-kind field list, matching the schema selected for the same kind |
 | `:210` | `ref` is path and line | per-kind |
 | `:245` | skeptics read the cited file, line and callers | per-kind |
@@ -308,9 +310,12 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
 - **AC4** — When the schema region is read, two schemas exist, the diff one requires `line` and the
   spec one requires `where`, and neither requires both. Observation: `grep -n "where"
   tools/workflows/tier2-review.js` returns a hit inside a `required` array and a hit inside a
-  `properties` object. The finder's return-shape line at `:195` names the SAME address field as the
-  schema passed on that arm: `grep -c "file,line,severity"` and `grep -c "file,where,severity"` each
-  return 1, and the arm spelling `where` is the arm passing `SPEC_FINDING_SCHEMA`.
+  `properties` object. EVERY finder-prompt line naming the address field names the SAME field as the
+  schema passed on that arm, not just the return-shape line: the unspaced list at `:195` and the
+  spaced list inside `:194`'s emit sentence. Observation: `grep -c "file,line,severity"`, `grep -c
+  "file,where,severity"`, `grep -c "file, line, severity"` and `grep -c "file, where, severity"` each
+  return 1, where the two `where` counts are 0 today and the two `line` counts are already 1, and each
+  arm spelling `where` is the arm passing `SPEC_FINDING_SCHEMA`.
 - **AC5** — When the anchor block is read, the spec arm grades `subjects`, refuses an empty array,
   and applies the SAME hex expression the diff arm applies to `base`. Observation: `grep -c
   "0-9a-f]{7,40}" tools/workflows/tier2-review.js` shows the pattern spelled once rather than
@@ -336,7 +341,10 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
   today it returns `tools/workflows/tier2-review.js:154` and `tools/check-agent-cap-restatement.sh:35`
   — and every surviving hit outside `memory/builds/` and `memory/archive/` is the
   `TOOL-aDeclaredBound-6` row in `memory/backlog/TOOL.md`, which reads CLOSED with its stale line
-  citation corrected.
+  citation corrected. S11's fifth edit target gets its own observation, because that grep cannot see
+  it: `grep -n 'TOOL-aDeclaredBound-6' memory/builds/dTieredTribunal/README.md` returns a
+  Parked-decisions bullet naming the row as closed by `TOOL-dTieredTribunal-11`, where today it
+  returns line 58 reading the row OPEN and untouched.
 - **AC12** — When `memory/map/features/review-harnesses.md` is read, the bullet asserting that no
   harness takes a review-kind parameter is gone rather than negated beside its replacement.
   Observation: `grep -n "review-KIND parameter" memory/map/features/review-harnesses.md` returns no
@@ -356,10 +364,17 @@ are the backlog row closed by S11 under `memory/backlog/TOOL.md` and the Parked-
   ends with that finding's own `where` value and contains no `:undefined`. Observation: a synthetic
   spec-kind finding carrying a `where` of `§2 S4` renders a `ref` whose tail is that string, where
   the shipped `${f.file}:${f.line}` renders `:undefined`.
-- **AC17** — S9's witness. When `grep -n "diff" tools/workflows/tier2-review.js` runs, every hit
-  inside a prompt string sits on a diff-arm selection, on `diffCmd`, or on the `diff-review` kind
-  token itself. The range line at `:353` spelling `${base}...${head}` with no kind selection fails
-  this, which is its state today.
+- **AC17** — S9's witness. When `grep -nE 'diff|file:line|file, ?line, ?severity|\$\{base\}\.\.\.\$\{head\}'
+  tools/workflows/tier2-review.js` runs, every hit inside a prompt string or inside the pre-spawn log
+  string sits on a kind selection, on `diffCmd`, or on the `diff-review` kind token itself. Hits
+  inside comments are outside the population. The alternation is wider than `diff` alone because
+  FOUR S9 sites carry no `diff` token at all: `:245` and `:345` carry `file:line`, `:353` carries
+  only the literal `${base}...${head}`, and `:195`'s return-shape list carries neither, so it is
+  reached by the `file, ?line, ?severity` alternate alone. `:194`'s address list is reached by that
+  same alternate. Verified per site with `sed -n '<n>p' … | grep -q diff` over all nine. Ran at HEAD, the widened grep
+  returns every one of S9's nine sites. It reds there on at least two of them: the range line at
+  `:353` spells `${base}...${head}` with no kind selection, and the pre-spawn log at `:103` names the
+  diff unconditionally.
 
 ## 7. Gates
 
@@ -378,8 +393,10 @@ fork, which is why AC2 names it instead of naming a grep over the selector line.
 
 The named legs carrying `subject: kit` are `verifier fan-out self-test`, `review-join self-test` and
 `agent-cap restatement self-test`, and all three are HELD by `tools/run-gates/run-gates.sh` unless
-`GATE_SELFTESTS=1` is set. The first two are guarded on `tools/lib/` and `tools/workflows/`; the
-third carries no guard at all. A guarded leg arming is not the same as a leg running, so this unit's
+`GATE_SELFTESTS=1` is set. Their guards are not written here: `TOOL-dTieredTribunal-14` S12 moves two
+of the three one order before this unit lands, so any guard sentence in this section is a claim about
+a manifest this build is mid-way through editing. Read `tools/gate-legs.json`. What survives is the
+part that does not move — a guarded leg arming is not the same as a leg running, so this unit's
 Definition of Done needs the run that sets both that variable and `GATE_FULL=1`.
 
 This unit adds no gate leg, per §3.
@@ -441,9 +458,28 @@ that settles this once order 1 lands, and the fallback above is what this unit t
   fold's own adversarial verify stage before any code. `:192` — a finder-prompt sentence reading
   `the whole diff` — satisfies AC17's population and was absent from section 4's Inventory, which S9
   declares authoritative, so a builder implementing the Inventory exactly would have redded AC17.
-  It is a genuine per-kind site and the Inventory now carries it. Section 5's rollback bullet still
+  It is a genuine per-kind site. This sentence used to end "and the Inventory now carries it", which
+  was false when it was written: rev-3 added the site to S9's prose and never touched the table.
+  Corrected here rather than negated below it, and rev-4 is the revision that put the row in.
+  Section 5's rollback bullet still
   said `two files` after section 4 grew to three; the numeral is deleted rather than corrected,
   because a count of a derived population does not belong in prose beside the section that owns it.
+- rev-4 · 2026-08-26 · spec-audit round 2 fold, closing findings 1, 2, 5, 7, 8, 9, 10, 12, 13, 14, 18
+  and 19 — five of the ten distinct defects that round grouped. §4's Inventory gained the `:192` row
+  between `:184` and `:194`, and the table was read back and grepped before this line was written (1,
+  5, 10, 14, 18); the rev-3 entry above, which certified that repair before it landed, is corrected in
+  place. AC17's population widened from `grep -n "diff"` to a `grep -nE` alternation over `diff`,
+  `file:line`, the address list and the literal `${base}...${head}`, because `:245`, `:345` and `:353`
+  carry no `diff` token and the narrow grep never returned them, which also made the old `:353`
+  failing-case sentence false; the widened grep was RUN at HEAD and its failing cases re-derived from
+  what it actually returned (19, 2, 9). The `:194` Inventory row now names both of that line's
+  diff-shaped halves, and AC4 widened from `:195` alone to every finder-prompt line naming the address
+  field, with the two spaced counts added (7). AC11 gained the observation over
+  `memory/builds/dTieredTribunal/README.md`, the fifth edit target S11 added and the one carrier its
+  `6-wide` sweep cannot see (8, 13). §7's guard clause for the two self-test legs is DELETED rather
+  than restated, because `TOOL-dTieredTribunal-14` S12 moves those guards at order 3 and this unit is
+  order 4 (12). Every grep in this entry was run against the tree at HEAD, and every line citation
+  re-derived there.
 
 ## 10. Reuse audit
 
