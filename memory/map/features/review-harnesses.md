@@ -81,10 +81,15 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
   three files, one pipeline, no shared module, because workflow scripts cannot import. A future
   divergence has nothing structural stopping it — only the provenance comments each ported guard now
   carries, naming the unit that originally earned it.
-- **No harness takes a review-KIND parameter.** The build method forbids `tier2-review.js` on a spec
-  audit, which is the majority review kind in this corpus, so every spec audit is driven by a script
-  authored from scratch in the session that needs it. The measured consequence is that a field a
-  program emits reaches the record far more often than one a document asks a human to remember.
+- **`tier2-review.js` takes a review KIND now, and the other two do not.** `TOOL-dTieredTribunal-11`
+  gave it a closed two-value `kind` defaulting to `diff-review`, and six things dispatch on it: the
+  acquire sentence, the lens catalogue, the context default, the anchor predicate, the finding
+  schema's address field, and the record's kind token. A spec audit's anchor is a pinned BLOB per
+  subject rather than a commit range, and the lens verifies it with `git hash-object` because the
+  orchestrator holds no filesystem — which is what makes that anchor a check that can fail. What
+  remains a gap is the other two harnesses, which still know only their own subject, and the fact
+  that a kind is a parameter rather than a profile: adding a third would mean a third branch at each
+  of the six sites, and the enforcement hook admits no registry that would collapse them.
 - **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
   `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
   rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one

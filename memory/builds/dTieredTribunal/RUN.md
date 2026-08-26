@@ -30,3 +30,5 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T12:26:39Z dispatch · item 7b0999a4 TOOL-dTieredTribunal-13 · reason tools/hooks .claude/hooks memory/map/features memory/map/generated
 
 2026-08-26T13:00:50Z dispatch · item 91c5d3ac TOOL-dTieredTribunal-14 · reason tools/hooks .claude/hooks tools/workflows
+
+2026-08-26T13:27:36Z dispatch · item fb2d692e TOOL-dTieredTribunal-11 · reason tools/workflows/tier2-review.js memory/map/features tools/check-agent-cap-restatement.sh memory/builds/dTieredTribunal/README.md

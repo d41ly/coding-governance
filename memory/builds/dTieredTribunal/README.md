@@ -55,7 +55,9 @@ one a document asks a human to remember in 5–27%.
 - **Node split.** The folder and its ids are node `d`'s; the specs say `node a` because a node `a`
   session authored them under this build's slug and the mandate.
 ## Parked decisions
-- **`TOOL-aDeclaredBound-6`** and **`TOOL-aBoundedVerdict-20`** are OPEN and untouched here.
+- **`TOOL-aBoundedVerdict-20`** is OPEN and untouched here. `TOOL-aDeclaredBound-6` was OPEN when
+  this build opened and is CLOSED by `TOOL-dTieredTribunal-11`, which deleted both disagreeing digits
+  rather than reconciling them.
 - **P1 against P9 — the owner turn this build turns on.** P1 is the subject descriptor that IS this
   build's goal; it makes M4's "Not the harness" rule false, so M3 veto 2 reserves it. P9 is the
   record-shape gate the research names as its substitute. They park together because building P9
@@ -106,7 +108,7 @@ ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL
 | [TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded](spec/2026-08-26-spec-dTieredTribunal-13.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-26 |
 | [TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script](spec/2026-08-26-spec-dTieredTribunal-14.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-08-26 |
-| [TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too](spec/2026-08-26-spec-dTieredTribunal-11.md) | 4 | 2 | SPECCED | rev-5 | 2026-08-26 |
+| [TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too](spec/2026-08-26-spec-dTieredTribunal-11.md) | 4 | 2 | INPROGRESS | rev-5 | 2026-08-26 |
 | [TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do](spec/2026-08-26-spec-dTieredTribunal-12.md) | 5 | 2 | SPECCED | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->
 

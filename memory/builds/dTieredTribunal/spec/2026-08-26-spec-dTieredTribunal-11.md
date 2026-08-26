@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too
 
-**Status:** SPECCED · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 4 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
