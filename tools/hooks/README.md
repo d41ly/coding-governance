@@ -22,8 +22,19 @@ which is the configuration this hook was rewritten to stop shipping.
   `boundedParallel(thunks, 5)` or `boundedPipeline(items, 5, …)`, inlined, because workflow scripts
   cannot import. The line carries a `gov:bounded-fanout` marker.
 - Any `agent(` fanned over a receiver the hook cannot PROVE bounded. The batching assignment carries
-  a `gov:fixed-verifiers` marker and must spell `chunk(x, Math.ceil(x.length / K))` or
-  `splitInto(x, K)`, with `K` an integer literal ≤5 or an identifier bound to one.
+  a `gov:fixed-verifiers` marker, and EVERY top-level value branch of that assignment must qualify on
+  its own — a marked line is admitted only when all of its branches do, never when the first one that
+  matches does. A branch qualifies in one of three ways and no fourth: a bounded split, spelling
+  `chunk(x, Math.ceil(x.length / K))` or `splitInto(x, K)` with a `K` the hook can resolve; an array
+  LITERAL whose element count it can count here; or an identifier it has already proven bounded,
+  alone or followed by operations that cannot grow it. A branch it cannot delimit never qualifies, so
+  an expression the hook cannot read lands on the deny side rather than being waved through.
+- The marked DERIVATION receiver, which is the third form above and was undocumented until now. A
+  marked assignment may derive its receiver from something already proven bounded — a `.filter()` or
+  a `.slice()`, which cannot grow an array — and the bound is inherited. Mentioning a bounded name is
+  not enough: the whole right-hand side is still vetoed if it can grow, and the derivation must be
+  ROOTED on the bounded value rather than merely referring to one. Accepted only WITH the marker, so
+  it stays a deliberate claim rather than something inferred from a name.
 - Any `K` it cannot resolve to an integer ≤5. It RESOLVES a bound wherever it is written — the call
   site, a helper's default parameter, or a `gov:bounded-fanout` slice width — and the burden is on
   the fan-out.

@@ -156,6 +156,15 @@ re-deriving `1 + count(commas)`, which reads a trailing comma as an item.
 seam: agent-cap.boundedK — reuse to resolve a source token to an integer bound that is either a
 literal or a file-bound constant never reassigned; extend by adding a CALL SITE, never a second
 resolver, and note that it deliberately refuses an `<expr> || <int>` fallback as a bound.
+
+The MARKED-DERIVATION receiver is the same class one level out, and it was defeated the same way
+until `TOOL-dTieredTribunal-13`. A marked assignment may derive its receiver from a value already
+proven bounded, because a `.filter()` or a `.slice()` cannot grow an array. The branch used to accept
+when ONE non-self reference was bounded, so it never examined the others: a marked ternary whose
+other arm was caller-supplied passed, and an args-supplied array of any length then reached `agent()`
+once per element. That is a caller-settable knob wearing a constant's clothes, which is exactly what
+the `<expr> || <int>` binder was deleted for. Every top-level value branch is now judged on its own
+text against a closed list of three forms, and a branch the walk cannot delimit never qualifies.
 seam: check-verifier-fanout.delegation — reuse the shape whenever a merge-bar gate and a live hook
 must apply ONE rule: the gate builds the hook's payload and runs the hook, so there is never a second
 implementation to drift.

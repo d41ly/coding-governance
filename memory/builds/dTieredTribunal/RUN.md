@@ -26,3 +26,5 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T11:17:18Z review · item dTieredTribunal-run2-specs · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-08-26T11:48:38Z dispatch · item c6f320bd TOOL-dTieredTribunal-15 · reason memory/gotchas memory/map/features memory/map/generated
+
+2026-08-26T12:26:39Z dispatch · item 7b0999a4 TOOL-dTieredTribunal-13 · reason tools/hooks .claude/hooks memory/map/features memory/map/generated

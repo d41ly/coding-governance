@@ -197,6 +197,42 @@ const ALL_LENSES = [{ s: 'a' }, { s: 'b' }, { s: 'c' }]
 const LENSES = a.lenses ? ALL_LENSES.filter((L) => a.lenses.includes(L.s)) : ALL_LENSES // gov:fixed-verifiers
 const r = await boundedParallel(LENSES.map((L) => () => agent(L.s)), 5)
 EOF
+# TOOL-dTieredTribunal-13 S5 — the marked branch now judges EVERY top-level value branch. THREE of
+# these five DENY arms are the reproduced holes: before this unit each PASSED, because either accept
+# could return on a single arm while the other stayed caller-supplied. The other two are the guards
+# inside the new predicate, which had no arm at all — and a guard nobody has watched fail is an
+# assertion about nothing. Every one was run against the shipped file and its verdict recorded.
+js "rule2: marked ternary whose OTHER arm is caller-supplied → deny" 2 <<'EOF'
+const SPEC = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.kind === 'spec' ? SPEC : args.customLenses // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: marked .filter ROOTED on a caller value → deny" 2 <<'EOF'
+const ALL = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.lenses.filter((L) => ALL.includes(L)) // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: bounded split in one arm, caller value in the other → deny" 2 <<'EOF'
+const MAX_VERIFIERS = 5
+const items = [1, 2, 3]
+const b = cond ? chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) : args.custom // gov:fixed-verifiers
+const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
+EOF
+js "rule2: marked line whose right-hand side yields NO branch → deny" 2 <<'EOF'
+const LENSES = // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L)), 5)
+EOF
+js "rule2: marked ternary whose : is not on the line → deny" 2 <<'EOF'
+const SPEC = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.kind === 'spec' ? SPEC // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: a marked ternary between two sibling literals → allow" 0 <<'EOF'
+const SPEC_LENSES = [{ k: 'a' }, { k: 'b' }]
+const DIFF_LENSES = [{ k: 'c' }, { k: 'd' }]
+const LENSES = kind === 'spec-audit' ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
 js "rule2: a single synthesis agent → allow" 0 <<'EOF'
 const synth = await agent('synthesize the confirmed findings', { label: 'synth' })
 EOF

@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.6' // gov:kit agent-cap@1.6 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.7' // gov:kit agent-cap@1.7 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -162,6 +162,55 @@ function intConsts(code) {
   return { consts, orBound }
 }
 
+// TOOL-dTieredTribunal-13 S2 - split an expression into its top-level VALUE branches. Depth-aware
+// over (), [] and {}; skips `?.` and `??`, which are not ternaries; recurses into nested ternaries;
+// and DROPS the condition, because a condition is not a value the fan-out ever iterates. A `?` whose
+// `:` this walk cannot find yields a single null branch, and a null branch never qualifies — so an
+// expression this file cannot delimit lands on the DENY side rather than being waved through.
+function parseBranches(expr) {
+  const t = String(expr)
+  let d = 0
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i]
+    if ('([{'.includes(ch)) { d++; continue }
+    if (')]}'.includes(ch)) { d--; continue }
+    if (d !== 0 || ch !== '?') continue
+    if (t[i + 1] === '.' || t[i + 1] === '?') { i++; continue }
+    let dd = 0
+    let nest = 0
+    for (let j = i + 1; j < t.length; j++) {
+      const c = t[j]
+      if ('([{'.includes(c)) { dd++; continue }
+      if (')]}'.includes(c)) { dd--; continue }
+      if (dd !== 0) continue
+      if (c === '?') { if (t[j + 1] === '.' || t[j + 1] === '?') { j++; continue } nest++; continue }
+      if (c === ':') {
+        if (nest > 0) { nest--; continue }
+        return parseBranches(t.slice(i + 1, j)).concat(parseBranches(t.slice(j + 1)))
+      }
+    }
+    return [null]
+  }
+  return [t]
+}
+
+// TOOL-dTieredTribunal-13 S3 - the qualifying forms are a CLOSED list and each branch is judged on
+// its OWN text. Three forms and no fourth: a bounded split whose K resolves through `boundedK`; an
+// array LITERAL whose top-level element count is at or under MAX_LENSES, counted with the shared
+// splitter so a trailing comma is not an element; or a bare identifier already proven bounded,
+// alone or followed by a chain of operations that cannot grow it.
+function boundedBranch(br, name, consts, ok) {
+  if (br === null) return false
+  const t = String(br).trim()
+  if (!t) return false
+  const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(t)
+  const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
+  if ((c && boundedK(c[1], consts)) || (sp && boundedK(sp[1], consts))) return true
+  if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
+  const m = /^([A-Za-z_$][\w$]*)((?:\s*\.\s*(?:filter|slice)\s*\([\s\S]*\))?)$/.exec(t)
+  return !!m && m[1] !== name && ok.has(m[1])
+}
+
 function fanoutFindings(script) {
   const lines = script.split(/\r?\n/)
   const code = lines.map((l) => stripStrings(l).split('//')[0])
@@ -173,31 +222,51 @@ function fanoutFindings(script) {
   // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
   // pass would reject it on declaration order rather than on the property being checked.
   const ok = new Set()
+  // S4 - one reason per refused marked assignment, keyed by the name it binds.
+  const markedWhy = new Map()
   const scan = (raw, i) => {
     const l = code[i]
     const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
     if (!asg) return
     const name = asg[1]
     if (raw.includes(FIXED_MARK)) {
-      const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(l)
-      const s = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(l)
-      if ((c && boundedK(c[1], consts)) || (s && boundedK(s[1], consts))) {
+      // TOOL-dTieredTribunal-13 S1 - EVERY top-level value branch is judged, not the first that
+      // happens to match. This block used to be two sequential accepts, and either could return on a
+      // SINGLE arm: a marked ternary whose other branch was caller-supplied passed, and an
+      // args-supplied array of any length then reached agent() once per element. That is the same
+      // defeat the `<expr> || <int>` binder was deleted for — a caller-settable knob wearing a
+      // constant's clothes. Reproduced against this file before the rewrite.
+      const rhs = l.slice(l.indexOf('=') + 1)
+      // The whole-RHS growth veto is kept and still vetoes the assignment however the branches read.
+      // The first cut of the derivation receiver accepted any line MENTIONING a bounded name, which
+      // blessed `ALL_LENSES.concat(allFindings)` on the strength of the word appearing.
+      const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
+      const branches = parseBranches(rhs)
+      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
+      if (!grows && branches.length && bad0 === undefined) {
         ok.add(name)
         return
       }
-      // A marked DERIVATION from an array already known bounded — `ALL_LENSES.filter(…)`, a
-      // `.slice()`, a ternary between two bounded sources. Neither filter nor slice can GROW an
-      // array, so the bound is inherited. Only accepted WITH the marker, so it stays a deliberate
-      // claim rather than something inferred from a name.
-      //
-      // The operations are a CLOSED list, and mentioning a bounded name is not enough: the first cut
-      // accepted any line referencing one, which blessed `ALL_LENSES.concat(allFindings)` — a
-      // derivation that grows without limit — on the strength of the word ALL_LENSES appearing.
-      const rhs = l.slice(l.indexOf('=') + 1)
-      const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
-      const shrinks = /\.\s*(filter|slice)\s*\(/.test(rhs) || /\?[^?]*:/.test(rhs)
-      const refs = rhs.match(/[A-Za-z_$][\w$]*/g) || []
-      if (!grows && shrinks && refs.some((r) => r !== name && ok.has(r))) ok.add(name)
+      // S4 - record WHY, keyed by the name bound. The refusal a caller saw was emitted at the
+      // fan-out line and named only the receiver, while the author was looking at a marked
+      // assignment two lines above. This is the convention `why()` already applies to every
+      // unresolvable K: one explanation per refusal, naming the FORM, because an operator who
+      // cannot tell which spelling was refused fixes it by guessing.
+      markedWhy.set(
+        name,
+        grows
+          ? `\`${name}\` carries ${FIXED_MARK} but its right-hand side can GROW the receiver`
+          : !branches.length || bad0 === null
+            ? `\`${name}\` carries ${FIXED_MARK} but this file cannot delimit its value branches`
+            : /\b(chunk|splitInto)\s*\(/.test(String(bad0))
+              // A branch that IS a bounded split and still fails, failed on its K. Saying only that
+              // the branch is not a bounded form would send the author to rewrite a spelling that is
+              // already correct, so the cap is named instead — and the phrase the generic refusal
+              // uses is kept, because two self-test arms assert a marked K's refusal by that text and
+              // a message edit that strands an arm is a recorded class in this repo.
+              ? `\`${name}\` carries ${FIXED_MARK} but its bounded split names a cap which this file does not show to be bounded`
+              : `\`${name}\` carries ${FIXED_MARK} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
+      )
       return
     }
     // an array literal whose element count is visible here. Counted on the FULL statement, which may
@@ -310,7 +379,9 @@ function fanoutFindings(script) {
       if (hit.name === null) {
         bad.push({ n: i + 1, line: raw, why: `agent() fanned through .${hit.method}() over an expression this file cannot size (\`${hit.expr}\`) — only a bare identifier proven bounded is accepted` })
       } else if (!ok.has(hit.name)) {
-        bad.push({ n: i + 1, line: raw, why: `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
+        // S4 - prefer the marked assignment's own reason. The generic sentence is right and useless
+        // when the author already wrote a marker and got no word about which branch failed.
+        bad.push({ n: i + 1, line: raw, why: markedWhy.get(hit.name) || `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
       }
       return
     }

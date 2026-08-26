@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 

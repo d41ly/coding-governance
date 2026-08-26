@@ -278,6 +278,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "boundedBranch",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "boundedK",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -1671,6 +1676,11 @@
       "id": "parse",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "parseBranches",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "parse_affordance",
