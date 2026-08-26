@@ -5749,8 +5749,55 @@ user_skills = "/tmp/gk-fake-skills"
         _p5uk = a5_cov(a5_target("unknownkit", _A5_HELD,
                                  '\n[[decline]]\nkit = "elsewhere"\ndest = "scripts/demo/two.py"\n'
                                  'why = "x"\n'))
-        check("[-5] a decline naming a kit outside this run's selection reds BY NAME",
-              _p5uk.returncode == 1 and "not in this run's selection" in _p5uk.stdout, _p5uk.stdout)
+        check("[-5] a decline naming a kit NO REGISTRY ENTRY declares reds BY NAME",
+              _p5uk.returncode == 1 and "not a registry entry" in _p5uk.stdout, _p5uk.stdout)
+        # THE OTHER HALF OF THAT FIELD, found by this unit's own closing review: a kit that EXISTS
+        # and is outside THIS RUN's `--kits` is not this run's business, and redding it would red an
+        # operator for narrowing a selection. It is announced rather than dropped, because a decline
+        # that vanishes without saying why is the failure mode the whole unit is written against.
+        _t5nar = a5_target("narrow", _A5_HELD,
+                           '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                           'why = "not this run\'s business"\n')
+        _p5nar = run_in_gov(_g4k, "plan", "--target", str(_t5nar), "--coverage", "--kits", "demo")
+        check("[-5] LIVENESS the narrow fixture's decline IS graded when its kit is selected",
+              "declined" in _p5nar.stdout, _p5nar.stdout)
+        # A TWO-KIT gov, because the branch under test needs a kit that EXISTS and is NOT selected —
+        # and the first draft of this arm reused a one-kit fixture, so `--kits demo` selected the
+        # only kit there was, the branch never ran, and the arm passed on the exit code alone. That
+        # is `fixture-passes-by-finding-nothing`, in an arm written for a review finding.
+        _g5sib = tmp / "a5-sibling"
+        (_g5sib / "tools" / "govkit").mkdir(parents=True)
+        (_g5sib / "tools" / "demo").mkdir(parents=True)
+        (_g5sib / "tools" / "sib").mkdir(parents=True)
+        shutil.copy2(HERE / "govkit.py", _g5sib / "tools" / "govkit" / "govkit.py")
+        (_g5sib / "tools" / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
+            '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+            '[[entry]]\nid = "sib"\ndescriptor = "tools/sib/kit.toml"\n\n'
+            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            encoding="utf-8", newline="\n")
+        for _e in ("demo", "sib"):
+            (_g5sib / "tools" / _e / "kit.toml").write_text(
+                _A4_KIT.replace('id = "demo"', f'id = "{_e}"').replace(
+                    'home = "tools/demo"', f'home = "tools/{_e}"'),
+                encoding="utf-8", newline="\n")
+            (_g5sib / "tools" / _e / "one.py").write_text("1\n", encoding="utf-8", newline="\n")
+        git(_g5sib, "init", "-q", "-b", "main")
+        git(_g5sib, "config", "user.email", "t@e")
+        git(_g5sib, "config", "user.name", "t")
+        git(_g5sib, "config", "core.autocrlf", "false")
+        git(_g5sib, "add", "-A")
+        git(_g5sib, "commit", "-qm", "A")
+        _t5out = a5_target("outside", {"scripts/demo/one.py": b"1\n"},
+                           '\n[[decline]]\nkit = "sib"\ndest = "scripts/sib/one.py"\n'
+                           'why = "the other kit, not this run"\n')
+        check("[-5] LIVENESS the two-kit fixture really carries a decline for an UNSELECTED kit",
+              "sib" in (_t5out / ".governance" / "deploy.toml").read_text(encoding="utf-8"))
+        _p5out = run_in_gov(_g5sib, "plan", "--target", str(_t5out), "--coverage", "--kits", "demo")
+        check("[-5] a decline for a kit outside the run's SELECTION does not RED the run",
+              _p5out.returncode == 0, f"rc {_p5out.returncode}: {_p5out.stdout[-700:]}")
+        check("[-5] ...and does not VANISH either — it announces that it was not graded",
+              "OUTSIDE this run's selection" in _p5out.stdout, _p5out.stdout[-700:])
         _p5ta = a5_cov(a5_target("takenas-missing", _A5_HELD,
                                  '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
                                  'why = "x"\ntaken_as = "vendor/absent.py"\n'))

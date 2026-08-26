@@ -1805,12 +1805,21 @@ def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
         if not kit or not dest:
             r.fail(f"a [[decline]] row carries no kit or no dest: {row!r}")
             continue
+        # TWO DIFFERENT QUESTIONS ABOUT THE SAME FIELD, and collapsing them was a defect this
+        # unit's own closing review found. A kit outside the REGISTRY is stale: nothing ships it,
+        # the decline excuses a row that cannot exist, and it reds like the other staleness arms. A
+        # kit inside the registry but outside THIS RUN's selection is simply not this run's
+        # business — an operator narrowing `--kits` must not be redded over a decline for a kit
+        # they did not ask about. It is announced rather than dropped, because a decline that
+        # vanishes from the report without saying why is the failure mode the whole unit is
+        # written against.
+        if kit not in descs:
+            r.fail(f"[[decline]] for '{dest}' names kit '{kit}', which is not a registry entry — "
+                   f"nothing ships that kit, so this row excuses a gap that cannot exist. Delete it")
+            continue
         if kit not in selection:
-            # BY NAME rather than silently skipped. A decline naming a kit this run does not carry
-            # is the same silence the third arm exists to close, one field over.
-            r.fail(f"[[decline]] for '{dest}' names kit '{kit}', which is not in this run's "
-                   f"selection — refusing rather than skipping a row that would then excuse nothing "
-                   f"and say nothing")
+            print(f"govkit: [[decline]] {kit} '{dest}' is OUTSIDE this run's selection and was "
+                  f"neither graded nor applied — narrow selections grade narrowly")
             continue
         if not why:
             r.fail(f"[[decline]] {kit} '{dest}' carries an empty reason — an exemption without one "
