@@ -114,7 +114,7 @@ is unchanged.
 
 - **AC1** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on the clean tree before and
   after, its stdout and exit status are byte-identical, proven by `diff` of the two captures.
-- **AC2** — When a break is staged for EACH touched check (23, 10, 11), the post-change checker
+- **AC2** — When a break is staged for EACH touched check (23, 10, 11) and `bash tools/memory-tree/check-memory-hygiene.sh` runs, the post-change checker
   reports it with a message byte-identical to the pre-change checker's, and both exit 1. A check
   whose break cannot be staged is named as unproven rather than assumed.
 - **AC3** — When the leg is timed on the same node before and after UNDER THE SAME MACHINE LOAD,
