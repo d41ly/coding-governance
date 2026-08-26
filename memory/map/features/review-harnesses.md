@@ -70,13 +70,17 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
 
 ## Gaps
 
-- **The pipeline is implemented three times and only `tier2-review.js` carries its full trust
-  accounting.** `drift-audit-state.js` and `drift-audit-code.js` lack the dead-lens count, the
-  all-lenses-dead early return, the dead-skeptic count, the spurious and duplicate and conflict
-  counters, and the synthesis-death log. `drift-audit-state.js` returns the CONFIGURED lens set, so a
-  dead lens is invisible to its caller, and `drift-audit-code.js` returns no lens information at all.
-  Both resolve a disagreeing repeat verdict by keeping whichever arrived first. Every gate on the bar
-  is green over all of it, which is the point: the loss shows as absence, never as a crash.
+- **The pipeline is still implemented three times, but the three now carry the same accounting.**
+  `TOOL-dTieredTribunal-3` ported it: both drift-audit siblings gained the dead-lens count, the
+  dead-skeptic count, the spurious and duplicate and conflict counters, the synthesis-death log, and
+  two guarded early returns — one for an all-dead lens fan and one for an empty configured set, which
+  are different states and had been collapsible into a `0 === 0` misread. `lensesRun` is the
+  SURVIVING count in both, an integer, where `drift-audit-state.js` had returned the configured slug
+  list and `drift-audit-code.js` had returned nothing. A disagreeing repeat verdict now DEMOTES its
+  finding to unverified instead of keeping whichever arrived first. What remains true is the shape:
+  three files, one pipeline, no shared module, because workflow scripts cannot import. A future
+  divergence has nothing structural stopping it — only the provenance comments each ported guard now
+  carries, naming the unit that originally earned it.
 - **No harness takes a review-KIND parameter.** The build method forbids `tier2-review.js` on a spec
   audit, which is the majority review kind in this corpus, so every spec audit is driven by a script
   authored from scratch in the session that needs it. The measured consequence is that a field a
@@ -86,9 +90,11 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
   directory covers the already-compliant committed harnesses and none of the observed failures. Only
   the PreToolUse hook reaches that modality, and the two enforcement points currently disagree: a
   cap-compliant inline script carrying a ref-keyed join passes the hook and fails the file gate.
-- **`drift-audit-state.js` parses no `args`.** It is `const a = args || {}` with no JSON parse, so a
-  caller handing it a string falls back to the current directory — the wrong-repository defect
-  `tier2-review.js` was hardened against and this sibling was not.
+- **NEITHER sibling parses `args`.** Both are `const a = args || {}` with no JSON parse, at
+  `drift-audit-state.js:47` and `drift-audit-code.js:48`, so a caller handing either a string falls
+  back to the current directory — the wrong-repository defect `tier2-review.js` was hardened against
+  and neither sibling was. Deliberately out of scope for the port, and tracked as
+  `TOOL-dTieredTribunal-4`.
 
 ## Reuse affordance
 

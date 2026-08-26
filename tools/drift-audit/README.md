@@ -1,8 +1,18 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.6` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.7` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
+
+**Migrating 1.6 → 1.7 (breaking, one RETURN field).** `lensesRun` on the Tier-2 harnesses was an
+ARRAY of lens slugs in `drift-audit-state.js` and is now an INTEGER, the count of lenses that
+actually returned. A caller reading it as a list breaks, loudly, on a type error rather than quietly
+on a wrong value; no caller in this tree reads it. `drift-audit-code.js` returned no lens information
+at all and now returns the same integer. Everything else added is additive — `lensesDead`,
+`skepticsDead`, `conflicts`, `duplicates`, `spurious` and `note` — so an adopter passing the same
+`args` needs no edit. One behaviour change is observable: a run whose lenses ALL died, or whose
+configured lens set is empty, now returns early with those counters instead of synthesizing a report
+over an empty finding set. That path previously produced a confident report about nothing.
 
 **Migrating 1.0 → 1.1 (breaking, `args` only).** The two Tier-2 harnesses no longer accept a
 caller-supplied concurrency cap or verifier total; both are bare literals matching the review

@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries
 
-**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
