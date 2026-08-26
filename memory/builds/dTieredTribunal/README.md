@@ -83,13 +83,13 @@ owner's turn from.
 
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-08-26 |
+| [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | INPROGRESS | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | SPECCED | rev-4 | 2026-08-26 |
 | [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-08-26 |
 <!-- /gen:build-units -->

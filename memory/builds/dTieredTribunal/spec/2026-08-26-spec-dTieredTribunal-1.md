@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line
 
-**Status:** SPECCED · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
+**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
