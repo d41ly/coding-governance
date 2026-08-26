@@ -44,8 +44,10 @@ cd "$ROOT" || exit 2
 # ---- repo applies to every other pin it owns.
 # ----
 # ---- THE READINGS ARE NOT ALL FROM ONE NODE, and a single global integer cannot be right for a cost
-# ---- that is node-relative (TOOL-aCollapsedScan-4). Seven of the eight below are the 2026-08-23
-# ---- readings on node `d`. `BUDGET_kit_gate` is a node-`a` one, because the node-`d` figure was never
+# ---- that is node-relative (TOOL-aCollapsedScan-4). FIVE of the eight below are the 2026-08-23
+# ---- readings on node `d`, and two more (`gate_selftest`, `driver_selftest`) are 2026-08-25 node-`d`
+# ---- re-declarations under TOOL-dNarrowedAnchor-1. `BUDGET_kit_gate` is a node-`a` one, because the
+# ---- node-`d` figure was never
 # ---- a statement about node `a` at all: the same leg with check 30 removed costs about 70 s here
 # ---- against 28 s there, a 2.5x ratio that holds across this kit's work. Whether the SHAPE should be
 # ---- per node rather than one integer is `TOOL-aCollapsedScan-9`, not this line.

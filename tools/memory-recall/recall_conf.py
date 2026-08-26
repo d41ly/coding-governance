@@ -74,8 +74,23 @@ def repo_root() -> pathlib.Path:
     """
     here = pathlib.Path(__file__).resolve()
     for parent in here.parents:
-        if (parent / CONF_NAME).is_file():
+        # THE WALK STOPS AT THE REPOSITORY BOUNDARY, which `tools/codebase-map/map_lib.py`'s
+        # `resolve_root` already pays two lines for and records the reason: worktrees are commonly
+        # kept INSIDE the primary tree (this repo puts them under `.claude/worktrees/`), so an
+        # UNBOUNDED walk out of a checkout reaches the PRIMARY tree's conf and answers with a
+        # different repository. Reproduced during this unit's own closing review: with a conf at
+        # `outer/` and a separate repo at `outer/inner/` holding the kit, an unbounded walk answered
+        # `outer` and `resolve()` succeeded against a FOREIGN conf, where the pre-fix code refused.
+        # `.git` is a directory in a primary tree and a FILE in a linked worktree, so one
+        # `exists()` covers both.
+        #
+        # THE CONF IS TESTED FIRST, so an adopted root that holds both still wins on its own line.
+        # Falling out of the loop hands the question to the git probe below, which is what raises
+        # the not-a-git-repository refusal for a conf-bearing tree that is not a checkout at all.
+        if (parent / CONF_NAME).is_file() and (parent / ".git").exists():
             return parent
+        if (parent / ".git").exists():
+            break
     # NO CONF ABOVE THE KIT: keep the old git answer, so `resolve()` raises ITS refusal - the one
     # carrying the copy-pasteable conf stub an adopter needs. This is NOT a fallback that
     # fabricates a passing value: the path it returns is by definition one with no conf on it, so
@@ -216,8 +231,9 @@ _cached: Conf | None = None
 def resolve(root: pathlib.Path | None = None) -> Conf:
     """The kit's project layer, or a ConfError carrying the printable refusal.
 
-    Cached per process: every module in the kit calls this at import, and the resolution costs a
-    `git rev-parse`.
+    Cached per process: every module in the kit calls this at import. It no longer costs a
+    `git rev-parse` on any path where a conf exists - `repo_root()` walks for it - but the call
+    frequency is what justified the cache and that has not changed.
     """
     global _cached
     if root is None and _cached is not None:

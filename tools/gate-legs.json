@@ -242,6 +242,7 @@
     ],
     "guard": [
       "tools/lib/",
+      "tools/memory-recall/",
       "tools/memory-tree/"
     ],
     "chunk": "selftests",

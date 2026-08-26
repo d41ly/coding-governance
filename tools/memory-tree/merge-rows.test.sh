@@ -6,7 +6,7 @@
 # `git merge-file` on the identical three blobs. The MECHANICAL never-worse comparison — the driver
 # may not lose a line the control keeps, nor at rc 0 write a row the control does not — can only
 # bind where the control EXITS 0, because only then is its output an ANSWER rather than a conflict
-# to be resolved by hand. Measured: 12 of the 34 `run` cases, floored below at `NEVER_WORSE_FLOOR`
+# to be resolved by hand. Floored below at `NEVER_WORSE_FLOOR`; the live split is in this suite's own PASS line, which derives it
 # so that a fixture edit flipping a control from rc 0 to rc 1 cannot quietly drop a case out of the
 # bar while the group count stays the same. The other 22 are held by the id-set oracle, the
 # duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
@@ -1508,9 +1508,19 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
   cd "$WT" || exit 2
   git check-attr merge -- memory/backlog/TOOL.md | grep -q 'merge: rows' \
     || { echo "FAIL worktree: git does not resolve memory/backlog/TOOL.md to merge=rows in the worktree"; exit 1; }
-  out=$(git merge --no-edit side 2>&1) || { echo "FAIL worktree: git merge did not auto-resolve in a linked worktree"; printf '%s\n' "$out" | sed 's/^/       /' | head -4; exit 1; }
-  printf '%s\n' "$out" | grep -qi 'ConfError' \
-    && { echo "FAIL worktree: the driver raised a ConfError - the inherited GIT_DIR is still deciding the root"; exit 1; }
+  # THE CLASSIFICATION LIVES IN THE FAILURE BRANCH, because that is the only place it can fire:
+  # the driver's fail-closed handler returns 1 on a ConfError, so git reports the merge as failed
+  # and `$out` is only ever inspected after a NON-zero exit. Written the other way round it was a
+  # probe that could not move.
+  if ! out=$(git merge --no-edit side 2>&1); then
+    if printf '%s\n' "$out" | grep -qi 'ConfError'; then
+      echo "FAIL worktree: the driver raised a ConfError - the inherited GIT_DIR is still deciding the root"
+    else
+      echo "FAIL worktree: git merge did not auto-resolve in a linked worktree"
+    fi
+    printf '%s\n' "$out" | sed 's/^/       /' | head -4
+    exit 1
+  fi
   for want in TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3; do
     c=$(grep -c "^- $want " memory/backlog/TOOL.md)
     [ "$c" = 1 ] || { echo "FAIL worktree: $want appears $c time(s), expected exactly 1"; exit 1; }
@@ -1529,8 +1539,8 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 47 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 47 — a group was deleted"
-[ "$nruns" -ge 36 ] || bad "only $nruns 'run' case(s) remain, expected at least 36 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 49 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 49 — a group was deleted"
+[ "$nruns" -ge 40 ] || bad "only $nruns 'run' case(s) remain, expected at least 40 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"

@@ -1309,31 +1309,38 @@ def test_repo_root_linked_worktree():
     `memory/DECISIONS.md` and `memory/backlog/*.md` inside a worktree.
     """
     root, kitdir = make_repo()
-    git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
-    subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
     wt = root.parent / (root.name + "-wt")
-    subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
-    gitdir = subprocess.run(
-        ["git", "-C", str(wt), "rev-parse", "--absolute-git-dir"],
-        check=True, capture_output=True, text=True,
-    ).stdout.strip()
-    env = dict(os.environ, GIT_DIR=gitdir)
-    env.pop("GIT_WORK_TREE", None)
-    out = subprocess.run(
-        [sys.executable, "-c",
-         "import sys;sys.path.insert(0, sys.argv[1]);import recall_conf;"
-         "print(recall_conf.repo_root().as_posix())",
-         str(wt / kitdir.name)],
-        cwd=str(wt), env=env, capture_output=True, text=True,
-    )
-    got = out.stdout.strip()
-    want = pathlib.Path(wt).resolve().as_posix()
-    if got != want:
-        raise AssertionError(
-            f"repo_root() returned {got!r}; want the worktree root {want!r}. "
-            f"stderr: {out.stderr.strip()[:300]}"
+    try:
+        git = ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t"]
+        subprocess.run([*git, "commit", "-qm", "seed"], check=True, capture_output=True)
+        subprocess.run([*git, "worktree", "add", "-q", "-b", "wt", str(wt)], check=True, capture_output=True)
+        gitdir = subprocess.run(
+            ["git", "-C", str(wt), "rev-parse", "--absolute-git-dir"],
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+        env = dict(os.environ, GIT_DIR=gitdir)
+        env.pop("GIT_WORK_TREE", None)
+        out = subprocess.run(
+            [sys.executable, "-c",
+             "import sys;sys.path.insert(0, sys.argv[1]);import recall_conf;"
+             "print(recall_conf.repo_root().as_posix())",
+             str(wt / kitdir.name)],
+            cwd=str(wt), env=env, capture_output=True, text=True,
         )
-    return "worktree root resolved under an inherited GIT_DIR"
+        got = out.stdout.strip()
+        want = pathlib.Path(wt).resolve().as_posix()
+        if got != want:
+            raise AssertionError(
+                f"repo_root() returned {got!r}; want the worktree root {want!r}. "
+                f"stderr: {out.stderr.strip()[:300]}"
+            )
+        return "worktree root resolved under an inherited GIT_DIR"
+    finally:
+        # BOTH, through `cleanup`, and in this order. `wt` is a SIBLING of `root`, not a child, so
+        # sweeping root alone leaves a registered worktree standing - and `cleanup` is what appends
+        # to `_SWEPT`, so a bare rmtree would leave the residue arm blind to whether either went.
+        cleanup(wt)
+        cleanup(root)
 
 
 def main() -> int:
