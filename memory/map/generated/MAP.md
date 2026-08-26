@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 32 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 33 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -71,8 +71,8 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `python resolver (behaviour + inline parity + idiom ban)` | baseline |
 | `recall floor` | memory-recall |
 | `recall floor arms` | memory-recall |
-| `review-join ban (no ref-keyed join)` | baseline |
-| `review-join self-test` | baseline |
+| `review-join ban (no ref-keyed join)` | review-harnesses |
+| `review-join self-test` | review-harnesses |
 | `review-protocol parity (kit vs dogfood)` | agent-cap |
 | `row-grammar selftest` | row-grammar |
 | `row-keyed merge driver replay` | memory-tree-merge-driver |
@@ -94,7 +94,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |
 | `verifier fan-out self-test` | agent-cap |
-| `workflow script syntax` | baseline |
+| `workflow script syntax` | review-harnesses |
 
 ## kits
 
@@ -128,10 +128,10 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 
 | key | claimant |
 |---|---|
-| `check-workflow-syntax.js` | baseline |
-| `drift-audit-code.js` | baseline |
-| `drift-audit-state.js` | baseline |
-| `tier2-review.js` | baseline |
+| `check-workflow-syntax.js` | review-harnesses |
+| `drift-audit-code.js` | review-harnesses |
+| `drift-audit-state.js` | review-harnesses |
+| `tier2-review.js` | review-harnesses |
 
 ## skill-engines
 
@@ -164,6 +164,7 @@ Inventories: gate-legs: 85 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-passes-by-finding-nothing.md` | baseline |
+| `fold-text-is-unreviewed-surface.md` | build-method |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |

@@ -29,12 +29,9 @@ gate-legs = [
   "push-main self-test",
   "pytest-guardrails self-test",
   "python resolver (behaviour + inline parity + idiom ban)",
-  "review-join ban (no ref-keyed join)",
-  "review-join self-test",
   "run-gates canary",
   "settings-merge selftest",
   "template size <=48KiB",
-  "workflow script syntax",
 ]
 kits = [
   "agent-instructions",
@@ -49,10 +46,6 @@ git-hooks = [
   "pre-push",
 ]
 workflow-scripts = [
-  "check-workflow-syntax.js",
-  "drift-audit-code.js",
-  "drift-audit-state.js",
-  "tier2-review.js",
 ]
 skill-engines = [
 ]

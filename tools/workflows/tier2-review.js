@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.2', // gov:kit tier2-review@1.2 — engine identity (deployed verbatim; this field is the deployer's version marker)
+  version: '1.3', // gov:kit tier2-review@1.3 — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
@@ -213,7 +213,8 @@ const allFindings = liveResults
 if (lensesDead === LENSES.length) {
   log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed.`)
   return {
-    confirmed: [], report: null, root: repo, lensesRun: 0, lensesDead,
+    // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
+    confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     note: `UNVERIFIED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed`,
   }
 }
@@ -222,7 +223,8 @@ if (allFindings.length === 0) {
     ? `partial: ${lensesDead}/${LENSES.length} lenses died, survivors found nothing`
     : 'clean: 0 findings'
   log(note)
-  return { confirmed: [], report: null, root: repo, lensesRun: liveResults.length, lensesDead, note }
+  // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
+  return { confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead, note }
 }
 log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verifying in batches.`)
 
@@ -311,7 +313,9 @@ log(
 // caller can tell "every finding was refuted" from "the verify stage was degraded".
 if (confirmed.length + unverified.length === 0)
   return {
-    confirmed: [], report: null, precision, root: repo,
+    // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
+    // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
+    confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0,
     conflicts: conflicts.size, duplicates, spurious,
     note: lensesDead > 0
@@ -347,6 +351,20 @@ const synth = await agent(
     // filesystem and no repo access — so M8 spelling the invocation with the pinned sha is what
     // makes this work, and the failure surfaces as an unmet DoD item naming the run's own record.
     `Open the report with a line naming the reviewed range as ${base}...${head}, and state the ROUND as ${round}. ` +
+    // TOOL-dTieredTribunal-1 S4 - the record's opening ORDER. THREE sentences in this prompt each
+    // claim the record's opening: the binding line below, the range line above, and the verdict
+    // heading this unit adds. Instructing a second "first line" leaves the agent to resolve the
+    // collision, so the order is stated once, here, and names all three. Keeping the binding line
+    // first is also what satisfies check 21's 12-line binding-head window by construction.
+    // S4b - the token set is READ from the carrier that ENFORCES it on a diff-review record, which
+    // is hygiene check 22 in check-memory-hygiene.sh (gated by REVIEW_VERDICT_CUTOFF). It is not a
+    // new rule invented here, and the build method is not the enforcing carrier for this kind.
+    `THE RECORD'S OPENING IS ORDERED, and these four things precede the body, in this order. ` +
+    `First the \`**Serves:**\` binding line described below. Then the report's title and provenance. ` +
+    `Then the range line named above. Then, as a heading of its own, the literal \`## Verdict: \` ` +
+    `followed by exactly ONE token from the CLOSED set CLEAN, CLEAN WITH FIXES, BLOCKED. ` +
+    `The set is closed: no fourth token, no tally appended to the line, no qualifier on it. ` +
+    `A count or a caveat goes in the paragraph beneath that heading, never on it. ` +
     // TOOL-aBoundedVerdict-14 S7 - the record's BINDING LINE, instructed here because the harness does
     // not write the record: the synth AGENT does. Rev-1 said the harness writes one lacking a kind
     // token; `grep -ni serves` over this file returned NOTHING, so it wrote no binding line at all and
@@ -357,13 +375,24 @@ const synth = await agent(
     `The report's FIRST line must be the record's binding line, exactly: **Serves:** diff-review ` +
     `followed by every unit id in the diff, space-separated. A kind with no id is malformed under the ` +
     `project's record-binding grammar, so never emit the kind alone. ` +
+    // TOOL-dTieredTribunal-1 S5 - BOTH integers are defined, not just one. S1 makes both REQUIRED,
+    // so a definition for one and silence on the other ships a mandatory integer with no stated
+    // population. What this buys, stated exactly: ONE agent writes the record and returns the
+    // integers, from one adjudication, in one turn. Nothing re-counts the record, so the agreement
+    // is a property of this prompt and not of a mechanism.
+    `\`blockers\` is the number of CONFIRMED findings you classified at BLOCKER severity, and ` +
+    `\`highs\` the number at HIGH severity. In both cases the severity meant is the one YOU ` +
+    `adjudicated in this report, so the integers you return and the table you wrote agree. ` +
     `Return JSON {path, blockers, highs, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
     phase: 'Synthesize',
     schema: {
       type: 'object',
-      required: ['path', 'summary'],
+      // TOOL-dTieredTribunal-1 S1 - `blockers` and `highs` were requested and schemad from the
+      // start and were never required and never read. Requiring them is what makes a synthesis that
+      // omits one fail loudly at validation instead of returning a partial object nobody notices.
+      required: ['path', 'summary', 'blockers', 'highs'],
       properties: {
         path: { type: 'string' },
         blockers: { type: 'integer' },
@@ -403,13 +432,26 @@ return {
   agents: LENSES.length + batches.length + 1, // finders + batched skeptics + synth
   report: synth?.path || null,
   summary: synth?.summary || '',
+  // TOOL-dTieredTribunal-1 S2/S3b - the counts the synthesis pass adjudicated, returned rather than
+  // dropped. The ternary is deliberate and none of the shorter spellings is correct here.
+  // `synth.blockers` THROWS on a dead synthesis. `synth?.blockers` yields `undefined`, which
+  // serializes as an absent key rather than as a stated absence. `synth?.blockers || 0` fabricates a
+  // clean bill on a dead synthesis, which is the false-clean class this file exists to refuse. And
+  // `synth?.blockers || null` maps a real adjudicated 0 to null, because after S1 the field is
+  // required and a returned 0 is a result. So: the value when a synthesis ran, null when none did.
+  blockers: synth ? synth.blockers : null,
+  highs: synth ? synth.highs : null,
+  // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
+  // reportable only when nothing else was degraded and the most serious note was the least reachable
+  // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
+  // the two drift-audit siblings, where the same ordering had been copied.
   note:
-    judged === 0
-      ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
-      : lensesDead || skepticsDead || unverified.length
-        ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-        : !synth
-          ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+    !synth
+      ? `UNVERIFIED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log only`
+      : judged === 0
+        ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged (${skepticsDead}/${verdictResults.length} skeptic batches died) — the report lists them as outstanding`
+        : lensesDead || skepticsDead || unverified.length
+          ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
           : 'complete',
   round,
   priorFindings: priorFindings.length,
