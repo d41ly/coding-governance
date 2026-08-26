@@ -1646,6 +1646,162 @@ def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
             if row["kind"] == "write" and not row["missing"] and row["dest"] not in have]
 
 
+
+# ------------------------------------------------------- the decline contract (DEPL-dCarriedReceipt-5)
+# A coverage report with no way to say "we deliberately did not take that" is a report an operator
+# reads ONCE. The live target's gap set contains rows the adopter took under another name or folded
+# into another file, and a run that keeps naming them is crying wolf — the only way to quiet it is
+# to stop running it, which loses the whole signal.
+#
+# THE DESIGN PROBLEM IS DISTINGUISHING "deliberately not taken" FROM "missed", and it must be solved
+# without creating the thing it prevents: an exclusion list nobody grades is a fork with a friendlier
+# name. So a row asks for two different things at once. `why` is for the human who reads the report
+# next year and is graded ONLY FOR EXISTENCE, because grading prose is how a gate starts lying —
+# every content predicate (length, an id, a pattern) is satisfiable by typing something. The evidence
+# field is for the machine and is graded for truth.
+#
+# A row may carry `why` alone. That is the honest "we chose not to take it", and it is exactly the
+# row the three staleness arms exist for: with no evidence field, the only thing keeping it from
+# becoming permanent fiction is that it REDS the day the file arrives, and REDS the day gov stops
+# shipping it.
+DECLINE_EVIDENCE = ("taken_as", "consumed_into", "discharge")
+
+
+def _sha_nocr(data: bytes | None) -> str | None:
+    """A hash with `\\r` removed, so a CRLF checkout is not a different file (S3, AC6).
+
+    Its own function rather than a flag on `_sha`, because the two answer different questions and a
+    boolean parameter would let a caller ask the wrong one by accident. `_sha` hashes the bytes a
+    receipt RECORDS; this hashes bytes for a comparison across two checkouts whose eol filters
+    disagree. Deliberately NOT applied to `cmd_check`'s existing merged-block hash, which computes a
+    value stored in receipts — re-spelling that is a different unit's risk for no gain here.
+    """
+    return hashlib.sha256(data.replace(CR.encode(), b"")).hexdigest() if data is not None else None
+
+
+def decline_findings(root: pathlib.Path, target: pathlib.Path, deploy: dict,
+                     descs: dict[str, tuple[dict, str]], selection: list[str],
+                     commit: str, gaps: list[dict], r: Report) -> dict[str, str]:
+    """Grade every `[[decline]]` and return `{dest: state}` for the rows it excuses (S6, S7).
+
+    ONE PREDICATE, TWO CALL SITES — `cmd_check` and `plan --coverage`. **A decline may only hide a
+    gap row in a run that also grades it**, which is why this returns the map rather than letting
+    each caller decide: a reader that filtered on presence alone would be an exclusion list again.
+
+    THE THREE STALENESS ARMS mirror the exemption hygiene `selfcheck` already runs over
+    `[[exempt]]`, in the same words, because it is the same class one level out. An empty `why`
+    reds. A `dest` now PRESENT in the target reds — the file arrived, and the message says so rather
+    than calling the row malformed. A `dest` no claimed kit ships at the measured revision reds:
+    that is the arm making the list self-cleaning when gov withdraws a file, and without it a
+    decline outlives the thing it declined and quietly widens the surface it was written to narrow.
+
+    `taken_as` MISMATCHING IS NOT A FAILURE, and that is the load-bearing choice. Redding it would
+    red the honest adopter who relocated a file and then edited it, whose only route back to green
+    is DELETING the decline — the exclusion list eating the evidence that made it trustworthy. The
+    row reclassifies to `diverged` instead: it keeps the row, keeps the reason, and names the state
+    `VERDICT_GRID` already has for exactly this.
+
+    Returns `{dest: state}` where state is one of `declined`, `diverged`, `discharged` or
+    `undischarged`. A row that RED any arm is absent from the map, so a stale decline hides nothing.
+    """
+    out: dict[str, str] = {}
+    declines = deploy.get("decline") or []
+    if not declines:
+        return out
+    have = set(tracked(target))
+    # WHAT GOV SHIPS AT THIS REVISION, derived from the same plan the caller measured rather than
+    # re-walked: the gap list is a subset of it, so a `dest` outside the union of "planned" and
+    # "already held" is one no claimed kit ships. Passing the gaps in keeps this function from
+    # owning a second answer to "what would gov write here".
+    planned = {g["dest"] for g in gaps} | have
+    idx, _present = index_read(target, [str(d.get("taken_as") or "") for d in declines
+                                        if d.get("taken_as")]) if declines else ({}, set())
+
+    for row in declines:
+        kit, dest = row.get("kit"), row.get("dest")
+        why = str(row.get("why", "")).strip()
+        if not kit or not dest:
+            r.fail(f"a [[decline]] row carries no kit or no dest: {row!r}")
+            continue
+        if kit not in selection:
+            # BY NAME rather than silently skipped. A decline naming a kit this run does not carry
+            # is the same silence the third arm exists to close, one field over.
+            r.fail(f"[[decline]] for '{dest}' names kit '{kit}', which is not in this run's "
+                   f"selection — refusing rather than skipping a row that would then excuse nothing "
+                   f"and say nothing")
+            continue
+        if not why:
+            r.fail(f"[[decline]] {kit} '{dest}' carries an empty reason — an exemption without one "
+                   f"is an omission wearing a label")
+            continue
+        evidence = [k for k in DECLINE_EVIDENCE if row.get(k) is not None]
+        if len(evidence) > 1:
+            # BEFORE either is evaluated (S2, AC9). A row asserting two different things about one
+            # destination is two rows, and a reader that has to pick between them picks wrong.
+            r.fail(f"[[decline]] {kit} '{dest}' carries {len(evidence)} evidence fields "
+                   f"({', '.join(evidence)}) and at most one is allowed — a row asserting two "
+                   f"different things about one destination is two rows")
+            continue
+        if dest in have:
+            r.fail(f"[[decline]] {kit} '{dest}' is STALE: the target now tracks that path, so the "
+                   f"file arrived and the decline no longer describes anything. Delete the row")
+            continue
+        if dest not in planned:
+            r.fail(f"[[decline]] {kit} '{dest}' is STALE: no claimed kit ships that destination at "
+                   f"{commit[:8]}, so gov has withdrawn it and the decline outlives what it "
+                   f"declined. Delete the row")
+            continue
+
+        state = "declined"
+        if row.get("taken_as"):
+            ta = str(row["taken_as"])
+            src = next((g["src"] for g in gaps if g["dest"] == dest), None)
+            theirs = blob_at(root, commit, src) if src else None
+            ours = index_blob(target, idx[ta][1]) if ta in idx else None
+            if ours is None:
+                r.fail(f"[[decline]] {kit} '{dest}' declares taken_as '{ta}', which the target does "
+                       f"not track — the evidence names a file that is not there")
+                continue
+            # CR-STRIPPED ON BOTH SIDES (AC6). A relocated file in a CRLF checkout is the same file,
+            # and a plain hash comparison calls it a different one — which is the arm this helper
+            # exists for.
+            if _sha_nocr(theirs) != _sha_nocr(ours):
+                state = "diverged"
+        elif row.get("consumed_into"):
+            ci = str(row["consumed_into"])
+            # DELIBERATELY WEAK (S4). Gov cannot know what "folded into" means byte-wise, and a
+            # predicate that pretended to would pass on everything — the could-not-fail shape. All
+            # this asserts is that the named path exists in the target's index.
+            if ci not in have:
+                r.fail(f"[[decline]] {kit} '{dest}' declares consumed_into '{ci}', which the target "
+                       f"does not track — a fold into a file that is not there is not a fold")
+                continue
+        elif row.get("discharge"):
+            cmd = (row.get("discharge") or {}).get("command")
+            if not cmd:
+                r.fail(f"[[decline]] {kit} '{dest}' declares a discharge with no command, so "
+                       f"'discharged' is undefined for it and this check cannot answer the question")
+                continue
+            ctx = target_context(target, deploy, kit, descs[kit][0]) if kit in descs else {}
+            resolved, unresolved = [], []
+            for a in cmd:
+                s, miss = resolve_tokens(a, ctx)
+                resolved.append(s)
+                unresolved += miss
+            if unresolved:
+                r.fail(f"[[decline]] {kit} '{dest}' probe needs answer(s) "
+                       f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
+                continue
+            try:
+                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
+                                    capture_output=True, text=True).returncode
+            except OSError as e:
+                r.fail(f"[[decline]] {kit} '{dest}' probe could not run: {e}")
+                continue
+            state = "discharged" if rc == 0 else "undischarged"
+        out[dest] = state
+    return out
+
 def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
              coverage: bool = False, emit_declines: bool = False) -> int:
     r = Report()
@@ -1696,13 +1852,31 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     # is also why this adds no refusal branch, which is what §7 promises about `BRANCH_PIN`.
     if coverage or emit_declines:
         gaps = coverage_rows(root, target, deploy, descs, selection, r, rows)
+        # DEPL-dCarriedReceipt-5 S7, call site one of two. A decline may only hide a gap row in a
+        # run that ALSO GRADES it, which is why the map comes back from the grader rather than
+        # being read off the descriptor here — filtering on presence alone would make this an
+        # exclusion list again, which is the whole thing that unit exists to avoid becoming.
+        commit_now = git(root, "rev-parse", "HEAD").strip()
+        declined = decline_findings(root, target, deploy, descs, selection, commit_now, gaps, r)
         for g in gaps:
-            print(f"  GAP    [{g['kit']:<13}] {g['dest']}   <- {g['src']}")
+            st = declined.get(g["dest"])
+            if st is None:
+                print(f"  GAP    [{g['kit']:<13}] {g['dest']}   <- {g['src']}")
+        # DECLINED ROWS PRINT, never vanish. A gap that disappears from a report without saying why
+        # is the failure mode of every exclusion list, so each one prints with its state and its
+        # reason and is counted apart rather than subtracted in silence.
+        for row in (deploy.get("decline") or []):
+            st = declined.get(row.get("dest"))
+            if st is not None:
+                print(f"  {st:<6} [{str(row.get('kit')):<13}] {row.get('dest')}   "
+                      f"· {str(row.get('why', '')).splitlines()[0]}")
+        gaps = [g for g in gaps if g["dest"] not in declined]
         per_kit = {k: sum(1 for g in gaps if g["kit"] == k) for k in selection}
         # `gap 0` PRINTS. A clean run that printed nothing is indistinguishable from a coverage
         # check that never ran, and this whole unit exists because an absent signal read as a
         # present one for two live targets.
         print(f"govkit plan — coverage: gap {len(gaps)} of {counts['write']} write row(s)"
+              + (f", {len(declined)} declined" if declined else "")
               + (" · " + ", ".join(f"{k} {v}" for k, v in per_kit.items() if v) if gaps else "")
               + ". Coverage answers PRESENCE only: a present-but-hand-edited file reads as covered.")
         if emit_declines:
@@ -1809,6 +1983,22 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path) -> int:
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
+
+    # ---- DEPL-dCarriedReceipt-5 S7, call site two of two. The SAME predicate `plan --coverage`
+    # ---- runs, so the two verbs cannot disagree about whether a decline is stale. The gap list is
+    # ---- computed here rather than passed, because `check` has no plan of its own — and it is what
+    # ---- the withdrawal arm needs: a `dest` outside the union of "planned" and "already held" is
+    # ---- one no claimed kit ships any more. Every declined row prints; a stale one reds and hides
+    # ---- nothing, which is the property that keeps the list from becoming a fork.
+    if deploy.get("decline"):
+        _dsel = [e for e in selection if e in descs]
+        _dcommit = git(root, "rev-parse", "HEAD").strip()
+        _dgaps = coverage_rows(root, target, deploy, descs, _dsel, r)
+        for _dest, _st in decline_findings(root, target, deploy, descs, _dsel, _dcommit,
+                                           _dgaps, r).items():
+            _why = next((str(x.get("why", "")).splitlines()[0]
+                         for x in deploy["decline"] if x.get("dest") == _dest), "")
+            print(f"govkit check — decline {_st}: {_dest} · {_why}")
 
     # ---- EVIDENCE, role-scoped. Before this, `check` contained ONE
     # ---- filesystem test — on the receipt's own path — and never opened the file list, never read

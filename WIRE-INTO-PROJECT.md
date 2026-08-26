@@ -642,6 +642,46 @@ different name reads as absent, because rename detection for coverage is a state
 paste into `deploy.toml` yourself. It never opens that file: a deployer that edits the document
 carrying your decisions has made one for you.
 
+### Saying "we deliberately did not take that" — the `[[decline]]` contract
+
+A coverage report with no way to record a deliberate omission is one you read once. The rows you
+chose not to take keep being named, the run starts crying wolf, and the only way to quiet it is to
+stop running it — which loses the whole signal.
+
+A `[[decline]]` block in the target's own `.governance/deploy.toml` records the decision. It is
+graded on every run, and it dies when the world moves underneath it, which is the difference between
+a declaration and a fork with a friendlier name.
+
+```toml
+[[decline]]
+kit  = "review-harness"
+dest = "scripts/review-harness/tier2-review.js"
+why  = "we vendored this kit under .claude/workflows/ years before adopting gov"
+taken_as = ".claude/workflows/tier2-review-indexed.js"   # at most ONE evidence field
+```
+
+`kit`, `dest` and `why` are required. **`why` is graded for EXISTENCE only** — grading prose is how
+a gate starts lying, and every content predicate is satisfiable by typing something.
+
+**At most one evidence field**, from three: `taken_as` (gov's bytes live at this path instead —
+hash-graded against gov's blob, CR-stripped, so a CRLF checkout is not a different file);
+`consumed_into` (folded into this tracked file — deliberately weak, because gov cannot know what a
+fold means byte-wise); `discharge = { command = [...] }` (this probe proves it is handled, exit 0).
+Two evidence fields on one row is two rows, and it reds before either is evaluated.
+
+**A `taken_as` mismatch is not a failure.** The row reclassifies to `diverged`, keeps its reason,
+and the run's exit code does not move. Redding it would red the honest adopter who relocated a file
+and then edited it, whose only route back to green would be deleting the decline.
+
+**Three staleness arms red, and they are the point.** An empty `why`. A `dest` the target now
+tracks — the file arrived, so delete the row. A `dest` no claimed kit ships any more — gov withdrew
+it, so delete the row. A row that reds excuses nothing, so a stale decline can never hide a gap.
+Both `check` and `plan --coverage` run the same predicate: a decline may only hide a gap row in a
+run that also grades it.
+
+Declined rows PRINT, with their state and their reason. A gap that vanishes from a report without
+saying why is the failure mode of every exclusion list.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

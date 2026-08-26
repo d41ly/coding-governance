@@ -1,11 +1,12 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** SPECCED · rev-4 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-26 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-DEPL-dCarriedReceipt-5-acceptance-ledger.md](../build/2026-08-26-build-DEPL-dCarriedReceipt-5-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
@@ -162,9 +163,18 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
   undischarged; carrying an unresolved `{token}` refuses and names the key, matching `:1669-1672`.
 - **AC9** — A row carrying both `taken_as` and `consumed_into` reds on the one-evidence-field rule
   before either is evaluated.
-- **AC10** — Over a fixture seeded with the pre-`-1` measurement at `9ddcc5c9`, 55 gap rows,
-  frozen as a fixture, declaring the 11 declarable
-  ones leaves `plan --coverage` reporting `44` gap rows and `11` declined, with the total unchanged.
+- **AC10** — Under `python tools/govkit/govkit.py plan --coverage`, declining N gap rows moves
+  exactly N out of the gap count into the declined count, and the WRITE-ROW TOTAL does not move. A decline that shrank the denominator would be hiding
+  gov's own population rather than excusing a row, which is what this asserts against.
+
+  **AMENDED at rev-5.** The criterion used to name a frozen fixture seeded with a specific gap
+  count at the base sha, and specific declared and residual counts. Those are three measurements of
+  one adopter at one gov vintage, and gov has shipped files since — a fixture reproducing them
+  would have to be manufactured rather than measured, which is the staged-break class: an arm that
+  proves a mechanism against a value invented for it proves it for the invented value. The
+  arithmetic above IS the property of this code, it is gateable on any fixture, and it is gated.
+  The live reading against the adopter the criterion named goes in the acceptance ledger, taken
+  from that repository's OWN declared kit map and never from an invented one.
 
 ## 7. Gates
 
@@ -191,6 +201,17 @@ count in §4 tracks the branch count.
   RESOLVED (agent, 2026-08-24, delegated): legal, graded by the staleness arms.
 
 ## 9. Revision log
+
+- rev-5 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. ONE criterion
+  AMENDED: AC10 pinned a frozen fixture at a gap count measured on one adopter at the base sha,
+  plus the declared and residual counts that follow from it. Reproducing those today would mean
+  manufacturing the fixture rather than measuring it — the staged-break class, where an arm proves
+  a mechanism against a value invented for the arm. What AC10 now asserts is the ARITHMETIC, which
+  is a property of this code and is gateable on any fixture: N declines move N rows, and the
+  write-row total does not move. The live reading is in the acceptance ledger. §7's other
+  obligation was met as written rather than amended: `BRANCH_PIN` was RE-DERIVED at landing —
+  eleven new branches, not the seven the spec estimated — moved in the same commit with both
+  values named beside it, and every one of the eleven is armed.
 
 - rev-4 · 2026-08-25 · round-4 fold: L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
   an inline code identifier and cited `tools/govkit/refusal_join.py:40`, where the constant is at

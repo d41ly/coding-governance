@@ -5581,6 +5581,240 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-4] S4 ...and the tally counts ROWS, so the collision is two triage items not one",
               a4_gap_total(_p4dup.stdout) == len(_g4rows) and len(_g4rows) == 2, str(_g4rows))
 
+        # ============================================================= DEPL-dCarriedReceipt-5
+        # The `[[decline]]` contract and the three staleness arms. Every arm below runs the SAME
+        # fixture kit as `-4`'s, because a decline is only meaningful against a gap and `-4` is what
+        # produces one — reusing it also means the two units cannot drift apart about what a gap is.
+        def a5_target(tag: str, files: dict[str, bytes], declines: str = "") -> pathlib.Path:
+            t = tmp / f"a5t-{tag}"
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "scripts"\nkits = ["demo"]\n' + declines,
+                encoding="utf-8", newline="\n")
+            for rel, body in files.items():
+                pth = t / rel
+                pth.parent.mkdir(parents=True, exist_ok=True)
+                pth.write_bytes(body)
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "base")
+            return t
+
+        def a5_cov(t: pathlib.Path, g: pathlib.Path = None):
+            return run_in_gov(g or _g4, "plan", "--target", str(t), "--coverage", "--kits", "demo")
+
+        # A target holding one of the three engine sources, so `two.py` and `three.py` are gaps and
+        # a decline has something to excuse. `kit.toml` is held so it is not a fourth gap.
+        _A5_HELD = {"scripts/demo/one.py": b"1\n", "scripts/demo/kit.toml": b"x\n"}
+
+        # ---- AC1's RED is HISTORICAL and was observed on the tree BEFORE this build's coverage
+        # ---- unit: `grep decline` over the engine at that vintage returned one hit, in an unrelated
+        # ---- comment about what `apply` prints when it declines a RULE. No reader of a
+        # ---- `[[decline]]` block existed. It cannot be re-observed now without removing the reader.
+        _g5src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("[-5] AC1 the engine now READS a [[decline]] block rather than merely parsing it",
+              'deploy.get("decline")' in _g5src and "def decline_findings" in _g5src)
+        check("[-5] S2 the evidence set is a CLOSED constant, not a check spelled per call site",
+              tuple(govkit_module().DECLINE_EVIDENCE) == ("taken_as", "consumed_into", "discharge"),
+              str(govkit_module().DECLINE_EVIDENCE))
+
+        # ---- LIVENESS FIRST. Without a run that DECLINES successfully, every red arm below could
+        # ---- be passing because the grader rejects everything.
+        _t5ok = a5_target("ok", _A5_HELD,
+                          '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                          'why = "we do not use it"\n')
+        _p5ok = a5_cov(_t5ok)
+        check("[-5] LIVENESS a well-formed decline with `why` alone is accepted and exits 0",
+              _p5ok.returncode == 0 and "declined" in _p5ok.stdout, _p5ok.stdout + _p5ok.stderr)
+        check("[-5] S7 ...it drops out of the gap count",
+              a4_gap_total(_p5ok.stdout) == 1, _p5ok.stdout)
+        check("[-5] ...and it PRINTS with its reason rather than vanishing from the report",
+              "we do not use it" in _p5ok.stdout, _p5ok.stdout)
+
+        # ---- AC2: the empty reason. Same words the exemption hygiene already uses one level up.
+        _p5w = a5_cov(a5_target("nowhy", _A5_HELD,
+                                '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                'why = ""\n'))
+        check("[-5] AC2 an empty `why` reds, naming the kit and the dest",
+              _p5w.returncode == 1 and "empty reason" in _p5w.stdout
+              and "scripts/demo/two.py" in _p5w.stdout, _p5w.stdout)
+        check("[-5] AC2 ...and the row excuses nothing, so its gap is still counted",
+              a4_gap_total(_p5w.stdout) == 2, _p5w.stdout)
+
+        # ---- AC3: the file ARRIVED. The message says so rather than calling the row malformed.
+        _p5a = a5_cov(a5_target("arrived", dict(_A5_HELD, **{"scripts/demo/two.py": b"2\n"}),
+                                '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                'why = "we do not use it"\n'))
+        check("[-5] AC3 a decline whose dest the target now TRACKS reds as stale",
+              _p5a.returncode == 1 and "the file arrived" in _p5a.stdout, _p5a.stdout)
+
+        # ---- AC4: gov WITHDREW it. Built by declining a destination no rule ships, which is the
+        # ---- withdrawal case seen from the descriptor side.
+        _p5x = a5_cov(a5_target("withdrawn", _A5_HELD,
+                                '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/gone.py"\n'
+                                'why = "gov used to ship it"\n'))
+        check("[-5] AC4 a decline no claimed kit ships any more reds as stale",
+              _p5x.returncode == 1 and "gov has withdrawn it" in _p5x.stdout, _p5x.stdout)
+
+        # ---- AC5 + AC6: `taken_as`, hash-graded, CR-stripped on BOTH sides.
+        _t5t = a5_target("takenas", dict(_A5_HELD, **{"vendor/two-renamed.py": b"2\n"}),
+                         '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                         'why = "we took it under another name"\n'
+                         'taken_as = "vendor/two-renamed.py"\n')
+        _p5t = a5_cov(_t5t)
+        check("[-5] AC5 `taken_as` whose bytes equal gov's reports `declined`",
+              _p5t.returncode == 0 and "declined" in _p5t.stdout, _p5t.stdout + _p5t.stderr)
+        check("[-5] AC5 ...and drops out of the gap count", a4_gap_total(_p5t.stdout) == 1,
+              _p5t.stdout)
+        # ONE BYTE CHANGED -> `diverged`, and the exit code does NOT move. Redding here would red
+        # the honest adopter who relocated a file and then edited it, whose only route back to green
+        # is deleting the decline — the exclusion list eating its own evidence.
+        _t5d = a5_target("diverged", dict(_A5_HELD, **{"vendor/two-renamed.py": b"2 edited\n"}),
+                         '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                         'why = "we took it under another name"\n'
+                         'taken_as = "vendor/two-renamed.py"\n')
+        _p5d = a5_cov(_t5d)
+        check("[-5] AC5 one byte changed reclassifies the row to `diverged`",
+              "diverged" in _p5d.stdout, _p5d.stdout)
+        check("[-5] AC5 ...and the exit code is UNCHANGED — a local edit is not a coverage failure",
+              _p5d.returncode == 0, f"rc {_p5d.returncode}: {_p5d.stdout}{_p5d.stderr}")
+        # AC6: CRLF ONLY. This is the arm that fails against a plain `_sha` comparison and is why
+        # the helper strips CR.
+        _t5c = a5_target("crlf", dict(_A5_HELD, **{"vendor/two-renamed.py": b"2\r\n"}),
+                         '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                         'why = "we took it under another name"\n'
+                         'taken_as = "vendor/two-renamed.py"\n')
+        _p5c = a5_cov(_t5c)
+        check("[-5] AC6 a `taken_as` differing ONLY in line endings still reports `declined`",
+              "declined" in _p5c.stdout and "diverged" not in _p5c.stdout, _p5c.stdout)
+
+        # ---- AC7: `consumed_into`, deliberately weak — the named path is tracked, and nothing more.
+        _p5ci = a5_cov(a5_target("consumed", dict(_A5_HELD, **{"scripts/all-in-one.py": b"both\n"}),
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "folded in"\nconsumed_into = "scripts/all-in-one.py"\n'))
+        check("[-5] AC7 `consumed_into` naming a TRACKED path passes",
+              _p5ci.returncode == 0 and "declined" in _p5ci.stdout, _p5ci.stdout + _p5ci.stderr)
+        _p5cx = a5_cov(a5_target("consumed-bad", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "folded in"\nconsumed_into = "scripts/nowhere.py"\n'))
+        check("[-5] AC7 ...and naming an UNTRACKED one reds",
+              _p5cx.returncode == 1 and "is not there is not a fold" in _p5cx.stdout, _p5cx.stdout)
+
+        # ---- AC8: `discharge`, through the same runner a `[[hole]]` probe already uses.
+        _p5g0 = a5_cov(a5_target("disch-ok", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "a probe proves it"\n'
+                                 'discharge = { command = ["bash", "-c", "exit 0"] }\n'))
+        check("[-5] AC8 a discharge exiting 0 reports `discharged`",
+              _p5g0.returncode == 0 and "discharged" in _p5g0.stdout,
+              _p5g0.stdout + _p5g0.stderr)
+        _p5g1 = a5_cov(a5_target("disch-red", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "a probe proves it"\n'
+                                 'discharge = { command = ["bash", "-c", "exit 1"] }\n'))
+        check("[-5] AC8 ...and exiting 1 reports `undischarged` rather than `discharged`",
+              "undischarged" in _p5g1.stdout, _p5g1.stdout)
+        _p5gt = a5_cov(a5_target("disch-token", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "a probe proves it"\n'
+                                 'discharge = { command = ["bash", "-c", "test -f {nowhere}"] }\n'))
+        check("[-5] AC8 ...and an unresolved {token} refuses BY NAME rather than running",
+              _p5gt.returncode == 1 and "needs answer(s) nowhere" in _p5gt.stdout, _p5gt.stdout)
+
+        # ---- AC9: the one-evidence-field rule, enforced BEFORE either field is evaluated. The
+        # ---- fixture makes BOTH fields individually valid, so an implementation that graded them
+        # ---- first and complained second would pass every other arm and fail only this one.
+        _p5two = a5_cov(a5_target("two-evidence",
+                                  dict(_A5_HELD, **{"vendor/two-renamed.py": b"2\n",
+                                                    "scripts/all-in-one.py": b"both\n"}),
+                                  '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                  'why = "both, somehow"\ntaken_as = "vendor/two-renamed.py"\n'
+                                  'consumed_into = "scripts/all-in-one.py"\n'))
+        check("[-5] AC9 a row carrying two evidence fields reds on the one-field rule",
+              _p5two.returncode == 1 and "evidence fields" in _p5two.stdout, _p5two.stdout)
+        check("[-5] AC9 ...naming BOTH fields, and before either was evaluated",
+              "taken_as, consumed_into" in _p5two.stdout, _p5two.stdout)
+
+        # ---- THE REMAINING REFUSAL BRANCHES, so every one of the eleven this unit adds is reached
+        # ---- by a named arm. Five of them serve no acceptance criterion and would otherwise ship
+        # ---- unasserted, which is exactly what `refusal_join.py` exists to prevent.
+        _p5nk = a5_cov(a5_target("nokit", _A5_HELD,
+                                 '\n[[decline]]\ndest = "scripts/demo/two.py"\nwhy = "x"\n'))
+        check("[-5] a decline row with no `kit` reds rather than being skipped",
+              _p5nk.returncode == 1 and "carries no kit or no dest" in _p5nk.stdout, _p5nk.stdout)
+        _p5uk = a5_cov(a5_target("unknownkit", _A5_HELD,
+                                 '\n[[decline]]\nkit = "elsewhere"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "x"\n'))
+        check("[-5] a decline naming a kit outside this run's selection reds BY NAME",
+              _p5uk.returncode == 1 and "not in this run's selection" in _p5uk.stdout, _p5uk.stdout)
+        _p5ta = a5_cov(a5_target("takenas-missing", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "x"\ntaken_as = "vendor/absent.py"\n'))
+        check("[-5] a `taken_as` the target does not track reds — the evidence names nothing",
+              _p5ta.returncode == 1 and "the evidence names a file that is not there"
+              in _p5ta.stdout, _p5ta.stdout)
+        _p5nc = a5_cov(a5_target("disch-nocmd", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "x"\ndischarge = { why = "no command here" }\n'))
+        check("[-5] a discharge with no command reds — `discharged` is undefined for it",
+              _p5nc.returncode == 1 and "discharge with no command" in _p5nc.stdout, _p5nc.stdout)
+        _p5nb = a5_cov(a5_target("disch-nobin", _A5_HELD,
+                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                 'why = "x"\n'
+                                 'discharge = { command = ["no-such-binary-xyzzy"] }\n'))
+        check("[-5] a discharge probe that cannot LAUNCH reds rather than raising a traceback",
+              _p5nb.returncode == 1 and "probe could not run" in _p5nb.stdout
+              and "Traceback" not in _p5nb.stderr, _p5nb.stdout + _p5nb.stderr)
+
+        # ---- S7's SECOND CALL SITE. `check` runs the same predicate, so the two verbs cannot
+        # ---- disagree about whether a decline is stale — asserted by observing the SAME fixture
+        # ---- red in both, rather than by reading the source and trusting it.
+        _t5chk = a5_target("check-site", dict(_A5_HELD, **{"scripts/demo/two.py": b"2\n"}),
+                           '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                           'why = "we do not use it"\n')
+        run_in_gov(_g4, "adopt", "--target", str(_t5chk), "--write")
+        _p5chk = run_in_gov(_g4, "check", "--target", str(_t5chk))
+        check("[-5] S7 `check` grades declines through the same predicate `plan --coverage` runs",
+              "the file arrived" in _p5chk.stdout, _p5chk.stdout[-1200:])
+        check("[-5] S7 ...and a stale one reds THERE too, so neither verb can excuse what the "
+              "other refuses",
+              _p5chk.returncode == 1, f"rc {_p5chk.returncode}")
+
+        # ---- AC10's ARITHMETIC, which is the part of it that is a property of this code rather
+        # ---- than of one adopter's tree at one vintage: declining N rows moves exactly N from the
+        # ---- gap count to the declined count, and the WRITE-ROW TOTAL does not move. A decline
+        # ---- that shrank the denominator would be hiding gov's own population rather than
+        # ---- excusing a row, which is the failure this asserts against.
+        _p5base = a5_cov(a5_target("arith-base", _A5_HELD))
+        _p5one = a5_cov(a5_target("arith-one", _A5_HELD,
+                                  '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                  'why = "one"\n'))
+        _p5both = a5_cov(a5_target("arith-both", _A5_HELD,
+                                   '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                   'why = "one"\n\n[[decline]]\nkit = "demo"\n'
+                                   'dest = "scripts/demo/three.py"\nwhy = "two"\n'))
+
+        def _tot5(out: str) -> int:
+            return int(_re.search(r"gap \d+ of (\d+) write row\(s\)", out).group(1))
+
+        check("[-5] AC10 declining rows moves them out of the gap count, one for one",
+              (a4_gap_total(_p5base.stdout), a4_gap_total(_p5one.stdout),
+               a4_gap_total(_p5both.stdout)) == (2, 1, 0),
+              f"{a4_gap_total(_p5base.stdout)}, {a4_gap_total(_p5one.stdout)}, "
+              f"{a4_gap_total(_p5both.stdout)}")
+        check("[-5] AC10 ...and the WRITE-ROW TOTAL does not move, so a decline excuses a row "
+              "rather than shrinking gov's population",
+              _tot5(_p5base.stdout) == _tot5(_p5one.stdout) == _tot5(_p5both.stdout),
+              f"{_tot5(_p5base.stdout)}, {_tot5(_p5one.stdout)}, {_tot5(_p5both.stdout)}")
+        check("[-5] AC10 ...and the declined count rises to match",
+              ", 2 declined" in _p5both.stdout and ", 1 declined" in _p5one.stdout,
+              _p5both.stdout)
+
+
 
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------

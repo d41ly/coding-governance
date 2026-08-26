@@ -38,7 +38,16 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 197    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 208    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 197 -> 208 (DEPL-dCarriedReceipt-5). Its ELEVEN new refusals, all inside `decline_findings`: a row
+# with no `kit` or no `dest`; a `kit` outside the run's selection; an empty `why`; more than one
+# evidence field; the two STALENESS arms (the dest arrived, and gov withdrew it); a `taken_as` the
+# target does not track; a `consumed_into` it does not track; a `discharge` with no command; a
+# discharge argv carrying an unresolved token; and a discharge probe that cannot LAUNCH. The spec
+# estimated "roughly seven" and asked for the figure to be RE-DERIVED at landing rather than pinned
+# to a literal, which is what this is. ALL ELEVEN are armed by a named selftest arm — six by an
+# acceptance criterion and five by arms written for the branches alone, because a branch serving no
+# criterion is exactly the one that otherwise ships unasserted. 11/11 armed.
 # 190 -> 197 (DEPL-dCarriedReceipt-13). Its SEVEN new refusals, all on the `adopt` path: `--pin`
 # with no `=` (in `parse_args`, so it is the one reachable without a target), `--target` resolving
 # to the gov checkout, an existing receipt without `--re-adopt`, a target index differing from HEAD,
