@@ -38,7 +38,11 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 210    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 212    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 210 -> 212 at this build's CLOSING-REVIEW FOLD. Two new refusals, both from confirmed findings:
+# a `[[decline]].discharge.command` that is not a list (D1's secondary — a string was iterated
+# character by character, spawning `b`), and a `--pin` key that matched no planned destination (D6 —
+# an operator assertion consumed by lookup with nothing checking that any lookup hit). Both armed.
 # 208 -> 210 (DEPL-dCarriedReceipt-6). Its TWO new refusals: `apply`'s silenced-leg finding,
 # and the gov-side `selfcheck` arm that catches the same class one side over, before any
 # adopter can receive the descriptor. Both armed — the first by AC5's fixture, the second by a

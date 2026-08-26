@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** CLOSED · rev-5 · 2026-08-26 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-26 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
 | [2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-15 |
 | [2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-15 |
 
 <!-- /gen:spec-records -->
@@ -120,9 +121,27 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
 
 ## 5. Production-readiness checklist
 
-- security — `discharge` runs an argv from the TARGET's own descriptor. That is not new exposure:
-  `[[hole]].discharge` already does exactly this through the same runner, in the same verb, against
-  the same file, and this unit adds no second execution path.
+- security — `discharge` runs an argv from the TARGET's own descriptor.
+
+  **CORRECTED at rev-6, and the sentence this replaces was FALSE IN BOTH HALVES.** It read: "That
+  is not new exposure: `[[hole]].discharge` already does exactly this through the same runner, in
+  the same verb, against the same file." A `[[hole]]` is iterated from the KIT descriptor, which
+  `read_descriptors` reads out of GOV's own tree — so its argv is gov-authored, not target-authored,
+  and it is not the same file. The only pre-existing target-authored execution is the gate runner's
+  own command, which runs inside `apply` alone and prints its argv before spawning. So the
+  equivalence that cleared this bullet did not exist, and because it was written down it was
+  believed: the branch shipped reachable from `plan --coverage`, a verb needing no receipt and no
+  `--write` that prints "NOTHING was written." on the same run. Previewing an untrusted repository
+  executed whatever that repository asked for, on the previewer's machine. Found by this build's own
+  closing review, which read the call graph instead of this sentence.
+
+  **What the unit actually does now.** The `discharge` branch is OPT-IN behind `--run-discharge`,
+  default OFF in both verbs; a row whose probe did not run reports `probe-not-run`, a STATE rather
+  than a silent skip; the resolved argv is PRINTED before it is spawned; and a `command` that is not
+  a list is refused rather than iterated character by character. The executing surface is now a
+  DECLARED POPULATION in the engine, `SHELL_EXEC_SITES`, labelled by who authors each argv and
+  asserted in both directions by an arm — which is the gate that would have caught this at authoring
+  time and is the reason the class cannot recur silently.
 - perf / scale — one `blob_at` and one index read per `taken_as` row. Bounded by the number of
   declines an owner typed, which is bounded by the coverage gap.
 - a11y — N/A: CLI.
@@ -202,6 +221,18 @@ count in §4 tracks the branch count.
   RESOLVED (agent, 2026-08-24, delegated): legal, graded by the staleness arms.
 
 ## 9. Revision log
+
+- rev-6 · 2026-08-26 · CLOSING-REVIEW FOLD, and the finding was a BLOCKER. §5's security bullet
+  cleared the `discharge` branch on an equivalence that does not exist — it claimed
+  `[[hole]].discharge` already ran a target-authored argv through the same runner in the same verb
+  against the same file, and a hole's argv is GOV-authored, read from the kit descriptors. Because
+  the sentence was in the spec it was believed, and the branch shipped reachable from
+  `plan --coverage`: previewing an untrusted repository executed whatever that repository asked for.
+  The bullet is corrected in place rather than deleted, because the false claim is the useful part
+  of the record. `discharge` is now opt-in behind `--run-discharge`, default off in both verbs, with
+  `probe-not-run` as its own state, the argv printed before spawning, a non-list `command` refused,
+  and the engine's executing surface declared as a population asserted in both directions.
+  AC8 is unamended: it says what a discharge REPORTS and never which flags reach it.
 
 - rev-5 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. ONE criterion
   AMENDED: AC10 pinned a frozen fixture at a gap count measured on one adopter at the base sha,

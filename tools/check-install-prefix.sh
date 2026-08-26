@@ -178,25 +178,61 @@ if [ ! -f tools/govkit/registry.toml ] || [ ! -f tools/lib/resolve-python.sh ]; 
   echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
   echo "install-prefix: that looks like a pass is indistinguishable from coverage."
 elif [ "$MODE" = --write-ratchet ]; then
-  carried_rows > "$CARRIED.tmp" && mv "$CARRIED.tmp" "$CARRIED"
+  # D3, from the closing review of DEPL-dCarriedReceipt. `carried_rows` ends in a pipe, and this
+  # script sets only `set -u` — no `pipefail` — so the status is `sort`'s and a DEAD producer (an
+  # unresolvable python, a govkit import error, a `resolve_entry` raise, a traceback out of the
+  # heredoc) yields ZERO ROWS AT EXIT 0. That truncated the tracked ratchet and printed
+  # `wrote 0 carried-prefix row(s)` cheerfully; once committed, `--check` compared empty against
+  # empty and printed `clean` forever. Green-by-absence, on a leg that is on the bar — and reachable
+  # by FOLLOWING THE GATE'S OWN REMEDY, since a collapsed population reds as SLACK first and the
+  # SLACK message says to re-run this very mode.
+  #
+  # The class is not hypothetical here: this build's own first `--write-ratchet` wrote zero rows for
+  # a CR reason and reported it cheerfully. That INSTANCE was fixed with `tr -d ''`; this is the
+  # CLASS. The first arm of this same script already guards the identical shape twice, by name.
+  rows=$(carried_rows)
+  [ -n "$rows" ] || { echo "install-prefix: the carried-prefix population is empty — that is not a pass.
+install-prefix: the derivation produced no rows at all, which means it DIED rather than that this
+install-prefix: repo ships nothing. Refusing to truncate $CARRIED over a probe that cannot move."; exit 1; }
+  printf '%s
+' "$rows" > "$CARRIED.tmp" && mv "$CARRIED.tmp" "$CARRIED"
   echo "install-prefix: wrote $(grep -c . "$CARRIED" || true) carried-prefix row(s) to $CARRIED"
   exit 0
 elif [ "$MODE" = --list ]; then
   echo "install-prefix: carried-prefix rows (the shipping spelling, inside the shippable set):"
   carried_rows | sed 's/^/  /'
 else
-  if [ ! -f "$CARRIED" ]; then
+  # `-s` not `-f` (D4): an empty-but-present file passed an existence check and then met the awk.
+  if [ ! -s "$CARRIED" ]; then
     echo "install-prefix: no $CARRIED — run --write-ratchet once and commit it. A missing ratchet is"
     echo "install-prefix: not a clean one."
     exit 1
   fi
+  # D3's other half: the same liveness assertion on the CHECK path, so a dead derivation cannot
+  # report a clean empty population against an empty ratchet either.
+  rows=$(carried_rows)
+  [ -n "$rows" ] || { echo "install-prefix: the carried-prefix population is empty — that is not a pass.
+install-prefix: the derivation produced no rows, which means it DIED rather than that this repo
+install-prefix: ships nothing. A probe that cannot move does not get to report clean."; exit 1; }
   # SHRINK-ONLY, PER FILE. The existing arm's `<path>:<line>` shape goes stale on every edit above a
   # waived line, and one row per hit line would rot within a week; per file trades swap-blindness for
   # a ratchet that survives ordinary editing. ONE awk over both sides, reporting all four conditions,
   # because a `| while` loop runs in a subshell and its verdict variable never reaches the exit.
-  carried_rows > "$CARRIED.now"
+  # D12: this wrote `tools/install-prefix-carried.txt.now` INTO the tree it is grading, with no
+  # trap. `gate-fingerprint.sh` folds untracked files into the working-tree fingerprint, so a
+  # leftover forced an unnecessary full bar at the push boundary — and it broke the hermetic-leg
+  # rule while grading the tree it dirtied. `mktemp` plus a trap, and the rows are already in hand.
+  _now=$(mktemp); trap 'rm -f "$_now"' EXIT
+  printf '%s
+' "$rows" > "$_now"
   awk -F'\t' -v pinf="$CARRIED" '
-    NR==FNR { if ($0 !~ /^[[:space:]]*(#|$)/) pin[$1]=$2; next }
+    # D4 + D13. `NR==FNR` is true for the WHOLE of file 2 when file 1 has zero records, because
+    # FNR resets per file and NR does not — so an empty-but-present ratchet filled `pin[]` from the
+    # MEASURED file, left `now[]` empty, and printed `SLACK <path> N -> 0 (delete the row)` for
+    # every file: telling the operator to delete a ratchet that records nothing, while the correct
+    # verdict UNRECORDED never printed. `FILENAME == pinf` cannot swap the roles, and it finally
+    # READS the `-v pinf` this program was already being passed and never used (D13).
+    FILENAME == pinf { if ($0 !~ /^[[:space:]]*(#|$)/) pin[$1]=$2; next }
     { now[$1]=$2 }
     END {
       bad=0
@@ -209,9 +245,8 @@ else
         if (c+0 < pin[p]+0) { printf "  SLACK       %s\t%s -> %s%s\n", p, pin[p], c, (c+0==0 ? " (delete the row)" : "") ; bad++ }
       }
       exit bad ? 1 : 0
-    }' "$CARRIED" "$CARRIED.now"
+    }' "$CARRIED" "$_now"
   cstat=$?
-  rm -f "$CARRIED.now"
   if [ "$cstat" != 0 ]; then
     echo "install-prefix: apply writes gov's bytes VERBATIM, so a carried tools/<kit>/ literal arrives"
     echo "install-prefix: unchanged in a target installed at another prefix and resolves to nothing"

@@ -171,14 +171,14 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-2 — `refuse` becomes `report`, and `attributes` gets a pins arm](spec/2026-08-24-spec-DEPL-dCarriedReceipt-2.md) | — | 1 | CLOSED | rev-3 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-3 — `intake` honours `--answer prefix=`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-3.md) | — | 1 | CLOSED | rev-2 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-4 — `coverage_rows()` and `plan --coverage`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-4.md) | — | 1 | CLOSED | rev-6 | 2026-08-26 |
-| [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | — | 1 | CLOSED | rev-5 | 2026-08-26 |
+| [DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest](spec/2026-08-24-spec-DEPL-dCarriedReceipt-5.md) | — | 1 | CLOSED | rev-6 | 2026-08-26 |
 | [DEPL-dCarriedReceipt-6 — the silenced-gate-leg bar, and the gov defect it finds](spec/2026-08-24-spec-DEPL-dCarriedReceipt-6.md) | — | 2 | CLOSED | rev-6 | 2026-08-26 |
 | [DEPL-dCarriedReceipt-7 — two identities, read index-side](spec/2026-08-24-spec-DEPL-dCarriedReceipt-7.md) | — | 2 | CLOSED | rev-7 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`](spec/2026-08-24-spec-DEPL-dCarriedReceipt-8.md) | — | 2 | CLOSED | rev-5 | 2026-08-25 |
 | [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | CLOSED | rev-9 | 2026-08-25 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 3 record folder(s).
+Records: 25 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

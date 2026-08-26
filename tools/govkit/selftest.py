@@ -14,6 +14,7 @@ Every fixture is a throwaway repo under `mktemp`-equivalent. Nothing is written 
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -5312,75 +5313,6 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- scoping in BOTH directions. One fixture, because the classes only exist together: a
         # ---- descriptor declaring an `lf_pin` and a merged rule, adopted into a target that holds
         # ---- both, plus a `seed` row that matched no vintage.
-        _S11_EXTRA = ('\n[[files]]\ninclude = "seed-one.py"\nrole = "seed"\n\n'
-                      '[[files]]\ninclude = "block.txt"\nrole = "merged"\n'
-                      'block_id = "demo:block"\nmarker_style = "hash-comment"\n'
-                      'to = "hooks/pre-commit"\n\n'
-                      '[[lf_pin]]\npattern = "*.sh"\n')
-        # THE MARKER PAIR IS `marker_pair`'s, not a shape invented here. It synthesizes
-        # `# <block_id>` / `# /<block_id>` for `hash-comment`, and a fixture spelling any other
-        # pair produces a source `find_block` cannot read — which reads as "the feature does not
-        # work" and is really "the fixture never triggered it". Cost one round here.
-        _BLOCK = "# demo:block\nechodemo\n# /demo:block\n"
-        _W1s = dict(_W1, **{"seed-one.py": "seed-v1\n", "block.txt": _BLOCK})
-        _g11, _sh11 = a13_gov("s11", [_W1s, _W2], a13_kit(_S11_EXTRA))
-        _t11 = a13_target("s11", "scripts", {
-            "scripts/demo/verbatim-one.py": b"v1\n",
-            "scripts/demo/seed-one.py": b"the target rewrote its own seed entirely\n",
-            "hooks/pre-commit": b"#!/bin/sh\n# demo:block\nechodemo\n# /demo:block\n",
-            ".gitattributes": b"*.sh text eol=lf\n"})
-        _p11 = run_in_gov(_g11, "adopt", "--target", str(_t11), "--write")
-        check("[-13] AC13 adopt exits 0 over a descriptor declaring an lf_pin and a merged rule",
-              _p11.returncode == 0, _p11.stdout + _p11.stderr)
-        _rec11 = a13_receipt(_t11)
-        _attr = [f for f in _rec11["files"] if f.get("role") == "attributes"]
-        check("[-13] AC13 the receipt carries EXACTLY ONE synthesized `attributes` row",
-              len(_attr) == 1 and _attr[0]["path"] == ".gitattributes",
-              str([f["path"] for f in _attr]))
-        check("[-13] AC13 ...carrying neither identity and no `evidence`, per S11",
-              not any(k in _attr[0] for k in ("gov_oid", "oid", "evidence")) if _attr else False,
-              str(_attr[0]) if _attr else "no row")
-        _mrg = [f for f in _rec11["files"] if f.get("role") == "merged"]
-        check("[-13] AC13 ...and a `merged` row in apply's shape, with the block_id `check` reads",
-              len(_mrg) == 1 and _mrg[0].get("block_id") == "demo:block", str(_mrg))
-        _pc11 = run_in_gov(_g11, "check", "--target", str(_t11))
-        check("[-13] AC13 ...so `check` reports the merged block rather than raising KeyError",
-              "Traceback" not in (_pc11.stdout + _pc11.stderr), _pc11.stdout + _pc11.stderr)
-        _seed = a13_row(_rec11, "scripts/demo/seed-one.py")
-        check("[-13] AC14 the fixture really produced an UNATTRIBUTED `seed` row",
-              _seed.get("role") == "seed" and _seed.get("evidence") == "unattributed", str(_seed))
-        settle(_t11, "receipt")
-        _before11 = (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes()
-        _pu11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
-        check("[-13] AC14 the unattributed SEED row reaches its own disposition, not S7's skip",
-              "[seed" in _pu11.stdout and "reseed" in _pu11.stdout.lower(), _pu11.stdout)
-        check("[-13] AC14 ...and the synthesized `attributes` row reaches `-2`'s pins arm",
-              "[attributes" in _pu11.stdout, _pu11.stdout)
-        check("[-13] AC14 ...and neither writes a byte",
-              (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes() == _before11)
-
-        # ---- `EVIDENCE_STATES` IS LOAD-BEARING OR IT IS A SECOND SPELLING. A tuple nothing reads
-        # ---- is exactly the two-answers-to-one-question shape: the real enum would live in the
-        # ---- branches that assign the field, and the constant would drift beside them saying
-        # ---- nothing. These two arms make it the answer. The first joins it to the values a real
-        # ---- run WROTE; the second to every literal the engine can assign, so a fourth state added
-        # ---- in a branch reds here rather than shipping undeclared.
-        _GK13 = govkit_module()
-        # THE PINNED ROW IS CARRIED IN EXPLICITLY. Its receipt belongs to a fixture the AC8 arms
-        # re-adopt READ-ONLY afterwards, so re-reading it here would work today and stop working the
-        # first time somebody adds a `--write` to one of those arms. The row object is the evidence.
-        _seen13 = {f["evidence"] for f in (_rec13["files"] + _rec11["files"] + [_pinned])
-                   if "evidence" in f}
-        check("[-13] every `evidence` value a real run wrote is a declared state",
-              _seen13 <= set(_GK13.EVIDENCE_STATES),
-              f"{sorted(_seen13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
-        check("[-13] LIVENESS ...over a population carrying THREE of them, not one",
-              len(_seen13) >= 3, str(sorted(_seen13)))
-        _lit13 = set(_re.findall(r'\["evidence"\]\s*=\s*"([a-z-]+)"', _g13src)) | set(
-            _re.findall(r'"evidence":\s*"([a-z-]+)"', _g13src))
-        check("[-13] ...and every literal the ENGINE can assign to `evidence` is declared too",
-              _lit13 and _lit13 <= set(_GK13.EVIDENCE_STATES),
-              f"{sorted(_lit13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
 
         # ============================================================= DEPL-dCarriedReceipt-4
         # `coverage_rows()` and `plan --coverage`. AC2 and AC3 are LIVE-TARGET readings and are
@@ -5607,6 +5539,10 @@ user_skills = "/tmp/gk-fake-skills"
         def a5_cov(t: pathlib.Path, g: pathlib.Path = None):
             return run_in_gov(g or _g4, "plan", "--target", str(t), "--coverage", "--kits", "demo")
 
+        def a5_cov_flag(t: pathlib.Path, *flags: str):
+            return run_in_gov(_g4, "plan", "--target", str(t), "--coverage", *flags,
+                              "--kits", "demo")
+
         # A target holding one of the three engine sources, so `two.py` and `three.py` are gaps and
         # a decline has something to excuse. `kit.toml` is held so it is not a fourth gap.
         _A5_HELD = {"scripts/demo/one.py": b"1\n", "scripts/demo/kit.toml": b"x\n"}
@@ -5618,6 +5554,67 @@ user_skills = "/tmp/gk-fake-skills"
         _g5src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("[-5] AC1 the engine now READS a [[decline]] block rather than merely parsing it",
               'deploy.get("decline")' in _g5src and "def decline_findings" in _g5src)
+
+        # ---- D1's CLASS-LEVEL GATE — the one that would have caught the blocker at authoring time.
+        # ---- The executing surface is a DECLARED POPULATION asserted in BOTH directions, so a new
+        # ---- `resolve_shell_argv` spawn reds until a row claims it and a row naming a function that
+        # ---- no longer spawns reds too. Derived from the AST rather than from a grep, because a
+        # ---- grep cannot say which function a call sits in and the function is the whole key.
+        import ast as _ast1
+        _t1 = _ast1.parse(_g5src)
+        _par1 = {}
+        for _n in _ast1.walk(_t1):
+            for _c in _ast1.iter_child_nodes(_n):
+                _par1[_c] = _n
+
+        def _enclosing1(node):
+            while node in _par1:
+                node = _par1[node]
+                if isinstance(node, _ast1.FunctionDef):
+                    return node.name
+            return "(module)"
+
+        _exec_found = set()
+        for _n in _ast1.walk(_t1):
+            if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Name) \
+                    and _n.func.id == "resolve_shell_argv":
+                _exec_found.add(_enclosing1(_n))
+        _declared = set(govkit_module().SHELL_EXEC_SITES)
+        check("[-5] D1 LIVENESS the AST walk really finds shell-executing call sites",
+              len(_exec_found) >= 4, str(sorted(_exec_found)))
+        check("[-5] D1 every function that runs a shell command is DECLARED in SHELL_EXEC_SITES",
+              not (_exec_found - _declared),
+              "undeclared spawn in: " + ", ".join(sorted(_exec_found - _declared)))
+        check("[-5] D1 ...and every declared row still names a function that spawns — both "
+              "directions, so a stale row cannot widen the surface it was written to narrow",
+              not (_declared - _exec_found),
+              "declared but no longer spawning: " + ", ".join(sorted(_declared - _exec_found)))
+        # THE TRUST LABEL IS THE POINT. A site whose argv the TARGET authored owes two properties,
+        # and the second is the one D1 violated: it must not be reachable from a verb that runs by
+        # default. Asserted on the source of each such function rather than on a claim about it.
+        _tgt_sites = [k for k, v in govkit_module().SHELL_EXEC_SITES.items() if v == "target"]
+        check("[-5] D1 LIVENESS the declaration really marks some sites target-authored",
+              len(_tgt_sites) >= 2, str(_tgt_sites))
+        # THE ANNOUNCEMENT MAY LIVE IN THE FUNCTION OR AT ITS CALL SITE, and the arm has to admit
+        # both or it is asserting a code SHAPE rather than the property. `decline_findings` prints
+        # inside itself; `read_gate_verdicts` is announced by `apply` before it calls it, which is
+        # the older idiom and is equally honest. Asserting only the first would have redded a
+        # correct pre-existing site — the near-miss this arm was run over the real tree to find.
+        _g5lines = _g5src.split("\n")
+        for _fn in sorted(_tgt_sites):
+            _body = next((_ast1.get_source_segment(_g5src, _n) or "" for _n in _ast1.walk(_t1)
+                          if isinstance(_n, _ast1.FunctionDef) and _n.name == _fn), "")
+            _inside = "print(" in _body
+            _callsites = [_n.lineno for _n in _ast1.walk(_t1)
+                          if isinstance(_n, _ast1.Call) and isinstance(_n.func, _ast1.Name)
+                          and _n.func.id == _fn]
+            _announced = any(
+                any("print(" in _g5lines[j] for j in range(max(0, ln - 12), ln))
+                for ln in _callsites)
+            check(f"[-5] D1 target-authored site '{_fn}' announces its argv — in the function or "
+                  f"at its call site — before spawning it",
+                  _inside or _announced,
+                  f"neither: body-print={_inside} callsites={_callsites}")
         check("[-5] S2 the evidence set is a CLOSED constant, not a check spelled per call site",
               tuple(govkit_module().DECLINE_EVIDENCE) == ("taken_as", "consumed_into", "discharge"),
               str(govkit_module().DECLINE_EVIDENCE))
@@ -5704,26 +5701,73 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-5] AC7 ...and naming an UNTRACKED one reds",
               _p5cx.returncode == 1 and "is not there is not a fold" in _p5cx.stdout, _p5cx.stdout)
 
-        # ---- AC8: `discharge`, through the same runner a `[[hole]]` probe already uses.
-        _p5g0 = a5_cov(a5_target("disch-ok", _A5_HELD,
-                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
-                                 'why = "a probe proves it"\n'
-                                 'discharge = { command = ["bash", "-c", "exit 0"] }\n'))
+        # ---- D1, THE BLOCKER this build's closing review escalated. A `[[decline]].discharge`
+        # ---- argv is authored in the TARGET's own descriptor — a repository gov does not own —
+        # ---- and it was reachable from `plan --coverage`, a verb that needs no receipt, takes no
+        # ---- `--write`, and prints `NOTHING was written.` on the same run. The spec bullet that
+        # ---- cleared it asserted `[[hole]].discharge` "already does exactly this", which is false
+        # ---- in both halves: holes come from `read_descriptors(root, ...)`, gov's own tree.
+        # ----
+        # ---- THE ARM IS A SENTINEL FILE, not an exit code. An assertion on the exit code cannot
+        # ---- tell "the probe did not run" from "the probe ran and returned 0", which is exactly
+        # ---- the ambiguity that let this ship.
+        _t5sent = a5_target("sentinel", _A5_HELD,
+                            '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                            'why = "a probe proves it"\n'
+                            'discharge = { command = ["bash", "-c", "echo pwned > SENTINEL"] }\n')
+        _sent = _t5sent / "SENTINEL"
+        _p5sent = a5_cov(_t5sent)
+        check("[-5] D1 `plan --coverage` does NOT execute a target-authored probe by default",
+              not _sent.exists(),
+              "SENTINEL EXISTS — a read-only preview ran a command the target wrote")
+        check("[-5] D1 ...and the row reports `probe-not-run`, a STATE rather than a silent skip",
+              "probe-not-run" in _p5sent.stdout, _p5sent.stdout)
+        _p5sentc = run_in_gov(_g4, "check", "--target", str(_t5sent))
+        check("[-5] D1 ...and `check` does not execute it either",
+              not _sent.exists(), "SENTINEL EXISTS after `check`")
+        # LIVENESS: the same fixture WITH the opt-in must actually run it, or the three arms above
+        # pass because the mechanism is broken rather than because the guard works.
+        _p5sento = a5_cov_flag(_t5sent, "--run-discharge")
+        check("[-5] D1 LIVENESS `--run-discharge` DOES run it, so the guard is a guard",
+              _sent.exists(), "SENTINEL ABSENT even with --run-discharge: the arms above prove nothing")
+        check("[-5] D1 ...and the run PRINTS the argv before spawning it",
+              "RUNNING a target-authored probe" in _p5sento.stdout and "SENTINEL" in _p5sento.stdout,
+              _p5sento.stdout)
+        _sent.unlink(missing_ok=True)
+
+        # ---- AC8: `discharge`, under the opt-in D1 added. The criterion says what a discharge
+        # ---- REPORTS; it never said which flags reach it, so the flag is where it is now reached.
+        _p5g0 = a5_cov_flag(a5_target("disch-ok", _A5_HELD,
+                                      '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                      'why = "a probe proves it"\n'
+                                      'discharge = { command = ["bash", "-c", "exit 0"] }\n'),
+                            "--run-discharge")
         check("[-5] AC8 a discharge exiting 0 reports `discharged`",
               _p5g0.returncode == 0 and "discharged" in _p5g0.stdout,
               _p5g0.stdout + _p5g0.stderr)
-        _p5g1 = a5_cov(a5_target("disch-red", _A5_HELD,
-                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
-                                 'why = "a probe proves it"\n'
-                                 'discharge = { command = ["bash", "-c", "exit 1"] }\n'))
+        _p5g1 = a5_cov_flag(a5_target("disch-red", _A5_HELD,
+                                      '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                      'why = "a probe proves it"\n'
+                                      'discharge = { command = ["bash", "-c", "exit 1"] }\n'),
+                            "--run-discharge")
         check("[-5] AC8 ...and exiting 1 reports `undischarged` rather than `discharged`",
               "undischarged" in _p5g1.stdout, _p5g1.stdout)
-        _p5gt = a5_cov(a5_target("disch-token", _A5_HELD,
-                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
-                                 'why = "a probe proves it"\n'
-                                 'discharge = { command = ["bash", "-c", "test -f {nowhere}"] }\n'))
+        _p5gt = a5_cov_flag(a5_target("disch-token", _A5_HELD,
+                                      '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                      'why = "a probe proves it"\n'
+                                      'discharge = { command = ["bash", "-c", "test -f {nowhere}"] }\n'),
+                            "--run-discharge")
         check("[-5] AC8 ...and an unresolved {token} refuses BY NAME rather than running",
               _p5gt.returncode == 1 and "needs answer(s) nowhere" in _p5gt.stdout, _p5gt.stdout)
+        # D1 secondary: a STRING command is iterated character by character. `validate_gate_runner`
+        # refuses the same shape by name for `[gate_runner].command`; this branch had no equivalent.
+        _p5str = a5_cov_flag(a5_target("disch-str", _A5_HELD,
+                                       '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                       'why = "a probe proves it"\n'
+                                       'discharge = { command = "bash -c true" }\n'),
+                             "--run-discharge")
+        check("[-5] D1 a discharge.command that is a STRING is refused, not iterated per character",
+              _p5str.returncode == 1 and "must be an argv ARRAY" in _p5str.stdout, _p5str.stdout)
 
         # ---- AC9: the one-evidence-field rule, enforced BEFORE either field is evaluated. The
         # ---- fixture makes BOTH fields individually valid, so an implementation that graded them
@@ -5809,10 +5853,11 @@ user_skills = "/tmp/gk-fake-skills"
                                  'why = "x"\ndischarge = { why = "no command here" }\n'))
         check("[-5] a discharge with no command reds — `discharged` is undefined for it",
               _p5nc.returncode == 1 and "discharge with no command" in _p5nc.stdout, _p5nc.stdout)
-        _p5nb = a5_cov(a5_target("disch-nobin", _A5_HELD,
-                                 '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
-                                 'why = "x"\n'
-                                 'discharge = { command = ["no-such-binary-xyzzy"] }\n'))
+        _p5nb = a5_cov_flag(a5_target("disch-nobin", _A5_HELD,
+                                      '\n[[decline]]\nkit = "demo"\ndest = "scripts/demo/two.py"\n'
+                                      'why = "x"\n'
+                                      'discharge = { command = ["no-such-binary-xyzzy"] }\n'),
+                            "--run-discharge")
         check("[-5] a discharge probe that cannot LAUNCH reds rather than raising a traceback",
               _p5nb.returncode == 1 and "probe could not run" in _p5nb.stdout
               and "Traceback" not in _p5nb.stderr, _p5nb.stdout + _p5nb.stderr)
@@ -5860,6 +5905,200 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-5] AC10 ...and the declined count rises to match",
               ", 2 declined" in _p5both.stdout and ", 1 declined" in _p5one.stdout,
               _p5both.stdout)
+
+        # ---- D2/D5/D9, the three closing-review findings that damage a TARGET. Each is asserted on
+        # ---- the observable consequence rather than on the code shape that produces it.
+        #
+        # ---- D8, from the closing review. `decline_findings` returned a DEST-KEYED map while the
+        # ---- population it filters is keyed by (kit, dest) -- and `coverage_rows`' own docstring
+        # ---- insists on rows never unique destinations, because a destination-keyed tally is what
+        # ---- hid a collision at a live target. So a decline naming kit A for a destination only
+        # ---- kit B ships passed every arm, hid B's genuine gap, and mis-attributed it.
+        _t8 = a5_target('crosskit', {'scripts/demo/one.py': b'1\n'},
+                        '\n[[decline]]\nkit = "demo"\ndest = "scripts/sib/one.py"\n'
+                        'why = "the wrong kit for this destination"\n')
+        _p8 = run_in_gov(_g5sib, 'plan', '--target', str(_t8), '--coverage',
+                         '--kits', 'demo,sib')
+        check('[-5] D8 LIVENESS the two-kit fixture really plans a sib destination',
+              'scripts/sib/one.py' in _p8.stdout, _p8.stdout[-800:])
+        check('[-5] D8 a decline naming the WRONG kit for a destination does not excuse it',
+              'GAP' in _p8.stdout and 'scripts/sib/one.py' in _p8.stdout.split('coverage:')[0],
+              _p8.stdout[-900:])
+        check('[-5] D8 ...and reds as stale, naming the kit that ships no such destination',
+              _p8.returncode == 1 and 'ships no such destination' in _p8.stdout,
+              f'rc {_p8.returncode}: ' + _p8.stdout[-900:])
+        # D2: `adopt --re-adopt --write` over a receipt `apply` wrote must not discard the five keys
+        # recording what the install DID. Dropping `gate_runner.emitted` empties `owned` in the next
+        # `apply`, whose first leg-name collision then refuses the whole install permanently.
+        _t2d = a13_target("readopt", "scripts", {})
+        _a2d = run_in_gov(_g4, "apply", "--target", str(_t2d), "--kits", "demo")
+        check("[-13] D2 LIVENESS the fixture's apply really wrote a receipt to re-adopt over",
+              (_t2d / ".governance" / "install.json").is_file(),
+              _a2d.stdout[-700:] + _a2d.stderr[-400:])
+        _before2 = a13_receipt(_t2d) if (_t2d / ".governance" / "install.json").is_file() else {}
+        _keys2 = [k for k in ("orders", "baseline", "after", "hook_block", "gate_runner")
+                  if k in _before2]
+        check("[-13] D2 LIVENESS ...carrying install-record keys, so the drop is observable at all",
+              len(_keys2) >= 3, str(sorted(_before2)))
+        settle(_t2d, "the install")
+        run_in_gov(_g4, "adopt", "--target", str(_t2d), "--re-adopt", "--write")
+        _after2 = a13_receipt(_t2d)
+        check("[-13] D2 `--re-adopt` carries every install-record key forward rather than dropping it",
+              all(k in _after2 for k in _keys2),
+              "lost: " + ", ".join(k for k in _keys2 if k not in _after2))
+        check("[-13] D2 ...VERBATIM — this verb did not witness the install and may not re-measure it",
+              all(_after2.get(k) == _before2.get(k) for k in _keys2),
+              "changed: " + ", ".join(k for k in _keys2 if _after2.get(k) != _before2.get(k)))
+
+        # D5: `adopt --write` is the THIRD receipt writer and must stand inside the per-target lock.
+        # Asserted by planting a held lock and observing the refusal -- and by asserting the
+        # READ-ONLY run does NOT pay it, which is the half a lock-everything fix would break.
+        _t5l = a13_target("lock", "scripts", {"scripts/demo/one.py": b"1\n"})
+        # THE LOCK PATH IS THE ENGINE'S OWN CONSTANT, never a spelling invented here. The first cut
+        # of this arm planted `.governance/install.lock` from memory; the engine's lock lives at
+        # `WRITE_LOCK_REL`, so it never saw the file and `adopt --write` sailed through at rc 0 — an
+        # arm that would have reported the fix working while testing nothing. Read the constant.
+        _lockp = _t5l.joinpath(*govkit_module().WRITE_LOCK_REL.split("/"))
+        _lockp.parent.mkdir(parents=True, exist_ok=True)
+        _lockp.write_text('{"pid": 999999, "verb": "apply", "started_utc": "2026-01-01T00:00:00Z"}\n',
+                          encoding="utf-8", newline="\n")
+        # READ-ONLY FIRST, deliberately: it must not pay for the lock, and running it first keeps it
+        # away from a receipt the write arm would otherwise have left behind.
+        _p5lr = run_in_gov(_g4, "adopt", "--target", str(_t5l))
+        check("[-13] D5 a READ-ONLY adopt does not pay for the lock, which is the rule the other "
+              "two verbs already follow",
+              _p5lr.returncode == 0, _p5lr.stdout[-400:] + _p5lr.stderr[-400:])
+        _p5l = run_in_gov(_g4, "adopt", "--target", str(_t5l), "--write")
+        check("[-13] D5 ...while `adopt --write` REFUSES against a held write lock, like the two "
+              "writers that already stood inside it",
+              _p5l.returncode == 2 and "lock" in (_p5l.stdout + _p5l.stderr).lower(),
+              f"rc {_p5l.returncode}: {_p5l.stdout[-400:]}{_p5l.stderr[-400:]}")
+        check("[-13] D5 ...and wrote no receipt while refusing, so the lock is taken BEFORE the "
+              "existence guard rather than after it",
+              not (_t5l / ".governance" / "install.json").is_file(),
+              "a receipt exists: the refusal came after the write")
+        _lockp.unlink()
+
+        # D9: `sha256` must answer the question `check` and `sha256sum -c` ASK, which is about the
+        # WORKTREE. It stamped the INDEX blob, so an unstaged edit -- which
+        # `demand_adopt_index_clean` DELIBERATELY permits, and which the -13 ledger asserts as a
+        # tested property -- made `check` report a mismatch for a row nothing was wrong with, on
+        # precisely the trees this verb exists for.
+        _t9 = a13_target("worktree-hash", "scripts", {"scripts/demo/one.py": b"1\n"})
+        (_t9 / "scripts" / "demo" / "one.py").write_bytes(b"an unstaged local edit\n")
+        _p9 = run_in_gov(_g4, "adopt", "--target", str(_t9), "--write")
+        check("[-13] D9 LIVENESS adopt still SUCCEEDS over an unstaged edit — the width -12 permits",
+              _p9.returncode == 0, _p9.stdout[-500:] + _p9.stderr[-400:])
+        _row9 = a13_row(a13_receipt(_t9), "scripts/demo/one.py")
+        _wt9 = hashlib.sha256((_t9 / "scripts" / "demo" / "one.py").read_bytes()).hexdigest()
+        _ix9 = hashlib.sha256(b"1\n").hexdigest()
+        check("[-13] D9 LIVENESS the fixture's index and worktree really differ, or this proves "
+              "nothing", _wt9 != _ix9)
+        check("[-13] D9 `sha256` is the WORKTREE's bytes, which is what `check` compares against",
+              _row9.get("sha256") == _wt9,
+              f"got {_row9.get('sha256')} · worktree {_wt9} · index {_ix9}")
+        check("[-13] D9 ...while `oid` stays the INDEX identity the verdict logic reads",
+              _row9.get("oid") == subprocess.run(
+                  ["git", "-C", str(_t9), "rev-parse", ":scripts/demo/one.py"],
+                  capture_output=True, text=True).stdout.strip(), str(_row9.get("oid")))
+        _pc9 = run_in_gov(_g4, "check", "--target", str(_t9))
+        check("[-13] D9 ...so `check` does not report a mismatch for a row nothing is wrong with",
+              "does not match the receipt" not in _pc9.stdout, _pc9.stdout[-800:])
+
+        # D6: an unmatched `--pin` was silently ignored, which closes a loop on the operator: the
+        # row it was meant to rescue keeps `unattributed`, `update` keeps skipping it, and the
+        # remedy names the command they just ran to no effect. The same flag already refuses loudly
+        # on its other two error classes.
+        _t6p = a13_target("pin-unmatched", "scripts", {"scripts/demo/verbatim-one.py": b"v1\n"})
+        _p6p = run_in_gov(_g13, "adopt", "--target", str(_t6p), "--write",
+                          "--pin", "scripts/demo/no-such-file.py=" + _sh13[0])
+        check("[-13] D6 a `--pin` matching no planned row is REFUSED rather than silently ignored",
+              _p6p.returncode == 2 and "no-such-file.py" in _p6p.stderr, _p6p.stderr[-600:])
+        check("[-13] D6 ...and the refusal lists what WAS measured, so a typo cannot read as applied",
+              "measured" in _p6p.stderr.lower(), _p6p.stderr[-600:])
+        _p6pok = run_in_gov(_g13, "adopt", "--target", str(_t6p), "--write",
+                            "--pin", "scripts/demo/verbatim-one.py=" + _sh13[0])
+        check("[-13] D6 LIVENESS ...while a pin that DOES match still succeeds",
+              _p6pok.returncode == 0, _p6pok.stdout[-400:] + _p6pok.stderr[-400:])
+
+        # D14: the remedy `update` prints named an invocation `adopt` always refuses, in the one
+        # sentence that exists to stop an operator concluding the tool is broken.
+        _gk14 = govkit_module()
+        _src14 = (HERE / "govkit.py").read_text(encoding="utf-8")
+        check("[-13] D14 the unattributed remedy names an invocation that can actually work",
+              "--re-adopt --pin" in _src14 and "adopt --pin <path>=<rev>` supplies one"
+              not in _src14, "the remedy still names the refusing form")
+
+        _S11_EXTRA = ('\n[[files]]\ninclude = "seed-one.py"\nrole = "seed"\n\n'
+                      '[[files]]\ninclude = "block.txt"\nrole = "merged"\n'
+                      'block_id = "demo:block"\nmarker_style = "hash-comment"\n'
+                      'to = "hooks/pre-commit"\n\n'
+                      '[[lf_pin]]\npattern = "*.sh"\n')
+        # THE MARKER PAIR IS `marker_pair`'s, not a shape invented here. It synthesizes
+        # `# <block_id>` / `# /<block_id>` for `hash-comment`, and a fixture spelling any other
+        # pair produces a source `find_block` cannot read — which reads as "the feature does not
+        # work" and is really "the fixture never triggered it". Cost one round here.
+        _BLOCK = "# demo:block\nechodemo\n# /demo:block\n"
+        _W1s = dict(_W1, **{"seed-one.py": "seed-v1\n", "block.txt": _BLOCK})
+        _g11, _sh11 = a13_gov("s11", [_W1s, _W2], a13_kit(_S11_EXTRA))
+        _t11 = a13_target("s11", "scripts", {
+            "scripts/demo/verbatim-one.py": b"v1\n",
+            "scripts/demo/seed-one.py": b"the target rewrote its own seed entirely\n",
+            "hooks/pre-commit": b"#!/bin/sh\n# demo:block\nechodemo\n# /demo:block\n",
+            ".gitattributes": b"*.sh text eol=lf\n"})
+        _p11 = run_in_gov(_g11, "adopt", "--target", str(_t11), "--write")
+        check("[-13] AC13 adopt exits 0 over a descriptor declaring an lf_pin and a merged rule",
+              _p11.returncode == 0, _p11.stdout + _p11.stderr)
+        _rec11 = a13_receipt(_t11)
+        _attr = [f for f in _rec11["files"] if f.get("role") == "attributes"]
+        check("[-13] AC13 the receipt carries EXACTLY ONE synthesized `attributes` row",
+              len(_attr) == 1 and _attr[0]["path"] == ".gitattributes",
+              str([f["path"] for f in _attr]))
+        check("[-13] AC13 ...carrying neither identity and no `evidence`, per S11",
+              not any(k in _attr[0] for k in ("gov_oid", "oid", "evidence")) if _attr else False,
+              str(_attr[0]) if _attr else "no row")
+        _mrg = [f for f in _rec11["files"] if f.get("role") == "merged"]
+        check("[-13] AC13 ...and a `merged` row in apply's shape, with the block_id `check` reads",
+              len(_mrg) == 1 and _mrg[0].get("block_id") == "demo:block", str(_mrg))
+        _pc11 = run_in_gov(_g11, "check", "--target", str(_t11))
+        check("[-13] AC13 ...so `check` reports the merged block rather than raising KeyError",
+              "Traceback" not in (_pc11.stdout + _pc11.stderr), _pc11.stdout + _pc11.stderr)
+        _seed = a13_row(_rec11, "scripts/demo/seed-one.py")
+        check("[-13] AC14 the fixture really produced an UNATTRIBUTED `seed` row",
+              _seed.get("role") == "seed" and _seed.get("evidence") == "unattributed", str(_seed))
+        settle(_t11, "receipt")
+        _before11 = (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes()
+        _pu11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        check("[-13] AC14 the unattributed SEED row reaches its own disposition, not S7's skip",
+              "[seed" in _pu11.stdout and "reseed" in _pu11.stdout.lower(), _pu11.stdout)
+        check("[-13] AC14 ...and the synthesized `attributes` row reaches `-2`'s pins arm",
+              "[attributes" in _pu11.stdout, _pu11.stdout)
+        check("[-13] AC14 ...and neither writes a byte",
+              (_t11 / "scripts" / "demo" / "seed-one.py").read_bytes() == _before11)
+
+        # ---- `EVIDENCE_STATES` IS LOAD-BEARING OR IT IS A SECOND SPELLING. A tuple nothing reads
+        # ---- is exactly the two-answers-to-one-question shape: the real enum would live in the
+        # ---- branches that assign the field, and the constant would drift beside them saying
+        # ---- nothing. These two arms make it the answer. The first joins it to the values a real
+        # ---- run WROTE; the second to every literal the engine can assign, so a fourth state added
+        # ---- in a branch reds here rather than shipping undeclared.
+        _GK13 = govkit_module()
+        # THE PINNED ROW IS CARRIED IN EXPLICITLY. Its receipt belongs to a fixture the AC8 arms
+        # re-adopt READ-ONLY afterwards, so re-reading it here would work today and stop working the
+        # first time somebody adds a `--write` to one of those arms. The row object is the evidence.
+        _seen13 = {f["evidence"] for f in (_rec13["files"] + _rec11["files"] + [_pinned])
+                   if "evidence" in f}
+        check("[-13] every `evidence` value a real run wrote is a declared state",
+              _seen13 <= set(_GK13.EVIDENCE_STATES),
+              f"{sorted(_seen13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
+        check("[-13] LIVENESS ...over a population carrying THREE of them, not one",
+              len(_seen13) >= 3, str(sorted(_seen13)))
+        _lit13 = set(_re.findall(r'\["evidence"\]\s*=\s*"([a-z-]+)"', _g13src)) | set(
+            _re.findall(r'"evidence":\s*"([a-z-]+)"', _g13src))
+        check("[-13] ...and every literal the ENGINE can assign to `evidence` is declared too",
+              _lit13 and _lit13 <= set(_GK13.EVIDENCE_STATES),
+              f"{sorted(_lit13)} vs {sorted(_GK13.EVIDENCE_STATES)}")
+
 
         # ============================================================= DEPL-dCarriedReceipt-6
         # The silenced-gate-leg bar. `apply` emitted a target's gate legs and asked, of the leg's
@@ -6022,6 +6261,52 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-6] S3 ...while a leg no plan row would satisfy IS previewed as silenced",
               "SILENT" in _p6planbad.stdout and "absent-engine.sh" in _p6planbad.stdout,
               _p6planbad.stdout)
+
+        # ---- D7, from the closing review. Every `-6` arm above declares `kind = "manifest"`, so
+        # ---- the ORDER branch — taken whenever a target has not promoted a runner, which is the
+        # ---- normal state of a fresh adopter — was graded by nothing, and it wrote every silenced
+        # ---- leg into `.governance/outbox/gate-legs.md` as an INSTRUCTION with no warning at all.
+        def a6_target_norunner(tag: str) -> pathlib.Path:
+            t = tmp / f"a6tn-{tag}"
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(
+                'gov_source = "local"\nprefix = "scripts"\nkits = ["demo"]\n',
+                encoding="utf-8", newline="\n")
+            (t / "README.md").write_text("t\n", encoding="utf-8", newline="\n")
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "base")
+            return t
+
+        _t6n = a6_target_norunner("bad")
+        _a6n = run_in_gov(_g6bad, "apply", "--target", str(_t6n), "--kits", "demo")
+        _ordp = _t6n / ".governance" / "outbox" / "gate-legs.md"
+        check("[-6] D7 LIVENESS the no-runner fixture really took the ORDER branch",
+              _ordp.is_file() and "ORDERED, not emitted" in _a6n.stdout,
+              _a6n.stdout[-700:] + _a6n.stderr[-400:])
+        _ordt = _ordp.read_text(encoding="utf-8") if _ordp.is_file() else ""
+        # SCOPED TO THE INSTRUCTION HALF. The whole-file absence test the first cut used matched the
+        # WITHHELD block's own line and redded on a correct order — the assertion has to be about
+        # where the leg appears, not whether its name appears at all.
+        _ord_instr = _ordt.split("## WITHHELD", 1)[0]
+        check("[-6] D7 a silenced leg is NOT written into the order as an instruction",
+              "demo leg" not in _ord_instr, _ord_instr)
+        check("[-6] D7 ...it is listed under WITHHELD rather than dropped, because an order that "
+              "silently omits a leg reads like a kit that declares none",
+              "WITHHELD" in _ordt and "demo leg" in _ordt, _ordt)
+        check("[-6] D7 ...the run REPORTS it, where before the order branch was silent",
+              _a6n.returncode == 1 and "ordering it would" in _a6n.stdout,
+              _a6n.stdout[-900:])
+        check("[-6] D7 ...and the healthy sibling leg IS still ordered",
+              "demo sibling" in _ordt, _ordt)
+        _t6n2 = a6_target_norunner("ok")
+        _a6n2 = run_in_gov(_g6ok, "apply", "--target", str(_t6n2), "--kits", "demo")
+        check("[-6] D7 LIVENESS a no-runner target whose legs all resolve still exits 0",
+              _a6n2.returncode == 0, _a6n2.stdout[-600:] + _a6n2.stderr[-400:])
 
         # ---- S6: ONE index reader. The legs step used an inline `git ls-files` split on newlines
         # ---- beside a `tracked()` that already existed — two spellings of one question, in the one
