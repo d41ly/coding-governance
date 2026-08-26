@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6
+ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10
 ---
 
 # dTieredTribunal — one review harness for every review kind a build needs
@@ -84,7 +84,7 @@ owner's turn from.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6
+ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
