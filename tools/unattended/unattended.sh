@@ -1548,16 +1548,75 @@ unit_ids_of() { # slug
 # The ids verb_plan already derives, lifted so the listing and the join cannot disagree about what a
 # unit's id IS. A spec whose heading and status header disagree is then invisible to both halves in
 # the same way, rather than counted present by one and absent by the other.
-spec_ids() { # dir
-  local dir="$1" spec
-  for spec in $(git ls-files "$dir/spec/*.md" 2>/dev/null); do
-    awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ /{ hdr=1 } /^# [A-Za-z0-9][A-Za-z0-9-]* /{ if (id=="") id=$2 } END { if (hdr && id != "") print id }' "$spec"
-  done | sort -u
+# TOOL-aCollapsedScan-1 - ONE awk pass over a build's specs, so every later read of a spec's id or
+# status is a map lookup and not a process.
+#
+# WHY THIS EXISTS, in numbers rather than in taste. `verb_plan` resolved a region id to its spec by
+# running an awk per (unit, spec) pair until one matched, and the pass above it read each spec's
+# status and heading with two more. Measured on node `a` 2026-08-26: a 24-spec build cost 16.6 s
+# against 1.5 s for a one-spec build, and check 30 of the sibling checker - an UNGUARDED merge-bar
+# leg - walks this verb over every tracked build for 235 s of a 289 s leg. The same diagnosis and the
+# same fix are already recorded for the gate self-test in `run-unattended-gates.sh`: the unit of cost
+# on this platform is process creation, and it is the only term in that product this repo owns.
+#
+# POSIX AWK, deliberately. The obvious spelling is gawk's `ENDFILE`, and this kit is copy-installed
+# into repos whose awk is not gawk. `FNR==1` flushes the PREVIOUS file instead and `END` the last.
+#
+# A ZERO-LINE SPEC EMITS NO ROW, because `FNR==1` never fires for it. That is not a hole and it is
+# not luck: every caller iterates the FILE LIST and looks the path up, so an absent row reads as an
+# empty status - the same `NOT A UNIT (no status header)` row the per-spec awk produced for it.
+# THE EMITTER IS PURE and the map-filler is a separate caller, which is not tidiness. The first cut
+# of this unit had ONE function that filled globals, and rewrote `spec_ids` to read them - and
+# `--close`'s build-complete term calls `spec_ids` through `missing_units` with no `verb_plan` frame
+# anywhere above it, so it read a map nobody had filled. Under `set -u` that is not a wrong answer,
+# it is `SPEC_ID: unbound variable` on stderr and twelve red arms in the driver suite. The grep that
+# was supposed to have found that call site was truncated by a `head -20` and read as a complete
+# inventory, which is the vacuous-selector class this repo names everywhere else.
+spec_facts() { # spec paths... -> one "<path>\t<heading id>\t<status>" row per spec, on stdout
+  [ "$#" -gt 0 ] || return 0
+  awk '{ sub(/\r$/,"") }
+    FNR==1 { if (f != "") print f "\t" id "\t" st; f=FILENAME; id=""; st="" }
+    /^# [A-Za-z0-9][A-Za-z0-9-]* / { if (id == "") id=$2 }
+    /^\*\*Status:\*\* [A-Z]+ / { if (st == "") st=$2 }
+    END { if (f != "") print f "\t" id "\t" st }' "$@"
+}
+# ASSIGNED AT DECLARATION, not merely declared. `declare -A X` alone leaves X unset as far as `set -u`
+# is concerned until something assigns to it, so `${#X[@]}` on a never-filled map is a hard error and
+# not the zero it looks like. The `=()` is what makes the emptiness tests below answerable.
+declare -A SPEC_ID=() SPEC_ST=() SPEC_PATH=()
+load_spec_facts() { # spec paths... -> fills the three maps, replacing whatever they held
+  SPEC_ID=(); SPEC_ST=(); SPEC_PATH=()
+  [ "$#" -gt 0 ] || return 0
+  local p i st
+  while IFS=$'\t' read -r p i st; do
+    [ -n "$p" ] || continue
+    SPEC_ID["$p"]="$i"; SPEC_ST["$p"]="$st"
+    # FIRST path wins, which is what the nested scan this replaces did by breaking on its first
+    # match over this same `git ls-files` order.
+    [ -z "$i" ] || [ -n "${SPEC_PATH[$i]:-}" ] || SPEC_PATH["$i"]="$p"
+  done < <(spec_facts "$@")
+}
+# TOOL-aCollapsedScan-1 - it KEEPS its `dir` argument and its own read, and takes the whole build in
+# ONE awk instead of one per spec. STATELESS on purpose: `--close` reaches it through `missing_units`
+# with no `verb_plan` frame above, so a version that read the shared maps would read whatever the
+# process happened to have loaded - which in that path is nothing at all.
+spec_ids() { # dir -> every spec id under this build that parses as a unit, sorted, one per line
+  local dir="$1" specs
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
+  [ -n "$specs" ] || return 0
+  # BOTH fields required, which is the predicate the per-spec awk applied with `if (hdr && id != "")`.
+  spec_facts $specs | awk -F'\t' '$2 != "" && $3 != "" { print $2 }' | sort -u
 }
 missing_units() { # slug · dir
   # THE STATUS IS TESTED. `set -u` is on and `set -e` is not, so a status this caller did not read
   # would change nothing observable however carefully roster_ids returned it - which is the defect
   # round 2 found in S5's first draft: the item would have gone green over a surviving vacuous pass.
+  #
+  # TOOL-aCollapsedScan-1 tried handing the roster ids in from `verb_plan`, which had already
+  # derived them, and that was WRONG for a reason the signature hides: `--close`'s build-complete
+  # term is the OTHER caller, it has no derived roster to hand in, and its `if ! _bcmiss=$(...)`
+  # depends on the exit 3 this function forwards. Deriving twice costs four processes per build and
+  # keeps one contract; the saving was not worth two.
   #
   # The `[ -n "$want" ] || return 0` guard that stood here is GONE. With the pair mandatory on every
   # tracked build README it is unreachable, and it was measured INERT anyway: `comm` over an empty
@@ -1649,6 +1708,10 @@ verb_plan() { # slug
     fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
     return 1
   fi
+  # ONE read of every spec, before any per-spec question below is asked. UNQUOTED on purpose:
+  # `$specs` is the newline-separated `git ls-files` output that every loop below already
+  # word-splits, so this adds no assumption the surrounding code does not already make.
+  load_spec_facts $specs
   # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
   # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
   # with none has no row to appear in. Five tracked specs produce the first row today and ZERO produce
@@ -1659,16 +1722,27 @@ verb_plan() { # slug
   # inline count that stood here was a third spelling of that predicate, looser than the generator's,
   # so the stale-region refusal could name an inert repair. Latent — zero of 277 tracked specs
   # disagree today — and removed rather than left to be discovered by the first one that does.
-  local _sid _renderable
-  _renderable=$(spec_ids "$dir" | grep -c . || true)
+  # TOOL-aCollapsedScan-1 - both readers below are map lookups now, and the count comes off those
+  # maps rather than being priced with a sort and a grep. `basename` went too: it is an exec and
+  # the expansion is not.
+  #
+  # WHAT THIS COUNTS, said exactly rather than approximately. `spec_ids` deduplicates, so it
+  # counted distinct IDS; this counts SPECS carrying both fields. The two differ only where two
+  # specs claim one id, and the sole reader below asks `-gt 0`, on which they cannot differ. The
+  # predicate per spec is identical either way - both fields present - and that is the part the
+  # stale-region refusal depends on.
+  local _sid _renderable=0 _p
+  [ "${#SPEC_ID[@]}" -eq 0 ] || for _p in "${!SPEC_ID[@]}"; do
+    [ -n "${SPEC_ID[$_p]}" ] && [ -n "${SPEC_ST[$_p]}" ] && _renderable=$((_renderable + 1))
+  done
   for spec in $specs; do
-    st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
+    st="${SPEC_ST[$spec]:-}"
     if [ -z "$st" ]; then
-      printf '%-34s %-11s %s\n' "$(basename "$spec")" "-" "NOT A UNIT (no status header)"
+      printf '%-34s %-11s %s\n' "${spec##*/}" "-" "NOT A UNIT (no status header)"
       continue
     fi
-    _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$spec")
-    [ -n "$_sid" ] || printf '%-34s %-11s %s\n' "$(basename "$spec")" "$st" "NOT A UNIT (heading id does not parse)"
+    _sid="${SPEC_ID[$spec]:-}"
+    [ -n "$_sid" ] || printf '%-34s %-11s %s\n' "${spec##*/}" "$st" "NOT A UNIT (heading id does not parse)"
   done
 
   # R2-H2 — the EMPTY-REGION guard, ordered HERE and conditioned on `_renderable`. Above the two
@@ -1702,21 +1776,18 @@ verb_plan() { # slug
   # empty region, and the verb answered `next: none - every tracked spec is terminal` at exit 0 — a
   # false all-clear on the one verb an agent reads to pick up work.
   local _ids _graded=0
-  _ids=$(printf '%s
-' "$_rows" | while IFS= read -r _row; do
-        printf '%s
-' "$_row" | grep -oE "[A-Z]+-$slug-[0-9]+" | head -1
-      done)
+  # TOOL-aCollapsedScan-1 - ONE awk over the whole region, where this ran a printf, a grep and a
+  # head PER ROW. `match` returns the FIRST occurrence on the line, which is exactly what the
+  # `head -1` bought and for the same reason: a rendered row spells its id twice, once as the
+  # link text and once inside the link target.
+  _ids=$(printf '%s\n' "$_rows" | awk -v s="$slug" '
+      { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }')
   if [ -n "$_rows" ] && [ -z "$_ids" ]; then
     fail 42 "the generated units region carries rows but none names an id of this build, so this verb has no unit set to grade: $_rmp"
     return 1
   fi
   for id in $_ids; do
-    spec=""
-    for _c in $specs; do
-      _sid=$(awk '{ sub(/\r$/,"") } /^# [A-Za-z0-9][A-Za-z0-9-]* / { print $2; exit }' "$_c")
-      [ "$_sid" = "$id" ] && { spec="$_c"; break; }
-    done
+    spec="${SPEC_PATH[$id]:-}"
     # S7 - a region row whose id no tracked spec defines. It cannot arise while the region is rendered
     # FROM those specs, but S1 makes it representable and a row that fell through would be invisible.
     # Distinct from the authored pair's MISSING, which is about a PLANNED unit nobody has specced.
@@ -1727,7 +1798,7 @@ verb_plan() { # slug
     # The status comes from the spec the id resolved to. Its two unparseable shapes were reported by
     # the S6 pass above and cannot reach here: a row exists in the region only for a spec whose status
     # header parsed, so this branch grades a file already known to be a unit.
-    st=$(awk '{ sub(/\r$/,"") } /^\*\*Status:\*\* [A-Z]+ / { print $2; exit }' "$spec")
+    st="${SPEC_ST[$spec]:-}"
     state=$(plan_state "$spec")
     case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
     printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
