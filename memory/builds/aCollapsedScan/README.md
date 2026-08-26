@@ -71,11 +71,12 @@ without that ceiling being re-measured.
 | 2 | `TOOL-aCollapsedScan-7` | 2 | `repo_root()` walks up for the conf instead of asking git, as `govkit.py` already does for this defect; the kit's second resolver goes |
 | 3 | `TOOL-aCollapsedScan-4` | 1 | `BUDGET_kit_gate` re-declared against a node-`a` measurement, with the scoping alternative refused in writing |
 | 4 | `TOOL-aCollapsedScan-6` | 1 | retires the finding — hygiene check 20 already gates per-file id uniqueness; flips to WONTDO only after its record corrections are observed |
+| 5 | `TOOL-aCollapsedScan-13` | 2 | the hygiene gate reaches its data with builtins and one prebuilt map instead of ~4900 process spawns |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-26 · streams tooling
+**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-08-26 · streams tooling
 ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 TOOL-aCollapsedScan-8 TOOL-aCollapsedScan-9 TOOL-aCollapsedScan-10 TOOL-aCollapsedScan-11 TOOL-aCollapsedScan-12 TOOL-aCollapsedScan-13
 
 <!-- gen:build-units -->
@@ -85,13 +86,14 @@ ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aColl
 | [TOOL-aCollapsedScan-7 — `repo_root()` takes the walk-up govkit already took for this defect](spec/2026-08-26-spec-TOOL-aCollapsedScan-7.md) | 2 | 2 | CLOSED | rev-2 | 2026-08-26 |
 | [TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused](spec/2026-08-26-spec-TOOL-aCollapsedScan-4.md) | 3 | 1 | CLOSED | rev-3 | 2026-08-26 |
 | [TOOL-aCollapsedScan-6 — RETIRED: hygiene check 20 already gates per-file id uniqueness](spec/2026-08-26-spec-TOOL-aCollapsedScan-6.md) | 4 | 1 | WONTDO | rev-2 | 2026-08-26 |
+| [TOOL-aCollapsedScan-13 — the hygiene gate stops spawning a process per file, and per criterion](spec/2026-08-26-spec-TOOL-aCollapsedScan-13.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-08-26 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aCollapsedScan-13.
 
-Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1.
+Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-13.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -102,6 +104,7 @@ Ids no `spec-audit` record has ever named: TOOL-aCollapsedScan-1.
 | 2 | `TOOL-aCollapsedScan-7` | no |
 | 3 | `TOOL-aCollapsedScan-4` | no |
 | 4 | `TOOL-aCollapsedScan-6` | no |
+| 5 | `TOOL-aCollapsedScan-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

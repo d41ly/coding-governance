@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: b679190c64e7256ff145e4637d8eb322b5ef9622
-phase: REVIEWING
+witness: cfb962a600e9129a7d186d6757600aaeb3aa5fca
+phase: BUILDING
 mode: slug
 anchor-kind: default-branch
 keepalive: dc48400e
@@ -36,3 +36,5 @@ base: 3c37a1fbd2ac54449e98386dd5a6b047e0dbfbaf
 2026-08-26T14:16:27Z review · item aCollapsedScan · reason verdict CLEAN WITH FIXES · blockers 2
 
 2026-08-26T15:36:55Z review · item aCollapsedScan · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-26T18:04:35Z rescope · item add TOOL-aCollapsedScan-13 · reason owner-instructed 2026-08-26: the memory hygiene leg is spawn-bound, the same class this build removed from --plan, and it is the leg gating every commit in this run
