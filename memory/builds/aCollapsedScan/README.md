@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-26
 streams: tooling
 roster: TOOL
-ids: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5
+ids: TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7
 ---
 
 # aCollapsedScan — `--plan` stops paying a process per (unit, spec)
@@ -64,7 +64,7 @@ without that ceiling being re-measured.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-08-26 · streams tooling
-ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5
+ids TOOL-aCollapsedScan-1 TOOL-aCollapsedScan-2 TOOL-aCollapsedScan-3 TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-5 TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
