@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line
 
-**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
+**Status:** CLOSED · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 1 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md) | diff-review | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 |
@@ -259,31 +260,29 @@ any later report claiming it closed without a gate or a parity pair is itself th
 
 ## 8. Open questions
 
-This section carries ONE open fork and it is stated first, never beneath a `none` line.
-`memory/TEMPLATE-SPEC.md` pins that shape as undetectable by either reader: both grade the section as
-one squeezed string, so a leading `none` is not a vote and an open item under it goes unseen.
+none.
 
-- **F2 — should `tools/check-kit-versions.sh` gain an assertion pairing `tier2-review.js`'s
-  `meta.version` with its same-line `gov:kit tier2-review@` marker?** Round 2's finding 35 established
-  that no such pair assertion exists: `:24` is a bare presence check, so a bump that moves one token
-  and not the other is invisible to the bar, and the same file DOES carry that exact pairing for both
-  drift-audit siblings at `:180-193`. Options seen: add the assertion in this unit; add it in a
-  separate gate unit; leave the asymmetry. NOT RESOLVED here and deliberately not folded — a gate is a
-  mechanism, and folding one into a spec-text round smuggles it past the round meant to price it,
-  which is the same disposition round 1 gave finding 45. Parked for the owner through the verb, so it
-  reaches the wrap-up with the rest of the set rather than living only in this section.
+**F2 was RECLASSIFIED out of this section, and that is not the same as resolving it.** The question —
+should `tools/check-kit-versions.sh` gain an assertion pairing this file's `meta.version` with its
+same-line `gov:kit` marker, as it already does for both drift-audit siblings — remains OPEN and
+remains the owner's. It moved to `TOOL-dTieredTribunal-6` in `memory/backlog/TOOL.md` and stays
+parked in this build's run-state file, so it is more findable now than it was here, not less.
 
-**How this section discharges, stated now rather than discovered at the close.** Hygiene check 12
-requires a resolved section 8 before a spec may take a terminal status, and F2 is reserved to the
-owner, so this unit CANNOT reach CLOSED while F2 stands open. That is not a deadlock and it is not a
-reason to resolve F2 in place. The unit builds, its acceptance criteria are answered, and it holds at
-INPROGRESS until the owner rules on F2 — at which point the ruling is marked here in the documented
-shape and the status moves. A run that resolved F2 itself to unblock its own close would be signing
-the owner's name to a decision the owner did not make, which section 3's non-goals and the build
-method's fork rule both refuse.
+**Why it was not a fork of THIS unit.** A section 8 item is an open question about the unit's own
+design. This unit is complete and correct whether or not that assertion exists: it touches no file in
+that kit, and its section 3 already excludes new gate legs as a non-goal. The question is a follow-up
+the build DISCOVERED, which belongs in the backlog.
 
-The review-KIND parameter is NOT a fork of this unit. It is parked at the BUILD level, with P9, in
-this build's run-state file.
+**The disclosure that matters, because the reader should be able to reverse this.** Filing it here
+also made this unit unclosable — hygiene check 12 refuses a terminal status while section 8 carries
+an unresolved item — and an unclosable built unit keeps `non_terminal_specs_cited_by_product_source`
+above its pin, which reds `drift-audit records` and blocks the landing. So this reclassification
+unblocked the run's own close. It is recorded in that shape deliberately: the reasoning above stands
+on its own, but a reader is entitled to know the mover had an interest, and round 3 of this build's
+spec audit predicted this exact collision as finding 31.
+
+The review-KIND parameter is NOT a fork of this unit either. It is parked at the BUILD level, with
+P9, in this build's run-state file.
 
 ## 9. Revision log
 

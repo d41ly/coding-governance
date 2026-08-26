@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue
 
-**Status:** INPROGRESS · rev-4 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
+**Status:** CLOSED · rev-4 · 2026-08-26 · node a · Tier-1 · base da9e4cd2 · order 1 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md) | diff-review | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-3 |
@@ -141,7 +142,7 @@ This unit adds no leg.
 
 ## 7. Open questions
 
-**F1 — what makes the class selectable on a fold diff.** RESOLVED (agent, 2026-08-26, delegated).
+- **F1 — what makes the class selectable on a fold diff.** RESOLVED (agent, 2026-08-26, delegated).
 
 Round 1 of this build's spec audit measured that the record as first scoped could never be selected
 on the one diff class §1 says it exists to serve. Two arms were available, and only one survives.

@@ -1,11 +1,12 @@
 # TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries
 
-**Status:** INPROGRESS · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** CLOSED · rev-5 · 2026-08-26 · node a · Tier-2 · base da9e4cd2 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md](../build/2026-08-26-build-TOOL-dTieredTribunal-1-acceptance-ledger.md) | journal | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-closing-diff.md) | diff-review | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round1.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
 | [2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md](../reviews/2026-08-26-review-TOOL-dTieredTribunal-1-spec-audit-round2.md) | spec-audit | TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 |
