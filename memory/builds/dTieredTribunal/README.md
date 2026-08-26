@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10
+ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15
 ---
 
 # dTieredTribunal — one review harness for every review kind a build needs
@@ -45,7 +45,9 @@ one a document asks a human to remember in 5–27%.
 - **Scope is both halves**: the single review pass AND the round/convergence loop M4 and M8 describe.
 - **`BUILD-METHOD.md` M4/M8 and `REVIEW-PROTOCOL.md` are in scope as PROPOSALS**, not as edits.
 - **Any design fits the caps the hook actually resolves.** File constants in `tools/hooks/agent-cap.js`.
-- **The headline goal is NOT delivered.** One engine for every review kind is P1, and P1 is parked.
+- **The headline goal IS delivered, in a SECOND run.** Run one parked P1, which needs an M4
+  amendment M3 veto 2 reserves to the owner. Granted at `TOOL-dTieredTribunal-7`; `-8` sequences
+  P5 behind P11, `-9` picks the left-shift mechanism. Units 11-15 are that work.
 - **CORRECTION to the problem slot, recorded here because M3 reserves that slot from this run.** It
   says a hand-written driver re-loses four things and only `tier2-review.js` carries any. Two are
   wrong: both siblings DO assign ids in the orchestrator and DO treat a missing verdict as unverified.
@@ -72,6 +74,14 @@ one a document asks a human to remember in 5–27%.
 | 1 | `TOOL-dTieredTribunal-1` | 2 | the harness READS the blocker count it already asks for, and instructs the verdict line |
 | 1 | `TOOL-dTieredTribunal-2` | 1 | the fold writes text nobody reviews, and that class is not in the catalogue |
 | 2 | `TOOL-dTieredTribunal-3` | 2 | the two drift-audit harnesses gain the trust accounting their sibling already carries |
+| 1 | `TOOL-dTieredTribunal-15` | 1 | the false-clean family enters the catalogue a reviewer is handed |
+| 2 | `TOOL-dTieredTribunal-13` | 2 | the marked-derivation branch requires every reference bounded |
+| 3 | `TOOL-dTieredTribunal-14` | 2 | the ref-keyed-join ban reaches an inline script |
+| 4 | `TOOL-dTieredTribunal-11` | 2 | the subject descriptor — one engine drives a spec audit too |
+| 5 | `TOOL-dTieredTribunal-12` | 2 | M4 stops forbidding what the harness can now do |
+
+Rows 1 to 3 are the FIRST run, landed 2026-08-26 and CLOSED. Rows 11 to 15 are the SECOND run,
+which delivers the goal the first one parked. The two orders are per-run and restart at 1.
 
 The owner's narrowing did not arrive with the invocation, so the standing mandate carried it. The
 criterion is stated in full in Build-level rules above and has two parts, because carrier-freeness
@@ -83,30 +93,39 @@ owner's turn from.
 
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-08-25 · streams tooling
-ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10
+**Build status:** SPECCED · 8 unit(s) · node d · opened 2026-08-25 · streams tooling
+ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12
+ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dTieredTribunal-1 — the harness READS the blocker count it already asks for, and instructs the verdict line](spec/2026-08-26-spec-dTieredTribunal-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-26 |
+| [TOOL-dTieredTribunal-15 — the false-clean family enters the catalogue](spec/2026-08-26-spec-dTieredTribunal-15.md) | 1 | 1 | SPECCED | rev-1 | 2026-08-26 |
 | [TOOL-dTieredTribunal-2 — the fold writes text nobody reviews, and that class is not in the catalogue](spec/2026-08-26-spec-dTieredTribunal-2.md) | 1 | 1 | CLOSED | rev-4 | 2026-08-26 |
+| [TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded](spec/2026-08-26-spec-dTieredTribunal-13.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-26 |
 | [TOOL-dTieredTribunal-3 — the two drift-audit harnesses gain the trust accounting their sibling already carries](spec/2026-08-26-spec-dTieredTribunal-3.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-26 |
+| [TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script](spec/2026-08-26-spec-dTieredTribunal-14.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-26 |
+| [TOOL-dTieredTribunal-11 — the subject descriptor — one engine drives a spec audit too](spec/2026-08-26-spec-dTieredTribunal-11.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-26 |
+| [TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do](spec/2026-08-26-spec-dTieredTribunal-12.md) | 5 | 2 | SPECCED | rev-1 | 2026-08-26 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dTieredTribunal-1`, `TOOL-dTieredTribunal-2` | yes |
-| 2 | `TOOL-dTieredTribunal-3` | no |
+| 1 | `TOOL-dTieredTribunal-1`, `TOOL-dTieredTribunal-15`, `TOOL-dTieredTribunal-2` | yes |
+| 2 | `TOOL-dTieredTribunal-13`, `TOOL-dTieredTribunal-3` | yes |
+| 3 | `TOOL-dTieredTribunal-14` | no |
+| 4 | `TOOL-dTieredTribunal-11` | no |
+| 5 | `TOOL-dTieredTribunal-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
