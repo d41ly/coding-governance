@@ -55,7 +55,9 @@ def repo_root() -> pathlib.Path:
     test that copies the kit in resolves to that repo rather than to wherever the runner stood.
 
     WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice
-    `tools/govkit/govkit.py:83` already made for the same measured reason. `git -C <dir> rev-parse
+    `tools/codebase-map/map_lib.py`'s `resolve_root` already made for the same measured reason,
+    and which `tools/govkit/govkit.py` reached for the same defect WITHOUT the boundary - its walk
+    is still unbounded, which is `TOOL-aCollapsedScan-12`. `git -C <dir> rev-parse
     --show-toplevel` returns <dir> ITSELF when an absolute GIT_DIR is inherited and no
     GIT_WORK_TREE names a tree, because git then treats the current directory as the work tree.
     That is exactly what git exports to a merge driver inside a LINKED WORKTREE, and it is how the
@@ -69,8 +71,10 @@ def repo_root() -> pathlib.Path:
     already pins eight names for that job under `TOOL-dScrubbedConduit-1`, with one deliberate
     exclusion; a second list here would be a ninth thing to keep current. The walk inherits nothing.
 
-    The two answers coincide by construction: `resolve()` refuses a root that does not hold
-    `.memory-tree.conf`, so the nearest ancestor holding it IS the only root this kit can use.
+    THEY DO NOT ALWAYS COINCIDE, and an earlier revision of this docstring said they did. The
+    nearest conf-holding ancestor is deliberately NOT the answer once a `.git` boundary intervenes -
+    see the walk below, which is where that rule lives. Where no boundary intervenes the two agree,
+    because `resolve()` refuses a root that does not hold `.memory-tree.conf`.
     """
     here = pathlib.Path(__file__).resolve()
     for parent in here.parents:
@@ -91,7 +95,8 @@ def repo_root() -> pathlib.Path:
             return parent
         if (parent / ".git").exists():
             break
-    # NO CONF ABOVE THE KIT: keep the old git answer, so `resolve()` raises ITS refusal - the one
+    # NO USABLE CONF ON THE WALK - none at all, or one only beyond the repository boundary. Keep
+    # the old git answer, so `resolve()` raises ITS refusal - the one
     # carrying the copy-pasteable conf stub an adopter needs. This is NOT a fallback that
     # fabricates a passing value: the path it returns is by definition one with no conf on it, so
     # `resolve()` refuses on the very next line. It also cannot mask the defect above, because that

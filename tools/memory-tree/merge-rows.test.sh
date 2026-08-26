@@ -6,10 +6,10 @@
 # `git merge-file` on the identical three blobs. The MECHANICAL never-worse comparison — the driver
 # may not lose a line the control keeps, nor at rc 0 write a row the control does not — can only
 # bind where the control EXITS 0, because only then is its output an ANSWER rather than a conflict
-# to be resolved by hand. Floored below at `NEVER_WORSE_FLOOR`; the live split is in this suite's own PASS line, which derives it
-# so that a fixture edit flipping a control from rc 0 to rc 1 cannot quietly drop a case out of the
-# bar while the group count stays the same. The other 22 are held by the id-set oracle, the
-# duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
+# to be resolved by hand. Floored below at `NEVER_WORSE_FLOOR` so that a fixture edit flipping a
+# control from rc 0 to rc 1 cannot quietly drop a case out of the bar while the group count stays
+# the same; the live split is in this suite's own PASS line, which derives it. The remaining cases
+# are held by the id-set oracle, the duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
 # acceptable and is counted by name against a shrink-only constant, never absorbed.
 #
 # That bar exists because a green suite has twice signed off on corruption here. Three adversarial
@@ -109,7 +109,13 @@ CONSERVATIVE=""
 # How many `run` cases the arithmetic comparison actually BINDS on. A GROW-ONLY floor: without
 # it, a fixture edit that flips a control from rc 0 to rc 1 silently removes a case from the
 # mechanical bar and the suite still prints PASS with the same group count. Measured at 12.
-NEVER_WORSE_FLOOR=12
+# THE THIRD FLOOR LAGS ITS TWO SIBLINGS ON PURPOSE (TOOL-aCollapsedScan-7, closing review round 2).
+# `ngroups` and `nruns` are pure greps of THIS file, so their derived values are the same on every
+# node and were ratcheted to 49 and 40. This bound is not: it counts the controls `git merge-file`
+# exits 0 on, which is a property of the git in hand. Node `a` reads 16 on 2026-08-26 against the 12
+# pinned here, and raising it to 16 would red any node whose git resolves fewer. Raise it when the
+# same reading is confirmed on a second node, not before - the 4-case window is the price.
+NEVER_WORSE_FLOOR=12   # see the note above before raising this
 NEVER_WORSE_BOUND=0
 # Cases where `git merge-file` exits 0 with a WRONG result — it duplicates a row-shaped line at rc 0,
 # which is the single corruption class git commits and the whole justification for this driver. The

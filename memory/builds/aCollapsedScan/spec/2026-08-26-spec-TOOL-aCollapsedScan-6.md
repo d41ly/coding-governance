@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md](../build/2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md) | journal | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-7 |
 | [2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md) | spec-audit | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-7 |
+| [2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md) | diff-review | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-7 |
 
 <!-- /gen:spec-records -->
 

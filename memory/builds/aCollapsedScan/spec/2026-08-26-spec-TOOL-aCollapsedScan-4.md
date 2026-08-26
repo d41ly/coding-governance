@@ -1,12 +1,14 @@
 # TOOL-aCollapsedScan-4 — `BUDGET_kit_gate` re-declared against a measurement, and the scoping refused
 
-**Status:** INPROGRESS · rev-3 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-08-26 · node a · Tier-1 · base 3c37a1fb · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md](../build/2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md) | journal | TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 |
 | [2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md) | spec-audit | TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 |
+| [2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md) | diff-review | TOOL-aCollapsedScan-6 TOOL-aCollapsedScan-7 |
 
 <!-- /gen:spec-records -->
 

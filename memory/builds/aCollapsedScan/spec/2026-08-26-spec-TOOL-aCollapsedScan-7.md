@@ -1,12 +1,14 @@
 # TOOL-aCollapsedScan-7 — `repo_root()` takes the walk-up govkit already took for this defect
 
-**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-2 · base 3c37a1fb · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-08-26 · node a · Tier-2 · base 3c37a1fb · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md](../build/2026-08-26-build-TOOL-aCollapsedScan-7-acceptance-ledger.md) | journal | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 |
 | [2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-4-spec-audit-round1.md) | spec-audit | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 |
+| [2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md](../reviews/2026-08-26-review-TOOL-aCollapsedScan-7-closing-diff.md) | diff-review | TOOL-aCollapsedScan-4 TOOL-aCollapsedScan-6 |
 
 <!-- /gen:spec-records -->
 
