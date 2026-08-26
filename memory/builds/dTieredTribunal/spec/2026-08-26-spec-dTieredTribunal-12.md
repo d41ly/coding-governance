@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-12 — M4 stops forbidding what the harness can now do
 
-**Status:** SPECCED · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 5 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 5 · streams tooling
 
 <!-- gen:spec-records -->
 
