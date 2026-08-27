@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4
+ids: TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4 TOOL-aReapedTicket-5
 ---
 
 # aReapedTicket — the turnstile's queue gets the liveness its beacon already has
@@ -138,7 +138,7 @@ definition until M4 runs.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4
+ids TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4 TOOL-aReapedTicket-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
