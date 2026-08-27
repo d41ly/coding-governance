@@ -1111,7 +1111,14 @@ fi
 # ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
 # ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
 alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
-if [ -n "$alcut" ]; then
+# TOOL-aGroundedOrientation-3 — the `--staged` guard its four structural siblings carry (:667, :1051,
+# :1066, :1076) and this one never got. Without it the pre-commit leg walks all specs and all records
+# on every commit regardless of what is staged, which is 94% of that leg's wall clock: measured
+# 2026-08-27 node `a`, 963 s as shipped against 54 s guarded, uncontended, same staged set. No
+# coverage moves — `.githooks/pre-push` runs the full bar at the push boundary, where STAGED=0 and
+# this block runs exactly as before. The class is the one this file's own :111-112 already documents
+# fixing elsewhere: a fork is ~50-100 ms under MSYS/Windows, and this block spawns thousands.
+if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
   alledger=$(for r in $(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do

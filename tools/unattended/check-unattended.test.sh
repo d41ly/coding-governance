@@ -1846,6 +1846,34 @@ mutate tools/unattended/SKILL.template.md 's/^## Start a run from a PROMPT$/## N
 miss "$(run)" "the Skill's prompt path does not name all three of its ordered steps"
 reset_tree
 
+# TOOL-aGroundedOrientation-2 - the ORIENTATION PROBES precede the build-folder write. Three arms,
+# and the third is the one that earns the section slice: without it every criterion is satisfied by
+# a whole-file grep, which the spec's own 4 rejects. The round-1 spec audit caught exactly that.
+#
+# J, the ORDERING violation: probes moved below the write, so the roster is authored before the
+# probes that inform it.
+reset_tree
+mutate tools/unattended/SKILL.template.md '/RUN the orientation probes/d'
+mutate tools/unattended/SKILL.template.md 's|^5\. \*\*Preflight\*\*|5. RUN the orientation probes\n5. **Preflight**|'
+hit "$(run)" "the Skill's prompt path runs its orientation probes AFTER it writes the build folder, so the roster is authored and pushed before the probes that inform it, and correcting it costs a commit and a push:"
+
+# J, the VACUITY case: the locator gone entirely. Without this arm the ordering comparison runs
+# against an empty string and is GREEN - the same shape check 20's own third arm exists for.
+reset_tree
+mutate tools/unattended/SKILL.template.md '/RUN the orientation probes/d'
+out=$(run)
+hit "$out" "the Skill's prompt path does not name both its orientation-probe step and its build-folder write, so the ordering that puts the probes before the roster cannot be checked at all and would compare against an empty string; it looks for 'RUN the orientation probes' and 'Write the build folder'"
+miss "$out" "runs its orientation probes AFTER it writes the build folder"
+
+# J, THE SECTION SLICE IS OBSERVABLE. The literal is deleted from the prompt path and re-added under
+# a DIFFERENT heading. A file-wide locator finds it there and goes green; a section-scoped one still
+# refuses. This arm is the only thing separating the shipped implementation from the one 4 rejects.
+reset_tree
+mutate tools/unattended/SKILL.template.md '/RUN the orientation probes/d'
+mutate tools/unattended/SKILL.template.md 's|^## While it runs$|## While it runs\n\nRUN the orientation probes\n|'
+hit "$(run)" "the Skill's prompt path does not name both its orientation-probe step and its build-folder write, so the ordering that puts the probes before the roster cannot be checked at all and would compare against an empty string; it looks for 'RUN the orientation probes' and 'Write the build folder'"
+reset_tree
+
 # TOOL-aPromptedMandate-6 fold — the three predicates the CLOSING REVIEW asked for. Each was measured
 # firing against the live tree before its arm was written, which is the claim that failed for exactly
 # one arm in this build and is why these say so explicitly.
