@@ -113,7 +113,9 @@ item present ONLY a conforming mark resolves it, the first line does not vote, a
 **Which.** Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
 authored this run, is unreviewed.
 
-**Not the harness.** `tier2-review.js` reviews DIFFS; a spec is not code, so calling one reviewed by it is false.
+**The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
+names the spec kind. Undeclared, it acquires a diff and primes code-shaped lenses, so calling
+a spec reviewed by that run is false. The spelling is in that file's own `args` header.
 
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next user prompt to reset it: three specs audited by direct spawns exhaust it mid-set,

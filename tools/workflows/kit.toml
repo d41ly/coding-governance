@@ -45,7 +45,7 @@ the parity gate is this entry's leg and it performs its own render comparison; t
 name = "verifier fan-out self-test"
 subject = "kit"
 argv = ["bash", "{kit}/check-verifier-fanout.test.sh"]
-guard = ["{kit}/"]
+guard = ["{kit}/", "{prefix}/hooks/"]
 
 [[gate_leg]]
 name = "review-join ban (no ref-keyed join)"
@@ -60,10 +60,16 @@ argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 
 [[gate_leg]]
+name = "tier2-review self-test"
+subject = "kit"
+argv = ["bash", "{kit}/tier2-review.test.sh"]
+guard = ["{kit}/"]
+
+[[gate_leg]]
 name = "review-join self-test"
 subject = "kit"
 argv = ["bash", "{kit}/check-review-join.test.sh"]
-guard = ["{kit}/"]
+guard = ["{kit}/", "{prefix}/hooks/"]
 
 # Line-ending pins this kit needs in a TARGET. Emitted into the target's own
 # .gitattributes as one govkit-owned block; the renormalize that follows reads git's
