@@ -1,6 +1,6 @@
 # TOOL-aReapedTicket-2 — the acquire loop asserts liveness on the QUEUE, and refuses to wait on what cannot change
 
-**Status:** SPECCED · rev-1 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -111,6 +111,16 @@ false forever. The run cannot acquire and cannot ever acquire, so it must fail o
 reason, rather than burning `TS_MAXWAIT` first to reach the same outcome. Same class as the two
 above: a loop waiting on a condition that cannot change.
 
+**And it needs its own `queued_from` state — `unticketed` — which rev-1 did not foresee.** The
+existing comment above that block reasons explicitly that "an `expired` run has burned at least
+`TS_MAXWAIT` … and therefore never 0", and leans on it to conclude that a `queued 0` is unambiguous.
+A run that fails open on the first tick has a wait of exactly 0, so recording it as `expired` would
+falsify that invariant silently — the `amendment-leaves-its-other-half-standing` class, in the very
+paragraph that states the rule. A fourth state word keeps the sentence true as written instead. The
+key is read BY NAME by the suite's `hdrkey` helper, and that file's own header records that an arm
+counting keys or reading them by position would red on every future addition, so a new member is
+additive by design.
+
 ### Where the sweep is called
 
 Immediately beside `ts_try_reap && continue` at `:523`, and on the same tick. Not before the acquire
@@ -186,7 +196,12 @@ today.
   fixture from `AC1`.
 - **AC6** — When `TS_TICKET` is empty because the ticket write failed, the run fails open immediately
   with a reason naming the ticket, rather than after `TS_MAXWAIT`; asserted by a fixture that makes
-  `$TS_Q` unwritable and bounds the observed wall clock well under the bound.
+  the ticket write impossible and bounds the observed wall clock well under the bound. The portable
+  way to force it is to create `gate-bar-queue` as a FILE — `mkdir -p` then fails and the write
+  cannot succeed — rather than by changing a mode, which a directory this user owns often ignores.
+- **AC7** — The same run records `queued_from` as `unticketed`, distinct from `expired`, so a
+  `queued 0` never has to be disambiguated by guesswork and the existing "an expired run is never 0"
+  invariant stays true. Read from the run-record header by name.
 
 ## 7. Gates
 
@@ -211,6 +226,11 @@ today.
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft, written from the reproductions in the prompt record.
+- rev-2 · 2026-08-27 · added the `unticketed` `queued_from` state and AC7. rev-1 specced the early
+  fail-open without noticing that recording it as `expired` would falsify the invariant the existing
+  comment beside that block states in prose — found while building, by reading the comment the change
+  sat next to rather than by a gate. Also pinned in AC6 the portable way to force a ticket-write
+  failure, after a mode change proved useless on a directory this user owns.
 
 ## 10. Reuse audit
 
