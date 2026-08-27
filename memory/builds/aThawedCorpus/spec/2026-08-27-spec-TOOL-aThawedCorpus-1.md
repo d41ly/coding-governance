@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-1 · base f5dff6ae · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -13,10 +13,10 @@
 
 ## 1. Goal
 
-Check 21 of `tools/memory-tree/check-memory-hygiene.sh` costs 365.6 s of a 470 s full run on node
-`a`, and its filename-projection loop spawns four to six processes for each of 310 records. Collapse
-that loop to one `awk` pass so the leg's dominant term stops being process creation this repo
-controls.
+Check 21 of `tools/memory-tree/check-memory-hygiene.sh` costs 338.9 s of a 1398 s full run on a
+QUIET node `a` — the second-largest term, after check 23 — and its filename-projection loop spawns
+four to six processes for each of 310 records. Collapse that loop to one `awk` pass so this term
+stops being process creation this repo controls.
 
 ## 2. Scope (IN)
 
@@ -33,9 +33,11 @@ controls.
 
 ## 3. Non-goals (OUT)
 
-- **N1** — No skip, cache, freeze or scoping mechanism. That is `TOOL-aThawedCorpus-2` and
-  `TOOL-aThawedCorpus-3`, and buying a policy change to fix a performance bug is the wrong purchase
-  in the wrong order. The precedent is `TOOL-aCollapsedScan-1`, which parked exactly that.
+- **N1** — No skip, cache, freeze or scoping mechanism. That is `TOOL-aThawedCorpus-2`, sequenced
+  after this unit so it is priced against the collapsed baseline. The precedent is
+  `TOOL-aCollapsedScan-1`, which parked exactly that decision for exactly that reason.
+- **N1b** — No overlap with `TOOL-aThawedCorpus-4`, which collapses check 23's loops. Two checks,
+  two grammars, two units.
 - **N2** — No change to what check 21 MEANS. The projection rule, the pin, the unbound escape and
   the four branch texts are untouched.
 - **N3** — No change to `gen_build_index.py --print-bindings`, whose one invocation is not the term
@@ -100,8 +102,9 @@ None. The checker is not a stored artifact and has no consumers other than its o
   unchanged checker's, `diff` reports no difference.
 - **AC2** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, it exits 0 and its red
   fixtures still red.
-- **AC3** — When the instrumented per-check timing is re-taken on node `a` the same way, check 21's
-  own span is under 30 s, against the 365.6 s recorded in this build's measurement record.
+- **AC3** — When the instrumented per-check timing is re-taken on a quiet node `a` the same way,
+  check 21's own span is under 30 s, against the 338.9 s recorded in this build's measurement
+  record, with the foreign-process count reported at both ends of the run.
 - **AC4** — When `python tools/memory-tree/check-arms.py --check` runs, it is green with
   `ARMS_FLOORS` for `tools/memory-tree/check-memory-hygiene.sh` unchanged at `20:20`.
 - **AC5** — When the four projection outcomes are staged one at a time into a scratch corpus, each
@@ -115,24 +118,24 @@ would have been this unit's left-shift.
 
 ## 8. Open questions
 
-- **FACT-QUESTION · F1 — is the 365.6 s the projection loop, or the one `gen_build_index.py
-  --print-bindings` invocation inside the same check?** The whole unit rests on the answer, and both
-  are inside the tick boundary that measured 365.6 s. PROBE: time
-  `python tools/memory-tree/gen_build_index.py --print-bindings > /dev/null` alone on node `a`, and
-  time the `proj21` loop alone over its saved output. OBSERVATION THAT DECIDES IT: if the python
-  invocation is the larger half, this unit is wrong and is re-specced against `--print-bindings`
-  instead. LIVENESS: the probe can produce a negative — a python run over 310 records and every
-  spec is capable of taking minutes on this node, and `TOOL-aMeteredTurnstile-6` records
-  `python -c pass` at 103.7 ms to 1297 ms here, so a slow python half is a live possibility rather
-  than a straw one.
+- **FACT-QUESTION · F1 — is the span the projection loop, or the one `gen_build_index.py
+  --print-bindings` invocation inside the same check?** RESOLVED (agent, 2026-08-27, delegated): the
+  LOOP. Measured on a quiet node `a`, `--print-bindings` alone is **1.416 s** producing 301 `S` rows,
+  against check 21's directly measured body span of **338.9 s** — 0.4% and 99.6%. The probe could
+  have produced a negative and nearly did on the prior contaminated pass, where the same command
+  measured 10.1 s; on a quiet box it does not. This unit's design stands unchanged and N3 holds.
 
-- **F2 — does the `awk` pass need `FAM_ALT` interpolated, or passed with `-v`?** Recommendation:
-  `-v`, matching check 12's driver, so the family alternation is data rather than program text.
-  Immaterial to the verdict either way; recorded so the reviewer does not have to ask.
+- **F2 — does the `awk` pass need `FAM_ALT` interpolated, or passed with `-v`?** RESOLVED (agent,
+  2026-08-27, delegated): `-v`, matching check 12's driver, so the family alternation is data rather
+  than program text. Interpolating it would put shell-expanded bytes inside an `awk` program, which
+  is the class this corpus records as `heredoc-escape-reaches-the-regex`.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft, from the instrumented per-check measurement on node `a`.
+- rev-2 · 2026-08-27 · re-based on the QUIET-box re-measurement, which withdrew the contaminated
+  figures and reordered this unit behind `TOOL-aThawedCorpus-4`. F1 and F2 both resolved, F1 by its
+  stated probe.
 
 ## 10. Reuse audit
 

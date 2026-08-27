@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-27
 streams: tooling
 roster: TOOL
-ids: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3
+ids: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4
 authorized-by: prompt
 ---
 
@@ -15,22 +15,22 @@ Node `a` · opened 2026-08-27 · streams tooling. The owner's prompt is at
 verbatim, with what this run read out of it and what it declined to adopt.
 
 ## The problem this build exists to solve
-Memory tooling re-reads the whole tree on every call, and the tree only grows: 71 builds, 823
-tracked files, 1.9 MB. The `memory hygiene` leg carries `subject: repo` and therefore no guard, so
-every node pays it on every bar. The recorded ledger figure is 421 s; measured on node `a`
-2026-08-27 it is far worse, and the cost is NOT the walk. Checks 1 through the start of 21 cost 38 s
-over that whole corpus. Check 21 alone then runs for minutes, because its filename-projection loop
-spawns four to six processes for each of 310 records. The owner's mtime observation is true and
-reproduced; what it implies is that no mtime-keyed cache can ever hit here.
+The `memory hygiene` leg costs 1398 s on a QUIET node `a`, 2026-08-27, over 71 builds and 823 files.
+The cost is not the walk. Check 23 is 962.0 s of it and check 21 is 338.9 s — 93.1% between them —
+and both are slow for one reason: they spawn a process per corpus item for work that is string
+manipulation. Ten other checks total 32.4 s. Separately, the leg declares no `guard`, so
+`run-gates.sh` keys it on the whole-tree fingerprint and the `GATE_REUSE` freeze it already has can
+never match. The owner's mtime observation is reproduced, and what it implies is that no mtime-keyed
+cache could ever hit here — git records none.
 
 ## Expected improvements
 - The dominant term in the memory bar's cost stops being process creation this repo controls.
 - A bar that touches no memory file stops re-deriving a verdict nothing could have invalidated.
 - Adopters inherit both, from the kit, without hand-fitting anything to their tree.
-- The saving is stated as a declared wall-clock ceiling that REDS on breach, not as a claim.
+- The saving is held by a declared SPAWN ceiling that REDS on breach, not asserted in prose.
 
 ## Detriments if this is not built
-- An unguarded leg whose cost grows with the corpus, on every node, forever.
+- A 23-minute leg whose cost grows with the corpus, on every node, forever.
 - The next agent that reaches for `--staged` to dodge it also drops the checks that catch the
   defects the leg exists to catch.
 - Every adopter inherits the same curve the day their tree gets interesting.
@@ -40,8 +40,12 @@ reproduced; what it implies is that no mtime-keyed cache can ever hit here.
   diffs the checker's full-corpus output against the pre-change checker. A performance change that
   moves a verdict is a defect, not a trade.
 - **A cache miss costs wall clock and never a verdict.** Absent, corrupt, unreadable or
-  version-mismatched skip state means RUN. This is the law `<git-dir>/gate-ledger.tsv` and
-  `.githooks/pre-push`'s `gate-full-green` already run under, and it is not renegotiated here.
+  version-mismatched skip state means RUN. This is the law `<git-dir>/gate-ledger.tsv`,
+  `.githooks/pre-push`'s `gate-full-green` and `run-gates.sh`'s reuse unit already run under, and it
+  is not renegotiated here.
+- **Seconds are not a verdict on this node.** The same commit's hook measured 913 s under load and
+  29 s quiet — 31x on identical bytes. Every figure in this build carries the foreign-process count
+  at both ends, and the ceiling unit counts SPAWNS, which do not vary with load.
 - **The key covers everything the verdict depends on, or the check is not keyed.** A checker whose
   answer depends on files other than the one in hand may not be skipped per file. Check 2 reds on a
   DELETED link target; check 21 and 23 read an id set defined elsewhere. Those are keyed on their
@@ -51,6 +55,11 @@ reproduced; what it implies is that no mtime-keyed cache can ever hit here.
   on "unchanged" subsumes the owner's "fully closed" and also covers the idle-but-open build.
 - **The kit stays standalone.** No `../lib/`, no `tools/run-gates/`. `resolve_python` is the
   precedent for what that costs and how it is paid.
+- **The freeze already exists — do not build a second one.** `run-gates.sh`'s `input_key` keys a leg
+  on `git ls-files -s` over its guard pathspecs plus their dirty share, and `GATE_REUSE` skips a leg
+  whose key is unchanged and whose last verdict was green. That is content-addressed, fail-open and
+  already gated. The memory legs are excluded from it only because they declare no guard. Declaring
+  the true input set is DATA, and a parallel cache would be a second answer to one question.
 
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
@@ -60,34 +69,41 @@ and why the run refused it.)*
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aThawedCorpus-1` | 1 | check 21's filename projection stops spawning per record |
-| 2 | `TOOL-aThawedCorpus-2` | 2 | a kit-local input-digest skip primitive, conf-declared, fail-open |
-| 3 | `TOOL-aThawedCorpus-3` | 2 | wire it through the memory tools with a declared wall-clock ceiling |
+| 1 | `TOOL-aThawedCorpus-4` | 1 | check 23's three per-item loops become two `awk` passes |
+| 2 | `TOOL-aThawedCorpus-1` | 1 | check 21's filename projection stops spawning per record |
+| 3 | `TOOL-aThawedCorpus-2` | 2 | the memory legs declare their true input set, so guard-skip and `GATE_REUSE` both start working |
+| 4 | `TOOL-aThawedCorpus-3` | 2 | a declared SPAWN ceiling per leg that REDS on breach — the left-shift for the per-item-spawn class |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-1.md) | 1 | 1 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-4.md) | 1 | 1 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-1.md) | 2 | 1 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them](spec/2026-08-27-spec-TOOL-aThawedCorpus-2.md) | 3 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here](spec/2026-08-27-spec-TOOL-aThawedCorpus-3.md) | 4 | 2 | OPEN | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4.
 
-Ids no `spec-audit` record has ever named: TOOL-aThawedCorpus-1.
+Ids no `spec-audit` record has ever named: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aThawedCorpus-1` | no |
+| 1 | `TOOL-aThawedCorpus-4` | no |
+| 2 | `TOOL-aThawedCorpus-1` | no |
+| 3 | `TOOL-aThawedCorpus-2` | no |
+| 4 | `TOOL-aThawedCorpus-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

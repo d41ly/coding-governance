@@ -10,86 +10,105 @@ cost to anything smaller than the leg.
 ## Method
 
 `tools/memory-tree/check-memory-hygiene.sh` was copied to `tools/memory-tree/_hyg_timed.sh` with a
-`date +%s%N` emission inserted immediately before every top-level `# <n> — ` check comment, and run
-once over the full corpus with no arguments. Nothing else was changed; the copy was deleted
-afterwards. A tick therefore measures the span from the START of one check to the START of the next
-in SOURCE order, which is not numeric order — the file runs 22 before 21, and 21 before 10.
+`date +%s%N` emission inserted before every top-level `# <n> — ` check comment, and — in the second
+pass — before check 23's `alcut=` line and each `if [ "$STAGED" = 0 ]` delegating block, neither of
+which carries a numbered comment of its own. Nothing else was changed and the copy was deleted after.
+A tick measures the span from one emission to the next in SOURCE order, which is not numeric order:
+the file runs 22 before 21, and 21 before 10.
 
-The corpus at the time: 71 build folders, 823 tracked files under `memory/`, 1.95 MB. 310 records
-under `memory/builds/*/{build,prompts,reviews}/`.
+The corpus: 71 build folders, 823 tracked files under `memory/`, 1.95 MB, 310 records under
+`memory/builds/*/{build,prompts,reviews}/`, roughly 250 specs.
 
-## What it measured
+## The first pass was contaminated, and the manifest said it would be
 
-| check | span | note |
+`memory/guides/SESSION-KICKOFF.md` front-loads the trap verbatim: several sessions share this node,
+the bar has no admission control, and a latency claim taken under load must be re-run on a quiet box
+before it is believed (`TOOL-aPacedTurnstile-2`). Forty to forty-one `python.exe` processes belonging
+to another project's virtualenv and a second Claude session were resident throughout the first pass.
+
+That trap was read AFTER the first measurement rather than before it, because the unattended prompt
+path preflights before it hands back to `/session-kickoff`, and preflight needs a pushed build folder.
+The ordering is correct for authorization and wrong for measurement; the cost was one contaminated
+pass and two figures that had to be withdrawn.
+
+**Withdrawn: the pre-commit hook at 913 s, and `--staged` at 593 s of it.** Re-measured on a quiet
+box the same hook is **29 s**. `--staged` never runs checks 21 or 23 at all, so the commit path was
+never carrying this defect — it was carrying contention. Any claim that the memory gate dominates
+every commit is wrong and is not repeated below.
+
+## What the quiet box measured
+
+Zero foreign python processes at start and at end, on the pass these figures come from. Full run,
+no arguments: **1398 s**, exit 1. A second complete pass with coarser ticks read 1265 s; the two
+agree on the shape and the finer one is quoted throughout, because it is the one whose spans are
+measured rather than inferred.
+
+| segment | span | share |
 |---|---|---|
-| 1 | 1.6 s | |
-| 2 | 2.8 s | |
-| 3 | 9.5 s | |
-| 4 | 2.8 s | |
-| 5 | 5.8 s | |
-| 6 | 3.6 s | |
-| 7 | 1.9 s | |
-| 8 | 4.3 s | carries check 9's `gen_build_index.py --check`, which sits above the tick |
-| 9 | 3.5 s | |
-| 22 | 1.8 s | |
-| **21** | **365.6 s** | |
-| 10 | 0.5 s | |
-| 11 | 0.3 s | |
-| 12 | 31.9 s | |
-| 13-20, 23 | > 600 s, unfinished | one tick covers the whole delegating block and check 23 |
+| checks 1-9 and 22, ten checks | 32.4 s | 2.3% |
+| **check 21**, record-to-spec binding | **338.9 s** | **24.2%** |
+| checks 10, 11, 12 | 7.0 s | 0.5% |
+| checks 13-19 and 20, the python delegates | 47.4 s | 3.4% |
+| **check 23**, the acceptance ledger | **962.0 s** | **68.8%** |
 
-Everything except check 21 and the final block totals **70.3 s**. Check 21 alone is **five times**
-that, and the run was stopped inside the final block after 684 s of tick span rather than allowed to
-finish, because the attribution needed was already unambiguous.
+Every span is a tick-to-tick measurement. Check 21's is its comment to its own
+`if [ "$STAGED" = 0 ]` guard; check 23's is its `alcut=` line to process end, since it is the last
+thing the script does. Neither is a remainder.
 
-## Why check 21 costs what it does
+**Check 21's span is the LOOP, not the parse it contains.** `gen_build_index.py --print-bindings`
+alone measures **1.416 s** and yields 301 `S` rows — 0.4% of the 338.9 s. On the contaminated pass the
+same command measured 10.1 s, so this probe could have come back the other way and did not.
 
-Its filename-projection loop, `proj21`, runs once per record and spawns per iteration: a command
-substitution plus a `grep -oE` for `claimed`, and a pipeline subshell plus `tr` and `grep -qxF` for
-the membership test. Four to six processes, 310 times, so 1,240 to 1,860 process creations for work
-that is pure string manipulation.
+**Two checks are 1300.9 s of 1398 s — 93.1% — and they carry the same defect.**
 
-The node's own recorded process-creation tax is what turns that into minutes.
-`TOOL-aMeteredTurnstile-6` measured `bash -c true` between 22.5 ms and 581 ms here depending on load,
-and `TOOL-aScannedThrottle-4` records HVCI/VBS enforcing with synchronous antimalware inspection of
-exactly this shape. 1,500 spawns at 0.24 s is 360 s.
+## The defect, which is not the walk
 
-## The same defect is in check 23
+Neither check is slow because it reads 823 files. Both are slow because they spawn a process per
+corpus item for work that is string manipulation.
 
-Read rather than measured separately, because the final block's tick does not separate it:
+**Check 21**, `proj21`: per record, a command substitution plus a `grep -oE` for `claimed`, and a
+pipeline subshell plus `tr` and `grep -qxF` for the membership test. Four to six process creations,
+310 times.
 
-- `alledger=$(for r in $(git ls-files …); do awk … "$r"; done)` — one `awk` process per record.
-- `for sp in $alspecs; do case "$(basename "$sp")" … sdate=$(basename "$sp" | cut -c1-10)` — two
-  `basename` spawns and a `cut` per spec, over roughly 250 specs.
+**Check 23**, twice over: `for r in $(git ls-files …); do awk … "$r"; done` is one `awk` per record
+across 310 of them; and the per-spec loop pays two `basename` spawns, a `cut`, a `sort -C`, a `sed`
+piped to a `grep`, another `grep`, a `sed` piped to a `head`, and an `awk` piped to a `sort -u` —
+roughly eleven per spec over ~250 specs, before an inner loop that runs one more `grep` per
+acceptance criterion. Several thousand process creations for one verdict.
 
-That block ran for more than 600 s before the run was stopped, which is consistent with it and is
-not proof of it. Attributing check 23 on its own is `TOOL-aThawedCorpus-2`'s first act.
+The node's own recorded tax turns that into minutes. `TOOL-aMeteredTurnstile-6` measured `bash -c
+true` between 22.5 ms and 581 ms here depending on load; `TOOL-aScannedThrottle-4` records HVCI/VBS
+enforcing with synchronous antimalware inspection of exactly this shape.
 
-## What this rules out
+This is the fifth and sixth instance of one class in this repo. `TOOL-aBatchedLintel-1` collapsed it
+in checks 12 and 7, porting `PERF-aSlothfulCapstan-1`; `TOOL-aCollapsedScan-1` collapsed it in
+`unattended.sh --plan` on 2026-08-26. `check-method-carriers.sh` carries the shape over a
+six-element population and is immaterial. A class fixed three times by hand and never gated is a
+class that returns, which is what this build's ceiling unit is for.
 
-**An mtime-keyed cache.** Every build directory's filesystem mtime reads `2026-08-27 11:15`, the
-worktree's creation time, while the last commit touching each is days older. That is git, which
-records no mtimes, so a fresh clone, checkout or worktree resets all of them at once. The corpus
-digest `tools/memory-recall/query.py` already computes is `st_mtime_ns` plus `st_size`, which is why
-its index reports `rebuilt` on the first query in any new worktree. A cache keyed that way does not
-merely miss sometimes here; it never hits.
+## What the measurement rules out
+
+**An mtime-keyed cache.** Every build directory's filesystem mtime reads the worktree's creation
+time while the last commit touching it is days older — git records no mtimes, so a clone, checkout
+or worktree resets all of them at once. The corpus digest `tools/memory-recall/query.py` already
+computes is `st_mtime_ns` plus `st_size`, which is why its index reports `rebuilt` on the first query
+in any new worktree. Keyed that way a cache does not merely miss sometimes here; it never hits.
 
 **Keying on `CLOSED`.** Every build's last touching commit is inside seven days, because one
 migration — `e6328ce4`, the mandatory roster pair — rewrote 55 build READMEs at once. Status is
 authored and can be wrong; content is derived and cannot. Keying on "unchanged" covers the owner's
 "fully closed" and also the idle-but-open build, and needs no new authored field.
 
-## Contention caveat
-
-40 to 41 `python.exe` processes belonging to another project's virtualenv and to a second Claude
-session were resident throughout. The absolute figures are therefore inflated and are not a clean-box
-baseline. The RATIO is what this record is for, and a 5x gap between one check and the other thirteen
-is not explained by ambient load.
+**A cache as the FIRST purchase.** Collapsing two loops is expected to take the leg from 1398 s to
+roughly 120 s with no policy change, no new state and no new failure mode. A skip mechanism bought
+before that would be measured against the wrong baseline and would hide the defect rather than
+remove it. The owner asked for the systemic half explicitly, so it is built — after, and priced
+against what is left.
 
 ## An inherited red, found while measuring
 
 `gen_build_index.py --check` exits 1 at `f5dff6ae` with this branch's own build folder moved out of
-the tree: `dCarriedReceipt`'s README and fifteen specs are stale. `f5dff6ae` landed that build's
-round-4 diff-review record without re-rendering. So hygiene check 9 reds the merge bar on `main`
-right now, for every node. Repaired here by re-rendering, in its own commit, because this run cannot
+the tree: `dCarriedReceipt`'s README and fifteen specs are stale, because `f5dff6ae` landed that
+build's round-4 diff-review record without re-rendering. Hygiene check 9 therefore reds the merge bar
+on `main` for every node. Repaired here by re-rendering, in its own commit, because this run cannot
 reach a green bar over it.
