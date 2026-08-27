@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-26T00:23:32+03:00 @ 2196414866a0e2db52759ebd015aae4a79dd0e8d
+last-audit: 2026-08-27T13:40:37+03:00 @ f5dff6aee0b0a0177fac8ec842532b461eeca71f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2196414866a0e2db52759ebd015aae4a79dd0e8d
@@ -212,6 +212,11 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
+- ALWAYS BACKGROUND A COMMIT HERE. A commit staging `memory/**` runs the hygiene `--staged` leg,
+  whose SET-checks are tree-wide: one file cost 963 s until check 23 got the `[ "$STAGED" = 0 ]`
+  guard its four siblings carry — now 54 s (`TOOL-aGroundedOrientation-3`). A raised timeout is the
+  WRONG remedy: a timed-out commit leaves its hook tree alive, so each retry adds a competing scan.
+  Three cost fourteen orphans and an hour; reap by PID before timing.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
 - The hooks kit (1.5) ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
