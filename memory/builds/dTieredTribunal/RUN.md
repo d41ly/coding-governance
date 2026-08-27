@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes
+keepalive-reaped: yes
 witness: eb4b0660a54426dbbb36cdecc50ebbdd6e3d8e4f
-phase: REVIEWING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 7071b8ff
