@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -21,8 +22,11 @@ keeps it from becoming a licence to widen a build on taste.
 ## 2. Scope (IN)
 
 - **S1** — a new numbered section in `tools/unattended/PROTOCOL.template.md` states the adoption
-  rule. It is the binding contract for unattended runs and has no byte budget, which is why the rule
-  lives there and not in the build method.
+  rule. It lives there rather than in the build method because M10's delta 1 already owns "never ask,
+  and here are the substitutes" and because the protocol has the HEADROOM, not because it is
+  unbudgeted — **it is budgeted, and the first draft of this line said otherwise.** Hygiene check 6
+  caps every `memory/guides/*.md` at `GUIDE_CAP_BYTES=61440` and `GUIDE_CAP_LINES=750`, and
+  `.memory-tree.conf` does not override either. Measured: 613 lines / 50 437 B at BASE.
 - **S2** — the rule defines DISCOVERY, defines STRICTLY BENEFICIAL as a three-part test rather than
   an adjective, and names the disposition for a discovery that fails each part.
 - **S3** — the rule covers a BLOCKER the run can resolve, not only a discovery it would be nice to
@@ -94,8 +98,10 @@ MEASURED: a run that cannot state the measurement has not made a discovery.
 
 ### Where it goes, and where it does not
 
-The protocol, because it is the binding contract for unattended runs and carries no byte budget.
-NOT the build method: M10's delta 1 already owns "never ask, and here are the substitutes", and
+The protocol, because it is the binding contract for unattended runs and — measured, not assumed —
+has the headroom. It carries a real budget: check 6's `GUIDE_CAP_LINES=750`, against 613 lines at
+BASE. This build spends about 68 of the 137 remaining lines, which is HALF the remaining headroom in
+one build and is the number the next author needs. NOT the build method: M10's delta 1 already owns "never ask, and here are the substitutes", and
 adoption is a fourth substitute for asking rather than a fourth delta. M10 therefore gains one word
 and a pointer, keeping "Three deltas, and no others" true.
 
@@ -157,7 +163,12 @@ not decided is a rule that resolves to whatever the run already wanted to do, wh
   BLOCKER the run can resolve is a discovery, citing this run's own reproduction of the defect.
 - **AC5** — When `memory/guides/BUILD-METHOD.md` M10 is read, its first delta's substitute list names
   ADOPT and points at the protocol section, and M10 still opens "Three deltas, and no others".
-- **AC6** — When `wc -c memory/guides/BUILD-METHOD.md` runs, the result is at or below `24576`.
+- **AC6** — When `wc -c` runs over BOTH `memory/guides/BUILD-METHOD.md` and
+  `tools/memory-tree/BUILD-METHOD.template.md`, each is at or below `24576`. The template is the
+  tighter half by 11 B and grading only the render passes over a breach.
+- **AC9** — When `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` runs, it is at or below
+  `GUIDE_CAP_LINES=750` and `GUIDE_CAP_BYTES=61440`, and the wrap-up states the remaining headroom in
+  lines, because half of it was spent here.
 - **AC7** — When `.claude/skills/unattended/SKILL.md` "While it runs" is read, the park bullet is
   followed by the counterweight naming what may not be parked.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` runs, check 10 is green and the
@@ -174,6 +185,10 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-27 · folded spec-audit round 1, findings 12 and 23. S1 and §4 claimed the protocol
+  "has no byte budget"; it has one — check 6's guide caps — and that false clause was the sole stated
+  reason for choosing this carrier over the build method. Replaced with the measured headroom and a
+  criterion that grades it. AC6 now grades both halves of the BUILD-METHOD pair.
 - rev-1 · 2026-08-27 · initial draft. S3's widening — a blocker counts as a discovery — comes from
   the owner's correction of this run's own AskUserQuestion, recorded in the prompt record.
 

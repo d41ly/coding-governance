@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-27T15:15:28+03:00 @ b4e1d5be879bc8868529fb57c15657e271c39113
+last-audit: 2026-08-27T15:23:30+03:00 @ b4e1d5be879bc8868529fb57c15657e271c39113
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2196414866a0e2db52759ebd015aae4a79dd0e8d
@@ -73,11 +73,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid.
 
-- **An unattended run ADOPTS a strictly beneficial discovery instead of parking it**, and the
-  keepalive is its FIRST act on every start path — before orientation, before `--preflight`. Both
-  invert the reflex. `UNATTENDED-PROTOCOL.md` sections 11 and 5 are the rules; the test, the three
-  dispositions and the handle are not restated here. Worth knowing before you meet it: a BLOCKER
-  between the run and its own landing is a discovery, not a question.
+- **An unattended run ADOPTS a strictly beneficial discovery instead of parking it**, and schedules
+  its keepalive FIRST, before orienting. `UNATTENDED-PROTOCOL.md` sections 11 and 5; the test and the
+  dispositions are not restated here. A BLOCKER between the run and its landing is a discovery.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
   discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the

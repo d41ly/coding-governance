@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -27,7 +28,10 @@ from. Move the obligation to the run's first act and state it once, where every 
   is orphaned exactly like one left by a run that ended.
 - **S3** — `tools/unattended/SKILL.template.md` hoists the keepalive out of the slug path's step 3
   into a section that binds all four paths, placed BEFORE the path-routing table so no path can be
-  entered without passing it.
+  entered without passing it. **`## Resume` is a FIFTH path and the section names it explicitly**: a
+  resumed session's keepalive is dead by construction, so that section carries its own instruction and
+  the hoisted one says it cannot bind it. "Every path" meaning "the four rows of the routing table"
+  was the first draft's silent definition and it missed the only path where the job is provably gone.
 - **S4** — the slug path's numbered steps are renumbered around the removal, and the two paths that
   reach preflight through "exactly as the slug path does" are checked to make sure that phrase now
   carries what it claims.
@@ -36,6 +40,11 @@ from. Move the obligation to the run's first act and state it once, where every 
   gains no rule of its own — M1 forbids a rule stated both there and in a carrier it points at.
 - **S6** — both rendered halves are regenerated in the same commit: `memory/guides/UNATTENDED-PROTOCOL.md`
   and `.claude/skills/unattended/SKILL.md`, each of which a leg byte-compares against its template.
+- **S7** — `memory/guides/SESSION-KICKOFF.md` is a FOURTH carrier, not a bookkeeping afterthought:
+  the charter's Definition of Done obliges a manifest update when a unit changes a governing doc, and
+  the manifest is byte-capped at 25 600 by `skills/session-kickoff/manifest-check.sh`, whose refusal
+  text says the limit is trimmed against and never raised. The §B bullet this build adds is priced
+  against that cap and pays for itself by trimming its own first draft.
 
 ## 3. Non-goals (OUT)
 
@@ -79,8 +88,13 @@ obligation is stated in the same section rather than discovered later.
 ### Files touched (estimate)
 
 `tools/unattended/PROTOCOL.template.md` · `tools/unattended/SKILL.template.md` ·
-`tools/memory-tree/BUILD-METHOD.template.md` · and the three installed copies each of those renders
-to. No script changes.
+`tools/memory-tree/BUILD-METHOD.template.md` · the three installed copies each of those renders to ·
+and `memory/guides/SESSION-KICKOFF.md`, the fourth carrier S7 adds. No script changes.
+
+**The BUILD-METHOD pair has TWO capped halves and the TEMPLATE is the tighter one.** The render
+substitution shrinks the file by 11 B, so a criterion grading only `memory/guides/BUILD-METHOD.md`
+prices the looser half and passes over a breached constraint. That is exactly what happened: at one
+point the guide read 24 573 and the template 24 584, 8 B over a budget this run may not raise.
 
 ### Alternatives rejected
 
@@ -124,8 +138,15 @@ cannot observe its subject would be an assertion about nothing.
   duty for a start path that refuses before a run exists.
 - **AC6** — When `memory/guides/BUILD-METHOD.md` M10 is read, its keepalive bullet no longer reads
   "Create it before preflight", still points at protocol §5, and states no rule of its own.
-- **AC7** — When `wc -c memory/guides/BUILD-METHOD.md` runs after this unit, the result is at or
-  below `24576`, M1's stated budget.
+- **AC7** — When `wc -c` runs over BOTH halves of the pair — `memory/guides/BUILD-METHOD.md` AND
+  `tools/memory-tree/BUILD-METHOD.template.md` — each is at or below `24576`, M1's stated budget. The
+  template is the binding half.
+- **AC8** — When `wc -c memory/guides/SESSION-KICKOFF.md` runs, the result is at or below the
+  `MAX_MANIFEST_BYTES` value `skills/session-kickoff/manifest-check.sh` declares, and the build's own
+  §B bullet is the trim that paid for it.
+- **AC9** — When `.claude/skills/unattended/SKILL.md`'s `## Resume` section is read, it instructs the
+  resumed session to schedule a NEW keepalive and states that `--keepalive-id` is recordable only at
+  `--preflight`, so the recorded id stays stale and the close attestation is about the new job.
 
 ## 7. Gates
 
@@ -139,6 +160,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft.
+- rev-3 · 2026-08-27 · folded spec-audit round 1, findings 24 and 28: the `## Resume` path was
+  outside "every path" and is now named in S3 and AC9; `SESSION-KICKOFF.md` was an unpriced fourth
+  carrier and is now S7 and AC8; AC7 grades BOTH halves of the BUILD-METHOD pair, because the
+  template is 11 B tighter than the render and only the looser half was priced.
 - rev-2 · 2026-08-27 · AC1's observable was wrong: the superseded wording is deliberately QUOTED in
   the new section, so a zero-count grep could never pass over a correct implementation. Rewritten to
   grade the obligation and to name the one legitimate survivor.

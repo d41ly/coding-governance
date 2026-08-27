@@ -24,3 +24,5 @@ base: 0e92aaa9ec0006c285eb96b26a0d851a1d496b75
 ## Parked
 
 2026-08-27T11:55:19Z rescope · item add TOOL-aPrimedKeepalive-7 · reason Observed while verifying unit 3 AC6: the DRIVER's check_single_live refuses --preflight with 2 live records, so dTieredTribunal at LANDING blocks the next run on this repo even after unit 4 fixes the LEG. Unit 4's section 3 named this a non-goal on a reading of the code that is false. Strictly beneficial by protocol section 11: measured, nothing gets worse, no veto tripped.
+
+2026-08-27T12:20:29Z review · item aPrimedKeepalive-specs · reason verdict BLOCKED · blockers 4

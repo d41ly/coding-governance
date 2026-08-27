@@ -31,6 +31,11 @@ is the longest unattended stretch a run has. A run that stalls in it has no keep
 it, and nothing records why. A step written inside one path is a step the other three do not execute,
 which is why this one sits above the table instead.
 
+**One path below is NOT covered by this section, and it is named rather than left out**: `Resume`.
+A resumed session's keepalive is dead before it starts — the store went with the process — so that
+section carries its own instruction and this one cannot bind it. Every other path routes through the
+table below.
+
 **If the run never starts, reap it anyway.** Every path below can refuse — a value that does not
 resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s refusals. The store
 is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
@@ -578,6 +583,19 @@ bash tools/unattended/unattended.sh --resume <slug>
 
 Read the run-state file before doing anything else. It survived compaction and process death; your
 context did not.
+
+**Then schedule a NEW keepalive, because the recorded one is dead.** The store is session-scoped, so
+a resume across a process death is the one path where the job is gone by construction rather than by
+accident — and the run-state file still names the old id, which no `CronDelete` you can
+issue will reach. This is the only exception to "read the record first": read it, then schedule,
+before any other work.
+
+**The record cannot be corrected in place, and you must know that rather than discover it.**
+`--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
+new id. Two consequences, both yours to carry: the `keepalive` fact names a job that no longer
+exists, and the `keepalive-reaped` attestation you make at close is about the job you scheduled here,
+not the one the record names. Say so in the wrap-up. Re-preflighting to record it is NOT the remedy —
+it refuses on a dirty tree and re-pins the anchor, which costs more than the stale field does.
 
 ## Close
 

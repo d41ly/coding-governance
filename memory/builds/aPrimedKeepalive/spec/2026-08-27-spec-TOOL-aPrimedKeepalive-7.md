@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 7
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -24,8 +24,11 @@ a two-half wedge leaves the wedge.
   witness is an ancestor of the anchor the run already observed is not counted.
 - **S2** — the exclusion is REPORTED on stdout with the record, its witness and the anchor, so a
   refusal that did not happen is still visible.
-- **S3** — it FAILS CLOSED: with no observed anchor, an unresolvable witness, or any phase other
-  than `LANDING`, the record counts exactly as it does today, and the reason is printed.
+- **S3** — it FAILS CLOSED: with no observed anchor, **an anchor naming a commit this clone has not
+  fetched**, an unresolvable witness, or any phase other than `LANDING`, the record counts exactly as
+  it does today, and the reason is printed. The fetched-anchor cause is the same one
+  `TOOL-aPrimedKeepalive-4` rev-3 added to its S3; the two units share one predicate and a cause named
+  in only one of them is the `amendment-leaves-its-other-half-standing` class.
 - **S4** — `TOOL-aPrimedKeepalive-4`'s §3 is corrected as a `rev-2`. It currently names this a
   non-goal on the ground that the driver "already admits the ordinary second run", which is FALSE and
   was disproved by observation before this spec was written.
@@ -97,9 +100,10 @@ reverse; a dependency in that direction would make the driver unrunnable without
   NOT fire, and stdout names the excluded record with its witness and the anchor.
 - **AC2** — When the same invocation runs against a `LANDING` record whose witness is NOT an ancestor
   of the observed anchor, `check 5` still fires. Observed by staging a fixture record and removing it.
-- **AC3** — When `ASHA` is empty because the anchor was not observed, every record counts and the
-  driver prints that the exclusion was unavailable — read from the predicate, since a run that cannot
-  reach its remote refuses earlier for other reasons.
+- **AC3** — When `ASHA` is empty, or names a commit this clone cannot resolve, every record counts
+  and the driver prints that the exclusion was unavailable — read from the predicate, since a run that
+  cannot reach its remote refuses earlier for other reasons. The line is emitted unconditionally when
+  it would have mattered, never behind an opt-in flag.
 - **AC4** — When `memory/builds/aPrimedKeepalive/spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md` is
   read, its §3 no longer claims the driver "already admits the ordinary second run", and its §9
   carries the `rev-2` line saying what disproved it.
@@ -117,6 +121,9 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-27 · folded spec-audit round 1's findings 25 and 26 from its sibling, which the
+  audit named explicitly: unit 7 was outside the subject set, and fixing the predicate in unit 4 alone
+  would leave the two copies disagreeing.
 - rev-1 · 2026-08-27 · initial draft. ADOPTED mid-build under protocol section 11, the rule this
   build is writing, recorded by `--rescope --act add`. The discovery came from verifying another
   unit's acceptance criterion, which is where a spec's own reasoning gets tested against the machine.

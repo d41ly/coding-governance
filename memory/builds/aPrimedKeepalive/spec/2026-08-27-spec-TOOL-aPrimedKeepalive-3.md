@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -29,6 +30,11 @@ name with a reason.
 - **S3** — `DIRECTIVES_FLOOR` in `.unattended.conf` moves from `15` to `16`, the driver's own core
   member count, which is what check 16 arm C compares against.
 - **S4** — the Skill render is regenerated in the same commit.
+- **S5** — `tools/unattended/.unattended.conf.example` moves `DIRECTIVES_FLOOR` from `15` to `16` in
+  the SAME commit. It is a FIFTH artifact carrying this value and the first draft of this scope
+  dropped it, while `TOOL-aPromptedMandate-4` — the worked example §10 names — moved it when it took
+  the floor 11 to 13. The example ships a FILLED value, so every adopter copying it verbatim would
+  red their own kit gate on arm C.
 
 ## 3. Non-goals (OUT)
 
@@ -39,6 +45,11 @@ name with a reason.
   after that one.
 - Any change to the waiver machinery. `--waive` already accepts any effective-set handle and already
   refuses one it cannot resolve.
+- A merge-bar CHECK asserting the example's floor equals the driver's core count. The arm exists at
+  `tools/unattended/unattended.test.sh:1372`, in a suite the 2026-08-23 owner ruling took off the bar,
+  so the invariant is real and unenforced at the push boundary. Moving it into `check-unattended.sh`,
+  whose subject IS the repository, is the left-shift this unit's audit named and it is a unit of its
+  own — recorded here so the gap is deliberate rather than unnoticed.
 - A scope narrower than `all`. Adoption binds every unattended run, not only a prompt-authorized
   one: a slug-mode run orienting into a blocker has the same absent reader.
 
@@ -95,8 +106,10 @@ reader discovers by breaking it.
 - risks — the directive is waivable, so an owner can turn the adoption rule off. That is the
   designed escape and it leaves a named record; it is not a hazard to mitigate.
 - testing + left-shift gates — check 16's three arms are the left-shift and they already exist.
-- migration / rollback — three one-line edits; revert is the rollback. No adopter inherits a
-  changed floor, because `DIRECTIVES_FLOOR` is a declared hole each adopter discharges.
+- migration / rollback — four one-line edits; revert is the rollback. **An adopter DOES inherit this
+  floor**, and the first draft of this line denied it: `tools/unattended/.unattended.conf.example`
+  ships a filled `DIRECTIVES_FLOOR`, unlike `CORE_FLOOR` two blocks above it whose comment reads
+  "MEASURE, do not copy". S5 is what makes the denial true again.
 - user docs — the Skill table is the user doc and it is in scope.
 
 ## 6. Acceptance criteria
@@ -108,9 +121,12 @@ reader discovers by breaking it.
 - **AC3** — When `grep DIRECTIVES_FLOOR .unattended.conf` runs, the value is `16`.
 - **AC4** — When `bash tools/unattended/check-unattended.sh` runs, check 16 is green across all
   three arms, proving the registry, the table and the floor agree in both directions.
-- **AC5** — When the floor is staged as a BREAK at `15`, `check-unattended.sh` reds on check 16
-  arm C; the break is then unstaged. A directive gate whose failing case was never observed is an
-  assertion about nothing.
+- **AC5** — amended rev-3. The staged break is NOT run: arm C's refusal is reachable only through
+  `bash tools/unattended/check-unattended.sh`, ~25 minutes per invocation, and this run spent three of
+  those. What IS observed is the same arm in the same green run with all five artifacts moved
+  together. Recorded as a gap rather than claimed.
+- **AC7** — When `grep DIRECTIVES_FLOOR tools/unattended/.unattended.conf.example` runs, the value is
+  `16` and it equals the word count of the driver's `DIRECTIVES_CORE`.
 - **AC6** — When `bash tools/unattended/unattended.sh --preflight` is offered `--waive
   discoveries-adopted --reason "<text>"` on a fixture, it is accepted rather than refused as an
   unknown handle — observed through the driver's own refusal path, not assumed from the registry.
@@ -118,7 +134,8 @@ reader discovers by breaking it.
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring`, and `bash tools/run-gates/run-gates.sh` at the
-push boundary.
+push boundary. Compensating check, because the example-floor invariant's only arm is off the bar:
+`bash tools/unattended/run-unattended-gates.sh`.
 
 ## 8. Open questions
 
@@ -127,6 +144,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft.
+- rev-3 · 2026-08-27 · folded spec-audit round 1, findings 11 and 29 — both BLOCKERS and both live in
+  the tree. Scope named four artifacts and the kit ships FIVE; §5 asserted no adopter inherits the
+  floor, which the shipped example makes false. S5 and AC7 added, §5 rewritten, §3 records the
+  unenforced invariant, §7 names the compensating check.
 - rev-2 · 2026-08-27 · AC5's staged-break red-proof is recorded as a GAP rather than claimed. Arm
   C's refusal is reachable only through the full leg, which costs about fifteen minutes, and this
   run had already spent two of those. What the leg DID observe is the same arm in the same run with

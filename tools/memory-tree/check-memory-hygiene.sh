@@ -8,11 +8,12 @@
 #   tools/memory-tree/check-memory-hygiene.sh            # full check
 #   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
 #
-# `--staged` is NOT the full check with a narrower file list. Every check whose population is the
-# CORPUS rather than the diff is HELD: 13-16, 17-19, the row-grammar arm and 22-23 all skip, and
-# the full run at the push boundary is where they bind. This line used to read "set-checks
-# tree-wide", which was already false of 13-19 before 22-23 joined them — one rule returning two
-# verdicts, which is the `amendment-leaves-its-other-half-standing` class this repo catalogues.
+# `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
+# CORPUS rather than the diff are HELD: 13-16, 17-19, the row-grammar arm and 23 all skip, and the
+# full run at the push boundary is where they bind. Check 22 is NOT among them and still walks
+# every tracked review record here. This line used to read "set-checks tree-wide", which was
+# already false of 13-19 — one rule returning two verdicts, the
+# `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
@@ -1101,7 +1102,10 @@ $badL"
 $badD"
 fi
 
-# ---- 22: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
+# ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
+# ---- NUMBERED 22 IN THIS COMMENT UNTIL 2026-08-27, AND IT WAS NEVER 22. Every fail arm below
+# ---- says 23 and so does the pop_guard; 22 is the review-verdict vocabulary at `:610`, and
+# ---- HYGIENE.md item 22 says so too. A spec trusted this header and graded the wrong check.
 # ---- TOOL-dUnstalledConvoy-12. Specs number their criteria and nothing joined a built unit back to
 # ---- those numbers: `build-complete` reads terminal STATUS only, and the closing-review item says
 # ---- outright that it measures a review EXISTS and never what it concluded. This is the join.
@@ -1127,8 +1131,11 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- both, so nothing loses coverage between a commit and a push.
 # ---- IT ANNOUNCES ITSELF. A skip that prints nothing is indistinguishable from a check that found
 # ---- nothing, which is this repo's named class; the line below is what keeps a held check visible.
+# ---- CHECK 22 IS NOT HELD AND IS NOT THIS BLOCK. It walks every tracked review record on every
+# ---- commit with no staged filter, and it stays that way deliberately: the whole --staged leg
+# ---- measures 10 s on this corpus after this guard, so nothing here is worth the second scope.
 if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
-  printf 'memory-hygiene: checks 22-23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
+  printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
 '
 fi
 if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then

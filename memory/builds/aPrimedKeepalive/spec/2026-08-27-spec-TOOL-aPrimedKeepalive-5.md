@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 6
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -22,9 +23,12 @@ verb on a finished record. Hand-complete the missing fact, on evidence verified 
 
 - **S1** — `memory/builds/dCarriedReceipt/RUN.md` gains `landed-anchor: remote`, in the exact fact
   grammar `set_fact` writes and in the position its siblings occupy.
-- **S2** — the claim is VERIFIED before it is written, not assumed: the record's witness must be an
-  ancestor of the tip `origin` advertises for its default branch, shown by `git merge-base
-  --is-ancestor`, and the command and its result are recorded in the unit's journal.
+- **S2** — the claim is VERIFIED before it is written, not assumed, and **against what the LEG
+  observes rather than against a ref this run can write**. Check 15 judges the witness against
+  `ADV_HEAD`, the observed advertisement; `TOOL-aStandingWrit-6` removed `refs/remotes/*` from that
+  path precisely because a run can forge it. So the instrument is `git ls-remote origin HEAD`, and
+  the command with its output goes in the unit's journal. The first draft used `origin/main`, which is
+  the one ref class this kit rejected and is silently stale in an unfetched clone.
 - **S3** — `unpushed-at-landing` is written only if the record lacks it AND the value can be
   measured; if it cannot, it is left absent rather than defaulted, because a zero meaning "could not
   measure" is this repo's named green-by-absence class.
@@ -86,8 +90,9 @@ driver's landing path. Out of scope by §3; the row stays open and says so.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `git merge-base --is-ancestor 04c7da244361950b38a611671d341ac3400e32cb origin/main`
-  runs, it exits 0, and that command and result are in the unit's journal record.
+- **AC1** — When `git ls-remote origin HEAD` is resolved to a sha and
+  `git merge-base --is-ancestor 04c7da244361950b38a611671d341ac3400e32cb <that sha>` runs, it exits 0,
+  and both commands with their output are in the unit's journal record.
 - **AC2** — When `memory/builds/dCarriedReceipt/RUN.md` is read, it carries `landed-anchor: remote`
   in the same fact grammar as its neighbours.
 - **AC3** — When `bash tools/unattended/check-unattended.sh` runs, check 15 no longer names
@@ -106,6 +111,9 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-27 · folded spec-audit round 1, finding 27. S2 and AC1 verified against
+  `origin/main`, a remote-tracking ref this run can write and which check 15 deliberately does not
+  read. Re-verified with `git ls-remote origin HEAD`, which returned `b4e1d5be...`; the ancestry holds.
 - rev-1 · 2026-08-27 · initial draft. Adopted into this build by owner ruling on 2026-08-27.
 
 ## 10. Reuse audit

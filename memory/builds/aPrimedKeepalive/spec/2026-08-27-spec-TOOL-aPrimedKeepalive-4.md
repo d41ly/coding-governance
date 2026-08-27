@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -26,9 +27,12 @@ it instead.
   ancestor of the tip the remote advertises for the default branch.
 - **S2** — every excluded record is REPORTED by path, with the witness and the anchor it was judged
   against. An exclusion nobody can see is a check quietly deleted.
-- **S3** — the exclusion FAILS CLOSED. If the remote did not answer, or the witness does not resolve
-  in this clone, or the phase is anything other than `LANDING`, the record counts exactly as it does
-  today, and the reason is reported so a skip is never mistaken for a pass.
+- **S3** — the exclusion FAILS CLOSED. If the remote did not answer, **if the advertised tip names a
+  commit this clone has not fetched**, if the witness does not resolve, or if the phase is anything
+  other than `LANDING`, the record counts exactly as it does today, and the reason is reported. The
+  fetched-tip cause is the one the first draft omitted, and the code it borrows from documents it two
+  lines from the idiom S1 copies: `check-unattended.sh:816-817` blanks its anchor under the comment
+  "PROVED PRESENT, not merely non-empty ... which red three honest LANDED records".
 - **S4** — the failing case is OBSERVED before the change lands: a record in `LANDING` whose witness
   is NOT an ancestor of the advertised tip must still red check 7 when a second run is live.
 
@@ -61,12 +65,18 @@ run measures against.
 The check keeps its full strength everywhere else. A `LANDING` record whose work is NOT on the remote
 is exactly the dangerous case — a run that closed and never landed — and it keeps counting.
 
-### The predicate, and the idiom it borrows
+### The predicate, and where it actually goes
 
-Check 15 already performs this ancestry test at `:909`:
-`GIT merge-base --is-ancestor "$w" "$b"`, where `$w` is the record's witness and `$b` the anchor sha.
-The same two values are in scope in the same walk, so the exclusion is the same expression under a
-phase guard — one grammar, not two.
+Check 15 performs the same ancestry test at `:909` — `GIT merge-base --is-ancestor "$w" "$b"` — but
+**`$b` is NOT in scope at the accumulation point**, and an earlier draft of this section said it was.
+`nlive` increments at `:695`; `b="$ADV_HEAD"` is assigned at `:816` inside a conditional, so at the
+accumulation point it is unset on the first record and holds the PREVIOUS record's value on every
+later one. Written literally, that is a loop-carried stale anchor.
+
+So the exclusion is a SECOND pass over `$live`, after the walk, reading `ADV_HEAD` directly and
+never `$b`, re-deriving `phase_of` and `fact_of` per record. That re-derivation is deliberate and is
+not the two-answers-to-one-question class: it reads the same two accessors the walk reads, from the
+same file, at the same commit — one grammar evaluated twice, not two grammars.
 
 ### Liveness, which is the part that must not be skipped
 
@@ -118,9 +128,13 @@ refuses here — correctly. Verified before this line was written.
   with its witness and the anchor it was judged against.
 - **AC2** — When a fixture record is placed in `LANDING` with a witness that is NOT an ancestor of
   the advertised tip and a second run is live, check 7 FAILS — observed, then removed. This is S4.
-- **AC3** — When the remote cannot be observed, the leg reports that the exclusion was unavailable
-  and every `LANDING` record counts, so no green verdict is reachable through an absent
-  advertisement.
+- **AC3** — When the remote cannot be observed OR its advertised tip does not resolve in this clone,
+  the leg reports the exclusion UNAVAILABLE naming that cause and every `LANDING` record counts. The
+  line is emitted only when `nlive > 1`, i.e. only when the exclusion could have changed the verdict —
+  stated so silence at `nlive <= 1` is a decision rather than an omission.
+- **AC6** — When the leg runs with two live records and one excluded, the exclusion line appears on
+  STDOUT of a DEFAULT invocation, not behind `REPORT=1`. An exclusion visible only under an opt-in
+  flag is the invisible skip S2 forbids.
 - **AC4** — When a record in any phase other than `LANDING` carries a witness on the advertised tip,
   it still counts toward `nlive` — the guard is on the phase, verified by reading the predicate.
 - **AC5** — When check 7's own header in `tools/unattended/check-unattended.sh` is read, it names the
@@ -141,6 +155,11 @@ none
 
 - rev-1 · 2026-08-27 · initial draft. Adopted into this build by owner ruling on 2026-08-27, recorded
   in the build README's owner-decisions section.
+- rev-3 · 2026-08-27 · folded spec-audit round 1, findings 25 and 26. S3 omitted the fourth
+  fail-closed cause — an advertised tip this clone has not fetched — which the borrowed code documents
+  two lines away. §4 claimed the witness and the anchor are in scope in the same walk; `$b` is not, and
+  the delivered code is a post-loop second pass, now described as built. AC6 added after the first
+  implementation routed both report lines through `report()`, which is gated on `REPORT=1`.
 - rev-2 · 2026-08-27 · §3's driver non-goal was FALSE and is replaced by a pointer at
   `TOOL-aPrimedKeepalive-7`. `--preflight` was observed printing `check 5` at two live records while
   verifying another unit's acceptance criterion; the original claim had been reasoned, not observed.
