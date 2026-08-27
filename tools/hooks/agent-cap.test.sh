@@ -47,6 +47,73 @@ check "string mentions parallel() + a real raw parallel( → deny" 2 '{"tool_nam
 # reject cannot double as the fixture proving it accepts.
 check "boundedParallel + marker → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"async function boundedParallel(t,cap=5){const o=[];for(let i=0;i<t.length;i+=cap)o.push(...await parallel(t.slice(i,i+cap))); // gov:bounded-fanout\nreturn o}\nconst LENSES = [1,2,3]\nconst r = await boundedParallel(LENSES.map(d=>()=>agent(d)),5)"}}'
 
+# ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
+# TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
+# observed" means for that unit, and the unit landed WITHOUT them: `git show --stat fb2d692e` never
+# touched this file, and no arm here named `join`, `.ref` or `--only`. Rule 5 was covered only
+# INDIRECTLY, through check-review-join.sh delegating to this hook — so the hook's own suite could
+# not tell whether its own rule worked. Written now, from that table, against the shipped rule.
+#
+# jso <name> <expected_exit> <flag> — like `js`, but passes a selector flag, which the three
+# selector arms need and which `check`/`js` cannot express.
+jso() { # name expected_exit flag  (script on stdin)
+  local name=$1 want=$2 flag=$3 payload got
+  payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
+  case "$payload" in *'"script"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
+  printf '%s' "$payload" | node "$HOOK" "$flag" >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
+  else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+}
+
+# The three bans. Each fires with NO raw primitive anywhere in the fixture, which is the whole point
+# of the port: the file gate could only ever see files, and the modality where this defect actually
+# happens is an inline `script` string on a Workflow call.
+js "rule5: the bracket ban fires with no raw primitive present" 2 <<'EOF'
+const verdicts = {}
+verdicts[v.ref] = v
+EOF
+js "rule5: the Map ban fires" 2 <<'EOF'
+const m = new Map()
+m.set(f.ref, v)
+EOF
+js "rule5: the retired identifier fires" 2 <<'EOF'
+const verdictByRef = new Map()
+EOF
+
+# Prose is NOT code. This is the narrowing the port deliberately took over the awk it replaced, and
+# it is load-bearing: `tools/workflows/tier2-review.js` carries a comment that necessarily spells the
+# banned expression while documenting the retired join, and a whole-file-text ban reds on it.
+js "rule5: a comment documenting the join is prose" 0 <<'EOF'
+// never key the join on m[f.ref] = v again; use the integer id
+const r = 1
+EOF
+js "rule5: a string mentioning the join is prose" 0 <<'EOF'
+const s = "do not write m[f.ref] = v"
+EOF
+js "rule5: a template mentioning the join is prose" 0 <<'EOF'
+const prompt = `Never key a verdict join on verdictByRef; use the integer id.`
+EOF
+
+# The integer-keyed join is the SANCTIONED shape, and an arm that only proves denial is satisfied by
+# a rule that denies everything.
+js "rule5: the integer-keyed join is untouched" 0 <<'EOF'
+const verdictById = new Map()
+verdictById.set(f.id, v)
+EOF
+
+# The selector, as ONE arm set of three. The eighth alone proves only that the fixture is harmless;
+# the ninth is what shows the flag actually narrowed something; the tenth is what stops the flag
+# being a silent switch that disables the cap whenever it is misspelled.
+jso "rule5: --only=join passes a rule-2 breach that carries no join" 0 --only=join <<'EOF'
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+js "rule5: the same script unfiltered still denies" 2 <<'EOF'
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+jso "rule5: an unrecognised selector refuses" 2 --only=bogus <<'EOF'
+const r = 1
+EOF
+
 # ---- rule 2: verifier arity ---------------------------------------------------------------------
 # THE PROVENANCE OF THESE FIXTURES: the first is the verify stage of the bespoke closing-review
 # workflow written in this repo's own session on 2026-08-09, reconstructed from the transcript. It is
@@ -197,6 +264,42 @@ const ALL_LENSES = [{ s: 'a' }, { s: 'b' }, { s: 'c' }]
 const LENSES = a.lenses ? ALL_LENSES.filter((L) => a.lenses.includes(L.s)) : ALL_LENSES // gov:fixed-verifiers
 const r = await boundedParallel(LENSES.map((L) => () => agent(L.s)), 5)
 EOF
+# TOOL-dTieredTribunal-13 S5 — the marked branch now judges EVERY top-level value branch. THREE of
+# these five DENY arms are the reproduced holes: before this unit each PASSED, because either accept
+# could return on a single arm while the other stayed caller-supplied. The other two are the guards
+# inside the new predicate, which had no arm at all — and a guard nobody has watched fail is an
+# assertion about nothing. Every one was run against the shipped file and its verdict recorded.
+js "rule2: marked ternary whose OTHER arm is caller-supplied → deny" 2 <<'EOF'
+const SPEC = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.kind === 'spec' ? SPEC : args.customLenses // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: marked .filter ROOTED on a caller value → deny" 2 <<'EOF'
+const ALL = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.lenses.filter((L) => ALL.includes(L)) // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: bounded split in one arm, caller value in the other → deny" 2 <<'EOF'
+const MAX_VERIFIERS = 5
+const items = [1, 2, 3]
+const b = cond ? chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) : args.custom // gov:fixed-verifiers
+const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
+EOF
+js "rule2: marked line whose right-hand side yields NO branch → deny" 2 <<'EOF'
+const LENSES = // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L)), 5)
+EOF
+js "rule2: marked ternary whose : is not on the line → deny" 2 <<'EOF'
+const SPEC = [{ k: 'a' }, { k: 'b' }]
+const LENSES = args.kind === 'spec' ? SPEC // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
+js "rule2: a marked ternary between two sibling literals → allow" 0 <<'EOF'
+const SPEC_LENSES = [{ k: 'a' }, { k: 'b' }]
+const DIFF_LENSES = [{ k: 'c' }, { k: 'd' }]
+const LENSES = kind === 'spec-audit' ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
+const r = await boundedParallel(LENSES.map((L) => () => agent(L.k)), 5)
+EOF
 js "rule2: a single synthesis agent → allow" 0 <<'EOF'
 const synth = await agent('synthesize the confirmed findings', { label: 'synth' })
 EOF
@@ -305,6 +408,19 @@ let K = 5
 K = 500
 const b = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers
 const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
+EOF
+
+# D10 - a REASSIGNED receiver must SAY so. The reason map is written by both scan passes and was
+# never cleared on accept, so a name refused on pass 1 for declaration order and then accepted on
+# pass 2 kept the pass-1 text; the sweep below took the name back and the refusal printed an
+# explanation of a branch pass 2 had just blessed. The verdict was right and the reason was wrong,
+# which is precisely the "operator fixes it by guessing" failure the map was added to remove. This
+# arm asserts the TEXT, because an exit-code arm cannot tell a right reason from a wrong one.
+msg "rule2: a reassigned marked receiver -> deny NAMING the reassignment" 2   'was REASSIGNED after its bounded assignment' <<'EOF'
+let LENSES = ALL.filter((L) => L.on) // gov:fixed-verifiers
+const ALL = [1, 2, 3]
+LENSES = args.custom
+const r = await boundedParallel(LENSES.map((L) => () => agent(L)), 5)
 EOF
 
 # S4 — `gov:bounded-fanout` is a CLAIM about a width, checked like its sibling. It used to exempt its

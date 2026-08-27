@@ -42,7 +42,9 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=129
+# 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
+# skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
+FLOOR_ASSERTIONS=132
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -93,7 +95,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -113,6 +115,123 @@ if stray:
     sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
+# ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
+#     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
+#     so an arm asserting "timed out after Ns" is satisfied by the broken code. This one measures
+#     ELAPSED TIME against a control, which is the only instrument that can see the defect.
+#
+#     IT GRADES THE CONSTRUCT, NOT THE BAR. A whole-bar timing assertion is a fact about the node:
+#     measured on node `a` while writing this, a bar carrying ONE trivial leg exceeded 120 s under
+#     ambient load, which would make any absolute bar-level bound flaky in exactly the way that
+#     drives people to delete arms.
+#
+#     THE WINDOW IS DECIDED BY A MEASUREMENT. The CORRECT construct was measured at 12 s under heavy
+#     load against a 2 s bound -- that is kill-path and scheduling overhead, and it does NOT shrink
+#     when the sleeper does. So the valid window is (12, sleeper): a 30 s sleeper against a 20 s
+#     allowance. An earlier revision of this arm used a 10 s sleeper and a 6 s allowance, which is an
+#     EMPTY window and would have redded correct code on the node that produced the 12 s.
+#
+#     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
+# HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
+HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+if [ "$HAVE_TIMEOUT" != 1 ]; then
+  # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
+  # for a property of their box, which is what the sibling arms below already refuse to do.
+  echo "canary: SKIP arms 1c/1d/1e — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here. 1e is INSIDE this gate: with CEILINGS_LIVE=0 the runner deliberately runs every leg unbounded, so its fixture leg would finish and the arm would red for a property of the box"
+else
+n=$((n+1))
+_cw=$(mktemp -d)
+_t0=$(date +%s)
+timeout -k 5s 2 bash -c 'sleep 30 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
+_t1=$(date +%s)
+_took=$(( _t1 - _t0 ))
+# The control: the SAME command through a command substitution, which is the form that does not
+# bound the clock. Without it a green here could mean "this box is fast", not "the form is right".
+_t2=$(date +%s)
+_ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1)
+_t3=$(date +%s)
+_ctltook=$(( _t3 - _t2 ))
+if [ "$_took" -gt 20 ]; then
+  echo "canary: a file-captured 2s timeout over a backgrounded grandchild took ${_took}s — the bound"
+  echo "canary: is on the verdict and not on the clock, which is bounded-through-a-pipe-is-unbounded."
+  fail=1
+elif [ "$_ctltook" -le 20 ]; then
+  echo "canary: the CONTROL returned in ${_ctltook}s, so this host does not reproduce the pipe defect"
+  echo "canary: and the arm above proved nothing. Not a pass: a control that cannot fail is the"
+  echo "canary: vacuous-selector class, and this arm is reported UNPROVEN rather than green."
+  fail=1
+fi
+rm -rf "$_cw"
+
+# ---- 1d. THE RUNNER USES THAT CONSTRUCT. Scoped to CODE LINES: a whole-file grep reds on the
+#     comments documenting the fix, which is absence-assertion-over-whole-file-text happening inside
+#     the guard. TOOL-aBoundedCeiling-1.
+n=$((n+1))
+if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 2>&1; then
+  echo "canary: run-gates.sh captures a timeout through a command substitution on a code line —"
+  echo "canary: that bounds the verdict and not the clock. Redirect to a file and read the file."
+  grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" | sed 's/^/    /'
+  fail=1
+fi
+
+# ---- 1e. THE RUNNER ACTUALLY APPLIES A LEG'S CEILING. spec-1 AC1/AC3.
+#     Arms 1c and 1d grade the CONSTRUCT and the SOURCE. Neither invokes the runner, so deleting the
+#     `timeout` wrapper from runleg() leaves both of them green and every leg unbounded -- 1c runs its
+#     own literal in this process, and 1d is a negative search that matches nothing when there is no
+#     timeout at all. This build's closing review staged exactly that deletion and watched the bar
+#     stay green. So this arm drives the REAL runner over a fixture manifest.
+#
+#     ELAPSED IS NOT ASSERTED HERE, deliberately, and the reason is measured: on the node that wrote
+#     this, a bar carrying ONE trivial leg exceeded 120 s under ambient load, so a wall-clock bound
+#     around the whole runner is a fact about the box. What IS asserted is the VERDICT plus the
+#     control -- an identical leg with NO ceiling is not reported as timed out -- which is what
+#     distinguishes "the runner bounds legs" from "this leg happened to fail".
+n=$((n+1))
+_cd=$(mktemp -d)
+printf '#!/usr/bin/env bash\nsleep 45\n' > "$_cd/slow.sh"
+"$PYBIN" - "$_cd" <<'CEILPY'
+import json, sys, io
+d = sys.argv[1]
+bounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo", "ceiling": 2},
+           {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+unbounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo"},
+             {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+io.open(d + "/bounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(bounded, indent=2) + "\n")
+io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(unbounded, indent=2) + "\n")
+CEILPY
+# A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
+# nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
+_cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_bout" in
+  *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
+  *) echo "canary: a leg declaring \"ceiling\": 2 over a 45s command was not reported as timed out —"
+     echo "canary: the runner is not applying per-leg ceilings. Got:"
+     printf '%s\n' "$_bout" | grep -E 'GATE (ok|FAIL|skip)' | sed 's/^/    /'
+     fail=1 ;;
+esac
+
+# 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
+#     that reds every long leg for any reason would read as proof that ceilings work.
+n=$((n+1))
+_uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_uout" in
+  *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
+                       echo "canary: does not discriminate and proves nothing about the ceiling."
+                       fail=1 ;;
+esac
+
+# 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
+#     forgotten gov leg from an adopter leg it has no business bounding, so a mixed manifest RUNS.
+n=$((n+1))
+case "$_uout" in
+  *"declare no ceiling and run unbounded"*) ;;
+  *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
+     echo "canary: losing its bounds is invisible on every run"; fail=1 ;;
+esac
+rm -rf "$_cd" "$_cr"
+fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
@@ -122,7 +241,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -622,7 +741,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: kit self-tests, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: every self-test, GATE_SELFTESTS=1 runs them)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -909,7 +1028,7 @@ case "$(profline "$o")" in *'built-in default'*) ;; *) echo "canary: the no-tabl
 # announcing the knob INERT and taking the width alone — a supported state, on a BSD base install or a
 # minimal image. Asserting a timeout there reds an adopter's bar and blames the runner's override
 # logic for a missing binary. `timeout` is RUN, never probed for on PATH, which is this tree's rule.
-HAVE_TIMEOUT=0; timeout 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# (probed once, near the top, so arms 1c and 4g/4h can all gate on it)
 
 # 4g. GATE_JOBS overrides the WIDTH ONLY. The row is still selected and still supplies every other
 #     knob — an override that silently disabled the rest of the profile would make the table a lie

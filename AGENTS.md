@@ -480,15 +480,19 @@ that can. What survives here is what a session cannot get anywhere else.
 ```bash
 bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every self-test
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the self-tests, which are held by default — by CHUNK since 325d5f55, so six subject=repo legs are held too
-GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # the complete bar, and what a DoD needs
+GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every self-test, by `subject = kit` OR `chunk = selftests`
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the self-tests. ON DEMAND ONLY — no boundary sets this any more (owner, 2026-08-27)
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg there is. Owed by a DoD for work that touched a KIT, and by nothing else
 ```
 
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
 the kit dir they exercise, so a records-only commit runs only the legs that check this repo's actual
 state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —
-an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
+an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. **NO BOUNDARY RUNS A SELF-TEST ANY MORE** (owner, 2026-08-27). `.githooks/gate-env.sh` was the one
+place still switching them on for this repo, and it no longer does, which completes the 2026-08-23
+ruling in the words that ruling used — "in this repo and in every adopter alike". The consequence is
+stated in that file and is not softened here: nothing exercises them automatically, a change that
+guts a kit check lands green, and the compensating check is a person running them. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
 is still available — but `.githooks/pre-push` no longer sets it unconditionally. It DECIDES, forcing a
 total run when no recorded full green covers the pushed tip, when that green is more than a declared
 number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, when

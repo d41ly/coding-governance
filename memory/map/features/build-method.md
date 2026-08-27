@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["fold-text-is-unreviewed-surface.md"]
+gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -84,11 +84,15 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   `verb_resume`'s echo, still guarded by `[ -f "$M/guides/BUILD-METHOD.md" ]`, and leg check 16's
   arm B, which stays silent when the carrier is absent BY DESIGN: the leg grades the tree, the driver
   grades the run.
-- **`M4` has no harness, and the method says so again.** `tier2-review.js` reviews DIFFS and cannot
-  be pointed at a document, so the spec audit is hand-run under the review protocol's caps. The rule
-  was briefly deleted from M4 rather than displaced, leaving this bullet describing a line that was
-  not there; it is restored in the method. The most token-expensive obligation the method names is
-  its least instrumented step.
+- **`M4` HAS a harness now, and the rule states the mechanism rather than a category.**
+  `TOOL-dTieredTribunal-12` replaced the ban with a declared-subject rule: `tier2-review.js` audits a
+  spec when the call names the spec kind, and undeclared it acquires a diff and primes code-shaped
+  lenses, which is why calling a spec reviewed by that run would be false. The wording matters more
+  than the verdict. The old rule stated a CONCLUSION — a spec is not code — whose ground was a
+  category assertion nothing could falsify, and it reached that state by losing its mechanism clause
+  in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
+  reader can check whether the call carries it. The obligation is still the method's least
+  instrumented step, because nothing yet asserts that a spec audit HAPPENED.
 
 ## Reuse affordance
 

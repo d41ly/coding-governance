@@ -6,7 +6,8 @@
       "skills/session-kickoff/manifest-check.sh"
     ],
     "chunk": "records",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "template size <=48KiB",
@@ -15,7 +16,8 @@
       "tools/check-template-size.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "charter size",
@@ -25,7 +27,8 @@
       "AGENTS.md"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "micro-format definitions",
@@ -34,7 +37,8 @@
       "tools/check-microformats.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "micro-format gate selftest",
@@ -47,7 +51,8 @@
       "tools/check-microformats.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 170
   },
   {
     "name": "line length",
@@ -56,7 +61,8 @@
       "tools/check-line-length.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "line-length gate selftest",
@@ -69,7 +75,8 @@
       "tools/check-line-length.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 280
   },
   {
     "name": "playbook parity",
@@ -78,7 +85,8 @@
       "tools/check-playbook-parity.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "playbook parity selftest",
@@ -92,7 +100,8 @@
       "tools/check-playbook-parity.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 420
   },
   {
     "name": "template size gate selftest",
@@ -101,7 +110,8 @@
       "tools/check-template-size.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 220
   },
   {
     "name": "kickoff engine size <=18KiB",
@@ -111,7 +121,8 @@
       "skills/session-kickoff/SKILL.md"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "kit version markers",
@@ -120,7 +131,8 @@
       "tools/check-kit-versions.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
@@ -129,7 +141,8 @@
       "tools/memory-tree/check-verdict-epoch.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "verdict-epoch self-test",
@@ -142,7 +155,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 340
   },
   {
     "name": "agent-instructions wiring",
@@ -154,7 +168,8 @@
       "claude"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "manifest-check self-test",
@@ -167,7 +182,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 1310
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
@@ -180,7 +196,8 @@
       "tools/lib/"
     ],
     "chunk": "wiring",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 110
   },
   {
     "name": "agent-cap self-test",
@@ -193,7 +210,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 230
   },
   {
     "name": "scratch-guard self-test",
@@ -206,7 +224,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 150
   },
   {
     "name": "agent-instructions self-test",
@@ -219,7 +238,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 100
   },
   {
     "name": "memory-hygiene self-test",
@@ -232,7 +252,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 1980
   },
   {
     "name": "row-keyed merge driver replay",
@@ -245,7 +266,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 830
   },
   {
     "name": "kit/dogfood doc parity",
@@ -261,7 +283,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "method carriers (every pointer declared)",
@@ -270,7 +293,8 @@
       "tools/memory-tree/check-method-carriers.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 120
   },
   {
     "name": "method-carriers self-test",
@@ -279,7 +303,8 @@
       "tools/memory-tree/check-method-carriers.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 140
   },
   {
     "name": "build-index selftest",
@@ -293,7 +318,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 110
   },
   {
     "name": "build README slot contract",
@@ -303,7 +329,8 @@
       "--check-format"
     ],
     "chunk": "records",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "corpus-ids selftest",
@@ -317,7 +344,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 810
   },
   {
     "name": "gotchas selftest",
@@ -331,7 +359,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 70
   },
   {
     "name": "row-grammar selftest",
@@ -345,7 +374,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
@@ -355,7 +385,8 @@
       "--check"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "check-arms selftest",
@@ -369,7 +400,8 @@
       "tools/memory-tree/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "branch-guard self-test",
@@ -382,7 +414,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "pre-push self-test",
@@ -395,7 +428,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 540
   },
   {
     "name": "push-main self-test",
@@ -409,7 +443,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 180
   },
   {
     "name": "check-wiring self-test",
@@ -423,7 +458,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 700
   },
   {
     "name": "verifier fan-out self-test",
@@ -432,11 +468,13 @@
       "tools/workflows/check-verifier-fanout.test.sh"
     ],
     "guard": [
+      "tools/hooks/",
       "tools/lib/",
       "tools/workflows/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 80
   },
   {
     "name": "review-protocol parity (kit vs dogfood)",
@@ -450,7 +488,8 @@
       "tools/workflows/"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "review-join ban (no ref-keyed join)",
@@ -459,7 +498,8 @@
       "tools/workflows/check-review-join.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "workflow script syntax",
@@ -468,7 +508,20 @@
       "tools/workflows/check-workflow-syntax.js"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
+  },
+  {
+    "name": "tier2-review self-test",
+    "argv": [
+      "bash",
+      "tools/workflows/tier2-review.test.sh"
+    ],
+    "guard": [
+      "tools/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit"
   },
   {
     "name": "review-join self-test",
@@ -477,11 +530,13 @@
       "tools/workflows/check-review-join.test.sh"
     ],
     "guard": [
+      "tools/hooks/",
       "tools/lib/",
       "tools/workflows/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 70
   },
   {
     "name": "pytest-guardrails self-test",
@@ -494,7 +549,8 @@
       "tools/pytest-parallel-guardrails/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "codebase-map kit selftest",
@@ -508,7 +564,8 @@
       "tools/lexicon/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "codebase-map coverage + freshness",
@@ -517,7 +574,8 @@
       "tools/codebase-map/test_codebase_map.py"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "codebase-map adopter e2e",
@@ -530,7 +588,8 @@
       "tools/lib/"
     ],
     "chunk": "e2e",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 160
   },
   {
     "name": "settings-merge selftest",
@@ -544,7 +603,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "memory-recall kit selftest",
@@ -557,7 +617,8 @@
       "tools/memory-recall/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 820
   },
   {
     "name": "recall floor",
@@ -570,7 +631,8 @@
       "memory/"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "recall floor arms",
@@ -584,7 +646,8 @@
       "tools/govkit/"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "memory-recall skill wiring",
@@ -594,7 +657,8 @@
       "--check"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "drift-audit selftest",
@@ -607,7 +671,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 690
   },
   {
     "name": "drift-audit wiring",
@@ -617,7 +682,8 @@
       "--check"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "drift-audit records",
@@ -627,7 +693,8 @@
       "--check"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "unattended kit gate",
@@ -637,7 +704,8 @@
     ],
     "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 1600
   },
   {
     "name": "playbook validity gate",
@@ -646,7 +714,8 @@
       "tools/unattended/check-playbook.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 490
   },
   {
     "name": "unattended skill wiring",
@@ -656,7 +725,8 @@
       "--check"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "run-gates canary",
@@ -670,7 +740,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 3960
   },
   {
     "name": "run-gates evidence",
@@ -683,7 +754,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 2120
   },
   {
     "name": "run-gates turnstile",
@@ -696,7 +768,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 1130
   },
   {
     "name": "run-gates gov canary",
@@ -709,7 +782,8 @@
       "tools/gate-legs.json"
     ],
     "chunk": "selftests",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "run-gates adopter e2e",
@@ -721,7 +795,8 @@
       "tools/run-gates/"
     ],
     "chunk": "e2e",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 140
   },
   {
     "name": "run-gates wiring",
@@ -732,7 +807,8 @@
     ],
     "guard": [],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "profile-bar selftest",
@@ -744,7 +820,8 @@
       "tools/run-gates/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 580
   },
   {
     "name": "install-prefix (shipped surface)",
@@ -753,7 +830,8 @@
       "tools/check-install-prefix.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 290
   },
   {
     "name": "agent-cap restatement",
@@ -762,7 +840,8 @@
       "tools/check-agent-cap-restatement.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "agent-cap restatement self-test",
@@ -771,7 +850,8 @@
       "tools/check-agent-cap-restatement.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 330
   },
   {
     "name": "install-prefix self-test",
@@ -784,7 +864,8 @@
       "tools/lib/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 510
   },
   {
     "name": "dead-path carriers (deleted files still named)",
@@ -793,7 +874,8 @@
       "tools/check-dead-paths.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "dead-path carriers self-test",
@@ -805,7 +887,8 @@
       "tools/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 630
   },
   {
     "name": "govkit selfcheck",
@@ -815,7 +898,8 @@
       "selfcheck"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "govkit selftest",
@@ -827,7 +911,8 @@
       "tools/govkit/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 3530
   },
   {
     "name": "lexicon naming predicates",
@@ -842,7 +927,8 @@
       ".claude/"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "lexicon selftest",
@@ -854,7 +940,8 @@
       "tools/lexicon/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 270
   },
   {
     "name": "lexicon wiring",
@@ -865,7 +952,8 @@
     ],
     "guard": [],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "playbook placeholder catalogue",
@@ -874,7 +962,8 @@
       "tools/check-placeholders.sh"
     ],
     "chunk": "product",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "placeholder-catalogue self-test",
@@ -887,7 +976,8 @@
       "tools/check-placeholders.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   },
   {
     "name": "memory hygiene",
@@ -896,7 +986,8 @@
       "tools/memory-tree/check-memory-hygiene.sh"
     ],
     "chunk": "records",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 1270
   },
   {
     "name": "marker contracts",
@@ -905,7 +996,8 @@
       "tools/memory-tree/marker-contract.test.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 180
   },
   {
     "name": "verifier fan-out",
@@ -914,7 +1006,8 @@
       "tools/workflows/check-verifier-fanout.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "govkit refusal join",
@@ -926,7 +1019,8 @@
       "tools/govkit/"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "govkit acceptance matrix",
@@ -941,7 +1035,8 @@
       "tools/check-line-length.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 700
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
@@ -950,7 +1045,8 @@
       "tools/check-testsuite-counts.sh"
     ],
     "chunk": "declarations",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "testsuite counts self-test",
@@ -959,7 +1055,8 @@
       "tools/check-testsuite-counts.test.sh"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 110
   },
   {
     "name": "playbook render wiring",
@@ -971,7 +1068,8 @@
       "--check"
     ],
     "chunk": "wiring",
-    "subject": "repo"
+    "subject": "repo",
+    "ceiling": 60
   },
   {
     "name": "playbook render selftest",
@@ -984,6 +1082,7 @@
       "--selftest"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 60
   }
 ]

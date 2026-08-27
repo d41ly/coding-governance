@@ -33,7 +33,13 @@
 #   * EXECUTABLE FILES ARE OUT OF SCOPE. A bound stated in a comment inside a harness is not seen.
 #     Also observed: `tools/workflows/tier2-review.js` says `<=5 concurrent` on one line and
 #     `ONE <=6-wide wave` on another while its code fans at 5, and this gate cannot arbitrate that.
-#     Filed as TOOL-aDeclaredBound-6. Widening to source is what took the false-positive rate to
+#     Filed as TOOL-aDeclaredBound-6 and CLOSED by TOOL-dTieredTribunal-11, which deleted the
+#     DISAGREEING carrier - the `ONE <=6-wide wave` comment - and nothing else. `<=5` still stands in
+#     `meta.description` and in `meta.phases[0].detail`, and it agrees with `boundedParallel`'s
+#     default, so the pair no longer contradicts. That is NOT the stronger claim three carriers made
+#     for a while, that no digit survives at either site: changing that default re-creates the drift,
+#     and this gate reads markdown only, so nothing would be watching. The example is kept because it
+#     is the clearest statement of what this gate cannot do, and its `<=6` half is dead. Widening to source is what took the false-positive rate to
 #     64% when it was measured, which is why the scope stops at markdown. The one carrier this cost
 #     the build was a REMEDY STRING inside `tools/hooks/agent-cap.js`; it was fixed by reading, and
 #     it is the standing argument for widening the population when someone has the budget.

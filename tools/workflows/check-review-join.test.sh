@@ -85,6 +85,29 @@ arm 'comments describing the retired join are prose, not code' 'clean — no ref
 arm 'the shipped tree is clean' 'clean — no ref-keyed verdict join' \
   bash "$GATE"
 
+# ---- D7: a status this gate cannot interpret is a REFUSAL, never a verdict -----------------------
+# Both halves of one root: the loop read "the pipeline exited non-zero" as "rule 5 fired".
+# The false RED. agent-cap exits 2 on its own environment refusal BEFORE any rule runs, and that
+# message has no line starting with two spaces and L, so the sed emptied it and the gate reported a
+# ref-keyed verdict join with a blank body - sending an operator off to rewrite a join that is not
+# there. Reproduced exactly this way against the shipped tree.
+arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   env AGENT_CAP=7 bash "$GATE"
+
+# The false GREEN, and the reason `set -o pipefail` is now set beside `set -u`: only the hook's
+# status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and
+# the file was recorded clean. A stub predicate returning an unclassifiable status stands in for
+# every such shape. The gate's own header preaches that a probe which cannot move must say so.
+BS="$TMP/badstatus"; mkdir -p "$BS/tools/workflows" "$BS/tools/hooks"
+( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf "export const meta = { name: 'x' }
+await log('hi')
+" > tools/workflows/w.js
+  printf 'process.exit(3)
+' > tools/hooks/agent-cap.js
+  git add -A && git commit -qm badstatus --no-verify )
+cp "$GATE" "$BS/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./gate.sh' _ "$BS"
+
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
   bash "$GATE" "$TMP/does-not-exist.js"
@@ -131,6 +154,9 @@ mkdir -p "$D/tools/workflows"
     > tools/workflows/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
 cp "$GATE" "$D/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+# TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
+# without one meets the missing-predicate refusal instead of the verdict this arm asserts.
+mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"
 
 # never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
 cat >"$D/tools/workflows/scratch-join.js" <<'EOF'
@@ -161,8 +187,22 @@ E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
 cp "$GATE" "$E/gate.sh"
+# S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
+# not bound until this block, so a `$D` spelling here would judge the wrong repo.
+mkdir -p "$E/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$E/tools/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
   bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
+
+# TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
+# predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
+# assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
+N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
+( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > tools/workflows/w.js
+  git add -A && git commit -qm nohook --no-verify )
+cp "$GATE" "$N/gate.sh"
+arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
+  bash -c 'cd "$1" && bash ./gate.sh' _ "$N"
 
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi

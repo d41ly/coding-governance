@@ -15,6 +15,9 @@
 
 ## TOOL — tooling
 
+- TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
+- TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
+
 - TOOL-dFramedEntrypoint-9 · the build-README contract grows ORGANICALLY: each build's owner conforms their own README on next touch (owner). Declines making the two judgement slots empty_ok for pre-existing builds; binds 1 of 62 today and the 49 terminal builds never bind
 - TOOL-dFramedEntrypoint-8 · the build README's authored half GETS a prose template, bound to a DECLARED REGISTRY not the corpus. Reverses aMouldedFolio-1 conclusion 3 and aMouldedFolio-3 §3 knowingly (owner): they refused on 17 of 25 violating day one, re-measured 20 of 61
 - TOOL-aRelaxedShard-4 · the backlog's bound is its LIVE ROW COUNT, not its byte cap: rotation carries forward every non-terminal row. `live_backlog_rows_per_shard` reports it per shard, REPORT-ONLY — a pin on an unguarded merge leg is a scheduled refusal. Sharding rejected on the slope
@@ -111,3 +114,5 @@
 - TOOL-dTieredTribunal-8 · P5 IS AUTHORIZED but SEQUENCED AFTER P11 (owner, 2026-08-26). The ref-keyed-join ban lifts into `agent-cap.js`, the only point reaching an inline script — but P11 closes that file's reproduced marked-derivation hole FIRST, so P5 is not built on it
 - TOOL-dTieredTribunal-9 · the left-shift M8 owed for the closing review's D1 and D2 is a `memory/gotchas/` RECORD, not a scanner (owner, 2026-08-26). Named as a documented check, not a gate: nothing static separates a fold-created sentence from any other. Closes `TOOL-dTieredTribunal-5`
 - TOOL-dTieredTribunal-10 · the F2 reclassification STANDS (owner, 2026-08-26), ratified knowing the run which moved it was the run it was blocking. The unit is complete either way and excludes new gate legs. The QUESTION stays OPEN at `TOOL-dTieredTribunal-6`
+- TOOL-dTieredTribunal-25 · the THIRD RECEIVER is ruled IN to `REVIEW-PROTOCOL.md` (owner, 2026-08-27). It listed two receivers, then said `Everything else is denied` — false since the marked derivation. Authored in the TEMPLATE and rendered down, because the parity leg renders live FROM ship
+- TOOL-dTieredTribunal-26 · the `--only` control on `check-wiring.sh` STAYS ADVISORY (owner, 2026-08-27), not a merge-bar leg. It still reds at session start and AC7d catches it in the suite, so the residual is WHEN it is noticed. Resolves spec-14 F3

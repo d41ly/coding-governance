@@ -283,6 +283,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "boundedBranch",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "boundedK",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -1858,6 +1863,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "parseBranches",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "parse_affordance",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2656,6 +2666,11 @@
       "id": "scan",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "scanJoinFindings",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "scanWriteTargets",

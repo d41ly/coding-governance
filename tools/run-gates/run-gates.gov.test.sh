@@ -69,7 +69,7 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=15
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -233,6 +233,51 @@ else
   a=$((a+1))
   grep -qF 'tools/run-gates/gate-profiles.txt' "$CHARTER" \
     || { echo "gov-canary: $CHARTER does not name tools/run-gates/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
+fi
+
+# ---- G6. EVERY GOV LEG DECLARES A CEILING --------------------------------------------------------
+# TOOL-aBoundedCeiling-1 S9. The RUNNER deliberately does not enforce this: it cannot tell a gov leg
+# somebody forgot from an adopter leg the deployer has no business bounding, so it reports an
+# unbounded count and refuses nothing. The requirement over THIS corpus lives here, which is the file
+# allowed to hold a claim about this repository -- see this suite's header for why that split exists.
+#
+# WHAT THIS DOES NOT CHECK: whether a ceiling is the RIGHT number. It grades presence and shape only.
+# A leg bounded at 99999 passes here and is still unbounded in every sense that matters; the number is
+# argued in the spec and in the manifest, and no gate reads an argument.
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+try:
+    legs = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
+
+bad = []
+for l in legs:
+    if not isinstance(l, dict):
+        print("gov-canary: a leg row is not an object"); sys.exit(1)
+    nm = l.get("name", "?")
+    if "ceiling" not in l:
+        bad.append("%s declares no ceiling, so it runs unbounded and a hang in it wedges the bar" % nm)
+        continue
+    c = l.get("ceiling")
+    if isinstance(c, bool) or not isinstance(c, int) or c <= 0:
+        bad.append("%s has ceiling %r, which is not a positive integer of seconds" % (nm, c))
+
+# LIVENESS. An empty manifest, or one this predicate never selected, would report zero problems and
+# read exactly like a fully-bounded corpus. Say so instead.
+if not legs:
+    print("gov-canary: the manifest carries no legs at all, so this arm graded nothing"); sys.exit(1)
+
+if bad:
+    print("gov-canary: %d of %d gov leg(s) are not bounded:" % (len(bad), len(legs)))
+    for b in bad[:12]:
+        print("  " + b)
+    if len(bad) > 12:
+        print("  ... and %d more" % (len(bad) - 12))
+    sys.exit(1)
+' "$LEGS_FILE"; then
+  fail=1
 fi
 
 # ---- verdict -------------------------------------------------------------------------------------
