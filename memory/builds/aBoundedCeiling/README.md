@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
+ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
 ---
 
 # aBoundedCeiling — a leg that cannot hang forever, and a landing that pays for the bar once
@@ -62,7 +62,7 @@ by the owner; and the two Definition-of-Done overrides that landing took.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
+ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

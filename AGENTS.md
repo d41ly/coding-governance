@@ -480,9 +480,9 @@ that can. What survives here is what a session cannot get anywhere else.
 ```bash
 bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every kit self-test
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # the kit self-tests. ON DEMAND: no boundary runs them (owner 2026-08-27)
-GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg. A DoD needs it only for KIT work
+GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every self-test, by `subject = kit` OR `chunk = selftests`
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run the self-tests. ON DEMAND ONLY — no boundary sets this any more (owner, 2026-08-27)
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg there is. Owed by a DoD for work that touched a KIT, and by nothing else
 ```
 
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming

@@ -155,7 +155,8 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask. The cost is process creation, not logic:
-  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
+  `memory/gotchas/process-creation-is-the-suite-cost.md`. No ceiling figure here — each suite
+  declares its own and they have already moved once · prune when a bar runs them automatically.
 - 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
   take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
   adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
@@ -212,6 +213,11 @@ does — hit three times in one file in one session) · `process-creation-is-the
   re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
+- The memory hygiene leg is ~34 s, not ~23 minutes: `TOOL-aThawedCorpus-4` and `-1` collapsed
+  checks 23 and 21 from a process per corpus item to one `awk` each.
+- The pre-commit hygiene leg no longer runs check 23 (`TOOL-aThawedCorpus-5`: 683 s to 20 s). A
+  broken ACCEPTANCE LEDGER is now caught only at the push boundary, which works because
+  `memory hygiene` declares no guard and so runs on both of pre-push's branches.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
