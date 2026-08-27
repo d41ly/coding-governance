@@ -1,10 +1,12 @@
 # TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md](../reviews/2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md) | spec-audit | TOOL-aThawedCorpus-5 TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 |
 
 <!-- /gen:spec-records -->
 

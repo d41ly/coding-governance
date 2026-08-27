@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aThawedCorpus-1-per-check-timing.md](../build/2026-08-27-build-TOOL-aThawedCorpus-1-per-check-timing.md) | research | — |
 | [2026-08-27-prompt-TOOL-aThawedCorpus-1-1.md](../prompts/2026-08-27-prompt-TOOL-aThawedCorpus-1-1.md) | research | — |
+| [2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md](../reviews/2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md) | spec-audit | TOOL-aThawedCorpus-5 TOOL-aThawedCorpus-4 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 |
 
 <!-- /gen:spec-records -->
 

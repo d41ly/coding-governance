@@ -1,10 +1,12 @@
 # TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 4f406bf7 · streams tooling · order 3
+**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 4f406bf7 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md](../reviews/2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md) | spec-audit | TOOL-aThawedCorpus-5 TOOL-aThawedCorpus-4 TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-3 |
 
 <!-- /gen:spec-records -->
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-27
 streams: tooling
 roster: TOOL
-ids: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4
+ids: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4 TOOL-aThawedCorpus-5
 authorized-by: prompt
 ---
 
@@ -55,6 +55,9 @@ cache could ever hit here — git records none.
   on "unchanged" subsumes the owner's "fully closed" and also covers the idle-but-open build.
 - **The kit stays standalone.** No `../lib/`, no `tools/run-gates/`. `resolve_python` is the
   precedent for what that costs and how it is paid.
+- **A concurrent session on this node measured the same subject.** Its `project` memory note,
+  `hygiene-staged-leg-costs-16-minutes`, is where unit `-5` came from. Cite it, do not re-derive it,
+  and verify every claim it makes against source before acting — which is what that unit's §10 does.
 - **The freeze already exists — do not build a second one.** `run-gates.sh`'s `input_key` keys a leg
   on `git ls-files -s` over its guard pathspecs plus their dirty share, and `GATE_REUSE` skips a leg
   whose key is unchanged and whose last verdict was green. That is content-addressed, fail-open and
@@ -69,41 +72,44 @@ and why the run refused it.)*
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aThawedCorpus-4` | 1 | check 23's three per-item loops become two `awk` passes |
-| 2 | `TOOL-aThawedCorpus-1` | 1 | check 21's filename projection stops spawning per record |
-| 3 | `TOOL-aThawedCorpus-2` | 2 | the memory legs declare their true input set, so guard-skip and `GATE_REUSE` both start working |
-| 4 | `TOOL-aThawedCorpus-3` | 2 | a declared SPAWN ceiling per leg that REDS on breach — the left-shift for the per-item-spawn class |
+| 1 | `TOOL-aThawedCorpus-5` | 1 | check 23 gets the `--staged` guard its four siblings already have — one line |
+| 2 | `TOOL-aThawedCorpus-4` | 1 | check 23's three per-item loops become two `awk` passes |
+| 3 | `TOOL-aThawedCorpus-1` | 1 | check 21's filename projection stops spawning per record |
+| 4 | `TOOL-aThawedCorpus-2` | 2 | the memory legs declare their true input set, so guard-skip and `GATE_REUSE` both start working |
+| 5 | `TOOL-aThawedCorpus-3` | 2 | a declared SPAWN ceiling per leg that REDS on breach — the left-shift for the per-item-spawn class |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4
+**Build status:** OPEN · 5 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4 TOOL-aThawedCorpus-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-4.md) | 1 | 1 | OPEN | rev-2 | 2026-08-27 |
-| [TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-1.md) | 2 | 1 | OPEN | rev-2 | 2026-08-27 |
-| [TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them](spec/2026-08-27-spec-TOOL-aThawedCorpus-2.md) | 3 | 2 | OPEN | rev-1 | 2026-08-27 |
-| [TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here](spec/2026-08-27-spec-TOOL-aThawedCorpus-3.md) | 4 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aThawedCorpus-5 — check 23 gets the `--staged` guard its four siblings already have](spec/2026-08-27-spec-TOOL-aThawedCorpus-5.md) | 1 | 1 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-4.md) | 2 | 1 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-1.md) | 3 | 1 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them](spec/2026-08-27-spec-TOOL-aThawedCorpus-2.md) | 4 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here](spec/2026-08-27-spec-TOOL-aThawedCorpus-3.md) | 5 | 2 | OPEN | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedCorpus-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aThawedCorpus-4` | no |
-| 2 | `TOOL-aThawedCorpus-1` | no |
-| 3 | `TOOL-aThawedCorpus-2` | no |
-| 4 | `TOOL-aThawedCorpus-3` | no |
+| 1 | `TOOL-aThawedCorpus-5` | no |
+| 2 | `TOOL-aThawedCorpus-4` | no |
+| 3 | `TOOL-aThawedCorpus-1` | no |
+| 4 | `TOOL-aThawedCorpus-2` | no |
+| 5 | `TOOL-aThawedCorpus-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
