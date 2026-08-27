@@ -134,8 +134,10 @@ would be satisfied by the defect it exists to prevent.
 
 - **F1 — is the ceiling per LEG or per CORPUS ITEM?** RESOLVED (agent, 2026-08-27, delegated): moot.
   `tools/gate-legs.json` on `main` already carries a per-leg `ceiling` on 85 of its 86 legs, with
-  `memory hygiene` at 1270, and `run-gates.sh` kills a leg that outlives its own. The question this
-  fork asked was answered by `TOOL-aBoundedCeiling-1` while this spec was being written.
+  `memory hygiene` among them, and `run-gates.sh` kills a leg that outlives its own. The question
+  this fork asked was answered by `TOOL-aBoundedCeiling-1` while this spec was being written — and
+  that unit then re-derived its own numbers at rev-5, which is the second reason not to have built
+  a rival mechanism here.
 
 - **F2 — does the shim's own `exec` overhead swamp the signal?** RESOLVED (agent, 2026-08-27,
   delegated): the shim cannot produce the signal at all. A `PATH` shim intercepts an `exec`; a
@@ -149,8 +151,9 @@ would be satisfied by the defect it exists to prevent.
   load-spread measurement.
 - rev-2 · 2026-08-27 · RETIRED (WONTDO), on two independent fatal findings. The PREMISE died on
   `main`: per-leg `ceiling` declarations landed as `TOOL-aBoundedCeiling-1`, and `memory hygiene`
-  is declared at 1270 s — this build's 1398 s measurement is a BREACH of it, which is a stronger
-  argument for the collapse units than a new gate would have been. The MECHANISM died on the audit:
+  carries a declared ceiling. This spec once read that 1398 s BREACHED it; that claim is withdrawn,
+  because `TOOL-aBoundedCeiling-1` rev-5 re-derived the rule and the number, on the ground that a
+  hang bound sized like a cost budget reds on ambient load. The MECHANISM died on the audit:
   a `PATH` shim cannot see a fork. Successor: none needed; the wall-clock ceiling that exists is
   live on this host, since `timeout -k` runs here.
 

@@ -15,8 +15,11 @@ Node `a` · opened 2026-08-27 · streams tooling. The owner's prompt is at
 verbatim, with what this run read out of it and what it declined to adopt.
 
 ## The problem this build exists to solve
-The `memory hygiene` leg costs 1398 s and is DECLARED at `ceiling: 1270`, so it breaches a bound
-`run-gates.sh` enforces with a kill. Measured on node `a`, 2026-08-27.
+The `memory hygiene` leg costs 1398 s. Measured on node `a`, 2026-08-27. A WITHDRAWN claim sat
+here: that this breached the leg's declared ceiling. It did, against the 1270 that stood when it was
+measured, and `TOOL-aBoundedCeiling-1` rev-5 then re-derived that number to 12720 on the ground that
+a ceiling is a HANG bound and sizing one like a cost budget makes it red on ambient load. The
+speedup stands on its own numbers; the breach framing does not.
 The cost is not the walk. Check 23 is 962.0 s of it and check 21 is 338.9 s — 93.1% between them —
 and both are slow for one reason: they spawn a process per corpus item for work that is string
 manipulation. Ten other checks total 32.4 s. Separately, the leg declares no `guard`, so
@@ -89,7 +92,7 @@ ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedC
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aThawedCorpus-5 — check 23 gets the `--staged` guard its four siblings already have](spec/2026-08-27-spec-TOOL-aThawedCorpus-5.md) | 1 | 1 | CLOSED | rev-3 | 2026-08-27 |
-| [TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-4.md) | 2 | 1 | CLOSED | rev-5 | 2026-08-27 |
+| [TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-4.md) | 2 | 1 | CLOSED | rev-6 | 2026-08-27 |
 | [TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record](spec/2026-08-27-spec-TOOL-aThawedCorpus-1.md) | 3 | 1 | CLOSED | rev-5 | 2026-08-27 |
 | [TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them](spec/2026-08-27-spec-TOOL-aThawedCorpus-2.md) | 4 | 2 | WONTDO | rev-2 | 2026-08-27 |
 | [TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here](spec/2026-08-27-spec-TOOL-aThawedCorpus-3.md) | 5 | 2 | WONTDO | rev-2 | 2026-08-27 |

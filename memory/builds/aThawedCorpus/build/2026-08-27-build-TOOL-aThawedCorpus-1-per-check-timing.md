@@ -122,9 +122,19 @@ full on every commit for want of the guard its four siblings carry: **683 s to 2
 practical reading is the commits in this build's own history: the pre-commit hook cost 913 s at the
 start of this run and **23 s** on the commit that landed the last unit.
 
-**The leg was over a live bound, not merely slow.** `tools/gate-legs.json` declares
-`memory hygiene` at `ceiling: 1270` and `run-gates.sh` kills a leg that outlives its own;
-`timeout -k` is runnable on this host, so the ceilings are live. 1398 s breached it. 34 s does not.
+**A claim this record made, and WITHDRAWS.** It read: the leg was over a live bound, not merely
+slow — `memory hygiene` declared at `ceiling: 1270`, `run-gates.sh` killing a leg that outlives its
+own, `timeout -k` runnable here, so 1398 s was a breach. Every clause was true when written.
+
+While this build ran, `TOOL-aBoundedCeiling-1` reached rev-5 and re-derived the ceiling RULE from
+3x with a 60 s floor to 10x with a 300 s floor, moving `memory hygiene` from 1270 to **12720**. Its
+reason is the same lesson this record learned one section above: twelve of forty legs timed out on a
+real landing with nothing hung, because a ceiling sized like a COST budget reds on ambient load. A
+hang bound and a cost budget are two questions, and 1270 was answering the wrong one.
+
+So 1398 s was never a hang. The collapse is worth what its own controlled pairs say it is worth and
+not a byte more, and this record does not get to borrow urgency from a number somebody else has
+since corrected.
 
 ## What the fixture suite did NOT cover, stated because a green suite looked like evidence
 

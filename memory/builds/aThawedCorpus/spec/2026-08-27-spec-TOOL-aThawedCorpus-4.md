@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record
 
-**Status:** CLOSED · rev-5 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -18,9 +18,10 @@ measured directly. It spawns one `awk` per record, then roughly eleven processes
 more `grep` per acceptance criterion (populations derived in §4 Inventory, never quoted). Collapse
 all three loops so the leg's largest term stops being process creation this repo controls.
 
-This is now a RED, not a slow. `tools/gate-legs.json` declares `memory hygiene` at `ceiling: 1270`
-and `run-gates.sh` kills a leg that outlives its own; `timeout -k` runs on this host, so the
-ceilings are live. 1398 s is a breach.
+A claim here was WITHDRAWN at rev-6: that 1398 s breached the leg's declared ceiling. True against
+the 1270 that stood when it was written, and `TOOL-aBoundedCeiling-1` rev-5 has since re-derived
+that number to 12720, because a ceiling is a hang bound and sizing one like a cost budget makes it
+red on ambient load. The unit's justification is its own measured span, which needs no ceiling.
 
 ## 2. Scope (IN)
 
@@ -58,7 +59,8 @@ ceilings are live. 1398 s is a breach.
 - **N1** — No skip, cache or freeze, and no spawn ceiling. `TOOL-aThawedCorpus-2` and
   `TOOL-aThawedCorpus-3` were to have built those and are both RETIRED (WONTDO) — the freeze exists
   already, and per-leg ceilings shipped as `TOOL-aBoundedCeiling-1`. This unit's job is the cost,
-  and the ceiling it must come in under is the declared 1270 that already binds.
+  and the ceiling it must come in under is whatever `tools/gate-legs.json` declares, read there
+  rather than quoted here — this build already watched that number move under it.
 - **N2** — No change to what check 23 MEANS. The ledger grammar, the two legal forms, the cutoff, the
   grandfather registry and the vacuity arm are untouched.
 - **N3** — No change to `.memory-tree.conf`. `ACCEPTANCE_LEDGER_CUTOFF` and
@@ -160,7 +162,8 @@ None. The checker is not a stored artifact.
   live `bash` processes, check 23's own span is under 60 s, against the 962.0 s this build's
   measurement record carries, with that process count reported at both ends of the run.
 - **AC3b** — When `bash tools/run-gates/run-gates.sh` runs the `memory hygiene` leg, it completes
-  inside the `ceiling` declared for it in `tools/gate-legs.json` rather than being killed.
+  inside whatever `ceiling` `tools/gate-legs.json` declares for it, read from that file at the time
+  rather than against a figure quoted in this spec.
 - **AC4** — When every tracked spec is temporarily moved below `ACCEPTANCE_LEDGER_CUTOFF` in a
   scratch corpus, the checker still prints the `check 23 measured NO unit` liveness line.
 - **AC5** — When two records are staged into a scratch corpus such that the first carries an
@@ -204,6 +207,9 @@ None. The checker is not a stored artifact.
 - rev-4 · 2026-08-27 · three forward references to the retired `-2` and `-3` re-pointed. Caught by
   `gotchas.py --for-diff` selecting `amendment-leaves-its-other-half-standing`.
 
+- rev-6 · 2026-08-27 · WITHDREW the ceiling-breach claim after `TOOL-aBoundedCeiling-1` rev-5
+  re-derived `memory hygiene` from 1270 to 12720 mid-build, and re-pointed both remaining ceiling
+  references at the manifest instead of quoting a number.
 - rev-5 · 2026-08-27 · CLOSED. Built and measured: check 23 962.0 s -> 3.8 s, full leg 1420 s ->
   360 s, stdout AND stderr identical. AC1's seeded half satisfied by a differential over a scratch
   corpus firing all three outcomes plus the grandfather, cutoff, CLOSED/Tier-2, first-wins,
