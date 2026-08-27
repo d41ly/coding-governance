@@ -14,6 +14,29 @@ merge and a push — it REPLACES it with something a machine can check. If the r
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
 
+## Before any path — schedule the keepalive NOW
+
+**This is the run's first act, and it comes before you read anything else.** Not before preflight:
+before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declares —
+{{KEEPALIVE_INTERVAL}} — and keep the id it returns, because `--preflight` refuses without it.
+
+```
+{{KEEPALIVE_CREATE}}  ->  keep the id
+```
+
+**Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
+three of the four paths below never reached it: the two that start from prose or a playbook orient,
+research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
+is the longest unattended stretch a run has. A run that stalls in it has no keepalive, nothing wakes
+it, and nothing records why. A step written inside one path is a step the other three do not execute,
+which is why this one sits above the table instead.
+
+**If the run never starts, reap it anyway.** Every path below can refuse — a value that does not
+resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s refusals. The store
+is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
+that ended, and there is no run-state file for a later reader to find it through. Delete it with
+`{{KEEPALIVE_DELETE}}` before you stop.
+
 ## Which path
 
 **Four start paths, and picking the wrong one costs a refusal you cannot answer.** Read the row that
@@ -35,6 +58,7 @@ Making a playbook and following one are two acts with two authorizations.
 **A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
 playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
 It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
+It schedules no keepalive, and the section above does not bind it: there is an owner in the loop.
 
 ## Start a run
 
@@ -59,6 +83,7 @@ It is [below](#produce-pieces-attended), after the unattended paths it shares it
    | `land-once-done` | when a build may land | M8 | all | D8 |
    | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
+   | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
    | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
    | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
    | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
@@ -131,11 +156,8 @@ It is [below](#produce-pieces-attended), after the unattended paths it shares it
    exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
    a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
 
-3. **Schedule the keepalive yourself.** This is your half and no script can do it: the scheduling
-   store is in-memory and session-scoped, reachable only through your own tool calls. Use
-   `{{KEEPALIVE_CREATE}}`, at the cadence this project declares — {{KEEPALIVE_INTERVAL}}. Keep the
-   id it returns.
-4. **Preflight**, handing over that id and any waiver pairs step 2 confirmed:
+3. **Preflight**, handing over the keepalive id you already hold and any waiver pairs step 2
+   confirmed:
 
    ```bash
    bash {{KIT_DIR}}/unattended.sh --preflight <slug> --keepalive-id <id>
@@ -147,7 +169,7 @@ It is [below](#produce-pieces-attended), after the unattended paths it shares it
    advertises no default branch of its own, and when a second run is already live. It writes nothing until every one of those
    passes. Read the refusal it prints — each one names itself.
 
-5. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
+4. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
    The engine's unattended hand-back fires only when a run-state file already exists in a
    non-terminal phase, and `--preflight` is the only thing that creates one. Invoked first it
    halts at the READY card waiting for a confirmation nobody is present to give; invoked here it
@@ -241,7 +263,7 @@ rather than a claim in a transcript nobody reads.
    `the remote advertises no tip for the branch this run is on, so nothing published authorizes it`
    — read here so you do not have to diagnose it there.
 5. **Preflight**, exactly as the slug path does. It records the mode from the file you just pushed.
-6. **The kickoff hand-back**, at the slug path's step 5 and for its reason.
+6. **The kickoff hand-back**, at the slug path's step 4 and for its reason.
 
 **After any later roster change, commit AND PUSH before the next authorization read.** The roster
 comparison holds on this anchor only because you re-push; a roster grown and committed but not pushed
@@ -301,7 +323,7 @@ the push is provably older than the commit that authorizes the run.
    globs, no piece grain or no declaration block — all three are read from the blob at BASE, so fix
    them in the playbook and land that, never in the working tree.
 
-6. **The kickoff hand-back**, at the slug path's step 5 and for its reason.
+6. **The kickoff hand-back**, at the slug path's step 4 and for its reason.
 
 **While the pieces are made, RECORD each one.** A verdict that exists only in the transcript is a
 verdict the merge bar cannot read, and the two piece-scoped Definition-of-Done items read the records
@@ -435,6 +457,14 @@ definition, so the absence is a decision and not an oversight.
   Re-running it with the same question and reason is a no-op, so a resumed run that re-derives the
   same refusal does not duplicate the row. It is refused on a finished record — an abort is the verb
   for a decision that stops the run.
+- **And what you may NOT park: a STRICTLY BENEFICIAL discovery.** Protocol section 11 is the rule and
+  is not restated here. The shape of it: a discovery that makes an observable this repo already
+  MEASURES strictly better, makes nothing it measures worse, and survives M3's vetoes is ADOPTED into
+  this build — now, by you — with `--rescope --act add`. One that fails the first two clauses is a
+  BACKLOG row; one that trips a veto is a park. A BLOCKER between you and your own landing is a
+  discovery, and it is the one most often mistaken for a question. Parking a discovery that qualifies
+  is not caution: the reader you are deferring to is the one who left, so the finding is discarded
+  and the record makes the discarding look careful.
 - A playbook you are FOLLOWING is not a playbook you may edit. A run that rewrites the checklist it
   is graded by has no rules left, so what you would change goes on the record joined to the step that
   provoked it, and the amendment is a separate authoring run the owner starts:
