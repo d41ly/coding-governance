@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md) | diff-review | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 |
 | [2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md) | spec-audit | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 |
 
 <!-- /gen:spec-records -->

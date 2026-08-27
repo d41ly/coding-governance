@@ -9,8 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
-phase: RUNNING
+parked-surfaced: yes, 3 surfaced
+keepalive-reaped: yes
+witness: ded172527621226aed8f4b9f3dcf78234ac084e2
+phase: LANDED
+landed-anchor: remote
+landed-anchor-source: reconstructed 2026-08-27 by hand, not by the verb, following the precedent commit 7cf96591. `--landed` flipped this record to LANDED and THEN failed leg check 34 on a stale lander marker, leaving a terminal phase with no anchor kind; re-running it now refuses with check 26 because the record is finished, so no verb can write these keys. VERIFIED before writing: `git merge-base --is-ancestor ded17252 origin/main` is true, so the witness genuinely reached the remote default branch and `remote` is the true kind, not the convenient one.
+unpushed-at-landing: 29
 branch-sha: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 branch-ref: refs/heads/branch/unattended-prompt-cg-toolkits-831d35
 mode: prompt
@@ -34,3 +39,9 @@ base: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 2026-08-27T13:38:34Z decision · item RESOLVED by owner, 2026-08-27: the check-7 LANDING red is not this run's to fix and clears at push-main. · reason Owner ruling in response to the parked question above. The dTieredTribunal run-state file sitting at phase LANDING on main reds UNATTENDED check 7 for every later run; the owner states it clears on push-main and instructed this run to proceed. This run therefore does NOT treat check 7 as a landing blocker and does NOT forge another node's record. Recorded here because a ruling that lives only in a transcript is a ruling nobody can audit, and because the earlier parked entry would otherwise read as still-open at wrap-up.
 
 2026-08-27T17:58:37Z decision · item memory/guides/SESSION-KICKOFF.md is EFFECTIVELY FULL — 2 bytes under its 25600 cap after this merge. The next session that hits a trap cannot record it without evicting someone else's entry. Raise the cap, split the file, or accept that §B stops accreting? · reason Measured across three merges today. Before this run: 25118. After my trap entry: 25584, 16 bytes headroom, which I flagged then as a signal rather than a healthy state. After merging main, which added a GATE_BOUND bullet of its own: 26064, i.e. 464 OVER. Two nodes grew one hard-capped file in one afternoon. Options seen: (1) prune a dated correction — CHECKED, neither prune-when condition holds; 75e0e5c0 is gov dropping its own GATE_SELFTESTS, not the second-kit adoption that entry waits for; (2) remove another node's entry — refused, not mine to delete; (3) drop my own. Chose 3, and it is defensible beyond arithmetic: my entry documented a 963 s pre-commit leg, and the fix landing in this same merge makes it 54 s, so its primary fact is obsolete on arrival. The surviving half — a timed-out commit orphans its hook tree — is preserved in TOOL-aGroundedOrientation-3's spec and in this run's commit messages. What is NOT solved is the structural point: a document whose job is front-loading traps has no room to front-load the next one.
+
+2026-08-27T18:46:45Z review · item aGroundedOrientation · reason verdict BLOCKED · blockers 2
+
+2026-08-27T18:47:02Z review · item aGroundedOrientation · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-27T18:47:42Z override · item gates-green · reason Owner instructed 'merge to main without gates' on 2026-08-27, so the bar was not run for this landing and the pre-commit hook was bypassed on five commits, each recorded in its own message. Two reds this build created were found by the closing review and FIXED and pushed anyway (b0b1cb31): check 9's last-body-change threshold and check 5's stamp. One red remains on main and is NOT this build's: check-arms on the stale pin at memory/project/unarmed-branches.txt:42, verified green at BASE and red at f1be0b49 in its own worktree, with an empty diff on that file across this build's range.

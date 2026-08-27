@@ -1,4 +1,4 @@
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
 
 # TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write
 
@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-27-prompt-TOOL-aGroundedOrientation-1.md](../prompts/2026-08-27-prompt-TOOL-aGroundedOrientation-1.md) | research | TOOL-aGroundedOrientation-1 |
+| [2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md) | diff-review | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-3 |
 | [2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md) | spec-audit | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-3 |
 
 <!-- /gen:spec-records -->
@@ -88,6 +89,27 @@ None.
   whole-file grep §4 explicitly rejects, so the section-slice decision §4 calls "the point" was
   unobservable — the gate's own rationale went untested. AC5 added as the discriminating case: the
   literal moved to another `## ` section must still RED.
+- rev-4 · 2026-08-27 · built and landed on main at ded17252 with its ARMS 1-OF-3 OBSERVED, which is
+  a real gap and is recorded rather than rounded up. AC1 OBSERVED: with the probe step moved below
+  the write, the leg emitted the ordering refusal. AC2 and AC5 UNOBSERVED — the run was landing
+  when they were still executing. AC5 is the costly one: it is the only criterion separating this
+  section-scoped gate from the whole-file grep 4 rejects, so the design decision remains untested.
+  AC4 OBSERVED: `check-arms.py --check` exit 0 at the bumped 101:100 floor, after it REFUSED the
+  first attempt for asserting a PREFIX of the failure text rather than the text itself.
+  A prior observation attempt ran 45 minutes against a clone of HEAD where this unit was
+  uncommitted, so the arm under test did not exist and all three reported hit=0 — indistinguishable
+  from a broken arm. The probe now asserts the locator is PRESENT in the checker under test,
+  because the liveness check could not: 'the clean tree emits neither message' is true both when
+  the arm is correctly silent and when it is absent.
+- rev-5 · 2026-08-27 · ALL THREE ARMS NOW OBSERVED. rev-4's claim that AC2 and AC5 were unobserved
+  was PREMATURE and is corrected here rather than left standing. AC5 PASSED: the literal moved to
+  another `## ` heading still produced the vacuity refusal, so the section slice is observable and
+  the design decision 4 calls "the point" is tested. AC2 initially reported FAIL, and that was my
+  interference, not the arm: its output was 313 bytes ending mid-run at check 9 against 2835 for a
+  completed arm, because an orphan-reap I ran excluded PIDs and the string `u2arms` while that
+  checker appears as a bare relative path containing neither. Re-run alone and uninterrupted it
+  emitted the vacuity refusal, 2835 bytes, one hit. The lesson is already written down and was not
+  applied: match a reap on the script PATH, never on a keyword the checking command itself carries.
 
 ## 10. Reuse audit
 **The seam extended.** Check 20's own `$psec` slice in `tools/unattended/check-unattended.sh`, and
