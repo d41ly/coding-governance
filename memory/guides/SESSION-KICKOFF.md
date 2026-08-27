@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-27T20:33:59+03:00 @ ee0e75471b66991f50f07640651881323b2d702f
+last-audit: 2026-08-27T21:49:27+03:00 @ ded172527621226aed8f4b9f3dcf78234ac084e2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: ee0e75471b66991f50f07640651881323b2d702f
+last-body-change: ded172527621226aed8f4b9f3dcf78234ac084e2
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -71,7 +71,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
-  the handles are written here — that is the drift the pointer design exists to avoid.
+  the handles are written here — that is the drift the pointer design exists to avoid. Two invert
+  the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`.** A breach is KILLED, and `gates-green`
   then says the bar never RETURNED — not the same fact as a leg FAILING. `TOOL-aBoundedCeiling-6`.
@@ -117,7 +118,7 @@ bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width 
 # Legs report in CHUNKS, each closing with its own verdict line, so a red is readable before the run ends. Chunks bound REPORTING only — dispatch is untouched, and a chunk whose every leg skipped reports as skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. ON DEMAND ONLY: no boundary sets this (owner, 2026-08-27), so nothing exercises a kit self-test automatically and a change gutting one lands green
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
@@ -154,8 +155,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask. The cost is process creation, not logic:
-  `memory/gotchas/process-creation-is-the-suite-cost.md`. No ceiling figure here — each suite
-  declares its own and they have already moved once · prune when a bar runs them automatically.
+  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
 - 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
   take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
   adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand

@@ -19,6 +19,7 @@ landed-anchor-source: reconstructed 2026-08-27 by TOOL-aBoundedCeiling-9 — thi
   landing commits are all ancestors of origin/main. `unpushed-at-landing` is deliberately
   NOT reconstructed — the driver measures it at landing time and cannot be re-derived after.
 phase: LANDED
+landed-anchor: remote
 mode: slug
 anchor-kind: default-branch
 keepalive: 91ed1be1

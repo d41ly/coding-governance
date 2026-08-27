@@ -6,11 +6,18 @@
 # THIS script — never hand-copy the checks. Part of the coding-governance memory-tree kit.
 #
 #   tools/memory-tree/check-memory-hygiene.sh            # full check
-#   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (set-checks tree-wide, file-checks on staged paths)
+#   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
+#
+# `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
+# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 23 all skip, and the
+# full run at the push boundary is where they bind. Check 22 is NOT among them and still walks
+# every tracked review record here. This line used to read "set-checks tree-wide", which was
+# already false of 13-19 — one rule returning two verdicts, the
+# `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.47   # gov:kit memory-tree@2.47 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.48   # gov:kit memory-tree@2.48 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1095,7 +1102,10 @@ $badL"
 $badD"
 fi
 
-# ---- 22: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
+# ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
+# ---- NUMBERED 22 IN THIS COMMENT UNTIL 2026-08-27, AND IT WAS NEVER 22. Every fail arm below
+# ---- says 23 and so does the pop_guard; 22 is the review-verdict vocabulary at `:610`, and
+# ---- HYGIENE.md item 22 says so too. A spec trusted this header and graded the wrong check.
 # ---- TOOL-dUnstalledConvoy-12. Specs number their criteria and nothing joined a built unit back to
 # ---- those numbers: `build-complete` reads terminal STATUS only, and the closing-review item says
 # ---- outright that it measures a review EXISTS and never what it concluded. This is the join.
@@ -1111,13 +1121,30 @@ fi
 # ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
 # ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
 alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
-# TOOL-aGroundedOrientation-3 — the `--staged` guard its four structural siblings carry (:667, :1051,
-# :1066, :1076) and this one never got. Without it the pre-commit leg walks all specs and all records
-# on every commit regardless of what is staged, which is 94% of that leg's wall clock: measured
-# 2026-08-27 node `a`, 963 s as shipped against 54 s guarded, uncontended, same staged set. No
-# coverage moves — `.githooks/pre-push` runs the full bar at the push boundary, where STAGED=0 and
-# this block runs exactly as before. The class is the one this file's own :111-112 already documents
-# fixing elsewhere: a fork is ~50-100 ms under MSYS/Windows, and this block spawns thousands.
+# TOOL-aGroundedOrientation-3 AND TOOL-aPrimedKeepalive-6 — TWO BUILDS FIXED THIS INDEPENDENTLY on
+# ---- 2026-08-27 and the merge kept both halves, because each carried something the other did not.
+# ----
+# ---- THE GUARD, which is the shared half: the `--staged` guard its four structural siblings carry
+# ---- (`:667`, `:1051`, `:1066`, `:1076`) and this one never got. Without it the pre-commit leg walks
+# ---- all specs and all records on every commit regardless of what is staged, which is 94% of that
+# ---- leg's wall clock: measured 2026-08-27 node `a`, 963 s as shipped against 54 s guarded,
+# ---- uncontended, same staged set. No coverage moves — `.githooks/pre-push` runs the full bar at the
+# ---- push boundary, where STAGED=0 and this block runs exactly as before. The class is the one this
+# ---- file's own `:111-112` already documents fixing elsewhere: a fork is ~50-100 ms under
+# ---- MSYS/Windows, and this block spawns thousands.
+# ----
+# ---- IT ANNOUNCES ITSELF. A skip that prints nothing is indistinguishable from a check that found
+# ---- nothing, which is this repo's named class; the line below is what keeps a held check visible.
+# ----
+# ---- CHECK 22 IS NOT HELD AND IS NOT THIS BLOCK. It walks every tracked review record on every
+# ---- commit with no staged filter, and it stays that way deliberately: the whole `--staged` leg
+# ---- measures ~10 s on this corpus once this block is held, so a second scope buys nothing. Worth
+# ---- saying because the header comment above this block read `22:` until 2026-08-27 and a spec
+# ---- trusted it, graded the wrong check, and shipped the error into a runtime line.
+if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
+  printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
+'
+fi
 if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.

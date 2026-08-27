@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.10 -->
+<!-- gov:kit unattended@1.11 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -351,19 +351,47 @@ every other check decorative.
 
 ## 5. The keepalive — an AGENT obligation
 
-The scheduling store is in-memory and session-scoped. The job is gone when the agent process exits,
-and deleting it removes it from that same store. **No script can reach it.** So the obligation
-splits by actor, and the split is not a convenience:
+The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same
+store. **No script can reach it.** So the obligation splits by actor, and the split is not a
+convenience:
 
-- The **agent** schedules the keepalive before the run leaves `PREFLIGHT`, and reaps it before the
-  run reaches a terminal phase. It uses the tool calls its own project layer declares —
-  `KEEPALIVE_CREATE` and `KEEPALIVE_DELETE` in `.unattended.conf`, because an adopter's harness
-  exposes a different scheduler and a kit that hardcodes one repo's spelling is wrong everywhere
-  else.
+**What this section does NOT say, because it said it for four kit versions and it is measured
+false: that the job dies when the agent process exits.** It may not.
+`TOOL-aPromptedMandate-11` records a run asserting exactly that about two jobs, twice, while the
+scheduler's own listing showed both still firing. Treat a job you did not schedule as ALIVE until a
+delete says otherwise. The consequence is section 5's resume rule below, and the reason the reap is an
+obligation rather than a formality: the failure mode of assuming death is a keepalive firing forever
+under a green `keepalive-reaped` attestation.
+
+- The **agent** schedules the keepalive as the run's **FIRST act**, before any orientation and
+  before `--preflight`, on **every** start path — and reaps it before the run reaches a terminal
+  phase. It uses the tool calls its own project layer declares — `KEEPALIVE_CREATE` and
+  `KEEPALIVE_DELETE` in `.unattended.conf`, because an adopter's harness exposes a different
+  scheduler and a kit that hardcodes one repo's spelling is wrong everywhere else.
+- **"First act" replaces "before the run leaves `PREFLIGHT`", which was this sentence for four kit
+  versions and is the weaker claim.** A run enters `PREFLIGHT` only when `--preflight` writes that
+  phase, so the old wording was satisfied by scheduling at preflight time — and two of the four start
+  paths do their longest unattended work BEFORE that instant. A prompt-authorized run orients from
+  prose, runs the research-then-test loop its `prompt`-scoped directives oblige, writes a build
+  folder and pushes a branch, all before its first verb. That stretch is where a run is most likely
+  to stall and was the one stretch nothing could wake it from.
+- **A run that never STARTS still owns the job it created.** Where a start path refuses — a `--prompt`
+  value that does not resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s
+  refusals — the agent reaps the keepalive before it stops. The store is session-scoped, so a job
+  left behind by a run that never began is orphaned in exactly the way one left by a run that ended
+  is, and there is no run-state file for a later reader to find it through.
 - The **driver** RECORDS the id the agent hands it, and later ASSERTS that a reap was recorded. It
   never schedules and never deletes, and it labels the item agent-attested wherever it reports.
 
 A driver verb that claimed to schedule or reap would be claiming an effect it cannot produce.
+
+**RESUME is the third case, and it is the one the actor split does not cover.** A resumed session did
+not schedule the job the run-state file names and cannot assume it died with the process that did.
+So it REAPS that recorded id first, reads the result back and reports it, and only then schedules a
+replacement. `--keepalive-id` is accepted by `--preflight` alone, so the new id cannot be recorded:
+the `keepalive` fact keeps naming the old job, the close attestation covers both, and the wrap-up says
+which. Ordering matters — reap, then schedule — because the reverse leaves the run holding two jobs
+and a record naming neither correctly.
 
 ## 6. Landing
 
@@ -612,3 +640,59 @@ that run only. It is **never a Definition-of-Done override** — the two are sep
 separate records, and `--override` remains the only route to a DoD item. And it **never removes a
 GATE**: a directive relaxed here does not relax any check the merge bar performs, so a waiver whose
 directive has a machine-enforced consequence still meets that consequence at the bar.
+
+## 11. The adoption rule — a discovery joins the running build
+
+An attended run hands a discovery to the owner. An unattended run has no owner to hand it to, and a
+discovery filed as a question for an absent reader is not preserved — it is discarded, with a record
+that makes the discarding look careful. So under a mandate the disposition changes: **a strictly
+beneficial discovery is ADOPTED into the running build and decided in its favour at the moment it is
+found.**
+
+**A DISCOVERY is anything the run learns that it was not looking for.** A defect in a path it read, a
+measurement that contradicts a record, a cheaper mechanism for something the tree already does — and
+a BLOCKER standing between the run and its own landing, which is the case a run is most likely to
+mistake for an owner's question. Most discoveries happen in ORIENTATION, before the spec set exists,
+which is why this rule binds from the run's first act rather than from its first pass.
+
+**STRICTLY BENEFICIAL is a TEST, not an adjective.** A discovery qualifies when all three hold:
+
+1. it makes an observable this repo ALREADY measures strictly better — a gate that reds where it
+   should, a leg that costs less wall clock, a record that stops being false — and the improvement is
+   MEASURED rather than argued;
+2. nothing this repo measures gets worse: no acceptance criterion, no gate leg, no declared budget or
+   shrink-only pin, no security, data or write surface;
+3. it survives the build method's M3 vetoes unchanged.
+
+**Three dispositions, and choosing between them is not a judgement call.** Passes all three → ADOPT,
+now, by the run that found it. Fails 1 or 2 → a BACKLOG row naming what was seen and why it was
+declined, which is a decision the run TOOK. Trips a veto → PARK, with the question, the options and
+the refusal, which is a decision the run REFUSED. **Veto 2 is the one that bites**: a discovery
+needing a new external dependency, a new install location, a new public surface, or a change to a
+governance carrier is an owner turn and is parked.
+
+**Adoption is the M2 ADD act and introduces no authority.** M3 already delegates a build's own scope
+to a standing mandate through M2's amendment acts; what was missing was the instruction to use it.
+Record it with `--rescope <slug> --act add --item <unit-id> --reason "<what the run found>"`, spec the
+unit at its tier, and build it like any other. The build README's GOAL statement is NOT amended — a
+unit is added beside the goal, never in place of it — and on a project whose `ANCHOR_SCOPE` is
+`published` a grown roster is committed AND PUSHED before the next authorization read.
+
+**Decide AT ONCE.** A discovery adopted late costs a second pass over the same code; a discovery
+deferred costs the whole finding. The corpus is unambiguous on this: a run that recorded a measured
+sixteen-fold improvement, parked it, was told to proceed, and parked it a second time. "Write it down
+and move on" is not a stable state under a mandate, because the reader it defers to is the one who
+left.
+
+**What this does NOT license.** It is not permission to widen a build with work that is merely good.
+A refactor nobody measured, a rename, a "while we are here" is not a discovery — it is taste, and
+taste is the owner's. Clause 1's operative word is MEASURED: a run that cannot state the measurement
+has not made a discovery, and a run that adopts on preference has taken the owner's turn rather than
+substituted for it.
+
+**THERE IS NO MACHINE HALF, and this section says so rather than implying otherwise.** Nothing in
+this kit can observe a discovery a run did not record, so no gate can tell an adopted discovery from
+one silently dropped. What IS observable afterwards is the trail each disposition leaves: an adopted
+one leaves a `--rescope` row, a spec and a unit in the roster; a declined one leaves a backlog row; a
+parked one leaves a parked entry the wrap-up surfaces. That is the property parking-everything
+destroyed, and it is the closest thing to enforcement this rule has.

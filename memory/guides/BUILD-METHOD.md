@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.47 -->
+<!-- gov:kit memory-tree@2.48 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -271,9 +271,9 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
 - **Nobody reads the transcript.** Speak only when it changes what happens next: a refusal, an abort, a park, the
   wrap-up. Anything you would have said goes to a file — a park to the run-state file, a decision to the spec, a
   finding to a review record. **Never ask:** there is nobody to answer, so a question is a stall. The substitutes
-  are derive, park and abort; Step 5b says which one per exit.
+  are derive, ADOPT (§11), park and abort; Step 5b says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
-  Create it before preflight, reap it before the wrap-up. Both halves: protocol §5.
+  Create it FIRST, reap it before the wrap-up. Both halves: protocol §5.
 - **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,
   its record and what it cannot reach are protocol §10.
 
