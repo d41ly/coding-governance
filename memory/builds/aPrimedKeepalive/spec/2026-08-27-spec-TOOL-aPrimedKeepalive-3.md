@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

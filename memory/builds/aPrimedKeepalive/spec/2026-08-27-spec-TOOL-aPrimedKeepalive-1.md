@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path
 
-**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

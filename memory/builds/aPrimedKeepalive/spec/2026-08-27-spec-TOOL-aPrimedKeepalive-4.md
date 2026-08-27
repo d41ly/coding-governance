@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote
 
-**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

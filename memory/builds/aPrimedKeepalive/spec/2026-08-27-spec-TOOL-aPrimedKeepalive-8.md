@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-8 — the Skill's two halves agree that a resumed keepalive is presumed ALIVE
 
-**Status:** INPROGRESS · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 8
+**Status:** CLOSED · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

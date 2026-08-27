@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 6
 
 <!-- gen:spec-records -->
 

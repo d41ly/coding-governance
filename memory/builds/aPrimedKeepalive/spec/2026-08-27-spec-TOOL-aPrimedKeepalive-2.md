@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

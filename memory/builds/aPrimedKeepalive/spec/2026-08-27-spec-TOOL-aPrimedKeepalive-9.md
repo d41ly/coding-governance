@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-9 — the acceptance ledger evidences every criterion a fold added
 
-**Status:** INPROGRESS · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 9
+**Status:** CLOSED · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 9
 
 <!-- gen:spec-records -->
 

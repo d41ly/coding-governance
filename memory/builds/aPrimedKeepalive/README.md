@@ -197,21 +197,21 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-08-27 · streams tooling
+**Build status:** CLOSED · 9 unit(s) · node a · opened 2026-08-27 · streams tooling
 ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | INPROGRESS | rev-4 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-1.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-2.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-3.md) | 4 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-5.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-8 — the Skill's two halves agree that a resumed keepalive is presumed ALIVE](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-8.md) | 8 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-9 — the acceptance ledger evidences every criterion a fold added](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-9.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-1.md) | 2 | 2 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-2.md) | 3 | 2 | CLOSED | rev-3 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-3.md) | 4 | 2 | CLOSED | rev-3 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-5.md) | 6 | 1 | CLOSED | rev-2 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | CLOSED | rev-3 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-8 — the Skill's two halves agree that a resumed keepalive is presumed ALIVE](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-8.md) | 8 | 1 | CLOSED | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-9 — the acceptance ledger evidences every criterion a fold added](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-9.md) | 9 | 1 | CLOSED | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).

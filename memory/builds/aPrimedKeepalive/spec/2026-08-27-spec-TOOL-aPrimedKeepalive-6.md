@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22
 
-**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
