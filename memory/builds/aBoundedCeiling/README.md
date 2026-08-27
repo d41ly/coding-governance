@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
+ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
 ---
 
 # aBoundedCeiling — a leg that cannot hang forever, and a landing that pays for the bar once
@@ -117,7 +117,7 @@ units. The refusal is correct and the record belongs here instead.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
+ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
