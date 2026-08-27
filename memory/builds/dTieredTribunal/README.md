@@ -4,7 +4,7 @@ node: d
 opened: 2026-08-25
 streams: tooling
 roster: TOOL
-ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL-dTieredTribunal-16 TOOL-dTieredTribunal-17 TOOL-dTieredTribunal-21 TOOL-dTieredTribunal-22 TOOL-dTieredTribunal-23 TOOL-dTieredTribunal-24 TOOL-dTieredTribunal-25 TOOL-dTieredTribunal-26 TOOL-dTieredTribunal-27
+ids: TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12 TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL-dTieredTribunal-16 TOOL-dTieredTribunal-17 TOOL-dTieredTribunal-21 TOOL-dTieredTribunal-22 TOOL-dTieredTribunal-23 TOOL-dTieredTribunal-24 TOOL-dTieredTribunal-25 TOOL-dTieredTribunal-26 TOOL-dTieredTribunal-27 TOOL-dTieredTribunal-28
 ---
 
 # dTieredTribunal — one review harness for every review kind a build needs
@@ -98,6 +98,7 @@ owner's turn from.
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-08-25 · streams tooling
 ids TOOL-dTieredTribunal-1 TOOL-dTieredTribunal-2 TOOL-dTieredTribunal-3 TOOL-dTieredTribunal-4 TOOL-dTieredTribunal-5 TOOL-dTieredTribunal-6 TOOL-dTieredTribunal-7 TOOL-dTieredTribunal-8 TOOL-dTieredTribunal-9 TOOL-dTieredTribunal-10 TOOL-dTieredTribunal-11 TOOL-dTieredTribunal-12
 ids TOOL-dTieredTribunal-13 TOOL-dTieredTribunal-14 TOOL-dTieredTribunal-15 TOOL-dTieredTribunal-16 TOOL-dTieredTribunal-17 TOOL-dTieredTribunal-21 TOOL-dTieredTribunal-22 TOOL-dTieredTribunal-23 TOOL-dTieredTribunal-24 TOOL-dTieredTribunal-25 TOOL-dTieredTribunal-26 TOOL-dTieredTribunal-27
+ids TOOL-dTieredTribunal-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
