@@ -379,14 +379,19 @@ prof_n() { if [ "$1" = 0 ]; then printf '?'; else printf '%s' "$1"; fi; }
 if [ -n "$PROF_WHERE" ]; then prof_where=$PROF_WHERE
 else prof_where="cores $(prof_n "$DET_CORES") via $CORE_SRC, ram $(prof_n "$DET_RAM") MB via $RAM_SRC"; fi
 prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
+# THE CEILING REGIME IS ITS OWN FIELD, and deliberately not folded into `timeout`. That field names
+# the PROFILE knob, which every shipped row sets to 0, and the canary asserts it reads `off` on a
+# host that cannot honour it -- overloading it made an INERT run read as a live bound. But leaving
+# the line saying only `timeout off` while 85 legs carried a ceiling was the opposite lie, so the
+# regime is reported beside the knob rather than instead of it. TOOL-aBoundedCeiling-1.
+prof_c=live; [ "$CEILINGS_LIVE" = 1 ] || prof_c=INERT
 # ON STDERR, and independent of PROF_TIMEOUT. The pre-existing INERT notice at the profile probe is
 # gated on a knob every shipped row sets to 0, so it can never fire; without this line the only
 # signal that all 85 ceilings are dead would be a stdout suffix nobody reads for warnings.
 if [ "$CEILINGS_LIVE" != 1 ]; then
-  prof_t="$prof_t (per-leg ceilings INERT)"
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c; $PROF_TAG)"
 echo "$PROF_LINE"
 
 
@@ -756,15 +761,6 @@ total=${#names[@]}
 # profile line, which is where an operator already reads this run's knobs. The DECLARATION
 # requirement over gov's own corpus is S9, in run-gates.gov.test.sh, which is the suite allowed to
 # hold a claim about this repository.
-unbounded=0
-for ((i=0; i<total; i++)); do
-  [ -z "${names[$i]}" ] && continue
-  [ -n "${ceilings[$i]:-}" ] || unbounded=$((unbounded + 1))
-done
-if [ "$unbounded" -gt 0 ]; then
-  printf 'run-gates: %s of %s legs declare no ceiling and run unbounded this run\n' "$unbounded" "$total" >&2
-fi
-
 # Guard evaluation runs SERIALLY and up front: it is a read-only `git diff` per guarded leg, and
 # deciding before dispatch keeps the skip verdict independent of scheduling.
 for ((i=0; i<total; i++)); do
@@ -799,6 +795,20 @@ for ((i=0; i<total; i++)); do
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
 done
+
+# UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED, and counted over the legs that will actually RUN.
+# The runner cannot tell a leg somebody forgot from an adopter leg the deployer has no business
+# bounding, so a refusal it cannot justify would red a tree for a field it has no way to supply.
+# Counted HERE rather than at parse time: before the hold and guard passes the count is a fact about
+# the manifest, and this line claims to be a fact about the run. TOOL-aBoundedCeiling-1 S6.
+unbounded=0; willrun=0
+for ((i=0; i<total; i++)); do
+  [ -z "${names[$i]}" ] && continue
+  [ -f "$WORK/$i.rc" ] && continue          # already held, skipped or reuse-marked: it will not run
+  willrun=$((willrun + 1))
+  [ -n "${ceilings[$i]:-}" ] || unbounded=$((unbounded + 1))
+done
+[ "$unbounded" -gt 0 ] && printf 'run-gates: %s of %s legs that will run declare no ceiling and run unbounded\n' "$unbounded" "$willrun" >&2
 
 # The per-leg INPUT KEY: "what did this leg's verdict depend on". Written here and CONSUMED by
 # the reuse unit, which is what makes the two units' authority explicit rather than assumed —
@@ -862,6 +872,9 @@ if [ -n "$RUNDIR" ]; then
     printf 'profile_row\t%s\n' "$PROF_NAME"
     printf 'width\t%s\n' "$JOBS"
     printf 'leg_timeout\t%s\n' "$PROF_TIMEOUT"
+    # THE REGIME the legs actually ran under, beside the profile knob rather than instead of it: the
+    # knob is an input a later reader may want, and the regime is what the run did.
+    printf 'leg_ceilings\t%s\n' "$([ "$CEILINGS_LIVE" = 1 ] && echo live || echo inert)"
     printf 'profile_from\t%s\n' "$PROF_TAG"
     printf 'legs\t%s\n' "$total"
     printf 'worktree\t%s\n' "$(git rev-parse --show-toplevel 2>/dev/null)"

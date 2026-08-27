@@ -1079,6 +1079,10 @@ check_wiring() {
   wout=$RB_OUT
   if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
     fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+    # WHATEVER IT MANAGED TO SAY BEFORE IT WAS KILLED, indented under the refusal. This branch
+    # returns before the shared printer below, whose comment promises the declared check's output is
+    # never discarded -- true of the ordinary-failure path and, until this line, false of this one.
+    [ -z "$wout" ] || printf '%s\n' "$wout" | sed 's/^/    /' >&2
     return 1
   fi
   fail 4 "the declared wiring check failed, and a dormant hook makes every later green meaningless: $WIRING_CHECK"

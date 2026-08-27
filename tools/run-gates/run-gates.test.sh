@@ -42,7 +42,9 @@ PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
-FLOOR_ASSERTIONS=129
+# 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
+# skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
+FLOOR_ASSERTIONS=132
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -121,8 +123,13 @@ if stray:
 #     IT GRADES THE CONSTRUCT, NOT THE BAR. A whole-bar timing assertion is a fact about the node:
 #     measured on node `a` while writing this, a bar carrying ONE trivial leg exceeded 120 s under
 #     ambient load, which would make any absolute bar-level bound flaky in exactly the way that
-#     drives people to delete arms. The construct below is compared against a 60 s sleeper, a 30x
-#     margin, so it survives a slow box and still fails a wrong construct.
+#     drives people to delete arms.
+#
+#     THE WINDOW IS DECIDED BY A MEASUREMENT. The CORRECT construct was measured at 12 s under heavy
+#     load against a 2 s bound -- that is kill-path and scheduling overhead, and it does NOT shrink
+#     when the sleeper does. So the valid window is (12, sleeper): a 30 s sleeper against a 20 s
+#     allowance. An earlier revision of this arm used a 10 s sleeper and a 6 s allowance, which is an
+#     EMPTY window and would have redded correct code on the node that produced the 12 s.
 #
 #     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
 # HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.

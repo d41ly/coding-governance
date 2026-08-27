@@ -4599,6 +4599,21 @@ _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared wiring check did not answer within the declared"
 n=$((n+1))
 [ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --preflight took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+# ...and the OTHER call site, which is the one AC5's own text warns about: "the helper has one
+# exercised call site and one asserted only by inspection, which is how the sibling seam went
+# unbounded the first time." Until this arm, $GATE_CMD was that unexercised site -- check-arms is
+# structurally blind to it because the branch sets DOD_OUT rather than calling `fail`.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 30\n' > slowgate.sh
+mkconf "true" "bash slowgate.sh" "" "2"        # GATE_CMD sleeps; GATE_BOUND=2
+fixture
+run --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+_t0=$(date +%s); out=$(run --close tRun); _t1=$(date +%s)
+hit "$out" "the merge bar did not answer within the declared"
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --close took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach the gates-green arm"; st=1; }
+reset_tree
+
 fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT
      # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
      # ---- for a property of the box rather than a defect in the code.
@@ -4639,7 +4654,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=514
+FLOOR_ASSERTIONS=516
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4670,7 +4685,7 @@ FLOOR_ASSERTIONS=514
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=673
+FLOOR_ASSERTIONS=675
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -4692,7 +4707,9 @@ FLOOR_ASSERTIONS=673
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
 FLOOR_SHARD_1=205
-FLOOR_SHARD_2=471
+# +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
+# paid by shard 2 as well as by an unsharded run.
+FLOOR_SHARD_2=479
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
