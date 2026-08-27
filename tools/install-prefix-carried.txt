@@ -80,7 +80,7 @@ tools/run-gates/profile_bar.py	1
 tools/run-gates/profile_bar.test.sh	9
 tools/run-gates/run-gates.evidence.test.sh	5
 tools/run-gates/run-gates.gov.test.sh	4
-tools/run-gates/run-gates.sh	4
+tools/run-gates/run-gates.sh	3
 tools/run-gates/run-gates.test.sh	33
 tools/run-gates/run-gates.turnstile.test.sh	21
 tools/settings-merge.py	1
@@ -90,7 +90,7 @@ tools/unattended/adopt-unattended.test.sh	16
 tools/unattended/check-playbook.sh	1
 tools/unattended/check-playbook.test.sh	24
 tools/unattended/check-unattended.sh	3
-tools/unattended/check-unattended.test.sh	115
+tools/unattended/check-unattended.test.sh	120
 tools/unattended/cross-component.test.sh	2
 tools/unattended/kit.toml	2
 tools/unattended/playbook.fixture.md	1

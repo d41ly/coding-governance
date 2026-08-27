@@ -33,7 +33,6 @@ exempt-pin: 64
 !memory/builds/aBoundedVerdict/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBranchedMandate/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aCandidStub/README.md - predates the contract; drains when its build's owner conforms it
-memory/builds/aBoundedCeiling/README.md
 memory/builds/aCollapsedScan/README.md
 !memory/builds/aDeclaredBound/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aDeclaredCeiling/README.md - predates the contract; drains when its build's owner conforms it
@@ -102,3 +101,5 @@ memory/builds/dTieredTribunal/README.md
 !memory/builds/dUnstalledConvoy/README.md - predates the contract; drains when its build's owner conforms it
 memory/builds/aPrimedKeepalive/README.md
 !memory/builds/aBoundedCeiling/README.md - authored on a branch that did not carry the contract; drains when its build's owner conforms it
+memory/builds/aGroundedOrientation/README.md
+memory/builds/aReapedTicket/README.md

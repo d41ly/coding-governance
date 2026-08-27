@@ -3,3 +3,4 @@
 # that lived here left it the way the rows said they would: each gained a family-qualified H1 id in
 # its own spec (TOOL-aTetheredRecord-1), so every one now resolves and the pin fell 5 -> 0.
 # A row returns here only for an id that is cited, cannot be defined, and carries the reason why.
+TOOL-aBoundedCeiling-2 - dropped to a PARK before any spec existed, and recorded as such in that build's README: removing it needs relaxing .githooks/pre-push predicate 5, which widens what can land unverified, so it is an owner turn a standing mandate does not delegate. It stays cited by that README's generated `ids:` reservation range, which is not a unit roster, and no spec can ever define it. Diagnosed independently by memory/builds/aPrimedKeepalive/reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-9-reconcile-verification.md; waived here by the aReapedTicket landing because it reds the bar for every later run and is not that build's to resolve.

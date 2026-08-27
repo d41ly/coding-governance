@@ -1,11 +1,12 @@
 # TOOL-aReapedTicket-1 — a queued waiter drops its own ticket on every signal a trap can catch
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aReapedTicket-1-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aReapedTicket-1-acceptance-ledger.md) | journal | TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 |
 | [2026-08-27-prompt-TOOL-aReapedTicket-1.md](../prompts/2026-08-27-prompt-TOOL-aReapedTicket-1.md) | research | TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 |
 
 <!-- /gen:spec-records -->

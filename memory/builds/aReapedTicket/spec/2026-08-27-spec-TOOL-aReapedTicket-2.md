@@ -1,11 +1,12 @@
 # TOOL-aReapedTicket-2 — the acquire loop asserts liveness on the QUEUE, and refuses to wait on what cannot change
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aReapedTicket-1-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aReapedTicket-1-acceptance-ledger.md) | journal | TOOL-aReapedTicket-1 TOOL-aReapedTicket-3 |
 | [2026-08-27-prompt-TOOL-aReapedTicket-1.md](../prompts/2026-08-27-prompt-TOOL-aReapedTicket-1.md) | research | TOOL-aReapedTicket-1 TOOL-aReapedTicket-3 |
 
 <!-- /gen:spec-records -->
