@@ -178,7 +178,7 @@ ids DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 DEPL
 | [DEPL-dCarriedReceipt-9 — `carry` rungs, recomputed, over a derived needle map](spec/2026-08-24-spec-DEPL-dCarriedReceipt-9.md) | — | 2 | CLOSED | rev-10 | 2026-08-26 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 3 record folder(s).
+Records: 28 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
