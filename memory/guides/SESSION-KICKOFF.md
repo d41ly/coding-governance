@@ -117,7 +117,7 @@ bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width 
 # Legs report in CHUNKS, each closing with its own verdict line, so a red is readable before the run ends. Chunks bound REPORTING only — dispatch is untouched, and a chunk whose every leg skipped reports as skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. A DoD needs BOTH. The two run-gates canaries are in that held set, so a default bar no longer proves it can move
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. ON DEMAND ONLY: no boundary sets this (owner, 2026-08-27), so nothing exercises a kit self-test automatically and a change gutting one lands green
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift

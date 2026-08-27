@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: d4eae035e0cec30f209f04f8c4842c3c996af4f5
-phase: BUILDING
+phase: LANDING
 branch-sha: 1d83cc94eec944f8ecb3bae8e7186a545a58934c
 branch-ref: refs/heads/branch/unattended-self-check-perf-373152
 mode: prompt
@@ -38,3 +38,7 @@ base: 1d83cc94eec944f8ecb3bae8e7186a545a58934c
 2026-08-27T03:33:42Z review · item aBoundedCeiling · reason verdict BLOCKED · blockers 6
 
 2026-08-27T05:50:03Z review · item aBoundedCeiling · reason verdict BLOCKED · blockers 1
+
+2026-08-27T10:24:36Z override · item gates-green · reason owner instructed 2026-08-27 to skip the local bar; the BINDING bar still runs at the push boundary via .githooks/pre-push, which this run does not bypass
+
+2026-08-27T10:24:37Z override · item build-complete · reason owner instructed 2026-08-27 to merge and push at 2.5 of 3 units; TOOL-aBoundedCeiling-5 is specced at rev-3 with only S6 built, and its remaining scope carries forward
