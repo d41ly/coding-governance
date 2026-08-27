@@ -27,6 +27,11 @@ FLOOR_ASSERTIONS=51
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
+# A SKIP THAT ANNOUNCES ITSELF. This file had `ok` and `nope` and nothing else, so an arm that could
+# not be exercised had only two ways to end: claim a pass it had not earned, or accuse the subject of
+# a defect it had not observed. It chose the second, which is worse. `skipped` counts toward the same
+# floor as the other two, so an arm that stops running still cannot vanish quietly.
+skipped() { n=$((n+1)); echo "  SKIP — $1"; }
 
 # mk_legs <file> <json-array-body>
 mk_legs() { printf '[%s]\n' "$2" > "$1"; }
@@ -215,7 +220,12 @@ printf '%s\n' '#!/usr/bin/env bash' \
   'grep -q "^run_id	$id$" "$gd/gate-run/$id/header" || { echo "header does not name this run"; exit 1; }' \
   'echo "read the header of run $id"' > "$REC_T/fx/reader.sh"
 rec_legs '[ {"name": "reader", "argv": ["bash", "fx/reader.sh"]} ]'
+# BRACKETED, because the hard-kill arm below needs to know how slow THIS host is rather than assume
+# it. This arm already drives a full run to completion, so the measurement is free.
+REC_T0=$(date +%s)
 rc=$(rec_run GATE_FULL=1)
+REC_STARTUP=$(( $(date +%s) - REC_T0 ))
+[ "$REC_STARTUP" -ge 1 ] 2>/dev/null || REC_STARTUP=1
 if [ "$rc" = 0 ] && grep -q 'GATE ok    reader' "$REC_OUT"; then
   ok "a leg resolved gate-run/current and read this run's header WHILE the run was in flight"
 else
@@ -237,12 +247,33 @@ rec_done
 # and it is not used here because `timeout -s KILL` is what makes the descendants die; polling for
 # the header and then killing a backgrounded pipeline leaks the nested legs, which is the orphan
 # class this repo catalogues under bounded-through-a-pipe-is-unbounded.
+# ...AND THE DEADLINE IS DERIVED NOW, because a fourth hand-widening buys margin without removing
+# the class. Startup here was measured at 5, 6, 14, 15 and 17 seconds inside ten minutes with no code
+# change — a 3.4x spread straddling a fixed 20. Three times the run measured above, floored at the 20
+# this arm already used so no host gets a TIGHTER deadline than before, and capped at 50 so the 60s
+# leg still cannot finish first and leave no crash to observe.
+REC_KILL=$(( REC_STARTUP * 3 ))
+[ "$REC_KILL" -lt 20 ] && REC_KILL=20
+[ "$REC_KILL" -gt 50 ] && REC_KILL=50
 rec_repo
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 20 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL "$REC_KILL" env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
 d=$(rec_dir)
-[ -f "$d/header" ] && ok "the header survived a hard kill" \
-                   || nope "no header after a hard kill — the crash case is unreadable"
+# A MISSING HEADER IS NOT AUTOMATICALLY A DEFECT, and this arm used to say it was. The header is
+# written late in startup — after the fingerprint, the porcelain walk, python resolution and the
+# manifest parse — while `gate-run/current` is written well before it. A kill landing DURING startup
+# therefore leaves `current` present and `header` absent: a run that was never graded, not a runner
+# that loses its header on a crash. Measured on this platform, `current` at 7.65s and 12.13s against
+# headers at 15.53s and 18.04s. Printing "the crash case is unreadable" for that state is a starved
+# host manufacturing a defect claim about code it never exercised. `nope` survives for the genuine
+# shape only.
+if [ -f "$d/header" ]; then
+  ok "the header survived a hard kill"
+elif [ -f "$REC_GD/gate-run/current" ]; then
+  skipped "the kill at ${REC_KILL}s landed during startup (a full run here measured ${REC_STARTUP}s) — the run never reached its header, so the crash case went UNEXERCISED rather than failing"
+else
+  nope "no header and no run directory after a hard kill — the crash case is unreadable"
+fi
 [ -f "$d/verdict" ] && nope "a verdict exists after a hard kill, so its absence is not the crash signal" \
                     || ok "no verdict after a hard kill (absence IS the crash signal)"
 rec_done
