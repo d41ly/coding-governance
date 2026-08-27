@@ -75,10 +75,10 @@ ids TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 TOOL-aGroundedOrient
 |---|---|---|---|---|---|
 | [TOOL-aGroundedOrientation-3 — check 23 gets the `--staged` guard its four siblings carry](spec/2026-08-27-spec-TOOL-aGroundedOrientation-3.md) | 1 | 1 | CLOSED | rev-3 | 2026-08-27 |
 | [TOOL-aGroundedOrientation-1 — the prompt path runs its orientation probes before it writes the roster](spec/2026-08-27-spec-TOOL-aGroundedOrientation-1.md) | 2 | 1 | CLOSED | rev-2 | 2026-08-27 |
-| [TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write](spec/2026-08-27-spec-TOOL-aGroundedOrientation-2.md) | 3 | 1 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write](spec/2026-08-27-spec-TOOL-aGroundedOrientation-2.md) | 3 | 1 | CLOSED | rev-5 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
