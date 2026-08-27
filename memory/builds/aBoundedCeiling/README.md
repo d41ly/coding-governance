@@ -127,7 +127,7 @@ ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aB
 | [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-3 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

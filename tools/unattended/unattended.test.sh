@@ -91,6 +91,7 @@ UNITS_REGION_CUTOFF="${3-2026-08-19}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
+GATE_BOUND="${4-3600}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -4527,8 +4528,14 @@ hit "$out" "no run-state file, so there is no run to record an amendment against
 rb_fn=$(mktemp)
 sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
 [ -s "$rb_fn" ] || { echo "FAIL could not extract run_bounded from $SCRIPT — the arms below would grade nothing"; st=1; }
+# PLAIN ASSIGNMENTS, ON THEIR OWN LINE. A prefix assignment on the `.` builtin does not persist in
+# bash outside POSIX mode, so the sourced function saw GATE_BOUND_LIVE UNSET, `set -u` killed the
+# suite at the first call, and the redirect below swallowed the diagnostic -- no FAIL line and no
+# PASS line, with the stranded-arm floor never reached. Caught by this build's closing review.
+GATE_BOUND_LIVE=1
+GATE_BOUND=2
 # shellcheck disable=SC1090
-GATE_BOUND_LIVE=1 GATE_BOUND=2 . "$rb_fn"
+. "$rb_fn"
 
 # ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
 # against a 60 s sleeper with a 2 s bound, so a 20 s allowance survives a loaded box and still fails
@@ -4557,11 +4564,60 @@ hit "$RB_OUT" "alive"
 
 # ...and with the bound INERT the command still RUNS, exit status intact. A bound may cost speed and
 # may turn a hang into a verdict; it may never turn a check into a skip.
-GATE_BOUND_LIVE=0 run_bounded bash -c 'echo ran-unbounded; exit 3'; _rc=$?
+GATE_BOUND_LIVE=0
+run_bounded bash -c 'echo ran-unbounded; exit 3'; _rc=$?
+GATE_BOUND_LIVE=1
 n=$((n+1))
 [ "$_rc" = 3 ] || { echo "FAIL an INERT bound changed the command exit status to $_rc; 3 expected"; st=1; }
 hit "$RB_OUT" "ran-unbounded"
 rm -f "$rb_fn"
+
+# ...and the BOUND REACHES ITS VERBS, which the helper arms above cannot show. spec-6 AC1 and AC5.
+# Asserted as ELAPSED TIME against a 60 s sleeper with a 2 s bound: the message was always the
+# correct half of this defect.
+#
+# TWO PRECONDITIONS THIS ARM LEARNED THE HARD WAY, both of them the driver being right. The fixture
+# must be COMMITTED, because check 2 refuses a dirty tree before check_wiring is ever reached. And
+# WIRING_CHECK may carry only flags this kit recognises as READ-ONLY (check 4 permits --check,
+# --dry-run, --verify, -n), so the sleeper is a SCRIPT invoked with --check rather than a `bash -c`.
+reset_tree
+printf '#!/usr/bin/env bash\nsleep 60\n' > slowwire.sh
+mkconf "bash slowwire.sh --check" "true" "" "2"     # WIRING_CHECK sleeps; GATE_BOUND=2
+fixture
+_t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
+hit "$out" "the declared wiring check did not answer within the declared"
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --preflight took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+
+# ...and a MALFORMED bound is a refusal rather than a silent fallback, because 0 means no bound at
+# all to `timeout` and a value nobody can parse is a value nobody set.
+reset_tree
+mkconf "true" "true" "" "nonsense"
+out=$(run --status tRun)
+hit "$out" "which is not a positive integer of seconds"
+reset_tree
+mkconf "true" "true" "" "0"
+out=$(run --status tRun)
+hit "$out" "which is not a positive integer of seconds"
+
+# ...and an ABSENT bound announces the default rather than applying it silently. spec-6 AC3. This is
+# the one arm that WANTS the NOTE, which is why every other fixture now declares the key.
+reset_tree
+cat > .unattended.conf <<'NOCONF'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+NOCONF
+out=$(run --status tRun)
+hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
+reset_tree
 
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
@@ -4569,7 +4625,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=508
+FLOOR_ASSERTIONS=514
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4600,7 +4656,7 @@ FLOOR_ASSERTIONS=508
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=667
+FLOOR_ASSERTIONS=673
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #

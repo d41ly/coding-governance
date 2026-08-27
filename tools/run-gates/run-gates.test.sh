@@ -160,6 +160,60 @@ if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 
   fail=1
 fi
 
+# ---- 1e. THE RUNNER ACTUALLY APPLIES A LEG'S CEILING. spec-1 AC1/AC3.
+#     Arms 1c and 1d grade the CONSTRUCT and the SOURCE. Neither invokes the runner, so deleting the
+#     `timeout` wrapper from runleg() leaves both of them green and every leg unbounded -- 1c runs its
+#     own literal in this process, and 1d is a negative search that matches nothing when there is no
+#     timeout at all. This build's closing review staged exactly that deletion and watched the bar
+#     stay green. So this arm drives the REAL runner over a fixture manifest.
+#
+#     ELAPSED IS NOT ASSERTED HERE, deliberately, and the reason is measured: on the node that wrote
+#     this, a bar carrying ONE trivial leg exceeded 120 s under ambient load, so a wall-clock bound
+#     around the whole runner is a fact about the box. What IS asserted is the VERDICT plus the
+#     control -- an identical leg with NO ceiling is not reported as timed out -- which is what
+#     distinguishes "the runner bounds legs" from "this leg happened to fail".
+n=$((n+1))
+_cd=$(mktemp -d)
+printf '#!/usr/bin/env bash\nsleep 45\n' > "$_cd/slow.sh"
+"$PYBIN" - "$_cd" <<'CEILPY'
+import json, sys, io
+d = sys.argv[1]
+bounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo", "ceiling": 2},
+           {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+unbounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject": "repo"},
+             {"name": "quick", "argv": ["bash", "-c", "true"], "subject": "repo", "ceiling": 60}]
+io.open(d + "/bounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(bounded, indent=2) + "\n")
+io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(unbounded, indent=2) + "\n")
+CEILPY
+_bout=$(GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_bout" in
+  *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
+  *) echo "canary: a leg declaring \"ceiling\": 2 over a 45s command was not reported as timed out —"
+     echo "canary: the runner is not applying per-leg ceilings. Got:"
+     printf '%s\n' "$_bout" | grep -E 'GATE (ok|FAIL|skip)' | sed 's/^/    /'
+     fail=1 ;;
+esac
+
+# 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
+#     that reds every long leg for any reason would read as proof that ceilings work.
+n=$((n+1))
+_uout=$(GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_uout" in
+  *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
+                       echo "canary: does not discriminate and proves nothing about the ceiling."
+                       fail=1 ;;
+esac
+
+# 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
+#     forgotten gov leg from an adopter leg it has no business bounding, so a mixed manifest RUNS.
+n=$((n+1))
+case "$_uout" in
+  *"declare no ceiling and run unbounded"*) ;;
+  *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
+     echo "canary: losing its bounds is invisible on every run"; fail=1 ;;
+esac
+rm -rf "$_cd"
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
