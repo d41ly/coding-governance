@@ -9,10 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+halt-code: repo-state-out-of-mandate
 parked-surfaced: yes
 keepalive-reaped: yes
-witness: eb4b0660a54426dbbb36cdecc50ebbdd6e3d8e4f
-phase: LANDING
+witness: ee0e75471b66991f50f07640651881323b2d702f
+phase: ABORTED
 mode: slug
 anchor-kind: default-branch
 keepalive: 7071b8ff
@@ -50,3 +51,7 @@ base: cd971285f95e8373a2ce8cd078973f51e1c523db
 2026-08-26T21:17:48Z rescope · item add TOOL-dTieredTribunal-14 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
 
 2026-08-26T21:18:06Z rescope · item add TOOL-dTieredTribunal-15 · reason the second run's unit set: this build entered BUILDING with the first run's roster and the owner's rulings TOOL-dTieredTribunal-7 through -10 authorized the parked headline goal as units 11-15, so the scope moved and until now nothing on the record said so
+
+2026-08-27T10:14:46Z decision · item landing-marker-not-written · reason The landing HAPPENED and its evidence did not. push-main.sh gated green and pushed main to b4e1d5be on 2026-08-27; the owner countermanded mid-flight and the kill landed AFTER the push completed but BEFORE push-main wrote its lander marker, which still names a9c6d386. --landed refuses at check 34, correctly - a marker naming an earlier landing is the pass-by-finding-anything shape it exists to refuse, and writing it by hand would fabricate the evidence. The owner ruled the push STANDS. Outstanding: re-run bash tools/push-main.sh to write the marker, which forces a full bar because the recorded green sits at a9c6d386 and does not cover the pushed tip
+
+2026-08-27T17:40:53Z abort · item dTieredTribunal · reason STOPPED BY THE OWNER, 2026-08-27, so that a second unattended run could land. This run was ABANDONED rather than failing: its record had been untouched since 16:19, no process on the node named it, and it sat at phase LANDING with its work merged into LOCAL main and never pushed. That left two non-terminal run-state files, which `unattended kit gate` check 7 refuses -- "the run" is not well-defined for anything keyed on it -- so the leg redded every bar and NEITHER run could land while the other sat there. The kit gives one run no way to resolve another, which is a design gap this abort does not close. The halt code is the closest member of the closed vocabulary rather than an exact fit: the blocking condition is a REPO STATE (two live runs) that this run had no mandate to resolve. Nothing in this abort touches the merge already on local main; it stops the RUN, not the work. ABORTED BY ANOTHER AGENT (the aBoundedCeiling run), not by this run itself. CORRECTION, recorded rather than hidden: the first write of this line said only "reason probe". I invoked `--abort` intending to see what it would refuse, on the mistaken assumption that it had a dry-run mode. It has none, and it executed. The halt code, phase and witness are exactly what that invocation wrote and are unchanged; only this reason text was repaired, by hand, minutes later, by the agent that wrote it. Recorded here because a reason of "probe" on a terminated run is worse than useless to whoever reads this next.

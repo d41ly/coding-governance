@@ -348,7 +348,9 @@ fi
 # were two different commands, which is the shape a probe exists to rule out.
 # PROBED ONCE, READ TWICE. The profile knob and the per-leg ceilings need the same fact -- does
 # `timeout -k` actually RUN here -- and probing it per consumer would cost a spawn each and could
-# answer differently. RUN, never `command -v`: the lesson tools/lib/resolve-python.sh records.
+# answer differently. RUN it, never `command -v` — the resolver note near the top of this file
+# records why, and repeating the path here would add a kit literal that resolves to nothing in a
+# target installed at another prefix.
 CEILINGS_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || CEILINGS_LIVE=0
 if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
@@ -481,6 +483,29 @@ if [ -n "$TS_COMMON" ]; then
     # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
     # `flock` — which does not exist on this platform. The heartbeat is written FIRST on winning, so
     # a just-claimed holder is never mistaken by a waiter for one with no clock.
+    # REAP DEAD WAITERS BEFORE READING THE HEAD. The beacon has always had a liveness test --
+    # `ts_alive`, ten lines up, and the runner even prints "reaping the beacon of a dead
+    # holder". The QUEUE had none, and the acquire predicate below is only "my ticket sorts
+    # first". So a killed bar left a ticket that sorts first FOREVER and wedged every later bar
+    # in the repository, reporting nothing at all: no legs, no per-leg log, just a position
+    # number that never moves.
+    #
+    # MEASURED 2026-08-27: a `push-main.sh` landing sat 6858 s at "queued at position 4" with
+    # ZERO legs run, behind three dead tickets from bars killed earlier that session. Deleting
+    # them by hand advanced it 4 -> 3 -> 1 and it acquired at once. Second wedge that day.
+    # TOOL-aBoundedCeiling-12.
+    #
+    # A ticket is `<utc>-<pid>-<nonce>`, so the pid is field 2. A name that does not parse is
+    # LEFT ALONE rather than guessed at: deleting a ticket we cannot read is how a live bar
+    # loses its place, which is a worse failure than the one being fixed.
+    for _tk in "$TS_Q"/*; do
+      [ -e "$_tk" ] || continue
+      _tb=$(basename "$_tk")
+      [ "$_tb" = "$(basename "${TS_TICKET:-}")" ] && continue
+      _tp=$(printf %s "$_tb" | cut -d- -f2)
+      case "$_tp" in ""|*[!0-9]*) continue ;; esac
+      ts_alive "$_tp" || rm -f "$_tk" 2>/dev/null || true
+    done
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
        && mkdir "$TS_DIR_C" 2>/dev/null; then
       TS_DIR="$TS_DIR_C"

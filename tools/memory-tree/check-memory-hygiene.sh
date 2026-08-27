@@ -1121,19 +1121,26 @@ fi
 # ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
 # ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
 alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
-# ---- THE `--staged` GUARD ITS THREE SIBLINGS ALREADY CARRY, and its absence was the whole cost of
-# ---- the pre-commit leg. 22 and 23 join every acceptance criterion of every CLOSED Tier-2 spec
-# ---- against every `**Evidences:**` block in every tracked record — a corpus-wide population that
-# ---- does not change because a commit stages three files. It ran on EVERY commit, and one commit
-# ---- of the build that fixed this timed out at 120 s on it. The split is this file's own, stated
-# ---- at the top: set-checks tree-wide, file-checks on staged paths — and 13-19 at `:1051`, `:1066`
-# ---- and `:1076` are all guarded exactly this way. The full run at the push boundary still runs
-# ---- both, so nothing loses coverage between a commit and a push.
+# TOOL-aGroundedOrientation-3 AND TOOL-aPrimedKeepalive-6 — TWO BUILDS FIXED THIS INDEPENDENTLY on
+# ---- 2026-08-27 and the merge kept both halves, because each carried something the other did not.
+# ----
+# ---- THE GUARD, which is the shared half: the `--staged` guard its four structural siblings carry
+# ---- (`:667`, `:1051`, `:1066`, `:1076`) and this one never got. Without it the pre-commit leg walks
+# ---- all specs and all records on every commit regardless of what is staged, which is 94% of that
+# ---- leg's wall clock: measured 2026-08-27 node `a`, 963 s as shipped against 54 s guarded,
+# ---- uncontended, same staged set. No coverage moves — `.githooks/pre-push` runs the full bar at the
+# ---- push boundary, where STAGED=0 and this block runs exactly as before. The class is the one this
+# ---- file's own `:111-112` already documents fixing elsewhere: a fork is ~50-100 ms under
+# ---- MSYS/Windows, and this block spawns thousands.
+# ----
 # ---- IT ANNOUNCES ITSELF. A skip that prints nothing is indistinguishable from a check that found
 # ---- nothing, which is this repo's named class; the line below is what keeps a held check visible.
+# ----
 # ---- CHECK 22 IS NOT HELD AND IS NOT THIS BLOCK. It walks every tracked review record on every
-# ---- commit with no staged filter, and it stays that way deliberately: the whole --staged leg
-# ---- measures 10 s on this corpus after this guard, so nothing here is worth the second scope.
+# ---- commit with no staged filter, and it stays that way deliberately: the whole `--staged` leg
+# ---- measures ~10 s on this corpus once this block is held, so a second scope buys nothing. Worth
+# ---- saying because the header comment above this block read `22:` until 2026-08-27 and a spec
+# ---- trusted it, graded the wrong check, and shipped the error into a runtime line.
 if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
   printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
 '
