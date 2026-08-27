@@ -348,7 +348,9 @@ fi
 # were two different commands, which is the shape a probe exists to rule out.
 # PROBED ONCE, READ TWICE. The profile knob and the per-leg ceilings need the same fact -- does
 # `timeout -k` actually RUN here -- and probing it per consumer would cost a spawn each and could
-# answer differently. RUN, never `command -v`: the lesson tools/lib/resolve-python.sh records.
+# answer differently. RUN it, never `command -v` — the resolver note near the top of this file
+# records why, and repeating the path here would add a kit literal that resolves to nothing in a
+# target installed at another prefix.
 CEILINGS_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || CEILINGS_LIVE=0
 if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
