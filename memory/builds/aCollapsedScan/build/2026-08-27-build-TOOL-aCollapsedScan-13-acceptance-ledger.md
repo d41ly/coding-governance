@@ -32,7 +32,12 @@ criterion, naming the observation that answered it.
   the pre-fix profile that is 1035.9 s to 74.8 s for check 23 (13.8x) and 149.6 s to 16.6 s for
   check 21 (9.0x). The criterion exists because a 7.7x overall cut is equally consistent with having
   MOVED the cost, and only a re-profile tells the two apart.
-- AC5 — `bash tools/run-gates/run-gates.sh` — recorded below.
+- AC5 — `bash tools/run-gates/run-gates.sh` — MET. `gates GREEN — 41/41 legs passed (5 skipped)
+  (39 held: kit self-tests)`, 1605 s. Two earlier runs redded and both were this unit's own debt:
+  `verdict epoch` for the kit version I had argued was unnecessary, and `kit version markers` for
+  two carriers the first refusal's list did not name. THE BAR'S OWN WALL CLOCK is the unit's least
+  arguable evidence: 3162 s on the run before the fix landed against 1605 s after, on the same node
+  and the same 41 legs.
 
 ## The equivalence evidence that is not an acceptance criterion
 
