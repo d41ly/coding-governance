@@ -139,6 +139,14 @@ M3's delegation explicitly does not reach — so the budget is not raiseable by 
 does not fit trims prose elsewhere in that file under charter §5's derive-over-author rule, or it
 raises a fork. Re-measure from `wc -c`, never from this line.
 
+**THE WORK PRECEDED THE PREFLIGHT, and the closing review's base is the MERGE-BASE, not the pinned
+BASE.** The prompt path writes the build folder, pushes, then preflights — but this repo's own
+pre-commit hook took ten minutes per commit until unit 6 landed, and the build-folder commit could
+not be made until that was fixed. So units 6, 1, 2, 3, 4 and 5 are all ancestors of the commit
+`--preflight` pinned as BASE, and a review scoped `BASE..HEAD` would read an empty diff. The closing
+review runs `b4e1d5be..HEAD`, which is the diff that actually lands. Recorded here rather than parked
+because it is a fact about this run, not a question for the owner.
+
 **Every unit re-renders its carrier's pair in the same commit.** The protocol, the Skill and the
 build method are each a template plus an installed copy that a leg byte-compares.
 
