@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
 
 - TOOL-dFramedEntrypoint-9 · the build-README contract grows ORGANICALLY: each build's owner conforms their own README on next touch (owner). Declines making the two judgement slots empty_ok for pre-existing builds; binds 1 of 62 today and the 49 terminal builds never bind
