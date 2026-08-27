@@ -4525,6 +4525,13 @@ hit "$out" "no run-state file, so there is no run to record an amendment against
 # The function is SOURCED FROM THE SHIPPED FILE rather than retyped, because an arm that proves a
 # mechanism against a copy proves it for the copy — memory/gotchas/staged-break-substitutes-a-
 # synthetic-value.md.
+# THE SAME HOST GATE. With GATE_BOUND_LIVE forced to 1 on a host with no runnable timeout, the
+# sourced function would take exit 127 against a 124|137 case; and the verb-level arm below would
+# watch its sleeper run to completion and red for a property of the box.
+RB_HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && RB_HAVE_TIMEOUT=1
+if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
+  echo "  (SKIP the run_bounded arms — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here)"
+else
 rb_fn=$(mktemp)
 sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
 [ -s "$rb_fn" ] || { echo "FAIL could not extract run_bounded from $SCRIPT — the arms below would grade nothing"; st=1; }
@@ -4538,24 +4545,27 @@ GATE_BOUND=2
 . "$rb_fn"
 
 # ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
-# against a 10 s sleeper with a 2 s bound. A 60 s sleeper discriminated no better and cost the driver
-# suite ~62 s per run against a 970 s declared budget already at 906 s -- the control BLOCKS for its
-# full sleep by construction, which is the whole point of it.
-_t0=$(date +%s); run_bounded bash -c 'sleep 10' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+# against a 30 s sleeper with a 2 s bound. THE WINDOW IS DECIDED BY A MEASUREMENT, not by taste:
+# the CORRECT construct was measured on node `a` at 12 s under heavy ambient load against that same
+# 2 s bound -- kill-path and scheduling overhead, which does NOT shrink when the sleeper does. So the
+# valid window is (12, sleeper), and a 10 s sleeper made it empty. 30 s gives a real window at half
+# the cost of the 60 s original, which mattered: the control BLOCKS for its full sleep by
+# construction, and this suite's declared budget is 970 s against a measured 906 s.
+_t0=$(date +%s); run_bounded bash -c 'sleep 30' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 7 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
 n=$((n+1))
 case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
 
 # ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
 # same command through a command substitution: if the control also returns fast, this host does not
 # reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
-_t0=$(date +%s); run_bounded bash -c 'sleep 10 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
-_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 10 & exit 0' 2>&1); _t3=$(date +%s)
+_t0=$(date +%s); run_bounded bash -c 'sleep 30 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
+_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1); _t3=$(date +%s)
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 7 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
 n=$((n+1))
-[ $(( _t3 - _t2 )) -ge 7 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
 
 # ...a command that finishes INSIDE the bound is not killed and its output survives.
 run_bounded bash -c 'echo alive; exit 0'; _rc=$?
@@ -4574,7 +4584,7 @@ hit "$RB_OUT" "ran-unbounded"
 rm -f "$rb_fn"
 
 # ...and the BOUND REACHES ITS VERBS, which the helper arms above cannot show. spec-6 AC1 and AC5.
-# Asserted as ELAPSED TIME against a 60 s sleeper with a 2 s bound: the message was always the
+# Asserted as ELAPSED TIME against a 30 s sleeper with a 2 s bound: the message was always the
 # correct half of this defect.
 #
 # TWO PRECONDITIONS THIS ARM LEARNED THE HARD WAY, both of them the driver being right. The fixture
@@ -4589,6 +4599,9 @@ _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared wiring check did not answer within the declared"
 n=$((n+1))
 [ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --preflight took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT
+     # ---- the wiring sleeper runs to completion, the check PASSES, and both assertions above red
+     # ---- for a property of the box rather than a defect in the code.
 
 # ...and a MALFORMED bound is a refusal rather than a silent fallback, because 0 means no bound at
 # all to `timeout` and a value nobody can parse is a value nobody set.

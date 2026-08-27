@@ -130,25 +130,25 @@ HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
 if [ "$HAVE_TIMEOUT" != 1 ]; then
   # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
   # for a property of their box, which is what the sibling arms below already refuse to do.
-  echo "canary: SKIP arms 1c/1d — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here"
+  echo "canary: SKIP arms 1c/1d/1e — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here. 1e is INSIDE this gate: with CEILINGS_LIVE=0 the runner deliberately runs every leg unbounded, so its fixture leg would finish and the arm would red for a property of the box"
 else
 n=$((n+1))
 _cw=$(mktemp -d)
 _t0=$(date +%s)
-timeout -k 5s 2 bash -c 'sleep 10 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
+timeout -k 5s 2 bash -c 'sleep 30 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
 _t1=$(date +%s)
 _took=$(( _t1 - _t0 ))
 # The control: the SAME command through a command substitution, which is the form that does not
 # bound the clock. Without it a green here could mean "this box is fast", not "the form is right".
 _t2=$(date +%s)
-_ctl=$(timeout -k 5s 2 bash -c 'sleep 10 & exit 0' 2>&1)
+_ctl=$(timeout -k 5s 2 bash -c 'sleep 30 & exit 0' 2>&1)
 _t3=$(date +%s)
 _ctltook=$(( _t3 - _t2 ))
-if [ "$_took" -gt 6 ]; then
+if [ "$_took" -gt 20 ]; then
   echo "canary: a file-captured 2s timeout over a backgrounded grandchild took ${_took}s — the bound"
   echo "canary: is on the verdict and not on the clock, which is bounded-through-a-pipe-is-unbounded."
   fail=1
-elif [ "$_ctltook" -le 6 ]; then
+elif [ "$_ctltook" -le 20 ]; then
   echo "canary: the CONTROL returned in ${_ctltook}s, so this host does not reproduce the pipe defect"
   echo "canary: and the arm above proved nothing. Not a pass: a control that cannot fail is the"
   echo "canary: vacuous-selector class, and this arm is reported UNPROVEN rather than green."
@@ -166,7 +166,6 @@ if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 
   grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" | sed 's/^/    /'
   fail=1
 fi
-fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d ------------------------------------------------
 
 # ---- 1e. THE RUNNER ACTUALLY APPLIES A LEG'S CEILING. spec-1 AC1/AC3.
 #     Arms 1c and 1d grade the CONSTRUCT and the SOURCE. Neither invokes the runner, so deleting the
@@ -193,7 +192,10 @@ unbounded = [{"name": "slow bounded", "argv": ["bash", d + "/slow.sh"], "subject
 io.open(d + "/bounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(bounded, indent=2) + "\n")
 io.open(d + "/unbounded.json", "w", encoding="utf-8", newline="\n").write(json.dumps(unbounded, indent=2) + "\n")
 CEILPY
-_bout=$(GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+# A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
+# nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
+_cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
+_bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_bout" in
   *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
   *) echo "canary: a leg declaring \"ceiling\": 2 over a 45s command was not reported as timed out —"
@@ -205,7 +207,7 @@ esac
 # 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
 #     that reds every long leg for any reason would read as proof that ceilings work.
 n=$((n+1))
-_uout=$(GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+_uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_uout" in
   *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
                        echo "canary: does not discriminate and proves nothing about the ceiling."
@@ -220,7 +222,8 @@ case "$_uout" in
   *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
      echo "canary: losing its bounds is invisible on every run"; fail=1 ;;
 esac
-rm -rf "$_cd"
+rm -rf "$_cd" "$_cr"
+fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e ----------------------------------------------
 
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
