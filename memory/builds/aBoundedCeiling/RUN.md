@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-5
+unpushed-at-landing: 45 oldest b17b0ed2
+landed-anchor: local
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-witness: d4eae035e0cec30f209f04f8c4842c3c996af4f5
-phase: LANDING
+witness: 75e0e5c0b1408f96236ebd2297b3a0c2ad45caa8
+phase: LANDED
 branch-sha: 1d83cc94eec944f8ecb3bae8e7186a545a58934c
 branch-ref: refs/heads/branch/unattended-self-check-perf-373152
 mode: prompt
