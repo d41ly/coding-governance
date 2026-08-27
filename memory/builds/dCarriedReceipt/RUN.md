@@ -12,6 +12,12 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: 04c7da244361950b38a611671d341ac3400e32cb
+landed-anchor: remote
+landed-anchor-source: reconstructed 2026-08-27 by TOOL-aBoundedCeiling-9 — this record's
+  phase was hand-edited to LANDED by ce4ef9f3 rather than written by `--landed`, so the verb's
+  facts were never recorded. `remote` is VERIFIED: the witness above and this build's
+  landing commits are all ancestors of origin/main. `unpushed-at-landing` is deliberately
+  NOT reconstructed — the driver measures it at landing time and cannot be re-derived after.
 phase: LANDED
 mode: slug
 anchor-kind: default-branch

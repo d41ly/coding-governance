@@ -141,6 +141,74 @@ REMOTE_LOWSPEED_BYTES="1000"
 # is indistinguishable from coverage.
 REMOTE_BOUND_LIVE=1
 timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+# The same fact, read by run_bounded below. One probe, two consumers, because probing twice costs a
+# spawn and could answer differently.
+GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
+
+# ---- run_bounded: the ONE bounded runner for a project-DECLARED command. TOOL-aBoundedCeiling-6.
+#
+# WHY IT EXISTS. Two seams in this file ran a command the PROJECT names, each with no bound of any
+# kind: $GATE_CMD for the gates-green DoD item, where a --close waits, and $WIRING_CHECK in
+# check_wiring, where a --preflight waits. An adopter --close was observed on node a running for
+# 3h19m with its launching session already dead and its inner child at zero CPU across two and a
+# half hours. Nothing in the chain could end it.
+#
+# WHY ONE FUNCTION AND NOT TWO CALL SITES PATCHED. The gates-green site carries this comment:
+# "Sibling of the seam check_wiring already uses for $WIRING_CHECK -- TOOL-aBranchedMandate-2 fixed
+# that call site and did not grep for this one." Bounding one of the two again would be that same
+# defect, third instance. TOOL-aPromptedMandate-9 measured the wiring seam at 1m22s and concluded
+# nothing in the precondition chain has a timeout; this closes that too.
+#
+# CAPTURED THROUGH A FILE, NEVER A SUBSTITUTION, and that is the whole difference between a bound
+# and a decoration. out=$(timeout N cmd) reads until EOF and EOF arrives when the LAST inherited
+# write end closes, so a surviving grandchild holds it while timeout reports on schedule. MEASURED
+# on node a: the file form over a backgrounded grandchild returns in 1s, the substitution form takes
+# 62s against the same 60s sleeper. memory/gotchas/bounded-through-a-pipe-is-unbounded.md names this
+# file as one of the two places the class has already bitten.
+#
+# Sets RB_OUT (the command output) and RB_TOOK (elapsed seconds). Returns the command status, or
+# 124/137 when the bound fired -- the caller decides what that means, because a DoD item and a
+# preflight refusal say different things about it.
+RB_OUT=""; RB_TOOK=0
+run_bounded() { # argv...
+  local _s _e _rc _f
+  _f=$(mktemp) || { RB_OUT="run_bounded: cannot create a capture file"; return 1; }
+  _s=$(date +%s)
+  # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
+  # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
+  # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
+  if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
+    timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_f" 2>&1; _rc=$?
+  else
+    "$@" </dev/null >"$_f" 2>&1; _rc=$?
+  fi
+  _e=$(date +%s); RB_TOOK=$(( _e - _s ))
+  RB_OUT=$(cat "$_f" 2>/dev/null)
+  rm -f "$_f" 2>/dev/null
+  return "$_rc"
+}
+
+# The bound itself. DEFAULTED rather than required, and ANNOUNCED rather than silent.
+#
+# A required key would make --preflight refuse every adopter whose .unattended.conf predates it, so
+# the key that fixes a hang would first break every install. And "absent means unbounded" is the
+# wrong default for the one thing this exists to stop: a FLOOR exists to detect shrinkage and a
+# silent default defeats it, but a wall-clock bound exists to stop an unbounded wait, and any finite
+# default is strictly better than infinity -- including for the adopter who never edits their conf,
+# which is the population that produced the observed hang.
+#
+# 3600s: gov's own full bar with self-tests is roughly 9700s of leg-sum with a 1320s longest leg,
+# about 26 minutes of wall clock at width 8. An hour sits above every recorded gov bar and far below
+# the 3h19m actually observed. A project whose bar legitimately runs longer raises it in its own
+# conf, with the reason beside it, which is what every other pin in that file already does.
+GATE_BOUND_DEFAULT=3600
+
+# LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
+# runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
+# $WIRING_CHECK ran unbounded and three carriers said they were bounded. A probe that cannot move
+# says so.
+[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session" >&2
+
 # AND IT SAYS SO, which the comment above has always required and the code did not do: the flag's
 # only reader was the `if` in observe_remote, so a node without a working `timeout -k` produced
 # byte-identical output while running unbounded. The transport options survive on that path.
@@ -212,8 +280,26 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""
+GATE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
+
+# GATE_BOUND: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6.
+#
+# A conf that declares nothing still gets a bound, because the population that produced the observed
+# 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line
+# below says which number is in force and where it came from, so a defaulted pin is never invisible.
+#
+# A malformed value is a REFUSAL rather than a silent fallback. "0" would mean no bound at all to
+# `timeout`, so accepting junk and coercing it would unbound the one project whose declaration was
+# wrong -- the failure landing on whoever tried hardest to configure it.
+case "${GATE_BOUND:-}" in
+  "") GATE_BOUND=$GATE_BOUND_DEFAULT
+      echo "unattended: NOTE - this project declares no GATE_BOUND, so a declared command is bounded at the kit default of ${GATE_BOUND}s. Declare one in $CONF to change it." >&2 ;;
+  *[!0-9]*|0)
+      echo "unattended: REFUSING - GATE_BOUND is declared as '$GATE_BOUND', which is not a positive integer of seconds. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
+      exit 2 ;;
+esac
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
@@ -985,7 +1071,20 @@ check_wiring() {
     esac
   done
   local wout
-  wout=$($WIRING_CHECK 2>&1) && return 0
+  # BOUNDED, same helper. TOOL-aBoundedCeiling-6 and TOOL-aPromptedMandate-9: nothing in the
+  # precondition chain had a timeout, and this seam was measured at 1m22s under load.
+  # shellcheck disable=SC2086
+  run_bounded $WIRING_CHECK && return 0
+  local _wrc=$?
+  wout=$RB_OUT
+  if { [ "$_wrc" = 124 ] || [ "$_wrc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
+    fail 4 "the declared wiring check did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so preflight cannot tell a dormant hook from a slow one: $WIRING_CHECK"
+    # WHATEVER IT MANAGED TO SAY BEFORE IT WAS KILLED, indented under the refusal. This branch
+    # returns before the shared printer below, whose comment promises the declared check's output is
+    # never discarded -- true of the ordinary-failure path and, until this line, false of this one.
+    [ -z "$wout" ] || printf '%s\n' "$wout" | sed 's/^/    /' >&2
+    return 1
+  fi
   fail 4 "the declared wiring check failed, and a dormant hook makes every later green meaningless: $WIRING_CHECK"
   # The declared check's OWN output, indented under the refusal rather than discarded. It already
   # carries whatever remedy that project's check knows about, and this kit may not spell a repairing
@@ -2692,7 +2791,18 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      DOD_OUT=$($GATE_CMD 2>&1) && { DOD_OUT=""; return 0; }
+      # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always was:
+      # the project declares a command line, not a path.
+      # shellcheck disable=SC2086
+      run_bounded $GATE_CMD && { DOD_OUT=""; return 0; }
+      local _grc=$?
+      DOD_OUT=$RB_OUT
+      # A BREACH IS NOT A RED BAR, and the difference is the whole information this adds. A red bar
+      # says a check ran and said no; a breach says the bar never answered. Reporting them the same
+      # way is how an operator spends an hour looking for a failing leg that does not exist.
+      if { [ "$_grc" = 124 ] || [ "$_grc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
+        DOD_OUT="the merge bar did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+      fi
       return 1 ;;
     records-current)
       # The unit list is DERIVED from the build README, so "current" is not a comparison between two

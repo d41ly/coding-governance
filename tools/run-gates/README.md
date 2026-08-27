@@ -122,6 +122,31 @@ nothing, the tree did not move, AND the tree was CLEAN when the run started. CLE
 `git status --porcelain` empty, untracked files included. All five preconditions are what make the
 file's name true, and an implementation that forgets one passes every arm written for the others.
 
+## Every leg may declare a `ceiling`, and the runner holds it to it
+
+**`"ceiling": <seconds>`, a positive integer, per leg row in the manifest.** A leg that outlives it
+is KILLED and reported `GATE FAIL <leg> (timed out after Ns)` — never skipped, never green. That is
+the one way a knob here may change a verdict: it converts an unbounded hang into a RED naming its
+leg. Before it existed, one leg that never returned wedged the whole bar and named nothing.
+
+**A leg that declares no ceiling runs UNBOUNDED, and is COUNTED rather than refused.** The runner
+prints `N of M legs declare no ceiling and run unbounded this run` on stderr and carries on. It
+cannot tell a leg somebody forgot from a leg you deliberately left alone, so it reports and leaves
+the judgement to you. If you want the requirement enforced over YOUR corpus, assert it in a harness
+of your own — gov does exactly that in `run-gates.gov.test.sh`, which is withheld from this payload
+for the reason that file's header gives.
+
+**Choosing a number.** `<git-dir>/gate-ledger.tsv` already carries one row per leg with its own
+seconds, so the derivation gov used is `max(60, 3 × that leg's measured seconds)`. The factor is
+headroom for the box, not for the code: the same workload has been measured at 10.7 s and 26 s
+across one session on a machine with an on-access antivirus scanner, and a ceiling that reds on
+someone else's scan is a ceiling that gets deleted. The 60 s floor is what gives a leg that
+finishes in under five seconds a bound worth having.
+
+**On a host with no runnable `timeout -k`, every ceiling is INERT** and the runner says so on
+stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
+turn a leg into a pass or a skip.
+
 ## The leg manifest is the kit dir's SIBLING
 
 `<prefix>/gate-legs.json`, DERIVED from this kit's own location rather than spelled, so a one-segment

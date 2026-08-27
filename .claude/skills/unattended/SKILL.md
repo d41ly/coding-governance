@@ -563,6 +563,13 @@ context did not.
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
+**The bar it runs is BOUNDED.** `GATE_BOUND` seconds, declared by the project or defaulted by the
+kit — and when it is the DEFAULT, said so on stderr, because a bound nobody set should not
+be invisible. A bar that does not answer within it is KILLED, and
+`gates-green` is then unmet with a message saying the bar never RETURNED rather than that a leg
+FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
+failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
+
 It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
 can observe them: that you reaped the keepalive (`CronDelete`), and that every parked
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the

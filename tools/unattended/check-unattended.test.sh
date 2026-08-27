@@ -1147,7 +1147,11 @@ mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE
 # word-boundary group as well. So every redirect the exemption removes sat OUTSIDE the bound's
 # population and the stated bound did not hold over redirects at all - it still fired on mv, rm and
 # cp, which is why it read as armed.
-WRITE_RE='(^|[^-[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
+# UNDERSCORE IN THE BOUNDARY CLASS. `[^-[:alnum:]]` does not exclude `_`, so a VARIABLE whose name
+# ends in one of these verbs matched as a write: this kit's OWN check-unattended.sh carries
+# `for _pv_rm in $(GIT ls-files ...)` in check 30, and the word `rm` inside that identifier reds
+# this arm against a file that writes nothing. A name is not a command.
+WRITE_RE='(^|[^-_[:alnum:]])(mv|rm|cp|sed -i|tee|> *"?\$)'
 w=$(grep -nE "$WRITE_RE" "$HERE/check-unattended.sh" \
     | grep -v '^[0-9]*: *#' || true)
 # A line is exempt when its write touches a SCRATCH variable and the line names no path in the
@@ -1400,9 +1404,32 @@ hit "$(run)" "the Skill template names no --preflight invocation, so there is no
 # ---- that decides whether a clean verdict means anything: with every build's units pair broken,
 # ---- every --plan refuses, the walk grades nothing, and a check without this branch would report
 # ---- clean over an empty population.
+# ---- BOTH BUILDS. The comment above describes a fixture that predates tPlanOk: breaking tRun alone
+# ---- WAS enough when tRun was the only build, and tPlanOk was added in this same round precisely so
+# ---- that one build grades. From that commit on, this arm asserted a message the check cannot emit —
+# ---- `--plan tPlanOk` exits 0, the walk counts one verdict, and the liveness branch never fires.
+# ---- Measured on the fixture: tRun alone gives 0 hits, both give 1.
 reset_tree
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
+mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
 hit "$(run)" "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus"
+
+# ---- 30 branch 2: the VERDICT the walk exists to reach. Branch 1 above grades the walk's LIVENESS
+# ---- and nothing else, so `check-arms.py` reports this branch as carrying no positive assertion and
+# ---- the leg ships pinned-or-unarmed. BOTH halves of the mutation are load-bearing and neither reds
+# ---- alone: a headerless spec beside a SPECCED unit still names a next, and a CLOSED unit with no
+# ---- headerless spec prints no NOT A UNIT row. Only the conjunction is the blocker — a build told it
+# ---- is finished by a verb that graded nothing on the file it is reporting.
+# ---- The new spec is `git add`ed because `--plan` finds specs with `git ls-files`, so an untracked
+# ---- file is invisible to it and this arm would assert against an unchanged listing.
+reset_tree
+mutate memory/builds/tPlanOk/spec/one.md 's/^\*\*Status:\*\* SPECCED /**Status:** CLOSED /'
+printf '# cross-unit contracts
+
+Ratified centrally. Not a unit spec, and carries no status header.
+' > memory/builds/tPlanOk/spec/contracts.md
+git add memory/builds/tPlanOk/spec/contracts.md
+hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it: tPlanOk"
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
