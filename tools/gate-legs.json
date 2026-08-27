@@ -7,7 +7,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 640
   },
   {
     "name": "template size <=48KiB",
@@ -17,7 +17,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "charter size",
@@ -28,7 +28,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "micro-format definitions",
@@ -38,7 +38,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 650
   },
   {
     "name": "micro-format gate selftest",
@@ -52,7 +52,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 170
+    "ceiling": 560
   },
   {
     "name": "line length",
@@ -62,7 +62,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "line-length gate selftest",
@@ -76,7 +76,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 280
+    "ceiling": 930
   },
   {
     "name": "playbook parity",
@@ -86,7 +86,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 560
   },
   {
     "name": "playbook parity selftest",
@@ -101,7 +101,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 420
+    "ceiling": 1380
   },
   {
     "name": "template size gate selftest",
@@ -111,7 +111,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 220
+    "ceiling": 710
   },
   {
     "name": "kickoff engine size <=18KiB",
@@ -122,7 +122,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "kit version markers",
@@ -132,7 +132,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 660
   },
   {
     "name": "verdict epoch (kit version dates the engine)",
@@ -142,7 +142,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "verdict-epoch self-test",
@@ -156,7 +156,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 340
+    "ceiling": 1130
   },
   {
     "name": "agent-instructions wiring",
@@ -169,7 +169,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "manifest-check self-test",
@@ -183,7 +183,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1310
+    "ceiling": 4370
   },
   {
     "name": "python resolver (behaviour + inline parity + idiom ban)",
@@ -197,7 +197,7 @@
     ],
     "chunk": "wiring",
     "subject": "kit",
-    "ceiling": 110
+    "ceiling": 350
   },
   {
     "name": "agent-cap self-test",
@@ -211,7 +211,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 230
+    "ceiling": 740
   },
   {
     "name": "scratch-guard self-test",
@@ -225,7 +225,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 150
+    "ceiling": 490
   },
   {
     "name": "agent-instructions self-test",
@@ -239,7 +239,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 100
+    "ceiling": 330
   },
   {
     "name": "memory-hygiene self-test",
@@ -253,7 +253,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1980
+    "ceiling": 6590
   },
   {
     "name": "row-keyed merge driver replay",
@@ -267,7 +267,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 830
+    "ceiling": 2750
   },
   {
     "name": "kit/dogfood doc parity",
@@ -284,7 +284,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "method carriers (every pointer declared)",
@@ -294,7 +294,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 120
+    "ceiling": 1230
   },
   {
     "name": "method-carriers self-test",
@@ -304,7 +304,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 140
+    "ceiling": 460
   },
   {
     "name": "build-index selftest",
@@ -319,7 +319,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 110
+    "ceiling": 350
   },
   {
     "name": "build README slot contract",
@@ -330,7 +330,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "corpus-ids selftest",
@@ -345,7 +345,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 810
+    "ceiling": 2690
   },
   {
     "name": "gotchas selftest",
@@ -360,7 +360,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 70
+    "ceiling": 300
   },
   {
     "name": "row-grammar selftest",
@@ -375,7 +375,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "harness arms (fail branches armed or pinned)",
@@ -386,7 +386,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "check-arms selftest",
@@ -401,7 +401,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "branch-guard self-test",
@@ -415,7 +415,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "pre-push self-test",
@@ -429,7 +429,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 540
+    "ceiling": 1780
   },
   {
     "name": "push-main self-test",
@@ -444,7 +444,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 180
+    "ceiling": 580
   },
   {
     "name": "check-wiring self-test",
@@ -459,7 +459,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 700
+    "ceiling": 2320
   },
   {
     "name": "verifier fan-out self-test",
@@ -474,7 +474,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 80
+    "ceiling": 300
   },
   {
     "name": "review-protocol parity (kit vs dogfood)",
@@ -489,7 +489,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "review-join ban (no ref-keyed join)",
@@ -499,7 +499,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "workflow script syntax",
@@ -509,7 +509,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "tier2-review self-test",
@@ -521,7 +521,8 @@
       "tools/workflows/"
     ],
     "chunk": "selftests",
-    "subject": "kit"
+    "subject": "kit",
+    "ceiling": 1800
   },
   {
     "name": "review-join self-test",
@@ -536,7 +537,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 70
+    "ceiling": 300
   },
   {
     "name": "pytest-guardrails self-test",
@@ -550,7 +551,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "codebase-map kit selftest",
@@ -565,7 +566,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "codebase-map coverage + freshness",
@@ -575,7 +576,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "codebase-map adopter e2e",
@@ -589,7 +590,7 @@
     ],
     "chunk": "e2e",
     "subject": "kit",
-    "ceiling": 160
+    "ceiling": 540
   },
   {
     "name": "settings-merge selftest",
@@ -604,7 +605,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "memory-recall kit selftest",
@@ -618,7 +619,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 820
+    "ceiling": 2730
   },
   {
     "name": "recall floor",
@@ -632,7 +633,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "recall floor arms",
@@ -647,7 +648,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "memory-recall skill wiring",
@@ -658,7 +659,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "drift-audit selftest",
@@ -672,7 +673,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 690
+    "ceiling": 2300
   },
   {
     "name": "drift-audit wiring",
@@ -683,7 +684,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "drift-audit records",
@@ -694,7 +695,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 540
   },
   {
     "name": "unattended kit gate",
@@ -705,7 +706,7 @@
     "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 1600
+    "ceiling": 16040
   },
   {
     "name": "playbook validity gate",
@@ -715,7 +716,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 490
+    "ceiling": 4940
   },
   {
     "name": "unattended skill wiring",
@@ -726,7 +727,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "run-gates canary",
@@ -741,7 +742,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 3960
+    "ceiling": 13200
   },
   {
     "name": "run-gates evidence",
@@ -755,7 +756,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 2120
+    "ceiling": 7040
   },
   {
     "name": "run-gates turnstile",
@@ -769,7 +770,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1130
+    "ceiling": 3750
   },
   {
     "name": "run-gates gov canary",
@@ -783,7 +784,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "run-gates adopter e2e",
@@ -796,7 +797,7 @@
     ],
     "chunk": "e2e",
     "subject": "kit",
-    "ceiling": 140
+    "ceiling": 460
   },
   {
     "name": "run-gates wiring",
@@ -808,7 +809,7 @@
     "guard": [],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "profile-bar selftest",
@@ -821,7 +822,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 580
+    "ceiling": 1910
   },
   {
     "name": "install-prefix (shipped surface)",
@@ -831,7 +832,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 290
+    "ceiling": 2940
   },
   {
     "name": "agent-cap restatement",
@@ -841,7 +842,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 640
   },
   {
     "name": "agent-cap restatement self-test",
@@ -851,7 +852,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 330
+    "ceiling": 1100
   },
   {
     "name": "install-prefix self-test",
@@ -865,7 +866,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 510
+    "ceiling": 1670
   },
   {
     "name": "dead-path carriers (deleted files still named)",
@@ -875,7 +876,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 430
   },
   {
     "name": "dead-path carriers self-test",
@@ -888,7 +889,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 630
+    "ceiling": 2070
   },
   {
     "name": "govkit selfcheck",
@@ -899,7 +900,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 310
   },
   {
     "name": "govkit selftest",
@@ -912,7 +913,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 3530
+    "ceiling": 11750
   },
   {
     "name": "lexicon naming predicates",
@@ -928,7 +929,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "lexicon selftest",
@@ -941,7 +942,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 270
+    "ceiling": 880
   },
   {
     "name": "lexicon wiring",
@@ -953,7 +954,7 @@
     "guard": [],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 330
   },
   {
     "name": "playbook placeholder catalogue",
@@ -963,7 +964,7 @@
     ],
     "chunk": "product",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "placeholder-catalogue self-test",
@@ -977,7 +978,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "memory hygiene",
@@ -987,7 +988,7 @@
     ],
     "chunk": "records",
     "subject": "repo",
-    "ceiling": 1270
+    "ceiling": 12720
   },
   {
     "name": "marker contracts",
@@ -997,7 +998,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 180
+    "ceiling": 1840
   },
   {
     "name": "verifier fan-out",
@@ -1007,7 +1008,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "govkit refusal join",
@@ -1020,7 +1021,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "govkit acceptance matrix",
@@ -1036,7 +1037,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 700
+    "ceiling": 7030
   },
   {
     "name": "testsuite counts (every bar self-test prints one)",
@@ -1046,7 +1047,7 @@
     ],
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 630
   },
   {
     "name": "testsuite counts self-test",
@@ -1056,7 +1057,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 110
+    "ceiling": 350
   },
   {
     "name": "playbook render wiring",
@@ -1069,7 +1070,7 @@
     ],
     "chunk": "wiring",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 300
   },
   {
     "name": "playbook render selftest",
@@ -1083,6 +1084,6 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 60
+    "ceiling": 300
   }
 ]

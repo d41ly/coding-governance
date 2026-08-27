@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it
 
-**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -81,6 +81,17 @@ One new key per leg row, alongside the six the canary already pins:
 `ceiling` is a positive integer of seconds. It is a LITERAL, not a formula and not a lookup: a
 number typed beside the leg it bounds is a number a reader can argue with, and a script that
 re-derived it from the ledger would be a second answer to a question the manifest already answers.
+
+**CORRECTED AT rev-5, AFTER THE NUMBERS WERE TESTED.** The rule below was 3x with a 60 s floor and
+it was WRONG in a way only a real landing could show: twelve of forty legs timed out on the first
+bar this unit gated, `kickoff-manifest ratchet` at 60 s against a 15 s measurement, because a
+second
+session bar was running concurrently. Nothing was hanging. The error was conflating the two
+questions this same section separates -- a ceiling is a HANG bound, and whether a leg costs too much
+is a COST question that `run-unattended-gates.sh` answers by measuring without killing. Sizing a
+hang bound like a cost budget produces exactly what the process-creation gotcha names: a ceiling
+that reds on ambient load and therefore gets ignored. The rule is now **10x with a 300 s floor**, and
+a leg with no reading on this node takes an explicitly UNMEASURED 1800 s rather than a scaled zero.
 
 **How the shipped numbers were picked, so a later reader can question them.** Each is
 `max(60, 3 × the leg's own seconds in `<git-dir>/gate-ledger.tsv` on node `a`)`, rounded up. The
@@ -285,6 +296,9 @@ that is already a leg.
   R2-1 showed specs 1 and 5 together would red an adopter's mixed manifest. Replaced the exclusion
   list in §4 with the uniform formula, which already produces the two argued numbers, and corrected
   the claim that this unit takes `TOOL-aCollapsedScan-4`'s candidate (2) — it takes neither.
+- rev-5 · 2026-08-27 · the derivation CORRECTED after its first real landing: 3x/60 s became
+  10x/300 s, because twelve legs timed out under ordinary contention with nothing hung. A ceiling is
+  a hang bound, not a cost budget, and this spec already said so one paragraph away.
 - rev-4 · 2026-08-27 · DESIGN CHANGE made before the code, per M2. The runner no longer enforces the
   ceiling declaration at all: it reports its unbounded count and refuses nothing, and the requirement
   moves to `run-gates.gov.test.sh`, the gov-only suite that already exists for corpus-specific claims

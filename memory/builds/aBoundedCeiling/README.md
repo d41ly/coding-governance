@@ -122,7 +122,7 @@ ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aB
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-27 |
 | [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-08-27 |
 | [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | WONTDO | rev-3 | 2026-08-27 |
 <!-- /gen:build-units -->
