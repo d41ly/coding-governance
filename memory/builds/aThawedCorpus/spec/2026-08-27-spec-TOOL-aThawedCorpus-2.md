@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-2 — the memory legs declare what they read, so the freeze that exists can reach them
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 4f406bf7 · streams tooling · order 4
+**Status:** WONTDO · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 4 · retired, see §9 rev-2
 
 <!-- gen:spec-records -->
 
@@ -133,27 +133,27 @@ declared in the tooling registry). Adds one leg, the `guard-covers-its-reader` a
 
 ## 8. Open questions
 
-- **FACT-QUESTION · F1 — after the two collapse units land, is the guardable half still worth
-  guarding?** PROBE: re-run the instrumented per-check timing on a quiet node `a` with
-  `TOOL-aThawedCorpus-4` and `TOOL-aThawedCorpus-1` landed, and read off the shell half and the
-  delegating half separately. OBSERVATION THAT DECIDES IT: if the guardable shell half is under 20 s,
-  declare nothing and close this unit as `WONTDO` with the measurement as the reason, because a
-  declaration that buys 20 s is a maintenance obligation bought with a rounding error. If it is
-  materially larger, declare the guard. LIVENESS: the probe can produce a negative — the shell half
-  is 34 s of set checks TODAY before any collapse, and the collapse does not touch those checks, so a
-  reading near 34 s is the likely one and the "declare nothing" branch is live rather than
-  rhetorical.
+- **F1 — after the two collapse units land, is the guardable half still worth guarding?**
+  RESOLVED (agent, 2026-08-27, delegated): NO, and the unit is retired rather than re-scoped. The
+  spec audit established that guard-skip is decided at `run-gates.sh:762`, BEFORE the reuse loop at
+  `:855`, which opens `[ -f "$WORK/$i.rc" ] && continue` — so a guarded leg is skipped and never
+  reused, and this unit's stated goal was a misdescription of what a guard buys.
 
-- **F2 — where does the arm live?** Options: `tools/run-gates/`, beside the mechanism it exercises,
-  or `tools/memory-tree/`, beside the legs it grades. Recommendation: `tools/run-gates/`, because the
-  property under test is `input_key`'s and an adopter who takes the memory-tree kit without run-gates
-  has no leg manifest for it to grade. Immaterial to the verdict; recorded so the reviewer need not
-  ask.
+- **F2 — where does the arm live?** RESOLVED (agent, 2026-08-27, delegated): nowhere. `input_key` is
+  an internal shell function with no print mode and no external surface, so the arm this unit needs
+  cannot be written without first changing `run-gates.sh`, which is another kit and another owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft, after the reuse audit found `input_key` and `GATE_REUSE`
   already implement the mechanism this unit was first specced to build.
+- rev-2 · 2026-08-27 · RETIRED (WONTDO). Three findings from the M4 spec audit, each verified
+  against `main` after regrounding: guard-skip preempts reuse so the goal was misdescribed;
+  `input_key` has no readable surface for the arm; and `memory hygiene` is unguarded TODAY, which is
+  exactly why `.githooks/pre-push` runs it on both its forced and its scoped branch — the
+  compensating control `TOOL-aThawedCorpus-5` depends on. Guarding it would open the hole that unit
+  relies on not existing. No successor: the freeze the owner asked for already exists and the memory
+  leg is deliberately outside it.
 
 ## 10. Reuse audit
 

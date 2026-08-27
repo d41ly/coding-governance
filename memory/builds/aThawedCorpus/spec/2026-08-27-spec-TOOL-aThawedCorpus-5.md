@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-5 — check 23 gets the `--staged` guard its four siblings already have
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -53,6 +53,20 @@ per-pass commit discipline actually pays for. Every later pass in this run benef
 
 `tools/memory-tree/check-memory-hygiene.sh` — one line, plus a header paragraph for S3.
 
+### Inventory
+
+The two populations check 23 walks, DERIVED rather than typed, because a count written beside the
+thing it counts is wrong on the next commit — this build has already watched all three of its
+figures drift inside a day:
+
+```bash
+git ls-files 'memory/builds/*/spec/*.md' | wc -l                                  # the per-spec loop
+git ls-files 'memory/builds/*/build/*.md' 'memory/builds/*/reviews/*.md' | wc -l   # the ledger pass
+```
+
+Check 21's population is a THIRD set, `build|prompts|reviews`, and is not check 23's. Conflating the
+two is the error this section exists to stop.
+
 ### Alternatives rejected
 
 - **Leave it and rely on `TOOL-aThawedCorpus-4`.** Rejected: the collapse makes check 23 cheap, but
@@ -74,8 +88,13 @@ per-pass commit discipline actually pays for. Every later pass in this run benef
   already produce and is what S3 documents.
 - observability — S3's header paragraph is the record; the leg's ledger row carries the duration.
 - risks — this is a COVERAGE REDUCTION at the pre-commit boundary, and calling it anything else
-  would be dishonest. The compensating control is `.githooks/pre-push:229`, which runs the full
-  `run-gates.sh` at the push boundary where the unguarded pass already lives. AC3 asserts it.
+  would be dishonest. The compensating control is `.githooks/pre-push`, which ALWAYS runs
+  `run-gates.sh` at `:230`; what it decides at `:222` is only WHICH mode — `GATE_FULL=1` on the
+  force branch, `GATE_BASE="$rec_sha"` on the scoped one. Guards are what `GATE_FULL` bypasses, and
+  `memory hygiene` DECLARES NO GUARD, so it executes on both branches. The control therefore holds
+  today, and it holds BECAUSE that leg is unguarded. `TOOL-aThawedCorpus-2` was retired partly to
+  keep it that way: a guard on this leg would let a scoped push skip the very pass that compensates
+  for what this unit removes. AC3 asserts the boundary in both directions.
 - testing + left-shift gates — `check-memory-hygiene.test.sh` stays green; no `fail` branch moves, so
   `ARMS_FLOORS` stays `20:20`.
 - migration / rollback — one line, revertable.
@@ -109,6 +128,11 @@ measurement exists twice from two independent sessions.
 - rev-1 · 2026-08-27 · initial draft. Found late, from a `project` memory note written by another
   session on this node at 10:30 the same day; the defect and the sibling guards were then verified
   against source before this spec was written.
+- rev-2 · 2026-08-27 · folded the M4 spec audit. Re-pinned `base` to a real default-branch sha after
+  regrounding 39 commits. Corrected §5's compensating control: `.githooks/pre-push` always runs the
+  bar and only chooses its MODE, and the control holds because `memory hygiene` is unguarded. Added
+  §4 Inventory deriving both populations instead of quoting counts, after all three figures in this
+  build drifted within a day.
 
 ## 10. Reuse audit
 

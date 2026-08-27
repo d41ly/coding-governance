@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base 4f406bf7 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -25,7 +25,9 @@ stops being process creation this repo controls.
   over the same `S` rows of `gen_build_index.py --print-bindings`, preserving its four outcomes:
   a name with no date prefix, a bound record with no family-qualified id, a name claiming an id its
   own `Serves` line does not list, and a conformant record that prints nothing.
-- **S2** — Keep the four `fail 21` branches in the shell, where `check-arms.py` can discover them.
+- **S2** — Keep every `fail 21` branch in the shell, where `check-arms.py` can discover it. There
+  are FIVE call sites — `:670`, `:673`, `:680`, `:683`, `:704` — and only `:704` belongs to the
+  projection this unit touches; the other four are check 21's other branches and are not in scope.
   The `awk` pass replaces the projection, never the reporting.
 - **S3** — Prove the output byte-identical: the full-corpus stdout of the changed checker equals the
   unchanged checker's, and both fixture classes of `check-memory-hygiene.test.sh` still red.
@@ -99,8 +101,11 @@ None. The checker is not a stored artifact and has no consumers other than its o
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the changed checker runs over the full corpus and its stdout is diffed against the
-  unchanged checker's, `diff` reports no difference.
+- **AC1** — When the changed checker runs over the full corpus AND over a scratch corpus seeded
+  with one instance of each projection outcome, its stdout is diffed against the unchanged
+  checker's on both and `diff` reports no difference. The real corpus alone is a ONE-SIDED oracle:
+  check 21 emits nothing today, so a diff over it catches added output and can never catch a
+  dropped finding.
 - **AC2** — When `bash tools/memory-tree/check-memory-hygiene.test.sh` runs, it exits 0 and its red
   fixtures still red.
 - **AC3** — When the instrumented per-check timing is re-taken on a quiet node `a` the same way,
@@ -108,8 +113,10 @@ None. The checker is not a stored artifact and has no consumers other than its o
   record, with the foreign-process count reported at both ends of the run.
 - **AC4** — When `python tools/memory-tree/check-arms.py --check` runs, it is green with
   `ARMS_FLOORS` for `tools/memory-tree/check-memory-hygiene.sh` unchanged at `20:20`.
-- **AC5** — When the four projection outcomes are staged one at a time into a scratch corpus, each
-  still produces its own `fail 21` text — a break observed RED, not asserted.
+- **AC5** — When the three reportable projection outcomes are staged one at a time into a scratch
+  corpus, each still appears inside the single `fail 21` body at `:704`, and a conformant record
+  still contributes no line — the fourth outcome prints nothing by construction, which is why it is
+  not gradeable as its own message.
 
 ## 7. Gates
 
@@ -137,6 +144,10 @@ would have been this unit's left-shift.
 - rev-2 · 2026-08-27 · re-based on the QUIET-box re-measurement, which withdrew the contaminated
   figures and reordered this unit behind `TOOL-aThawedCorpus-4`. F1 and F2 both resolved, F1 by its
   stated probe.
+- rev-3 · 2026-08-27 · folded the M4 spec audit. `base` re-pinned after regrounding 39 commits.
+  Corrected the `fail 21` surface from four branches to five call sites of which one is in scope.
+  AC5 restated against what the projection can actually emit, and AC1 given a seeded scratch corpus
+  because a byte-diff over a silent corpus is one-sided.
 
 ## 10. Reuse audit
 

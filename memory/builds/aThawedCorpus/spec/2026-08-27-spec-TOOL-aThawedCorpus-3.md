@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base 4f406bf7 · streams tooling · order 5
+**Status:** WONTDO · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 5 · retired, see §9 rev-2
 
 <!-- gen:spec-records -->
 
@@ -132,24 +132,27 @@ would be satisfied by the defect it exists to prevent.
 
 ## 8. Open questions
 
-- **F1 — is the ceiling per LEG or per CORPUS ITEM?** A flat per-leg integer goes stale as the corpus
-  grows: 71 builds today, and a ceiling measured now reds on a tree with 90. A per-item ratio
-  (`spawns / tracked memory file`) survives growth but is a figure nobody can check by eye.
-  Recommendation: a per-leg integer PLUS the corpus size it was measured at, on the same row, so a
-  breach report can say whether the count grew or the corpus did. Resolve before code.
+- **F1 — is the ceiling per LEG or per CORPUS ITEM?** RESOLVED (agent, 2026-08-27, delegated): moot.
+  `tools/gate-legs.json` on `main` already carries a per-leg `ceiling` on 85 of its 86 legs, with
+  `memory hygiene` at 1270, and `run-gates.sh` kills a leg that outlives its own. The question this
+  fork asked was answered by `TOOL-aBoundedCeiling-1` while this spec was being written.
 
-- **F2 — does the shim's own `exec` overhead swamp the signal on this node?** PROBE: run the
-  collapsed checker with and without the shim on a quiet box and compare wall clock. OBSERVATION
-  THAT DECIDES IT: if the shimmed run costs more than twice the unshimmed one, the gate is too
-  expensive to keep on the bar and becomes an on-demand leg instead. LIVENESS: the probe can produce
-  a negative — process creation on this node is the very thing this build measured at 0.2 s and up,
-  and the shim adds one per spawn, so a 2x breach is the expected outcome rather than an unlikely
-  one, and the on-demand branch is live.
+- **F2 — does the shim's own `exec` overhead swamp the signal?** RESOLVED (agent, 2026-08-27,
+  delegated): the shim cannot produce the signal at all. A `PATH` shim intercepts an `exec`; a
+  `$( )` command substitution and every pipeline stage FORK a subshell without one. Those forks are
+  precisely what this build measured in checks 21 and 23, so the counter would have been blind to
+  its own subject.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft. Spawns rather than seconds, on this build's own 31x
   load-spread measurement.
+- rev-2 · 2026-08-27 · RETIRED (WONTDO), on two independent fatal findings. The PREMISE died on
+  `main`: per-leg `ceiling` declarations landed as `TOOL-aBoundedCeiling-1`, and `memory hygiene`
+  is declared at 1270 s — this build's 1398 s measurement is a BREACH of it, which is a stronger
+  argument for the collapse units than a new gate would have been. The MECHANISM died on the audit:
+  a `PATH` shim cannot see a fork. Successor: none needed; the wall-clock ceiling that exists is
+  live on this host, since `timeout -k` runs here.
 
 ## 10. Reuse audit
 
