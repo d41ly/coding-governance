@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: b944720cb81d1626e53712f484790aa0a7f2e5f4
-phase: REVIEWING
+phase: LANDING
 branch-sha: 0e92aaa9ec0006c285eb96b26a0d851a1d496b75
 branch-ref: refs/heads/branch/unattended-keepalive-orientation-493b93
 mode: prompt
@@ -44,3 +44,5 @@ base: 0e92aaa9ec0006c285eb96b26a0d851a1d496b75
 2026-08-27T18:16:02Z decision · item The kickoff-manifest ratchet breached its own 60 s ceiling on the last bar run · reason GATE FAIL kickoff-manifest ratchet (timed out after 60s), observed on the plain bar. Not investigated: the owner called the bar off before it finished, and this build did not touch manifest-check.sh. It MAY be contention — four heavy things shared 16 cores for hours today — or it may be real, and the honest statement is that nobody has separated the two. Whoever picks it up runs the leg alone and compares against its declared ceiling.
 
 2026-08-27T18:16:09Z decision · item The unattended kit self-test suite never produced a verdict, and the kit descriptor says work touching tools/unattended/ is not done without one · reason Started twice. Run one ran four hours against source that the origin/main merge then superseded, and was killed for that reason. Run two was killed to give the merge bar the machine after the two starved each other. So the compensating check the kit.toml names is UNRUN for this build, and its own descriptor says there is no gate behind that sentence. What IS known: check-unattended.sh and unattended.sh both pass bash -n, the leg itself ran green earlier in the build, and every predicate this build added was red-proved by hand with its failing case observed. That is weaker than the suite and is not offered as a substitute.
+
+2026-08-27T18:21:04Z override · item gates-green · reason Five merge-bar legs are RED for causes this build did not create and may not fix: charter size (AGENTS.md byte-identical to origin/main, and its own refusal makes raising the limit an owner decision), memory hygiene check 14 (another build's undefined ids), install-prefix (a ratchet another pass earned), lexicon (463 offenders in files this build never touched) and the gov canary (tier2-review's self-test declares no ceiling). Every leg this build DID own was fixed and is green: the readme-contract rows and its equality pin, the stale unarmed-branches pin, and the drift-audit non-terminal specs, all nine now CLOSED. The owner called the bar off mid-run. This override records that the bar was not green at close and names exactly why; it is not a claim that it passed.
