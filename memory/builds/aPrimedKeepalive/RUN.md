@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9
+unpushed-at-landing: 44 oldest b17b0ed2
+landed-anchor: local
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-witness: b944720cb81d1626e53712f484790aa0a7f2e5f4
-phase: LANDING
+witness: 51ec33e2e1f6f20ee9a975b8e4729e431dd0a92b
+phase: LANDED
 branch-sha: 0e92aaa9ec0006c285eb96b26a0d851a1d496b75
 branch-ref: refs/heads/branch/unattended-keepalive-orientation-493b93
 mode: prompt
