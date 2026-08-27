@@ -598,8 +598,15 @@ legs "$R16" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # above allows 30 for launch-to-claim alone on a box where process creation moves 25x, and this has
 # to cover launch, the ticket, and one announce. TS_MAXWAIT here is 1200, so a longer window costs
 # nothing: the run stays queued until the timeout fires either way.
-out16=$( cd "$R16" && env GATE_FULL=1 GATE_TURNSTILE_TTL=300 GATE_TURNSTILE_TICK=1 \
-           timeout -s TERM -k 10 45 bash tools/run-gates/run-gates.sh 2>&1 )
+# THROUGH A FILE, NEVER A COMMAND SUBSTITUTION — `memory/gotchas/bounded-through-a-pipe-is-unbounded`.
+# `$( )` reads until the LAST inherited write end of the pipe closes, not until `timeout`'s direct
+# child exits, so a surviving leg grandchild holds it open and the substitution blocks long after the
+# bound has been reported. `timeout` would return 124 on schedule and the arm would still sit there.
+# Caught by the bug-class checklist over this build's own diff; the pattern did not exist anywhere in
+# this suite before these arms introduced it.
+( cd "$R16" && env GATE_FULL=1 GATE_TURNSTILE_TTL=300 GATE_TURNSTILE_TICK=1 \
+    timeout -s TERM -k 10 45 bash tools/run-gates/run-gates.sh ) </dev/null >"$tmp/out16.raw" 2>&1 || true
+out16=$(cat "$tmp/out16.raw" 2>/dev/null)
 [ "$(ls -1 "$Q16" 2>/dev/null | wc -l)" -ge 1 ] \
   && ok "a LIVE waiter's fresh ticket is NOT swept" \
   || nope "the sweep deleted a live waiter's ticket — it cannot tell a waiter from a corpse"
@@ -634,16 +641,26 @@ if [ -f "$Q17" ]; then
   # verdict at all — a red that names nothing. The cutoff below is not a timing window in the sense
   # `TOOL-aScannedThrottle-7` warns about: it separates "one bar's startup" from "two hours", a
   # margin of about sixty, so load cannot move a passing run across it.
+  # THROUGH A FILE, for the reason arm 18 above states — and here it is load-bearing twice over,
+  # because this arm's whole subject is a HANG and it also MEASURES elapsed time. Through a
+  # substitution the bound would be reported on schedule while the arm itself blocked, so the elapsed
+  # figure it prints would be the block and not the run, and the assertion below would be grading the
+  # wrong clock. That is precisely what the class record says an arm must not do.
   t17s=$(date +%s)
-  out17=$( cd "$R17" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1800 \
-             timeout -s TERM -k 10 180 bash tools/run-gates/run-gates.sh 2>&1 ); rc17=$?
+  ( cd "$R17" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1800 \
+      timeout -s TERM -k 10 180 bash tools/run-gates/run-gates.sh ) </dev/null >"$tmp/out17.raw" 2>&1; rc17=$?
+  out17=$(cat "$tmp/out17.raw" 2>/dev/null)
   t17=$(( $(date +%s) - t17s ))
   printf '%s' "$out17" | grep -q 'could not create a queue ticket' \
     && ok "a run that cannot take a ticket says so" \
     || nope "a run that cannot take a ticket did not report it"
-  { [ "$rc17" -ne 124 ] && [ "$rc17" -ne 137 ]; } \
+  # The ELAPSED clause is not redundant with the exit code, and the class record is explicit about
+  # why: the verdict was always the half that stayed correct, and only a measured clock can see a
+  # bound that reports on schedule while the caller blocks. With the file form above the two now
+  # agree, and asserting both means a regression to the substitution form reds here.
+  { [ "$rc17" -ne 124 ] && [ "$rc17" -ne 137 ] && [ "$t17" -lt 180 ]; } \
     && ok "it failed open at once rather than waiting out the 7200s bound (${t17}s)" \
-    || nope "a run with no ticket was still waiting after ${t17}s — it is burning the 7200s bound"
+    || nope "a run with no ticket was still waiting after ${t17}s (rc $rc17) — it is burning the 7200s bound"
   [ "$(hdrkey "$R17" queued_from)" = unticketed ] \
     && ok "the run record distinguishes 'unticketed' from 'expired', so a queued 0 stays unambiguous" \
     || nope "queued_from is '$(hdrkey "$R17" queued_from)', not 'unticketed'"

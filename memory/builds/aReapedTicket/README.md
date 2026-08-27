@@ -98,13 +98,23 @@ survive.
 
 ## BUILD-LEVEL RULES
 
-**Scoped OUT, with its reason, and leaving as a backlog row rather than a silence:** the unguarded
-holder reap. `ts_try_reap` does `rm -rf "$TS_DIR_C"` directly at two sites, which the
+**Scoped OUT, with its reason, and filed as `TOOL-aReapedTicket-4` rather than left as a silence:**
+the unguarded holder reap. `ts_try_reap` does `rm -rf "$TS_DIR_C"` directly at two sites, which the
 `aPacedTurnstile` spec explicitly prescribed a RENAME for and explained — a second reaper that
 claimed in the gap has its fresh beacon destroyed, and two bars run. That is a different failure from
 a different predicate, its failing case is a sub-millisecond race needing its own arm design, and
-§7's rule is that a guard whose failing case has not been observed is not landed. The prompt record
-carries the spec citation so the next session does not re-derive it.
+§7's rule is that a guard whose failing case has not been observed is not landed. The row carries the
+spec citation and the observation that the property is testable WITHOUT racing it — two concurrent
+reapers against one dead beacon must produce exactly one reap line — so the next session does not
+re-derive either.
+
+**One scope AMENDMENT, made while building and recorded rather than absorbed:** the beacon's own
+release TRAP came into `TOOL-aReapedTicket-1`, which had declared the beacon out of scope. Verifying
+the ticket trap refuted the spec's reasoning about it — a trap on `INT` replaces the default
+disposition, so a handler that does not `exit` drops the ticket and resumes the loop ticketless — and
+the claim-time trap carried that identical spelling ten lines away, where it releases the beacon and
+then keeps running the bar. Fixing one and leaving the other is the fix-the-instance-not-the-class
+failure §7 names. Spec rev-2 carries the refutation.
 
 **No unit may make the turnstile able to wedge a bar.** `run-gates.sh:526-529` states the standing
 constraint: the turnstile fails open, loudly, and contributes nothing to the exit code, ever. A
