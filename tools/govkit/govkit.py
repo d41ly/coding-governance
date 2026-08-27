@@ -4326,7 +4326,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 # counted zero — an `if n_kit:` that is never true prints nothing and reads exactly
                 # like a kit with no self-tests. TOOL-dUnstalledConvoy-26.
                 emitted.append({"name": nm, "kit": eid, "argv": argv, "guard": guards,
-                                "subject": row["subject"],
+                                # .get, NOT a subscript. TOOL-aBoundedCeiling-5 S6: the key three
+                                # lines up is set CONDITIONALLY on check_target_reads_subject, and
+                                # was read here UNCONDITIONALLY -- so `govkit apply` raised
+                                # KeyError against any target below the version floor. It survived
+                                # because selftest.py exercises the predicate directly and never
+                                # runs a full apply on a below-floor fixture. Found by the spec
+                                # audit of a unit that was about to copy this seam verbatim.
+                                "subject": row.get("subject"),
                                 "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
                                 "history_depth": leg.get("history_depth")})
                 if dropped and not guards:

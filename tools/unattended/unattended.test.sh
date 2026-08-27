@@ -4516,13 +4516,60 @@ reset_tree; rm -f memory/builds/tRun/RUN.md
 out=$(run --rescope tRun --act retire --item ARCH-tNone-1 --reason r)
 hit "$out" "no run-state file, so there is no run to record an amendment against:"
 
+# ---- TOOL-aBoundedCeiling-6: run_bounded is a bound on the CLOCK, not on the verdict -------------
+# The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
+# which names THIS FILE as one of the two places the class has bitten. So these arms measure ELAPSED
+# TIME, and one of them carries the control that proves the instrument can see the defect at all.
+#
+# The function is SOURCED FROM THE SHIPPED FILE rather than retyped, because an arm that proves a
+# mechanism against a copy proves it for the copy — memory/gotchas/staged-break-substitutes-a-
+# synthetic-value.md.
+rb_fn=$(mktemp)
+sed -n '/^run_bounded() {/,/^}$/p' "$SCRIPT" > "$rb_fn"
+[ -s "$rb_fn" ] || { echo "FAIL could not extract run_bounded from $SCRIPT — the arms below would grade nothing"; st=1; }
+# shellcheck disable=SC1090
+GATE_BOUND_LIVE=1 GATE_BOUND=2 . "$rb_fn"
+
+# ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
+# against a 60 s sleeper with a 2 s bound, so a 20 s allowance survives a loaded box and still fails
+# a construct that does not bound the clock. Measured on node `a` at 12 s under heavy ambient load.
+_t0=$(date +%s); run_bounded bash -c 'sleep 60' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+n=$((n+1))
+case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
+
+# ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
+# same command through a command substitution: if the control also returns fast, this host does not
+# reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
+_t0=$(date +%s); run_bounded bash -c 'sleep 60 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
+_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 60 & exit 0' 2>&1); _t3=$(date +%s)
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+n=$((n+1))
+[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+
+# ...a command that finishes INSIDE the bound is not killed and its output survives.
+run_bounded bash -c 'echo alive; exit 0'; _rc=$?
+n=$((n+1))
+[ "$_rc" = 0 ] || { echo "FAIL run_bounded returned $_rc for a command that finished inside its bound"; st=1; }
+hit "$RB_OUT" "alive"
+
+# ...and with the bound INERT the command still RUNS, exit status intact. A bound may cost speed and
+# may turn a hang into a verdict; it may never turn a check into a skip.
+GATE_BOUND_LIVE=0 run_bounded bash -c 'echo ran-unbounded; exit 3'; _rc=$?
+n=$((n+1))
+[ "$_rc" = 3 ] || { echo "FAIL an INERT bound changed the command exit status to $_rc; 3 expected"; st=1; }
+hit "$RB_OUT" "ran-unbounded"
+rm -f "$rb_fn"
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=500
+FLOOR_ASSERTIONS=508
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4553,7 +4600,7 @@ FLOOR_ASSERTIONS=500
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=659
+FLOOR_ASSERTIONS=667
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
