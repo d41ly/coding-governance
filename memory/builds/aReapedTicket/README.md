@@ -127,13 +127,13 @@ definition until M4 runs.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
 ids TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aReapedTicket-1 — a queued waiter drops its own ticket on every signal a trap can catch](spec/2026-08-27-spec-TOOL-aReapedTicket-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-27 |
+| [TOOL-aReapedTicket-1 — a queued waiter drops its own ticket on every signal a trap can catch](spec/2026-08-27-spec-TOOL-aReapedTicket-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aReapedTicket-2 — the acquire loop asserts liveness on the QUEUE, and refuses to wait on what cannot change](spec/2026-08-27-spec-TOOL-aReapedTicket-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-27 |
 | [TOOL-aReapedTicket-3 — arms for a dead waiter, which the suite has never had](spec/2026-08-27-spec-TOOL-aReapedTicket-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->

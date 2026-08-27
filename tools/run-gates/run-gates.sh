@@ -476,6 +476,34 @@ if [ -n "$TS_COMMON" ]; then
   # independently, so there is no counter file to corrupt and no coordinator to elect.
   TS_TICKET="$TS_Q/$(date -u +%Y%m%dT%H%M%S)-$$-$RANDOM"
   : > "$TS_TICKET" 2>/dev/null || TS_TICKET=""
+  # THE TICKET GETS A HANDLER THE MOMENT IT EXISTS (TOOL-aReapedTicket-1). Until this line the only
+  # `ts_drop_ticket` trap was armed 24 lines below, inside the branch that WINS the beacon — so a
+  # waiter polling the loop below ran with no handler at all, for the entire queue wait.
+  #
+  # That is the same defect the claim-time trap's own comment argues against, one participant over,
+  # and the consequence is worse because the window is the whole wait rather than a few seconds: the
+  # leak needs no SIGKILL, an ordinary Ctrl-C on a queued bar leaves a ticket that sorts first
+  # FOREVER. Nothing prunes it, every later bar then burns the full TS_MAXWAIT and runs UNQUEUED,
+  # and the turnstile is not slowed by that — it is permanently defeated. Measured before the fix:
+  # one leaked ticket, no beacon at all, and the next bar still reached `WAIT EXPIRED`.
+  #
+  # DELIBERATELY NOT `ts_release; ts_drop_ticket`. No beacon is held here and `ts_release` returns on
+  # its first line, so the release half would be inert code implying a waiter can release something
+  # it never claimed. Both traps below REPLACE this one — `trap` replaces rather than appends — and
+  # both are strictly wider, so there is never an instant with no handler and never two handlers
+  # racing.
+  #
+  # THE SIGNAL ARMS RE-EXIT, and that is not cosmetic symmetry with the `cleanup` traps below — it
+  # is required for correctness, and the first draft of this line got it wrong. Setting a trap on
+  # INT REPLACES bash's default disposition, so a handler that does not exit drops the ticket and
+  # then RESUMES the loop below. That run is now ticketless, its acquire predicate can never match
+  # again, and it spins to the full bound — the exact "a waiter that can never acquire" state this
+  # unit exists to remove, re-created by its own fix. Caught by running it: `timeout -s INT` had to
+  # escalate to KILL because the runner would not die.
+  trap 'ts_drop_ticket' EXIT
+  trap 'ts_drop_ticket; exit 130' INT
+  trap 'ts_drop_ticket; exit 143' TERM
+  trap 'ts_drop_ticket; exit 129' HUP
   ts_start=$(ts_now); ts_lastpos=""; ts_announced=0
   while :; do
     # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
@@ -499,7 +527,17 @@ if [ -n "$TS_COMMON" ]; then
       # harness. Under that load the window is seconds wide — process creation on this platform
       # has been measured 25x slower under contention — so the window is not theoretical and it is
       # widest exactly when two bars are most likely to collide.
-      trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP
+      #
+      # THE SIGNAL ARMS RE-EXIT, for the reason the ticket trap above states and which applies here
+      # unchanged: this spelling was a single `EXIT INT TERM HUP` handler, so an interrupt in this
+      # window released the beacon and then RESUMED — leaving the run believing it still held a
+      # lock it had just given away, and running the whole bar unqueued beside whoever claimed
+      # next. That is the two-bar condition this unit exists to prevent, arriving through its own
+      # cleanup path, which is the same shape the nonce guard was written for.
+      trap 'ts_release; ts_drop_ticket' EXIT
+      trap 'ts_release; ts_drop_ticket; exit 130' INT
+      trap 'ts_release; ts_drop_ticket; exit 143' TERM
+      trap 'ts_release; ts_drop_ticket; exit 129' HUP
       # S4 (TOOL-aShardedFloor-1), and the GUARD is the whole of it. `TS_WAITED` is refreshed at
       # the BOTTOM of this loop and this path breaks above it, so a contended acquire records the
       # previous tick's value and understates the wait by up to one `TS_TICK`.

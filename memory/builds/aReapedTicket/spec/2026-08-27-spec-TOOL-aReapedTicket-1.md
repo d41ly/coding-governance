@@ -1,6 +1,6 @@
 # TOOL-aReapedTicket-1 — a queued waiter drops its own ticket on every signal a trap can catch
 
-**Status:** SPECCED · rev-1 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base f1be0b49 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -29,7 +29,9 @@ place in the queue instead of leaving a file that blocks the repository forever.
 - Reaping a ticket whose owner died UNCATCHABLY. A trap cannot catch `SIGKILL`, an OOM kill or a
   power loss, and pretending otherwise is the whole reason a backstop is a separate unit.
   `TOOL-aReapedTicket-2` owns that.
-- Anything about the beacon's own reaping, release or nonce. Untouched.
+- Anything about the beacon's own REAPING or its nonce. Untouched. Its release TRAP is in scope as
+  of rev-2, for the reason §4 gives — it carries the identical defect this unit fixes, in the
+  identical shape, ten lines away.
 - The holder-reap race recorded in the build README's BUILD-LEVEL RULES. Out by an explicit ruling.
 - Changing the acquire predicate, the wait bound, or the FIFO ordering.
 
@@ -70,19 +72,41 @@ The two later traps SUPERSEDE it, which is safe because `trap` REPLACES rather t
 `ts_drop_ticket` is already idempotent (`[ -n "$TS_TICKET" ] && rm -f …; TS_TICKET=""`), so a handler
 firing after the ticket was dropped at `:530` or `:542` is a no-op.
 
-### Why the signal arms must re-exit, and why this one does not
+### The signal arms MUST re-exit — and rev-1 of this spec had this wrong
 
-`:604-606` re-exit with the conventional `128+n` so a caller can see what killed the run. This trap
-does not, and the difference is deliberate: at `:502` and `:603` the handlers are the run's final
-disposition, whereas this one covers a window in which bash's own default disposition for `INT`,
-`TERM` and `HUP` is already to terminate. Adding an explicit `exit` here would change the exit code
-of a window that currently has one, for no gain. The `EXIT` arm is what makes the ordinary
-`ts_drop_ticket` happen; the signal arms exist so the `EXIT` arm runs at all on a signal, which is
-bash's documented behaviour.
+rev-1 argued that a bare `trap 'ts_drop_ticket' EXIT INT TERM HUP` was sufficient because "this
+covers a window in which bash's own default disposition for `INT`, `TERM` and `HUP` is already to
+terminate." **That is false, and it was refuted by running it.** Setting a trap on a signal REPLACES
+the default disposition. A handler that does not exit runs and then RESUMES the loop — so the run
+drops its ticket and keeps polling, ticketless, with an acquire predicate that can never match
+again, and spins to the full bound. That is precisely the "a waiter that can never acquire" state
+this build exists to remove, re-created by this unit's own fix.
+
+Observed: under `timeout -s INT -k 5`, the patched runner had to be escalated to `SIGKILL` on all
+three signals, because it would not die. The corrected spelling follows the convention already in
+this file at `:621-624` — a bare `EXIT` arm, and one arm per signal re-exiting with the conventional
+`128+n`:
+
+```
+trap 'ts_drop_ticket' EXIT
+trap 'ts_drop_ticket; exit 130' INT
+trap 'ts_drop_ticket; exit 143' TERM
+trap 'ts_drop_ticket; exit 129' HUP
+```
+
+**This is why the claim-time trap is now in scope.** `:520` was the same single-handler spelling —
+`trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP` — so it carries the identical defect: an
+interrupt in the window between claiming the beacon and the `cleanup` traps releases the beacon and
+then RESUMES, leaving the run believing it holds a lock it has just given away and running the whole
+bar beside whoever claims next. That is the two-bar condition the turnstile exists to prevent,
+arriving through its own cleanup path — the same shape the nonce guard was written for. Fixing this
+unit's trap and leaving an identical one ten lines below would be the fix-the-instance-not-the-class
+failure §7 names, so both are corrected in one commit and to one convention.
 
 ### Files touched (estimate)
 
-- `tools/run-gates/run-gates.sh` — one `trap` statement and its comment. Under 15 lines.
+- `tools/run-gates/run-gates.sh` — two trap sites, four statements each, with their comments. Under
+  45 lines.
 
 ### Alternatives rejected
 
@@ -130,7 +154,13 @@ bash's documented behaviour.
   the other two members of the trap's signal list are unasserted.
 - **AC3** — When a bar acquires the beacon uncontended and exits cleanly, its ticket is gone and the
   beacon is released — the existing arm 8 behaviour is unchanged, proving the added trap is
-  superseded rather than competing with `:502` and `cleanup`.
+  superseded rather than competing with the claim-time trap and `cleanup`.
+- **AC5** — When a queued bar is signalled, it EXITS rather than resuming the loop, observed as the
+  absence of a `SIGKILL` escalation under `timeout -s <sig> -k`. rev-1's spelling failed this on all
+  three signals, which is what produced rev-2.
+- **AC6** — When a bar holding the beacon is signalled in the window before the `cleanup` traps arm,
+  it releases and EXITS rather than continuing to run unqueued while believing it holds the lock.
+  Same defect, same arm shape, at the claim-time trap.
 - **AC4** — `grep -c "^ *trap" tools/run-gates/run-gates.sh` shows the new site, and the ticket is
   created at a line NUMBER lower than that site — the ordering property this unit is about, asserted
   structurally so a later edit that moves the trap back inside the win branch reds.
@@ -153,6 +183,15 @@ written.
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft, written from the reproductions in the prompt record.
+- rev-2 · 2026-08-27 · REFUTED rev-1's claim that the signal arms need no explicit `exit` — a trap
+  replaces the default disposition, so the handler dropped the ticket and resumed the loop
+  ticketless, and `timeout -s INT -k` had to escalate to `SIGKILL` on all three signals. Corrected to
+  the `128+n` convention already in the file. The refutation came from running the change, not from
+  re-reading it, which is why it is recorded rather than quietly amended. Scope widened to the
+  claim-time beacon trap, which carried the identical defect in the identical shape; §3 and §4 say
+  why leaving it was not an option, and AC5/AC6 were added. **The code for the sibling trap was
+  written before this rev bump** — the divergence was found by verification mid-pass, and the spec
+  is being corrected in the same pass rather than after it.
 
 ## 10. Reuse audit
 
