@@ -1,4 +1,4 @@
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 2
 
 # TOOL-aGroundedOrientation-1 — the prompt path runs its orientation probes before it writes the roster
 
@@ -80,6 +80,13 @@ than preference.
 ## 9. Revision log
 - rev-1 · 2026-08-27 · authored during the run, unreviewed by definition (M4). Grounded against
   b4e1d5be, the merged tree, not the run's original f5dff6ae.
+- rev-2 · 2026-08-27 · built and landed on main at ded17252. AC1, AC2 and AC4 OBSERVED: probe step
+  at prompt-section line 44 against the write at 64; `adopt-unattended.sh --check` exit 0; the diff
+  adds zero occurrences of `reuse_lookup`, `query.py` or `gotchas.py`. AC3 is NOT met and is not
+  claimed: `check-unattended.sh` exits 1 on this tree for reasons predating this unit — check 7's
+  two-live-runs red (since cleared on main by 7cf96591) and check 24's roster-growth red, which
+  this run answered with two recorded `--rescope add` rows. Check 18's ordering invariant WAS
+  re-verified by hand: first `--preflight` at 141, first `/session-kickoff` at 150.
 
 ## 10. Reuse audit
 **Map probe.** `python tools/codebase-map/reuse_lookup.py "orientation probes an unattended run runs

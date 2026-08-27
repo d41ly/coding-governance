@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
-phase: RUNNING
+parked-surfaced: yes, 3 surfaced
+keepalive-reaped: yes
+witness: ded172527621226aed8f4b9f3dcf78234ac084e2
+phase: BUILDING
 branch-sha: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 branch-ref: refs/heads/branch/unattended-prompt-cg-toolkits-831d35
 mode: prompt

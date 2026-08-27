@@ -1,4 +1,4 @@
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
 
 # TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write
 
@@ -88,6 +88,18 @@ None.
   whole-file grep §4 explicitly rejects, so the section-slice decision §4 calls "the point" was
   unobservable — the gate's own rationale went untested. AC5 added as the discriminating case: the
   literal moved to another `## ` section must still RED.
+- rev-4 · 2026-08-27 · built and landed on main at ded17252 with its ARMS 1-OF-3 OBSERVED, which is
+  a real gap and is recorded rather than rounded up. AC1 OBSERVED: with the probe step moved below
+  the write, the leg emitted the ordering refusal. AC2 and AC5 UNOBSERVED — the run was landing
+  when they were still executing. AC5 is the costly one: it is the only criterion separating this
+  section-scoped gate from the whole-file grep 4 rejects, so the design decision remains untested.
+  AC4 OBSERVED: `check-arms.py --check` exit 0 at the bumped 101:100 floor, after it REFUSED the
+  first attempt for asserting a PREFIX of the failure text rather than the text itself.
+  A prior observation attempt ran 45 minutes against a clone of HEAD where this unit was
+  uncommitted, so the arm under test did not exist and all three reported hit=0 — indistinguishable
+  from a broken arm. The probe now asserts the locator is PRESENT in the checker under test,
+  because the liveness check could not: 'the clean tree emits neither message' is true both when
+  the arm is correctly silent and when it is absent.
 
 ## 10. Reuse audit
 **The seam extended.** Check 20's own `$psec` slice in `tools/unattended/check-unattended.sh`, and
