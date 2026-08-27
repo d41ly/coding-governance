@@ -67,20 +67,22 @@ push. The probes cost seconds.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-27 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
 ids TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 TOOL-aGroundedOrientation-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGroundedOrientation-3 — check 23 gets the `--staged` guard its four siblings carry](spec/2026-08-27-spec-TOOL-aGroundedOrientation-3.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
+| [TOOL-aGroundedOrientation-1 — the prompt path runs its orientation probes before it writes the roster](spec/2026-08-27-spec-TOOL-aGroundedOrientation-1.md) | 2 | 1 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write](spec/2026-08-27-spec-TOOL-aGroundedOrientation-2.md) | 3 | 1 | OPEN | rev-2 | 2026-08-27 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aGroundedOrientation-3.
 
-Ids no `spec-audit` record has ever named: TOOL-aGroundedOrientation-3.
+Ids no `spec-audit` record has ever named: TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 TOOL-aGroundedOrientation-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -88,6 +90,8 @@ Ids no `spec-audit` record has ever named: TOOL-aGroundedOrientation-3.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aGroundedOrientation-3` | no |
+| 2 | `TOOL-aGroundedOrientation-1` | no |
+| 3 | `TOOL-aGroundedOrientation-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
