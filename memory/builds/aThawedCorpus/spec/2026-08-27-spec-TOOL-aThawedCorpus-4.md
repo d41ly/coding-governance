@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record
 
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -54,9 +54,10 @@ ceilings are live. 1398 s is a breach.
 
 ## 3. Non-goals (OUT)
 
-- **N1** — No skip, cache or freeze. That is `TOOL-aThawedCorpus-2` and `TOOL-aThawedCorpus-3`, and
-  it is deliberately sequenced after this unit so it is priced against the collapsed baseline rather
-  than the current one.
+- **N1** — No skip, cache or freeze, and no spawn ceiling. `TOOL-aThawedCorpus-2` and
+  `TOOL-aThawedCorpus-3` were to have built those and are both RETIRED (WONTDO) — the freeze exists
+  already, and per-leg ceilings shipped as `TOOL-aBoundedCeiling-1`. This unit's job is the cost,
+  and the ceiling it must come in under is the declared 1270 that already binds.
 - **N2** — No change to what check 23 MEANS. The ledger grammar, the two legal forms, the cutoff, the
   grandfather registry and the vacuity arm are untouched.
 - **N3** — No change to `.memory-tree.conf`. `ACCEPTANCE_LEDGER_CUTOFF` and
@@ -139,8 +140,9 @@ None. The checker is not a stored artifact.
 - risks — an `awk` reading many files in one process carries state across file boundaries where a
   fresh process did not. That is the single real defect class here and AC5 stages it.
 - testing + left-shift gates — `check-memory-hygiene.test.sh` stays green; `ARMS_FLOORS` for this
-  file stays `20:20`, no `fail` branch added or removed. The recurring class itself is left-shifted by
-  `TOOL-aThawedCorpus-3`, not here.
+  file stays `20:20`, no `fail` branch added or removed. The recurring class is left-shifted by the
+  `ceiling` field already declared for every leg in `tools/gate-legs.json`, not by anything this
+  build adds.
 - migration / rollback — one commit, revertable.
 - user docs — N/A.
 
@@ -198,6 +200,8 @@ None. The checker is not a stored artifact.
   point, and the ordering properties. Corrected the branch surface to three `fail 23` calls plus a
   liveness `printf`. Counts replaced by deriving commands. AC1 given a seeded corpus, and AC3b added
   for the declared ceiling this leg currently breaches.
+- rev-4 · 2026-08-27 · three forward references to the retired `-2` and `-3` re-pointed. Caught by
+  `gotchas.py --for-diff` selecting `amendment-leaves-its-other-half-standing`.
 
 ## 10. Reuse audit
 
@@ -211,7 +215,8 @@ invented here.
 `python tools/codebase-map/reuse_lookup.py "skip re-checking a memory build folder whose content has
 not changed since it was last verified"` returned `checks` at `tools/memory-tree/corpus_ids.py`,
 `cmd_check` at `tools/memory-tree/row_grammar.py` and `build_cache` at
-`tools/memory-recall/query.py`. The last is `TOOL-aThawedCorpus-2`'s business, not this unit's.
+`tools/memory-recall/query.py` — the mtime-keyed cache this build's measurement record rules out as
+a model, and not this unit's business.
 
 Recall terms used, because M7 re-runs the query: `cache freeze closed build corpus walk hygiene gate
 fingerprint incremental stale mtime tree-hash rescan`. It surfaced `TOOL-aQuarriedLantern-1`'s review

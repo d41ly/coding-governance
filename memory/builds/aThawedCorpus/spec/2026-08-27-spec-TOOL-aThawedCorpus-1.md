@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record
 
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -36,9 +36,11 @@ stops being process creation this repo controls.
 
 ## 3. Non-goals (OUT)
 
-- **N1** — No skip, cache, freeze or scoping mechanism. That is `TOOL-aThawedCorpus-2`, sequenced
-  after this unit so it is priced against the collapsed baseline. The precedent is
-  `TOOL-aCollapsedScan-1`, which parked exactly that decision for exactly that reason.
+- **N1** — No skip, cache, freeze or scoping mechanism. `TOOL-aThawedCorpus-2` was to have declared
+  one and is RETIRED (WONTDO): the freeze already exists as `run-gates.sh`'s `input_key` plus
+  `GATE_REUSE`, guard-skip preempts it, and guarding this leg would break `TOOL-aThawedCorpus-5`'s
+  compensating control. The precedent for deferring rather than bundling is `TOOL-aCollapsedScan-1`,
+  which parked exactly that decision for exactly that reason.
 - **N1b** — No overlap with `TOOL-aThawedCorpus-4`, which collapses check 23's loops. Two checks,
   two grammars, two units.
 - **N2** — No change to what check 21 MEANS. The projection rule, the pin, the unbound escape and
@@ -148,6 +150,9 @@ would have been this unit's left-shift.
   Corrected the `fail 21` surface from four branches to five call sites of which one is in scope.
   AC5 restated against what the projection can actually emit, and AC1 given a seeded scratch corpus
   because a byte-diff over a silent corpus is one-sided.
+- rev-4 · 2026-08-27 · N1 re-pointed after `TOOL-aThawedCorpus-2` was retired. Caught by
+  `gotchas.py --for-diff` selecting `amendment-leaves-its-other-half-standing`, which is precisely
+  a retirement leaving a forward reference describing it as merely sequenced later.
 
 ## 10. Reuse audit
 
