@@ -1,11 +1,12 @@
 # TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it
 
-**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aBoundedCeiling-1-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-acceptance-ledger.md) | journal | TOOL-aBoundedCeiling-6 |
 | [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-review-TOOL-aBoundedCeiling-1-diff-review-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-diff-review-round1.md) | diff-review | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |

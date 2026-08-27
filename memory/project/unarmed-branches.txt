@@ -39,4 +39,3 @@ tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a hal
 # header draws: not "an arm nobody wrote" but "an arm that cannot be written from here".
 # It WAS observed red, against a staged revert of the driver's `_graded` branch: it named all
 # five affected builds and went green on restore. Its sibling liveness branch IS armed.
-tools/unattended/check-unattended.sh	30	2	a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it

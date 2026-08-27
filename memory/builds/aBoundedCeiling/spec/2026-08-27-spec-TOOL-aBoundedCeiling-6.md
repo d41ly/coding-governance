@@ -1,11 +1,12 @@
 # TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aBoundedCeiling-1-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-acceptance-ledger.md) | journal | TOOL-aBoundedCeiling-1 |
 | [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |
 | [2026-08-27-review-TOOL-aBoundedCeiling-1-diff-review-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-diff-review-round1.md) | diff-review | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 |

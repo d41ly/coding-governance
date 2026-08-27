@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too
 
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 2
+**Status:** WONTDO · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 2 · retired TOOL-aBoundedCeiling-13 carries S1-S5 and S7; only S6 was built
 
 <!-- gen:spec-records -->
 

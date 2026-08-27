@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
+ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-13
 ---
 
 # aBoundedCeiling — a leg that cannot hang forever, and a landing that pays for the bar once
@@ -116,18 +116,18 @@ units. The refusal is correct and the record belongs here instead.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-3 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | WONTDO | rev-3 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
