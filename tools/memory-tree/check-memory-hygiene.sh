@@ -1125,7 +1125,7 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- 2026-08-27 and the merge kept both halves, because each carried something the other did not.
 # ----
 # ---- THE GUARD, which is the shared half: the `--staged` guard its four structural siblings carry
-# ---- (`:667`, `:1051`, `:1066`, `:1076`) and this one never got. Without it the pre-commit leg walks
+# ---- (`:674`, `:1058`, `:1073`, `:1083`) and this one never got. Without it the pre-commit leg walks
 # ---- all specs and all records on every commit regardless of what is staged, which is 94% of that
 # ---- leg's wall clock: measured 2026-08-27 node `a`, 963 s as shipped against 54 s guarded,
 # ---- uncontended, same staged set. No coverage moves — `.githooks/pre-push` runs the full bar at the
