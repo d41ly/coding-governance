@@ -1121,8 +1121,12 @@ EOF
 # ---- repo's own green-by-absence class.
 c7anchor="$ADV_HEAD"
 [ -n "$c7anchor" ] && { GIT rev-parse --verify --quiet "$c7anchor^{commit}" >/dev/null 2>&1 || c7anchor=""; }
+# ---- UNCONDITIONAL, not `report`. `report` is gated on REPORT=1, so routing either line through it
+# ---- would make the exclusion invisible on every default bar run — a check quietly deleted, which is
+# ---- the exact shape this exclusion must not have. Caught by verifying it rather than by reading it.
 if [ "$nlive" -gt 1 ] && [ -z "$c7anchor" ]; then
-  report "check 7 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted"
+  printf 'unattended: check 7 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted
+'
 fi
 c7keep=""; c7drop=""; c7n=0
 for c7f in $live; do
@@ -1130,7 +1134,8 @@ for c7f in $live; do
   c7w=$(fact_of "$c7f" witness)
   if [ "$c7ph" = LANDING ] && [ -n "$c7anchor" ]      && GIT rev-parse --verify --quiet "$c7w^{commit}" >/dev/null 2>&1      && GIT merge-base --is-ancestor "$c7w" "$c7anchor" 2>/dev/null; then
     c7drop="$c7drop $c7f"
-    report "check 7 excluded $c7f — LANDING, and its witness $c7w is an ancestor of the advertised default-branch tip $c7anchor, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one"
+    printf 'unattended: check 7 EXCLUDED %s — LANDING, and its witness %s is an ancestor of the advertised default-branch tip %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
+' "$c7f" "$c7w" "$c7anchor"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi

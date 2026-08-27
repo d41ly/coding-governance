@@ -1102,11 +1102,39 @@ check_single_live() {
   # live one, and a rule that quantified over `RUN.md` alone would let an archive hand-edited back to
   # a non-terminal phase sit there as an unseen second run — which is exactly what this check exists
   # to make impossible.
+  # THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION, the DRIVER's half of the leg's check 7.
+  # TOOL-aPrimedKeepalive-7. A record at LANDING whose witness is an ancestor of the anchor this verb
+  # already observed is not a competing run: it is a finished one missing its stamp, and its work is
+  # on the branch every later run measures against. Without this half, fixing the leg alone still
+  # leaves the NEXT --preflight on this repo refused, which is how the wedge survived being fixed.
+  # Observed before it was written: --preflight printed check 5 at two live records, one of them a
+  # build merged and pushed days earlier.
+  #
+  # WHAT IT DOES NOT CLAIM: nothing about whether that run finished correctly or met its Definition
+  # of Done. One thing only — the commit its record names as witness is on the branch the remote
+  # calls its default. LANDING stays non-terminal; a terminal phase is a PRODUCER's to write.
+  #
+  # FAILS CLOSED. `ASHA` is populated by observe_anchor, which verb_preflight calls BEFORE this; with
+  # no anchor, an unresolvable witness, or any phase but LANDING, the record counts as it always did.
+  local anc="${ASHA:-}" w=""
+  [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
   for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
+    if [ "$p" = LANDING ] && [ -n "$anc" ]; then
+      w=$(fact "$f" witness)
+      if [ -n "$w" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1          && GIT merge-base --is-ancestor "$w" "$anc" 2>/dev/null; then
+        printf 'unattended: EXCLUDED %s from the live-run count — LANDING, and its witness %s is an ancestor of the observed anchor %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
+' "$f" "$w" "$anc"
+        continue
+      fi
+    fi
     n=$((n + 1)); live="$live $f"
   done
+  if [ "$n" -gt 1 ] && [ -z "$anc" ]; then
+    printf 'unattended: the live-run exclusion is UNAVAILABLE — no anchor was observed, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted
+'
+  fi
   [ "$n" -le 1 ] && return 0
   fail 5 "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined: $n live,${live}"
   return 1

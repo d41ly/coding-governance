@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-27
 streams: tooling
 roster: TOOL
-ids: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6
+ids: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
 authorized-by: prompt
 ---
 
@@ -150,6 +150,17 @@ because it is a fact about this run, not a question for the owner.
 **Every unit re-renders its carrier's pair in the same commit.** The protocol, the Skill and the
 build method are each a template plus an installed copy that a leg byte-compares.
 
+## Amended mid-build — unit 7, ADOPTED not parked
+
+Verifying unit 3's AC6 disproved a non-goal unit 4 had written down. The DRIVER's
+`check_single_live` refuses `--preflight` at two live records exactly as the leg did, so
+`dTieredTribunal` at `LANDING` would still block the NEXT run on this repo after unit 4 landed.
+Unit 4's §3 had called that a non-goal on a reading of the code that is false.
+
+**It was adopted, not parked, and that is the rule this build is writing being applied to itself.**
+Measured by observation, nothing this repo measures gets worse, no M3 veto tripped. Recorded with
+`--rescope --act add`; unit 4 takes a `rev-2` correcting its §3.
+
 ## Units — the authored roster (M2)
 
 One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
@@ -163,28 +174,30 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 | `TOOL-aPrimedKeepalive-4` | 2 | leg check 7 stops counting a LANDING record whose work is already on the remote |
 | `TOOL-aPrimedKeepalive-5` | 1 | `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write |
 | `TOOL-aPrimedKeepalive-6` | 1 | hygiene checks 22 and 23 take the `--staged` guard all three of their siblings carry |
+| `TOOL-aPrimedKeepalive-7` | 2 | the driver's live-run count takes the same exclusion the leg got |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 6 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aPrimedKeepalive-6 — hygiene checks 22 and 23 take the `--staged` guard all three of their siblings carry](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-6 — hygiene checks 22 and 23 take the `--staged` guard all three of their siblings carry](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-1.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-2.md) | 3 | 2 | OPEN | rev-1 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-3.md) | 4 | 2 | OPEN | rev-1 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-3.md) | 4 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-5.md) | 6 | 1 | OPEN | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | OPEN | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aPrimedKeepalive-6.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6.
+Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -197,6 +210,7 @@ Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-1 TOOL-aPrimedK
 | 4 | `TOOL-aPrimedKeepalive-3` | no |
 | 5 | `TOOL-aPrimedKeepalive-4` | no |
 | 6 | `TOOL-aPrimedKeepalive-5` | no |
+| 7 | `TOOL-aPrimedKeepalive-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

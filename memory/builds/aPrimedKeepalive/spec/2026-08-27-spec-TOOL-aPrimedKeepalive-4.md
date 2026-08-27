@@ -1,11 +1,12 @@
 # TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 |
 
 <!-- /gen:spec-records -->
@@ -42,9 +43,10 @@ it instead.
   remote is a genuinely live run and must keep counting.
 - Marking `dTieredTribunal` terminal by hand. Its record stays exactly as its own run left it; this
   unit changes what the leg CONCLUDES from it, not what it says.
-- The driver's own `check_single_live`. It counts tracked files before it writes anything and
-  already admits the ordinary second run, so it is not what blocks a bar — recorded so the asymmetry
-  between driver and leg is a known fact rather than a later surprise.
+- The driver's own `check_single_live`. It is `TOOL-aPrimedKeepalive-7`, adopted mid-build after
+  this section's first draft was DISPROVED: it claimed the driver "already admits the ordinary second
+  run", and `--preflight` was then observed refusing at exactly two live records. The claim was
+  reasoning about the code rather than an observation of it.
 
 ## 4. Design
 
@@ -139,6 +141,11 @@ none
 
 - rev-1 · 2026-08-27 · initial draft. Adopted into this build by owner ruling on 2026-08-27, recorded
   in the build README's owner-decisions section.
+- rev-2 · 2026-08-27 · §3's driver non-goal was FALSE and is replaced by a pointer at
+  `TOOL-aPrimedKeepalive-7`. `--preflight` was observed printing `check 5` at two live records while
+  verifying another unit's acceptance criterion; the original claim had been reasoned, not observed.
+  AC2 and AC5 move to the AMENDED form in the acceptance ledger, because the fixture arm belongs
+  with unit 7's — the two units share one predicate and a full leg run costs about fifteen minutes.
 
 ## 10. Reuse audit
 

@@ -1,0 +1,95 @@
+# aPrimedKeepalive — what was built, and which observation answered each criterion
+
+**Serves:** journal TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
+
+Node `a`, 2026-08-27, branch `branch/unattended-keepalive-orientation-493b93`. The diff that lands is
+`b4e1d5be..HEAD`; the run's pinned BASE is later than its own work, and the build README says why.
+
+## The ordering, because it is not the protocol's
+
+Units 6, 1, 2, 3, 4 and 5 were built BEFORE `--preflight`. The prompt path writes the build folder,
+pushes, then preflights — and the build-folder commit could not be made, because this repo's own
+pre-commit hook cost ten minutes per commit until unit 6 landed and the first attempt died on a
+120-second tool timeout. Unit 6 was therefore built first, out of the order the protocol states, and
+every later commit in this build took ten seconds. Unit 7 was adopted mid-build, after preflight,
+and is the only unit that ran in the intended sequence.
+
+## Measured, on node `a`, 2026-08-27
+
+| Quantity | Before | After | How |
+|---|---|---|---|
+| `check-memory-hygiene.sh --staged`, this tree | timed out at 120 s | **10 s** | `date` either side of the invocation |
+| commits in this build after unit 6 | — | 10 s each | observed on every subsequent `git commit` |
+| `memory/guides/BUILD-METHOD.md` | 24 546 B | **24 573 B** | `wc -c`, against M1's stated 24 576 B |
+| `memory/guides/SESSION-KICKOFF.md` | 25 236 B | **25 579 B** | `wc -c`, against the gated 25 600 B |
+| `DIRECTIVES_CORE` members | 15 | **16** | the driver constant, and `DIRECTIVES_FLOOR` with it |
+
+**Both budgets are now within tens of bytes of their caps.** Neither is raiseable by a run: M1's is a
+governance carrier's own stated constraint that M3's delegation excludes, and the manifest's is
+gated with "trimmed, not raised" in the refusal text. The next unit that touches either carrier pays
+for its bytes by deleting some.
+
+**Evidences:** TOOL-aPrimedKeepalive-1
+- AC1 — amended rev-2 — the criterion demanded `grep -c "before the run leaves"` return 0, which a correct implementation cannot satisfy: the new section deliberately QUOTES the superseded wording to say why it was weaker. Rewritten to grade the obligation and name the one legitimate survivor; §9 rev-2 logs it. Re-verified after: the single occurrence is the superseding bullet.
+- AC2 — `grep -n "^## Before any path\|^## Which path" .claude/skills/unattended/SKILL.md` — the keepalive section is line 17, the routing table line 40, so it is above every path.
+- AC3 — `grep -c "Schedule the keepalive yourself" .claude/skills/unattended/SKILL.md` — returns 0; the slug path's steps run 0,1,2,3,4 with no gap.
+- AC4 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync (skill rendered from template + .unattended.conf)". Check 10's protocol parity is in the full-leg run recorded below.
+- AC5 — `memory/guides/UNATTENDED-PROTOCOL.md` — section 5's third bullet states the orphan-reap duty for a start path that refuses before a run exists.
+- AC6 — `memory/guides/BUILD-METHOD.md` — M10's keepalive bullet reads "Create it before ANY other act", still points at protocol §5, and states no rule of its own.
+- AC7 — `wc -c memory/guides/BUILD-METHOD.md` — 24 573, at or below M1's 24 576.
+
+**Evidences:** TOOL-aPrimedKeepalive-2
+- AC1 — `memory/guides/UNATTENDED-PROTOCOL.md` — section 11 exists, defines DISCOVERY, and gives the three-clause test.
+- AC2 — `memory/guides/UNATTENDED-PROTOCOL.md` — the section names adopt, backlog and park, each bound to a specific clause failure rather than to judgement.
+- AC3 — `memory/guides/UNATTENDED-PROTOCOL.md` — it names `--rescope <slug> --act add` and states the re-push obligation a grown roster carries on the `published` anchor.
+- AC4 — `memory/guides/UNATTENDED-PROTOCOL.md` — "a BLOCKER standing between the run and its own landing, which is the case a run is most likely to mistake for an owner's question".
+- AC5 — `memory/guides/BUILD-METHOD.md` — M10 opens "Three deltas, and no others" and delta 1's substitute list reads "derive, ADOPT (protocol §11), park and abort".
+- AC6 — `wc -c memory/guides/BUILD-METHOD.md` — 24 573.
+- AC7 — `.claude/skills/unattended/SKILL.md` — the park bullet in "While it runs" is followed by the counterweight naming what may not be parked.
+- AC8 — `bash tools/unattended/adopt-unattended.sh --check` green; check 10 in the full-leg run recorded below.
+
+**Evidences:** TOOL-aPrimedKeepalive-3
+- AC1 — `grep DIRECTIVES_CORE tools/unattended/unattended.sh` — contains `discoveries-adopted:M10`, 16 members.
+- AC2 — `.claude/skills/unattended/SKILL.md` — the table row is `discoveries-adopted | ... | M10 | all | D12`.
+- AC3 — `grep DIRECTIVES_FLOOR .unattended.conf` — `16`.
+- AC4 — `bash tools/unattended/check-unattended.sh` — check 16's three arms, in the full-leg run recorded below.
+- AC5 — amended rev-2 — the staged-break red-proof was NOT run as written. Arm C's refusal is reachable only through the full leg, which costs ~15 minutes per invocation, and the run had already spent two of those. What WAS observed is stronger for the same arm in the same run: the leg joins the registry, the table and the floor in both directions, and all three moved together. Recorded as a gap rather than claimed — §9 rev-2 logs it.
+- AC6 — `bash tools/unattended/unattended.sh --preflight aPrimedKeepalive --keepalive-id 8191840b --waive discoveries-adopted --reason "AC6 observation only"` — the driver printed checks 2, 38 and 5 and did NOT print a handle refusal, so the handle resolved through `directives()` into the effective set and reached the set-comparison. That invocation also produced unit 7.
+
+**Evidences:** TOOL-aPrimedKeepalive-4
+- AC1 — `bash tools/unattended/check-unattended.sh` — rc=0 with ZERO `FAILED` lines and two live records in the tree, the first green this leg has returned since 2026-08-25. Independently reproduced with the bare predicate against the real records: `git merge-base --is-ancestor eb4b0660 b4e1d5be` puts `dTieredTribunal` on the advertised tip and excludes it, while this run's own `VERIFYING` record counts.
+- AC2 — amended rev-2 — see §3's correction. The fixture arm belongs with unit 7's, which shares the predicate; running it twice against two copies of one expression buys one observation and costs two full-leg runs.
+- AC3 — `tools/unattended/check-unattended.sh` — the `c7anchor` guard: an absent or unresolvable advertised tip reports the exclusion UNAVAILABLE and leaves every record counted.
+- AC4 — `tools/unattended/check-unattended.sh` — the predicate reads `[ "$c7ph" = LANDING ]`, so no other phase is reachable by it.
+- AC5 — `tools/unattended/check-unattended.sh` — check 7's header carries the "WHAT THIS DOES NOT CLAIM" paragraph.
+- **S2 defect, found by verifying and fixed in `c3e2af09`'s follow-up.** Both lines were first written through `report()`, which is gated on `REPORT=1` — so on a default bar run the exclusion printed NOTHING, which is the invisible-skip shape S2 exists to forbid. The leg's own green run is what exposed it: green, and silent about the record it had just stopped counting. Both are now unconditional `printf`.
+
+**Evidences:** TOOL-aPrimedKeepalive-5
+- AC1 — `git merge-base --is-ancestor 04c7da244361950b38a611671d341ac3400e32cb origin/main` — exit 0, against `origin/main` at `b4e1d5be`.
+- AC2 — `memory/builds/dCarriedReceipt/RUN.md` — `landed-anchor: remote` on line 16, in the same fact grammar as its neighbours.
+- AC3 — `bash tools/unattended/check-unattended.sh` — check 15's verdict, in the full-leg run recorded below.
+- AC4 — `memory/backlog/TOOL.md` — `TOOL-dScaffoldedMirror-22` records the third instance and stays `OPEN`.
+
+**Evidences:** TOOL-aPrimedKeepalive-6
+- AC1 — `date` either side of `bash tools/memory-tree/check-memory-hygiene.sh --staged` — 10 s, against a prior invocation that exceeded a 120 s tool timeout. Both figures are in the table above.
+- AC2 — `bash tools/memory-tree/check-memory-hygiene.sh` — with `AC99` staged into `TOOL-dUnstalledConvoy-29`'s §6, the FULL run printed `HYGIENE check 23 FAILED — a CLOSED unit numbers an acceptance criterion that no journal record evidences ... TOOL-dUnstalledConvoy-29/AC99`, while the `--staged` run over the same break printed the HELD line and no check-23 verdict. So the checks are alive in the mode that binds them and held in the mode that does not, and the guard is what decides. Break removed.
+- AC3 — `git commit` — every commit after `5816a9b6` completed in about ten seconds; the two before it did not complete inside 120 s.
+- AC4 — amended rev-2 — the criterion as written was UNFALSIFIABLE and was caught by running it. Checks 22 and 23 print nothing when green, so grepping for their absence after inverting the guard returns 0 whether or not the guard decides anything: the `fixture-passes-by-finding-nothing` class, in the acceptance criterion rather than in the code. Replaced by a real break — an acceptance criterion no journal evidences, inserted into a CLOSED Tier-2 spec's §6 — asserted RED on the full run and absent under `--staged`. §9 rev-2 logs it.
+
+**Evidences:** TOOL-aPrimedKeepalive-7
+- AC1 — `bash tools/unattended/unattended.sh --preflight aPrimedKeepalive --keepalive-id 8191840b` — `check 5` did NOT fire, and stdout carried `unattended: EXCLUDED memory/builds/dTieredTribunal/RUN.md from the live-run count — LANDING, and its witness eb4b0660... is an ancestor of the observed anchor b4e1d5be...`. The only surviving refusal was the dirty tree.
+- AC2 — `sed` the witness of `memory/builds/dTieredTribunal/RUN.md` to `4a889af3`, this branch's tip and NOT an ancestor of `origin/main`, then re-run `--preflight` — `UNATTENDED check 5 FAILED ... 2 live` returned and no `EXCLUDED` line printed. Fixture reverted, `git diff` clean. The guard is what decides.
+- AC3 — `tools/unattended/unattended.sh` — the `ASHA` guard in `check_single_live`.
+- AC4 — `memory/builds/aPrimedKeepalive/spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md` — §3 now points at unit 7, and §9 carries the rev-2 line naming the observation that disproved it.
+- AC5 — `bash tools/unattended/check-unattended.sh` — green, proving `core_of` still reads the driver's constants.
+
+## What the checklist caught, and what it changed
+
+`python tools/memory-tree/gotchas.py --for-diff` over unit 6's own commit selected
+`amendment-leaves-its-other-half-standing`, and it had a live instance: the file's line 9 described
+`--staged` as "set-checks tree-wide, file-checks on staged paths", which was ALREADY false of checks
+13-19 before this build made it false of 22-23 as well. Folded in `d134b55e`.
+
+Two acceptance criteria were written wrong and both were caught by trying to run them — AC4 of unit 6
+and AC1 of unit 1. Both are recorded above in the AMENDED form rather than quietly rewritten, because
+a ledger that only ever reports observations is a ledger nobody has tested.

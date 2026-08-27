@@ -1,11 +1,12 @@
 # TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
 
 <!-- /gen:spec-records -->
@@ -126,6 +127,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft.
+- rev-2 · 2026-08-27 · AC5's staged-break red-proof is recorded as a GAP rather than claimed. Arm
+  C's refusal is reachable only through the full leg, which costs about fifteen minutes, and this
+  run had already spent two of those. What the leg DID observe is the same arm in the same run with
+  all three artifacts moved together; the deliberate break was not fired.
 
 ## 10. Reuse audit
 

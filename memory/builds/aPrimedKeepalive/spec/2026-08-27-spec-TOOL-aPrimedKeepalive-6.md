@@ -1,10 +1,12 @@
 # TOOL-aPrimedKeepalive-6 — hygiene checks 22 and 23 take the `--staged` guard all three of their siblings carry
 
-**Status:** OPEN · rev-1 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 |
 
 <!-- /gen:spec-records -->
 
@@ -110,6 +112,12 @@ none
 - rev-1 · 2026-08-27 · initial draft. Authored under a standing mandate as an ADOPTED discovery: the
   owner's prompt cites this fix by its measurement, `aGroundedOrientation` parked it twice, and it
   taxes every commit of this build until it lands.
+- rev-2 · 2026-08-27 · AC4 as drafted was UNFALSIFIABLE and running it is what showed that: checks
+  22 and 23 print nothing when green, so grepping for their absence after inverting the guard
+  returns 0 whether or not the guard decides anything. That is this corpus's own
+  `fixture-passes-by-finding-nothing` class, occurring in an acceptance criterion rather than in
+  code. Replaced by a real staged break — an acceptance criterion no journal record evidences,
+  inserted into a CLOSED Tier-2 spec's §6 — asserted RED on the full run and absent under `--staged`.
 
 ## 10. Reuse audit
 
