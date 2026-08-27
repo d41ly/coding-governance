@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
+ids: TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
 ---
 
 # aBoundedCeiling — a leg that cannot hang forever, and a landing that pays for the bar once
@@ -61,8 +61,9 @@ by the owner; and the two Definition-of-Done overrides that landing took.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12 TOOL-aBoundedCeiling-13
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aBoundedCeiling-7 TOOL-aBoundedCeiling-8 TOOL-aBoundedCeiling-9 TOOL-aBoundedCeiling-10 TOOL-aBoundedCeiling-11 TOOL-aBoundedCeiling-12
+ids TOOL-aBoundedCeiling-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -70,13 +71,16 @@ ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-5 TOOL-aB
 | [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-27 |
 | [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-08-27 |
 | [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | WONTDO | rev-3 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-2 — a unit planned and dropped before any spec existed](spec/2026-08-28-spec-TOOL-aBoundedCeiling-2.md) | 3 | 1 | WONTDO | rev-1 | 2026-08-28 |
+| [TOOL-aBoundedCeiling-3 — a unit planned and dropped before any spec existed](spec/2026-08-28-spec-TOOL-aBoundedCeiling-3.md) | 4 | 1 | WONTDO | rev-1 | 2026-08-28 |
+| [TOOL-aBoundedCeiling-4 — a unit planned and dropped before any spec existed](spec/2026-08-28-spec-TOOL-aBoundedCeiling-4.md) | 5 | 1 | WONTDO | rev-1 | 2026-08-28 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -85,6 +89,9 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 |---|---|---|
 | 1 | `TOOL-aBoundedCeiling-1`, `TOOL-aBoundedCeiling-6` | yes |
 | 2 | `TOOL-aBoundedCeiling-5` | no |
+| 3 | `TOOL-aBoundedCeiling-2` | no |
+| 4 | `TOOL-aBoundedCeiling-3` | no |
+| 5 | `TOOL-aBoundedCeiling-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

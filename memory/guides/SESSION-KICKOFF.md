@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-28T00:03:42+03:00 @ 241faed04fda598e0e47e5c2a47a5d664f6e4162
+last-audit: 2026-08-28T02:17:44+03:00 @ 5e69747235a74498ae2e5c3e16ba1232f079ab5f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 065c39759b0a0cd7f8d5ca26fb2dd68d469534b5
@@ -155,8 +155,7 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask. The cost is process creation, not logic:
-  `memory/gotchas/process-creation-is-the-suite-cost.md`. No ceiling figure here — each suite
-  declares its own and they have already moved once · prune when a bar runs them automatically.
+  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
 - 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
   take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
   adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
@@ -207,17 +206,14 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
-- Several sessions share this node and the bar has no admission control: four concurrent full
-  bars turned the run-gates canary's timing arms RED at every width and stretched the driver
-  selftest from 11 to 99 minutes. `both expired ... unproven either way` means contention —
-  re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
+- The turnstile serializes bars WITHIN one repository; sessions on this node still contend
+  across repos, and four concurrent bars once stretched the driver selftest from 11 to 99
+  minutes. `both expired ... unproven either way` means contention — re-run quiet before
+  believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
-- The memory hygiene leg is ~34 s, not ~23 minutes: `TOOL-aThawedCorpus-4` and `-1` collapsed
-  checks 23 and 21 from a process per corpus item to one `awk` each.
-- The pre-commit hygiene leg no longer runs check 23 (`TOOL-aThawedCorpus-5`: 683 s to 20 s). A
-  broken ACCEPTANCE LEDGER is now caught only at the push boundary, which works because
-  `memory hygiene` declares no guard and so runs on both of pre-push's branches.
+- The memory hygiene leg is under two minutes, not ~23: `TOOL-aThawedCorpus-4` and `-1` collapsed
+  checks 23 and 21 from a process per item to one `awk` each. 65 s, node a, 2026-08-28.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
@@ -252,8 +248,8 @@ does — hit three times in one file in one session) · `process-creation-is-the
   records render in the spec they serve. All of it: `memory/map/features/build-readme-surface.md`.
 - `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
-- `memory/builds/*/STATUS.md` no longer exists. The slot was retired at kit 2.17 — one file existed
-  corpus-wide and contradicted its own build README. Check 8's population is the backlog shards alone.
+- Check 8's population is the backlog shards ALONE: `memory/builds/*/STATUS.md` was retired at
+  kit 2.17 and the dead-path gate keeps it gone.
 - A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
   reservation range and a planned unit cannot be added to it by hand; the next render removes it.
 - A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
@@ -262,10 +258,8 @@ does — hit three times in one file in one session) · `process-creation-is-the
   so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
 - A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
-- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar, not
-  this list. MEASURED 2026-08-18: map freshness, the kickoff ratchet, govkit selfcheck + selftest (a
-  leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]` row). The coverage
-  assert and handkept signal did NOT fire; this line claimed both and neither govkit gate.
+- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar,
+  never a list. A leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]`.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
