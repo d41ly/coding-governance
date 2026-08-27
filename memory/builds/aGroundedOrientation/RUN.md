@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: ded172527621226aed8f4b9f3dcf78234ac084e2
-phase: BUILDING
+phase: LANDING
 branch-sha: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 branch-ref: refs/heads/branch/unattended-prompt-cg-toolkits-831d35
 mode: prompt
@@ -40,3 +40,5 @@ base: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 2026-08-27T18:46:45Z review · item aGroundedOrientation · reason verdict BLOCKED · blockers 2
 
 2026-08-27T18:47:02Z review · item aGroundedOrientation · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-08-27T18:47:42Z override · item gates-green · reason Owner instructed 'merge to main without gates' on 2026-08-27, so the bar was not run for this landing and the pre-commit hook was bypassed on five commits, each recorded in its own message. Two reds this build created were found by the closing review and FIXED and pushed anyway (b0b1cb31): check 9's last-body-change threshold and check 5's stamp. One red remains on main and is NOT this build's: check-arms on the stale pin at memory/project/unarmed-branches.txt:42, verified green at BASE and red at f1be0b49 in its own worktree, with an empty diff on that file across this build's range.
