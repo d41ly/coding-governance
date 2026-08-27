@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 3 surfaced
+keepalive-reaped: yes
 witness: d4eae035e0cec30f209f04f8c4842c3c996af4f5
 phase: BUILDING
 branch-sha: 1d83cc94eec944f8ecb3bae8e7186a545a58934c
