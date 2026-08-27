@@ -1758,6 +1758,26 @@ if [ -f "$tmpl" ]; then
       [ "$askl" -lt "$pshl" ] || fail 20 "the Skill's prompt path puts its owner turn AFTER the branch push, so the one question it is allowed to ask would be asked by a run that is already authorized and has nobody to answer it: $askl against $pshl"
       [ "$pshl" -lt "$pfl2" ] || fail 20 "the Skill's prompt path puts the branch push AFTER preflight, and preflight run first meets the refusal that nothing published authorizes the run: $pshl against $pfl2"
     fi
+
+    # ---- TOOL-aGroundedOrientation-2 - the ORIENTATION PROBES precede the build-folder write.
+    # ---- Same slice, same shape, fourth locator. The defect: step 1 said "in the /session-kickoff
+    # ---- manner", which is a posture a reader satisfies without running anything, while the engine
+    # ---- that runs the probes is invoked at step 6 - after step 3 has authored the ROSTER and step 4
+    # ---- has pushed it. Under a published anchor that roster IS the authorization, so a seam found
+    # ---- late costs a commit and a push. Measured on the run that added this check: its own roster
+    # ---- grew after BASE and check 24 caught it.
+    # ----
+    # ---- It does NOT assert WHICH probes run. The kickoff engine's Step 4 owns that list and a gate
+    # ---- enumerating it becomes a third carrier that reds when that engine legitimately changes.
+    # ---- SECTION-scoped, never file-scoped, for check 18's own recorded reason: a file-wide locator
+    # ---- goes green when the literal sits in any other section, and is blind to a third start path.
+    prbl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "RUN the orientation probes") { print $1; exit }')
+    wrtl=$(printf '%s\n' "$psec" | awk -F'\t' 'index($2, "Write the build folder") { print $1; exit }')
+    if [ -z "$prbl" ] || [ -z "$wrtl" ]; then
+      fail 20 "the Skill's prompt path does not name both its orientation-probe step and its build-folder write, so the ordering that puts the probes before the roster cannot be checked at all and would compare against an empty string; it looks for 'RUN the orientation probes' and 'Write the build folder'"
+    else
+      [ "$prbl" -lt "$wrtl" ] || fail 20 "the Skill's prompt path runs its orientation probes AFTER it writes the build folder, so the roster is authored and pushed before the probes that inform it, and correcting it costs a commit and a push: $prbl against $wrtl"
+    fi
   fi
 fi
 

@@ -1,4 +1,4 @@
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-1 · base f5dff6ae · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-08-27 · node a · Tier-1 · base f5dff6ae · streams tooling · order 1
 
 # TOOL-aGroundedOrientation-3 — check 23 gets the `--staged` guard its four siblings carry
 
@@ -63,6 +63,20 @@ and that this exact class once cost "minutes on a large adopter tree".
   REDs naming `fail 23`, while the `--staged` run over the same tree passes. This is the failing case
   the charter requires observed before a gate change lands, and it is the one that matters here —
   the risk is not a false red, it is a check that silently stops running.
+  **OBSERVED 2026-08-27 node `a`**, in a scratch clone at a green baseline. An unevidenced `AC99` was
+  staged into `memory/builds/aNamedGesture/spec/2026-08-25-spec-TOOL-aNamedGesture-1.md`. FULL mode
+  exited 1 with `HYGIENE check 23 FAILED — a CLOSED unit numbers an acceptance criterion that no
+  journal record evidences: TOOL-aNamedGesture-1/AC99`; `--staged` over the identical tree exited 0
+  with zero check-23 mentions.
+  **It took seven attempts and all six failures were the PROBE, never the guard** — each one a
+  different way of asking a question nothing could answer. A pre-cutoff target check 23 does not
+  grade. A break with no backticked witness, which tripped check 12 in both modes so check 23 never
+  spoke. A target on `ACCEPTANCE_LEDGER_GRANDFATHER`, the one list the check is told to skip. Plus a
+  `grep -c` verdict that appended a second zero (the §14 no-match trap), a work dir deleted under a
+  live run, and a `TMPDIR` holding 1711 stale scratch dirs that aborted two runs at startup. What
+  made the seventh readable is that the SCRIPT adjudicates: it requires `full` red *naming check 23*
+  and `staged` green with *zero* check-23 mentions, and exits 7 naming the broken arm otherwise. Six
+  times the first reading looked like a verdict and was not one.
 - **AC4.** `.githooks/pre-push:229` runs `tools/run-gates/run-gates.sh`, which invokes this checker
   without `--staged`, so `STAGED=0` and the block executes unchanged at the push boundary. Verified
   by reading the hook.
@@ -92,6 +106,10 @@ None. AC3 is an obligation, not a fork.
   spelled `check-arms.py` with `bash`, disagreeing with both sibling unit 2 and `tools/gate-legs.json`.
   This spec was written and BUILT before any audit ran, under the owner's sequencing ruling; the audit
   therefore graded shipped code, and all three findings were spec defects rather than code defects.
+- rev-3 · 2026-08-27 · AC3 OBSERVED and the unit CLOSED. The coverage proof passed on its seventh
+  attempt; the six before it were all defects in the probe, enumerated in AC3 itself so the next
+  reader does not repeat them. Status moves INPROGRESS -> CLOSED: every criterion now has an
+  observation, not an argument.
 
 ## 10. Reuse audit
 **The seam extended.** The four sibling guards in this same file — `:667`, `:1051`, `:1066`, `:1076`.
