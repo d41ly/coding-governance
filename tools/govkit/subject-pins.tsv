@@ -85,6 +85,7 @@ template size <=48KiB	repo
 template size gate selftest	kit
 testsuite counts (every bar self-test prints one)	repo
 testsuite counts self-test	kit
+tier2-review self-test	kit
 unattended kit gate	repo
 unattended skill wiring	repo
 verdict epoch (kit version dates the engine)	repo

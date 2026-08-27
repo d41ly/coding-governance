@@ -113,7 +113,14 @@ An `agent(` call reached through an iteration construct is allowed only when its
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers`, where that line
   spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` resolves; or
 - an identifier assigned exactly once from an array LITERAL with ≤ 5 elements — the finder-lens case,
-  where the agent count is visible in the source. A trailing comma is not an element.
+  where the agent count is visible in the source. A trailing comma is not an element; or
+- an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers` whose right-hand
+  side DERIVES from a name already proven bounded above — the marked-derivation case, and the third
+  receiver. Mentioning a bounded name is not enough: EVERY top-level branch of that right-hand side
+  is judged on its own text, the derivation must be ROOTED on the bounded value rather than merely
+  referring to one, every top-level link of the chain after that root must be shrink-only
+  (`.filter` or `.slice`) and the chain must CONSUME to a balanced close, and the whole right-hand
+  side is vetoed if it can grow. A bare reassignment of the name afterwards takes the bound back.
 
 Everything else is denied: a `for` / `while` / `forEach` body containing `agent(`, a `.map` /
 `.flatMap` / `Array.from` over any other receiver, and a marked line whose second argument is an

@@ -31,11 +31,11 @@ tools/gate-lint/kit.toml	1
 tools/gate-lint/ps-hygiene.py	1
 tools/govkit/registry.toml	15
 tools/hooks/README.md	1
-tools/hooks/agent-cap.js	3
-tools/hooks/agent-cap.test.sh	2
+tools/hooks/agent-cap.js	5
+tools/hooks/agent-cap.test.sh	3
 tools/hooks/scratch-guard.js	1
 tools/hooks/scratch-guard.test.sh	4
-tools/install-prefix-carried.txt	85
+tools/install-prefix-carried.txt	87
 tools/install-prefix-waivers.txt	6
 tools/lexicon/LEXICON.md	3
 tools/lexicon/README.md	10
@@ -98,8 +98,10 @@ tools/unattended/run-unattended-gates.sh	2
 tools/unattended/unattended.sh	5
 tools/unattended/unattended.test.sh	8
 tools/workflows/check-protocol-parity.test.sh	3
-tools/workflows/check-review-join.sh	2
-tools/workflows/check-review-join.test.sh	6
+tools/workflows/check-review-join.sh	3
+tools/workflows/check-review-join.test.sh	9
 tools/workflows/check-verifier-fanout.sh	3
 tools/workflows/check-verifier-fanout.test.sh	1
 tools/workflows/check-workflow-syntax.js	2
+tools/workflows/tier2-review.js	3
+tools/workflows/tier2-review.test.sh	1

@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.6' // gov:kit agent-cap@1.6 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.8' // gov:kit agent-cap@1.8 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -162,6 +162,98 @@ function intConsts(code) {
   return { consts, orBound }
 }
 
+// TOOL-dTieredTribunal-13 S2 - split an expression into its top-level VALUE branches. Depth-aware
+// over (), [] and {}; skips `?.` and `??`, which are not ternaries; recurses into nested ternaries;
+// and DROPS the condition, because a condition is not a value the fan-out ever iterates. A `?` whose
+// `:` this walk cannot find yields a single null branch, and a null branch never qualifies — so an
+// expression this file cannot delimit lands on the DENY side rather than being waved through.
+function parseBranches(expr) {
+  const t = String(expr)
+  let d = 0
+  for (let i = 0; i < t.length; i++) {
+    const ch = t[i]
+    if ('([{'.includes(ch)) { d++; continue }
+    if (')]}'.includes(ch)) { d--; continue }
+    if (d !== 0 || ch !== '?') continue
+    if (t[i + 1] === '.' || t[i + 1] === '?') { i++; continue }
+    let dd = 0
+    let nest = 0
+    for (let j = i + 1; j < t.length; j++) {
+      const c = t[j]
+      if ('([{'.includes(c)) { dd++; continue }
+      if (')]}'.includes(c)) { dd--; continue }
+      if (dd !== 0) continue
+      if (c === '?') { if (t[j + 1] === '.' || t[j + 1] === '?') { j++; continue } nest++; continue }
+      if (c === ':') {
+        if (nest > 0) { nest--; continue }
+        return parseBranches(t.slice(i + 1, j)).concat(parseBranches(t.slice(j + 1)))
+      }
+    }
+    return [null]
+  }
+  return [t]
+}
+
+// TOOL-dTieredTribunal-13 S3 - the qualifying forms are a CLOSED list and each branch is judged on
+// its OWN text. Three forms and no fourth: a bounded split whose K resolves through `boundedK`; an
+// array LITERAL whose top-level element count is at or under MAX_LENSES, counted with the shared
+// splitter so a trailing comma is not an element; or a bare identifier already proven bounded,
+// alone or followed by a chain of operations that cannot grow it.
+function boundedBranch(br, name, consts, ok) {
+  if (br === null) return false
+  const t = String(br).trim()
+  if (!t) return false
+  const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(t)
+  const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
+  if ((c && boundedK(c[1], consts)) || (sp && boundedK(sp[1], consts))) return true
+  if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
+  const m = /^([A-Za-z_$][\w$]*)([\s\S]*)$/.exec(t)
+  if (!m || m[1] === name || !ok.has(m[1])) return false
+  const tail = m[2].trim()
+  if (tail === '') return true
+  // M8 closing review, HIGH: the tail used to be one greedy `[\s\S]*` inside an optional
+  // filter/slice group. It matched the FIRST call and then swallowed the whole rest of the chain,
+  // so `ALL.filter(x).reduce((a, b) => args.big, [])` was ADMITTED - and that returns a caller
+  // array of any length. A bound escape through the very tightening written to close the class.
+  // Every TOP-LEVEL call on the chain must now be shrink-only. Depth-aware, because the calls
+  // inside a predicate body are not chain links: `.filter((L) => a.lenses.includes(L.slug))` is
+  // the shipped user, and counting its `.includes(` would deny it. `.map` is denied too although
+  // it preserves length - the qualifying forms are a closed list, and widening it is an edit.
+  // ROUND 2 - the first cut of this walk counted links and returned `links > 0`, which asked only
+  // whether a shrink call APPEARED. It never required the tail to be CONSUMED, so everything after
+  // the last link went unexamined and an unbalanced tail was fine. That was a NET REGRESSION on the
+  // regex it replaced, measured: `const LENSES = ALL.filter( // gov:fixed-verifiers` continued on
+  // the next line was DENIED at eb4b0660 and ADMITTED at the tip, fanning agent() over whatever the
+  // continuation built. The regex it replaced ended in `\)$`, and dropping that anchor is what cost
+  // the property. Three separate escapes shared the one root, so the walk is now CONSUMING: each
+  // segment must be a shrink call, each must CLOSE, and the tail must end with the last one.
+  const SHRINK = ['filter', 'slice']
+  let i = 0
+  let links = 0
+  while (i < tail.length) {
+    if (/\s/.test(tail[i])) { i++; continue }
+    // A segment that is not `.<name>(` at all - a computed `["concat"](…)` member, a trailing
+    // `|| args.big`, an operator, anything - ends the walk in a refusal rather than being skipped.
+    const call = /^\.\s*([A-Za-z_$][\w$]*)\s*\(/.exec(tail.slice(i))
+    if (!call || SHRINK.indexOf(call[1]) === -1) return false
+    let j = i + call[0].length
+    let d = 1
+    while (j < tail.length && d > 0) {
+      const c = tail[j]
+      if (c === '(' || c === '[' || c === '{') d++
+      else if (c === ')' || c === ']' || c === '}') d--
+      j++
+    }
+    // An unclosed segment is REFUSED, never assumed closed. `stripStrings` blanks '' and "" but not
+    // a template literal, so a stray `(` inside one strands this counter - and the safe reading of
+    // "this file cannot tell where the chain ends" is that it cannot prove the receiver bounded.
+    if (d !== 0) return false
+    i = j
+    links++
+  }
+  return links > 0
+}
+
 function fanoutFindings(script) {
   const lines = script.split(/\r?\n/)
   const code = lines.map((l) => stripStrings(l).split('//')[0])
@@ -173,31 +265,57 @@ function fanoutFindings(script) {
   // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
   // pass would reject it on declaration order rather than on the property being checked.
   const ok = new Set()
+  // S4 - one reason per refused marked assignment, keyed by the name it binds.
+  const markedWhy = new Map()
   const scan = (raw, i) => {
     const l = code[i]
     const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
     if (!asg) return
     const name = asg[1]
     if (raw.includes(FIXED_MARK)) {
-      const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(l)
-      const s = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(l)
-      if ((c && boundedK(c[1], consts)) || (s && boundedK(s[1], consts))) {
+      // TOOL-dTieredTribunal-13 S1 - EVERY top-level value branch is judged, not the first that
+      // happens to match. This block used to be two sequential accepts, and either could return on a
+      // SINGLE arm: a marked ternary whose other branch was caller-supplied passed, and an
+      // args-supplied array of any length then reached agent() once per element. That is the same
+      // defeat the `<expr> || <int>` binder was deleted for — a caller-settable knob wearing a
+      // constant's clothes. Reproduced against this file before the rewrite.
+      const rhs = l.slice(l.indexOf('=') + 1)
+      // The whole-RHS growth veto is kept and still vetoes the assignment however the branches read.
+      // The first cut of the derivation receiver accepted any line MENTIONING a bounded name, which
+      // blessed `ALL_LENSES.concat(allFindings)` on the strength of the word appearing.
+      const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
+      const branches = parseBranches(rhs)
+      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
+      if (!grows && branches.length && bad0 === undefined) {
         ok.add(name)
+        // D10 - the reason is a CACHE and both scan passes write it. A name refused on pass 1 for a
+        // declaration-order reason and ACCEPTED on pass 2 kept the pass-1 text, so a later refusal
+        // printed an explanation of a branch this pass had just blessed. Clear it on accept: a
+        // guard whose stated reason is wrong is a guard an operator cannot act on, which is the
+        // exact failure the S4 note below says this map was added to remove.
+        markedWhy.delete(name)
         return
       }
-      // A marked DERIVATION from an array already known bounded — `ALL_LENSES.filter(…)`, a
-      // `.slice()`, a ternary between two bounded sources. Neither filter nor slice can GROW an
-      // array, so the bound is inherited. Only accepted WITH the marker, so it stays a deliberate
-      // claim rather than something inferred from a name.
-      //
-      // The operations are a CLOSED list, and mentioning a bounded name is not enough: the first cut
-      // accepted any line referencing one, which blessed `ALL_LENSES.concat(allFindings)` — a
-      // derivation that grows without limit — on the strength of the word ALL_LENSES appearing.
-      const rhs = l.slice(l.indexOf('=') + 1)
-      const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
-      const shrinks = /\.\s*(filter|slice)\s*\(/.test(rhs) || /\?[^?]*:/.test(rhs)
-      const refs = rhs.match(/[A-Za-z_$][\w$]*/g) || []
-      if (!grows && shrinks && refs.some((r) => r !== name && ok.has(r))) ok.add(name)
+      // S4 - record WHY, keyed by the name bound. The refusal a caller saw was emitted at the
+      // fan-out line and named only the receiver, while the author was looking at a marked
+      // assignment two lines above. This is the convention `why()` already applies to every
+      // unresolvable K: one explanation per refusal, naming the FORM, because an operator who
+      // cannot tell which spelling was refused fixes it by guessing.
+      markedWhy.set(
+        name,
+        grows
+          ? `\`${name}\` carries ${FIXED_MARK} but its right-hand side can GROW the receiver`
+          : !branches.length || bad0 === null
+            ? `\`${name}\` carries ${FIXED_MARK} but this file cannot delimit its value branches`
+            : /\b(chunk|splitInto)\s*\(/.test(String(bad0))
+              // A branch that IS a bounded split and still fails, failed on its K. Saying only that
+              // the branch is not a bounded form would send the author to rewrite a spelling that is
+              // already correct, so the cap is named instead — and the phrase the generic refusal
+              // uses is kept, because two self-test arms assert a marked K's refusal by that text and
+              // a message edit that strands an arm is a recorded class in this repo.
+              ? `\`${name}\` carries ${FIXED_MARK} but its bounded split names a cap which this file does not show to be bounded`
+              : `\`${name}\` carries ${FIXED_MARK} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
+      )
       return
     }
     // an array literal whose element count is visible here. Counted on the FULL statement, which may
@@ -242,7 +360,19 @@ function fanoutFindings(script) {
   code.forEach((l) => {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
-      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) ok.delete(m[1])
+      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
+        // ROUND 2 - the reason was written for EVERY reassigned name, including names this file had
+        // never bounded, so a refusal could announce that a bound was taken back that was never
+        // granted. That is D10's own failure mode inverted: right verdict, false reason. Only a name
+        // actually in `ok` had a bound to lose, so only that name gets this explanation.
+        const hadBound = ok.has(m[1])
+        ok.delete(m[1])
+        if (!hadBound) return
+        // ...and this sweep runs AFTER both passes, so it states its own reason too. Without that, a
+        // name accepted on pass 2 and taken back here falls through to whatever pass 1 happened to
+        // write, or to the generic fan-out text - neither of which names the reassignment.
+        markedWhy.set(m[1], `\`${m[1]}\` was REASSIGNED after its bounded assignment, which takes the bound back`)
+      }
     }
   })
 
@@ -310,7 +440,9 @@ function fanoutFindings(script) {
       if (hit.name === null) {
         bad.push({ n: i + 1, line: raw, why: `agent() fanned through .${hit.method}() over an expression this file cannot size (\`${hit.expr}\`) — only a bare identifier proven bounded is accepted` })
       } else if (!ok.has(hit.name)) {
-        bad.push({ n: i + 1, line: raw, why: `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
+        // S4 - prefer the marked assignment's own reason. The generic sentence is right and useless
+        // when the author already wrote a marker and got no word about which branch failed.
+        bad.push({ n: i + 1, line: raw, why: markedWhy.get(hit.name) || `agent() fanned over \`${hit.name}\`, which this file does not show to be bounded` })
       }
       return
     }
@@ -730,7 +862,77 @@ function guardAgentSpawn(data) {
   )
 }
 
+// TOOL-dTieredTribunal-14 S1 - RULE 5, the ref-keyed verdict join. Ported from the awk in
+// tools/workflows/check-review-join.sh, which is a FILE gate and therefore blind to the modality
+// where this defect actually happens: an ad-hoc review harness is an inline `script` string on a
+// Workflow tool call and is never a file. That gate covered four already-compliant committed
+// harnesses and none of the observed failures. The three `why` strings are FROZEN at the bytes that
+// gate's self-test asserts - those arms are this port's regression suite, and an unedited arm
+// proving an unchanged verdict is worth more than a prettier string.
+//
+// S2 - the view is `blankLiterals`, the one this file already defines, rather than a second
+// character scanner. That is a deliberate NARROWING: the awk kept string CONTENTS and only stripped
+// comments, so it matched the retired identifier inside a string. Two fixtures in the self-test pin
+// the difference in both directions. A regex LITERAL survives the blanking, which is why the gate
+// excludes this file from its own population - the ban table below would otherwise match itself.
+function scanJoinFindings(script) {
+  const raws = script.split(/\r?\n/)
+  const code = blankLiterals(script)
+  const out = []
+  // S3 - one ban table, tested against every view of the line. It was three inline conditions per
+  // view until the M8 closing review found the second view missing; duplicating them per view would
+  // have been two answers to one question, which is the class this build spent a unit on.
+  const BANS = [
+    [/\[[A-Za-z_$][A-Za-z0-9_$.]*\.ref\]/, "object/Map literal keyed by a .ref string"],
+    [/\.(get|set|has|delete)\([A-Za-z_$][A-Za-z0-9_$.]*\.ref[),]/, "Map keyed by a .ref string"],
+    [/verdictByRef/, "the retired verdictByRef identifier"],
+  ]
+  for (let i = 0; i < code.length; i++) {
+    const l = code[i]
+    const raw = raws[i] === undefined ? l : raws[i]
+    // M8 closing review, HIGH: `blankLiterals` blanks template CONTENTS, so a join written inside a
+    // `${...}` interpolation was invisible - a coverage regression against the awk this rule
+    // replaced, which kept string contents. These harnesses render every report through template
+    // literals, so that is exactly where such an expression lives. The interpolation SPANS are
+    // scanned as a second view, which restores the reach without restoring the awk's false
+    // positives: a mention inside a plain string stays out of scope and both fixtures still hold.
+    // A nested `${}` closes the span early; that costs reach on a shape none of these harnesses
+    // writes, and the outer views still carry the identifier ban.
+    // ROUND 2 - this took its spans from the RAW line, so the second view reached into COMMENTS and
+    // into plain quoted strings and rule 5 started firing on prose. That refuted this rule's own
+    // narrowing doctrine two lines above, and check-review-join.sh's, in the same commit that wrote
+    // them both down. The span view is comment-stripped and quote-blanked first: `stripStrings`
+    // leaves backticks alone, which is the whole point - a `${…}` is only an interpolation inside a
+    // template literal, and inside a '' or "" string it is three characters of text.
+    const interp = stripStrings(raw).split('//')[0]
+    const views = [l].concat(interp.match(/\$\{[^}]*\}/g) || [])
+    let why = null
+    for (const b of BANS) {
+      if (views.some((v) => b[0].test(v))) { why = b[1]; break }
+    }
+    if (why) out.push({ n: i + 1, line: raw, why })
+  }
+  return out
+}
+
 function main() {
+  // TOOL-dTieredTribunal-14 S4 - a rule selector over a CLOSED set, so a second entry point can ask
+  // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
+  // Anything outside the set REFUSES rather than silently matching nothing, which would be this
+  // repo's vacuous-selector-empty-population class arriving in the file whose job is to refuse what
+  // it cannot resolve. A WIRED command must never carry it: tools/check-wiring.sh asserts that,
+  // because `--only=join` in settings.json would turn the three cap rules off with no diff.
+  const ONLY_RULES = ["join"]
+  const onlyArg = process.argv.slice(2).find((a) => a.startsWith("--only="))
+  const ONLY = onlyArg === undefined ? null : onlyArg.slice("--only=".length)
+  if (ONLY !== null && ONLY_RULES.indexOf(ONLY) === -1) {
+    process.stderr.write(
+      "agent-cap: --only=" + ONLY + " names no rule this hook has. The closed set is: " +
+        ONLY_RULES.join(", ") + ". Omit the flag to run every rule.\n",
+    )
+    process.exit(2)
+  }
+
   let data
   try {
     data = JSON.parse(readStdin())
@@ -783,7 +985,7 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = fanoutFindings(script)
+  const fan = ONLY === null ? fanoutFindings(script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
@@ -803,7 +1005,7 @@ function main() {
   // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
   // both, and the arity message is the one that names the defect an operator has to fix; reversing
   // the order would retitle the rule-2 corpus without changing a verdict.
-  const caps = capFindings(script)
+  const caps = ONLY === null ? capFindings(script) : []
   if (caps.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
@@ -818,9 +1020,14 @@ function main() {
     process.exit(2)
   }
 
-  const bad = offendingLines(script)
-  if (bad.length === 0) process.exit(0)
-
+  // TOOL-dTieredTribunal-14 S3 - INVERTED. This block alone was written as an early exit-0, so any
+  // rule appended after it never ran for a script carrying no raw parallel()/pipeline() - which is
+  // every script the join ban exists to judge. The two rules above already use this additive shape.
+  // Order is unchanged and still decides which message an operator sees: the three rules above all
+  // prevent a BURST, the expensive failure this hook exists for, while a ref-keyed join is a wrong
+  // verdict, which is cheap to re-run.
+  const bad = ONLY === null ? offendingLines(script) : []
+  if (bad.length) {
   const shown = bad
     .slice(0, 6)
     .map(({ n, line }) => `  L${n}: ${line.trim()}`)
@@ -847,6 +1054,24 @@ function main() {
       `\n`,
   )
   process.exit(2)
+  }
+
+  // RULE 5 - the ref-keyed verdict join. LAST because it is the cheapest failure to recover from.
+  const joins = scanJoinFindings(script)
+  if (joins.length) {
+    process.stderr.write(
+      `BLOCKED by agent-cap: a ref-keyed verdict join. A review harness that joins each finding to ` +
+        `its skeptic verdict on a \`file:line\` STRING loses findings to echo drift and COLLAPSES two ` +
+        `findings at one location, so both inherit whichever verdict landed last. The class has no ` +
+        `runtime signal - a mis-keyed harness reports a clean bill.\n\n` +
+        joins.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
+        `\n\nKey the join on the integer id the orchestrator assigns, never on a string the skeptic ` +
+        `reproduces. Ready-made: tools/workflows/tier2-review.js.\n`,
+    )
+    process.exit(2)
+  }
+
+  process.exit(0)
 }
 
 main()
