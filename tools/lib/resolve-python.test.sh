@@ -89,6 +89,7 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 PARITY_ROWS="
 resolve_python|$CANON|tools/lib/resolve-python
 kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
+render_doc|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
 "
 blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2"; }
 while IFS='|' read -r stem canon excl; do

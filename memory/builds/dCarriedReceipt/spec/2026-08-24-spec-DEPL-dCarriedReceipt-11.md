@@ -1,12 +1,17 @@
 # DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting silently
 
-**Status:** SPECCED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-7 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-11-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-11-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md) | diff-review | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 
 <!-- /gen:spec-records -->
 
@@ -51,7 +56,7 @@ order.
   `report-reseed` row to `current`/`patched`. Without the exemption a seed row whose gov source gov
   RENAMED classifies `t_state = "absent"` → `withdrawn` (`:2846`) → **rewritten to `current`** — the
   run reports the row healthy while the source behind it no longer exists, which is a silent-green of
-  exactly the kind the comment at `:3054-3058` records a measured incident for. This unit does not
+  exactly the kind the comment at `:3058-3062` records a measured incident for. This unit does not
   become its sequel.
 - **S1** — one `git -C <gov> diff --find-renames --name-status <base_commit> <to_commit>` per run,
   producing a map from old source path to new source path over the `R` rows. It runs **unscoped**:
@@ -152,9 +157,9 @@ rename is where behaviour differs, and it differs by not destroying anything.
 ### Files touched (estimate)
 
 `tools/govkit/govkit.py` (~70 lines, across `cmd_update`, `parse_args`, `USAGE` and `main`),
-`tools/govkit/selftest.py` (9 arms, the ninth being S11's and landing with `-9`), one fixture that
-renames a claimed engine file in a scratch gov and one that renames it AND changes its content in
-the same range.
+`tools/govkit/selftest.py` (11 arms, the ninth being S11's and landing with `-9`, the tenth and
+eleventh being AC10's and AC11's), one fixture that renames a claimed engine file in a scratch gov
+and one that renames it AND changes its content in the same range.
 
 ## 5. Production-readiness checklist
 
@@ -172,10 +177,11 @@ the same range.
 - risks — the residual risk is a rename git scores below threshold, which degrades to `withdrawn` and
   therefore to a report. That is a coverage gap rather than a data-loss path, and it is the direction
   the degrade is deliberately chosen to fail in.
-- testing + left-shift gates — nine `selftest.py` arms, the RED-first observation being AC1. The
+- testing + left-shift gates — eleven `selftest.py` arms, the RED-first observation being AC1. The
   class gated is "a verdict deletes a tracked file", asserted as AC6: no `update` run without
   `--write-withdrawals` may reduce the target's tracked-file count. The ninth arm is S11's carried
-  rename, gated as "a rename compared against an un-carried base", and it lands with `-9`.
+  rename, gated as "a rename compared against an un-carried base", and it lands with `-9`. The tenth
+  and eleventh are AC10's seed-override exemption and AC11's reported-only line, both RED-first.
 - migration / rollback — none on disk. Reverting the unit restores the old behaviour without touching
   any receipt.
 - user docs — `WIRE-INTO-PROJECT.md`'s update section gains the two dispositions and the flag, stated
@@ -212,12 +218,21 @@ the same range.
   `sha256` equals `_sha` of gov's blob at `to_commit`, not of the pre-rename content. The class gated
   is `VERDICT_GRID`'s `("differs","equal")` cell at `:2847` naming a divergence the target never
   created.
+- **AC10** — S0c. In a fixture where gov renames the source behind a `seed` row between
+  `base_commit` and `--to`, `update` prints `renamed` for that row and the string `current` appears
+  nowhere in its output. Observe RED first: without the `:3016-3020` exemption the same row
+  classifies `withdrawn` and the seed override rewrites it to `current` while its gov source no
+  longer exists.
+- **AC11** — S0b. In a fixture where gov renames the source behind a `rendered` row, the write
+  loop's reported-only line at `:3064` names `renamed` for it, in addition to the `:3024` verdict
+  line. Observe RED first: with `renamed` absent from that tuple the row falls through to the bare
+  `continue` and only the first line prints.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
 selfcheck` legs, plus `tools/govkit/refusal_join.py`, whose declared contract is that each added
-refusal branch has an arm. Adds nine arms and one standing predicate; adds no new leg file.
+refusal branch has an arm. Adds eleven arms and one standing predicate; adds no new leg file.
 
 ## 8. Open questions
 
@@ -244,6 +259,23 @@ refusal branch has an arm. Adds nine arms and one standing predicate; adds no ne
 
 ## 9. Revision log
 
+- rev-7 · 2026-08-25 · built. §5's user-docs item names an update section in
+  `WIRE-INTO-PROJECT.md`; that runbook has NO update-verb section at all, so the two dispositions
+  and the `--write-withdrawals` flag landed in `skills/deploy-governance/SKILL.md`, where the
+  deployer's user-facing documentation actually lives. §4 estimated ~70 lines and 11 arms; the
+  landed change is ~380 lines and 82 arms, and the difference is the guards §5's error-states
+  bullet asks for while §4 did not count them — the escaping destination, the occupied
+  destination, the failed move, the ambiguous destination and the out-of-kit source, each armed.
+  One judgement the spec does not cover, decided and armed: a row the TARGET deleted whose gov
+  source was renamed stays `converged` rather than `renamed`, because there is nothing to move and
+  calling it renamed would `git mv` an absent file, fail, and freeze that run's re-stamp.
+- rev-6 · 2026-08-25 · round-4 fold: H4 — S0c, the fold's headline scope item, had no acceptance
+  criterion and no arm, and no criterion put a non-`table` role through the write loop S0b edits.
+  New AC10 observes the seed-override exemption RED-first on a `seed` row, new AC11 observes S0b's
+  reported-only line at `:3064` on a `rendered` row, and the arm count in §4, §5 and §7 goes from
+  nine to eleven. L3 — S0c cited the incident comment at `:3054-3058`, which is the tail of the
+  escapes-the-tree refusal and its `continue`; re-read at `9ddcc5c9` the comment spans `:3058-3062`
+  with the guard at `:3063`, and the citation now says so.
 - rev-5 · 2026-08-25 · round-5 fold: S0b was self-contradicting and its mechanism was false
   against source — it scoped `renamed` out of the write loop and then edited a tuple the scoping
   made unreachable, and claimed a renamed row would vanish from the output when every row in

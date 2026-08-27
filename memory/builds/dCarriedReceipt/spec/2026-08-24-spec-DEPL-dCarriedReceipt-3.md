@@ -1,6 +1,6 @@
 # DEPL-dCarriedReceipt-3 — `intake` honours `--answer prefix=`
 
-**Status:** SPECCED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-2 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,10 @@
 |---|---|---|
 | [2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md](../build/2026-08-24-build-DEPL-dCarriedReceipt-1-adopter-measurements.md) | research | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-12 |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md) | diff-review | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 
 <!-- /gen:spec-records -->
 
@@ -22,8 +26,14 @@ as ABL-dReadoptedConvoy-3 on the adopter side; it is two lines, and `-9`'s needl
 
 ## 2. Scope (IN)
 
-- **S1** — `cmd_intake` emits `prefix = "<value>"` from `answers["prefix"]` when supplied, and
-  `"tools"` when not.
+- **S1** — `cmd_intake` resolves the prefix ONCE from `answers["prefix"]` when supplied and
+  `"tools"` when not, and every spelling in that function reads the resolved value. There are
+  THREE, not one, and they all land in the same written file: the `prefix = "<value>"` line
+  (`:3206`), and — when the selection carries a `[gate_runner_seed]` — the `{prefix}` and `{kit}`
+  tokens the seed resolver is given (`:3230`), which are substituted into the `[gate_runner]` block
+  emitted into that same `deploy.toml`. Leaving the latter two would write a descriptor declaring
+  `prefix = "scripts"` whose gate-runner paths spell `tools/`, which is the one-fact-two-answers
+  class this build exists to remove, inside a single file.
 - **S2** — `prefix` joins the `derived` set in `needed_answers`, so it does not become a newly
   *required* answer that breaks every existing intake invocation.
 - **S3** — one arm in `selftest.py` per branch: supplied and omitted.
@@ -52,7 +62,8 @@ answer stream.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` (2 lines), `tools/govkit/selftest.py` (2 arms).
+`tools/govkit/govkit.py` (4 lines — one resolve, three reads), `tools/govkit/selftest.py`
+(4 arms, 10 checks).
 
 ## 5. Production-readiness checklist
 
@@ -85,7 +96,7 @@ answer stream.
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically the `govkit selftest` and `govkit
-selfcheck` legs. Adds two arms; adds no new leg.
+selfcheck` legs. Adds four arms — supplied, omitted, empty, and the gate-runner block under a non-default prefix; adds no new leg.
 
 ## 8. Open questions
 
@@ -93,6 +104,12 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-25 · building found what speccing did not: `cmd_intake` hardcodes the prefix in
+  THREE places, and rev-1's S1 named only the descriptor line. The other two are `gctx`'s `prefix`
+  and `kit` values at `:3230`, which resolve into the `[gate_runner]` block written into the same
+  `deploy.toml`, so a `scripts` target would have carried gate-runner paths spelling `tools/`. S1
+  now resolves once and names every reader; §4's estimate moves 2 -> 4 lines. The spec moved before
+  the code, per the build method's M2.
 - rev-1 · 2026-08-24 · initial draft, from the kit-sync design pass (5 lenses + fold).
 
 ## 10. Reuse audit

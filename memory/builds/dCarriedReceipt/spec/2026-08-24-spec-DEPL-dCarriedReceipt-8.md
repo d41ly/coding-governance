@@ -1,12 +1,17 @@
 # DEPL-dCarriedReceipt-8 — a merge result never overwrites `gov_oid`
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-25 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-25-build-DEPL-dCarriedReceipt-8-acceptance-ledger.md](../build/2026-08-25-build-DEPL-dCarriedReceipt-8-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md) | diff-review | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
 
 <!-- /gen:spec-records -->
 
@@ -213,9 +218,15 @@ no new leg file.
   base the next three-way merges from. Advancing it silently moves that base.
   RESOLVED (agent, 2026-08-24, delegated): leave `patched` rows untouched.
 - **F3 — the red-first observation lands after `-7`, so which tree is it observed against?** Both,
-  and the spec is written to make that possible. `-7` deliberately preserves the corruption under
-  the new field names, so the AC1 sequence reproduces identically at `9ddcc5c9` and on `-7`'s tip;
-  the measurement above is the `9ddcc5c9` one, and the build re-runs it on `-7`'s tip before fixing.
+  and the spec is written to make that possible. rev-1 predicted that `-7` deliberately preserves
+  the corruption under the new field names, so the sequence would reproduce identically on both
+  trees. **rev-5: BUILDING MEASURED THE OPPOSITE, and the difference matters.** `-7` does leave the
+  diverged arm stamping the merge result, but its S9 preamble integrity assertion then INTERCEPTS
+  that stamp on the next run: at `9ddcc5c9` the second update reported `wrote 2, 0 conflict(s)`,
+  rc 0, and the operator's line silently vanished, while on `-7`'s tip the same fixture refuses at
+  rc 2 naming both oids, writes nothing, and can never be updated again. Silent destruction became
+  a permanent brick. Both symptoms were reproduced end to end before the fix and both are recorded
+  at the code site.
   RESOLVED (agent, 2026-08-24, delegated): observe on both, fix on `-7`'s tip.
 - **F4 — is `gov_oid` stored in the receipt, or recomputed from `blob_at(root, commit, source)` on
   every read?** Stored. Recomputed was the rejected alternative, and the reason is `-13`: with
@@ -235,6 +246,13 @@ no new leg file.
 
 ## 9. Revision log
 
+- rev-5 · 2026-08-25 · built. §8 F3 predicted that `-7` preserves the corruption so the red-first
+  sequence reproduces identically on both trees; measured, it does not. `-7` S9 intercepts the
+  corrupt stamp and the second update REFUSES at rc 2 permanently rather than destroying the edit
+  silently. F3's grounds are corrected and its resolution stands. §3's non-goal carries the same
+  prediction and is corrected with it. Also recorded: S6's integrity half is deliberately NOT
+  implemented, because repointing `check`'s integrity loop index-side would delete unit 5 AC2's
+  unstaged-edit guarantee, and adding a second reader is what §10 forbids in the same sentence.
 - rev-4 · 2026-08-24 · round-3 fold: S3's rev-3 sentence was FALSE in exactly the case `-9` S11
   exists for. It claimed a proven rung never re-opens the raw arm at `:3069-3073` because that arm
   sits on the grid's `equal` row — but the arm is guarded by `v == "stale" or v == "missing"`, and

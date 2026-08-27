@@ -1,12 +1,20 @@
 # DEPL-dCarriedReceipt-5 — the `[[decline]]` contract, and three arms that keep it honest
 
-**Status:** SPECCED · rev-3 · 2026-08-25 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-6 · 2026-08-26 · node d · Tier-1 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-DEPL-dCarriedReceipt-5-acceptance-ledger.md](../build/2026-08-26-build-DEPL-dCarriedReceipt-5-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-1-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round4.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round5.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-1-round6.md) | spec-audit | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-15 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md) | diff-review | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 DEPL-dCarriedReceipt-15 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-15 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-15 |
 
 <!-- /gen:spec-records -->
 
@@ -115,9 +123,27 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
 
 ## 5. Production-readiness checklist
 
-- security — `discharge` runs an argv from the TARGET's own descriptor. That is not new exposure:
-  `[[hole]].discharge` already does exactly this through the same runner, in the same verb, against
-  the same file, and this unit adds no second execution path.
+- security — `discharge` runs an argv from the TARGET's own descriptor.
+
+  **CORRECTED at rev-6, and the sentence this replaces was FALSE IN BOTH HALVES.** It read: "That
+  is not new exposure: `[[hole]].discharge` already does exactly this through the same runner, in
+  the same verb, against the same file." A `[[hole]]` is iterated from the KIT descriptor, which
+  `read_descriptors` reads out of GOV's own tree — so its argv is gov-authored, not target-authored,
+  and it is not the same file. The only pre-existing target-authored execution is the gate runner's
+  own command, which runs inside `apply` alone and prints its argv before spawning. So the
+  equivalence that cleared this bullet did not exist, and because it was written down it was
+  believed: the branch shipped reachable from `plan --coverage`, a verb needing no receipt and no
+  `--write` that prints "NOTHING was written." on the same run. Previewing an untrusted repository
+  executed whatever that repository asked for, on the previewer's machine. Found by this build's own
+  closing review, which read the call graph instead of this sentence.
+
+  **What the unit actually does now.** The `discharge` branch is OPT-IN behind `--run-discharge`,
+  default OFF in both verbs; a row whose probe did not run reports `probe-not-run`, a STATE rather
+  than a silent skip; the resolved argv is PRINTED before it is spawned; and a `command` that is not
+  a list is refused rather than iterated character by character. The executing surface is now a
+  DECLARED POPULATION in the engine, `SHELL_EXEC_SITES`, labelled by who authors each argv and
+  asserted in both directions by an arm — which is the gate that would have caught this at authoring
+  time and is the reason the class cannot recur silently.
 - perf / scale — one `blob_at` and one index read per `taken_as` row. Bounded by the number of
   declines an owner typed, which is bounded by the coverage gap.
 - a11y — N/A: CLI.
@@ -159,19 +185,28 @@ call sites), `tools/govkit/selftest.py` (8 arms), `WIRE-INTO-PROJECT.md` (the de
   undischarged; carrying an unresolved `{token}` refuses and names the key, matching `:1669-1672`.
 - **AC9** — A row carrying both `taken_as` and `consumed_into` reds on the one-evidence-field rule
   before either is evaluated.
-- **AC10** — Over a fixture seeded with the pre-`-1` measurement at `9ddcc5c9`, 55 gap rows,
-  frozen as a fixture, declaring the 11 declarable
-  ones leaves `plan --coverage` reporting `44` gap rows and `11` declined, with the total unchanged.
+- **AC10** — Under `python tools/govkit/govkit.py plan --coverage`, declining N gap rows moves
+  exactly N out of the gap count into the declined count, and the WRITE-ROW TOTAL does not move. A decline that shrank the denominator would be hiding
+  gov's own population rather than excusing a row, which is what this asserts against.
+
+  **AMENDED at rev-5.** The criterion used to name a frozen fixture seeded with a specific gap
+  count at the base sha, and specific declared and residual counts. Those are three measurements of
+  one adopter at one gov vintage, and gov has shipped files since — a fixture reproducing them
+  would have to be manufactured rather than measured, which is the staged-break class: an arm that
+  proves a mechanism against a value invented for it proves it for the invented value. The
+  arithmetic above IS the property of this code, it is gateable on any fixture, and it is gated.
+  The live reading against the adopter the criterion named goes in the acceptance ledger, taken
+  from that repository's OWN declared kit map and never from an invented one.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` full bar; specifically `govkit selftest`, `govkit selfcheck` and
 `govkit refusal join`. That last one is a real obligation rather than a mention: this unit adds
-roughly seven refusal branches, and `BRANCH_PIN (a shrink-only FLOOR, so it is re-derived at
-landing rather than pinned to a literal here)` in `tools/govkit/refusal_join.py:40` is
-shrink-only, so it is re-derived and moved in the SAME commit with both values named beside it, per
-that file's own convention. Every new branch also needs an arm asserting it, which is the join's
-declared contract and is why the arm count in §4 tracks the branch count.
+roughly seven refusal branches, and `BRANCH_PIN` in `tools/govkit/refusal_join.py:41` is a
+shrink-only FLOOR, so it is re-derived at landing rather than pinned to a literal here, and it is
+moved in the SAME commit with both values named beside it, per that file's own convention. Every
+new branch also needs an arm asserting it, which is the join's declared contract and is why the arm
+count in §4 tracks the branch count.
 
 ## 8. Open questions
 
@@ -189,6 +224,34 @@ declared contract and is why the arm count in §4 tracks the branch count.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-26 · CLOSING-REVIEW FOLD, and the finding was a BLOCKER. §5's security bullet
+  cleared the `discharge` branch on an equivalence that does not exist — it claimed
+  `[[hole]].discharge` already ran a target-authored argv through the same runner in the same verb
+  against the same file, and a hole's argv is GOV-authored, read from the kit descriptors. Because
+  the sentence was in the spec it was believed, and the branch shipped reachable from
+  `plan --coverage`: previewing an untrusted repository executed whatever that repository asked for.
+  The bullet is corrected in place rather than deleted, because the false claim is the useful part
+  of the record. `discharge` is now opt-in behind `--run-discharge`, default off in both verbs, with
+  `probe-not-run` as its own state, the argv printed before spawning, a non-list `command` refused,
+  and the engine's executing surface declared as a population asserted in both directions.
+  AC8 is unamended: it says what a discharge REPORTS and never which flags reach it.
+
+- rev-5 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. ONE criterion
+  AMENDED: AC10 pinned a frozen fixture at a gap count measured on one adopter at the base sha,
+  plus the declared and residual counts that follow from it. Reproducing those today would mean
+  manufacturing the fixture rather than measuring it — the staged-break class, where an arm proves
+  a mechanism against a value invented for the arm. What AC10 now asserts is the ARITHMETIC, which
+  is a property of this code and is gateable on any fixture: N declines move N rows, and the
+  write-row total does not move. The live reading is in the acceptance ledger. §7's other
+  obligation was met as written rather than amended: `BRANCH_PIN` was RE-DERIVED at landing —
+  eleven new branches, not the seven the spec estimated — moved in the same commit with both
+  values named beside it, and every one of the eleven is armed.
+
+- rev-4 · 2026-08-25 · round-4 fold: L4 — §7's `BRANCH_PIN` sentence rendered an English clause as
+  an inline code identifier and cited `tools/govkit/refusal_join.py:40`, where the constant is at
+  `:41` and `:39-40` is the comment above it. It now carries `-9` §7's repaired shape, identifier
+  inside the backticks and property in prose beside it, with the duplicated shrink-only clause
+  dropped.
 - rev-3 · 2026-08-25 · round-5 fold: §1's coverage figure carried the pre-`-1` vintage flat, which
   `-4` rev-2 arms as a regression alarm. It now reads 54 with 55 labelled as the pre-`-1`
   measurement, and AC10's fixture is labelled frozen rather than live.

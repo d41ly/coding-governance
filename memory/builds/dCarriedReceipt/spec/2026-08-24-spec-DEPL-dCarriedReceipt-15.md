@@ -1,12 +1,20 @@
 # DEPL-dCarriedReceipt-15 — gov stops shipping its own prefix inside kit bodies
 
-**Status:** SPECCED · rev-4 · 2026-08-24 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
+**Status:** CLOSED · rev-5 · 2026-08-26 · node d · Tier-2 · base 9ddcc5c9 · streams deployer · ratified 2026-08-24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-26-build-DEPL-dCarriedReceipt-15-acceptance-ledger.md](../build/2026-08-26-build-DEPL-dCarriedReceipt-15-acceptance-ledger.md) | journal | — |
 | [2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md](../reviews/2026-08-24-review-DEPL-dCarriedReceipt-9-spec-precode.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round4.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round5.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 |
+| [2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md](../reviews/2026-08-25-review-DEPL-dCarriedReceipt-9-round6.md) | spec-audit | DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-13-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-15-diff-review-round4.md) | diff-review | DEPL-dCarriedReceipt-1 DEPL-dCarriedReceipt-2 DEPL-dCarriedReceipt-3 DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-7 DEPL-dCarriedReceipt-8 DEPL-dCarriedReceipt-9 DEPL-dCarriedReceipt-10 DEPL-dCarriedReceipt-11 DEPL-dCarriedReceipt-12 DEPL-dCarriedReceipt-13 DEPL-dCarriedReceipt-14 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-4-diff-review-round1.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 |
+| [2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md](../reviews/2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md) | diff-review | DEPL-dCarriedReceipt-4 DEPL-dCarriedReceipt-5 DEPL-dCarriedReceipt-6 DEPL-dCarriedReceipt-13 |
 
 <!-- /gen:spec-records -->
 
@@ -200,9 +208,18 @@ carrying file),
   `tools/lexicon/lexicon.py`, which is four of inCMS's seven `tools/`-prefixed literals; the other
   three are the prose citations S5 leaves alone.
 - **AC5** — with backtick-delimited spans and fenced blocks removed,
-  `grep -cE 'tools/[A-Za-z0-9_-]+/' tools/lexicon/lexicon.py` returns 0, and
-  `tools/install-prefix-carried.txt` carries NO row for that file, because S4 deletes a row that
-  falls to zero. Observe RED first: at `9ddcc5c9` the same stripped count is 4 — the docstring
+  `grep -cE 'tools/[A-Za-z0-9_-]+/' tools/lexicon/lexicon.py` returns 0, and that file's row in
+  `tools/install-prefix-carried.txt` falls to exactly the count of its surviving PROSE citations —
+  the ones S5 is forbidden to touch.
+
+  **AMENDED at rev-5.** The criterion demanded NO row at all, on a measurement taken when all three
+  prose citations spelled a bare directory and were therefore invisible to the §4 predicate, which
+  requires a kit name followed by a real FILE. The file has moved since and one of them now spells a
+  real file, so it IS a ratchet hit — while remaining exactly the kind of citation S5 says to leave
+  alone, because rewriting it destroys the explanation it carries. Demanding zero would force S5 to
+  do the one thing §2 forbids it. What the criterion asserts instead is that the EXECUTABLE
+  population S5 owns goes to zero, which the stripped grep measures, and that the residual row is
+  prose and nothing else. The measured value goes in the acceptance ledger, not here. Observe RED first: at `9ddcc5c9` the same stripped count is 4 — the docstring
   usage block at `:5-7` and the runtime usage printer at `:559`, which is the whole of the
   population S5 touches — and that file's ratchet row reads 4 there, not 3. Measured rather than
   reasoned, at `9ddcc5c9`: the §4 predicate hits lines `5`, `6`, `7` and `559` and NONE of `:245`,
@@ -241,6 +258,19 @@ manifest.
   RESOLVED (agent, 2026-08-24, delegated): ratcheted, not converted.
 
 ## 9. Revision log
+
+- rev-5 · 2026-08-26 · BUILT and CLOSED on node `a`, session `aResumedRelay`. ONE criterion
+  AMENDED, AC5, and the amendment is the same shape the unit is about: it demanded a residual of
+  ZERO on a measurement taken when all three of the file's prose citations spelled a bare directory
+  and were invisible to the §4 predicate. One of them now spells a real file and is a hit, while
+  remaining exactly the citation §2 forbids S5 to rewrite — so the criterion as written required S5
+  to do the one thing it may not. It now asserts what it was standing in for: the executable
+  population goes to zero, and the residual is prose. Everything else was observed as written,
+  including both halves of AC2 and AC4 and the staged drift for AC6. Two things the spec did not
+  foresee, both in the ledger: python's newline translation made the derived population arrive with
+  a trailing CR, so all 181 paths failed a file test and the first ratchet came out empty; and the
+  repo's own idiom ban redded the launcher fallback this arm was first written with, which is the
+  ban doing its job. No `BRANCH_PIN` movement — this unit touches no deployer refusal branch.
 
 - rev-4 · 2026-08-24 · round-3 fold: the §9 entry shape is corrected to the mandated `round-N fold:` colon form.
 - rev-3 · 2026-08-24 · round-2 fold: every item re-measured at `9ddcc5c9` before it was written.
