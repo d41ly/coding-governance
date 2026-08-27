@@ -1092,6 +1092,51 @@ EOF
 
 # ---- 7: at most ONE non-terminal run-state file, or "the run" is not well-defined and anything
 # ---- keying on it must either OR the phases together or pick one arbitrarily.
+# ----
+# ---- THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION. A record at `LANDING` whose witness is an
+# ---- ancestor of the tip the remote advertises is NOT a competing run — it is a finished one missing
+# ---- a stamp. Nothing keyed on "the run" could ever resolve to it, because its work is already on
+# ---- the branch every later run measures against. Without this, such a record counts forever and
+# ---- reds the bar for every later run on every node, which is the deadlock `TOOL-aBoundedVerdict-24`
+# ---- and `TOOL-aFusedCharter-4` both record and which the fleet previously cleared only by marking
+# ---- honest runs ABORTED. `--landed` cannot repair it either: its check 34 wants a lander marker
+# ---- naming the witness, and a marker is per-machine and per-push, so a run landed from another node
+# ---- is unreachable by the verb by construction.
+# ----
+# ---- WHAT THIS DOES NOT CLAIM, and the header says so because a structural check reads as a semantic
+# ---- one to everybody who did not write it. It does NOT say the run finished correctly, that its
+# ---- Definition of Done was met, or that anything reviewed it. It says one thing: the commit this
+# ---- record names as its witness is on the branch the remote calls its default. `LANDING` stays
+# ---- non-terminal — a phase move into terminality is a PRODUCER's to write, never a leg's — so
+# ---- every other check keyed on the phase grades this record exactly as before.
+# ----
+# ---- SCOPED TO `LANDING` AND NOTHING ELSE. A `BUILDING` record whose witness happens to be on the
+# ---- remote is a genuinely live run and keeps counting: `LANDING` is the one phase that means
+# ---- `--close` already evaluated the Definition of Done, so it is the one phase where "missing a
+# ---- stamp" is the whole remaining difference.
+# ----
+# ---- IT FAILS CLOSED AND IT SAYS SO. No advertisement, an unresolvable witness, or a tip this clone
+# ---- has not fetched leaves the record counted, with the reason reported. A check that silently
+# ---- stops excluding is indistinguishable from one that found nothing to exclude, which is this
+# ---- repo's own green-by-absence class.
+c7anchor="$ADV_HEAD"
+[ -n "$c7anchor" ] && { GIT rev-parse --verify --quiet "$c7anchor^{commit}" >/dev/null 2>&1 || c7anchor=""; }
+if [ "$nlive" -gt 1 ] && [ -z "$c7anchor" ]; then
+  report "check 7 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted"
+fi
+c7keep=""; c7drop=""; c7n=0
+for c7f in $live; do
+  c7ph=$(phase_of "$c7f")
+  c7w=$(fact_of "$c7f" witness)
+  if [ "$c7ph" = LANDING ] && [ -n "$c7anchor" ]      && GIT rev-parse --verify --quiet "$c7w^{commit}" >/dev/null 2>&1      && GIT merge-base --is-ancestor "$c7w" "$c7anchor" 2>/dev/null; then
+    c7drop="$c7drop $c7f"
+    report "check 7 excluded $c7f — LANDING, and its witness $c7w is an ancestor of the advertised default-branch tip $c7anchor, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one"
+  else
+    c7keep="$c7keep $c7f"; c7n=$((c7n+1))
+  fi
+done
+[ -z "$c7drop" ] || live="$c7keep"
+[ -z "$c7drop" ] || nlive="$c7n"
 [ "$nlive" -le 1 ] || fail 7 "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it:$live"
 
 # ---- 10: the kit ships what this repo runs. ONE pair. The comparison is written here rather than
