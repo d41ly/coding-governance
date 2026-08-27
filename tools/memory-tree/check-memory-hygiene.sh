@@ -6,7 +6,13 @@
 # THIS script — never hand-copy the checks. Part of the coding-governance memory-tree kit.
 #
 #   tools/memory-tree/check-memory-hygiene.sh            # full check
-#   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (set-checks tree-wide, file-checks on staged paths)
+#   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
+#
+# `--staged` is NOT the full check with a narrower file list. Every check whose population is the
+# CORPUS rather than the diff is HELD: 13-16, 17-19, the row-grammar arm and 22-23 all skip, and
+# the full run at the push boundary is where they bind. This line used to read "set-checks
+# tree-wide", which was already false of 13-19 before 22-23 joined them — one rule returning two
+# verdicts, which is the `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
