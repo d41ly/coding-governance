@@ -5,7 +5,7 @@ opened: 2026-08-27
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3
+ids: TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4
 ---
 
 # aReapedTicket — the turnstile's queue gets the liveness its beacon already has
@@ -128,14 +128,14 @@ definition until M4 runs.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 3 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3
+ids TOOL-aReapedTicket-1 TOOL-aReapedTicket-2 TOOL-aReapedTicket-3 TOOL-aReapedTicket-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aReapedTicket-1 — a queued waiter drops its own ticket on every signal a trap can catch](spec/2026-08-27-spec-TOOL-aReapedTicket-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aReapedTicket-2 — the acquire loop asserts liveness on the QUEUE, and refuses to wait on what cannot change](spec/2026-08-27-spec-TOOL-aReapedTicket-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
-| [TOOL-aReapedTicket-3 — arms for a dead waiter, which the suite has never had](spec/2026-08-27-spec-TOOL-aReapedTicket-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-27 |
+| [TOOL-aReapedTicket-3 — arms for a dead waiter, which the suite has never had](spec/2026-08-27-spec-TOOL-aReapedTicket-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

@@ -769,7 +769,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1130
+    "ceiling": 2400
   },
   {
     "name": "run-gates gov canary",

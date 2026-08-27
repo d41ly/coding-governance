@@ -80,9 +80,9 @@ tools/run-gates/profile_bar.py	1
 tools/run-gates/profile_bar.test.sh	9
 tools/run-gates/run-gates.evidence.test.sh	5
 tools/run-gates/run-gates.gov.test.sh	4
-tools/run-gates/run-gates.sh	3
+tools/run-gates/run-gates.sh	4
 tools/run-gates/run-gates.test.sh	33
-tools/run-gates/run-gates.turnstile.test.sh	16
+tools/run-gates/run-gates.turnstile.test.sh	21
 tools/settings-merge.py	1
 tools/unattended/.unattended.conf.example	2
 tools/unattended/adopt-unattended.sh	2

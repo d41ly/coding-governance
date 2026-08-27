@@ -27,7 +27,10 @@ bad=0
 # Stated ABSOLUTELY rather than as a delta: TOOL-aShardedFloor-4 raises the same pin, and
 # whichever lands second has to say the number it expects. The compare below is `-ge`, so arms
 # left under an unraised floor are STRANDED rather than red — which is why this moves with them.
-FLOOR_ASSERTIONS=42
+# Raised from 42 to 62 by TOOL-aReapedTicket-3, which adds arms 15-21 — the QUEUE side, which this
+# suite had no arm for at all. The 20 they contribute were counted by running them, not derived on
+# paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
+FLOOR_ASSERTIONS=62
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -90,6 +93,13 @@ peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev
 beacon(){ local c; c=$(cd "$1" && git rev-parse --git-common-dir) || return 1
           c=$(cd "$1" && cd "$c" && pwd) || return 1
           printf '%s/gate-bar-beacon' "$c"; }
+# The QUEUE's path, resolved the same absolute way and for the same reason (TOOL-aReapedTicket-3).
+# The arms below plant tickets in it, so a helper that returned a relative path would have them
+# planting into a directory the runner never reads — the failure `beacon` already carries a comment
+# about, which is why this is a sibling of it rather than a fresh derivation.
+queue(){  local c; c=$(cd "$1" && git rev-parse --git-common-dir) || return 1
+          c=$(cd "$1" && cd "$c" && pwd) || return 1
+          printf '%s/gate-bar-queue' "$c"; }
 
 # ------------------------------------------------------ 1/2: peak occupancy, and its control -------
 # AC1 with AC2 beneath it. AC1 alone passes on an implementation that serializes by accident — two
@@ -503,6 +513,158 @@ legs "$R13" '[ {"name": "bad", "argv": ["bash", "fx/bad.sh"]} ]'
 [ -f "$R13/.git/gate-last-failure.txt" ] && grep -q '^gate queue: queued ' "$R13/.git/gate-last-failure.txt" \
   && ok "the RED-only durable copy carries it as well" \
   || nope "the durable failure record carries no queue line"
+
+# ================= TOOL-aReapedTicket: the QUEUE side, which had no arms at all =================
+# Every liveness arm above is about the HOLDER beacon, and every ordering arm drives a fixture with a
+# live holder. Nothing put a ticket in the queue whose owner was gone — so the suite was exactly as
+# blind as the runner, and a wedge that permanently defeats the turnstile shipped green.
+
+# ---- 15: a waiter INTERRUPTED while queued drops its own ticket --------------------------------
+# The ROOT-CAUSE arm. The only `ts_drop_ticket` trap used to be armed inside the branch that WINS the
+# beacon, so a queued waiter had no handler at all and an ordinary Ctrl-C left a ticket that sorts
+# first forever. All three catchable signals, because a trap listing three and an arm asserting one
+# leaves two unexercised.
+#
+# The beacon is held by THIS shell — unquestionably alive, heartbeat fresh — so nothing reaps it and
+# the runner genuinely queues. The TTL is left at its DEFAULT deliberately: scaling it down to
+# shorten the wait would make the fixture's own beacon reapable and the runner would ACQUIRE instead
+# of queueing, which is arm 4's mechanism quietly disarming this one.
+for sig in INT TERM HUP; do
+  Rq=$tmp/sig$sig; mk_repo "$Rq"; Bq=$(beacon "$Rq"); Qq=$(queue "$Rq")
+  mkdir -p "$Bq"; printf '%s' "$$" > "$Bq/pid"; printf '%s' "$(date +%s)" > "$Bq/heartbeat"
+  printf '%s' held > "$Bq/nonce"
+  legs "$Rq" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+  ( cd "$Rq" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 \
+      timeout -s "$sig" -k 10 12 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ); rcq=$?
+  nq=$(ls -1 "$Qq" 2>/dev/null | wc -l)
+  [ "$nq" -eq 0 ] \
+    && ok "a waiter killed by SIG$sig while queued left no ticket behind" \
+    || nope "SIG$sig on a queued waiter leaked $nq ticket(s) — the wedge this build exists to remove"
+  # 137 is `timeout` escalating to SIGKILL, i.e. the runner IGNORED the signal. A handler that does
+  # not re-exit drops the ticket and RESUMES the loop, ticketless and unable to ever acquire — the
+  # same wedge one level down, and it is what the first draft of this fix actually did.
+  [ "$rcq" -ne 137 ] \
+    && ok "the waiter EXITED on SIG$sig rather than resuming the loop ticketless" \
+    || nope "SIG$sig had to be escalated to SIGKILL — the trap handler does not re-exit"
+done
+
+# ---- 16: a ticket whose owner is DEAD, with no beacon at all, is swept -------------------------
+# The arm that FAILED on the runner as it stood at this build's BASE: it printed `another bar holds
+# this repository` with nothing holding it, waited out the whole bound, ran UNQUEUED, and left the
+# ticket in place for the next bar and every bar after it.
+R14=$tmp/deadticket; mk_repo "$R14"; Q14=$(queue "$R14")
+mkdir -p "$Q14"; : > "$Q14/20200101T000000-999999-1"
+legs "$R14" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+out14=$( cd "$R14" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+printf '%s' "$out14" | grep -q 'dead waiter (pid 999999)' \
+  && ok "a queue ticket whose PID is dead is swept, and the reason recorded is the dead PID" \
+  || { nope "a dead waiter's ticket was not swept"; printf '%s\n' "$out14" | tail -4 | sed 's/^/      /'; }
+printf '%s' "$out14" | grep -q 'WAIT EXPIRED' \
+  && nope "the run still burned the bounded wait behind a dead ticket" \
+  || ok "the run did NOT burn the bounded wait behind a dead ticket"
+printf '%s' "$out14" | grep -q 'gates GREEN' \
+  && ok "the run proceeded after sweeping a dead ticket" || nope "the run did not complete after the sweep"
+[ "$(ls -1 "$Q14" 2>/dev/null | wc -l)" -eq 0 ] \
+  && ok "the dead ticket is gone, so the NEXT bar does not meet it either" \
+  || nope "the dead ticket survived the run that swept it"
+
+# ---- 17: the AGE signal fires on a ticket whose PID is ALIVE -----------------------------------
+# Against the UNMODIFIED runner, exactly as arm 4 does for the holder: the ticket's PID is this
+# shell, so the dead-PID branch CANNOT fire, and only the name's stamp is forced old. An arm that
+# planted a dead PID would prove the first signal twice and the second not at all.
+R15=$tmp/oldticket; mk_repo "$R15"; Q15=$(queue "$R15")
+mkdir -p "$Q15"; : > "$Q15/$(date -u -d "@$(( $(date +%s) - 99999 ))" +%Y%m%dT%H%M%S)-$$-1"
+legs "$R15" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+out15=$( cd "$R15" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+if printf '%s' "$out15" | grep -q 'past the bounded wait'; then
+  ok "a ticket whose PID is ALIVE but whose stamp is past the bound is swept, and the reason is the age"
+  printf '%s' "$out15" | grep -q 'dead waiter' \
+    && nope "the age case also reported a dead PID — the two sweep reasons are not distinguishable" \
+    || ok "the age sweep did NOT report a dead PID (the two signals stay distinguishable)"
+else
+  nope "a live-PID ticket past the bound was not swept"; printf '%s\n' "$out15" | tail -4 | sed 's/^/      /'
+fi
+
+# ---- 18: a LIVE waiter's ticket is NOT swept --------------------------------------------------
+# THE NEGATIVE CONTROL, and the arm that makes 16 and 17 mean anything: a reaper that deletes every
+# ticket it finds passes both of those and is strictly WORSE than the bug, because a waiter whose
+# ticket is deleted can never match the acquire predicate again. The TTL is raised so the planted
+# ticket is nowhere near the staleness cutoff, and its PID is this shell.
+R16=$tmp/liveticket; mk_repo "$R16"; Q16=$(queue "$R16")
+mkdir -p "$Q16"; : > "$Q16/$(date -u +%Y%m%dT%H%M%S)-$$-1"
+legs "$R16" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
+# FORTY-FIVE SECONDS, and the number is load, not caution. At 15 this run did not reach the queued
+# state inside a full-suite bar and arm 19 below reported two SKIPs — honest, but ungraded. Arm 4b
+# above allows 30 for launch-to-claim alone on a box where process creation moves 25x, and this has
+# to cover launch, the ticket, and one announce. TS_MAXWAIT here is 1200, so a longer window costs
+# nothing: the run stays queued until the timeout fires either way.
+out16=$( cd "$R16" && env GATE_FULL=1 GATE_TURNSTILE_TTL=300 GATE_TURNSTILE_TICK=1 \
+           timeout -s TERM -k 10 45 bash tools/run-gates/run-gates.sh 2>&1 )
+[ "$(ls -1 "$Q16" 2>/dev/null | wc -l)" -ge 1 ] \
+  && ok "a LIVE waiter's fresh ticket is NOT swept" \
+  || nope "the sweep deleted a live waiter's ticket — it cannot tell a waiter from a corpse"
+printf '%s' "$out16" | grep -q 'sweeping' \
+  && nope "the runner reported a sweep against a queue holding only a live waiter's ticket" \
+  || ok "no sweep was reported while only a live waiter's ticket was queued"
+
+# ---- 19: the queued line does not invent a holder ---------------------------------------------
+# The line is emitted from the failure of the ACQUIRE predicate, which conflates `someone is ahead of
+# me in the queue` with `someone holds the beacon`. It named a holder unconditionally, so the
+# reproduction this build started from sent its reader hunting a holder that did not exist.
+if printf '%s' "$out16" | grep -q 'queued at position'; then
+  ok "the greppable position tail is still emitted"
+  printf '%s' "$out16" | grep -q 'another bar holds this repository' \
+    && nope "the runner claimed a bar holds the repository while no beacon directory existed" \
+    || ok "with no beacon held, the queued line reports the QUEUE rather than inventing a holder"
+else
+  skipped "the position-tail arm: this run never queued, so the line under test was never emitted"
+  skipped "the holder-claim arm: this run never queued, so the line under test was never emitted"
+fi
+
+# ---- 20: a run that cannot take a ticket fails open AT ONCE ------------------------------------
+# `[ -n "$TS_TICKET" ]` opens every iteration of the acquire loop, so a failed ticket write made the
+# predicate false FOREVER and the run burned the entire bound to reach a fail-open it was entitled to
+# on the first tick. Forced by creating the queue path as a FILE, which is portable — a mode change
+# on a directory this user owns is routinely ignored on this platform.
+R17=$tmp/noticket; mk_repo "$R17"; Q17=$(queue "$R17")
+rm -rf "$Q17" 2>/dev/null; : > "$Q17" 2>/dev/null || true
+if [ -f "$Q17" ]; then
+  # BOUNDED, because the defect this arm covers is a HANG. TTL 1800 makes the bound 7200s, so a
+  # regressed runner would sit here for two hours and the leg's own ceiling would kill it with no
+  # verdict at all — a red that names nothing. The cutoff below is not a timing window in the sense
+  # `TOOL-aScannedThrottle-7` warns about: it separates "one bar's startup" from "two hours", a
+  # margin of about sixty, so load cannot move a passing run across it.
+  t17s=$(date +%s)
+  out17=$( cd "$R17" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1800 \
+             timeout -s TERM -k 10 180 bash tools/run-gates/run-gates.sh 2>&1 ); rc17=$?
+  t17=$(( $(date +%s) - t17s ))
+  printf '%s' "$out17" | grep -q 'could not create a queue ticket' \
+    && ok "a run that cannot take a ticket says so" \
+    || nope "a run that cannot take a ticket did not report it"
+  { [ "$rc17" -ne 124 ] && [ "$rc17" -ne 137 ]; } \
+    && ok "it failed open at once rather than waiting out the 7200s bound (${t17}s)" \
+    || nope "a run with no ticket was still waiting after ${t17}s — it is burning the 7200s bound"
+  [ "$(hdrkey "$R17" queued_from)" = unticketed ] \
+    && ok "the run record distinguishes 'unticketed' from 'expired', so a queued 0 stays unambiguous" \
+    || nope "queued_from is '$(hdrkey "$R17" queued_from)', not 'unticketed'"
+else
+  skipped "the no-ticket arm: this host created the queue path anyway, so the condition was never staged"
+  skipped "the no-ticket fail-open timing: its condition was never staged"
+  skipped "the no-ticket run-record state: its condition was never staged"
+fi
+
+# ---- 21: the ticket's handler is armed BEFORE the acquire loop, structurally -------------------
+# Not a grep for prose — a real ordering property of the file, which is the whole of the root-cause
+# fix. `TOOL-aBoundedCeiling-8` records arm 4c grading a source COMMENT and thereby asserting
+# nothing; this asserts that three real statements appear in the required order, so an edit that
+# moves the trap back inside the winning branch reds here rather than shipping the wedge again.
+rgs=$ROOT/tools/run-gates/run-gates.sh
+tl=$(grep -n 'TS_TICKET="\$TS_Q/' "$rgs" | head -1 | cut -d: -f1)
+pl=$(grep -n "^  trap 'ts_drop_ticket' EXIT" "$rgs" | head -1 | cut -d: -f1)
+wl=$(grep -n '^  while \[ -n "\$TS_TICKET" \]' "$rgs" | head -1 | cut -d: -f1)
+{ [ -n "$tl" ] && [ -n "$pl" ] && [ -n "$wl" ] && [ "$tl" -lt "$pl" ] && [ "$pl" -lt "$wl" ]; } \
+  && ok "the ticket's own trap is armed after the ticket exists and before the acquire loop" \
+  || nope "the ticket trap is not between the ticket creation and the loop (ticket=$tl trap=$pl loop=$wl)"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "turnstile: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
