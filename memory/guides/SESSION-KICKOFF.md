@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-27T14:08:59+03:00 @ b4e1d5be879bc8868529fb57c15657e271c39113
+last-audit: 2026-08-27T17:57:06+03:00 @ f1be0b495f216a6b02e1f4e70b852eccfa2a1d2b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2196414866a0e2db52759ebd015aae4a79dd0e8d
@@ -156,15 +156,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
   `--selftests` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md`. No ceiling figure here — each suite
   declares its own and they have already moved once · prune when a bar runs them automatically.
-- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
-  take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
-  adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
-  runner. They were 68 % of leg-seconds and the largest put a 26-minute floor under every full run.
-  Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
-  `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
-  rather than an exception.
-
-
 ### Environment traps worth front-loading
 
 *One line each; link out for detail — check 11 enforces it at 400 bytes per bullet. A recurring BUG
@@ -212,6 +203,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
+- The pre-commit hygiene leg no longer runs check 23 (`TOOL-aThawedCorpus-5`: 683 s to 20 s). A
+  broken ACCEPTANCE LEDGER is now caught only at the push boundary, which works because
+  `memory hygiene` declares no guard and so runs on both of pre-push's branches.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.

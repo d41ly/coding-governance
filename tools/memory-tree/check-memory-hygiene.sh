@@ -1111,7 +1111,19 @@ fi
 # ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
 # ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
 alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
-if [ -n "$alcut" ]; then
+# GUARDED ON $STAGED, like every other delegating corpus-walker in this file (check 21 above, and
+# the three blocks below). This one never had the guard, so the pre-commit fast leg walked every
+# spec and every record on every commit whatever was staged — measured at 94% of that leg's wall
+# clock, 963 s of it, and the whole leg fell to 54 s once this conjunct was added.
+#
+# WHAT THE PRE-COMMIT LEG NO LONGER COVERS, and where it is covered instead. Under --staged this
+# check does not run at all, so a broken acceptance ledger is not caught at commit time. It is
+# caught at the PUSH boundary: `.githooks/pre-push` always runs `run-gates.sh`, choosing only
+# between GATE_FULL=1 and a scoped GATE_BASE run, and `memory hygiene` DECLARES NO GUARD in
+# tools/gate-legs.json, so it executes on both branches. That compensating control holds BECAUSE
+# the leg is unguarded; a guard on it would let a scoped push skip the pass this exemption leans
+# on. TOOL-aThawedCorpus-5, and TOOL-aThawedCorpus-2 was retired to keep that property.
+if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
   alledger=$(for r in $(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
