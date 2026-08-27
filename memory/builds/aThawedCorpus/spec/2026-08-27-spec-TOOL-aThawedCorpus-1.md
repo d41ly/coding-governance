@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-1 — hygiene check 21 stops spawning a process per record
 
-**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -154,6 +154,9 @@ would have been this unit's left-shift.
   `gotchas.py --for-diff` selecting `amendment-leaves-its-other-half-standing`, which is precisely
   a retirement leaving a forward reference describing it as merely sequenced later.
 
+- rev-5 · 2026-08-27 · CLOSED. Built and measured: full leg 226 s -> 34 s, stdout AND stderr
+  identical. AC1's seeded half satisfied by a differential feeding both implementations crafted S
+  rows over all four outcomes plus empty ids, short rows and non-S rows — identical on every one.
 ## 10. Reuse audit
 
 The seam is `tools/memory-tree/check-memory-hygiene.sh`'s own check 12 driver, which already builds

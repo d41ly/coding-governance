@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-5 — check 23 gets the `--staged` guard its four siblings already have
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -134,6 +134,9 @@ measurement exists twice from two independent sessions.
   §4 Inventory deriving both populations instead of quoting counts, after all three figures in this
   build drifted within a day.
 
+- rev-3 · 2026-08-27 · CLOSED. Built and measured: `--staged` 683 s -> 20 s on a controlled pair,
+  stdout identical, and AC3's coverage boundary observed in both directions with a real criterion
+  staged into a live CLOSED Tier-2 spec. AC4 PASS 254 assertions, AC5 green at 20:20.
 ## 10. Reuse audit
 
 The seam is the checker's OWN four sibling guards — `:667` for check 21, and `:1051`, `:1066`,

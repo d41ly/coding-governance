@@ -105,6 +105,38 @@ before that would be measured against the wrong baseline and would hide the defe
 remove it. The owner asked for the systemic half explicitly, so it is built — after, and priced
 against what is left.
 
+## What the collapse actually bought
+
+Every row a controlled pair on the same corpus and the same box, stdout AND stderr identical at
+every step. The live `bash` process count is reported because this node's cost IS process creation
+and an unreported one is how the first round of these figures had to be withdrawn.
+
+| step | full leg | check 23 | check 21 |
+|---|---|---|---|
+| as shipped | 1398-1420 s | 962.0 s | 338.9 s |
+| after `TOOL-aThawedCorpus-4` | 226-360 s | **3.8 s** | 338.9 s |
+| after `TOOL-aThawedCorpus-1` | **34 s** | 3.8 s | collapsed |
+
+`TOOL-aThawedCorpus-5` is a separate axis — the pre-commit `--staged` leg, which check 23 walked in
+full on every commit for want of the guard its four siblings carry: **683 s to 20 s**, 34x. The
+practical reading is the commits in this build's own history: the pre-commit hook cost 913 s at the
+start of this run and **23 s** on the commit that landed the last unit.
+
+**The leg was over a live bound, not merely slow.** `tools/gate-legs.json` declares
+`memory hygiene` at `ceiling: 1270` and `run-gates.sh` kills a leg that outlives its own;
+`timeout -k` is runnable on this host, so the ceilings are live. 1398 s breached it. 34 s does not.
+
+## What the fixture suite did NOT cover, stated because a green suite looked like evidence
+
+`check-memory-hygiene.test.sh` passes 254 assertions and covers checks 3, 4, 5, 7 and 12. It carries
+NOTHING for check 23 and only incidental mentions of 21, so its green says nothing about either
+collapse. Both units therefore carry their own SEEDED differential, running the retired
+implementation and the new one over crafted inputs that fire outcomes the live corpus never
+produces — check 21 and check 23 both emit nothing on this tree, so a byte-diff over it can catch
+added output and never a dropped finding. Both came back identical, including check 23's
+first-wins ledger lookup, its per-record state reset, its grandfather exclusion, and its label
+dedup and collation order.
+
 ## An inherited red, found while measuring
 
 `gen_build_index.py --check` exits 1 at `f5dff6ae` with this branch's own build folder moved out of

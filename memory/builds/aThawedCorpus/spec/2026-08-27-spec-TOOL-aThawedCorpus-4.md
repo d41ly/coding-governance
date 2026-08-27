@@ -1,6 +1,6 @@
 # TOOL-aThawedCorpus-4 — hygiene check 23 stops spawning a process per spec and per record
 
-**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-08-27 · node a · Tier-1 · base f1be0b49 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -203,6 +203,10 @@ None. The checker is not a stored artifact.
 - rev-4 · 2026-08-27 · three forward references to the retired `-2` and `-3` re-pointed. Caught by
   `gotchas.py --for-diff` selecting `amendment-leaves-its-other-half-standing`.
 
+- rev-5 · 2026-08-27 · CLOSED. Built and measured: check 23 962.0 s -> 3.8 s, full leg 1420 s ->
+  360 s, stdout AND stderr identical. AC1's seeded half satisfied by a differential over a scratch
+  corpus firing all three outcomes plus the grandfather, cutoff, CLOSED/Tier-2, first-wins,
+  obs/amd, per-record-reset and label dedup/order invariants — identical on every one.
 ## 10. Reuse audit
 
 The seam is this checker's own check 12 driver, which builds a tagged path stream in the shell and
