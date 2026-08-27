@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-13 — the marked-derivation branch requires every reference bounded
 
-**Status:** CLOSED · rev-6 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
+**Status:** CLOSED · rev-7 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 2 · streams tooling · ratified 2026-08-26
 
 <!-- gen:spec-records -->
 
@@ -460,6 +460,11 @@ wired copy moves.
   which is true and is not a reason: `check-kit-versions.sh` grades consistency, not movement, and a
   version that never moves is consistent and useless.
 
+- **F3 — RESOLVED (owner, 2026-08-27, `TOOL-dTieredTribunal-25`): ruled IN.** The bullet is authored
+  in `tools/workflows/REVIEW-PROTOCOL.template.md` and rendered down with
+  `check-protocol-parity.test.sh --render`, which is the direction that file's own `:6` header gets
+  backwards; the parity leg is green on the rendered pair. The `Everything else is denied` sentence
+  is no longer false. Original question and options below, unedited.
 - **F3 — should `memory/guides/REVIEW-PROTOCOL.md` gain the third receiver too?** Its predicate lists
   two receivers at `:113-116` and then says `Everything else is denied` at `:118`, which is false
   while the derivation branch goes unnamed — the same defect S8 closes in the kit README. This run
@@ -532,6 +537,15 @@ wired copy moves.
   round 2 added. AC12's second half was a byte-equality proxy over the dossier's `## Gaps` span; it
   fired on `TOOL-dTieredTribunal-14` adding its OWN gap there, which is not this unit's to suppress,
   so the criterion now grades the property it was always for.
+
+- rev-7 · 2026-08-27 · **F3 RESOLVED by the owner, ruled IN — `TOOL-dTieredTribunal-25`.** The unit
+  shipped with `memory/guides/REVIEW-PROTOCOL.md` listing two receivers above a sentence reading
+  `Everything else is denied`, which the marked derivation this unit tightened had made false. The
+  run held no grant to fix it and said so rather than editing a binding carrier under a delegation
+  that does not reach one. Authorized now, the bullet was authored in
+  `tools/workflows/REVIEW-PROTOCOL.template.md` and rendered down — the direction that file's own
+  `:6` header states backwards, and the trap the fork flagged in advance — and the parity leg is
+  green on the rendered pair.
 
 ## 10. Reuse audit
 

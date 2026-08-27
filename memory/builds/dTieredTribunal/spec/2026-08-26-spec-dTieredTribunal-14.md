@@ -1,6 +1,6 @@
 # TOOL-dTieredTribunal-14 — the ref-keyed-join ban reaches an inline script
 
-**Status:** CLOSED · rev-5 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
+**Status:** CLOSED · rev-6 · 2026-08-26 · node a · Tier-2 · base cd971285 · order 3 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -538,7 +538,12 @@ runs. This unit changes no protocol text, so it must stay green untouched.
   `memory/map/features/review-harnesses.md`, it is what grades a new harness from its first commit
   before anyone has added the marker, and narrowing it is a scope reduction this unit was not asked
   to make.
-- **F3 — OPEN, and the owner's.** S7's control on the `--only` selector is ADVISORY, not a merge-bar
+- **F3 — RESOLVED (owner, 2026-08-27, `TOOL-dTieredTribunal-26`): the advisory control is ACCEPTED**
+  and `check-wiring.sh` is not promoted to a `subject: repo` leg, which is the recommendation this
+  section made. The residual the fork names is real and is now bounded to WHEN the bypass is
+  noticed rather than whether: `check-wiring.sh` reds on it at session start, and this unit's own
+  AC7d arm reds on it in the suite. Original question and options below, unedited.
+- **F3 — was OPEN, and the owner's.** S7's control on the `--only` selector is ADVISORY, not a merge-bar
   leg. `tools/check-wiring.sh` runs at SessionStart and through `check-wiring self-test`, which is
   `subject: kit` and held on a default bar, so a hand-wired `--only=join` is caught at the next
   session start rather than at a push. Options: accept the advisory control, which is the regime
@@ -616,6 +621,13 @@ runs. This unit changes no protocol text, so it must stay green untouched.
   AC15's carve-out is widened explicitly instead of by citation, because authorizing a seven-line edit
   through a criterion that happens to need it is authorization by side effect. AC10's ten arms, which
   this unit declared and never wrote, landed at rev-4 and are green.
+
+- rev-6 · 2026-08-27 · **F3 RESOLVED by the owner: the advisory control is ACCEPTED —
+  `TOOL-dTieredTribunal-26`.** `check-wiring.sh` is NOT promoted to a `subject: repo` leg, which is
+  what this section recommended. What changed the weight of the question is this unit's own AC7d arm,
+  landed at rev-4: the `--only` bypass now reds in the suite as well as at session start, so the
+  residual is when it is noticed rather than whether it is. Promotion stays available and is a
+  decision about all nine wiring arms, not about this flag.
 
 ## 10. Reuse audit
 
