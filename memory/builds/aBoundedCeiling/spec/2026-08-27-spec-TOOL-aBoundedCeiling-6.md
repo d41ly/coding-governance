@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound
 
-**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

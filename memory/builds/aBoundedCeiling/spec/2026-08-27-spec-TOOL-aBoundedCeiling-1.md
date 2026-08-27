@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it
 
-**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
