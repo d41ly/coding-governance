@@ -1,10 +1,12 @@
-**Status:** INPROGRESS · rev-1 · 2026-08-27 · node a · Tier-1 · base f5dff6ae · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-1 · base f5dff6ae · streams tooling · order 1
 
 # TOOL-aGroundedOrientation-3 — check 23 gets the `--staged` guard its four siblings carry
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md) | spec-audit | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-2 |
 
 <!-- /gen:spec-records -->
 
@@ -50,7 +52,10 @@ and that this exact class once cost "minutes on a large adopter tree".
 - **Raise the commit timeout.** Not a fix; it is what produced four orphaned hook trees today.
 
 ## 6. Acceptance criteria
-- **AC1.** `sed -n '1114p'` shows the guard in the sibling form. Observed.
+- **AC1.** `grep -c '\[ "$STAGED" = 0 \] && \[ -n "$alcut" \]' tools/memory-tree/check-memory-hygiene.sh`
+  returns 1, and that line is the check-23 block's opening condition. Pinned by PREDICATE, never by
+  line number: rev-1 pinned `sed -n '1114p'` and the comment S1 itself mandates pushed the guard to
+  `:1121`, so the criterion was falsified by the very change it describes.
 - **AC2.** `check-memory-hygiene.sh --staged` over the same staged set drops from 963 s to 54 s,
   uncontended, both exit 0. **Observed 2026-08-27 node `a`** — 963 s unguarded untraced, 54 s guarded
   untraced, 890 s unguarded traced. 94% of the leg's wall clock, 17.8x.
@@ -63,8 +68,15 @@ and that this exact class once cost "minutes on a large adopter tree".
   by reading the hook.
 
 ## 7. Gates
-`bash tools/memory-tree/check-memory-hygiene.sh` (full) · `bash tools/memory-tree/check-arms.py --check` ·
-`bash tools/run-gates/run-gates.sh` at the push boundary.
+`bash tools/memory-tree/check-memory-hygiene.sh` (full) · `python3 tools/memory-tree/check-arms.py --check` ·
+`bash tools/run-gates/run-gates.sh` at the push boundary, which covers the `records`-chunk leg.
+
+**The self-test is NOT covered by that push-boundary run and must be invoked deliberately:**
+`bash tools/memory-tree/check-memory-hygiene.test.sh`, or `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
+`tools/gate-legs.json` puts `memory-hygiene self-test` in chunk `selftests`, which is held by default,
+and `.githooks/pre-push:224` exports `GATE_FULL=1` only — `GATE_FULL` does not unlock that chunk. rev-1
+claimed the push boundary covered it, which is the "an exemption is not coverage" class named against
+a gate this spec is itself changing.
 
 ## 8. Open questions
 None. AC3 is an obligation, not a fork.
@@ -72,6 +84,14 @@ None. AC3 is an obligation, not a fork.
 ## 9. Revision log
 - rev-1 · 2026-08-27 · authored during the run after the owner ruled the fix ahead of the build's own
   two units. Unreviewed by definition (M4).
+- rev-2 · 2026-08-27 · round-1 spec-audit fold, three findings, all reproduced against source before
+  folding. **F2 (high)** — AC1 pinned `sed -n '1114p'` and the comment S1 mandates moved the guard to
+  `:1121`, so the criterion was falsified by its own change; re-pinned on the PREDICATE. **F3 (high)** —
+  §7 claimed the push boundary covered `check-memory-hygiene.test.sh`; it does not, because that leg
+  is chunk `selftests` and `.githooks/pre-push:224` exports `GATE_FULL=1` only. **F4 (medium)** — §7
+  spelled `check-arms.py` with `bash`, disagreeing with both sibling unit 2 and `tools/gate-legs.json`.
+  This spec was written and BUILT before any audit ran, under the owner's sequencing ruling; the audit
+  therefore graded shipped code, and all three findings were spec defects rather than code defects.
 
 ## 10. Reuse audit
 **The seam extended.** The four sibling guards in this same file — `:667`, `:1051`, `:1066`, `:1076`.

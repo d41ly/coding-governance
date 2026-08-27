@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 
 ## Parked
+
+2026-08-27T11:30:07Z review · item 2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

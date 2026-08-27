@@ -1,4 +1,4 @@
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 3
 
 # TOOL-aGroundedOrientation-2 — a check arm holds the probe step ahead of the build-folder write
 
@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-27-prompt-TOOL-aGroundedOrientation-1.md](../prompts/2026-08-27-prompt-TOOL-aGroundedOrientation-1.md) | research | TOOL-aGroundedOrientation-1 |
+| [2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md) | spec-audit | TOOL-aGroundedOrientation-1 TOOL-aGroundedOrientation-3 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,12 @@ emitted in that case.
   three pre-existing arms in `tools/unattended/check-unattended.test.sh` still pass.
 - **AC4.** `python3 tools/memory-tree/check-arms.py --check` exits 0 with the bumped floor, so both
   new branches are armed rather than pinned as unarmed.
+- **AC5.** THE SECTION SLICE IS OBSERVABLE. With `RUN the orientation probes` deleted from the prompt
+  section and re-added under a DIFFERENT `## ` heading of
+  `tools/unattended/SKILL.template.md`, the leg still REDS with the vacuity message. AC1–AC4 are all
+  satisfied by the whole-file grep §4 rejects, so without this criterion the design decision §4 calls
+  "the point" is untested — a gate whose stated rationale nothing observes is the could-not-fail shape
+  one level up. This is the criterion that distinguishes the two implementations.
 
 ## 7. Gates
 `bash tools/unattended/check-unattended.sh` · `bash tools/unattended/check-unattended.test.sh` ·
@@ -77,6 +84,10 @@ None.
 - rev-2 · 2026-08-27 · AC3 named no backticked witness and hygiene check 12 refused it at the
   pre-commit boundary. Rewritten to name `check-unattended.sh` and its sibling `.test.sh` explicitly.
   The gate caught a spec defect this run wrote, which is the acceptance-witness rule doing its job.
+- rev-3 · 2026-08-27 · round-1 spec-audit fold, F1 (high). AC1-AC4 were ALL satisfied by the
+  whole-file grep §4 explicitly rejects, so the section-slice decision §4 calls "the point" was
+  unobservable — the gate's own rationale went untested. AC5 added as the discriminating case: the
+  literal moved to another `## ` section must still RED.
 
 ## 10. Reuse audit
 **The seam extended.** Check 20's own `$psec` slice in `tools/unattended/check-unattended.sh`, and

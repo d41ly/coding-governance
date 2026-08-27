@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-27-prompt-TOOL-aGroundedOrientation-1.md](../prompts/2026-08-27-prompt-TOOL-aGroundedOrientation-1.md) | research | TOOL-aGroundedOrientation-2 |
+| [2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-spec-audit-round1.md) | spec-audit | TOOL-aGroundedOrientation-2 TOOL-aGroundedOrientation-3 |
 
 <!-- /gen:spec-records -->
 
