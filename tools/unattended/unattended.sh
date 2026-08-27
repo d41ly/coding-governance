@@ -203,6 +203,12 @@ run_bounded() { # argv...
 # conf, with the reason beside it, which is what every other pin in that file already does.
 GATE_BOUND_DEFAULT=3600
 
+# LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
+# runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
+# $WIRING_CHECK ran unbounded and three carriers said they were bounded. A probe that cannot move
+# says so.
+[ "$GATE_BOUND_LIVE" = 1 ] || echo "unattended: NOTE - this node has no working 'timeout -k', so the GATE_BOUND wall-clock bound on GATE_CMD and WIRING_CHECK is INERT; both run unbounded this session" >&2
+
 # AND IT SAYS SO, which the comment above has always required and the code did not do: the flag's
 # only reader was the `if` in observe_remote, so a node without a working `timeout -k` produced
 # byte-identical output while running unbounded. The transport options survive on that path.
@@ -289,7 +295,7 @@ GATE_BOUND=""
 # wrong -- the failure landing on whoever tried hardest to configure it.
 case "${GATE_BOUND:-}" in
   "") GATE_BOUND=$GATE_BOUND_DEFAULT
-      [ -n "${UNATT_QUIET:-}" ] || echo "unattended: NOTE - this project declares no GATE_BOUND, so a declared command is bounded at the kit default of ${GATE_BOUND}s. Declare one in $CONF to change it." >&2 ;;
+      echo "unattended: NOTE - this project declares no GATE_BOUND, so a declared command is bounded at the kit default of ${GATE_BOUND}s. Declare one in $CONF to change it." >&2 ;;
   *[!0-9]*|0)
       echo "unattended: REFUSING - GATE_BOUND is declared as '$GATE_BOUND', which is not a positive integer of seconds. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
       exit 2 ;;

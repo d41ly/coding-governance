@@ -125,23 +125,30 @@ if stray:
 #     margin, so it survives a slow box and still fails a wrong construct.
 #
 #     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
+# HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
+HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+if [ "$HAVE_TIMEOUT" != 1 ]; then
+  # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
+  # for a property of their box, which is what the sibling arms below already refuse to do.
+  echo "canary: SKIP arms 1c/1d — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here"
+else
 n=$((n+1))
 _cw=$(mktemp -d)
 _t0=$(date +%s)
-timeout -k 5s 2 bash -c 'sleep 60 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
+timeout -k 5s 2 bash -c 'sleep 10 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
 _t1=$(date +%s)
 _took=$(( _t1 - _t0 ))
 # The control: the SAME command through a command substitution, which is the form that does not
 # bound the clock. Without it a green here could mean "this box is fast", not "the form is right".
 _t2=$(date +%s)
-_ctl=$(timeout -k 5s 2 bash -c 'sleep 60 & exit 0' 2>&1)
+_ctl=$(timeout -k 5s 2 bash -c 'sleep 10 & exit 0' 2>&1)
 _t3=$(date +%s)
 _ctltook=$(( _t3 - _t2 ))
-if [ "$_took" -gt 20 ]; then
+if [ "$_took" -gt 6 ]; then
   echo "canary: a file-captured 2s timeout over a backgrounded grandchild took ${_took}s — the bound"
   echo "canary: is on the verdict and not on the clock, which is bounded-through-a-pipe-is-unbounded."
   fail=1
-elif [ "$_ctltook" -le 20 ]; then
+elif [ "$_ctltook" -le 6 ]; then
   echo "canary: the CONTROL returned in ${_ctltook}s, so this host does not reproduce the pipe defect"
   echo "canary: and the arm above proved nothing. Not a pass: a control that cannot fail is the"
   echo "canary: vacuous-selector class, and this arm is reported UNPROVEN rather than green."
@@ -159,6 +166,7 @@ if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 
   grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" | sed 's/^/    /'
   fail=1
 fi
+fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d ------------------------------------------------
 
 # ---- 1e. THE RUNNER ACTUALLY APPLIES A LEG'S CEILING. spec-1 AC1/AC3.
 #     Arms 1c and 1d grade the CONSTRUCT and the SOURCE. Neither invokes the runner, so deleting the
@@ -723,7 +731,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
 # -31 AC2: and it NAMES the held population, or the smaller number is a smaller lie — a bar that
 # shrank with no explanation reads as a bar that shrank for reasons nobody recorded.
 n=$((n+1))
-printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: kit self-tests, GATE_SELFTESTS=1 runs them)$' \
+printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (3 held: every self-test, GATE_SELFTESTS=1 runs them)$' \
   || { echo "canary: the summary did not name the held population beside the reduced total"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # -31 AC3: the RECORDED figure is the printed one. Two call sites computing one number is how they
 # come to disagree, and the record is what a later run and the push boundary read instead of stdout.
@@ -1010,7 +1018,7 @@ case "$(profline "$o")" in *'built-in default'*) ;; *) echo "canary: the no-tabl
 # announcing the knob INERT and taking the width alone — a supported state, on a BSD base install or a
 # minimal image. Asserting a timeout there reds an adopter's bar and blames the runner's override
 # logic for a missing binary. `timeout` is RUN, never probed for on PATH, which is this tree's rule.
-HAVE_TIMEOUT=0; timeout 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# (probed once, near the top, so arms 1c and 4g/4h can all gate on it)
 
 # 4g. GATE_JOBS overrides the WIDTH ONLY. The row is still selected and still supplies every other
 #     knob — an override that silently disabled the rest of the profile would make the table a lie

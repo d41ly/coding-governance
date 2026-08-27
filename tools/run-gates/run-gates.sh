@@ -379,7 +379,13 @@ prof_n() { if [ "$1" = 0 ]; then printf '?'; else printf '%s' "$1"; fi; }
 if [ -n "$PROF_WHERE" ]; then prof_where=$PROF_WHERE
 else prof_where="cores $(prof_n "$DET_CORES") via $CORE_SRC, ram $(prof_n "$DET_RAM") MB via $RAM_SRC"; fi
 prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
-[ "$CEILINGS_LIVE" = 1 ] || prof_t="$prof_t (per-leg ceilings INERT: timeout does not run here)"
+# ON STDERR, and independent of PROF_TIMEOUT. The pre-existing INERT notice at the profile probe is
+# gated on a knob every shipped row sets to 0, so it can never fire; without this line the only
+# signal that all 85 ceilings are dead would be a stdout suffix nobody reads for warnings.
+if [ "$CEILINGS_LIVE" != 1 ]; then
+  prof_t="$prof_t (per-leg ceilings INERT)"
+  echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
+fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
 echo "$PROF_LINE"
 

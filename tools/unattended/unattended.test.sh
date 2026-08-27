@@ -4538,23 +4538,24 @@ GATE_BOUND=2
 . "$rb_fn"
 
 # ...a plain child that outlives the bound is KILLED, and the WALL CLOCK reflects it. Compared
-# against a 60 s sleeper with a 2 s bound, so a 20 s allowance survives a loaded box and still fails
-# a construct that does not bound the clock. Measured on node `a` at 12 s under heavy ambient load.
-_t0=$(date +%s); run_bounded bash -c 'sleep 60' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
+# against a 10 s sleeper with a 2 s bound. A 60 s sleeper discriminated no better and cost the driver
+# suite ~62 s per run against a 970 s declared budget already at 906 s -- the control BLOCKS for its
+# full sleep by construction, which is the whole point of it.
+_t0=$(date +%s); run_bounded bash -c 'sleep 10' >/dev/null 2>&1; _rc=$?; _t1=$(date +%s)
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
+[ $(( _t1 - _t0 )) -lt 7 ] || { echo "FAIL run_bounded took $(( _t1 - _t0 ))s against a 2s bound — the bound is on the verdict, not the clock"; st=1; }
 n=$((n+1))
 case "$_rc" in 124|137) ;; *) echo "FAIL run_bounded returned $_rc for a killed command; 124 or 137 expected"; st=1 ;; esac
 
 # ...and a backgrounded GRANDCHILD does not hold it, which is the actual defect. The CONTROL is the
 # same command through a command substitution: if the control also returns fast, this host does not
 # reproduce the class and the arm above proved nothing, so that is a FAIL and not a pass.
-_t0=$(date +%s); run_bounded bash -c 'sleep 60 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
-_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 60 & exit 0' 2>&1); _t3=$(date +%s)
+_t0=$(date +%s); run_bounded bash -c 'sleep 10 & exit 0' >/dev/null 2>&1; _t1=$(date +%s)
+_t2=$(date +%s); _ctl=$(timeout -k 5s 2 bash -c 'sleep 10 & exit 0' 2>&1); _t3=$(date +%s)
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 20 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
+[ $(( _t1 - _t0 )) -lt 7 ] || { echo "FAIL run_bounded blocked $(( _t1 - _t0 ))s on a backgrounded grandchild — bounded-through-a-pipe-is-unbounded"; st=1; }
 n=$((n+1))
-[ $(( _t3 - _t2 )) -ge 20 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
+[ $(( _t3 - _t2 )) -ge 7 ] || { echo "FAIL the CONTROL returned in $(( _t3 - _t2 ))s, so this host does not reproduce the pipe defect and the grandchild arm graded nothing"; st=1; }
 
 # ...a command that finishes INSIDE the bound is not killed and its output survives.
 run_bounded bash -c 'echo alive; exit 0'; _rc=$?
