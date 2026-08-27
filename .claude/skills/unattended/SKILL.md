@@ -201,6 +201,14 @@ rather than a claim in a transcript nobody reads.
 
 1. **Orient from the prose**, in the `/session-kickoff` manner — steps 0 to 4 of that engine. Derive
    every field you can from the prose, the memory tree and the code. Do not ask yet.
+
+   **RUN the orientation probes HERE, before step 3 writes the roster.** Step 4 of that engine names
+   WHICH they are and this step does not restate them; what it adds is WHEN. The hand-back at step 6
+   runs the same engine, but by then the roster is written, pushed and comparable — so a seam the
+   reuse probe would have found, or a prior record recall would have surfaced, arrives after the
+   decision it was meant to inform, and re-deciding costs a commit and a push. The probes cost
+   seconds. "In the manner of" is a posture a reader can satisfy without running anything, which is
+   why the timing is stated as its own instruction rather than left inside the pointer.
 2. **Decide whether to ask, ONCE.** The field set is the kickoff checker's, not this file's:
    `bash <check-script> --task-skeleton` prints it. **ACCEPTANCE and GATES are disqualifying** — a
    unit with no observable that proves it is not Ready, and no run can split it. Any other gap is
