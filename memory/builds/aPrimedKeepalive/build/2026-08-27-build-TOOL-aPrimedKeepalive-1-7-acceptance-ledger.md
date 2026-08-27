@@ -37,7 +37,7 @@ for its bytes by deleting some.
 - AC3 — `grep -c "Schedule the keepalive yourself" .claude/skills/unattended/SKILL.md` — returns 0; the slug path's steps run 0,1,2,3,4 with no gap.
 - AC4 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync (skill rendered from template + .unattended.conf)". Check 10's protocol parity is in the full-leg run recorded below.
 - AC5 — `memory/guides/UNATTENDED-PROTOCOL.md` — section 5's third bullet states the orphan-reap duty for a start path that refuses before a run exists.
-- AC6 — `memory/guides/BUILD-METHOD.md` — M10's keepalive bullet reads "Create it before ANY other act", still points at protocol §5, and states no rule of its own.
+- AC6 — `grep -n "Create it FIRST" memory/guides/BUILD-METHOD.md` — M10's keepalive bullet reads "Create it FIRST, reap it before the wrap-up. Both halves: protocol §5", states no rule of its own, and no longer says "before preflight". It read "before ANY other act" until the round-1 fold traded 15 B of it to bring the TEMPLATE half back under M1's budget; an earlier version of this ledger line still quoted the retired wording.
 - AC7 — `wc -c` over BOTH halves — `tools/memory-tree/BUILD-METHOD.template.md` 24 560 and `memory/guides/BUILD-METHOD.md` 24 549, each at or below M1's 24 576. The template is the binding half and it is the one that breached during this build.
 - AC8 — `wc -c memory/guides/SESSION-KICKOFF.md` — 25 417 against `MAX_MANIFEST_BYTES=25600`; the build's own §B bullet was trimmed from its first draft to pay for itself, 25 579 down to 25 417.
 - AC9 — `grep -c "REAP the recorded id, and only then" .claude/skills/unattended/SKILL.md` — returns 1. The `## Resume` section issues `CronDelete` against the recorded id first, reads the result back, cites `TOOL-aPromptedMandate-11` as the measurement that forbids assuming the job is dead, and then schedules the replacement.
@@ -48,7 +48,7 @@ for its bytes by deleting some.
 - AC3 — `memory/guides/UNATTENDED-PROTOCOL.md` — it names `--rescope <slug> --act add` and states the re-push obligation a grown roster carries on the `published` anchor.
 - AC4 — `memory/guides/UNATTENDED-PROTOCOL.md` — "a BLOCKER standing between the run and its own landing, which is the case a run is most likely to mistake for an owner's question".
 - AC5 — `memory/guides/BUILD-METHOD.md` — M10 opens "Three deltas, and no others" and delta 1's substitute list reads "derive, ADOPT (protocol §11), park and abort".
-- AC6 — `wc -c memory/guides/BUILD-METHOD.md` — 24 573.
+- AC6 — `wc -c` over both halves — `tools/memory-tree/BUILD-METHOD.template.md` 24 560 and `memory/guides/BUILD-METHOD.md` 24 549, each at or below 24 576. An earlier version of this line read 24 573, a figure from before the round-1 fold's trim and contradicted by two other lines of this same record.
 - AC7 — `.claude/skills/unattended/SKILL.md` — the park bullet in "While it runs" is followed by the counterweight naming what may not be parked.
 - AC8 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync"; check 10's protocol parity in the green leg run recorded above.
 - AC9 — `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` — 681 lines / 55 700 B against hygiene check 6's `GUIDE_CAP_LINES=750` and `GUIDE_CAP_BYTES=61440`. This build spent 68 of the 137 lines that were left, which is half the remaining headroom and is the figure the next author needs.
@@ -60,6 +60,7 @@ for its bytes by deleting some.
 - AC4 — `bash tools/unattended/check-unattended.sh` — check 16's three arms, in the full-leg run recorded below.
 - AC5 — amended rev-2 — the staged-break red-proof was NOT run as written. Arm C's refusal is reachable only through the full leg, which costs ~15 minutes per invocation, and the run had already spent two of those. What WAS observed is stronger for the same arm in the same run: the leg joins the registry, the table and the floor in both directions, and all three moved together. Recorded as a gap rather than claimed — §9 rev-2 logs it.
 - AC6 — `bash tools/unattended/unattended.sh --preflight aPrimedKeepalive --keepalive-id 8191840b --waive discoveries-adopted --reason "AC6 observation only"` — the driver printed checks 2, 38 and 5 and did NOT print a handle refusal, so the handle resolved through `directives()` into the effective set and reached the set-comparison. That invocation also produced unit 7.
+- AC7 — `grep DIRECTIVES_FLOOR tools/unattended/.unattended.conf.example` — `16`, equal to the word count of the driver's `DIRECTIVES_CORE`. Added at rev-3 and missed by unit 9's first sweep, because spec 3 had been dropped from round 3's subject set — the sweep inherited the audit's scope instead of the roster's.
 
 **Evidences:** TOOL-aPrimedKeepalive-4
 - AC1 — `bash tools/unattended/check-unattended.sh` — rc=0 with ZERO `FAILED` lines and two live records in the tree, the first green this leg has returned since 2026-08-25. Independently reproduced with the bare predicate against the real records: `git merge-base --is-ancestor eb4b0660 b4e1d5be` puts `dTieredTribunal` on the advertised tip and excludes it, while this run's own `VERIFYING` record counts.
@@ -80,6 +81,7 @@ for its bytes by deleting some.
 - AC1 — `date` either side of `bash tools/memory-tree/check-memory-hygiene.sh --staged` — 10 s, against a prior invocation that exceeded a 120 s tool timeout. Both figures are in the table above.
 - AC2 — `bash tools/memory-tree/check-memory-hygiene.sh` — with `AC99` staged into `TOOL-dUnstalledConvoy-29`'s §6, the FULL run printed `HYGIENE check 23 FAILED — a CLOSED unit numbers an acceptance criterion that no journal record evidences ... TOOL-dUnstalledConvoy-29/AC99`, while the `--staged` run over the same break printed the HELD line and no check-23 verdict. So the checks are alive in the mode that binds them and held in the mode that does not, and the guard is what decides. Break removed.
 - AC3 — `git commit` — every commit after `5816a9b6` completed in about ten seconds; the two before it did not complete inside 120 s.
+- AC5 — `grep -c "^# ---- 23: every acceptance criterion" tools/memory-tree/check-memory-hygiene.sh` and `grep -c "check 23 HELD under --staged"` — each returns 1. The mislabeled `# ---- 22:` header is corrected at source and the run-time line names only the check that is held.
 - AC4 — amended rev-2 — the criterion as written was UNFALSIFIABLE and was caught by running it. Checks 22 and 23 print nothing when green, so grepping for their absence after inverting the guard returns 0 whether or not the guard decides anything: the `fixture-passes-by-finding-nothing` class, in the acceptance criterion rather than in the code. Replaced by a real break — an acceptance criterion no journal evidences, inserted into a CLOSED Tier-2 spec's §6 — asserted RED on the full run and absent under `--staged`. §9 rev-2 logs it.
 
 **Evidences:** TOOL-aPrimedKeepalive-7
@@ -129,7 +131,7 @@ a ledger that only ever reports observations is a ledger nobody has tested.
 - AC3 — `memory/builds/aPrimedKeepalive/README.md` — the roster's unit-6 row names check 23, and no row asserts the retired claim.
 
 **Evidences:** TOOL-aPrimedKeepalive-9
-- AC1 — `memory/builds/aPrimedKeepalive/build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md` — every criterion a fold added now carries a line: unit 1 AC8 and AC9, unit 2 AC9, unit 4 AC6, unit 6 AC5.
+- AC1 — `memory/builds/aPrimedKeepalive/build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md` — every criterion a fold added now carries a line: unit 1 AC8 and AC9, unit 2 AC9, unit 3 AC7, unit 4 AC6, unit 6 AC5. **The first version of this line was wrong in BOTH directions** — it asserted a unit-6 AC5 line that had not been written and omitted unit 3's AC7 entirely — and unit 6 is Tier-1, so check 23's join could never have contradicted it. Found by the closing diff review, not by a gate.
 - AC2 — `wc -c` and `git show b4e1d5be:memory/guides/SESSION-KICKOFF.md | wc -c` — the Measured table's manifest row read 25 236 to 25 579 and the real pair is 25 118 to 25 417; corrected, and the BUILD-METHOD row now names the template as the binding half.
 - AC3 — `bash tools/memory-tree/check-memory-hygiene.sh` — check 23 green over the ledger once every unit is CLOSED, which is the push-boundary run recorded in the landing report.
 

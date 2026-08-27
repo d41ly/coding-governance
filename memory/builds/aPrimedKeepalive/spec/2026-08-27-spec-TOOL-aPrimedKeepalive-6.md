@@ -10,6 +10,7 @@
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round3.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round3.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-7 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-9-closing-diff.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-9-closing-diff.md) | diff-review | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9 |
 
 <!-- /gen:spec-records -->
 

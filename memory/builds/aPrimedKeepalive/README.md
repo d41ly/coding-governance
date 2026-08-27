@@ -214,7 +214,7 @@ ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL
 | [TOOL-aPrimedKeepalive-9 — the acceptance ledger evidences every criterion a fold added](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-9.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

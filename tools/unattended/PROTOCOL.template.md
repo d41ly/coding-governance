@@ -351,9 +351,17 @@ every other check decorative.
 
 ## 5. The keepalive — an AGENT obligation
 
-The scheduling store is in-memory and session-scoped. The job is gone when the agent process exits,
-and deleting it removes it from that same store. **No script can reach it.** So the obligation
-splits by actor, and the split is not a convenience:
+The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same
+store. **No script can reach it.** So the obligation splits by actor, and the split is not a
+convenience:
+
+**What this section does NOT say, because it said it for four kit versions and it is measured
+false: that the job dies when the agent process exits.** It may not.
+`TOOL-aPromptedMandate-11` records a run asserting exactly that about two jobs, twice, while the
+scheduler's own listing showed both still firing. Treat a job you did not schedule as ALIVE until a
+delete says otherwise. The consequence is section 5's resume rule below, and the reason the reap is an
+obligation rather than a formality: the failure mode of assuming death is a keepalive firing forever
+under a green `keepalive-reaped` attestation.
 
 - The **agent** schedules the keepalive as the run's **FIRST act**, before any orientation and
   before `--preflight`, on **every** start path — and reaps it before the run reaches a terminal
@@ -376,6 +384,14 @@ splits by actor, and the split is not a convenience:
   never schedules and never deletes, and it labels the item agent-attested wherever it reports.
 
 A driver verb that claimed to schedule or reap would be claiming an effect it cannot produce.
+
+**RESUME is the third case, and it is the one the actor split does not cover.** A resumed session did
+not schedule the job the run-state file names and cannot assume it died with the process that did.
+So it REAPS that recorded id first, reads the result back and reports it, and only then schedules a
+replacement. `--keepalive-id` is accepted by `--preflight` alone, so the new id cannot be recorded:
+the `keepalive` fact keeps naming the old job, the close attestation covers both, and the wrap-up says
+which. Ordering matters — reap, then schedule — because the reverse leaves the run holding two jobs
+and a record naming neither correctly.
 
 ## 6. Landing
 

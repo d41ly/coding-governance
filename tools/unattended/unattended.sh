@@ -1123,6 +1123,14 @@ check_single_live() {
     is_terminal "$p" && continue
     if [ "$p" = LANDING ] && [ -n "$anc" ]; then
       w=$(fact "$f" witness)
+      # SHA-SHAPED, for the reason the leg's copy states: `rev-parse --verify` resolves a tag or a
+      # branch name too, and the witness is authored by the run being graded. A witness reading
+      # `main` is an ancestor of the anchor by construction. This is the ADMISSION point, so the
+      # weaker predicate here is worth more to an attacker than the leg's.
+      case "$w" in
+        [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+        *) w="" ;;
+      esac
       if [ -n "$w" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1          && GIT merge-base --is-ancestor "$w" "$anc" 2>/dev/null; then
         printf 'unattended: EXCLUDED %s from the live-run count — LANDING, and its witness %s is an ancestor of the observed anchor %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
 ' "$f" "$w" "$anc"

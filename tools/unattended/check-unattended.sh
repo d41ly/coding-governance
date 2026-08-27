@@ -9,13 +9,24 @@
 #
 #   bash tools/unattended/check-unattended.sh
 #
-# Exit 0 + no output = clean. Anything printed is a violation. Exit 2 = misconfigured.
+# Exit 0 + no output = clean, EXCEPT for the two announcements named below. Anything else printed
+# is a violation. Exit 2 = misconfigured.
 #
-# ONE EXCEPTION, and it is named rather than quietly taken: a check that cannot COMPARE announces
-# the case it could not reach, on the REPORT channel, which the default run does not print. Set
-# GOV_UNATTENDED_REPORT=1 to see them. A skip that looks like a pass is indistinguishable from
-# coverage, and a skip printed by default would falsify the contract line above — so the line keeps
-# its meaning and the announcement gets a channel of its own. TOOL-dUnstalledConvoy-6.
+# TWO EXCEPTIONS, both named rather than quietly taken.
+#
+# ONE: a check that cannot COMPARE announces the case it could not reach, on the REPORT channel,
+# which the default run does not print. Set GOV_UNATTENDED_REPORT=1 to see them. A skip that looks
+# like a pass is indistinguishable from coverage, and a skip printed by default would falsify the
+# contract line above — so the line keeps its meaning and the announcement gets a channel of its
+# own. TOOL-dUnstalledConvoy-6.
+#
+# TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
+# contract line above is written to admit them. They are not skips. An exclusion is a positive
+# finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
+# run is entitled to know which one and on what evidence. Routing them through REPORT was the first
+# implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
+# deleted shape unit 4 exists to prevent; routing them to stdout without amending this paragraph
+# would leave the header asserting something the code disproves. TOOL-aPrimedKeepalive-4.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
 # nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
@@ -26,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.10   # gov:kit unattended@1.11 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.11   # gov:kit unattended@1.11 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -1132,7 +1143,17 @@ c7keep=""; c7drop=""; c7n=0
 for c7f in $live; do
   c7ph=$(phase_of "$c7f")
   c7w=$(fact_of "$c7f" witness)
-  if [ "$c7ph" = LANDING ] && [ -n "$c7anchor" ]      && GIT rev-parse --verify --quiet "$c7w^{commit}" >/dev/null 2>&1      && GIT merge-base --is-ancestor "$c7w" "$c7anchor" 2>/dev/null; then
+  # SHA-SHAPED FIRST, and it is not decoration. `rev-parse --verify` resolves a TAG or a BRANCH NAME
+  # as happily as a sha, so without this clause a witness reading `main` — which is trivially an
+  # ancestor of the advertised tip — disarms the one guard standing between two concurrent
+  # unsupervised runs. The witness field is authored by the run being graded. Check 5's own
+  # sha-shape test at `:736` is the pattern this borrows, and dropping it here was the difference
+  # between the spec's S1 and the first implementation of it.
+  case "$c7w" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) c7sha=1 ;;
+    *) c7sha=0 ;;
+  esac
+  if [ "$c7ph" = LANDING ] && [ -n "$c7anchor" ] && [ "$c7sha" = 1 ]      && GIT rev-parse --verify --quiet "$c7w^{commit}" >/dev/null 2>&1      && GIT merge-base --is-ancestor "$c7w" "$c7anchor" 2>/dev/null; then
     c7drop="$c7drop $c7f"
     printf 'unattended: check 7 EXCLUDED %s — LANDING, and its witness %s is an ancestor of the advertised default-branch tip %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
 ' "$c7f" "$c7w" "$c7anchor"

@@ -9,7 +9,7 @@
 #   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
-# CORPUS rather than the diff are HELD: 13-16, 17-19, the row-grammar arm and 23 all skip, and the
+# CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 23 all skip, and the
 # full run at the push boundary is where they bind. Check 22 is NOT among them and still walks
 # every tracked review record here. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
