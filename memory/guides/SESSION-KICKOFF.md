@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-27T18:52:35+03:00 @ f1be0b495f216a6b02e1f4e70b852eccfa2a1d2b
+last-audit: 2026-08-27T19:01:20+03:00 @ f1be0b495f216a6b02e1f4e70b852eccfa2a1d2b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 2196414866a0e2db52759ebd015aae4a79dd0e8d
@@ -203,6 +203,8 @@ does — hit three times in one file in one session) · `process-creation-is-the
   re-run on a quiet box before believing a latency claim. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
+- The memory hygiene leg is ~34 s, not ~23 minutes: `TOOL-aThawedCorpus-4` and `-1` collapsed
+  checks 23 and 21 from a process per corpus item to one `awk` each.
 - The pre-commit hygiene leg no longer runs check 23 (`TOOL-aThawedCorpus-5`: 683 s to 20 s). A
   broken ACCEPTANCE LEDGER is now caught only at the push boundary, which works because
   `memory hygiene` declares no guard and so runs on both of pre-push's branches.

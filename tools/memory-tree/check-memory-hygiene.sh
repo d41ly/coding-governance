@@ -687,20 +687,35 @@ $over21"
   # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
   # id: family, slug and ordinal. A bound record whose name carries no family qualifier fails here,
   # since two thirds of an id is not a projection of it.
-  proj21=$(printf '%s\n' "$b21" | sed -n 's/^S\t\([^\t]*\)\t[^\t]*\t\(.*\)$/\1|\2/p' | while IFS='|' read -r p ids; do
-      base=${p##*/}; base=${base%.*}
-      case "$base" in
-        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) stem=${base#????-??-??-} ;;
-        *) echo "  $p — the name carries no date, so no id can be read from it"; continue ;;
-      esac
-      rest=${stem#*-}
-      claimed=$(printf '%s\n' "$rest" | grep -oE "^($FAM_ALT)-[A-Za-z0-9]+-[0-9]+" || true)
-      if [ -z "$claimed" ]; then
-        echo "  $p — bound, but the name carries no family-qualified id"
-      else
-        printf '%s\n' "$ids" | tr ' ' '\n' | grep -qxF "$claimed" || echo "  $p — the name claims $claimed"
-      fi
-    done)
+  # ONE awk over the S rows, replacing a `sed` plus a shell loop that spawned a command
+  # substitution and a `grep -oE` for `claimed`, then a subshell with `tr` and `grep -qxF` for the
+  # membership test - four to six processes on every record. Measured at 338.9 s of a 1398 s run
+  # while `--print-bindings`, the parse this check delegates, was 1.416 s of it: the cost was the
+  # LOOP, not the read. The three message lines are byte-identical to the retired ones and a
+  # conformant record still contributes none. TOOL-aThawedCorpus-1.
+  #
+  # `FAM_ALT` arrives by `-v`, as check 12's driver does it, rather than being interpolated into
+  # the program text: a shell-expanded alternation inside an awk program is the class this corpus
+  # records as `heredoc-escape-reaches-the-regex`.
+  proj21=$(printf '%s\n' "$b21" | awk -F'\t' -v famalt="$FAM_ALT" '
+    $1 != "S" || NF < 4 { next }        # the retired `sed` required all four fields; so does this
+    {
+      p = $2; ids = $4
+      base = p; sub(/^.*\//, "", base); sub(/\.[^.]*$/, "", base)
+      if (base !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
+        print "  " p " — the name carries no date, so no id can be read from it"; next
+      }
+      rest = substr(base, 12)           # past the date prefix the test above proved is there
+      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did
+      claimed = ""
+      if (match(rest, "^(" famalt ")-[A-Za-z0-9]+-[0-9]+")) claimed = substr(rest, RSTART, RLENGTH)
+      if (claimed == "") {
+        print "  " p " — bound, but the name carries no family-qualified id"; next
+      }
+      n = split(ids, a, " ")
+      for (i = 1; i <= n; i++) if (a[i] == claimed) next
+      print "  " p " — the name claims " claimed
+    }')
   [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
 $proj21"
 fi
