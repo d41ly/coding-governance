@@ -408,7 +408,7 @@ echo "$PROF_LINE"
 # two different repositories never do — so "one bar per repo" falls out of the key derivation instead
 # of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
 # left exactly as they are: evidence is per-worktree, contention is per-repository.
-TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0
+TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
@@ -468,6 +468,71 @@ ts_try_reap() {
   return 1
 }
 
+# Reap a QUEUE TICKET whose owner cannot still be waiting (TOOL-aReapedTicket-2) — the other half of
+# `ts_try_reap`, which looks only at the beacon and RETURNS ON ITS FIRST LINE when there is no beacon
+# to look at. That asymmetry was the deadlock: a bar killed while queued left a ticket that sorts
+# first forever, nothing pruned it, and every later bar waited out the full TS_MAXWAIT and then ran
+# UNQUEUED. The turnstile was not slowed by that — it was permanently defeated, by one death, for
+# good. Measured before the fix: one leaked ticket, no beacon at all, and the next bar still reached
+# `WAIT EXPIRED` and left the ticket behind for the bar after it.
+#
+# TWO SIGNALS, mirroring the holder's, and BOTH are chosen so they CANNOT BE TRUE OF A LIVE WAITER.
+# That constraint is the whole design, not a nicety: a sweep that deletes a LIVE waiter's ticket
+# leaves that waiter unable to ever match the acquire predicate, which turns a wedge affecting future
+# bars into one affecting the bar in front of you. Strictly worse. So neither signal is a heuristic:
+#
+#   dead pid       a live waiter's own pid answers, by definition. NEGATIVE-ONLY, exactly as for the
+#                  holder — a pid that answers proves nothing, because pids are recycled, so success
+#                  only withholds the sweep and never confers life.
+#   older than     a live waiter FAILS OPEN at TS_MAXWAIT and drops its own ticket, so a ticket past
+#   TS_MAXWAIT     that bound cannot belong to one. DERIVED from the fail-open rule below rather than
+#                  chosen, which is why this whole unit introduces NO new constant.
+#
+# THE AGE IS READ FROM THE TICKET NAME, never its mtime. The name is what the sort order is derived
+# from, and a name and an mtime that disagree would give the sweep and the ordering two opinions
+# about one ticket. The cutoff is computed ONCE per call and compared as a STRING: `%Y%m%dT%H%M%S` is
+# lexicographically ordered by time, which is already why the queue sorts correctly — so the
+# staleness test reuses that property instead of parsing a date per ticket.
+#
+# ON THE PID'S REACH: a ticket's pid was written by another bash process, and two different msys
+# runtimes do not necessarily share a pid table. That can only make `kill -0` answer for the wrong
+# process or answer when it should not — and because the signal is negative-only, both directions
+# merely WITHHOLD the fast sweep and defer to the age signal. It cannot cause a false sweep, which is
+# the only direction that would hurt.
+ts_sweep_queue() {
+  local t base pid stamp cutoff swept=0
+  [ -n "$TS_Q" ] && [ -d "$TS_Q" ] || return 1
+  # If `date` cannot produce the cutoff the AGE SIGNAL IS UNARMED, and it says so rather than leaving
+  # a reaper silently down to one signal — which is indistinguishable from one that is working.
+  cutoff=$(date -u -d "@$(( $(ts_now) - TS_MAXWAIT ))" +%Y%m%dT%H%M%S 2>/dev/null) || cutoff=""
+  if [ -z "$cutoff" ]; then
+    printf 'run-gates: NOTE - this host cannot compute a queue staleness cutoff, so a leaked ticket whose pid has been RECYCLED will not be swept this run\n' >&2
+  fi
+  for t in "$TS_Q"/*; do
+    [ -e "$t" ] || continue
+    base=${t##*/}
+    # NEVER OUR OWN, guarded explicitly. Both signals already exclude it — our pid answers and our
+    # ticket is young — so this line is redundant TODAY. That is exactly the point: it is what stops
+    # a later edit to either signal deleting the ticket of the process doing the sweeping.
+    [ -n "$TS_TICKET" ] && [ "$base" = "${TS_TICKET##*/}" ] && continue
+    stamp=${base%%-*}
+    pid=${base#*-}; pid=${pid%%-*}
+    # A ticket whose name we cannot read is one we must NOT delete.
+    case "$stamp" in [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]T[0-9][0-9][0-9][0-9][0-9][0-9]) ;; *) continue ;; esac
+    case "$pid" in ''|*[!0-9]*) pid="" ;; esac
+    if [ -n "$pid" ] && ! ts_alive "$pid"; then
+      printf 'run-gates: sweeping the queue ticket of a dead waiter (pid %s)\n' "$pid" >&2
+      rm -f "$t" 2>/dev/null && swept=1
+      continue
+    fi
+    if [ -n "$cutoff" ] && [ "$stamp" \< "$cutoff" ]; then
+      printf 'run-gates: sweeping a queue ticket past the bounded wait (stamp %s, cutoff %s)\n' "$stamp" "$cutoff" >&2
+      rm -f "$t" 2>/dev/null && swept=1
+    fi
+  done
+  [ "$swept" = 1 ]
+}
+
 if [ -n "$TS_COMMON" ]; then
   TS_DIR_C="$TS_COMMON/gate-bar-beacon"
   TS_Q="$TS_COMMON/gate-bar-queue"
@@ -478,8 +543,45 @@ if [ -n "$TS_COMMON" ]; then
   # independently, so there is no counter file to corrupt and no coordinator to elect.
   TS_TICKET="$TS_Q/$(date -u +%Y%m%dT%H%M%S)-$$-$RANDOM"
   : > "$TS_TICKET" 2>/dev/null || TS_TICKET=""
+  # THE TICKET GETS A HANDLER THE MOMENT IT EXISTS (TOOL-aReapedTicket-1). Until this line the only
+  # `ts_drop_ticket` trap was armed 24 lines below, inside the branch that WINS the beacon — so a
+  # waiter polling the loop below ran with no handler at all, for the entire queue wait.
+  #
+  # That is the same defect the claim-time trap's own comment argues against, one participant over,
+  # and the consequence is worse because the window is the whole wait rather than a few seconds: the
+  # leak needs no SIGKILL, an ordinary Ctrl-C on a queued bar leaves a ticket that sorts first
+  # FOREVER. Nothing prunes it, every later bar then burns the full TS_MAXWAIT and runs UNQUEUED,
+  # and the turnstile is not slowed by that — it is permanently defeated. Measured before the fix:
+  # one leaked ticket, no beacon at all, and the next bar still reached `WAIT EXPIRED`.
+  #
+  # DELIBERATELY NOT `ts_release; ts_drop_ticket`. No beacon is held here and `ts_release` returns on
+  # its first line, so the release half would be inert code implying a waiter can release something
+  # it never claimed. Both traps below REPLACE this one — `trap` replaces rather than appends — and
+  # both are strictly wider, so there is never an instant with no handler and never two handlers
+  # racing.
+  #
+  # THE SIGNAL ARMS RE-EXIT, and that is not cosmetic symmetry with the `cleanup` traps below — it
+  # is required for correctness, and the first draft of this line got it wrong. Setting a trap on
+  # INT REPLACES bash's default disposition, so a handler that does not exit drops the ticket and
+  # then RESUMES the loop below. That run is now ticketless, its acquire predicate can never match
+  # again, and it spins to the full bound — the exact "a waiter that can never acquire" state this
+  # unit exists to remove, re-created by its own fix. Caught by running it: `timeout -s INT` had to
+  # escalate to KILL because the runner would not die.
+  trap 'ts_drop_ticket' EXIT
+  trap 'ts_drop_ticket; exit 130' INT
+  trap 'ts_drop_ticket; exit 143' TERM
+  trap 'ts_drop_ticket; exit 129' HUP
   ts_start=$(ts_now); ts_lastpos=""; ts_announced=0
-  while :; do
+  # A RUN WITH NO TICKET CANNOT EVER ACQUIRE, so it must not wait to find that out. Every iteration
+  # of the loop below opens with `[ -n "$TS_TICKET" ]`, which is false forever once the write above
+  # failed — so the run burned the ENTIRE TS_MAXWAIT (7200s at the shipped fallback) to reach a
+  # fail-open it was entitled to on the first tick. Same class as the wedge this unit is about: a
+  # loop waiting on a condition that cannot change.
+  if [ -z "$TS_TICKET" ]; then
+    echo "run-gates: could not create a queue ticket in $TS_Q — running UNQUEUED rather than waiting out the ${TS_MAXWAIT}s bound on a predicate that can never match" >&2
+    TS_UNTICKETED=1
+  fi
+  while [ -n "$TS_TICKET" ]; do
     # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
     # `flock` — which does not exist on this platform. The heartbeat is written FIRST on winning, so
     # a just-claimed holder is never mistaken by a waiter for one with no clock.
@@ -524,7 +626,17 @@ if [ -n "$TS_COMMON" ]; then
       # harness. Under that load the window is seconds wide — process creation on this platform
       # has been measured 25x slower under contention — so the window is not theoretical and it is
       # widest exactly when two bars are most likely to collide.
-      trap 'ts_release; ts_drop_ticket' EXIT INT TERM HUP
+      #
+      # THE SIGNAL ARMS RE-EXIT, for the reason the ticket trap above states and which applies here
+      # unchanged: this spelling was a single `EXIT INT TERM HUP` handler, so an interrupt in this
+      # window released the beacon and then RESUMED — leaving the run believing it still held a
+      # lock it had just given away, and running the whole bar unqueued beside whoever claimed
+      # next. That is the two-bar condition this unit exists to prevent, arriving through its own
+      # cleanup path, which is the same shape the nonce guard was written for.
+      trap 'ts_release; ts_drop_ticket' EXIT
+      trap 'ts_release; ts_drop_ticket; exit 130' INT
+      trap 'ts_release; ts_drop_ticket; exit 143' TERM
+      trap 'ts_release; ts_drop_ticket; exit 129' HUP
       # S4 (TOOL-aShardedFloor-1), and the GUARD is the whole of it. `TS_WAITED` is refreshed at
       # the BOTTOM of this loop and this path breaks above it, so a contended acquire records the
       # previous tick's value and understates the wait by up to one `TS_TICK`.
@@ -545,7 +657,12 @@ if [ -n "$TS_COMMON" ]; then
       [ "$ts_announced" = 1 ] && TS_WAITED=$(( $(ts_now) - ts_start ))
       break
     fi
-    ts_try_reap && continue
+    # BOTH probes, on the same tick, and either one making progress re-tries the claim at once.
+    # `ts_try_reap` first because it is the cheaper of the two and the commoner case; `||` because
+    # when there IS a dead holder the ticket sweep can wait a tick. The two are separate functions
+    # rather than one because their preconditions differ — the reaper is guarded on a beacon
+    # EXISTING, which is precisely the guard that made it unable to see the wedge.
+    { ts_try_reap || ts_sweep_queue; } && continue
     TS_WAITED=$(( $(ts_now) - ts_start ))
     if [ "$TS_WAITED" -ge "$TS_MAXWAIT" ]; then
       # FAILS OPEN, LOUDLY. A turnstile that can wedge a bar is worse than two bars: the run drops
@@ -558,7 +675,17 @@ if [ -n "$TS_COMMON" ]; then
     pos=$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | grep -n "^$(basename "${TS_TICKET:-none}")$" | cut -d: -f1)
     [ -n "$pos" ] || pos="?"
     if [ "$pos" != "$ts_lastpos" ] || [ "$ts_announced" = 0 ]; then
-      echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      # SAY WHICH OF THE TWO IS TRUE. This line used to claim a holder unconditionally, because it is
+      # emitted from the FAILURE of the acquire predicate — which conflates "someone is ahead of me
+      # in the queue" with "someone holds the beacon". In the reproduction that wedge was diagnosed
+      # from, nothing held the beacon at all and this line still named one, sending the reader to
+      # hunt a holder that did not exist. The `queued at position N (waited Ns)` tail is byte-stable
+      # because `run-gates.turnstile.test.sh` greps it; only the leading clause varies.
+      if [ -d "$TS_DIR_C" ]; then
+        echo "run-gates: another bar holds this repository — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      else
+        echo "run-gates: no bar holds this repository, but a ticket sorts ahead of this one — queued at position $pos (waited ${TS_WAITED}s)" >&2
+      fi
       [ -n "$gd" ] && printf 'position\t%s\nwaited\t%s\n' "$pos" "$TS_WAITED" > "$gd/gate-queue-status" 2>/dev/null || true
       ts_lastpos=$pos; ts_announced=1
     fi
@@ -587,6 +714,13 @@ fi
 # burned at least `TS_MAXWAIT`, which is `TS_TTL * 4` and therefore never 0. What the second key
 # carries that a bare integer cannot is the `held`/`expired` split, and the `off`/`unresolved` one.
 #
+# `unticketed` (TOOL-aReapedTicket-2) is a FOURTH measurable state and it is why the sentence above
+# now needs this one beside it. A run whose ticket write failed cannot ever acquire, so it fails open
+# on the first tick and its wait IS 0 — which would otherwise have been recorded as `expired` and
+# broken the "an expired run is never 0" invariant that paragraph leans on. Splitting the state word
+# keeps the invariant true as written rather than quietly falsifying it: `expired` still means the
+# bound was burned, and a `queued 0` is still unambiguous once the state word is read with it.
+#
 # WHAT THIS DOES NOT CHECK, stated here because a reader will assume otherwise: `unresolved` is
 # UNARMED. Reaching it needs `git rev-parse --git-common-dir` to fail while the runner is already
 # past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
@@ -595,6 +729,7 @@ QUEUED="-"; QUEUED_FROM=off
 if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
+  elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
   else                            QUEUED="$TS_WAITED"; QUEUED_FROM=expired
   fi
 fi
