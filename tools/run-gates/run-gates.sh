@@ -346,7 +346,12 @@ fi
 # PROBED WITH THE OPTION SET THE RUN ACTUALLY USES. A bare `timeout 1 true` passes on a build that
 # rejects `-k`, so the probe cleared a path the leg exec then failed on — the probe and the subject
 # were two different commands, which is the shape a probe exists to rule out.
-if [ "$PROF_TIMEOUT" -gt 0 ] && ! timeout -k 1s 1 true >/dev/null 2>&1; then
+# PROBED ONCE, READ TWICE. The profile knob and the per-leg ceilings need the same fact -- does
+# `timeout -k` actually RUN here -- and probing it per consumer would cost a spawn each and could
+# answer differently. RUN, never `command -v`: the lesson tools/lib/resolve-python.sh records.
+CEILINGS_LIVE=1
+timeout -k 1s 1 true >/dev/null 2>&1 || CEILINGS_LIVE=0
+if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0
 fi
@@ -374,6 +379,7 @@ prof_n() { if [ "$1" = 0 ]; then printf '?'; else printf '%s' "$1"; fi; }
 if [ -n "$PROF_WHERE" ]; then prof_where=$PROF_WHERE
 else prof_where="cores $(prof_n "$DET_CORES") via $CORE_SRC, ram $(prof_n "$DET_RAM") MB via $RAM_SRC"; fi
 prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
+[ "$CEILINGS_LIVE" = 1 ] || prof_t="$prof_t (per-leg ceilings INERT: timeout does not run here)"
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t; $PROF_TAG)"
 echo "$PROF_LINE"
 
@@ -712,20 +718,46 @@ rows = [" ".join(str(i) for i in order)]
 rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")
-         + "\x1e" + (l.get("subject") or "repo") for l in data]
+         + "\x1e" + (l.get("subject") or "repo")
+         # THE SEVENTH FIELD, appended after `subject` for exactly the reason `subject` was appended
+         # after `chunk`: a field inserted before an existing one is parsed AS that one by any reader
+         # that has not moved in the same commit. EMPTY when the leg declares none, which is legal and
+         # is what an adopter emitted manifest carries until the deployer learns the key
+         # (TOOL-aBoundedCeiling-5). A non-integer or non-positive value reads as absent rather than
+         # as zero: `timeout 0` means NO timeout, so coercing junk to 0 would silently unbound the one
+         # leg whose declaration was malformed.
+         + "\x1e" + (str(l["ceiling"]) if isinstance(l.get("ceiling"), int)
+                            and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
+         for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}")
 done <<<"$legs"
 total=${#names[@]}
+
+# UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
+# whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
+# business bounding, and a refusal it cannot justify is a refusal that reds a tree for a field it
+# has no way to supply -- the class the shipped canary header names. So this is a COUNT on the
+# profile line, which is where an operator already reads this run's knobs. The DECLARATION
+# requirement over gov's own corpus is S9, in run-gates.gov.test.sh, which is the suite allowed to
+# hold a claim about this repository.
+unbounded=0
+for ((i=0; i<total; i++)); do
+  [ -z "${names[$i]}" ] && continue
+  [ -n "${ceilings[$i]:-}" ] || unbounded=$((unbounded + 1))
+done
+if [ "$unbounded" -gt 0 ]; then
+  printf 'run-gates: %s of %s legs declare no ceiling and run unbounded this run\n' "$unbounded" "$total" >&2
+fi
 
 # Guard evaluation runs SERIALLY and up front: it is a read-only `git diff` per guarded leg, and
 # deciding before dispatch keeps the skip verdict independent of scheduling.
@@ -887,7 +919,19 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # wall against a 1 s bound, indistinguishable from the same fixture with the timeout off. The
   # verdict was bounded and the clock was not, which is the one property the knob exists for.
   # `-k` follows for the child that ignores SIGTERM; the file read cannot block on anybody.
-  if [ "$PROF_TIMEOUT" -gt 0 ]; then timeout -k 5s "$PROF_TIMEOUT" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
+  # THE LEG'S OWN CEILING WINS, and the two bounds NEVER wrap one leg together: nested deadlines
+  # both exit 124 and the verdict cannot then say which fired. `PROF_TIMEOUT` stays the fallback for
+  # a leg that declares none, which is every leg in a manifest the deployer has not yet taught the
+  # key. `bound` is also what report_one reads, so the number in the verdict is the number that
+  # fired rather than a second lookup that could disagree with it. TOOL-aBoundedCeiling-1.
+  local bound=${ceilings[$i]:-}
+  [ -n "$bound" ] || bound=$PROF_TIMEOUT
+  # CEILINGS_LIVE is the liveness gate: with no runnable `timeout` a declared ceiling is INERT, and
+  # the leg runs UNBOUNDED rather than being skipped. A knob may cost speed and may turn a hang into
+  # a RED; it may never turn a leg into a pass or a skip (gate-profiles.txt, the governing invariant).
+  [ "$CEILINGS_LIVE" = 1 ] || bound=0
+  printf '%s' "$bound" > "$WORK/$i.bound"
+  if [ "${bound:-0}" -gt 0 ]; then timeout -k 5s "$bound" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
   else "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?; fi
   out=$(cat "$WORK/$i.raw" 2>/dev/null)
   e=$(date +%s%N)
@@ -965,9 +1009,14 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
        # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
        # exit code. Both stay behind the PROF_TIMEOUT guard, so a leg that chooses either for its own
        # reasons is still reported as the code it chose.
+       # THE BOUND THAT ACTUALLY FIRED, read from what runleg recorded rather than re-derived. The
+       # old spelling read `PROF_TIMEOUT` for both the guard and the number, so once a leg carried
+       # its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
+       # leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
+       local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
        ftail="(exit $rc)"
-       { [ "$rc" = 124 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s)"
-       { [ "$rc" = 137 ] && [ "$PROF_TIMEOUT" -gt 0 ]; } && ftail="(timed out after ${PROF_TIMEOUT}s, killed)"
+       { [ "$rc" = 124 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s)"
+       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s, killed)"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY

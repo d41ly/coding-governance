@@ -93,7 +93,7 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -113,6 +113,53 @@ if stray:
     sys.exit(1)
 ' "$LEGS_FILE" || fail=1
 
+# ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
+#     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
+#     so an arm asserting "timed out after Ns" is satisfied by the broken code. This one measures
+#     ELAPSED TIME against a control, which is the only instrument that can see the defect.
+#
+#     IT GRADES THE CONSTRUCT, NOT THE BAR. A whole-bar timing assertion is a fact about the node:
+#     measured on node `a` while writing this, a bar carrying ONE trivial leg exceeded 120 s under
+#     ambient load, which would make any absolute bar-level bound flaky in exactly the way that
+#     drives people to delete arms. The construct below is compared against a 60 s sleeper, a 30x
+#     margin, so it survives a slow box and still fails a wrong construct.
+#
+#     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
+n=$((n+1))
+_cw=$(mktemp -d)
+_t0=$(date +%s)
+timeout -k 5s 2 bash -c 'sleep 60 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
+_t1=$(date +%s)
+_took=$(( _t1 - _t0 ))
+# The control: the SAME command through a command substitution, which is the form that does not
+# bound the clock. Without it a green here could mean "this box is fast", not "the form is right".
+_t2=$(date +%s)
+_ctl=$(timeout -k 5s 2 bash -c 'sleep 60 & exit 0' 2>&1)
+_t3=$(date +%s)
+_ctltook=$(( _t3 - _t2 ))
+if [ "$_took" -gt 20 ]; then
+  echo "canary: a file-captured 2s timeout over a backgrounded grandchild took ${_took}s — the bound"
+  echo "canary: is on the verdict and not on the clock, which is bounded-through-a-pipe-is-unbounded."
+  fail=1
+elif [ "$_ctltook" -le 20 ]; then
+  echo "canary: the CONTROL returned in ${_ctltook}s, so this host does not reproduce the pipe defect"
+  echo "canary: and the arm above proved nothing. Not a pass: a control that cannot fail is the"
+  echo "canary: vacuous-selector class, and this arm is reported UNPROVEN rather than green."
+  fail=1
+fi
+rm -rf "$_cw"
+
+# ---- 1d. THE RUNNER USES THAT CONSTRUCT. Scoped to CODE LINES: a whole-file grep reds on the
+#     comments documenting the fix, which is absence-assertion-over-whole-file-text happening inside
+#     the guard. TOOL-aBoundedCeiling-1.
+n=$((n+1))
+if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 2>&1; then
+  echo "canary: run-gates.sh captures a timeout through a command substitution on a code line —"
+  echo "canary: that bounds the verdict and not the clock. Redirect to a file and read the file."
+  grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" | sed 's/^/    /'
+  fail=1
+fi
+
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
@@ -122,7 +169,7 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }

@@ -44,10 +44,10 @@ adopter cannot audit.
 ## The shape of the answer
 
 A ceiling belongs to a LEG, declared where the leg population already lives, and the runner enforces
-it as that leg's deadline. One mechanism then does three jobs that currently have zero, one and two
-implementations respectively: it bounds a hang, it makes slowness fail, and it refuses a leg that
-arrives with no ceiling at all. The remaining two units are about paying for that bar once per landing
-instead of twice, and about a forced run keeping the guards that scope it.
+it as that leg's deadline. One mechanism then does two jobs that currently have none: it bounds a
+hang, and it makes slowness fail rather than merely annoy. The other two units carry that field to
+adopters through the deployer, and bound whatever gate command an unattended close actually runs —
+which, as the live observation showed, is frequently not gov's runner at all.
 
 ## Units
 
@@ -122,12 +122,12 @@ ids TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 TOOL-aB
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | OPEN | rev-2 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | OPEN | rev-2 | 2026-08-27 |
-| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-2 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it](spec/2026-08-27-spec-TOOL-aBoundedCeiling-1.md) | 1 | 2 | OPEN | rev-4 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-6 — the close's gate run cannot outlive a declared bound](spec/2026-08-27-spec-TOOL-aBoundedCeiling-6.md) | 1 | 2 | OPEN | rev-3 | 2026-08-27 |
+| [TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too](spec/2026-08-27-spec-TOOL-aBoundedCeiling-5.md) | 2 | 2 | OPEN | rev-3 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

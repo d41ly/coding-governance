@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-5 — the ceiling travels, so an adopter's bar is bounded too
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md) | spec-audit | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-6 |
+| [2026-08-27-review-TOOL-aBoundedCeiling-1-round2.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round2.md) | spec-audit | TOOL-aBoundedCeiling-1 TOOL-aBoundedCeiling-6 |
 
 <!-- /gen:spec-records -->
 
@@ -39,14 +40,24 @@ delivered, and every adopting tree keeps a bar in which one hung leg wedges the 
   crashes against any target below the subject floor today. Both reads become `.get(...)`. This is
   not scope creep: copying the seam verbatim for `ceiling` reproduces the crash for every target that
   has not yet reached the ceiling floor, which is every current adopter.
-- **S7** — a project-owned lever so an adopter on a slower node is not stuck with node `a`'s numbers.
-  The emitter never overwrites a leg's ceiling that the target itself declared, and reports when it
-  withheld one for that reason.
+- **S7** — a project-owned lever so an adopter on a slower node is not stuck with node `a`'s numbers,
+  stated as the PREDICATE that implements it rather than as the intent. The receipt's emitted row
+  gains `ceiling`, and the emitter withholds its own value for exactly one case: the target's current
+  ceiling differs from what the receipt recorded for that leg, which is the signature of a human
+  edit. It says so when it withholds. Without the receipt field the rule is unanswerable — the code
+  states that three lines above the site, *"a field that reaches the target's manifest but not the
+  receipt is a field no drift check can ever see move"* — and every other predicate the intent admits
+  fails an arm: preserve-anything withholds forever after the first apply, preserve-unless-descriptor
+  withholds exactly the kit updates, and preserve-only-unclaimed-rows is vacuous because N1 already
+  says a kit writes nothing to a project's own legs.
 
 ## 3. Non-goals (OUT)
 
 - **N1** — no ceiling VALUE is chosen for an adopter's own project-authored legs. A kit ships a
-  ceiling for the legs the kit owns; a project's own legs are the project's to bound.
+  ceiling for the legs the kit owns; a project's own legs are the project's to bound, and
+  `TOOL-aBoundedCeiling-1` S6 is scoped so that leaving them unbounded does not red their bar. The
+  lever a slow-node adopter reaches for is S7: edit the ceiling in the manifest, and the emitter
+  will see it differ from the receipt and leave it alone.
 - **N2** — no BEHAVIOUR in `run-gates.sh` changes. Its reader, its enforcement and its declaration
   check are `TOOL-aBoundedCeiling-1` and are complete without this unit. The file is still EDITED
   here, by exactly one line: `KIT_RUN_GATES_VERSION` and its inline `gov:kit` marker, which is where
@@ -97,6 +108,8 @@ argument for the floor being conservative rather than clever.
 | `tools/run-gates/README.md:3` | the matching `gov:kit run-gates@` marker, or `kit version markers` reds |
 | `tools/govkit/govkit.py` check 7h | descriptor-to-manifest parity for `ceiling`, beside the subject arms |
 | `tools/govkit/selftest.py` | where the failing case for that parity arm is STAGED |
+| `tools/govkit.py` receipt emitted row | carries `ceiling`, or S7's predicate has nothing to compare |
+| `govkit.py` `RECEIPT_SCHEMA` | widened in the same commit if it enumerates the emitted row's keys |
 
 ### Alternatives rejected
 
@@ -104,22 +117,29 @@ argument for the floor being conservative rather than clever.
 target's leg set is the set of kits that target selected, which gov cannot know. Shipping gov's
 manifest would give every adopter gov's legs.
 
-**Let adopters hand-write ceilings.** They can, and nothing stops them — but a kit-owned leg whose
-ceiling is authored downstream drifts from the suite it bounds on the first kit update, and the
-descriptor is where every other kit-owned property of that leg already lives.
+**Let adopters hand-write ceilings with no machinery at all.** This was rejected in an earlier
+revision on the ground that a downstream-authored value drifts from the suite it bounds — which was
+the wrong objection, and the right one is worse: it does not drift, it is silently CLOBBERED. The
+emitter replaces the whole row for any leg the receipt claims, and its drift refusal compares only
+argv and guard, so a hand-edited ceiling is neither preserved nor reported. S7 exists because of
+that, and it is why the lever is a receipt-joined predicate rather than a documented convention.
 
 ## 5. Production-readiness checklist
 
 - **security** — no new trust. The value moves from a tracked kit descriptor into a generated
   manifest through the emitter that already writes that file.
 - **perf/scale** — one integer per leg in a file written once per `apply`.
-- **observability** — the floor's decision is reported the way `check_target_reads_subject`'s is, so
-  an operator can see that a ceiling was withheld and why.
+- **observability** — TWO reports, neither of which exists today. The floor's withhold currently
+  prints nothing at all, so this unit writes that line rather than copying one; and S7's
+  project-override withhold is a second, different line. Naming them separately matters because an
+  earlier revision promised "reported the way `check_target_reads_subject`'s is", which is silent.
 - **risks** — the real hazard is writing the field into a tree that cannot read it, which reds that
   target's canary during an unrelated install. That is precisely what S3 exists to prevent and what
   AC3 observes.
-- **testing + left-shift gates** — AC1 through AC4, in `tools/govkit/selftest.py` against a target
-  fixture pinned below the floor and one at or above it.
+- **testing + left-shift gates** — AC1, AC2, AC3, AC5 and AC6 in `tools/govkit/selftest.py`, against
+  a target fixture pinned below the floor and one at or above it. AC4 is a whole-bar
+  `GATE_SELFTESTS=1` run asserting the `govkit selftest` leg is green, so it belongs to no suite —
+  least of all the one that leg runs.
 - **migration / rollback** — dropping the `ceiling` write restores today's emitter exactly. A target
   already carrying ceilings keeps them; they are inert to a runner that does not read the key.
 - **user docs** — the kit descriptor's `[[gate_leg]]` documentation gains the field and the floor.
@@ -136,8 +156,10 @@ descriptor is where every other kit-owned property of that leg already lives.
 - **AC5** — When `govkit apply` runs against a target BELOW the subject floor, it completes without
   raising, observed against a fixture pinned below it. That call raises `KeyError` today, so this
   criterion FAILS before the change and passes after, which is what makes it a test.
-- **AC6** — When a target's `tools/gate-legs.json` already declares a `ceiling` a kit did not write,
-  a subsequent `govkit apply` leaves that value intact and reports that it withheld its own.
+- **AC6** — BOTH arms, because a withhold rule with only its positive arm tested is a rule that could
+  withhold always. When a target's ceiling for a kit-owned leg DIFFERS from the value its receipt
+  records, a subsequent `govkit apply` leaves the target's value intact and reports the withhold;
+  when it MATCHES the receipt, the same apply updates it to the descriptor's current value.
 - **AC4** — When `bash tools/run-gates/run-gates.sh` runs under `GATE_SELFTESTS=1` after this unit,
   the `govkit selftest` and `govkit acceptance matrix` legs are green.
 
@@ -164,6 +186,13 @@ this unit's edits reach directly: `govkit selfcheck`, which is where S5's arm la
 
 - rev-1 · 2026-08-27 · initial draft, grounded on the deploy-surface probe and verified directly
   against `govkit.py`'s leg emitter and `tools/run-gates/kit.toml`.
+- rev-3 · 2026-08-27 · folded the round-2 spec audit. Restated S7 as its receipt-joined PREDICATE,
+  since the intent it was written as had no provenance channel and every reading of it failed an arm;
+  the receipt's emitted row gains `ceiling` to make it answerable. Corrected §4's rejected
+  alternative, which had become an argument against this unit's own accepted scope, and which had the
+  mechanism wrong besides — a hand-written ceiling is clobbered, not drifted. Split §5's observability
+  promise into the two reports it actually owes. Re-routed §5's acceptance homes to cover AC5 and AC6
+  and to stop AC4 living inside the leg it grades.
 - rev-2 · 2026-08-27 · folded the round-1 spec audit. Named `govkit.py` check 7h as the parity site,
   where three sections had named two different programs. Re-resolved F2, whose premise was false.
   Routed the version bump to `run-gates.sh:19` and its README marker, where the constant lives.
@@ -199,8 +228,8 @@ the general join, because the general join is a larger unit with its own accepta
 per target by the emitter, so equality is not the right predicate for it. That is a reason, not a
 dismissal, and the row stays open.
 
-**The seam is copied MINUS a defect.** §4 says the `check_target_reads_subject` shape "already
-exists". Two thirds of that is true. The withhold path RAISES rather than reporting, and nothing is
+**The seam is copied MINUS a defect.** The paragraph above says the `check_target_reads_subject`
+shape "already exists". Two thirds of that is true. The withhold path RAISES rather than reporting, and nothing is
 printed when a key is withheld, so §5's observability sentence describes a report that does not exist
 yet. S6 repairs the first and this unit writes the second.
 

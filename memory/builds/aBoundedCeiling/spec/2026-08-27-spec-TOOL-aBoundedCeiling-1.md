@@ -1,6 +1,6 @@
 # TOOL-aBoundedCeiling-1 — a leg declares how long it may take, and the runner holds it to it
 
-**Status:** OPEN · rev-2 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-08-27 · node a · Tier-2 · base 1d83cc94 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md](../build/2026-08-27-build-TOOL-aBoundedCeiling-1-live-hang-observed.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-prompt-TOOL-aBoundedCeiling-1.md](../prompts/2026-08-27-prompt-TOOL-aBoundedCeiling-1.md) | research | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 | [2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round1.md) | spec-audit | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
+| [2026-08-27-review-TOOL-aBoundedCeiling-1-round2.md](../reviews/2026-08-27-review-TOOL-aBoundedCeiling-1-round2.md) | spec-audit | TOOL-aBoundedCeiling-5 TOOL-aBoundedCeiling-6 |
 
 <!-- /gen:spec-records -->
 
@@ -33,9 +34,15 @@ at the place legs actually run.
   of `PROF_TIMEOUT`.
 - **S5** — a liveness line when `timeout` will not run on this host: the ceilings are announced
   INERT on stderr, and every leg still runs unbounded rather than being skipped.
-- **S6** — a static declaration check: every leg in a manifest that already carries at least one
-  `ceiling` must carry one. Scoped that way on purpose, per §4's rollout rule.
-- **S7** — the canary's pinned leg-key set gains `ceiling`, at BOTH of its two sites.
+- **S6** — the runner REPORTS its unbounded legs and never reds on one. The profile line names how
+  many of this run's legs carry no ceiling, so a manifest that is silently losing its bounds is
+  visible on every run without any tree being refused for a field it cannot supply.
+- **S9** — the DECLARATION requirement lives in `tools/run-gates/run-gates.gov.test.sh`, which
+  asserts that every row of gov's own manifest carries a positive integer `ceiling`. A new leg
+  arriving without one reds gov's bar, which is the forcing function charter §7 asks for. Numbered
+  S9 and not S8 because rev-2 RETIRED an S8, and a retired label reused is two scope items answering
+  to one name in the same document.
+- **S7** — the shipped canary's pinned leg-key set gains `ceiling`, at BOTH of its two sites.
 
 ## 3. Non-goals (OUT)
 
@@ -84,22 +91,25 @@ that nothing but a true hang could reach it.
 Tightening the factor later is a one-line edit per leg with a reason beside it, which is the same
 discipline `tools/unattended/run-unattended-gates.sh` already applies to its own eight ceilings.
 
-**The formula does NOT apply to a leg that already carries a declared ceiling.** Three legs do, in
-`run-unattended-gates.sh`'s `BUDGET_*` block, and applying `3 × current cost` to them would raise a
-number somebody set on purpose by reference to the cost it was set to catch. `unattended kit gate` is
-the case that proves it: its declared ceiling is `BUDGET_kit_gate=120  # measured 28 s`, its current
-cost is 533 s on node `a`, and the formula would ship 1600 s — a thirteenfold raise, in a file whose
-own header reads *"Raising one is fine; raising one silently is not."*
+**The formula applies to all 85 rows uniformly, and three of those legs ALSO carry a `BUDGET_*`
+declaration in `run-unattended-gates.sh`. Those declarations are not touched, and they are not
+duplicates of anything shipped here.** A `BUDGET_*` is a COST bound: it asks whether a suite still
+costs roughly what somebody accepted. A manifest `ceiling` is a HANG bound: it asks whether a leg has
+stopped returning at all. One is measured after the fact and deliberately does not kill; the other
+kills. A leg carrying both carries two numbers because it is being asked two questions.
 
-That breach is not news and it is not mine to discover. `TOOL-aCollapsedScan-3` is a RATIFIED
-decision recording it — *"The ceiling worked and nothing on the bar reads it"* — and
-`TOOL-aCollapsedScan-4` is OPEN against it, offering two candidates. **This unit takes candidate (2),
-re-declare the ceiling with the reason beside it**, and the reason is this one: the leg's cost rose
-from 305 s to about 164 s after the spawn fix and then to 533 s under the load this node now carries,
-so 120 s describes a machine that no longer exists. The manifest ceiling for that leg ships at
-**1600 s** as a HANG bound, the `BUDGET_kit_gate` declaration stays at 120 s as a COST bound, and
-`TOOL-aCollapsedScan-4` closes only when someone rules on the cost half. Two numbers, two questions,
-and saying so is what keeps the raise from being silent.
+`unattended kit gate` is where the distinction earns its keep, and it is already on the record.
+`TOOL-aCollapsedScan-3` is a RATIFIED decision noting that `BUDGET_kit_gate=120` was set against a
+28 s reading and that `--checks` later read 305 s: *"The ceiling worked and nothing on the bar reads
+it."* `TOOL-aCollapsedScan-4` is OPEN against that same breach. **This unit takes NEITHER of that
+row's candidates** — it neither fixes the leg's cost nor re-declares the 120 s. It ships a 1600 s
+HANG bound beside the untouched 120 s COST bound, and `-4` stays open on its own terms until someone
+rules on the cost half. Saying that plainly is the point: a unit that claimed to close it would leave
+a future session reading a closed row that is not.
+
+The uniform formula happens to produce 1600 s for that leg (533 × 3) and 490 s for
+`playbook validity gate` (161.8 × 3), so no row here is a hand-placed exception. There are no
+exceptions.
 
 ### Why `PROF_TIMEOUT` must stay zero
 
@@ -137,8 +147,30 @@ from the selected kits' `[[gate_leg]]` rows, and that emitter writes no `ceiling
 that redded on absence would therefore red every adopter on upgrade day over a field they have no
 way to supply. Presence-scoping is what makes the check meaningful in gov — where all eighty-five
 rows gain a ceiling in one commit, so a later row arriving without one reds — and inert everywhere
-it would only be cruel. When `TOOL-aBoundedCeiling-5` teaches the deployer to carry the field, the
-scoping stops mattering on its own, with no cutoff date to retire.
+it would only be cruel.
+
+**Why the RUNNER does not enforce the declaration at all, which is a change from two earlier
+revisions of this spec and is the simpler answer they were both circling.** An adopter's manifest is
+a MERGE, not a rewrite: `govkit apply` reads the target's existing rows, replaces or appends only the
+rows a kit owns, and writes the whole list back — a protection that exists precisely so a leg the
+target wrote survives. So the first apply after `TOOL-aBoundedCeiling-5` produces a MIXED manifest,
+kit rows carrying a ceiling and project rows not.
+
+rev-3 answered that by scoping the runner's check to rows a kit receipt claims. That is wrong for a
+reason worth stating: **the runner cannot know.** A receipt is `govkit`'s artifact, and teaching the
+merge-bar runner to read the deployer's bookkeeping to decide whether to refuse a leg couples two
+kits that are deliberately independent, in the direction that makes the bar depend on the deployer.
+
+So the runner REPORTS and never refuses, and the requirement moves to the one place that may hold a
+claim about gov's corpus: `tools/run-gates/run-gates.gov.test.sh`. That file exists for exactly this,
+is already the `run-gates gov canary` leg, and is withheld from the kit payload as `project-owned`.
+Its own header states the rule this unit is obeying — *"the shipped canary may assert only what is
+true in ANY tree"* — and names `memory/gotchas/pin-copied-from-another-corpus.md` as the class that
+follows from breaking it.
+
+The result is stronger in gov and harmless everywhere else. In gov all 85 rows carry a ceiling, and
+the 86th arriving without one reds the bar. In an adopter nothing is refused, a mixed manifest is
+legal, and the unbounded count is printed on every run so the state is visible rather than silent.
 
 ### Inventory
 
@@ -151,6 +183,7 @@ scoping stops mattering on its own, with no cutoff date to retire.
 | `run-gates.sh` `report_one()` (~:966) | attribute 124 and 137 to the leg's own ceiling |
 | `run-gates.sh` liveness (~:349) | say so when `timeout` will not run |
 | `run-gates.test.sh` (:96 and :125) | `ceiling` joins the pinned `KNOWN` set, both copies |
+| `run-gates.gov.test.sh` | S9's arm: every row of GOV's manifest declares a ceiling |
 
 ### Alternatives rejected
 
@@ -174,8 +207,9 @@ deliberately does not, because a killed suite prints no verdict and the kill the
 - **risks** — a ceiling set too tight reds a healthy leg on a slow node. Priced by the 3× factor and
   the 60 s floor, both argued in §4. The rollback is one integer.
 - **testing + left-shift gates** — AC1 to AC4 and AC6 live in `run-gates.test.sh`, which IS the
-  `run-gates canary` leg and therefore may name no leg of this corpus. AC5 is a whole-bar run and
-  belongs to no suite. Every failing case is observed before landing, per charter §7.
+  `run-gates canary` leg and therefore may name no leg of this corpus. AC8 lives in
+  `run-gates.gov.test.sh`, which is the suite that MAY name one. AC5 is a whole-bar run and belongs
+  to no suite. Every failing case is observed before landing, per charter §7.
 - **migration / rollback** — deleting every `ceiling` key restores today's behaviour exactly; the
   reader `.get`-defaults the field and the wrapper is skipped when it is absent.
 - **user docs** — `tools/run-gates/README.md` gains the field and the derivation rule. The TTL
@@ -190,9 +224,13 @@ deliberately does not, because a killed suite prints no verdict and the kill the
 - **AC2** — When that same leg breaches, the verdict is `FAIL` and never `skip`, `held` or `reuse`,
   keeping the governing invariant in `tools/run-gates/gate-profiles.txt` that no knob may turn a leg
   into a pass or a skip.
-- **AC3** — When a manifest carries at least one `ceiling` and one row carries none, the run refuses
-  and names that row; when NO row carries one, the same manifest runs green, proving the
-  presence-scoping in `run-gates.test.sh`.
+- **AC3** — When a manifest carries rows with and without a `ceiling`, `bash
+  tools/run-gates/run-gates.sh` runs every leg and its profile line NAMES the unbounded count. No
+  tree is refused for a missing ceiling, asserted in `run-gates.test.sh` over a mixed fixture,
+  because that shipped suite runs in an adopter's tree where a mixed manifest is the normal state.
+- **AC8** — When a row is removed from `tools/gate-legs.json`'s ceiling set, `bash
+  tools/run-gates/run-gates.gov.test.sh` FAILS naming that leg — the staged break observed RED
+  before this unit lands, per charter §7.
 - **AC4** — When `timeout` cannot run on the host, `run-gates.sh` prints that the ceilings are INERT
   and every leg still executes, with the run's verdict unchanged against a control.
 - **AC5** — When `ceiling` is added to `tools/gate-legs.json`, `bash tools/run-gates/run-gates.sh`
@@ -208,9 +246,10 @@ deliberately does not, because a killed suite prints no verdict and the kill the
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` with `GATE_SELFTESTS=1`, which is the only run that exercises
-`run-gates canary`, `run-gates turnstile` and `run-gates evidence` — all three are held on a default
-bar and all three read what this unit changes. No new gate LEG is added: the ceilings are enforced by
-the runner every leg already goes through.
+`run-gates canary`, `run-gates gov canary`, `run-gates turnstile` and `run-gates evidence` — all four
+are held on a default bar and all four read what this unit changes. No new gate LEG is added: the
+ceilings are enforced by the runner every leg already goes through, and S8's assertion joins a suite
+that is already a leg.
 
 ## 8. Open questions
 
@@ -231,7 +270,6 @@ the runner every leg already goes through.
   permanent RED on `--checks`. They stay. See N6.
 
 ## 9. Revision log
-
 - rev-1 · 2026-08-27 · initial draft, grounded on five read-only probes of `run-gates.sh`, the
   turnstile suite, the canary's pinned key set and `govkit`'s leg emitter.
 - rev-2 · 2026-08-27 · folded the round-1 spec audit. Dropped S8 and AC7, which were INVERTED — the
@@ -240,6 +278,18 @@ the runner every leg already goes through.
   (2) explicitly. Cited `TOOL-aCollapsedScan-3` and `-4` in §10. Re-routed §5's acceptance homes,
   which contradicted §7. Narrowed AC6, whose reuse-cache clause was false for 48 of 85 legs. Dropped
   a misplaced Inventory condition.
+- rev-3 · 2026-08-27 · folded the round-2 spec audit. Scoped S6 to the rows a receipt claims, after
+  R2-1 showed specs 1 and 5 together would red an adopter's mixed manifest. Replaced the exclusion
+  list in §4 with the uniform formula, which already produces the two argued numbers, and corrected
+  the claim that this unit takes `TOOL-aCollapsedScan-4`'s candidate (2) — it takes neither.
+- rev-4 · 2026-08-27 · DESIGN CHANGE made before the code, per M2. The runner no longer enforces the
+  ceiling declaration at all: it reports its unbounded count and refuses nothing, and the requirement
+  moves to `run-gates.gov.test.sh`, the gov-only suite that already exists for corpus-specific claims
+  and is withheld from the kit payload. rev-2 required a ceiling on every row, which round 2's R2-1
+  showed would red an adopter's mixed manifest; rev-3 scoped that to rows a kit receipt claims, which
+  is worse — it would make the merge-bar runner read the deployer's bookkeeping to decide a refusal.
+  Reporting plus a gov-only arm is simpler than either and strictly stronger in gov. S6 restated, S9
+  and AC8 added, AC3 rewritten, `run-gates gov canary` added to §7.
 
 ## 10. Reuse audit
 
