@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-27-review-TOOL-aThawedCorpus-4-diff-round1.md](../reviews/2026-08-27-review-TOOL-aThawedCorpus-4-diff-round1.md) | diff-review | TOOL-aThawedCorpus-5 TOOL-aThawedCorpus-1 |
 | [2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md](../reviews/2026-08-27-review-TOOL-aThawedCorpus-5-spec-audit.md) | spec-audit | TOOL-aThawedCorpus-5 TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 |
 
 <!-- /gen:spec-records -->

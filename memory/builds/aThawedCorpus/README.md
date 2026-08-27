@@ -95,7 +95,7 @@ ids TOOL-aThawedCorpus-1 TOOL-aThawedCorpus-2 TOOL-aThawedCorpus-3 TOOL-aThawedC
 | [TOOL-aThawedCorpus-3 — a declared SPAWN ceiling per memory leg, because wall clock cannot be a verdict here](spec/2026-08-27-spec-TOOL-aThawedCorpus-3.md) | 5 | 2 | WONTDO | rev-2 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
