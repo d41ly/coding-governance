@@ -1111,7 +1111,21 @@ fi
 # ---- Tier-1 spec's section 6 may be Gates — two closed ones in this corpus are — and a check reading
 # ---- section 6 by NUMBER would red a spec that is legal under the format it enforces.
 alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
-if [ -n "$alcut" ]; then
+# ---- THE `--staged` GUARD ITS THREE SIBLINGS ALREADY CARRY, and its absence was the whole cost of
+# ---- the pre-commit leg. 22 and 23 join every acceptance criterion of every CLOSED Tier-2 spec
+# ---- against every `**Evidences:**` block in every tracked record — a corpus-wide population that
+# ---- does not change because a commit stages three files. It ran on EVERY commit, and one commit
+# ---- of the build that fixed this timed out at 120 s on it. The split is this file's own, stated
+# ---- at the top: set-checks tree-wide, file-checks on staged paths — and 13-19 at `:1051`, `:1066`
+# ---- and `:1076` are all guarded exactly this way. The full run at the push boundary still runs
+# ---- both, so nothing loses coverage between a commit and a push.
+# ---- IT ANNOUNCES ITSELF. A skip that prints nothing is indistinguishable from a check that found
+# ---- nothing, which is this repo's named class; the line below is what keeps a held check visible.
+if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
+  printf 'memory-hygiene: checks 22-23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
+'
+fi
+if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
   alledger=$(for r in $(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
