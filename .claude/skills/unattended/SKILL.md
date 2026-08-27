@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.10 -->
+<!-- gov:kit unattended@1.11 -->
 
 # Unattended runs
 
@@ -584,18 +584,23 @@ bash tools/unattended/unattended.sh --resume <slug>
 Read the run-state file before doing anything else. It survived compaction and process death; your
 context did not.
 
-**Then schedule a NEW keepalive, because the recorded one is dead.** The store is session-scoped, so
-a resume across a process death is the one path where the job is gone by construction rather than by
-accident — and the run-state file still names the old id, which no `CronDelete` you can
-issue will reach. This is the only exception to "read the record first": read it, then schedule,
-before any other work.
+**Then REAP the recorded id, and only then schedule a replacement.** In that order, and the order is
+the whole point. The intuition is that a resumed session's keepalive died with its process because
+the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
+jobs and `CronCreate`'s own listing showed both still firing. So issue
+`CronDelete` against the `keepalive` id the run-state file already names, read the result
+back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
+dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
+
+Then schedule the new one. This is the only exception to "read the record first": read it, reap,
+schedule, and then do the work.
 
 **The record cannot be corrected in place, and you must know that rather than discover it.**
 `--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
-new id. Two consequences, both yours to carry: the `keepalive` fact names a job that no longer
-exists, and the `keepalive-reaped` attestation you make at close is about the job you scheduled here,
-not the one the record names. Say so in the wrap-up. Re-preflighting to record it is NOT the remedy —
-it refuses on a dirty tree and re-pins the anchor, which costs more than the stale field does.
+new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped` attestation at close
+covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
+the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
+tree and re-pins the anchor, which costs more than the stale field does.
 
 ## Close
 

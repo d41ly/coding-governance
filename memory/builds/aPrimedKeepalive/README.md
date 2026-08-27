@@ -184,20 +184,20 @@ ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-1.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-2.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-6.md) | 1 | 1 | INPROGRESS | rev-4 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-1.md) | 2 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-2.md) | 3 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-3 — the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-3.md) | 4 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-5.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-08-27 |
-| [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | INPROGRESS | rev-2 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-7.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

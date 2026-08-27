@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
+**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 
 <!-- /gen:spec-records -->
 
@@ -155,6 +156,10 @@ none
 
 - rev-1 · 2026-08-27 · initial draft. Adopted into this build by owner ruling on 2026-08-27, recorded
   in the build README's owner-decisions section.
+- rev-4 · 2026-08-27 · folded spec-audit round 2, findings 8, 14 and 19 — one defect reached by three
+  lenses. rev-3 corrected §4 and left §10 asserting the very claim §4 had just disproved, so the fold
+  was half applied in the one section whose job is the reuse record. §10 now describes the delivered
+  shape and names the two-spelling cost.
 - rev-3 · 2026-08-27 · folded spec-audit round 1, findings 25 and 26. S3 omitted the fourth
   fail-closed cause — an advertised tip this clone has not fetched — which the borrowed code documents
   two lines away. §4 claimed the witness and the anchor are in scope in the same walk; `$b` is not, and
@@ -168,12 +173,22 @@ none
 
 ## 10. Reuse audit
 
-The seam is check 15's own ancestry idiom, cited by path:
-`tools/unattended/check-unattended.sh:909`, `GIT merge-base --is-ancestor "$w" "$b"`, inside the same
-per-record walk that computes `nlive`. Both the witness and the anchor are already in scope there, so
-this unit adds a phase guard to an existing expression rather than introducing a second way to ask
-the same question. `ADV_HEAD`, `ADV_TIPS` and `ADV_NREM_RC` already carry the advertisement and its
-distinct failure causes, which is what S3's fail-closed reporting is built from.
+**The IDIOM is reused; the SITE is not, and an earlier draft of this paragraph said otherwise.** What
+is borrowed from check 15 is the expression `GIT merge-base --is-ancestor` and the observation behind
+it — `ADV_HEAD`, `ADV_TIPS` and `ADV_NREM_RC` already carry the advertisement and its distinct
+failure causes, which is what S3's fail-closed reporting is built from.
+
+What is NOT borrowed is the location. Check 15's test lives at `check-unattended.sh:909` inside
+check 9's conditional, where `b="$ADV_HEAD"` is assigned at `:816`; `nlive` increments 120 lines
+earlier at `:695`, so at the accumulation point `$b` is unset on the first record and loop-carried
+afterwards. The shipped exclusion is therefore a SEPARATE post-loop pass over `$live` at `:1122-1145`
+with its own `c7anchor`, its own `phase_of`/`fact_of` re-derivation and its own ancestry call.
+Nothing was added to the `:909` expression.
+
+**That leaves TWO ancestry tests in one file and they must move together** — the same two-spelling
+maintenance cost `TOOL-aPrimedKeepalive-7` §3 names for the driver-and-leg pair, one level down. §4
+defends the re-derivation as one grammar evaluated twice; this section agrees with it rather than
+denying a second evaluation exists.
 
 Recall terms used: `landing terminal phase check 7 nlive witness ancestor advertised tip deadlock
 wedge run-state non-terminal fleet bar`. The query returned `TOOL-aBoundedVerdict-24`

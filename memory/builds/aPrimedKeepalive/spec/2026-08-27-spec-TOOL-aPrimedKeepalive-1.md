@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-1 — the keepalive is scheduled as the run's FIRST act, on every start path
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
+**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 
 <!-- /gen:spec-records -->
 
@@ -29,8 +30,10 @@ from. Move the obligation to the run's first act and state it once, where every 
 - **S3** — `tools/unattended/SKILL.template.md` hoists the keepalive out of the slug path's step 3
   into a section that binds all four paths, placed BEFORE the path-routing table so no path can be
   entered without passing it. **`## Resume` is a FIFTH path and the section names it explicitly**: a
-  resumed session's keepalive is dead by construction, so that section carries its own instruction and
-  the hoisted one says it cannot bind it. "Every path" meaning "the four rows of the routing table"
+  resumed session's keepalive is presumed alive, not dead. `TOOL-aPromptedMandate-11` MEASURED the
+  opposite of the intuition — a run asserted twice that two jobs died with their processes and the
+  scheduler's own listing showed both still firing — so Resume REAPS the recorded id first, reads the
+  result back, and only then schedules a replacement. "Every path" meaning "the four rows of the routing table"
   was the first draft's silent definition and it missed the only path where the job is provably gone.
 - **S4** — the slug path's numbered steps are renumbered around the removal, and the two paths that
   reach preflight through "exactly as the slug path does" are checked to make sure that phrase now
@@ -145,8 +148,10 @@ cannot observe its subject would be an assertion about nothing.
   `MAX_MANIFEST_BYTES` value `skills/session-kickoff/manifest-check.sh` declares, and the build's own
   §B bullet is the trim that paid for it.
 - **AC9** — When `.claude/skills/unattended/SKILL.md`'s `## Resume` section is read, it instructs the
-  resumed session to schedule a NEW keepalive and states that `--keepalive-id` is recordable only at
-  `--preflight`, so the recorded id stays stale and the close attestation is about the new job.
+  resumed session to issue `CronDelete` against the recorded `keepalive` id FIRST and report what it
+  returned, THEN schedule a replacement, and it cites the measurement that forbids assuming the old
+  job is dead. It also states that `--keepalive-id` is recordable only at `--preflight`, so the close
+  attestation covers both jobs and the wrap-up says which.
 
 ## 7. Gates
 
@@ -160,6 +165,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-27 · initial draft.
+- rev-4 · 2026-08-27 · folded spec-audit round 2, finding 20. S3 and AC9 rested on "a resumed
+  session's keepalive is dead by construction", which `TOOL-aPromptedMandate-11` records as MEASURED
+  FALSE, and the rendered prose went further and told the agent no delete could reach it — the orphan
+  leak S2 exists to close, reintroduced on the path the previous fold added. Resume now reaps first.
 - rev-3 · 2026-08-27 · folded spec-audit round 1, findings 24 and 28: the `## Resume` path was
   outside "every path" and is now named in S3 and AC9; `SESSION-KICKOFF.md` was an unpriced fourth
   carrier and is now S7 and AC8; AC7 grades BOTH halves of the BUILD-METHOD pair, because the

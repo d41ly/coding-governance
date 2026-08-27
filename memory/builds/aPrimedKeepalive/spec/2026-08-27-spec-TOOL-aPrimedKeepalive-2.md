@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-2 — the adoption rule: a strictly beneficial discovery joins the running build, decided at once
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md](../prompts/2026-08-27-prompt-TOOL-aPrimedKeepalive-1-1.md) | research | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 |
 
 <!-- /gen:spec-records -->
 
@@ -107,11 +108,17 @@ and a pointer, keeping "Three deltas, and no others" true.
 
 ### Migration
 
-`BUILD-METHOD.md` sits 30 B under M1's 24 576 B budget at BASE, and M1's budget is a governance
-carrier's own stated constraint that M3's delegation does not reach — so this unit may not raise it.
+**Price the edit against the BINDING half, which is the TEMPLATE.** At BASE
+`tools/memory-tree/BUILD-METHOD.template.md` sits 19 B under M1's 24 576 B budget while
+`memory/guides/BUILD-METHOD.md` sits 30 B under it; the 11 B gap is the render substitution and is
+structural, not slack. Sizing against the render is how this build spent 8 B it did not have — guide
+24 573, template 24 584 — and only AC6 caught it, after the bytes were gone. M1's budget is a
+governance carrier's own stated constraint that M3's delegation does not reach, so this unit may not
+raise it.
 The M10 edit is priced first; if it does not fit, the donor is M1's own budget-history paragraph,
 which narrates three past raises that git already records and which charter §5's derive-over-author
-rule makes removable. Re-measure with `wc -c`, never from a number in a spec.
+rule makes removable. Re-measure with `wc -c` over BOTH halves, never from a number in a spec, and let the template's
+figure decide.
 
 ### Files touched (estimate)
 
@@ -185,6 +192,9 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-27 · folded spec-audit round 2, finding 10. rev-2 fixed AC6 to grade both halves
+  and left §4's Migration paragraph pricing the edit against the render, 11 B too generous — so the
+  builder's own sizing number stayed wrong while the criterion that catches the overrun was correct.
 - rev-2 · 2026-08-27 · folded spec-audit round 1, findings 12 and 23. S1 and §4 claimed the protocol
   "has no byte budget"; it has one — check 6's guide caps — and that false clause was the sole stated
   reason for choosing this carrier over the build method. Replaced with the measured headroom and a

@@ -1,6 +1,6 @@
 # TOOL-aPrimedKeepalive-6 — hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22
 
-**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
+**Status:** INPROGRESS · rev-4 · 2026-08-27 · node a · Tier-1 · base b4e1d5be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 |
 | [2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-6-spec-audit-round1.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-7 |
 
 <!-- /gen:spec-records -->
 
@@ -35,8 +36,10 @@ run-time HELD line and the file header.
 - **S2** — the change is measured: the pre-commit leg's wall clock before and after, on this node,
   recorded in the unit's journal record.
 - **S3** — the guard's own liveness is asserted. The full (non-`--staged`) run must still execute
-  checks 22 and 23, observed rather than assumed, because a guard that skips in both modes is a
-  silently deleted check.
+  check 23 — and "execute" is observed over an INSERTED BREAK, per AC4, never by looking for the
+  check's name in the output. Both checks print nothing when green, which rev-2 recorded as the reason
+  the first liveness criterion was unfalsifiable. A guard that skips in both modes is a silently
+  deleted check, and only a break can tell the two apart.
 
 ## 3. Non-goals (OUT)
 
@@ -46,7 +49,8 @@ run-time HELD line and the file header.
   Named as a non-goal on a MEASUREMENT rather than an assumption: with check 23 held, the whole
   `--staged` leg costs 10 s on this corpus, so check 22's walk is inside that and buys nothing to
   guard. Re-measure before assuming that holds on a corpus with many more review records.
-- Any change to what checks 22 and 23 ASSERT. This is a scope guard, not a predicate edit.
+- Any change to what check 23 ASSERTS. This is a scope guard, not a predicate edit. (Check 22's
+  predicate is equally untouched, and it is a non-goal twice over — see the bullet below.)
 - Making the pre-commit leg fast in general. Other legs may also be slow; this unit fixes the one
   the owner's prompt names and the one this build measured.
 - A gate on wall-clock cost for the hygiene leg. Charter §7 wants suites to declare a ceiling; that
@@ -95,7 +99,8 @@ stated split.
 - a11y — N/A.
 - i18n — N/A.
 - error / empty / loading states — N/A.
-- observability — the full run still names checks 22 and 23; S3 observes that.
+- observability — NEITHER check prints anything when green, so there is no name to look for. Liveness
+  is observable only over an inserted break, which is what AC2 and AC4 do.
 - risks — the one risk is silently disarming the checks in BOTH modes, which S3's liveness
   assertion is written to catch.
 - testing + left-shift gates — the full bar exercises the unguarded path on every push.
@@ -130,6 +135,11 @@ none
 - rev-1 · 2026-08-27 · initial draft. Authored under a standing mandate as an ADOPTED discovery: the
   owner's prompt cites this fix by its measurement, `aGroundedOrientation` parked it twice, and it
   taxes every commit of this build until it lands.
+- rev-4 · 2026-08-27 · folded spec-audit round 2, finding 9. rev-3 rewrote seven sites to name check
+  23 alone and left S3, §5 observability and the §3 non-goal quantified over "22 and 23" — a partial
+  fold on the exact axis rev-3 called a blocker, and §5 still named as its observable the thing rev-2
+  had discarded as unfalsifiable. A builder following S3 and §5 instead of AC2 and AC4 would have
+  reproduced the defect the fold removed.
 - rev-3 · 2026-08-27 · folded spec-audit round 1, finding 22, a BLOCKER. The unit graded a subject it
   had misidentified: the block holds check 23 alone and the spec, the run-time HELD line and the file
   header all said "22 and 23", so AC2 and AC4 could not observe check 22 and graded green for an

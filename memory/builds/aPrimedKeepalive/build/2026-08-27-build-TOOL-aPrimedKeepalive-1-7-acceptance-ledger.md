@@ -82,6 +82,29 @@ for its bytes by deleting some.
 - AC3 — `tools/unattended/unattended.sh` — the `ASHA` guard in `check_single_live`.
 - AC4 — `memory/builds/aPrimedKeepalive/spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md` — §3 now points at unit 7, and §9 carries the rev-2 line naming the observation that disproved it.
 - AC5 — `bash tools/unattended/check-unattended.sh` — green, proving `core_of` still reads the driver's constants.
+- AC6 — `sed -i 's/^phase: LANDING/phase: BUILDING/'` on `memory/builds/dTieredTribunal/RUN.md`, whose witness IS on the anchor, then `--preflight` — `UNATTENDED check 5 FAILED ... 2 live` returned and no `EXCLUDED` line printed. The PHASE guard is what decides, and it was the one clause of S3 with no observation behind it. Fixture reverted, `git diff` clean.
+
+## The two audit rounds, and what they cost
+
+| Round | Verdict | Blockers | Raw | Confirmed | Precision | State |
+|---|---|---|---|---|---|---|
+| 1 | BLOCKED | 4 | 33 | 10 | 0.30 | CONVERGING |
+| 2 | BLOCKED | 1 | 22 | 9 | 0.41 | CONVERGING |
+
+Round 1's four blockers included two live tree defects — a shipped example declaring a floor of 15
+against a 16-member core, and `BUILD-METHOD.template.md` 8 B over a budget this run may not raise —
+plus a unit that had graded a subject it misidentified. Round 2 found one blocker, also live: two
+behaviour-bearing engine lines moved with no `KIT_MEMORY_TREE_VERSION` bump. Its three HIGHs were all
+one shape, `amendment-leaves-its-other-half-standing`: round 1's fold corrected §4 and left §10, or
+rewrote seven sites and left three.
+
+**The sharpest finding of either round is round 2's number 20**, and it is the one worth reading
+twice. Round 1's fold added a Resume path resting on "a resumed session's keepalive is dead by
+construction" — and `TOOL-aPromptedMandate-11` records that premise as MEASURED FALSE, a run having
+asserted it twice about two jobs the scheduler's own listing showed still firing. The rendered prose
+went further than the spec and told the agent no delete could reach the old id. A build whose subject
+is the keepalive had reintroduced the orphan leak on the one path it added, in the fold, after the
+audit that was supposed to catch it. Resume now reaps first and reads the result back.
 
 ## What the checklist caught, and what it changed
 

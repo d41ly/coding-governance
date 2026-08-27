@@ -1,12 +1,13 @@
 # TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got
 
-**Status:** INPROGRESS · rev-2 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 7
+**Status:** INPROGRESS · rev-3 · 2026-08-27 · node a · Tier-2 · base b4e1d5be · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md](../build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md) | journal | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
+| [2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md](../reviews/2026-08-27-review-TOOL-aPrimedKeepalive-1-7-spec-audit-round2.md) | spec-audit | TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 |
 
 <!-- /gen:spec-records -->
 
@@ -109,6 +110,14 @@ reverse; a dependency in that direction would make the driver unrunnable without
   carries the `rev-2` line saying what disproved it.
 - **AC5** — When `bash tools/unattended/check-unattended.sh` runs, it stays green, proving the
   driver edit did not break the constants the leg reads out of it with `core_of`.
+- **AC6** — When a record whose phase is `BUILDING` and whose witness IS an ancestor of the observed
+  anchor is placed beside this run's own, `--preflight` still fires `check 5` and prints no `EXCLUDED`
+  line. This grades the PHASE guard, which is the single predicate keeping a genuinely concurrent run
+  from being excluded, and AC1 cannot stand in for it: `check 5` fires only above one live record, so a
+  driver with no phase guard yields a count of one and AC1 passes anyway. The kit's own check-5
+  fixture cannot reach it either — `runmd()` at `tools/unattended/unattended.test.sh:473` writes no
+  `witness` fact, so the exclusion takes the empty-witness branch whether or not the phase guard
+  exists. Observed with a staged fixture, then removed.
 
 ## 7. Gates
 
@@ -121,6 +130,9 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-27 · folded spec-audit round 2, finding 2. S3 names four fail-closed causes and §6
+  graded two; the PHASE guard — the clause that keeps a live `BUILDING` record from being excluded —
+  had no observation behind it at all. AC6 added and observed.
 - rev-2 · 2026-08-27 · folded spec-audit round 1's findings 25 and 26 from its sibling, which the
   audit named explicitly: unit 7 was outside the subject set, and fixing the predicate in unit 4 alone
   would leave the two copies disagreeing.
