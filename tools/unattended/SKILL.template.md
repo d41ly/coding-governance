@@ -32,9 +32,10 @@ it, and nothing records why. A step written inside one path is a step the other 
 which is why this one sits above the table instead.
 
 **One path below is NOT covered by this section, and it is named rather than left out**: `Resume`.
-A resumed session's keepalive is dead before it starts — the store went with the process — so that
-section carries its own instruction and this one cannot bind it. Every other path routes through the
-table below.
+A resumed session inherits a job it did not schedule and must PRESUME IT ALIVE — the intuition that
+the store went with the process is measured false, and `## Resume` says so with the measurement. That
+section therefore reaps before it schedules and carries its own instruction; this one cannot bind it.
+Every other path routes through the table below.
 
 **If the run never starts, reap it anyway.** Every path below can refuse — a value that does not
 resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s refusals. The store

@@ -1,6 +1,6 @@
 # aPrimedKeepalive — what was built, and which observation answered each criterion
 
-**Serves:** journal TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
+**Serves:** journal TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9
 
 Node `a`, 2026-08-27, branch `branch/unattended-keepalive-orientation-493b93`. The diff that lands is
 `b4e1d5be..HEAD`; the run's pinned BASE is later than its own work, and the build README says why.
@@ -20,8 +20,10 @@ and is the only unit that ran in the intended sequence.
 |---|---|---|---|
 | `check-memory-hygiene.sh --staged`, this tree | timed out at 120 s | **10 s** | `date` either side of the invocation |
 | commits in this build after unit 6 | — | 10 s each | observed on every subsequent `git commit` |
-| `memory/guides/BUILD-METHOD.md` | 24 546 B | **24 573 B** | `wc -c`, against M1's stated 24 576 B |
-| `memory/guides/SESSION-KICKOFF.md` | 25 236 B | **25 579 B** | `wc -c`, against the gated 25 600 B |
+| `tools/memory-tree/BUILD-METHOD.template.md` | 24 557 B | **24 560 B** | `wc -c`, against M1's 24 576 B — the BINDING half |
+| `memory/guides/BUILD-METHOD.md` | 24 546 B | **24 549 B** | `wc -c`; the render is 11 B looser and pricing against it cost this build an 8 B breach |
+| `memory/guides/UNATTENDED-PROTOCOL.md` | 613 L | **681 L** | `wc -l`, against hygiene check 6's `GUIDE_CAP_LINES=750` |
+| `memory/guides/SESSION-KICKOFF.md` | 25 118 B | **25 417 B** | `wc -c` at `b4e1d5be` and at HEAD, against the gated 25 600 B |
 | `DIRECTIVES_CORE` members | 15 | **16** | the driver constant, and `DIRECTIVES_FLOOR` with it |
 
 **Both budgets are now within tens of bytes of their caps.** Neither is raiseable by a run: M1's is a
@@ -36,7 +38,9 @@ for its bytes by deleting some.
 - AC4 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync (skill rendered from template + .unattended.conf)". Check 10's protocol parity is in the full-leg run recorded below.
 - AC5 — `memory/guides/UNATTENDED-PROTOCOL.md` — section 5's third bullet states the orphan-reap duty for a start path that refuses before a run exists.
 - AC6 — `memory/guides/BUILD-METHOD.md` — M10's keepalive bullet reads "Create it before ANY other act", still points at protocol §5, and states no rule of its own.
-- AC7 — `wc -c memory/guides/BUILD-METHOD.md` — 24 573, at or below M1's 24 576.
+- AC7 — `wc -c` over BOTH halves — `tools/memory-tree/BUILD-METHOD.template.md` 24 560 and `memory/guides/BUILD-METHOD.md` 24 549, each at or below M1's 24 576. The template is the binding half and it is the one that breached during this build.
+- AC8 — `wc -c memory/guides/SESSION-KICKOFF.md` — 25 417 against `MAX_MANIFEST_BYTES=25600`; the build's own §B bullet was trimmed from its first draft to pay for itself, 25 579 down to 25 417.
+- AC9 — `grep -c "REAP the recorded id, and only then" .claude/skills/unattended/SKILL.md` — returns 1. The `## Resume` section issues `CronDelete` against the recorded id first, reads the result back, cites `TOOL-aPromptedMandate-11` as the measurement that forbids assuming the job is dead, and then schedules the replacement.
 
 **Evidences:** TOOL-aPrimedKeepalive-2
 - AC1 — `memory/guides/UNATTENDED-PROTOCOL.md` — section 11 exists, defines DISCOVERY, and gives the three-clause test.
@@ -46,7 +50,8 @@ for its bytes by deleting some.
 - AC5 — `memory/guides/BUILD-METHOD.md` — M10 opens "Three deltas, and no others" and delta 1's substitute list reads "derive, ADOPT (protocol §11), park and abort".
 - AC6 — `wc -c memory/guides/BUILD-METHOD.md` — 24 573.
 - AC7 — `.claude/skills/unattended/SKILL.md` — the park bullet in "While it runs" is followed by the counterweight naming what may not be parked.
-- AC8 — `bash tools/unattended/adopt-unattended.sh --check` green; check 10 in the full-leg run recorded below.
+- AC8 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync"; check 10's protocol parity in the green leg run recorded above.
+- AC9 — `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` — 681 lines / 55 700 B against hygiene check 6's `GUIDE_CAP_LINES=750` and `GUIDE_CAP_BYTES=61440`. This build spent 68 of the 137 lines that were left, which is half the remaining headroom and is the figure the next author needs.
 
 **Evidences:** TOOL-aPrimedKeepalive-3
 - AC1 — `grep DIRECTIVES_CORE tools/unattended/unattended.sh` — contains `discoveries-adopted:M10`, 16 members.
@@ -62,6 +67,7 @@ for its bytes by deleting some.
 - AC3 — `tools/unattended/check-unattended.sh` — the `c7anchor` guard: an absent or unresolvable advertised tip reports the exclusion UNAVAILABLE and leaves every record counted.
 - AC4 — `tools/unattended/check-unattended.sh` — the predicate reads `[ "$c7ph" = LANDING ]`, so no other phase is reachable by it.
 - AC5 — `tools/unattended/check-unattended.sh` — check 7's header carries the "WHAT THIS DOES NOT CLAIM" paragraph.
+- AC6 — `grep -c "printf 'unattended: check 7 EXCLUDED" tools/unattended/check-unattended.sh` — returns 1. Both report lines are unconditional `printf` rather than `report()`, which is gated on `REPORT=1`.
 - **S2 defect, found by verifying and fixed in `c3e2af09`'s follow-up.** Both lines were first written through `report()`, which is gated on `REPORT=1` — so on a default bar run the exclusion printed NOTHING, which is the invisible-skip shape S2 exists to forbid. The leg's own green run is what exposed it: green, and silent about the record it had just stopped counting. Both are now unconditional `printf`.
 
 **Evidences:** TOOL-aPrimedKeepalive-5
@@ -116,3 +122,20 @@ audit that was supposed to catch it. Resume now reaps first and reads the result
 Two acceptance criteria were written wrong and both were caught by trying to run them — AC4 of unit 6
 and AC1 of unit 1. Both are recorded above in the AMENDED form rather than quietly rewritten, because
 a ledger that only ever reports observations is a ledger nobody has tested.
+
+**Evidences:** TOOL-aPrimedKeepalive-8
+- AC1 — `grep -c "dead before it starts" .claude/skills/unattended/SKILL.md` — returns 0. The carve-out now reads that a resumed session inherits a job it did not schedule and must PRESUME IT ALIVE.
+- AC2 — `bash tools/unattended/adopt-unattended.sh --check` — "in sync (skill rendered from template + .unattended.conf)".
+- AC3 — `memory/builds/aPrimedKeepalive/README.md` — the roster's unit-6 row names check 23, and no row asserts the retired claim.
+
+**Evidences:** TOOL-aPrimedKeepalive-9
+- AC1 — `memory/builds/aPrimedKeepalive/build/2026-08-27-build-TOOL-aPrimedKeepalive-1-7-acceptance-ledger.md` — every criterion a fold added now carries a line: unit 1 AC8 and AC9, unit 2 AC9, unit 4 AC6, unit 6 AC5.
+- AC2 — `wc -c` and `git show b4e1d5be:memory/guides/SESSION-KICKOFF.md | wc -c` — the Measured table's manifest row read 25 236 to 25 579 and the real pair is 25 118 to 25 417; corrected, and the BUILD-METHOD row now names the template as the binding half.
+- AC3 — `bash tools/memory-tree/check-memory-hygiene.sh` — check 23 green over the ledger once every unit is CLOSED, which is the push-boundary run recorded in the landing report.
+
+## The loop stopped itself, and that is the record
+
+Three rounds: 4 blockers, 1, then 2. `--review` returned NON-CONVERGENT on round 3 and M4's exit
+fired — the two standing blockers became units 8 and 9 rather than a fourth round over the same
+specs. Both are corrections to this build's own folds, which is the honest shape of a loop that
+stops: the audit had stopped finding defects in the WORK and started finding them in the FIXES.

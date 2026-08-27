@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-27
 streams: tooling
 roster: TOOL
-ids: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
+ids: TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9
 authorized-by: prompt
 ---
 
@@ -161,6 +161,23 @@ Unit 4's §3 had called that a non-goal on a reading of the code that is false.
 Measured by observation, nothing this repo measures gets worse, no M3 veto tripped. Recorded with
 `--rescope --act add`; unit 4 takes a `rev-2` correcting its §3.
 
+## The review loop stopped itself — units 8 and 9 are PROMOTED, not parked
+
+Three spec-audit rounds: 4 blockers, then 1, then 2. Round 3's count did not shrink, so `--review`
+returned NON-CONVERGENT and M4's exit fired: **every blocker still standing becomes a unit of this
+build, specced at its tier and built.** Not parked, not waived, not re-reviewed — a promoted unit is
+audited as a spec, which is what makes promotion terminate.
+
+Both are corrections to this build's own folds, which is what the loop was measuring:
+
+- **Unit 8** — `SKILL.template.md:35` asserted a resumed keepalive is dead before it starts while
+  `:589` of the same file calls that intuition MEASURED FALSE. 554 lines apart, with the false half in
+  the section every path reads first, and no criterion could red on it because AC9's observation
+  window stops at the `## Resume` heading. The same claim sat here in this README's own roster.
+- **Unit 9** — every criterion a fold ADDED was unevidenced in the acceptance ledger, while unit 7's
+  fold-added AC6 was evidenced — an omission rather than a convention, and hygiene check 23 reds the
+  push boundary the moment those units flip to CLOSED.
+
 ## Units — the authored roster (M2)
 
 One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the statement.
@@ -173,13 +190,15 @@ One mechanism per unit. Each cell is a label; the unit's `§1` Goal owns the sta
 | `TOOL-aPrimedKeepalive-3` | 2 | the `discoveries-adopted` directive, so the rule is in the set a run reads at step 0 |
 | `TOOL-aPrimedKeepalive-4` | 2 | leg check 7 stops counting a LANDING record whose work is already on the remote |
 | `TOOL-aPrimedKeepalive-5` | 1 | `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write |
-| `TOOL-aPrimedKeepalive-6` | 1 | hygiene checks 22 and 23 take the `--staged` guard all three of their siblings carry |
+| `TOOL-aPrimedKeepalive-6` | 1 | hygiene check 23 takes the `--staged` guard its siblings carry, and the block stops calling itself 22 |
 | `TOOL-aPrimedKeepalive-7` | 2 | the driver's live-run count takes the same exclusion the leg got |
+| `TOOL-aPrimedKeepalive-8` | 1 | the Skill's two halves agree that a resumed keepalive is presumed ALIVE |
+| `TOOL-aPrimedKeepalive-9` | 1 | the acceptance ledger evidences every criterion a fold added |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-27 · streams tooling
-ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-08-27 · streams tooling
+ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL-aPrimedKeepalive-4 TOOL-aPrimedKeepalive-5 TOOL-aPrimedKeepalive-6 TOOL-aPrimedKeepalive-7 TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -191,13 +210,15 @@ ids TOOL-aPrimedKeepalive-1 TOOL-aPrimedKeepalive-2 TOOL-aPrimedKeepalive-3 TOOL
 | [TOOL-aPrimedKeepalive-4 — leg check 7 stops counting a LANDING record whose work is already on the remote](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-4.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-5 — `dCarriedReceipt`'s record gains the `landed-anchor` its own verb failed to write](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-5.md) | 6 | 1 | INPROGRESS | rev-2 | 2026-08-27 |
 | [TOOL-aPrimedKeepalive-7 — the DRIVER's live-run count takes the same exclusion the leg just got](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-7.md) | 7 | 2 | INPROGRESS | rev-3 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-8 — the Skill's two halves agree that a resumed keepalive is presumed ALIVE](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-8.md) | 8 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
+| [TOOL-aPrimedKeepalive-9 — the acceptance ledger evidences every criterion a fold added](spec/2026-08-27-spec-TOOL-aPrimedKeepalive-9.md) | 9 | 1 | INPROGRESS | rev-1 | 2026-08-27 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPrimedKeepalive-8 TOOL-aPrimedKeepalive-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -211,6 +232,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 5 | `TOOL-aPrimedKeepalive-4` | no |
 | 6 | `TOOL-aPrimedKeepalive-5` | no |
 | 7 | `TOOL-aPrimedKeepalive-7` | no |
+| 8 | `TOOL-aPrimedKeepalive-8` | no |
+| 9 | `TOOL-aPrimedKeepalive-9` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
