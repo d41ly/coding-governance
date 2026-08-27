@@ -13,6 +13,9 @@ parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: ded172527621226aed8f4b9f3dcf78234ac084e2
 phase: LANDED
+landed-anchor: remote
+landed-anchor-source: reconstructed 2026-08-27 by hand, not by the verb, following the precedent commit 7cf96591. `--landed` flipped this record to LANDED and THEN failed leg check 34 on a stale lander marker, leaving a terminal phase with no anchor kind; re-running it now refuses with check 26 because the record is finished, so no verb can write these keys. VERIFIED before writing: `git merge-base --is-ancestor ded17252 origin/main` is true, so the witness genuinely reached the remote default branch and `remote` is the true kind, not the convenient one.
+unpushed-at-landing: 29
 branch-sha: e62f6f32ddc0d102f3dba5dfdae64f763cbf90cf
 branch-ref: refs/heads/branch/unattended-prompt-cg-toolkits-831d35
 mode: prompt
