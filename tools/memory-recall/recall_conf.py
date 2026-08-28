@@ -55,13 +55,13 @@ def repo_root() -> pathlib.Path:
     test that copies the kit in resolves to that repo rather than to wherever the runner stood.
 
     WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice
-    `tools/codebase-map/map_lib.py`'s `resolve_root` already made for the same measured reason,
-    and which `tools/govkit/govkit.py` reached for the same defect WITHOUT the boundary - its walk
+    the `codebase-map` kit's `map_lib.py` `resolve_root` already made for the same measured reason,
+    and which the `govkit` kit reached for the same defect WITHOUT the boundary - its walk
     is still unbounded, which is `TOOL-aCollapsedScan-12`. `git -C <dir> rev-parse
     --show-toplevel` returns <dir> ITSELF when an absolute GIT_DIR is inherited and no
     GIT_WORK_TREE names a tree, because git then treats the current directory as the work tree.
     That is exactly what git exports to a merge driver inside a LINKED WORKTREE, and it is how the
-    row-keyed merge driver was found inert here: this function answered `<root>/tools/memory-recall`,
+    row-keyed merge driver was found inert here: this function answered the KIT directory itself,
     `resolve()` looked for the conf beside the kit, `extract.py`'s import-time CONF raised, and
     every `memory/DECISIONS.md` and `memory/backlog/*.md` merge got conflict markers instead of a
     merge. Measured with a control: in an ordinary clone git exports no GIT_DIR and the defect is
@@ -78,7 +78,7 @@ def repo_root() -> pathlib.Path:
     """
     here = pathlib.Path(__file__).resolve()
     for parent in here.parents:
-        # THE WALK STOPS AT THE REPOSITORY BOUNDARY, which `tools/codebase-map/map_lib.py`'s
+        # THE WALK STOPS AT THE REPOSITORY BOUNDARY, which the `codebase-map` kit's `map_lib.py`
         # `resolve_root` already pays two lines for and records the reason: worktrees are commonly
         # kept INSIDE the primary tree (this repo puts them under `.claude/worktrees/`), so an
         # UNBOUNDED walk out of a checkout reaches the PRIMARY tree's conf and answers with a
