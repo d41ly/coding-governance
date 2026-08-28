@@ -1422,8 +1422,14 @@ def main(argv: list[str] | None = None) -> int:
     # default is not `main`, every ancestry answer was silently wrong rather than refused.
     base_ref = args.base_ref or os.environ.get("GOV_DEFAULT_BRANCH") or ""
     if not base_ref:
+        # `encoding="utf-8"` like every other probe in this file. `text=True` ALONE decodes with
+        # the platform default, which on a cp125x Windows node mis-decodes a non-ASCII branch name
+        # and, under a strict-encoding lint, is a finding in its own right. Fourteen call sites in
+        # this file already carry it; this was the one that did not. Reported by the inCMS adopter,
+        # whose encoding-posture leg requires it (ARCH-dReadoptedConvoy-1 S7).
         head = subprocess.run(["git", "-C", str(root), "symbolic-ref", "--quiet",
-                               "refs/remotes/origin/HEAD"], capture_output=True, text=True)
+                               "refs/remotes/origin/HEAD"], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
         base_ref = head.stdout.strip().rpartition("/")[2] if head.returncode == 0 else ""
     if not base_ref:
         print("drift-report: cannot resolve a default branch. Set GOV_DEFAULT_BRANCH, or pass "

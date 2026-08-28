@@ -690,6 +690,9 @@ def demand_contained_dest(dest: str, where: str) -> str:
 # ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
 # ---- Different questions, and collapsing them was the first cut of this fix.
 SEEDED_TOKENS = ("prefix", "kit_id", "kit")
+# The subset a per-ENTRY `[kit.<eid>]` table may set, graded by the STRICT path class. See
+# `target_context` for why the split is per-table rather than a name ban.
+PER_KIT_PATH_TOKENS = ("prefix", "kit")
 
 
 ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
@@ -731,32 +734,56 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
     EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
     consumed. See `demand_safe_token` for what was reproduced without it.
     """
-    prefix = demand_safe_token("prefix", (deploy.get("prefix") or "tools").strip("/"),
-                               f"entry '{eid}'")
+    # WHERE A TARGET MAY SPEAK ABOUT A SEEDED TOKEN, per TABLE and per KEY rather than by name.
+    #
+    # `ce4ef9f3` closed a live injection: a target could put a PROSE-class value -- one that admits
+    # a space -- on a key this engine interpolates into a `bash -c` template, and a READ-ONLY
+    # `check` would run it. That fix refused `prefix`, `kit_id` and `kit` from both target tables.
+    #
+    # The refusal is a SUPERSET of the defect, and the surplus is load-bearing for an adopter. The
+    # top-level `prefix` below is target-supplied too, and it is safe for exactly one reason: it is
+    # graded by the STRICT class, which admits no space, quote, semicolon, backtick or pipe, so a
+    # value cannot leave its argument. The defect was the CLASS, not the key. So:
+    #
+    #   [answers]    refuses all three. It is GLOBAL: a `kit` there collapses every entry into one
+    #                home and a `kit_id` renames all of them, so no value is ever legitimate.
+    #   [kit.<eid>]  accepts `prefix` and `kit`, graded STRICTLY. A per-entry install home is a path
+    #                fragment the OPERATOR owns and this engine cannot derive -- an adopter whose
+    #                memory-tree lives at `scripts/` rather than `scripts/memory-tree/` has no other
+    #                way to say so, and before this it had none at all. `kit_id` stays refused
+    #                everywhere: that is the ENTRY's identity, joined to the receipt's `kit` field,
+    #                and not a path.
+    per_kit = (deploy.get("kit") or {}).get(eid) or {}
+    for _tbl, _label, _allowed in ((deploy.get("answers") or {}, "answers", ()),
+                                   (per_kit, f"kit.{eid}", PER_KIT_PATH_TOKENS)):
+        for k in _tbl:
+            if k in SEEDED_TOKENS and k not in _allowed:
+                raise Refusal(
+                    f"the target descriptor supplies '{_label}.{k}', which this engine derives "
+                    f"({', '.join(SEEDED_TOKENS)}). These are interpolated into argv this engine "
+                    f"RUNS -- a `{{{k}}}` inside a `bash -c` or `python -c` template becomes the "
+                    f"command. A per-ENTRY install home is settable as `kit.<entry>.prefix` or "
+                    f"`kit.<entry>.kit`, graded by the strict path class; the global `[answers]` "
+                    f"table and `kit_id` are not. Remove the key: {_label}.{k}")
+    prefix = demand_safe_token(
+        f"kit.{eid}.prefix" if per_kit.get("prefix") else "prefix",
+        (per_kit.get("prefix") or deploy.get("prefix") or "tools").strip("/"),
+        f"entry '{eid}'")
+    # DERIVED unless the target names it. `{kit}` follows a per-entry `prefix` when only that is
+    # given, so an adopter who moves a whole kit family says it once.
+    _kit = per_kit.get("kit")
+    kit = (demand_safe_token(f"kit.{eid}.kit", _kit.strip("/"), f"entry '{eid}'")
+           if isinstance(_kit, str) and _kit else f"{prefix}/{eid}")
     ctx: dict[str, str] = {
         "prefix": prefix,
         "kit_id": eid,
-        "kit": f"{prefix}/{eid}",
+        "kit": kit,
     }
-    # REFUSED BY NAME, not dropped silently. Dropping the key also closes the hole and hides an
-    # operator's mistake; this engine's whole posture is to say what it refuses and why.
-    for _tbl, _label in ((deploy.get("answers") or {}, "answers"),
-                         ((deploy.get("kit") or {}).get(eid) or {}, f"kit.{eid}")):
-        for k in _tbl:
-            if k in SEEDED_TOKENS:
-                raise Refusal(
-                    f"the target descriptor supplies '{_label}.{k}', which is a token this engine "
-                    f"DERIVES for itself ({', '.join(SEEDED_TOKENS)}). Accepting it would let a "
-                    f"target overwrite the value the strict character class exists to guard, and "
-                    f"those tokens are interpolated into argv this engine RUNS -- a `{{{k}}}` inside "
-                    f"a `bash -c` or `python -c` template becomes the command. `intake` already "
-                    f"refuses to ASK for these; refusing to READ them is the same rule, one door "
-                    f"over. Remove the key: {_label}.{k}")
     for k, v in (deploy.get("answers") or {}).items():
         if isinstance(v, str):
             ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
-    for k, v in ((deploy.get("kit") or {}).get(eid) or {}).items():
-        if isinstance(v, str):
+    for k, v in per_kit.items():
+        if isinstance(v, str) and k not in PER_KIT_PATH_TOKENS:
             ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
     ctx.setdefault("memory_root", "memory")
     return ctx

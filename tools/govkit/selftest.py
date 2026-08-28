@@ -6257,6 +6257,7 @@ user_skills = "/tmp/gk-fake-skills"
             ('answers', 'kit_id',      'the same, one key over'),
             ('answers', 'prefix',      'and the strict-class key itself, through the prose door'),
             ('kit',     'kit',         'the per-entry table, which is a third door onto one dict'),
+            ('kit',     'kit_id',      'the one seeded key the per-entry table still may not set'),
         )
         # `pwn.py` is the script the payload aims at: `{kit}` is interpolated into a shipped
         # `python {kit}/...` template, so a value of `pwn.py z` makes python run THAT file.
@@ -6289,6 +6290,39 @@ user_skills = "/tmp/gk-fake-skills"
         check('[-5] R4-B1 LIVENESS a NON-reserved answer through the same door is still accepted',
               'DERIVES for itself' not in (_pokans.stdout + _pokans.stderr),
               (_pokans.stdout + _pokans.stderr)[-400:])
+
+        # ---- THE OTHER HALF OF R4-B1, AND THE REASON THE GUARD IS PER-TABLE. The blocker was a
+        # ---- PROSE-class value reaching an argv-bound key; the fix refused three NAMES, which is a
+        # ---- superset. An adopter whose kit does not live at `{prefix}/{kit_id}` -- memory-tree
+        # ---- installed FLAT at `scripts/`, say -- then had no way to say so at all, and the
+        # ---- refusal above is the only thing that had ever stopped it.
+        # ----
+        # ---- So the per-ENTRY table takes `prefix` and `kit` through the STRICT class, which is
+        # ---- the identical control the top-level `prefix` has always had, and the arms below hold
+        # ---- BOTH directions: the hostile spellings still refuse (the table above), and a
+        # ---- legitimate path fragment now RESOLVES. Without the second half the first passes by
+        # ---- refusing everything, which is the shape this file exists to refuse.
+        # `--kits` IS LOAD-BEARING on all three: `plan` with no selection takes the REGISTRY
+        # default, which carries `playbook`, whose unanswered `playbook_path` refuses before the
+        # per-entry table is ever read. Measured while writing these arms -- all three passed by
+        # finding nothing, on an error naming a kit the fixture does not install.
+        _homed = a_evil_target('homedkit', 'docs/da', 'drift-audit', door='kit', key='kit')
+        _phomed = run('plan', '--target', str(_homed), '--kits', 'drift-audit')
+        check('[-5] a STRICT per-entry `kit` is accepted and destinations resolve through it',
+              'docs/da/' in _phomed.stdout and 'DERIVES for itself' not in
+              (_phomed.stdout + _phomed.stderr),
+              f'rc {_phomed.returncode}: ' + (_phomed.stdout + _phomed.stderr)[-500:])
+        _hompfx = a_evil_target('homedpfx', 'docs', 'drift-audit', door='kit', key='prefix')
+        _phompfx = run('plan', '--target', str(_hompfx), '--kits', 'drift-audit')
+        check('[-5] a STRICT per-entry `prefix` is accepted and `{kit}` follows it',
+              'docs/drift-audit/' in _phompfx.stdout,
+              f'rc {_phompfx.returncode}: ' + (_phompfx.stdout + _phompfx.stderr)[-500:])
+        # AND THE REFUSAL IS STILL BY NAME for the key that is an IDENTITY rather than a path.
+        _kidt = a_evil_target('homedkid', 'x', 'drift-audit', door='kit', key='kit_id')
+        _pkidt = run('plan', '--target', str(_kidt), '--kits', 'drift-audit')
+        check('[-5] `kit.<entry>.kit_id` is still refused BY NAME -- it joins the receipt, not a path',
+              'kit.drift-audit.kit_id' in (_pkidt.stdout + _pkidt.stderr),
+              f'rc {_pkidt.returncode}: ' + (_pkidt.stdout + _pkidt.stderr)[-500:])
 
         # ---- ROUND 4 H2 + M1 -- A `merged` ROW LEFT THE TARGET DIRTY FOREVER. `apply` stages a
         # ---- merged destination and deliberately gives it no `oid` (`ROLE_KINDS["merged"]` is
