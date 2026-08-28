@@ -4528,7 +4528,15 @@ hit "$out" "no run-state file, so there is no run to record an amendment against
 # THE SAME HOST GATE. With GATE_BOUND_LIVE forced to 1 on a host with no runnable timeout, the
 # sourced function would take exit 127 against a 124|137 case; and the verb-level arm below would
 # watch its sleeper run to completion and red for a property of the box.
-RB_HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && RB_HAVE_TIMEOUT=1
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+RB_HAVE_TIMEOUT=0; timeout -k 1s 10 true >/dev/null 2>&1 && RB_HAVE_TIMEOUT=1
 if [ "$RB_HAVE_TIMEOUT" != 1 ]; then
   echo "  (SKIP the run_bounded arms — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here)"
 else

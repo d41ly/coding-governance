@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.11   # gov:kit unattended@1.11 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.12   # gov:kit unattended@1.12 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -563,7 +563,15 @@ if [ -z "$REMOTE_BOUND" ] || [ -z "$REMOTE_CONNECT_BOUND" ] || [ -z "$REMOTE_LOW
   REMOTE_BOUND=60; REMOTE_CONNECT_BOUND=20; REMOTE_LOWSPEED_BYTES=1000
 fi
 REMOTE_BOUND_LIVE=1
-timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+timeout -k 1s 10 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
 # IT MUST SAY SO. The flag's only reader used to be the `if` below, so on a node with no working
 # `timeout -k` every observation ran with the wall-clock bound silently absent and byte-identical
 # output — a skip that looks like a pass. The transport options still apply on that path; it is the

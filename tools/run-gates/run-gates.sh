@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.2   # gov:kit run-gates@1.2
+KIT_RUN_GATES_VERSION=1.3   # gov:kit run-gates@1.3
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -352,7 +352,15 @@ fi
 # records why, and repeating the path here would add a kit literal that resolves to nothing in a
 # target installed at another prefix.
 CEILINGS_LIVE=1
-timeout -k 1s 1 true >/dev/null 2>&1 || CEILINGS_LIVE=0
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+timeout -k 1s 10 true >/dev/null 2>&1 || CEILINGS_LIVE=0
 if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0

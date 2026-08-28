@@ -133,7 +133,15 @@ if stray:
 #
 #     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
 # HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
-HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+HAVE_TIMEOUT=0; timeout -k 1s 10 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
 # COUNTED EITHER WAY, hoisted above the host check for the reason arm 4h states in its own skip:
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this BOX could run
 # them, and the SKIP below is what reports the host. Left inside the else branch these six vanished
