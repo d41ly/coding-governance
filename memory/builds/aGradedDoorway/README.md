@@ -112,3 +112,20 @@ cover the new capability, and this says so rather than implying otherwise.
 its own outputs, grain, records and legs and ships `role = "engine"` — verbatim, no placeholder
 pass — so the suite cannot follow a variable the fixture does not have. That is
 `TOOL-dScrubbedConduit-2`, whose row already names that obstacle.
+
+## The push, and what went unverified in it
+
+Pushed to `origin/main` with `--no-verify`, on the owner's explicit instruction of 2026-08-28. The
+full push-boundary bar did not run.
+
+**Known green, from this build rather than from the push:** `govkit selftest` at 986 arms, exit 0,
+run after the final needle fix. `drift-audit/selftest.py` green. `adopt-unattended.test.sh` green at
+three prefixes — `tools/unattended`, `scripts/unattended`, `vendor/gov/unattended` — 55 assertions
+each.
+
+**Unverified:** `check-unattended.test.sh` was not run at all, at either prefix. What stands in for
+it is an equivalence proof rather than an execution: expanding `$KIT_REL` back to its default and
+removing the added lines reproduces the pre-change file BYTE FOR BYTE, so this repo's own behaviour
+cannot have changed. That covers regression and says nothing about the new capability. The
+foreign-prefix run for that file remains owed, and `TOOL-aGradedDoorway-2` stays INPROGRESS for
+exactly that reason.
