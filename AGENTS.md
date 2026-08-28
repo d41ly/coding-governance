@@ -480,23 +480,21 @@ that can. What survives here is what a session cannot get anywhere else.
 ```bash
 bash tools/run-gates/run-gates.sh                 # the bar, legs CONCURRENT
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh     # the serial bar, same code path — the concurrency rollback
-GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every kit self-test
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # the kit self-tests. ON DEMAND: no boundary runs them (owner 2026-08-27)
-GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg. A DoD needs it only for KIT work
+GATE_FULL=1 bash tools/run-gates/run-gates.sh     # ignore every leg guard — NOT the whole bar: it holds every `subject = kit` OR `chunk = selftests` leg
+GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run those. ON DEMAND ONLY: no boundary sets it (owner, 2026-08-27)
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # every leg there is. Owed by a DoD only for KIT work
 ```
 
 **Guards scope a run, never a verdict.** MOST self-test legs carry a `guard` in the manifest naming
 the kit dir they exercise, so a records-only commit runs only the legs that check this repo's actual
 state. Not all do, and the split is DERIVED from `tools/gate-legs.json` rather than counted here —
-an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard and `.githooks/pre-push` sets it, so the authoritative run
-is still available — but `.githooks/pre-push` no longer sets it unconditionally. It DECIDES, forcing a
-total run when no recorded full green covers the pushed tip, when that green is more than a declared
+an unguarded leg runs on every bar, which is the whole point of leaving it unguarded. `GATE_FULL=1` bypasses every guard, and `.githooks/pre-push` DECIDES whether to set it rather
+than setting it unconditionally, forcing a total run when no recorded full green covers the pushed tip, when that green is more than a declared
 number of commits behind it, when its tree fingerprint does not reproduce at the sha it names, when
 the leg manifest itself moved, or when the push runs the kit self-tests and the recorded green was
 earned with them held. That last one is COVERAGE and not equality — a green that covered MORE still
 satisfies a push that needs less, and a stamp with no such key at all reads as HELD. A guard can therefore scope the authoritative run too, and a
-too-narrow
-guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
+too-narrow guard cost an early signal rather than a wrong merge verdict. A guard naming an untracked path would
 skip forever and silently, so the run-gates canary refuses one.
 
 **How the bar behaves**, because none of this is derivable from the manifest. Legs run through a

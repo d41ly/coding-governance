@@ -134,12 +134,23 @@ if stray:
 #     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
 # HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
 HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# COUNTED EITHER WAY, hoisted above the host check for the reason arm 4h states in its own skip:
+# FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this BOX could run
+# them, and the SKIP below is what reports the host. Left inside the else branch these six vanished
+# on a host with no runnable `timeout` and the executed total fell to 128 against a floor of 132 --
+# the box redding the bar, which is the exact thing that skip exists to prevent. An arm added to
+# that branch owes its increment HERE, where it cannot be lost with the host.
+n=$((n+1))   # 1c        the construct bounds a grandchild
+n=$((n+1))   # 1d        the runner uses that construct, by source
+n=$((n+1))   # 1e        the runner applies a leg's declared ceiling
+n=$((n+1))   # 1e-ctl    an identical leg with NO ceiling is not reported timed out
+n=$((n+1))   # 1e-report an unbounded leg is counted, never refused
+n=$((n+1))   # 1e-scope  the negative search selected the population it claims to
 if [ "$HAVE_TIMEOUT" != 1 ]; then
   # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
   # for a property of their box, which is what the sibling arms below already refuse to do.
   echo "canary: SKIP arms 1c/1d/1e — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here. 1e is INSIDE this gate: with CEILINGS_LIVE=0 the runner deliberately runs every leg unbounded, so its fixture leg would finish and the arm would red for a property of the box"
 else
-n=$((n+1))
 _cw=$(mktemp -d)
 _t0=$(date +%s)
 timeout -k 5s 2 bash -c 'sleep 30 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
@@ -166,7 +177,6 @@ rm -rf "$_cw"
 # ---- 1d. THE RUNNER USES THAT CONSTRUCT. Scoped to CODE LINES: a whole-file grep reds on the
 #     comments documenting the fix, which is absence-assertion-over-whole-file-text happening inside
 #     the guard. TOOL-aBoundedCeiling-1.
-n=$((n+1))
 if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 2>&1; then
   echo "canary: run-gates.sh captures a timeout through a command substitution on a code line —"
   echo "canary: that bounds the verdict and not the clock. Redirect to a file and read the file."
@@ -186,7 +196,6 @@ fi
 #     around the whole runner is a fact about the box. What IS asserted is the VERDICT plus the
 #     control -- an identical leg with NO ceiling is not reported as timed out -- which is what
 #     distinguishes "the runner bounds legs" from "this leg happened to fail".
-n=$((n+1))
 _cd=$(mktemp -d)
 printf '#!/usr/bin/env bash\nsleep 45\n' > "$_cd/slow.sh"
 "$PYBIN" - "$_cd" <<'CEILPY'
@@ -213,7 +222,6 @@ esac
 
 # 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
 #     that reds every long leg for any reason would read as proof that ceilings work.
-n=$((n+1))
 _uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_uout" in
   *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
@@ -223,7 +231,6 @@ esac
 
 # 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
 #     forgotten gov leg from an adopter leg it has no business bounding, so a mixed manifest RUNS.
-n=$((n+1))
 case "$_uout" in
   *"declare no ceiling and run unbounded"*) ;;
   *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
@@ -235,7 +242,6 @@ fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e -------------------------
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
-n=$((n+1))
 ctl=$(mktemp -d)
 printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.sh"],"guard":["z/"]}]' > "$ctl/clean.json"
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
@@ -496,12 +502,17 @@ esac
 # arm that could not look has not looked, and scoring that green is fixture-passes-by-finding-nothing
 # with the machine blamed for the fixture. The caller owns `fail`, so the self-test below can call
 # this in a subshell and read the message without reddening the suite.
-clamp_expired_verdict() { # width-input -> prints the verdict, always returns 1
+clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the clamp, 2 = undecidable
   local w="$1" ctw ctl crc
   ctw=$(clamp_target "$w")
   ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); crc=$?
   if [ "$crc" = 124 ]; then
     echo "canary: GATE_JOBS='$w' and its width-$ctw control BOTH expired - this host could not finish the fixture at any width, so the clamp is unproven either way"
+    # 2, NOT 1. This branch already DECLINES to blame the clamp, and the caller red anyway - so
+    # the canary reported "the clamp is broken" on the strength of a sentence saying it is
+    # unproven. Naming a cause it never checked, which is the defect this unit exists to remove,
+    # arriving through the arm that asserts it. The caller skips loudly on 2 and reds on 1.
+    return 2
   else
     echo "canary: GATE_JOBS='$w' never terminated while its width-$ctw control finished - the clamp let it spin"
   fi
@@ -513,8 +524,13 @@ n=$((n+1))
 n=$((n+1))
   out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
-    clamp_expired_verdict "$w"
-    fail=1; continue
+    clamp_expired_verdict "$w"; cv=$?
+    if [ "$cv" = 2 ]; then
+      echo "canary: SKIP the GATE_JOBS='$w' clamp arm - UNEXERCISED on this host, not passed"
+    else
+      fail=1
+    fi
+    continue
   fi
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
@@ -548,8 +564,21 @@ case "$v" in
   *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
-[ "$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )" != "$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )" ] \
-  || { echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1; }
+#        GUARDED THE WAY ITS NEIGHBOUR ALREADY IS, and for that neighbour's reason. When this host
+#        cannot finish the control inside 60s BOTH runs legitimately report `BOTH expired`, the two
+#        strings are equal, and an unguarded comparison then reds claiming the verdict is unreadable
+#        - when what actually happened is that the second outcome was never produced. The arm
+#        directly above already classifies such a host as a SKIP; this one used to red on it.
+v_undec=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
+v_spun=$(  CLAMP_BUDGET=60   clamp_expired_verdict 0 2>&1 )
+case "$v_spun" in
+  *"BOTH expired"*)
+    echo "canary: SKIP the distinguishability arm - this host never produced the spun outcome, so the two messages were never both generated" ;;
+  *)
+    if [ "$v_undec" = "$v_spun" ]; then
+      echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1
+    fi ;;
+esac
 
 # 3g. a healthy leg is NEVER reported "(no result)" — the reader must not conclude a still-pending
 #     leg is dead just because no job is RUNNING at the instant it looks.

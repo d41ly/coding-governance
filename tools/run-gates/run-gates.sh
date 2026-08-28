@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.1   # gov:kit run-gates@1.1
+KIT_RUN_GATES_VERSION=1.2   # gov:kit run-gates@1.2
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -585,29 +585,18 @@ if [ -n "$TS_COMMON" ]; then
     # THE CLAIM IS A DIRECTORY CREATE, which is atomic on every filesystem this runs on and needs no
     # `flock` — which does not exist on this platform. The heartbeat is written FIRST on winning, so
     # a just-claimed holder is never mistaken by a waiter for one with no clock.
-    # REAP DEAD WAITERS BEFORE READING THE HEAD. The beacon has always had a liveness test --
-    # `ts_alive`, ten lines up, and the runner even prints "reaping the beacon of a dead
-    # holder". The QUEUE had none, and the acquire predicate below is only "my ticket sorts
-    # first". So a killed bar left a ticket that sorts first FOREVER and wedged every later bar
-    # in the repository, reporting nothing at all: no legs, no per-leg log, just a position
-    # number that never moves.
+    # THE DEAD-WAITER SWEEP IS NOT HERE, AND THAT IS THE FIX. It was here, silently, and being here
+    # is what broke it: this loop deleted the dead ticket before `ts_sweep_queue` at the wait branch
+    # below could ever see one, so the sweep that ANNOUNCES never spoke and arm 16 of
+    # `run-gates.turnstile.test.sh` red on a message that was never going to be printed. Two
+    # implementations of one predicate, and the quiet one won the race.
     #
-    # MEASURED 2026-08-27: a `push-main.sh` landing sat 6858 s at "queued at position 4" with
-    # ZERO legs run, behind three dead tickets from bars killed earlier that session. Deleting
-    # them by hand advanced it 4 -> 3 -> 1 and it acquired at once. Second wedge that day.
-    # TOOL-aBoundedCeiling-12.
-    #
-    # A ticket is `<utc>-<pid>-<nonce>`, so the pid is field 2. A name that does not parse is
-    # LEFT ALONE rather than guessed at: deleting a ticket we cannot read is how a live bar
-    # loses its place, which is a worse failure than the one being fixed.
-    for _tk in "$TS_Q"/*; do
-      [ -e "$_tk" ] || continue
-      _tb=$(basename "$_tk")
-      [ "$_tb" = "$(basename "${TS_TICKET:-}")" ] && continue
-      _tp=$(printf %s "$_tb" | cut -d- -f2)
-      case "$_tp" in ""|*[!0-9]*) continue ;; esac
-      ts_alive "$_tp" || rm -f "$_tk" 2>/dev/null || true
-    done
+    # The sweep now happens ONCE, in `ts_sweep_queue`, reached from the failure of the acquire
+    # below on every tick. That call is NOT guarded on a beacon existing — which is the guard that
+    # made `ts_try_reap` unable to see this wedge at all — so the wedge is still swept. The cost is
+    # one extra tick before acquiring behind a dead ticket; the gain is a reason on stderr naming
+    # the pid, which is the whole difference between a fixed wedge and a wedge nobody can see was
+    # fixed. TOOL-aBoundedCeiling-12.
     if [ -n "$TS_TICKET" ] && [ "$(ls -1 "$TS_Q" 2>/dev/null | LC_ALL=C sort | head -1)" = "$(basename "$TS_TICKET")" ] \
        && mkdir "$TS_DIR_C" 2>/dev/null; then
       TS_DIR="$TS_DIR_C"

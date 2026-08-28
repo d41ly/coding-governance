@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.48   # gov:kit memory-tree@2.48 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.49   # gov:kit memory-tree@2.49 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -694,20 +694,35 @@ $over21"
   # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
   # id: family, slug and ordinal. A bound record whose name carries no family qualifier fails here,
   # since two thirds of an id is not a projection of it.
-  proj21=$(printf '%s\n' "$b21" | sed -n 's/^S\t\([^\t]*\)\t[^\t]*\t\(.*\)$/\1|\2/p' | while IFS='|' read -r p ids; do
-      base=${p##*/}; base=${base%.*}
-      case "$base" in
-        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) stem=${base#????-??-??-} ;;
-        *) echo "  $p — the name carries no date, so no id can be read from it"; continue ;;
-      esac
-      rest=${stem#*-}
-      claimed=$(printf '%s\n' "$rest" | grep -oE "^($FAM_ALT)-[A-Za-z0-9]+-[0-9]+" || true)
-      if [ -z "$claimed" ]; then
-        echo "  $p — bound, but the name carries no family-qualified id"
-      else
-        printf '%s\n' "$ids" | tr ' ' '\n' | grep -qxF "$claimed" || echo "  $p — the name claims $claimed"
-      fi
-    done)
+  # ONE awk over the S rows, replacing a `sed` plus a shell loop that spawned a command
+  # substitution and a `grep -oE` for `claimed`, then a subshell with `tr` and `grep -qxF` for the
+  # membership test - four to six processes on every record. Measured at 338.9 s of a 1398 s run
+  # while `--print-bindings`, the parse this check delegates, was 1.416 s of it: the cost was the
+  # LOOP, not the read. The three message lines are byte-identical to the retired ones and a
+  # conformant record still contributes none. TOOL-aThawedCorpus-1.
+  #
+  # `FAM_ALT` arrives by `-v`, as check 12's driver does it, rather than being interpolated into
+  # the program text: a shell-expanded alternation inside an awk program is the class this corpus
+  # records as `heredoc-escape-reaches-the-regex`.
+  proj21=$(printf '%s\n' "$b21" | awk -F'\t' -v famalt="$FAM_ALT" '
+    $1 != "S" || NF < 4 { next }        # the retired `sed` required all four fields; so does this
+    {
+      p = $2; ids = $4
+      base = p; sub(/^.*\//, "", base); sub(/\.[^.]*$/, "", base)
+      if (base !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
+        print "  " p " — the name carries no date, so no id can be read from it"; next
+      }
+      rest = substr(base, 12)           # past the date prefix the test above proved is there
+      sub(/^[^-]*-/, "", rest)          # drop the kind, exactly as `${stem#*-}` did
+      claimed = ""
+      if (match(rest, "^(" famalt ")-[A-Za-z0-9]+-[0-9]+")) claimed = substr(rest, RSTART, RLENGTH)
+      if (claimed == "") {
+        print "  " p " — bound, but the name carries no family-qualified id"; next
+      }
+      n = split(ids, a, " ")
+      for (i = 1; i <= n; i++) if (a[i] == claimed) next
+      print "  " p " — the name claims " claimed
+    }')
   [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
 $proj21"
 fi
@@ -1141,6 +1156,13 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- measures ~10 s on this corpus once this block is held, so a second scope buys nothing. Worth
 # ---- saying because the header comment above this block read `22:` until 2026-08-27 and a spec
 # ---- trusted it, graded the wrong check, and shipped the error into a runtime line.
+# ----
+# ---- MAKE THAT THREE BUILDS, INDEPENDENTLY, AND THE THIRD IS WHY THIS COMMENT SAYS SO.
+# ---- `TOOL-aThawedCorpus-5` derived the same guard on a branch that never landed, and its
+# ---- merge kept THIS half because the branch's spelling skipped SILENTLY — no announce
+# ---- line — which is the class the paragraph above exists to refuse. `TOOL-aThawedCorpus-2`
+# ---- was retired to keep `memory hygiene` guardless in tools/gate-legs.json, which is what
+# ---- makes the push-boundary compensating control above actually hold on BOTH pre-push arms.
 if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
   printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
 '
@@ -1148,17 +1170,31 @@ fi
 if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # The ledger, flattened ONCE to `<unit> <label> <form>` triples across every tracked record. A
   # record may carry several `**Evidences:**` blocks; a block ends at the next one or at a heading.
-  alledger=$(for r in $(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null); do
-    awk '
-      /^\*\*Serves:\*\*/ { j = ($0 ~ /\*\*Serves:\*\* *journal/) }
-      /^\*\*Evidences:\*\* / { u = (j ? $2 : ""); next }
-      /^#/ { u = ""; next }
-      u != "" && /^- *(\*\*)?AC[0-9]+/ {
-        lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
-        form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
-        print u " " lab " " form
-      }' "$r"
-  done)
+  #
+  # ONE awk over a path STREAM, not one awk per record. This loop and the per-spec prologue below
+  # were measured together at 962.0 s of a 1398 s full run, 68.8%, and the cost was process
+  # creation rather than reading: `TOOL-aMeteredTurnstile-6` puts `bash -c true` between 22.5 ms and
+  # 581 ms on this fleet. A STREAM and not awk OPERANDS, because awk handed a path it cannot open
+  # aborts the entire pass, where the retired per-file loop skipped that path and continued — and
+  # `git ls-files` enumerates the INDEX, so a tracked-but-absent path is a real input. An empty
+  # operand list would also make awk read stdin; an empty stream is a no-op. TOOL-aThawedCorpus-4.
+  alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | awk '
+    { f = $0; if (f == "") next
+      j = 0; u = ""                       # per-RECORD reset; the retired spelling got this free
+      while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
+        sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
+        $0 = line                         # attribute one record'"'"'s criteria to the next
+        if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
+        if ($0 ~ /^\*\*Evidences:\*\* /) { u = (j ? $2 : ""); continue }
+        if ($0 ~ /^#/) { u = ""; continue }
+        if (u != "" && $0 ~ /^- *(\*\*)?AC[0-9]+/) {
+          lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
+          form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
+          print u " " lab " " form
+        }
+      }
+      close(f)
+    }')
   alpop=0; algap=""; albad=""; alnolab=""
   alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null || true)
   # The LISTING, guarded, not the post-cutoff population: a tree whose closed Tier-2 specs all
@@ -1167,45 +1203,85 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # difference between an announced skip and a check that is dark and looks identical to green.
   pop_guard 23 "no spec file selected under $M/builds/*/spec/" "$(printf '%s
 ' "$alspecs" | grep -c . || true)" "$PRE_SPEC"
-  for sp in $alspecs; do
-    case "$(basename "$sp")" in
-      [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*) sdate=$(basename "$sp" | cut -c1-10) ;;
-      *) continue ;;
-    esac
-    printf '%s\n%s\n' "$alcut" "$sdate" | sort -C || continue
-    hdr=$(sed -n '1,6p' "$sp" | grep -m1 '^\*\*Status:\*\*')
-    case "$hdr" in *" CLOSED "*) ;; *) continue ;; esac
-    case "$hdr" in *"Tier-2"*) ;; *) continue ;; esac
-    grep -qE '^## [0-9]+[.] Acceptance criteria[ 	]*$' "$sp" || continue
-    uid=$(sed -n 's/^# \([A-Z][A-Za-z0-9-]*\) .*/\1/p' "$sp" | head -1)
-    [ -n "$uid" ] || continue
-    # A DECLARED, NARROW EXEMPTION, listed by unit id and never by pattern. The cutoff is a DATE and
-    # a date boundary falls mid-day: a unit that closed before this grammar existed can share its
-    # cutoff date with one that closed after. Back-filling another build's ledger is not this build's
-    # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
-    # shrink-only, with its reason beside it in the conf.
-    case " ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " in *" $uid "*) continue ;; esac
-    alpop=$((alpop + 1))
-    labs=$(awk '
-      /^## / { inac = ($0 ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/); next }
-      !inac { next }
-      /^([ 	]*(-|\*)[ 	]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/ {
-        lab = $0; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab); print lab
-      }' "$sp" | sort -u)
-    if [ -z "$labs" ]; then
-      # A CLOSED Tier-2 spec with the heading and no labels cannot be evidenced, and "every criterion
-      # is evidenced" is vacuously TRUE over none of them. That vacuity is the whole reason this arm
-      # exists rather than being an oversight the check tolerates.
-      alnolab="$alnolab $uid"
-      continue
+  # THE PROLOGUE, in ONE awk over the same kind of stream. Every filter the retired per-spec loop
+  # applied, IN ITS ORDER, and then the labels — which that loop paid a separate awk and a sort for.
+  # The filters: filename date at or after the cutoff; a `**Status:**` line in the first six RAW
+  # lines (raw, NOT unfenced — check 23 deliberately differs from check 12 here, and unfencing would
+  # move the verdict); CLOSED; Tier-2; an acceptance-criteria heading anywhere; an H1 id; and finally
+  # the declared grandfather set. `seq` numbers specs in stream order so the sort below can restore
+  # per-spec label order without losing which spec a label came from.
+  #
+  # A DECLARED, NARROW EXEMPTION, listed by unit id and never by pattern. The cutoff is a DATE and
+  # a date boundary falls mid-day: a unit that closed before this grammar existed can share its
+  # cutoff date with one that closed after. Back-filling another build's ledger is not this build's
+  # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
+  # shrink-only, with its reason beside it in the conf.
+  alsel=$(printf '%s\n' "$alspecs" | grep . | awk -v cut="$alcut" \
+      -v grand=" ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " '
+    { f = $0; seq++
+      base = f; sub(/^.*\//, "", base)
+      if (base !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) next
+      if (substr(base, 1, 10) < cut) next        # the retired `sort -C` on two ISO dates, inlined
+      hdr = ""; nl = 0; hasac = 0; uid = ""; inac = 0; nlab = 0
+      while ((getline line < f) > 0) {
+        sub(/\r$/, "", line)
+        nl++
+        if (nl <= 6 && hdr == "" && line ~ /^\*\*Status:\*\*/) hdr = line
+        if (uid == "" && line ~ /^# [A-Z][A-Za-z0-9-]* /) {
+          uid = line; sub(/^# /, "", uid); sub(/ .*$/, "", uid)
+        }
+        if (line ~ /^## /) {
+          inac = (line ~ /^## [0-9]+[.] Acceptance criteria[ \t]*$/)
+          if (inac) hasac = 1
+          continue
+        }
+        if (!inac) continue
+        if (line ~ /^([ \t]*(-|\*)[ \t]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
+          lab = line
+          sub(/^[ \t]*(-|\*)?[ \t]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
+          labs[++nlab] = lab
+        }
+      }
+      close(f)
+      if (hdr !~ / CLOSED /) next
+      if (hdr !~ /Tier-2/) next
+      if (!hasac) next
+      if (uid == "") next
+      if (index(grand, " " uid " ") > 0) next    # grandfathered leaves the COUNT too, as it did
+      print "U\t" seq "\t" uid
+      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i]
+    }')
+  # The ledger as a MAP, built once. FIRST-WINS, because the retired lookup was `grep -m1` and a
+  # bash associative array is last-wins; getting that backwards would silently reclassify a unit
+  # whose ledger carries two lines for one criterion.
+  declare -A ALFORM
+  while IFS= read -r _al; do
+    [ -n "$_al" ] || continue
+    _alk="${_al% *}"
+    [ -n "${ALFORM[$_alk]+x}" ] || ALFORM["$_alk"]="${_al##* }"
+  done <<<"$alledger"
+  alU=$(printf '%s\n' "$alsel" | grep "^U	" || true)
+  alpop=$(printf '%s\n' "$alU" | grep -c . || true)
+  # Labels sorted per spec, deduplicated, in ONE sort rather than one per spec. `-k2,2n` is the
+  # stream order the retired outer loop walked and `-k4,4` is the `sort -u` it applied inside it,
+  # so the three failure strings below are built in exactly the order they were before. No LC_ALL,
+  # matching the retired `sort -u`, which took the ambient collation.
+  declare -A ALHASLAB
+  while IFS="	" read -r _lt _lseq _luid _llab; do
+    [ -n "$_llab" ] || continue
+    ALHASLAB["$_lseq"]=1
+    _alk="$_luid $_llab"
+    if [ -z "${ALFORM[$_alk]+x}" ]; then algap="$algap $_luid/$_llab"
+    elif [ "${ALFORM[$_alk]}" = bad ]; then albad="$albad $_luid/$_llab"
     fi
-    for lab in $labs; do
-      row=$(printf '%s\n' "$alledger" | grep -m1 -E "^$uid $lab (obs|amd|bad)$" || true)
-      if [ -z "$row" ]; then algap="$algap $uid/$lab"
-      else case "$row" in *" bad") albad="$albad $uid/$lab" ;; esac
-      fi
-    done
-  done
+  done <<<"$(printf '%s\n' "$alsel" | grep "^L	" | sort -u -t"	" -k2,2n -k4,4)"
+  # A CLOSED Tier-2 spec with the heading and no labels cannot be evidenced, and "every criterion
+  # is evidenced" is vacuously TRUE over none of them. That vacuity is the whole reason this arm
+  # exists rather than being an oversight the check tolerates.
+  while IFS="	" read -r _ut _useq _uuid; do
+    [ -n "$_uuid" ] || continue
+    [ -n "${ALHASLAB[$_useq]+x}" ] || alnolab="$alnolab $_uuid"
+  done <<<"$alU"
   [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
   [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
