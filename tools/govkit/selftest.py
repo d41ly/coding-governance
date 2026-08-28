@@ -6278,9 +6278,14 @@ user_skills = "/tmp/gk-fake-skills"
         # reproduction attempts for this defect proved nothing at all.
         _reached = a_evil_target('doorlive', 'pwn.py z', 'drift-audit', door='answers', key='kit')
         _preach = run('check', '--target', str(_reached))
+        # THE NEEDLE IS THE REMEDY LINE, not a phrase from the prose. The prose was rewritten when
+        # the guard became per-table (TOOL-aGradedDoorway-1) and this arm redded on the wording
+        # while the behaviour it grades was unchanged -- an arm keyed on a sentence rather than on
+        # the fact. `Remove the key: answers.kit` names BOTH the door and the key, which is the
+        # thing this arm is actually about.
         check('[-5] R4-B1 LIVENESS the answers door is REACHED -- the run refuses at the reserved '
               'key rather than dying earlier on a receipt or a TOML error',
-              'DERIVES for itself' in (_preach.stdout + _preach.stderr),
+              'Remove the key: answers.kit' in (_preach.stdout + _preach.stderr),
               f'rc {_preach.returncode}: ' + (_preach.stdout + _preach.stderr)[-600:])
         # AND A LEGITIMATE ANSWER THROUGH THE SAME DOOR still resolves, or the table above passes
         # because the engine refuses every answer there is.
@@ -6288,7 +6293,7 @@ user_skills = "/tmp/gk-fake-skills"
                                door='answers', key='memory_root')
         _pokans = run('check', '--target', str(_okans))
         check('[-5] R4-B1 LIVENESS a NON-reserved answer through the same door is still accepted',
-              'DERIVES for itself' not in (_pokans.stdout + _pokans.stderr),
+              'Remove the key: answers.' not in (_pokans.stdout + _pokans.stderr),
               (_pokans.stdout + _pokans.stderr)[-400:])
 
         # ---- THE OTHER HALF OF R4-B1, AND THE REASON THE GUARD IS PER-TABLE. The blocker was a
@@ -6309,7 +6314,7 @@ user_skills = "/tmp/gk-fake-skills"
         _homed = a_evil_target('homedkit', 'docs/da', 'drift-audit', door='kit', key='kit')
         _phomed = run('plan', '--target', str(_homed), '--kits', 'drift-audit')
         check('[-5] a STRICT per-entry `kit` is accepted and destinations resolve through it',
-              'docs/da/' in _phomed.stdout and 'DERIVES for itself' not in
+              'docs/da/' in _phomed.stdout and 'Remove the key:' not in
               (_phomed.stdout + _phomed.stderr),
               f'rc {_phomed.returncode}: ' + (_phomed.stdout + _phomed.stderr)[-500:])
         _hompfx = a_evil_target('homedpfx', 'docs', 'drift-audit', door='kit', key='prefix')
