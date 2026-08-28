@@ -1182,6 +1182,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
     { f = $0; if (f == "") next
       j = 0; u = ""                       # per-RECORD reset; the retired spelling got this free
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
+        sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
         if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
         if ($0 ~ /^\*\*Evidences:\*\* /) { u = (j ? $2 : ""); continue }
@@ -1223,6 +1224,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       if (substr(base, 1, 10) < cut) next        # the retired `sort -C` on two ISO dates, inlined
       hdr = ""; nl = 0; hasac = 0; uid = ""; inac = 0; nlab = 0
       while ((getline line < f) > 0) {
+        sub(/\r$/, "", line)
         nl++
         if (nl <= 6 && hdr == "" && line ~ /^\*\*Status:\*\*/) hdr = line
         if (uid == "" && line ~ /^# [A-Z][A-Za-z0-9-]* /) {
