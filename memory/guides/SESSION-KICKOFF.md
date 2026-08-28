@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-28T02:17:44+03:00 @ 5e69747235a74498ae2e5c3e16ba1232f079ab5f
+last-audit: 2026-08-28T07:42:34+03:00 @ 782870c3463fbc103400a7eb269369f3ced7c71f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 065c39759b0a0cd7f8d5ca26fb2dd68d469534b5
@@ -208,8 +208,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `TOOL-aPromptedMandate-4`.
 - The turnstile serializes bars WITHIN one repository; sessions on this node still contend
   across repos, and four concurrent bars once stretched the driver selftest from 11 to 99
-  minutes. `both expired ... unproven either way` means contention — re-run quiet before
-  believing a latency claim. `TOOL-aPacedTurnstile-2`.
+  minutes. `both expired ... unproven either way` means contention and now SKIPS that arm
+  loudly rather than redding it — re-run quiet before believing a latency claim. A queue
+  wedged behind a killed bar sweeps itself and names the dead pid. `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
 - The memory hygiene leg is under two minutes, not ~23: `TOOL-aThawedCorpus-4` and `-1` collapsed

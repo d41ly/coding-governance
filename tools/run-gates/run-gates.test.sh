@@ -496,12 +496,17 @@ esac
 # arm that could not look has not looked, and scoring that green is fixture-passes-by-finding-nothing
 # with the machine blamed for the fixture. The caller owns `fail`, so the self-test below can call
 # this in a subshell and read the message without reddening the suite.
-clamp_expired_verdict() { # width-input -> prints the verdict, always returns 1
+clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the clamp, 2 = undecidable
   local w="$1" ctw ctl crc
   ctw=$(clamp_target "$w")
   ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); crc=$?
   if [ "$crc" = 124 ]; then
     echo "canary: GATE_JOBS='$w' and its width-$ctw control BOTH expired - this host could not finish the fixture at any width, so the clamp is unproven either way"
+    # 2, NOT 1. This branch already DECLINES to blame the clamp, and the caller red anyway - so
+    # the canary reported "the clamp is broken" on the strength of a sentence saying it is
+    # unproven. Naming a cause it never checked, which is the defect this unit exists to remove,
+    # arriving through the arm that asserts it. The caller skips loudly on 2 and reds on 1.
+    return 2
   else
     echo "canary: GATE_JOBS='$w' never terminated while its width-$ctw control finished - the clamp let it spin"
   fi
@@ -513,8 +518,13 @@ n=$((n+1))
 n=$((n+1))
   out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
-    clamp_expired_verdict "$w"
-    fail=1; continue
+    clamp_expired_verdict "$w"; cv=$?
+    if [ "$cv" = 2 ]; then
+      echo "canary: SKIP the GATE_JOBS='$w' clamp arm - UNEXERCISED on this host, not passed"
+    else
+      fail=1
+    fi
+    continue
   fi
   printf '%s\n' "$out" | grep -q '^gates GREEN — 4/4 legs passed$' \
     || { echo "canary: GATE_JOBS='$w' did not clamp to a working width"; printf '%s\n' "$out" | tail -3 | sed 's/^/    /'; fail=1; }
@@ -548,8 +558,21 @@ case "$v" in
   *) echo "canary: the expiry verdict emitted neither outcome when its control was run: $v"; fail=1 ;;
 esac
 #        ...and the two outcomes are DISTINGUISHABLE, which is the whole point of the unit.
-[ "$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )" != "$( CLAMP_BUDGET=60 clamp_expired_verdict 0 2>&1 )" ] \
-  || { echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1; }
+#        GUARDED THE WAY ITS NEIGHBOUR ALREADY IS, and for that neighbour's reason. When this host
+#        cannot finish the control inside 60s BOTH runs legitimately report `BOTH expired`, the two
+#        strings are equal, and an unguarded comparison then reds claiming the verdict is unreadable
+#        - when what actually happened is that the second outcome was never produced. The arm
+#        directly above already classifies such a host as a SKIP; this one used to red on it.
+v_undec=$( CLAMP_BUDGET=0.05 clamp_expired_verdict 0 2>&1 )
+v_spun=$(  CLAMP_BUDGET=60   clamp_expired_verdict 0 2>&1 )
+case "$v_spun" in
+  *"BOTH expired"*)
+    echo "canary: SKIP the distinguishability arm - this host never produced the spun outcome, so the two messages were never both generated" ;;
+  *)
+    if [ "$v_undec" = "$v_spun" ]; then
+      echo "canary: the two expiry outcomes emit the same message, so the verdict cannot be read"; fail=1
+    fi ;;
+esac
 
 # 3g. a healthy leg is NEVER reported "(no result)" — the reader must not conclude a still-pending
 #     leg is dead just because no job is RUNNING at the instant it looks.
