@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.11 -->
+<!-- gov:kit unattended@1.12 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to

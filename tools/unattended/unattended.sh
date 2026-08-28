@@ -38,7 +38,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.11   # gov:kit unattended@1.11 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.12   # gov:kit unattended@1.12 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -140,7 +140,15 @@ REMOTE_LOWSPEED_BYTES="1000"
 # is worse than the hang — but it must SAY the bound is inert, because a skip that looks like a pass
 # is indistinguishable from coverage.
 REMOTE_BOUND_LIVE=1
-timeout -k 1s 1 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
+# THE BOUND IS 10 s AND IT IS NOT A TIMEOUT, IT IS A CAPABILITY PROBE. `true` returns instantly, so
+# the only thing a bound can add here is a FALSE NEGATIVE: at the shipped `1` it was process-creation
+# latency that tripped it, not a missing binary. MEASURED node `a` 2026-08-28, `timeout -k 1s 1 true`
+# 0/40 failures quiet and 7/40 under eight concurrent spawn loops, while `timeout -k 1s 10 true` was
+# 0/40 under that same load. That 17% is the whole of the run-gates canary's flakiness: the suite
+# probes once while the box is quiet, the runner probes again under a full bar, they disagree, and an
+# arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
+# bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
+timeout -k 1s 10 true >/dev/null 2>&1 || REMOTE_BOUND_LIVE=0
 # The same fact, read by run_bounded below. One probe, two consumers, because probing twice costs a
 # spawn and could answer differently.
 GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
