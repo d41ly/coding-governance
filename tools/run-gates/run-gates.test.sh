@@ -134,12 +134,23 @@ if stray:
 #     WHAT IT DOES NOT CHECK: that run-gates.sh USES this construct. Arm 1d does that, by source.
 # HOISTED: the same probe the timing arms further down use. RUN, never `command -v`.
 HAVE_TIMEOUT=0; timeout -k 1s 1 true >/dev/null 2>&1 && HAVE_TIMEOUT=1
+# COUNTED EITHER WAY, hoisted above the host check for the reason arm 4h states in its own skip:
+# FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this BOX could run
+# them, and the SKIP below is what reports the host. Left inside the else branch these six vanished
+# on a host with no runnable `timeout` and the executed total fell to 128 against a floor of 132 --
+# the box redding the bar, which is the exact thing that skip exists to prevent. An arm added to
+# that branch owes its increment HERE, where it cannot be lost with the host.
+n=$((n+1))   # 1c        the construct bounds a grandchild
+n=$((n+1))   # 1d        the runner uses that construct, by source
+n=$((n+1))   # 1e        the runner applies a leg's declared ceiling
+n=$((n+1))   # 1e-ctl    an identical leg with NO ceiling is not reported timed out
+n=$((n+1))   # 1e-report an unbounded leg is counted, never refused
+n=$((n+1))   # 1e-scope  the negative search selected the population it claims to
 if [ "$HAVE_TIMEOUT" != 1 ]; then
   # A SKIP THAT ANNOUNCES ITSELF. Asserting a timeout on a host that has none reds an adopter's bar
   # for a property of their box, which is what the sibling arms below already refuse to do.
   echo "canary: SKIP arms 1c/1d/1e — this host has no runnable 'timeout -k', so the bound they grade cannot be exercised here. 1e is INSIDE this gate: with CEILINGS_LIVE=0 the runner deliberately runs every leg unbounded, so its fixture leg would finish and the arm would red for a property of the box"
 else
-n=$((n+1))
 _cw=$(mktemp -d)
 _t0=$(date +%s)
 timeout -k 5s 2 bash -c 'sleep 30 & exit 0' </dev/null >"$_cw/grandchild.raw" 2>&1
@@ -166,7 +177,6 @@ rm -rf "$_cw"
 # ---- 1d. THE RUNNER USES THAT CONSTRUCT. Scoped to CODE LINES: a whole-file grep reds on the
 #     comments documenting the fix, which is absence-assertion-over-whole-file-text happening inside
 #     the guard. TOOL-aBoundedCeiling-1.
-n=$((n+1))
 if grep -nE '^[[:space:]]*[^#]*=\$\(timeout ' "$KITDIR/run-gates.sh" >/dev/null 2>&1; then
   echo "canary: run-gates.sh captures a timeout through a command substitution on a code line —"
   echo "canary: that bounds the verdict and not the clock. Redirect to a file and read the file."
@@ -186,7 +196,6 @@ fi
 #     around the whole runner is a fact about the box. What IS asserted is the VERDICT plus the
 #     control -- an identical leg with NO ceiling is not reported as timed out -- which is what
 #     distinguishes "the runner bounds legs" from "this leg happened to fail".
-n=$((n+1))
 _cd=$(mktemp -d)
 printf '#!/usr/bin/env bash\nsleep 45\n' > "$_cd/slow.sh"
 "$PYBIN" - "$_cd" <<'CEILPY'
@@ -213,7 +222,6 @@ esac
 
 # 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
 #     that reds every long leg for any reason would read as proof that ceilings work.
-n=$((n+1))
 _uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_uout" in
   *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
@@ -223,7 +231,6 @@ esac
 
 # 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
 #     forgotten gov leg from an adopter leg it has no business bounding, so a mixed manifest RUNS.
-n=$((n+1))
 case "$_uout" in
   *"declare no ceiling and run unbounded"*) ;;
   *) echo "canary: a manifest with an unbounded leg printed no unbounded count, so a manifest quietly"
@@ -235,7 +242,6 @@ fi   # ---- end the HAVE_TIMEOUT gate on arms 1c/1d/1e -------------------------
 # 1a-control: the same predicate over a manifest with NO `impure` key must PASS, and over one with
 #     a near-miss spelling must FAIL. Both halves, because the arm above is a negative search and a
 #     negative search passes just as happily over a population it never selected.
-n=$((n+1))
 ctl=$(mktemp -d)
 printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.sh"],"guard":["z/"]}]' > "$ctl/clean.json"
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
