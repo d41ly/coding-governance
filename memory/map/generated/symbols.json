@@ -2345,11 +2345,6 @@
     {
       "id": "repo_root",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "repo_root",
-      "kind": "function",
       "file": "tools/memory-recall/recall_conf.py"
     },
     {
@@ -3311,6 +3306,11 @@
       "id": "test_renders_round_trip_and_determinism",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_repo_root_linked_worktree",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_require_adopted_root_refuses",
