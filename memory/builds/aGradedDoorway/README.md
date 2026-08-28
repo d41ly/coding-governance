@@ -91,3 +91,24 @@ fixture does not install. Measured, then fixed, then re-measured.
 Four rows, each with its measurement, in `memory/backlog/TOOL.md`. The two fixture-prefix items are
 refactors of two 2 700-line suites that cost an hour each to verify, and half-landing them is worse
 than reporting them precisely.
+
+## TOOL-aGradedDoorway-2, and what is proven about it
+
+`adopt-unattended.test.sh` and `check-unattended.test.sh` now spell the fixture's kit home through
+one `KIT_REL`, defaulting to `tools/unattended`. 145 sites in the second file, and NONE of them sat
+inside a single-quoted region — measured with a quote-state walk rather than a `grep` for a
+apostrophe, which had put the figure at 93 and made the job look undoable.
+
+**Proven:** `adopt-unattended.test.sh` runs green at `tools/unattended`, `scripts/unattended` and
+`vendor/gov/unattended` — 55 assertions each. Both files expand back to their pre-change bytes
+EXACTLY when `$KIT_REL` is replaced by its default and the added lines are removed, so this repo's
+own behaviour cannot have changed.
+
+**Not proven:** `check-unattended.test.sh` at a foreign prefix. That run costs about an hour and was
+skipped by the owner as not viable. The equivalence proof covers the regression risk; it does not
+cover the new capability, and this says so rather than implying otherwise.
+
+**Not done:** `check-playbook.test.sh`. Its fixture, `playbook.fixture.md`, hardcodes the prefix in
+its own outputs, grain, records and legs and ships `role = "engine"` — verbatim, no placeholder
+pass — so the suite cannot follow a variable the fixture does not have. That is
+`TOOL-dScrubbedConduit-2`, whose row already names that obstacle.

@@ -13,6 +13,15 @@
 # Windows node without the privilege, `ln -s` degrades to a copy and would score a refusal as
 # success.
 set -u
+# THE FIXTURE'S KIT HOME, ONCE (TOOL-aGradedDoorway-2). Every arm below spells it through this
+# variable rather than as a literal, because `seed()` INSTALLS the kit here and the arms RUN it
+# here, and those two had been two independent spellings of one fact. An adopter at another
+# prefix had to repath every site by hand, and a missed one is SILENT rather than red: `mutate`
+# and `cp` no-op on a path that does not exist, so the arm asserts against a tree it never
+# changed and passes. Measured three times -- ARCH-dReadoptedConvoy-6, ARCH-aThriftySentry-1 and
+# ARCH-aBridledVintage-5 each cleared the same class by hand, and the last found NINE fresh sites
+# arriving in one kit pull. The default keeps gov identical; an adopter sets it once.
+KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -23,12 +32,12 @@ absent() { n=$((n+1)); [ ! -e "$1" ] || { echo "FAIL $2: $1 exists and should no
 present() { n=$((n+1)); [ -e "$1" ] || { echo "FAIL $2: $1 is missing"; st=1; }; }
 
 seed() { # dir  -> a git repo carrying the kit and a conf
-  mkdir -p "$1/tools/unattended"
+  mkdir -p "$1/$KIT_REL"
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
   # BOTH SIDES ADDED A FILE HERE: main the playbook template, this branch the kit library. A fixture
   # missing either materialises a kit that cannot run, so the union is the only correct resolution.
-  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh"      "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/tools/unattended/"
+  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh"      "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/$KIT_REL/"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 LANDER="bash tools/land.sh"
@@ -49,7 +58,7 @@ EOF
 # ---- ARM 1: the ordinary adopt. Asserted on the CONTENT of what was written, because "a file
 # ---- appeared" is satisfied by a render that interpolated nothing.
 A="$TMP/host"; seed "$A"
-out=$( cd "$A" && bash tools/unattended/adopt-unattended.sh 2>&1 )
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 )
 present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
 # check 10 of the gate compares the SHIPPED protocol against the installed copy and fails hard
 # when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
@@ -61,10 +70,10 @@ present "$A/memory/guides/PLAYBOOK-TEMPLATE.md" "arm 1 installed the playbook te
 hit "$(cat "$A/memory/guides/PLAYBOOK-TEMPLATE.md")" "PROHIBITED OUTPUT unless it is a tracked"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
-hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 same "arm 1 left no placeholder" \
   "$(grep -cE '\{\{[A-Z_]+\}\}' "$A/.claude/skills/unattended/SKILL.md" || true)" "0"
-( cd "$A" && bash tools/unattended/adopt-unattended.sh --check >/dev/null 2>&1 )
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 
 # ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
@@ -84,7 +93,7 @@ LANDER="bash tools/land.sh | tee log & echo done \\ok"
 KEEPALIVE_INTERVAL="every 10 min | offset 3 & then \\wait"
 HOSTILEEOF
 mv "$H/.conf.tmp" "$H/.unattended.conf"
-out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh 2>&1); rc=$?
+out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh 2>&1); rc=$?
 same "a hostile conf still adopts" "$rc" "0"
 SK="$H/.claude/skills/unattended/SKILL.md"
 present "$SK" "the Skill is written for a hostile conf"
@@ -107,7 +116,7 @@ n=$((n+1)); ang=$(grep -oE '<[A-Z][A-Z_]{2,}>' "$SK" | sort -u | tr '\n' ' ')
 n=$((n+1)); grep -qF '{{LANDER}}' "$SK" && { echo "FAIL a dropped substitution left {{LANDER}} standing"; st=1; }
 n=$((n+1)); grep -qF '{{KEEPALIVE_INTERVAL}}' "$SK" && { echo "FAIL a dropped substitution left {{KEEPALIVE_INTERVAL}} standing"; st=1; }
 # And the gate agrees, rather than comparing one empty file to another.
-out=$(cd "$H" && bash tools/unattended/adopt-unattended.sh --check 2>&1); rc=$?
+out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1); rc=$?
 same "--check agrees on a hostile conf" "$rc" "0"
 
 # ---- ARM 1c: AUTH_PARAM — the conf channel, and the four refusals.
@@ -125,13 +134,13 @@ authconf() { # dir · value  -> reseed with AUTH_PARAM set to exactly <value>
 # BLANK derives the kit default. Delete the derivation in adopt-unattended.sh and this arm fails
 # while every placeholder arm above still passes — an empty substitution leaves no token behind.
 AB="$TMP/authblank"; seed "$AB"; authconf "$AB" '""'
-( cd "$AB" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+( cd "$AB" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
 same "a blank AUTH_PARAM adopts" "$?" "0"
 hit "$(cat "$AB/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--prompt`'
 
 # A NON-DEFAULT value reaches the render, and the default does not survive anywhere in it.
 AV="$TMP/authvalue"; seed "$AV"; authconf "$AV" '"--build"'
-( cd "$AV" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+( cd "$AV" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
 same "a non-default AUTH_PARAM adopts" "$?" "0"
 hit "$(cat "$AV/.claude/skills/unattended/SKILL.md")" 'Only when the invocation carries `--build`'
 same "a non-default AUTH_PARAM leaves no trace of the kit default" \
@@ -147,7 +156,7 @@ same "a non-default AUTH_PARAM leaves no trace of the kit default" \
 # to the guard, so they are the only form that can exercise it.
 authrefuse() { # label · value
   local d="$TMP/authbad$n"; seed "$d"; authconf "$d" "'$2'"
-  ( cd "$d" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+  ( cd "$d" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
   local rc=$?
   n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL $1: a malformed AUTH_PARAM adopted at exit 0"; st=1; }
   absent "$d/.claude/skills/unattended/SKILL.md" "$1 wrote no Skill"
@@ -162,7 +171,7 @@ authrefuse "a backtick is refused"    '--pro`mpt'
 # render(), where the LAST-substitution order deliberately lets it survive as a brace shape. Before
 # the fold that shape was only ever looked for under --check, so the adopter INSTALLED it at exit 0.
 AH="$TMP/authholed"; seed "$AH"; authconf "$AH" "'--{{LANDER}}'"
-( cd "$AH" && bash tools/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+( cd "$AH" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
 # rc CAPTURED FIRST: `$?` read after the counter increment is the ASSIGNMENT's status, always 0.
 ahrc=$?
 n=$((n+1)); [ "$ahrc" != 0 ] || { echo "FAIL a holed render adopted at exit 0"; st=1; }
@@ -173,7 +182,7 @@ absent "$AH/.claude/skills/unattended/SKILL.md" "a holed render wrote no Skill"
 B="$TMP/other"; mkdir -p "$B"
 ( cd "$B" && git init -q -b main . && git config user.email t@t.test && git config user.name t )
 rm -rf "$A/.claude"
-out=$( cd "$B" && bash "$A/tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+out=$( cd "$B" && bash "$A/$KIT_REL/adopt-unattended.sh" 2>&1 ); rc=$?
 # RE-KEYED. This asserted "is not inside", which was the PATH-STRIP refusal — and that refusal fired
 # for every repo, including legitimate ones, whenever the adopter was invoked by absolute path. So
 # this arm was green for the wrong reason and could not tell a foreign repo from any repo at all.
@@ -187,7 +196,7 @@ absent "$A/.claude/skills/unattended/SKILL.md" "arm 2 wrote into the KIT OWNER's
 # ---- commands in the rendered Skill, so this is not cosmetic: the render would emit a command that
 # ---- word-splits. Refusing beats emitting a Skill that misfires at the first verb.
 C="$TMP/spaced"; seed "$C"
-mkdir -p "$C/my tools" && cp -r "$C/tools/unattended" "$C/my tools/unattended"
+mkdir -p "$C/my tools" && cp -r "$C/$KIT_REL" "$C/my tools/unattended"
 out=$( cd "$C" && bash "$C/my tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
 hit "$out" "the kit path contains whitespace and is interpolated into shell commands"
 same "arm 3 refuses" "$rc" "2"
@@ -218,10 +227,10 @@ if [ -n "$F_ALT" ]; then
   # LIVENESS, asserted rather than assumed: the arm is only meaningful while the two spellings differ.
   n=$((n+1))
   [ "$(cd "$F_ALT" && pwd)" != "$(cd "$F_ALT" && git rev-parse --show-toplevel)" ]     || { echo "FAIL arm 3b fixture is inert: the two spellings agree, so it would pass with the fix reverted"; st=1; }
-  out=$( cd "$F_ALT" && bash "$F_ALT/tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+  out=$( cd "$F_ALT" && bash "$F_ALT/$KIT_REL/adopt-unattended.sh" 2>&1 ); rc=$?
   same "arm 3b adopts despite two spellings" "$rc" "0"
   present "$F/.claude/skills/unattended/SKILL.md" "arm 3b wrote into the adopting repo"
-  hit "$(cat "$F/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+  hit "$(cat "$F/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 else
   echo "SKIP arm 3b (two spellings): this host spells one directory one way, so the arm would pass"
   echo "     with the fix reverted and proves nothing. Needs a node where pwd and git disagree."
@@ -233,30 +242,30 @@ fi
 # ---- The walk must stay LOGICAL: resolving the link physically would adopt the target's tree.
 D="$TMP/linkhost"; seed "$D"
 E="$TMP/linktarget"; mkdir -p "$E"
-cp -r "$D/tools/unattended" "$E/unattended"
-rm -rf "$D/tools/unattended"
+cp -r "$D/$KIT_REL" "$E/unattended"
+rm -rf "$D/$KIT_REL"
 # ---- THE DISCRIMINATOR IS `[ -L ]` AFTER CREATION, NEVER `ln -s`'s EXIT CODE. Measured on this
 # ---- fleet: `ln -s` exits 0 here and produces a real directory COPY (`-L` false, `-d` true, entries
 # ---- duplicated). So an `if ln -s …; then` structure always takes the first branch and a junction
 # ---- fallback behind it would be unreachable — and the copy left behind also makes the junction
 # ---- creation fail, because the path is no longer empty. Hence: try, test, clean up, try the other.
 link_ok=0
-if ln -s "$E/unattended" "$D/tools/unattended" 2>/dev/null && [ -L "$D/tools/unattended" ]; then
+if ln -s "$E/unattended" "$D/$KIT_REL" 2>/dev/null && [ -L "$D/$KIT_REL" ]; then
   link_ok=1
 else
-  rm -rf "$D/tools/unattended"                       # the ln -s copy, if that is what we got
+  rm -rf "$D/$KIT_REL"                       # the ln -s copy, if that is what we got
   if command -v powershell >/dev/null 2>&1 && \
-     powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$D/tools/unattended" 2>/dev/null || echo "$D/tools/unattended")' -Target '$(cygpath -w "$E/unattended" 2>/dev/null || echo "$E/unattended")' -ErrorAction Stop" >/dev/null 2>&1 \
-     && [ -L "$D/tools/unattended" ]; then
+     powershell -NoProfile -Command "New-Item -ItemType Junction -Path '$(cygpath -w "$D/$KIT_REL" 2>/dev/null || echo "$D/$KIT_REL")' -Target '$(cygpath -w "$E/unattended" 2>/dev/null || echo "$E/unattended")' -ErrorAction Stop" >/dev/null 2>&1 \
+     && [ -L "$D/$KIT_REL" ]; then
     link_ok=1
   fi
 fi
 if [ "$link_ok" = 1 ]; then
-  out=$( cd "$D" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+  out=$( cd "$D" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
   same "arm 4 adopts through a junction" "$rc" "0"
   present "$D/.claude/skills/unattended/SKILL.md" "arm 4 wrote into the ADOPTING repo"
   absent "$E/.claude" "arm 4 wrote into the LINK TARGET"
-  hit "$(cat "$D/.claude/skills/unattended/SKILL.md")" "bash tools/unattended/unattended.sh --preflight"
+  hit "$(cat "$D/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 else
   echo "SKIP arm 4 (junction): neither a symlink nor a junction on this host yields -L true, and a"
   echo "     directory COPY would score a refusal as success. Run this suite on a node that can link."
@@ -265,15 +274,15 @@ fi
 # ---- ARM 5: a half-adoption is not an adoption. With the conf absent the adopter refuses BEFORE it
 # ---- writes, so an operator never gets a Skill rendered against declarations that do not exist.
 F="$TMP/noconf"; seed "$F"; rm -f "$F/.unattended.conf"
-out=$( cd "$F" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+out=$( cd "$F" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 hit "$out" "no .unattended.conf at the repo root"
 same "arm 5 refuses" "$rc" "1"
 absent "$F/.claude/skills/unattended/SKILL.md" "arm 5 left a half-stamped adoption"
 
 # ---- ARM 6: the kit's own template missing. Same shape from the other side, and it is the arm that
 # ---- keeps a broken INSTALL from reading as a repo problem.
-G="$TMP/notemplate"; seed "$G"; rm -f "$G/tools/unattended/SKILL.template.md"
-out=$( cd "$G" && bash tools/unattended/adopt-unattended.sh 2>&1 ); rc=$?
+G="$TMP/notemplate"; seed "$G"; rm -f "$G/$KIT_REL/SKILL.template.md"
+out=$( cd "$G" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 hit "$out" "SKILL.template.md is missing from the kit"
 same "arm 6 refuses" "$rc" "1"
 absent "$G/.claude/skills/unattended/SKILL.md" "arm 6 wrote despite a missing template"
