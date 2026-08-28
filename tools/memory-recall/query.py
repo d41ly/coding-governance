@@ -196,11 +196,10 @@ def git(repo: pathlib.Path, *args: str) -> str:
     ).stdout
 
 
-def repo_root() -> pathlib.Path:
-    out = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True
-    ).stdout.strip()
-    return pathlib.Path(out).resolve()
+# TOOL-aCollapsedScan-7 - a SECOND `repo_root()` lived here, shelling a bare `rev-parse` with no
+# `-C` anchor at all, so it resolved from the cwd AND was identically fooled by an inherited
+# GIT_DIR. One kit, one answer: `recall_conf.repo_root()` walks up for the conf and is the only
+# resolver this kit has.
 
 
 def common_git_dir(repo: pathlib.Path) -> pathlib.Path:
@@ -1086,7 +1085,7 @@ def main(argv: list[str] | None = None) -> int:
             return None
         return v
 
-    repo = repo_root()
+    repo = recall_conf.repo_root()
 
     if "--export" in flags:
         tag = (flags.get("--tag") or "").strip().lower()

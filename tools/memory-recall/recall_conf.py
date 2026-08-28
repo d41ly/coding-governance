@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.3
+gov:kit memory-recall@1.4
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.3"
+KIT_MEMORY_RECALL_VERSION = "1.4"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).
@@ -53,8 +53,55 @@ def repo_root() -> pathlib.Path:
     The kit directory lives inside the adopting repo (`memory-recall/` at the root in an adopter,
     `tools/memory-recall/` in this one), so the anchor is exact from any cwd, and a throwaway-repo
     test that copies the kit in resolves to that repo rather than to wherever the runner stood.
+
+    WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice
+    `tools/codebase-map/map_lib.py`'s `resolve_root` already made for the same measured reason,
+    and which `tools/govkit/govkit.py` reached for the same defect WITHOUT the boundary - its walk
+    is still unbounded, which is `TOOL-aCollapsedScan-12`. `git -C <dir> rev-parse
+    --show-toplevel` returns <dir> ITSELF when an absolute GIT_DIR is inherited and no
+    GIT_WORK_TREE names a tree, because git then treats the current directory as the work tree.
+    That is exactly what git exports to a merge driver inside a LINKED WORKTREE, and it is how the
+    row-keyed merge driver was found inert here: this function answered `<root>/tools/memory-recall`,
+    `resolve()` looked for the conf beside the kit, `extract.py`'s import-time CONF raised, and
+    every `memory/DECISIONS.md` and `memory/backlog/*.md` merge got conflict markers instead of a
+    merge. Measured with a control: in an ordinary clone git exports no GIT_DIR and the defect is
+    ABSENT, so the precondition is the worktree and not the merge.
+
+    THE ALTERNATIVE WAS AN ENVIRONMENT SCRUB and it lost on being a DENYLIST. `.githooks/pre-push`
+    already pins eight names for that job under `TOOL-dScrubbedConduit-1`, with one deliberate
+    exclusion; a second list here would be a ninth thing to keep current. The walk inherits nothing.
+
+    THEY DO NOT ALWAYS COINCIDE, and an earlier revision of this docstring said they did. The
+    nearest conf-holding ancestor is deliberately NOT the answer once a `.git` boundary intervenes -
+    see the walk below, which is where that rule lives. Where no boundary intervenes the two agree,
+    because `resolve()` refuses a root that does not hold `.memory-tree.conf`.
     """
-    here = pathlib.Path(__file__).resolve().parent
+    here = pathlib.Path(__file__).resolve()
+    for parent in here.parents:
+        # THE WALK STOPS AT THE REPOSITORY BOUNDARY, which `tools/codebase-map/map_lib.py`'s
+        # `resolve_root` already pays two lines for and records the reason: worktrees are commonly
+        # kept INSIDE the primary tree (this repo puts them under `.claude/worktrees/`), so an
+        # UNBOUNDED walk out of a checkout reaches the PRIMARY tree's conf and answers with a
+        # different repository. Reproduced during this unit's own closing review: with a conf at
+        # `outer/` and a separate repo at `outer/inner/` holding the kit, an unbounded walk answered
+        # `outer` and `resolve()` succeeded against a FOREIGN conf, where the pre-fix code refused.
+        # `.git` is a directory in a primary tree and a FILE in a linked worktree, so one
+        # `exists()` covers both.
+        #
+        # THE CONF IS TESTED FIRST, so an adopted root that holds both still wins on its own line.
+        # Falling out of the loop hands the question to the git probe below, which is what raises
+        # the not-a-git-repository refusal for a conf-bearing tree that is not a checkout at all.
+        if (parent / CONF_NAME).is_file() and (parent / ".git").exists():
+            return parent
+        if (parent / ".git").exists():
+            break
+    # NO USABLE CONF ON THE WALK - none at all, or one only beyond the repository boundary. Keep
+    # the old git answer, so `resolve()` raises ITS refusal - the one
+    # carrying the copy-pasteable conf stub an adopter needs. This is NOT a fallback that
+    # fabricates a passing value: the path it returns is by definition one with no conf on it, so
+    # `resolve()` refuses on the very next line. It also cannot mask the defect above, because that
+    # defect only reaches a tree where a conf DOES exist and the walk-up therefore wins first.
+    here = here.parent
     try:
         out = subprocess.run(
             ["git", "-C", str(here), "rev-parse", "--show-toplevel"],
@@ -189,8 +236,9 @@ _cached: Conf | None = None
 def resolve(root: pathlib.Path | None = None) -> Conf:
     """The kit's project layer, or a ConfError carrying the printable refusal.
 
-    Cached per process: every module in the kit calls this at import, and the resolution costs a
-    `git rev-parse`.
+    Cached per process: every module in the kit calls this at import. It no longer costs a
+    `git rev-parse` on any path where a conf exists - `repo_root()` walks for it - but the call
+    frequency is what justified the cache and that has not changed.
     """
     global _cached
     if root is None and _cached is not None:

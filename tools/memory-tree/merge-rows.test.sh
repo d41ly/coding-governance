@@ -6,10 +6,10 @@
 # `git merge-file` on the identical three blobs. The MECHANICAL never-worse comparison — the driver
 # may not lose a line the control keeps, nor at rc 0 write a row the control does not — can only
 # bind where the control EXITS 0, because only then is its output an ANSWER rather than a conflict
-# to be resolved by hand. Measured: 12 of the 34 `run` cases, floored below at `NEVER_WORSE_FLOOR`
-# so that a fixture edit flipping a control from rc 0 to rc 1 cannot quietly drop a case out of the
-# bar while the group count stays the same. The other 22 are held by the id-set oracle, the
-# duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
+# to be resolved by hand. Floored below at `NEVER_WORSE_FLOOR` so that a fixture edit flipping a
+# control from rc 0 to rc 1 cannot quietly drop a case out of the bar while the group count stays
+# the same; the live split is in this suite's own PASS line, which derives it. The remaining cases
+# are held by the id-set oracle, the duplicate-id oracle, and per-case assertions on bytes. Conflicting where git resolves CORRECTLY is
 # acceptable and is counted by name against a shrink-only constant, never absorbed.
 #
 # That bar exists because a green suite has twice signed off on corruption here. Three adversarial
@@ -109,7 +109,13 @@ CONSERVATIVE=""
 # How many `run` cases the arithmetic comparison actually BINDS on. A GROW-ONLY floor: without
 # it, a fixture edit that flips a control from rc 0 to rc 1 silently removes a case from the
 # mechanical bar and the suite still prints PASS with the same group count. Measured at 12.
-NEVER_WORSE_FLOOR=12
+# THE THIRD FLOOR LAGS ITS TWO SIBLINGS ON PURPOSE (TOOL-aCollapsedScan-7, closing review round 2).
+# `ngroups` and `nruns` are pure greps of THIS file, so their derived values are the same on every
+# node and were ratcheted to 49 and 40. This bound is not: it counts the controls `git merge-file`
+# exits 0 on, which is a property of the git in hand. Node `a` reads 16 on 2026-08-26 against the 12
+# pinned here, and raising it to 16 would red any node whose git resolves fewer. Raise it when the
+# same reading is confirmed on a second node, not before - the 4-case window is the price.
+NEVER_WORSE_FLOOR=12   # see the note above before raising this
 NEVER_WORSE_BOUND=0
 # Cases where `git merge-file` exits 0 with a WRONG result — it duplicates a row-shaped line at rc 0,
 # which is the single corruption class git commits and the whole justification for this driver. The
@@ -1469,6 +1475,66 @@ elif [ "$ncons" -lt "$CONSERVATIVE_CAP" ]; then
   st=1
 fi
 
+# --- 47. THE SAME MERGE, INSIDE A LINKED WORKTREE (TOOL-aCollapsedScan-7) -------------------------
+# Case 9 drives git through the real wiring in an ORDINARY repo, which is exactly the tree where this
+# class CANNOT appear: git exports no GIT_DIR there. Measured with a control - ordinary clone, GIT_DIR
+# unset, `git -C <dir> rev-parse --show-toplevel` returns the root; linked worktree, GIT_DIR set, the
+# same command returns <dir> itself. So the driver aborted on every backlog merge in a worktree while
+# case 9 stayed green, and this leg was blind to the class it exists to hold. Observed RED against the
+# pre-fix recall_conf.py.
+#
+# It wires the SHIPPED wrapper, not pyrun.sh: `merge-rows.sh` is what a node actually carries, and it
+# is the path an adopter gets.
+W=$(mktemp -d); SCRATCH="$SCRATCH $W"
+mkdir -p "$W/tools/memory-tree" "$W/tools/memory-recall" "$W/tools/lib" "$W/memory/backlog"
+cp .memory-tree.conf "$W/"
+cp tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.sh "$W/tools/memory-tree/"
+cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$W/tools/memory-recall/"
+cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$W/tools/lib/"
+WT="$W-wt"; SCRATCH="$SCRATCH $WT"
+(
+  cd "$W" || exit 2
+  git init -q -b main
+  git config user.email t@e; git config user.name t; git config core.autocrlf false
+  printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\n' > .gitattributes
+  git config merge.rows.driver 'bash tools/memory-tree/merge-rows.sh %O %A %B %P'
+  { printf '# tooling backlog\n\n> Mutable. Each row leads with one status token.\n'
+    row TOOL-zFixture-1 base; } > memory/backlog/TOOL.md
+  git add -A; git commit -q -m base
+  git checkout -q -b side
+  row TOOL-zFixture-3 theirs >> memory/backlog/TOOL.md
+  git commit -q -am theirs
+  git checkout -q main
+  row TOOL-zFixture-2 ours >> memory/backlog/TOOL.md
+  git commit -q -am ours
+  # DETACHED, because `main` is checked out in the primary tree and a second checkout of it is
+  # refused. The merge happens HERE, which is the whole point of the arm.
+  git worktree add -q --detach "$WT" main \
+    || { echo "FAIL worktree: could not create the linked worktree"; exit 1; }
+  cd "$WT" || exit 2
+  git check-attr merge -- memory/backlog/TOOL.md | grep -q 'merge: rows' \
+    || { echo "FAIL worktree: git does not resolve memory/backlog/TOOL.md to merge=rows in the worktree"; exit 1; }
+  # THE CLASSIFICATION LIVES IN THE FAILURE BRANCH, because that is the only place it can fire:
+  # the driver's fail-closed handler returns 1 on a ConfError, so git reports the merge as failed
+  # and `$out` is only ever inspected after a NON-zero exit. Written the other way round it was a
+  # probe that could not move.
+  if ! out=$(git merge --no-edit side 2>&1); then
+    if printf '%s\n' "$out" | grep -qi 'ConfError'; then
+      echo "FAIL worktree: the driver raised a ConfError - the inherited GIT_DIR is still deciding the root"
+    else
+      echo "FAIL worktree: git merge did not auto-resolve in a linked worktree"
+    fi
+    printf '%s\n' "$out" | sed 's/^/       /' | head -4
+    exit 1
+  fi
+  for want in TOOL-zFixture-1 TOOL-zFixture-2 TOOL-zFixture-3; do
+    c=$(grep -c "^- $want " memory/backlog/TOOL.md)
+    [ "$c" = 1 ] || { echo "FAIL worktree: $want appears $c time(s), expected exactly 1"; exit 1; }
+  done
+  grep -q '<<<<<<<' memory/backlog/TOOL.md && { echo "FAIL worktree: conflict markers in an auto-resolved file"; exit 1; }
+  exit 0
+) || st=1
+
 # The count is DERIVED from the file, not typed: a hand-maintained tally reads as a claim about
 # coverage and goes stale the first time a group is added without touching it. The floor is a
 # RATCHET — raised with the groups, never left behind, or a deleted group passes as a green run.
@@ -1479,8 +1545,8 @@ fi
 # driver, and the count of cases the arithmetic bar binds on.
 ngroups=$(grep -c '^# --- ' "$SELF")
 nruns=$(grep -c '^run "' "$SELF")
-[ "$ngroups" -ge 46 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 46 — a group was deleted"
-[ "$nruns" -ge 36 ] || bad "only $nruns 'run' case(s) remain, expected at least 36 — a group was emptied while its banner stayed, which the banner count cannot see"
+[ "$ngroups" -ge 49 ] || bad "the fixture-group scan found $ngroups banner(s), expected at least 49 — a group was deleted"
+[ "$nruns" -ge 40 ] || bad "only $nruns 'run' case(s) remain, expected at least 40 — a group was emptied while its banner stayed, which the banner count cannot see"
 [ "$NEVER_WORSE_BOUND" -ge "$NEVER_WORSE_FLOOR" ]   || bad "the arithmetic never-worse comparison bound on $NEVER_WORSE_BOUND case(s) against a grow-only floor of $NEVER_WORSE_FLOOR — a control flipped from rc 0 to rc 1 and silently left the bar"
 [ "$st" = 0 ] && echo "PASS — merge-rows: $ngroups groups / $nruns run cases held, $NEVER_WORSE_BOUND under the arithmetic never-worse bar, $ncons conservative (cap $CONSERVATIVE_CAP)"
 exit "$st"
