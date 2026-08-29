@@ -10,33 +10,6 @@ ids: TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGra
 
 # aGradedDoorway — an adopter whose kit does not live at `{prefix}/{kit_id}` can say so again
 
-<!-- BEGIN GENERATED -->
-<!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-08-28 · streams tooling
-ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6
-
-<!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
-<!-- /gen:build-units -->
-
-Records: 0 bound to this build, across 0 record folder(s).
-
-Ids no record names: none — every unit id is named by a record.
-
-Ids no `spec-audit` record has ever named: none — every unit id has one.
-<!-- /gen:build-index -->
-
-<!-- gen:build-order -->
-
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
-<!-- /gen:build-order -->
-
-<!-- gen:build-edges -->
-
-*This build declares no parent and no build declares it as one.*
-<!-- /gen:build-edges -->
-<!-- END GENERATED -->
-
 Node `a` · opened 2026-08-28 · streams tooling. Authored FROM the inCMS adopter, whose own unit is
 `ARCH-aBridledVintage-7`.
 
@@ -129,3 +102,47 @@ removing the added lines reproduces the pre-change file BYTE FOR BYTE, so this r
 cannot have changed. That covers regression and says nothing about the new capability. The
 foreign-prefix run for that file remains owed, and `TOOL-aGradedDoorway-2` stays INPROGRESS for
 exactly that reason.
+
+## Units
+
+*Seeded from this build's own backlog rows by a later session, because the slot leg requires the
+pair and the build landed without one. Status is each row's own token in `memory/backlog/TOOL.md`;
+no tier is claimed here, because this session did not author these units and cannot know it.*
+
+<!-- roster:units -->
+
+| # | Unit | Status | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aGradedDoorway-1` | CLOSED | a target may name a per-entry install home again, graded strictly rather than refused |
+| 2 | `TOOL-aGradedDoorway-2` | INPROGRESS | the unattended fixture suites spell their kit home once instead of a literal `tools/` |
+| 3 | `TOOL-aGradedDoorway-3` | CLOSED | drift_report.py's default-branch probe decodes as UTF-8 like its fourteen siblings |
+| 4 | `TOOL-aGradedDoorway-4` | OPEN | check 21's build-README population stops using a `*` pathspec that crosses `/` |
+| 5 | `TOOL-aGradedDoorway-5` | OPEN | check 30 stops spawning a `--plan` subprocess per build |
+| 6 | `TOOL-aGradedDoorway-6` | OPEN | check-wiring.sh resolves prefix and launcher for a non-`tools` install prefix |
+
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-08-28 · streams tooling
+ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6
+
+<!-- gen:build-units -->
+*No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
+
+Records: 0 bound to this build, across 0 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
