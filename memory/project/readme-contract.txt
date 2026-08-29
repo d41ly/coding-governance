@@ -26,7 +26,7 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 65
+exempt-pin: 66
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
@@ -104,3 +104,4 @@ memory/builds/aPrimedKeepalive/README.md
 !memory/builds/aBoundedCeiling/README.md - authored on a branch that did not carry the contract; drains when its build's owner conforms it
 !memory/builds/aGroundedOrientation/README.md - registered BOUND by its own build's session, but its `## Build-level rules` slot is 1824 B over the 1800 B ceiling and has been red on every bar since; exempted so the bar can bind again, and it drains when that build's owner trims the slot
 memory/builds/aReapedTicket/README.md
+!memory/builds/aGradedDoorway/README.md - landed 2026-08-28 naming no row at all, and BOUND reds it: authored content after the first generated marker, lines 127-131. Conforming it is its build owner's call, not this pass's; drains when they do
