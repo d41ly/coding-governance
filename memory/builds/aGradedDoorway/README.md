@@ -4,8 +4,7 @@ node: a
 opened: 2026-08-28
 streams: tooling
 roster: TOOL
-status: INPROGRESS
-ids: TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6
+ids: TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7
 ---
 
 # aGradedDoorway — an adopter whose kit does not live at `{prefix}/{kit_id}` can say so again
@@ -123,18 +122,20 @@ no tier is claimed here, because this session did not author these units and can
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-08-28 · streams tooling
-ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6
+**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-28 · streams tooling
+ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | SPECCED | rev-1 | 2026-08-29 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 0 record folder(s).
+Records: 0 bound to this build, across 1 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aGradedDoorway-7.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGradedDoorway-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
