@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-29T11:47:49+03:00 @ 23a20ca6bec18ff136bfe22eb13209d7f4d465ba
+last-audit: 2026-08-29T12:17:14+03:00 @ 23a20ca6bec18ff136bfe22eb13209d7f4d465ba
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 065c39759b0a0cd7f8d5ca26fb2dd68d469534b5
+last-body-change: d902165a87967eb0d3f1fe280876948745e6a8e3
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -212,13 +212,14 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
-- The memory hygiene leg is under two minutes, not ~23: `TOOL-aThawedCorpus-4` and `-1` collapsed
-  checks 23 and 21 from a process per item to one `awk` each. 65 s, node a, 2026-08-28.
+- The memory hygiene leg is minutes, not ~23: `TOOL-aThawedCorpus-4` and `-1` collapsed checks 23
+  and 21 to one `awk` each. 48 s QUIET (node a, 2026-08-29) but 139 s inside a full bar at width 8,
+  so a 120 s wrapper timeout around it WILL fire. Read it from `gate-ledger.tsv`, never from here.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The hooks kit (1.5) ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
+- The hooks kit ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
   the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
   `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
   concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
