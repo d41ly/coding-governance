@@ -565,6 +565,19 @@ def main() -> int:
     if len(sys.argv) < 3:
         print(__doc__)
         return 2
+    # A FLAG IS NOT A PATH, and the check above is ARITY alone. `extract.py <repo> --help` is a
+    # well-formed three-argument call, so `--help` reached `outdir` and the `mkdir(parents=True)`
+    # below CREATED A DIRECTORY named `--help`, exit 0. tools/lexicon/scaffold_lexicon.py shipped
+    # the same defect and wrote a FILE by the same route; that one was committed and pushed to a
+    # real adopter before anyone noticed it. A path whose name is a flag breaks every unquoted
+    # glob in its directory from then on, and the directory is the worse half -- `rm -rf --help`
+    # does not remove it either. `./--help` still reaches a genuine leading-dash path.
+    for _slot, _val in (("REPO", sys.argv[1]), ("OUTDIR", sys.argv[2])):
+        if _val.startswith("-"):
+            sys.stderr.write(f"extract.py: {_val!r} is a flag, not a path, in the {_slot} "
+                             f"slot -- this script takes two positional PATHS.\n")
+            print(__doc__)
+            return 2
     repo = pathlib.Path(sys.argv[1]).resolve()
     outdir = pathlib.Path(sys.argv[2])
     outdir.mkdir(parents=True, exist_ok=True)

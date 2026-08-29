@@ -85,8 +85,22 @@ def _measure_suffix_offenders(root, files) -> int:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
+    # A FLAG IS NOT A PATH, and the guard here used to be an ARITY check alone.
+    # `scaffold_lexicon.py --help` is a well-formed one-argument call, so `--help` became the
+    # DESTINATION: this script derived a whole seed and wrote it to a file literally named
+    # `--help`. Measured on a real adopter (incms/main, 2026-08-23), where that file was
+    # committed, pushed, and then survived every leg of a 62-leg bar. Nothing downstream can
+    # see it -- `adopt-lexicon.sh --check` looks for `.lexicon.conf` BY NAME, so a stray sibling
+    # is invisible to it -- and a file whose name is a flag breaks every unquoted glob in its
+    # directory from then on. The WRAPPER already refuses an unknown flag; this script is the
+    # one that WRITES, so the refusal has to be here too. `./--help` still reaches a genuine
+    # leading-dash path, which is the usual convention.
+    if len(argv) != 2 or argv[1].startswith("-"):
         sys.stderr.write("usage: scaffold_lexicon.py <conf-path>\n")
+        if len(argv) == 2:
+            sys.stderr.write(f"scaffold_lexicon.py: {argv[1]!r} is a flag, not a destination "
+                             f"-- this script takes one conf PATH and has no options of its "
+                             f"own.\n")
         return 2
     dest = Path(argv[1])
     root = Path(subprocess.run(["git", "rev-parse", "--show-toplevel"],
