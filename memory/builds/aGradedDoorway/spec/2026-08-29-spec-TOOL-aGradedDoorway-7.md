@@ -1,6 +1,6 @@
 # TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock
 
-**Status:** SPECCED · rev-1 · 2026-08-29 · node a · Tier-2 · base ffa01a07e · streams tooling
+**Status:** SPECCED · rev-2 · 2026-08-29 · node a · Tier-2 · base ffa01a07e · streams tooling · ratified 2026-08-29
 
 <!-- gen:spec-records -->
 
@@ -19,9 +19,12 @@ all — without deleting a single assertion.
 - **S1** — wire the sharding both unattended suites already ship. `check-unattended.test.sh` and
   `unattended.test.sh` each declare `SHARD_ARITY=2` and accept `--shard <i>/<n>`; the gate manifest
   invokes both bare. Emit one leg per shard.
-- **S2** — raise `SHARD_ARITY` past 2 in both suites, which requires auditing each suite's HOIST SET
-  (`check-unattended.test.sh` names its own: `anchor_break` and `anchor_restore`) so no arm depends
-  on an arm in another shard.
+- **S2** — raise `SHARD_ARITY` to 8 in both suites and fix what breaks, per the owner's ruling of
+  2026-08-29. The HOIST SET audit is NOT the control here and the spec should not pretend it is:
+  AC1 is. A shard that silently drops arms fails the assertion-count identity whatever the split,
+  so the empirical route is safe for the reason the criterion exists rather than because the split
+  was reasoned about first. Each suite's declared hoist set (`check-unattended.test.sh` names
+  `anchor_break` and `anchor_restore`) is the first place to look when one does break.
 - **S3** — the GATING MEASUREMENT this spec refuses to design past: instrument one `run()` on the
   suite's own fixture and split its ~57 s into process startup, git plumbing, and check bodies.
   Every remedy below is ranked by an inference from that number, and only S3 turns it into a fact.
@@ -30,6 +33,10 @@ all — without deleting a single assertion.
 - **S5** — a per-suite budget declared in `tools/gate-legs.json` and enforced, so a leg that grows
   past it fails on cost rather than being discovered by a person six months later.
 - **S6** — records: this spec, a decision row, and a backlog row per remedy not taken.
+- **S7** — a scheduled runner for the `optIn` self-tests whose ABSENCE is itself reported, per the
+  owner's ruling of 2026-08-29. The failure this closes is not a red: `drift-audit-selftest` sat
+  unrun long enough that a twelve-arm breakage reached an adopter unnoticed, and silence was
+  indistinguishable from health. A stale or missed run must therefore be a signal, not a gap.
 
 ## 3. Non-goals (OUT)
 
@@ -39,7 +46,7 @@ all — without deleting a single assertion.
 - **Deleting or thinning assertions.** 337 in one suite and 663 in another exist because something
   went wrong once. Cost is a scheduling problem, not a coverage problem.
 - **Putting the `optIn` self-tests back on the merge bar.** They are `optIn` for the reason this
-  spec measures. What they need is a scheduled run, not promotion.
+  spec measures. S7 gives them a scheduled runner instead; promotion to the bar stays refused.
 - **Porting anything to a faster language.** The suites test shell behaviour through shell.
 - **Adopter-side workarounds.** These are gov's files; an adopter patching them locally is the fork
   class `TOOL-aGradedDoorway-1` exists to end.
@@ -165,6 +172,9 @@ single largest factor and a reader deserves to know it was considered.
   names the budget and the measured cost.
 - **AC6** — When the merge bar (no `optIn` legs) runs at the default pool, it completes in under
   30 minutes on a 16-core node.
+- **AC7** — When a scheduled `optIn` run is missed or its last result is stale,
+  `tools/run-gates/run-gates.sh` reports that fact. A schedule that reports only its failures is
+  indistinguishable from one that never ran, which is the defect S7 exists to close.
 
 ## 7. Gates
 
@@ -176,19 +186,26 @@ single largest factor and a reader deserves to know it was considered.
 
 - **Does S3 confirm the ranking?** The §4 inference makes batching and sharding beat decomposition.
   If S3 finds the 57 s is mostly check bodies rather than fixed overhead, the ranking inverts and
-  decomposition returns as the primary remedy. Recommendation: run S3 before committing to S4, and
-  treat this spec's ordering as provisional until it lands. UNRESOLVED.
+  decomposition returns as the primary remedy. RESOLVED (owner, 2026-08-29): land S1 immediately,
+  since it is free and independent of the inference, then run S3 before anything else. S4 and S2
+  wait on its answer, and this spec's ordering stays provisional until it lands.
 - **How far can `SHARD_ARITY` go before the HOIST SET blocks it?** Both suites declare 2. The
   ceiling is set by how many arms depend on state another arm establishes, which nobody has counted.
-  Recommendation: count it as part of S2 and let the number decide, rather than picking an arity and
-  discovering the coupling. UNRESOLVED.
+  RESOLVED (owner, 2026-08-29): pick 8 and fix what breaks, against the author's recommendation to
+  count the coupling first. The author's objection was that an unaudited split can produce a GREEN
+  proving nothing; the answer is that AC1 already forbids exactly that, by requiring the union of
+  assertions across shards to equal the unsharded count. The empirical route is therefore cheaper
+  and no less safe, and the objection is recorded rather than removed.
 - **Should the `optIn` self-tests get a scheduled runner?** They are off the merge bar for good
   reason, but `drift-audit-selftest` sat unrun long enough that a 12-arm breakage reached an adopter
-  unnoticed. Recommendation: a scheduled run whose absence is itself reported, since a leg nobody
-  runs is a leg that rots. UNRESOLVED.
+  unnoticed. RESOLVED (owner, 2026-08-29): yes, and the ABSENCE of a run is itself reported. Landed
+  as S7. A schedule whose skips are silent would reproduce the defect it exists to close.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-29 · all three forks resolved by the owner. S2 reshaped from "audit then raise" to
+  "raise to 8 and fix what breaks", against the author's recommendation; the objection and the
+  reason it is survivable both stand in §8. S7 added for the scheduled runner.
 - rev-1 · 2026-08-29 · initial draft, written from the 62-leg timing run and two scope measurements.
   Records a reversal of the author's own earlier recommendation: decomposition was proposed verbally
   before the 15270/265 division was done, and is rejected in §4 on that arithmetic.

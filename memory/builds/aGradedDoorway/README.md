@@ -128,7 +128,7 @@ ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGrad
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | SPECCED | rev-1 | 2026-08-29 |
+| [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | SPECCED | rev-2 | 2026-08-29 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
