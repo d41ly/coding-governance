@@ -567,7 +567,7 @@ def main() -> int:
         return 2
     # A FLAG IS NOT A PATH, and the check above is ARITY alone. `extract.py <repo> --help` is a
     # well-formed three-argument call, so `--help` reached `outdir` and the `mkdir(parents=True)`
-    # below CREATED A DIRECTORY named `--help`, exit 0. tools/lexicon/scaffold_lexicon.py shipped
+    # below CREATED A DIRECTORY named `--help`, exit 0. The lexicon kit's scaffolder shipped
     # the same defect and wrote a FILE by the same route; that one was committed and pushed to a
     # real adopter before anyone noticed it. A path whose name is a flag breaks every unquoted
     # glob in its directory from then on, and the directory is the worse half -- `rm -rf --help`

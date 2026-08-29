@@ -45,7 +45,7 @@ tools/lexicon/kit.toml	1
 tools/lexicon/lexicon.py	1
 tools/lexicon/lexicon_conf.py	3
 tools/lexicon/scaffold_lexicon.py	4
-tools/lexicon/selftest.py	14
+tools/lexicon/selftest.py	15
 tools/memory-recall/README.md	7
 tools/memory-recall/adopt-memory-recall.sh	5
 tools/memory-recall/recall-fixture.json	1

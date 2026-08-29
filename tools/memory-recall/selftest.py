@@ -1349,7 +1349,7 @@ def test_extract_rejects_flag_in_path_slot():
 
     `extract.py <repo> --help` is a well-formed three-argument call, so `--help` reached
     `outdir` and `mkdir(parents=True)` CREATED A DIRECTORY named `--help`, exit 0. The sibling
-    instance in tools/lexicon/scaffold_lexicon.py wrote a FILE by the same route, and that one
+    instance in the lexicon kit's scaffolder wrote a FILE by the same route, and that one
     was committed and pushed to a real adopter before anyone noticed. A path whose name is a
     flag also breaks every unquoted glob in its directory from then on, and a directory is the
     worse half: `rm -rf --help` does not remove it either.
