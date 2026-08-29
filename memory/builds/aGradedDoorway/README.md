@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-28
 streams: tooling
 roster: TOOL
-ids: TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7
+ids: TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7 TOOL-aGradedDoorway-8 TOOL-aGradedDoorway-9 TOOL-aGradedDoorway-10
 ---
 
 # aGradedDoorway — an adopter whose kit does not live at `{prefix}/{kit_id}` can say so again
@@ -122,16 +122,16 @@ no tier is claimed here, because this session did not author these units and can
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-08-28 · streams tooling
-ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-28 · streams tooling
+ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGradedDoorway-4 TOOL-aGradedDoorway-5 TOOL-aGradedDoorway-6 TOOL-aGradedDoorway-7 TOOL-aGradedDoorway-8 TOOL-aGradedDoorway-9 TOOL-aGradedDoorway-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | SPECCED | rev-2 | 2026-08-29 |
+| [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | INPROGRESS | rev-3 | 2026-08-29 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 0 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aGradedDoorway-7.
 
