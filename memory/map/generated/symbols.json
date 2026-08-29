@@ -3118,6 +3118,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_extract_rejects_flag_in_path_slot",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_extractor_helpers_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"

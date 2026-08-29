@@ -1343,6 +1343,29 @@ def test_repo_root_linked_worktree():
         cleanup(root)
 
 
+@check("extract.py refuses a flag in a positional PATH slot rather than materialising it")
+def test_extract_rejects_flag_in_path_slot():
+    """A FLAG IS NOT A PATH, and this script guarded its argv by ARITY alone.
+
+    `extract.py <repo> --help` is a well-formed three-argument call, so `--help` reached
+    `outdir` and `mkdir(parents=True)` CREATED A DIRECTORY named `--help`, exit 0. The sibling
+    instance in the lexicon kit's scaffolder wrote a FILE by the same route, and that one
+    was committed and pushed to a real adopter before anyone noticed. A path whose name is a
+    flag also breaks every unquoted glob in its directory from then on, and a directory is the
+    worse half: `rm -rf --help` does not remove it either.
+    """
+    root, kitdir = make_repo()
+    try:
+        proc = run(root, kitdir, str(root), "--help", script="extract.py")
+        assert proc.returncode != 0, f"exited 0 on a flag outdir: {proc.stdout[-300:]}"
+        assert not (root / "--help").exists(), "materialised a path named '--help'"
+        out = (proc.stdout + proc.stderr).lower()
+        assert "flag" in out or "usage" in out, f"unnamed refusal: {out[-300:]}"
+        return f"rc={proc.returncode}, nothing materialised"
+    finally:
+        cleanup(root)
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -1366,7 +1389,7 @@ def main() -> int:
         test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
-        test_repo_root_linked_worktree,
+        test_repo_root_linked_worktree, test_extract_rejects_flag_in_path_slot,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
 

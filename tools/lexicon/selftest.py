@@ -481,6 +481,26 @@ with build_tempdir() as td:
           r.returncode != 0, out)
     check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
+    # A FLAG IS NOT A PATH. This script guarded its argv by ARITY alone, so
+    # `scaffold_lexicon.py --help` is a well-formed one-argument call and `--help` became the
+    # DESTINATION: the run derived a whole seed and wrote it to a file literally named `--help`.
+    # Measured on a real adopter (incms/main, 2026-08-23), where that file was committed and pushed
+    # and then survived every leg of a 62-leg bar — nothing there enumerates root-level filenames,
+    # and this kit's own `--check` looks for `.lexicon.conf` BY NAME, so a stray sibling is invisible
+    # to it. The wrapper already refuses an unknown flag; the script it calls did not, and the script
+    # is the one that writes. A file whose name is a flag is also a live hazard for every unquoted
+    # glob in its directory: `wc -l *` in that adopter's root printed wc's usage instead of counting.
+    for flag in ("--help", "-h"):
+        r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", flag],
+                           cwd=root, capture_output=True, text=True)
+        out = r.stdout + r.stderr
+        check(f"scaffold: refuses {flag} as a destination rather than writing it",
+              r.returncode != 0, out)
+        check(f"scaffold: and NAMES the refusal rather than failing silently ({flag})",
+              "usage" in out.lower(), out)
+        check(f"scaffold: no file named {flag} is left behind",
+              not (root / flag).exists(), f"{flag} exists in {root}")
+
 # ---- verdict ------------------------------------------------------------------------------------
 # ---- TOOL-dScaffoldedMirror-2: per-predicate populations, counts on green, an honest --measure ----
 #
