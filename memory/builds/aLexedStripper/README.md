@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling
 roster: TOOL
-ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2
+ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4
 authorized-by: prompt
 ---
 
@@ -95,20 +95,20 @@ and why the run refused it.)*
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-30 · streams tooling
-ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2
+ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-30 |
+| [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aLexedStripper-2.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
