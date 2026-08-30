@@ -48,6 +48,12 @@ owner's prose is the mandate and is recorded verbatim under
   the GOAL; what stays out is any edit that changes what a rule DEMANDS. A trim that is not provably
   meaning-preserving is parked, never taken.
 
+- **Ids `-10` and `-16` through `-34` are NOT units and carry no spec.** They are the findings
+  this run reported rather than built, each a row in `memory/backlog/TOOL.md` with its own
+  measurement. They were recorded through `--rescope --act add` as the run found them, which
+  was the wrong verb for a backlog row; said here rather than rewritten out of an append-only
+  record. The roster region holds units only, which is what `--plan` and the DoD read.
+
 ## Parked decisions
 
 None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
@@ -72,12 +78,6 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 14 | `TOOL-aScouredKit-15` | CLOSED | the drift-audit Skill stops pointing at a directory govkit never creates |
 
 <!-- /roster:units -->
-
-*`TOOL-aScouredKit-10` and `-16` through `-26` are NOT units of this build and deliberately carry
-no spec. They are the findings this run reported rather than built, each landed as a row in*
-`memory/backlog/TOOL.md` *with its own measurement. They were recorded through `--rescope --act
-add` as the run found them, which was the wrong verb for a backlog row and is said here rather
-than rewritten out of an append-only record.*
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 17 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
