@@ -1,12 +1,14 @@
 # TOOL-aScouredKit-2 — wave 2: hardcoded values, govkit convergence, instruction-prose load
 
-**Status:** OPEN · rev-1 · 2026-08-30 · node a · Tier-1 · base 14e21399 · streams tooling+playbook
+**Status:** CLOSED · rev-1 · 2026-08-30 · node a · Tier-1 · base 14e21399 · streams tooling+playbook
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-30-prompt-TOOL-aScouredKit-1.md](../prompts/2026-08-30-prompt-TOOL-aScouredKit-1.md) | research | TOOL-aScouredKit-1 |
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 |
+| [2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md) | spec-audit | TOOL-aScouredKit-1 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md) | research | — |

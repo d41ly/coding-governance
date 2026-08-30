@@ -80,3 +80,15 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T12:14:22Z rescope · item add TOOL-aScouredKit-29 · reason closing-review finding reported with its measurement rather than half-built
 
 2026-08-30T12:40:09Z review · item aScouredKit · reason verdict BLOCKED · blockers 3
+
+2026-08-30T13:48:34Z review · item aScouredKit · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT
+
+2026-08-30T13:49:05Z rescope · item add TOOL-aScouredKit-30 · reason PROMOTED from closing round 3, blockers A and B plus high D and medium H. The -15 persistence mechanism is withdrawn: one derivation everywhere, the dead pointer REPORTED loudly rather than red or silent
+
+2026-08-30T13:49:06Z rescope · item add TOOL-aScouredKit-31 · reason PROMOTED from closing round 3, high C and mediums E and F. The container guard reaches cmd_adopt, and the two govkit arms this build added stop being vacuous
+
+2026-08-30T13:49:07Z rescope · item add TOOL-aScouredKit-32 · reason PROMOTED from closing round 3, medium G and low J. exempt_leg's fail-closed return must not veto the independent red_after_land exemption, and its dead deploy=None fallback goes
+
+2026-08-30T13:54:04Z rescope · item add TOOL-aScouredKit-33 · reason closing round 3 low; the waiver registry's grammar is a format decision, not a fold
+
+2026-08-30T16:43:56Z rescope · item add TOOL-aScouredKit-34 · reason the better refusal is real but could not be armed; the three failed fixtures are recorded so the next attempt starts ahead

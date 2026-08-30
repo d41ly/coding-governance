@@ -1,6 +1,6 @@
 # The owner's prompt, verbatim
 
-**Serves:** prompt TOOL-aScouredKit-1 TOOL-aScouredKit-2
+**Serves:** research TOOL-aScouredKit-1 TOOL-aScouredKit-2
 
 Handed to `/unattended` as the `--prompt` value on 2026-08-30, node `a`. The value carried
 whitespace and named no readable file, so it is the prompt itself and is taken verbatim. Recorded

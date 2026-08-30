@@ -1,12 +1,13 @@
-# TOOL-aScouredKit-7 — the unattended kit stops shipping a scope helper with no caller
+# TOOL-aScouredKit-7 — the dead scope helper gets a caller
 
-**Status:** OPEN · rev-1 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 |
+| [2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md) | spec-audit | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 |
 
 <!-- /gen:spec-records -->
 
@@ -75,6 +76,15 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-30 · initial draft, authored by the run under the standing mandate.
+- rev-2 · 2026-08-30 · S1's disposition RESOLVED TO DELETE, and the reasoning is the unit. Wiring
+  was attempted first and is the better refusal: a malformed scope reported as "a mode this run is
+  not" blames the RUN for a defect in the DECLARATION. But it could not be ARMED. Three fixtures
+  each failed for a different reason and the third left reachability UNPROVEN, so the choice was
+  between shipping a guard nobody can make fire and taking the disposition this spec named as the
+  default. A guard that has never been observed firing is an assertion about nothing, which is
+  this repo's own rule and the one this build has spent three review rounds applying to other
+  people's code. Deleted. The refusal is banked as `TOOL-aScouredKit-34` WITH all three fixture
+  faults written down, so the next attempt starts from what was learned rather than from zero.
 
 ## 10. Reuse audit
 

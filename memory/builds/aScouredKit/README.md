@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
+ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34
 authorized-by: prompt
 ---
 
@@ -80,34 +80,38 @@ than rewritten out of an append-only record.*
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 14 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
+**Build status:** CLOSED · 17 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
 ids TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15
 ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
+ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aScouredKit-1 — wave 1: dead, unwired, duplicated, inefficient, and lying instruments](spec/2026-08-30-spec-TOOL-aScouredKit-1.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-11 — the gate-leg manifest is withheld only by problems the LEGS step raised](spec/2026-08-30-spec-TOOL-aScouredKit-11.md) | — | 2 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-12 — two gate legs receive the path the descriptor already holds](spec/2026-08-30-spec-TOOL-aScouredKit-12.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-13 — `plan` and `apply` honour the target's own declared kit list](spec/2026-08-30-spec-TOOL-aScouredKit-13.md) | — | 2 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-14 — three prose defects in the load-bearing documents](spec/2026-08-30-spec-TOOL-aScouredKit-14.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-15 — the drift-audit Skill stops pointing at a directory govkit never creates](spec/2026-08-30-spec-TOOL-aScouredKit-15.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-2 — wave 2: hardcoded values, govkit convergence, instruction-prose load](spec/2026-08-30-spec-TOOL-aScouredKit-2.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-3 — one predicate decides a gate leg's hold, and the pin file sees both fields](spec/2026-08-30-spec-TOOL-aScouredKit-3.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender](spec/2026-08-30-spec-TOOL-aScouredKit-4.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
-| [TOOL-aScouredKit-5 — drift-audit's conf parser matches the source its docstring claims to copy](spec/2026-08-30-spec-TOOL-aScouredKit-5.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
-| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | OPEN | rev-3 | 2026-08-30 |
-| [TOOL-aScouredKit-7 — the unattended kit stops shipping a scope helper with no caller](spec/2026-08-30-spec-TOOL-aScouredKit-7.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-8 — drift-audit stops printing a cardinality its own source retracted](spec/2026-08-30-spec-TOOL-aScouredKit-8.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
-| [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-1 — wave 1: dead, unwired, duplicated, inefficient, and lying instruments](spec/2026-08-30-spec-TOOL-aScouredKit-1.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-11 — the gate-leg manifest is withheld only by problems the LEGS step raised](spec/2026-08-30-spec-TOOL-aScouredKit-11.md) | — | 2 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-12 — two gate legs receive the path the descriptor already holds](spec/2026-08-30-spec-TOOL-aScouredKit-12.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-13 — `plan` and `apply` honour the target's own declared kit list](spec/2026-08-30-spec-TOOL-aScouredKit-13.md) | — | 2 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-14 — three prose defects in the load-bearing documents](spec/2026-08-30-spec-TOOL-aScouredKit-14.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-15 — the drift-audit Skill stops pointing at a directory govkit never creates](spec/2026-08-30-spec-TOOL-aScouredKit-15.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-2 — wave 2: hardcoded values, govkit convergence, instruction-prose load](spec/2026-08-30-spec-TOOL-aScouredKit-2.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-3 — one predicate decides a gate leg's hold, and the pin file sees both fields](spec/2026-08-30-spec-TOOL-aScouredKit-3.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-30 — one derivation everywhere, and the dead pointer REPORTED](spec/2026-08-30-spec-TOOL-aScouredKit-30.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-31 — the container guard reaches every caller, and two arms stop lying](spec/2026-08-30-spec-TOOL-aScouredKit-31.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-32 — an unresolvable probe answers for itself, not for its siblings](spec/2026-08-30-spec-TOOL-aScouredKit-32.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender](spec/2026-08-30-spec-TOOL-aScouredKit-4.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-5 — drift-audit's conf parser matches the source its docstring claims to copy](spec/2026-08-30-spec-TOOL-aScouredKit-5.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | CLOSED | rev-3 | 2026-08-30 |
+| [TOOL-aScouredKit-7 — the dead scope helper gets a caller](spec/2026-08-30-spec-TOOL-aScouredKit-7.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-8 — drift-audit stops printing a cardinality its own source retracted](spec/2026-08-30-spec-TOOL-aScouredKit-8.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 3 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aScouredKit-1 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

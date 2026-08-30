@@ -1,6 +1,6 @@
 # TOOL-aScouredKit-15 — the drift-audit Skill stops pointing at a directory govkit never creates
 
-**Status:** OPEN · rev-1 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling+deployer
+**Status:** CLOSED · rev-2 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling+deployer
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 |
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 |
+| [2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 |
+| [2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md) | spec-audit | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 |
 
 <!-- /gen:spec-records -->
 
@@ -18,10 +20,13 @@ not exist in a govkit-deployed tree, and stop its `--check` arm from reporting t
 
 ## 2. Scope (IN)
 
-- S1. `DRIFT_WORKFLOWS_REL` overrides the derived sibling directory, so whoever knows the real
-  destination can say so.
-- S2. Both rendered paths are ASSERTED against the filesystem. `--check` REDS when either is absent;
-  the adopt path WARNS and still renders.
+- S1. `DRIFT_WORKFLOWS_REL` overrides the derived sibling directory for a HAND-INSTALL, where one
+  person runs both `adopt` and `--check` and can export it for both. It is NOT a deployment
+  channel, and the attempt to make it one was withdrawn by `TOOL-aScouredKit-30`.
+- S2. Both rendered paths are ASSERTED against the filesystem, and the result is REPORTED in both
+  modes at exit 0. The original wording said `--check` REDS; `TOOL-aScouredKit-30` changed that
+  to a report, because this kit does not require the review-harness kit and cannot distinguish
+  "not installed" from "installed elsewhere" without the token `TOOL-aScouredKit-26` describes.
 - S3. The refusal names both missing paths, the reason the derivation guesses wrong, and the
   override. Its suggestion derives from this kit's own parent, never from the value being
   complained about.
@@ -72,10 +77,10 @@ available that the render cannot supply itself.
 
 - **AC1** — When `bash tools/drift-audit/adopt-drift-audit.sh --check` runs on this tree, it exits 0
   and its in-sync line names the directory it verified.
-- **AC2** — When the Skill is rendered with a `DRIFT_WORKFLOWS_REL` naming an absent directory and
-  `--check` is then run with the SAME value — the adopter's real state, where the render matches and
-  only the filesystem disagrees — it exits 1 naming both missing paths. Observed before this spec
-  was written, and recorded in §9.
+- **AC2** — When the Skill is rendered and `--check` is then run over a tree whose sibling
+  directory is absent — the adopter's real state, where the render matches and only the
+  filesystem disagrees — the output NAMES both missing paths. Superseded from "exits 1" to
+  "names them" by `TOOL-aScouredKit-30`, whose §4 gives the reason.
 - **AC3** — When the suggestion in that refusal is read, it derives from `KIT_REL` — this kit's own
   parent — rather than from `WORKFLOWS_REL`, the value being complained about, so it never reads
   "set it to X" when X is already what is set.
@@ -91,6 +96,11 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-30 · SUPERSEDED IN PART by `TOOL-aScouredKit-30`. This unit's ASSERTION half
+  stands and is what fixed the finding; its DELIVERY half — an override that had to reach the
+  gate leg — was refuted by three consecutive review rounds and withdrawn. S1, S2 and AC2 are
+  restated above to describe what actually shipped, rather than left as a spec the code no longer
+  matches. This edit exists because the closing review kept finding exactly that class.
 - rev-1 · 2026-08-30 · initial draft, authored by the run under the standing mandate. AC2 observed
   before the spec was written: rendering with `DRIFT_WORKFLOWS_REL=tools/review-harness` and then
   checking with the same value reproduces the adopter state exactly — the diff arm agrees, and the

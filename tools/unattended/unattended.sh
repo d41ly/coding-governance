@@ -489,13 +489,17 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
   done
   printf 'all'
 }
-# the directive SCOPE set is DERIVED, never a second constant: a scope is
-# exactly "every run" or "a run in mode M", so `all` plus every member IS the set. Deriving it is
-# what stops the two disagreeing - a second literal would need editing in step with this one, and
-# the pair that already existed did not.
-scopes()      { printf 'all %s\n' "$AUTH_MODES"; }
+# TOOL-aScouredKit-7 — `scopes()` and `is_scope()` are DELETED. They had no caller anywhere but each
+# other, and the scope vocabulary is decided in `check_waiver_scope` by comparing against `all` and
+# the run's own mode. Wiring `is_scope` in was tried first, because a malformed scope reported as "a
+# mode this run is not" blames the RUN for a defect in the DECLARATION — but the guard could not be
+# ARMED: three fixtures each failed for a different reason (a dirty tree refusing at check 2, a
+# two-field directive that `scope_of` defaults to `all`, and a third that still resolved as legal),
+# so whether the branch is reachable at all is UNPROVEN. A guard nobody can make fire is the shape
+# this kit's own gates exist to refuse, so the verifiable option was taken instead of the appealing
+# one. The better refusal is worth having and is `TOOL-aScouredKit-34`, which carries what was
+# learned about the fixture so the next attempt does not re-derive it.
 is_auth_mode(){ case " $AUTH_MODES " in *" $1 "*) return 0;; esac; return 1; }
-is_scope()    { case " $(scopes) " in *" $1 "*) return 0;; esac; return 1; }
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 # The EFFECTIVE halt vocabulary: kit core plus whatever the project appended. Same shape as the phase
 # and Definition-of-Done sets, so a project can extend it and cannot delete from it.
@@ -1144,16 +1148,6 @@ check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bo
     # naming a mode binds only a run of that mode. The test used to name `prompt` twice, so a
     # handle scoped to a later member was silently unenforced - accepted rather than refused,
     # which is the direction that loses.
-    # TOOL-aScouredKit-7 - a scope that is not a scope AT ALL is its own refusal. `is_scope` had no
-    # caller anywhere and the vocabulary it defines was decided here by comparing against `all` and
-    # the run's mode, so a directive declared with a typo'd scope - reachable, because a project
-    # appends its own directives through .unattended.conf - fell into fail 45 and was reported as
-    # "a mode this run is not". That blames the RUN for a defect in the DECLARATION, and it is the
-    # one reading under which the operator changes the wrong thing.
-    if ! is_scope "$sc"; then
-      fail 45 "--waive names a directive whose declared scope is not a scope at all, so no run of any mode is bound by it and the waiver could never be checked - handle $h, directive scope $sc, legal scopes $(scopes)"
-      return 1
-    fi
     if [ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]; then
       fail 45 "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle $h, directive scope $sc, run mode ${AUTH_MODE:-unset}"
       return 1

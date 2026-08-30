@@ -438,7 +438,7 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # element check, and `kits = "memory-tree"` — a plausible typo, the string instead of a list of
     # one — is iterable, so it exploded into eleven single characters and produced a refusal naming
     # `m, e, m, o, r, y` as unknown entries. Both now say what is actually wrong.
-    def _graded(src: object, where: str) -> list[str]:
+    def _check_kits_shape(src: object, where: str) -> list[str]:
         if src is None:
             return []
         if isinstance(src, str) or not isinstance(src, (list, tuple)):
@@ -458,7 +458,7 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     if mode == "all":
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
-        kits = _graded(kits, "the kit selection")
+        kits = _check_kits_shape(kits, "the kit selection")
         unknown = [k for k in kits if k not in descs]
         if unknown:
             raise Refusal(
@@ -471,7 +471,7 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # target declaring `kits = ["check-wiring"]` got a six-kit preview and then an `apply` that
     # exited 2 over an answer intake never asked for — the documented no-`--kits` install path was
     # the broken one, and `plan` previewed the same wrong set so nothing warned first.
-    declared = _graded((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
+    declared = _check_kits_shape((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
     if declared:
         unknown = [k for k in declared if k not in descs]
         if unknown:
@@ -3113,7 +3113,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
 
 
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
-               configure_skipped: set[str], deploy: dict | None = None) -> bool:
+               configure_skipped: set[str], deploy: dict) -> bool:
     """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
 
     The exemption is granted by RUNNING the hole's discharge probe, never by reading its flag. The
@@ -3153,19 +3153,26 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                 #
                 # A probe that cannot be resolved yields NO exemption. Fail closed: the leg stays
                 # red, which is visible, rather than exempt, which is not.
-                ctx = (target_context(target, deploy, eid, d) if deploy is not None
-                       else {"kit": f"tools/{eid}", "prefix": "tools", "kit_id": eid,
-                             "memory_root": "memory"})
+                # TOOL-aScouredKit-32: `deploy` is REQUIRED, not defaulted. The `None` fallback
+                # here rebuilt the very hardcoded `tools/` + `memory` context the paragraph above
+                # condemns, and no caller ever passed None — a dead branch that preserved the
+                # defect in case anyone reached it.
+                ctx = target_context(target, deploy, eid, d)
                 resolved, missing = [], []
                 for a in cmd:
                     _s, _m = resolve_tokens(a, ctx)
                     resolved.append(_s)
                     missing += _m
                 if missing:
+                    # TOOL-aScouredKit-32: `continue`, not `return False`. This probe cannot grant
+                    # an exemption — that half was right — but returning exited the WHOLE function,
+                    # vetoing every later hole of this kit AND the independent `red_after_land`
+                    # window below, neither of which has anything to do with an unresolvable token.
+                    # One probe's inability to answer is not an answer about the others.
                     print(f"govkit: leg '{name}' — the hole probe for '{eid}' holds unresolved "
                           f"token(s) {', '.join(sorted(set(missing)))}, so it cannot be run and "
-                          f"cannot grant an exemption. The leg stays red.")
-                    return False
+                          f"cannot grant an exemption. Other exemption routes are still checked.")
+                    continue
                 try:
                     if subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
@@ -6361,8 +6368,17 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     demand_adopt_index_clean(target)
 
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, "kits" if deploy.get("kits") else "default",
-                                  list(deploy.get("kits") or []))
+    # TOOL-aScouredKit-31. `deploy` IS PASSED and the list is NOT pre-coerced here. `list(...)` at
+    # this call site consumed the target-authored value before `resolve_selection` could grade its
+    # container, so `kits = 5` and `kits = true` raised a raw TypeError — `main` catches only
+    # `Refusal` — and `kits = "memory-tree"` was iterated into eleven single characters and refused
+    # as eleven unknown entries. Round 2 fixed the grader and round 3 found this caller still
+    # bypassing it, which is the same defect surviving one caller over.
+    #
+    # Handing `deploy` and the "default" mode lets the grader see the raw value and lets the
+    # declared-list branch do the work, exactly as `plan` and `apply` do. The explicit
+    # `"kits" if …` split it replaces was the only thing that made this path different.
+    selection = resolve_selection(reg, descs, "default", [], deploy)
     out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", to_rev + "^{commit}"],
                          capture_output=True, text=True, check=False)
     if out.returncode != 0:

@@ -137,33 +137,37 @@ esac
 # in its argv — `govkit selfcheck` refuses a leg naming a path this entry does not ship, correctly,
 # because an adopter may install drift-audit alone — and an environment variable does not survive
 # to the leg's own fresh process. So the ADOPT run writes the answer next to the kit and every
-# later invocation, including the leg's `--check`, reads it back. Same shape as `drift_signals.py`:
-# seeded by adoption, then owned by the tree.
+# TOOL-aScouredKit-30 — ONE DERIVATION, BOTH INVOCATIONS, and the persistence that used to sit here
+# is GONE. Three review rounds each produced a fix whose next round refuted it, for one reason the
+# first design missed: `adopt` and `--check` must resolve the SAME value, and `--check` cannot be
+# given one. `govkit selfcheck` refuses a gate-leg argv naming a path the entry does not ship — an
+# adopter may install drift-audit alone — so the leg carries nothing. Every channel that reached
+# `adopt` alone therefore made the two DISAGREE, and the diff arm then reds with a message that
+# misdiagnoses the cause and a remedy that overwrites the correct Skill with the wrong one: a red
+# turned into a green over a broken artifact, which is worse than the silence this started from.
 #
-# Precedence, narrowest first: an explicit positional, then the persisted answer, then the
-# environment escape hatch for a hand-install, then the derivation.
-WORKFLOWS_STORE="$KIT_DIR/.workflows-rel"
-WORKFLOWS_SAVED=""
-[ -f "$WORKFLOWS_STORE" ] && WORKFLOWS_SAVED="$(tr -d '\r\n' < "$WORKFLOWS_STORE")"
-WORKFLOWS_REL="${WORKFLOWS_ARG:-${WORKFLOWS_SAVED:-${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}}}"
+# The `{kit}/.workflows-rel` store was the attempt to bridge that, and it failed separately: it is
+# untracked, claimed by no `[[files]]` rule and in no receipt, so it does not survive a fresh
+# checkout — where the leg re-derives, disagrees with the committed Skill, and reds.
+#
+# So no answer is carried. The pointer is WRONG in a govkit-deployed tree, exactly as it was before
+# this build; what changed is that it is no longer SILENT, which was the actual finding. The real
+# fix needs a cross-entry destination token govkit does not have: `TOOL-aScouredKit-26`.
+#
+# `DRIFT_WORKFLOWS_REL` survives for a hand-install, where one person runs both invocations and can
+# export it for both. It is deliberately NOT a deployment channel.
+WORKFLOWS_REL="${WORKFLOWS_ARG:-${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}}"
 
 # The two files the rendered Skill tells an agent to run. Named once, checked in both modes.
 #
-# THE DIRECTORY'S ABSENCE IS A DIFFERENT FACT FROM THE FILES' ABSENCE, and conflating them is what
-# would make this assertion unusable. `drift-audit` does not REQUIRE the review-harness kit and
-# neither is in the registry's default selection, so an adopter may legitimately install this kit
-# alone — and redding their bar forever over a sibling they never asked for is not a check, it is a
-# tax. A missing DIRECTORY therefore means "that kit is not installed", which this kit has no
-# standing to complain about; a directory that EXISTS without the files means the Skill points into
-# a real place at the wrong contents, which is exactly the defect this assertion exists for.
-#
-# This distinction is only honest because the descriptor now passes the sibling's real home. While
-# the path was GUESSED, a missing directory was the symptom of the bug rather than evidence of a
-# choice, and this branch would have restored the silence it was written to remove.
-_wf_absent_kit() { [ -d "$ROOT/$WORKFLOWS_REL" ] && return 1 || return 0; }
+# NO "IS THE KIT INSTALLED AT ALL" BRANCH. One stood here and round 3 proved it cannot be written:
+# it inspected the DERIVED path, so "the sibling kit is not installed" and "it is installed
+# somewhere else" produced the same answer — and the second is the defect. It therefore reported a
+# clean bill over exactly the tree this check exists for, restoring the silence it was added to
+# remove. Measured with the harnesses really at `tools/review-harness` and no answer supplied:
+# adopt printed nothing and `--check` exited 0 asserting the kit was absent.
 _wf_missing() {
   local miss="" f
-  _wf_absent_kit && { printf ''; return; }
   for f in drift-audit-code.js drift-audit-state.js; do
     [ -f "$ROOT/$WORKFLOWS_REL/$f" ] || miss="$miss $WORKFLOWS_REL/$f"
   done
@@ -216,19 +220,16 @@ if [ "$MODE" = "--check" ]; then
   # is invisible: that is how this leg reported "in sync" over a Skill naming two files that did not
   # exist. An assertion against the filesystem is the only operand this check has that the render
   # cannot supply itself.
+  # REPORTED, NOT RED. This kit does not require the review-harness kit and neither is in the
+  # registry's default selection, so an adopter may legitimately hold one without the other — and a
+  # red they cannot clear is a tax, not a check. Nor can this script tell "not installed" from
+  # "installed elsewhere": that needs the sibling's real destination, which is
+  # `TOOL-aScouredKit-26`. So it says exactly what it observed and exits 0. The finding this whole
+  # thread came from was SILENCE, and silence is what is fixed here; the wrongness itself is not.
   _miss=$(_wf_missing)
   if [ -n "$_miss" ]; then
     _wf_complain "$_miss"
-    exit 1
-  fi
-  if _wf_absent_kit; then
-    # SAID, not passed over in silence. The Skill still names two commands, and a reader is entitled
-    # to know they will not run here — but this is the sibling kit's absence, not this kit's defect,
-    # so it is a note at exit 0 rather than a red bar.
-    echo "drift-audit: in sync (skill rendered from template, project layer present). NOTE: no"
-    echo "drift-audit: $WORKFLOWS_REL/ in this tree, so the review-harness kit is not installed and"
-    echo "drift-audit: the Skill's two deep-tier commands will not run. Install that kit, or ignore"
-    echo "drift-audit: that section. Not graded: this kit does not require it."
+    echo "drift-audit: in sync (skill rendered from template, project layer present) — but see above."
     exit 0
   fi
   echo "drift-audit: in sync (skill rendered from template, project layer present, deep-tier harnesses present at $WORKFLOWS_REL/)"
@@ -242,14 +243,6 @@ if [ -f "$KIT_DIR/drift_signals.py" ]; then
 else
   cp "$KIT_DIR/drift_signals.template.py" "$KIT_DIR/drift_signals.py"
   echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report"
-fi
-
-# PERSIST THE ANSWER, so the `--check` leg resolves the same sibling this render used. Written only
-# when an explicit answer was given: a value that came from the derivation is not an answer, and
-# storing it would freeze a guess into a file that outranks the derivation forever.
-if [ -n "$WORKFLOWS_ARG" ] || [ -n "${DRIFT_WORKFLOWS_REL:-}" ]; then
-  printf '%s\n' "$WORKFLOWS_REL" > "$WORKFLOWS_STORE"
-  echo "drift-audit: recorded the review-harness home as $WORKFLOWS_REL in $(basename "$WORKFLOWS_STORE")"
 fi
 
 mkdir -p "$SKILL_DIR"

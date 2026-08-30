@@ -1090,13 +1090,22 @@ user_skills = "/tmp/gk-fake-skills"
                   "them — a blank makes the next apply refuse the legs this deployer wrote",
                   _post_owned == _pre_owned, f"pre={_pre_owned} post={_post_owned}")
             # THE WEDGE ITSELF, end to end, because the two arms above are about a FIELD and this
-            # one is about the CONSEQUENCE. Restore the receipt's argv and apply again: with
-            # ownership carried forward this succeeds, and with the blanking it would hit "the
-            # target's runner already has a leg named X and this target's receipt does not claim
-            # it" and stay there forever.
-            _tamper["argv"] = [a for a in _tamper["argv"] if a != "--recorded-differently"]
+            # one is about the CONSEQUENCE.
+            #
+            # THIS ARM WAS VACUOUS AND ROUND 3 PROVED IT. It used to overwrite the on-disk
+            # receipt's `emitted` with the pre-run rows before re-applying — which is precisely the
+            # job the production fix is supposed to do, so the arm passed whether or not the fix
+            # existed. Demonstrated by staging the break: with `emitted = []` restored in
+            # `govkit.py`, the suite reported exactly ONE failure (the field arm) while this one,
+            # billed as covering the wedge end to end, printed ok.
+            #
+            # It now UNDOES THE TAMPER ONLY, in whatever rows the production code actually left,
+            # and never writes an ownership row of its own. If the fix blanked `emitted`, there is
+            # nothing to untamper, the re-apply meets a runner holding legs the receipt no longer
+            # claims, and this arm fails — which is the whole point of it.
             _rcpt_now = json.loads(_rcpt_path.read_text(encoding="utf-8"))
-            _rcpt_now["gate_runner"]["emitted"] = (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])
+            for _e in (_rcpt_now.get("gate_runner") or {}).get("emitted", []):
+                _e["argv"] = [a for a in _e.get("argv", []) if a != "--recorded-differently"]
             _rcpt_path.write_text(json.dumps(_rcpt_now, indent=2) + "\n",
                                   encoding="utf-8", newline="\n")
             _wr2 = run("apply", "--target", str(gt), "--kits", "check-wiring")
@@ -1106,6 +1115,31 @@ user_skills = "/tmp/gk-fake-skills"
             check("AC-withheld: and the receipt records legs_withheld, so the fact survives "
                   "outside the stdout nobody kept",
                   (_post.get("gate_runner") or {}).get("legs_withheld") is True, str(_post.get("gate_runner")))
+
+            # TOOL-aScouredKit-31 — THE OTHER CARRY-FORWARD, on the `kind != "manifest"` branch,
+            # which had no arm ANYWHERE. Round 3 proved it by reverting that line and getting "all
+            # arms held", exit 0: a whole production behaviour with nothing observing it.
+            #
+            # Reached by flipping the target's declared runner kind to `none`, which is an operator
+            # action rather than an exotic one. That branch ORDERS legs into an outbox instead of
+            # writing them, so it must not REVOKE the receipt's claim on legs a previous
+            # manifest-kind run really wrote — otherwise flipping back wedges the target exactly as
+            # the withheld path did.
+            _dep = (gt / ".governance" / "deploy.toml")
+            _dep_src = _dep.read_text(encoding="utf-8")
+            _dep.write_text(_dep_src.replace('kind = "manifest"', 'kind = "none"', 1),
+                            encoding="utf-8", newline="\n")
+            _wr3 = run("apply", "--target", str(gt), "--kits", "check-wiring")
+            _r3 = json.loads(_rcpt_path.read_text(encoding="utf-8"))
+            _own3 = [e["name"] for e in (_r3.get("gate_runner") or {}).get("emitted", [])]
+            check("AC-ordered: a kind=none apply KEEPS the receipt's ownership of legs a previous "
+                  "manifest run wrote — blanking it wedges the target when the kind is flipped back",
+                  _own3 == _pre_owned, f"pre={_pre_owned} post={_own3} :: {_wr3.stdout[-400:]}")
+            _dep.write_text(_dep_src, encoding="utf-8", newline="\n")
+            _wr4 = run("apply", "--target", str(gt), "--kits", "check-wiring")
+            check("AC-ordered: and flipping the kind BACK to manifest is not wedged",
+                  _wr4.returncode == 0 and "already has a leg named" not in _wr4.stdout,
+                  _wr4.stdout + _wr4.stderr)
         else:
             # LOUD, not silent. This suite has no skip verb, and inventing one here to excuse a
             # missing fixture would make the arms above indistinguishable from arms that ran. The
