@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 6ad62a6102a38bc1fb7377325ccad46b0b4ed6d2
-phase: BUILDING
+witness: 3eaf38d0d57dd0206103835628a27f2c57831547
+phase: REVIEWING
 branch-sha: 093730e40355d6a04300966f791f2634379e8b45
 branch-ref: refs/heads/branch/kit-adversarial-review-15ed31
 mode: prompt
@@ -46,3 +46,27 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T11:25:43Z rescope · item add TOOL-aScouredKit-13 · reason plan and apply honour the target's own declared kits list (wave-2 high 7)
 
 2026-08-30T11:25:44Z rescope · item add TOOL-aScouredKit-14 · reason three prose defects in the load-bearing documents: two rules stated three times, one count contradicting its own breakdown (wave-2 15, 19, 14)
+
+2026-08-30T11:41:30Z rescope · item add TOOL-aScouredKit-15 · reason the drift-audit adopter renders a Skill pointing at a sibling directory govkit never creates, and --check was blind because it compared two renders (wave-2 F9)
+
+2026-08-30T11:43:04Z rescope · item add TOOL-aScouredKit-16 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:05Z rescope · item add TOOL-aScouredKit-17 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:06Z rescope · item add TOOL-aScouredKit-18 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:06Z rescope · item add TOOL-aScouredKit-19 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:07Z rescope · item add TOOL-aScouredKit-20 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:08Z rescope · item add TOOL-aScouredKit-21 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:09Z rescope · item add TOOL-aScouredKit-22 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:09Z rescope · item add TOOL-aScouredKit-23 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:10Z rescope · item add TOOL-aScouredKit-24 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:11Z rescope · item add TOOL-aScouredKit-25 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T11:43:11Z rescope · item add TOOL-aScouredKit-26 · reason reported with its measurement as a backlog row rather than half-built in this run

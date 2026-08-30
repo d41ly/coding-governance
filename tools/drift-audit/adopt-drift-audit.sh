@@ -104,10 +104,43 @@ KIT_REL="$("$DA_PY" -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv
 # two files that do not exist — and `--check` reported "in sync", because it diffs the render against
 # the template and BOTH carried the same wrong spelling. Parameterising this kit's own dir while
 # hardcoding a sibling's is the whole defect; a derived value cannot drift from the install.
+# TOOL-aScouredKit-15 — THE DERIVATION GUESSES THE SIBLING'S DIRECTORY NAME, and in a govkit-deployed
+# tree the guess is wrong. govkit lands a kit at `{prefix}/{entry-id}` and the harnesses' entry id is
+# `review-harness`, not `workflows` — so an adopter at `vendor/gov` got a Skill pointing at
+# `vendor/gov/workflows/`, which govkit never creates. gov itself is right BY COINCIDENCE: its own
+# directory is literally `tools/workflows` and it does not deploy into itself. The comment above
+# claimed a derived value "cannot drift from the install"; it cannot drift from the PREFIX, which is
+# a different and weaker property, and this is what that gap cost.
+#
+# Two changes, and the second is the one that matters. `DRIFT_WORKFLOWS_REL` lets whoever knows the
+# real destination say so. And the paths are ASSERTED to exist below rather than assumed, so a wrong
+# answer is a refusal naming the override instead of a Skill that instructs an agent to run nothing.
 case "$KIT_REL" in
   */*) WORKFLOWS_REL="${KIT_REL%/*}/workflows" ;;   # prefixed install: sibling of this kit
   *)   WORKFLOWS_REL="workflows" ;;                 # root install: sibling at the root
 esac
+WORKFLOWS_REL="${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}"
+
+# The two files the rendered Skill tells an agent to run. Named once, checked in both modes.
+_wf_missing() {
+  local miss="" f
+  for f in drift-audit-code.js drift-audit-state.js; do
+    [ -f "$ROOT/$WORKFLOWS_REL/$f" ] || miss="$miss $WORKFLOWS_REL/$f"
+  done
+  printf '%s' "$miss"
+}
+_wf_complain() { # $1 = the missing list, non-empty
+  echo "drift-audit: the rendered Skill points at deep-tier harnesses that are NOT THERE:$1"
+  echo "drift-audit: this kit derives its sibling's directory from its own install prefix, which"
+  echo "drift-audit: assumes the sibling is named 'workflows'. A govkit-deployed tree lands it under"
+  # SUGGESTED FROM THIS KIT'S OWN PARENT, never from WORKFLOWS_REL — deriving the hint from the
+  # value being complained about prints "set it to X" when X is what it already is.
+  case "$KIT_REL" in
+    */*) echo "drift-audit: the ENTRY ID instead — '${KIT_REL%/*}/review-harness' is the usual answer." ;;
+    *)   echo "drift-audit: the ENTRY ID instead — 'review-harness' is the usual answer." ;;
+  esac
+  echo "drift-audit: Set DRIFT_WORKFLOWS_REL to the real path and re-run this script."
+}
 
 render() { # -> stdout; LF only (the rendered Skill is pinned LF in .gitattributes)
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
@@ -138,7 +171,17 @@ if [ "$MODE" = "--check" ]; then
   fi
   # The project layer must exist for the report to run at all; --check is where a half-adoption shows.
   [ -f "$KIT_DIR/drift_signals.py" ] || { echo "drift-audit: drift_signals.py missing — the report cannot run"; exit 1; }
-  echo "drift-audit: in sync (skill rendered from template, project layer present)"
+  # TOOL-aScouredKit-15 — ASSERT THE RENDERED PATHS, do not merely re-derive them. Everything above
+  # compares a render against the template, so both sides carry the same answer and a WRONG answer
+  # is invisible: that is how this leg reported "in sync" over a Skill naming two files that did not
+  # exist. An assertion against the filesystem is the only operand this check has that the render
+  # cannot supply itself.
+  _miss=$(_wf_missing)
+  if [ -n "$_miss" ]; then
+    _wf_complain "$_miss"
+    exit 1
+  fi
+  echo "drift-audit: in sync (skill rendered from template, project layer present, deep-tier harnesses present at $WORKFLOWS_REL/)"
   exit 0
 fi
 
@@ -154,6 +197,12 @@ fi
 mkdir -p "$SKILL_DIR"
 render > "$SKILL_OUT"
 echo "drift-audit: rendered $SKILL_OUT"
+# The same assertion at ADOPT time, as a WARNING rather than a refusal. The render is the useful
+# part of this run and withholding it over a sibling kit the operator may not have selected would
+# be worse than shipping it with a loud caveat — but silence is what let a dead pointer sit in an
+# adopter's Skill unnoticed, so the caveat is not optional. `--check` is where it reds.
+_miss=$(_wf_missing)
+[ -n "$_miss" ] && _wf_complain "$_miss"
 
 cat <<EOF
 
