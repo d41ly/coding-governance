@@ -290,3 +290,36 @@ which no ceiling raise can fix.
 **One pre-existing repair rather than a waiver.** `memory/builds/aGradedDoorway/build/…-s3-cost-split.md`
 carried no `Serves:` line and predates this build's BASE, so check 21 was red for every session, not
 just this one. The binding line was added rather than left for the next run to trip over.
+
+## 11. "It was contention" is a hypothesis, and two of them were tested
+
+§10 called three RED legs contention artifacts. Two of those were killed at a ceiling, which means
+they produced NO verdict at all — so "it would have passed" was a story, not a measurement, and it is
+exactly the reassuring story a killed leg invites. An adopter session put the principle better than
+this record had: **a green earned with ceilings OFF rests on strictly more evidence than a run where
+a ceiling fired, because the legs a ceiling kills are precisely the ones nobody has measured.**
+
+So both were re-run directly, unbounded.
+
+| leg | in the bar | run unbounded |
+|---|---|---|
+| `check-wiring self-test` | killed at 2320 s, no verdict | **76 passed, 0 failed, exit 0** |
+| `manifest-check self-test` | killed at 4370 s, no verdict | **PASS, 62 assertions, exit 0** |
+
+That converts an assertion into a result for BOTH: neither leg has a defect, and both ceilings were
+breached on a node carrying a second session's full bar and roughly 110 live processes. The bound is
+what failed, not the thing bounded — and that is now measured rather than assumed, which is the whole
+difference between this paragraph and the one §10 first wrote.
+
+**The third RED is a different animal and no ceiling raise reaches it.** `run-gates evidence` kills a
+nested run at a fixed 50 s expecting to catch it mid-run, and under load a full run took 125 s, so
+the kill landed during startup and the crash case went unexercised. Its validity depends on
+wall-clock ORDERING rather than on a budget. It announced its own skip, which is more than the two
+ceilings did — a killed leg says nothing at all, and silence is the failure mode this repo's own
+liveness rule exists to prevent.
+
+**Why this belongs in a build record about two scanners.** The same shape has now appeared five ways
+in one night: a ceiling derived from a run whose cache was alive, a waiver keyed to a line number,
+a fixture that cannot reach its mechanism, a repair that passes every test that exists, and a leg
+killed before it could answer. Each is an artifact whose validity depends on a condition it does not
+record, and each reads as a result.
