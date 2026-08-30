@@ -148,6 +148,8 @@ owns are `bash tools/hooks/agent-cap.test.sh`, `bash tools/check-kit-versions.sh
   match text inside one. That REMOVES false positives and cannot hide a real join, because a join
   cannot be written inside a regex literal. AC10 pins both directions. The `scanJoinFindings` S2
   comment claiming "a regex LITERAL survives the blanking" becomes false and is corrected.
+  RESOLVED (agent, 2026-08-31, delegated): both directions are pinned by AC10 and the stale comment
+  is corrected in the same commit, so the widening is measured rather than assumed.
 
 ## 9. Revision log
 
