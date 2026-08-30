@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6
+unpushed-at-landing: 0
+landed-anchor: remote
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
-witness: eb76532eac8969da6ba67ad67abe9848e34a28df
-phase: LANDING
+witness: 7038bc2ca52717c74527f7a4deb5ed24944d50e9
+phase: LANDED
 branch-sha: 19d9b328c26ca41d9d275ef43abfa76f7efbef20
 branch-ref: refs/heads/branch/kit-degradations-review-2faa8d
 mode: prompt
