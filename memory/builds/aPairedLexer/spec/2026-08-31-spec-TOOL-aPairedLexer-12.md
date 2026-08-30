@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-12 — model regex literals, so the phantom span never exists
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 11
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 |
 
 <!-- /gen:spec-records -->
 
@@ -92,14 +93,20 @@ table gains no row for it, because the direction is not measurable from the extr
 - **AC3** — When the audit's second LOSS fixture (`export const RX = /` backtick `/;` ·
   `const R = /a\/*b/;` · `export const REAL = 1;` · `const x = 2; /* real */` ·
   ``export const T = `x`;``) is run, the result is `['REAL', 'RX', 'T']`.
-- **AC4** — When `test_enumerate_exports_regex_borne_comment_opener` runs, its two LOSS ceilings are
-  INVERTED: the regex-borne block opener and the regex-borne line-comment opener no longer lose
-  anything, and the arm records that they were retired by modelling rather than waived.
+- **AC4** — When `test_enumerate_exports_regex_borne_comment_opener` runs, ceiling 1 (the
+  regex-borne BLOCK opener) is retired and loses nothing. **Ceiling 2 does NOT retire — it
+  INVERTS into a raised `MapError`**, and that is a new failure mode this unit must declare rather
+  than discover. The regex-borne `//` was MASKING the multi-declarator guard by truncating the
+  line before the comma; modelling regexes removes the truncation, the guard sees the comma, and
+  `export const U = /^https?:` + `\/\/` + `/, ALSO = 1;` raises where it previously returned
+  the single-name result. That is the guard working, so the arm asserts the RAISE.
 - **AC5** — When `render_comment_free` processes any fixture, its output line count equals its input
   line count — the statement-leading contract `JS_DEFINITION_RULES` depends on.
 - **AC6** — When `enumerate_exports` and `scan_js_definitions` run over this repo's tracked `.js`,
-  the symbol set is IDENTICAL to the pre-change run. Asserted by run, so the eight-definition
-  regression the docstring records can actually fire.
+  the symbol set is IDENTICAL to the pre-change run AND neither raises. Measured for this repo:
+  identical with and without the model, so the arm is a REGRESSION guard here rather than evidence
+  the change is needed — the need is adopter-facing and AC1–AC3 carry it. A symbol-set comparison
+  cannot see an EXCEPTION, which is why the no-raise half is stated separately.
 - **AC7** — When `python tools/codebase-map/selftest.py` runs, it reports `PASS`, and
   `python tools/codebase-map/test_codebase_map.py` exits 0.
 
@@ -124,6 +131,10 @@ not survive, so the model is built.
   exist — so S1 now models regex literals instead of compensating inside the span, which is this
   build's own stated rule applied one language over. The two pinned LOSS ceilings retire as a
   measured consequence, and S3 adds the corpus arm the audit asked for.
+- rev-3 · 2026-08-31 · folded round-2 audit H2. Only ceiling 1 retires. Ceiling 2 inverts into a
+  raised `MapError`, because the regex-borne `//` was masking the multi-declarator guard by
+  truncating the line before the comma — an undeclared new failure mode, now AC4's subject. AC6
+  also could not have seen it: a symbol-set comparison is blind to an exception.
 
 ## 10. Reuse audit
 

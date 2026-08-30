@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -33,9 +34,6 @@ was real. rev-2 puts the signal in the SHARED predicate and routes BOTH views th
   and 5 fall back on the second. **All four rules, or the fix is the defect it was promoted for.**
 - **S3** — the leak set is the openers a declined span can carry into code mode: a backtick, a
   quote, `/*` and `*/`. Not a backtick alone.
-- **S4** — **a test SEAM**: a `--selftest` argv branch guarding `main()`, so the scanners and the
-  predicate can be called directly. Added to BOTH copies, or the mirror-drift arm reds. Every
-  "structural" criterion in this build's set depends on it.
 - **S5** — arms pinning the SIGNAL per RULE, not per fixture.
 
 ## 3. Non-goals (OUT)
@@ -58,7 +56,14 @@ because the per-line view this routes back to is the false-positive source `TOOL
 built to remove, and the audit measured rev-1's looser condition flipping legal lens-prompt scripts
 from ADMIT to DENY.
 
-**Ordering.** `-8` now lands first because S1 consumes its predicate. `-7` may land with either.
+**Ordering.** `-8` lands first: S1 consumes its predicate AND its `--selftest` seam.
+`-7` may land with either.
+
+**Fixture discipline, and it is the reverse of the sibling units'.** Every arm here needs a slash
+`-8` DECLINES — one after `)`, an identifier or a number. A `return`-position trigger is DISSOLVED
+by `-8` two steps earlier, so an arm written that way goes green with this unit unimplemented.
+Units 9, 10 and 11 avoid triggers their siblings REMOVE; this unit must avoid triggers its
+siblings RESOLVE, which is the same rule read from the other end.
 
 ## 5. Production-readiness checklist
 
@@ -92,12 +97,12 @@ from ADMIT to DENY.
   (`if (a) /x[/*]y/.test(s)` … `if (a) /z[*/]w/.test(s)`), the hook exits `2`. Measured at the tip
   as exit `0`: no backtick appears anywhere, so rev-1's condition never fired. Table-driven over the
   opener set, one row per opener.
-- **AC6** — When a script carries ordinary DIVISION and an unrelated backtick on one line
-  (`log(` backtick `progress ${done / total}` backtick `)`) together with a lens prompt naming a
-  primitive, it still exits `0`. This is the precision control: under rev-1's condition it flipped to
-  `2`, re-breaking `TOOL-aPairedLexer-2`'s win. Measured.
-- **AC7** — When `node tools/hooks/agent-cap.js --selftest` is invoked, the seam exists and returns
-  the scanners' output for a given script, in BOTH copies.
+- **AC6** — When a script carries ordinary DIVISION on a line that ALSO has a later slash and a
+  CLOSED opener between them (`const rate = done / total; log(` backtick `tick` backtick `); const
+  inv = total / done;`) together with a lens prompt naming a primitive, it still exits `0`. The
+  later slash is load-bearing: rev-2's control had none, so `-8` S3 could not fire on it under any
+  reading and the control could not fail. This is the precision guard for `TOOL-aPairedLexer-2`'s
+  win, and it is what `-8` AC7's closure test buys.
 - **AC8** — When `renderCodeView` is called through that seam on a declined-slash-plus-backtick line,
   `.unterminated === true`; and `blankLiterals` on the same line gives `.clean === false`. Both
   asserted, because the two answering differently is the defect rev-1 shipped.
@@ -124,6 +129,12 @@ extent-scoped condition in §4 is what makes that answer available.
   Four criteria across the set called internal functions with no seam to call them through, so S4
   adds one (4). The precision claim was false against the tip it lands on, so §4 scopes `dirty` to
   the declined span's extent and AC6 pins the control (38, 3).
+- rev-3 · 2026-08-31 · folded round-2 audit B2, B4 and H5. B2: the seam moves to `-8`, which lands
+  first and needs it for its own criteria — rev-2 put it here at order 7 behind two units that
+  depend on it. B4: no fixture-discipline paragraph, and the arms' trigger was the return-position
+  span `-8` dissolves, so all four class arms would have gone green with this unit unimplemented.
+  H5: AC6's precision control had no later slash on its line, so the leak test could not fire on it
+  under any reading — a control that could not fail, in the unit whose subject is exactly that.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -28,17 +29,29 @@ instead of each carrying a copy. This unit therefore lands FIRST.
 
 - **S1** — ONE predicate answering, for a given position, whether a `/` starts a regex. It decides on
   the previous TOKEN: the trailing WORD when there is one, else the previous significant character.
-- **S2** — the keyword set is closed, and a keyword preceded by `.` is NOT a keyword. The guard is
-  `(?:^|[^.\w$])(return|typeof|case|in|of|instanceof|new|delete|void|throw|yield|await)\s*$`;
-  `obj.in`, `x.of`, `m.delete`, `p.new` and `r.case` are legal member accesses, and a bare word match
-  turns each into a regex opener over live code.
-- **S3** — the predicate also reports, for a slash it DECLINES, whether the declined span LEAKS: is
-  there a later `/` on the same line with an opener (a backtick, a quote, `/*` or `*/`) strictly
-  between the two? That is the fact `TOOL-aPairedLexer-6` routes on, and it lives HERE so the two
-  scanners cannot answer it differently.
+- **S2** — the keyword set is closed, and a keyword preceded by `.` is NOT a keyword.
+  **The SUBJECT of the guard is the running CODE TEXT emitted so far, not the current line and not
+  a bare trailing word.** Against a bare word every keyword matches and the guard never fires;
+  against a line prefix, `obj.` on one line and `in / 2` on the next is legal JavaScript the guard
+  would miss. The `^` alternative therefore means START OF INPUT, never start of line. The test is:
+  the code text ends with one of the keywords, and the character before that keyword is absent (start of input) or is not `.`, a word character or a dollar sign.
+- **S3** — the predicate also reports, for a slash it DECLINES, whether the declined span LEAKS.
+  **A leak requires a CLOSURE test, not merely an opener between two slashes.** Scan the candidate
+  span — from the declined slash to the next slash on the same line — AS CODE; it leaked only if a
+  construct is still OPEN at the end of that span. An opener that closes inside the span leaks
+  nothing, which is what keeps ordinary division out. Three measured false positives, all of which
+  must report NO leak: a division, a closed single-quoted string, then a second division; a
+  division followed by a closed block comment; and a division followed by a closed template.
+  Without the closure test each reports a leak, and `TOOL-aPairedLexer-6` S2 routes that into all
+  four rules — re-entering the ADMIT-to-DENY flip `TOOL-aPairedLexer-2` was built to remove,
+  through the fix promoted to bound it. This lives HERE so the two scanners cannot answer it
+  differently.
 - **S4** — both `renderCodeView` and `blankLiterals` call it. Neither keeps a keyword list, a member
   guard, or a leak test of its own.
 - **S5** — a TABLE-DRIVEN arm over the keyword class in BOTH directions, positive and negative.
+- **S6** — **the test SEAM**, moved here from `TOOL-aPairedLexer-6` because this unit lands FIRST
+  and both this unit and `-7` state criteria that call the scanners directly. A `--selftest` argv
+  branch guarding `main()`, in BOTH copies or the mirror-drift arm reds.
 
 ## 3. Non-goals (OUT)
 
@@ -46,8 +59,8 @@ instead of each carrying a copy. This unit therefore lands FIRST.
   That residual is real, and `TOOL-aPairedLexer-6` is what makes it announce itself — using S3.
 - Not merging the two scanners wholesale (`TOOL-aPairedLexer-5`). S1 extracts the ONE predicate D2
   and the audit force; the rest of the duplication stays tracked.
-- Not the test seam — that is `TOOL-aPairedLexer-6` S4, because that unit needs it too and it should
-  be added once.
+- Not the routing of the leak report into the four rules — that is `TOOL-aPairedLexer-6`. This unit
+  ANSWERS the question; that one acts on the answer.
 
 ## 4. Design
 
@@ -98,14 +111,17 @@ the other's. One predicate, one answer, both callers.
   tip and would NOT under a bare word match, measured by the audit.
 - **AC5** — When `rule1: after a closing bracket a slash is division, not a regex` runs, it stays
   green.
-- **AC6** — When a script containing `return /re/` is rendered by both scanners through the
-  `--selftest` seam `TOOL-aPairedLexer-6` S4 adds, `renderCodeView` and `blankLiterals` BOTH blank
-  the literal. Asserted by RUN over a corpus of regex-position fixtures, never by counting copies of
-  a string.
-- **AC7** — When a declined slash has a later `/` on its line with a backtick between them, the
-  predicate reports a LEAK; when the line holds ordinary division and an unrelated backtick
-  (`const label = args.n / args.total + ` backtick `%` backtick), it reports NO leak. S3's own
-  criterion, and the precision control for `TOOL-aPairedLexer-6`.
+- **AC6** — When a script containing `return /re/` is rendered by both scanners through this unit's
+  own `--selftest` seam (S6), `renderCodeView` and `blankLiterals` BOTH blank the literal. Asserted
+  by RUN over a corpus of regex-position fixtures, never by counting copies of a string.
+- **AC7** — When a declined slash has a later slash on its line and an opener still OPEN at the end
+  of the span, the predicate reports a LEAK. When the opener CLOSES inside the span it reports NO
+  leak, asserted over all three measured false positives named in S3. This is the precision control
+  for `TOOL-aPairedLexer-6`, and rev-2's version could not fail: its fixture had no later slash, so
+  the leak test could not fire on it under any reading.
+- **AC9** — When `node tools/hooks/agent-cap.js --selftest` is invoked, the seam exists and returns
+  the scanners' output for a given script, in BOTH copies. S6's own criterion, and the one every
+  structural criterion in this build depends on.
 - **AC8** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is
   green after it.
 
@@ -128,6 +144,12 @@ none — the audit measured both the defect and the fix's own failure mode, and 
   `grep -c` was satisfied by a one-scanner patch, so S4 and AC6 now assert the two scanners AGREE by
   running them. S3 is new and absorbs the decline signal from `TOOL-aPairedLexer-6`, per audit
   finding 26's recommendation that it live where both views must read one answer.
+- rev-3 · 2026-08-31 · folded round-2 audit B1, B3 and B2. B1: S3 had no CLOSURE test, so ordinary
+  division with a closed string, template or block comment between two slashes reported a LEAK —
+  measured on three fixtures — which `-6` S2 then routed into all four rules. B3: the member
+  guard's SUBJECT was unstated and its `^` alternative was fail-open both ways. B2: the seam moves
+  here from `-6`, because this unit lands at order 5 and `-7` at order 6 both state criteria that
+  need it, while `-6` added it at order 7 — a dependency pointing backwards.
 
 ## 10. Reuse audit
 

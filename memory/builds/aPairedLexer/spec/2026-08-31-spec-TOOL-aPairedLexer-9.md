@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -35,6 +36,10 @@ away. Round-2 review **D4**, exit 2 at BOTH 1.9 and 1.10, exit 0 at the tip.
   "never closes its parens", which is green and observes nothing.
 - **S2b** — a call site the paren-safe view cannot show AT ALL is a DENY naming the ambiguity,
   never a dropped finding.
+- **S2c** — S2b FLIPS the shipped arm `rule3: an exposed const resolves the cap and the script
+  admits` from ADMIT to DENY, at THIS unit's step rather than at `TOOL-aPairedLexer-10`'s. That
+  unit's S3 claims the re-baseline; the flip actually happens here, one step earlier. The arm is
+  re-baselined HERE, with `-10` S3 amended to say the inversion is already done and why.
 - **S3** — a PAIRED arm: the fixture and its control, because the fixture alone would pass under a
   fix that merely stopped setting `dirty`.
 
@@ -85,10 +90,11 @@ units delete would make this live defect look fixed. The review measured exactly
 - **AC4** — When `rule3: an exposed const resolves the cap and the script admits` runs, its verdict
   is whatever `TOOL-aPairedLexer-10` re-baselines it to, and this unit does not change it alone.
 - **AC5** — When `rule3: a cap of 500 below an unterminated BLOCK comment denies` runs, it still
-  denies AND the message still names the width. Measured: `_bl.code` for that arm is
-  `["const c = ","","",""]`, so detection over the paren-safe view finds nothing and the arm
-  flips to ADMIT — a fresh fail-open, which is why S1 puts detection on the fallback view.
-  Asserting the MESSAGE is what separates a real denial from one that lost the number.
+  denies, and the message names the AMBIGUITY rather than the width. `_bl.code` for that arm is
+  `["const c = ","","",""]` — the call-site line is blank in the paren-safe view — so S2b applies
+  and the denial is the one S2b prescribes. rev-2 demanded the message name `500`, which S2b makes
+  impossible: the view that could name it cannot show the line. Two clauses of one spec requiring
+  opposite things is the defect round 1 found at 16/6, and rev-2 reintroduced it one clause over.
 - **AC6** — When `rule3: a cap of 500 below an unterminated backtick denies` runs, it still
   denies. This arm pins the LINE-SET decision: `blankLiterals` emits nothing while in `tmpl`
   mode, so a build resolving S1 the other way turns this arm red instead of shipping.
@@ -114,6 +120,11 @@ buys nothing AC1 does not.
   call-site line is EMPTY — flipping a shipped DENY to ADMIT. The other reading left `joinCall`
   walking a different string at a fallback column. The interface is now stated, and AC5/AC6 name
   the two shipped arms that pin each half.
+- rev-3 · 2026-08-31 · folded round-2 audit B5 and H3. B5: AC5 demanded a denial message naming the
+  width 500 on an arm whose call-site line is BLANK in the paren-safe view, which S2b makes
+  impossible — §2 and §6 requiring opposite things, the same defect round 1 found, one clause over.
+  H3: S2b flips a shipped ADMIT arm at this unit's step, one step before `-10` claims the
+  re-baseline, so S2c records it here.
 
 ## 10. Reuse audit
 

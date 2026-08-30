@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-7 — start of input is a REGEX position
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -69,7 +70,7 @@ instance" broken in the commit that cites it. So AC2 asserts the code view direc
   `.ref`-keyed join, `boundedParallel(work, 500)`, and a closing regex) is fed to the hook, it exits
   `2`. At the tip it exits `0`. Independently reproduced before speccing.
 - **AC2** — When `node tools/hooks/agent-cap.js --selftest` renders the single line `/x/` through
-  the seam `TOOL-aPairedLexer-6` S4 adds, its first output line trims to empty — a structural
+  the seam `TOOL-aPairedLexer-8` S6 adds, its first output line trims to empty — a structural
   assertion that start of input is a regex position, which no future rewrite of the heuristic can
   quietly lose. Asserted for BOTH scanners, since `-8` S4 makes them share the predicate.
 - **AC3** — When the same fixture is prefixed with a bare `;`, it exits `2` both before and after —
@@ -96,6 +97,9 @@ none — the defect, its control and its fix were all measured before speccing.
   has no seam — no `module.exports`, and `main()` runs unconditionally — so the criterion named no
   runnable command. It now names the `--selftest` seam `TOOL-aPairedLexer-6` S4 adds, and asserts
   both scanners rather than one.
+- rev-3 · 2026-08-31 · folded round-2 audit B2: the seam moved from `TOOL-aPairedLexer-6` S4 to
+  `TOOL-aPairedLexer-8` S6, because this unit is order 6 and `-6` is order 7 — AC2 named a seam that
+  would not exist yet when this unit landed.
 
 ## 10. Reuse audit
 

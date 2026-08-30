@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-11 — rule 2 calls the same merge as rule 3
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 10
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +25,10 @@ why it is HIGH rather than MEDIUM — the impact is D5's, the novelty is not.
 
 ## 2. Scope (IN)
 
-- **S1** — hoist `TOOL-aPairedLexer-10`'s corrected merge into ONE helper.
+- **S1** — hoist `TOOL-aPairedLexer-10`'s corrected merge into ONE helper. **It takes both views as
+  PARAMETERS**, because `fanoutFindings` has no `_bl` in scope and a helper written against one
+  caller's locals is not hoisted, it is moved. Signature: the trusted view, the fallback view, and
+  whether the trusted view is clean.
 - **S2** — both `capFindings` and `fanoutFindings` call it. Same code, same rationale, two consumers.
 - **S3** — an arm asserting the two rules resolve the SAME const table for a given script, so they
   cannot diverge again.
@@ -73,7 +77,12 @@ appears; an arm asserting the two rules AGREE holds whatever either does next.
 - **AC2** — When only the block comment is deleted, it exits `2` with the message naming the
   unbounded split — the review's control, and proof the prose is what buys the pass.
 - **AC3** — When a script is run through both rules, `fanoutFindings` and `capFindings` resolve the
-  SAME const table. Asserted directly, so the two cannot diverge again.
+  SAME const table. **The fixture must be one where the two scanners AGREE**, or the criterion
+  selects the wrong answer: measured on `tools/workflows/drift-audit-state.js`, this repo's own
+  shipped harness, `renderCodeView.unterminated` is `false` while `blankLiterals.clean` is `false`
+  — the two views disagree, so rule 2 and rule 3 legitimately read different views and an
+  equality assertion over that script would demand they not. Assert equality of the CONST TABLE
+  given the same view, and pin the disagreement separately as `-6` AC8 does.
 - **AC4** — When `grep -c` finds the merge logic in `agent-cap.js`, there is exactly ONE occurrence.
 - **AC5** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
   after it, except any `TOOL-aPairedLexer-10` re-baselines by name.
@@ -94,6 +103,10 @@ none — the fix is a hoist, and AC3 pins the agreement it exists to create.
   `blankLiterals` — two mechanisms behind one phrase — so every verdict AC1 stated was false for the
   fixture the phrase admits. The trigger is now named literally, with its measured verdicts, and §4
   says why it differs from its siblings'.
+- rev-3 · 2026-08-31 · folded round-2 audit H1. The hoisted merge was written against `_bl` and
+  handed to `fanoutFindings`, which has no `_bl` — a move rather than a hoist. S1 now states the
+  signature. AC3's equality assertion also needed a fixture where the two scanners agree, since
+  they measurably diverge on this repo's own drift-audit harness.
 
 ## 10. Reuse audit
 

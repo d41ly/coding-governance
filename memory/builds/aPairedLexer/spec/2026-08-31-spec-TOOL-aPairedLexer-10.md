@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -34,9 +35,10 @@ meeting.
 - **S2** — sweep `\b(?:const|let|var)\s+(\w+)\s*=` over `_bl.code` and delete every name the clean
   view SAW but refused to resolve. A declaration the trusted view examined and rejected is stronger
   evidence than one the untrusted view invented.
-- **S3** — re-baseline `rule3: an exposed const resolves the cap and the script admits` as a DENY
-  with a clearer message. Resolving a cap out of a view the file has declared untrustworthy is the
-  fail-open direction, and that arm pins it as the admit direction today.
+- **S3** — the arm `rule3: an exposed const resolves the cap and the script admits` is ALREADY
+  re-baselined by `TOOL-aPairedLexer-9` S2c, one step earlier: its S2b flips that arm from ADMIT to
+  DENY. This unit inherits the inversion and does not repeat it. rev-2 claimed the re-baseline
+  here, which would have left the flip unexplained at the step where it actually happens.
 - **S4** — both directions as arms: the fabricated binding, and a real reassignment the fallback
   retains because `blankLiterals` deleted it.
 
@@ -96,9 +98,12 @@ only in the view the file distrusts. The arm is not deleted, it is inverted, wit
 - **AC5** — When a script's view is CLEAN, `intConsts` binds the same table as before this unit,
   no name is deleted, and the verdict is unchanged.
 - **AC6** — When a name is bound by BOTH views but the clean view SAW it in a declaration it
-  refused to resolve (a real `const K = args.width` OUTSIDE any mis-lexed span, with the prose
-  integer inside one), the denial names `K` as unresolvable. This is S2's own criterion, and it
-  FAILS with S1 alone — without it S2 could be omitted entirely and nothing would red.
+  refused to resolve, the denial names `K` as unresolvable, and the criterion FAILS with S1 alone.
+  **The fixture must make BOTH views bind `K`**, or S1 deletes it and the arm passes without S2.
+  A `const K = args.width` binds nothing — `intConsts` matches only a trailing integer — so rev-2's
+  fixture left round-1 finding 10 open. Use a clean-view declaration that BINDS an integer and is
+  then REASSIGNED (`const K = 7` … `K = args.width`), with the prose `const K = 5` inside the
+  mis-lexed span: both views bind, S1 keeps the max, and only S2's sweep deletes the name.
 - **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
   after it, except the one S3 re-baselines by name.
 
@@ -119,6 +124,10 @@ review states the direction and §4 records the reason.
   `-9` lands no arm would exercise the max-merge at all. 10: every AC was satisfied by S1 alone,
   so S2 could ship unimplemented — AC6 is the criterion that fails without it. 30: the risks line
   named a widening that did not reach this gate.
+- rev-3 · 2026-08-31 · folded round-2 audit H3 and H4. H3: S3 claimed a re-baseline that
+  `TOOL-aPairedLexer-9` S2b actually performs one step earlier. H4: AC6's fixture used a binding
+  `intConsts` does not match at all, so the criterion written to make S2 non-optional still passed
+  with S1 alone — round-1 finding 10 left open by its own fix.
 
 ## 10. Reuse audit
 
