@@ -147,6 +147,40 @@ Units 4 and 5 are the only genuinely parallel pair — disjoint write sets, no s
 the `[bar]` table each adds one key to. Their `--dispatch` declaration is the one this build should
 make; everything else sequences.
 
+## R10 — AMENDS unit 2: TOML imposes a Python 3.11 FLOOR on every adopter, and that is a veto-2 shape
+
+`tomllib` entered the standard library in Python 3.11. This kit's whole premise is that it travels
+with nothing, and its resolver `tools/lib/resolve-python.sh` RUNS each candidate precisely because
+being on `PATH` is not evidence — it has never asserted a VERSION. Choosing TOML therefore adds a
+requirement no adopter has been told about, on a repository whose merge bar stops working if the
+requirement is unmet.
+
+**Verified on this node**: the resolver returns `python3` and that interpreter is 3.14.6 with
+`tomllib` importable. So gov is fine and this is not a blocker here; it is a blocker somewhere
+nobody has looked.
+
+This is M3's veto 2 in shape — *needs a new external dependency* — which makes it an owner turn.
+**The owner already took that turn on 2026-08-31 by ruling for TOML, so the fork is ratified rather
+than reopened**; what was not ruled on is the consequence, because nobody had measured it yet.
+
+**Recommendation: unit 2's dual-format loader stops being "for one release" and becomes the
+permanent low-python path.** The branch is already specified in S3 and already has to exist; the
+change is what it means. On an interpreter without `tomllib` the runner reads `gate-legs.json` and
+says on stderr that it did so because the resolved python is below 3.11, naming the version it
+found. Three properties, and they are why this beats the alternatives:
+
+- **It costs nothing new.** The JSON arm is written either way; only its trigger and its message
+  change.
+- **It fails LOUD rather than closed.** An adopter on 3.9 gets a working bar and a sentence telling
+  them why they are on the old format, instead of a refusal at a push boundary.
+- **It refuses the tempting alternative by name.** Shipping a hand-rolled TOML subset parser to
+  avoid the floor is a parser — the category where "just a few lines" is always wrong — and it would
+  put the declaration's meaning in two implementations that must agree.
+
+The cost is honest and belongs here: an adopter on old python keeps a manifest that cannot carry
+comments, which is the whole benefit they do not get. Unit 7's `--upgrade` must therefore REFUSE on
+a sub-3.11 interpreter rather than writing a file that tree cannot read.
+
 ## What this record does NOT claim
 
 - No measurement was taken on this tree today. Every number above is read from a record — the
@@ -154,6 +188,8 @@ make; everything else sequences.
   each is cited so a reader can re-derive rather than trust it.
 - R6's 78-minute figure is arithmetic on a recorded floor, not an observation. No push-main retry
   storm has actually been measured with the turnstile off, because the turnstile has never been off.
+- R10's floor was verified on node `a` ONLY. No adopter's interpreter version was checked, and
+  neither inCMS nor NicoCares was probed for one.
 - Whether a textual splice (R1) survives every TOML shape an adopter might write is UNVERIFIED. The
   marker region makes it a string operation, which is why it is recommended, but a leg row spanning
   the marker would break it and unit 2 owes that refusal.
