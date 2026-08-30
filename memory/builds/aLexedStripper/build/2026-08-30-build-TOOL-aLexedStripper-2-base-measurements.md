@@ -1,6 +1,6 @@
 # BASE measurements and the rev-2 design proof — `TOOL-aLexedStripper-2`
 
-**Serves:** build TOOL-aLexedStripper-2
+**Serves:** journal TOOL-aLexedStripper-2
 
 Node `a`, 2026-08-30, BASE `19d9b328`. Every verdict below is `node <hook> <<< {tool_name:Workflow,
 tool_input:{script}}`, taking the exit code: `0` ADMIT, `2` DENY. The BASE column runs
@@ -219,3 +219,74 @@ the one every harness is actually in.
 fixture to the population — same field count, same element position — or the grid honestly describes
 a different program. Two independent sessions each produced a clean, correct grid about a shape
 neither of them had.
+
+## 9. The class this build kept hitting: a clean result that means nothing
+
+Six instances across two sessions in one night, three of them ours. They are one class in two
+directions, and both survive reading, which is why neither reviewer nor author catches them.
+
+**The FIXTURE direction — a probe that cannot reach the mechanism.**
+
+| # | the clean result | what it actually described |
+|---|---|---|
+| 1 | rev-1's §4 fixtures for over-strip rows 3 and 4 | the identifier sat BEFORE the marker, so nothing could be lost |
+| 2 | the adopter's four ADMIT rows against 1.6 | its lens prompts were single-quoted, so the prose never reached the counter |
+| 3 | the adopter's `)` grid | a one-field element, where the class needs a comma after the stray bracket |
+| 4 | the adopter's first swallow sweep | injected into any long backtick rather than into the fan receiver |
+| 5 | this run's refutation of closing-review blocker 2 | four fixtures with the fan on a different line from the quote |
+| 6 | this run's first gov harness sweep | same as 4, and it read 0/0 and nearly shipped as an all-clear |
+
+**The CLAIM direction — a correction that does not reach its sibling.** The adopter's: a phrase grep
+returns zero while a sibling three lines down restates the same fact in its own words, so the
+correction lands on one copy and the other survives. Their generalisation is the better one and is
+recorded here in their words: **grep the SUBJECT of a claim, not its wording.**
+
+**Why it is one class.** Both produce a result that is honest, reproducible, and about a population
+nobody meant to measure. Neither leaves a symptom: the fixture passes, the grep is empty, the sweep
+is green. The only defence either session found is to state the population first and check the probe
+reaches it — same field count, same element position, same line, same file set — before believing a
+null result. A null result is a claim and owes the same evidence a positive one does.
+
+**And the most expensive instance was not a fixture at all.** Closing-review round 1 prescribed
+deleting `renderCodeView`'s block-comment branch. This run shipped the smaller repair instead —
+widening the unterminated flag — and it PASSED everything: all 29 acceptance shapes, the 99-arm
+suite, and the blocker harness written for round 1. Round 2 then measured the one shape it cannot
+reach. A repair that passes every test you have is indistinguishable from a correct one until
+somebody builds the test you did not, which is the argument for taking a review's prescribed fix
+rather than the cheaper one that satisfies its evidence.
+
+## 10. The first full bar came back RED, and what the seven legs were
+
+`GATE_FULL=1 GATE_SELFTESTS=1` on `addc6169`: **RED, 7 of 86**. Recorded because a build record that
+only ever shows greens is not evidence of a bar, and because two of the seven are worth more than
+their fix.
+
+**Four attributable to this build.**
+
+| leg | what it caught |
+|---|---|
+| `memory hygiene` check 21 | the measurements record wrote `**Serves:** build …`, and `build` is not a record KIND — the set is spec-audit / diff-review / journal / research. The closing review's Serves also named `TOOL-aLexedStripper-7`, a BACKLOG row rather than a unit, so no spec H1 defines it |
+| `build README slot contract` | a new build README naming no row in `readme-contract.txt` "would escape the contract by existing" |
+| `drift-audit records` | `non_terminal_specs_cited_by_product_source` grew 2 → 6, because the four specs were still SPECCED while the code already cited them |
+| `install-prefix (shipped surface)` | see below |
+
+**The install-prefix red is the ceiling-provenance class in a third disguise, and worth keeping.**
+The waiver exempting `REGEN_CMD` is keyed by LINE NUMBER — `tools/codebase-map/map_lib.py:1244`. This
+build's rewrite moved that line to 1387, the key stopped matching, and the leg red on a line nobody
+touched, naming the exempted line rather than the stale key. A waiver keyed by POSITION expires
+silently on any edit above it. Same shape as a ceiling derived from a cache-hit run and a fixture
+that cannot reach its mechanism: a correct-looking artifact whose validity depends on a condition it
+does not record.
+
+**Three are contention, and all three say so in their own output.** `manifest-check self-test` timed
+out at 4370 s, `check-wiring self-test` at 2320 s, and `run-gates evidence` failed after printing
+`SKIP — the kill at 50s landed during startup (a full run here measured 125s) — the run never
+reached its header, so the crash case went UNEXERCISED rather than failing`. The node carried a
+second session's full bar and roughly 110 live processes throughout; an adopter session measured 89%
+of one leg's wall clock as waiting rather than computing. The first two are ceilings sized on a quiet
+machine. The third is different and harder: a fixture whose validity depends on wall-clock ORDERING,
+which no ceiling raise can fix.
+
+**One pre-existing repair rather than a waiver.** `memory/builds/aGradedDoorway/build/…-s3-cost-split.md`
+carried no `Serves:` line and predates this build's BASE, so check 21 was red for every session, not
+just this one. The binding line was added rather than left for the next run to trip over.

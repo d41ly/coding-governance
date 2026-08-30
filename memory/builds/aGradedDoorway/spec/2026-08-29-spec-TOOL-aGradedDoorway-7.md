@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-29-build-TOOL-aGradedDoorway-7-1-s3-cost-split.md](../build/2026-08-29-build-TOOL-aGradedDoorway-7-1-s3-cost-split.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

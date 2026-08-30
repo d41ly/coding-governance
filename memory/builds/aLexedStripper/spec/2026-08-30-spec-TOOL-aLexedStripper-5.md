@@ -1,13 +1,13 @@
 # TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced
 
-**Status:** SPECCED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
-| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
 
 <!-- /gen:spec-records -->

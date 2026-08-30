@@ -1,6 +1,6 @@
 # TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass
 
-**Status:** SPECCED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-prompt-TOOL-aLexedStripper-1-1.md](../prompts/2026-08-30-prompt-TOOL-aLexedStripper-1-1.md) | research | — |
-| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-2 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-2 |

@@ -131,9 +131,9 @@ ids TOOL-aGradedDoorway-1 TOOL-aGradedDoorway-2 TOOL-aGradedDoorway-3 TOOL-aGrad
 | [TOOL-aGradedDoorway-7 — fold the five expensive legs under a viable wall clock](spec/2026-08-29-spec-TOOL-aGradedDoorway-7.md) | — | 2 | INPROGRESS | rev-3 | 2026-08-29 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 2 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aGradedDoorway-7.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aGradedDoorway-7.
 <!-- /gen:build-index -->

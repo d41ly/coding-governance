@@ -1,5 +1,7 @@
 # S3 — where a `check-unattended.sh` invocation's time actually goes
 
+**Serves:** journal TOOL-aGradedDoorway-7
+
 **The spec refused to design past this number and this is the number.** `TOOL-aGradedDoorway-7` §4
 inferred the split from a division (15270 s over 265 runs) and said so in the text: *"S3 exists
 because this paragraph is arithmetic on two measured numbers rather than a third measured number,
