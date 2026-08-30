@@ -1237,6 +1237,12 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
         manifest = {leg.get("name") for leg in _legs_json}
         manifest_subject = {leg.get("name"): leg.get("subject") for leg in _legs_json}
+        # TOOL-aScouredKit-3. TWO fields decide whether a leg runs on an automatic bar, and
+        # tools/run-gates/run-gates.sh is the code that decides: it holds when
+        # `subject == kit OR chunk == selftests`. Pinning and counting the subject alone left six
+        # legs — both run-gates canaries among them, which the runner itself calls the bar's own
+        # liveness assertion — held off every bar while this file reported them running.
+        manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -1353,18 +1359,22 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # answer and -29 rev-2 records why.
         pin_path = root / "tools" / "govkit" / "subject-pins.tsv"
         live = {nm: (manifest_subject.get(nm) or "repo") for nm in manifest if nm}
+        live_chunk = {nm: (manifest_chunk.get(nm) or "") for nm in manifest if nm}
         bad_name = sorted(nm for nm in live if "\t" in nm)
         for nm in bad_name:
             r.fail(f"gate leg '{nm}' carries a TAB in its name, which is this pin file's field "
                    f"separator — a name that cannot be recorded cannot be ratcheted")
-        body = "".join(f"{nm}\t{live[nm]}\n" for nm in sorted(live) if nm not in bad_name)
+        body = "".join(f"{nm}\t{live[nm]}\t{live_chunk[nm]}\n"
+                       for nm in sorted(live) if nm not in bad_name)
         header = (
             "# subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py "
             "selfcheck --write`.\n"
             "#\n"
-            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>. `kit` legs are HELD "
-            "off the\n"
-            "# automatic bar and run only under GATE_SELFTESTS=1; `repo` legs run on every bar.\n"
+            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>\\t<chunk>. TWO fields\n"
+            "# decide whether a leg runs on an automatic bar, and tools/run-gates/run-gates.sh is the\n"
+            "# code that decides: it HOLDS a leg when `subject == kit` OR `chunk == selftests`, and\n"
+            "# runs it otherwise. Both are pinned here, because pinning one left the other free to\n"
+            "# take a leg off every bar with nothing in a diff to see (TOOL-aScouredKit-3).\n"
             "#\n"
             "# THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without\n"
             "# the move appearing in a diff. Whether any given value is RIGHT is a review judgement\n"
@@ -1384,6 +1394,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    "Regenerate with `python tools/govkit/govkit.py selfcheck --write`")
         else:
             pinned: dict[str, str] = {}
+            pinned_chunk: dict[str, str] = {}
             for ln in pin_path.read_text(encoding="utf-8").split("\n"):
                 if not ln.strip() or ln.lstrip().startswith("#"):
                     continue
@@ -1391,7 +1402,13 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 if not _tab:
                     r.fail(f"tools/govkit/subject-pins.tsv has a row with no tab: {ln!r}")
                     continue
+                # A pre-TOOL-aScouredKit-3 row carries two fields; the chunk half is then EMPTY,
+                # which is also the legal value for a leg that declares no chunk. The two are
+                # indistinguishable on purpose — a stale file reds on the SUBJECT rows it already
+                # had, and `selfcheck --write` regenerates every row with both fields.
+                sv, _tab2, cv = sv.partition("\t")
                 pinned[nm] = sv.strip()
+                pinned_chunk[nm] = cv.strip()
             for nm in sorted(set(live) - set(pinned)):
                 r.fail(f"gate leg '{nm}' has no row in tools/govkit/subject-pins.tsv — a NEW leg "
                        f"reds until its subject is on the record, because an unpinned leg is one "
@@ -1410,8 +1427,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"this moves the leg {moved}. If that is intended, move the pin in the "
                            f"SAME commit with `python tools/govkit/govkit.py selfcheck --write`; "
                            f"this check grades the CHANGE and never whether the value is right")
+                if live_chunk[nm] != pinned_chunk[nm]:
+                    moved = ("OFF the automatic bar: it will run only under GATE_SELFTESTS=1"
+                             if live_chunk[nm] == "selftests" else
+                             "ON to the automatic bar: it will run on every gate run"
+                             if pinned_chunk[nm] == "selftests" else
+                             "between chunks; its side of the bar is unchanged")
+                    r.fail(f"gate leg '{nm}' is chunk '{live_chunk[nm] or '(none)'}' and pinned "
+                           f"'{pinned_chunk[nm] or '(none)'}' — this moves the leg {moved}. If that "
+                           f"is intended, move the pin in the SAME commit with "
+                           f"`python tools/govkit/govkit.py selfcheck --write`; this check grades "
+                           f"the CHANGE and never whether the value is right")
+            # HELD is the RUNNER's predicate, not the subject alone — run-gates.sh holds on
+            # `subject == kit OR chunk == selftests`. Counting subjects reported 40 where the bar
+            # holds 46, and the six it missed included both run-gates canaries.
             r.note(f"subject pins: {len(pinned)} pinned · "
-                   f"{sum(1 for v in live.values() if v == 'kit')} held")
+                   f"{sum(1 for nm in live if live[nm] == 'kit' or live_chunk[nm] == 'selftests')}"
+                   f" held")
 
     # ---- 7h3: A REPO-LOCAL POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD. TOOL-dUnstalledConvoy-28.
     #

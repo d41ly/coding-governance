@@ -1664,8 +1664,11 @@ user_skills = "/tmp/gk-fake-skills"
               _w.returncode == 0 and "wrote 1 subject pin" in _w.stdout, _w.stdout + _w.stderr)
         _rows = [l for l in pinf.read_text(encoding="utf-8").split("\n")
                  if l.strip() and not l.startswith("#")]
+        # Three fields since TOOL-aScouredKit-3: `<name>\t<subject>\t<chunk>`. The fixture leg
+        # declares no chunk, so the third field is EMPTY — which is the value a real leg with no
+        # chunk key also pins, and is why the trailing tab is asserted rather than trimmed.
         check("AC4: and the generated pin is exactly the derived population",
-              _rows == ["demo\trepo"], str(_rows))
+              _rows == ["demo\trepo\t"], str(_rows))
         _g0 = run_in(rg)
         # A CONTROL, not a discriminating arm: an assertion that something is green cannot fail when
         # the mechanism is absent, and this one passed in the red-first run for exactly that reason.
@@ -1696,7 +1699,35 @@ user_skills = "/tmp/gk-fake-skills"
         # EXACTLY the new population, which is what makes this arm discriminating: the stale row
         # planted in the corruption above must be GONE, and only a real regeneration removes it.
         check("AC2: and the moved pin records the new value and drops the stale row",
-              _rows2 == ["demo\tkit"], str(_rows2))
+              _rows2 == ["demo\tkit\t"], str(_rows2))
+
+        # TOOL-aScouredKit-3 — the SECOND deciding field, with its failing case observed rather than
+        # assumed. `run-gates.sh` holds a leg when `subject == kit` OR `chunk == selftests`, and
+        # until this arm existed only the subject was pinned: flipping a `repo` leg's chunk to
+        # `selftests` took it off every automatic bar with nothing in a diff to see. Measured on the
+        # real tree before the fix — `selfcheck` exited 0 and still reported the old held count.
+        _write_legs("repo")
+        run_in_gov(rg, "selfcheck", "--write")
+        _legs_now = json.loads(legsf.read_text(encoding="utf-8"))
+        _legs_now[0]["chunk"] = "selftests"
+        legsf.write_text(json.dumps(_legs_now, indent=2) + "\n", encoding="utf-8", newline="\n")
+        kitf.write_text(kitf.read_text(encoding="utf-8").replace(
+            'name = "demo"\nargv = ["true"]\nguard = []\nsubject = "repo"\n',
+            'name = "demo"\nargv = ["true"]\nguard = []\nsubject = "repo"\nchunk = "selftests"\n'),
+            encoding="utf-8", newline="\n")
+        _rc = run_in(rg)
+        check("AC5: flipping a leg's CHUNK to selftests without moving its pin REDS",
+              _rc.returncode == 1, _rc.stdout + _rc.stderr)
+        check("AC5: and the refusal names the leg and BOTH chunk values",
+              "gate leg 'demo' is chunk 'selftests' and pinned '(none)'" in _rc.stdout, _rc.stdout)
+        check("AC5: and says what the move does — leaving the automatic bar",
+              "OFF the automatic bar" in _rc.stdout, _rc.stdout)
+        _wc = run_in_gov(rg, "selfcheck", "--write")
+        _rowsc = [l for l in pinf.read_text(encoding="utf-8").split("\n")
+                  if l.strip() and not l.startswith("#")]
+        check("AC5: and moving the pin in the same commit records the chunk and passes",
+              _wc.returncode == 0 and _rowsc == ["demo\trepo\tselftests"],
+              str(_rowsc) + _wc.stdout + _wc.stderr)
 
         # AC3 — a NEW leg is UNPINNED, and unpinned reds. A new leg passing by default is the hole:
         # it would let a leg arrive already held, on nobody's decision.

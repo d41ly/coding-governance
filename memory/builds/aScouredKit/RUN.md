@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 witness: 093730e40355d6a04300966f791f2634379e8b45
-phase: RESEARCHING
+phase: BUILDING
 branch-sha: 093730e40355d6a04300966f791f2634379e8b45
 branch-ref: refs/heads/branch/kit-adversarial-review-15ed31
 mode: prompt
