@@ -1,14 +1,16 @@
 # TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 |
+| [2026-08-31-build-TOOL-aGatheredDeclaration-6-descriptor-census.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-6-descriptor-census.md) | research | — |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -37,8 +39,19 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
   `subject = ` rows across 23 descriptor TOMLs, 21 under `tools/govkit/entries/` and the rest in
   other kits' `kit.toml`, plus the selfcheck arms at `govkit.py:1235`, `:1239`, `:1264`, `:1271`,
   `:1285`, `:1290`, `:1322-1330`, `:4332-4334` and the `SUBJECT_FLOOR_RUN_GATES` pin at
-  `:2971-2972`. rev-2 priced govkit at three edits; S1b's own premise, *once `subject` is gone*,
+  `:2971-2972`. The descriptor census: **18 rows across 11 files** under `entries/` and 50 rows
+  across 12 other kits' `kit.toml`, re-derived in
+  `build/2026-08-31-build-TOOL-aGatheredDeclaration-6-descriptor-census.md`; rev-3 said 21 under
+  `entries/`, a figure carried from the round-2 audit without re-deriving, which is the class this
+  build exists to remove committed by the fold that was fixing it.
+  rev-2 priced govkit at three edits; S1b's own premise, *once `subject` is gone*,
   is the trigger for every one of them.
+- **S12** — a below-floor INTAKE. S1(c) makes a freshly intaken target declare a `.toml` file and
+  a `toml-legs` grammar; a target whose resolved python predates 3.11 then has a declaration it
+  cannot read and NO legacy pair to fall back to, because intake writes only the new file.
+  Intake probes the target's interpreter and emits the legacy pair instead, saying so — the same
+  probe `TOOL-aGatheredDeclaration-7` S9 runs before `--upgrade`, called from one shared
+  preflight rather than written twice.
 - **S1b** — the SUBJECT RATCHET moves with the key it pins. `govkit.py:1354` resolves each leg's
   subject against `tools/govkit/subject-pins.tsv`, defaulting to `repo`. Once `subject` is gone,
   all 40 kit legs resolve to that default and `govkit selfcheck` — `chunk = declarations`,
@@ -53,8 +66,17 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 - **S3** — `tools/drift-audit/drift_signals.py` and its `.template.py` twin.
 - **S4** — `tools/codebase-map/map_extractors.py`, whose `_gate_legs` inventory keys the map's
   `gate-legs` population.
-- **S5** — the SECOND ENTRY POINT closes: `tools/unattended/run-unattended-gates.sh` becomes a thin
-  call into `run-gates.sh --leg`, naming the seven legs it holds, rather than a parallel dispatcher.
+- **S5** — the SECOND ENTRY POINT closes, and the leg count does NOT move. Re-derived by matching
+  ARGV rather than label: the script issues EIGHT `run_one` calls, not seven. THREE of them
+  already have manifest rows — `unattended kit gate`, `playbook validity gate`,
+  `unattended skill wiring` — and those route through `run-gates.sh --leg`. The other FIVE are
+  the suites the 2026-08-23 owner ruling removed from the bar, and they STAY OFF it: the wrapper
+  keeps dispatching them directly. **That is not a second gate entry point**, because they are
+  not declared legs; the single-entry-point rule governs what the manifest declares, and the
+  owner ruled these out of it. Folding them back in as `opt_in` rows would take the manifest
+  86 -> 91 and partially reverse a governance ruling, which M3's veto 2 puts outside a mandate's
+  delegated authority. rev-2 said "the seven legs it holds" and rev-3 kept it; both the count
+  and the disposition were wrong.
 - **S6** — the carriers that NAME the entry point to a session: `AGENTS.md`'s merge-bar section,
   `coding-governance-agents.template.md`, and whatever `tools/playbook/` renders from them. The
   command block gains the sharding verbs and drops nothing.
@@ -114,7 +136,7 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 | `run-unattended-gates.sh` | its own dispatch | S5, folded away |
 | `check-testsuite-counts.sh` | its POPULATION, selected by grepping the manifest BYTES | S9 |
 | `check-memory-hygiene.sh`, `template-size-limits.txt`, `drift-audit-state.js` | each names the file | S9 |
-| `tools/run-gates/profile_bar.py` | reads the manifest to profile the bar | S9 |
+| `tools/run-gates/profile_bar.py` | reads the manifest to profile the bar | S9, AC15 |
 
 **The inventory at rev-1 was certified by a grep nobody re-ran, and the grep refutes it.**
 `tools/check-testsuite-counts.sh:27` hardcodes `MANIFEST=tools/gate-legs.json` and `:32` HARD
@@ -202,11 +224,34 @@ branch exists precisely so this can be a second landing.
 - **AC13** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs after S11, it is
   GREEN, asserted as its own arm. A hand edit inside the rendered region passes every other
   criterion here and is reverted by the next render.
-- **AC7** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on this tree with the
-  legacy pair deleted, it is GREEN and its leg count is unchanged. **The selftests flag is load
-  bearing**: both canaries are `chunk = selftests`, so a DEFAULT bar holds them and rev-1's AC7
-  would have passed green over two guard pathspecs pointing at a deleted file — the exact shape
-  the criterion was written to catch.
+- **AC14** — When a full intake runs into a scratch target, the EMITTED
+  `<prefix>/gate-legs.toml` is parsed and its `[bar]` table carries ALL FOUR declared keys with
+  the kit's shipped values, asserted key-by-key in `tools/govkit/selftest.py`, where this unit's
+  other intake arms sit. This is where `TOOL-aGatheredDeclaration-4` S7 and
+  `TOOL-aGatheredDeclaration-5` S3 are graded; both DECLARE the default and neither can grade it,
+  because the emitter is here.
+- **AC15** — When `python tools/run-gates/profile_bar.py` runs after S7, it profiles the bar from
+  the TOML, asserted by `tools/run-gates/profile_bar.test.sh` — already a leg. Without this the
+  reader degrades to a state nothing observes.
+- **AC16** — When the emitter re-writes a target's manifest, every comment OUTSIDE the marker
+  region survives byte-identically, asserted in `tools/govkit/selftest.py` by planting a sentinel
+  comment in the authored half and re-running the emit. Observed RED first against a parse-and-reserialise implementation,
+  which is the one this criterion exists to forbid.
+- **AC17** — When a below-floor target is intaken, it receives the legacy pair and a line saying
+  why, never a TOML it cannot read, asserted in `tools/govkit/selftest.py` against a stub
+  interpreter. Observed RED first.
+- **AC18** — When `bash tools/unattended/run-unattended-gates.sh` runs after S5, the leg count in
+  `tools/gate-legs.toml` is DERIVED and equals its pre-S5 value with a stated delta of zero,
+  asserted by counting both. rev-3 wrote the word "unchanged", which cannot survive a scope item
+  that changes it — and this is the third round in which a prose count in this build disagreed
+  with the tree.
+- **AC7** — When `bash tools/run-gates/run-gates.sh --leg "run-gates canary" --leg "run-gates gov
+  canary"` runs on this tree with the legacy pair deleted, both are GREEN. **Sharding, not
+  `GATE_SELFTESTS=1`**: both canaries are `chunk = selftests`, so a DEFAULT bar holds them and
+  rev-1's wording would have passed green over two guard pathspecs pointing at a deleted file —
+  but rev-2's blanket `GATE_SELFTESTS=1` would have executed the five suites the 2026-08-23 owner
+  ruling removed from the bar. `TOOL-aGatheredDeclaration-3`'s `--leg` runs exactly the two arms
+  that grade guard liveness and nothing else, which is this build using its own new capability.
 - **AC9** — When `bash tools/check-testsuite-counts.sh` runs after S9, it derives the same
   population from the TOML that it derived from the JSON, asserted by running both at the commit
   where both files exist. Observed RED first against the unmoved checker.
@@ -241,6 +286,14 @@ listed two. No new leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R1, R3, R6, R8, R10, R11 and R14. The
+  Rollout added leg rows while AC7 sixty lines below asserted the count was unchanged, and the
+  disposition folded five suites back onto a bar an owner ruling had removed them from — outside
+  a mandate's authority, so S5 now keeps them off and routes only the three declared legs through
+  `--leg`. The whole emitted `[bar]` table, the comment-preserving splice, `profile_bar.py` and a
+  below-floor intake each gained a criterion. The descriptor census was re-derived after rev-3
+  carried a figure it had not checked.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) findings R1, R3,
   R5, R6, R7 and R12. AC6 was unsatisfiable beside unit 2's permanent legacy branch and its
@@ -268,8 +321,10 @@ the probe is not**, stated so the difference is visible rather than implied.
 
 The recall probe run for `TOOL-aGatheredDeclaration-7` reaches this unit and changes it:
 `memory/builds/dUnstalledConvoy/reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md:328`
-records that on an upgrade re-apply `govkit.py:2510-2512` fires `a leg that vanished is not a leg
-that passed` once per MIGRATED leg, naming the wrong cause. S1 moves the emitter, so every leg in
+records that on an upgrade re-apply govkit fires `a leg that vanished is not a leg that passed`
+once per MIGRATED leg, naming the wrong cause. **The line numbers that record cited are stale at
+this base and are deliberately not repeated**; the behaviour was re-confirmed from the record and
+the site is not re-cited rather than cited wrongly. S1 moves the emitter, so every leg in
 every target becomes a migrated leg exactly once. **AC1 is not sufficient on its own for that**, and
 the S1 work must either avoid the branch or the build must record that adopters meet it once. It is
 carried as a known consequence rather than silently discovered at an adopter.

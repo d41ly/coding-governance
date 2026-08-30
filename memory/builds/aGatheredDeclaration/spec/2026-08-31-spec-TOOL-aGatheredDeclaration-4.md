@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -36,8 +37,10 @@ and killed legs have cost this fleet reds and re-runs that produced no evidence 
 - **S6** — `.unattended.conf`'s `GATE_BOUND` — the whole-bar bound the unattended `--close` runs
   under — comes under the same rule: it ships absent, the kit's default applies only when
   enforcement is on, and the driver says on stderr which it used.
-- **S7** — the kit's adopter seed declares `enforce_ceilings = false`, so no adopter inherits
-  enforcement by arriving.
+- **S7** — the adopter default `enforce_ceilings = false` is DECLARED here and GRADED at
+  `TOOL-aGatheredDeclaration-6` AC14, which is where the emitter that writes it lives. rev-3 put
+  the criterion in THIS unit, at order 4, against an artifact unit 6's S1(d) emitter does not
+  write until order 6 — a criterion that cannot be satisfied when its own unit closes.
 
 ## 3. Non-goals (OUT)
 
@@ -89,13 +92,16 @@ ahead of any request for it.
 ### Files touched (estimate)
 
 `tools/run-gates/run-gates.sh` · `tools/gate-legs.toml` · `.unattended.conf` ·
-`tools/unattended/unattended.sh` (the `GATE_BOUND` read) · `.githooks/pre-push` (S5) ·
-`tools/run-gates/kit.toml` (the `[gate_runner_seed]` block, for S7) ·
-`tools/run-gates/adopt-run-gates.sh` and `tools/run-gates/adopt-run-gates.test.sh` (S7) ·
-`tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md`.
+`tools/unattended/unattended.sh` (the `GATE_BOUND` read) · `.githooks/pre-push` and
+`.githooks/pre-push.test.sh` (S5, S5b) · `tools/run-gates/run-gates.test.sh` ·
+`tools/run-gates/README.md`. **The `[gate_runner_seed]` block and `adopt-run-gates.sh` are NOT
+here**: rev-2 named them on a mechanism rev-3 disproved, and rev-3 corrected the prose while
+leaving both in this list. The adopter default's files belong to
+`TOOL-aGatheredDeclaration-6`, whose estimate already names `tools/govkit/govkit.py`.
 
-**S7 writes the default through `TOOL-aGatheredDeclaration-6` S1's TEXTUAL-SPLICE EMITTER**, the
-thing that actually writes a target's `gate-legs.toml`. rev-2 named `[gate_runner_seed]` and
+**The grading moved with the mechanism, which is the part rev-3 got wrong twice.**
+`TOOL-aGatheredDeclaration-6` S1(d)'s textual-splice emitter is the thing that writes a target's
+`gate-legs.toml`. rev-2 named `[gate_runner_seed]` and
 cited unit 5's identical scope item as precedent; both were wrong, and copying an untested
 sibling is how the same defect landed twice. `tools/run-gates/kit.toml:105-135` seeds the
 TARGET'S `.governance/deploy.toml` `[gate_runner]` table — a different file read by a different
@@ -141,9 +147,10 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
   literal.
 - **AC1b** — When `[bar].enforce_ceilings` is `true` and `GATE_CEILINGS` is UNSET, that same leg is
   KILLED and `bash tools/run-gates/run-gates.sh --manifest` reports enforcement on with source
-  `declaration`. This is the middle row of the resolution table and the key this unit exists to
-  add; without it an implementation that reads only `GATE_CEILINGS` and hardcodes the default off
-  passes every other criterion and leaves the declaration decorative. Observed RED first.
+  `declaration` in its header `ceilings` clause. This is the middle row of the resolution table
+  and the key this unit exists to add; without it an implementation that reads only
+  `GATE_CEILINGS` and hardcodes the default off passes every other criterion and leaves the
+  declaration decorative. Observed RED first.
 - **AC2** — When `GATE_CEILINGS=1`, that same leg is killed and its row is
   `GATE FAIL <leg> (timed out after Ns)`, never a skip and never a pass.
 - **AC3** — When enforcement is OFF, a banner naming the state appears on stderr before the first
@@ -158,13 +165,16 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 - **AC7** — When `.unattended.conf` declares no `GATE_BOUND`, `bash tools/unattended/unattended.sh
   --close <slug>` runs the bar unbounded and says on stderr that no bound was declared, asserted in
   the unattended kit's own suite.
-- **AC8** — When `bash tools/run-gates/run-gates.sh --manifest` runs with enforcement off, every
-  leg's ceiling column reads `declared, not enforced`, asserted by grepping the output.
-- **AC9** — When a full intake runs into a scratch target, the EMITTED
-  `<prefix>/gate-legs.toml` is parsed and its `[bar]` table carries `enforce_ceilings = false`,
-  asserted in `tools/run-gates/adopt-run-gates.test.sh`. It reads the emitted FILE, never the
-  seed — rev-2 asserted a read-only verb against a seed block that structurally cannot carry the
-  key.
+- **AC8** — When `bash tools/run-gates/run-gates.sh --manifest` runs with enforcement off, the
+  header's `ceilings` clause reads `off` with its source, and every leg's APPENDED enforcement
+  column reads `declared-only` while the ceiling column keeps its declared NUMBER. The row is
+  `TOOL-aGatheredDeclaration-3` §4's contract and is not respelled here — rev-3 overwrote the
+  ceiling column with a word, which made this criterion and that unit's AC11 ratio arm mutually
+  unsatisfiable.
+- **AC9** — MOVED to `TOOL-aGatheredDeclaration-6` AC14, which grades the whole emitted `[bar]`
+  table in `tools/govkit/selftest.py` where unit 6's other intake arms sit. rev-2 asserted it
+  against a seed block that cannot carry the key; rev-3 fixed the mechanism and left the
+  criterion two units early, in a suite that runs no intake at all.
 - **AC11** — When neither `GATE_CEILINGS` nor `[bar].enforce_ceilings` is present at all — an
   adopter's hand-written manifest, or gov's own tree before this unit lands — enforcement is OFF
   and the runner says the default was taken, asserted in `tools/run-gates/run-gates.test.sh`.
@@ -196,6 +206,11 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R1, R2 and R5. The adopter-default
+  criterion was two units early — rev-3 corrected the MECHANISM and left the grading against an
+  artifact that does not exist until order 6 — and it is now unit 6's AC14. AC8 respelled unit
+  3's output contract incompatibly. The files-touched list still named the block rev-3 disproved.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Findings R1, R8 and R11. rev-2's answer to F17 routed the
   adopter default through `[gate_runner_seed]`, which writes a different file from a closed key

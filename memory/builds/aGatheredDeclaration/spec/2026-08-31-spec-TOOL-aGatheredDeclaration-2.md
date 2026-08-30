@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -51,11 +52,23 @@ legs, held in the same set, dispatched by the same loop.
   check, and rev-2 took the exemption without naming one.
 - **S9** — the canary arms: the reader, the dual-format branch, the floor refusal, the schema
   refusals, the empty-guard round trip, the boolean marshalling, and the repointed pinned-knob arm.
-- **S10** — a TOML declaring NO `[[profile]]` row exits 2 naming the file. A converter that drops
+- **S12** — the COMMENTS are graded, on gov's own migration. S5 carries `gate-profiles.txt`'s
+  argued paragraphs across, and after `TOOL-aGatheredDeclaration-6` S7 deletes that file the
+  evidence is gone — so the arm belongs to THIS unit, while both files exist. AC16.
+- **S13** — the manifest path is derived in ONE place. §4's reuse claim says the derivation is one
+  seam and both canaries re-derive it themselves; the loader exports the resolved path and the
+  suites read it rather than rebuilding it, or §10's claim is false in the same commit that makes
+  it.
+- **S10** — a TOML declaring NO `[[profile]]` row exits 2 naming the file, and a `[bar]` table
+  MISSING any key the loader resolves a default against does the same, naming the key. The
+  second half is what holds both write paths with one check: a loader that reds on a partial
+  `[bar]` cannot be satisfied by a partial emitter, so `TOOL-aGatheredDeclaration-6` S1(d) and
+  `TOOL-aGatheredDeclaration-7` S10 are held by a refusal rather than by two criteria agreeing
+  with each other. A converter that drops
   a table is then caught by the loader on its first run rather than by a wide pool on a small
   machine, and the same refusal covers a hand-written adopter manifest.
 - **S11** — `short_circuit` is part of the `[[lane]]` SCHEMA declared here, validated as a boolean
-  and defaulting to `false`. `TOOL-aGatheredDeclaration-8` READS it. rev-2 dropped it from this
+  and defaulting to `false`, both graded by AC17. `TOOL-aGatheredDeclaration-8` READS it. rev-2 dropped it from this
   schema when the example lane set shrank to one row, leaving unit 8 reading a key no unit
   declared.
 
@@ -185,7 +198,9 @@ falls to the legacy pair, which is still tracked.
 
 `tools/gate-legs.toml` (new) · `tools/run-gates/run-gates.sh` (loader, marshalling, stamp) ·
 `tools/run-gates/run-gates.test.sh` (arms, and the pinned-knob arm repointed) ·
-`tools/run-gates/README.md` · `tools/run-gates/kit.toml` (`[[lf_pin]]`) · `.gitattributes`.
+`tools/run-gates/README.md` · `tools/run-gates/kit.toml` (`[[lf_pin]]`) · `.gitattributes` ·
+`.githooks/pre-push` and `.githooks/pre-push.test.sh` — S8 edits predicate 6's pathspec and three
+criteria are asserted in that suite, and rev-3 budgeted neither.
 
 ### Alternatives rejected
 
@@ -259,8 +274,19 @@ agree. S3's permanent dual-format path is the answer instead.
   turnstile's holder TTL takes it, asserted in `tools/run-gates/run-gates.turnstile.test.sh`.
   Without this the key replaces a live consumer of a knob this unit removes and is graded by
   nothing in any of the eight units.
-- **AC15** — When `tools/gate-legs.toml` declares no `[[profile]]` row,
-  `bash tools/run-gates/run-gates.sh` exits 2 naming the file. Observed RED first.
+- **AC15** — When `tools/gate-legs.toml` declares no `[[profile]]` row, or its `[bar]` table omits
+  any key the loader defaults against, `bash tools/run-gates/run-gates.sh` exits 2 naming the
+  file or the key. Observed RED first against a two-key `[bar]`.
+- **AC16** — When `tools/gate-legs.toml` is compared against `tools/run-gates/gate-profiles.txt`,
+  every comment paragraph in the source appears in the target, asserted by a normalised
+  substring join in `tools/run-gates/run-gates.test.sh` while BOTH files exist. After
+  `TOOL-aGatheredDeclaration-6` S7 the source is deleted and this can never be checked again.
+- **AC17** — When a `[[lane]]` declares a non-boolean `short_circuit`, the runner exits 2 naming
+  the lane; when it declares none, the resolved value is `false`, asserted field-by-field in
+  `tools/run-gates/run-gates.test.sh`. Observed RED first.
+- **AC18** — When `GATE_OPTIN` is the spelling in use, `python tools/govkit/govkit.py selfcheck`
+  is still green: its kit-payload policy guard at `govkit.py:1441` keys on the OLD spelling and
+  the rename leaves it matching nothing. Observed RED first.
 - **AC11** — When a run sets `GATE_OPTIN` and another sets `GATE_SELFTESTS`, both write the same
   run-record byte and both satisfy pre-push predicate 8, asserted in `.githooks/pre-push.test.sh`
   parameterised over both spellings.
@@ -302,6 +328,13 @@ agree. S3's permanent dual-format path is the answer instead.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft, from `TOOL-aGatheredDeclaration-1`'s schema union.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R4, R7, R9, R10, R12 and R13. The
+  emitted `[bar]` was two keys of four with nothing defaulting or refusing the rest, so the
+  refusal moved into the loader where one check holds both write paths. The comment carry-across
+  — the whole point of the format — was graded by nothing, and its evidence is deleted at unit 6.
+  `short_circuit` was declared at rev-3 and ruled by no criterion. The `GATE_OPTIN` rename leaves
+  a govkit policy regex on the old spelling.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Findings R2, R9, R10, R16 and R18. rev-2's answer to F10 closed
   predicate 7 and left predicate 6 watching a file that no longer scopes the bar, which is the

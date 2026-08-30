@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -78,8 +79,10 @@ one — the turnstile never contributes to the exit code.
 ### Files touched (estimate)
 
 `tools/run-gates/run-gates.sh` · `tools/gate-legs.toml` ·
-`tools/run-gates/run-gates.turnstile.test.sh` · `tools/run-gates/README.md` ·
-`tools/run-gates/kit.toml` (the `[gate_runner_seed]` block).
+`tools/run-gates/run-gates.turnstile.test.sh` · `tools/run-gates/README.md`. **The
+`[gate_runner_seed]` block is NOT here**: rev-1 named it on a mechanism rev-3 disproved, and
+rev-3 corrected the prose while leaving the file in this list. The adopter default's files
+belong to `TOOL-aGatheredDeclaration-6`.
 
 ### Alternatives rejected
 
@@ -129,11 +132,10 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
   `tools/run-gates/run-gates.turnstile.test.sh` with that variable exported.
 - **AC4** — When the turnstile is off, the run record's `queued` and `queued_from` keys are present
   and read `-` and `off`, asserted by reading the run record rather than the stream.
-- **AC5** — When a full intake runs into a scratch target, the EMITTED
-  `<prefix>/gate-legs.toml` is parsed and its `[bar]` table carries `turnstile = false`, asserted
-  in `tools/run-gates/adopt-run-gates.test.sh`. It reads the emitted FILE, never the seed;
-  `adopt-run-gates.sh --check` is read-only and seeds nothing, so rev-1's spelling asserted a
-  verb that cannot write what it checks.
+- **AC5** — MOVED to `TOOL-aGatheredDeclaration-6` AC14, which grades the whole emitted `[bar]`
+  table at the unit whose emitter writes it. rev-1 asserted a read-only verb that seeds nothing;
+  rev-3 fixed the mechanism and left the criterion at order 5, against an artifact order 6
+  produces. The default is DECLARED here and GRADED there.
 - **AC6** — When the profile line is printed, it names the turnstile state and where the value came
   from, asserted by grepping the first line of `bash tools/run-gates/run-gates.sh` captured output.
 
@@ -156,6 +158,9 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R1 and R5. AC5 graded an artifact
+  order 6 produces, from order 5, and the files-touched list still named the disproved block.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Finding R1. S3 and AC5 named `[gate_runner_seed]`, which writes a
   different file from a closed key tuple, and graded it with a read-only verb.

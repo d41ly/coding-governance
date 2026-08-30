@@ -28,3 +28,5 @@ base: 44734f152c0f6a2d7ea5c6438dc969de8a7e9f33
 2026-08-30T22:43:33Z rescope · item add TOOL-aGatheredDeclaration-8 · reason F9 and F29 of the round-1 spec audit: unit 2's S6 lanes and S7 tool probe cannot be built without rewriting the dispatch loop (one pool at one width, one global longest-first hint), which S2 asserts does not change and Section 5 prices as no regression. R3 of the architecture record reaches the same place from the migration side — a behaviour change inside a format change is unreviewable. Lanes and the tool probe become their own unit so unit 2 is provably behaviour-neutral.
 
 2026-08-30T23:16:43Z review · item aGatheredDeclaration · reason verdict BLOCKED · blockers 4
+
+2026-08-30T23:46:31Z review · item aGatheredDeclaration · reason verdict BLOCKED · blockers 3

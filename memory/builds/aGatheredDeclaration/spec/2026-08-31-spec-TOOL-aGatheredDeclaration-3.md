@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -83,12 +84,21 @@ in it, and no guard or hold is consulted.
 usage: run-gates.sh [--leg <name>]... [--list] [--manifest] [--help]
 ```
 
-**The `LEG` row format is an OUTPUT CONTRACT, and S9 changes it.** `--manifest`'s row is
-`LEG  <name>  <lane>  <opt-in|always>  <ceiling|none>  <guards>  <would-run|held|guarded-out>`
-and S9 appends the measured seconds and the ratio. The two columns go at the END, after the
-selection verdict, because a column inserted before an existing one is read AS that one by any
-reader not moved in the same commit — the same append-only rule
-`TOOL-aGatheredDeclaration-2` states for the RS/US wire format.
+**The `LEG` row format is an OUTPUT CONTRACT and it is spelled ONCE, here.** Every other unit
+CITES this paragraph; a second spelling elsewhere is the defect this whole build exists to
+remove, and `TOOL-aGatheredDeclaration-4` had one at rev-3.
+
+```
+gate manifest: <n> legs · <n> opt-in · <n> guarded · profile <row> width <w> · ceilings <on|off> from <env|declaration|default>
+LEG  <name>  <lane>  <opt-in|always>  <ceiling|none>  <guards>  <would-run|held|guarded-out>  <measured|->  <ratio|->  <enforced|declared-only>
+```
+
+The ceiling column stays the DECLARED NUMBER in every state — it is what AC11 computes a ratio
+from, so a unit that overwrites it with a word makes two criteria mutually unsatisfiable, which
+is exactly what happened. Enforcement is reported by an APPENDED column and by the header's
+`ceilings` clause instead. Every new column goes at the END, because one inserted before an
+existing one is read AS that one by any reader not moved in the same commit — the same
+append-only rule `TOOL-aGatheredDeclaration-2` states for the RS/US wire format.
 
 ### Inventory
 
@@ -163,6 +173,10 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 - **AC11** — When `--manifest` runs, each leg row carries its declared ceiling, the seconds
   `<git-dir>/gate-ledger.tsv` recorded for it, and their ratio, with a flag on any ratio under 3,
   asserted in `tools/run-gates/run-gates.test.sh` against a planted ledger.
+- **AC14** — When `--manifest` runs, one recorded row is compared FIELD-BY-FIELD against a fixture
+  in `tools/run-gates/run-gates.test.sh` holding the contract above. Any later unit changing a
+  column then reds this arm instead of quietly redefining the contract in prose, and AC11's ratio
+  arm parses the same fixture.
 - **AC12** — When `bash tools/run-gates/run-gates.sh --help` runs, it prints the usage line and
   exits 0; when an unknown argument is passed, it exits 2 naming the argument. Asserted in
   `tools/run-gates/run-gates.test.sh`. S4 had no criterion at rev-2, which left the one
@@ -191,6 +205,12 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) finding R2. The `LEG` row was spelled here and
+  incompatibly in `TOOL-aGatheredDeclaration-4`, whose AC8 overwrote the ceiling column AC11
+  computes its ratio from; the two criteria could not both be green. The contract is now spelled
+  once, enforcement moved to an appended column and a header clause, and AC14 pins it as a
+  fixture.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) findings R13,
   R14 and R15. The fold-new ledger join had no unmeasured-leg rendering, no empty state and a

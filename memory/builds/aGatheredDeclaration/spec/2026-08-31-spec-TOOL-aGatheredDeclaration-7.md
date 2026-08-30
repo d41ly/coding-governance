@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -44,7 +45,8 @@ a flag day for two live repositories, and the prompt asks for the tool explicitl
   `--force`.
 - **S8** — the e2e arms in `tools/run-gates/adopt-run-gates.test.sh`, driving both dialects from
   fixtures derived from the two real manifests.
-- **S9** — the INTERPRETER PROBE, run BEFORE anything is written: the target's resolved python is
+- **S9** — the INTERPRETER PROBE, ONE shared preflight that `TOOL-aGatheredDeclaration-6` S12's
+  intake path calls too, run BEFORE anything is written: the target's resolved python is
   asked to import `tomllib`, and a failure refuses with exit 2 naming the interpreter and its
   version unless `--force`. Without it `--upgrade` converts a working merge bar into a dead one,
   because `TOOL-aGatheredDeclaration-2` S3 makes the TOML win wherever it exists. It is a SHARED
@@ -169,9 +171,12 @@ report the owner acts on.
 - **AC8b** — When the target holds no `gate-profiles.txt`, `--upgrade` exits 2 naming it rather
   than emitting a manifest with no `[[profile]]` row, asserted in
   `tools/run-gates/adopt-run-gates.test.sh`. Observed RED first.
-- **AC8c** — When the emitted TOML is parsed, its `[bar]` table carries the kit defaults, asserted
-  key-by-key against `TOOL-aGatheredDeclaration-6` S1(d)'s emitted set rather than against a
-  list typed here.
+- **AC8c** — When the emitted TOML is parsed, its `[bar]` table carries ALL FOUR declared keys with
+  the kit defaults, asserted key-by-key against `TOOL-aGatheredDeclaration-6` S1(d)'s emitted set
+  rather than against a list typed here. `TOOL-aGatheredDeclaration-2` S10's partial-`[bar]`
+  refusal is the backstop: a converter that drops a key is caught by the loader on the first run,
+  so this criterion and unit 6's AC14 are held by one check rather than by agreeing with each
+  other.
 
 ## 7. Gates
 
@@ -195,6 +200,10 @@ the arms join `adopt-run-gates.test.sh`, which is already a leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-4 · 2026-08-31 · folded round-3 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) finding R4, and the shared-preflight half of R11.
+  The emitted `[bar]` was two keys of four; the refusal that holds both write paths now lives in
+  `TOOL-aGatheredDeclaration-2` S10 and this criterion cites it.
 - rev-3 · 2026-08-31 · folded round-2 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) finding R4. The
   fold's S10 had the right argument — emitting the legs alone writes a file the runner rejects —
@@ -225,8 +234,9 @@ govkit receipt descriptor emit prefix dialect fixture parity"` — 37 hits, and 
 Three records bind:
 
 - `memory/builds/dUnstalledConvoy/reviews/2026-08-24-review-TOOL-dUnstalledConvoy-26-spec-rev2.md:328`
-  — on an upgrade re-apply, `govkit.py:2510-2512` fires `a leg that vanished is not a leg that
-  passed` once per MIGRATED leg, naming the wrong cause. **A format move is exactly a migrated-leg
+  — on an upgrade re-apply govkit fires `a leg that vanished is not a leg that passed` once per
+  MIGRATED leg, naming the wrong cause. **The line numbers that record cited are stale at this
+  base and are deliberately not repeated.** **A format move is exactly a migrated-leg
   event**, so an adopter running `govkit apply` after this upgrade will meet that refusal on every
   leg. It is unit 6's problem as much as this one's and is recorded in both.
 - `TOOL-aPacedTurnstile-12` — govkit's selfcheck joins descriptor rows to the manifest by NAME only
