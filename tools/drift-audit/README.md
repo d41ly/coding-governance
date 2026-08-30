@@ -1,8 +1,21 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.7` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.8` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
+
+**Migrating 1.7 → 1.8 (additive, no caller edit).** Three changes, none of which moves an existing
+field. `drift-audit-state.js` gains the aggregate `severityCorrections` return key and the matching
+downgrade count on its RUN INTEGRITY line, both of which `drift-audit-code.js` has carried since
+1.4 — the per-finding value already reached the synthesis writer, so this adds the number an
+operator reads without opening the report. `drift_report.py`'s conf parser gains `map_lib`'s
+`export ` prefix rule and its ends-at-whitespace rule, which it had claimed in its docstring and did
+not implement: a conf spelling `export K=v` now yields key `K`, and `K=v  # note` now yields `v`
+rather than `v  # note`. **That is the one observable behaviour change**, and it only reaches a repo
+whose `.memory-tree.conf` uses either spelling; no tracked conf in this repo does. Finally
+`shrink_only_lists_not_shrinking` stops counting a list that was seeded EMPTY and is still empty,
+which could never shrink and made the signal unable to reach its own tolerance of 0. A list that
+GREW is still an offender.
 
 **Migrating 1.6 → 1.7 (breaking, one RETURN field).** `lensesRun` on the Tier-2 harnesses was an
 ARRAY of lens slugs in `drift-audit-state.js` and is now an INTEGER, the count of lenses that

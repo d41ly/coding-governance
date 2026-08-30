@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.7',
+  version: '1.8',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.7
+// gov:kit drift-audit@1.8
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -391,6 +391,12 @@ const refuted = judged.filter((f) => f.verdict === 'refuted')
 const unverified = judged.filter((f) => f.verdict === 'unverified')
 const precision =
   confirmed.length + refuted.length ? confirmed.length / (confirmed.length + refuted.length) : null
+// TOOL-aScouredKit-9 - the AGGREGATE its sibling drift-audit-code.js has had since 1.4. The
+// per-finding `severityCorrection` already reaches the synthesis writer, because `judged` is
+// serialized wholesale into that prompt; what was missing is the number an operator reads WITHOUT
+// opening the report. A run where every finding was downgraded and a run where none was looked
+// identical on this line.
+const downgrades = judged.filter((f) => f.verdict === 'partial' && f.severityCorrection).length
 log(
   `Verify: ${confirmed.length} confirmed, ${partial.length} partial, ${refuted.length} refuted, ` +
     `${unverified.length} UNVERIFIED, precision ${precision === null ? 'n/a' : precision.toFixed(2)}`
@@ -429,7 +435,7 @@ Return {path, summary} only — the prose goes in the file. Forward slashes in t
 DATA:
 counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}
 RUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:
-lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified.
+lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified, ${downgrades} severity correction(s).
 If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. Say so where you would otherwise call a zero positive evidence.
 lens writeups: ${JSON.stringify(lensOut.map((r) => ({ lens: r.lens, path: r.path, summary: r.summary })), null, 1)}
 judged findings: ${JSON.stringify(judged, null, 1)}`,
@@ -484,6 +490,7 @@ return {
     unverified: unverified.length,
   },
   precision,
+  severityCorrections: downgrades,
   report: synth && synth.path,
   summary: synth && synth.summary,
   confirmedTop: confirmed

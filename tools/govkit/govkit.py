@@ -4444,24 +4444,30 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                   f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
                   f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
             emitted = []
-            # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
-            # they can run them for the first time against the kit they just installed, and once as
-            # the standing way to ask. Without this line the legs are simply absent from their bar
-            # and nothing says they exist. TOOL-dUnstalledConvoy-26.
-            n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
-            if n_kit:
-                print(f"govkit apply — {n_kit} of those are kit SELF-TESTS and are HELD by default: "
-                      f"they test the kit's own source, which does not change in a repo that "
-                      f"copy-installs it. Run them once now to verify this install, and afterwards "
-                      f"whenever you edit a kit:")
-                # THE TARGET'S OWN RUNNER COMMAND, not this repo's path. An adopter told to run a
-                # script that does not exist in their tree has been told nothing, and `command` is
-                # the declaration govkit already validated and already echoed at BASELINE.
-                _cmd = " ".join(gr.get("command") or []) or "your gate runner"
-                print(f"govkit apply —   GATE_SELFTESTS=1 {_cmd}")
-                print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
-                      f"kit's own tests are not a guard. A green bar without that variable says "
-                      f"nothing about the kits themselves.")
+        # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
+        # they can run them for the first time against the kit they just installed, and once as
+        # the standing way to ask. Without this line the legs are simply absent from their bar
+        # and nothing says they exist. TOOL-dUnstalledConvoy-26.
+        #
+        # AT THE `if`'s INDENT, not inside either branch. It was inside the write branch, and the
+        # first draft of the withheld branch above silently captured it into the ELSE — so the
+        # summary printed exactly when nothing was written and never when something was. Python
+        # accepted it and three arms caught it. `emitted` is empty on the withheld path, so the
+        # `if n_kit:` below is false there and the block is correct at this indent for both.
+        n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
+        if n_kit:
+            print(f"govkit apply — {n_kit} of those are kit SELF-TESTS and are HELD by default: "
+                  f"they test the kit's own source, which does not change in a repo that "
+                  f"copy-installs it. Run them once now to verify this install, and afterwards "
+                  f"whenever you edit a kit:")
+            # THE TARGET'S OWN RUNNER COMMAND, not this repo's path. An adopter told to run a
+            # script that does not exist in their tree has been told nothing, and `command` is
+            # the declaration govkit already validated and already echoed at BASELINE.
+            _cmd = " ".join(gr.get("command") or []) or "your gate runner"
+            print(f"govkit apply —   GATE_SELFTESTS=1 {_cmd}")
+            print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
+                  f"kit's own tests are not a guard. A green bar without that variable says "
+                  f"nothing about the kits themselves.")
     else:
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]

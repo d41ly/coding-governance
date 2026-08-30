@@ -176,6 +176,16 @@ manifest_path = "docs/SESSION-KICKOFF.md"
 user_skills = "~/.claude/skills"
 """
 
+# TOOL-aScouredKit-13. DEPLOY_FULL declares `kits = ["memory-tree"]`, and until that unit landed
+# `plan`/`apply` IGNORED a target's own list and substituted gov's registry default — so the arms
+# below that say "the default selection" were, in fact, measuring the registry default against a
+# target that had asked for one kit. Now that the declaration is honoured, a fixture that exercises
+# the REGISTRY default has to declare none. Same answers, no `kits` line: the difference between the
+# two constants is the whole point and is why this is not a parameter.
+DEPLOY_REGISTRY_DEFAULT = "".join(
+    ln for ln in DEPLOY_FULL.splitlines(keepends=True) if not ln.startswith("kits = "))
+assert "kits = " not in DEPLOY_REGISTRY_DEFAULT, "the kits line must be gone, or the fixture lies"
+
 DEPLOY_NO_ANSWERS = """gov_source = "local"
 prefix = "tools"
 kits = ["playbook"]
@@ -1964,7 +1974,7 @@ user_skills = "/tmp/gk-fake-skills"
 
             # ...AND OVER THE DEFAULT SELECTION, which is the operand that matters to an operator who
             # types no `--kits`. The `**` kit alone cannot see a divergence that lives in the roles.
-            t2 = make_target(tmp3 / "dflt", DEPLOY_FULL)
+            t2 = make_target(tmp3 / "dflt", DEPLOY_REGISTRY_DEFAULT)
             ap2 = run("apply", "--target", str(t2))
             check("apply over the DEFAULT selection ran", ap2.returncode == 0, ap2.stdout + ap2.stderr)
             rec2 = json.loads((t2 / ".governance" / "install.json").read_text(encoding="utf-8"))
@@ -1986,6 +1996,29 @@ user_skills = "/tmp/gk-fake-skills"
             # while sitting first in the default selection. This arm asserted the role that defect
             # wore. An un-covered `project-owned` row is worth an arm, so it keeps one — over a
             # scratch descriptor below, where the role cannot be silently redefined out from under it.
+            # TOOL-aScouredKit-13 — the OTHER side of the split above, and the arm that did not
+            # exist. A target declaring its own `kits` gets exactly those from a no---kits `plan`,
+            # rather than gov's registry default. Before this unit, `plan` previewed the six-kit
+            # default over a target that had asked for one, and `apply` then exited 2 over an answer
+            # intake never asked for — so the documented no---kits path was the broken one and the
+            # preview agreed with it. Asserted as a SUBSET relation on the preview's write set: the
+            # declared single kit's rows are a strict subset of what the registry default writes,
+            # which is a property no re-baselining of a row count can accidentally satisfy.
+            t3 = make_target(tmp3 / "declared", DEPLOY_FULL)
+            pl3 = run("plan", "--target", str(t3))
+            check("a target's own `kits` list is honoured by a no---kits plan", pl3.returncode == 0,
+                  pl3.stdout + pl3.stderr)
+            _declared_writes = extract_plan_writes(pl3.stdout)
+            _default_writes = extract_plan_writes(pl2.stdout)
+            check("...and it is a STRICT subset of the registry default's write set",
+                  _declared_writes and _declared_writes < _default_writes,
+                  f"declared={len(_declared_writes)} default={len(_default_writes)} "
+                  f"declared-only={sorted(_declared_writes - _default_writes)}")
+            check("...and every path it writes belongs to the kit it declared",
+                  all("memory-tree" in w or "memory" in w or w.endswith(".conf")
+                      for w in _declared_writes),
+                  str(sorted(_declared_writes)))
+
             marks = measure_plan_marks(pl2.stdout)
             check("the default selection previews exactly 4 SIDE|rendered rows",
                   marks.get("SIDE|rendered") == 4, str(marks))
