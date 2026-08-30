@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -24,9 +25,16 @@ away. Round-2 review **D4**, exit 2 at BOTH 1.9 and 1.10, exit 0 at the tip.
 
 ## 2. Scope (IN)
 
-- **S1** — `capFindings` keeps `_bl.code` for the JOIN and PAREN work, which is what that view is for.
-- **S2** — the fallback view is used ONLY to supply `intConsts` bindings — the one thing the
-  `TOOL-aPairedLexer-1` rationale actually argued for.
+- **S1** — the interface is STATED, because rev-1 left it to the builder and both readings broke a
+  shipped arm. The FALLBACK view supplies the scan LINE SET, the call-site and helper DETECTION,
+  the `intConsts` bindings, and the `lines[]` used for reporting. The PAREN-SAFE `_bl.code`
+  supplies `joinCall` and `topLevelArgs` for an argument on a line already found.
+- **S2** — `joinCall` and `topLevelArgs` RE-DERIVE their own match column inside `_bl.code`. They
+  may not reuse a column computed against the fallback view: the two strings differ, and a
+  fallback-derived column makes `joinCall` walk the wrong text and return null — a denial for
+  "never closes its parens", which is green and observes nothing.
+- **S2b** — a call site the paren-safe view cannot show AT ALL is a DENY naming the ambiguity,
+  never a dropped finding.
 - **S3** — a PAIRED arm: the fixture and its control, because the fixture alone would pass under a
   fix that merely stopped setting `dirty`.
 
@@ -76,7 +84,15 @@ units delete would make this live defect look fixed. The review measured exactly
   this unit — the fallback path is the only behaviour that moves.
 - **AC4** — When `rule3: an exposed const resolves the cap and the script admits` runs, its verdict
   is whatever `TOOL-aPairedLexer-10` re-baselines it to, and this unit does not change it alone.
-- **AC5** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is
+- **AC5** — When `rule3: a cap of 500 below an unterminated BLOCK comment denies` runs, it still
+  denies AND the message still names the width. Measured: `_bl.code` for that arm is
+  `["const c = ","","",""]`, so detection over the paren-safe view finds nothing and the arm
+  flips to ADMIT — a fresh fail-open, which is why S1 puts detection on the fallback view.
+  Asserting the MESSAGE is what separates a real denial from one that lost the number.
+- **AC6** — When `rule3: a cap of 500 below an unterminated backtick denies` runs, it still
+  denies. This arm pins the LINE-SET decision: `blankLiterals` emits nothing while in `tmpl`
+  mode, so a build resolving S1 the other way turns this arm red instead of shipping.
+- **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is
   green after it, except any this unit's sibling re-baselines by name.
 
 ## 7. Gates
@@ -92,6 +108,12 @@ buys nothing AC1 does not.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored on promotion from the round-2 closing review, finding D4.
+- rev-2 · 2026-08-31 · folded spec-audit findings 16 and 6. S1/S2 never said which view DETECTS
+  call sites, and `capFindings` runs ONE array for detection, for `joinCall` column offsets and
+  for `intConsts`. Read literally, S2 put detection on `_bl.code`, where the block-comment arm's
+  call-site line is EMPTY — flipping a shipped DENY to ADMIT. The other reading left `joinCall`
+  walking a different string at a fallback column. The interface is now stated, and AC5/AC6 name
+  the two shipped arms that pin each half.
 
 ## 10. Reuse audit
 

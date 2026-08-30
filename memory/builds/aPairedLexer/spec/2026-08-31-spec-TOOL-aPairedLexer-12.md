@@ -1,102 +1,138 @@
-# TOOL-aPairedLexer-12 — a phantom template may not RESURRECT a comment
+# TOOL-aPairedLexer-12 — model regex literals, so the phantom span never exists
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-`render_comment_free` models strings and templates but no regex literal. A regex holding a backtick
-opens a template span, and the string/template arm emits `text[i:j+1]` VERBATIM when that span
-closes — so real comments inside it are never blanked, and a commented-out `export` is scanned as
-LIVE code.
+`render_comment_free` models strings and templates but no REGEX LITERAL. A regex holding a backtick
+opens a PHANTOM template span, and the template arm emits its contents verbatim on close — so real
+comments inside it are never blanked and a commented-out `export` is scanned as LIVE code, ADDING a
+symbol that does not exist to the committed `symbols.json` a coverage ratchet then demands be
+claimed.
 
-Round-2 review **D7**, reproduced end to end through `enumerate_exports`: a `.ts` file yields
-`['GHOST', 'RX', 'T']` at the tip and `['RX', 'T']` at base `14e21399`.
+Round-2 review **D7**, reproduced end to end: a `.ts` file yields `['GHOST', 'RX', 'T']` at the tip
+and `['RX', 'T']` at base `14e21399`.
 
-This is a **third** regex-borne direction and is not one of the two ceilings pinned by
-`test_enumerate_exports_regex_borne_comment_opener`. That arm pins two LOSSES; this one silently ADDS
-a symbol that does not exist — corrupting the committed `symbols.json` a coverage ratchet then
-demands be claimed. It is the map's own "a claim naming a dead key" failure, arriving through the
-extractor rather than through a dossier.
+**rev-2 changes the FIX, not the defect.** rev-1 proposed blanking comments inside the span and
+argued it was safe because "a definition cannot live inside a template literal". The spec audit
+measured that argument as unsound: it is about a REAL template, while the whole premise is that the
+span is PHANTOM and therefore holds LIVE CODE. Implemented as written it LOST a real `export`.
 
 ## 2. Scope (IN)
 
-- **S1** — blank comment text INSIDE a template span the same way it is blanked outside one, so a
-  phantom span can never resurrect a comment.
-- **S2** — a third arm on `test_enumerate_exports_regex_borne_comment_opener`, asserting `GHOST` is
-  absent. The arm name already promises the class; it currently pins two of its three directions.
-- **S3** — correct the docstring's safety claim, which is about DELETION and does not cover
+- **S1** — `render_comment_free` models regex literals, so a regex-borne backtick, quote or comment
+  opener cannot open anything. Same conservative rule as the JavaScript side: a `/` starts a regex
+  only after a token that cannot END an expression; after an identifier, a number or a closing
+  bracket it is DIVISION.
+- **S2** — the existing ceiling arm becomes a TABLE with one row per direction: the ghost ADDED, a
+  definition lost to a regex-borne line comment, a definition lost to a regex-borne block comment.
+- **S3** — a CORPUS arm: `enumerate_exports` plus `scan_js_definitions` over this repo's tracked
+  `.js` produce a symbol set identical to the pre-change run. That makes the eight-definition
+  regression this function's own docstring records RUNNABLE rather than remembered.
+- **S4** — correct the docstring's safety claim, which is about DELETION and does not cover
   un-blanking.
 
 ## 3. Non-goals (OUT)
 
-- **Not modelling regex literals in Python.** S1 is strictly safer and cannot lose a real definition,
-  because a definition inside a template literal is not one. Modelling regexes here would import the
-  whole ambiguity `TOOL-aPairedLexer-8` is managing in JavaScript, for no gain.
-- Not the two pinned LOSS ceilings — they stay ceilings.
-- Not `_has_top_level_comma`'s unterminated-quote masking; that is round-2 D8, a MEDIUM, and outside
-  the owner's named scope.
+- Not the JavaScript predicate. The two languages share a rule and not an implementation; unifying
+  them across languages is not on the table and no seam exists.
+- Not `_has_top_level_comma`'s unterminated-quote masking (round-2 D8, a MEDIUM, outside scope).
 
 ## 4. Design
 
-The template arm currently emits its span verbatim on close. It should emit the span with comment
-text blanked, exactly as the code path does. A definition cannot live inside a template literal, so
-blanking there can only ever remove noise — which is what makes this the safe direction and why it
-does not need a regex model to be correct.
+**Model the thing rather than compensating for it — this build's own rule, applied to itself.** The
+build README carries it because three revisions of the JavaScript view each mitigated a missing regex
+model and each was defeated. rev-1 proposed the same shape one language over: a compensating pass
+inside a span whose existence is itself the bug. Removing the phantom span removes the ghost, and it
+also removes both LOSS directions the current ceiling arm pins — a regex-borne `/*` and a regex-borne
+`//` stop being comment openers at all.
 
-**Adopter-facing rather than local.** This repo's map has no `.ts` layer, so its own `symbols.json`
-is unaffected today. That is why it is HIGH and not a blocker, and it is also why the arm matters:
-nothing in this tree would notice the regression.
+**So the two pinned ceilings RETIRE, and that is a measured outcome rather than a waiver** — the same
+shape `TOOL-aPairedLexer-4` met when modelling regexes retired the block-comment ceiling. The arms
+are kept and inverted, with the reason recorded, so the suite still records that the rows changed.
+
+**The residual is the regex/division ambiguity**, identical to the JavaScript side and stated as a
+ceiling: a regex in an ambiguous position is still mis-modelled. The Python side has no `dirty`
+signal and no fallback view, so the residual here is a straight limit rather than a routed one. S2's
+table gains no row for it, because the direction is not measurable from the extractor's output alone
+— it is declared in the docstring and that is what S4 covers.
 
 ## 5. Production-readiness checklist
 
 - security — N/A; this is inventory integrity, not a guard.
-- perf / scale — one blanking pass over template spans; the function already walks them.
+- perf / scale — one extra branch in a walk the function already performs.
 - a11y · i18n — N/A.
 - error / empty / loading states — unchanged; line count is still preserved.
-- observability — none needed; the selftest arm is the signal.
-- risks — over-blanking inside a template cannot lose a definition, by the §4 argument. Line count
-  must not move, which AC4 pins.
-- testing + left-shift gates — S2 completes a class arm that already names the class.
+- observability — the selftest arms are the signal.
+- risks — over-recognising a regex would blank live code and LOSE a definition, which is the
+  direction the audit caught rev-1 in. The conservative rule bounds it, and S3's corpus arm is what
+  actually observes it: an identical symbol set over this repo's own tracked `.js`.
+- testing + left-shift gates — S2's table completes a class arm whose title already names the class;
+  S3 makes the historical eight-definition regression runnable.
 - migration / rollback — revert restores verbatim emission; `symbols.json` is re-rendered either way.
-- user docs — the docstring correction is S3.
+- user docs — S4.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the D7 `.ts` file (`export const RX = /` backtick `/;` then a block comment holding
-  `export const GHOST = 1` then ``export const T = `x`;``) is run through `enumerate_exports`, the
+- **AC1** — When the D7 `.ts` file (`export const RX = /` backtick `/;`, a block comment holding
+  `export const GHOST = 1`, then ``export const T = `x`;``) is run through `enumerate_exports`, the
   result is `['RX', 'T']`. At the tip it is `['GHOST', 'RX', 'T']`.
-- **AC2** — When the same file is run at base `14e21399`, the result is `['RX', 'T']` — this restores
-  the pre-diff behaviour rather than inventing one.
-- **AC3** — When the two pinned LOSS ceilings run, they still hold:
-  `test_enumerate_exports_regex_borne_comment_opener` keeps its existing two directions.
-- **AC4** — When `render_comment_free` processes any of the fixtures, its output line count equals
-  its input line count — the statement-leading contract.
-- **AC5** — When `python tools/codebase-map/selftest.py` runs, it reports `PASS`.
+- **AC2** — When the audit's LOSS fixture (`export const RX = /` backtick `/;` · `const s = "/*";` ·
+  `export const KEEP = 1;` · `const t = "*/";` · ``export const T = `x`;``) is run, `KEEP` is
+  PRESENT. Under rev-1's design it was lost — this is the criterion rev-1 had no way to fail.
+- **AC3** — When the audit's second LOSS fixture (`export const RX = /` backtick `/;` ·
+  `const R = /a\/*b/;` · `export const REAL = 1;` · `const x = 2; /* real */` ·
+  ``export const T = `x`;``) is run, the result is `['REAL', 'RX', 'T']`.
+- **AC4** — When `test_enumerate_exports_regex_borne_comment_opener` runs, its two LOSS ceilings are
+  INVERTED: the regex-borne block opener and the regex-borne line-comment opener no longer lose
+  anything, and the arm records that they were retired by modelling rather than waived.
+- **AC5** — When `render_comment_free` processes any fixture, its output line count equals its input
+  line count — the statement-leading contract `JS_DEFINITION_RULES` depends on.
+- **AC6** — When `enumerate_exports` and `scan_js_definitions` run over this repo's tracked `.js`,
+  the symbol set is IDENTICAL to the pre-change run. Asserted by run, so the eight-definition
+  regression the docstring records can actually fire.
+- **AC7** — When `python tools/codebase-map/selftest.py` runs, it reports `PASS`, and
+  `python tools/codebase-map/test_codebase_map.py` exits 0.
 
 ## 7. Gates
 
 Legs read from `tools/gate-legs.json` at emission time. Direct:
-`python tools/codebase-map/selftest.py`, `python tools/codebase-map/test_codebase_map.py`.
+`python tools/codebase-map/selftest.py`, `python tools/codebase-map/test_codebase_map.py`,
+`python tools/codebase-map/gen_map.py --write`.
 
 ## 8. Open questions
 
-none — the safe direction is argued in §4 and does not depend on a regex model.
+none — rev-1's open question was implicit and the audit answered it: the no-regex-model argument does
+not survive, so the model is built.
 
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored on promotion from the round-2 closing review, finding D7.
+- rev-2 · 2026-08-31 · folded spec-audit findings 21 and 31, which together refuted rev-1's design.
+  21: the safety argument was about a REAL template applied to a PHANTOM span, and the fix as written
+  LOST a real `export` between two string-borne comment delimiters. 31: a regex-borne `/*` inside the
+  phantom span, balanced by a real `*/`, lost another. Both are the same root — the span should not
+  exist — so S1 now models regex literals instead of compensating inside the span, which is this
+  build's own stated rule applied one language over. The two pinned LOSS ceilings retire as a
+  measured consequence, and S3 adds the corpus arm the audit asked for.
 
 ## 10. Reuse audit
 
-Probes as `TOOL-aPairedLexer-6` §10, same session, same terms. **The seam is
-`render_comment_free`'s own code-path blanking, and S1 applies it in the template arm** — the same
-mechanism, one branch over. `reuse_lookup.py` reports `render_comment_free` at `fan-in 1`, its two
-callers being `scan_js_definitions` and `enumerate_exports`; neither changes, and both benefit.
+Probes as `TOOL-aPairedLexer-6` §10, same session, same terms. **The seam is the conservative
+regex-position rule `TOOL-aPairedLexer-8` states for JavaScript**, reused as a RULE here rather than
+as code — the two languages share no runtime and `reuse_lookup.py` reports no Python counterpart.
+`render_comment_free` is `fan-in 1` with callers `scan_js_definitions` and `enumerate_exports`;
+neither changes signature and both benefit.
+
+rev-1 cited "the code path's blanking, one branch over" as its seam. The audit measured that reuse as
+the defect: the code path's blanking is correct OUTSIDE a span and destructive INSIDE a phantom one,
+so the citation was wrong and is withdrawn here.

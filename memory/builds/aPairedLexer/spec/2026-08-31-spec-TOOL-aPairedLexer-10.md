@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -67,8 +68,11 @@ only in the view the file distrusts. The arm is not deleted, it is inverted, wit
 - a11y · i18n — N/A.
 - error / empty / loading states — unchanged.
 - observability — the denial names the unresolvable form rather than silently approving.
-- risks — MORE denials on non-clean views. That is the fail-closed direction and is the point; the
-  precision cost is bounded by how often a view is not clean, and `-6` widens that deliberately.
+- risks — MORE denials where `blankLiterals.clean` is false. That is the fail-closed direction and
+  is the point. rev-1 said the population was widened by `-6`; it was not — `-6` rev-1 widened
+  `renderCodeView.unterminated`, a different signal on the other scanner, so it added ZERO here.
+  `-6` rev-2 routes BOTH views through one predicate, so the widening is now real and is stated
+  against `_bl.clean` by name.
 - testing + left-shift gates — S4's two directions; S3 re-baselines an arm rather than deleting it.
 - migration / rollback — revert restores the exemption.
 - user docs — dossier gap list refreshed.
@@ -79,14 +83,23 @@ only in the view the file distrusts. The arm is not deleted, it is inverted, wit
   contains `const K = 5`, a real `const K = args.width`, and `boundedParallel(thunks, K)`) is fed to
   the hook, it exits `2` and the message names `K` as unresolvable. At the tip it exits `0`.
 - **AC2** — When the fixture's trigger line is deleted, it still exits `2` — the control.
-- **AC3** — When a name is bound to DIFFERENT integers by the two views, the LARGER governs:
-  `rule3: prose inside a template cannot lower a real cap` stays green.
+- **AC3** — When a name is bound to DIFFERENT integers by the two views, the LARGER governs, and
+  the denial MESSAGE names 500. The fixture is an ambiguous-position trigger plus a real
+  `const K = 500` plus a prose `const K = 5` inside a CLOSED template — the shape
+  `TOOL-aPairedLexer-9` AC1 uses, whose call-site line SURVIVES `_bl.code`. The shipped arm
+  `rule3: prose inside a template cannot lower a real cap` cannot serve here: its template is
+  UNTERMINATED, so after `-9` lands it denies because the call site cannot be joined, never
+  because 500 beat the prose 5. Asserting the message is what separates the two.
 - **AC4** — When the re-baselined arm runs, `rule3: an exposed const resolves the cap and the script
   admits` denies, and its replacement name states that a binding visible only to the distrusted view
   does not resolve a cap.
 - **AC5** — When a script's view is CLEAN, `intConsts` binds the same table as before this unit,
   no name is deleted, and the verdict is unchanged.
-- **AC6** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
+- **AC6** — When a name is bound by BOTH views but the clean view SAW it in a declaration it
+  refused to resolve (a real `const K = args.width` OUTSIDE any mis-lexed span, with the prose
+  integer inside one), the denial names `K` as unresolvable. This is S2's own criterion, and it
+  FAILS with S1 alone — without it S2 could be omitted entirely and nothing would red.
+- **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
   after it, except the one S3 re-baselines by name.
 
 ## 7. Gates
@@ -101,6 +114,11 @@ review states the direction and §4 records the reason.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored on promotion from the round-2 closing review, finding D5.
+- rev-2 · 2026-08-31 · folded spec-audit findings 19, 10 and 30. 19: AC3 pinned the max-merge on a
+  shipped arm whose UNTERMINATED template makes its call-site line empty in `_bl.code`, so after
+  `-9` lands no arm would exercise the max-merge at all. 10: every AC was satisfied by S1 alone,
+  so S2 could ship unimplemented — AC6 is the criterion that fails without it. 30: the risks line
+  named a widening that did not reach this gate.
 
 ## 10. Reuse audit
 

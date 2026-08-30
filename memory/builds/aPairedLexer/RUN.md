@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 72dff924d77c5a482a01150141da31e4bdd52334
-phase: SPECCING
+witness: 2e87e8ff06d6603d2969e16fb58c2775aff6484c
+phase: REVIEWING
 branch-sha: 72dff924d77c5a482a01150141da31e4bdd52334
 branch-ref: refs/heads/branch/paired-lexer-followup-9c31a2
 mode: prompt
@@ -26,3 +26,5 @@ base: 72dff924d77c5a482a01150141da31e4bdd52334
 2026-08-30T21:39:54Z review · item aPairedLexer · reason verdict BLOCKED · blockers 2
 
 2026-08-30T21:39:55Z review · item aPairedLexer · reason verdict BLOCKED · blockers 5 · NON-CONVERGENT
+
+2026-08-30T22:21:57Z review · item spec-audit-6-through-12 · reason verdict BLOCKED · blockers 7

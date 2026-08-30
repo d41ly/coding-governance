@@ -70,13 +70,13 @@ and why the run refused it.)*
 | 2 | `TOOL-aPairedLexer-2` | 2 | rule 1 stops reading prose in a template literal or block comment as a call (was `TOOL-aLexedStripper-3`) |
 | 3 | `TOOL-aPairedLexer-3` | 2 | the map's definition probe strips line comments before block ones (was `TOOL-aLexedStripper-7`) |
 | 4 | `TOOL-aPairedLexer-4` | 2 | both views model REGEX LITERALS, which retires the block-comment ceiling and closes review D2-D5 |
-| 5 | `TOOL-aPairedLexer-6` | 2 | `renderCodeView` gains the per-line `dirty` half, so a DECLINED slash announces itself (round-2 D3) |
-| 6 | `TOOL-aPairedLexer-7` | 2 | start of input becomes a REGEX position — `'})]'.includes('')` is `true`, so it was a division position (round-2 D1) |
-| 7 | `TOOL-aPairedLexer-8` | 2 | the regex/division test decides on the previous TOKEN, not the previous character, in one shared predicate (round-2 D2) |
-| 8 | `TOOL-aPairedLexer-9` | 2 | rule 3 keeps the paren-safe view for join work and uses the fallback ONLY for `intConsts` bindings (round-2 D4) |
-| 9 | `TOOL-aPairedLexer-10` | 2 | the cross-check iterates the UNION and DELETES a name only one view binds, instead of exempting it (round-2 D5) |
+| 5 | `TOOL-aPairedLexer-8` | 2 | ONE regex-position predicate, keyword-aware and member-guarded, called by BOTH scanners (round-2 D2) |
+| 6 | `TOOL-aPairedLexer-7` | 2 | start of input becomes a REGEX position — `'})]'.includes('')` is `true` (round-2 D1) |
+| 7 | `TOOL-aPairedLexer-6` | 2 | a DECLINED slash announces itself to BOTH views, through that predicate, plus the test seam (round-2 D3) |
+| 8 | `TOOL-aPairedLexer-9` | 2 | rule 3's view interface is STATED: detection on the fallback, joins on the paren-safe view (round-2 D4) |
+| 9 | `TOOL-aPairedLexer-10` | 2 | the cross-check iterates the UNION and DELETES a name only one view binds (round-2 D5) |
 | 10 | `TOOL-aPairedLexer-11` | 2 | rule 2 calls the same corrected merge as rule 3, from one helper (round-2 D6) |
-| 11 | `TOOL-aPairedLexer-12` | 2 | `render_comment_free` blanks comment text INSIDE a template span, so a phantom span cannot RESURRECT a comment (round-2 D7) |
+| 11 | `TOOL-aPairedLexer-12` | 2 | `render_comment_free` models regex literals, so the phantom span never exists (round-2 D7) |
 
 <!-- /roster:units -->
 
@@ -91,20 +91,20 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-4 — both views model regex literals, and the ceiling retires](spec/2026-08-30-spec-TOOL-aPairedLexer-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aPairedLexer-6 — a DECLINED slash announces itself](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-7 — start of input is a REGEX position](spec/2026-08-31-spec-TOOL-aPairedLexer-7.md) | 6 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-8 — decide on the previous TOKEN, in one shared predicate](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 7 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work](spec/2026-08-31-spec-TOOL-aPairedLexer-9.md) | 8 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption](spec/2026-08-31-spec-TOOL-aPairedLexer-10.md) | 9 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-11 — rule 2 calls the same merge as rule 3](spec/2026-08-31-spec-TOOL-aPairedLexer-11.md) | 10 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aPairedLexer-12 — a phantom template may not RESURRECT a comment](spec/2026-08-31-spec-TOOL-aPairedLexer-12.md) | 11 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 5 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-7 — start of input is a REGEX position](spec/2026-08-31-spec-TOOL-aPairedLexer-7.md) | 6 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 7 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work](spec/2026-08-31-spec-TOOL-aPairedLexer-9.md) | 8 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption](spec/2026-08-31-spec-TOOL-aPairedLexer-10.md) | 9 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-11 — rule 2 calls the same merge as rule 3](spec/2026-08-31-spec-TOOL-aPairedLexer-11.md) | 10 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aPairedLexer-12 — model regex literals, so the phantom span never exists](spec/2026-08-31-spec-TOOL-aPairedLexer-12.md) | 11 | 2 | SPECCED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9.
+Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -115,9 +115,9 @@ Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer
 | 2 | `TOOL-aPairedLexer-2` | no |
 | 3 | `TOOL-aPairedLexer-3` | no |
 | 4 | `TOOL-aPairedLexer-4` | no |
-| 5 | `TOOL-aPairedLexer-6` | no |
+| 5 | `TOOL-aPairedLexer-8` | no |
 | 6 | `TOOL-aPairedLexer-7` | no |
-| 7 | `TOOL-aPairedLexer-8` | no |
+| 7 | `TOOL-aPairedLexer-6` | no |
 | 8 | `TOOL-aPairedLexer-9` | no |
 | 9 | `TOOL-aPairedLexer-10` | no |
 | 10 | `TOOL-aPairedLexer-11` | no |

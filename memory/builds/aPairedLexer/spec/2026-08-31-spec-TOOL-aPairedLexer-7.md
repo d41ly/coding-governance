@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-7 — start of input is a REGEX position
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -67,9 +68,10 @@ instance" broken in the commit that cites it. So AC2 asserts the code view direc
 - **AC1** — When the D1 fixture (a leading `//` comment, then a regex holding a backtick, a
   `.ref`-keyed join, `boundedParallel(work, 500)`, and a closing regex) is fed to the hook, it exits
   `2`. At the tip it exits `0`. Independently reproduced before speccing.
-- **AC2** — When `renderCodeView` is called on the single line `/x/`, its first output line trims to
-  empty — a structural assertion that start of input is a regex position, which no future rewrite of
-  the heuristic can quietly lose.
+- **AC2** — When `node tools/hooks/agent-cap.js --selftest` renders the single line `/x/` through
+  the seam `TOOL-aPairedLexer-6` S4 adds, its first output line trims to empty — a structural
+  assertion that start of input is a regex position, which no future rewrite of the heuristic can
+  quietly lose. Asserted for BOTH scanners, since `-8` S4 makes them share the predicate.
 - **AC3** — When the same fixture is prefixed with a bare `;`, it exits `2` both before and after —
   the control the review used to isolate the empty `prev` as the sole cause.
 - **AC4** — When `bash tools/hooks/agent-cap.test.sh` runs with the change applied to
@@ -90,6 +92,10 @@ none — the defect, its control and its fix were all measured before speccing.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored on promotion from the round-2 closing review, finding D1.
+- rev-2 · 2026-08-31 · folded spec-audit finding 4: AC2 called `renderCodeView` directly and the file
+  has no seam — no `module.exports`, and `main()` runs unconditionally — so the criterion named no
+  runnable command. It now names the `--selftest` seam `TOOL-aPairedLexer-6` S4 adds, and asserts
+  both scanners rather than one.
 
 ## 10. Reuse audit
 
