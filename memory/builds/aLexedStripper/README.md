@@ -104,7 +104,7 @@ ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexe
 | [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 2 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
