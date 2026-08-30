@@ -81,7 +81,7 @@ and why the run refused it.)*
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-30 · streams tooling
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-30 · streams tooling
 ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexer-4 TOOL-aPairedLexer-5 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12
 
 <!-- gen:build-units -->
@@ -91,13 +91,16 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-4 — both views model regex literals, and the ceiling retires](spec/2026-08-30-spec-TOOL-aPairedLexer-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
+| [TOOL-aPairedLexer-6 — a DECLINED slash announces itself](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-7 — start of input is a REGEX position](spec/2026-08-31-spec-TOOL-aPairedLexer-7.md) | 6 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-8 — decide on the previous TOKEN, in one shared predicate](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 7 | 2 | SPECCED | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4.
+Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -108,6 +111,9 @@ Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4.
 | 2 | `TOOL-aPairedLexer-2` | no |
 | 3 | `TOOL-aPairedLexer-3` | no |
 | 4 | `TOOL-aPairedLexer-4` | no |
+| 5 | `TOOL-aPairedLexer-6` | no |
+| 6 | `TOOL-aPairedLexer-7` | no |
+| 7 | `TOOL-aPairedLexer-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
