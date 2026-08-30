@@ -628,5 +628,211 @@ else
   echo "skip the two-copy parity arm — no kit copy of agent-cap.js is tracked in this tree (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/)"
 fi
 
+
+# ---- rule 2: LENS PROSE IS NOT CODE (TOOL-aLexedStripper-2) --------------------------------------
+# Every arm below is the SAME correct five-element lens array, fanned through the sanctioned helper.
+# Only the English inside one prompt differs, and every one of them must ADMIT.
+#
+# THE PROVENANCE: five of these spellings DENIED against `agent-cap` 1.8, measured across both array
+# shapes before the fix was wired — a literal `...` read as a spread by the array-literal guard, and
+# an unmatched `[`, `]`, `)` or `}` read as bracket structure by the join-forward walk or by
+# `topLevelArgs`. An adopter hit this and filed it as a gov ask; their diagnosis blamed apostrophes
+# and prescribed U+2019, and both of those admit at 1.8 — which is why the apostrophe and U+2019 rows
+# are here too, as the negative result.
+#
+# The ADMIT direction is the whole point of this group. A fixture set that only ever asserts denials
+# cannot catch a guard that has become a blanket.
+
+js "rule2 prose: a literal ... in a prompt is not a spread" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows ... then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched [ in a prompt is not an array" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows [see the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched ] in a prompt does not close the array" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows], then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched ) in a prompt does not shift the depth" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows), then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched } in a prompt does not close the element" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows}, then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: apostrophes and an em dash, the adopter's stale diagnosis" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `check S2's rows and the table's keys — then stop` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: SIX lenses still deny, whatever the prose" 2 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `list the rows ... then the table` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+  { key: "f", prompt: `six` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# ---- rule 2: an interpolation holds CODE, and both directions are checked ------------------------
+# `blankLiterals` blanks `${…}` bodies. Rule 2 may not, or an `agent(` written inside one becomes
+# invisible to the only rule that bounds it. The multi-line shape is the one a per-line span view
+# cannot reach: its `}` is not on its opening line.
+
+js "rule2 interp: an unbounded fan inside a single-line interpolation denies" 2 <<'EOF'
+const all = args.everything
+const r = `x: ${await Promise.all(all.map((f) => agent(f.p)))}`
+return r
+EOF
+
+js "rule2 interp: an unbounded fan inside a MULTI-line interpolation denies" 2 <<'EOF'
+const all = args.everything
+const report = `results: ${await Promise.all(
+  all.map((f) => agent(f.prompt))
+)}`
+return report
+EOF
+
+js "rule2 interp: a BOUNDED fan inside an interpolation still admits" 0 <<'EOF'
+const L = [{a:1},{a:2},{a:3},{a:4},{a:5}]
+const r = `res: ${await boundedParallel(L.map((x) => () => agent(x)), 5)}`
+return r
+EOF
+
+# ---- rule 2: template-literal edges (TOOL-aLexedStripper-2 S2, TOOL-aLexedStripper-5) ------------
+# A nested template must BALANCE, or the fallback path fires on a legal script. A backtick that this
+# file cannot model — inside a regex literal, a string, or a comment — must not change a verdict:
+# the fallback returns the pre-change view, so these are the shipped hook's own answers.
+
+js "rule2 edges: a nested template balances and admits" 0 <<'EOF'
+const n = `a${`b`}c`
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a regex literal admits a legal harness" 0 <<'EOF'
+const re = /`/
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick in a regex character class admits" 0 <<'EOF'
+const re = /[`~]/g
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a quoted string admits" 0 <<'EOF'
+const s = "a ` b"
+const t = 'c ` d'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a comment admits" 0 <<'EOF'
+// a stray ` in a line comment
+/* and one ` in a block comment */
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# THE FAIL-OPEN THIS GROUP EXISTS FOR. An unterminated template literal blanks everything below it
+# under a naive template-aware view, hiding the fan entirely. The fallback denies it because the
+# shipped hook denies it — which is the property, not a coincidence.
+js "rule2 edges: an unbounded fan below an unterminated backtick still denies" 2 <<'EOF'
+const stray = `an unterminated template literal
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-1 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-1 |
 
 <!-- /gen:spec-records -->
 

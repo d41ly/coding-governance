@@ -26,3 +26,11 @@ base: 19d9b328c26ca41d9d275ef43abfa76f7efbef20
 2026-08-29T23:56:01Z review · item TOOL-aLexedStripper-1 · reason verdict BLOCKED · blockers 2
 
 2026-08-29T23:56:22Z review · item TOOL-aLexedStripper-2 · reason verdict BLOCKED · blockers 2
+
+2026-08-30T00:34:49Z review · item TOOL-aLexedStripper-1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
+
+2026-08-30T00:34:56Z review · item TOOL-aLexedStripper-2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
+
+2026-08-30T00:35:21Z rescope · item add TOOL-aLexedStripper-5 · reason promoted from round-2 spec audit blocker 1+37 (NON-CONVERGENT exit): renderCodeView inherits blankLiterals' lack of a regex-literal mode, so a backtick inside a regex literal opens template mode and never closes, and S3's fail-closed branch then DENIES a legal script BASE admits. Reproduced: two shapes exit 0 at BASE and 2 under the prototype
+
+2026-08-30T00:35:28Z rescope · item add TOOL-aLexedStripper-6 · reason promoted from round-2 spec audit blocker 26+30 (NON-CONVERGENT exit): no field of the six-field profile can express a Python f-string replacement field, whose braces hold real code. Reproduced: 73 ground-truth identifiers missed across 25 files in this repo, and -1's AC3 100% recall on selftest.py is unreachable by any implementation of the rev-2 design (measured 99.7%, sole miss 'or')

@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.2"
+KIT_CODEBASE_MAP_VERSION = "1.3"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -633,16 +633,134 @@ _STRING_RE = re.compile(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`]*`')
 _IDENT_TOKEN_RE = re.compile(r"[A-Za-z_$][\w$]*")
 
 
-def _identifier_tokens(source: str) -> set[str]:
-    """Distinct identifier tokens in a source file, with comments and string literals stripped
-    first (crudely: `/* */`, trailing `//`/`#`, then quoted spans) so fan-in is
-    import/identifier-scoped, never counting a name that only appears in a doc-comment or a
-    string. A documented heuristic (a `//` inside a string over-strips its tail); good enough
-    for ranking + a WARN, per §3."""
-    cleaned = _BLOCK_COMMENT_RE.sub(" ", source)
-    cleaned = _LINE_COMMENT_RE.sub(" ", cleaned)
-    cleaned = _STRING_RE.sub(" ", cleaned)
-    return set(_IDENT_TOKEN_RE.findall(cleaned))
+#: Per-language lexical PROFILE — the sole declaration of the field set (TOOL-aLexedStripper-1 §4,
+#: seventh field by TOOL-aLexedStripper-6). Fields, in order:
+#:   line_markers             tokens opening a comment that runs to end of line
+#:   marker_needs_word_start  whether a marker opens a comment ONLY at line start or after space
+#:   block_pair               the block-comment open/close pair, or None
+#:   quote_chars              characters opening a single-line string
+#:   triple_quoted            whether ''' and \"\"\" open a multi-line string
+#:   backtick_is_string       whether a backtick opens a string whose content is NOT code
+#:   interpolation_pair       open/close tokens whose BODY is code, or None
+#: `marker_needs_word_start` is shell-only: `$#` is the argument count and `${p#/opt/}` is a prefix
+#: strip, and treating either as a comment deletes the rest of the line. Backtick is NOT a string in
+#: shell, where it opens command substitution and the content IS code. `interpolation_pair` is what
+#: lets one rule cover a JS template's `${…}` and a Python f-string's `{…}`; the Python row applies
+#: it only inside a string whose prefix carries `f`.
+_PROFILE_C = (("//",), False, ("/*", "*/"), ("'", '"'), False, True, ("${", "}"))
+_PROFILE_PY = (("#",), False, None, ("'", '"'), True, False, ("{", "}"))
+_PROFILE_SH = (("#",), True, None, ("'", '"'), False, False, None)
+
+_LEX_PROFILES = {}
+for _e in (".js .jsx .mjs .cjs .ts .tsx .c .h .cc .cpp .hpp .java .go .rs .cs .swift .kt "
+           ".scala .php").split():
+    _LEX_PROFILES[_e] = _PROFILE_C
+for _e in (".py", ".pyi"):
+    _LEX_PROFILES[_e] = _PROFILE_PY
+for _e in ".sh .bash .zsh .toml .yaml .yml .cfg .ini .conf".split():
+    _LEX_PROFILES[_e] = _PROFILE_SH
+
+_TRIPLE_QUOTES = ('"""', "'''")
+#: String prefix letters Python allows before a quote. Only `f` (any case) turns the
+#: `interpolation_pair` on, but all of them have to be RECOGNISED so `rf"…"` is still seen as
+#: f-prefixed and `b"…"` is not.
+_PY_PREFIX_CHARS = "rRbBuUfF"
+
+
+def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
+    """Distinct identifier tokens in a source file's CODE, with comments and string CONTENT removed
+    by ONE left-to-right pass over the lexical profile for ``suffix``.
+
+    A regex chain cannot express that comments and strings EXCLUDE each other, and whichever it
+    strips first wins. The three regexes this replaced applied C syntax to every language, so a
+    ``/*`` inside a Python docstring opened a comment running to the next ``*/`` (measured: 674
+    lines swallowed, one file down to 18.8% recall against ``tokenize`` ground truth), a ``//``
+    truncated a line of floor division, and a ``#`` truncated a line of TypeScript.
+
+    An UNDECLARED suffix strips NOTHING and returns every token. Over-counting is this scan's
+    documented fail-open direction — it feeds a RANKING and a WARN, never a gate — and guessing a
+    comment syntax is exactly how the old chain got here.
+
+    A multi-line construct left UNTERMINATED at EOF is ABANDONED, the pass resuming just after the
+    opener, so an odd backtick cannot reproduce the same swallow this function exists to remove.
+    """
+    prof = _LEX_PROFILES.get(suffix)
+    if prof is None:
+        return set(_IDENT_TOKEN_RE.findall(source))
+    markers, word_start, block, quotes, triple, backtick, interp = prof
+    out: list[str] = []
+    i, n = 0, len(source)
+
+    def _string(start: int, delim: str, multiline: bool, interpolate: bool) -> int:
+        """Consume a string opened at ``start`` by ``delim``. Text is blanked; an interpolation body
+        is COPIED, because it holds real code. Returns the index just past the close, or past the
+        opener when the literal is unterminated (the abandon rule)."""
+        j = start + len(delim)
+        while j < n:
+            if source[j] == "\\":
+                j += 2
+                continue
+            if interpolate and source.startswith(interp[0], j):
+                if source.startswith(interp[0] * 2, j) and interp[0] == "{":
+                    j += 2  # `{{` is a literal brace and opens nothing
+                    continue
+                k = j + len(interp[0])
+                depth = 0
+                body = []
+                while k < n:
+                    c = source[k]
+                    if c == interp[0][-1]:
+                        depth += 1
+                    elif c == interp[1]:
+                        if depth == 0:
+                            break
+                        depth -= 1
+                    body.append(c)
+                    k += 1
+                out.append(" " + "".join(body) + " ")
+                j = k + 1 if k < n else k
+                continue
+            if not multiline and source[j] == "\n":
+                return j  # a single-line literal never crosses its line
+            if source.startswith(delim, j):
+                return j + len(delim)
+            j += 1
+        return start + len(delim)  # unterminated: abandon, rescan from just after the opener
+
+    while i < n:
+        ch = source[i]
+        if block and source.startswith(block[0], i):
+            j = source.find(block[1], i + len(block[0]))
+            i = i + len(block[0]) if j < 0 else j + len(block[1])
+            out.append(" ")
+            continue
+        hit = next((m for m in markers if source.startswith(m, i)), None)
+        if hit and (not word_start or i == 0 or source[i - 1].isspace()):
+            j = source.find("\n", i)
+            i = n if j < 0 else j
+            out.append(" ")
+            continue
+        if ch in quotes or (backtick and ch == "`"):
+            # Python string prefixes sit immediately before the quote; `f` (any case) turns on the
+            # replacement field. A prefix run is at most a few letters and is already in ``out``.
+            pre = ""
+            k = i - 1
+            while k >= 0 and source[k] in _PY_PREFIX_CHARS:
+                pre = source[k] + pre
+                k -= 1
+            fstring = "f" in pre.lower()
+            if triple and any(source.startswith(d, i) for d in _TRIPLE_QUOTES):
+                d = source[i : i + 3]
+                i = _string(i, d, True, bool(interp) and fstring)
+            elif ch == "`":
+                i = _string(i, "`", True, bool(interp))
+            else:
+                i = _string(i, ch, False, bool(interp) and fstring)
+            out.append(" ")
+            continue
+        out.append(ch)
+        i += 1
+    return set(_IDENT_TOKEN_RE.findall("".join(out)))
 
 
 def build_reference_index(
@@ -672,7 +790,7 @@ def build_reference_index(
                 except (UnicodeDecodeError, OSError):
                     continue
                 rel = path.relative_to(root).as_posix()
-                for tok in _identifier_tokens(text):
+                for tok in _identifier_tokens(text, path.suffix):
                     index.setdefault(tok, set()).add(rel)
     return index
 
@@ -707,7 +825,7 @@ def reference_index_for(
             text = (root / rel).read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
-        for tok in _identifier_tokens(text):
+        for tok in _identifier_tokens(text, Path(rel).suffix):
             index.setdefault(tok, set()).add(rel)
     return index
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling
 roster: TOOL
-ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4
+ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6
 authorized-by: prompt
 ---
 
@@ -80,6 +80,25 @@ already correct.
 - **Every fix here is gated by its own failing case, observed RED before it is wired** (§7). A gate
   whose failure has only ever been reasoned about is an assertion about nothing.
 
+## The spec-audit loop exited NON-CONVERGENT, and that is recorded rather than smoothed
+
+Round 1 confirmed 2 blockers; round 2 confirmed 2 again. The count did not strictly fall, so
+`BUILD-METHOD.md` M4 STOPS the loop and PROMOTES every surviving blocker to a unit. Units `-5` and
+`-6` are those two, and neither is re-reviewed as a round.
+
+Both rounds were useful and neither was taken on trust. Round 1 refuted `-2`'s central design, and
+its two blockers were reproduced against BASE before being folded. Round 2 then found that the FOLDS
+introduced two new defects, one per unit, each moving a verdict in the direction its own §1 forbids
+— and those were reproduced too. That is the loop working, not failing: what it could not do is
+converge inside two rounds, and the method says to stop rather than keep paying.
+
+One round-1 finding was REFUTED by measurement and did not survive into rev-2: the claim that no
+unmatched `)` in lens prose denies at BASE. It denies in the multi-line array, which is the shape
+every shipped harness writes; the report had run 17 one-line variants only.
+
+Precision was 0.28 then 0.29, both far under the ~0.5 the charter names. Round 2's own report records
+that as a negative result under exactly the priming round 1 prescribed.
+
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
 and why the run refused it.)*
@@ -89,26 +108,30 @@ and why the run refused it.)*
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aLexedStripper-1` | 2 | `_identifier_tokens` becomes one language-aware pass over a per-suffix comment/string profile |
-| 2 | `TOOL-aLexedStripper-2` | 2 | `agent-cap`'s bounded-receiver view becomes `blankLiterals` plus the interpolation spans rule 5 already reads |
+| 2 | `TOOL-aLexedStripper-2` | 2 | `agent-cap`'s bounded-receiver view becomes a line-aligned, interpolation-preserving `renderCodeView` |
+| 3 | `TOOL-aLexedStripper-5` | 2 | an unterminated scan falls back to the view it replaced, so a backtick in a regex literal stops denying a legal script |
+| 4 | `TOOL-aLexedStripper-6` | 2 | a seventh profile field: an f-string replacement field is code, not string |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node a · opened 2026-08-30 · streams tooling
-ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-30 · streams tooling
+ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced](spec/2026-08-30-spec-TOOL-aLexedStripper-5.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-30 |
+| [TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair](spec/2026-08-30-spec-TOOL-aLexedStripper-6.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 4 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aLexedStripper-5 TOOL-aLexedStripper-6.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aLexedStripper-5 TOOL-aLexedStripper-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -117,6 +140,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 |---|---|---|
 | 1 | `TOOL-aLexedStripper-1` | no |
 | 2 | `TOOL-aLexedStripper-2` | no |
+| 3 | `TOOL-aLexedStripper-5` | no |
+| 4 | `TOOL-aLexedStripper-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

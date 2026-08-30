@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-30-prompt-TOOL-aLexedStripper-1-1.md](../prompts/2026-08-30-prompt-TOOL-aLexedStripper-1-1.md) | research | — |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-2 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-2 |
 
 <!-- /gen:spec-records -->
 
