@@ -24,8 +24,8 @@ standing, on a Definition-of-Done item that was MET. The report is
 ## Expected improvements
 - A closing review must END, and `--close` reads whether it did.
 - A spec audit stops being unobservable: a CLOSED unit no audit ever named blocks the close.
-- A run that edits a held checker runs that checker's own arms before it lands.
 - Dropping declared scope reaches the owner's one turn instead of the history class.
+- A spec that never said what done was cannot be closed against.
 
 ## Detriments if this is not built
 - Candour stays charged and silence stays free: recording a second review round buys the whole
@@ -48,11 +48,13 @@ standing, on a Definition-of-Done item that was MET. The report is
   a spec audit naming every unit, and an escalated bar.
 
 ## Parked decisions
-Entries live in `RUN.md`. The two standing at authoring time: the unattended kit's own five suites
-remain reachable by no bar and no value of any flag, because closing that needs either a raised
-`GATE_BOUND` or a new record surface, and both are owner turns; and the landing itself, since
-`tools/push-main.sh` refuses off the default branch and this session may not leave its worktree —
-the same wall `aScouredKit` met and parked on 2026-08-30.
+Entries live in `RUN.md`. **The self-test escalation is the big one**: 46 of 86 legs are held, no
+carrier a run reads names `GATE_SELFTESTS`, and every lawful fix is an owner turn — the in-driver
+form reds govkit check 7h3, and the sanctioned channel reverses the ruling of 2026-08-27. Unit 3 was
+retired for it, and the parked entry carries all five options plus the measurement that the naive
+intersection fires on every close. The landing is parked too: `tools/push-main.sh` refuses off the
+default branch and this session may not leave its worktree, the wall `aScouredKit` met on
+2026-08-30.
 
 <!-- roster:units -->
 
