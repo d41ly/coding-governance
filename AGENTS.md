@@ -6,7 +6,9 @@ gate, the kickoff-manifest ratchet, the template size gate, and the codebase-map
 itself. The map lives at `memory/map/`; its dossiers are the files under `memory/map/features/`, and the
 keys not yet claimed by one are in the `baseline.toml`, which shrinks except where a recorded
 decision says otherwise (`TOOL-aSiftedPlaybook-1` swapped one key in place; see the file's header). Both counts move as dossiers
-land, so neither is spelled here — `python tools/codebase-map/reuse_lookup.py` prints the live pair.
+land, so neither is spelled here: count `memory/map/features/` and the rows of
+`memory/map/baseline.toml`. No command reports the pair — this line used to claim
+`reuse_lookup.py` did, and it needs a query and prints the whole inventory, not the remainder.
 
 *(Read by every AI tool: `AGENTS.md` is canonical; `CLAUDE.md` is a `@AGENTS.md` import — Claude Code
 doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
@@ -91,13 +93,13 @@ reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. Histor
 ## §0 — TL;DR (the load-bearing rules)
 
 - **Session-scope every new ID** (slug = node tag + CamelCase adjective-noun) — collisions become impossible, not avoided (§2).
-- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session (§4).
+- **Own streams, not files; merge small and often** to local `main` (§3) — and isolate *runtimes* too: ports/DBs per session.
 - **Memory holds only the non-derivable**; status is DERIVED, no shared mutable index, no per-node shard (§5).
 - **Gates are the merge bar; reviews cover what gates can't**; every confirmed finding becomes a gate or a documented check (§7, §8).
 - **Never more than the declared bound at once, AND never more than the declared total per verify
   stage** — two rules, not one: concurrency bounds how many run together, the total bounds how many exist. Batching grows the batch, never the agent count. A wide burst trips the server rate limiter (§8, enforced by the `agent-cap` hook, which counts direct spawns too).
-- **Verify before claiming done** — a check that exercises the change, never an assertion (§4, §8).
-- **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12, §13).
+- **Verify before claiming done** — a check that exercises the change, never an assertion (§8).
+- **Consistency by construction**: build tokens, primitives, and factories *before* the screens/features that use them (§12).
 - **Chat carries signal, not narration**: payload first, one line per mechanical event, facts outrank format (§16).
 - **When no rule below covers it**, decide by these: verify over assert, gate over remember, derive over author, delete over disable, one fact in one place.
 
@@ -228,7 +230,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 - A value stated in prose beside the source that OWNS it rots between changes — point at the source,
   or gate the pair. This is the same rule as "derive over author", applied to documents rather than
   to code, and it is the one most often broken by the document that states it.
-- In-doc paths are repo-root-relative; the root is pinned once per node in the §2 registry, never re-derived. (User-facing links follow §17, a different convention.)
+- In-doc paths are repo-root-relative; the root is pinned once per node in the §2 registry, never re-derived. (User-facing links follow §16, a different convention.)
 - Non-obvious rules carry provenance inline (the motivating decision/incident id); environment/capability claims carry a verified-(date, node) stamp.
 - Each guarded security surface keeps a written security-model section in the decision log; read it BEFORE extending that surface (§9).
 
@@ -315,10 +317,10 @@ matched its target population.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
-- Persist each Tier-2 run as an in-repo artifact folder (`memory/reviews/`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
+- Persist each Tier-2 run as an in-repo artifact folder (`memory/builds/<slug>/reviews/`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
 - Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script, where no hook reaches.
 - A sidechain agent holds NEITHER tool, so it cannot fan out at all — the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
-- Verify before "done": a check that exercises THIS change (its own/affected test, the relevant gate, or the §4 harness) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
+- Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `main` for doc-only per §3); landing is §1's rule, not restated here.
 
 - Structured-output schemas so a malformed return can't force full regeneration (top output-token
@@ -387,7 +389,7 @@ matched its target population.
 
 ## §14 — Session execution hygiene (per-call token discipline)
 
-- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory (§5), streams + small merges (§3), system-first UI (§12, §13); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
+- Strategy: spend tokens on NEW judgment, never re-deriving the known — tier + diff-scope reviews (§8), gate over re-review (§7), lean memory (§5), streams + small merges (§3), system-first UI (§12); **stop once verified** (re-reads, uncapped output, hand-polling, and edit/format ordering are the dominant avoidable spend).
 - Don't re-fetch what's in context: no re-Read to keep editing a file or to "verify" an edit the tool confirmed; slice large files (range/grep), never whole re-reads; never re-read a command-output spill or large artifact — filter it at generation.
 - Re-Read ONLY when something outside your edits changed the file (formatter/`--fix`, format-on-save, a concurrent node on a shared doc); make manual edits FIRST and format LAST — reformatting between edits forces the modified-since-read re-read loop; batch a file's edits.
 - Bound every command's output (it all lands in the transcript): `--stat`/`--name-only` over raw diffs; concise linter formats; head/tail caps on noisy tails; quiet test flags.

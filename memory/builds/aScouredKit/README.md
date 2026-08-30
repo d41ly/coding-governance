@@ -48,11 +48,17 @@ owner's prose is the mandate and is recorded verbatim under
   the GOAL; what stays out is any edit that changes what a rule DEMANDS. A trim that is not provably
   meaning-preserving is parked, never taken.
 
-- **Ids `-10` and `-16` through `-34` are NOT units and carry no spec.** They are the findings
-  this run reported rather than built, each a row in `memory/backlog/TOOL.md` with its own
-  measurement. They were recorded through `--rescope --act add` as the run found them, which
-  was the wrong verb for a backlog row; said here rather than rewritten out of an append-only
-  record. The roster region holds units only, which is what `--plan` and the DoD read.
+- **Ids `-10`, `-16` through `-29`, `-33` and `-34` are NOT units and carry no spec.** They are the
+  findings this run reported rather than built, each a row in `memory/backlog/TOOL.md` with its own
+  measurement. They were recorded through `--rescope --act add` as the run found them, which was the
+  wrong verb for a backlog row; said here rather than rewritten out of an append-only record. The
+  roster region holds units only, which is what `--plan` and the DoD read.
+- **`-30`, `-31` and `-32` ARE units** — the three PROMOTED when the closing review's blocker count
+  went 4 → 3 → 4 and the loop stopped NON-CONVERGENT. Each has a spec and is CLOSED. An earlier
+  wording of the bullet above read `-16` through `-34` and so denied three of this build's own
+  units; the range was widened by hand when the note was re-homed into this slot, which is the
+  hazard of writing a range instead of deriving one. Both sets above are derivable: a non-unit has a
+  `memory/backlog/TOOL.md` row and no spec, a unit has a spec and no row, and no id has both.
 
 ## Parked decisions
 
@@ -107,7 +113,7 @@ ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 3 record folder(s).
+Records: 22 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

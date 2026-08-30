@@ -11,6 +11,12 @@
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md) | diff-review | TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-15 |
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md) | diff-review | TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-15 |
 | [2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md) | spec-audit | TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-charter.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-charter.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-gates.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-gates.md) | research | TOOL-aScouredKit-2 |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-machine.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-machine.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-memory.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-memory.md) | research | TOOL-aScouredKit-2 |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-workstate.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-lens-workstate.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-statewave-report.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-statewave-report.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-dead-code.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-dead-code.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-duplication.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-duplication.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-inefficiency.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-inefficiency.md) | research | — |
