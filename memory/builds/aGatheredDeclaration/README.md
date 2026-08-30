@@ -4,8 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-status: OPEN
-ids: TOOL-aGatheredDeclaration-1
+ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4
 authorized-by: prompt
 ---
 
@@ -69,23 +68,27 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGatheredDeclaration-1
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aGatheredDeclaration-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
