@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aScouredKit-1 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-35 TOOL-aScouredKit-36 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9
+unpushed-at-landing: 0
+landed-anchor: remote
 keepalive-reaped: yes
 parked-surfaced: yes, 1 surfaced
-witness: 3eaf38d0d57dd0206103835628a27f2c57831547
-phase: LANDING
+witness: b680337a34a962a19f7f8aa49c62e15e93fbb03f
+phase: LANDED
 branch-sha: 093730e40355d6a04300966f791f2634379e8b45
 branch-ref: refs/heads/branch/kit-adversarial-review-15ed31
 mode: prompt
