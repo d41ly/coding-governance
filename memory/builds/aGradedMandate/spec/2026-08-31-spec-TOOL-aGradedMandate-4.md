@@ -1,0 +1,130 @@
+# TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN
+
+**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+`plan_state` already grades a spec THIN when its §2 Scope, §6 Acceptance criteria or §7 Gates is
+empty or names nothing observable — the kit's own predicate for "too thin to build against". Its one
+caller computes that grade and overwrites it a line later with `DONE` the moment the unit's status is
+terminal. This unit makes `build-complete` read the grade before the status hides it, so a unit
+cannot be CLOSED against a spec that never said what done was.
+
+## 2. Scope (IN)
+
+- **S1** — Add a sixth term to `dod_met`'s `build-complete` arm: for every unit id in the generated
+  region whose status is `CLOSED`, run `plan_state` over that unit's spec and refuse the item when
+  the grade is `THIN`.
+- **S2** — Order it AFTER the five existing terms, so a structural failure still reports as a
+  structural failure and this term never masks one.
+- **S3** — A `DOD_OUT` message naming each thin unit and which of the three sections is empty, since
+  `plan_state` already knows which and the operator otherwise has to re-derive it.
+- **S4** — Date-grandfather the term on the spec's FILENAME date against a new `.unattended.conf`
+  key `SPEC_THIN_CUTOFF`, absent or blank meaning "grandfather everything", set to this build's own
+  landing date. Two of 307 tracked CLOSED specs grade THIN today, both from a pre-kit July build,
+  and a term that reds a landed spec no run may rewrite is unlandable.
+- **S5** — At `--plan`, print the grade BESIDE `DONE` rather than in place of it, so the discard
+  stops being silent for a human reader too.
+
+## 3. Non-goals (OUT)
+
+- **No change to `plan_state` itself.** Its three-section predicate is M2's classification and this
+  unit computes nothing new.
+- **No leg-side clause.** The grade is a property of a build's own specs at close time; a leg
+  sweeping every tracked spec would grade builds this item never bound, including the two July ones.
+- **No Tier-1 widening.** Whether a Tier-1 spec should carry §7 at all is memory hygiene's question,
+  not this kit's, and the tier-blindness proposal is backlogged rather than built here.
+
+## 4. Design
+
+### Data model
+
+No new fact. One new declaration, `SPEC_THIN_CUTOFF`, in `.unattended.conf`, following the idiom
+`UNITS_REGION_CUTOFF` and `LANDED_ANCHOR_CUTOFF` already establish in that file: a date, absent or
+blank grandfathers everything, moving it later re-admits more.
+
+### Inventory
+
+| Site | Change |
+|---|---|
+| `unattended.sh` `dod_met` `build-complete` | the sixth term |
+| `unattended.sh` `verb_plan` | the grade printed beside `DONE` |
+| `.unattended.conf` | `SPEC_THIN_CUTOFF`, with its reason beside it |
+| `PROTOCOL.template.md` §8 · `memory/guides/UNATTENDED-PROTOCOL.md` §8 | one declaration-table row |
+| `unattended.test.sh` | a thin-and-CLOSED arm, a thin-but-grandfathered arm, a fat arm |
+
+### Migration
+
+The cutoff is the whole migration. The two July specs predate it and stay green.
+
+### Alternatives rejected
+
+Refusing at `--phase CLOSED`. There is no such verb — a unit's status lives in its spec header, which
+the driver never writes — so the refusal has to sit where the roster is read, which is
+`build-complete`.
+
+## 5. Production-readiness checklist
+
+- security — N/A. Reads tracked spec bytes.
+- perf / scale — one `plan_state` call per CLOSED unit, at close only. `verb_plan` already makes the
+  same call per unit on every invocation.
+- a11y — N/A. No user surface.
+- i18n — N/A. No user surface.
+- error / empty / loading states — a unit whose spec cannot be resolved is already reported by the
+  existing `missing_units` term, which runs first.
+- observability — the message names the unit and the empty section.
+- risks — the term is inside an overridable item, so a deliberate thin unit is a recorded decision.
+  A declared cutoff whose value is absent turns the term off entirely, which is announced.
+- testing + left-shift gates — three arms, each observed RED first.
+- migration / rollback — deleting the term, or blanking the cutoff, reverts it.
+- user docs — none owed; the Skill does not enumerate `build-complete`'s terms.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a unit is `CLOSED` and its spec's §6 Acceptance criteria section is empty,
+  `--close` blocks on `build-complete` naming that unit and that section, verified by an arm in
+  `unattended.test.sh`.
+- **AC2** — When the same spec's filename date is before `SPEC_THIN_CUTOFF`, the item is MET and the
+  grandfather is announced.
+- **AC3** — When every CLOSED unit's spec grades READY under `plan_state`, the item is MET and
+  nothing is printed.
+- **AC4** — `bash tools/unattended/unattended.sh --plan <slug>` prints the THIN grade beside `DONE`
+  for a closed thin unit rather than replacing it.
+- **AC5** — `bash tools/unattended/check-unattended.sh` stays green with the new key declared, and
+  reds when `SPEC_THIN_CUTOFF` carries a non-date value.
+
+## 7. Gates
+
+`unattended kit gate` · `memory hygiene` · `bash tools/run-gates/run-gates.sh` ·
+`bash tools/unattended/run-unattended-gates.sh --selftests`.
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-1 · 2026-08-31 · authored from finding F9 of
+  `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+
+## 10. Reuse audit
+
+The SET-level probes are recorded in `TOOL-aGradedMandate-1` §10.
+
+The seam is `plan_state` at `tools/unattended/unattended.sh:1589`, which already computes exactly
+this grade and is already reached from `build-complete`'s own neighbourhood through `unit_ids_of` and
+`missing_units`. Nothing new is derived; an existing derivation stops being discarded.
+
+The cutoff idiom is `UNITS_REGION_CUTOFF` in `.unattended.conf`, whose header states the reason a
+date is used rather than a boolean and why moving it in either direction is visible. That header is
+the template for this key's, and the parallel `.memory-tree.conf` family (`SPEC10_CUTOFF`,
+`SPEC_WITNESS_CUTOFF`) is the prior art for grandfathering a spec rule by FILENAME date rather than
+by commit date.

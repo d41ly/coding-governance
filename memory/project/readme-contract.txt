@@ -107,3 +107,4 @@ memory/builds/aReapedTicket/README.md
 !memory/builds/aGradedDoorway/README.md - landed 2026-08-28 naming no row at all. Its STRUCTURE was conformed by a later session - authored body above the regions, an authored roster pair, and the BEGIN/END GENERATED wrapper no other build README carries removed - but its headings are freeform rather than the canon's five slots, so BOUND still reds. Mapping that prose onto the slots is its build owner's call; drains when they do
 memory/builds/aLexedStripper/README.md
 memory/builds/aScouredKit/README.md
+memory/builds/aGradedMandate/README.md
