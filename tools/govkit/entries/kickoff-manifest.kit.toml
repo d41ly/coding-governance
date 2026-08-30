@@ -32,9 +32,15 @@ mutates_index = false
 why_no_adopter = "installation is a copy plus a per-machine link; the manifest's own section B is the hole"
 
 [[gate_leg]]
+# TOOL-aScouredKit-12. The PATH IS PASSED, because the engine cannot derive it. `manifest-check.sh`
+# resolves the manifest from a hardcoded two-element list and reads MEMORY_ROOT zero times, while
+# the seed above lands at the target-supplied `{manifest_path}` that nothing validates and intake
+# refuses to invent. At any answer but gov's own the leg exited 2 forever, on `guard = []`, printing
+# a remedy that told the adopter to move the manifest out of their declared memory root — and this
+# entry is in the registry's DEFAULT selection. The script already accepts and grades a path as $1.
 name = "kickoff-manifest ratchet"
 subject = "repo"
-argv = ["bash", "{prefix}/manifest-check.sh"]
+argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true

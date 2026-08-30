@@ -420,7 +420,14 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
 
 
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
-                      kits: list[str]) -> list[str]:
+                      kits: list[str], deploy: dict | None = None) -> list[str]:
+    """Which entries this run installs.
+
+    `deploy` is the TARGET's own `deploy.toml`, and passing it is what makes the no-`--kits` path
+    mean "what this target declared" rather than "gov's registry default". Every caller that HAS a
+    target descriptor passes it; `intake` does not, because it is the verb that writes that file and
+    has none to read (TOOL-aScouredKit-13).
+    """
     if mode == "all":
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
@@ -431,6 +438,21 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                 f"not a registry entry; the population is the registry, never a directory listing"
             )
         return derive_install_order(sorted(kits), descs)
+    # TOOL-aScouredKit-13. THE TARGET'S OWN LIST WINS over gov's registry default. `cmd_adopt` has
+    # always read it (by picking the "kits" mode at its call site) and `plan`/`apply` did not, so a
+    # target declaring `kits = ["check-wiring"]` got a six-kit preview and then an `apply` that
+    # exited 2 over an answer intake never asked for — the documented no-`--kits` install path was
+    # the broken one, and `plan` previewed the same wrong set so nothing warned first.
+    declared = list((deploy or {}).get("kits") or [])
+    if declared:
+        unknown = [k for k in declared if k not in descs]
+        if unknown:
+            raise Refusal(
+                f"the target's deploy.toml names {', '.join(unknown)} in `kits`, which "
+                f"{'is' if len(unknown) == 1 else 'are'} not a registry entry; the population is "
+                f"the registry, never a directory listing"
+            )
+        return derive_install_order(sorted(declared), descs)
     dk = default_kits(reg)
     if not dk:
         raise Refusal("registry.toml declares no [selection] default set, and this tool will not "
@@ -2346,7 +2368,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits, deploy)
     rows = planned_writes(root, target, deploy, descs, selection, r)
 
     print(f"govkit plan — target {target.as_posix()} · selection: {', '.join(selection)}")
@@ -3728,7 +3750,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                       "stated non-goal and would be indistinguishable from a self-overwrite")
 
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits, deploy)
     commit = git(root, "rev-parse", "HEAD").strip()
 
     receipt_path = target / ".governance" / "install.json"
@@ -4263,6 +4285,13 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
     emitted: list[dict] = []
     step(STEP_LEGS, gr.get("kind", "absent"))
+    # TOOL-aScouredKit-11. The write-back below used to be guarded on the GLOBAL `r.problems`,
+    # accumulated since step 1, while LEGS is step 9 — so ANY earlier problem, including a by-design
+    # one, withheld the manifest for every kit in the run. Measured: a `--all` install recorded 57
+    # emitted legs in the receipt and wrote no manifest anywhere, which is zero gate coverage under
+    # a receipt claiming full coverage. This snapshot is what makes the guard mean "did THIS step
+    # fail", which is the question the comment at the loop below already thought it was asking.
+    _legs_problems_before = len(r.problems)
     # D7, from this build's closing review. `-6`'s bar was built INSIDE the manifest branch, so the
     # `else:` below — taken whenever `[gate_runner].kind` is `none` or absent, which is the normal
     # state of a target that has not promoted a runner — looped the same legs and wrote every one
@@ -4398,13 +4427,23 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 if dropped and not guards:
                     print(f"govkit apply — gate leg '{nm}': UNGUARDED "
                           f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
-        if not r.problems:
+        if len(r.problems) == _legs_problems_before:
             rf.parent.mkdir(parents=True, exist_ok=True)
             rf.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
                           encoding="utf-8", newline="\n")
             subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
                            capture_output=True, check=False)
             print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
+        else:
+            # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
+            # and a receipt claiming N emitted legs — and `emitted` is cleared below for the same
+            # reason: a receipt that records legs nothing wrote is a record of a coverage that does
+            # not exist, which is worse than a missing field.
+            print(f"govkit apply — gate legs: WITHHELD from {gr['file']} — "
+                  f"{len(r.problems) - _legs_problems_before} problem(s) were raised while "
+                  f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
+                  f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
+            emitted = []
             # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
             # they can run them for the first time against the kit they just installed, and once as
             # the standing way to ask. Without this line the legs are simply absent from their bar

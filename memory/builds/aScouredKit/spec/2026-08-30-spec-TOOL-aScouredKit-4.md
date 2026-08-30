@@ -1,6 +1,6 @@
 # TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender
 
-**Status:** OPEN · rev-1 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -15,8 +15,8 @@ tolerance is a target rather than a permanently-red decoration.
 
 ## 2. Scope (IN)
 
-- S1. `tools/drift-audit/drift_report.py` — the offender test becomes `shrunk_by < 0` where it is
-  `shrunk_by <= 0` today.
+- S1. `tools/drift-audit/drift_report.py` — the offender test EXCLUDES a list seeded empty and
+  still empty, and keeps `shrunk_by <= 0` for every other row.
 - S2. A list seeded EMPTY and still empty is reported separately from a list that GREW. The two are
   different facts and the signal currently prints one token for both.
 - S3. The failing case is OBSERVED before the change lands: a shrink-only list staged with a row
@@ -71,6 +71,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-30 · initial draft, authored by the run under the standing mandate.
+- rev-2 · 2026-08-30 · S1 rewritten. It restated the wave-1 report's proposed `shrunk_by < 0`,
+  which is WRONG: it drops the seed>0, now==seed case, the one case this signal exists for, and no
+  row in this corpus exercises that case so the loss would have been invisible. Caught by the M6
+  bug-class checklist under `amendment-leaves-its-other-half-standing` after the code was already
+  written correctly — the spec was the half left standing. The code carries the same reasoning.
 
 ## 10. Reuse audit
 

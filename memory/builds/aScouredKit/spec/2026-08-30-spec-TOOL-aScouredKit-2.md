@@ -4,7 +4,12 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-2-wave2-report.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-report.md) | research | — |
 
 <!-- /gen:spec-records -->
 

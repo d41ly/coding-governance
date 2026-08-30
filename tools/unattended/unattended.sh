@@ -1144,6 +1144,16 @@ check_waiver_scope() { # -> refuses a scoped waiver a run of this mode is not bo
     # naming a mode binds only a run of that mode. The test used to name `prompt` twice, so a
     # handle scoped to a later member was silently unenforced - accepted rather than refused,
     # which is the direction that loses.
+    # TOOL-aScouredKit-7 - a scope that is not a scope AT ALL is its own refusal. `is_scope` had no
+    # caller anywhere and the vocabulary it defines was decided here by comparing against `all` and
+    # the run's mode, so a directive declared with a typo'd scope - reachable, because a project
+    # appends its own directives through .unattended.conf - fell into fail 45 and was reported as
+    # "a mode this run is not". That blames the RUN for a defect in the DECLARATION, and it is the
+    # one reading under which the operator changes the wrong thing.
+    if ! is_scope "$sc"; then
+      fail 45 "--waive names a directive whose declared scope is not a scope at all, so no run of any mode is bound by it and the waiver could never be checked - handle $h, directive scope $sc, legal scopes $(scopes)"
+      return 1
+    fi
     if [ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]; then
       fail 45 "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle $h, directive scope $sc, run mode ${AUTH_MODE:-unset}"
       return 1

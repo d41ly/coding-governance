@@ -526,8 +526,7 @@ nothing. None of those figures is authored anywhere: `<git-dir>/gate-ledger.tsv`
 leg with its own seconds, so the per-leg table is a `sort -rn` away and cannot go stale in prose. Read
 it there. The build record that first measured this is reachable from `memory/LIVE.md` like any other.
 
-The only cold/warm pair on record is node `a`, 2026-08-21: 393 s warm against 432 s with the dispatch
-hint removed. It describes a bar that no longer exists. Every leg's output is persisted
+Every leg's output is persisted
 per-leg under `<git-dir>/gate-logs/`, redacted; a RED run also leaves `gate-last-failure.txt`, which
 only the next RED run overwrites. Never pipe the bar through `tail` — it discards the failing row;
 read the durable summary instead.
@@ -576,9 +575,7 @@ checklist for that diff.
   in a companion, not the template.
 - Follow the governance playbook (`coding-governance-agents.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build folder the
-  run did not create**, whose shape the merge bar validates. The mandate is
-  ASSERTED, never written by the run that uses it, and must be reachable from the run's pinned BASE,
-  which is observed from the remote rather than read from any local ref. A run with full shell access
-  can still defeat that; the protocol's §9 says exactly how, and the control that actually binds lives
-  on the remote. Rules: `memory/guides/UNATTENDED-PROTOCOL.md`.
+- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build
+  folder the run did not create**. §1 Landing states the substitute and its properties, and
+  `memory/guides/UNATTENDED-PROTOCOL.md` is the contract; this bullet is the pointer, not a third
+  copy of the rule.

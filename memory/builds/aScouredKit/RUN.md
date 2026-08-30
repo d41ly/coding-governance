@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 093730e40355d6a04300966f791f2634379e8b45
+witness: 6ad62a6102a38bc1fb7377325ccad46b0b4ed6d2
 phase: BUILDING
 branch-sha: 093730e40355d6a04300966f791f2634379e8b45
 branch-ref: refs/heads/branch/kit-adversarial-review-15ed31
@@ -36,3 +36,13 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T10:47:30Z rescope · item add TOOL-aScouredKit-8 · reason drift-audit stops printing a cardinality claim its own source retracted (wave-1 F22)
 
 2026-08-30T10:47:31Z rescope · item add TOOL-aScouredKit-9 · reason drift-audit-state.js gains the two run-integrity fields its sibling harness has (wave-1 F12)
+
+2026-08-30T11:20:20Z rescope · item add TOOL-aScouredKit-10 · reason the leg-hold predicate is now written twice and nothing asserts the pair; reported as a backlog row rather than half-gated here
+
+2026-08-30T11:25:41Z rescope · item add TOOL-aScouredKit-11 · reason the gate-leg manifest write-back guards on THIS step's problems, not the whole run's (wave-2 blocker 6)
+
+2026-08-30T11:25:42Z rescope · item add TOOL-aScouredKit-12 · reason two shipped gate legs receive the path the descriptor already holds, instead of a literal (wave-2 blocker 1, high 3)
+
+2026-08-30T11:25:43Z rescope · item add TOOL-aScouredKit-13 · reason plan and apply honour the target's own declared kits list (wave-2 high 7)
+
+2026-08-30T11:25:44Z rescope · item add TOOL-aScouredKit-14 · reason three prose defects in the load-bearing documents: two rules stated three times, one count contradicting its own breakdown (wave-2 15, 19, 14)
