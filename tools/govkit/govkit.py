@@ -428,9 +428,37 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     target descriptor passes it; `intake` does not, because it is the verb that writes that file and
     has none to read (TOOL-aScouredKit-13).
     """
+    # TOOL-aScouredKit-13, corrected twice by this build's own closing review. The shape guard sits
+    # HERE, above the branch split, because BOTH branches consume a target-authored list: `cmd_adopt`
+    # routes `deploy['kits']` through the `mode == "kits"` branch, so a guard that lived only in the
+    # default branch left the adopt path exactly as it was. Round 2 reproduced `[1]` and `[["a"]]`
+    # through it against the live registry, both TypeErrors.
+    #
+    # It grades the CONTAINER before the elements. `kits = 5` raised on `list()` one line above the
+    # element check, and `kits = "memory-tree"` — a plausible typo, the string instead of a list of
+    # one — is iterable, so it exploded into eleven single characters and produced a refusal naming
+    # `m, e, m, o, r, y` as unknown entries. Both now say what is actually wrong.
+    def _graded(src: object, where: str) -> list[str]:
+        if src is None:
+            return []
+        if isinstance(src, str) or not isinstance(src, (list, tuple)):
+            raise Refusal(
+                f"{where} must be a LIST of registry entry ids; got {type(src).__name__} "
+                f"{src!r}. A bare string is the usual slip and it is refused rather than iterated "
+                f"into single characters"
+            )
+        bad = [repr(k) for k in src if not isinstance(k, str)]
+        if bad:
+            raise Refusal(
+                f"{where} holds {', '.join(bad)}, which {'is' if len(bad) == 1 else 'are'} not a "
+                f"string; it is a list of registry entry ids and nothing else"
+            )
+        return list(src)
+
     if mode == "all":
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
+        kits = _graded(kits, "the kit selection")
         unknown = [k for k in kits if k not in descs]
         if unknown:
             raise Refusal(
@@ -443,21 +471,8 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # target declaring `kits = ["check-wiring"]` got a six-kit preview and then an `apply` that
     # exited 2 over an answer intake never asked for — the documented no-`--kits` install path was
     # the broken one, and `plan` previewed the same wrong set so nothing warned first.
-    declared = list((deploy or {}).get("kits") or [])
+    declared = _graded((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
     if declared:
-        # TARGET-AUTHORED, so the SHAPE is checked before the membership test. A non-string element
-        # — `kits = [1]`, or a nested array — made `k not in descs` raise TypeError against a dict
-        # keyed by str on some shapes and, worse, reached `", ".join(unknown)` as a non-str and
-        # crashed the REFUSAL written to reject it. A traceback is not a refusal: it names no key,
-        # suggests no fix, and reads as a deployer bug rather than a descriptor one. Found by this
-        # build's own closing review.
-        badshape = [repr(k) for k in declared if not isinstance(k, str)]
-        if badshape:
-            raise Refusal(
-                f"the target's deploy.toml `kits` holds {', '.join(badshape)}, which "
-                f"{'is' if len(badshape) == 1 else 'are'} not a string; `kits` is a list of "
-                f"registry entry ids and nothing else"
-            )
         unknown = [k for k in declared if k not in descs]
         if unknown:
             raise Refusal(
@@ -3098,7 +3113,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
 
 
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
-               configure_skipped: set[str]) -> bool:
+               configure_skipped: set[str], deploy: dict | None = None) -> bool:
     """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
 
     The exemption is granted by RUNNING the hole's discharge probe, never by reading its flag. The
@@ -3120,9 +3135,37 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                 cmd = (h.get("discharge") or {}).get("command")
                 if not cmd:
                     continue
-                ctx = {"kit": f"tools/{eid}", "prefix": "tools", "kit_id": eid,
-                       "memory_root": "memory"}
-                resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
+                # TOOL-aScouredKit-12, third half, and the first two made this one URGENT.
+                #
+                # THE REAL CONTEXT, not a hardcoded four-key stand-in. This dict spelled `tools/`
+                # and `memory` literally, so at any other prefix or memory root the probe ran
+                # against paths the target does not have; and it carried none of the target's
+                # ANSWERS, so `{manifest_path}` — which this build had just added to the kickoff
+                # probe — resolved to nothing at all.
+                #
+                # AND THE MISSING LIST IS READ. `resolve_tokens(a, ctx)[0]` dropped it, so a command
+                # holding an unresolved token was EXECUTED with a literal brace in its argv, exited
+                # non-zero for that reason, and the function returned True — granting the leg a
+                # standing exemption on the strength of a probe that never ran. That is the
+                # dangerous direction: an exemption is not coverage, and this one silenced the
+                # default-selection leg the same build had just fixed. The sibling defect, same
+                # token, is documented as already-fixed at `rule_destinations`.
+                #
+                # A probe that cannot be resolved yields NO exemption. Fail closed: the leg stays
+                # red, which is visible, rather than exempt, which is not.
+                ctx = (target_context(target, deploy, eid, d) if deploy is not None
+                       else {"kit": f"tools/{eid}", "prefix": "tools", "kit_id": eid,
+                             "memory_root": "memory"})
+                resolved, missing = [], []
+                for a in cmd:
+                    _s, _m = resolve_tokens(a, ctx)
+                    resolved.append(_s)
+                    missing += _m
+                if missing:
+                    print(f"govkit: leg '{name}' — the hole probe for '{eid}' holds unresolved "
+                          f"token(s) {', '.join(sorted(set(missing)))}, so it cannot be run and "
+                          f"cannot grant an exemption. The leg stays red.")
+                    return False
                 try:
                     if subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
@@ -4482,11 +4525,18 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         # AT THE `if`'s INDENT, not inside either branch. It was inside the write branch, and the
         # first draft of the withheld branch above silently captured it into the ELSE — so the
         # summary printed exactly when nothing was written and never when something was. Python
-        # accepted it and three arms caught it. `emitted` is empty on the withheld path, so the
-        # `if n_kit:` below is false there and the block is correct at this indent for both.
+        # accepted it and three arms caught it.
+        #
+        # ON THE WITHHELD PATH THIS COUNTS CARRIED-FORWARD ROWS, and it is worded that way because
+        # the previous wording said `emitted` was empty there — true of the first draft, false the
+        # moment ownership started being carried forward, and false in the same commit that made it
+        # so. The count is still CORRECT: those rows describe the legs the target's runner really
+        # holds, which is exactly the population this advice is about. The sentence below says "in
+        # your runner", not "just written", for that reason.
         n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
         if n_kit:
-            print(f"govkit apply — {n_kit} of those are kit SELF-TESTS and are HELD by default: "
+            print(f"govkit apply — {n_kit} leg(s) in your runner are kit SELF-TESTS and are HELD by "
+                  f"default: "
                   f"they test the kit's own source, which does not change in a repo that "
                   f"copy-installs it. Run them once now to verify this install, and afterwards "
                   f"whenever you edit a kit:")
@@ -4531,6 +4581,13 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
         orders.append({"kind": "gate-legs", "id": "gate-legs",
                        "path": ".governance/outbox/gate-legs.md"})
+        # OWNERSHIP IS CARRIED FORWARD HERE TOO. This branch writes no legs, so it must not
+        # REVOKE the receipt's claim on legs a previous manifest-kind run wrote. `emitted` is
+        # initialized empty, and leaving it empty means a target whose `[gate_runner].kind` is
+        # flipped to `none` and back — an operator action, not a rare one — comes back with an
+        # empty `owned` and refuses its own legs. That is the same wedge the withheld path had,
+        # one branch over, and it was left standing when that one was fixed.
+        emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
         print("govkit apply — gate legs: ORDERED, not emitted — "
               + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
                  else "this target's deploy.toml declares no [gate_runner]")
@@ -4568,7 +4625,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 r.fail(f"leg '{nm}' was green before this install and is gone after — a leg that "
                        f"vanished is not a leg that passed")
             elif b is None and a2 == "red" and not exempt_leg(descs, selection, target, nm,
-                                                              configure_skipped):
+                                                              configure_skipped, deploy):
                 r.fail(f"leg '{nm}' did not exist before this install and is red after")
 
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.

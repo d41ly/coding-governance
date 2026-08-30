@@ -78,3 +78,5 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T12:14:21Z rescope · item add TOOL-aScouredKit-28 · reason closing-review finding reported with its measurement rather than half-built
 
 2026-08-30T12:14:22Z rescope · item add TOOL-aScouredKit-29 · reason closing-review finding reported with its measurement rather than half-built
+
+2026-08-30T12:40:09Z review · item aScouredKit · reason verdict BLOCKED · blockers 3

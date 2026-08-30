@@ -79,11 +79,13 @@ blocks_gate = true
 why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
-# TOOL-aScouredKit-15. THE SIBLING'S HOME IS PASSED, because this kit cannot derive it and an
-# environment variable is not durable — the leg re-invokes the script with a fresh environment on
-# every bar, so an env-only answer is lost between the render and the check that grades it.
-# `review-harness` is not target-supplied: it is the sibling ENTRY ID, a constant of gov's own
-# registry, so `{prefix}/review-harness` resolves for every adopter without a cross-entry token.
+# TOOL-aScouredKit-15. THE LEG CARRIES NO SIBLING PATH, and that is a REFUSAL gov's own selfcheck
+# taught this build rather than a preference. `[adopt]` and `[check]` above pass
+# `{prefix}/review-harness` because they are this kit's own commands; putting it in a gate LEG's
+# argv instead reds `govkit selfcheck` with "names '{prefix}/review-harness', which no kit ships" —
+# correctly, because THIS entry does not ship it and an adopter may install drift-audit alone.
+# The answer is persisted at adopt time into `{kit}/.workflows-rel` and re-read here, which is the
+# durable channel an environment variable was not.
 [[gate_leg]]
 name = "drift-audit wiring"
 subject = "repo"

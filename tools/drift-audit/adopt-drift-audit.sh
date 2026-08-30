@@ -133,15 +133,37 @@ case "$KIT_REL" in
   */*) WORKFLOWS_REL="${KIT_REL%/*}/workflows" ;;   # prefixed install: sibling of this kit
   *)   WORKFLOWS_REL="workflows" ;;                 # root install: sibling at the root
 esac
-# Precedence, narrowest first: the positional the descriptor passes, then the environment escape
-# hatch for a hand-install that cannot edit a descriptor, then the derivation. The positional wins
-# because it is the one channel that is REREAD on every invocation, which is the property the
-# environment lacks and the whole reason this argument exists.
-WORKFLOWS_REL="${WORKFLOWS_ARG:-${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}}"
+# THE ANSWER IS PERSISTED, and that file is the point. The gate LEG cannot carry the sibling's path
+# in its argv — `govkit selfcheck` refuses a leg naming a path this entry does not ship, correctly,
+# because an adopter may install drift-audit alone — and an environment variable does not survive
+# to the leg's own fresh process. So the ADOPT run writes the answer next to the kit and every
+# later invocation, including the leg's `--check`, reads it back. Same shape as `drift_signals.py`:
+# seeded by adoption, then owned by the tree.
+#
+# Precedence, narrowest first: an explicit positional, then the persisted answer, then the
+# environment escape hatch for a hand-install, then the derivation.
+WORKFLOWS_STORE="$KIT_DIR/.workflows-rel"
+WORKFLOWS_SAVED=""
+[ -f "$WORKFLOWS_STORE" ] && WORKFLOWS_SAVED="$(tr -d '\r\n' < "$WORKFLOWS_STORE")"
+WORKFLOWS_REL="${WORKFLOWS_ARG:-${WORKFLOWS_SAVED:-${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}}}"
 
 # The two files the rendered Skill tells an agent to run. Named once, checked in both modes.
+#
+# THE DIRECTORY'S ABSENCE IS A DIFFERENT FACT FROM THE FILES' ABSENCE, and conflating them is what
+# would make this assertion unusable. `drift-audit` does not REQUIRE the review-harness kit and
+# neither is in the registry's default selection, so an adopter may legitimately install this kit
+# alone — and redding their bar forever over a sibling they never asked for is not a check, it is a
+# tax. A missing DIRECTORY therefore means "that kit is not installed", which this kit has no
+# standing to complain about; a directory that EXISTS without the files means the Skill points into
+# a real place at the wrong contents, which is exactly the defect this assertion exists for.
+#
+# This distinction is only honest because the descriptor now passes the sibling's real home. While
+# the path was GUESSED, a missing directory was the symptom of the bug rather than evidence of a
+# choice, and this branch would have restored the silence it was written to remove.
+_wf_absent_kit() { [ -d "$ROOT/$WORKFLOWS_REL" ] && return 1 || return 0; }
 _wf_missing() {
   local miss="" f
+  _wf_absent_kit && { printf ''; return; }
   for f in drift-audit-code.js drift-audit-state.js; do
     [ -f "$ROOT/$WORKFLOWS_REL/$f" ] || miss="$miss $WORKFLOWS_REL/$f"
   done
@@ -199,6 +221,16 @@ if [ "$MODE" = "--check" ]; then
     _wf_complain "$_miss"
     exit 1
   fi
+  if _wf_absent_kit; then
+    # SAID, not passed over in silence. The Skill still names two commands, and a reader is entitled
+    # to know they will not run here — but this is the sibling kit's absence, not this kit's defect,
+    # so it is a note at exit 0 rather than a red bar.
+    echo "drift-audit: in sync (skill rendered from template, project layer present). NOTE: no"
+    echo "drift-audit: $WORKFLOWS_REL/ in this tree, so the review-harness kit is not installed and"
+    echo "drift-audit: the Skill's two deep-tier commands will not run. Install that kit, or ignore"
+    echo "drift-audit: that section. Not graded: this kit does not require it."
+    exit 0
+  fi
   echo "drift-audit: in sync (skill rendered from template, project layer present, deep-tier harnesses present at $WORKFLOWS_REL/)"
   exit 0
 fi
@@ -210,6 +242,14 @@ if [ -f "$KIT_DIR/drift_signals.py" ]; then
 else
   cp "$KIT_DIR/drift_signals.template.py" "$KIT_DIR/drift_signals.py"
   echo "drift-audit: seeded drift_signals.py from the template — FILL IT before trusting the report"
+fi
+
+# PERSIST THE ANSWER, so the `--check` leg resolves the same sibling this render used. Written only
+# when an explicit answer was given: a value that came from the derivation is not an answer, and
+# storing it would freeze a guess into a file that outranks the derivation forever.
+if [ -n "$WORKFLOWS_ARG" ] || [ -n "${DRIFT_WORKFLOWS_REL:-}" ]; then
+  printf '%s\n' "$WORKFLOWS_REL" > "$WORKFLOWS_STORE"
+  echo "drift-audit: recorded the review-harness home as $WORKFLOWS_REL in $(basename "$WORKFLOWS_STORE")"
 fi
 
 mkdir -p "$SKILL_DIR"

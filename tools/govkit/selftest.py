@@ -973,9 +973,16 @@ user_skills = "/tmp/gk-fake-skills"
         check("LIVENESS: the fixture actually emitted a kit-subject leg, or the AC11 arms below "
               "would be asserting about a summary with nothing to summarise",
               len(_kits_in) == 1, str(_kits_in))
+        # TOOL-aScouredKit-11 moved this sentence's lead-in from "of those" to "leg(s) in your
+        # runner", because on the WITHHELD path the count is over rows carried forward from the
+        # previous receipt rather than over rows this run emitted, and "of those" then names a
+        # population that does not exist. The edit STRANDED this arm — `arm-literal-strands-on-
+        # message-edit`, catalogued in this repo's own gotchas and warned about in its kickoff
+        # manifest — and the suite caught it. The literal is re-pinned here rather than the message
+        # reverted, because the new wording is the true one.
         check("AC11: the install summary states how many emitted legs are HELD kit self-tests",
-              f"govkit apply — {len(_kits_in)} of those are kit SELF-TESTS and are HELD by default"
-              in pa.stdout, pa.stdout)
+              f"govkit apply — {len(_kits_in)} leg(s) in your runner are kit SELF-TESTS and are "
+              f"HELD by default" in pa.stdout, pa.stdout)
         # The invocation is the TARGET's declared runner command, not this repo's path — an adopter
         # pointed at a script absent from their tree has been told nothing.
         check("AC11: and names the once-and-on-demand invocation against the target's own runner",
@@ -1032,6 +1039,80 @@ user_skills = "/tmp/gk-fake-skills"
         # no apply creates — has no fixture here. Every shipped guard resolves to something apply
         # stages, and a fixture that pre-writes one trips the foreign-kit refusal instead. Recorded
         # so the gap is visible rather than looking covered.
+
+        # TOOL-aScouredKit-11 — THE WITHHELD PATH, which had three writers and no arm until this
+        # build's own round-2 review said so. Two properties, and the second is the one whose
+        # absence wedged a target: the manifest is NOT rewritten when the LEGS step raises, and the
+        # receipt's `emitted` KEEPS the previous run's rows instead of being blanked. `owned`
+        # derives from that field, so a blank makes the next apply refuse the legs this deployer
+        # itself wrote — permanently, with --re-adopt carrying the blank forward.
+        _pre_legs = (gt / "tools" / "legs.json").read_text(encoding="utf-8")
+        _pre_rcpt = json.loads((gt / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _pre_owned = [e["name"] for e in (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])]
+        check("PRECONDITION: the target owns at least one emitted leg before the withheld run — "
+              "without this the two arms below pass over an empty set",
+              len(_pre_owned) >= 1, str(_pre_owned))
+        # THE BREAK IS IN THE TARGET'S OWN RUNNER, and the first attempt got this wrong in a way
+        # worth recording: it edited `<target>/tools/check-wiring/kit.toml`, which does not exist.
+        # `check-wiring` is a FLAT registry entry — no kit directory, and the descriptor is gov's,
+        # never copied into the target — so the fixture asserted against a path no install creates
+        # and the loud else-branch below is what said so.
+        #
+        # What a target DOES have is its runner file, and editing a row gov's receipt claims makes
+        # the LEGS step raise its own drift fail: "leg X in the target differs from what the receipt
+        # recorded". That is a problem raised INSIDE the step, which is exactly and only what the
+        # fixed guard reacts to — an earlier step's problem must NOT withhold, and that half is
+        # covered by every other apply arm in this suite passing with problems recorded elsewhere.
+        # THE RECEIPT IS THE OPERAND, not the runner file. The drift check reads
+        # `prev.get("argv") != argv`, where `prev` is the RECEIPT's row and `argv` is this run's
+        # fresh resolve — so tampering the RUNNER changes neither side and apply silently repairs
+        # it, which is what the first cut of this fixture did and why it measured nothing. The
+        # message's own wording ("in the target differs from what the receipt recorded") points at
+        # the runner and the comparison does not; that gap is why this took two attempts.
+        _rcpt_path = gt / ".governance" / "install.json"
+        _tamper = next((e for e in (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])
+                        if e.get("name") in _pre_owned), None)
+        if _tamper is not None:
+            _tamper["argv"] = list(_tamper.get("argv", [])) + ["--recorded-differently"]
+            _rcpt_path.write_text(json.dumps(_pre_rcpt, indent=2) + "\n",
+                                  encoding="utf-8", newline="\n")
+            _wr = run("apply", "--target", str(gt), "--kits", "check-wiring")
+            check("AC-withheld: a leg differing from what the receipt recorded WITHHOLDS the "
+                  "manifest — the problem is raised INSIDE the LEGS step, which is the only thing "
+                  "the guard reacts to",
+                  "gate legs: WITHHELD" in _wr.stdout, _wr.stdout + _wr.stderr)
+            check("AC-withheld: and the runner file is byte-identical — nothing was rewritten",
+                  (gt / "tools" / "legs.json").read_text(encoding="utf-8") == _pre_legs,
+                  (gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+            _post = json.loads((gt / ".governance" / "install.json").read_text(encoding="utf-8"))
+            _post_owned = [e["name"] for e in (_post.get("gate_runner") or {}).get("emitted", [])]
+            check("AC-withheld: and the receipt KEEPS the previous ownership rather than blanking "
+                  "them — a blank makes the next apply refuse the legs this deployer wrote",
+                  _post_owned == _pre_owned, f"pre={_pre_owned} post={_post_owned}")
+            # THE WEDGE ITSELF, end to end, because the two arms above are about a FIELD and this
+            # one is about the CONSEQUENCE. Restore the receipt's argv and apply again: with
+            # ownership carried forward this succeeds, and with the blanking it would hit "the
+            # target's runner already has a leg named X and this target's receipt does not claim
+            # it" and stay there forever.
+            _tamper["argv"] = [a for a in _tamper["argv"] if a != "--recorded-differently"]
+            _rcpt_now = json.loads(_rcpt_path.read_text(encoding="utf-8"))
+            _rcpt_now["gate_runner"]["emitted"] = (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])
+            _rcpt_path.write_text(json.dumps(_rcpt_now, indent=2) + "\n",
+                                  encoding="utf-8", newline="\n")
+            _wr2 = run("apply", "--target", str(gt), "--kits", "check-wiring")
+            check("AC-withheld: and a later apply RECOVERS — it is not wedged by the withheld run",
+                  _wr2.returncode == 0 and "already has a leg named" not in _wr2.stdout,
+                  _wr2.stdout + _wr2.stderr)
+            check("AC-withheld: and the receipt records legs_withheld, so the fact survives "
+                  "outside the stdout nobody kept",
+                  (_post.get("gate_runner") or {}).get("legs_withheld") is True, str(_post.get("gate_runner")))
+        else:
+            # LOUD, not silent. This suite has no skip verb, and inventing one here to excuse a
+            # missing fixture would make the arms above indistinguishable from arms that ran. The
+            # rows are written by the applies above, so an empty set is a real breakage.
+            check("AC-withheld: the target owns a runner row to tamper with — an absent fixture "
+                  "means the withheld arms above never ran",
+                  False, f"owned={_pre_owned} rows={_pre_legs[:200]}")
 
         # Ownership: a name the target already owns is refused, not overwritten.
         own = runner_target("u4b")

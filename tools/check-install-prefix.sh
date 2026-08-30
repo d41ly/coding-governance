@@ -97,7 +97,13 @@ fi
 
 if [ "$MODE" = --check ]; then
 bad=0
-for h in $hits; do
+# LINE-DELIMITED, not word-split. `for h in $hits` splits on IFS, so a hit whose path holds a space
+# becomes two bogus rows and neither matches a waiver — the reverse of the `-0` hardening applied to
+# the PRODUCER above, left standing in its CONSUMER. Latent in this repo (0 spaced tracked paths,
+# measured) and not latent in an adopter, whose tree this same gate grades. Same change on the
+# waiver loop below, for the same reason.
+while IFS= read -r h; do
+  [ -n "$h" ] || continue
   printf '%s\n' "$waived_rows" | grep -qxF "$h" && continue
   if [ "$bad" = 0 ]; then
     echo "install-prefix: a SHIPPED file spells a root-install kit path. An adopter installs kits at"
@@ -106,17 +112,22 @@ for h in $hits; do
   fi
   bad=$((bad+1))
   printf '  %s  %s\n' "$h" "$(sed -n "${h##*:}p" "${h%:*}" | sed 's/^[[:space:]]*//' | cut -c1-90)"
-done
+done <<EOF
+$hits
+EOF
 [ "$bad" = 0 ] || exit 1
 
 # A waiver that no longer names a hit is a stale row: the spelling it excused is gone, and leaving it
 # lets the NEXT one in silently under a pin that never fell.
 stale=0
-for w in $waived_rows; do
+while IFS= read -r w; do
+  [ -n "$w" ] || continue
   printf '%s\n' "$hits" | grep -qxF "$w" && continue
   [ "$stale" = 0 ] && echo "install-prefix: stale waiver(s) — the spelling they excuse is gone; delete the row:"
   stale=$((stale+1)); printf '  %s\n' "$w"
-done
+done <<EOF
+$waived_rows
+EOF
 [ "$stale" = 0 ] || exit 1
 
 echo "install-prefix: clean — $(printf '%s\n' "$files" | grep -c .) shipped files, $waived_n declared waiver(s), no undeclared root-install spelling"

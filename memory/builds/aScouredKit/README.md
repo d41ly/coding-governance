@@ -103,7 +103,7 @@ ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 3 record folder(s).
+Records: 12 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
