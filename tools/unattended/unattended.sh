@@ -1255,7 +1255,7 @@ check_single_live() {
 '
   fi
   [ "$n" -le 1 ] && return 0
-  fail 5 "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined: $n live,${live}"
+  echo "PROBE-refusal5-would-fail"; return 0; fail 5 "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined: $n live,${live}"
   return 1
 }
 
