@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-convergence.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md) | research | — |

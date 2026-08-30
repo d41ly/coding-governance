@@ -69,10 +69,18 @@ RE="(^|[^/{}[:alnum:]._-])($alt)/[A-Za-z0-9_.-]+\.(sh|py|js|md|json|toml)"
 #
 # `grep` exits 1 on no match and a zero hit count is the SUCCESS state here, so the pipeline is
 # terminated with `|| true` — the passing-zero-reads-as-failure class the charter names. `xargs -r`
-# keeps an empty list from making grep read stdin, and the list is newline-delimited exactly as the
-# `$files` variable already was, so no path handling changes.
-hits=$(printf '%s\n' "$files" | tr -d '\r' | grep -v '^$' \
-  | xargs -r grep -nE "$RE" -- 2>/dev/null | cut -d: -f1,2 || true)
+# keeps an empty list from making grep read stdin.
+#
+# `-0` AND `-H`, both bought by this build's own closing review, and both are the difference between
+# a gate and a gate-shaped no-op. BARE `xargs` applies shell-like quote processing to its input: a
+# path holding a quote ABORTS the invocation and a path holding a space is silently split, and with
+# stderr going to /dev/null and the status swallowed by `|| true` this arm would then print a clean
+# result over files it never read. The two sibling scripts batched in the same commit use `-0` for
+# exactly this reason and this one did not. `-H` forces the `<file>:` prefix that the `cut` below
+# assumes: grep omits it when handed exactly ONE file, so a single-file population produced
+# `<lineno>:<text>` and the cut took the line number as the path.
+hits=$(printf '%s\n' "$files" | tr -d '\r' | grep -v '^$' | tr '\n' '\0' \
+  | xargs -0 -r grep -HnE "$RE" -- 2>/dev/null | cut -d: -f1,2 || true)
 
 waived_rows=""
 [ -f "$WAIVERS" ] && waived_rows=$(grep -vE '^\s*(#|$)' "$WAIVERS" | awk '{print $1}')
@@ -198,8 +206,8 @@ carried_rows() {
   carried_population | tr -d '\r' | while IFS= read -r f; do
     [ -n "$f" ] || continue
     [ -f "$f" ] || continue
-    printf '%s\n' "$f"
-  done | xargs -r grep -cE "$re_ship" -- 2>/dev/null \
+    printf '%s\0' "$f"
+  done | xargs -0 -r grep -cHE "$re_ship" -- 2>/dev/null \
        | awk -F: 'NF>=2 && $NF+0 > 0 { c=$NF; sub(/:[^:]*$/, "", $0); printf "%s\t%s\n", $0, c }' \
        | LC_ALL=C sort || true
 }

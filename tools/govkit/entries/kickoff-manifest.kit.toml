@@ -51,7 +51,11 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
 why = "MEASURED: the ratchet exits 1 on a copied-and-unfilled template, failing its placeholder check and its stamp check together, and exits 2 with no manifest at all. There is no install of this kit that leaves its leg at exit 0 without an authoring step. The probe is the WHOLE check, not the placeholder grep: filling every placeholder and stamping a well-formed but foreign sha passes the grep and still reds the leg."
-discharge = { command = ["bash", "{prefix}/manifest-check.sh"] }
+# TOOL-aScouredKit-12, second half. The LEG above gained `{manifest_path}` and this probe did
+# not, eleven lines below it — so the hole stayed undischarged forever at any non-gov answer
+# and `exempt_leg` would then grant the newly-fixed leg a standing red-after-install
+# exemption. Caught by this build's own closing review. One token, twice.
+discharge = { command = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"] }
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26
+ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
 authorized-by: prompt
 ---
 
@@ -82,7 +82,7 @@ than rewritten out of an append-only record.*
 <!-- gen:build-index -->
 **Build status:** OPEN · 14 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
 ids TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15
-ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26
+ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -97,15 +97,15 @@ ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit
 | [TOOL-aScouredKit-3 — one predicate decides a gate leg's hold, and the pin file sees both fields](spec/2026-08-30-spec-TOOL-aScouredKit-3.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender](spec/2026-08-30-spec-TOOL-aScouredKit-4.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-5 — drift-audit's conf parser matches the source its docstring claims to copy](spec/2026-08-30-spec-TOOL-aScouredKit-5.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
-| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
+| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | OPEN | rev-3 | 2026-08-30 |
 | [TOOL-aScouredKit-7 — the unattended kit stops shipping a scope helper with no caller](spec/2026-08-30-spec-TOOL-aScouredKit-7.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-8 — drift-audit stops printing a cardinality its own source retracted](spec/2026-08-30-spec-TOOL-aScouredKit-8.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aScouredKit-1 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9.
 <!-- /gen:build-index -->

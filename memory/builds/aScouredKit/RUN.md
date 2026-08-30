@@ -70,3 +70,11 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T11:43:11Z rescope · item add TOOL-aScouredKit-25 · reason reported with its measurement as a backlog row rather than half-built in this run
 
 2026-08-30T11:43:11Z rescope · item add TOOL-aScouredKit-26 · reason reported with its measurement as a backlog row rather than half-built in this run
+
+2026-08-30T12:10:12Z review · item aScouredKit · reason verdict BLOCKED · blockers 4
+
+2026-08-30T12:14:19Z rescope · item add TOOL-aScouredKit-27 · reason closing-review finding reported with its measurement rather than half-built
+
+2026-08-30T12:14:21Z rescope · item add TOOL-aScouredKit-28 · reason closing-review finding reported with its measurement rather than half-built
+
+2026-08-30T12:14:22Z rescope · item add TOOL-aScouredKit-29 · reason closing-review finding reported with its measurement rather than half-built

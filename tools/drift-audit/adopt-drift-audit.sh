@@ -21,11 +21,25 @@
 #   Exit 0 = adopted / in sync · 1 = out of sync or unusable · 2 = wrong invocation or not a repo.
 set -u
 
-MODE="${1:-}"
-case "$MODE" in
-  ""|--check) ;;
-  *) echo "usage: $0 [--check]"; exit 2 ;;
-esac
+# TOOL-aScouredKit-15 — the second argument is the SIBLING KIT'S installed directory: optional,
+# positional, and it exists because this kit cannot DERIVE it and an environment variable is not
+# DURABLE. The gate leg re-invokes this script with a fresh environment on every bar, so an
+# env-only answer set at render time is gone by the time `--check` grades what was rendered, and
+# the two disagree. The descriptor passes `{prefix}/review-harness` instead, so the answer travels
+# with the install. Absent, the derivation further down still applies, which is what keeps a
+# hand-install — and this repo's own dogfood, where the sibling really is `tools/workflows` —
+# working unchanged.
+MODE=""
+WORKFLOWS_ARG=""
+for _a in "${@:-}"; do
+  case "$_a" in
+    "") ;;
+    --check) MODE="--check" ;;
+    -*) echo "usage: $0 [--check] [<workflows-dir>]"; exit 2 ;;
+    *) [ -z "$WORKFLOWS_ARG" ] || { echo "usage: $0 [--check] [<workflows-dir>]"; exit 2; }
+       WORKFLOWS_ARG="$_a" ;;
+  esac
+done
 
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(git -C "$KIT_DIR" rev-parse --show-toplevel 2>/dev/null)" || { echo "drift-audit: not a git repo"; exit 2; }
@@ -119,7 +133,11 @@ case "$KIT_REL" in
   */*) WORKFLOWS_REL="${KIT_REL%/*}/workflows" ;;   # prefixed install: sibling of this kit
   *)   WORKFLOWS_REL="workflows" ;;                 # root install: sibling at the root
 esac
-WORKFLOWS_REL="${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}"
+# Precedence, narrowest first: the positional the descriptor passes, then the environment escape
+# hatch for a hand-install that cannot edit a descriptor, then the derivation. The positional wins
+# because it is the one channel that is REREAD on every invocation, which is the property the
+# environment lacks and the whole reason this argument exists.
+WORKFLOWS_REL="${WORKFLOWS_ARG:-${DRIFT_WORKFLOWS_REL:-$WORKFLOWS_REL}}"
 
 # The two files the rendered Skill tells an agent to run. Named once, checked in both modes.
 _wf_missing() {

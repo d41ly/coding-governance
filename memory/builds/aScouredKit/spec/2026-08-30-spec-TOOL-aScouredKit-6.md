@@ -1,10 +1,12 @@
 # TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output
 
-**Status:** OPEN · rev-2 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
+**Status:** OPEN · rev-3 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round1.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 |
 
 <!-- /gen:spec-records -->
 
@@ -20,8 +22,13 @@ an ADOPTER's whole repository rather than with the kit.
   one batched call. Measured 22.45 s to 0.69 s here, identical output.
 - S2. `tools/unattended/check-playbook.sh` — 941 `grep -q` spawns to discover a population of one
   become one batched call. Measured 44.1 s to 1.17 s, same single result.
-- S3. `tools/check-install-prefix.sh` — both per-file loops batched, and the double
-  `carried_population()` call on the `--check` path hoisted to one.
+- S3. `tools/check-install-prefix.sh` — both per-file loops batched. The double
+  `carried_population()` call on the `--check` path was ALSO in this scope and was NOT built: the
+  measurement it rested on did not reproduce. The finders priced it at 2.11 s a call; re-measured
+  on node `a` the whole leg runs in about 4 s and a call is nearer 1 s, so the hoist buys about a
+  second against a real risk of changing which arm observes a dead population — and this leg's
+  liveness assertion is the reason it reads the population twice. Dropped rather than deferred,
+  and said here rather than left as a scope item nobody closed.
 - S4. Every changed arm proves output equivalence by comparing the batched result against the
   unbatched one on THIS tree, byte for byte, and the comparison is recorded in §9.
 
@@ -104,6 +111,15 @@ none
   All five comparisons byte-identical. 47.2 s off the leg-sum on this node. The lens's own
   figures (22.45 s, 44.1 s, 10.74+19.24 s) are not reproduced here and are not contradicted:
   they were taken on a differently-loaded machine, and what AC2 binds is the AFTER figure.
+  S3's hoist is DROPPED, not deferred - see section 2; the closing review caught this spec still
+  claiming it. TWO REGRESSIONS the closing review caught in the code, both mine and both in this
+  file: a BARE `xargs` on both arms, where a path holding a quote aborts the invocation and one
+  holding a space is split, with stderr eaten by `2>/dev/null` and the status by `|| true` - so
+  the gate would print clean over files it never read, and the two siblings batched in the same
+  commit used `-0` for exactly that reason. And a missing `-H`: `grep` omits the `<file>:` prefix
+  when handed exactly ONE file, which both pipelines assume, so a single-file population fed the
+  LINE NUMBER to `cut` as the path. Verified directly rather than argued. Both fixed at rev-3;
+  output re-compared against the pre-change bytes and still byte-identical on both modes.
   ONE FIRST CUT WAS WRONG AND IS RECORDED RATHER THAN QUIETLY FIXED: the playbook change first
   round-tripped a NUL-delimited list through `$(...)`, which strips NUL bytes, so `xargs -0` got
   one mangled argument and the leg reported a population of 0 against a tree holding 1 - it

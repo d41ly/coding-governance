@@ -445,6 +445,19 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     # the broken one, and `plan` previewed the same wrong set so nothing warned first.
     declared = list((deploy or {}).get("kits") or [])
     if declared:
+        # TARGET-AUTHORED, so the SHAPE is checked before the membership test. A non-string element
+        # — `kits = [1]`, or a nested array — made `k not in descs` raise TypeError against a dict
+        # keyed by str on some shapes and, worse, reached `", ".join(unknown)` as a non-str and
+        # crashed the REFUSAL written to reject it. A traceback is not a refusal: it names no key,
+        # suggests no fix, and reads as a deployer bug rather than a descriptor one. Found by this
+        # build's own closing review.
+        badshape = [repr(k) for k in declared if not isinstance(k, str)]
+        if badshape:
+            raise Refusal(
+                f"the target's deploy.toml `kits` holds {', '.join(badshape)}, which "
+                f"{'is' if len(badshape) == 1 else 'are'} not a string; `kits` is a list of "
+                f"registry entry ids and nothing else"
+            )
         unknown = [k for k in declared if k not in descs]
         if unknown:
             raise Refusal(
@@ -4284,6 +4297,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
     # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
     emitted: list[dict] = []
+    # Set on the WITHHELD path below, and recorded in the receipt so a later reader can tell a run
+    # that wrote its legs from one that carried the previous run's rows forward. Without it the two
+    # receipts are byte-identical and the withheld fact lives only in stdout nobody kept.
+    _legs_withheld = False
     step(STEP_LEGS, gr.get("kind", "absent"))
     # TOOL-aScouredKit-11. The write-back below used to be guarded on the GLOBAL `r.problems`,
     # accumulated since step 1, while LEGS is step 9 — so ANY earlier problem, including a by-design
@@ -4436,14 +4453,27 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
         else:
             # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
-            # and a receipt claiming N emitted legs — and `emitted` is cleared below for the same
-            # reason: a receipt that records legs nothing wrote is a record of a coverage that does
-            # not exist, which is worse than a missing field.
+            # and a receipt claiming N emitted legs it never wrote.
             print(f"govkit apply — gate legs: WITHHELD from {gr['file']} — "
                   f"{len(r.problems) - _legs_problems_before} problem(s) were raised while "
                   f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
                   f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
-            emitted = []
+            # THE RECEIPT KEEPS THE PREVIOUS RUN'S ROWS, and does NOT get this run's discarded list
+            # and does NOT get blanked. Both wrong answers were written before this comment was.
+            #
+            # `emitted` is OWNERSHIP OF A NAME, not a claim about this run: `owned` at the top of
+            # this branch derives from it, and a leg name present in the target's runner but absent
+            # from `owned` raises "the target's runner already has a leg named X and this target's
+            # receipt does not claim it". So blanking it WEDGES the target permanently — every
+            # later apply refuses the legs this deployer itself wrote, and `--re-adopt` carries the
+            # blanked receipt forward. Caught by this build's own closing review, one round after
+            # the spec that asked for the blanking.
+            #
+            # Carrying THIS run's built list forward would be the other error: it would claim rows
+            # that are not in any file. The manifest on disk is exactly what the last successful
+            # run left, so the previous receipt's rows are the true ownership set.
+            emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
+            _legs_withheld = True
         # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
         # they can run them for the first time against the kit they just installed, and once as
         # the standing way to ask. Without this line the legs are simply absent from their bar
@@ -4549,7 +4579,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
          "orders": orders, "baseline": baseline, "after": after_map,
          "hook_block": {"state": hook_state},
          "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
-                         "emitted": emitted}},
+                         "emitted": emitted, "legs_withheld": _legs_withheld}},
         indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
