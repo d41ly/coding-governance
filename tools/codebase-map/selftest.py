@@ -1269,6 +1269,52 @@ def test_enumerate_exports_string_borne_punctuation():
             raise AssertionError("a real multi-declarator export must still raise MapError")
 
 
+def test_enumerate_exports_regex_borne_comment_opener():
+    r"""TOOL-aPairedLexer-4 (review D8): the KNOWN losses from `render_comment_free` modelling no
+    regex literal, pinned as CEILINGS so a future parser upgrade trips this arm and gets the
+    docstring corrected with it.
+
+    These assert the WRONG answer on purpose. That is the project's own pattern for a documented
+    blind spot, and it is the opposite of a silent one: the arm fails the day someone fixes it.
+
+    The review's stated repro did NOT reproduce, and the difference matters. An unterminated span is
+    ABANDONED rather than swallowed, so a regex-borne block opener with no later closer loses
+    nothing; the loss needs a REAL closer further down the file. Measured both ways below, because a
+    ceiling arm that pins a loss which does not happen is the same nothing as a gate that cannot
+    fire."""
+    import tempfile
+
+    def ids(src):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "m.ts").write_text(src, encoding="utf-8")
+            rows = m.enumerate_exports(base, "web-ts", extensions=frozenset({".ts"}), root=base)
+            return {r["id"] for r in rows}
+
+    # CEILING 1 — a regex carrying a block opener, closed by a REAL `*/` later. Everything between
+    # is silently dropped. `LOST` is the export this pass cannot see.
+    got = ids(
+        "export const RX = /a\\/*b/;\n"
+        "export const LOST = 1;\n"
+        "const x = 2; /* real */\n"
+        "export const AFTER = 3;\n"
+    )
+    assert got == {"RX", "AFTER"}, f"ceiling moved (good, then fix the docstring): {sorted(got)}"
+    assert "LOST" not in got, "the regex-borne block-comment ceiling is FIXED — update the docstring"
+
+    # CEILING 2 — a regex carrying a line-comment opener truncates its own line, which also MASKS
+    # the multi-declarator guard: `_has_top_level_comma` never sees the comma, so a second
+    # declarator is dropped with NO MapError. This is the more dangerous of the two, because the
+    # guard it disables is the one that exists to refuse exactly this silence.
+    got = ids("export const U = /^https?:\\/\\//, ALSO = 1;\n")
+    assert got == {"U"}, f"ceiling moved (good, then fix the docstring): {sorted(got)}"
+
+    # NOT a ceiling — the review claimed this one and it does not reproduce. An unterminated span is
+    # abandoned, so both exports survive. Pinned so the docstring cannot drift back to claiming it.
+    got = ids("export const RX = /a\\/*b/;\nexport const KEEP = 1;\n")
+    assert got == {"RX", "KEEP"}, f"an unterminated span must be abandoned, not swallowed: {sorted(got)}"
+
+
 def test_render_comment_free():
     """TOOL-aPairedLexer-3: comments blanked in ONE pass, strings TRACKED but not blanked, line
     count preserved.
@@ -1490,6 +1536,10 @@ def main() -> int:
     failures += check(
         "enumerate_exports: string contents do not steer the parse",
         test_enumerate_exports_string_borne_punctuation,
+    )
+    failures += check(
+        "enumerate_exports: the regex-borne comment ceilings, pinned",
+        test_enumerate_exports_regex_borne_comment_opener,
     )
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0

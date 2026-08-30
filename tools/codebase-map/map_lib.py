@@ -601,7 +601,15 @@ def enumerate_exports(
     vanishing (stronger than a parsed-vs-keyword count check, which cannot name the offender).
 
     ``file`` is POSIX-relative to ``root``. Ceilings (documented, not silent): comments are
-    stripped naively (``/* */`` spans and trailing ``//``), and only statement-leading markers
+    stripped by ``render_comment_free``, which is string-aware but models NO REGEX LITERAL, so a
+    line-comment or block-comment opener written INSIDE a regex still reads as one. Two losses
+    follow, both MEASURED and both pinned as ceilings by
+    ``test_enumerate_exports_regex_borne_comment_opener``: a regex carrying a block opener starts a
+    span that a later real closer ends, silently dropping every export between them; and a regex
+    carrying a line-comment opener truncates its own line, which also MASKS the multi-declarator
+    guard below, so a second declarator after it is dropped with no MapError. An unterminated span
+    is abandoned rather than swallowed, so the loss needs a real closer. Upgrade the pass and that
+    arm trips, which is how this paragraph gets corrected with it. Only statement-leading markers
     are scanned — a ``marker`` inside a multi-line template literal would false-positive RAISE
     (fail-closed direction) and a multi-name ``export { a, b }`` is recognized-not-indexed
     (the names are indexed at their def sites). Use a real parser (tsc/tree-sitter) for full
