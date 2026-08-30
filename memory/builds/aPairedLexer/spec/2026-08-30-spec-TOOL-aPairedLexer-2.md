@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call
 
-**Status:** SPECCED · rev-1 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md](../build/2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md) | journal | TOOL-aPairedLexer-1 TOOL-aPairedLexer-3 |
+| [2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-1 TOOL-aPairedLexer-3 |
 
 <!-- /gen:spec-records -->
 
@@ -22,6 +23,11 @@ inside a prompt is read as a call. This is the last member of the class
 - **S1** — `offendingLines` builds its view with `renderCodeView(script)` instead of the per-line
   `stripStrings(l).split('//')[0]`. Template prose is blanked, `${…}` interpolation bodies are kept
   as code, and the `gov:bounded-fanout` marker check keeps reading the RAW line.
+- **S1b** — **and it falls back to the per-line view when the scan ends unterminated**, the same
+  branch `TOOL-aLexedStripper-5` landed for rule 2. Rev-1 omitted this and it was a REPRODUCED
+  fail-open in the ban rule: `renderCodeView` models no regex literal and no block comment, so one
+  stray backtick in either blanks every later line and a genuine raw `parallel(` below it is
+  ADMITTED where the shipped hook DENIES. Measured on two spellings, both legal JavaScript.
 - **S2** — Fixtures in `tools/hooks/agent-cap.test.sh` in both directions: prose naming a primitive
   inside a prompt ADMITS, a real raw primitive still DENIES, and a primitive written inside a `${…}`
   interpolation still DENIES.
@@ -107,6 +113,12 @@ verbatim, which is why it is the right view and a blanket template-blanker is no
   interpolation is code and the view must not blank it.
 - **AC5** — When a real raw primitive sits ABOVE an unterminated backtick, it exits `2` — the
   blanked tail must not hide a call that precedes it.
+- **AC5b** — When a real raw primitive sits BELOW a regex literal containing a backtick, it exits
+  `2`. Under rev-1's S1 this exits `0`, measured. This is the criterion rev-1 lacked, and its
+  absence is why the fail-open reached the spec: AC5 pinned only the ABOVE case, which is green both
+  before and after and therefore observes nothing about the change.
+- **AC5c** — When a real raw primitive sits BELOW a block comment containing a backtick, it exits
+  `2`, likewise `0` under rev-1.
 - **AC6** — When a primitive is named inside a `/* */` block comment, it exits `2`, UNCHANGED from
   BASE. This unit does not fix that row and the arm pins the ceiling rather than the bug.
 - **AC7** — When a `gov:bounded-fanout` marked helper line is present, it is still exempt — the
@@ -130,6 +142,10 @@ and `bash tools/check-kit-versions.sh` are the direct invocations §6 names.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-30 · folded the round-1 spec audit's blocker cluster. S1 as written was a
+  fail-open in the raw-primitive ban, reproduced on two legal-JavaScript spellings, because it took
+  `renderCodeView` without the fallback that makes it safe. S1b adds it and AC5b/AC5c pin the shape
+  AC5 could not observe.
 - rev-1 · 2026-08-30 · initial draft, from a measured reproduction against the shipped hook at
   `14e21399`.
 

@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-1 — rule 3 stops being blind below an unterminated template
 
-**Status:** SPECCED · rev-1 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md](../build/2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md) | journal | TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 |
+| [2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 |
 
 <!-- /gen:spec-records -->
 
@@ -18,9 +19,16 @@ line and the rule that exists to refuse an unresolvable or oversized cap sees no
 
 ## 2. Scope (IN)
 
-- **S1** — `capFindings` detects that the scan ended inside a template literal and, when it did,
-  builds its view with the per-line `stripStrings(l).split('//')[0]` instead of `blankLiterals`.
-  The signal is `renderCodeView(script).unterminated`, which this file already computes for rule 2.
+- **S1** — `blankLiterals` returns `{ code, endMode }` instead of a bare array, where `endMode` is
+  the mode its own state machine finished in. Its two existing consumers take `.code`.
+- **S1b** — `capFindings` builds its view with the per-line `stripStrings(l).split('//')[0]` when
+  `endMode !== 'code'`, and with `blankLiterals(...).code` otherwise.
+  **The signal must come from the view being used.** Rev-1 read
+  `renderCodeView(script).unterminated`, which is TEMPLATE-only — `TOOL-aLexedStripper-5` deleted
+  renderCodeView's block branch — while `blankLiterals` carries `code | tmpl | block`. Measured with
+  rev-1's fix applied: a bounded receiver with a cap of 500 below an unterminated BLOCK comment is
+  still ADMITTED. A signal taken from a different view than the one being repaired reports on the
+  wrong machine.
 - **S2** — Fixtures in `tools/hooks/agent-cap.test.sh` for both directions: the two ADMIT-today
   shapes must DENY, and a bounded fan with a resolvable cap below an unterminated template must
   still ADMIT.
@@ -52,14 +60,21 @@ mask rule 3 entirely. The isolation is a BOUNDED receiver plus an unresolvable o
 
 ### Why the fallback, and why it cannot regress
 
-Identical in shape to `TOOL-aLexedStripper-5`'s fix for rule 2, and it has the same property. The
-per-line view sees MORE than the blanked one — it never blanks a line to nothing — so switching to
-it on the unterminated path can only ADD findings, never remove them. A rule whose findings are
-denials cannot fail open by seeing more.
+Identical in SHAPE to `TOOL-aLexedStripper-5`'s fix for rule 2. **It does NOT have the same safety
+property, and rev-1 claimed it did.**
 
-The direction that could hurt is a false positive: a cap-shaped token inside a template literal now
-reaching the counter. That is bounded to scripts that END inside a template literal, which are not
-valid JavaScript, and AC3 pins the one legal-looking shape that matters.
+Rev-1 argued the per-line view "can only ADD findings, never remove them", so the change could not
+fail open. That is false, and the counterexample is in this rule's own plumbing: the view also feeds
+`intConsts`, so exposing a line can ADD a const binding, and an added binding can RESOLVE a `K` that
+was previously unresolvable — which REMOVES a finding. Measured: a script whose `const K = 5` is
+hidden by the blanked view and revealed by the per-line one goes from "unresolvable, deny" to
+"resolves to 5, admit".
+
+So the honest bound is narrower and is what this unit now rests on. **The fallback restores the
+verdict rule 3 would reach on a script it can actually read**, in both directions, rather than being
+monotone in one. Where the exposed binding is real the new verdict is the CORRECT one — `K` really
+is 5 — and where the exposed cap is oversized the new verdict is a denial the blanked view missed.
+AC5 pins the removing direction so the behaviour is observed rather than argued.
 
 ### Files touched (estimate)
 
@@ -99,7 +114,13 @@ valid JavaScript, and AC3 pins the one legal-looking shape that matters.
   backtick, it exits `0` — the fallback adds no false positive on the shape most likely to be legal.
 - **AC4** — When both shapes are written with the template TERMINATED, they exit `2` as at BASE, and
   the deny message still names the cap rule rather than another.
-- **AC5** — When each new fixture is staged against the shipped code first,
+- **AC4b** — When a bounded receiver is fanned with a cap of `500` below an unterminated BLOCK
+  comment, `node tools/hooks/agent-cap.js` exits `2`. Under rev-1's template-only signal this exits
+  `0`, measured, which is the half of the defect that design did not reach.
+- **AC5** — When a script's `const K = 5` is hidden by the blanked view and revealed by the per-line
+  one, `node tools/hooks/agent-cap.js` exits `0` — the fallback REMOVES a finding here, and the
+  criterion pins that direction because §4 no longer claims it cannot happen.
+- **AC5b** — When each new fixture is staged against the shipped code first,
   `bash tools/hooks/agent-cap.test.sh` reports the BASE verdicts §4's table records.
 - **AC6** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm that passes at BASE passes.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, `KIT_AGENT_CAP_VERSION` is bumped and all
@@ -121,6 +142,12 @@ is the direct invocation AC5, AC6 name; `bash tools/check-kit-versions.sh` is AC
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-30 · folded the round-1 spec audit, which refuted this unit's central safety
+  argument and half its fix. The monotonicity claim is FALSE via `intConsts` and is replaced rather
+  than softened; the signal moves off `renderCodeView.unterminated`, which is template-only, onto
+  `blankLiterals`' own end mode, because a signal read from a different view than the one being
+  repaired reports on the wrong machine. Both were re-measured with rev-1's fix applied before
+  folding. AC4b and AC5 are new and pin exactly the two behaviours rev-1 asserted away.
 - rev-1 · 2026-08-30 · initial draft. The defect was isolated by deny-message classification after a
   first fixture of four scripts returned all-DENY and proved nothing, an unbounded receiver having
   masked the rule under test.

@@ -1,12 +1,13 @@
 # TOOL-aPairedLexer-3 — the definition probe strips comments in one pass
 
-**Status:** SPECCED · rev-1 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 14e21399 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md](../build/2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md) | journal | TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 |
+| [2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 |
 
 <!-- /gen:spec-records -->
 
@@ -19,8 +20,14 @@ comment. It strips BLOCK comments before LINE comments, so a bare `/*` in a `//`
 ## 2. Scope (IN)
 
 - **S1** — Add `render_comment_free(text)` to `map_lib.py`: ONE left-to-right pass that blanks
-  `//` line comments, `/* */` block comments and the CONTENTS of `'…'`, `"…"` and backticked
-  strings, and emits a newline for every newline it consumes so LINE NUMBERS are preserved.
+  `//` line comments and `/* */` block comments ONLY, emitting a newline for every newline it
+  consumes so LINE NUMBERS are preserved. It TRACKS `'…'`, `"…"` and backticked strings so that a
+  comment marker inside one does not open a comment, and **emits their contents unchanged**.
+  **Rev-1 said to blank string contents and that was a measured loss.** The defect is the comment
+  ORDER and nothing about it requires touching strings; blanking them adds a second unsound strip —
+  the pass models no regex literal — and the audit measured eight real definitions removed from
+  this repo's own tracked JavaScript. Tracking without blanking is what the correctness needs, and
+  it cannot delete anything: the only bytes this pass removes are inside a comment.
 - **S2** — Both consumers use it: `map_lib.py:461` and the mirror at `:539`. `_BLOCK_COMMENT_RE`
   loses its last consumer and is deleted with them.
 - **S3** — A selftest arm per direction: a definition after a line-comment block-opener is FOUND, a
@@ -127,7 +134,9 @@ and zero definitions; another loses 5968 and two real components.
   tools/codebase-map/selftest.py` reports it RED, except AC2, AC4 and AC5, which pass at BASE and are
   regression guards rather than defect arms — stated so a green row is not misread as a fix.
 - **AC8** — When `python tools/codebase-map/gen_map.py --write` runs, the diff to
-  `memory/map/generated/symbols.json` contains ADDED definitions and no removed ones.
+  `memory/map/generated/symbols.json` contains ADDED definitions and **no removed ones**. This is
+  the criterion that catches rev-1's string-blanking loss, and it is checked by diffing the
+  regenerated artifact rather than by reading the pass.
 - **AC9** — When `python tools/codebase-map/selftest.py` runs whole, it passes, including the
   `js definition probe ⊇ the lexicon's own set` cross-check that caught this class twice.
 - **AC10** — When `bash tools/check-kit-versions.sh` runs, `KIT_CODEBASE_MAP_VERSION` is bumped and
@@ -149,6 +158,12 @@ tools/codebase-map/selftest.py`, `python tools/codebase-map/gen_map.py --write` 
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-30 · folded the round-1 spec audit. S1 blanked string and template CONTENTS,
+  which BASE never does and which the comment-ORDER defect does not require; implemented literally
+  it removed eight real definitions from this repo's tracked JavaScript, because the pass models no
+  regex literal and a stray delimiter blanks a live region. The pass now TRACKS strings and blanks
+  only comments, so the only bytes it can remove are inside a comment. Same root as this build's
+  `-2` blocker: a blanking argued from one delimiter model that the input does not obey.
 - rev-1 · 2026-08-30 · initial draft, from a fixture measured against the shipped code at
   `14e21399` and from the adopter-side count taken during `aLexedStripper`.
 

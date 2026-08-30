@@ -67,16 +67,16 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aPairedLexer-1 — rule 3 stops being blind below an unterminated template](spec/2026-08-30-spec-TOOL-aPairedLexer-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-30 |
+| [TOOL-aPairedLexer-1 — rule 3 stops being blind below an unterminated template](spec/2026-08-30-spec-TOOL-aPairedLexer-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
