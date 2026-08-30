@@ -1,12 +1,13 @@
 # TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -33,6 +34,11 @@ cannot be CLOSED against a spec that never said what done was.
   and a term that reds a landed spec no run may rewrite is unlandable.
 - **S5** — At `--plan`, print the grade BESIDE `DONE` rather than in place of it, so the discard
   stops being silent for a human reader too.
+- **S6** — Declare `SPEC_THIN_CUTOFF` in THREE carriers, not one. `.unattended.conf` is the project
+  declaration; `tools/unattended/.unattended.conf.example` is the kit example, whose absence reds
+  check 22's `documented but in no example` arm; and the driver's conf-default init block, because
+  `unattended.sh` runs under `set -u` and every conf key it reads is defaulted there. Both sibling
+  cutoffs are carried in all three.
 
 ## 3. Non-goals (OUT)
 
@@ -58,6 +64,8 @@ blank grandfathers everything, moving it later re-admits more.
 | `unattended.sh` `dod_met` `build-complete` | the sixth term |
 | `unattended.sh` `verb_plan` | the grade printed beside `DONE` |
 | `.unattended.conf` | `SPEC_THIN_CUTOFF`, with its reason beside it |
+| `tools/unattended/.unattended.conf.example` | the key, blank, with the grandfather semantics beside it |
+| `unattended.sh` conf-default init block | the key defaulted, or `set -u` aborts the driver |
 | `PROTOCOL.template.md` §8 · `memory/guides/UNATTENDED-PROTOCOL.md` §8 | one declaration-table row |
 | `unattended.test.sh` | a thin-and-CLOSED arm, a thin-but-grandfathered arm, a fat arm |
 
@@ -83,6 +91,11 @@ the driver never writes — so the refusal has to sit where the roster is read, 
 - observability — the message names the unit and the empty section.
 - risks — the term is inside an overridable item, so a deliberate thin unit is a recorded decision.
   A declared cutoff whose value is absent turns the term off entirely, which is announced.
+  **The cutoff's VALUE is not shape-checked**, and that is deliberate rather than overlooked: neither
+  sibling cutoff is either, and building the first cutoff-shape validator in this leg is a change to
+  a file this unit inventories as untouched. A malformed value therefore sorts as an ordinary string
+  and grandfathers unpredictably. Stated here rather than discovered, and it is the one residual this
+  unit ships with.
 - testing + left-shift gates — three arms, each observed RED first.
 - migration / rollback — deleting the term, or blanking the cutoff, reverts it.
 - user docs — none owed; the Skill does not enumerate `build-complete`'s terms.
@@ -98,8 +111,13 @@ the driver never writes — so the refusal has to sit where the roster is read, 
   nothing is printed.
 - **AC4** — `bash tools/unattended/unattended.sh --plan <slug>` prints the THIN grade beside `DONE`
   for a closed thin unit rather than replacing it.
-- **AC5** — `bash tools/unattended/check-unattended.sh` stays green with the new key declared, and
-  reds when `SPEC_THIN_CUTOFF` carries a non-date value.
+- **AC5** — `bash tools/unattended/check-unattended.sh` stays green with the new key declared in
+  all three carriers, which is what check 22's three-way key join asserts.
+- **AC6** — When a fixture is BOTH structurally broken and thin — a unit whose spec is missing AND a
+  second unit that is `CLOSED` and thin — `--close` reports the missing-unit failure and NOT the
+  THIN grade, which is what S2's ordering requirement means in behaviour.
+- **AC7** — Running the driver with `SPEC_THIN_CUTOFF` unset in the conf does not abort under
+  `set -u`, verified by an arm in `unattended.test.sh`.
 
 ## 7. Gates
 
@@ -114,6 +132,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F9 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+
+- rev-2 · 2026-08-31 · round-1 fold of F7, F15 and F16: SPEC_THIN_CUTOFF gains its two missing carriers (S6), AC6 observes the term ORDERING S2 requires, AC7 the set -u default, and AC5's orphaned shape clause is dropped with the residual stated in section 5.
 
 ## 10. Reuse audit
 

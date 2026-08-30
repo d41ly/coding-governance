@@ -7,14 +7,15 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Five statements an unattended agent reads are wrong or missing in a way that changes what the agent
-DOES. They are collected into one edit of the two kit templates and one adopter render, so the
-divergence is repaired once rather than five times.
+Four statements an unattended agent reads are wrong or missing in a way that changes what the agent
+DOES. They are collected into one edit of the Skill template and one adopter render, so the
+divergence is repaired once rather than four times.
 
 ## 2. Scope (IN)
 
@@ -30,12 +31,14 @@ divergence is repaired once rather than five times.
 - **S4** — All six documented `--record-piece` / `--record-set` invocations spell `--verdict PASS`,
   and `FAIL` appears in no example. Make one example spell `FAIL`, so the instruction layer stops
   priming the answer on the item that takes no override.
-- **S5** — The protocol's §2 fact 3 enumerates five parked kinds against the driver's eight and says
-  all four listed kinds are surfaced. Correct the enumeration and the surfaced claim, in the
-  template and its render, which two legs byte-compare.
-- **S6** — Name the diff-driven self-test escalation `TOOL-aGradedMandate-3` adds in the Skill's
-  `--close` section, and the retirement split `TOOL-aGradedMandate-5` adds in its `--rescope`
-  paragraph, so a run learns about both from the file it actually reads.
+- **S6** — Name the retirement split `TOOL-aGradedMandate-5` adds in the Skill's `--rescope`
+  paragraph, so a run learns from the file it actually reads that a retirement now reaches the
+  owner's one turn. The self-test-escalation half of this item was deleted in the round-1 fold, with
+  `TOOL-aGradedMandate-3`.
+
+*S5 was DELETED in the round-1 fold. It claimed the protocol §2 fact-3 correction that
+`TOOL-aGradedMandate-5` S5 also claimed; one edit now has one owner, and this unit touches
+`PROTOCOL.template.md` not at all.*
 
 ## 3. Non-goals (OUT)
 
@@ -44,9 +47,9 @@ divergence is repaired once rather than five times.
 - **No new rule.** Every sentence here either states what the code already does or points at a
   section that owns a rule. A gloss that grew into a condition would be the defect the pointer design
   exists to avoid.
-- **No render of the DoD set into the Skill.** Enumerating the ten items in an agent-facing carrier
-  creates a fourth copy of a set that already has three; only the non-overridable pair is named,
-  because that is the pair the agent has to act on at close.
+- **No render of the DoD set into the Skill.** Enumerating the core Definition-of-Done set in an
+  agent-facing carrier creates a fourth copy of a set that already has three; only the
+  non-overridable pair is named, because that is the pair the agent has to act on at close.
 
 ## 4. Design
 
@@ -60,9 +63,7 @@ leg byte-compares the pair and a hand edit is how the two stop agreeing.
 | File | Why |
 |---|---|
 | `tools/unattended/SKILL.template.md` | S1, S2, S3, S4, S6 |
-| `tools/unattended/PROTOCOL.template.md` | S5 |
 | `.claude/skills/unattended/SKILL.md` | render |
-| `memory/guides/UNATTENDED-PROTOCOL.md` | render |
 
 ### Alternatives rejected
 
@@ -76,8 +77,11 @@ Hand-editing the renders. Rejected by the wiring leg's own existence.
 - i18n — N/A.
 - error / empty / loading states — N/A.
 - observability — the render is verified by the existing wiring leg rather than by eye.
-- risks — the Skill carries byte ceilings through the kit's own size checks; the additions are short
-  and the render is re-run rather than patched.
+- risks — **the rendered Skill has NO size ceiling anywhere in this tree.**
+  `tools/template-size-limits.txt` declares three subjects and this is not one of them, no leg caps a
+  skill other than the kickoff engine, and `check-unattended.sh` performs no byte measurement at all.
+  So the additions land with nothing measuring the result. Stated rather than mitigated: adding a
+  measured row to another kit's declared limits table is a pin this unit did not price.
 - testing + left-shift gates — the machine half is `TOOL-aGradedMandate-9`, which makes the S1 class
   of divergence red rather than ship. S2 to S6 have no machine half and that is stated here.
 - migration / rollback — reverting the template and re-rendering.
@@ -91,10 +95,11 @@ Hand-editing the renders. Rejected by the wiring leg's own existence.
 - **AC3** — `grep -c "gotchas.py" .claude/skills/unattended/SKILL.md` is at least 1.
 - **AC4** — `grep -c -- "--verdict FAIL" .claude/skills/unattended/SKILL.md` is at least 1.
 - **AC5** — `bash tools/check-wiring.sh --check` reports the installed Skill matching the tracked
-  render, and `bash tools/unattended/run-unattended-gates.sh --checks` reports the protocol pair
-  byte-identical.
-- **AC6** — The rendered Skill still passes whatever size and shape checks the kit's own leg applies
-  to it, verified by `bash tools/unattended/check-unattended.sh`.
+  render.
+- **AC6** — The rendered Skill still passes the SHAPE checks the kit's leg applies to it, verified by
+  `bash tools/unattended/check-unattended.sh`. There is no size half, for the reason section 5 gives.
+- **AC7** — `grep -c 'retire' .claude/skills/unattended/SKILL.md` inside the `--rescope` paragraph
+  is at least 1, which is the only observation S6 has.
 
 ## 7. Gates
 
@@ -108,6 +113,10 @@ none
 
 - rev-1 · 2026-08-31 · authored from findings F10, F6 and F7 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+- rev-2 · 2026-08-31 · round-1 fold. S5 deleted (F17: one edit, two owners), the escalation half of
+  S6 deleted with `TOOL-aGradedMandate-3`, the section 5 size-ceiling claim corrected (F12: the
+  mitigation did not exist), AC6 narrowed to the shape half it can actually observe, AC7 added for S6
+  (F18), and the prose count in section 3 replaced (F19).
 
 ## 10. Reuse audit
 

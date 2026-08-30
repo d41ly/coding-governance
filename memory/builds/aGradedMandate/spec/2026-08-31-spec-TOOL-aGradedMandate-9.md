@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
 
 <!-- /gen:spec-records -->
 
@@ -35,8 +36,9 @@ unit points it at a second, so `TOOL-aGradedMandate-8`'s correction cannot silen
 
 ## 3. Non-goals (OUT)
 
-- **No join over the full `DOD_CORE` set.** The Skill deliberately does not enumerate the ten items,
-  and demanding it would create a fourth copy of a set that already has three.
+- **No join over the full `DOD_CORE` set.** The Skill deliberately does not enumerate the core
+  Definition-of-Done set, and demanding it would create a fourth copy of a set that already has
+  three.
 - **No re-implementation of the directive join.** The existing two-way join is the pattern; this is
   a sibling using the same shape, not a generalisation of it into one parameterised checker.
 - **No adopter-facing declaration.** `DOD_NO_OVERRIDE` is kit-owned with no conf channel and stays
@@ -110,6 +112,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F10 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`, its machine half.
+- rev-2 · 2026-08-31 · round-1 fold of the spec audit's F19: the prose count in section 3 replaced
+  with a name, since the set is eleven by the time this unit lands.
 
 ## 10. Reuse audit
 

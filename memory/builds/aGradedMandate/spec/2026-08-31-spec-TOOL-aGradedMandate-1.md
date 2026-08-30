@@ -1,12 +1,13 @@
 # TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -66,9 +67,18 @@ one exists.
 
 ### Migration
 
-None. Every existing `LANDED` record is terminal and is never re-closed. The one live record in the
-tree, `memory/builds/aThawedCorpus/RUN.md`, is at `LANDING` with `--close` already run; re-closing it
-would meet the new term, and that is the correct answer for a loop that stopped at five blockers.
+None for a terminal record: every existing `LANDED` record is never re-closed.
+
+The one live record in the tree is `memory/builds/aThawedCorpus/RUN.md`, and it WOULD BLOCK. Round 1
+of the spec audit corrected an earlier reading of this section that said the opposite. That file
+holds exactly one review row, `review · item TOOL-aThawedCorpus-5 · reason verdict BLOCKED ·
+blockers 5`: the subject is a UNIT id rather than the build slug, so the S1 join returns no row at
+all, and the row carries no terminal token either. Both S4 messages would fire.
+
+That is accepted rather than exempted. The record is at `LANDING` with `--close` already run and
+nothing re-evaluates it, so the term costs nothing today; and a record whose closing loop stopped at
+five blockers is exactly the state this term exists to refuse, so carving it out would be carving
+out the case.
 
 ### Alternatives rejected
 
@@ -107,6 +117,11 @@ promotion clause already grades.
 - **AC5** — `grep -c "46 records" tools/unattended/unattended.sh` returns `0`, and the replacement
   sentence names the measured 208/170 pair.
 - **AC6** — `bash tools/unattended/run-unattended-gates.sh --checks` stays green.
+- **AC7** — Before the term is wired, the candidate predicate is run over every tracked `RUN.md`
+  with `GIT ls-files`, printing hits AND near-misses, and its output is recorded in this build's
+  journal record. The expected hits are `memory/builds/aBoundedCeiling/RUN.md`,
+  `memory/builds/aPrimedKeepalive/RUN.md` and `memory/builds/aThawedCorpus/RUN.md`; a fourth hit is
+  a finding, not a pass.
 
 ## 7. Gates
 
@@ -121,6 +136,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F1 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+
+- rev-2 · 2026-08-31 · round-1 fold of the spec audit's F9: section 4 Migration re-derived against the record it names, which WOULD block, plus AC7 requiring the candidate predicate be run over every tracked RUN.md before wiring.
 
 ## 10. Reuse audit
 

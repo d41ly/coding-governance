@@ -1,12 +1,13 @@
 # TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -23,10 +24,23 @@ item that reads it, so a CLOSED unit no spec audit ever named blocks the close.
 - **S2** — Add its arm to `dod_met`. For every id in the build README's `gen:build-units` region at
   HEAD whose status is `CLOSED`, require a TRACKED record under `<MEMORY_ROOT>/builds/<slug>/` whose
   first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit` naming that id.
+- **S2a** — The id join is WHOLE-TOKEN and EXPANDS the range form. `memory/HYGIENE.md`'s binding
+  grammar admits a trailing `@rev-N` and a contiguous run written `N..M`, and 18 of the 123 tracked
+  `spec-audit` binding lines use the range form. A substring join is wrong in both directions: it
+  blocks a unit that WAS audited under `TOOL-x-1..5`, and it satisfies `TOOL-x-1` from a line naming
+  `TOOL-x-19`. `id_in` in `tools/unattended/lib-unattended.sh` gives the whole-token half; the range
+  expansion has no seam in this kit and is written here, because the kit copy-installs without
+  `gen_build_index.py`, which is the only existing expander.
 - **S3** — Raise the Definition-of-Done half of `CORE_FLOOR` in `.unattended.conf` from `10` to
   `11`, with the reason beside the number, since the leg refuses a floor below the kit's own count.
 - **S4** — Add the item's row to the §4 table in `tools/unattended/PROTOCOL.template.md` and its
-  render `memory/guides/UNATTENDED-PROTOCOL.md`, which two legs byte-compare.
+  render `memory/guides/UNATTENDED-PROTOCOL.md`, which two legs byte-compare — AND move the
+  count sentence directly above that table from `Ten kit-owned core items.` to `Eleven`. Check 16
+  parses that word and fails when it disagrees with `DOD_CORE`, and the byte-identity assertion
+  cannot see it: the sentence would be wrong in both copies, which is that arm's own recorded origin.
+- **S4a** — Move `CORE_FLOOR` in `tools/unattended/.unattended.conf.example` from `12:10` to
+  `12:11` as well. `unattended.test.sh` asserts the example's value equals the driver's two set
+  sizes, and the example once shipped a slack floor for the whole life of the file.
 - **S5** — The item's own header states what it does NOT check: that the audit found anything, that
   it was performed at the unit's current rev, or that a `WONTDO` unit was ever audited.
 
@@ -55,7 +69,8 @@ No new fact. The evidence is the `**Serves:** spec-audit <id> …` line already 
 | `unattended.sh:343` `DOD_CORE` | one entry appended |
 | `unattended.sh` `dod_met` | the `specs-audited` arm |
 | `.unattended.conf` `CORE_FLOOR` | `12:10` → `12:11` |
-| `PROTOCOL.template.md` §4 · `memory/guides/UNATTENDED-PROTOCOL.md` §4 | one table row, byte-identical |
+| `tools/unattended/.unattended.conf.example` `CORE_FLOOR` | `12:10` → `12:11`, or `unattended.test.sh` reds |
+| `PROTOCOL.template.md` §4 · `memory/guides/UNATTENDED-PROTOCOL.md` §4 | one table row AND the count sentence above it, byte-identical |
 | `unattended.test.sh` | the refusal arm, the pass arm, and a `WONTDO`-only roster arm |
 
 The walk reuses the `closing-review-recorded` arm's shape: `GIT ls-files` over the build folder,
@@ -98,8 +113,16 @@ an adopter would get an item keyed on a line nothing in their tree writes.
 - **AC2** — When every `CLOSED` id is named by such a record, the item is MET.
 - **AC3** — When a record naming the id exists on disk but is UNTRACKED, `--close` reports the item
   unmet and the message says the join reads the index, since it walks `GIT ls-files`.
-- **AC4** — `bash tools/unattended/check-unattended.sh` stays green with `CORE_FLOOR="12:11"`, and
-  reds with `12:10` against the new core count, proving the floor pin moved for a reason.
+- **AC4** — `bash tools/unattended/check-unattended.sh` stays green with `CORE_FLOOR="12:11"` in
+  BOTH `.unattended.conf` and `tools/unattended/.unattended.conf.example`, and reds with `12:10`
+  against the new core count, proving the floor pin moved for a reason.
+- **AC4a** — `bash tools/unattended/run-unattended-gates.sh --selftests` is green, which is what
+  exercises the example conf's floor against the driver's two set sizes.
+- **AC4b** — Check 16 is green: the protocol's count sentence reads `Eleven` and agrees with
+  `DOD_CORE`, verified by `bash tools/unattended/check-unattended.sh` reporting no count
+  disagreement.
+- **AC4c** — A record binding `TOOL-x-1..5` satisfies unit `TOOL-x-5`, and a record binding
+  `TOOL-x-19` does NOT satisfy unit `TOOL-x-1`, both verified by arms in `unattended.test.sh`.
 - **AC5** — `bash tools/unattended/run-unattended-gates.sh --checks` reports the protocol pair
   byte-identical after the §4 row lands in both copies.
 
@@ -116,6 +139,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F3 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+
+- rev-2 · 2026-08-31 · round-1 fold of F4, F6 and F8: the id join becomes whole-token with range expansion (S2a), the protocol's spelled-out count sentence joins S4 because check 16 parses it, and the kit example conf's CORE_FLOOR joins the Inventory because unattended.test.sh asserts it.
 
 ## 10. Reuse audit
 

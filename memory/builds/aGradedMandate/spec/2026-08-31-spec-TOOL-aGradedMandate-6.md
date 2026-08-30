@@ -1,12 +1,13 @@
 # TOOL-aGradedMandate-6 — check 24's RETIRE arm keys its baseline to the run's pinned BASE
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -24,10 +25,21 @@ authorization actually sits, and leaves the ADD arm exactly as it is.
 - **S1** — Add `pinned_units` beside `baseline_units` in `tools/unattended/lib-unattended.sh`: the
   build README's units region as it stood at a NAMED commit, with the same cutoff handling and the
   same refusal shapes.
+- **S1a** — `pinned_units` VALIDATES its commit before the blob read: a value shorter than 7 hex, or
+  one failing `GIT cat-file -e "<c>^{commit}"`, is its own named refusal. This is not inherited from
+  the sibling and is the one shape `same refusal shapes` naturally omits, because the sibling CHOOSES
+  its commit and this one is GIVEN one. An empty value does not fail the read — `GIT show ":<path>"`
+  is INDEX syntax and succeeds, verified live on this tree — so an absent or truncated `base:` would
+  silently grade the working index instead of the pinned BASE, and S3's skip would never fire because
+  the read returned plausible bytes. That is the same degeneration the driver's own
+  `closing-review-recorded` header records from `check_authorization`.
 - **S2** — Point check 24's RETIRE loop at `pinned_units "$rb" …` while the ADD loop and the
   supersession-successor loop keep `baseline_units`.
 - **S3** — Report the two baselines separately when either is unreadable, so a skip names which
-  question could not be asked rather than skipping the whole check.
+  question could not be asked rather than skipping the whole check. THREE distinguishable skips: the
+  ADD baseline unreadable, the RETIRE baseline unreadable, and the RETIRE commit refused by S1a's
+  validation. Today a `baseline_units` failure skips all three loops at once, including the
+  supersession-successor loop, and removing that whole-check skip is what S3 is for.
 - **S4** — State in the arm's header why the two arms take different baselines: M2 MANDATES
   authoring an absent spec, so an addition is expected between BASE and BUILDING and a retirement is
   not.
@@ -98,6 +110,12 @@ ADD arm's baseline too, and an addition before `BUILDING` is the case that arm e
 - **AC2** — When the same fixture carries the `retire` row, the check passes.
 - **AC3** — When the pinned BASE does not resolve, `bash tools/unattended/check-unattended.sh`
   reports a skip naming the RETIRE baseline specifically and still evaluates the ADD arm.
+- **AC3b** — When `baseline_units` fails and the pinned BASE resolves, the check reports a skip
+  naming the ADD baseline specifically and STILL evaluates the RETIRE arm, which is the direction
+  that inherits today's whole-check skip.
+- **AC3c** — When a fixture run-state file carries a blank `base:`, check 24 reports S1a's named
+  refusal rather than a verdict. An empty base RESOLVES, to the git index, so AC3's
+  `does not resolve` fixture cannot reach this.
 - **AC4** — Running `pinned_units` over every tracked `RUN.md` before the arm is wired prints zero
   hits and its near-misses, recorded in this build's journal record.
 - **AC5** — `bash tools/unattended/check-unattended.sh` is green on the tree at HEAD after the
@@ -116,6 +134,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F4 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`, the leg half.
+
+- rev-2 · 2026-08-31 · round-1 fold of F5 and F14: pinned_units validates its commit before the blob read (S1a), since an empty base resolves to the git INDEX rather than failing; and AC3b covers the mirror direction S3 promises.
 
 ## 10. Reuse audit
 
