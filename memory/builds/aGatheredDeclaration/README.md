@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4
+ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7
 authorized-by: prompt
 ---
 
@@ -68,20 +68,26 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4
+**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7.
 
-Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1.
+Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -89,6 +95,12 @@ Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aGatheredDeclaration-1` | no |
+| 2 | `TOOL-aGatheredDeclaration-2` | no |
+| 3 | `TOOL-aGatheredDeclaration-3` | no |
+| 4 | `TOOL-aGatheredDeclaration-4` | no |
+| 5 | `TOOL-aGatheredDeclaration-5` | no |
+| 6 | `TOOL-aGatheredDeclaration-6` | no |
+| 7 | `TOOL-aGatheredDeclaration-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

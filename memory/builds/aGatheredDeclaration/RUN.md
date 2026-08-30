@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 44734f152c0f6a2d7ea5c6438dc969de8a7e9f33
-phase: RESEARCHING
+witness: aafbee3be7085929ab30c7d7cfe883d936701b4e
+phase: SPECCING
 branch-sha: 44734f152c0f6a2d7ea5c6438dc969de8a7e9f33
 branch-ref: refs/heads/branch/gate-bar-tooling-review-020565
 mode: prompt
