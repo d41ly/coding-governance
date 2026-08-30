@@ -81,7 +81,7 @@ and why the run refused it.)*
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-08-30 · streams tooling
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-08-30 · streams tooling
 ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexer-4 TOOL-aPairedLexer-5 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12
 
 <!-- gen:build-units -->
@@ -94,13 +94,17 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-6 — a DECLINED slash announces itself](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-08-31 |
 | [TOOL-aPairedLexer-7 — start of input is a REGEX position](spec/2026-08-31-spec-TOOL-aPairedLexer-7.md) | 6 | 2 | SPECCED | rev-1 | 2026-08-31 |
 | [TOOL-aPairedLexer-8 — decide on the previous TOKEN, in one shared predicate](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 7 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work](spec/2026-08-31-spec-TOOL-aPairedLexer-9.md) | 8 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption](spec/2026-08-31-spec-TOOL-aPairedLexer-10.md) | 9 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-11 — rule 2 calls the same merge as rule 3](spec/2026-08-31-spec-TOOL-aPairedLexer-11.md) | 10 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aPairedLexer-12 — a phantom template may not RESURRECT a comment](spec/2026-08-31-spec-TOOL-aPairedLexer-12.md) | 11 | 2 | SPECCED | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8.
+Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -114,6 +118,10 @@ Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4 TOOL-aPairedLexer
 | 5 | `TOOL-aPairedLexer-6` | no |
 | 6 | `TOOL-aPairedLexer-7` | no |
 | 7 | `TOOL-aPairedLexer-8` | no |
+| 8 | `TOOL-aPairedLexer-9` | no |
+| 9 | `TOOL-aPairedLexer-10` | no |
+| 10 | `TOOL-aPairedLexer-11` | no |
+| 11 | `TOOL-aPairedLexer-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

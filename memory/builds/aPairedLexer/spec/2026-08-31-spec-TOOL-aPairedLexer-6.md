@@ -86,8 +86,8 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
 
 ## 8. Open questions
 
-*(none — the fix and its ordering were measured by the round-2 review, and both directions are pinned
-by AC1 and AC3.)*
+none — the fix and its ordering were measured by the round-2 review, and both directions are
+pinned by AC1 and AC3.
 
 ## 9. Revision log
 

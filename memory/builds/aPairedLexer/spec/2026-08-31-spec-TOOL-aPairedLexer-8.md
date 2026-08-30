@@ -88,7 +88,7 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
 
 ## 8. Open questions
 
-*(none.)*
+none — the keyword set is closed and the review measured both fixtures against 1.9 and the tip.
 
 ## 9. Revision log
 

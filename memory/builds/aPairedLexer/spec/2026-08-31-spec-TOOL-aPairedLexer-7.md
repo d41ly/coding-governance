@@ -85,7 +85,7 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
 
 ## 8. Open questions
 
-*(none.)*
+none — the defect, its control and its fix were all measured before speccing.
 
 ## 9. Revision log
 
