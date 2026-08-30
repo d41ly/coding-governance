@@ -13,6 +13,7 @@ terminal status. Nothing here is edited by hand.
 | [aGradedDoorway](builds/aGradedDoorway/README.md) | INPROGRESS | a | 2026-08-28 | tooling | 10 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 |
+| [aPairedLexer](builds/aPairedLexer/README.md) | SPECCED | a | 2026-08-30 | tooling | 3 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
