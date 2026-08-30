@@ -3,7 +3,6 @@ slug: aProvenReuse
 node: a
 opened: 2026-08-31
 streams: tooling
-status: INPROGRESS
 roster: TOOL
 ids: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2
 authorized-by: prompt
@@ -88,23 +87,29 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-08-31 · streams tooling
+**Build status:** OPEN · 2 unit(s) · node a · opened 2026-08-31 · streams tooling
 ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aProvenReuse-1` | no |
+| 2 | `TOOL-aProvenReuse-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
