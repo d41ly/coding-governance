@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.3"
+KIT_CODEBASE_MAP_VERSION = "1.4"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -397,7 +397,6 @@ JS_EXPORT_RULES: tuple[tuple[re.Pattern[str], str | None], ...] = (
     (re.compile(r"export\s+default\b"), None),                # anonymous default / default <expr>
 )
 
-_BLOCK_COMMENT_RE = re.compile(r"/\*.*?\*/", re.DOTALL)
 
 #: Statement-leading DEFINITION forms for a JS/TS layer — the companion to JS_EXPORT_RULES, which
 #: sees only what a file exports. (regex, kind). `export` prefixes are optional here: a form that is
@@ -413,6 +412,65 @@ JS_DEFINITION_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(rf"^\s*(?:export\s+)?(?:const|let|var)\s+{_JS_ID}\s*=\s*(?:async\s*)?"
                 r"(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)", re.M), "function"),
 )
+
+
+def render_comment_free(text: str) -> str:
+    """The source with COMMENTS blanked and everything else byte-identical, line count preserved.
+
+    `scan_js_definitions` used to strip block comments and THEN line comments, so a bare block
+    opener written inside a `//` comment opened a `DOTALL` span that ran to the next closer and
+    swallowed every definition between. Measured on the adopter corpus: 14 definitions lost across 9
+    files. Swapping the two passes trades that for the mirror defect — a `//` inside a block comment
+    truncates the line, the closer is lost, and the span runs on — because comments and strings
+    EXCLUDE each other and no sequence of independent passes can say so.
+
+    It TRACKS strings and templates so a marker inside one cannot open a comment, and it emits their
+    contents UNCHANGED. That distinction is the whole safety argument: an earlier revision of this
+    unit blanked string contents too, and since the pass models no regex literal, a stray delimiter
+    blanked a live region — eight real definitions removed from this repo's own tracked JavaScript.
+    The only bytes this function removes are inside a comment, so it cannot delete a definition.
+
+    LINE COUNT IS PRESERVED because the caller reports `file:line` and `symbols.json` is committed;
+    a pass that collapsed lines would move every definition and corrupt the artifact silently.
+    """
+    out: list[str] = []
+    i, n = 0, len(text)
+    while i < n:
+        two = text[i : i + 2]
+        if two == "//":
+            j = text.find("\n", i)
+            i = n if j < 0 else j
+            continue
+        if two == "/*":
+            j = text.find("*/", i + 2)
+            if j < 0:
+                # Unterminated: abandon the opener rather than swallow the file, the rule
+                # TOOL-aLexedStripper-1 S5 set for the token scan.
+                out.append("  ")
+                i += 2
+                continue
+            out.append("\n" * text.count("\n", i, j + 2))
+            i = j + 2
+            continue
+        ch = text[i]
+        if ch in ("'", '"', "`"):
+            j = i + 1
+            while j < n:
+                if text[j] == "\\":
+                    j += 2
+                    continue
+                if text[j] == ch:
+                    break
+                if text[j] == "\n" and ch != "`":
+                    break  # an unterminated single-line literal ends at its line
+                j += 1
+            closed = j < n and text[j] == ch
+            out.append(text[i : j + 1] if closed else ch)
+            i = j + 1 if closed else i + 1
+            continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 def scan_js_definitions(
@@ -458,10 +516,7 @@ def scan_js_definitions(
                 continue
             path = Path(dirpath) / name
             rel = path.relative_to(root).as_posix()
-            text = _BLOCK_COMMENT_RE.sub(
-                lambda mm: "\n" * mm.group(0).count("\n"), path.read_text(encoding="utf-8")
-            )
-            text = "\n".join(ln.split("//", 1)[0] for ln in text.splitlines())
+            text = render_comment_free(path.read_text(encoding="utf-8"))
             seen: set[str] = set()
             for rx, kind in rules:
                 for mm in rx.finditer(text):
@@ -533,14 +588,14 @@ def enumerate_exports(
                 continue
             path = Path(dirpath) / name
             rel = path.relative_to(root).as_posix()
-            # Replace each block-comment span with as many newlines as it spanned, so removing a
-            # multi-line /* */ never MERGES two statements onto one line (which would push a then-
-            # non-leading export out of the statement-leading scan silently).
-            text = _BLOCK_COMMENT_RE.sub(
-                lambda mm: "\n" * mm.group(0).count("\n"), path.read_text(encoding="utf-8")
-            )
+            # ONE pass, and the line count is preserved for the reason the old two-pass version
+            # gave: removing a multi-line span must never MERGE two statements onto one line,
+            # which would push a then-non-leading export out of the statement-leading scan.
+            # The `//` split that used to live in the loop is GONE — comments are already blanked,
+            # and splitting again would truncate at a `//` inside a string literal.
+            text = render_comment_free(path.read_text(encoding="utf-8"))
             for raw in text.splitlines():
-                line = raw.split("//", 1)[0]
+                line = raw
                 if not marker_re.match(line):
                     continue
                 stripped = line.strip()

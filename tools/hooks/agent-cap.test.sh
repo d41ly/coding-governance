@@ -911,5 +911,96 @@ js "renderCodeView: a raw primitive inside a block comment still denies (fail-cl
 const r = await parallel(D.map((d) => () => agent(d.p)))
 EOF
 
+
+# ---- aPairedLexer: the three views the predecessor build left behind -----------------------------
+# Every arm below was measured against agent-cap 1.9 before being written. The two FAIL-OPEN groups
+# admitted at 1.9; the false-positive group denied.
+
+# -- TOOL-aPairedLexer-1: rule 3 was blind below an unterminated construct ------------------------
+# The isolation matters and is why these use a BOUNDED receiver: an unbounded one makes rule 2 deny
+# first and mask rule 3 entirely, which is how the first fixture for this defect proved nothing.
+
+js "rule3: an unresolvable cap below an unterminated backtick denies" 2 <<'EOF'
+const t = `an unterminated template literal
+const L = [{a:1},{a:2}]
+const K = args.width
+await boundedParallel(L.map((x) => () => agent(x)), K)
+EOF
+
+js "rule3: a cap of 500 below an unterminated backtick denies" 2 <<'EOF'
+const t = `an unterminated template literal
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), 500)
+EOF
+
+# The half the FIRST design of this unit did not reach: its signal was template-only while the view
+# it repaired carries `code | tmpl | block`.
+js "rule3: a cap of 500 below an unterminated BLOCK comment denies" 2 <<'EOF'
+const c = /* an unterminated block comment
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), 500)
+EOF
+
+# The REMOVING direction, pinned because this unit's first design claimed it could not happen. The
+# per-line view also feeds intConsts, so exposing a binding can RESOLVE a cap and drop a finding.
+js "rule3: an exposed const resolves the cap and the script admits" 0 <<'EOF'
+const t = `an unterminated template literal
+const K = 5
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), K)
+EOF
+
+# -- TOOL-aPairedLexer-2: rule 1 read PROSE as a call ---------------------------------------------
+
+js "rule1 prose: naming parallel( in a lens prompt admits" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `never write parallel(items.map(f)) here` },
+  { key: "c", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule1 prose: naming pipeline( in a lens prompt admits" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `and never pipeline(files, s1) either` },
+  { key: "c", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# THE FAIL-OPEN THIS UNIT'S FIRST DESIGN INTRODUCED, in the ban rule itself. renderCodeView models
+# no regex literal and no block comment, so one stray backtick in either blanks every later line —
+# and without the fallback a genuine raw primitive BELOW it was ADMITTED. Both are legal JavaScript.
+js "rule1: a raw primitive below a regex literal holding a backtick still denies" 2 <<'EOF'
+const tick = /[`]/
+const thunks = [one, two, three]
+const results = parallel(thunks)
+EOF
+
+js "rule1: a raw primitive below a block comment holding a backtick still denies" 2 <<'EOF'
+/* a backtick ` lives in this comment */
+const r = await parallel(thunks)
+EOF
+
+js "rule1: control, the same script with no backtick, denies" 2 <<'EOF'
+const tick = /[x]/
+const thunks = [one, two, three]
+const results = parallel(thunks)
+EOF
+
+# The retained CEILING, pinned as a ceiling rather than as a bug: a primitive named inside a block
+# comment still denies, because blanking block comments needs a strip TOOL-aLexedStripper-5 measured
+# as unsound and able to hide a real one.
+js "rule1: a primitive named in a block comment still denies (retained ceiling)" 2 <<'EOF'
+/* banned shape: parallel(x.map(y)) */
+const MAX_VERIFIERS = 5
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), MAX_VERIFIERS)
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

@@ -1223,6 +1223,70 @@ def test_identifier_tokens_corpus_recall():
     assert precision >= 0.95, f"corpus precision {precision:.3f} below the 0.95 floor"
 
 
+def test_render_comment_free():
+    """TOOL-aPairedLexer-3: comments blanked in ONE pass, strings TRACKED but not blanked, line
+    count preserved.
+
+    The defect this replaces stripped block comments and THEN line comments, so a bare block opener
+    inside a `//` comment opened a DOTALL span that swallowed every definition to the next closer —
+    14 of them across 9 files on the adopter corpus. Swapping the passes trades it for the mirror
+    defect, which is why this is one pass.
+
+    Both directions are here. The `absent` arms are what stop the fix degenerating into "strip
+    nothing", and the line-count arm is what stops it corrupting `symbols.json`, whose consumers
+    report `file:line`."""
+
+    def defs(text):
+        out = set()
+        for rx, _kind in m.JS_DEFINITION_RULES:
+            for mm in rx.finditer(text):
+                out.add(mm.group(1))
+        return out
+
+    cases = [
+        # (label, source, must be found, must NOT be found)
+        ("a block opener inside a line comment swallows nothing",
+         "function alpha() {}\n// banned: /* never write this\nfunction bravo() {}\n"
+         "function charlie() {}\nconst x = 1 */\n",
+         {"alpha", "bravo", "charlie"}, set()),
+        ("a definition inside a REAL block comment is not found",
+         "/* function ghost() {} */\nfunction real() {}\n",
+         {"real"}, {"ghost"}),
+        ("a // inside a string does not truncate its line",
+         'const u = "https://x.io/a"\nfunction after() {}\n',
+         {"after"}, set()),
+        ("a // inside a block comment does not break the closer",
+         "/* see http://x for why */\nfunction after() {}\n",
+         {"after"}, set()),
+        ("an unterminated block comment is abandoned, not swallowed",
+         "/* never closed\nfunction later() {}\n",
+         {"later"}, set()),
+        ("a backtick inside a regex literal blanks nothing",
+         "const re = /[`]/\nfunction after() {}\n",
+         {"after"}, set()),
+    ]
+    for label, src, present, absent in cases:
+        got = defs(m.render_comment_free(src))
+        assert not (present - got), f"{label}: lost {sorted(present - got)}"
+        assert not (absent & got), f"{label}: admitted {sorted(absent & got)}"
+
+    # LINE COUNT is the contract `symbols.json` depends on: the probe reports file:line.
+    for src in (
+        "a\nb\nc\n// x /* y\nd\n",
+        "/* one\ntwo\nthree */\nfour\n",
+        'const s = "a\\nb"\n// t\nfunction f() {}\n',
+    ):
+        assert m.render_comment_free(src).count("\n") == src.count("\n"), (
+            f"line count moved on {src!r}"
+        )
+
+    # The pass may only ever remove bytes that are INSIDE a comment. A definition can never be
+    # deleted, which is the property an earlier revision of this unit did not have.
+    src = 'const a = `t`\nconst b = "s"\nfunction keep() {}\n'
+    assert "keep" in defs(m.render_comment_free(src))
+    assert "`t`" in m.render_comment_free(src), "a string's contents must survive verbatim"
+
+
 def test_js_probe_against_the_lexicon():
     """CROSS-CHECK: over this repo's own `tools/**/*.js`, the map's definition set is a SUPERSET of
     the lexicon's independently-authored one.
@@ -1372,6 +1436,7 @@ def main() -> int:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
+    failures += check("render_comment_free: one pass, strings tracked not blanked", test_render_comment_free)
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

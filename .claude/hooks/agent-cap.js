@@ -49,10 +49,15 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.9' // gov:kit agent-cap@1.9 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.10' // gov:kit agent-cap@1.10 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
+
+// Case-sensitive: the primitives are lowercase `parallel`/`pipeline`; the helpers are
+// `boundedParallel`/`boundedPipeline` (capital P) so they never match. The lookbehind rejects
+// `.parallel(` / `xparallel(` member and identifier hits.
+const raw = /(?<![.\w$])(parallel|pipeline)\s*\(/
 
 function readStdin() {
   try {
@@ -72,17 +77,26 @@ function stripStrings(line) {
 }
 
 function offendingLines(script) {
-  // Case-sensitive: primitives are lowercase `parallel`/`pipeline`; the helpers
-  // are `boundedParallel`/`boundedPipeline` (capital P) so they never match.
-  // Lookbehind rejects `.parallel(` / `xparallel(` member/identifier hits.
-  const raw = /(?<![.\w$])(parallel|pipeline)\s*\(/
-  return script
-    .split(/\r?\n/)
+  // TOOL-aPairedLexer-2: the view is line-aligned, so PROSE naming a primitive inside a lens prompt
+  // is no longer read as a call — the last member of the class TOOL-aLexedStripper-2 removed from
+  // rule 2, in the rule next door.
+  //
+  // AND IT FALLS BACK, which rev-1 of that unit omitted and which was a measured FAIL-OPEN in this
+  // very ban: `renderCodeView` models no regex literal and no block comment, so one stray backtick
+  // in either blanks every later line and a genuine raw `parallel(` BELOW it was ADMITTED where the
+  // shipped hook DENIES. Both spellings are legal JavaScript. Seeing LESS is safe for a rule whose
+  // findings are permissions and dangerous for a rule whose findings are denials, and this is the
+  // second kind.
+  const lines = script.split(/\r?\n/)
+  const v = renderCodeView(script)
+  const code = v.unterminated
+    ? lines.map((l) => stripStrings(l).split('//')[0])
+    : v.code
+  return lines
     .map((line, i) => ({ line, n: i + 1 }))
-    .filter(({ line }) => {
+    .filter(({ line, n }) => {
       if (line.includes('gov:bounded-fanout')) return false // sanctioned helper line
-      const code = stripStrings(line).split('//')[0] // strings blanked, then line-comments
-      return raw.test(code)
+      return raw.test(code[n - 1] === undefined ? '' : code[n - 1])
     })
 }
 
@@ -633,7 +647,13 @@ function blankLiterals(script) {
     }
     out.push(res)
   }
-  return out
+  // TOOL-aPairedLexer-1: the machine reports the mode it FINISHED in, because a consumer repairing
+  // this view has to ask THIS view whether it ran off the end. Rule 3 previously took that signal
+  // from `renderCodeView`, which models no block comment since TOOL-aLexedStripper-5 deleted the
+  // branch — so an unterminated `/*` left the carry standing and a cap of 500 below one still
+  // ADMITTED with the repair applied. Measured. A signal read from a different view than the one
+  // being fixed reports on the wrong machine.
+  return { code: out, endMode: mode }
 }
 
 // Join forward from the `(` at code[i][col] until the parens BALANCE, and return the inside. The
@@ -678,7 +698,13 @@ function topLevelArgs(text) {
 
 function capFindings(script) {
   const lines = script.split(/\r?\n/)
-  const code = blankLiterals(script)
+  const _bl = blankLiterals(script)
+  // TOOL-aPairedLexer-1: when the machine ran off the end, judge the script on the per-line
+  // view instead. NOT because that view is strictly better — it is not, and rev-1 claimed so
+  // wrongly: it also feeds `intConsts`, where an EXPOSED `const K = 5` resolves a cap that was
+  // unresolvable and REMOVES a finding. What it is, is a view of a script this rule can
+  // actually read, in both directions, rather than a blank page.
+  const code = _bl.endMode === 'code' ? _bl.code : lines.map((l) => stripStrings(l).split('//')[0])
   const { consts, orBound } = intConsts(code)
   const bad = []
 
@@ -974,7 +1000,7 @@ function guardAgentSpawn(data) {
 // excludes this file from its own population - the ban table below would otherwise match itself.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  const code = blankLiterals(script)
+  const code = blankLiterals(script).code
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would
