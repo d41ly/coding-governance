@@ -278,6 +278,46 @@ function buildResolvedTarget(value, env) {
   return buildComparablePath(v)
 }
 
+/**
+ * The conventional top-level names at a drive root. A write that creates a NEW sibling of these is
+ * the litter class; a write UNDER one of them is somebody's ordinary working path and is none of
+ * this guard's business.
+ *
+ * Hand-listed on purpose, unlike the scratch roots above: this is a fact about how a filesystem is
+ * conventionally laid out, not about how THIS machine is configured, so there is nothing to derive
+ * it from at run time. A name missing from the list costs one denial with a message naming the fix.
+ */
+const DRIVE_ROOT_CONVENTIONAL = new Set([
+  'users', 'projects', 'windows', 'programdata', 'tmp', 'temp', 'perflogs', 'msys64', 'git',
+  'program files', 'program files (x86)', '$recycle.bin', 'system volume information', 'recovery',
+  'dev', 'proc', 'sys', 'etc', 'usr', 'var', 'opt', 'home', 'mnt', 'bin', 'sbin', 'lib', 'run',
+])
+
+/**
+ * Does this target CREATE A NEW TOP-LEVEL ENTRY AT A DRIVE ROOT? `c:/gvi`, not `c:/projects/x`.
+ *
+ * WHY THIS IS A SECOND RULE AND NOT A WIDER FIRST ONE. The rule above is scoped to the home
+ * directory because that is where the observed defect was. Everything outside home was therefore
+ * unguarded, and an agent building a throwaway adopter fixture wrote 7.2 MB to `C:\gvi` — outside
+ * the repo, outside the scratchpad, and outside this guard. It blocked a build for two hours.
+ *
+ * THE OBVIOUS WIDENING IS WRONG AND WAS MEASURED WRONG. "Deny any absolute write outside the repo,
+ * the scratch roots and home" hits 2,449 distinct targets across 128,568 real tool calls in this
+ * operator's history, almost all of them `/tmp/...` — a legitimate scratch root on every POSIX
+ * machine. That predicate would red constantly and be turned off within a day.
+ *
+ * The NARROW one hits 16 calls across 10 targets in that same corpus — `/c/t2`, `/c/gvi`, `/c/gvt`,
+ * `/c/gkt`, `/c/gk2`, `/c/gfclone`, `/c/temp-hyg.txt` — and every single one is agent throwaway.
+ * ZERO legitimate uses. That is the whole justification for the shape of this predicate: it was
+ * chosen by measuring two candidates against the real corpus, not by reasoning about which felt
+ * safer. `memory/gotchas/` has the class; the numbers are in this build's records.
+ */
+function checkDriveRootLitter(resolved) {
+  const m = /^([a-z]:)\/([^/]+)(\/.*)?$/.exec(resolved)
+  if (!m) return false
+  return !DRIVE_ROOT_CONVENTIONAL.has(m[2])
+}
+
 function checkCommand(cmd, env) {
   const homes = resolveHomeRoots(env)
   const allowed = resolveAllowedRoots(env)
@@ -285,10 +325,12 @@ function checkCommand(cmd, env) {
   const bad = []
   for (const t of scanWriteTargets(cmd)) {
     const resolved = buildResolvedTarget(t.value, env)
-    const isHome = symbolic.test(t.value) || homes.some((h) => checkUnderRoot(resolved, h))
-    if (!isHome) continue
     if (allowed.some((a) => checkUnderRoot(resolved, a))) continue
-    bad.push(t)
+    const isHome = symbolic.test(t.value) || homes.some((h) => checkUnderRoot(resolved, h))
+    // A drive-root target is never under home, so the two rules cannot both fire on one target and
+    // the `why` carried into the message stays unambiguous.
+    if (!isHome && !checkDriveRootLitter(resolved)) continue
+    bad.push(Object.assign({}, t, { kind: isHome ? 'home' : 'drive-root' }))
     if (bad.length >= MAX_FINDINGS) break
   }
   return { bad, allowed }
@@ -297,14 +339,28 @@ function checkCommand(cmd, env) {
 function renderDeny(bad, allowed) {
   const lines = bad.map((b) => `  ${b.why}: ${b.value}`).join('\n')
   const roots = allowed.length ? allowed.map((a) => `  ${a}`).join('\n') : '  (none resolved)'
+  // TWO RULES, TWO SENTENCES. One message covering both would have to say "home directory or drive
+  // root", which names neither accurately and leaves the reader working out which one they hit.
+  const anyDrive = bad.some((b) => b.kind === 'drive-root')
+  const anyHome = bad.some((b) => b.kind !== 'drive-root')
+  const what = anyHome && anyDrive
+    ? 'writes into the home directory AND creates a new top-level entry at a drive root'
+    : anyDrive
+      ? 'creates a NEW TOP-LEVEL entry at a drive root'
+      : 'writes into the home directory'
   return (
-    'BLOCKED by scratch-guard: this command writes into the home directory, outside every ' +
-    'sanctioned scratch root.\n\n' +
+    `BLOCKED by scratch-guard: this command ${what}, outside every sanctioned scratch root.\n\n` +
     lines +
     '\n\nScratch belongs in the session scratchpad or the temp root; durable gate evidence already ' +
     'goes to <git-dir>/gate-logs/. Writable roots resolved on this machine:\n' +
     roots +
-    '\n\nIf you need a log to outlive a backgrounded call, put it under one of those.\n'
+    '\n\nIf you need a log to outlive a backgrounded call, put it under one of those.' +
+    (anyDrive
+      ? '\n\nA throwaway repo or fixture goes in the scratchpad, never at `C:/<name>` — that litter ' +
+        'survives the session, is invisible to every gate, and nobody cleans it up. If the name you ' +
+        'used is a real conventional root on this machine, add it to DRIVE_ROOT_CONVENTIONAL.'
+      : '') +
+    '\n'
   )
 }
 

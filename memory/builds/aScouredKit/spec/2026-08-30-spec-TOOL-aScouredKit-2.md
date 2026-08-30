@@ -15,6 +15,9 @@
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-hardcoded.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-lens-prose.md) | research | — |
 | [2026-08-30-review-TOOL-aScouredKit-2-wave2-report.md](../reviews/2026-08-30-review-TOOL-aScouredKit-2-wave2-report.md) | research | — |
+| [2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-behaviour.md](../reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-behaviour.md) | research | — |
+| [2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-crossos.md](../reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-crossos.md) | research | — |
+| [2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-security.md](../reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-security.md) | research | — |
 
 <!-- /gen:spec-records -->
 

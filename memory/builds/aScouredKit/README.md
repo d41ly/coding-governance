@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34
+ids: TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34 TOOL-aScouredKit-35 TOOL-aScouredKit-36
 authorized-by: prompt
 ---
 
@@ -35,11 +35,10 @@ owner's prose is the mandate and is recorded verbatim under
 
 ## Build-level rules
 
-- **Classification (M2), written before acting**: units 1 and 2 are READY at Tier 1. Every unit this
-  build adds later is MISSING until its spec lands, and is specced at the tier its own risk earns.
-- The roster is PROVISIONAL by construction: the fix units cannot be named before the audit names
-  them. They arrive through `--rescope --act add`, and the branch is re-pushed after each roster
-  change so the authorization comparison holds.
+- **Classification (M2), written before acting**: units 1 and 2 were READY at Tier 1 and every later
+  unit MISSING until its spec landed. The roster was PROVISIONAL by construction — fix units cannot
+  be named before the audit names them — and the branch was re-pushed after each roster change so
+  the authorization comparison held.
 - **Already tracked is not a finding.** 199 open `memory/backlog/TOOL.md` rows and 8 `DEPL.md` rows
   are fed to both waves as `byDesign`. A wave may report one is still live or worse; it may not
   re-report one as new.
@@ -48,17 +47,12 @@ owner's prose is the mandate and is recorded verbatim under
   the GOAL; what stays out is any edit that changes what a rule DEMANDS. A trim that is not provably
   meaning-preserving is parked, never taken.
 
-- **Ids `-10`, `-16` through `-29`, `-33` and `-34` are NOT units and carry no spec.** They are the
-  findings this run reported rather than built, each a row in `memory/backlog/TOOL.md` with its own
-  measurement. They were recorded through `--rescope --act add` as the run found them, which was the
-  wrong verb for a backlog row; said here rather than rewritten out of an append-only record. The
-  roster region holds units only, which is what `--plan` and the DoD read.
-- **`-30`, `-31` and `-32` ARE units** — the three PROMOTED when the closing review's blocker count
-  went 4 → 3 → 4 and the loop stopped NON-CONVERGENT. Each has a spec and is CLOSED. An earlier
-  wording of the bullet above read `-16` through `-34` and so denied three of this build's own
-  units; the range was widened by hand when the note was re-homed into this slot, which is the
-  hazard of writing a range instead of deriving one. Both sets above are derivable: a non-unit has a
-  `memory/backlog/TOOL.md` row and no spec, a unit has a spec and no row, and no id has both.
+- **Not every id here is a unit, and the split is DERIVABLE rather than listed**: a unit has a spec
+  and no backlog row, a non-unit has a `memory/backlog/TOOL.md` row and no spec, and no id has both.
+  Non-units are findings this run reported rather than built, recorded through `--rescope --act add`
+  as it found them — the wrong verb for a backlog row, said here rather than rewritten out of an
+  append-only record. An earlier wording listed the split as a RANGE and so denied three of this
+  build's own promoted units; deriving it is why that cannot recur.
 
 ## Parked decisions
 
@@ -82,14 +76,19 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 12 | `TOOL-aScouredKit-13` | CLOSED | plan and apply honour the target's own declared kit list |
 | 13 | `TOOL-aScouredKit-14` | CLOSED | three prose defects in the load-bearing documents |
 | 14 | `TOOL-aScouredKit-15` | CLOSED | the drift-audit Skill stops pointing at a directory govkit never creates |
+| 15 | `TOOL-aScouredKit-30` | CLOSED | one derivation everywhere, and the dead pointer REPORTED |
+| 16 | `TOOL-aScouredKit-31` | CLOSED | the container guard reaches every caller, and two arms stop lying |
+| 17 | `TOOL-aScouredKit-32` | CLOSED | an unresolvable probe answers for itself, not for its siblings |
+| 18 | `TOOL-aScouredKit-35` | CLOSED | scratch-guard covers the drive root, not only the home directory |
+| 19 | `TOOL-aScouredKit-36` | CLOSED | a lens carries a budget and writes its file FIRST |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 17 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
+**Build status:** CLOSED · 19 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
 ids TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-10 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-13 TOOL-aScouredKit-14 TOOL-aScouredKit-15
 ids TOOL-aScouredKit-16 TOOL-aScouredKit-17 TOOL-aScouredKit-18 TOOL-aScouredKit-19 TOOL-aScouredKit-20 TOOL-aScouredKit-21 TOOL-aScouredKit-22 TOOL-aScouredKit-23 TOOL-aScouredKit-24 TOOL-aScouredKit-25 TOOL-aScouredKit-26 TOOL-aScouredKit-27 TOOL-aScouredKit-28 TOOL-aScouredKit-29
-ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34
+ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit-33 TOOL-aScouredKit-34 TOOL-aScouredKit-35 TOOL-aScouredKit-36
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -105,6 +104,8 @@ ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit
 | [TOOL-aScouredKit-30 — one derivation everywhere, and the dead pointer REPORTED](spec/2026-08-30-spec-TOOL-aScouredKit-30.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-31 — the container guard reaches every caller, and two arms stop lying](spec/2026-08-30-spec-TOOL-aScouredKit-31.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-32 — an unresolvable probe answers for itself, not for its siblings](spec/2026-08-30-spec-TOOL-aScouredKit-32.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-35 — scratch-guard covers the drive root, not only the home directory](spec/2026-08-31-spec-TOOL-aScouredKit-35.md) | — | 1 | CLOSED | rev-1 | 2026-08-31 |
+| [TOOL-aScouredKit-36 — a lens carries a budget and writes its file FIRST](spec/2026-08-31-spec-TOOL-aScouredKit-36.md) | — | 1 | CLOSED | rev-1 | 2026-08-31 |
 | [TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender](spec/2026-08-30-spec-TOOL-aScouredKit-4.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-5 — drift-audit's conf parser matches the source its docstring claims to copy](spec/2026-08-30-spec-TOOL-aScouredKit-5.md) | — | 1 | CLOSED | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | CLOSED | rev-3 | 2026-08-30 |
@@ -113,11 +114,11 @@ ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 3 record folder(s).
+Records: 25 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aScouredKit-35 TOOL-aScouredKit-36.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aScouredKit-35 TOOL-aScouredKit-36.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

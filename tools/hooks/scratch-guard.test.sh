@@ -93,10 +93,23 @@ run "touch -> deny"                               2 'touch ~/.a'
 run "mkdir -> deny"                               2 'mkdir -p ~/.gov-push'
 run "  near-miss: mkdir in repo -> allow"         0 'mkdir -p memory/builds/x'
 run "cp destination -> deny"                      2 'cp memory/x.md ~/.backup.md'
-run "cp home-rooted SOURCE -> allow"              0 'cp ~/.merge-bar.log /c/scratch/inv/'
+run "cp home-rooted SOURCE -> allow"              0 'cp ~/.merge-bar.log /tmp/inv/'
 run "mv destination -> deny"                      2 'mv memory/x.md ~/.backup.md'
-run "mv home-rooted SOURCE -> allow"              0 'mv ~/.merge-bar.log /c/scratch/inv/'
+run "mv home-rooted SOURCE -> allow"              0 'mv ~/.merge-bar.log /tmp/inv/'
 run "rsync destination -> deny"                   2 'rsync -a memory/ ~/.mirror/'
+
+# ---- the DRIVE-ROOT rule. The home rule above was scoped to home, so everything outside it was
+# ---- unguarded: an agent fixture wrote 7.2 MB to C:/gvi, outside repo, scratchpad and guard.
+# ---- Measured over 128,568 real tool calls: this predicate hits 16, all of them agent litter,
+# ---- while the obvious wider one hits 2,449 and is almost all legitimate /tmp use.
+run "drive-root mkdir -> deny"                    2 'mkdir -p /c/gvi'
+run "drive-root redirect -> deny"                 2 'echo x > /c/temp-hyg.txt'
+run "drive-root windows spelling -> deny"         2 'mkdir C:/gvi'
+run "drive-root cp DESTINATION -> deny"           2 'cp memory/x.md /c/scratch/inv/'
+run "  near-miss: /tmp is a real root -> allow"   0 'echo x > /tmp/hyg.txt'
+run "  near-miss: under a project -> allow"       0 'echo x > /c/projects/incms/f.txt'
+run "  near-miss: windows dir -> allow"           0 'echo x > /c/Windows/Temp/f.txt'
+run "  near-miss: /dev/null -> allow"             0 'echo hi > /dev/null'
 run "TMPDIR= to home -> deny"                     2 'export TMPDIR=~/.gov-push'
 run "TMP= to home -> deny"                        2 'TMP=~/.scratch bash x.sh'
 run "  near-miss: TMPDIR= to TEMP -> allow"       0 'export TMPDIR=C:/Users/FIXTUR~1/AppData/Local/Temp/gatetmp'
