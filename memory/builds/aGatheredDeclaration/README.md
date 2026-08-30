@@ -83,9 +83,9 @@ ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclar
 | [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7.
+Ids no record names: TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7.
 
 Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7.
 <!-- /gen:build-index -->

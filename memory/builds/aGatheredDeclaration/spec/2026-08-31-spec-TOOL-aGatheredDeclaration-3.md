@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-6 |
 
 <!-- /gen:spec-records -->
 
