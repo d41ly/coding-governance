@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 117de044094bc7ac729358edfc24541ba3a1486a
-phase: RESEARCHING
+witness: 4433483b967f1a4ff09c346d89efdb4895af6304
+phase: SPECCING
 branch-sha: 117de044094bc7ac729358edfc24541ba3a1486a
 branch-ref: refs/heads/branch/unattended-builds-blocking-640d0d
 mode: prompt

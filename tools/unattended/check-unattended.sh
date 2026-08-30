@@ -1171,7 +1171,7 @@ for c7f in $live; do
 done
 [ -z "$c7drop" ] || live="$c7keep"
 [ -z "$c7drop" ] || nlive="$c7n"
-[ "$nlive" -le 1 ] || echo "PROBE-check7-would-fail: " "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it:$live"
+[ "$nlive" -le 1 ] || fail 7 "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it:$live"
 
 # ---- 10: the kit ships what this repo runs. ONE pair. The comparison is written here rather than
 # ---- borrowed from the memory-tree harness because each kit is copy-installed standalone and an
