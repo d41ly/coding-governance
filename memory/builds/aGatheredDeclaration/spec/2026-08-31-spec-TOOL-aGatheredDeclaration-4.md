@@ -1,10 +1,12 @@
 # TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 
@@ -38,8 +40,10 @@ and killed legs have cost this fleet reds and re-runs that produced no evidence 
   value, and every one of them keeps its comment.
 - Changing what a fired ceiling DOES. It still produces `GATE FAIL <leg> (timed out after Ns)` —
   never a skip, never a green. That rule is correct and is not touched.
-- The turnstile's TTL, which is derived from the profile row's `timeout=` and not from a leg
-  ceiling. `TOOL-aGatheredDeclaration-5` owns the turnstile.
+- The turnstile's TTL, which is `[bar].turnstile_ttl` and not a leg ceiling.
+  `TOOL-aGatheredDeclaration-5` owns the turnstile. **rev-1 said this TTL was derived from the
+  profile row's `timeout=`, which `TOOL-aGatheredDeclaration-2` removes** — a sibling
+  contradiction on the interface axis, corrected here rather than left for the code to arbitrate.
 - Auditing the 86 declared ceiling values. With enforcement off they cost nothing; re-deriving them
   is a follow-up worth doing from `<git-dir>/gate-ledger.tsv` once the bar is cheap to shard.
 
@@ -81,7 +85,13 @@ ahead of any request for it.
 
 `tools/run-gates/run-gates.sh` · `tools/gate-legs.toml` · `.unattended.conf` ·
 `tools/unattended/unattended.sh` (the `GATE_BOUND` read) · `.githooks/pre-push` (S5) ·
+`tools/run-gates/kit.toml` (the `[gate_runner_seed]` block, for S7) ·
+`tools/run-gates/adopt-run-gates.sh` and `tools/run-gates/adopt-run-gates.test.sh` (S7) ·
 `tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md`.
+
+**S7 writes the seed through `[gate_runner_seed]`, the same path `TOOL-aGatheredDeclaration-5`
+S3 uses.** Two units writing two `[bar]` keys through two paths is how they diverge, and rev-1
+named no path at all.
 
 ### Alternatives rejected
 
@@ -113,10 +123,16 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When neither `GATE_CEILINGS` nor `[bar].enforce_ceilings` is set, a leg that sleeps past
-  its declared ceiling COMPLETES and its row is a pass, asserted in
-  `tools/run-gates/run-gates.test.sh` with a scratch leg whose ceiling is 1 s and whose sleep is
-  longer, graded on elapsed time against an untimed control rather than on a literal.
+- **AC1** — When `[bar].enforce_ceilings` is `false` — the SHIPPED state, not an absent key — and
+  `GATE_CEILINGS` is unset, a leg that sleeps past its declared ceiling COMPLETES and its row is a
+  pass, asserted in `tools/run-gates/run-gates.test.sh` with a scratch leg whose ceiling is 1 s and
+  whose sleep is longer, graded on elapsed time against an untimed control rather than on a
+  literal.
+- **AC1b** — When `[bar].enforce_ceilings` is `true` and `GATE_CEILINGS` is UNSET, that same leg is
+  KILLED and `bash tools/run-gates/run-gates.sh --manifest` reports enforcement on with source
+  `declaration`. This is the middle row of the resolution table and the key this unit exists to
+  add; without it an implementation that reads only `GATE_CEILINGS` and hardcodes the default off
+  passes every other criterion and leaves the declaration decorative. Observed RED first.
 - **AC2** — When `GATE_CEILINGS=1`, that same leg is killed and its row is
   `GATE FAIL <leg> (timed out after Ns)`, never a skip and never a pass.
 - **AC3** — When enforcement is OFF, a banner naming the state appears on stderr before the first
@@ -133,6 +149,13 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
   the unattended kit's own suite.
 - **AC8** — When `bash tools/run-gates/run-gates.sh --manifest` runs with enforcement off, every
   leg's ceiling column reads `declared, not enforced`, asserted by grepping the output.
+- **AC9** — When `bash tools/run-gates/adopt-run-gates.sh --check` runs against a freshly seeded
+  target, the seeded `[bar]` table carries `enforce_ceilings = false`, asserted in
+  `tools/run-gates/adopt-run-gates.test.sh`. Mirrors `TOOL-aGatheredDeclaration-5` AC5, which is
+  the arm rev-1's S7 lacked.
+- **AC10** — When a run finishes, its run record carries `enforce_ceilings` and the source that
+  decided it, asserted by reading `<git-dir>/gate-run/<run-id>/header` in
+  `tools/run-gates/run-gates.test.sh` rather than the stream. S4 had no criterion at rev-1.
 
 ## 7. Gates
 
@@ -154,6 +177,11 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-2 · 2026-08-31 · folded round-1 spec audit findings F12, F16, F17 and F26. The acceptance
+  set reached two of the resolution table's three rows and never exercised the declared value
+  itself, so AC1b was added and AC1 was reworded to the shipped state. S7's adopter seed gained a
+  file, a path and AC9. The run-record key gained AC10. Section 3 stopped naming a knob
+  `TOOL-aGatheredDeclaration-2` removes.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +26,9 @@ a flag day for two live repositories, and the prompt asks for the tool explicitl
 - **S3** — FIELD MAPPING, per `TOOL-aGatheredDeclaration-1` §S4: `subject = "kit"` and
   `optIn: true` both become `opt_in = true`; `phase` becomes `lane`; `scope` is carried as a comment
   rather than translated, because its enum is inCMS's and does not travel; `cwd`, `tool`, `ceiling`,
-  `guard`, `chunk` and `impure` map by name.
+  `guard`, `chunk` and `impure` map by name; `full_only` maps by name too, which rev-1 omitted
+  while citing the ruling that retains it. The table is the SOURCE: a key absent from it is
+  UNRULED and refuses, a key ruled DROP is reported and its leg still emitted.
 - **S4** — PROSE PRESERVATION: `_doc` becomes the file's header comment and `ceiling_over_policy`'s
   entries become comments above the legs they justify. A migration that drops the reasoning is the
   problem this build exists to fix, performed by the tool meant to fix it.
@@ -39,6 +43,15 @@ a flag day for two live repositories, and the prompt asks for the tool explicitl
   `--force`.
 - **S8** — the e2e arms in `tools/run-gates/adopt-run-gates.test.sh`, driving both dialects from
   fixtures derived from the two real manifests.
+- **S9** — the INTERPRETER PROBE, run BEFORE anything is written: the target's resolved python is
+  asked to import `tomllib`, and a failure refuses with exit 2 naming the interpreter and its
+  version unless `--force`. Without it `--upgrade` converts a working merge bar into a dead one,
+  because `TOOL-aGatheredDeclaration-2` S3 makes the TOML win wherever it exists. It is a SHARED
+  preflight every write verb calls, not a probe bolted to this one — a per-verb probe is a probe
+  the next verb forgets.
+- **S10** — the emitted file carries the `[[lane]]` rows its mapped `lane` values name. A `phase`
+  mapped to a lane no row declares is a manifest `TOOL-aGatheredDeclaration-2` AC9 refuses, so
+  emitting the legs alone would write a file the runner rejects.
 
 ## 3. Non-goals (OUT)
 
@@ -116,8 +129,25 @@ report the owner acts on.
 - **AC3** — When the source carries `_doc` or `ceiling_over_policy`, the emitted file carries that
   prose as COMMENTS and no prose is lost, asserted by grepping the output for a sentinel phrase
   planted in the fixture.
-- **AC4** — When a leg carries a key the mapping table does not cover, the verb exits 2 naming the
-  key and the leg, asserted in `tools/run-gates/adopt-run-gates.test.sh` and observed RED first.
+- **AC4** — When a leg carries an UNRULED key — one absent from S3's mapping table — the verb
+  exits 2 naming the key and the leg, asserted in `tools/run-gates/adopt-run-gates.test.sh` and
+  observed RED first.
+- **AC4b** — When a leg carries a key ruled DROP, the leg is still emitted and the report names
+  the dropped key, asserted on the same fixture. **AC2 and AC4 were in direct contradiction at
+  rev-1**: `full_only` sits on four real inCMS rows and was unmapped, so an honestly derived
+  dialect-B fixture could not satisfy both, and the only way to green them was a fixture with the
+  key stripped — the fixture-passes-by-finding-nothing class this spec names in its own
+  Section 10.
+- **AC4c** — When S3's mapping table is compared against the union of keys in both fixtures, the
+  table is a SUPERSET, computed from the fixtures rather than typed, asserted in
+  `tools/run-gates/adopt-run-gates.test.sh`. That arm fails the moment a real manifest carries a key
+  nobody ruled on.
+- **AC4d** — When `--upgrade` runs against a fixture target whose resolved python cannot import
+  `tomllib`, it writes NOTHING and exits 2 naming the interpreter and its version, asserted in
+  `tools/run-gates/adopt-run-gates.test.sh` by a `git status --porcelain` that stays empty.
+  Observed RED first.
+- **AC4e** — When the emitted TOML declares a leg in lane `<x>`, it also declares a `[[lane]]` row
+  named `<x>`, asserted by parsing the output and comparing the two sets.
 - **AC5** — When `gate-legs.toml` already exists, the verb exits 2 and writes nothing; with
   `--force` it overwrites, asserted by the file's mtime and content in both arms.
 - **AC6** — When `--dry-run` is passed, nothing is written under the target and the TOML appears on
@@ -151,6 +181,11 @@ the arms join `adopt-run-gates.test.sh`, which is already a leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-2 · 2026-08-31 · folded round-1 spec audit findings F5, F21 and F29. `full_only` was
+  unmapped while the spec cited the ruling that retains it, which put AC2 and AC4 in direct
+  contradiction on any honest fixture. The interpreter probe carries this build's own R10, which
+  the spec did not hold. Lane emission was added because a mapped `phase` with no `[[lane]]` row
+  writes a file the runner refuses.
 
 ## 10. Reuse audit
 

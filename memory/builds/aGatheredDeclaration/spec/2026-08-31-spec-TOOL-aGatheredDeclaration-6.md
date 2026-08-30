@@ -1,12 +1,13 @@
 # TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 
@@ -18,8 +19,20 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/govkit/govkit.py`: the emitter writes `gate-legs.toml` and the selfcheck joins
-  `[[gate_leg]]` descriptor rows against it. The `[gate_runner_seed]` block gains the new file name.
+- **S1** — `tools/govkit/govkit.py`, and it is THREE changes rather than a filename. (a) A
+  `toml-legs` member joins the grammar enum, which `govkit.py:2947` refuses by name today with
+  `only 'json-array' is implemented` — a correct fail-closed refusal that this unit must answer
+  rather than route around. (b) The writer becomes a TEXTUAL SPLICE between marker comments
+  rather than a parse-and-reserialise, because Python ships no comment-preserving TOML writer and
+  a reserialise would delete every argument this build exists to make storable. (c) The
+  `[gate_runner_seed]` block gains the new file name.
+- **S1b** — the SUBJECT RATCHET moves with the key it pins. `govkit.py:1354` resolves each leg's
+  subject against `tools/govkit/subject-pins.tsv`, defaulting to `repo`. Once `subject` is gone,
+  all 40 kit legs resolve to that default and `govkit selfcheck` — `chunk = declarations`,
+  `subject = repo`, no guard, so on every bar — reds once per leg. Clearing it with
+  `selfcheck --write` is worse than the failure: the ratchet whose purpose is that a subject
+  cannot move without appearing in a diff would record the ENTIRE population moving, as a
+  generated file. The pin file pins `opt_in` and moves in the same commit.
 - **S2** — `.githooks/pre-push`: reads the TOML for its manifest-moved test and its blob compare.
   This is also where `TOOL-aBoundedCeiling-7` is fixed — the hook hardcodes `tools/gate-legs.json`
   and `tools/run-gates/gate-fingerprint.sh` while the install prefix is configurable, so a target at
@@ -32,9 +45,19 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 - **S6** — the carriers that NAME the entry point to a session: `AGENTS.md`'s merge-bar section,
   `coding-governance-agents.template.md`, and whatever `tools/playbook/` renders from them. The
   command block gains the sharding verbs and drops nothing.
-- **S7** — `tools/gate-legs.json` is deleted, and unit 2's dual-format branch keeps its JSON arm for
-  adopters while gov itself carries no JSON. The deprecation line becomes the only thing pointing at
-  it.
+- **S7** — the LEGACY PAIR is deleted: `tools/gate-legs.json` AND
+  `tools/run-gates/gate-profiles.txt`. Unit 2's dual-format arm keeps reading the pair in an
+  adopter or below the interpreter floor; gov itself carries neither. Retiring the profile table
+  is four further edits nobody owned at rev-1: its `[[lf_pin]]` at `tools/run-gates/kit.toml:146`,
+  the `GATE_PROFILES` override the table's header calls the documented rollback for the whole
+  mechanism, `run-gates.test.sh:1241-1242` which REDS if the kit README stops naming the file, and
+  `run-gates.gov.test.sh:234-235` which reds if the charter does.
+- **S7b** — the two canaries' GUARD LISTS name `tools/gate-legs.json` and move to the TOML in the
+  same commit. `run-gates.test.sh:268-283` fails on a guard pathspec matching no tracked path, so
+  leaving them is a leg that skips forever.
+- **S9** — `tools/check-testsuite-counts.sh` and the three other carriers in the inventory above
+  move. The checker's population selector reads the manifest BYTES with a regex over quoted
+  `.test.sh` strings, which needs restating for TOML rather than repointing.
 - **S8** — the `run-gates` map dossier at `memory/map/features/run-gates.md` is refreshed: its
   `[paths]` globs and its `[claims]` gain the new file, which the map's coverage gate requires in
   the same commit as the claim edit.
@@ -60,6 +83,15 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 | `drift_signals.py` (+ template) | dead-path signal over leg argv | S3 |
 | `map_extractors.py` | the `gate-legs` inventory | S4 |
 | `run-unattended-gates.sh` | its own dispatch | S5, folded away |
+| `check-testsuite-counts.sh` | its POPULATION, selected by grepping the manifest BYTES | S9 |
+| `check-memory-hygiene.sh`, `template-size-limits.txt`, `drift-audit-state.js` | each names the file | S9 |
+
+**The inventory at rev-1 was certified by a grep nobody re-ran, and the grep refutes it.**
+`tools/check-testsuite-counts.sh:27` hardcodes `MANIFEST=tools/gate-legs.json` and `:32` HARD
+EXITS 2 when it is absent, with the message that the population would otherwise be empty and the
+leg would pass by finding nothing. Its manifest row is `chunk = declarations`, `subject = repo`,
+no guard — so it runs on EVERY bar, including a records-only one, and S7's deletion reds the
+default bar at this unit's own landing.
 
 ### Migration
 
@@ -77,9 +109,11 @@ into the declaration as `opt_in = true` rows carrying the 2026-08-23 owner rulin
 
 `tools/govkit/govkit.py` · `tools/govkit/registry.toml` · `.githooks/pre-push` ·
 `.githooks/pre-push.test.sh` · `tools/drift-audit/drift_signals.py` + `.template.py` ·
-`tools/codebase-map/map_extractors.py` · `tools/unattended/run-unattended-gates.sh` · `AGENTS.md` ·
+`tools/codebase-map/map_extractors.py` · `tools/unattended/run-unattended-gates.sh` ·
+`tools/check-testsuite-counts.sh` · `tools/govkit/subject-pins.tsv` · `tools/run-gates/kit.toml` ·
+`tools/gate-legs.toml` (the guard lists) · `AGENTS.md` ·
 `coding-governance-agents.template.md` · `memory/map/features/run-gates.md` · `tools/gate-legs.json`
-(deleted) · the affected suites.
+and `tools/run-gates/gate-profiles.txt` (both deleted) · the affected suites.
 
 ### Alternatives rejected
 
@@ -122,8 +156,17 @@ branch exists precisely so this can be a second landing.
   grepping for the runner's report tail rather than for a message this script prints.
 - **AC6** — When `bash tools/check-dead-paths.sh` runs after S7, no carrier names
   `tools/gate-legs.json`, asserted by the leg's own green.
-- **AC7** — When `bash tools/run-gates/run-gates.sh` runs on this tree with no JSON present, it is
-  GREEN and its leg count is unchanged.
+- **AC7** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on this tree with the
+  legacy pair deleted, it is GREEN and its leg count is unchanged. **The selftests flag is load
+  bearing**: both canaries are `chunk = selftests`, so a DEFAULT bar holds them and rev-1's AC7
+  would have passed green over two guard pathspecs pointing at a deleted file — the exact shape
+  the criterion was written to catch.
+- **AC9** — When `bash tools/check-testsuite-counts.sh` runs after S9, it derives the same
+  population from the TOML that it derived from the JSON, asserted by running both at the commit
+  where both files exist. Observed RED first against the unmoved checker.
+- **AC10** — When a leg's `opt_in` value is flipped against an unchanged
+  `tools/govkit/subject-pins.tsv`, `python tools/govkit/govkit.py selfcheck` REDS naming that leg.
+  Observed RED first, and asserted without `--write` anywhere in the arm.
 - **AC8** — When `python tools/codebase-map/check_map.py` runs, the `run-gates` dossier claims the
   new file and no unclaimed key remains, asserted by the map coverage leg.
 
@@ -131,7 +174,9 @@ branch exists precisely so this can be a second landing.
 
 `run-gates canary` · `run-gates gov canary` · `govkit selfcheck` · `pre-push hook selftest` ·
 `drift-audit selftest` · `codebase-map coverage` · `dead paths` · `unattended kit gate` ·
-`check-wiring`. No new leg.
+`check-wiring` · `testsuite counts` · `template size <=48KiB` · `charter size`. The last two are
+here because S6 edits `coding-governance-agents.template.md` and `AGENTS.md`, both size-gated,
+and rev-1 listed neither. No new leg.
 
 ## 8. Open questions
 
@@ -147,6 +192,11 @@ branch exists precisely so this can be a second landing.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-2 · 2026-08-31 · folded round-1 spec audit findings F1, F2, F7, F20, F27 and F28. The
+  reader inventory was incomplete in the one direction that reds the default bar, and the grep
+  rev-1's Section 10 cited as its evidence is what found the gap. The subject ratchet, the
+  profile table's retirement, the two canary guard lists, the govkit grammar enum and two size
+  gates each gained an owner.
 
 ## 10. Reuse audit
 

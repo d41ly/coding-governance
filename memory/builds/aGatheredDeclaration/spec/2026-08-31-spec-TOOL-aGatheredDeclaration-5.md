@@ -1,10 +1,12 @@
 # TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 
@@ -19,8 +21,11 @@ declaration. It is the mechanism that put a `push-main.sh` landing behind three 
 
 - **S1** — `[bar].turnstile`, declared in `gate-legs.toml`, shipping `false`.
 - **S2** — `GATE_TURNSTILE` keeps its current meaning as the per-machine override and now takes the
-  declared value in its absence. `run-gates.sh:420` reads `${GATE_TURNSTILE:-1}` today; the `1`
-  becomes the declared value.
+  declared value in its absence. **The declared value reaches the guard MARSHALLED to the byte `0`
+  or `1`**, per `TOOL-aGatheredDeclaration-2`'s loader rule, never as a TOML word. Both guards
+  (`run-gates.sh:420` and `:726`) compare a string against `0`, so substituting a TOML `false`
+  verbatim compares the word `false` against `0`, which is TRUE, and ships the mechanism ENABLED —
+  the exact inversion of this unit's goal, arriving with the declaration visibly wired.
 - **S3** — the adopter seed declares `turnstile = false`, so arriving at a target never enables it.
 - **S4** — the `queued_from` vocabulary keeps its `off` member, which already records a DASH rather
   than a zero for a probe that never ran. Shipping disabled makes `off` the ordinary state rather
@@ -99,9 +104,18 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
 
 ## 6. Acceptance criteria
 
-- **AC1** — When neither `GATE_TURNSTILE` nor `[bar].turnstile` is set, no beacon directory is
-  created under the git common dir and no ticket is written, asserted in
-  `tools/run-gates/run-gates.turnstile.test.sh` by the absence of both paths after a scratch run.
+- **AC1** — When `[bar].turnstile` is `false` — the SHIPPED state, not an absent key — and
+  `GATE_TURNSTILE` is unset, no beacon directory is created under the git common dir and no ticket
+  is written, asserted in `tools/run-gates/run-gates.turnstile.test.sh` by the absence of both
+  paths after a scratch run.
+- **AC1b** — When `[bar].turnstile` is `true` and `GATE_TURNSTILE` is UNSET, a beacon AND a ticket
+  ARE created and a second concurrent bar queues, asserted in
+  `tools/run-gates/run-gates.turnstile.test.sh`. This is the middle row of the resolution table:
+  without it, a runner that ignores the declaration entirely and flips the `run-gates.sh:420`
+  literal to `0` satisfies every other criterion. Observed RED first.
+- **AC1c** — When the loader reads `[bar].turnstile`, the value reaching the guard is exactly the
+  byte `0` or `1`, byte-compared, so a declared `false` can never present as a truthy word.
+  Observed RED first.
 - **AC2** — When the turnstile is off and a beacon is PLANTED by hand, a run does not queue behind
   it and does not delete it, asserted in `tools/run-gates/run-gates.turnstile.test.sh` — the planted beacon survives, which is what
   distinguishes "disabled" from "reaped everything".
@@ -134,6 +148,11 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-2 · 2026-08-31 · folded round-1 spec audit findings F18 and F19. rev-1's S2 prescribed
+  substituting the declared value into a `!= 0` string test, which would have shipped the
+  turnstile ENABLED on a declared `false` while every criterion stayed green — the inversion is
+  now closed by marshalling and by AC1c. AC1b was added because no criterion proved the
+  declaration enabled anything, which is the same could-not-fail shape this unit's own F1 names.
 
 ## 10. Reuse audit
 

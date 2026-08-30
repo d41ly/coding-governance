@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-1-adopter-review.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-1-adopter-review.md) | research | — |
 | [2026-08-31-prompt-TOOL-aGatheredDeclaration-1.md](../prompts/2026-08-31-prompt-TOOL-aGatheredDeclaration-1.md) | research | — |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 

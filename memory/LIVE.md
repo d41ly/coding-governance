@@ -10,7 +10,7 @@ terminal status. Nothing here is edited by hand.
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
-| [aGatheredDeclaration](builds/aGatheredDeclaration/README.md) | INPROGRESS | a | 2026-08-31 | tooling | 7 |
+| [aGatheredDeclaration](builds/aGatheredDeclaration/README.md) | INPROGRESS | a | 2026-08-31 | tooling | 8 |
 | [aGradedDoorway](builds/aGradedDoorway/README.md) | INPROGRESS | a | 2026-08-28 | tooling | 10 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 |

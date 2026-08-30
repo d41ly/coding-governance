@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7
+ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8
 authorized-by: prompt
 ---
 
@@ -51,7 +51,10 @@ prompt record holds the measurements.
   migrating each one is that repo's own build, on its own bar (owner ruling, 2026-08-31).
 
 ## Parked decisions
-None yet.
+None. One AMENDMENT, recorded in `RUN.md`: the round-1 spec audit returned BLOCKED with five
+blockers, and finding F9 showed unit 2 was carrying a dispatcher rewrite it had priced as a format
+change. Lanes and the tool probe became `TOOL-aGatheredDeclaration-8` rather than being built
+inside a migration whose whole claim is behaviour-neutrality.
 
 <!-- roster:units -->
 
@@ -64,30 +67,32 @@ None yet.
 | 5 | `TOOL-aGatheredDeclaration-5` | 2 | the turnstile beacon ships disabled, enabled by a declared variable |
 | 6 | `TOOL-aGatheredDeclaration-6` | 2 | the readers move: govkit emitter, pre-push, drift-audit, codebase-map, and the carriers that name the entry point to a session |
 | 7 | `TOOL-aGatheredDeclaration-7` | 2 | the upgrader: migrate any adopter's manifest and its tests onto the declaration |
+| 8 | `TOOL-aGatheredDeclaration-8` | 2 | lanes, the tool probe, and the dispatcher they need — split out of unit 2 at the round-1 audit fold |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7
+**Build status:** INPROGRESS · 8 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7.
+Ids no record names: TOOL-aGatheredDeclaration-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7.
+Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -101,6 +106,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGatheredDeclaration-1 TOOL-aGat
 | 5 | `TOOL-aGatheredDeclaration-5` | no |
 | 6 | `TOOL-aGatheredDeclaration-6` | no |
 | 7 | `TOOL-aGatheredDeclaration-7` | no |
+| 8 | `TOOL-aGatheredDeclaration-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

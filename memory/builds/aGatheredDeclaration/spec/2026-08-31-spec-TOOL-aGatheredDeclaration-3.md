@@ -1,12 +1,13 @@
 # TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-6 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 
@@ -35,6 +36,13 @@ declare" except by reading a JSON file.
   `scripts/gate.sh:735-786`; it closes `TOOL-aGradedDoorway-9` in this repo's backlog.
 - **S7** — a sharded run NEVER stamps `gate-full-green`, and says so on the line that would have
   stamped it.
+- **S8** — the QUERY VERBS are read-only and say so structurally: `--list` and `--manifest` load
+  the manifest early, NEVER acquire the turnstile, and write only their payload to stdout. The
+  profile line and any queue line go to stderr for these verbs.
+- **S9** — `--manifest` joins each declared ceiling against `<git-dir>/gate-ledger.tsv` and prints
+  the measured seconds and the ratio, flagging any leg whose ceiling is under 3x its measurement.
+  It REPORTS and never reds. This is the surviving half of `TOOL-aCollapsedScan-5` and it is what
+  stops the declarations rotting once `TOOL-aGatheredDeclaration-4` turns enforcement off.
 
 ## 3. Non-goals (OUT)
 
@@ -52,6 +60,13 @@ declare" except by reading a JSON file.
 ## 4. Design
 
 ### Data model
+
+**Ordering is an INTERFACE property, not an implementation detail.** `PROF_LINE` is echoed to
+STDOUT at `run-gates.sh:405`, the turnstile acquires at `:420` with a bounded wait four times the
+TTL, and the manifest is not loaded until `:846`. A query verb that ran in place would therefore
+queue behind a running bar for up to two hours to answer a read-only question, and its stdout
+would carry the profile line. So the verbs load the manifest early and exit before the turnstile
+is touched, and everything that is not their payload goes to stderr.
 
 Argument parsing sits above every existing env read, so nothing already declared changes meaning.
 `--leg` accumulates into a bash array; the selection loop that today evaluates `changed()` and the
@@ -110,8 +125,12 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 - **AC1** — When `bash tools/run-gates/run-gates.sh --leg "<name>"` names one leg, exactly that leg
   dispatches and the summary names one leg, asserted in `tools/run-gates/run-gates.test.sh` by a
   scratch manifest whose other legs write marker files that must be absent.
-- **AC2** — When `--leg` is passed twice, both legs run and they run in MANIFEST order rather than
-  argument order, asserted by the marker files' mtime ordering in a scratch repo.
+- **AC2** — When `--leg` is passed twice, both legs run and their `GATE ok` rows are REPORTED in
+  manifest order rather than argument order, asserted in `tools/run-gates/run-gates.test.sh` by
+  reading the captured report rows. **Not execution order**: `run-gates.sh:16-17` states that
+  execution order is a scheduling detail and `:842-844` dispatches longest-first from the timing
+  cache, so a marker-file mtime assertion would be a race at any width above 1 and would grade
+  the cache at width 1.
 - **AC3** — When `--leg` names a leg that is guarded out or opt-in held, it RUNS anyway, asserted
   with a leg carrying a guard on an untouched path and `opt_in = true`.
 - **AC4** — When `--leg` names nothing in the manifest, the runner exits 2 and its message names the
@@ -125,6 +144,12 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
   untimed control rather than against a literal.
 - **AC8** — When a run passes `--leg`, `<git-dir>/gate-full-green` is not written and the summary
   states the run was sharded, asserted by the file's absence plus the summary line.
+- **AC10** — When a beacon is PLANTED and the turnstile is enabled, `--list` and `--manifest` each
+  complete immediately, asserted in `tools/run-gates/run-gates.turnstile.test.sh` with an
+  elapsed-time bound taken against an untimed control rather than a literal.
+- **AC11** — When `--manifest` runs, each leg row carries its declared ceiling, the seconds
+  `<git-dir>/gate-ledger.tsv` recorded for it, and their ratio, with a flag on any ratio under 3,
+  asserted in `tools/run-gates/run-gates.test.sh` against a planted ledger.
 - **AC9** — When a run holds an opt-in leg, `<git-dir>/gate-optin-lastrun.tsv` carries that leg and
   the post-run block names it with its last-run stamp, asserted across two consecutive scratch runs.
 
@@ -145,6 +170,11 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-2 · 2026-08-31 · folded round-1 spec audit findings F14 and F15. AC2 was grading EXECUTION
+  order, which the runner explicitly disclaims, by a mechanism that is a race above width 1; it
+  now grades reporting order. S8 and S9 were added: the query verbs' turnstile and stdout
+  behaviour was unspecified and AC5 and AC6 pulled it in opposite directions, and the ceiling
+  join is this build's R5 landing where it costs nothing.
 
 ## 10. Reuse audit
 
