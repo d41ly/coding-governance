@@ -95,6 +95,11 @@ def run(cmd: list[str], cwd: pathlib.Path, env: dict | None = None) -> subproces
 
 def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     print("conf parser vs bash")
+    # TOOL-aScouredKit-5 — the last two spellings are the ones this arm did NOT cover, and their
+    # absence is why a gate written to catch parser divergence had never observed one. Both are
+    # legal bash and both diverged: an `export ` prefix left the key spelled `export EXPORTED`, and
+    # an unquoted value with a trailing comment swallowed the comment into the value. The arm below
+    # was seen RED against the unfixed parser before the parser was touched.
     body = (
         '# a comment with an = sign\n'
         'MEMORY_ROOT=memory\n'
@@ -102,6 +107,8 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         "QUOTED_SINGLE='x y'\n"
         '\n'
         'TRAILING=spaced   \n'
+        'export EXPORTED=exported\n'
+        'INLINE=value   # a trailing comment bash does not put in the value\n'
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -114,7 +121,8 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     if sh is None:
         skip("conf parser vs shell", "no POSIX shell here can source a file at this path")
         return
-    for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING"):
+    for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
+                "EXPORTED", "INLINE"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])

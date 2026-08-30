@@ -78,11 +78,20 @@ def repo_root() -> pathlib.Path:
 def load_conf(root: pathlib.Path) -> dict[str, str]:
     """Parse the memory-tree kit's KEY=VALUE conf.
 
-    A deliberate COPY of the twenty lines in codebase-map's `map_lib.load_conf`, not an import of
-    it: kits are copied into adopters independently, and importing across kit directories would make
-    drift-audit un-adoptable without codebase-map. The drift is gated by asserting this parser
-    against BASH sourcing the same file in selftest.py, never against a second Python parser — two
-    operands from one generator assert nothing (the adopter's own review-2 F5 lesson).
+    A deliberate COPY of codebase-map's `map_lib.load_conf`, not an import of it: kits are copied
+    into adopters independently, and importing across kit directories would make drift-audit
+    un-adoptable without codebase-map. The drift is gated by asserting this parser against BASH
+    sourcing the same file in selftest.py, never against a second Python parser — two operands from
+    one generator assert nothing (the adopter's own review-2 F5 lesson).
+
+    TOOL-aScouredKit-5: for two years that gate had never observed a divergence, because its fixture
+    covered four spellings and neither of the two that actually diverged. The copy had dropped
+    `map_lib`'s `removeprefix("export ")` and its ends-at-whitespace rule, so `export K=v` parsed to
+    no key at all and `K=v  # note` swallowed the comment. Both are now in the fixture and both were
+    seen RED there before this function was touched. The one REMAINING divergence is deliberate and
+    is named rather than left to be rediscovered: the `\\ufeff` strip below has no counterpart in
+    `map_lib`, and it stays because a BOM-led conf is a real Windows artifact and dropping the strip
+    would lose a behaviour rather than gain equivalence.
     """
     p = root / CONF_NAME
     if not p.exists():
@@ -96,10 +105,17 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, _, v = line.partition("=")
+        k = k.strip().removeprefix("export ").strip()
         v = v.strip().strip("\r")
+        # Bash sourcing semantics for the restricted grammar the conf documents: a quoted value
+        # keeps everything inside the quotes; an UNQUOTED value ends at whitespace, so a trailing
+        # inline comment cannot leak into it. Both rules are `map_lib.load_conf`'s and both were
+        # missing here — see the docstring.
         if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
             v = v[1:-1]
-        conf[k.strip()] = v
+        else:
+            v = v.split()[0] if v.split() else ""
+        conf[k] = v
     return conf
 
 
@@ -493,7 +509,19 @@ def signal_shrink_only(ctx) -> dict:
                            if ln.strip() and not ln.strip().startswith("#"))
         rows.append({"file": rel, "what": what, "entries": now, "seed": seed,
                      "shrunk_by": (seed - now) if seed is not None else None})
-    stalled = [r for r in rows if r["shrunk_by"] is not None and r["shrunk_by"] <= 0]
+    # TOOL-aScouredKit-3's sibling finding. A list SEEDED EMPTY and still empty has nothing to
+    # drain and never had: `shrunk_by` is pinned at 0 for it, so a bare `<= 0` marked it an offender
+    # forever and the signal could never reach the tolerance of 0 it declares below.
+    #
+    # The obvious tightening — `shrunk_by < 0` — is WRONG and is refused here rather than left for
+    # someone to re-propose. It would drop the seed>0, now==seed case, which is a list nobody has
+    # drained since the day it was written and is the single case this signal exists for. No row in
+    # this corpus is in that state today, so the regression would have been invisible: a predicate
+    # narrowed past its own subject with no fixture to notice, which is this repo's own
+    # vacuous-selector class. The exclusion is therefore the empty-seeded row alone.
+    stalled = [r for r in rows
+               if r["shrunk_by"] is not None and r["shrunk_by"] <= 0
+               and not (r["seed"] == 0 and r["entries"] == 0)]
     return {
         "signal": "shrink_only_lists_not_shrinking",
         "value": len(stalled),
