@@ -62,10 +62,17 @@ files=$(git ls-files -- 'tools/*' 'skills/*' '.githooks/*' '*.template.*' '*.fra
 # which would make the gate refuse the corrected form and accept only the broken one.
 RE="(^|[^/{}[:alnum:]._-])($alt)/[A-Za-z0-9_.-]+\.(sh|py|js|md|json|toml)"
 
-hits=$(printf '%s\n' "$files" | tr -d '\r' | while IFS= read -r f; do
-  [ -n "$f" ] || continue
-  grep -nE "$RE" -- "$f" 2>/dev/null | while IFS= read -r m; do printf '%s:%s\n' "$f" "${m%%:*}"; done
-done)
+# TOOL-aScouredKit-6 — ONE grep over the file list, not one PER FILE. `grep -nE` over many files
+# already prefixes each match with `<file>:<lineno>:`, which is the `<file>:<line>` shape this arm
+# was assembling by hand — so the per-file loop existed only to add a prefix grep already emits.
+# The `cut` keeps the first two colon-separated fields, which is exactly `${m%%:*}` applied twice.
+#
+# `grep` exits 1 on no match and a zero hit count is the SUCCESS state here, so the pipeline is
+# terminated with `|| true` — the passing-zero-reads-as-failure class the charter names. `xargs -r`
+# keeps an empty list from making grep read stdin, and the list is newline-delimited exactly as the
+# `$files` variable already was, so no path handling changes.
+hits=$(printf '%s\n' "$files" | tr -d '\r' | grep -v '^$' \
+  | xargs -r grep -nE "$RE" -- 2>/dev/null | cut -d: -f1,2 || true)
 
 waived_rows=""
 [ -f "$WAIVERS" ] && waived_rows=$(grep -vE '^\s*(#|$)' "$WAIVERS" | awk '{print $1}')
@@ -177,12 +184,24 @@ carried_rows() {
   # a trailing CR and `[ -f "$f" ]` answers false for all 181 of them — a population that silently
   # becomes empty, which is the shape this whole unit is written against. The arm above already does
   # this to its own file list, one line up, for the same reason.
+  # TOOL-aScouredKit-6 — ONE `grep -cE` over the whole population, not one PER FILE. With several
+  # files `grep -c` prefixes each count with `<file>:`, which is the `<file>\t<count>` pair this
+  # loop was building by hand — so the awk below only re-shapes the separator and drops the zeros
+  # the loop was dropping with its own `-gt 0` test. Output is byte-identical, sort included.
+  #
+  # The `[ -f "$f" ]` guard is preserved as a filter on the LIST rather than as a per-file test:
+  # grep would report a missing path on stderr and skip it, so dropping the guard would change
+  # what a stale population does, and this arm exists to grade one.
+  #
+  # `grep -c` exits 1 when every file counts zero, which is a legitimate and desirable state here,
+  # so the pipeline is terminated with `|| true`.
   carried_population | tr -d '\r' | while IFS= read -r f; do
     [ -n "$f" ] || continue
     [ -f "$f" ] || continue
-    n=$(grep -cE "$re_ship" -- "$f" 2>/dev/null || true)
-    [ "${n:-0}" -gt 0 ] && printf '%s\t%s\n' "$f" "$n"
-  done | LC_ALL=C sort
+    printf '%s\n' "$f"
+  done | xargs -r grep -cE "$re_ship" -- 2>/dev/null \
+       | awk -F: 'NF>=2 && $NF+0 > 0 { c=$NF; sub(/:[^:]*$/, "", $0); printf "%s\t%s\n", $0, c }' \
+       | LC_ALL=C sort || true
 }
 
 if [ ! -f tools/govkit/registry.toml ] || [ ! -f tools/lib/resolve-python.sh ]; then

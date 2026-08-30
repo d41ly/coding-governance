@@ -77,7 +77,7 @@ ids TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 
 | [TOOL-aScouredKit-3 — one predicate decides a gate leg's hold, and the pin file sees both fields](spec/2026-08-30-spec-TOOL-aScouredKit-3.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-4 — a shrink-only list seeded empty stops being a permanent offender](spec/2026-08-30-spec-TOOL-aScouredKit-4.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-5 — drift-audit's conf parser matches the source its docstring claims to copy](spec/2026-08-30-spec-TOOL-aScouredKit-5.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
-| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
+| [TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output](spec/2026-08-30-spec-TOOL-aScouredKit-6.md) | — | 1 | OPEN | rev-2 | 2026-08-30 |
 | [TOOL-aScouredKit-7 — the unattended kit stops shipping a scope helper with no caller](spec/2026-08-30-spec-TOOL-aScouredKit-7.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-8 — drift-audit stops printing a cardinality its own source retracted](spec/2026-08-30-spec-TOOL-aScouredKit-8.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | OPEN | rev-1 | 2026-08-30 |

@@ -1,6 +1,6 @@
 # TOOL-aScouredKit-6 — three per-file grep loops on the bar batch, at byte-identical output
 
-**Status:** OPEN · rev-1 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
+**Status:** OPEN · rev-2 · 2026-08-30 · node a · Tier-1 · base 093730e4 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -97,6 +97,19 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-08-30 · initial draft, authored by the run under the standing mandate.
+- rev-2 · 2026-08-30 · built, with AC1's byte-comparison recorded. Each leg was run from its
+  committed bytes, then from the batched bytes, on node `a`, and the two stdouts diffed:
+  `check-method-carriers.sh` 7652 ms to 2349 ms; `check-playbook.sh` 33467 ms to 6147 ms;
+  `check-install-prefix.sh` 18399 ms to 3816 ms, with `--check` AND `--list` compared separately.
+  All five comparisons byte-identical. 47.2 s off the leg-sum on this node. The lens's own
+  figures (22.45 s, 44.1 s, 10.74+19.24 s) are not reproduced here and are not contradicted:
+  they were taken on a differently-loaded machine, and what AC2 binds is the AFTER figure.
+  ONE FIRST CUT WAS WRONG AND IS RECORDED RATHER THAN QUIETLY FIXED: the playbook change first
+  round-tripped a NUL-delimited list through `$(...)`, which strips NUL bytes, so `xargs -0` got
+  one mangled argument and the leg reported a population of 0 against a tree holding 1 - it
+  REFUSED rather than passing, which is the direction that saves you. The list is piped straight
+  through now, and the second predicate was deliberately left per-file so its `^```toml` anchor
+  is unchanged; a batched `-F` pass would have widened the predicate rather than sped it up.
 
 ## 10. Reuse audit
 

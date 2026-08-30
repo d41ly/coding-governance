@@ -49,15 +49,26 @@ fi
 #   *.test.sh       — a test builds a violating fixture on purpose, which is why
 #                     `check-install-prefix.sh` excludes its own tests too.
 #   this leg        — it necessarily contains the literal it greps for.
-carriers=$(git ls-files | while IFS= read -r f; do
+# TOOL-aScouredKit-6 — ONE grep over the whole eligible set, not one grep PER FILE. The exclusions
+# are unchanged and are still applied first; only the search is batched. Measured on node `a`:
+# 1156 spawns and 22.45 s became 0.69 s, at byte-identical output. This leg is `subject = repo` with
+# an empty guard, so it runs on every bar in every adopting tree and its cost scaled with THEIR
+# tracked file count rather than with the kit's.
+#
+# `grep -l` exits 1 on no match, which is the passing-zero-reads-as-failure class the charter names —
+# so the pipeline is terminated with `|| true` and the EMPTY case is decided by the explicit refusal
+# below, which is where it belongs. `xargs -0` with a NUL-delimited list is what keeps a path
+# containing a space or a quote from being re-split, and `-r` keeps an empty list from running grep
+# against stdin, which would hang the bar waiting for input nobody types.
+carriers=$(git ls-files -z | while IFS= read -r -d '' f; do
   case "$f" in
     "$M"/*) continue ;;
     "$KITREL"/BUILD-METHOD.template.md) continue ;;
     "$KITREL"/check-method-carriers.sh) continue ;;
     *.test.sh) continue ;;
   esac
-  grep -lF "$DOC" "$f" 2>/dev/null
-done)
+  printf '%s\0' "$f"
+done | xargs -0 -r grep -lF -- "$DOC" 2>/dev/null || true)
 
 # ---- 2: an EMPTY population is a refusal. If nothing outside the memory tree points at the method,
 # ---- either it has been unwired — the loudest possible drift — or this selector is mis-segmented,
