@@ -79,6 +79,13 @@ blocks_gate = true
 why = "PINS ships empty and the reader defaults tolerance to 0, so an unmeasured pin set is indistinguishable from one measured at zero by any probe over the file. The probe below is weaker and differently scoped than the others, and that is stated rather than hidden."
 discharge = { command = ["bash", "-c", "python {kit}/drift_report.py --check"] }
 
+# TOOL-aScouredKit-30. NO SIBLING PATH IN ANY ARGV HERE, and the reason is a constraint rather than
+# a preference. `govkit selfcheck` refuses a gate-leg argv naming a path this entry does not ship,
+# correctly — an adopter may install drift-audit alone. So the LEG cannot carry the answer, and an
+# answer given only to `[adopt]` makes adopt and `--check` resolve DIFFERENT values, which reds the
+# template-drift arm with a remedy that overwrites the correct Skill. One derivation for both is
+# the only shape that is self-consistent. The pointer is therefore still wrong in a deployed tree,
+# and the script now SAYS SO instead of being silent; the real fix is `TOOL-aScouredKit-26`.
 [[gate_leg]]
 name = "drift-audit wiring"
 subject = "repo"

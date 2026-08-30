@@ -26,7 +26,7 @@ memory/
 ├── decisions/             decision detail (append-only area files)
 ├── guides/                long-lived reference guides
 ├── archive/               rotated indexes + legacy material a build can't claim
-├── project/               the gate's own waiver registries (`*.txt`, six of them) and nothing else
+├── project/               the gate's own waiver registries (`*.txt`) and nothing else
 └── builds/<slug>/
     ├── README.md                   (the build's entry point; mostly generated)
     ├── RUN.md                      run-state for an UNATTENDED run; only when one is/was live
@@ -91,7 +91,7 @@ Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle m
 
 ## The grandfather ratchet
 
-Six plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check. Should not grow after the initial adoption.
@@ -109,7 +109,8 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   ships none: an adopter's is scaffolded from their OWN measured population, because gov's rows would
   name paths their tree does not have.
 
-All six are scaffolded by `adopt-memory-tree.sh`. "Absent" and "present and empty" read identically
+MOST are scaffolded by `adopt-memory-tree.sh`, not all: a registry that arrives with the gate
+that reads it is scaffolded by nothing. "Absent" and "present and empty" read identically
 to every consumer, so a registry a gate names and nothing creates is invisible until the first row.
 
 ## The check catalog (all in `tools/memory-tree/check-memory-hygiene.sh`; this file is the prose home)

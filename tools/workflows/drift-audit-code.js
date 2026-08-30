@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.7',
+  version: '1.8',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.7
+// gov:kit drift-audit@1.8
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -80,6 +80,22 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Prefer few high-confidence findings over many speculative ones. Precision is the metric.
 - Severity: blocker = breaks a merge-bar gate or ships a live defect; high = real user-visible or
   data-integrity impact; medium = real debt with a concrete cost; low = tidy-up.
+
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
+cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
+on disk is worth more than a perfect one nobody ever receives.
+
+WRITE THE FILE FIRST, THEN APPEND. Create your writeup EARLY and incomplete, and add to it as you
+learn. Do not hold the whole thing in your head and write at the end.
+
+WHY, and it is not hypothetical. A completeness lens on this exact harness ran 2 HOURS 10 MINUTES
+against siblings that finished in TWELVE, building end-to-end fixtures nobody asked it for. It was
+killed with NOTHING on disk: 75 tool calls, zero durable output, and the whole workflow blocked
+behind it because verify and synthesize cannot start until every lens returns. Had it written as it
+went, two hours of real work would have survived instead of being discarded. Nothing here can
+enforce this — a script cannot time out its own agent — so it is a brief, and the brief is the only
+control there is.
 
 OUTPUT: Write your full prose writeup (evidence, commands run, per-finding detail) to
 ${OUT}/wave1-<yourLensSlug>.md and return ONLY the structured object. Keep each structured field

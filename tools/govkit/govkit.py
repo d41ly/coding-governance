@@ -420,10 +420,45 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
 
 
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
-                      kits: list[str]) -> list[str]:
+                      kits: list[str], deploy: dict | None = None) -> list[str]:
+    """Which entries this run installs.
+
+    `deploy` is the TARGET's own `deploy.toml`, and passing it is what makes the no-`--kits` path
+    mean "what this target declared" rather than "gov's registry default". Every caller that HAS a
+    target descriptor passes it; `intake` does not, because it is the verb that writes that file and
+    has none to read (TOOL-aScouredKit-13).
+    """
+    # TOOL-aScouredKit-13, corrected twice by this build's own closing review. The shape guard sits
+    # HERE, above the branch split, because BOTH branches consume a target-authored list: `cmd_adopt`
+    # routes `deploy['kits']` through the `mode == "kits"` branch, so a guard that lived only in the
+    # default branch left the adopt path exactly as it was. Round 2 reproduced `[1]` and `[["a"]]`
+    # through it against the live registry, both TypeErrors.
+    #
+    # It grades the CONTAINER before the elements. `kits = 5` raised on `list()` one line above the
+    # element check, and `kits = "memory-tree"` — a plausible typo, the string instead of a list of
+    # one — is iterable, so it exploded into eleven single characters and produced a refusal naming
+    # `m, e, m, o, r, y` as unknown entries. Both now say what is actually wrong.
+    def _check_kits_shape(src: object, where: str) -> list[str]:
+        if src is None:
+            return []
+        if isinstance(src, str) or not isinstance(src, (list, tuple)):
+            raise Refusal(
+                f"{where} must be a LIST of registry entry ids; got {type(src).__name__} "
+                f"{src!r}. A bare string is the usual slip and it is refused rather than iterated "
+                f"into single characters"
+            )
+        bad = [repr(k) for k in src if not isinstance(k, str)]
+        if bad:
+            raise Refusal(
+                f"{where} holds {', '.join(bad)}, which {'is' if len(bad) == 1 else 'are'} not a "
+                f"string; it is a list of registry entry ids and nothing else"
+            )
+        return list(src)
+
     if mode == "all":
         return derive_install_order(all_kits(descs), descs)
     if mode == "kits":
+        kits = _check_kits_shape(kits, "the kit selection")
         unknown = [k for k in kits if k not in descs]
         if unknown:
             raise Refusal(
@@ -431,6 +466,21 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                 f"not a registry entry; the population is the registry, never a directory listing"
             )
         return derive_install_order(sorted(kits), descs)
+    # TOOL-aScouredKit-13. THE TARGET'S OWN LIST WINS over gov's registry default. `cmd_adopt` has
+    # always read it (by picking the "kits" mode at its call site) and `plan`/`apply` did not, so a
+    # target declaring `kits = ["check-wiring"]` got a six-kit preview and then an `apply` that
+    # exited 2 over an answer intake never asked for — the documented no-`--kits` install path was
+    # the broken one, and `plan` previewed the same wrong set so nothing warned first.
+    declared = _check_kits_shape((deploy or {}).get("kits"), "the target's deploy.toml `kits`")
+    if declared:
+        unknown = [k for k in declared if k not in descs]
+        if unknown:
+            raise Refusal(
+                f"the target's deploy.toml names {', '.join(unknown)} in `kits`, which "
+                f"{'is' if len(unknown) == 1 else 'are'} not a registry entry; the population is "
+                f"the registry, never a directory listing"
+            )
+        return derive_install_order(sorted(declared), descs)
     dk = default_kits(reg)
     if not dk:
         raise Refusal("registry.toml declares no [selection] default set, and this tool will not "
@@ -1237,6 +1287,12 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
         manifest = {leg.get("name") for leg in _legs_json}
         manifest_subject = {leg.get("name"): leg.get("subject") for leg in _legs_json}
+        # TOOL-aScouredKit-3. TWO fields decide whether a leg runs on an automatic bar, and
+        # tools/run-gates/run-gates.sh is the code that decides: it holds when
+        # `subject == kit OR chunk == selftests`. Pinning and counting the subject alone left six
+        # legs — both run-gates canaries among them, which the runner itself calls the bar's own
+        # liveness assertion — held off every bar while this file reported them running.
+        manifest_chunk = {leg.get("name"): leg.get("chunk") for leg in _legs_json}
         claimed_legs: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             for leg in d.get("gate_leg", []):
@@ -1353,18 +1409,22 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # answer and -29 rev-2 records why.
         pin_path = root / "tools" / "govkit" / "subject-pins.tsv"
         live = {nm: (manifest_subject.get(nm) or "repo") for nm in manifest if nm}
+        live_chunk = {nm: (manifest_chunk.get(nm) or "") for nm in manifest if nm}
         bad_name = sorted(nm for nm in live if "\t" in nm)
         for nm in bad_name:
             r.fail(f"gate leg '{nm}' carries a TAB in its name, which is this pin file's field "
                    f"separator — a name that cannot be recorded cannot be ratcheted")
-        body = "".join(f"{nm}\t{live[nm]}\n" for nm in sorted(live) if nm not in bad_name)
+        body = "".join(f"{nm}\t{live[nm]}\t{live_chunk[nm]}\n"
+                       for nm in sorted(live) if nm not in bad_name)
         header = (
             "# subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py "
             "selfcheck --write`.\n"
             "#\n"
-            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>. `kit` legs are HELD "
-            "off the\n"
-            "# automatic bar and run only under GATE_SELFTESTS=1; `repo` legs run on every bar.\n"
+            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>\\t<chunk>. TWO fields\n"
+            "# decide whether a leg runs on an automatic bar, and tools/run-gates/run-gates.sh is the\n"
+            "# code that decides: it HOLDS a leg when `subject == kit` OR `chunk == selftests`, and\n"
+            "# runs it otherwise. Both are pinned here, because pinning one left the other free to\n"
+            "# take a leg off every bar with nothing in a diff to see (TOOL-aScouredKit-3).\n"
             "#\n"
             "# THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without\n"
             "# the move appearing in a diff. Whether any given value is RIGHT is a review judgement\n"
@@ -1384,6 +1444,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    "Regenerate with `python tools/govkit/govkit.py selfcheck --write`")
         else:
             pinned: dict[str, str] = {}
+            pinned_chunk: dict[str, str] = {}
             for ln in pin_path.read_text(encoding="utf-8").split("\n"):
                 if not ln.strip() or ln.lstrip().startswith("#"):
                     continue
@@ -1391,7 +1452,13 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 if not _tab:
                     r.fail(f"tools/govkit/subject-pins.tsv has a row with no tab: {ln!r}")
                     continue
+                # A pre-TOOL-aScouredKit-3 row carries two fields; the chunk half is then EMPTY,
+                # which is also the legal value for a leg that declares no chunk. The two are
+                # indistinguishable on purpose — a stale file reds on the SUBJECT rows it already
+                # had, and `selfcheck --write` regenerates every row with both fields.
+                sv, _tab2, cv = sv.partition("\t")
                 pinned[nm] = sv.strip()
+                pinned_chunk[nm] = cv.strip()
             for nm in sorted(set(live) - set(pinned)):
                 r.fail(f"gate leg '{nm}' has no row in tools/govkit/subject-pins.tsv — a NEW leg "
                        f"reds until its subject is on the record, because an unpinned leg is one "
@@ -1410,8 +1477,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"this moves the leg {moved}. If that is intended, move the pin in the "
                            f"SAME commit with `python tools/govkit/govkit.py selfcheck --write`; "
                            f"this check grades the CHANGE and never whether the value is right")
+                if live_chunk[nm] != pinned_chunk[nm]:
+                    moved = ("OFF the automatic bar: it will run only under GATE_SELFTESTS=1"
+                             if live_chunk[nm] == "selftests" else
+                             "ON to the automatic bar: it will run on every gate run"
+                             if pinned_chunk[nm] == "selftests" else
+                             "between chunks; its side of the bar is unchanged")
+                    r.fail(f"gate leg '{nm}' is chunk '{live_chunk[nm] or '(none)'}' and pinned "
+                           f"'{pinned_chunk[nm] or '(none)'}' — this moves the leg {moved}. If that "
+                           f"is intended, move the pin in the SAME commit with "
+                           f"`python tools/govkit/govkit.py selfcheck --write`; this check grades "
+                           f"the CHANGE and never whether the value is right")
+            # HELD is the RUNNER's predicate, not the subject alone — run-gates.sh holds on
+            # `subject == kit OR chunk == selftests`. Counting subjects reported 40 where the bar
+            # holds 46, and the six it missed included both run-gates canaries.
             r.note(f"subject pins: {len(pinned)} pinned · "
-                   f"{sum(1 for v in live.values() if v == 'kit')} held")
+                   f"{sum(1 for nm in live if live[nm] == 'kit' or live_chunk[nm] == 'selftests')}"
+                   f" held")
 
     # ---- 7h3: A REPO-LOCAL POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD. TOOL-dUnstalledConvoy-28.
     #
@@ -2314,7 +2396,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
     reg = load_toml(root / "tools" / "govkit" / "registry.toml")
     descs = read_descriptors(root, reg, r)
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits, deploy)
     rows = planned_writes(root, target, deploy, descs, selection, r)
 
     print(f"govkit plan — target {target.as_posix()} · selection: {', '.join(selection)}")
@@ -3031,7 +3113,7 @@ def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
 
 
 def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: str,
-               configure_skipped: set[str]) -> bool:
+               configure_skipped: set[str], deploy: dict) -> bool:
     """Is a leg that is red AFTER the install exempt? Two ways, and nothing else.
 
     The exemption is granted by RUNNING the hole's discharge probe, never by reading its flag. The
@@ -3053,9 +3135,44 @@ def exempt_leg(descs: dict, selection: list[str], target: pathlib.Path, name: st
                 cmd = (h.get("discharge") or {}).get("command")
                 if not cmd:
                     continue
-                ctx = {"kit": f"tools/{eid}", "prefix": "tools", "kit_id": eid,
-                       "memory_root": "memory"}
-                resolved = [resolve_tokens(a, ctx)[0] for a in cmd]
+                # TOOL-aScouredKit-12, third half, and the first two made this one URGENT.
+                #
+                # THE REAL CONTEXT, not a hardcoded four-key stand-in. This dict spelled `tools/`
+                # and `memory` literally, so at any other prefix or memory root the probe ran
+                # against paths the target does not have; and it carried none of the target's
+                # ANSWERS, so `{manifest_path}` — which this build had just added to the kickoff
+                # probe — resolved to nothing at all.
+                #
+                # AND THE MISSING LIST IS READ. `resolve_tokens(a, ctx)[0]` dropped it, so a command
+                # holding an unresolved token was EXECUTED with a literal brace in its argv, exited
+                # non-zero for that reason, and the function returned True — granting the leg a
+                # standing exemption on the strength of a probe that never ran. That is the
+                # dangerous direction: an exemption is not coverage, and this one silenced the
+                # default-selection leg the same build had just fixed. The sibling defect, same
+                # token, is documented as already-fixed at `rule_destinations`.
+                #
+                # A probe that cannot be resolved yields NO exemption. Fail closed: the leg stays
+                # red, which is visible, rather than exempt, which is not.
+                # TOOL-aScouredKit-32: `deploy` is REQUIRED, not defaulted. The `None` fallback
+                # here rebuilt the very hardcoded `tools/` + `memory` context the paragraph above
+                # condemns, and no caller ever passed None — a dead branch that preserved the
+                # defect in case anyone reached it.
+                ctx = target_context(target, deploy, eid, d)
+                resolved, missing = [], []
+                for a in cmd:
+                    _s, _m = resolve_tokens(a, ctx)
+                    resolved.append(_s)
+                    missing += _m
+                if missing:
+                    # TOOL-aScouredKit-32: `continue`, not `return False`. This probe cannot grant
+                    # an exemption — that half was right — but returning exited the WHOLE function,
+                    # vetoing every later hole of this kit AND the independent `red_after_land`
+                    # window below, neither of which has anything to do with an unresolvable token.
+                    # One probe's inability to answer is not an answer about the others.
+                    print(f"govkit: leg '{name}' — the hole probe for '{eid}' holds unresolved "
+                          f"token(s) {', '.join(sorted(set(missing)))}, so it cannot be run and "
+                          f"cannot grant an exemption. Other exemption routes are still checked.")
+                    continue
                 try:
                     if subprocess.run(resolve_shell_argv(resolved), cwd=str(target),
                                       capture_output=True).returncode != 0:
@@ -3696,7 +3813,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                       "stated non-goal and would be indistinguishable from a self-overwrite")
 
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, mode, kits)
+    selection = resolve_selection(reg, descs, mode, kits, deploy)
     commit = git(root, "rev-parse", "HEAD").strip()
 
     receipt_path = target / ".governance" / "install.json"
@@ -4230,7 +4347,18 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
     # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
     emitted: list[dict] = []
+    # Set on the WITHHELD path below, and recorded in the receipt so a later reader can tell a run
+    # that wrote its legs from one that carried the previous run's rows forward. Without it the two
+    # receipts are byte-identical and the withheld fact lives only in stdout nobody kept.
+    _legs_withheld = False
     step(STEP_LEGS, gr.get("kind", "absent"))
+    # TOOL-aScouredKit-11. The write-back below used to be guarded on the GLOBAL `r.problems`,
+    # accumulated since step 1, while LEGS is step 9 — so ANY earlier problem, including a by-design
+    # one, withheld the manifest for every kit in the run. Measured: a `--all` install recorded 57
+    # emitted legs in the receipt and wrote no manifest anywhere, which is zero gate coverage under
+    # a receipt claiming full coverage. This snapshot is what makes the guard mean "did THIS step
+    # fail", which is the question the comment at the loop below already thought it was asking.
+    _legs_problems_before = len(r.problems)
     # D7, from this build's closing review. `-6`'s bar was built INSIDE the manifest branch, so the
     # `else:` below — taken whenever `[gate_runner].kind` is `none` or absent, which is the normal
     # state of a target that has not promoted a runner — looped the same legs and wrote every one
@@ -4366,31 +4494,67 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 if dropped and not guards:
                     print(f"govkit apply — gate leg '{nm}': UNGUARDED "
                           f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
-        if not r.problems:
+        if len(r.problems) == _legs_problems_before:
             rf.parent.mkdir(parents=True, exist_ok=True)
             rf.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
                           encoding="utf-8", newline="\n")
             subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
                            capture_output=True, check=False)
             print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
-            # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
-            # they can run them for the first time against the kit they just installed, and once as
-            # the standing way to ask. Without this line the legs are simply absent from their bar
-            # and nothing says they exist. TOOL-dUnstalledConvoy-26.
-            n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
-            if n_kit:
-                print(f"govkit apply — {n_kit} of those are kit SELF-TESTS and are HELD by default: "
-                      f"they test the kit's own source, which does not change in a repo that "
-                      f"copy-installs it. Run them once now to verify this install, and afterwards "
-                      f"whenever you edit a kit:")
-                # THE TARGET'S OWN RUNNER COMMAND, not this repo's path. An adopter told to run a
-                # script that does not exist in their tree has been told nothing, and `command` is
-                # the declaration govkit already validated and already echoed at BASELINE.
-                _cmd = " ".join(gr.get("command") or []) or "your gate runner"
-                print(f"govkit apply —   GATE_SELFTESTS=1 {_cmd}")
-                print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
-                      f"kit's own tests are not a guard. A green bar without that variable says "
-                      f"nothing about the kits themselves.")
+        else:
+            # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
+            # and a receipt claiming N emitted legs it never wrote.
+            print(f"govkit apply — gate legs: WITHHELD from {gr['file']} — "
+                  f"{len(r.problems) - _legs_problems_before} problem(s) were raised while "
+                  f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
+                  f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
+            # THE RECEIPT KEEPS THE PREVIOUS RUN'S ROWS, and does NOT get this run's discarded list
+            # and does NOT get blanked. Both wrong answers were written before this comment was.
+            #
+            # `emitted` is OWNERSHIP OF A NAME, not a claim about this run: `owned` at the top of
+            # this branch derives from it, and a leg name present in the target's runner but absent
+            # from `owned` raises "the target's runner already has a leg named X and this target's
+            # receipt does not claim it". So blanking it WEDGES the target permanently — every
+            # later apply refuses the legs this deployer itself wrote, and `--re-adopt` carries the
+            # blanked receipt forward. Caught by this build's own closing review, one round after
+            # the spec that asked for the blanking.
+            #
+            # Carrying THIS run's built list forward would be the other error: it would claim rows
+            # that are not in any file. The manifest on disk is exactly what the last successful
+            # run left, so the previous receipt's rows are the true ownership set.
+            emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
+            _legs_withheld = True
+        # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
+        # they can run them for the first time against the kit they just installed, and once as
+        # the standing way to ask. Without this line the legs are simply absent from their bar
+        # and nothing says they exist. TOOL-dUnstalledConvoy-26.
+        #
+        # AT THE `if`'s INDENT, not inside either branch. It was inside the write branch, and the
+        # first draft of the withheld branch above silently captured it into the ELSE — so the
+        # summary printed exactly when nothing was written and never when something was. Python
+        # accepted it and three arms caught it.
+        #
+        # ON THE WITHHELD PATH THIS COUNTS CARRIED-FORWARD ROWS, and it is worded that way because
+        # the previous wording said `emitted` was empty there — true of the first draft, false the
+        # moment ownership started being carried forward, and false in the same commit that made it
+        # so. The count is still CORRECT: those rows describe the legs the target's runner really
+        # holds, which is exactly the population this advice is about. The sentence below says "in
+        # your runner", not "just written", for that reason.
+        n_kit = sum(1 for e in emitted if (e.get("subject") or "repo") == "kit")
+        if n_kit:
+            print(f"govkit apply — {n_kit} leg(s) in your runner are kit SELF-TESTS and are HELD by "
+                  f"default: "
+                  f"they test the kit's own source, which does not change in a repo that "
+                  f"copy-installs it. Run them once now to verify this install, and afterwards "
+                  f"whenever you edit a kit:")
+            # THE TARGET'S OWN RUNNER COMMAND, not this repo's path. An adopter told to run a
+            # script that does not exist in their tree has been told nothing, and `command` is
+            # the declaration govkit already validated and already echoed at BASELINE.
+            _cmd = " ".join(gr.get("command") or []) or "your gate runner"
+            print(f"govkit apply —   GATE_SELFTESTS=1 {_cmd}")
+            print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
+                  f"kit's own tests are not a guard. A green bar without that variable says "
+                  f"nothing about the kits themselves.")
     else:
         (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
         lines = ["# gate legs — ORDERED, not emitted", ""]
@@ -4424,6 +4588,13 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
         orders.append({"kind": "gate-legs", "id": "gate-legs",
                        "path": ".governance/outbox/gate-legs.md"})
+        # OWNERSHIP IS CARRIED FORWARD HERE TOO. This branch writes no legs, so it must not
+        # REVOKE the receipt's claim on legs a previous manifest-kind run wrote. `emitted` is
+        # initialized empty, and leaving it empty means a target whose `[gate_runner].kind` is
+        # flipped to `none` and back — an operator action, not a rare one — comes back with an
+        # empty `owned` and refuses its own legs. That is the same wedge the withheld path had,
+        # one branch over, and it was left standing when that one was fixed.
+        emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
         print("govkit apply — gate legs: ORDERED, not emitted — "
               + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
                  else "this target's deploy.toml declares no [gate_runner]")
@@ -4461,7 +4632,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 r.fail(f"leg '{nm}' was green before this install and is gone after — a leg that "
                        f"vanished is not a leg that passed")
             elif b is None and a2 == "red" and not exempt_leg(descs, selection, target, nm,
-                                                              configure_skipped):
+                                                              configure_skipped, deploy):
                 r.fail(f"leg '{nm}' did not exist before this install and is red after")
 
     # ---- RECEIPT. Tool-written only, plus the flat sidecar a target verifies with bash alone.
@@ -4472,7 +4643,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
          "orders": orders, "baseline": baseline, "after": after_map,
          "hook_block": {"state": hook_state},
          "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
-                         "emitted": emitted}},
+                         "emitted": emitted, "legs_withheld": _legs_withheld}},
         indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w),
@@ -6197,8 +6368,17 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     demand_adopt_index_clean(target)
 
     deploy = load_deploy(target)
-    selection = resolve_selection(reg, descs, "kits" if deploy.get("kits") else "default",
-                                  list(deploy.get("kits") or []))
+    # TOOL-aScouredKit-31. `deploy` IS PASSED and the list is NOT pre-coerced here. `list(...)` at
+    # this call site consumed the target-authored value before `resolve_selection` could grade its
+    # container, so `kits = 5` and `kits = true` raised a raw TypeError — `main` catches only
+    # `Refusal` — and `kits = "memory-tree"` was iterated into eleven single characters and refused
+    # as eleven unknown entries. Round 2 fixed the grader and round 3 found this caller still
+    # bypassing it, which is the same defect surviving one caller over.
+    #
+    # Handing `deploy` and the "default" mode lets the grader see the raw value and lets the
+    # declared-list branch do the work, exactly as `plan` and `apply` do. The explicit
+    # `"kits" if …` split it replaces was the only thing that made this path different.
+    selection = resolve_selection(reg, descs, "default", [], deploy)
     out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", to_rev + "^{commit}"],
                          capture_output=True, text=True, check=False)
     if out.returncode != 0:

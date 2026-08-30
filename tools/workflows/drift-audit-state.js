@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.7',
+  version: '1.8',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.7
+// gov:kit drift-audit@1.8
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -84,6 +84,22 @@ EVIDENCE RULES (these decide whether your finding survives the skeptic):
 - Quantify. "Some specs are stale" is worthless; "N of M, here is the list" is a finding.
 - Severity: blocker = actively misleads a session into wrong work, or breaks a gate; high = a session
   would make a materially wrong decision from it; medium = real cost; low = tidy-up.
+
+COST IS A VERDICT, AND THIS LENS HAS A BUDGET. Charter §7: every suite declares a wall-clock ceiling
+and one arriving without a ceiling reds by that fact. Yours is roughly 30 TOOL CALLS. If a question
+cannot be answered inside it, RECORD THE QUESTION AS UNANSWERED and move on — an unanswered question
+on disk is worth more than a perfect one nobody ever receives.
+
+WRITE THE FILE FIRST, THEN APPEND. Create your writeup EARLY and incomplete, and add to it as you
+learn. Do not hold the whole thing in your head and write at the end.
+
+WHY, and it is not hypothetical. A completeness lens on this exact harness ran 2 HOURS 10 MINUTES
+against siblings that finished in TWELVE, building end-to-end fixtures nobody asked it for. It was
+killed with NOTHING on disk: 75 tool calls, zero durable output, and the whole workflow blocked
+behind it because verify and synthesize cannot start until every lens returns. Had it written as it
+went, two hours of real work would have survived instead of being discarded. Nothing here can
+enforce this — a script cannot time out its own agent — so it is a brief, and the brief is the only
+control there is.
 
 OUTPUT: Write your full prose writeup (evidence, commands, per-finding detail, and any list too long
 for the structured return) to ${OUT}/wave2-<yourLensSlug>.md and return ONLY the structured object.
@@ -391,6 +407,12 @@ const refuted = judged.filter((f) => f.verdict === 'refuted')
 const unverified = judged.filter((f) => f.verdict === 'unverified')
 const precision =
   confirmed.length + refuted.length ? confirmed.length / (confirmed.length + refuted.length) : null
+// TOOL-aScouredKit-9 - the AGGREGATE its sibling drift-audit-code.js has had since 1.4. The
+// per-finding `severityCorrection` already reaches the synthesis writer, because `judged` is
+// serialized wholesale into that prompt; what was missing is the number an operator reads WITHOUT
+// opening the report. A run where every finding was downgraded and a run where none was looked
+// identical on this line.
+const downgrades = judged.filter((f) => f.verdict === 'partial' && f.severityCorrection).length
 log(
   `Verify: ${confirmed.length} confirmed, ${partial.length} partial, ${refuted.length} refuted, ` +
     `${unverified.length} UNVERIFIED, precision ${precision === null ? 'n/a' : precision.toFixed(2)}`
@@ -429,7 +451,7 @@ Return {path, summary} only — the prose goes in the file. Forward slashes in t
 DATA:
 counts: raw ${indexed.length}, confirmed ${confirmed.length}, partial ${partial.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision === null ? 'n/a' : precision.toFixed(2)}
 RUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:
-lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified.
+lenses ${lensOut.length}/${LENSES.length} returned, ${lensesDead} DIED; skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s), ${conflictIds.size} contradictory verdict(s) demoted to unverified, ${downgrades} severity correction(s).
 If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. Say so where you would otherwise call a zero positive evidence.
 lens writeups: ${JSON.stringify(lensOut.map((r) => ({ lens: r.lens, path: r.path, summary: r.summary })), null, 1)}
 judged findings: ${JSON.stringify(judged, null, 1)}`,
@@ -484,6 +506,7 @@ return {
     unverified: unverified.length,
   },
   precision,
+  severityCorrections: downgrades,
   report: synth && synth.path,
   summary: synth && synth.summary,
   confirmedTop: confirmed

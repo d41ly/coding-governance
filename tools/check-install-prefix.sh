@@ -62,10 +62,25 @@ files=$(git ls-files -- 'tools/*' 'skills/*' '.githooks/*' '*.template.*' '*.fra
 # which would make the gate refuse the corrected form and accept only the broken one.
 RE="(^|[^/{}[:alnum:]._-])($alt)/[A-Za-z0-9_.-]+\.(sh|py|js|md|json|toml)"
 
-hits=$(printf '%s\n' "$files" | tr -d '\r' | while IFS= read -r f; do
-  [ -n "$f" ] || continue
-  grep -nE "$RE" -- "$f" 2>/dev/null | while IFS= read -r m; do printf '%s:%s\n' "$f" "${m%%:*}"; done
-done)
+# TOOL-aScouredKit-6 — ONE grep over the file list, not one PER FILE. `grep -nE` over many files
+# already prefixes each match with `<file>:<lineno>:`, which is the `<file>:<line>` shape this arm
+# was assembling by hand — so the per-file loop existed only to add a prefix grep already emits.
+# The `cut` keeps the first two colon-separated fields, which is exactly `${m%%:*}` applied twice.
+#
+# `grep` exits 1 on no match and a zero hit count is the SUCCESS state here, so the pipeline is
+# terminated with `|| true` — the passing-zero-reads-as-failure class the charter names. `xargs -r`
+# keeps an empty list from making grep read stdin.
+#
+# `-0` AND `-H`, both bought by this build's own closing review, and both are the difference between
+# a gate and a gate-shaped no-op. BARE `xargs` applies shell-like quote processing to its input: a
+# path holding a quote ABORTS the invocation and a path holding a space is silently split, and with
+# stderr going to /dev/null and the status swallowed by `|| true` this arm would then print a clean
+# result over files it never read. The two sibling scripts batched in the same commit use `-0` for
+# exactly this reason and this one did not. `-H` forces the `<file>:` prefix that the `cut` below
+# assumes: grep omits it when handed exactly ONE file, so a single-file population produced
+# `<lineno>:<text>` and the cut took the line number as the path.
+hits=$(printf '%s\n' "$files" | tr -d '\r' | grep -v '^$' | tr '\n' '\0' \
+  | xargs -0 -r grep -HnE "$RE" -- 2>/dev/null | cut -d: -f1,2 || true)
 
 waived_rows=""
 [ -f "$WAIVERS" ] && waived_rows=$(grep -vE '^\s*(#|$)' "$WAIVERS" | awk '{print $1}')
@@ -82,7 +97,13 @@ fi
 
 if [ "$MODE" = --check ]; then
 bad=0
-for h in $hits; do
+# LINE-DELIMITED, not word-split. `for h in $hits` splits on IFS, so a hit whose path holds a space
+# becomes two bogus rows and neither matches a waiver — the reverse of the `-0` hardening applied to
+# the PRODUCER above, left standing in its CONSUMER. Latent in this repo (0 spaced tracked paths,
+# measured) and not latent in an adopter, whose tree this same gate grades. Same change on the
+# waiver loop below, for the same reason.
+while IFS= read -r h; do
+  [ -n "$h" ] || continue
   printf '%s\n' "$waived_rows" | grep -qxF "$h" && continue
   if [ "$bad" = 0 ]; then
     echo "install-prefix: a SHIPPED file spells a root-install kit path. An adopter installs kits at"
@@ -91,17 +112,22 @@ for h in $hits; do
   fi
   bad=$((bad+1))
   printf '  %s  %s\n' "$h" "$(sed -n "${h##*:}p" "${h%:*}" | sed 's/^[[:space:]]*//' | cut -c1-90)"
-done
+done <<EOF
+$hits
+EOF
 [ "$bad" = 0 ] || exit 1
 
 # A waiver that no longer names a hit is a stale row: the spelling it excused is gone, and leaving it
 # lets the NEXT one in silently under a pin that never fell.
 stale=0
-for w in $waived_rows; do
+while IFS= read -r w; do
+  [ -n "$w" ] || continue
   printf '%s\n' "$hits" | grep -qxF "$w" && continue
   [ "$stale" = 0 ] && echo "install-prefix: stale waiver(s) — the spelling they excuse is gone; delete the row:"
   stale=$((stale+1)); printf '  %s\n' "$w"
-done
+done <<EOF
+$waived_rows
+EOF
 [ "$stale" = 0 ] || exit 1
 
 echo "install-prefix: clean — $(printf '%s\n' "$files" | grep -c .) shipped files, $waived_n declared waiver(s), no undeclared root-install spelling"
@@ -177,12 +203,24 @@ carried_rows() {
   # a trailing CR and `[ -f "$f" ]` answers false for all 181 of them — a population that silently
   # becomes empty, which is the shape this whole unit is written against. The arm above already does
   # this to its own file list, one line up, for the same reason.
+  # TOOL-aScouredKit-6 — ONE `grep -cE` over the whole population, not one PER FILE. With several
+  # files `grep -c` prefixes each count with `<file>:`, which is the `<file>\t<count>` pair this
+  # loop was building by hand — so the awk below only re-shapes the separator and drops the zeros
+  # the loop was dropping with its own `-gt 0` test. Output is byte-identical, sort included.
+  #
+  # The `[ -f "$f" ]` guard is preserved as a filter on the LIST rather than as a per-file test:
+  # grep would report a missing path on stderr and skip it, so dropping the guard would change
+  # what a stale population does, and this arm exists to grade one.
+  #
+  # `grep -c` exits 1 when every file counts zero, which is a legitimate and desirable state here,
+  # so the pipeline is terminated with `|| true`.
   carried_population | tr -d '\r' | while IFS= read -r f; do
     [ -n "$f" ] || continue
     [ -f "$f" ] || continue
-    n=$(grep -cE "$re_ship" -- "$f" 2>/dev/null || true)
-    [ "${n:-0}" -gt 0 ] && printf '%s\t%s\n' "$f" "$n"
-  done | LC_ALL=C sort
+    printf '%s\0' "$f"
+  done | xargs -0 -r grep -cHE "$re_ship" -- 2>/dev/null \
+       | awk -F: 'NF>=2 && $NF+0 > 0 { c=$NF; sub(/:[^:]*$/, "", $0); printf "%s\t%s\n", $0, c }' \
+       | LC_ALL=C sort || true
 }
 
 if [ ! -f tools/govkit/registry.toml ] || [ ! -f tools/lib/resolve-python.sh ]; then

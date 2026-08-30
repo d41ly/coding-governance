@@ -152,19 +152,41 @@ case "$CONF_BYPASS" in
   *[[:space:]]*|*'#'*)
     fail 10 "the declared bypass flag resolves to a value carrying whitespace or a comment character, which no flag does - so this leg would grep the corpus for a literal no record can contain and then report that it read the corpus. Resolved value follows: [$CONF_BYPASS]" ;;
 esac
+# TOOL-aScouredKit-6 — TWO greps over the whole corpus, not two PER FILE. The predicate is
+# unchanged: a playbook is a `.md` carrying BOTH `^step_selector =` and a `^```toml` fence, and the
+# template is still excluded for the reason below. What changed is that the population is now
+# discovered by intersecting two batched `grep -l` runs instead of by spawning a process per file.
+# Measured on node `a`: 941 spawns discovering a population of ONE.
+#
+# `grep -l` exits 1 on no match, which is the passing-zero-reads-as-failure class — the run is
+# terminated with `|| true`, and an empty population is decided by the explicit arm below, not by an
+# exit code. `xargs -0 -r` keeps a path with a space intact and keeps an empty list from making grep
+# read stdin.
+#
+# THE NUL LIST IS NOT ROUND-TRIPPED THROUGH A VARIABLE. `$(…)` strips NUL bytes, so building the
+# candidate list into a shell variable and re-feeding it to `xargs -0` yields ONE mangled argument
+# and a `warning: ignored null byte in input` — the first cut of this change did exactly that and
+# reported a population of 0 against a tree holding 1. It is piped straight through instead.
+#
+# The SECOND predicate stays per-file on purpose. It runs over the handful of files the first grep
+# selected rather than over the corpus, so it costs nothing, and it keeps the `^```toml` anchor
+# exactly as it was — a batched `-F` pass would match the fence anywhere on a line and widen the
+# predicate, which is not a speed-up, it is a different check.
+#
+# The TEMPLATE is the canon, definitionally not a playbook: its block is a SPECIMEN with empty
+# values, and grading it would red on every field the specimen leaves for an author to fill.
+# Found by running this predicate over the real tree before wiring it, which is the rule.
+_pb_sel=$(git -c core.quotePath=false ls-files -z -- '*.md' \
+  | xargs -0 -r grep -lE '^step_selector[[:space:]]*=' -- 2>/dev/null || true)
 PLAYBOOKS=""
 while IFS= read -r f; do
-  case "$f" in *.md) ;; *) continue ;; esac
-  # The TEMPLATE is the canon, definitionally not a playbook: its block is a SPECIMEN with empty
-  # values, and grading it would red on every field the specimen leaves for an author to fill.
-  # Found by running this predicate over the real tree before wiring it, which is the rule.
+  [ -n "$f" ] || continue
   case "$f" in */PLAYBOOK-TEMPLATE.template.md|*/PLAYBOOK-TEMPLATE.md) continue ;; esac
-  if grep -q '^step_selector[[:space:]]*=' "$f" 2>/dev/null && grep -q '^```toml' "$f" 2>/dev/null; then
-    PLAYBOOKS="$PLAYBOOKS$f
+  grep -q '^```toml' "$f" 2>/dev/null || continue
+  PLAYBOOKS="$PLAYBOOKS$f
 "
-  fi
 done <<EOF
-$(git -c core.quotePath=false ls-files -- '*.md')
+$_pb_sel
 EOF
 POP=$(printf '%s' "$PLAYBOOKS" | grep -c . || true)
 

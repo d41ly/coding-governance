@@ -3377,6 +3377,7 @@ hit "$(cat memory/builds/tRecipeOk/RUN.md)" "waiver · item playbook-followed ·
 git rm -q --cached memory/builds/tRecipeOk/RUN.md >/dev/null 2>&1; rm -f memory/builds/tRecipeOk/RUN.md
 reset_tree
 
+
 # ---- ...and an ALL-scoped handle on the SAME run is accepted, or the refusal is just a broken
 # ---- waiver path wearing a scope's name.
 reset_tree

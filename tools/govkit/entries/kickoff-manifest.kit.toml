@@ -32,9 +32,15 @@ mutates_index = false
 why_no_adopter = "installation is a copy plus a per-machine link; the manifest's own section B is the hole"
 
 [[gate_leg]]
+# TOOL-aScouredKit-12. The PATH IS PASSED, because the engine cannot derive it. `manifest-check.sh`
+# resolves the manifest from a hardcoded two-element list and reads MEMORY_ROOT zero times, while
+# the seed above lands at the target-supplied `{manifest_path}` that nothing validates and intake
+# refuses to invent. At any answer but gov's own the leg exited 2 forever, on `guard = []`, printing
+# a remedy that told the adopter to move the manifest out of their declared memory root — and this
+# entry is in the registry's DEFAULT selection. The script already accepts and grades a path as $1.
 name = "kickoff-manifest ratchet"
 subject = "repo"
-argv = ["bash", "{prefix}/manifest-check.sh"]
+argv = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"]
 guard = []
 history_depth = "full"
 red_after_land = true
@@ -45,7 +51,11 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
 why = "MEASURED: the ratchet exits 1 on a copied-and-unfilled template, failing its placeholder check and its stamp check together, and exits 2 with no manifest at all. There is no install of this kit that leaves its leg at exit 0 without an authoring step. The probe is the WHOLE check, not the placeholder grep: filling every placeholder and stamping a well-formed but foreign sha passes the grep and still reds the leg."
-discharge = { command = ["bash", "{prefix}/manifest-check.sh"] }
+# TOOL-aScouredKit-12, second half. The LEG above gained `{manifest_path}` and this probe did
+# not, eleven lines below it — so the hole stayed undischarged forever at any non-gov answer
+# and `exempt_leg` would then grant the newly-fixed leg a standing red-after-install
+# exemption. Caught by this build's own closing review. One token, twice.
+discharge = { command = ["bash", "{prefix}/manifest-check.sh", "{manifest_path}"] }
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a

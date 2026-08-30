@@ -1,95 +1,98 @@
 # subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py selfcheck --write`.
 #
-# One row per gate leg in tools/gate-legs.json: <name>\t<subject>. `kit` legs are HELD off the
-# automatic bar and run only under GATE_SELFTESTS=1; `repo` legs run on every bar.
+# One row per gate leg in tools/gate-legs.json: <name>\t<subject>\t<chunk>. TWO fields
+# decide whether a leg runs on an automatic bar, and tools/run-gates/run-gates.sh is the
+# code that decides: it HOLDS a leg when `subject == kit` OR `chunk == selftests`, and
+# runs it otherwise. Both are pinned here, because pinning one left the other free to
+# take a leg off every bar with nothing in a diff to see (TOOL-aScouredKit-3).
 #
 # THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without
 # the move appearing in a diff. Whether any given value is RIGHT is a review judgement
 # — the criterion is stated once, at the `subject` field declaration in
 # tools/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.
-agent-cap restatement	repo
-agent-cap restatement self-test	kit
-agent-cap self-test	kit
-agent-instructions self-test	kit
-agent-instructions wiring	repo
-branch-guard self-test	repo
-build README slot contract	repo
-build-index selftest	kit
-charter size	repo
-check-arms selftest	kit
-check-wiring self-test	kit
-codebase-map adopter e2e	kit
-codebase-map coverage + freshness	repo
-codebase-map kit selftest	kit
-corpus-ids selftest	kit
-dead-path carriers (deleted files still named)	repo
-dead-path carriers self-test	kit
-drift-audit records	repo
-drift-audit selftest	kit
-drift-audit wiring	repo
-gotchas selftest	kit
-govkit acceptance matrix	repo
-govkit refusal join	repo
-govkit selfcheck	repo
-govkit selftest	kit
-harness arms (fail branches armed or pinned)	repo
-install-prefix (shipped surface)	repo
-install-prefix self-test	kit
-kickoff engine size <=18KiB	repo
-kickoff-manifest ratchet	repo
-kit version markers	repo
-kit/dogfood doc parity	repo
-lexicon naming predicates	repo
-lexicon selftest	kit
-lexicon wiring	repo
-line length	repo
-line-length gate selftest	kit
-manifest-check self-test	kit
-marker contracts	repo
-memory hygiene	repo
-memory-hygiene self-test	kit
-memory-recall kit selftest	kit
-memory-recall skill wiring	repo
-method carriers (every pointer declared)	repo
-method-carriers self-test	kit
-micro-format definitions	repo
-micro-format gate selftest	kit
-placeholder-catalogue self-test	kit
-playbook parity	repo
-playbook parity selftest	kit
-playbook placeholder catalogue	repo
-playbook render selftest	kit
-playbook render wiring	repo
-playbook validity gate	repo
-pre-push self-test	repo
-profile-bar selftest	kit
-push-main self-test	repo
-pytest-guardrails self-test	kit
-python resolver (behaviour + inline parity + idiom ban)	kit
-recall floor	repo
-recall floor arms	repo
-review-join ban (no ref-keyed join)	repo
-review-join self-test	kit
-review-protocol parity (kit vs dogfood)	repo
-row-grammar selftest	kit
-row-keyed merge driver replay	kit
-run-gates adopter e2e	kit
-run-gates canary	repo
-run-gates evidence	kit
-run-gates gov canary	repo
-run-gates turnstile	kit
-run-gates wiring	repo
-scratch-guard self-test	kit
-settings-merge selftest	kit
-template size <=48KiB	repo
-template size gate selftest	kit
-testsuite counts (every bar self-test prints one)	repo
-testsuite counts self-test	kit
-tier2-review self-test	kit
-unattended kit gate	repo
-unattended skill wiring	repo
-verdict epoch (kit version dates the engine)	repo
-verdict-epoch self-test	kit
-verifier fan-out	repo
-verifier fan-out self-test	kit
-workflow script syntax	repo
+agent-cap restatement	repo	product
+agent-cap restatement self-test	kit	selftests
+agent-cap self-test	kit	selftests
+agent-instructions self-test	kit	selftests
+agent-instructions wiring	repo	wiring
+branch-guard self-test	repo	selftests
+build README slot contract	repo	records
+build-index selftest	kit	selftests
+charter size	repo	product
+check-arms selftest	kit	selftests
+check-wiring self-test	kit	selftests
+codebase-map adopter e2e	kit	e2e
+codebase-map coverage + freshness	repo	declarations
+codebase-map kit selftest	kit	selftests
+corpus-ids selftest	kit	selftests
+dead-path carriers (deleted files still named)	repo	declarations
+dead-path carriers self-test	kit	selftests
+drift-audit records	repo	declarations
+drift-audit selftest	kit	selftests
+drift-audit wiring	repo	wiring
+gotchas selftest	kit	selftests
+govkit acceptance matrix	repo	declarations
+govkit refusal join	repo	declarations
+govkit selfcheck	repo	declarations
+govkit selftest	kit	selftests
+harness arms (fail branches armed or pinned)	repo	declarations
+install-prefix (shipped surface)	repo	product
+install-prefix self-test	kit	selftests
+kickoff engine size <=18KiB	repo	product
+kickoff-manifest ratchet	repo	records
+kit version markers	repo	declarations
+kit/dogfood doc parity	repo	declarations
+lexicon naming predicates	repo	declarations
+lexicon selftest	kit	selftests
+lexicon wiring	repo	wiring
+line length	repo	product
+line-length gate selftest	kit	selftests
+manifest-check self-test	kit	selftests
+marker contracts	repo	declarations
+memory hygiene	repo	records
+memory-hygiene self-test	kit	selftests
+memory-recall kit selftest	kit	selftests
+memory-recall skill wiring	repo	wiring
+method carriers (every pointer declared)	repo	declarations
+method-carriers self-test	kit	selftests
+micro-format definitions	repo	product
+micro-format gate selftest	kit	selftests
+placeholder-catalogue self-test	kit	selftests
+playbook parity	repo	product
+playbook parity selftest	kit	selftests
+playbook placeholder catalogue	repo	product
+playbook render selftest	kit	selftests
+playbook render wiring	repo	wiring
+playbook validity gate	repo	declarations
+pre-push self-test	repo	selftests
+profile-bar selftest	kit	selftests
+push-main self-test	repo	selftests
+pytest-guardrails self-test	kit	selftests
+python resolver (behaviour + inline parity + idiom ban)	kit	wiring
+recall floor	repo	declarations
+recall floor arms	repo	selftests
+review-join ban (no ref-keyed join)	repo	declarations
+review-join self-test	kit	selftests
+review-protocol parity (kit vs dogfood)	repo	declarations
+row-grammar selftest	kit	selftests
+row-keyed merge driver replay	kit	selftests
+run-gates adopter e2e	kit	e2e
+run-gates canary	repo	selftests
+run-gates evidence	kit	selftests
+run-gates gov canary	repo	selftests
+run-gates turnstile	kit	selftests
+run-gates wiring	repo	wiring
+scratch-guard self-test	kit	selftests
+settings-merge selftest	kit	selftests
+template size <=48KiB	repo	product
+template size gate selftest	kit	selftests
+testsuite counts (every bar self-test prints one)	repo	declarations
+testsuite counts self-test	kit	selftests
+tier2-review self-test	kit	selftests
+unattended kit gate	repo	declarations
+unattended skill wiring	repo	wiring
+verdict epoch (kit version dates the engine)	repo	declarations
+verdict-epoch self-test	kit	selftests
+verifier fan-out	repo	declarations
+verifier fan-out self-test	kit	selftests
+workflow script syntax	repo	wiring

@@ -2151,7 +2151,17 @@ if [ -f "$tpl" ]; then
   for _f in $KIT_SH; do
     KB_CALLS="$KB_CALLS$(grep -nE 'declared_(list|scalar) ' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | sed "s|^|$_f	|" || true)
 "
-    KB_CARETS="$KB_CARETS$(grep -nE '\^[A-Za-z_]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | grep -v 'grep -q' | sed "s|^|$_f	|" || true)
+    # THE EXEMPTION IS A CLASS, NOT A SPELLING. `grep -q` was the only form excluded here, and the
+    # property that earns the exclusion is that a PRESENCE TEST cannot yield the key's value and so
+    # cannot be a second answer to it. `grep -l` has exactly that property — it returns FILENAMES —
+    # and was not excluded, so batching a per-file `grep -q` discovery into one `grep -l` tripped
+    # this check while changing nothing it grades. Found when `TOOL-aScouredKit-6` did precisely
+    # that in check-playbook.sh.
+    #
+    # `-l` and `-q` only. NOT `-c`, which yields a count that a caller can branch on, and not the
+    # bare form, which yields the matching LINE — that is the read this check exists to catch. The
+    # widening is deliberately the narrowest one that covers the class.
+    KB_CARETS="$KB_CARETS$(grep -nE '\^[A-Za-z_]' "$_f" | grep -vE '^[0-9]+:[[:space:]]*#' | grep -vE 'grep [^|]*-[A-Za-z]*[ql]' | sed "s|^|$_f	|" || true)
 "
   done
   while IFS= read -r _k; do

@@ -518,6 +518,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkDriveRootLitter",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkUnderRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"

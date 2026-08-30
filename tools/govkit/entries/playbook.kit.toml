@@ -218,8 +218,18 @@ why = "where the user-facing page per feature lives"
 [[placeholder]]
 key = "REVIEW_DIR"
 class = "defaulted"
-default = "memory/reviews/"
-why = "where a Tier-2 run is persisted as an in-repo artifact"
+# TOOL-aScouredKit-14, corrected. The default was `memory/reviews/`, a directory that exists in no
+# tree this kit has ever produced: the memory-tree kit's own hygiene check 5 requires a review record
+# to live under `<MEMORY_ROOT>/builds/<slug>/reviews/`, so the charter was defaulting every adopter
+# to a location its sibling gate REFUSES. Found because a hand-edit of the rendered AGENTS.md was
+# reverted by the next render — the value is declared here, and editing the render was treating a
+# generated file as authored.
+#
+# A LITERAL, because a default is not token-expanded (`render_playbook.py` substitutes it as-is), so
+# `{{MEMORY_ROOT}}` here would land verbatim in the charter. An adopter whose memory root is not
+# `memory` answers `review_dir` in their own `[answers]`, which is what the `defaulted` class is for.
+default = "memory/builds/<slug>/reviews/"
+why = "where a Tier-2 run is persisted as an in-repo artifact; must agree with memory-tree hygiene check 5, which requires <MEMORY_ROOT>/builds/<slug>/reviews/"
 
 [[placeholder]]
 key = "PROSE_AUDIT"
