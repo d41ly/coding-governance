@@ -1,12 +1,13 @@
 # TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +27,12 @@ declaration. It is the mechanism that put a `push-main.sh` landing behind three 
   (`run-gates.sh:420` and `:726`) compare a string against `0`, so substituting a TOML `false`
   verbatim compares the word `false` against `0`, which is TRUE, and ships the mechanism ENABLED —
   the exact inversion of this unit's goal, arriving with the declaration visibly wired.
-- **S3** — the adopter seed declares `turnstile = false`, so arriving at a target never enables it.
+- **S3** — the adopter default `turnstile = false` is written by
+  `TOOL-aGatheredDeclaration-6` S1's textual-splice emitter, which is what actually writes a
+  target's `gate-legs.toml`. **NOT `[gate_runner_seed]`**: that block seeds the target's
+  `.governance/deploy.toml` `[gate_runner]` table from a closed key tuple at `govkit.py:6620`
+  with no member a `[bar]` key could travel in. rev-1 named it and `TOOL-aGatheredDeclaration-4`
+  copied the error, which is why both are corrected in one edit.
 - **S4** — the `queued_from` vocabulary keeps its `off` member, which already records a DASH rather
   than a zero for a probe that never ran. Shipping disabled makes `off` the ordinary state rather
   than an exception, and the summary says so once rather than on every leg.
@@ -123,9 +129,11 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
   `tools/run-gates/run-gates.turnstile.test.sh` with that variable exported.
 - **AC4** — When the turnstile is off, the run record's `queued` and `queued_from` keys are present
   and read `-` and `off`, asserted by reading the run record rather than the stream.
-- **AC5** — When `bash tools/run-gates/adopt-run-gates.sh --check` runs against a freshly seeded
-  target, the seeded declaration carries `turnstile = false`, asserted in
-  `tools/run-gates/adopt-run-gates.test.sh`.
+- **AC5** — When a full intake runs into a scratch target, the EMITTED
+  `<prefix>/gate-legs.toml` is parsed and its `[bar]` table carries `turnstile = false`, asserted
+  in `tools/run-gates/adopt-run-gates.test.sh`. It reads the emitted FILE, never the seed;
+  `adopt-run-gates.sh --check` is read-only and seeds nothing, so rev-1's spelling asserted a
+  verb that cannot write what it checks.
 - **AC6** — When the profile line is printed, it names the turnstile state and where the value came
   from, asserted by grepping the first line of `bash tools/run-gates/run-gates.sh` captured output.
 
@@ -148,6 +156,9 @@ question: gov dogfoods its own kits, and a default gov does not run is a default
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Finding R1. S3 and AC5 named `[gate_runner_seed]`, which writes a
+  different file from a closed key tuple, and graded it with a read-only verb.
 - rev-2 · 2026-08-31 · folded round-1 spec audit findings F18 and F19. rev-1's S2 prescribed
   substituting the declared value into a `!= 0` string test, which would have shipped the
   turnstile ENABLED on a declared `false` while every criterion stayed green — the inversion is

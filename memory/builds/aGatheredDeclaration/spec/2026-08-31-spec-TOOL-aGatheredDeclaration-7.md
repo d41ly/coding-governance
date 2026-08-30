@@ -1,12 +1,13 @@
 # TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -49,9 +50,14 @@ a flag day for two live repositories, and the prompt asks for the tool explicitl
   because `TOOL-aGatheredDeclaration-2` S3 makes the TOML win wherever it exists. It is a SHARED
   preflight every write verb calls, not a probe bolted to this one — a per-verb probe is a probe
   the next verb forgets.
-- **S10** — the emitted file carries the `[[lane]]` rows its mapped `lane` values name. A `phase`
-  mapped to a lane no row declares is a manifest `TOOL-aGatheredDeclaration-2` AC9 refuses, so
-  emitting the legs alone would write a file the runner rejects.
+- **S10** — the emitted file carries EVERY top-level table the loader owns, not just the legs.
+  Three, and rev-2 named one: the `[[lane]]` rows its mapped `lane` values name; the `[bar]`
+  table, seeded from the same defaults `TOOL-aGatheredDeclaration-6` S1(d) emits; and the
+  `[[profile]]` rows READ FROM the target's own `gate-profiles.txt`, refusing when that file is
+  absent. `TOOL-aGatheredDeclaration-2` S3 defines the legacy pair as the manifest TOGETHER WITH
+  the profile table and makes the TOML win wholesale, and `kit.toml:146` pins
+  `{kit}/gate-profiles.txt` into every target — so an upgrade that emits legs alone silently
+  orphans a real adopter's profile table and drops it to the built-in formula.
 
 ## 3. Non-goals (OUT)
 
@@ -157,7 +163,15 @@ report the owner acts on.
   than printing nothing, asserted in `tools/run-gates/adopt-run-gates.test.sh` in both directions —
   an empty report and a report nobody generated must be distinguishable.
 - **AC8** — When the emitted TOML is handed to `bash tools/run-gates/run-gates.sh --manifest`, it
-  loads and reports the same leg count the source declared, asserted end to end in a scratch repo.
+  loads and reports the same leg count the source declared AND the same resolved profile row and
+  width the target reported before the upgrade, asserted end to end in a scratch repo. The
+  profile half is what rev-2's leg-count-only criterion could not see.
+- **AC8b** — When the target holds no `gate-profiles.txt`, `--upgrade` exits 2 naming it rather
+  than emitting a manifest with no `[[profile]]` row, asserted in
+  `tools/run-gates/adopt-run-gates.test.sh`. Observed RED first.
+- **AC8c** — When the emitted TOML is parsed, its `[bar]` table carries the kit defaults, asserted
+  key-by-key against `TOOL-aGatheredDeclaration-6` S1(d)'s emitted set rather than against a
+  list typed here.
 
 ## 7. Gates
 
@@ -181,6 +195,10 @@ the arms join `adopt-run-gates.test.sh`, which is already a leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) finding R4. The
+  fold's S10 had the right argument — emitting the legs alone writes a file the runner rejects —
+  and stopped one table short of it, dropping `[bar]` and `[[profile]]`.
 - rev-2 · 2026-08-31 · folded round-1 spec audit findings F5, F21 and F29. `full_only` was
   unmapped while the spec cited the ruling that retains it, which put AC2 and AC4 in direct
   contradiction on any honest fixture. The interpreter probe carries this build's own R10, which

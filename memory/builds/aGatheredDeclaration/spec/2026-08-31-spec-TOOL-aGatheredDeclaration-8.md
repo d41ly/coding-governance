@@ -1,10 +1,12 @@
 # TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 
 <!-- /gen:spec-records -->
 
@@ -21,7 +23,9 @@ dispatcher change unit 2 was carrying unpriced.
   of lane N+1 dispatches.
 - **S2** — PER-LANE CONCURRENCY: `concurrency = <n>` is a literal width and `concurrency = "profile"`
   takes the selected profile's. `GATE_JOBS` continues to override the width alone, per lane.
-- **S3** — SHORT CIRCUIT: a lane declaring `short_circuit = true` whose legs did not all pass causes
+- **S3** — SHORT CIRCUIT. The key is DECLARED by `TOOL-aGatheredDeclaration-2` S11 and READ here;
+  at rev-1 it was declared by neither, because unit 2's example lane set shrank to one row in the
+  same fold that created this unit. A lane declaring `short_circuit = true` whose legs did not all pass causes
   every leg in every later lane to be SKIP-marked without launching, each reported with a verb and a
   reason DISTINCT from the guard skip's.
 - **S4** — the DISPATCH HINT is partitioned per lane. Today one global longest-first order is built
@@ -143,6 +147,9 @@ express short-circuit at all, because a sorted single pool has already launched 
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-31 · folded round-2 spec audit finding R16: `short_circuit` was read here and
+  declared nowhere. The schema half now sits in `TOOL-aGatheredDeclaration-2` S11, which is where
+  the rest of the `[[lane]]` shape lives.
 - rev-1 · 2026-08-31 · authored as an amendment during the round-1 spec-audit fold. Split out of
   `TOOL-aGatheredDeclaration-2`, whose S2 asserted "the dispatch loop below it does not change" while
   S6 and S7 required rewriting it — finding F9 of

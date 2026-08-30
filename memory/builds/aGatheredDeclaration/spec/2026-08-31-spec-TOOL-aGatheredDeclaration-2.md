@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -38,11 +39,25 @@ legs, held in the same set, dispatched by the same loop.
 - **S7** — the ENV SPELLINGS: `GATE_OPTIN` is the new name for the hold override and
   `GATE_SELFTESTS` is its alias. Both write the same run-record byte and satisfy the same pre-push
   predicate.
-- **S8** — the STAMP/HOOK PAIR: `run-gates.sh:1430` stamps `manifest_blob` from `$LEGS_FILE` while
-  `.githooks/pre-push:203` hashes a hardcoded `tools/gate-legs.json`. This unit keeps the pair
-  agreeing across the window before unit 6 moves the hook.
+- **S8** — the STAMP/HOOK PAIR, and it is TWO predicates rather than one. `.githooks/pre-push:195`
+  (predicate 6) diffs `tools/gate-legs.json` to catch a push that moves the scoping rules;
+  `:203` (predicate 7) hashes the same literal path. rev-2 froze the stamp on the JSON blob,
+  which keeps predicate 7 agreeing and leaves predicate 6 BLIND to the file that now scopes the
+  bar — the unsafe direction, since a push touching only the TOML would not be forced. Predicate
+  6's pathspec gains `tools/gate-legs.toml`, which is additive and waits on nothing.
+- **S8b** — predicate 7 stays pinned to the JSON blob until unit 6, and that is a DECLARED
+  EXEMPTION with a compensating check: S8's widened predicate 6 catches the same class from the
+  diff side for the whole window. Charter §7 requires an exemption to name its compensating
+  check, and rev-2 took the exemption without naming one.
 - **S9** — the canary arms: the reader, the dual-format branch, the floor refusal, the schema
   refusals, the empty-guard round trip, the boolean marshalling, and the repointed pinned-knob arm.
+- **S10** — a TOML declaring NO `[[profile]]` row exits 2 naming the file. A converter that drops
+  a table is then caught by the loader on its first run rather than by a wide pool on a small
+  machine, and the same refusal covers a hand-written adopter manifest.
+- **S11** — `short_circuit` is part of the `[[lane]]` SCHEMA declared here, validated as a boolean
+  and defaulting to `false`. `TOOL-aGatheredDeclaration-8` READS it. rev-2 dropped it from this
+  schema when the example lane set shrank to one row, leaving unit 8 reading a key no unit
+  declared.
 
 ## 3. Non-goals (OUT)
 
@@ -85,6 +100,7 @@ width = 8
 [[lane]]                     # DECLARED here, IMPLEMENTED in TOOL-aGatheredDeclaration-8.
 name = "heavy"               # every gov leg is in this lane, so the migration changes no behaviour
 concurrency = "profile"
+short_circuit = false        # a failing lane does NOT skip the lanes after it. Default.
 
 [[leg]]
 name = "kickoff-manifest ratchet"
@@ -112,8 +128,10 @@ rather than restating it, and so does unit 4's `GATE_CEILINGS` join.
 `ceiling` separated by the RECORD SEPARATOR byte, with `argv` internally joined by the UNIT
 SEPARATOR byte, and reads them back at `:905-910` with `IFS` set to that same record separator. Its
 own comment states the reason: both bytes are non-whitespace, so an EMPTY guard field survives
-`read` where a tab would collapse. **36 of 86 legs carry no guard** — 42%, the common case, not an
-edge. The TOML reader reproduces the separators, the field ORDER and the append-only rule
+`read` where a tab would collapse. **38 of 86 legs carry no effective guard** — 36 omit the key and 2 declare an
+empty list, so 44%: the common case, not an edge. rev-2 said 36, which counted only the omitted
+key while the paragraph's own criterion is an empty FIELD on the wire, and both spellings
+produce one. The TOML reader reproduces the separators, the field ORDER and the append-only rule
 byte-for-byte; a field inserted before an existing one is parsed AS that one by any reader not moved
 in the same commit.
 
@@ -138,7 +156,7 @@ census. `PROF_TIMEOUT` has two live readers and each gets a named replacement:
 
 | consumer | what it does | replacement |
 |---|---|---|
-| `run-gates.sh:434` | derives the turnstile holder TTL as three times it | `[bar].turnstile_ttl`, declared directly |
+| `run-gates.sh:434` | derives the turnstile holder TTL as three times it | `[bar].turnstile_ttl`, declared directly, graded by AC14 |
 | `run-gates.sh:1104` | the per-leg bound fallback | `[bar].default_ceiling` |
 
 `run-gates.sh:431`'s own comment names setting `timeout=` as the PRESCRIBED fix for a leg reaped
@@ -230,9 +248,19 @@ agree. S3's permanent dual-format path is the answer instead.
 - **AC9** — When a leg carries a key the schema does not declare, or names a lane no `[[lane]]` row
   declares, `bash tools/run-gates/run-gates.sh` exits 2 naming the leg and the key. Observed RED
   first.
-- **AC10** — When a bar runs and a default-branch push follows in one scratch repo, the push is NOT
-  forced to a full bar, asserted in `.githooks/pre-push.test.sh` — the stamp and the hook hash the
-  same file across this window.
+- **AC10** — When a bar runs in a scratch repo that DECLARES a `gate-legs.toml` and a
+  default-branch push follows, the push is NOT forced to a full bar, asserted in
+  `.githooks/pre-push.test.sh`. **The declared TOML is load-bearing in the fixture**: rev-2's
+  wording greened on a JSON-only scratch repo, where the defect it grades cannot occur.
+- **AC10b** — When a push's diff touches ONLY `tools/gate-legs.toml`, it IS forced to a full bar,
+  asserted in `.githooks/pre-push.test.sh` against predicate 6. Observed RED first against the
+  unmoved pathspec — this is the direction rev-2 left open.
+- **AC14** — When `[bar].turnstile_ttl` is set to a value distinguishable from the default, the
+  turnstile's holder TTL takes it, asserted in `tools/run-gates/run-gates.turnstile.test.sh`.
+  Without this the key replaces a live consumer of a knob this unit removes and is graded by
+  nothing in any of the eight units.
+- **AC15** — When `tools/gate-legs.toml` declares no `[[profile]]` row,
+  `bash tools/run-gates/run-gates.sh` exits 2 naming the file. Observed RED first.
 - **AC11** — When a run sets `GATE_OPTIN` and another sets `GATE_SELFTESTS`, both write the same
   run-record byte and both satisfy pre-push predicate 8, asserted in `.githooks/pre-push.test.sh`
   parameterised over both spellings.
@@ -274,6 +302,13 @@ agree. S3's permanent dual-format path is the answer instead.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft, from `TOOL-aGatheredDeclaration-1`'s schema union.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Findings R2, R9, R10, R16 and R18. rev-2's answer to F10 closed
+  predicate 7 and left predicate 6 watching a file that no longer scopes the bar, which is the
+  unsafe direction; S8 now covers both and S8b names the exemption's compensating check. AC10
+  could not fail on a JSON-only fixture. `short_circuit` was dropped from the schema when the
+  example lane set shrank, leaving unit 8 reading an undeclared key. The guard count was 38, not
+  36, by this paragraph's own criterion.
 - rev-2 · 2026-08-31 · folded round-1 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md`), findings F3, F4,
   F6, F7, F8, F9, F10, F11, F12, F13, F22, F23, F24, F25. Lanes and the tool probe left for

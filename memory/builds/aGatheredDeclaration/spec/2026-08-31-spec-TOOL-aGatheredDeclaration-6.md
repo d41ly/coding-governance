@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +26,19 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
   rather than route around. (b) The writer becomes a TEXTUAL SPLICE between marker comments
   rather than a parse-and-reserialise, because Python ships no comment-preserving TOML writer and
   a reserialise would delete every argument this build exists to make storable. (c) The
-  `[gate_runner_seed]` block gains the new file name.
+  `[gate_runner_seed]` block gains the new file name AND its `grammar` key. `kit.toml:107`
+  declares `grammar = "json-array"` on the line above `file`, and it is the ONLY place a
+  target's grammar comes from — so without this, `toml-legs` has no producer anywhere in the
+  build and a freshly intaken target declares a JSON grammar against a `.toml` file.
+  `govkit.py:2947` accepts `None` or `json-array`, so nothing refuses: the grammar simply lies.
+  (d) The emitter writes the `[bar]` table with `enforce_ceilings = false` and
+  `turnstile = false`, which is where `TOOL-aGatheredDeclaration-4` S7 and
+  `TOOL-aGatheredDeclaration-5` S3 actually land. (e) The DESCRIPTOR KEY MIGRATION: 68
+  `subject = ` rows across 23 descriptor TOMLs, 21 under `tools/govkit/entries/` and the rest in
+  other kits' `kit.toml`, plus the selfcheck arms at `govkit.py:1235`, `:1239`, `:1264`, `:1271`,
+  `:1285`, `:1290`, `:1322-1330`, `:4332-4334` and the `SUBJECT_FLOOR_RUN_GATES` pin at
+  `:2971-2972`. rev-2 priced govkit at three edits; S1b's own premise, *once `subject` is gone*,
+  is the trigger for every one of them.
 - **S1b** — the SUBJECT RATCHET moves with the key it pins. `govkit.py:1354` resolves each leg's
   subject against `tools/govkit/subject-pins.tsv`, defaulting to `repo`. Once `subject` is gone,
   all 40 kit legs resolve to that default and `govkit selfcheck` — `chunk = declarations`,
@@ -55,9 +68,25 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 - **S7b** — the two canaries' GUARD LISTS name `tools/gate-legs.json` and move to the TOML in the
   same commit. `run-gates.test.sh:268-283` fails on a guard pathspec matching no tracked path, so
   leaving them is a leg that skips forever.
-- **S9** — `tools/check-testsuite-counts.sh` and the three other carriers in the inventory above
-  move. The checker's population selector reads the manifest BYTES with a regex over quoted
-  `.test.sh` strings, which needs restating for TOML rather than repointing.
+- **S9** — `tools/check-testsuite-counts.sh` and the other carriers in the inventory above move.
+  The checker's population selector reads the manifest BYTES with a regex over quoted `.test.sh`
+  strings, which needs restating for TOML rather than repointing.
+- **S10** — `tools/dead-path-waivers.txt` gains one row per SURVIVING carrier of the string
+  `gate-legs.json`. `tools/check-dead-paths.sh:76-84` derives its needles as BASENAMES from the
+  deletion log minus every basename the tree still carries, then greps every tracked file outside
+  `memory/`. **31 tracked files outside `memory/` carry that string today**, 30 of them surviving
+  the deletion — the loader's own legacy branch, the hook and its test, `kit.toml`, the adopter
+  fixtures. The permanent ones are reasoned as *a live path in an adopter, dead only in gov*. The
+  waiver file's shrink-only header is being ratcheted the WRONG WAY in this one commit, and that
+  is said here rather than discovered in the diff.
+- **S11** — the SOURCE of the entry-point sentence is `.governance/deploy.toml:44`'s
+  `gate_commands`, not `AGENTS.md`. `coding-governance-agents.template.md:180` carries
+  `{{GATE_COMMANDS}}`, `AGENTS.md:250` is that value RENDERED, and it sits inside the
+  `<!-- gov:playbook -->` region between `AGENTS.md:76` and `:470`. rev-2's S6 had the direction
+  backwards: the renderer reads deploy.toml plus the template and WRITES the charter, so a hand
+  edit inside the region is reverted by the next render. `.codebase-map.conf:13` carries the same
+  string and is the second source. The merge-bar section BELOW `:470` is gov-authored and is
+  edited directly.
 - **S8** — the `run-gates` map dossier at `memory/map/features/run-gates.md` is refreshed: its
   `[paths]` globs and its `[claims]` gain the new file, which the map's coverage gate requires in
   the same commit as the claim edit.
@@ -85,6 +114,7 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
 | `run-unattended-gates.sh` | its own dispatch | S5, folded away |
 | `check-testsuite-counts.sh` | its POPULATION, selected by grepping the manifest BYTES | S9 |
 | `check-memory-hygiene.sh`, `template-size-limits.txt`, `drift-audit-state.js` | each names the file | S9 |
+| `tools/run-gates/profile_bar.py` | reads the manifest to profile the bar | S9 |
 
 **The inventory at rev-1 was certified by a grep nobody re-ran, and the grep refutes it.**
 `tools/check-testsuite-counts.sh:27` hardcodes `MANIFEST=tools/gate-legs.json` and `:32` HARD
@@ -111,7 +141,9 @@ into the declaration as `opt_in = true` rows carrying the 2026-08-23 owner rulin
 `.githooks/pre-push.test.sh` · `tools/drift-audit/drift_signals.py` + `.template.py` ·
 `tools/codebase-map/map_extractors.py` · `tools/unattended/run-unattended-gates.sh` ·
 `tools/check-testsuite-counts.sh` · `tools/govkit/subject-pins.tsv` · `tools/run-gates/kit.toml` ·
-`tools/gate-legs.toml` (the guard lists) · `AGENTS.md` ·
+`tools/gate-legs.toml` (the guard lists) · `tools/dead-path-waivers.txt` ·
+`.governance/deploy.toml` · `.codebase-map.conf` · `tools/govkit/entries/*.kit.toml` and every
+other kit's `kit.toml` `[[gate_leg]]` rows · `tools/run-gates/profile_bar.py` · `AGENTS.md` ·
 `coding-governance-agents.template.md` · `memory/map/features/run-gates.md` · `tools/gate-legs.json`
 and `tools/run-gates/gate-profiles.txt` (both deleted) · the affected suites.
 
@@ -154,8 +186,22 @@ branch exists precisely so this can be a second landing.
 - **AC5** — When `bash tools/unattended/run-unattended-gates.sh` runs, it dispatches through
   `run-gates.sh --leg` and its seven leg names appear in the runner's own summary, asserted by
   grepping for the runner's report tail rather than for a message this script prints.
-- **AC6** — When `bash tools/check-dead-paths.sh` runs after S7, no carrier names
-  `tools/gate-legs.json`, asserted by the leg's own green.
+- **AC6** — When `bash tools/check-dead-paths.sh` runs after S7 and S10, it is GREEN with the
+  declared waiver set, and a CONTROL arm planting a fresh undeclared carrier still REDS.
+  **rev-2's wording was unsatisfiable**: the gate's predicate is a BASENAME, and
+  `TOOL-aGatheredDeclaration-2` S3 makes the loader's legacy branch spell `gate-legs.json`
+  permanently, so "no carrier names it" and the permanent dual-format arm cannot both hold. The
+  control arm is what stops the waiver edit widening the surface it was written to narrow.
+- **AC11** — When `python tools/govkit/govkit.py selfcheck` runs with no `subject` key anywhere in
+  the tracked descriptor population, it is GREEN, asserted after S1(e)'s migration. A grep for a
+  surviving `^subject = ` row is the same arm's second half, so a kit added later cannot
+  reintroduce the key.
+- **AC12** — When a target is freshly intaken, its emitted `[gate_runner]` block carries
+  `grammar = "toml-legs"` and a `.toml` `file`, asserted in `tools/govkit/selftest.py`. Without
+  it the grammar lies and nothing refuses.
+- **AC13** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs after S11, it is
+  GREEN, asserted as its own arm. A hand edit inside the rendered region passes every other
+  criterion here and is reverted by the next render.
 - **AC7** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on this tree with the
   legacy pair deleted, it is GREEN and its leg count is unchanged. **The selftests flag is load
   bearing**: both canaries are `chunk = selftests`, so a DEFAULT bar holds them and rev-1's AC7
@@ -174,9 +220,12 @@ branch exists precisely so this can be a second landing.
 
 `run-gates canary` · `run-gates gov canary` · `govkit selfcheck` · `pre-push hook selftest` ·
 `drift-audit selftest` · `codebase-map coverage` · `dead paths` · `unattended kit gate` ·
-`check-wiring` · `testsuite counts` · `template size <=48KiB` · `charter size`. The last two are
-here because S6 edits `coding-governance-agents.template.md` and `AGENTS.md`, both size-gated,
-and rev-1 listed neither. No new leg.
+`check-wiring` · `testsuite counts` · `template size <=48KiB` · `charter size` ·
+`playbook render wiring` · `playbook placeholder catalogue` · `playbook parity`. The size pair is
+here because S6 edits `coding-governance-agents.template.md` and `AGENTS.md`, both size-gated;
+the playbook trio is here because S11 edits the render's SOURCE and all three are
+`subject = repo` with no guard, so they run on every bar. rev-1 listed none of the five and rev-2
+listed two. No new leg.
 
 ## 8. Open questions
 
@@ -192,6 +241,14 @@ and rev-1 listed neither. No new leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) findings R1, R3,
+  R5, R6, R7 and R12. AC6 was unsatisfiable beside unit 2's permanent legacy branch and its
+  landing would have redded a leg that runs on every bar, with the waiver file owned by nobody.
+  govkit was priced at three edits against 68 descriptor rows and nine selfcheck sites. The
+  entry-point sentence is owned by `.governance/deploy.toml`, not by the charter S6 proposed to
+  edit. The seed's `grammar` key had no producer. `profile_bar.py` was still missing from an
+  inventory rev-2 had just re-certified.
 - rev-2 · 2026-08-31 · folded round-1 spec audit findings F1, F2, F7, F20, F27 and F28. The
   reader inventory was incomplete in the one direction that reds the default bar, and the grep
   rev-1's Section 10 cited as its evidence is what found the gap. The subject ratchet, the

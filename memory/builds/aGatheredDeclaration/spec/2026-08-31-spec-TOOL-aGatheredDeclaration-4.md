@@ -1,12 +1,13 @@
 # TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -28,6 +29,10 @@ and killed legs have cost this fleet reds and re-runs that produced no evidence 
 - **S5** — `gate-full-green` records the enforcement state, and `.githooks/pre-push` treats a stamp
   earned with enforcement OFF as COVERING a push that needs it off, never the reverse. Same
   coverage-not-equality shape the self-test key already has.
+- **S5b** — the hook is TAUGHT the state a push needs, which rev-2 left undefined. Coverage is a
+  comparison and a comparison needs two sides: the hook resolves the needed state the same way
+  the runner does — `GATE_CEILINGS` if exported, else `[bar].enforce_ceilings` read from the
+  manifest — and that resolution is stated here rather than left for the code to invent.
 - **S6** — `.unattended.conf`'s `GATE_BOUND` — the whole-bar bound the unattended `--close` runs
   under — comes under the same rule: it ships absent, the kit's default applies only when
   enforcement is on, and the driver says on stderr which it used.
@@ -89,9 +94,15 @@ ahead of any request for it.
 `tools/run-gates/adopt-run-gates.sh` and `tools/run-gates/adopt-run-gates.test.sh` (S7) ·
 `tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md`.
 
-**S7 writes the seed through `[gate_runner_seed]`, the same path `TOOL-aGatheredDeclaration-5`
-S3 uses.** Two units writing two `[bar]` keys through two paths is how they diverge, and rev-1
-named no path at all.
+**S7 writes the default through `TOOL-aGatheredDeclaration-6` S1's TEXTUAL-SPLICE EMITTER**, the
+thing that actually writes a target's `gate-legs.toml`. rev-2 named `[gate_runner_seed]` and
+cited unit 5's identical scope item as precedent; both were wrong, and copying an untested
+sibling is how the same defect landed twice. `tools/run-gates/kit.toml:105-135` seeds the
+TARGET'S `.governance/deploy.toml` `[gate_runner]` table — a different file read by a different
+program — and `govkit.py:6620` emits that block from a CLOSED key tuple
+(`kind`, `grammar`, `file`, `dedupe_key`, `run_all_env`, the observed templates, `command`) that
+has no member a `[bar]` key could travel in. `adopt-run-gates.sh --check` is read-only and seeds
+nothing, so rev-2's AC9 graded a verb that cannot write the thing it asserts.
 
 ### Alternatives rejected
 
@@ -149,10 +160,18 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
   the unattended kit's own suite.
 - **AC8** — When `bash tools/run-gates/run-gates.sh --manifest` runs with enforcement off, every
   leg's ceiling column reads `declared, not enforced`, asserted by grepping the output.
-- **AC9** — When `bash tools/run-gates/adopt-run-gates.sh --check` runs against a freshly seeded
-  target, the seeded `[bar]` table carries `enforce_ceilings = false`, asserted in
-  `tools/run-gates/adopt-run-gates.test.sh`. Mirrors `TOOL-aGatheredDeclaration-5` AC5, which is
-  the arm rev-1's S7 lacked.
+- **AC9** — When a full intake runs into a scratch target, the EMITTED
+  `<prefix>/gate-legs.toml` is parsed and its `[bar]` table carries `enforce_ceilings = false`,
+  asserted in `tools/run-gates/adopt-run-gates.test.sh`. It reads the emitted FILE, never the
+  seed — rev-2 asserted a read-only verb against a seed block that structurally cannot carry the
+  key.
+- **AC11** — When neither `GATE_CEILINGS` nor `[bar].enforce_ceilings` is present at all — an
+  adopter's hand-written manifest, or gov's own tree before this unit lands — enforcement is OFF
+  and the runner says the default was taken, asserted in `tools/run-gates/run-gates.test.sh`.
+  The resolution table has three rows and rev-2 armed row 2 while disarming row 3.
+- **AC12** — When a push needs enforcement ON and the recorded green was earned with it OFF,
+  `.githooks/pre-push` forces a full bar; the reverse is accepted. Asserted in
+  `.githooks/pre-push.test.sh` with the needed state supplied both ways S5b names.
 - **AC10** — When a run finishes, its run record carries `enforce_ceilings` and the source that
   decided it, asserted by reading `<git-dir>/gate-run/<run-id>/header` in
   `tools/run-gates/run-gates.test.sh` rather than the stream. S4 had no criterion at rev-1.
@@ -177,6 +196,12 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`). Findings R1, R8 and R11. rev-2's answer to F17 routed the
+  adopter default through `[gate_runner_seed]`, which writes a different file from a closed key
+  tuple, and graded it with a read-only verb; both are corrected against source here. S5 gave
+  the hook no way to learn the state its coverage rule compares against. The absent-key row of
+  the resolution table lost its arm when rev-2 reworded AC1 to the shipped state.
 - rev-2 · 2026-08-31 · folded round-1 spec audit findings F12, F16, F17 and F26. The acceptance
   set reached two of the resolution table's three rows and never exercised the declared value
   itself, so AC1b was added and AC1 was reworded to the shipped state. S7's adopter seed gained a

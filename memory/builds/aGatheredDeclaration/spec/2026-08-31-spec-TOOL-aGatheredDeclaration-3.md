@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md](../build/2026-08-31-build-TOOL-aGatheredDeclaration-2-architecture-recommendations.md) | research | TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -43,6 +44,11 @@ declare" except by reading a JSON file.
   the measured seconds and the ratio, flagging any leg whose ceiling is under 3x its measurement.
   It REPORTS and never reds. This is the surviving half of `TOOL-aCollapsedScan-5` and it is what
   stops the declarations rotting once `TOOL-aGatheredDeclaration-4` turns enforcement off.
+  **The ledger is PER-CLONE and often absent**, so the rendering is declared rather than left to
+  the implementation: a leg with no ledger row renders its measured column as a DASH and its
+  ratio column as a dash, never as a zero, and a run with no ledger at all prints one line
+  saying the join found no measurements. A zero for a probe that never ran is a reassuring number
+  about nothing, which is the class this repo already names.
 
 ## 3. Non-goals (OUT)
 
@@ -76,6 +82,13 @@ in it, and no guard or hold is consulted.
 ```
 usage: run-gates.sh [--leg <name>]... [--list] [--manifest] [--help]
 ```
+
+**The `LEG` row format is an OUTPUT CONTRACT, and S9 changes it.** `--manifest`'s row is
+`LEG  <name>  <lane>  <opt-in|always>  <ceiling|none>  <guards>  <would-run|held|guarded-out>`
+and S9 appends the measured seconds and the ratio. The two columns go at the END, after the
+selection verdict, because a column inserted before an existing one is read AS that one by any
+reader not moved in the same commit — the same append-only rule
+`TOOL-aGatheredDeclaration-2` states for the RS/US wire format.
 
 ### Inventory
 
@@ -150,6 +163,14 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 - **AC11** — When `--manifest` runs, each leg row carries its declared ceiling, the seconds
   `<git-dir>/gate-ledger.tsv` recorded for it, and their ratio, with a flag on any ratio under 3,
   asserted in `tools/run-gates/run-gates.test.sh` against a planted ledger.
+- **AC12** — When `bash tools/run-gates/run-gates.sh --help` runs, it prints the usage line and
+  exits 0; when an unknown argument is passed, it exits 2 naming the argument. Asserted in
+  `tools/run-gates/run-gates.test.sh`. S4 had no criterion at rev-2, which left the one
+  pure-surface scope item ungraded.
+- **AC13** — When `--manifest` runs against a tree with NO `<git-dir>/gate-ledger.tsv`, every
+  measured column is a dash and one line says the join found no measurements, asserted in
+  `tools/run-gates/run-gates.test.sh`. AC11's planted-ledger arm grades only the populated
+  direction.
 - **AC9** — When a run holds an opt-in leg, `<git-dir>/gate-optin-lastrun.tsv` carries that leg and
   the post-run block names it with its last-run stamp, asserted across two consecutive scratch runs.
 
@@ -170,6 +191,11 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-3 · 2026-08-31 · folded round-2 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md`) findings R13,
+  R14 and R15. The fold-new ledger join had no unmeasured-leg rendering, no empty state and a
+  one-armed criterion; `--help` and the unknown-argument refusal had no criterion at all; and the
+  new columns needed the append-only rule stating against the pinned row format.
 - rev-2 · 2026-08-31 · folded round-1 spec audit findings F14 and F15. AC2 was grading EXECUTION
   order, which the runner explicitly disclaims, by a mechanism that is a race above width 1; it
   now grades reporting order. S8 and S9 were added: the query verbs' turnstile and stdout
