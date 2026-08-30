@@ -286,7 +286,7 @@ function boundedBranch(br, name, consts, ok) {
 // improved one. That is a smaller and stated loss.
 function renderCodeView(script) {
   const out = []
-  let mode = 'code' // code | tmpl | block
+  let mode = 'code' // code | tmpl
   const stack = [] // 'tmpl' | 'interp', innermost last
   let interpDepth = 0 // brace depth inside the current interpolation
   for (const raw of script.split(/\r?\n/)) {
@@ -297,15 +297,19 @@ function renderCodeView(script) {
       const two = raw.slice(i, i + 2)
       if (mode === 'code') {
         if (two === '//') break
-        if (two === '/*') { mode = 'block'; i += 2; continue }
         if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          res += ch
+          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
+          // and then append a closer the source never had, swallowing the rest of that line --
+          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
+          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
+          // needs a matching PAIR before it blanks anything, and so does this now.
           const q = ch
-          i++
-          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
-          res += q
-          i++
+          let e = i + 1
+          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
+          if (e >= raw.length) { res += ch; i++; continue }
+          res += q + q
+          i = e + 1
           continue
         }
         // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
@@ -324,19 +328,22 @@ function renderCodeView(script) {
         if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
         if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
         i++
-      } else {
-        if (two === '*/') { mode = 'code'; i += 2; continue }
-        i++
       }
     }
     out.push(res)
   }
-  // The flag reports EVERY mode that outlives the scan, not just an open template. Block mode pushes
-  // nothing onto the stack, so an unterminated block-comment opener used to end the scan with a
-  // `stack.length` of zero
-  // and no fallback: everything below the opener was blanked and an unbounded fan under it was
-  // ADMITTED where the shipped hook DENIES. Measured, and the reason this is `mode !== 'code'`
-  // rather than a second stack.
+  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
+  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
+  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
+  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
+  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
+  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
+  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
+  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
+  // documents for a primitive named inside a block comment.
+  //
+  // The flag still reports every mode that outlives the scan, which now means an unterminated
+  // TEMPLATE only.
   return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
 }
 

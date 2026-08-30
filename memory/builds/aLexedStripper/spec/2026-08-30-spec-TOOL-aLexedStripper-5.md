@@ -1,12 +1,13 @@
 # TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced
 
-**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
 
 <!-- /gen:spec-records -->
@@ -153,6 +154,26 @@ subject is the `agent-cap` kit, so its self-test leg is guarded and runs under `
   The review's second blocker — an unpaired quote in code position — is REFUTED: four fixtures were
   run and all four DENY at both BASE and HEAD, because this file's quote handling mirrors
   `stripStrings`' own and therefore cannot regress against it.
+
+- rev-3 · 2026-08-30 · folded the closing review's ROUND 2, which found rev-2's repair insufficient
+  and a second fail-open beside it. Both were reproduced before folding, and one of them refutes
+  this spec's own rev-2 claim.
+  **The widened flag was not enough.** Reporting `mode !== 'code'` catches an opener that never
+  closes; it does not catch one BORNE IN A REGEX LITERAL and closed by a later ordinary closer,
+  which returns the scan to code mode with an empty stack while the span between is already blanked.
+  Round 1 said to delete the block branch and rev-2 shipped the smaller repair instead. It is now
+  deleted: this view blanks no block comment at all, which is what the view it replaced also did, so
+  it cannot regress against it, and un-blanked comment text can only ADD apparent code rather than
+  hide it.
+  **Rev-2's refutation of round 1's blocker 2 was WRONG, and this spec now says so.** It claimed an
+  unpaired quote cannot regress because the handling mirrors `stripStrings`. The handling did not
+  mirror it: the loop ran to end of line and then appended a closer the source never had. The
+  verdict only moves when the fan sits on the SAME line as the quote, which is the shape rev-2's
+  four fixtures did not have — `if (/won't/.test(args.s)) await Promise.all(all.map((f) =>
+  agent(f.prompt)))` ADMITTED while its apostrophe-free control DENIED. An unpaired quote is now
+  left as ordinary text, which is what `stripStrings` does and what rev-2 wrongly asserted.
+  Six regression arms landed with the fix, one per shape, because round 2's HIGH was that none of
+  the previous three fixes had one.
 
 ## 10. Reuse audit
 

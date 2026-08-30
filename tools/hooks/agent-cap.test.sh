@@ -867,5 +867,49 @@ const LENSES = [
 await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
 EOF
 
+
+# ---- renderCodeView: the FAIL-OPEN arms (TOOL-aLexedStripper-5) ----------------------------------
+# Every arm here is a script the SHIPPED hook denies, and each one was ADMITTED by some revision of
+# renderCodeView before it reached this file. They exist because two closing-review rounds found a
+# fail-open in this view and the first repair was measured insufficient for the second shape. A view
+# that blanks anything can hide a fan-out; these are the shapes that proved it.
+
+js "renderCodeView: an unbounded fan below an unterminated block-comment opener denies" 2 <<'EOF'
+const x = 1 /* never closed
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
+js "renderCodeView: a regex-borne /* closed by a later ordinary */ denies" 2 <<'EOF'
+const re = /\/*/
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+const d = a */ b
+EOF
+
+# The apostrophe inside a regex literal. The view used to run to end of line and synthesize a closer
+# the source never had, taking the fan on that line with it.
+js "renderCodeView: an apostrophe in a regex does not swallow the fan on its line" 2 <<'EOF'
+const all = args.everything
+if (/won't/.test(args.s)) await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+js "renderCodeView: the same line without the apostrophe denies too (control)" 2 <<'EOF'
+const all = args.everything
+if (/wont/.test(args.s)) await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+js "renderCodeView: an unpaired double quote does not swallow the fan on its line" 2 <<'EOF'
+const all = args.everything
+if (x === 5") await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+# A block comment is NOT blanked by this view, deliberately, so a primitive named inside one still
+# trips rule 1 exactly as the dossier says it does. This arm pins that posture rather than the bug.
+js "renderCodeView: a raw primitive inside a block comment still denies (fail-closed posture)" 2 <<'EOF'
+/* the shape this bans is parallel(items.map(...)) */
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-1 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-1 |

@@ -708,6 +708,24 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
                 closed = False
                 while k < n:
                     c = source[k]
+                    # A brace inside a NESTED STRING is text, not structure. Counting it inflated the
+                    # depth so the real closer never matched, and the walk ran on past the literal
+                    # consuming comments and string bodies as code -- the over-capture direction of
+                    # the same defect this scanner exists to remove. Measured: `{` inside a quoted
+                    # argument leaked a following comment's prose into the index.
+                    if c in quotes:
+                        e = k + 1
+                        while e < n and source[e] != c:
+                            if source[e] == chr(92):
+                                e += 2
+                                continue
+                            if source[e] == chr(10):
+                                break
+                            e += 1
+                        if e < n and source[e] == c:
+                            body.append(" " * (e - k + 1))
+                            k = e + 1
+                            continue
                     if c == interp[0][-1]:
                         depth += 1
                     elif c == interp[1]:

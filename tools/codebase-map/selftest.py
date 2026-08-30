@@ -1139,8 +1139,12 @@ def test_identifier_tokens_per_language():
          {"name", "upper", "other", "or", "fallback"}, set()),
         ("rf-string still interpolates", ".py",
          'p = rf"^\\s*{re.escape(marker)}\\b"\n', {"re", "escape", "marker"}, set()),
+        # `k` is deliberately expected ABSENT: it is a STRING token, not a NAME, and stdlib
+        # `tokenize` agrees. An earlier revision of this arm demanded it and was wrong -- the
+        # interpolation walk now blanks nested strings, which is what stops a brace inside one
+        # inflating the depth and leaking the rest of the file into the index.
         ("a field may hold a nested quote", ".py",
-         "v = f\"{d['k'] if flag else other}\"\n", {"d", "k", "flag", "other"}, set()),
+         "v = f\"{d['k'] if flag else other}\"\n", {"d", "flag", "other"}, {"k"}),
         ("a string with NO f prefix holds no code", ".py",
          's = "{not_code}"\nalpha = 1\n', {"alpha"}, {"not_code"}),
         ("a b-string holds no code", ".py",

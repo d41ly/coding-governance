@@ -99,6 +99,33 @@ every shipped harness writes; the report had run 17 one-line variants only.
 Precision was 0.28 then 0.29, both far under the ~0.5 the charter names. Round 2's own report records
 that as a negative result under exactly the priming round 1 prescribed.
 
+## The CLOSING review also exited NON-CONVERGENT, and nothing was promoted
+
+Round 1 confirmed 2 blockers, round 2 confirmed 2, so `BUILD-METHOD.md` M4 STOPS that loop too.
+M4 then promotes "every blocker still STANDING". None stand: both were fixed and each fix is
+measured, so the promotion set is empty and no unit was added. Recorded because an empty promotion
+looks identical to a skipped one.
+
+Round 2 is the round worth reading, because it caught two things this run got wrong rather than two
+things the code got wrong.
+
+**The first repair was insufficient and round 1 had already said so.** Round 1 said to delete
+`renderCodeView`'s block-comment branch. This run shipped the smaller repair — widening the
+unterminated flag — and round 2 measured a block-comment opener BORNE IN A REGEX LITERAL and closed
+by a later ordinary closer, which returns the scan to code mode with an empty stack while the span
+between is already blanked. The branch is now deleted, which is what the view being replaced also
+did, so it cannot regress against it.
+
+**And this run REFUTED a real finding on a fixture that could not reach it.** Round 1's second
+blocker said an unpaired quote regresses the verdict. Four fixtures were run, all denied, and it was
+recorded as refuted with a stated mechanism. The mechanism was false and the fixtures were the wrong
+shape: the verdict only moves when the fan sits on the SAME line as the quote. Round 2 supplied
+`if (/won't/.test(args.s)) await Promise.all(...)` — admitted, against a denying control that
+differs only in the apostrophe. That is the same fixture-shape error the adopter session made three
+times tonight and that this build warned them about, made here, in a review of a security guard.
+
+Both rounds were worth their cost and the second was worth more than the first.
+
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
 and why the run refused it.)*
@@ -123,11 +150,11 @@ ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexe
 |---|---|---|---|---|---|
 | [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-30 |
 | [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
-| [TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced](spec/2026-08-30-spec-TOOL-aLexedStripper-5.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
-| [TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair](spec/2026-08-30-spec-TOOL-aLexedStripper-6.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced](spec/2026-08-30-spec-TOOL-aLexedStripper-5.md) | 3 | 2 | SPECCED | rev-3 | 2026-08-30 |
+| [TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair](spec/2026-08-30-spec-TOOL-aLexedStripper-6.md) | 4 | 2 | SPECCED | rev-3 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -36,3 +36,5 @@ base: 19d9b328c26ca41d9d275ef43abfa76f7efbef20
 2026-08-30T00:35:28Z rescope · item add TOOL-aLexedStripper-6 · reason promoted from round-2 spec audit blocker 26+30 (NON-CONVERGENT exit): no field of the six-field profile can express a Python f-string replacement field, whose braces hold real code. Reproduced: 73 ground-truth identifiers missed across 25 files in this repo, and -1's AC3 100% recall on selftest.py is unreachable by any implementation of the rev-2 design (measured 99.7%, sole miss 'or')
 
 2026-08-30T02:00:24Z review · item aLexedStripper · reason verdict BLOCKED · blockers 2
+
+2026-08-30T03:30:09Z review · item aLexedStripper · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT

@@ -1,12 +1,13 @@
 # TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair
 
-**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-7-closing-diff-round2.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-7 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 |
 
 <!-- /gen:spec-records -->
@@ -130,8 +131,10 @@ text. The scan therefore reads the prefix letters immediately before the opening
   reach.
 - **AC4** — When a `.py` source holds `s = "{not_code}"` with no `f` prefix, `not_code` is NOT
   returned — the prefix condition, and the negative arm that stops the field becoming a blanket.
-- **AC5** — When a `.py` source holds `f"{d['k'] if flag else other}"`, all of `d`, `k`, `flag` and
-  `other` are returned — S2's depth tracking through a nested quote.
+- **AC5** — When a `.py` source holds `f"{d['k'] if flag else other}"`, `d`, `flag` and `other`
+  are returned and `k` is NOT — S2's depth tracking through a nested quote, whose CONTENT is a
+  string and not an identifier. Stdlib `tokenize` reports `k` as a STRING token, so returning it
+  would be over-capture measured against the same oracle this unit is graded by.
 - **AC6** — When a `.py` source holds `f"{{literal}}"`, `literal` is NOT returned — the doubled
   brace is text.
 - **AC7** — When the S3 arm is staged against the code at BASE, `python
@@ -162,6 +165,16 @@ name.
 - rev-1 · 2026-08-30 · promoted from the round-2 spec audit's blocker 26+30 at the NON-CONVERGENT
   exit, per `BUILD-METHOD.md` M4. Both figures were reproduced before this spec was written: 73
   identifiers across 25 files, and `selftest.py` at 99.7% with `or` as the sole miss.
+- rev-3 · 2026-08-30 · AC5 AMENDED, and the amendment is a correction to this spec rather than to
+  the code. It demanded `k` from `f"{d['k'] …}"`, and `k` is the CONTENT of a string literal:
+  stdlib `tokenize` reports it as a STRING, not a NAME, so the criterion asked for over-capture
+  against the oracle §6 is measured by. It was caught by the closing review's round-2 finding
+  that the interpolation walk counted braces inside nested strings — fixing that leak made the
+  arm fail, and the arm was wrong. The nested string is now blanked inside the interpolation
+  body, which is what stops a `{` inside one inflating the depth so the real closer never
+  matches and the walk runs on consuming comments and strings as code. Reproduced before the
+  fix: a `.ts` template holding `${ name.replace('{', '') }` leaked a following comment's prose
+  and a following string's content into the index.
 - rev-2 · 2026-08-30 · S4 recorded as a NO-OP after the build, with the reason, because a scope item
   that silently evaporates is indistinguishable from one nobody did. S4 was to restate
   `TOOL-aLexedStripper-1` AC3 against "the figure the design now reaches". That figure turned out to
