@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -35,17 +36,15 @@ instead of each carrying a copy. This unit therefore lands FIRST.
   against a line prefix, `obj.` on one line and `in / 2` on the next is legal JavaScript the guard
   would miss. The `^` alternative therefore means START OF INPUT, never start of line. The test is:
   the code text ends with one of the keywords, and the character before that keyword is absent (start of input) or is not `.`, a word character or a dollar sign.
-- **S3** — the predicate also reports, for a slash it DECLINES, whether the declined span LEAKS.
-  **A leak requires a CLOSURE test, not merely an opener between two slashes.** Scan the candidate
-  span — from the declined slash to the next slash on the same line — AS CODE; it leaked only if a
-  construct is still OPEN at the end of that span. An opener that closes inside the span leaks
-  nothing, which is what keeps ordinary division out. Three measured false positives, all of which
-  must report NO leak: a division, a closed single-quoted string, then a second division; a
-  division followed by a closed block comment; and a division followed by a closed template.
-  Without the closure test each reports a leak, and `TOOL-aPairedLexer-6` S2 routes that into all
-  four rules — re-entering the ADMIT-to-DENY flip `TOOL-aPairedLexer-2` was built to remove,
-  through the fix promoted to bound it. This lives HERE so the two scanners cannot answer it
-  differently.
+- **S3** — the predicate reports, for every slash it DECLINES, that the LINE IS AMBIGUOUS when that
+  line also carries a later slash. No opener test and no closure test: see §8, where the fork is
+  resolved and both are refuted by measurement.
+- **S3-RETIRED** — the leak test three revisions tried to write.
+  Retired unbuilt. rev-2 tested for an opener between two slashes and produced false LEAKS on
+  ordinary division; rev-3 added a closure test and produced false NO-LEAKS on a balanced opener
+  pair that still blanks live code. Both measured. The audit then showed the two shapes are
+  IDENTICAL, so one input class was required to answer two ways. The span cannot classify itself,
+  and §8 records the resolution.
 - **S4** — both `renderCodeView` and `blankLiterals` call it. Neither keeps a keyword list, a member
   guard, or a leak test of its own.
 - **S5** — a TABLE-DRIVEN arm over the keyword class in BOTH directions, positive and negative.
@@ -132,7 +131,31 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
 
 ## 8. Open questions
 
-none — the audit measured both the defect and the fix's own failure mode, and S2 closes the latter.
+- **F1 — how should a DECLINED slash be classified?** Three revisions of one test, each refuted by
+  measurement. rev-2 tested for an opener between two slashes: false LEAKS on ordinary division.
+  rev-3 added a closure test: false NO-LEAKS on a balanced opener pair that still blanks live code.
+  The round-3 audit then showed the two shapes are IDENTICAL, so no test over the span can separate
+  them — one input class was being required to answer two ways.
+
+  Options seen. (a) Treat the span as DIVISION, the status quo: live code may open phantom constructs,
+  which is the fail-open this build was promoted to close. (b) Treat it as a REGEX and blank it:
+  blanks possibly-live code, which §5 of this spec establishes is ALSO fail-open for rules 1 and 2 —
+  the file's own words, "seeing LESS is safe for a rule whose findings are permissions and dangerous
+  for a rule whose findings are denials, and this is the second kind". (c) Report AMBIGUITY whenever a
+  declined slash shares a line with a later slash, and let the four rules fall back to the per-line
+  view.
+
+  RESOLVED (agent, 2026-08-31, delegated): **(c)**. It is the only option that is not fail-open, and
+  M3 ratifies the most feature-rich survivor after the vetoes — (a) and (b) both fail the acceptance
+  criteria already written into `TOOL-aPairedLexer-6`, which is veto 1. No new dependency, surface or
+  governance change, so vetoes 2 and 3 do not fire.
+
+  **The cost is real and is named rather than discovered.** A legal script with two ordinary slashes
+  on one line now routes to the per-line view, whose false positives are the class
+  `TOOL-aPairedLexer-2` removed. `TOOL-aPairedLexer-6` AC6 is re-baselined from admit to deny to
+  record it, and the workaround is one character: end the statement before the ambiguous regex, or
+  bind it to a name. That is the trade this file has been avoiding for three revisions by looking for
+  a test that does not exist.
 
 ## 9. Revision log
 
@@ -150,6 +173,13 @@ none — the audit measured both the defect and the fix's own failure mode, and 
   guard's SUBJECT was unstated and its `^` alternative was fail-open both ways. B2: the seam moves
   here from `-6`, because this unit lands at order 5 and `-7` at order 6 both state criteria that
   need it, while `-6` added it at order 7 — a dependency pointing backwards.
+- rev-4 · 2026-08-31 · folded round-3 B1 and B2 by RESOLVING the fork they expose rather than
+  amending the test a fourth time. B1: the span ended at "the next slash on the same line" and
+  `/*` is a slash first, so the `/*` row could never report. B2: the closure test answered NO LEAK
+  on a balanced opener pair that still blanks live code, and that shape is identical to the
+  precision control — one input class required to answer two ways. Three revisions of one test,
+  each refuted by measurement, is the same shape this build already named: stop mitigating and
+  decide. §8 carries the decision.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -87,8 +88,11 @@ units delete would make this live defect look fixed. The review measured exactly
   used, and the reason the arm is PAIRED.
 - **AC3** — When a script's view IS clean, `capFindings` returns the verdict it returned before
   this unit — the fallback path is the only behaviour that moves.
-- **AC4** — When `rule3: an exposed const resolves the cap and the script admits` runs, its verdict
-  is whatever `TOOL-aPairedLexer-10` re-baselines it to, and this unit does not change it alone.
+- **AC4** — When `rule3: an exposed const resolves the cap and the script admits` runs, it DENIES,
+  and the arm is renamed to say a binding visible only to the distrusted view does not resolve a
+  cap. S2c performs that re-baseline HERE. rev-3 left this criterion pointing at
+  `TOOL-aPairedLexer-10` while S2c claimed the flip, so one document held opposite verdicts for
+  three rounds — and it also made an order-8 unit depend on an order-9 one, which M2 forbids.
 - **AC5** — When `rule3: a cap of 500 below an unterminated BLOCK comment denies` runs, it still
   denies, and the message names the AMBIGUITY rather than the width. `_bl.code` for that arm is
   `["const c = ","","",""]` — the call-site line is blank in the paren-safe view — so S2b applies
@@ -125,6 +129,9 @@ buys nothing AC1 does not.
   impossible — §2 and §6 requiring opposite things, the same defect round 1 found, one clause over.
   H3: S2b flips a shipped ADMIT arm at this unit's step, one step before `-10` claims the
   re-baseline, so S2c records it here.
+- rev-4 · 2026-08-31 · folded round-3 B3: AC4 still attributed the re-baseline to
+  `TOOL-aPairedLexer-10` after S2c took it, so §2 and §6 gave opposite verdicts for the third round
+  running, with an ordering violation on top.
 
 ## 10. Reuse audit
 

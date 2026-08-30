@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -32,8 +33,9 @@ was real. rev-2 puts the signal in the SHARED predicate and routes BOTH views th
 - **S2** — `renderCodeView` returns `unterminated: stack.length > 0 || mode !== 'code' || dirty`, and
   `blankLiterals` folds the same `dirty` into `clean`. Rules 1 and 2 fall back on the first; rules 3
   and 5 fall back on the second. **All four rules, or the fix is the defect it was promoted for.**
-- **S3** — the leak set is the openers a declined span can carry into code mode: a backtick, a
-  quote, `/*` and `*/`. Not a backtick alone.
+- **S3** — there is no opener set. `TOOL-aPairedLexer-8` S3 reports AMBIGUITY, not a leak, and this
+  unit routes on that. The opener set is retired with the leak test that needed it — including
+  `*/`, a CLOSER the predicate could never have reported.
 - **S5** — arms pinning the SIGNAL per RULE, not per fixture.
 
 ## 3. Non-goals (OUT)
@@ -97,12 +99,12 @@ siblings RESOLVE, which is the same rule read from the other end.
   (`if (a) /x[/*]y/.test(s)` … `if (a) /z[*/]w/.test(s)`), the hook exits `2`. Measured at the tip
   as exit `0`: no backtick appears anywhere, so rev-1's condition never fired. Table-driven over the
   opener set, one row per opener.
-- **AC6** — When a script carries ordinary DIVISION on a line that ALSO has a later slash and a
-  CLOSED opener between them (`const rate = done / total; log(` backtick `tick` backtick `); const
-  inv = total / done;`) together with a lens prompt naming a primitive, it still exits `0`. The
-  later slash is load-bearing: rev-2's control had none, so `-8` S3 could not fire on it under any
-  reading and the control could not fail. This is the precision guard for `TOOL-aPairedLexer-2`'s
-  win, and it is what `-8` AC7's closure test buys.
+- **AC6** — When a script carries ordinary DIVISION twice on one line together with a lens prompt
+  naming a primitive, it exits `2`. **This is a RE-BASELINE and the cost of the §8 resolution**:
+  rev-2 and rev-3 both wrote this fixture as an ADMIT control, and the audit measured that the
+  admit and deny shapes are indistinguishable. The fail-closed answer is the one this file's own
+  rule requires, so the script denies and §4 names the class of legal script that now does. A
+  criterion that cannot fail was the alternative, and this build has shipped four of those.
 - **AC8** — When `renderCodeView` is called through that seam on a declined-slash-plus-backtick line,
   `.unterminated === true`; and `blankLiterals` on the same line gives `.clean === false`. Both
   asserted, because the two answering differently is the defect rev-1 shipped.
@@ -135,6 +137,10 @@ extent-scoped condition in §4 is what makes that answer available.
   span `-8` dissolves, so all four class arms would have gone green with this unit unimplemented.
   H5: AC6's precision control had no later slash on its line, so the leak test could not fire on it
   under any reading — a control that could not fail, in the unit whose subject is exactly that.
+- rev-4 · 2026-08-31 · folded round-3 B2 and the `*/` high. S3 loses its opener set entirely:
+  `TOOL-aPairedLexer-8` §8 resolves the fork toward reporting AMBIGUITY, so there is nothing to
+  enumerate and the `*/` closer the predicate could never report goes with it. AC6 is RE-BASELINED
+  from admit to deny, which is the honest cost of that resolution and is named as such in §4.
 
 ## 10. Reuse audit
 

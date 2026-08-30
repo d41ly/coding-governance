@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aPairedLexer-6.md](../prompts/2026-08-31-prompt-TOOL-aPairedLexer-6.md) | research | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -92,18 +93,23 @@ only in the view the file distrusts. The arm is not deleted, it is inverted, wit
   `rule3: prose inside a template cannot lower a real cap` cannot serve here: its template is
   UNTERMINATED, so after `-9` lands it denies because the call site cannot be joined, never
   because 500 beat the prose 5. Asserting the message is what separates the two.
-- **AC4** — When the re-baselined arm runs, `rule3: an exposed const resolves the cap and the script
-  admits` denies, and its replacement name states that a binding visible only to the distrusted view
-  does not resolve a cap.
+- **AC4** — When the re-baselined arm runs it denies — but the re-baseline is
+  `TOOL-aPairedLexer-9` S2c's, performed one step earlier, and this criterion OBSERVES it rather
+  than claiming it. §4 and §5 are corrected the same way: rev-3 handed the act to `-9` in S3 and
+  left four other places still attributing it here.
 - **AC5** — When a script's view is CLEAN, `intConsts` binds the same table as before this unit,
   no name is deleted, and the verdict is unchanged.
 - **AC6** — When a name is bound by BOTH views but the clean view SAW it in a declaration it
   refused to resolve, the denial names `K` as unresolvable, and the criterion FAILS with S1 alone.
   **The fixture must make BOTH views bind `K`**, or S1 deletes it and the arm passes without S2.
   A `const K = args.width` binds nothing — `intConsts` matches only a trailing integer — so rev-2's
-  fixture left round-1 finding 10 open. Use a clean-view declaration that BINDS an integer and is
-  then REASSIGNED (`const K = 7` … `K = args.width`), with the prose `const K = 5` inside the
-  mis-lexed span: both views bind, S1 keeps the max, and only S2's sweep deletes the name.
+  fixture left round-1 finding 10 open. rev-3's replacement was worse: the audit measured it
+  passing against the SHIPPED tip with neither S1 nor S2 implemented, because `intConsts` already
+  carries a bare-reassignment sweep. **The criterion is therefore stated as a REQUIREMENT on the
+  fixture rather than as a fixture**: it must be one that FAILS at the shipped tip and FAILS with
+  S1 alone, and the builder verifies both before wiring it. If no such fixture exists, S2 is
+  unobservable and is dropped rather than shipped as prose — three fixtures have now been written
+  for this one criterion and every one of them passed for a reason unrelated to S2.
 - **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
   after it, except the one S3 re-baselines by name.
 
@@ -128,6 +134,12 @@ review states the direction and §4 records the reason.
   `TOOL-aPairedLexer-9` S2b actually performs one step earlier. H4: AC6's fixture used a binding
   `intConsts` does not match at all, so the criterion written to make S2 non-optional still passed
   with S1 alone — round-1 finding 10 left open by its own fix.
+- rev-4 · 2026-08-31 · folded round-3 B4 and the attribution high. B4: rev-3's AC6 fixture passed
+  against the SHIPPED tip with neither S1 nor S2 implemented — the third fixture for one criterion
+  to pass for an unrelated reason — so the criterion now states a REQUIREMENT the builder must
+  verify, and names dropping S2 as the honest outcome if no discriminating fixture exists. The
+  attribution high: §4, §5, AC4 and AC7 still credited this unit with a re-baseline S3 had handed
+  to `-9`.
 
 ## 10. Reuse audit
 
