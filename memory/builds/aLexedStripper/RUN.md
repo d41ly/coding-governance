@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 2 surfaced
+keepalive-reaped: yes
 witness: eb76532eac8969da6ba67ad67abe9848e34a28df
-phase: VERIFYING
+phase: LANDING
 branch-sha: 19d9b328c26ca41d9d275ef43abfa76f7efbef20
 branch-ref: refs/heads/branch/kit-degradations-review-2faa8d
 mode: prompt
