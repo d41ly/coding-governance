@@ -10,6 +10,7 @@
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round2.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-15 |
 | [2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-closing-round3.md) | diff-review | TOOL-aScouredKit-1 TOOL-aScouredKit-6 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-15 |
 | [2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-spec-audit.md) | spec-audit | TOOL-aScouredKit-1 TOOL-aScouredKit-2 TOOL-aScouredKit-3 TOOL-aScouredKit-4 TOOL-aScouredKit-5 TOOL-aScouredKit-6 TOOL-aScouredKit-7 TOOL-aScouredKit-8 TOOL-aScouredKit-9 TOOL-aScouredKit-11 TOOL-aScouredKit-12 TOOL-aScouredKit-14 TOOL-aScouredKit-15 TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 |
+| [2026-08-30-review-TOOL-aScouredKit-11-acceptance-ledger.md](../reviews/2026-08-30-review-TOOL-aScouredKit-11-acceptance-ledger.md) | journal | TOOL-aScouredKit-11 |
 
 <!-- /gen:spec-records -->
 

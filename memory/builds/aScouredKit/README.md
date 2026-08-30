@@ -71,13 +71,13 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 13 | `TOOL-aScouredKit-14` | CLOSED | three prose defects in the load-bearing documents |
 | 14 | `TOOL-aScouredKit-15` | CLOSED | the drift-audit Skill stops pointing at a directory govkit never creates |
 
+<!-- /roster:units -->
+
 *`TOOL-aScouredKit-10` and `-16` through `-26` are NOT units of this build and deliberately carry
 no spec. They are the findings this run reported rather than built, each landed as a row in*
 `memory/backlog/TOOL.md` *with its own measurement. They were recorded through `--rescope --act
 add` as the run found them, which was the wrong verb for a backlog row and is said here rather
 than rewritten out of an append-only record.*
-
-<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 17 unit(s) · node a · opened 2026-08-30 · streams tooling+playbook
@@ -107,7 +107,7 @@ ids TOOL-aScouredKit-30 TOOL-aScouredKit-31 TOOL-aScouredKit-32 TOOL-aScouredKit
 | [TOOL-aScouredKit-9 — drift-audit-state.js gains its sibling's run-integrity fields](spec/2026-08-30-spec-TOOL-aScouredKit-9.md) | — | 1 | CLOSED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
