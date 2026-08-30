@@ -16,8 +16,14 @@ if [ -f "$HERE/../lib/resolve-python.sh" ]; then
 else
   TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
 fi
+denyn=0
 check() { # name expected_exit json
   printf '%s' "$3" | node "$HOOK" >/dev/null 2>"$TMP/err"; local got=$?
+  # Every deny-expected payload is kept for the version-parity arm at the bottom of this file, which
+  # replays them against the previous kit. Capturing here rather than restating them there is the
+  # point: the arm covers whatever this suite denies TODAY, so a fixture added later is covered by
+  # the fact of being added, and cannot be forgotten.
+  if [ "$2" = 2 ]; then denyn=$((denyn+1)); printf '%s' "$3" > "$TMP/deny-$denyn.json"; fi
   if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
@@ -992,15 +998,138 @@ const thunks = [one, two, three]
 const results = parallel(thunks)
 EOF
 
-# The retained CEILING, pinned as a ceiling rather than as a bug: a primitive named inside a block
-# comment still denies, because blanking block comments needs a strip TOOL-aLexedStripper-5 measured
-# as unsound and able to hide a real one.
-js "rule1: a primitive named in a block comment still denies (retained ceiling)" 2 <<'EOF'
+# -- TOOL-aPairedLexer-4: the regex mode, and the ceiling it retired ------------------------------
+# This arm was written as a CEILING — "a primitive named in a block comment still denies" — because
+# aLexedStripper-5 measured block-comment blanking as unsound: a `/*` inside a regex literal was
+# indistinguishable from a real one, so modelling block comments could hide a genuine primitive.
+#
+# Modelling REGEX LITERALS removes that ambiguity, which is what makes block comments safe to model
+# again, so the ceiling is gone rather than waived. The arm is kept, inverted, and left here as the
+# record that the ceiling was retired by a measurement rather than by an opinion.
+js "rule1: a primitive named in a block comment now ADMITS (ceiling retired by the regex mode)" 0 <<'EOF'
 /* banned shape: parallel(x.map(y)) */
 const MAX_VERIFIERS = 5
 const L = [{a:1},{a:2}]
 await boundedParallel(L.map((x) => () => agent(x)), MAX_VERIFIERS)
 EOF
+
+# The reason the ceiling existed, now pinned as the property that retired it. Both of these are legal
+# JavaScript that the pre-regex view mis-modelled: the first would open a phantom block comment, the
+# second a phantom template, and each blanks every later line — admitting the raw primitive BELOW it.
+js "rule1: a raw primitive below a regex holding a block opener still denies" 2 <<'EOF'
+const re = /[/*]/
+const thunks = [one, two, three]
+const results = parallel(thunks)
+EOF
+
+js "rule1: a raw primitive between TWO regex literals holding backticks still denies" 2 <<'EOF'
+const a = /[`]/
+const b = /[`]/
+const results = parallel(thunks)
+EOF
+
+# The conservative half of the regex decision, pinned so a future widening has to break it on
+# purpose: after an identifier or a closing bracket a `/` is DIVISION, and the backtick that follows
+# still opens a real template. Guessing "regex" here would consume live code to the next `/`.
+js "rule1: after a closing bracket a slash is division, not a regex" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const ratio = (a[0]) / 2
+const L = [{ p: `never write parallel(x.map(y))` }]
+await boundedParallel(L.map((x) => () => agent(x.p)), MAX_VERIFIERS)
+EOF
+
+# -- TOOL-aPairedLexer-4: a fabricated binding may not LOWER a real cap ---------------------------
+# Review D2. Rule 3's fallback view strips neither template contents nor block comments, and the
+# LATER binding wins, so a `const K = 5` written in prose overrode the real `const K = 500` and a
+# 500-wide fan was APPROVED. Both fixtures deny at 1.9, admitted at 1.10 before the cross-check.
+# The unterminated construct is load-bearing: without it the view is clean and the fallback is
+# never reached, so the arm would pass while observing nothing.
+
+js "rule3: prose inside a template cannot lower a real cap" 2 <<'EOF'
+const K = 500
+const L = [{a:1},{a:2}]
+const doc = `Lens A: report file:line, and never let the cap read const K = 5
+await boundedParallel(L.map((x) => () => agent(x)), K)
+EOF
+
+js "rule3: a const inside a block comment cannot lower a real cap" 2 <<'EOF'
+const K = 500
+const L = [{a:1},{a:2}]
+/* doc: the small-fan example uses const K = 5 */
+const c = /* an unterminated block comment
+await boundedParallel(L.map((x) => () => agent(x)), K)
+EOF
+
+# -- TOOL-aPairedLexer-4: rule 5 stops discarding the signal (review D5) --------------------------
+
+js "rule5: the bracket ban below an unterminated backtick still denies" 2 <<'EOF'
+const t = `an unterminated template literal
+const v = byRef[finding.ref]
+EOF
+
+js "rule5: the bracket ban below an unterminated BLOCK comment still denies" 2 <<'EOF'
+const c = /* an unterminated block comment
+const v = byRef[finding.ref]
+EOF
+
+# Both directions of the view change S3 makes to this rule: a regex literal is now BLANKED, so a ban
+# pattern can no longer match text inside one. That removes a false positive and cannot hide a real
+# join, because a join cannot be written inside a regex literal.
+js "rule5: a .ref-shaped pattern inside a regex literal admits" 0 <<'EOF'
+const pat = /\[[a-z]+\.ref\]/
+const v = byRef.get(finding.id)
+EOF
+
+js "rule5: control, the genuine join still denies" 2 <<'EOF'
+const pat = /\[[a-z]+\.ref\]/
+const v = byRef.get(finding.ref)
+EOF
+
+# ---- version parity: a DENY may never become an ADMIT across a kit version -----------------------
+# THREE consecutive revisions of this hook shipped a fail-open, and every one was a script the
+# PREVIOUS version denied and the new one admitted. Each was caught by a review, never by this suite,
+# because each new arm was written to describe the fix rather than to bound the change.
+#
+# This is the structural answer and it is cheap: replay every deny-expected fixture above against the
+# last tracked copy carrying a different KIT_AGENT_CAP_VERSION, and refuse any that denies THERE and
+# admits HERE. It needs no knowledge of the defect, which is the whole point — the three it would
+# have caught were three unrelated mechanisms. It cannot catch a fail-open shipped in the same
+# version as the fixture that would expose it, so it bounds regressions, not novelty.
+cur=$(grep -oE "KIT_AGENT_CAP_VERSION = '[0-9.]+'" "$HOOK" | head -1 | sed "s/.*'\\(.*\\)'/\\1/")
+prev_kit=""; prev_ver=""
+if [ -n "$cur" ] && git -C "$HERE" rev-parse --git-dir >/dev/null 2>&1; then
+  for cand in $(git -C "$HERE" log --format=%H -n 60 -- agent-cap.js 2>/dev/null); do
+    git -C "$HERE" show "$cand:./agent-cap.js" > "$TMP/cand.js" 2>/dev/null || continue
+    v=$(grep -oE "KIT_AGENT_CAP_VERSION = '[0-9.]+'" "$TMP/cand.js" | head -1 | sed "s/.*'\\(.*\\)'/\\1/")
+    [ -n "$v" ] && [ "$v" != "$cur" ] && { cp "$TMP/cand.js" "$TMP/prev.js"; prev_kit="$TMP/prev.js"; prev_ver=$v; break; }
+  done
+fi
+
+if [ -z "$prev_kit" ]; then
+  # A skip that looks like a pass is the exact failure this arm exists to stop, so it says so and
+  # names what went unexercised. An adopter tree holds no git history for this file.
+  echo "skip version parity — no earlier tracked agent-cap.js with a version below ${cur:-unknown} is"
+  echo "     reachable, so $denyn deny fixtures went uncompared. NOT a pass."
+else
+  pfail=0
+  for fx in "$TMP"/deny-*.json; do
+    [ -e "$fx" ] || continue
+    node "$prev_kit" < "$fx" >/dev/null 2>&1; was=$?
+    node "$HOOK"     < "$fx" >/dev/null 2>&1; now=$?
+    if [ "$was" = 2 ] && [ "$now" != 2 ]; then
+      echo "     DENY→ADMIT: $prev_ver exits 2, $cur exits $now, on $(head -c 160 "$fx")"
+      pfail=$((pfail+1))
+    fi
+  done
+  if [ "$denyn" = 0 ]; then
+    echo "FAIL version parity: no deny fixture was captured, so this arm compared nothing"; fail=$((fail+1))
+  elif [ "$pfail" = 0 ]; then
+    echo "ok   version parity: none of $denyn deny fixtures admits at $cur while denying at $prev_ver"
+    pass=$((pass+1))
+  else
+    echo "FAIL version parity: $pfail fixture(s) became ADMIT between $prev_ver and $cur"; fail=$((fail+1))
+  fi
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

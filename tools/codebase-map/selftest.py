@@ -1223,6 +1223,52 @@ def test_identifier_tokens_corpus_recall():
     assert precision >= 0.95, f"corpus precision {precision:.3f} below the 0.95 floor"
 
 
+def test_enumerate_exports_string_borne_punctuation():
+    """TOOL-aPairedLexer-4 (review D6): string CONTENTS must not steer the export parse.
+
+    `enumerate_exports` used to hand `_has_top_level_comma` a `raw.split("//", 1)[0]` line, which
+    truncated most string literals before the string-blind comma walk ever saw them. Removing that
+    split was correct — it truncated inside string literals too — but it withdrew an ACCIDENTAL mask,
+    not a real one, and `export const LINK = "https://x.com/?a=1,b=2"` then raised a MapError naming
+    a second declarator that does not exist. An adopter's web-ts layer hits that on any query string.
+
+    The table is the point rather than the one URL: every row buries a character that means something
+    to this parser inside a string literal, so the CLASS is gated and not the instance. Before the
+    fix, rows 1 and 2 raise MapError and rows 3-5 lose the id.
+
+    This is also the first coverage `enumerate_exports` has had at all — the sibling arm exercises
+    `render_comment_free` directly and never reaches this caller."""
+    import tempfile
+
+    cases = [
+        ("a comma inside a URL query string", 'export const LINK = "https://x.com/?a=1,b=2";', "LINK"),
+        ("a comma inside a single-quoted string", "export const SEP = 'a,b';", "SEP"),
+        ("a // inside a string", 'export const URL = "https://x.io/a";', "URL"),
+        ("a /* inside a string", 'export const GLOB = "/*.ts";', "GLOB"),
+        ("a brace inside a string", 'export const TPL = "{a: 1, b: 2}";', "TPL"),
+        ("a backtick-quoted comma", "export const T = `a,b`;", "T"),
+    ]
+    for label, src, want in cases:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "m.ts").write_text(src + "\n", encoding="utf-8")
+            rows = m.enumerate_exports(base, "web-ts", extensions=frozenset({".ts"}), root=base)
+            ids = {r["id"] for r in rows}
+            assert want in ids, f"{label}: lost {want!r}, got {sorted(ids)}"
+
+    # The REMOVING direction: a genuine second declarator must still be refused, or the fix above
+    # degenerates into "never raise" and the green-by-absence hole it guards reopens.
+    with tempfile.TemporaryDirectory() as td:
+        base = Path(td)
+        (base / "m.ts").write_text("export const a = 1, b = 2;\n", encoding="utf-8")
+        try:
+            m.enumerate_exports(base, "web-ts", extensions=frozenset({".ts"}), root=base)
+        except m.MapError:
+            pass
+        else:
+            raise AssertionError("a real multi-declarator export must still raise MapError")
+
+
 def test_render_comment_free():
     """TOOL-aPairedLexer-3: comments blanked in ONE pass, strings TRACKED but not blanked, line
     count preserved.
@@ -1233,8 +1279,9 @@ def test_render_comment_free():
     defect, which is why this is one pass.
 
     Both directions are here. The `absent` arms are what stop the fix degenerating into "strip
-    nothing", and the line-count arm is what stops it corrupting `symbols.json`, whose consumers
-    report `file:line`."""
+    nothing", and the line-count arm is what stops a definition losing its STATEMENT-LEADING
+    position: the rules are `re.M` anchored at a leading-whitespace escape, so a collapsed line
+    hides the second one."""
 
     def defs(text):
         out = set()
@@ -1270,7 +1317,10 @@ def test_render_comment_free():
         assert not (present - got), f"{label}: lost {sorted(present - got)}"
         assert not (absent & got), f"{label}: admitted {sorted(absent & got)}"
 
-    # LINE COUNT is the contract `symbols.json` depends on: the probe reports file:line.
+    # LINE COUNT is the contract the DEFINITION RULES depend on: they are `re.M` anchored at
+    # `^\s*`, so merging two lines pushes the second definition out of statement-leading position
+    # and it stops being found. Not, as this comment used to say, because anything reports file:line
+    # — nothing does (review D7).
     for src in (
         "a\nb\nc\n// x /* y\nd\n",
         "/* one\ntwo\nthree */\nfour\n",
@@ -1437,6 +1487,10 @@ def main() -> int:
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     failures += check("render_comment_free: one pass, strings tracked not blanked", test_render_comment_free)
+    failures += check(
+        "enumerate_exports: string contents do not steer the parse",
+        test_enumerate_exports_string_borne_punctuation,
+    )
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

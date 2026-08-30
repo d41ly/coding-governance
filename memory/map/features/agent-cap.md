@@ -140,10 +140,11 @@ turns the cap rules off with no diff.
 
 ## Gaps
 
-- **The join rule reads a blanked view, and a regex literal survives it.** So a file holding the ban
-  table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
-  The exclusion is measured rather than defensive, and it is the kind of row that silently widens if
-  the table ever moves.
+- **The join rule carries a self-exclusion row for this hook.** `check-review-join.sh` excludes the
+  file holding the ban table. The stated reason used to be that a regex literal survived the
+  blanking, so the table matched its own rule; `TOOL-aPairedLexer-4` made both views model regex
+  literals, so that reason is retired. The exclusion still stands on the general ground that a
+  ban table is not a join, and it remains the kind of row that silently widens if the table moves.
 - **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** That script runs
   with no hooks, so no process observes those spawns. Declared here and in the protocol rather than
   implied away; it is the reason the `Workflow` half is static.
@@ -158,15 +159,24 @@ turns the cap rules off with no diff.
   58/59 boundary is unfixtured. Tracked as `TOOL-aNumeralWarden-2`.
 - **The static scan cannot size a dynamically-built array**, by construction. It enforces "use the
   helper" instead, which kills the `parallel(items.map(...))` shape that causes the bursts.
-- **Block comments naming a primitive still trip rule 1.** Line comments and quoted strings are
-  stripped before the scan; block comments are not. Benign and fail-closed, so it stays.
-- **`renderCodeView` models no regex literal, so rule 2 falls back for such a script.** It inherits
-  `blankLiterals`' code-mode branch set, which tests `//`, `/*`, a backtick and the two quote
-  characters and nothing else — a backtick inside `/…/` therefore opens template mode and never
-  closes. Failing closed on that was measured to DENY a legal harness, so an unterminated scan
-  instead falls back to the per-line `stripStrings` view and returns the verdict this hook reached
-  before rule 2 moved. The residual is precision, not safety: such a script is judged at the old
-  view's accuracy, and prose punctuation inside it can still be read as structure. `TOOL-aLexedStripper-5`.
+- **Block comments naming a primitive used to trip rule 1. RETIRED** by `TOOL-aPairedLexer-4`.
+  This was recorded here for months as an accepted blind spot, and it was never an independent
+  limit: block comments went unmodelled only because a `/*` inside a regex literal could not be
+  told from a real one. Modelling regex literals removed that ambiguity and the gap closed as a
+  side effect. Worth remembering as a shape — an accepted ceiling can be a SYMPTOM of a different
+  missing model, and pricing it on its own terms priced the wrong thing.
+- **Both views now model regex literals; the residual is the regex/division ambiguity.**
+  `TOOL-aPairedLexer-4`. A `/` opens a regex only after a token that cannot END an expression;
+  after an identifier, a number or a closing bracket it is read as DIVISION. Guessing the other
+  way would consume live code to the next `/`, a worse fail-open than the one closed. So a regex
+  literal in an ambiguous position is still mis-modelled, and the unterminated fallback covers it
+  at the per-line view's precision.
+  
+  The history is the useful part: THREE consecutive revisions each shipped a fail-open here, and
+  all three were mitigations of this one missing model — swap the view, widen the flag, key off an
+  EOF signal. An EVEN number of phantom openers closes itself, so every EOF-based signal was blind
+  by construction. The version-parity arm in the self-test now bounds the class: no deny-expected
+  fixture may admit at a version that denied at the previous one.
 
 ## Reuse affordance
 

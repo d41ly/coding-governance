@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.4"
+KIT_CODEBASE_MAP_VERSION = "1.5"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -430,8 +430,16 @@ def render_comment_free(text: str) -> str:
     blanked a live region — eight real definitions removed from this repo's own tracked JavaScript.
     The only bytes this function removes are inside a comment, so it cannot delete a definition.
 
-    LINE COUNT IS PRESERVED because the caller reports `file:line` and `symbols.json` is committed;
-    a pass that collapsed lines would move every definition and corrupt the artifact silently.
+    LINE COUNT IS PRESERVED because both callers need a definition to stay STATEMENT-LEADING:
+    ``JS_DEFINITION_RULES`` are ``re.M`` anchored at ``^\\s*``, and ``enumerate_exports`` iterates
+    ``splitlines()`` with ``marker_re.match``. Collapse two lines into one and the second definition
+    is no longer at the start of a line, so it silently stops being found.
+
+    An earlier revision of this docstring justified the same invariant by saying the caller reports
+    ``file:line`` and ``symbols.json`` is committed. Neither is true — both callers build rows of
+    exactly ``{id, kind, file}`` and no line number is reported anywhere — so a maintainer checking
+    the stated reason would have found it absent and could have deleted the guard as vestigial
+    (review D7). The invariant is real; only the reason given for it was wrong.
     """
     out: list[str] = []
     i, n = 0, len(text)
@@ -541,15 +549,37 @@ def _has_top_level_comma(s: str) -> bool:
     declarator separator and must not trip this. Ceiling (documented, rare): a bare ``<``/``>``
     comparison or bit-shift appearing before a genuine second declarator can mask it — use a real
     parser for full fidelity. Tracking ``<>`` fixes the common false positive: a single-declarator
-    ``export const x: Generic<A, B> = …`` is overwhelmingly more common than that comparison case."""
+    ``export const x: Generic<A, B> = …`` is overwhelmingly more common than that comparison case.
+
+    TOOL-aPairedLexer-4 (review D6): QUOTED SPANS ARE SKIPPED. This walk was string-blind, and it got
+    away with it only because ``enumerate_exports`` used to hand it ``raw.split("//", 1)[0]``, which
+    truncated most string literals before they arrived. Removing that split was right — it truncated
+    inside string literals too — but it withdrew an accidental mask rather than a real one, and
+    ``export const LINK = "https://x.com/?a=1,b=2"`` then raised a MapError naming a second
+    declarator that does not exist. An adopter's web-ts layer hits this on an ordinary query string.
+    """
     depth = 0
+    quote = ""
+    prev = ""
     for ch in s:
-        if ch in "([{<":
+        if quote:
+            # A backslash escapes the next character, including the closing quote.
+            if prev == "\\":
+                prev = "" if ch == "\\" else ch
+                continue
+            if ch == quote:
+                quote = ""
+            prev = ch
+            continue
+        if ch in "'\"`":
+            quote = ch
+        elif ch in "([{<":
             depth += 1
         elif ch in ")]}>":
             depth = max(0, depth - 1)
         elif ch == "," and depth == 0:
             return True
+        prev = ch
     return False
 
 

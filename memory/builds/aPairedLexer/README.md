@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling
 roster: TOOL
-ids: TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3
+ids: TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexer-4 TOOL-aPairedLexer-5
 ---
 
 # aPairedLexer — the three views `aLexedStripper` left behind
@@ -45,6 +45,16 @@ waiting.
   a fail-open. Both directions get a fixture in the same commit as the change.
 - **A fix keyed to POSITION is not a fix.** `aLexedStripper` red the bar on a waiver keyed to a line
   number that its own edit moved.
+- **Stop mitigating a missing model and go build the model.** Added at unit 4, from this build's own
+  record. Three consecutive revisions of one function each shipped a fail-open, and all three were
+  compensations for the same absence — the views did not model regex literals. Swap the view, widen
+  the flag, key off an EOF signal: each was defeated by a different spelling of the one ambiguity,
+  because an EVEN number of phantom openers closes itself and no EOF signal can see it. The third
+  repair passing every existing arm is what makes this expensive — the suite kept agreeing.
+- **An accepted ceiling can be a SYMPTOM.** The block-comment blind spot was priced twice as its
+  own problem, found unaffordable both times, and recorded as a permanent gap. It was never
+  independent: modelling regex literals retired it for free. Price a ceiling against its CAUSE,
+  not against itself.
 
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
@@ -57,12 +67,13 @@ and why the run refused it.)*
 | 1 | `TOOL-aPairedLexer-1` | 2 | rule 3 stops being blind below an unterminated template literal (was `TOOL-aLexedStripper-4`) |
 | 2 | `TOOL-aPairedLexer-2` | 2 | rule 1 stops reading prose in a template literal or block comment as a call (was `TOOL-aLexedStripper-3`) |
 | 3 | `TOOL-aPairedLexer-3` | 2 | the map's definition probe strips line comments before block ones (was `TOOL-aLexedStripper-7`) |
+| 4 | `TOOL-aPairedLexer-4` | 2 | both views model REGEX LITERALS, which retires the block-comment ceiling and closes review D2-D5 |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-08-30 · streams tooling
-ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-30 · streams tooling
+ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexer-4 TOOL-aPairedLexer-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -70,13 +81,14 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3
 | [TOOL-aPairedLexer-1 — rule 3 stops being blind below an unterminated template](spec/2026-08-30-spec-TOOL-aPairedLexer-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aPairedLexer-4 — both views model regex literals, and the ceiling retires](spec/2026-08-30-spec-TOOL-aPairedLexer-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aPairedLexer-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -86,6 +98,7 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 1 | `TOOL-aPairedLexer-1` | no |
 | 2 | `TOOL-aPairedLexer-2` | no |
 | 3 | `TOOL-aPairedLexer-3` | no |
+| 4 | `TOOL-aPairedLexer-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

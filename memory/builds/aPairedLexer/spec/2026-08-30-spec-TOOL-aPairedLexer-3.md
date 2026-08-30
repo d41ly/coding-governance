@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md](../build/2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md) | journal | TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 |
+| [2026-08-30-review-TOOL-aPairedLexer-1-2-3-diff-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-diff-round1.md) | diff-review | TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 |
 | [2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 |
 
 <!-- /gen:spec-records -->

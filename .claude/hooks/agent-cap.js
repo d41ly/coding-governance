@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.10' // gov:kit agent-cap@1.10 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.11' // gov:kit agent-cap@1.11 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -268,41 +268,31 @@ function boundedBranch(br, name, consts, ok) {
   return links > 0
 }
 
-// TOOL-aLexedStripper-2 — the view RULE 2 reads, and the reason it is not `blankLiterals`.
+// TOOL-aPairedLexer-4 — the view models REGEX LITERALS, and that is what makes the rest sound.
 //
-// Rule 2 counts a lens array's elements and walks brackets to do it. `stripStrings` (line 70) blanks
-// '…' and "…" per line and leaves backticks ALONE, so a lens PROMPT — which is a backticked template
-// literal full of English — reaches those counters as though it were code. Measured against the
-// shipped hook, five prose spellings DENIED a correct five-element fan in the multi-line array shape
-// every harness here is written in: a literal `...` (read as a spread), and an unmatched `[`, `]`,
-// `)` or `}` (read as bracket structure). None of them is code.
+// Three revisions of this view have each shipped a fail-open, and they share one root: the scanner
+// could not tell a backtick that OPENS a template from one that merely sits inside a regex literal
+// or a block comment. Every mitigation so far has been an EOF-only signal — "what mode was I in when
+// the file ran out" — and an EVEN number of phantom backticks opens and closes the span, so the
+// signal never fires and a raw primitive between them is admitted. Measured against 1.9 twice.
 //
-// `blankLiterals` cannot be that view, and this was measured rather than reasoned. It blanks template
-// CONTENTS including `${…}` bodies, which hold real code — an `agent(` inside a multi-line
-// interpolation is DENIED today and would have been ADMITTED. And its mode is carried across lines,
-// so one unterminated backtick blanks every later line and an unbounded burst below it would have
-// been ADMITTED too. Both are fail-open on the only mechanical control against an agent burst.
+// A regex mode fixes the root. A backtick inside `/…/` is consumed as part of the regex and cannot
+// open anything, which also makes BLOCK comments safe to model again — TOOL-aLexedStripper-5 deleted
+// that branch precisely because a `/*` inside a regex literal was indistinguishable from a real one.
 //
-// So: LINE-ALIGNED (one output line per input line, because every walk here indexes by line),
-// interpolation bodies COPIED, `${…}` nesting tracked so `` `a${`b`}c` `` balances, and a report of
-// whether the scan ended inside a template literal.
-//
-// TOOL-aLexedStripper-5 — what that last flag is FOR, and what it is not. It does NOT fail closed.
-// This file models no regex literal (neither does `blankLiterals`), so a backtick inside `/…/`
-// opens template mode and never closes — on a LEGAL script the shipped hook admits. Denying on the
-// flag traded one false-positive class for another. Instead an unterminated scan FALLS BACK to the
-// per-line view rule 2 read before, which returns the shipped hook's own verdict for that script:
-// it cannot regress in either direction, because it IS the shipped behaviour. The fail-open the flag
-// was written to close stays closed, because the shipped hook DENIES that script too (measured).
-//
-// RESIDUAL, named the way `memory/map/features/agent-cap.md` names rule 1's: a script containing a
-// regex literal with an odd backtick count is judged at the shipped hook's precision, not the
-// improved one. That is a smaller and stated loss.
+// WHERE A `/` STARTS A REGEX is the classic JavaScript ambiguity and this file is DELIBERATELY
+// CONSERVATIVE about it: a regex is recognised only after a token that cannot end an expression —
+// an operator, an opening bracket, a comma, a colon, a semicolon, or start of input. After an
+// identifier, a number, or a closing bracket the `/` is treated as DIVISION, which is the status quo.
+// Guessing the other way would consume live code to the next `/` and invent a fail-open worse than
+// the one being closed. The residual is therefore a regex in an ambiguous position, and the
+// `unterminated` fallback still covers what this cannot.
 function renderCodeView(script) {
   const out = []
-  let mode = 'code' // code | tmpl
-  const stack = [] // 'tmpl' | 'interp', innermost last
-  let interpDepth = 0 // brace depth inside the current interpolation
+  let mode = 'code' // code | tmpl | block
+  const stack = []
+  let interpDepth = 0
+  let prev = '' // last significant code character emitted, for the regex/division decision
   for (const raw of script.split(/\r?\n/)) {
     let res = ''
     let i = 0
@@ -311,23 +301,35 @@ function renderCodeView(script) {
       const two = raw.slice(i, i + 2)
       if (mode === 'code') {
         if (two === '//') break
-        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
+        if (two === '/*') { mode = 'block'; i += 2; continue }
+        if (ch === '/' && !'})]'.includes(prev) && !/[A-Za-z0-9_$]/.test(prev)) {
+          // A regex literal. Consume it whole, including any backtick, `/*` or quote inside, so
+          // none of them can open a construct. A class `[...]` may hold an unescaped `/`.
+          let j = i + 1
+          let cls = false
+          let closed = false
+          while (j < raw.length) {
+            const c = raw[j]
+            if (c === '\\') { j += 2; continue }
+            if (c === '[') cls = true
+            else if (c === ']') cls = false
+            else if (c === '/' && !cls) { closed = true; break }
+            j++
+          }
+          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
+          // Unterminated on its line: not a regex after all, fall through as ordinary punctuation.
+        }
+        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
-          // and then append a closer the source never had, swallowing the rest of that line --
-          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
-          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
-          // needs a matching PAIR before it blanks anything, and so does this now.
           const q = ch
           let e = i + 1
           while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
-          if (e >= raw.length) { res += ch; i++; continue }
+          if (e >= raw.length) { res += ch; prev = ch; i++; continue }
           res += q + q
+          prev = q
           i = e + 1
           continue
         }
-        // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
-        // counted so an object literal or a block inside the expression does not close it early.
         if (stack.length && stack[stack.length - 1] === 'interp') {
           if (ch === '{') interpDepth++
           else if (ch === '}') {
@@ -336,28 +338,20 @@ function renderCodeView(script) {
           }
         }
         res += ch
+        if (!/\s/.test(ch)) prev = ch
         i++
       } else if (mode === 'tmpl') {
         if (ch === '\\') { i += 2; continue }
         if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
-        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
+        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; prev = '`'; i++; continue }
+        i++
+      } else {
+        if (two === '*/') { mode = 'code'; prev = '/'; i += 2; continue }
         i++
       }
     }
     out.push(res)
   }
-  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
-  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
-  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
-  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
-  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
-  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
-  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
-  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
-  // documents for a primitive named inside a block comment.
-  //
-  // The flag still reports every mode that outlives the scan, which now means an unterminated
-  // TEMPLATE only.
   return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
 }
 
@@ -615,6 +609,8 @@ const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
 function blankLiterals(script) {
   const out = []
   let mode = 'code' // code | tmpl | block
+  let dirty = false // did any line end with a construct still open, or a quote never closed?
+  let prev = ''
   for (const raw of script.split(/\r?\n/)) {
     let res = ''
     let i = 0
@@ -624,24 +620,48 @@ function blankLiterals(script) {
       if (mode === 'code') {
         if (two === '//') break
         if (two === '/*') { mode = 'block'; i += 2; continue }
-        if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
+        // TOOL-aPairedLexer-4: a regex literal is consumed WHOLE, so a backtick, a quote or a `/*`
+        // inside one cannot open anything. Same conservative rule as `renderCodeView`: a `/` is a
+        // regex only after a token that cannot END an expression, and division otherwise. Without
+        // this, ``/[`]/`` opened a phantom template and blanked every later line — and because two
+        // such literals close each other, `endMode` finished at 'code' and reported nothing wrong.
+        if (ch === '/' && !'})]'.includes(prev) && !/[A-Za-z0-9_$]/.test(prev)) {
+          let j = i + 1
+          let cls = false
+          let closed = false
+          while (j < raw.length) {
+            const c = raw[j]
+            if (c === '\\') { j += 2; continue }
+            if (c === '[') cls = true
+            else if (c === ']') cls = false
+            else if (c === '/' && !cls) { closed = true; break }
+            j++
+          }
+          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
+        }
+        if (ch === '`') { mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          res += ch
           const q = ch
-          i++
-          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
-          res += q
-          i++
+          let e = i + 1
+          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
+          // TOOL-aPairedLexer-4: an UNPAIRED quote used to fabricate its own closer and swallow the
+          // rest of the line while still reporting `code` — a blanked span no consumer was told
+          // about. It is now reported through `dirty`, which is what the fallback keys on.
+          if (e >= raw.length) { dirty = true; res += ch; prev = ch; i++; continue }
+          res += q + q
+          prev = q
+          i = e + 1
           continue
         }
         res += ch
+        if (!/\s/.test(ch)) prev = ch
         i++
       } else if (mode === 'tmpl') {
         if (ch === '\\') { i += 2; continue }
-        if (ch === '`') { mode = 'code'; res += '`'; i++; continue }
+        if (ch === '`') { mode = 'code'; res += '`'; prev = '`'; i++; continue }
         i++
       } else {
-        if (two === '*/') { mode = 'code'; i += 2; continue }
+        if (two === '*/') { mode = 'code'; prev = '/'; i += 2; continue }
         i++
       }
     }
@@ -653,7 +673,12 @@ function blankLiterals(script) {
   // branch — so an unterminated `/*` left the carry standing and a cap of 500 below one still
   // ADMITTED with the repair applied. Measured. A signal read from a different view than the one
   // being fixed reports on the wrong machine.
-  return { code: out, endMode: mode }
+  //
+  // TOOL-aPairedLexer-4: `endMode` alone is an EOF-ONLY signal, and a span that is spuriously
+  // opened AND closed leaves it at 'code' with content already blanked. `dirty` carries the
+  // per-line half of the same question, so `clean` means "nothing was blanked that should not
+  // have been", not merely "the file did not end mid-construct".
+  return { code: out, endMode: mode, dirty, clean: mode === 'code' && !dirty }
 }
 
 // Join forward from the `(` at code[i][col] until the parens BALANCE, and return the inside. The
@@ -704,8 +729,21 @@ function capFindings(script) {
   // wrongly: it also feeds `intConsts`, where an EXPOSED `const K = 5` resolves a cap that was
   // unresolvable and REMOVES a finding. What it is, is a view of a script this rule can
   // actually read, in both directions, rather than a blank page.
-  const code = _bl.endMode === 'code' ? _bl.code : lines.map((l) => stripStrings(l).split('//')[0])
+  const code = _bl.clean ? _bl.code : lines.map((l) => stripStrings(l).split('//')[0])
   const { consts, orBound } = intConsts(code)
+  // TOOL-aPairedLexer-4: the fallback view strips neither template contents nor block comments,
+  // and `intConsts` matches anywhere in the text it is handed. Later binding wins, so a
+  // `const K = 5` written in PROSE overrode a real `const K = 500` and turned a correct denial of
+  // a 500-wide fan into an approval. Three spellings measured, all `node --check` clean.
+  //
+  // Cross-check the two views and keep the LARGER of any two disagreeing integers: for a CAP,
+  // larger is fail-closed. A name only ONE view binds is not a disagreement — that is the exposed
+  // binding the fallback exists to serve, and its arm stays green.
+  if (!_bl.clean) {
+    for (const [k, v] of intConsts(_bl.code).consts) {
+      if (consts.has(k) && consts.get(k) !== v) consts.set(k, Math.max(consts.get(k), v))
+    }
+  }
   const bad = []
 
   // ONE explanation per unresolvable K, naming the FORM rather than shrugging — an operator who
@@ -996,11 +1034,20 @@ function guardAgentSpawn(data) {
 // S2 - the view is `blankLiterals`, the one this file already defines, rather than a second
 // character scanner. That is a deliberate NARROWING: the awk kept string CONTENTS and only stripped
 // comments, so it matched the retired identifier inside a string. Two fixtures in the self-test pin
-// the difference in both directions. A regex LITERAL survives the blanking, which is why the gate
-// excludes this file from its own population - the ban table below would otherwise match itself.
+// the difference in both directions.
+//
+// TOOL-aPairedLexer-4: a regex LITERAL no longer survives the blanking — this used to say it did,
+// and that was the reason given for the gate excluding this file from its own population. The
+// exclusion still stands on its own merits, but the reason has changed: blanking regex literals
+// REMOVES false positives here and cannot hide a real join, because a join cannot be written
+// inside one. Both directions are pinned in the self-test.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  const code = blankLiterals(script).code
+  // TOOL-aPairedLexer-4 (review D5): this rule computed the signal and threw it away, keeping the
+  // fail-open the sibling unit had just closed next door. Same fallback as rule 3: when the view is
+  // not clean, judge the script on the per-line view rather than on a blank page.
+  const _bl = blankLiterals(script)
+  const code = _bl.clean ? _bl.code : raws.map((l) => stripStrings(l).split('//')[0])
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would

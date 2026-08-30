@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md](../build/2026-08-30-build-TOOL-aPairedLexer-1-base-measurements.md) | journal | TOOL-aPairedLexer-1 TOOL-aPairedLexer-3 |
+| [2026-08-30-review-TOOL-aPairedLexer-1-2-3-diff-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-diff-round1.md) | diff-review | TOOL-aPairedLexer-1 TOOL-aPairedLexer-3 |
 | [2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aPairedLexer-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-1 TOOL-aPairedLexer-3 |
 
 <!-- /gen:spec-records -->
@@ -36,7 +37,10 @@ inside a prompt is read as a call. This is the last member of the class
 ## 3. Non-goals (OUT)
 
 - **The block-comment ceiling STAYS, and is the reason this unit fixes two of three rows rather than
-  three.** See §4.
+  three.** See §4. **SUPERSEDED by `TOOL-aPairedLexer-4` (rev-3, below): the ceiling is gone.** It
+  was never an independent limit — it was a consequence of the views not modelling regex literals,
+  and modelling those retired it. This non-goal was correct for the unit as specced and is kept
+  verbatim rather than rewritten, because a ratified spec records what was decided at the time.
 - Not touching rules 2, 3 or 5. Rule 3's blindness is `TOOL-aPairedLexer-1`.
 - Not changing `CAP`, `MAX_VERIFIERS` or `MAX_LENSES`.
 
@@ -121,6 +125,8 @@ verbatim, which is why it is the right view and a blanket template-blanker is no
   `2`, likewise `0` under rev-1.
 - **AC6** — When a primitive is named inside a `/* */` block comment, it exits `2`, UNCHANGED from
   BASE. This unit does not fix that row and the arm pins the ceiling rather than the bug.
+  **RETIRED by `TOOL-aPairedLexer-4` AC4, which pins the same fixture at `0`.** The arm was kept and
+  inverted rather than deleted, so the suite still records that this row changed and when.
 - **AC7** — When a `gov:bounded-fanout` marked helper line is present, it is still exempt — the
   marker is read from the RAW line and S1 does not move it.
 - **AC8** — When each new fixture is staged against the shipped code first,
@@ -139,6 +145,12 @@ and `bash tools/check-kit-versions.sh` are the direct invocations §6 names.
   `TOOL-aLexedStripper-5` declined. RESOLVED (agent, 2026-08-30, delegated): not now, and not as a
   row either — the dossier already carries it as an accepted blind spot and a backlog row would be a
   second copy of one fact, which is the class this build's own README bans.
+  **REOPENED and answered the other way, same day, by `TOOL-aPairedLexer-4`.** The round-1 diff
+  review's D1 forced the regex-literal work anyway, for a different reason: without it the view
+  mis-modelled regex literals and ADMITTED a raw primitive between two of them. Once that landed,
+  the block strip this fork called unaffordable became free, so the ceiling was retired as a side
+  effect rather than as a project. The "not now" was right on the evidence it had; what it could not
+  see was that the expensive prerequisite would be bought by an unrelated blocker.
 
 ## 9. Revision log
 
