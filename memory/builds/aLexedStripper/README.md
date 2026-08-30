@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling
 roster: TOOL
-ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7
+ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 TOOL-aLexedStripper-8
 authorized-by: prompt
 ---
 
@@ -63,7 +63,7 @@ merged to the trunk with the charter's `--no-ff` landing shape, and `--landed` r
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-30 · streams tooling
-ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7
+ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7 TOOL-aLexedStripper-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
