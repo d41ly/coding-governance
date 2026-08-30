@@ -11,124 +11,44 @@ authorized-by: prompt
 # aLexedStripper — two kit scanners stop reading prose as code
 
 ## The problem this build exists to solve
-Two shipped kits scan source with regexes that do not know what language they are looking at, and
-both mis-read ordinary prose as code structure. Both were found by an adopter (`d41ly/incms`) and
-filed there as gov asks, because both files are role `engine` in that tree and a local edit would be
-a policy violation.
-
-**`codebase-map`'s `_identifier_tokens`** (`tools/codebase-map/map_lib.py:636`) applies C-family
-comment syntax to every language. `_BLOCK_COMMENT_RE = /\*.*?\*/` with `DOTALL` has no language
-gate, so a `/*` sequence anywhere opens a comment that runs until the next `*/`. Measured on
-inCMS `services/api/app/main.py`: a MIME glob `application/*` inside a docstring opens a span that
-closes 674 lines later on an `on*` attribute glob, and the file's identifier count falls
-**1616 → 88**, reproducing the reported figure exactly. That is the input to `fan_in`, which is the
-ranking behind `reuse_lookup.py` — the probe template §10 and charter §1 make a Definition-of-Ready
-item. The audit is not merely degraded on Python; it is blind.
-
-**The damage is far wider than the row that reported it.** `ABL-bCandidLoupe-1` says "24 .py files
-affected". Measured across both trees at this build's BASE, counting a file as damaged when it loses
-more than half its identifiers: **107 files in gov, 1374 in inCMS**. Per extension, the share of
-identifiers that survive: gov `.sh` 16.5%, `.js` 19.9%, `.py` 51.5%; inCMS `.js` 15.4%, `.sh` 19.1%,
-`.ts` 21.5%, `.tsx` 30.4%, `.py` 66.7%. `.githooks/gate-env.sh` keeps **0 of 250**. The C-family
-languages the regexes were written for are damaged too, because comments are stripped BEFORE
-strings, so a `//` inside a URL truncates its line and a `#` inside a string eats the rest of one.
-Five distinct over-strip classes, one root: a language-blind regex chain in the wrong order.
-
-**`agent-cap`'s five-lens allowance** (`tools/hooks/agent-cap.js`) proves a lens array bounded by
-counting its top-level elements, over a view built by `stripStrings`, which blanks quoted strings
-per line and deliberately leaves template literals alone. Lens prompts ARE template literals full of
-English, so their punctuation is counted as code structure. Reproduced at gov 1.8 against a correct
-five-element fan: a literal `...` in lens prose is read as a spread, the array becomes unmeasurable,
-and the harness is DENIED. Unbalanced brackets in prose shift the same count. The refusal talks
-about verifier arity and names nothing about prose, so the operator restructures a harness that was
-already correct.
+Two shipped kits scan source with regexes that do not know what language they are reading, and both
+mis-read ordinary prose as code. `codebase-map`'s `_identifier_tokens` applies C comment syntax to
+every language: a MIME glob in a Python docstring opened a span that swallowed 674 lines, taking one
+file to 18.8% recall. `agent-cap`'s lens counter reads template prose as bracket structure, denying
+a correct five-lens harness. Both were found by the `d41ly/incms` adopter and filed there as gov
+asks, because both files are role `engine` in that tree. Measurements, and everything else this
+build learned, are in `build/2026-08-30-build-TOOL-aLexedStripper-2-base-measurements.md`.
 
 ## Expected improvements
-- The reuse audit charter §1 mandates can actually see Python, TypeScript and shell identifiers.
-- A correct five-lens review harness stops being denied for its English, in this repo and in every
-  adopter, without either of them hand-fitting prose to a counter.
+- The reuse audit the charter mandates can see Python, TypeScript and shell identifiers again.
+- A correct five-lens harness stops being denied for its English, here and in every adopter.
 - Both fixes land UPSTREAM, so adopters take them by re-pull with no role flip and no local delta.
-- Each fix reuses a seam that already exists rather than adding a second answer.
 
 ## Detriments if this is not built
-- Every DoR reuse audit in both trees keeps reading a corpus with most of its identifiers deleted,
-  and reports "no existing seam fits" for seams that are there — the exact failure M5 warns is
-  indistinguishable from an honest miss.
-- Adopters keep writing lens prose around a counter's punctuation bugs, and the gotcha that teaches
-  them to do it prescribes U+2019, which fixes nothing the ASCII form actually broke.
-- Both rot further with every kit sync: `ABL-bCandidLoupe-1` records that the defect already
-  survived one.
+- Every DoR reuse audit in both trees keeps reading a corpus with most identifiers deleted, and
+  reports "no existing seam fits" for seams that are there.
+- Adopters keep writing lens prose around a counter's punctuation bugs, following a gotcha whose
+  prescribed remedy is measured to fix nothing.
 
 ## Build-level rules
-- **Upstream is the side, and the adopter's blocker does not reach it.** The trap
-  `ABL-dPinnedVintage-5` §8 F3 walked for `extract.py` — patch locally, flip the role to `diverged`,
-  insert a delta marker, move the blob OID, red kit-sync check 8, and wait on the `install.index`
-  regeneration `ABL-dPinnedVintage-3` owns while that row is BLOCKED — is a property of the ADOPTER's
-  tree. In gov both files are role `engine` and gov is where they are authored. Nothing here is
-  blocked by that row, and the same precedent chose the same side.
-- **A stripper is a lexer, not a regex chain.** Comments and strings are mutually exclusive and a
-  regex pass over each cannot express that; the order of two such passes decides which one wins, and
-  every ordering is wrong for some input. One left-to-right pass with a per-language profile is the
-  root-cause shape, and `blankLiterals` in `agent-cap.js` is the in-repo precedent for it.
-- **Never widen a guard's blind spot to fix its false positives.** `agent-cap` may not stop seeing a
-  real `agent(` call. Interpolations carry real code, so the interpolation-span second view rule 5
-  already uses is part of the fix, not an optional extra — blanking template contents alone is a
-  fail-open change and would be a defect, not a fix.
-- **Both instruments are measured before and after, over the same real corpus**, and the after-figure
-  is derived by the same probe. A stripper change asserted rather than measured is how the first one
-  shipped.
-- **Every fix here is gated by its own failing case, observed RED before it is wired** (§7). A gate
-  whose failure has only ever been reasoned about is an assertion about nothing.
-
-## The spec-audit loop exited NON-CONVERGENT, and that is recorded rather than smoothed
-
-Round 1 confirmed 2 blockers; round 2 confirmed 2 again. The count did not strictly fall, so
-`BUILD-METHOD.md` M4 STOPS the loop and PROMOTES every surviving blocker to a unit. Units `-5` and
-`-6` are those two, and neither is re-reviewed as a round.
-
-Both rounds were useful and neither was taken on trust. Round 1 refuted `-2`'s central design, and
-its two blockers were reproduced against BASE before being folded. Round 2 then found that the FOLDS
-introduced two new defects, one per unit, each moving a verdict in the direction its own §1 forbids
-— and those were reproduced too. That is the loop working, not failing: what it could not do is
-converge inside two rounds, and the method says to stop rather than keep paying.
-
-One round-1 finding was REFUTED by measurement and did not survive into rev-2: the claim that no
-unmatched `)` in lens prose denies at BASE. It denies in the multi-line array, which is the shape
-every shipped harness writes; the report had run 17 one-line variants only.
-
-Precision was 0.28 then 0.29, both far under the ~0.5 the charter names. Round 2's own report records
-that as a negative result under exactly the priming round 1 prescribed.
-
-## The CLOSING review also exited NON-CONVERGENT, and nothing was promoted
-
-Round 1 confirmed 2 blockers, round 2 confirmed 2, so `BUILD-METHOD.md` M4 STOPS that loop too.
-M4 then promotes "every blocker still STANDING". None stand: both were fixed and each fix is
-measured, so the promotion set is empty and no unit was added. Recorded because an empty promotion
-looks identical to a skipped one.
-
-Round 2 is the round worth reading, because it caught two things this run got wrong rather than two
-things the code got wrong.
-
-**The first repair was insufficient and round 1 had already said so.** Round 1 said to delete
-`renderCodeView`'s block-comment branch. This run shipped the smaller repair — widening the
-unterminated flag — and round 2 measured a block-comment opener BORNE IN A REGEX LITERAL and closed
-by a later ordinary closer, which returns the scan to code mode with an empty stack while the span
-between is already blanked. The branch is now deleted, which is what the view being replaced also
-did, so it cannot regress against it.
-
-**And this run REFUTED a real finding on a fixture that could not reach it.** Round 1's second
-blocker said an unpaired quote regresses the verdict. Four fixtures were run, all denied, and it was
-recorded as refuted with a stated mechanism. The mechanism was false and the fixtures were the wrong
-shape: the verdict only moves when the fan sits on the SAME line as the quote. Round 2 supplied
-`if (/won't/.test(args.s)) await Promise.all(...)` — admitted, against a denying control that
-differs only in the apostrophe. That is the same fixture-shape error the adopter session made three
-times tonight and that this build warned them about, made here, in a review of a security guard.
-
-Both rounds were worth their cost and the second was worth more than the first.
+- **Upstream is the side.** The adopter's blocker — flip the role, insert a delta, red kit-sync,
+  wait on a BLOCKED receipt migration — is a property of THEIR tree. In gov both files are `engine`.
+- **A stripper is a lexer, not a regex chain.** Comments and strings exclude each other and no
+  ordering of separate passes expresses that.
+- **Never widen a guard's blind spot to fix its false positives.** A view that blanks anything can
+  hide a fan-out; this build shipped that defect twice before measuring it.
+- **Both instruments are measured before and after over the same real corpus**, and every fix is
+  gated by its own failing case observed RED first.
+- **A null result is a claim.** "It did not reproduce" and "it was contention" each owe the same
+  evidence a positive finding does. Both were wrong here until tested.
 
 ## Parked decisions
-*(none yet — this section is where a refused decision lands, with its question, the options seen,
-and why the run refused it.)*
+Two entries in `RUN.md`, and the second corrects the first. Landing publishes five
+`TOOL-aGradedDoorway-7` commits this build did not author, already on local main before the session
+began. The first entry justified that partly on their blocking another session; that reason measured
+the WRONG REPOSITORY and is withdrawn. The decision stands on the two that survive: they are already
+merged to the trunk with the charter's `--no-ff` landing shape, and `--landed` records
+`unpushed-at-landing` so the fact is visible rather than silent.
 
 <!-- roster:units -->
 

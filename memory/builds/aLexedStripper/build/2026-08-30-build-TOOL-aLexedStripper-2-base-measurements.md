@@ -323,3 +323,35 @@ in one night: a ceiling derived from a run whose cache was alive, a waiver keyed
 a fixture that cannot reach its mechanism, a repair that passes every test that exists, and a leg
 killed before it could answer. Each is an artifact whose validity depends on a condition it does not
 record, and each reads as a result.
+
+## 12. Both review loops exited NON-CONVERGENT
+
+Moved here from the build README when that file was registered under the slot contract, which closes
+the heading set at five. The narrative is the record's job; the README's is to be readable.
+
+**The spec audit.** Round 1 confirmed 2 blockers, round 2 confirmed 2. The count did not strictly
+fall, so M4 STOPS the loop and PROMOTES every surviving blocker to a unit — `-5` and `-6` are those
+two. Round 1 refuted `-2`'s central design; round 2 then found that the FOLDS introduced two new
+defects, one per unit, each moving a verdict in the direction its own §1 forbids. That is the loop
+working. What it could not do is converge in two rounds, and the method says stop rather than keep
+paying.
+
+**The closing review.** Round 1 confirmed 2, round 2 confirmed 2, so it stopped too. M4 promotes
+every blocker still STANDING and none stood: both were fixed and each fix is measured, so the
+promotion set was empty. Recorded because an empty promotion looks identical to a skipped one.
+
+**One round-1 finding was REFUTED by measurement** and did not survive into rev-2: the claim that no
+unmatched `)` in lens prose denies at BASE. It denies in the multi-line array, which is the shape
+every shipped harness writes; the report had run 17 one-line variants only.
+
+**And one refutation of mine was WRONG**, which is the more useful half. Closing round 1's second
+blocker was recorded refuted with a stated mechanism, on four fixtures. The mechanism was false and
+the fixtures were the wrong shape — the verdict only moves when the fan sits on the SAME line as the
+quote. Round 2 supplied one that does. That is the same fixture-shape error an adopter session made
+three times the same night and that this build had warned them about, made here, in a review of a
+security guard.
+
+Precision was 0.28, 0.29, 0.65 and 0.69 across the four rounds. The two spec-audit rounds sit far
+under the ~0.5 the charter names; the two diff-review rounds clear it. On this evidence the closing
+review was worth more per agent than the spec audit, and the cheapest instrument of all was a peer
+session asking whether a mechanism was really the mechanism.
