@@ -1,0 +1,94 @@
+---
+slug: aGatheredDeclaration
+node: a
+opened: 2026-08-31
+streams: tooling
+roster: TOOL
+status: OPEN
+ids: TOOL-aGatheredDeclaration-1
+authorized-by: prompt
+---
+
+# aGatheredDeclaration — one declared file, one gate entry point, and every ceiling opt-in
+
+## The problem this build exists to solve
+The gate bar is DECLARED in three places and EXECUTED from two, and neither split is visible to the
+owner who has to adjust it. Legs sit in JSON that cannot carry the reasoning for a row, concurrency
+sits in a separate knob table, and opt-in has no key at all — it is inferred from `subject = "kit"`.
+The runner parses NO arguments, so there is no way to run one leg: every check costs the whole bar,
+which on this tree has a 26-minute floor. Ceilings are enforced unconditionally on all 86 legs and
+have cost killed legs, reds and re-runs; the turnstile ships enabled and once wedged a landing 6858 s
+behind three dead tickets. Two adopters prove the schema is unsettled — inCMS runs its own 863-line
+runner over a richer manifest, NicoCares runs this kit over a manifest declaring almost nothing. The
+prompt record holds the measurements.
+
+## Expected improvements
+- One owner-readable, commented `gate-legs.toml` declares legs, opt-in, ceilings, guards, lanes AND
+  the profile table, so adjusting the bar is one file and every number keeps its argument beside it.
+- `run-gates.sh` grows a real argument surface, so a single leg can be run by name and the manifest
+  can be printed — the shard the bar has never had.
+- Ceilings become owner opt-in and default OFF, which converts a class of killed-leg reds into
+  evidence.
+- The turnstile ships disabled, so no adopter inherits a queue that can wedge their landings.
+- One upgrader migrates any adopter's manifest and its tests onto the canonical declaration.
+
+## Detriments if this is not built
+- Owners keep editing three files to change one bar, and JSON keeps silently deleting the reasoning.
+- Every check keeps costing the whole bar, so the bar keeps being skipped rather than sharded.
+- Adopters keep inheriting enforcement defaults that have measurably cost landings in this tree.
+- The two adopter dialects keep diverging, and each new adopter picks a third.
+
+## Build-level rules
+- **Reuse before invention: the runner already exists.** `tools/run-gates/` is a kit with an adopter
+  and 1480 lines of measured behaviour. Nothing here builds a second runner.
+- **inCMS is prior art, not a competitor.** Its `optIn`, `phase`, `cwd` and its `INCMS_GATE_UNBOUNDED`
+  banner discipline are harvested into the canonical schema. Its 863-line runner is not ported.
+- **A knob may never turn a leg into a PASS or a SKIP.** `gate-profiles.txt`'s governing invariant
+  survives the move verbatim; ceilings going OFF produces strictly MORE evidence, never less.
+- **Ceilings off must announce themselves twice and durably** — a banner before the first leg and a
+  line in the summary — so a green earned unbounded is never mistakable for one earned bounded.
+- **Every new gate and every changed refusal has its failing case observed RED first.**
+- **Nothing lands outside this repository.** The adopters are reviewed and an upgrader is shipped;
+  migrating each one is that repo's own build, on its own bar (owner ruling, 2026-08-31).
+
+## Parked decisions
+None yet.
+
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aGatheredDeclaration-1` | 1 | the adopter review: what inCMS and NicoCares declare and execute today, and the schema union it implies |
+| 2 | `TOOL-aGatheredDeclaration-2` | 2 | `gate-legs.toml` — the single commented declaration, its reader, and the migration of this repo's 86 legs plus the profile table |
+| 3 | `TOOL-aGatheredDeclaration-3` | 2 | the runner's argument surface: `--list`, `--leg`, `--manifest`, `--help` — sharding by name |
+| 4 | `TOOL-aGatheredDeclaration-4` | 2 | ceiling enforcement becomes owner opt-in, default OFF, announced twice and durably |
+| 5 | `TOOL-aGatheredDeclaration-5` | 2 | the turnstile beacon ships disabled, enabled by a declared variable |
+| 6 | `TOOL-aGatheredDeclaration-6` | 2 | the readers move: govkit emitter, pre-push, drift-audit, codebase-map, and the carriers that name the entry point to a session |
+| 7 | `TOOL-aGatheredDeclaration-7` | 2 | the upgrader: migrate any adopter's manifest and its tests onto the declaration |
+
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 0 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGatheredDeclaration-1
+
+<!-- gen:build-units -->
+*No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
+
+Records: 1 bound to this build, across 1 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
