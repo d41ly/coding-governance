@@ -4,7 +4,14 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-dead-code.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-dead-code.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-duplication.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-duplication.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-inefficiency.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-inefficiency.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-instruments.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-instruments.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-unwired.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-unwired.md) | research | — |
+| [2026-08-30-review-TOOL-aScouredKit-1-wave1-report.md](../reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-report.md) | research | — |
 
 <!-- /gen:spec-records -->
 
