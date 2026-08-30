@@ -331,7 +331,13 @@ function renderCodeView(script) {
     }
     out.push(res)
   }
-  return { code: out, unterminated: stack.length > 0 }
+  // The flag reports EVERY mode that outlives the scan, not just an open template. Block mode pushes
+  // nothing onto the stack, so an unterminated block-comment opener used to end the scan with a
+  // `stack.length` of zero
+  // and no fallback: everything below the opener was blanked and an unbounded fan under it was
+  // ADMITTED where the shipped hook DENIES. Measured, and the reason this is `mode !== 'code'`
+  // rather than a second stack.
+  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
 }
 
 function fanoutFindings(script) {

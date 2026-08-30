@@ -1173,6 +1173,14 @@ def test_identifier_tokens_corpus_recall():
     import tokenize as _tok
 
     root = m.repo_root()
+    # THIS REPO, not merely "a git checkout". The floors below are calibrated against this corpus;
+    # run them anywhere else and they are a claim about a population nobody measured. Measured: the
+    # CPython tree scores 0.858 precision against the 0.95 floor, so a git-ness guard turns this arm
+    # into a spurious RED in any adopter that vendors the kit inside its own repo.
+    if not (root / "coding-governance-agents.template.md").is_file():
+        print("     SKIP corpus recall: not the coding-governance repo, and these floors are "
+              "calibrated to its corpus. NOT a pass.")
+        return
     try:
         listing = subprocess.run(
             ["git", "-C", str(root), "ls-files", "*.py"],

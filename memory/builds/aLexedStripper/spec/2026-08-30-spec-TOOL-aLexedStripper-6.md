@@ -1,10 +1,13 @@
 # TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair
 
-**Status:** SPECCED · rev-1 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 |
 
 <!-- /gen:spec-records -->
 
@@ -159,6 +162,11 @@ name.
 - rev-1 · 2026-08-30 · promoted from the round-2 spec audit's blocker 26+30 at the NON-CONVERGENT
   exit, per `BUILD-METHOD.md` M4. Both figures were reproduced before this spec was written: 73
   identifiers across 25 files, and `selftest.py` at 99.7% with `or` as the sole miss.
+- rev-2 · 2026-08-30 · S4 recorded as a NO-OP after the build, with the reason, because a scope item
+  that silently evaporates is indistinguishable from one nobody did. S4 was to restate
+  `TOOL-aLexedStripper-1` AC3 against "the figure the design now reaches". That figure turned out to
+  be 100%, which is exactly what AC3 already demanded — so the criterion stands unamended and the
+  DESIGN moved to meet it instead. No edit to `-1` was owed and none was made.
 
 ## 10. Reuse audit
 

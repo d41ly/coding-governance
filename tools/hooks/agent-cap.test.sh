@@ -834,5 +834,38 @@ const all = args.everything
 await boundedParallel(all.map((x) => () => agent(x)), 5)
 EOF
 
+
+# The same class in the OTHER field-count regime. A stray `)` drives topLevelArgs' depth negative and
+# every comma AFTER it then counts at top level, so denial depends on how many commas follow -- i.e.
+# on how many fields each element has. A one-field array is denied only when the prose sits in the
+# LAST element; a two-field one is denied wherever it sits. Both regimes are here because a fixture
+# in one of them measures the other wrongly, which is how two independent grids disagreed on `)`.
+js "rule2 prose: one-field element, stray ) in the LAST element" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { prompt: `one` },
+  { prompt: `two` },
+  { prompt: `three` },
+  { prompt: `four` },
+  { prompt: `list the rows), then the table` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# The other end of the same rule: a `)` with no comma after it inside its element was ALWAYS harmless,
+# so this arm admits at BASE too. It is here to pin the boundary, not the fix -- without it the group
+# only ever asserts the denying side and cannot notice the guard becoming a blanket.
+js "rule2 prose: a stray ) at the very end of the prose was never a denial" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `the rows, then the table)` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

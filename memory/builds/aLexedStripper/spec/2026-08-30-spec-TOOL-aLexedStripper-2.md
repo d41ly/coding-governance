@@ -6,6 +6,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-1 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-1 |
 
@@ -84,6 +86,15 @@ Every script below is a CORRECT five-element lens array fanned through
 
 Five spellings deny in the multi-line array, which is the shape every shipped harness uses because
 every one of them is prettier-formatted. Two of those five also deny on one line.
+
+**THE PROMPT MUST BE A BACKTICKED TEMPLATE LITERAL, and that precondition is load-bearing.** The
+same array with its prompts written `"…"` or `'…'` ADMITS every row, because `stripStrings` already
+blanks those and the prose never reaches a counter. Measured across all three quotings. This is not
+a curiosity: it is why the class only ever bites LENS prose — a lens prompt is multi-line and is
+therefore always backticked — and it is why a reproduction attempt using quoted prompts sees
+nothing and concludes the row is unreproducible. An adopter session hit exactly that and reported
+four ADMIT rows against its installed 1.6; re-run with backticked prompts, that same 1.6 reproduces
+this table identically, so the class is not a 1.8 regression.
 
 **Two corrections this table makes to rev-1**, both from the round-1 audit and both re-measured
 before folding. Rev-1 listed only `...` and `)`; the audit found that `[`, `]` and `}` also deny and

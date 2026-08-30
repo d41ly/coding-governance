@@ -628,8 +628,6 @@ def stems(text: str) -> frozenset[str]:
     )
 
 
-_LINE_COMMENT_RE = re.compile(r"(?://|#).*$", re.MULTILINE)
-_STRING_RE = re.compile(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`]*`')
 _IDENT_TOKEN_RE = re.compile(r"[A-Za-z_$][\w$]*")
 
 
@@ -707,18 +705,23 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
                 k = j + len(interp[0])
                 depth = 0
                 body = []
+                closed = False
                 while k < n:
                     c = source[k]
                     if c == interp[0][-1]:
                         depth += 1
                     elif c == interp[1]:
                         if depth == 0:
+                            closed = True
                             break
                         depth -= 1
                     body.append(c)
                     k += 1
-                out.append(" " + "".join(body) + " ")
-                j = k + 1 if k < n else k
+                # An interpolation that never closes is TEXT, not code. Emitting the body anyway
+                # walked to EOF and leaked the whole rest of the file into the index as identifiers
+                # -- the over-capture direction of the same defect this scanner exists to remove.
+                out.append(" " + "".join(body) + " " if closed else " ")
+                j = k + 1 if closed else k
                 continue
             if not multiline and source[j] == "\n":
                 return j  # a single-line literal never crosses its line
@@ -743,12 +746,16 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
         if ch in quotes or (backtick and ch == "`"):
             # Python string prefixes sit immediately before the quote; `f` (any case) turns on the
             # replacement field. A prefix run is at most a few letters and is already in ``out``.
-            pre = ""
-            k = i - 1
-            while k >= 0 and source[k] in _PY_PREFIX_CHARS:
-                pre = source[k] + pre
-                k -= 1
-            fstring = "f" in pre.lower()
+            # The prefix run is a PYTHON construct, so it is read only for a profile that has
+            # them. Running it for the C family cost nothing but said the opposite of what it meant.
+            fstring = False
+            if triple:
+                k = i - 1
+                pre = ""
+                while k >= 0 and source[k] in _PY_PREFIX_CHARS:
+                    pre = source[k] + pre
+                    k -= 1
+                fstring = "f" in pre.lower()
             if triple and any(source.startswith(d, i) for d in _TRIPLE_QUOTES):
                 d = source[i : i + 3]
                 i = _string(i, d, True, bool(interp) and fstring)

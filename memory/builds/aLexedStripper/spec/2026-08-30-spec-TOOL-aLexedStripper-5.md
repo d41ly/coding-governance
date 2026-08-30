@@ -1,10 +1,13 @@
 # TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced
 
-**Status:** SPECCED · rev-1 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-6 |
 
 <!-- /gen:spec-records -->
 
@@ -141,6 +144,15 @@ subject is the `agent-cap` kit, so its self-test leg is guarded and runs under `
   exit, per `BUILD-METHOD.md` M4. The blocker was reproduced against BASE before this spec was
   written, and the fallback was measured to close it while holding all 29 of
   `TOOL-aLexedStripper-2`'s shapes.
+- rev-2 · 2026-08-30 · folded the closing diff review's blocker 1, which found the fallback did not
+  fire for every mode that can outlive a scan. `renderCodeView` reported `stack.length > 0`, and
+  BLOCK mode pushes nothing onto that stack — so an unterminated block-comment opener ended the scan
+  with an empty stack, blanked everything below it, and ADMITTED an unbounded fan the shipped hook
+  DENIES. Reproduced, then fixed by reporting `stack.length > 0 || mode !== 'code'`. S1 is unchanged
+  in intent and the fallback is now reached from any surviving mode.
+  The review's second blocker — an unpaired quote in code position — is REFUTED: four fixtures were
+  run and all four DENY at both BASE and HEAD, because this file's quote handling mirrors
+  `stripStrings`' own and therefore cannot regress against it.
 
 ## 10. Reuse audit
 

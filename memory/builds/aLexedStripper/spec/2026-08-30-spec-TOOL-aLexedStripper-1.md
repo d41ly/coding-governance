@@ -1,12 +1,14 @@
 # TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass
 
-**Status:** SPECCED · rev-2 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-08-30 · node a · Tier-2 · base 19d9b328 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md](../build/2026-08-30-build-TOOL-aLexedStripper-1-acceptance-ledger.md) | journal | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-prompt-TOOL-aLexedStripper-1-1.md](../prompts/2026-08-30-prompt-TOOL-aLexedStripper-1-1.md) | research | — |
+| [2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-5-6-closing-diff-round1.md) | diff-review | TOOL-aLexedStripper-2 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round1.md) | spec-audit | TOOL-aLexedStripper-2 |
 | [2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md](../reviews/2026-08-30-review-TOOL-aLexedStripper-1-2-spec-audit-round2.md) | spec-audit | TOOL-aLexedStripper-2 |
 
@@ -234,6 +236,19 @@ AC2 name, so the class is gated and not only the instances.
   gained the fixture that demonstrates each row, after the rev-1 fixtures for rows 3 and 4 were
   found to prove nothing — they placed the identifier BEFORE the marker, which is this repo's own
   `fixture-passes-by-finding-nothing` class.
+- rev-3 · 2026-08-30 · folded the closing diff review. Three findings, all confirmed and all in the
+  same direction — the scanner captured MORE than it should rather than less. An interpolation body
+  that never closes walked to EOF and leaked the rest of the file into the index as identifiers; it
+  is now treated as TEXT unless it closes. The Python string-prefix backscan ran for the C-family
+  profile too, where prefixes do not exist; it is now scoped to a profile that has them. And
+  `_LINE_COMMENT_RE` and `_STRING_RE` were left behind dead when the pass replaced them — deleted.
+  `_BLOCK_COMMENT_RE` is NOT dead and stays: `scan_js_definitions` still uses it, which is its own
+  defect, filed as `TOOL-aLexedStripper-7` rather than folded here.
+  The corpus arm's guard also moved, and that one is a correction to this spec's own §6: it read
+  `is this a git checkout`, which is not the same question as `is this the corpus these floors were
+  calibrated against`. Measured: the CPython tree scores 0.858 precision against the 0.95 floor, so
+  the arm would have RED-ed spuriously in any adopter vendoring this kit inside its own repo. It now
+  requires this repo by name and says so when it skips.
 
 ## 10. Reuse audit
 

@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-30
 streams: tooling
 roster: TOOL
-ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6
+ids: TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7
 authorized-by: prompt
 ---
 
@@ -116,20 +116,20 @@ and why the run refused it.)*
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 4 unit(s) · node a · opened 2026-08-30 · streams tooling
-ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6
+ids TOOL-aLexedStripper-1 TOOL-aLexedStripper-2 TOOL-aLexedStripper-3 TOOL-aLexedStripper-4 TOOL-aLexedStripper-5 TOOL-aLexedStripper-6 TOOL-aLexedStripper-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aLexedStripper-1 — `_identifier_tokens` becomes one language-aware pass](spec/2026-08-30-spec-TOOL-aLexedStripper-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-30 |
 | [TOOL-aLexedStripper-2 — `agent-cap`'s lens counter reads a template-aware view](spec/2026-08-30-spec-TOOL-aLexedStripper-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
-| [TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced](spec/2026-08-30-spec-TOOL-aLexedStripper-5.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair](spec/2026-08-30-spec-TOOL-aLexedStripper-6.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
+| [TOOL-aLexedStripper-5 — an unterminated scan falls back to the view it replaced](spec/2026-08-30-spec-TOOL-aLexedStripper-5.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
+| [TOOL-aLexedStripper-6 — a seventh profile field: the interpolation pair](spec/2026-08-30-spec-TOOL-aLexedStripper-6.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aLexedStripper-5 TOOL-aLexedStripper-6.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aLexedStripper-5 TOOL-aLexedStripper-6.
 <!-- /gen:build-index -->
