@@ -1,6 +1,8 @@
 # TOOL-aPairedLexer-4 — acceptance, with the RED observations that back it
 
-**Status:** BUILT · rev-1 · 2026-08-30 · node a · Tier-2 · streams tooling · order 4
+**Serves:** journal TOOL-aPairedLexer-4
+
+Node `a`, 2026-08-30. Build commit `16dfaaef`, BASE `b3d1ecd8`.
 
 <!-- gen:spec-records -->
 <!-- /gen:spec-records -->

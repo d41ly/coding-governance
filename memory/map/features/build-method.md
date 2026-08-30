@@ -14,7 +14,12 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md"]
+gotcha-classes = [
+  "fold-text-is-unreviewed-surface.md",
+  "amendment-leaves-its-other-half-standing.md",
+  "staged-break-never-applied.md",
+  "rationale-names-a-consumer-that-does-not-exist.md",
+]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

@@ -84,9 +84,9 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-4 — both views model regex literals, and the ceiling retires](spec/2026-08-30-spec-TOOL-aPairedLexer-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aPairedLexer-4.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aPairedLexer-4.
 <!-- /gen:build-index -->

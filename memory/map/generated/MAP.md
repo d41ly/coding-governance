@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 86 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 35 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 86 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 37 · guides: 5 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -176,8 +176,10 @@ Inventories: gate-legs: 86 · kits: 15 · git-hooks: 3 · workflow-scripts: 4 ·
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `process-creation-is-the-suite-cost.md` | unattended |
+| `rationale-names-a-consumer-that-does-not-exist.md` | build-method |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `spec-names-code-its-base-lacks.md` | unattended |
+| `staged-break-never-applied.md` | build-method |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |

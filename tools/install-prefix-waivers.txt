@@ -12,7 +12,7 @@ tools/check-wiring.sh:231               dual-spelling probe: memory-recall fragm
 tools/check-wiring.sh:384               dual-spelling probe: the merge driver, both layouts
 tools/check-wiring.sh:393               launcher probe: the gov-internal shim is the fallback after the kit launcher
 tools/check-wiring.sh:416               prose naming the gov-internal shim's own dependency
-tools/codebase-map/map_lib.py:1387      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
+tools/codebase-map/map_lib.py:1472      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
 tools/memory-tree/README.md:108         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it

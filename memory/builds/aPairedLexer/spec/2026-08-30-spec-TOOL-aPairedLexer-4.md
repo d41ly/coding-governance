@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-30-build-TOOL-aPairedLexer-4-acceptance.md](../build/2026-08-30-build-TOOL-aPairedLexer-4-acceptance.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
