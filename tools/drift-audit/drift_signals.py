@@ -65,8 +65,10 @@ TRACE_GLOBS: list[str] = [
 # --------------------------------------------------------------------------------------------
 # SHRINK_ONLY — the lists this repo promises will only ever get shorter, with the seed each was
 # measured at. The previous comment here claimed "this repo ships no waiver list of its own", which
-# was false when written and falser since: four such lists are live in `memory/project/`, every one
-# of them load-bearing for a gate.
+# was false when written and falser since: the lists below are live in `memory/project/`, every one
+# of them load-bearing for a gate. TOOL-aScouredKit-8 removed a count from this sentence — it said
+# "four" against a table of five, and it was wrong by the same act that added a row. The population
+# is the table underneath, and the signal derives and prints its own `of`.
 #
 # `legacy-files.txt` is EXCLUDED, deliberately and in writing rather than by omission: it is the
 # memory-tree kit's permanent grandfather list, not a debt being drained, so a shrink-only assertion
@@ -77,7 +79,10 @@ SHRINK_ONLY: dict[str, str] = {
     "memory/project/id-orphan-waiver.txt": "the orphan-id waiver — one row per id cited but not defined",
     "memory/project/curation-debt.txt": "files exempted from the index caps until they are curated",
     "memory/project/corpus-path-unresolved.txt": "citations that cannot legally be repaired",
-    "memory/project/unarmed-branches.txt": "fail branches with no arm; empty today and meant to stay so",
+    # No cardinality in this gloss. It said "empty today and meant to stay so" while the row beside
+    # it printed `entries 3`, so an operator reading the JSON was told the opposite of the derived
+    # value standing next to it (TOOL-aScouredKit-8).
+    "memory/project/unarmed-branches.txt": "fail branches with no arm; drains as each is armed",
     "memory/project/trace-waiver.txt": "CLOSED specs no TRACE_GLOBS subject can name — signal 6's exemption",
 }
 
