@@ -105,3 +105,4 @@ memory/builds/aPrimedKeepalive/README.md
 !memory/builds/aGroundedOrientation/README.md - registered BOUND by its own build's session, but its `## Build-level rules` slot is 1824 B over the 1800 B ceiling and has been red on every bar since; exempted so the bar can bind again, and it drains when that build's owner trims the slot
 memory/builds/aReapedTicket/README.md
 !memory/builds/aGradedDoorway/README.md - landed 2026-08-28 naming no row at all. Its STRUCTURE was conformed by a later session - authored body above the regions, an authored roster pair, and the BEGIN/END GENERATED wrapper no other build README carries removed - but its headings are freeform rather than the canon's five slots, so BOUND still reds. Mapping that prose onto the slots is its build owner's call; drains when they do
+memory/builds/aLexedStripper/README.md

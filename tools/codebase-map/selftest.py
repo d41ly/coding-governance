@@ -1088,6 +1088,141 @@ def test_new_clones_reader(tmp: Path):
     assert md._new_clones(tmp, conf) is None
 
 
+def test_identifier_tokens_per_language():
+    """TOOL-aLexedStripper-1 §4 + -6: one arm per over-strip class, each asserting an identifier the
+    LANGUAGE-BLIND chain deleted. Every fixture below was observed RED against the three-regex
+    chain before this arm was wired -- the class table in that spec's §4 records which identifier
+    each one lost. The arms assert the CLASS, not the reported instance: a suffix gate on the block
+    regex alone (the adopter's proposed fix) passes rows 1-2 and fails 3-5.
+
+    Both directions are checked. `absent` is not decoration: a scanner that strips nothing passes
+    every `present` assertion, so the negative arms are what stop this test being satisfied by
+    doing no work at all."""
+    cases = [
+        # (label, suffix, source, must be present, must be absent)
+        ("class1 /* in a Python docstring", ".py",
+         'def alpha():\n    """docs for application/* glob"""\n    return BRAVO\n# on*/\ndef charlie(): pass\n',
+         {"alpha", "BRAVO", "charlie"}, set()),
+        ("class2 // is floor division in Python", ".py",
+         "def alpha():\n    return DELTA // ECHO\n", {"alpha", "DELTA", "ECHO"}, set()),
+        ("class2 // is a path in shell", ".sh",
+         "p=//server/share\nalpha=1\n", {"p", "server", "share", "alpha"}, set()),
+        ("class3 # inside a TypeScript string", ".ts",
+         'const a = "#frag" + bravo\nconst charlie = 1\n', {"a", "bravo", "charlie"}, set()),
+        ("class3 # is a private field in TypeScript", ".ts",
+         "class Foo { #priv = 1; bravo() {} }\n", {"Foo", "bravo"}, set()),
+        ("class4 // inside a URL literal", ".ts",
+         'const u = "https://x.io/" + bravo\n', {"u", "bravo"}, set()),
+        ("class4 # inside a Python string", ".py",
+         'alpha = "a # b" + bravo\n', {"alpha", "bravo"}, set()),
+        ("class5 backtick is command substitution in shell", ".sh",
+         "alpha=`date`\nbravo=1\n", {"alpha", "date", "bravo"}, set()),
+        # the word-start predicate: the field a five-field profile could not express
+        ("shell $# is not a comment", ".sh",
+         'if [ $# -gt 0 ]; then resolve_target "$1"; fi\n', {"resolve_target"}, set()),
+        ("shell ${x#y} is not a comment", ".sh",
+         "prefix=${path#/opt/}; emit_result $prefix\n",
+         {"prefix", "path", "opt", "emit_result"}, set()),
+        ("shell a REAL comment is still stripped", ".sh",
+         "alpha=1  # this is GONE\nbravo=2\n", {"alpha", "bravo"}, {"GONE"}),
+        # S5: an unterminated multi-line construct is abandoned, never allowed to eat the file
+        ("unterminated backtick does not swallow the file", ".ts",
+         "const a = `unterminated\nconst bravo = 1\nfunction charlie() {}\n", {"bravo", "charlie"}, set()),
+        ("unterminated triple quote does not swallow the file", ".py",
+         'x = """unterminated\ndef bravo(): pass\ndef charlie(): pass\n', {"bravo", "charlie"}, set()),
+        # S4: an undeclared suffix strips NOTHING -- the fail-open direction, stated and checked
+        ("an undeclared suffix strips nothing", ".zzz",
+         "anything # goes /* here */ `and` here\n", {"anything", "goes", "here", "and"}, set()),
+        # TOOL-aLexedStripper-6: an interpolation body is CODE
+        ("python f-string replacement field is code", ".py",
+         'msg = f"hi {name.upper()} and {other or fallback}"\n',
+         {"name", "upper", "other", "or", "fallback"}, set()),
+        ("rf-string still interpolates", ".py",
+         'p = rf"^\\s*{re.escape(marker)}\\b"\n', {"re", "escape", "marker"}, set()),
+        # `k` is deliberately expected ABSENT: it is a STRING token, not a NAME, and stdlib
+        # `tokenize` agrees. An earlier revision of this arm demanded it and was wrong -- the
+        # interpolation walk now blanks nested strings, which is what stops a brace inside one
+        # inflating the depth and leaking the rest of the file into the index.
+        ("a field may hold a nested quote", ".py",
+         "v = f\"{d['k'] if flag else other}\"\n", {"d", "flag", "other"}, {"k"}),
+        ("a string with NO f prefix holds no code", ".py",
+         's = "{not_code}"\nalpha = 1\n', {"alpha"}, {"not_code"}),
+        ("a b-string holds no code", ".py",
+         'v = b"{not_code}"\nalpha = 1\n', {"alpha"}, {"not_code"}),
+        ("a doubled brace is literal text", ".py",
+         'v = f"{{literal}}"\nalpha = 1\n', {"alpha"}, {"literal"}),
+        ("a JS template interpolation is code", ".ts",
+         "const r = `x ${compute(y)} z`\n", {"compute", "y"}, set()),
+    ]
+    for label, suffix, src, present, absent in cases:
+        got = m._identifier_tokens(src, suffix)
+        missing = sorted(present - got)
+        leaked = sorted(absent & got)
+        assert not missing, f"{label}: lost {missing}"
+        assert not leaked, f"{label}: admitted {leaked} from a non-code position"
+
+
+def test_identifier_tokens_corpus_recall():
+    """TOOL-aLexedStripper-1 AC1/AC2 + -6 AC2/AC3: the CLASS gated over this repo's real Python
+    corpus, against stdlib `tokenize` NAME tokens -- the exact set this function approximates.
+
+    Floors, not fixed figures: a floor cannot go stale on the next commit the way a pinned count
+    would, and it is the property that matters. Measured at the landing commit: recall 100.0%,
+    precision 98.1%, against 88.6% and 37.6% for the three-regex chain this replaced.
+
+    SKIPPED, loudly, outside a git checkout of this repo -- an adopter copy-installs the kit and has
+    no such corpus. A skip that looks like a pass is indistinguishable from coverage."""
+    import io
+    import subprocess
+    import tokenize as _tok
+
+    root = m.repo_root()
+    # THIS REPO, not merely "a git checkout". The floors below are calibrated against this corpus;
+    # run them anywhere else and they are a claim about a population nobody measured. Measured: the
+    # CPython tree scores 0.858 precision against the 0.95 floor, so a git-ness guard turns this arm
+    # into a spurious RED in any adopter that vendors the kit inside its own repo.
+    if not (root / "coding-governance-agents.template.md").is_file():
+        print("     SKIP corpus recall: not the coding-governance repo, and these floors are "
+              "calibrated to its corpus. NOT a pass.")
+        return
+    try:
+        listing = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "*.py"],
+            capture_output=True, text=True, check=True,
+        ).stdout.split("\n")
+    except (OSError, subprocess.CalledProcessError):
+        print("     SKIP corpus recall: not a git checkout, so there is no corpus to measure. NOT a pass.")
+        return
+
+    truth_total = hit = kept = 0
+    for rel in listing:
+        if not rel:
+            continue
+        path = root / rel
+        if not path.is_file():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+            names = {t.string for t in _tok.generate_tokens(io.StringIO(text).readline)
+                     if t.type == _tok.NAME}
+        except (OSError, UnicodeDecodeError, _tok.TokenError, IndentationError, SyntaxError):
+            continue
+        if not names:
+            continue
+        got = m._identifier_tokens(text, ".py")
+        truth_total += len(names)
+        hit += len(got & names)
+        kept += len(got)
+
+    if truth_total < 1000:
+        print(f"     SKIP corpus recall: only {truth_total} ground-truth identifiers found. NOT a pass.")
+        return
+    recall = hit / truth_total
+    precision = hit / kept if kept else 0.0
+    assert recall >= 0.99, f"corpus recall {recall:.3f} below the 0.99 floor"
+    assert precision >= 0.95, f"corpus precision {precision:.3f} below the 0.95 floor"
+
+
 def test_js_probe_against_the_lexicon():
     """CROSS-CHECK: over this repo's own `tools/**/*.js`, the map's definition set is a SUPERSET of
     the lexicon's independently-authored one.
@@ -1235,6 +1370,8 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
+    failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
+    failures += check("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

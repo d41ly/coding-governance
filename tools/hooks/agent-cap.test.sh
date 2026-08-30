@@ -628,5 +628,288 @@ else
   echo "skip the two-copy parity arm — no kit copy of agent-cap.js is tracked in this tree (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/)"
 fi
 
+
+# ---- rule 2: LENS PROSE IS NOT CODE (TOOL-aLexedStripper-2) --------------------------------------
+# Every arm below is the SAME correct five-element lens array, fanned through the sanctioned helper.
+# Only the English inside one prompt differs, and every one of them must ADMIT.
+#
+# THE PROVENANCE: five of these spellings DENIED against `agent-cap` 1.8, measured across both array
+# shapes before the fix was wired — a literal `...` read as a spread by the array-literal guard, and
+# an unmatched `[`, `]`, `)` or `}` read as bracket structure by the join-forward walk or by
+# `topLevelArgs`. An adopter hit this and filed it as a gov ask; their diagnosis blamed apostrophes
+# and prescribed U+2019, and both of those admit at 1.8 — which is why the apostrophe and U+2019 rows
+# are here too, as the negative result.
+#
+# The ADMIT direction is the whole point of this group. A fixture set that only ever asserts denials
+# cannot catch a guard that has become a blanket.
+
+js "rule2 prose: a literal ... in a prompt is not a spread" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows ... then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched [ in a prompt is not an array" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows [see the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched ] in a prompt does not close the array" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows], then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched ) in a prompt does not shift the depth" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows), then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: an unmatched } in a prompt does not close the element" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `list the rows}, then the table` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: apostrophes and an em dash, the adopter's stale diagnosis" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `check S2's rows and the table's keys — then stop` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 prose: SIX lenses still deny, whatever the prose" 2 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `list the rows ... then the table` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+  { key: "f", prompt: `six` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# ---- rule 2: an interpolation holds CODE, and both directions are checked ------------------------
+# `blankLiterals` blanks `${…}` bodies. Rule 2 may not, or an `agent(` written inside one becomes
+# invisible to the only rule that bounds it. The multi-line shape is the one a per-line span view
+# cannot reach: its `}` is not on its opening line.
+
+js "rule2 interp: an unbounded fan inside a single-line interpolation denies" 2 <<'EOF'
+const all = args.everything
+const r = `x: ${await Promise.all(all.map((f) => agent(f.p)))}`
+return r
+EOF
+
+js "rule2 interp: an unbounded fan inside a MULTI-line interpolation denies" 2 <<'EOF'
+const all = args.everything
+const report = `results: ${await Promise.all(
+  all.map((f) => agent(f.prompt))
+)}`
+return report
+EOF
+
+js "rule2 interp: a BOUNDED fan inside an interpolation still admits" 0 <<'EOF'
+const L = [{a:1},{a:2},{a:3},{a:4},{a:5}]
+const r = `res: ${await boundedParallel(L.map((x) => () => agent(x)), 5)}`
+return r
+EOF
+
+# ---- rule 2: template-literal edges (TOOL-aLexedStripper-2 S2, TOOL-aLexedStripper-5) ------------
+# A nested template must BALANCE, or the fallback path fires on a legal script. A backtick that this
+# file cannot model — inside a regex literal, a string, or a comment — must not change a verdict:
+# the fallback returns the pre-change view, so these are the shipped hook's own answers.
+
+js "rule2 edges: a nested template balances and admits" 0 <<'EOF'
+const n = `a${`b`}c`
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a regex literal admits a legal harness" 0 <<'EOF'
+const re = /`/
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick in a regex character class admits" 0 <<'EOF'
+const re = /[`~]/g
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a quoted string admits" 0 <<'EOF'
+const s = "a ` b"
+const t = 'c ` d'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+js "rule2 edges: a backtick inside a comment admits" 0 <<'EOF'
+// a stray ` in a line comment
+/* and one ` in a block comment */
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `one` },
+  { key: "b", prompt: `two` },
+  { key: "c", prompt: `three` },
+  { key: "d", prompt: `four` },
+  { key: "e", prompt: `five` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# THE FAIL-OPEN THIS GROUP EXISTS FOR. An unterminated template literal blanks everything below it
+# under a naive template-aware view, hiding the fan entirely. The fallback denies it because the
+# shipped hook denies it — which is the property, not a coincidence.
+js "rule2 edges: an unbounded fan below an unterminated backtick still denies" 2 <<'EOF'
+const stray = `an unterminated template literal
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
+
+# The same class in the OTHER field-count regime. A stray `)` drives topLevelArgs' depth negative and
+# every comma AFTER it then counts at top level, so denial depends on how many commas follow -- i.e.
+# on how many fields each element has. A one-field array is denied only when the prose sits in the
+# LAST element; a two-field one is denied wherever it sits. Both regimes are here because a fixture
+# in one of them measures the other wrongly, which is how two independent grids disagreed on `)`.
+js "rule2 prose: one-field element, stray ) in the LAST element" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { prompt: `one` },
+  { prompt: `two` },
+  { prompt: `three` },
+  { prompt: `four` },
+  { prompt: `list the rows), then the table` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+# The other end of the same rule: a `)` with no comma after it inside its element was ALWAYS harmless,
+# so this arm admits at BASE too. It is here to pin the boundary, not the fix -- without it the group
+# only ever asserts the denying side and cannot notice the guard becoming a blanket.
+js "rule2 prose: a stray ) at the very end of the prose was never a denial" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `hunt auth holes` },
+  { key: "b", prompt: `hunt logic bugs` },
+  { key: "c", prompt: `the rows, then the table)` },
+  { key: "d", prompt: `hunt dead code` },
+  { key: "e", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+
+# ---- renderCodeView: the FAIL-OPEN arms (TOOL-aLexedStripper-5) ----------------------------------
+# Every arm here is a script the SHIPPED hook denies, and each one was ADMITTED by some revision of
+# renderCodeView before it reached this file. They exist because two closing-review rounds found a
+# fail-open in this view and the first repair was measured insufficient for the second shape. A view
+# that blanks anything can hide a fan-out; these are the shapes that proved it.
+
+js "renderCodeView: an unbounded fan below an unterminated block-comment opener denies" 2 <<'EOF'
+const x = 1 /* never closed
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
+js "renderCodeView: a regex-borne /* closed by a later ordinary */ denies" 2 <<'EOF'
+const re = /\/*/
+const all = args.everything
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+const d = a */ b
+EOF
+
+# The apostrophe inside a regex literal. The view used to run to end of line and synthesize a closer
+# the source never had, taking the fan on that line with it.
+js "renderCodeView: an apostrophe in a regex does not swallow the fan on its line" 2 <<'EOF'
+const all = args.everything
+if (/won't/.test(args.s)) await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+js "renderCodeView: the same line without the apostrophe denies too (control)" 2 <<'EOF'
+const all = args.everything
+if (/wont/.test(args.s)) await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+js "renderCodeView: an unpaired double quote does not swallow the fan on its line" 2 <<'EOF'
+const all = args.everything
+if (x === 5") await Promise.all(all.map((f) => agent(f.prompt)))
+EOF
+
+# A block comment is NOT blanked by this view, deliberately, so a primitive named inside one still
+# trips rule 1 exactly as the dossier says it does. This arm pins that posture rather than the bug.
+js "renderCodeView: a raw primitive inside a block comment still denies (fail-closed posture)" 2 <<'EOF'
+/* the shape this bans is parallel(items.map(...)) */
+const r = await parallel(D.map((d) => () => agent(d.p)))
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

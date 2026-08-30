@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.8' // gov:kit agent-cap@1.8 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.9' // gov:kit agent-cap@1.9 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -254,9 +254,106 @@ function boundedBranch(br, name, consts, ok) {
   return links > 0
 }
 
+// TOOL-aLexedStripper-2 — the view RULE 2 reads, and the reason it is not `blankLiterals`.
+//
+// Rule 2 counts a lens array's elements and walks brackets to do it. `stripStrings` (line 70) blanks
+// '…' and "…" per line and leaves backticks ALONE, so a lens PROMPT — which is a backticked template
+// literal full of English — reaches those counters as though it were code. Measured against the
+// shipped hook, five prose spellings DENIED a correct five-element fan in the multi-line array shape
+// every harness here is written in: a literal `...` (read as a spread), and an unmatched `[`, `]`,
+// `)` or `}` (read as bracket structure). None of them is code.
+//
+// `blankLiterals` cannot be that view, and this was measured rather than reasoned. It blanks template
+// CONTENTS including `${…}` bodies, which hold real code — an `agent(` inside a multi-line
+// interpolation is DENIED today and would have been ADMITTED. And its mode is carried across lines,
+// so one unterminated backtick blanks every later line and an unbounded burst below it would have
+// been ADMITTED too. Both are fail-open on the only mechanical control against an agent burst.
+//
+// So: LINE-ALIGNED (one output line per input line, because every walk here indexes by line),
+// interpolation bodies COPIED, `${…}` nesting tracked so `` `a${`b`}c` `` balances, and a report of
+// whether the scan ended inside a template literal.
+//
+// TOOL-aLexedStripper-5 — what that last flag is FOR, and what it is not. It does NOT fail closed.
+// This file models no regex literal (neither does `blankLiterals`), so a backtick inside `/…/`
+// opens template mode and never closes — on a LEGAL script the shipped hook admits. Denying on the
+// flag traded one false-positive class for another. Instead an unterminated scan FALLS BACK to the
+// per-line view rule 2 read before, which returns the shipped hook's own verdict for that script:
+// it cannot regress in either direction, because it IS the shipped behaviour. The fail-open the flag
+// was written to close stays closed, because the shipped hook DENIES that script too (measured).
+//
+// RESIDUAL, named the way `memory/map/features/agent-cap.md` names rule 1's: a script containing a
+// regex literal with an odd backtick count is judged at the shipped hook's precision, not the
+// improved one. That is a smaller and stated loss.
+function renderCodeView(script) {
+  const out = []
+  let mode = 'code' // code | tmpl
+  const stack = [] // 'tmpl' | 'interp', innermost last
+  let interpDepth = 0 // brace depth inside the current interpolation
+  for (const raw of script.split(/\r?\n/)) {
+    let res = ''
+    let i = 0
+    while (i < raw.length) {
+      const ch = raw[i]
+      const two = raw.slice(i, i + 2)
+      if (mode === 'code') {
+        if (two === '//') break
+        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
+        if (ch === "'" || ch === '"') {
+          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
+          // and then append a closer the source never had, swallowing the rest of that line --
+          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
+          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
+          // needs a matching PAIR before it blanks anything, and so does this now.
+          const q = ch
+          let e = i + 1
+          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
+          if (e >= raw.length) { res += ch; i++; continue }
+          res += q + q
+          i = e + 1
+          continue
+        }
+        // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
+        // counted so an object literal or a block inside the expression does not close it early.
+        if (stack.length && stack[stack.length - 1] === 'interp') {
+          if (ch === '{') interpDepth++
+          else if (ch === '}') {
+            if (interpDepth === 0) { stack.pop(); mode = 'tmpl'; res += ' '; i++; continue }
+            interpDepth--
+          }
+        }
+        res += ch
+        i++
+      } else if (mode === 'tmpl') {
+        if (ch === '\\') { i += 2; continue }
+        if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
+        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
+        i++
+      }
+    }
+    out.push(res)
+  }
+  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
+  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
+  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
+  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
+  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
+  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
+  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
+  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
+  // documents for a primitive named inside a block comment.
+  //
+  // The flag still reports every mode that outlives the scan, which now means an unterminated
+  // TEMPLATE only.
+  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
+}
+
 function fanoutFindings(script) {
   const lines = script.split(/\r?\n/)
-  const code = lines.map((l) => stripStrings(l).split('//')[0])
+  // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
+  // the verdict this hook reached before rule 2 moved. Not a fail-closed branch: that denied a
+  // legal script carrying a regex literal with a backtick in it.
+  const view = renderCodeView(script)
+  const code = view.unterminated ? lines.map((l) => stripStrings(l).split('//')[0]) : view.code
 
   // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`
   const { consts } = intConsts(code)
