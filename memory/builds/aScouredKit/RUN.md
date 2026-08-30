@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 keepalive-reaped: yes
-parked-surfaced: yes, 0 surfaced
+parked-surfaced: yes, 1 surfaced
 witness: 3eaf38d0d57dd0206103835628a27f2c57831547
 phase: LANDING
 branch-sha: 093730e40355d6a04300966f791f2634379e8b45
@@ -94,3 +94,5 @@ base: 093730e40355d6a04300966f791f2634379e8b45
 2026-08-30T13:54:04Z rescope · item add TOOL-aScouredKit-33 · reason closing round 3 low; the waiver registry's grammar is a format decision, not a fold
 
 2026-08-30T16:43:56Z rescope · item add TOOL-aScouredKit-34 · reason the better refusal is real but could not be armed; the three failed fixtures are recorded so the next attempt starts ahead
+
+2026-08-30T18:13:40Z decision · item The merge to main and the push have NOT happened. Everything is committed and pushed to origin/branch/kit-adversarial-review-15ed31; the build is CLOSED with every declared DoD item met and the phase is LANDING. · reason tools/push-main.sh refuses from a worktree branch by design - it lands main from the primary tree - and this session was explicitly instructed not to leave the worktree or cd to the repository root. The options seen were: (1) run the lander via git -C against the primary tree, refused because it is the same act the instruction forbids; (2) abort, refused because the work is complete and an abort would misrepresent it; (3) park, taken. To land: from the primary tree on main, git merge --no-ff branch/kit-adversarial-review-15ed31 then bash tools/push-main.sh, then bash tools/unattended/unattended.sh --landed aScouredKit WITHOUT committing anything in between - check 34 compares the lander marker to HEAD by equality.
