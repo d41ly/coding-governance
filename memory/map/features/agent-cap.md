@@ -160,6 +160,13 @@ turns the cap rules off with no diff.
   helper" instead, which kills the `parallel(items.map(...))` shape that causes the bursts.
 - **Block comments naming a primitive still trip rule 1.** Line comments and quoted strings are
   stripped before the scan; block comments are not. Benign and fail-closed, so it stays.
+- **`renderCodeView` models no regex literal, so rule 2 falls back for such a script.** It inherits
+  `blankLiterals`' code-mode branch set, which tests `//`, `/*`, a backtick and the two quote
+  characters and nothing else — a backtick inside `/…/` therefore opens template mode and never
+  closes. Failing closed on that was measured to DENY a legal harness, so an unterminated scan
+  instead falls back to the per-line `stripStrings` view and returns the verdict this hook reached
+  before rule 2 moved. The residual is precision, not safety: such a script is judged at the old
+  view's accuracy, and prose punctuation inside it can still be read as structure. `TOOL-aLexedStripper-5`.
 
 ## Reuse affordance
 
