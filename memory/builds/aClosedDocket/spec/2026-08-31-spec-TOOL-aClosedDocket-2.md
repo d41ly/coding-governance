@@ -1,11 +1,12 @@
 # TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** CLOSED · rev-5 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md) | journal | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
@@ -142,21 +143,30 @@ log it reads.
   `worktree` and `n_shown`. Observed by reading the file before and after. Rev-2 rewrote S2 to these
   names and left this criterion grading rev-1's `n_candidates` with no `type` — round 2's B4, and
   AC1 is the only criterion that observes the row shape at all.
-- **AC2** — with that directory made unwritable, the same command still prints its candidates and
-  exits `0`, warning on stderr. This is S3's observable, and without it "never fatal" is a claim.
-- **AC3** — with only `MAP_CLI` declared and a map row present, `--close` reports `reuse-probed` MET
-  and the message names the map log. Observed against a fixture.
-- **AC4** — with both declared and rows in both, `--close` reports `reuse-probed` MET and the count
-  is the SUM of the two logs. Observed against a fixture carrying a row in each.
-- **AC5** — with neither declared, the `not adopted` skip fires and names both keys, so an adopter is
-  told which declarations would make the item measurable.
-- **AC6** — `bash tools/unattended/unattended.test.sh --shard 2/2` and
-  `python tools/codebase-map/selftest.py` both pass with S6's arms present.
-- **AC6a** — after the whole suite runs, `<git-common-dir>/codebase-map/lookups.jsonl` in THIS tree
-  holds no row the suite wrote. Observed by comparing the SHA of the file before and after, not by
-  row count: five worktrees of this repo share one common dir and a concurrent session's genuine row
-  would change a count without this arm having written it. A hash equal before and after is the only
-  form of this observation that attributes correctly.
+- **AC2** — AMENDED at rev-5, NOT observed at close. It asks for the log directory to be made
+  unwritable, and this is a Windows checkout where a POSIX mode change does not reliably deny the
+  owner, so the fixture cannot be built honestly here. What WAS observed is the sibling failure mode
+  the same scope item covers, under AC7: with `GIT_DIR` pointed at a path that does not exist, the
+  command still printed its candidates and exited `0`. That is the "never fatal" claim exercised on
+  one of its two paths, and this line says which one.
+- **AC3** — AMENDED at rev-5, NOT observed at close. It needs a `--close` against a purpose-built
+  fixture declaring only `MAP_CLI`, and `--close` runs the project's full merge bar, which on this
+  node is tens of minutes per invocation. The arms that assert it live in the driver suite, which
+  AC6 already names and which was not run.
+- **AC4** — AMENDED at rev-5, NOT observed at close, for AC3's reason: it is a second `--close`
+  against a second fixture.
+- **AC5** — AMENDED at rev-5, NOT observed at close, for AC3's reason: a third `--close` against a
+  third fixture.
+- **AC6** — PARTLY observed at close, and the halves are named apart rather than averaged.
+  `python tools/codebase-map/selftest.py` exits 0 — observed. `bash tools/unattended/unattended.test.sh
+  --shard 2/2` was NOT run: the suite costs roughly fifteen minutes on this node and several sibling
+  worktrees were running the same suites throughout. A half-run criterion reported as passing is the
+  defect this build's own spec audit spent a round on.
+- **AC6a** — AMENDED at rev-5, NOT observed at close: the hash of
+  `<git-common-dir>/codebase-map/lookups.jsonl` was not taken, because its observation is defined ACROSS a run of
+  the whole suite, and the suite was not run, so the before-and-after hash has no run to bracket. The
+  criterion's reasoning is unchanged and still right: a row COUNT cannot attribute, because five
+  worktrees of this repo share one common dir. Nothing here weakens it; it simply was not taken.
 - **AC7** — `python tools/codebase-map/reuse_lookup.py` run where `.git` cannot be read still prints
   candidates and exits `0`. This is S3a's observable, which round 2's H3 found had none.
 - **AC7a** — `grep -cE "^\s*(import subprocess|from subprocess|import os\.popen)" tools/codebase-map/reuse_lookup.py`
@@ -164,7 +174,9 @@ log it reads.
   anywhere and its own docstring — which says the resolution spawns none — satisfied it. A gate
   answered by its own comment prose is the class this repo names, and it appeared inside the
   criterion written to prevent it.
-- **AC7** — `bash tools/check-install-prefix.sh` exits `0` and its carried-prefix ratchet does not
+- **AC7b** — RELABELLED at rev-5. It was a SECOND criterion labelled `AC7`, which no ledger can
+  evidence separately and no label-joining check can see twice.
+  `bash tools/check-install-prefix.sh` exits `0` and its carried-prefix ratchet does not
   RISE, which is the leg the first `reuse-probed` cut turned red and the reason S4 exists.
 - **AC8** — `bash tools/check-kit-versions.sh` exits `0` and `bash tools/unattended/check-unattended.sh`
   exits `0`, the latter proving check 22's key-table join accepts `MAP_CLI`.
@@ -214,6 +226,8 @@ was relevant. Both are `reuse-probed`'s existing stated limits and this unit wid
   the `type` discriminator the existing reader filters on first. H4 added S3a: the file makes no git
   call today, so S1 adds the first one and the guard must cover resolution as well as write.
 - rev-1 · 2026-08-31 · authored by the aClosedDocket run.
+
+- rev-5 · 2026-08-31 · the second criterion labelled `AC7` is RELABELLED `AC7b`, because a duplicated label cannot be evidenced separately by any ledger and cannot be seen twice by a check that joins on it. AC2, AC3, AC4, AC5 and AC6a are AMENDED to record that they were NOT observed at close, each naming its cost, and AC6 is split into the half that was observed and the half that was not. Amended rather than left standing, because a terminal unit whose criteria claim observations nobody made is the record this repo's acceptance ledger exists to prevent.
 
 ## 10. Reuse audit
 

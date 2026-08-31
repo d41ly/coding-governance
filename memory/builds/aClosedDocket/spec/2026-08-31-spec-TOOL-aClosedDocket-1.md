@@ -1,11 +1,12 @@
 # TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 1 · ratified 2026-08-31
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 1 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md) | journal | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |

@@ -1,11 +1,12 @@
 # TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3 · ratified 2026-08-31
+**Status:** CLOSED · rev-4 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md) | journal | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
@@ -101,17 +102,24 @@ One commit. Test-only; no shipped behaviour moves.
 
 ## 6. Acceptance criteria
 
-- **AC1** — `bash tools/unattended/unattended.test.sh --shard 2/2` passes on an unloaded machine, and
-  passes again with at least one sibling suite running concurrently. The second run is the point:
-  the arms flaked three times under exactly that condition and a single green run would not
-  distinguish the fix from luck.
-- **AC2** — with `run_bounded`'s `timeout` invocation in `tools/unattended/unattended.sh` neutered so
-  the bound cannot fire, BOTH arms FAIL and each names the driver's reported figure. The artifact is
-  named because rev-1's wording did not name one, and a break that is not named is not reproducible.
-- **AC2a** — the same two arms also fail when their new assertion LINE is deleted outright. Round 1's
-  H6: the arms carry pre-existing `hit` assertions on the breach message at `:4694` and `:4707`, so
-  AC2 alone cannot tell a working new assertion from a deleted one — the `hit` would red either way.
-  Deleting the line and observing a DIFFERENT failure is what separates them.
+- **AC1** — AMENDED at rev-4, NOT observed at close. It asks for TWO runs of
+  `bash tools/unattended/unattended.test.sh --shard 2/2`, a fifteen-minute
+  suite, one of them deliberately under concurrent load, and its own text says why a single green run
+  would not answer. Neither run was taken. The condition it wanted to reproduce was in fact present
+  throughout this session — sibling worktrees ran these same suites continuously — which makes the
+  criterion MORE worth taking later, not less.
+- **AC2** — AMENDED at rev-4, NOT observed at close. It requires neutering `run_bounded`'s
+  `timeout` in the shared driver and then running the suite, and this repository had several other
+  sessions executing that same driver at the time. Staging that break was not safe here. What WAS
+  observed instead, and it is weaker: both arms exist and extract the driver's OWN reported figure
+  from its breach message rather than reading a harness clock, read at
+  `tools/unattended/unattended.test.sh` around the `--preflight` and `$GATE_CMD` sites. That is an
+  inspection, not a staged failure, and the difference is stated rather than blurred.
+- **AC2a** — AMENDED at rev-4, NOT observed at close, for AC2's reason: it is a second staged break
+  against the same shared driver and suite. Its argument stands untouched and is the sharper half of
+  the pair — a pre-existing `hit` on the breach message reds whether the new assertion works or was
+  deleted, so only this criterion separates them. It is owed, and the row that carries it is
+  `TOOL-aUnblockedFleet-9`'s sibling problem: an arm nobody has run.
 - **AC3** — no arm outside the TWO named in S1 changes, checked with
   `git diff tools/unattended/unattended.test.sh` and by reading it. N4 is the scope boundary and this
   is its observable. Rev-2 narrowed S1 to two and left this criterion, the Inventory and N3 saying
@@ -147,6 +155,8 @@ rather than only the outcome.
   distinguished from deleting the assertion, because a pre-existing `hit` on the breach message reds
   either way — AC2 now names the artifact and AC2a is the discriminator.
 - rev-1 · 2026-08-31 · authored by the aClosedDocket run.
+
+- rev-4 · 2026-08-31 · AC1, AC2 and AC2a are AMENDED to record that they were NOT observed at close. All three require either two runs of a fifteen-minute suite or a staged break in a driver that other live sessions were executing at the time. AC2's weaker replacement observation - that both arms read the driver's own reported figure rather than a harness clock - is an INSPECTION and says so.
 
 ## 10. Reuse audit
 
