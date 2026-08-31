@@ -1,12 +1,13 @@
 # TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
+| [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 
 <!-- /gen:spec-records -->
 
@@ -19,18 +20,21 @@ machine while the mechanism they test is working.
 
 ## 2. Scope (IN)
 
-- **S1** — the three arms in `tools/unattended/unattended.test.sh` that wrap a verb in
-  `_t0=$(date +%s) … _t1=$(date +%s)` and assert a ceiling assert instead on the number the DRIVER
-  reports: `run_bounded` already sets `RB_TOOK`, and the breach message already carries it.
+- **S1** — the **TWO** arms in `tools/unattended/unattended.test.sh` that wrap a VERB in
+  `_t0=$(date +%s) … _t1=$(date +%s)` and assert a ceiling — `:4696` over `--preflight` and `:4709`
+  over `--close`, both at `-lt 25` — assert instead on what the DRIVER reports. Rev-1 said three;
+  measured, there are four such wrappers and the other two (`:4651`, `:4661`, both `-lt 20`) wrap
+  `run_bounded` DIRECTLY. Those two are already measuring inside the bound's own scope, are correct
+  as they stand, and are N4.
 - **S2** — where a verb's output does not carry that number, the arm asserts on the BREACH MESSAGE
   rather than on elapsed time. That the bound fired is the property under test; how long the
   surrounding harness took is not.
 - **S3** — the arms keep a wall-clock assertion as an OUTER SANITY BOUND only, generous enough that
   it cannot fire on a loaded machine and present only to catch a hang, with a comment saying that is
   its whole job. A bound that can fire for two reasons cannot tell you which.
-- **S4** — the comment on each arm records the measurement that motivated the change: 35 s, 44 s and
-  66 s against a 25 s assertion under cross-session load, clean on an unloaded run, on one unchanged
-  tree.
+- **S4** — the comment on each arm records the measurement that motivated the change: `--preflight`
+  at 35 s and `--close` at 44 s and 66 s against a 25 s assertion under cross-session load, clean on
+  an unloaded run of the same shard on one unchanged tree.
 
 ## 3. Non-goals (OUT)
 
@@ -42,8 +46,10 @@ machine while the mechanism they test is working.
   would show.
 - **N3** — a fleet-wide suite lock. Cross-session contention is real here, but serialising every
   worktree's suite to fix three assertions prices a lock against a comment.
-- **N4** — the other five `_t0=$(date +%s)` sites in this suite. They time different things and none
-  of them was measured flaking; widening to them would be a change nobody has evidence for.
+- **N4** — the two DIRECT `run_bounded` wrappers at `:4651` and `:4661`, and every other
+  `_t0=$(date +%s)` site in this suite. The direct wrappers already measure the bound's own scope,
+  which is exactly what S1 is moving the other two TOWARD, so changing them would be a change away
+  from the fix. None of the rest was measured flaking.
 
 ## 4. Design
 
@@ -98,9 +104,13 @@ One commit. Test-only; no shipped behaviour moves.
   passes again with at least one sibling suite running concurrently. The second run is the point:
   the arms flaked three times under exactly that condition and a single green run would not
   distinguish the fix from luck.
-- **AC2** — with `run_bounded`'s kill path disabled so the bound cannot fire, the arms FAIL. Observed
-  by staging that break, because an arm that no longer reads a wall clock must be shown still to
-  read something.
+- **AC2** — with `run_bounded`'s `timeout` invocation in `tools/unattended/unattended.sh` neutered so
+  the bound cannot fire, BOTH arms FAIL and each names the driver's reported figure. The artifact is
+  named because rev-1's wording did not name one, and a break that is not named is not reproducible.
+- **AC2a** — the same two arms also fail when their new assertion LINE is deleted outright. Round 1's
+  H6: the arms carry pre-existing `hit` assertions on the breach message at `:4694` and `:4707`, so
+  AC2 alone cannot tell a working new assertion from a deleted one — the `hit` would red either way.
+  Deleting the line and observing a DIFFERENT failure is what separates them.
 - **AC3** — no arm outside the three named in S1 changes, checked with
   `git diff --stat tools/unattended/unattended.test.sh` and by reading the diff. N4 is the scope
   boundary and this is its observable.
@@ -126,6 +136,11 @@ rather than only the outcome.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-31 · round-1 spec-audit fold. H5: rev-1 said three arms; measured, four wrappers
+  exist and only TWO wrap a verb. The other two wrap `run_bounded` directly, already measure inside
+  the bound's scope, and moved from unstated to N4. H6: AC2 named no artifact and could not be
+  distinguished from deleting the assertion, because a pre-existing `hit` on the breach message reds
+  either way — AC2 now names the artifact and AC2a is the discriminator.
 - rev-1 · 2026-08-31 · authored by the aClosedDocket run.
 
 ## 10. Reuse audit

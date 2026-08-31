@@ -1,12 +1,13 @@
 # TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
+| [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 
 <!-- /gen:spec-records -->
 
@@ -21,11 +22,21 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
 - **S1** — `reuse_lookup.py` appends one JSONL row per answered lookup to
   `<git-common-dir>/codebase-map/lookups.jsonl`: its OWN directory under its own kit's name, never
   the recall kit's file.
-- **S2** — the row carries `at`, `query`, `worktree` and `n_candidates`, spelled the way the recall
-  log spells its equivalents, so one reader can parse both without a per-kit branch.
-- **S3** — the write is NEVER FATAL and never gates: it is wrapped so an `OSError` warns on stderr
-  and the lookup still answers, exactly as `log_event` does. `reuse_lookup.py`'s own header records
-  that a RESULT never fails, and a log must not be the thing that breaks that.
+- **S2** — the row carries `type`, `at`, `query`, `worktree` and `n_shown`, spelled the way the
+  recall log ACTUALLY spells them rather than the way rev-1 guessed. Measured: `query.py` writes
+  `"type": "query"`, `n_shown` and `n_hits`; rev-1 pinned `n_candidates` and omitted `type`
+  entirely, and `type` is the field the existing reader filters on FIRST
+  (`grep '"type": "query"'` at `unattended.sh:3268`), so a row without it is invisible to a reader
+  built in the recall log's image. The map row's discriminator is `"type": "lookup"`.
+- **S3** — the write is NEVER FATAL and never gates: an `OSError` warns on stderr and the lookup
+  still answers. `reuse_lookup.py`'s own `main` records that a RESULT never fails and only its
+  refusal exits non-zero, and a log must not be the thing that breaks that.
+- **S3a** — **the guard covers the git-dir RESOLUTION too, not only the write.** Measured:
+  `reuse_lookup.py` makes ZERO git calls today, so S1 introduces the first one and with it a failure
+  mode the file has never had — a `subprocess` that raises, a git that is absent, a `--git-common-dir`
+  that fails. `log_event`'s own `p = log_path(repo)` sits OUTSIDE its `try`, so copying that shape
+  would copy the hole; the resolution goes INSIDE, and a failure to locate the log is the same
+  warn-and-answer outcome as a failure to write it.
 - **S4** — a `MAP_CLI` declaration in `.unattended.conf`, optional and blank by default, in
   `kit.toml`'s `optional_keys` and the protocol's §8 key table. Same shape and same reason as
   `RECALL_CLI`: a kit path spelled into the driver arrives verbatim in an adopter at another prefix
@@ -34,7 +45,16 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
   neither CLI is declared-and-readable; a tree with one of them is measured on that one, and the
   message names which logs were read.
 - **S6** — self-test arms for the new outcomes, and a `codebase-map` arm asserting the row is written
-  and that a write failure does not change the exit code.
+  and that a write failure does not change the exit code. **The map arm runs in a SCRATCH repo with
+  its own git dir and NEVER against this tree.** A test that invokes `reuse_lookup.py` here writes a
+  real row, carrying this worktree's own path, into the very log `reuse-probed` counts — so every bar
+  run would manufacture the liveness evidence the DoD item exists to observe, and the item would
+  become unfalsifiable. That is round 1's blocker B3, and it is the same class as a fixture that
+  passes by finding nothing, one level up: a fixture that passes by CREATING what it looks for.
+- **S6a** — the `codebase-map` arm lands in `tools/codebase-map/selftest.py`, the kit's own suite.
+  NOT `test_codebase_map.py`, which rev-1 named: that file is byte-identical to
+  `test_codebase_map.template.py` and runs as the `subject:repo` coverage leg, so an arm added there
+  is graded as adopter-facing template content and its copy would diverge.
 - **S7** — both kit versions move, their renders refresh, and the `.unattended.conf.example` gains
   `MAP_CLI` beside `RECALL_CLI`.
 
@@ -61,7 +81,8 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
 | `tools/unattended/unattended.sh` | S4 default, S5 the arm |
 | `.unattended.conf`, `tools/unattended/.unattended.conf.example` | S4 — the declaration |
 | `tools/unattended/PROTOCOL.template.md` and its render | S4 key row, S5 the `reuse-probed` row |
-| `tools/unattended/unattended.test.sh`, `tools/codebase-map/test_codebase_map.py` | S6 |
+| `tools/unattended/unattended.test.sh` | S6 — the driver arms |
+| `tools/codebase-map/selftest.py` | S6, S6a — the map arm, in a scratch repo |
 
 ### Why the log location is derived and not declared
 
@@ -121,7 +142,10 @@ log it reads.
 - **AC5** — with neither declared, the `not adopted` skip fires and names both keys, so an adopter is
   told which declarations would make the item measurable.
 - **AC6** — `bash tools/unattended/unattended.test.sh --shard 2/2` and
-  `python -m pytest tools/codebase-map/test_codebase_map.py` both pass with S6's arms present.
+  `python tools/codebase-map/selftest.py` both pass with S6's arms present.
+- **AC6a** — after the whole suite runs, `<git-common-dir>/codebase-map/lookups.jsonl` in THIS tree
+  holds no row the suite wrote. Compared by row count before and after, because S6's scratch-repo
+  rule is a claim until something observes that the real log did not move.
 - **AC7** — `bash tools/check-install-prefix.sh` exits `0` and its carried-prefix ratchet does not
   RISE, which is the leg the first `reuse-probed` cut turned red and the reason S4 exists.
 - **AC8** — `bash tools/check-kit-versions.sh` exits `0` and `bash tools/unattended/check-unattended.sh`
@@ -150,6 +174,14 @@ was relevant. Both are `reuse-probed`'s existing stated limits and this unit wid
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-31 · round-1 spec-audit fold. Blocker B3: rev-1's map arm would have run
+  `reuse_lookup.py` against this tree, writing a real row into the log `reuse-probed` counts, so the
+  suite would manufacture the item's own evidence and the DoD item would stop being falsifiable —
+  S6 now requires a scratch repo and AC6a observes that the real log did not move. H2 moved the arm
+  from `test_codebase_map.py`, which is template-mirrored and graded as adopter content, to the
+  kit's own `selftest.py`. H3 replaced rev-1's guessed field names with the measured ones and added
+  the `type` discriminator the existing reader filters on first. H4 added S3a: the file makes no git
+  call today, so S1 adds the first one and the guard must cover resolution as well as write.
 - rev-1 · 2026-08-31 · authored by the aClosedDocket run.
 
 ## 10. Reuse audit

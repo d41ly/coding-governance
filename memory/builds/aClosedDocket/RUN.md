@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 733552e11d36e93836767b6478fec3607a99aca4
-phase: RUNNING
+witness: 6729875329d3ddc191d9020d218b73e7458781d1
+phase: SPECCING
 branch-sha: 733552e11d36e93836767b6478fec3607a99aca4
 branch-ref: refs/heads/branch/aclosed-docket
 mode: prompt
@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: 733552e11d36e93836767b6478fec3607a99aca4
 
 ## Parked
+
+2026-08-31T12:19:59Z review · item spec-set · reason verdict BLOCKED · blockers 3
