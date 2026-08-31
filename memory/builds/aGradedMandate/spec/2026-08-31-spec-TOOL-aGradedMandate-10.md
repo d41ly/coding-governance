@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
 
 <!-- gen:spec-records -->
 

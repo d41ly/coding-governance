@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-6 — check 24's RETIRE arm keys its baseline to the run's pinned BASE
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 6
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 6
 
 <!-- gen:spec-records -->
 

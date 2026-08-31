@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

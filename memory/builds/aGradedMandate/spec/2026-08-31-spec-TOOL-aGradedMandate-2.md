@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

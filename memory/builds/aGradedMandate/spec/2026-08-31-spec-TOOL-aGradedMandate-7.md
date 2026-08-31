@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-7 — the promotion clause counts only ids that are non-WONTDO at HEAD
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

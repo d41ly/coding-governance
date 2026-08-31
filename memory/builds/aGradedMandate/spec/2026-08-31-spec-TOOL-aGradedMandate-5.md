@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

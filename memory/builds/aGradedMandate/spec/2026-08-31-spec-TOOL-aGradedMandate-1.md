@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

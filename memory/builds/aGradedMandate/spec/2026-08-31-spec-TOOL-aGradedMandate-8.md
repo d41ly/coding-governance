@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 8
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

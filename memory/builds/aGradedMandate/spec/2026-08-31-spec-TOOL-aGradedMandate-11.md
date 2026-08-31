@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 11
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
