@@ -173,7 +173,7 @@ PINS: dict[str, int] = {
     # self-pruned its three landed rows and lowered the pin 4 -> 1, leaving node `b`'s single row.
     # That drain is subsumed — the shards are now frozen under `archive/ledger/` and the signal is
     # declared empty, so there is no population left for a pin of 1 to ratchet against.
-    # 2 — TOOL-aBatchedLintel-1 and TOOL-aGuardedTally-1, both INPROGRESS with their ids in tracked
+    # 2 — TOOL-aBatchedLintel-1 and TOOL-dNarrowedAnchor-1, both INPROGRESS with their ids in tracked
     # kit source. INPROGRESS means "approved, build underway", which is arguably TRUE for a
     # built-but-unmerged unit, so this is the oracle's known residual ambiguity rather than proven
     # rot. Pinned, not gated to zero, for exactly that reason — read them before lowering it.
