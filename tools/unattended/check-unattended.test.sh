@@ -2254,8 +2254,12 @@ seed_ros() {
   awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
     && mv /tmp/ros.$$ memory/builds/tRos/README.md
   sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-  sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
   git add -A && git commit -q -m "tRos baseline" --no-verify
+  # THE PINNED BASE IS THIS COMMIT, not the merge-base. `pinned_units` reads the units REGION at the
+  # pinned commit, and the merge-base predates this fixture build folder entirely — so the RETIRE arm
+  # would refuse rather than grade, and every arm below would be green because the arm found nothing.
+  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline pin" --no-verify
 }
 add_u7() {
   awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
@@ -2292,7 +2296,7 @@ hit "$(run)" "a rescope row supersedes into a successor the executing roster doe
 seed_ros
 sed -i 's#(spec/one.md) | OPEN |#(spec/one.md) | WONTDO |#' memory/builds/tRos/README.md
 git add -A && git commit -q -m dropped --no-verify
-hit "$(run)" "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so:"
+hit "$(run)" "a unit is WONTDO now and was not at the BASE this run pinned, and no rescope row retires or supersedes it, so declared scope was dropped with nothing on the record saying so:"
 
 # ...and the same transition WITH a retire row is accounted for.
 seed_ros

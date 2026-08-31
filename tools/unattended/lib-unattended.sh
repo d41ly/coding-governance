@@ -151,6 +151,66 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # THE BASELINE IS THE COMMIT THE RUN ENTERED ITS LIVE PHASE AT, never the pinned BASE. A run that
 # classifies a unit MISSING and authors its spec is obeying the build method, and every such spec is
 # absent at BASE — keying on BASE would red a run for following the method.
+# The units region as it stood at a NAMED commit. A SEPARATE PREDICATE from `baseline_units`, not a
+# parameterised one: the two answer different questions - "what roster did this run enter its live
+# phase with" and "what roster did the owner authorize" - and one predicate serving callers whose
+# edges disagree is the shape four adversarial rounds failed to make correct in this kit's dispatch
+# grading. The blob read below is the shared half; the commit CHOICE is what differs.
+#
+# IT VALIDATES ITS COMMIT, and its sibling does not need to. `baseline_units` CHOOSES its commit by
+# walking history, so it cannot be handed a bad one; this one is GIVEN one, and an EMPTY value does
+# not fail the read - `GIT show ":<path>"` is INDEX syntax and SUCCEEDS, returning plausible bytes.
+# A run-state file with an absent or truncated `base:` would therefore silently grade the working
+# INDEX instead of the pinned BASE, and the caller's unreadable-baseline skip would never fire
+# because the read worked. That is the same degeneration the driver's own `check_authorization`
+# header records from an empty base turning a provenance test into a read of the git index.
+pinned_units() {  # commit · build-README-path · [cutoff-date]
+  _pu_c=$1; _pu_bre=$2; _pu_cut=${3:-}
+  command -v region >/dev/null 2>&1 || {
+    echo "pinned_units needs a region() in the calling shell and this one has none, so the units region would read as empty and be reported as an empty roster"
+    return 1
+  }
+  case "$_pu_c" in
+    [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+    *) echo "the pinned commit is absent or is not sha-shaped, and an empty value reads as INDEX syntax rather than failing, so the comparison would silently grade the working index: [$_pu_c]"
+       return 1 ;;
+  esac
+  GIT cat-file -e "$_pu_c^{commit}" 2>/dev/null || {
+    echo "the pinned commit does not resolve to a commit in this history: $_pu_c"
+    return 1
+  }
+  _pu_blob=$(GIT show "$_pu_c:$_pu_bre" 2>/dev/null || true)
+  _pu_date=$(GIT show -s --format=%cs "$_pu_c" 2>/dev/null || true)
+  if [ -z "$_pu_blob" ]; then
+    echo "no build README at the pinned commit, so there is no authorized roster to compare against"
+    return 1
+  fi
+  if ! printf '%s\n' "$_pu_blob" | grep -qxF -- '<!-- gen:build-units -->'; then
+    echo "the build README at the pinned commit carries no units region, so the comparison would be vacuous over an empty set"
+    return 1
+  fi
+  if [ -n "$_pu_cut" ] && [ -n "$_pu_date" ] && ! printf '%s\n%s\n' "$_pu_cut" "$_pu_date" | sort -C; then
+    echo "the pinned commit predates UNITS_REGION_CUTOFF, so its absent region is grandfathered rather than a defect"
+    return 1
+  fi
+  if ! _pu_was=$(printf '%s\n' "$_pu_blob" | region - '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+    echo "the build README at the pinned commit carries a units marker but not exactly one well-formed pair, so there is no single roster to compare"
+    return 1
+  fi
+  # THE EMPTY-ROSTER REFUSAL, which the sibling also carries and for the same reason: `region` exits
+  # 0 with empty stdout for a well-formed pair enclosing nothing, so a BASE README with an id-less
+  # units region would otherwise return SUCCESS with an empty roster — and every caller's membership
+  # test then answers "absent" for every unit in the build. Seven tracked build READMEs are in that
+  # state today. Counting the two functions' refusal branches would NOT catch this: both have seven,
+  # and the sets differ rather than the sizes.
+  _pu_ids=$(printf '%s\n' "$_pu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
+  if [ -z "$_pu_ids" ]; then
+    echo "the roster at the pinned commit names no unit, so every membership test against it answers absent and the comparison would be vacuous rather than clean"
+    return 1
+  fi
+  printf '%s\n' "$_pu_was"
+}
+
 baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [fallback-commit]
   _bu_rel=$1; _bu_bre=$2; _bu_cut=${3:-}; _bu_fb=${4:-}
   # IT CALLS `region`, WHICH THIS LIBRARY DOES NOT DEFINE. Both current callers define their own —
