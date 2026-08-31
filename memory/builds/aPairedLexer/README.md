@@ -100,7 +100,7 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-12 — model regex literals, so the phantom span never exists](spec/2026-08-31-spec-TOOL-aPairedLexer-12.md) | 11 | 2 | SPECCED | rev-3 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

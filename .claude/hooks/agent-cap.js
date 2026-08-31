@@ -300,10 +300,6 @@ const KEYWORD_TAIL = new RegExp('(?:^|[^.\\w$])(' + REGEX_KEYWORDS.join('|') + '
 // Measured: `const y = i++ / 2, z = await parallel(D.map(f)) / 3` ADMITTED while `i + 1 / 2` denied.
 const POSTFIX_TAIL = /(\+\+|--)\s*$/
 
-// The tokens the four rules hunt. A REGEX BODY holding one is a span this file must not blank
-// silently — see the wrong-accept guard at each consumption site. Kept as ONE list because two
-// copies of the hunted set is the defect this build spent a unit removing.
-const SWALLOW_GUARD = /\b(?:bounded)?(?:parallel|pipeline)\s*\(|\bagent\s*\(|\.ref\b/
 
 // ORDER IS LOAD-BEARING HERE, and testing the keyword tail FIRST was a measured fail-open. The
 // running `codeText` is fed only on the code fall-through, so a CONSUMED LITERAL never reaches it:
@@ -400,20 +396,23 @@ function renderCodeView(script) {
             else if (c === '/' && !cls) { closed = true; break }
             j++
           }
-          if (closed) {
-            // THE WRONG-ACCEPT GUARD. `checkDeclinedSpan` is wired only behind a DECLINE, so a
-            // wrongly ACCEPTED slash could never raise `dirty`: a wrong decline was signalled and
-            // a wrong accept was silent. FOUR of the five fail-opens the closing review measured
-            // were wrong accepts, and every one reported `clean:true` to all four rules.
-            //
-            // A regex body is a PATTERN, so it has no business holding the exact tokens the four
-            // rules hunt. If a span this scanner is about to blank contains one, the acceptance is
-            // almost certainly wrong. This fires on positions nobody predicted, which is the
-            // property an enumerated clause set structurally cannot have — and the clause set has
-            // now been wrong five times.
-            if (SWALLOW_GUARD.test(raw.slice(i, j + 1))) dirty = true
-            res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue
-          }
+          // A WRONG-ACCEPT GUARD WAS TRIED HERE AND REVERTED, because it made things worse.
+          // The reasoning was that `checkDeclinedSpan` is wired only behind a DECLINE, so a
+          // wrongly ACCEPTED slash could never raise `dirty` — four of five measured fail-opens
+          // were wrong accepts reporting `clean:true`. So a span about to be blanked was tested
+          // for the tokens the four rules hunt, and raised `dirty` if it held one.
+          //
+          // THAT IS A FAIL-OPEN, and the measurement is unambiguous. `dirty` does not deny; it
+          // routes all four rules onto the per-line view, and that view sees STRICTLY LESS on
+          // some lines — `stripStrings` leaves backticks alone and the `//` split truncates
+          // inside a template. Measured on `const REF = /\.ref\b/` above a line holding a
+          // backtick URL and a raw primitive: the paren-safe view renders `const u = ``;
+          // await parallel(...)` with the primitive VISIBLE, the fallback renders
+          // `const u = `see http:` with it GONE, and the script flips DENY to ADMIT.
+          //
+          // So widening `dirty` widens the hole it was written to close, and the asymmetry it
+          // aimed at cannot be fixed from here. See the parked decision in RUN.md.
+          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
           // Unterminated on its line: not a regex after all, fall through as ordinary punctuation.
         }
         if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
@@ -785,20 +784,23 @@ function blankLiterals(script) {
             else if (c === '/' && !cls) { closed = true; break }
             j++
           }
-          if (closed) {
-            // THE WRONG-ACCEPT GUARD. `checkDeclinedSpan` is wired only behind a DECLINE, so a
-            // wrongly ACCEPTED slash could never raise `dirty`: a wrong decline was signalled and
-            // a wrong accept was silent. FOUR of the five fail-opens the closing review measured
-            // were wrong accepts, and every one reported `clean:true` to all four rules.
-            //
-            // A regex body is a PATTERN, so it has no business holding the exact tokens the four
-            // rules hunt. If a span this scanner is about to blank contains one, the acceptance is
-            // almost certainly wrong. This fires on positions nobody predicted, which is the
-            // property an enumerated clause set structurally cannot have — and the clause set has
-            // now been wrong five times.
-            if (SWALLOW_GUARD.test(raw.slice(i, j + 1))) dirty = true
-            res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue
-          }
+          // A WRONG-ACCEPT GUARD WAS TRIED HERE AND REVERTED, because it made things worse.
+          // The reasoning was that `checkDeclinedSpan` is wired only behind a DECLINE, so a
+          // wrongly ACCEPTED slash could never raise `dirty` — four of five measured fail-opens
+          // were wrong accepts reporting `clean:true`. So a span about to be blanked was tested
+          // for the tokens the four rules hunt, and raised `dirty` if it held one.
+          //
+          // THAT IS A FAIL-OPEN, and the measurement is unambiguous. `dirty` does not deny; it
+          // routes all four rules onto the per-line view, and that view sees STRICTLY LESS on
+          // some lines — `stripStrings` leaves backticks alone and the `//` split truncates
+          // inside a template. Measured on `const REF = /\.ref\b/` above a line holding a
+          // backtick URL and a raw primitive: the paren-safe view renders `const u = ``;
+          // await parallel(...)` with the primitive VISIBLE, the fallback renders
+          // `const u = `see http:` with it GONE, and the script flips DENY to ADMIT.
+          //
+          // So widening `dirty` widens the hole it was written to close, and the asymmetry it
+          // aimed at cannot be fixed from here. See the parked decision in RUN.md.
+          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
         }
         if (ch === '`') { mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
         if (ch === "'" || ch === '"') {
