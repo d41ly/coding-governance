@@ -1229,27 +1229,28 @@ for ((i=0; i<total; i++)); do
   # THE SHARD, decided before every other selector (TOOL-aGatheredDeclaration-3 S1). A named leg
   # runs whatever its guard says and whatever its opt-in hold says: the operator asked for THAT leg,
   # and a shard that silently declined to run it would be indistinguishable from one that ran and
-  # passed. Everything not named is dropped. Selection is by exact name; the refusal below prints
+  # passed. Everything not named is dropped. Selection is by exact name; the refusal earlier prints
   # near-misses, which gives an operator the benefit of a glob without a matching rule to specify.
-  # THE TOOL PROBE (TOOL-aGatheredDeclaration-8 S5). A leg may declare the binary it needs, and an
-  # unusable one is a FAIL naming the tool -- never a skip and never a pass. That direction is the
-  # whole point: a missing interpreter that SKIPPED would make the bar quieter exactly when it has
-  # stopped checking, which is the green-by-absence class this repo names. Harvested from an adopter
-  # that has had it for months; gov declares `tool` on no leg yet, so this changes nothing here and
-  # is ready for the first leg that needs it.
-  #
-  # Probed BEFORE the shard and guard passes, because "the binary is missing" is true of a leg
-  # whether or not this run selected it, and an operator sharding onto that leg deserves the real
-  # answer rather than a skip.
-  if [ -n "${legtools[$i]}" ] && ! command -v "${legtools[$i]}" >/dev/null 2>&1; then
-    printf 'notool' > "$WORK/$i.rc"; continue
-  fi
+  _shard_out=no
   if [ ${#SHARD[@]} -gt 0 ]; then
     _want=no
     for _s in "${SHARD[@]}"; do [ "$_s" = "${names[$i]}" ] && { _want=yes; break; }; done
-    if [ "$_want" = yes ]; then continue; fi
-    printf 'shardout' > "$WORK/$i.rc"; continue
+    [ "$_want" = yes ] || _shard_out=yes
   fi
+  # THE TOOL PROBE (TOOL-aGatheredDeclaration-8 S5). A leg may declare the binary it needs, and an
+  # unusable one is a FAIL naming the tool -- never a skip and never a pass. That direction is the
+  # whole point: a missing interpreter that SKIPPED would make the bar quieter exactly when it had
+  # stopped checking. gov declares `tool` on no leg yet, so this changes nothing here.
+  #
+  # BELOW THE SHARD FILTER, and the first spelling had it above. There it redded a run for a leg the
+  # operator never named -- and with the unattended wrapper now delegating three legs through --leg,
+  # one missing binary anywhere in the manifest would have redded that too. An operator who DOES
+  # name the leg still gets the real answer, which is the half worth keeping.
+  if [ "$_shard_out" = no ] && [ -n "${legtools[$i]}" ] && ! command -v "${legtools[$i]}" >/dev/null 2>&1; then
+    printf 'notool' > "$WORK/$i.rc"; continue
+  fi
+  if [ "$_shard_out" = yes ]; then printf 'shardout' > "$WORK/$i.rc"; continue; fi
+  [ ${#SHARD[@]} -gt 0 ] && continue   # named: every later selector is bypassed by the operator's ask
   [ -z "${names[$i]}" ] && continue
   # SUBJECT FIRST, and in this pass rather than in the dispatch loop. A kit-subject leg tests the
   # KIT'S OWN SOURCE and has no job in a repo that copy-installs the kit and never edits it, so it
@@ -1319,7 +1320,9 @@ if [ "$MODE" = manifest ]; then
     _disp=would-run
     if [ -f "$WORK/$i.rc" ]; then
       case "$(cat "$WORK/$i.rc")" in
-        ondemand) _disp=held ;; skip) _disp=guarded-out ;; shardout) _disp=not-named ;; *) _disp=held ;;
+        ondemand) _disp=held ;; skip) _disp=guarded-out ;; shardout) _disp=not-named ;;
+        notool)   _disp=will-fail-no-tool ;;   # a leg that WILL FAIL is not a withheld one
+        *) _disp=held ;;
       esac
     fi
     _meas="-"; _ratio="-"
@@ -1331,7 +1334,7 @@ if [ "$MODE" = manifest ]; then
       fi
     fi
     printf 'LEG  %s  %s  %s  %s  %s  %s  %s  %s  %s
-'       "${names[$i]}" "${lanes[$i]:-heavy}" "$_hold" "$_ceil" "$_gn" "$_disp" "$_meas" "$_ratio"       "$([ "${prof_c:-live}" = live ] && echo enforced || echo declared-only)"
+'       "${names[$i]}" "${lanes[$i]:-heavy}" "$_hold" "$_ceil" "$_gn" "$_disp" "$_meas" "$_ratio"       "$([ "$CEILINGS_LIVE" = 1 ] && echo enforced || echo declared-only)"
   done
   exit 0
 fi
@@ -1559,6 +1562,10 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # performs did not happen -- and a bar that reports that as anything other than red is a bar
     # that got quieter when it stopped checking.
     fails=$((fails+1)); c_fail=$((c_fail+1))
+    # INTO THE DURABLE RECORD TOO. Every other failure path appends here; this one did not, so
+    # gate-last-failure.txt reported a red bar and named NO leg -- the one thing that file is for.
+    FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (declares tool ${legtools[$i]}, which is not executable here)"$'
+'
     printf 'GATE FAIL  %s  (declares tool %s, which is not executable here)
 ' "${names[$i]}" "${legtools[$i]}"
   elif [ "$rc" = shardout ]; then

@@ -223,7 +223,10 @@ fi
 #    The relation only bites in the other direction: a weaker record offered for a stronger push.
 #    Without this predicate the `selftests` field the stamp writes is a byte nobody consults, and
 #    the boundary trusts a partial bar as a whole one. TOOL-dUnstalledConvoy-27.
-if [ -z "$force" ] && [ -n "${GATE_SELFTESTS:-}" ] && [ "$rec_st" != "1" ]; then
+# BOTH SPELLINGS. GATE_OPTIN is the primary now and GATE_SELFTESTS its alias; reading only the
+# alias let a push that WILL run the opt-in legs be measured against a record earned with them
+# held -- the exact case this predicate was written for, bypassed by the rename that kept it.
+if [ -z "$force" ] && [ -n "${GATE_OPTIN:-${GATE_SELFTESTS:-}}" ] && [ "$rec_st" != "1" ]; then
   force="this push runs the kit self-tests and the recorded full green was earned with them HELD"
 fi
 
@@ -237,7 +240,10 @@ else
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG"
   export GATE_BASE="$rec_sha"
 fi
-gate=${GOV_GATE_CMD:-bash tools/run-gates/run-gates.sh}
+# DERIVED, not spelled. Its siblings above became prefix-aware in the same commit that left this
+# line hardcoded, so an adopter installed anywhere but tools/ met exit 127 at the push boundary --
+# the hook unable to find the runner it exists to run. Half of an amendment, left standing.
+gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
 [ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
