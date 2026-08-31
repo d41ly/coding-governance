@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe
 
-**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -32,12 +32,15 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
 - **S3** — the write is NEVER FATAL and never gates: an `OSError` warns on stderr and the lookup
   still answers. `reuse_lookup.py`'s own `main` records that a RESULT never fails and only its
   refusal exits non-zero, and a log must not be the thing that breaks that.
-- **S3a** — **the guard covers the git-dir RESOLUTION too, not only the write.** Measured:
-  `reuse_lookup.py` makes ZERO git calls today, so S1 introduces the first one and with it a failure
-  mode the file has never had — a `subprocess` that raises, a git that is absent, a `--git-common-dir`
-  that fails. `log_event`'s own `p = log_path(repo)` sits OUTSIDE its `try`, so copying that shape
-  would copy the hole; the resolution goes INSIDE, and a failure to locate the log is the same
-  warn-and-answer outcome as a failure to write it.
+- **S3a** — **the resolution adds NO subprocess, which removes the failure mode rather than guarding
+  it.** Round 1's H4 was right that `reuse_lookup.py` makes zero git calls today and that adding one
+  would be a new class of failure. It is not added: the common git dir is read the way
+  `tools/memory-recall/recall-opened.js` reads it — `.git` as a directory IS the git dir; `.git` as a
+  FILE holds `gitdir: <path>`, and that directory's `commondir`, when present, names the common one.
+  Pure path math and two small file reads, matching `map_lib.repo_root()`'s own refusal to shell out.
+  The resolution still sits INSIDE the `try`, because `log_event`'s `p = log_path(repo)` sits outside
+  its own and that is a hole worth not copying; a failure to LOCATE the log warns and answers exactly
+  as a failure to write it does.
 - **S4** — a `MAP_CLI` declaration in `.unattended.conf`, optional and blank by default, in
   `kit.toml`'s `optional_keys` and the protocol's §8 key table. Same shape and same reason as
   `RECALL_CLI`: a kit path spelled into the driver arrives verbatim in an adopter at another prefix
@@ -154,9 +157,13 @@ log it reads.
   row count: five worktrees of this repo share one common dir and a concurrent session's genuine row
   would change a count without this arm having written it. A hash equal before and after is the only
   form of this observation that attributes correctly.
-- **AC7** — `python tools/codebase-map/reuse_lookup.py` with `CODEBASE_MAP_ROOT` unset and its git-dir
-  resolution forced to raise still prints candidates and exits `0`. This is S3a's observable, which
-  round 2's H3 found had none.
+- **AC7** — `python tools/codebase-map/reuse_lookup.py` run where `.git` cannot be read still prints
+  candidates and exits `0`. This is S3a's observable, which round 2's H3 found had none.
+- **AC7a** — `grep -cE "^\s*(import subprocess|from subprocess|import os\.popen)" tools/codebase-map/reuse_lookup.py`
+  returns `0`. The predicate is the IMPORT, not the word: the first cut grepped for `subprocess`
+  anywhere and its own docstring — which says the resolution spawns none — satisfied it. A gate
+  answered by its own comment prose is the class this repo names, and it appeared inside the
+  criterion written to prevent it.
 - **AC7** — `bash tools/check-install-prefix.sh` exits `0` and its carried-prefix ratchet does not
   RISE, which is the leg the first `reuse-probed` cut turned red and the reason S4 exists.
 - **AC8** — `bash tools/check-kit-versions.sh` exits `0` and `bash tools/unattended/check-unattended.sh`
@@ -185,6 +192,13 @@ was relevant. Both are `reuse-probed`'s existing stated limits and this unit wid
 
 ## 9. Revision log
 
+- rev-4 · 2026-08-31 · build-time amendment, per M2's rule that the spec changes before the code
+  diverges from it. S3a assumed the git-dir resolution would be a subprocess and specified a guard
+  around it. Reading `map_lib.resolve_root` at source showed the kit already refuses to shell out and
+  does pure path math, and `recall-opened.js` already reads the common dir the same way — so the
+  resolution adds NO process at all and AC7a observes that absence. The failure mode H4 named is
+  removed rather than guarded, which is the better answer and was not available until the code was
+  read.
 - rev-3 · 2026-08-31 · round-2 spec-audit fold. B4: AC1 still graded rev-1's field names after S2
   was rewritten, and it is the only criterion observing the row shape. H5: the scratch-repo rule was
   INSUFFICIENT — `map_lib.repo_root()` resolves from the kit directory, so only `CODEBASE_MAP_ROOT`

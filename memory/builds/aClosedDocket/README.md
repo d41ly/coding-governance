@@ -81,7 +81,7 @@ ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedD
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | OPEN | rev-3 | 2026-08-31 |
-| [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-3 | 2026-08-31 |
+| [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-4 | 2026-08-31 |
 | [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | OPEN | rev-3 | 2026-08-31 |
 | [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->

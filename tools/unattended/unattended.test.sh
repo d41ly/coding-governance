@@ -4690,10 +4690,25 @@ reset_tree
 printf '#!/usr/bin/env bash\nsleep 60\n' > slowwire.sh
 mkconf "bash slowwire.sh --check" "true" "" "2"     # WIRING_CHECK sleeps; GATE_BOUND=2
 fixture
+# ---- THE INSTRUMENT IS THE DRIVER'S OWN ELAPSED, NOT THIS HARNESS'S CLOCK. TOOL-aClosedDocket-3.
+# ---- `run_bounded` records RB_TOOK inside the bound's own scope and the breach message prints it,
+# ---- so the number below is what the BOUND measured. The harness clock around a whole verb also
+# ---- counts process start, git operations and a remote advertisement the bound does not govern —
+# ---- measured on node `a` 2026-08-31, this arm read 35 s while other Claude sessions ran these same
+# ---- suites on sibling worktrees, and the same shard was clean unloaded on one unchanged tree. The
+# ---- mechanism was never wrong: the breach message fired on every one of those runs.
 _t0=$(date +%s); out=$(run --preflight tRun --keepalive-id k1); _t1=$(date +%s)
 hit "$out" "the declared wiring check did not answer within the declared"
+# The DRIVER's number, extracted from its own message. `killed after <n>s` is what the bound saw.
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --preflight took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+_rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+{ [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+  || { echo "FAIL --preflight: the driver reported killed after '${_rbt:-<no figure>}'s against a 2s GATE_BOUND — the bound does not reach check_wiring"; st=1; }
+# ...and an OUTER SANITY BOUND, whose only job is to catch a HANG. It is deliberately far above any
+# load this fleet produces: a bound that can fire for two reasons cannot tell you which, and the
+# tight one above is the one that answers the question this arm asks.
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL --preflight hung for $(( _t1 - _t0 ))s — this is the hang backstop, not the bound assertion"; st=1; }
 # ...and the OTHER call site, which is the one AC5's own text warns about: "the helper has one
 # exercised call site and one asserted only by inspection, which is how the sibling seam went
 # unbounded the first time." Until this arm, $GATE_CMD was that unexercised site -- check-arms is
@@ -4703,10 +4718,15 @@ printf '#!/usr/bin/env bash\nsleep 30\n' > slowgate.sh
 mkconf "true" "bash slowgate.sh" "" "2"        # GATE_CMD sleeps; GATE_BOUND=2
 fixture
 run --preflight tRun --keepalive-id k1 >/dev/null 2>&1
+# ---- Same instrument, same reason, and this arm read 44 s and 66 s under that same load.
 _t0=$(date +%s); out=$(run --close tRun); _t1=$(date +%s)
 hit "$out" "the merge bar did not answer within the declared"
 n=$((n+1))
-[ $(( _t1 - _t0 )) -lt 25 ] || { echo "FAIL --close took $(( _t1 - _t0 ))s against a 2s GATE_BOUND — the bound does not reach the gates-green arm"; st=1; }
+_rbt=$(printf '%s' "$out" | sed -n 's/.*killed after \([0-9][0-9]*\)s.*/\1/p' | head -1)
+{ [ -n "$_rbt" ] && [ "$_rbt" -lt 25 ]; } \
+  || { echo "FAIL --close: the driver reported killed after '${_rbt:-<no figure>}'s against a 2s GATE_BOUND — the bound does not reach the gates-green arm"; st=1; }
+n=$((n+1))
+[ $(( _t1 - _t0 )) -lt 300 ] || { echo "FAIL --close hung for $(( _t1 - _t0 ))s — this is the hang backstop, not the bound assertion"; st=1; }
 reset_tree
 
 fi   # ---- end the run_bounded host gate: the VERB arm needs it too, because with the bound INERT

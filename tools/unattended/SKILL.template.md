@@ -569,8 +569,13 @@ It answers with one of four states, and the state is what you act on:
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
 - **CONVERGED** — zero blockers. The loop is done for that subject.
 - **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
-  becomes a UNIT of this build: specced at its tier, built, closed. Not parked, not waived, and not
-  re-reviewed — a promoted unit is audited as a SPEC, which is what makes promotion terminate.
+  is DISPOSED. FOLD one that is a defect in a document the review was already reading, as a `rev-N`
+  bump with its §9 line. PROMOTE one whose closing needs a MECHANISM this build does not have: it
+  becomes a UNIT, specced at its tier, built, closed. Never parked, never waived, never re-reviewed.
+  Both terminate — a fold ends the defect, and a promoted unit is audited as a SPEC.
+  **Record which you took**, with `--disposition fold|promote` on the round that exits; the merge
+  bar reads that field, and a fold with nothing recorded is indistinguishable from a promotion that
+  never happened.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
