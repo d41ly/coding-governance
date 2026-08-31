@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
+**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -68,8 +69,11 @@ Two inputs, one resolution, printed:
 | neither | `false` — and the runner says the default was taken |
 
 The existing per-leg bound code is not deleted. It is guarded: when enforcement is off, the leg is
-dispatched without its `timeout -k` prefix and its declared ceiling is reported in `--manifest` as
-`declared, not enforced`.
+dispatched without its `timeout -k` prefix. **The ceiling column keeps its declared NUMBER in
+every state** and enforcement is reported by the appended column and the header clause
+`TOOL-aGatheredDeclaration-3` §4's output contract defines. rev-4 rewrote AC8 to forbid the
+column overwrite and left this paragraph prescribing it, in a third spelling matching neither —
+and §4 is the text an implementer builds from.
 
 ### Migration
 
@@ -206,6 +210,10 @@ a per-leg opt-out is a follow-up that costs nothing to add later.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-5 · 2026-08-31 · folded round-4 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round
+  that ended the loop NON-CONVERGENT. Finding B2: the Design paragraph still prescribed the
+  ceiling-column overwrite AC8 had been rewritten to forbid.
 - rev-4 · 2026-08-31 · folded round-3 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R1, R2 and R5. The adopter-default
   criterion was two units early — rev-3 corrected the MECHANISM and left the grading against an

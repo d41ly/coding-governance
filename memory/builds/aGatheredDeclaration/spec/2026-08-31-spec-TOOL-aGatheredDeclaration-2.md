@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
+**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -55,12 +56,23 @@ legs, held in the same set, dispatched by the same loop.
 - **S12** — the COMMENTS are graded, on gov's own migration. S5 carries `gate-profiles.txt`'s
   argued paragraphs across, and after `TOOL-aGatheredDeclaration-6` S7 deletes that file the
   evidence is gone — so the arm belongs to THIS unit, while both files exist. AC16.
-- **S13** — the manifest path is derived in ONE place. §4's reuse claim says the derivation is one
+- **S13** — the manifest path is derived in ONE place. §10's reuse audit says the derivation is one
   seam and both canaries re-derive it themselves; the loader exports the resolved path and the
   suites read it rather than rebuilding it, or §10's claim is false in the same commit that makes
   it.
-- **S10** — a TOML declaring NO `[[profile]]` row exits 2 naming the file, and a `[bar]` table
-  MISSING any key the loader resolves a default against does the same, naming the key. The
+- **S10** — REQUIRED versus DEFAULTED, ruled once and here. A TOML declaring NO `[[profile]]` row
+  exits 2 naming the file, because there is no defensible default width for unknown hardware.
+  `[bar]`'s keys are DEFAULTED, every one of them: `enforce_ceilings` and `turnstile` default
+  `false` — that is what *opt-in, default off* means and a refusal on their absence would
+  contradict it — and `default_ceiling` and `turnstile_ttl` take the kit's shipped numbers. So a
+  `[bar]` may be absent entirely and an adopter's hand-written manifest runs. rev-4 refused a
+  partial `[bar]`, which made `TOOL-aGatheredDeclaration-4` AC11 and
+  `TOOL-aGatheredDeclaration-5`'s absent-key row unsatisfiable: both require exactly that fixture
+  to RUN and report the default taken.
+- **S10b** — what holds the two write paths instead is COVERAGE, not refusal: unit 6 AC14 and
+  unit 7 AC8c both grade the emitted `[bar]` against the same declared key set, so an emitter
+  that drops a key reds at the unit that wrote it rather than at a runner that could have
+  defaulted it. The
   second half is what holds both write paths with one check: a loader that reds on a partial
   `[bar]` cannot be satisfied by a partial emitter, so `TOOL-aGatheredDeclaration-6` S1(d) and
   `TOOL-aGatheredDeclaration-7` S10 are held by a refusal rather than by two criteria agreeing
@@ -127,7 +139,11 @@ guard = []
 
 Optional keys and their defaults: `cwd = "."`, `lane = "heavy"`, `opt_in = false`, `guard = []`,
 `impure = false`, `full_only = false`, `tool` absent, `ceiling` absent meaning
-`[bar].default_ceiling`.
+`[bar].default_ceiling`. **`full_only` is validated and SELECTS NOTHING** — §8 F3's resolution,
+carried here because the schema is where a reader looks for it, and the shipped file states it
+in a comment on the key. **`full_only` is validated and SELECTS NOTHING** — §8 F3's resolution,
+carried here because the schema is where a reader looks for it, and the shipped file states it
+in a comment on the key.
 
 **Every `[bar]` boolean is marshalled to the bytes `0` or `1` at the loader boundary.** The two
 turnstile guards are string tests — `run-gates.sh:420` and `:726` are `[ "${GATE_TURNSTILE:-1}" != 0 ]`
@@ -186,8 +202,13 @@ default-branch push until unit 6 lands — a permanent 26-minute floor, which is
 exists to remove. It is reachable during the window: `ondemand` is its own counter (`:69`, `:1174`)
 rather than `skips`, so an ordinary held-selftests push still satisfies the stamp's preconditions.
 
-**The stamp keeps writing the JSON blob until unit 6 moves the hook**, and says so in a comment
-naming unit 6. That is one line and it needs no cross-unit ordering guarantee.
+**There are TWO writers of `manifest_blob`, not one, and each is ruled separately.**
+`run-gates.sh:1430` writes the `gate-full-green` stamp that predicate 7 reads, and it hardcodes
+`tools/gate-legs.json` until unit 6 moves the hook, with a comment naming unit 6.
+`run-gates.sh:1021` writes the RUN-RECORD header and keeps `$LEGS_FILE`, so `manifest` and
+`manifest_blob` in that record stay consistent with each other and with the file the run actually
+read. rev-4 said "the stamp" and cited `:1430` alone; §10 had verified the `LEGS_FILE`
+derivation and never the writers.
 
 ### Rollout
 
@@ -274,9 +295,17 @@ agree. S3's permanent dual-format path is the answer instead.
   turnstile's holder TTL takes it, asserted in `tools/run-gates/run-gates.turnstile.test.sh`.
   Without this the key replaces a live consumer of a knob this unit removes and is graded by
   nothing in any of the eight units.
-- **AC15** — When `tools/gate-legs.toml` declares no `[[profile]]` row, or its `[bar]` table omits
-  any key the loader defaults against, `bash tools/run-gates/run-gates.sh` exits 2 naming the
-  file or the key. Observed RED first against a two-key `[bar]`.
+- **AC15** — When `tools/gate-legs.toml` declares no `[[profile]]` row,
+  `bash tools/run-gates/run-gates.sh` exits 2 naming the file; when its `[bar]` is PARTIAL or
+  ABSENT the run PROCEEDS on the declared defaults and says which it took. Observed RED first in
+  both directions.
+- **AC19** — When `tools/run-gates/run-gates.sh` loads the manifest it EXPORTS the resolved path,
+  and neither `tools/run-gates/run-gates.test.sh` nor `tools/run-gates/run-gates.gov.test.sh`
+  re-derives one of its own, asserted by a grep over both suites. Observed RED first against
+  today's re-derivation. S13 had no criterion at rev-4.
+- **AC20** — When a leg's `ceiling` exceeds `[bar].default_ceiling`, the TOML carries a comment
+  above that leg, asserted by parsing the file in `tools/run-gates/run-gates.test.sh`. S5
+  required this and AC16 grades only the profile-table comments.
 - **AC16** — When `tools/gate-legs.toml` is compared against `tools/run-gates/gate-profiles.txt`,
   every comment paragraph in the source appears in the target, asserted by a normalised
   substring join in `tools/run-gates/run-gates.test.sh` while BOTH files exist. After
@@ -328,6 +357,13 @@ agree. S3's permanent dual-format path is the answer instead.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft, from `TOOL-aGatheredDeclaration-1`'s schema union.
+- rev-5 · 2026-08-31 · folded round-4 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round
+  that ended the loop NON-CONVERGENT. Findings B4, H2, H4, M1, M2 and M3. rev-4's
+  partial-`[bar]` refusal contradicted two siblings' absent-key rows, so S10 now rules which keys
+  are required and which defaulted, and coverage rather than refusal holds the two write paths.
+  `manifest_blob` has two writers. S13 was ungraded and cited the wrong section for its own
+  premise.
 - rev-4 · 2026-08-31 · folded round-3 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R4, R7, R9, R10, R12 and R13. The
   emitted `[bar]` was two keys of four with nothing defaulting or refusing the rest, so the

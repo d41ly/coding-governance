@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
+**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -102,12 +103,10 @@ append-only rule `TOOL-aGatheredDeclaration-2` states for the RS/US wire format.
 
 ### Inventory
 
-`--manifest` prints one header line and one row per leg:
-
-```
-gate manifest: <n> legs · <n> opt-in · <n> guarded · profile <row> width <w> · ceilings <on|off>
-LEG  <name>  <lane>  <opt-in|always>  <ceiling|none>  <guards>  <would-run|held|guarded-out>
-```
+`--manifest` prints one header line and one row per leg, in the shape the OUTPUT CONTRACT above
+pins. **It is not respelled here** — rev-4 declared the contract "spelled ONCE" and then spelled
+it again eleven lines below in the pre-fold form, which is what made unit 4's citation of "unit 3
+§4's contract" ambiguous between two texts.
 
 The counts are DERIVED at emission from the loaded declaration. No count is written in prose
 anywhere, which is the charter's rule and the reason this verb exists at all.
@@ -205,6 +204,10 @@ reach `.githooks/pre-push`, which invokes the runner with no arguments.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-5 · 2026-08-31 · folded round-4 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round
+  that ended the loop NON-CONVERGENT. Finding B3: the Inventory block respelled the contract
+  the paragraph above it declares is spelled once, in the shape the fold had just replaced.
 - rev-4 · 2026-08-31 · folded round-3 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) finding R2. The `LEG` row was spelled here and
   incompatibly in `TOOL-aGatheredDeclaration-4`, whose AC8 overwrote the ceiling column AC11

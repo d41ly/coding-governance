@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
+**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -33,25 +34,34 @@ this lands, unit 2's dual-format branch is carrying a format nobody should still
   target's grammar comes from — so without this, `toml-legs` has no producer anywhere in the
   build and a freshly intaken target declares a JSON grammar against a `.toml` file.
   `govkit.py:2947` accepts `None` or `json-array`, so nothing refuses: the grammar simply lies.
-  (d) The emitter writes the `[bar]` table with `enforce_ceilings = false` and
-  `turnstile = false`, which is where `TOOL-aGatheredDeclaration-4` S7 and
-  `TOOL-aGatheredDeclaration-5` S3 actually land. (e) The DESCRIPTOR KEY MIGRATION: 68
-  `subject = ` rows across 23 descriptor TOMLs, 21 under `tools/govkit/entries/` and the rest in
-  other kits' `kit.toml`, plus the selfcheck arms at `govkit.py:1235`, `:1239`, `:1264`, `:1271`,
+  (d) The emitter writes the `[bar]` table with ALL FOUR declared keys at the kit's shipped values —
+  `enforce_ceilings = false`, `turnstile = false`, `default_ceiling` and `turnstile_ttl` — which is
+  where `TOOL-aGatheredDeclaration-4` S7 and `TOOL-aGatheredDeclaration-5` S3 actually land, and what
+  AC14 grades. rev-4 named two keys here and graded four there. (e) The DESCRIPTOR KEY MIGRATION: 68
+  `subject = ` rows across 23 descriptor TOMLs, plus the selfcheck arms at `govkit.py:1235`, `:1239`, `:1264`, `:1271`,
   `:1285`, `:1290`, `:1322-1330`, `:4332-4334` and the `SUBJECT_FLOOR_RUN_GATES` pin at
   `:2971-2972`. The descriptor census: **18 rows across 11 files** under `entries/` and 50 rows
   across 12 other kits' `kit.toml`, re-derived in
-  `build/2026-08-31-build-TOOL-aGatheredDeclaration-6-descriptor-census.md`; rev-3 said 21 under
-  `entries/`, a figure carried from the round-2 audit without re-deriving, which is the class this
-  build exists to remove committed by the fold that was fixing it.
+  `build/2026-08-31-build-TOOL-aGatheredDeclaration-6-descriptor-census.md`. rev-3 said 21 under
+  `entries/`, a figure carried from the round-2 audit without re-deriving — the class this build
+  exists to remove, committed by the fold that was fixing it — and rev-4 corrected it three sentences
+  below while leaving the wrong figure standing above, which is the class one level up.
   rev-2 priced govkit at three edits; S1b's own premise, *once `subject` is gone*,
   is the trigger for every one of them.
-- **S12** — a below-floor INTAKE. S1(c) makes a freshly intaken target declare a `.toml` file and
+- **S12** — a below-floor INTAKE. The probe is ONE CANONICAL SOURCE inlined per this kit's
+  no-gov-internal-dependency rule, gated the way `resolve_python` already is — not a shared file,
+  because S12's caller is `tools/govkit/govkit.py` (Python, gov-internal) and
+  `TOOL-aGatheredDeclaration-7` S9's is `tools/run-gates/adopt-run-gates.sh` (bash, shipped into
+  every target), and no single file can be both. S1(c) makes a freshly intaken target declare a `.toml` file and
   a `toml-legs` grammar; a target whose resolved python predates 3.11 then has a declaration it
   cannot read and NO legacy pair to fall back to, because intake writes only the new file.
-  Intake probes the target's interpreter and emits the legacy pair instead, saying so — the same
-  probe `TOOL-aGatheredDeclaration-7` S9 runs before `--upgrade`, called from one shared
-  preflight rather than written twice.
+  Intake probes the target's interpreter and emits the JSON manifest instead, saying so. **It cannot
+  emit "the legacy pair"**: S7 deletes `tools/run-gates/gate-profiles.txt` and the kit payload is
+  `include = "**"`, so after S7 there is no profile table left for any intake to ship. The declared
+  consequence is that a below-floor target runs on the runner's BUILT-IN formula, which is what the
+  profile table's own header already calls the documented rollback for that mechanism, and
+  `TOOL-aGatheredDeclaration-7` AC8b's refusal is scoped so it cannot fire on a target gov itself
+  created this way.
 - **S1b** — the SUBJECT RATCHET moves with the key it pins. `govkit.py:1354` resolves each leg's
   subject against `tools/govkit/subject-pins.tsv`, defaulting to `repo`. Once `subject` is gone,
   all 40 kit legs resolve to that default and `govkit selfcheck` — `chunk = declarations`,
@@ -154,8 +164,11 @@ moved and a file deleted in one commit gives a red no bisect can localise.
 ### Rollout
 
 S5 is the only behaviour change a person will notice: `bash tools/unattended/run-unattended-gates.sh`
-keeps its name and its output shape and stops being a second dispatcher. Its seven leg names move
-into the declaration as `opt_in = true` rows carrying the 2026-08-23 owner ruling as their comment.
+keeps its name and its output shape. **NOTHING moves into the declaration**: S5 rules that the
+three legs already declared route through `--leg` and the five suites the 2026-08-23 owner ruling
+removed keep being dispatched by the wrapper, off the bar. rev-2 wrote the opposite here and rev-4
+rewrote S5 without opening this paragraph, so the replaced disposition survived the fold that
+removed it — attributing to that ruling the very reversal it forbids.
 
 ### Files touched (estimate)
 
@@ -206,8 +219,10 @@ branch exists precisely so this can be a second landing.
 - **AC4** — When `python tools/codebase-map/reuse_lookup.py` runs, the `gate-legs` inventory key
   count is unchanged across the format move, asserted the same way.
 - **AC5** — When `bash tools/unattended/run-unattended-gates.sh` runs, it dispatches through
-  `run-gates.sh --leg` and its seven leg names appear in the runner's own summary, asserted by
-  grepping for the runner's report tail rather than for a message this script prints.
+  `run-gates.sh --leg` for the THREE legs the manifest declares, and those three names appear in
+  the runner's own summary, asserted by grepping the runner's report tail rather than a message this
+  script prints. The other five never appear there and must not be asserted to: they are dispatched
+  by the wrapper and are not declared legs.
 - **AC6** — When `bash tools/check-dead-paths.sh` runs after S7 and S10, it is GREEN with the
   declared waiver set, and a CONTROL arm planting a fresh undeclared carrier still REDS.
   **rev-2's wording was unsatisfiable**: the gate's predicate is a BASENAME, and
@@ -265,7 +280,8 @@ branch exists precisely so this can be a second landing.
 
 `run-gates canary` · `run-gates gov canary` · `govkit selfcheck` · `pre-push hook selftest` ·
 `drift-audit selftest` · `codebase-map coverage` · `dead paths` · `unattended kit gate` ·
-`check-wiring` · `testsuite counts` · `template size <=48KiB` · `charter size` ·
+`check-wiring` · `testsuite counts` · `profile-bar selftest` · `template size <=48KiB` ·
+`charter size` ·
 `playbook render wiring` · `playbook placeholder catalogue` · `playbook parity`. The size pair is
 here because S6 edits `coding-governance-agents.template.md` and `AGENTS.md`, both size-gated;
 the playbook trio is here because S11 edits the render's SOURCE and all three are
@@ -286,6 +302,13 @@ listed two. No new leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-5 · 2026-08-31 · folded round-4 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round that
+  ended the loop NON-CONVERGENT. Findings B1, H1, H3, H5, H6 and H7. B1 is the round's
+  most-confirmed finding, five hits across three lenses: rev-4 rewrote S5 and left the Rollout
+  paragraph and AC5 prescribing the disposition and the count it had just removed. H6 is the same
+  shape one level up — rev-4 corrected a figure three sentences below the wrong one and left the
+  wrong one standing.
 - rev-4 · 2026-08-31 · folded round-3 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) findings R1, R3, R6, R8, R10, R11 and R14. The
   Rollout added leg rows while AC7 sixty lines below asserted the count was unchanged, and the

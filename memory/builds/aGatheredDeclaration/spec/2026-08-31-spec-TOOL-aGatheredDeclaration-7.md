@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration
 
-**Status:** OPEN · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
+**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round1.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round2.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
 | [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
+| [2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md) | spec-audit | TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-8 |
 
 <!-- /gen:spec-records -->
 
@@ -45,8 +46,12 @@ a flag day for two live repositories, and the prompt asks for the tool explicitl
   `--force`.
 - **S8** — the e2e arms in `tools/run-gates/adopt-run-gates.test.sh`, driving both dialects from
   fixtures derived from the two real manifests.
-- **S9** — the INTERPRETER PROBE, ONE shared preflight that `TOOL-aGatheredDeclaration-6` S12's
-  intake path calls too, run BEFORE anything is written: the target's resolved python is
+- **S9** — the INTERPRETER PROBE, run BEFORE anything is written. It is ONE CANONICAL SOURCE
+  inlined into every shipped caller per this kit's no-gov-internal-dependency rule, gated the way
+  `resolve_python` already is — NOT a shared file: `TOOL-aGatheredDeclaration-6` S12's caller is
+  `tools/govkit/govkit.py`, which is Python and gov-internal, and this one is
+  `tools/run-gates/adopt-run-gates.sh`, which is bash and ships into every target. rev-4 said
+  "one shared preflight" and named neither file nor language, which no single file can satisfy: the target's resolved python is
   asked to import `tomllib`, and a failure refuses with exit 2 naming the interpreter and its
   version unless `--force`. Without it `--upgrade` converts a working merge bar into a dead one,
   because `TOOL-aGatheredDeclaration-2` S3 makes the TOML win wherever it exists. It is a SHARED
@@ -170,7 +175,10 @@ report the owner acts on.
   profile half is what rev-2's leg-count-only criterion could not see.
 - **AC8b** — When the target holds no `gate-profiles.txt`, `--upgrade` exits 2 naming it rather
   than emitting a manifest with no `[[profile]]` row, asserted in
-  `tools/run-gates/adopt-run-gates.test.sh`. Observed RED first.
+  `tools/run-gates/adopt-run-gates.test.sh`. Observed RED first. **Scoped so it cannot fire on a
+  target gov itself created below the interpreter floor**: `TOOL-aGatheredDeclaration-6` S12
+  emits a JSON manifest and no profile table for those, by declared consequence, and a refusal
+  that reds on gov's own output is a refusal that gets deleted.
 - **AC8c** — When the emitted TOML is parsed, its `[bar]` table carries ALL FOUR declared keys with
   the kit defaults, asserted key-by-key against `TOOL-aGatheredDeclaration-6` S1(d)'s emitted set
   rather than against a list typed here. `TOOL-aGatheredDeclaration-2` S10's partial-`[bar]`
@@ -200,6 +208,11 @@ the arms join `adopt-run-gates.test.sh`, which is already a leg.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · initial draft.
+- rev-5 · 2026-08-31 · folded round-4 spec audit
+  (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round that
+  ended the loop NON-CONVERGENT. Findings H1 and H3. "One shared preflight" crossed a
+  Python/bash and a gov-internal/shipped boundary at once, and AC8b could red on a target gov's
+  own below-floor intake produces.
 - rev-4 · 2026-08-31 · folded round-3 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round3.md`) finding R4, and the shared-preflight half of R11.
   The emitted `[bar]` was two keys of four; the refusal that holds both write paths now lives in

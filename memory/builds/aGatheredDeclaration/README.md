@@ -49,6 +49,19 @@ prompt record holds the measurements.
 - **Every new gate and every changed refusal has its failing case observed RED first.**
 - **Nothing lands outside this repository.** The adopters are reviewed and an upgrader is shipped;
   migrating each one is that repo's own build, on its own bar (owner ruling, 2026-08-31).
+- **The spec-audit loop ended NON-CONVERGENT at round 4, and no blocker was promoted.** Blocker
+  counts ran 5, 4, 3, 4; four is not strictly smaller than three, so under `BUILD-METHOD.md` M4 the
+  loop STOPPED and there is no round 5. M4 promotes every blocker STILL STANDING at the exit, and
+  all four were closed by the round-4 fold, so none stands and none was promoted. Three of the four
+  were `amendment-leaves-its-other-half-standing` in the round-3 fold's own text — editing residue
+  in these specs, where the fold IS the fix and there is no unit of work left to spec. The fourth
+  was a real design contradiction and is resolved in unit 2 S10. Promoting a stale paragraph to a
+  numbered unit would be ceremony this method's own budget rule argues against.
+- **Round 4's report was written by this run, not by the harness.** Its synthesis agent died on a
+  session limit after every finder and skeptic had returned, so the record was reconstructed from
+  the run journal by the same agent that authored the specs it grades. The conflict is stated in
+  that record's opening section rather than hidden, and the adjudicated count went AGAINST this
+  run's interest — four ends the loop where two would have continued it.
 
 ## Parked decisions
 None. One AMENDMENT, recorded in `RUN.md`: the round-1 spec audit returned BLOCKED with five
@@ -79,16 +92,16 @@ ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclar
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-4 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-4 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-4 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | OPEN | rev-4 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-4 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-4 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
