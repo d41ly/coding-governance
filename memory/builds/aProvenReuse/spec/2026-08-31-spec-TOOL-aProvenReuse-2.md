@@ -1,11 +1,12 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** SPECCED · rev-7 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** CLOSED · rev-7 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aProvenReuse-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aProvenReuse-1-acceptance-ledger.md) | journal | TOOL-aProvenReuse-1 |
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md) | diff-review | TOOL-aProvenReuse-1 TOOL-aProvenReuse-5 |

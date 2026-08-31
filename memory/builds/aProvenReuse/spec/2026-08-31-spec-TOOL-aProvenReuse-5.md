@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-5 — the example-conf parity arm reaches bare presets
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-1 · base 3bfc5e87 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-08-31 · node a · Tier-1 · base 3bfc5e87 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

@@ -177,28 +177,28 @@ the loop stopped rather than a reason to run a fourth.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aProvenReuse-1` | SPECCED | hygiene check 12 grades §10's CONTENT, behind a declared cutoff |
-| 2 | `TOOL-aProvenReuse-2` | SPECCED | a `reuse-probed` DoD item joins the run to the recall query log |
-| 3 | `TOOL-aProvenReuse-5` | SPECCED | the example-conf parity arm reaches bare presets |
+| 1 | `TOOL-aProvenReuse-1` | CLOSED | hygiene check 12 grades §10's CONTENT, behind a declared cutoff |
+| 2 | `TOOL-aProvenReuse-2` | CLOSED | a `reuse-probed` DoD item joins the run to the recall query log |
+| 3 | `TOOL-aProvenReuse-5` | CLOSED | the example-conf parity arm reaches bare presets |
 
-*Both spec headers read `SPECCED` too. Round 2's F14 found the fold flipping these cells while
+*All three spec headers read `CLOSED` too. Round 2's F14 found the fold flipping these cells while
 leaving both headers at `OPEN`, and the generated table below — which DERIVES from those headers —
 still saying `OPEN` in the same commit.*
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-08-31 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-08-31 · streams tooling
 ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReuse-4 TOOL-aProvenReuse-5 TOOL-aProvenReuse-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | SPECCED | rev-5 | 2026-08-31 |
-| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | SPECCED | rev-7 | 2026-08-31 |
-| [TOOL-aProvenReuse-5 — the example-conf parity arm reaches bare presets](spec/2026-08-31-spec-TOOL-aProvenReuse-5.md) | 3 | 1 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-08-31 |
+| [TOOL-aProvenReuse-5 — the example-conf parity arm reaches bare presets](spec/2026-08-31-spec-TOOL-aProvenReuse-5.md) | 3 | 1 | CLOSED | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
