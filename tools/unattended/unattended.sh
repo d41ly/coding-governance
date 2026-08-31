@@ -38,7 +38,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.12   # gov:kit unattended@1.12 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.13   # gov:kit unattended@1.13 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -287,7 +287,7 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""
 GATE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -340,7 +340,7 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent reuse-probed:machine"
 
 # the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
 # for the reason those are: a parked row whose kind is outside this set lands in a region every
@@ -2867,7 +2867,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
 # What the driver can honestly answer for each core item. Anything it cannot observe is reported as
 # agent-attested and read back from the record, never invented.
 dod_met() { # slug · run-state file · item · checker
-  local slug="$1" rel="$2" item="$3" ck="$4" rb _pv _pn _pa
+  local slug="$1" rel="$2" item="$3" ck="$4" rb _pv _pn _pa _rw _rl _rt _rn
   # CLEARED ON ENTRY. This is called in a loop and only some arms assign DOD_OUT, so an arm that set
   # it left its text attached to whichever LATER item happened not to — printing one item's diagnostic
   # as another item's detail. Clearing here means the channel always belongs to the item being graded.
@@ -3415,6 +3415,79 @@ $_bcnon"
         fi
         return 1
       fi
+      return 0 ;;
+    reuse-probed)
+      # TOOL-aProvenReuse-2. The LIVENESS half of the `reuse-first` directive. Its sibling
+      # TOOL-aProvenReuse-1 makes a spec RECORD its reuse audit; nothing tracked can tell a recorded
+      # audit from a typed one, so this observes that a recall probe actually RAN in this tree.
+      #
+      # WHY IT IS HERE AND NOT ON THE BAR. The evidence is the declared recall CLI's query
+      # log, which lives in the git COMMON DIR and is neither tracked nor pushed. A leg in
+      # check-unattended.sh could only ever report DEAD PROBE on it in a fresh clone, and a check
+      # that cannot run where the bar runs does not belong on the bar.
+      #
+      # WHAT IT DOES NOT OBSERVE, stated here because a gate that does not declare its blind spots
+      # sells false confidence: that the probe was run FOR THIS BUILD rather than earlier in the same
+      # worktree, that its question was relevant, or that its answer was read. A worktree reused
+      # across two builds carries the earlier one's rows. The alternative -- a window anchored on the
+      # pinned BASE -- is WORSE, because the prompt path runs its orientation probes BEFORE the build
+      # folder exists and a BASE-anchored window would miss exactly the probes this item is about.
+      DOD_OUT=""
+      # 1. WAIVED, and this arm is the whole reason the waiver stopped being silent. It comes first:
+      #    a run that was granted the waiver is not asked for the evidence.
+      if recorded_waivers "$rel" | grep -qx 'reuse-first'; then
+        _rw=$(sed -n 's/^[0-9][0-9-]*T[0-9:]*Z waiver · item reuse-first · reason //p' "$rel" | head -1)
+        DOD_OUT="skipped — the reuse-first directive was waived at preflight, so no probe is owed: ${_rw:-<no reason recorded>}"
+        return 0
+      fi
+      # 2. THE RECALL CLI IS NOT ADOPTED. Checked BEFORE the log, and the two are different facts:
+      #    no CLI means nothing could ever have written a log, while no log in a project that HAS one
+      #    means the probe was not run. Without this arm a CORE item is structurally unmeetable for
+      #    every adopter who took this kit and not the recall one, and every --close there needs an
+      #    override. MET, and it ANNOUNCES the skip -- a skip that looks like a pass is
+      #    indistinguishable from coverage.
+      #
+      #    A DECLARATION, not a probe of two guessed paths, and the first cut got that wrong three
+      #    ways: it broke this kit's own declarations-not-constants rule, it raised the carried-prefix
+      #    ratchet (a literal kit path arrives verbatim in an adopter installed at another prefix and
+      #    resolves to nothing there), and it was unreachable by the self-test, which runs this driver
+      #    from OUTSIDE the tree under test so the probe always found the real repo's copy.
+      if [ -z "$RECALL_CLI" ] || [ ! -f "$ROOT/$RECALL_CLI" ]; then
+        DOD_OUT="skipped — this project declares no readable RECALL_CLI in its .unattended.conf, so no query log can exist and there is nothing this item could observe${RECALL_CLI:+ (declared: $RECALL_CLI)}"
+        return 0
+      fi
+      # 3. THE LOG. Located the way its two existing readers locate it -- query.py's own log_path()
+      #    and recall-opened.js -- never as a path literal.
+      _rl="$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd)/recall/queries.jsonl"
+      if [ ! -f "$_rl" ]; then
+        DOD_OUT="the recall query log is ABSENT at $_rl, so this item cannot answer its question rather than answering it with a zero — run a probe, or override with a reason"
+        return 1
+      fi
+      # 4. THE JOIN, and every step of it was a review blocker.
+      #    The log is JSONL, so `worktree` is JSON-ESCAPED: the bytes on disk carry TWO backslashes
+      #    per separator. Folding a single backslash yields C://projects//... and matches nothing --
+      #    measured, that returned 0 on a tree holding three real rows. So fold every backslash byte
+      #    to a slash and SQUEEZE the doubles. Octal \134 rather than a quoted backslash, because the
+      #    literal spelling makes GNU tr warn on every run and a gate that cries wolf gets ignored.
+      #    The compare is EXACT (`grep -xF`) on the extracted value, not a substring: every worktree
+      #    here lives under the primary tree's path, so the primary's own logged value is a strict
+      #    PREFIX of every linked worktree's and a substring test counts another tree's probes.
+      #    The operand is `--show-toplevel`, NOT `pwd`: under Git-Bash pwd gives the MSYS spelling
+      #    /c/projects/... while the recall CLI records a Windows path, and that mismatch returns
+      #    correct run.
+      # $ROOT already holds --show-toplevel (set at :274). Re-deriving it here would be a second
+      # reader of one value, which is the class this repo files as two-readers-of-one-config.
+      _rt=$(printf '%s' "$ROOT" | tr -s '/')
+      _rn=$(grep '"type": "query"' "$_rl" 2>/dev/null \
+            | grep -o '"worktree": "[^"]*"' \
+            | sed 's/^"worktree": "//; s/"$//' \
+            | tr '\134' '/' | tr -s '/' \
+            | grep -cxF "$_rt" || true)
+      if [ "${_rn:-0}" -lt 1 ]; then
+        DOD_OUT="the recall query log holds no query for this tree ($_rt), so no reuse probe is recorded as having run — run the declared recall probe ($RECALL_CLI) with a question and 8-14 terms, or override with a reason"
+        return 1
+      fi
+      DOD_OUT="$_rn recall quer$([ "$_rn" = 1 ] && echo y || echo ies) recorded for this tree"
       return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;

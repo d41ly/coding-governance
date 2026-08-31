@@ -85,7 +85,7 @@ ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGrad
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED](spec/2026-08-31-spec-TOOL-aGradedMandate-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-08-31 |
-| [TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item](spec/2026-08-31-spec-TOOL-aGradedMandate-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-08-31 |
+| [TOOL-aGradedMandate-2 — `specs-audited`, a new core Definition-of-Done item](spec/2026-08-31-spec-TOOL-aGradedMandate-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-3 — `gates-green` escalates onto held self-test legs by the run's own diff](spec/2026-08-31-spec-TOOL-aGradedMandate-3.md) | 3 | 2 | WONTDO | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN](spec/2026-08-31-spec-TOOL-aGradedMandate-4.md) | 4 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act](spec/2026-08-31-spec-TOOL-aGradedMandate-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-08-31 |

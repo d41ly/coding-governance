@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.12 -->
+<!-- gov:kit unattended@1.13 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -319,7 +319,7 @@ deny) or pick one arbitrarily (nondeterminism, which is the worst property a gat
 
 ## 4. The Definition of Done
 
-Eleven kit-owned core items. Each names its checker, because an override budget must not be spent on
+Twelve kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
@@ -333,6 +333,7 @@ something no machine could have checked:
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
 | `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
 | `specs-audited` | machine | every unit the build README's generated region carries as CLOSED is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`. The id join is WHOLE-TOKEN and expands the `N..M` range form the binding grammar admits, because a substring join lets `TOOL-x-19` satisfy `TOOL-x-1` and an unexpanded one blocks a unit that WAS audited. It measures that the pre-code review pass the build method makes MUST-by-default left evidence; it does not read what the audit found, whether it ran at the unit's current rev, or whether a WONTDO unit was audited at all — a LOWER bound, which is what makes it safe as a refusal and useless as a certificate |
+| `reuse-probed` | machine | a recall probe actually RAN in this run's tree — the liveness half of the `reuse-first` directive, whose tracked half is whatever the memory kit demands of a spec's reuse section. Five outcomes, and three of them are MET: the directive was WAIVED, in which case the item reports the waiver and its recorded reason and that is what stops a waiver being silent; `RECALL_CLI` is blank or names nothing readable, an announced skip, because a core item that no adopter without a recall kit could ever meet would block every close in their fleet; or one or more queries are recorded, and the count rides the message. UNMET splits the two facts an operator must not confuse: the log is ABSENT, so the item cannot answer, versus the log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — the query log lives in the git common dir, is neither tracked nor pushed, and a leg reading it in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
 
@@ -553,6 +554,7 @@ where this document says it may:
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
+| `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
