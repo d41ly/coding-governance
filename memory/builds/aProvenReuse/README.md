@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReuse-4 TOOL-aProvenReuse-5
+ids: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReuse-4 TOOL-aProvenReuse-5 TOOL-aProvenReuse-6
 authorized-by: prompt
 ---
 
@@ -133,7 +133,45 @@ blockers are defects in that spec and "promote to a unit" has no legal referent.
 
 ## Parked decisions
 
-None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
+None. Nothing in this build was refused for the owner to decide: every fork its specs raised was
+resolvable under the delegated authority, and every review finding was folded, adopted as a unit, or
+filed as a backlog row. Parked entries would live in `RUN.md` and be surfaced in the wrap-up.
+
+**What was filed rather than built**, because a finding with no disposition is a finding discarded:
+
+| id | why it is a row and not a unit |
+|---|---|
+| `TOOL-aProvenReuse-3` | the NON-CONVERGENT disposition has no legal referent when the review subject is a SPEC; that is a defect in `BUILD-METHOD.md` M4, not in this build |
+| `TOOL-aProvenReuse-4` | closing the `reuse_lookup.py` liveness gap needs a cross-kit dependency or a third telemetry format, so it fails protocol §11's strictly-beneficial test |
+| `TOOL-aProvenReuse-6` | the unattended suite's bounded-observation arms are wall-clock assertions that flake under fleet load; measured three times, pre-existing, and this diff touches none of that machinery |
+
+**Round-3 findings NOT folded, and why each**, so the next reader does not re-derive them:
+
+- The fenced-`--terms` sub-claim of round 3's blocker is REFUTED, and this is the one place that is
+  written down. It was reproduced with a standalone predicate that does not strip fences; the shipped
+  checker unfences `body[]` before the arm ever runs, so that section scores `hasT=0 hasP=1` and reds
+  on the TERMS arm, identically before and after the fold. That is
+  `second-implementation-is-not-a-second-opinion`, and taking it at face value would have bought a
+  fix for a defect that does not exist.
+- The two suite totals round 3 could not verify — `check-memory-hygiene.test.sh` at 270 assertions
+  and `check-unattended.sh` at exit 0 — were both OBSERVED by this run and are recorded in the commit
+  that made them true. Round 3 timed out reaching them; that is a limit of that round, not a gap.
+- The `marker-written-last` hole is real, unreachable in this corpus, and now DECLARED in the spec
+  template's own §10 section rather than fixed. A gate that cannot state its blind spots is worse
+  than one that can.
+
+## Review rounds — the closing diff review
+
+**The closing loop ALSO exited NON-CONVERGENT**, at 2, 1, 1 confirmed blockers. Round 3's blocker was
+folded rather than promoted, for the reason recorded above the spec-audit rounds: it was a shipped
+document describing a predicate it no longer had, which is a defect in a carrier and not a mechanism
+M2 would let a unit hold.
+
+**Every round's blocker lived in the FOLD, never in the code the fold was closing.** Round 1: a red
+merge-bar leg this build turned red. Round 2: a conf key documented in neither protocol carrier, and
+a repair that leaked on wrapped input. Round 3: a template still describing the repair that replaced
+it. Three rounds, three fold defects, and the rate did not fall — which is the honest reading of why
+the loop stopped rather than a reason to run a fourth.
 
 <!-- roster:units -->
 
@@ -150,17 +188,17 @@ still saying `OPEN` in the same commit.*
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 3 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReuse-4 TOOL-aProvenReuse-5
+ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReuse-4 TOOL-aProvenReuse-5 TOOL-aProvenReuse-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-08-31 |
-| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | SPECCED | rev-6 | 2026-08-31 |
+| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | SPECCED | rev-5 | 2026-08-31 |
+| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | SPECCED | rev-7 | 2026-08-31 |
 | [TOOL-aProvenReuse-5 — the example-conf parity arm reaches bare presets](spec/2026-08-31-spec-TOOL-aProvenReuse-5.md) | 3 | 1 | SPECCED | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

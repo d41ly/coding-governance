@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 1 · ratified 2026-08-31
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 1 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md) | diff-review | TOOL-aProvenReuse-2 TOOL-aProvenReuse-5 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round3.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round3.md) | diff-review | TOOL-aProvenReuse-2 TOOL-aProvenReuse-5 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-2 |
 
@@ -76,8 +77,10 @@ the check works in a clone the run never touched.
 - **S7** — self-test arms in `tools/memory-tree/check-memory-hygiene.test.sh` covering: a
   post-cutoff spec missing arm T reds; one missing arm P reds; one satisfying both passes; a
   PRE-cutoff spec missing both passes; a Tier-1 post-cutoff spec missing both PASSES, which is the
-  arm that pins N4; the SKELETON's own §10 body reds, which is what stops the instructional prose
-  moving back inside the copyable fence; and a WRAPPED terms list with a probe token on its
+  arm that pins N4; a §10 carrying the skeleton's REPLACE-this-paragraph sentence reds, which is what
+  stops the instructional prose moving back inside the copyable fence — the fixture splices that one
+  sentence rather than reading the template's bytes, so AC10 rather than this arm is what observes
+  the real skeleton; and a WRAPPED terms list with a probe token on its
   continuation line reds, which is the arm that fails if the probe blob ever returns to a per-line
   cut. Arm T's fixture carries probe tokens INSIDE its terms value, so it also pins the two-blob
   split from the other side.
@@ -273,6 +276,13 @@ question the spec audit owns, not a predicate. Nothing checks arm content either
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-5 · 2026-08-31 · closing-diff-review round-3 fold, at the loop's NON-CONVERGENT exit. Round 3's
+  blocker: the fold that replaced the per-line terms cut with a whole-section truncation left the
+  spec template still describing the per-line behaviour, and three carriers claimed the template
+  stated an ORDER it never stated. The template now states the order as a rule, says why the
+  truncation exists, and DECLARES the one shape it cannot see. The failure message names the order
+  when the probe arm is the missing one. S7's skeleton-arm claim was overstated: the fixture splices
+  one sentence rather than reading the template's bytes, and AC10 is what observes the real skeleton.
 - rev-4 · 2026-08-31 · closing-diff-review round-2 fold. Round 2 found this spec had NOT been
   folded after round 1 at all: it still specified a single-blob scan and five self-test arms while
   the code had neither. S3 now states the two-blob split and the measurement behind its ordering, S7

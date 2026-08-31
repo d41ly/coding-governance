@@ -1109,7 +1109,12 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       if (!hasT) miss = "the recall terms used"
       if (!hasP) miss = (miss == "" ? "" : miss " AND ") \
         "the probe result (a reuse_lookup citation, an explicit \"no existing seam fits\", or a named reuse-first waiver)"
-      if (miss != "") print f " (§10 Reuse audit does not record " miss "; required at/after SPEC10_EVIDENCE_CUTOFF " ecut ")"
+      # ---- THE ORDER IS IN THE MESSAGE when the probe half is the missing one, because that is the
+      # ---- likeliest cause and it is not guessable from a list of accepted spellings: the probe
+      # ---- blob stops at the first terms marker, so a citation written BELOW the terms line is not
+      # ---- seen and the author is looking at a §10 that appears to hold both facts.
+      if (miss != "") print f " (§10 Reuse audit does not record " miss "; required at/after SPEC10_EVIDENCE_CUTOFF " ecut ")" \
+        (hasP ? "" : " — note the probe result must be recorded BEFORE the recall terms; the probe half is scanned over the section truncated at the first terms marker")
     }
   }')
 fi

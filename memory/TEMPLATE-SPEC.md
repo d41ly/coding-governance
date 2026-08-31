@@ -138,9 +138,19 @@ predicate necessarily contains the words that satisfy it.
   and BUILD-METHOD M7's regrounding step 5 re-runs the query FROM that line — a §10 without it makes
   that step resolve to nothing.
 
-The probe half is scanned over the section with each TERMS VALUE removed, so a terms list containing
-`reuse-first` or `reuse_lookup` does not buy the probe half by itself. The line PREFIX survives, so
-the ordinary one-line form — the finding, then the terms — still satisfies both.
+**RECORD THE PROBE RESULT BEFORE THE TERMS.** That order is the rule, not a style note: the probe
+half is scanned over the section TRUNCATED AT THE FIRST TERMS MARKER, so a probe token written after
+that marker is not seen. The ordinary one-line form — the finding, then the terms — satisfies both,
+and so does a finding paragraph followed by a terms line.
+
+Why the truncation exists: a terms list is 8-14 words of this corpus's own jargon and those words
+routinely include `reuse-first` or `reuse_lookup`, so scanning the whole section let a terms line
+alone satisfy BOTH arms and the probe half could not fail. Cutting only to end-of-LINE was tried and
+leaked, because a terms list that WRAPS puts its tail on a line carrying no marker.
+
+What it still cannot see, said plainly rather than left for a reader to discover: a section that
+writes the terms VALUES first and the marker last puts those values in the probe blob, so one such
+line can satisfy both arms. Nothing in this corpus is written that way and no gate catches it.
 
 Before this arm existed the section was graded on presence and non-emptiness alone, which made
 `N/A — none` a passing reuse audit. What the check still cannot see is whether either fact is TRUE:

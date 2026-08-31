@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** SPECCED · rev-6 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** SPECCED · rev-7 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md) | diff-review | TOOL-aProvenReuse-1 TOOL-aProvenReuse-5 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round3.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round3.md) | diff-review | TOOL-aProvenReuse-1 TOOL-aProvenReuse-5 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-1 |
 
@@ -38,8 +39,10 @@ instead of passing in silence.
     Definition-of-Done item is structurally unmeetable in every adopter that took `unattended`
     without `memory-recall`, and every `--close` there needs an override. A skip that announces
     itself is the `pieces-complete|set-checks-recorded` idiom this arm already copies.
-  - **met** — one or more. MET, and `DOD_OUT` reports the count and the newest row's timestamp, so
-    the wrap-up carries a number rather than a verdict.
+  - **met** — one or more. MET, and `DOD_OUT` reports the COUNT, so the wrap-up carries a number
+    rather than a verdict. Rev-1 said it also reported the newest row's timestamp; the code never
+    emitted one, and AC4 and the self-test both assert on the count alone — three records agreeing
+    and one spec sentence disagreeing, corrected here rather than built to.
 - **S3** — the log is located as `$(git rev-parse --git-common-dir)/recall/queries.jsonl`, which is
   where `query.py`'s own `log_path()` puts it and where `recall-opened.js` reads it. The location is
   DERIVED by the same rule both existing readers use, never spelled as a path literal.
@@ -157,8 +160,8 @@ instead of passing in silence.
 - **N5** — making the item unoverridable. `authorization-reachable` and `pieces-complete` are the
   two items with no override and both are about authorization; this one is about diligence, and a
   run resumed on a node whose log does not carry the probe has a legitimate reason to override.
-- **N6** — making `memory-recall` a HARD `requires` of the unattended kit. S9 declares the edge and
-  S2's `kit absent` outcome keeps the item meetable without it; forcing every adopter to take a
+- **N6** — making `memory-recall` a HARD `requires` of the unattended kit. S9 documents the edge and
+  S2's `not adopted` outcome keeps the item meetable without it; forcing every adopter to take a
   second kit to close a run is a wider change than this unit's goal, and M3 veto 2 puts a new
   install requirement outside a delegated resolver's authority.
 
@@ -322,6 +325,10 @@ where the item reports a SKIP and says so.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-7 · 2026-08-31 · closing-diff-review round-3 fold. S2's `met` outcome claimed `DOD_OUT` reports
+  the newest row's timestamp; the code never emitted one and AC4 and the self-test both assert the
+  count alone, so the spec sentence was the odd record out and is corrected rather than built to.
+  N6 still named the retired `kit absent` outcome after S2 renamed it to `not adopted`.
 - rev-6 · 2026-08-31 · closing-diff-review round-2 fold. Round 2 found rev-5 had changed S2, S3a
   and S9 to the `RECALL_CLI` declaration and left AC3a, §4 and §7 still describing the hardcoded
   two-path probe it replaced — the `amendment-leaves-its-other-half-standing` class, with AC3a false
