@@ -81,6 +81,13 @@ could preflight at all, and it is a special case for one of the twelve phases.
   `drift-audit records` ratchet sits at its ceiling with zero headroom, so a source header citing a
   unit id must land in the same commit range as that unit's status flip, and raising the pin is
   forbidden.
+- **Spec-audit round 2 was ATTEMPTED and DIED before it reviewed anything**, 2026-08-31 ~05:20 FLEDT:
+  all four finder lenses failed with `You've hit your session limit`, so the harness returned
+  `lensesRun 0 / lensesDead 4` and the explicit note *nothing was reviewed*. **No review round was
+  recorded for it**, because a round with no verdict is not a round and `--review` would have written
+  a convergence datapoint that no lens produced. It was re-launched after the limit reset. This is
+  recorded here rather than in the transcript because a dead review that looks like a skipped one is
+  the `green-by-absence` class applied to the review loop itself.
 
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
