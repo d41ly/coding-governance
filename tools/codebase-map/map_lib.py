@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.6"
+KIT_CODEBASE_MAP_VERSION = "1.7"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -414,7 +414,16 @@ JS_DEFINITION_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 
-def _js_resolve_regex_start(prev: str) -> str:
+JS_REGEX_KEYWORDS = (
+    "return", "typeof", "case", "in", "instanceof", "new", "delete", "void", "throw",
+)
+#: a keyword that cannot END an expression, and NOT one used as a property name. Kept in the same
+#: order and with the same members as the JavaScript side's ``REGEX_KEYWORDS``; the two are two
+#: copies of one fact and that is tracked, but a copy that DISAGREES is the defect this closes.
+_JS_KEYWORD_TAIL = re.compile(r"(?:^|[^.\w$])(" + "|".join(JS_REGEX_KEYWORDS) + r")\s*$")
+
+
+def _js_resolve_regex_start(prev: str, code_text: str = "") -> str:
     """TOOL-aPairedLexer-12: is a ``/`` at this position a REGEX start, or division?
 
     Same conservative rule the JavaScript side states: a regex is recognised only after a token
@@ -428,10 +437,14 @@ def _js_resolve_regex_start(prev: str) -> str:
         return "y"  # start of input
     if prev in "})]":
         return ""
-    if prev.isalnum() or prev in "_$":
-        return ""
     if prev in "\"'`":
         return ""
+    if prev.isalnum() or prev in "_$":
+        # Only an IDENTIFIER position can carry a keyword tail. Without this clause the Python
+        # side read ``return /re/`` as DIVISION while the JavaScript side read it as a regex —
+        # and the docstring claimed the two rules were the same. Measured: it invented a GHOST
+        # symbol into the committed map and lost a real export.
+        return "y" if _JS_KEYWORD_TAIL.search(code_text) else ""
     return "y"
 
 
@@ -483,7 +496,7 @@ def render_comment_free(text: str) -> str:
             i = j + 2
             continue
         ch = text[i]
-        if ch == "/" and _js_resolve_regex_start(prev):
+        if ch == "/" and _js_resolve_regex_start(prev, "".join(out)[-120:]):
             # A regex literal. Consume it WHOLE and emit it verbatim, exactly as a string is
             # emitted, so a backtick, quote or comment opener inside it cannot open anything. That
             # is what stops a phantom template span forming: without it, a regex-borne backtick

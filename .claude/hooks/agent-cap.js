@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.12' // gov:kit agent-cap@1.12 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.13' // gov:kit agent-cap@1.13 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -295,18 +295,40 @@ const REGEX_KEYWORDS = ['return', 'typeof', 'case', 'in', 'instanceof', 'new', '
 // the next, which is legal JavaScript. The leading alternative is start of INPUT, not start of line.
 const KEYWORD_TAIL = new RegExp('(?:^|[^.\\w$])(' + REGEX_KEYWORDS.join('|') + ')\\s*$')
 
+// `++` and `--` are the only expression-enders whose LAST CHARACTER escapes every clause below:
+// `prev` is `+`, nothing matches, and the fall-through opened a phantom span over live code.
+// Measured: `const y = i++ / 2, z = await parallel(D.map(f)) / 3` ADMITTED while `i + 1 / 2` denied.
+const POSTFIX_TAIL = /(\+\+|--)\s*$/
+
+// The tokens the four rules hunt. A REGEX BODY holding one is a span this file must not blank
+// silently — see the wrong-accept guard at each consumption site. Kept as ONE list because two
+// copies of the hunted set is the defect this build spent a unit removing.
+const SWALLOW_GUARD = /\b(?:bounded)?(?:parallel|pipeline)\s*\(|\bagent\s*\(|\.ref\b/
+
+// ORDER IS LOAD-BEARING HERE, and testing the keyword tail FIRST was a measured fail-open. The
+// running `codeText` is fed only on the code fall-through, so a CONSUMED LITERAL never reaches it:
+// after `return "a"` the text still ends `return `, the keyword clause matched, and it overrode the
+// closing-quote clause below — which was therefore unreachable for the one shape it was added for.
+// `return "a" / await parallel(...) / 2` ADMITTED; the keyword-free control denied.
+//
+// So the unambiguous expression-enders win first, and the keyword test is gated on the IDENTIFIER
+// position, which is the only one that can carry a keyword tail.
+//
+// Every clause here was a measured fail-open before it existed. `'})]'.includes('')` is TRUE, so an
+// empty `prev` made start of input a DIVISION position and took every rule dark on a script whose
+// first token was a regex. A closing bracket, an identifier and a number all END an expression. So
+// does a closing QUOTE — without that clause `const x = "a" / 2; await parallel(D.map(f))` consumed
+// the primitive inside a phantom regex. And so does `/`, which closes a REGEX LITERAL: that is a
+// primary expression, both scanners set `prev = '/'` there, and omitting it read the NEXT slash as a
+// regex start where JavaScript reads division.
 function resolveRegexStart(prev, codeText) {
-  // A keyword that cannot end an expression — but not one used as a PROPERTY NAME. `obj.in`,
-  // `x.of`, `m.delete`, `p.new` and `r.case` are legal member accesses.
-  if (KEYWORD_TAIL.test(codeText)) return true
-  if (prev === '') return true // start of input. `'})]'.includes('')` is TRUE, which made this a
-  // DIVISION position and took the whole hook dark on any script whose first token was a regex.
-  if ('})]'.includes(prev)) return false // a closing bracket ends an expression
-  if (/[A-Za-z0-9_$]/.test(prev)) return false // an identifier or a number ends an expression
-  if (prev === '"' || prev === "'" || prev === '`') return false // a closing QUOTE ends one too:
-  // without this, `const x = "a" / 2; await parallel(D.map(f)); const y = "b" / 3` consumed the
-  // primitive inside a phantom regex literal and ADMITTED. No slash is declined on that line, so no
-  // decline signal could ever have reached it. Measured.
+  if (prev === '') return true // start of input
+  if ('})]/'.includes(prev)) return false // closing bracket, or the close of a regex literal
+  if (prev === '"' || prev === "'" || prev === '`') return false // a closing quote
+  if (POSTFIX_TAIL.test(codeText)) return false // `i++ / 2` is division
+  // Only an identifier position can be a keyword tail, and a keyword used as a PROPERTY NAME is not
+  // a keyword: `obj.in`, `x.of`, `m.delete`, `p.new` and `r.case` are legal member accesses.
+  if (/[A-Za-z0-9_$]/.test(prev)) return KEYWORD_TAIL.test(codeText)
   return true
 }
 
@@ -378,7 +400,20 @@ function renderCodeView(script) {
             else if (c === '/' && !cls) { closed = true; break }
             j++
           }
-          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
+          if (closed) {
+            // THE WRONG-ACCEPT GUARD. `checkDeclinedSpan` is wired only behind a DECLINE, so a
+            // wrongly ACCEPTED slash could never raise `dirty`: a wrong decline was signalled and
+            // a wrong accept was silent. FOUR of the five fail-opens the closing review measured
+            // were wrong accepts, and every one reported `clean:true` to all four rules.
+            //
+            // A regex body is a PATTERN, so it has no business holding the exact tokens the four
+            // rules hunt. If a span this scanner is about to blank contains one, the acceptance is
+            // almost certainly wrong. This fires on positions nobody predicted, which is the
+            // property an enumerated clause set structurally cannot have — and the clause set has
+            // now been wrong five times.
+            if (SWALLOW_GUARD.test(raw.slice(i, j + 1))) dirty = true
+            res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue
+          }
           // Unterminated on its line: not a regex after all, fall through as ordinary punctuation.
         }
         if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
@@ -750,7 +785,20 @@ function blankLiterals(script) {
             else if (c === '/' && !cls) { closed = true; break }
             j++
           }
-          if (closed) { res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue }
+          if (closed) {
+            // THE WRONG-ACCEPT GUARD. `checkDeclinedSpan` is wired only behind a DECLINE, so a
+            // wrongly ACCEPTED slash could never raise `dirty`: a wrong decline was signalled and
+            // a wrong accept was silent. FOUR of the five fail-opens the closing review measured
+            // were wrong accepts, and every one reported `clean:true` to all four rules.
+            //
+            // A regex body is a PATTERN, so it has no business holding the exact tokens the four
+            // rules hunt. If a span this scanner is about to blank contains one, the acceptance is
+            // almost certainly wrong. This fires on positions nobody predicted, which is the
+            // property an enumerated clause set structurally cannot have — and the clause set has
+            // now been wrong five times.
+            if (SWALLOW_GUARD.test(raw.slice(i, j + 1))) dirty = true
+            res += ' '.repeat(j - i + 1); prev = '/'; i = j + 1; continue
+          }
         }
         if (ch === '`') { mode = 'tmpl'; res += '`'; prev = '`'; i++; continue }
         if (ch === "'" || ch === '"') {
@@ -804,10 +852,22 @@ function blankLiterals(script) {
 // it returns null, the rule denies for "never closes its parens", and that denial is green while
 // observing nothing. S2b: a call site the paren-safe view cannot show AT ALL is a DENY naming the
 // ambiguity, never a dropped finding.
-function readJoinAt(joinView, i, needle) {
+// The ORDINAL is required, not decorative. The callers loop every occurrence of a helper on a
+// line; resolving with a bare `indexOf` re-read the FIRST call for each of them, so a second call
+// carrying an over-cap bound was never read at all. Measured: `[bounded(A, 5), bounded(B, 500)]`
+// on one line ADMITTED, while the same two calls on separate lines denied.
+//
+// If the join view holds FEWER occurrences than the detection view, that is the S2b case applied
+// per-occurrence instead of per-line, and it stays fail-closed.
+function readJoinAt(joinView, i, needle, ordinal) {
   const line = joinView[i] === undefined ? '' : joinView[i]
-  const at = line.indexOf(needle)
-  if (at < 0) return { ambiguous: true }
+  let at = -1
+  let from = 0
+  for (let k = 0; k <= ordinal; k++) {
+    at = line.indexOf(needle, from)
+    if (at < 0) return { ambiguous: true }
+    from = at + 1
+  }
   const j = joinCall(joinView, i, at + needle.length - 1)
   return j ? { j } : { ambiguous: true }
 }
@@ -894,7 +954,7 @@ function capFindings(script) {
   code.forEach((l, i) => {
     const d = /\bfunction\s+(boundedParallel|boundedPipeline)\s*\(/.exec(l)
     if (!d) return
-    const h = readJoinAt(joinView, i, d[0])
+    const h = readJoinAt(joinView, i, d[0], l.slice(0, d.index).split(d[0]).length - 1)
     if (h.ambiguous) {
       bad.push({ n: i + 1, line: lines[i], why: `the ${d[1]}() DEFINITION cannot be read in the paren-safe view, so its default parameter is unresolvable — a definition this hook cannot parse is not one it may approve` })
       return
@@ -919,7 +979,7 @@ function capFindings(script) {
     while ((m = HELPERS.exec(l))) {
       if (/\bfunction\s+$/.test(l.slice(0, m.index))) continue // a definition — S2 judged it
       const name = m[1]
-      const h = readJoinAt(joinView, i, m[0])
+      const h = readJoinAt(joinView, i, m[0], l.slice(0, m.index).split(m[0]).length - 1)
       if (h.ambiguous) {
         bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE cannot be read in the paren-safe view — either it never closes its parens, or a mis-lexed span blanked it — so the cap argument is unresolvable, and a call this hook cannot parse is not a call it may approve` })
         continue

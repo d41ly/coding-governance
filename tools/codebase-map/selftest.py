@@ -1378,9 +1378,28 @@ def test_render_comment_free_corpus_is_unchanged():
             for mm in rx.finditer(stripped):
                 seen.add((f, mm.group(1)))
 
-    # The count is DERIVED, never typed beside the thing it counts: the assertion is that the pass
-    # finds definitions in this corpus at all, which is what a silent over-strip would destroy.
-    assert len(seen) > 50, f"the definition probe collapsed over the tracked corpus: {len(seen)}"
+    # THE ASSERTION IS A COMPARISON, not a floor. `len(seen) > 50` over a corpus of 103 is a check
+    # that cannot fail, which is the exact shape this build spent five review rounds removing —
+    # and it shipped here, in the arm written to catch that shape. The closing review caught it.
+    #
+    # The corpus is compared against the SAME pass run with the regex model disabled, so the arm
+    # fails if modelling regexes changes this repo's symbol set in either direction. That is the
+    # eight-definition regression the docstring records, made runnable instead of remembered.
+    unmodelled = set()
+    real = m._js_resolve_regex_start
+    try:
+        m._js_resolve_regex_start = lambda prev, code_text="": ""
+        for f in files:
+            stripped = m.render_comment_free(Path(f).read_text(encoding="utf-8"))
+            for rx, _kind in m.JS_DEFINITION_RULES:
+                for mm in rx.finditer(stripped):
+                    unmodelled.add((f, mm.group(1)))
+    finally:
+        m._js_resolve_regex_start = real
+    assert seen == unmodelled, (
+        "modelling regex literals moved this repo's own symbol set: "
+        f"lost {sorted(unmodelled - seen)[:5]}, gained {sorted(seen - unmodelled)[:5]}"
+    )
 
 def test_render_comment_free():
     """TOOL-aPairedLexer-3: comments blanked in ONE pass, strings TRACKED but not blanked, line

@@ -1340,6 +1340,80 @@ const groups = chunk(args.findings, Math.ceil(args.findings.length / K)) // gov:
 const r = await boundedParallel(groups.map((g) => () => agent(g)), 5)
 EOF
 
+
+# ---- the closing review's five blockers, each a measured ADMIT this file had to deny -------------
+# All five were wrong ACCEPTS of a slash as a regex start, and four of them reported clean:true to
+# every rule — `checkDeclinedSpan` is wired only behind a DECLINE, so a wrong accept was silent
+# while a wrong decline was signalled. The guard at each regex-consumption site closes that
+# asymmetry: a span about to be blanked that contains a token the rules HUNT sets `dirty`. That
+# fires on positions nobody predicted, which is the property an enumerated clause set cannot have —
+# and this clause set has now been wrong five times.
+
+# -- B1: readJoinAt resolved the FIRST occurrence, so a second call's cap was never read ----------
+js "rule3: the SECOND helper call on a line has its cap read" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap) out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
+  return out
+}
+const r = [await boundedParallel(A.map((x) => () => work(x)), 5), await boundedParallel(B.map((x) => () => work(x)), 500)]
+EOF
+
+js "rule3: the same two calls on separate lines (control)" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap) out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
+  return out
+}
+const a = await boundedParallel(A.map((x) => () => work(x)), 5)
+const b = await boundedParallel(B.map((x) => () => work(x)), 500)
+EOF
+
+# -- B2: a keyword tail SURVIVED a consumed literal, overriding the closing-quote clause ----------
+# `codeText` is fed only on the code fall-through, so after `return "a"` it still ended `return `.
+# The clause added for exactly this shape sat below the keyword test and was unreachable.
+js "rule1: a keyword before a STRING does not make the next slash a regex" 2 <<'EOF'
+async function go() {
+  return "a" / await parallel(D.map((x) => () => agent(x))) / 2
+}
+EOF
+
+js "rule1: the same line without the keyword (control)" 2 <<'EOF'
+const z = "a" / await parallel(D.map((x) => () => agent(x))) / 2
+EOF
+
+# -- B3: `prev = '/'` after a regex literal or a block-comment close fell through to `return true` -
+js "rule1: a slash after a BLOCK COMMENT close is division" 2 <<'EOF'
+const n = items.length /* how many */ / 2 + (await parallel(items.map((f) => () => agent(f)))).length / 3
+EOF
+
+js "rule1: a slash after a REGEX LITERAL is division" 2 <<'EOF'
+const n = /a/ / 2 + (await parallel(items.map((f) => () => agent(f)))).length / 3
+EOF
+
+# -- H2: the postfix operators were the only expression-enders escaping every clause --------------
+js "rule1: i++ ends an expression, so the next slash is division" 2 <<'EOF'
+const y = i++ / 2, z = await parallel(D.map((f) => () => agent(f))) / 3
+EOF
+
+js "rule1: i + 1 on the same shape (control)" 2 <<'EOF'
+const y = i + 1 / 2, z = await parallel(D.map((f) => () => agent(f))) / 3
+EOF
+
+# -- the DECLARED-LEGAL shapes, which none of the five fixes may break ----------------------------
+js "rule2: the gov:fixed-verifiers idiom still admits after the clause reorder" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const all = [1,2,3]
+const groups = chunk(all, Math.ceil(all.length / MAX_VERIFIERS)) // gov:fixed-verifiers
+await boundedParallel(groups.map((g) => () => agent(g)), 5)
+EOF
+
+js "rule1: a real return-position regex is still blanked" 2 <<'EOF'
+function isFence(l) { return /^```/.test(l) }
+await parallel(D.map((d) => () => agent(d)))
+function isEnd(l) { return /```$/.test(l) }
+EOF
+
 # ---- version parity: a DENY may never become an ADMIT across a kit version -----------------------
 # THREE consecutive revisions of this hook shipped a fail-open, and every one was a script the
 # PREVIOUS version denied and the new one admitted. Each was caught by a review, never by this suite,

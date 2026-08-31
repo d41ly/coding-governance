@@ -34,3 +34,5 @@ base: 72dff924d77c5a482a01150141da31e4bdd52334
 2026-08-30T23:43:31Z review · item spec-audit-6-through-12 · reason verdict BLOCKED · blockers 4
 
 2026-08-31T02:42:44Z review · item spec-audit-6-through-12 · reason verdict BLOCKED · blockers 5 · NON-CONVERGENT
+
+2026-08-31T04:23:27Z review · item promoted-units-6-through-12 · reason verdict BLOCKED · blockers 5
