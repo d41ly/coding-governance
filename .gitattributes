@@ -6,6 +6,7 @@
 
 # The gate leg manifest is runtime-read by run-gates.sh (a stray CR would corrupt leg names/argv).
 tools/gate-legs.json text eol=lf
+tools/gate-legs.toml text eol=lf
 
 # Settings fragments are parsed by `sed` in check-wiring.sh, whose bracket-negated capture would
 # take a trailing CR into the value: a matcher of `Bash|PowerShell<CR>` matches nothing and the arm

@@ -1,0 +1,1075 @@
+# gate-legs.toml — the merge bar, DECLARED. One file: defaults, profiles, lanes, legs.
+#
+# Generated once from tools/gate-legs.json and tools/run-gates/gate-profiles.txt by the
+# aGatheredDeclaration build, then AUTHORED from here on. It replaces both. Every number below
+# may carry the argument for itself on the line above it, which is the whole reason this is not
+# JSON: the file it replaces held a 1.4 KB _doc STRING and a ceiling_over_policy OBJECT in an
+# adopter tree, both of them comments with nowhere to go.
+#
+# NEEDS CPython 3.11+ to be read at all — tomllib entered the stdlib there. Below that the
+# runner reads the legacy pair and says so on stderr; it does not exit.
+#
+# THE GOVERNING INVARIANT, carried verbatim from gate-profiles.txt: no knob here may ever turn a
+# leg into a PASS or a SKIP. A knob may make the bar slower, and it may turn an unbounded hang
+# into a bounded RED. It may never make the bar check less.
+
+[bar]
+# OWNER OPT-IN, default false. A ceiling KILLS a leg before it can answer, so enforcement OFF
+# produces strictly more evidence than a ceiling that fired. An adopter measured a leg killed at
+# 2041 s against a 2040 s ceiling — by one second, on a bound already raised from a measurement
+# that was 3.07x low. GATE_CEILINGS=0|1 overrides per machine.
+enforce_ceilings = false
+# What a leg inheriting no ceiling takes. DECLARATION stays expected; enforcement is the opt-in
+# above. Also the fallback the profile row's retired timeout= knob used to supply.
+default_ceiling = 1800
+# OWNER OPT-IN, default false. The turnstile serialises one bar per repository and therefore
+# enqueues parallel pushes behind each other; one killed bar once wedged a landing for 6858 s
+# behind three dead tickets. It FAILS OPEN by design, so off is a state it already reaches on
+# its own whenever its bounded wait expires. GATE_TURNSTILE=1 turns it on.
+turnstile = false
+# The turnstile's holder TTL, declared directly. It used to be derived as three times the
+# profile row's timeout= knob, which this file retires; run-gates.sh:431 names setting that knob
+# as the prescribed fix for a leg reaped mid-run, so the value survives as a key rather than
+# disappearing with the knob. GATE_TURNSTILE_TTL overrides.
+turnstile_ttl = 1800
+
+# ------------------------------------------------------------------------------------------------
+# PROFILES — the declared knob table, keyed by detected hardware. Rows are ordered
+# MOST-CAPABLE-FIRST and the FIRST row whose BOTH thresholds are satisfied wins; the last row is
+# a zero-threshold catch-all, so unknown hardware lands there by ordinary threshold matching
+# rather than by a special case. GATE_PROFILE=<name> selects a row and skips detection.
+# GATE_CORES / GATE_RAM_MB replace the detected readings.
+#
+# The timeout= knob does NOT travel. All three rows declared timeout=0, so the profile-level
+# bound was already off everywhere — but the argument for removing it is its CONSUMERS, not that
+# reading: run-gates.sh:434 derived the turnstile TTL from it and :1104 used it as the per-leg
+# fallback. Both are now [bar] keys above.
+
+# gate-profiles.txt — the runner's knobs, DECLARED, keyed by detected hardware.
+#
+# GRAMMAR: `<name>\t<min cores>\t<min RAM MB>\t<comma-joined knobs>` per row. Comments carry the
+# justification for a threshold and every movement of it, because a number with no history beside it
+# is a number nobody can question. Modelled on `tools/template-size-limits.txt`, which is this tree's
+# settled answer to the same problem — a declared value read with `awk -F'\t'` and argued in place.
+#
+# SELECTION: rows are ordered MOST-CAPABLE-FIRST and the FIRST row whose BOTH thresholds are
+# satisfied wins. The last row is a zero-threshold catch-all, so an unknown-hardware run lands there
+# by ordinary threshold matching — one selection mechanism, no special case.
+#
+# THE GOVERNING INVARIANT: no knob here may ever turn a leg into a PASS or a SKIP. A knob may make
+# the bar slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar
+# check less. The runner declares the set it implements; the canary PINS the same set separately, so
+# a new knob cannot be added without an author reading this paragraph.
+#
+# KNOBS:
+#   width=<n>    the worker-pool width. `GATE_JOBS` overrides it — width ONLY: the row is still
+#                selected and still supplies every other knob.
+#   timeout=<s>  a per-leg wall-clock bound, 0 = off. A timeout that fires produces a RED naming its
+#                leg, never a skip and never a green: it converts a hang into a verdict AND returns
+#                the worker to the pool. The second half is not free — the first landing of this
+#                knob captured the leg through a pipe, so an orphaned grandchild held it open and
+#                the bound applied to the verdict alone: 51.4 s measured against a 1 s bound. The
+#                runner now captures through a file and adds a kill-after, and the canary grades
+#                the elapsed time against an untimed control rather than the message.
+#
+# OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
+# points at a different table; a path that does not exist falls back to the built-in formula, which
+# is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
+# leaves every other knob of the selected row in force.
+#
+# THE READINGS themselves have overrides too, and they are the escape hatch when detection is wrong:
+# `GATE_CORES=<n>` and `GATE_RAM_MB=<mb>` replace what the chain would find and BYPASS it entirely —
+# a seam is never capped by the cgroup source below, or the operator could not raise a number.
+# `GATE_CGROUP_ROOT=<dir>` relocates the cgroup files the RAM chain reads, which is how a fixture
+# drives the container path on a host that is not in one.
+# --- 8+ cores AND a RAM class that can hold the width ---------------------------------------------
+# 24000 MB, and cores alone are the wrong question: each heavy leg builds its OWN `mktemp -d` scratch
+# repo, so width 8 means up to eight scratch git repos and eight interpreters resident at once. The
+# threshold sits BELOW 32 GB deliberately — the honest distinction is a RAM class, not an exact
+# figure, and a 16-core / 8 GB VM selecting this row is the thrash this table exists to stop.
+# Width 8 is MEASURED, not guessed: at 16 each leg dilates under load faster than the extra worker
+# repays. Node `a` (16 cores, 32693 MB) selects this row, so its behaviour does not move.
+[[profile]]
+name = "capable"
+min_cores = 8
+min_ram_mb = 24000
+width = 8
+
+# --- the 4-core class ------------------------------------------------------------------------------
+# Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
+# 4-core width in the same unit that introduces the table would confound the one measurement that
+# matters, and a knob whose first landing is also its first behaviour change has no control. This
+# row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
+# low-RAM box falls to.
+[[profile]]
+name = "modest"
+min_cores = 4
+min_ram_mb = 0
+width = 4
+
+# --- the catch-all, and the detection-failure row --------------------------------------------------
+# Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
+# slow, not serial-only. Removing this row is an operator error and the runner refuses rather than
+# silently falling through to the built-in formula: absent and unmatchable are different states and
+# only one of them is a mistake.
+[[profile]]
+name = "minimal"
+min_cores = 0
+min_ram_mb = 0
+width = 2
+
+# ------------------------------------------------------------------------------------------------
+# LANES — declared here, IMPLEMENTED by TOOL-aGatheredDeclaration-8. Lanes run in DECLARATION
+# order; a lane declaring short_circuit = true skip-marks every later lane without launching it.
+# Gov declares exactly ONE lane and every leg is in it, so this migration changes no behaviour:
+# same legs, same held set, same single pool. Assigning legs to lanes is a later unit that reads
+# <git-dir>/gate-ledger.tsv, because a knob whose first landing is also its first behaviour
+# change has no control.
+
+[[lane]]
+name = "heavy"
+concurrency = "profile"   # take the selected profile row's width
+short_circuit = false
+
+# ------------------------------------------------------------------------------------------------
+# LEGS. opt_in = true means the leg is HELD unless asked for with GATE_OPTIN=1 (GATE_SELFTESTS=1
+# remains an accepted alias). It replaces the subject/chunk pair the JSON used: the shipped
+# predicate held a leg when subject was kit OR chunk was selftests, and mapping subject alone
+# would have silently un-held six legs — including both run-gates canaries — reverting the owner
+# ruling of 2026-08-26. The union is what travels.
+#
+# full_only is validated and SELECTS NOTHING. It is retained because an adopter declares it on
+# four rows and the upgrader needs one source to follow; gov has none.
+#
+# A guard names what the leg READS. A leg with no guard runs on every bar. A ceiling is DECLARED
+# on every leg and ENFORCED only when [bar].enforce_ceilings or GATE_CEILINGS says so; one
+# exceeding default_ceiling carries the reason above it.
+
+[[leg]]
+name = "kickoff-manifest ratchet"
+argv = ["bash", "skills/session-kickoff/manifest-check.sh"]
+chunk = "records"
+lane = "heavy"
+opt_in = false
+ceiling = 640
+guard = []
+
+[[leg]]
+name = "template size <=48KiB"
+argv = ["bash", "tools/check-template-size.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "charter size"
+argv = ["bash", "tools/check-template-size.sh", "AGENTS.md"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "micro-format definitions"
+argv = ["bash", "tools/check-microformats.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 650
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "micro-format gate selftest"
+argv = ["bash", "tools/check-microformats.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 560
+guard = ["tools/check-microformats.sh", "tools/check-microformats.test.sh"]
+
+[[leg]]
+name = "line length"
+argv = ["bash", "tools/check-line-length.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "line-length gate selftest"
+argv = ["bash", "tools/check-line-length.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 930
+guard = ["tools/check-line-length.sh", "tools/check-line-length.test.sh"]
+
+[[leg]]
+name = "playbook parity"
+argv = ["bash", "tools/check-playbook-parity.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 560
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "playbook parity selftest"
+argv = ["bash", "tools/check-playbook-parity.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1380
+guard = ["tools/check-playbook-parity.sh", "tools/check-playbook-parity.test.sh", "tools/playbook-kit-waivers.txt"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "template size gate selftest"
+argv = ["bash", "tools/check-template-size.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 710
+guard = []
+
+[[leg]]
+name = "kickoff engine size <=18KiB"
+argv = ["bash", "tools/check-template-size.sh", "skills/session-kickoff/SKILL.md"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "kit version markers"
+argv = ["bash", "tools/check-kit-versions.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 660
+guard = []
+
+[[leg]]
+name = "verdict epoch (kit version dates the engine)"
+argv = ["bash", "tools/memory-tree/check-verdict-epoch.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "verdict-epoch self-test"
+argv = ["bash", "tools/memory-tree/check-verdict-epoch.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1130
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+[[leg]]
+name = "agent-instructions wiring"
+argv = ["bash", "tools/agent-instructions/adopt-agent-instructions.sh", "--check", "--aliases", "claude"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 4370s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "manifest-check self-test"
+argv = ["bash", "skills/session-kickoff/manifest-check.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 4370
+guard = ["skills/session-kickoff/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "python resolver (behaviour + inline parity + idiom ban)"
+argv = ["bash", "tools/lib/resolve-python.test.sh"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = true
+ceiling = 350
+guard = ["tools/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "agent-cap self-test"
+argv = ["bash", "tools/hooks/agent-cap.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 740
+guard = ["tools/hooks/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "scratch-guard self-test"
+argv = ["bash", "tools/hooks/scratch-guard.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 490
+guard = ["tools/hooks/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "agent-instructions self-test"
+argv = ["bash", "tools/agent-instructions/adopt-agent-instructions.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 330
+guard = ["tools/agent-instructions/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 6590s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "memory-hygiene self-test"
+argv = ["bash", "tools/memory-tree/check-memory-hygiene.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 6590
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2750s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "row-keyed merge driver replay"
+argv = ["bash", "tools/memory-tree/merge-rows.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2750
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+[[leg]]
+name = "kit/dogfood doc parity"
+argv = ["bash", "tools/memory-tree/kit-dogfood-parity.test.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = ["memory/HYGIENE.md", "memory/TEMPLATE-SPEC.md", "memory/guides/BUILD-METHOD.md", "tools/lib/", "tools/memory-tree/"]
+
+[[leg]]
+name = "method carriers (every pointer declared)"
+argv = ["bash", "tools/memory-tree/check-method-carriers.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 1230
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "method-carriers self-test"
+argv = ["bash", "tools/memory-tree/check-method-carriers.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 460
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "build-index selftest"
+argv = ["python3", "tools/memory-tree/gen_build_index.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 350
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+[[leg]]
+name = "build README slot contract"
+argv = ["python3", "tools/memory-tree/gen_build_index.py", "--check-format"]
+chunk = "records"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2690s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "corpus-ids selftest"
+argv = ["python3", "tools/memory-tree/corpus_ids.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2690
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "gotchas selftest"
+argv = ["python3", "tools/memory-tree/gotchas.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "row-grammar selftest"
+argv = ["python3", "tools/memory-tree/row_grammar.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+[[leg]]
+name = "harness arms (fail branches armed or pinned)"
+argv = ["python3", "tools/memory-tree/check-arms.py", "--check"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "check-arms selftest"
+argv = ["python3", "tools/memory-tree/check-arms.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/lib/", "tools/memory-tree/"]
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+[[leg]]
+name = "branch-guard self-test"
+argv = ["bash", ".githooks/pre-commit.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = [".githooks/", "tools/lib/"]
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+[[leg]]
+name = "pre-push self-test"
+argv = ["bash", ".githooks/pre-push.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1780
+guard = [".githooks/", "tools/lib/"]
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+[[leg]]
+name = "push-main self-test"
+argv = ["bash", "tools/push-main.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 580
+guard = [".githooks/", "tools/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2320s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "check-wiring self-test"
+argv = ["bash", "tools/check-wiring.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2320
+guard = [".claude/", "tools/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "verifier fan-out self-test"
+argv = ["bash", "tools/workflows/check-verifier-fanout.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/hooks/", "tools/lib/", "tools/workflows/"]
+
+[[leg]]
+name = "review-protocol parity (kit vs dogfood)"
+argv = ["bash", "tools/workflows/check-protocol-parity.test.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = ["memory/guides/REVIEW-PROTOCOL.md", "tools/lib/", "tools/workflows/"]
+
+[[leg]]
+name = "review-join ban (no ref-keyed join)"
+argv = ["bash", "tools/workflows/check-review-join.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "workflow script syntax"
+argv = ["node", "tools/workflows/check-workflow-syntax.js"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "tier2-review self-test"
+argv = ["bash", "tools/workflows/tier2-review.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1800
+guard = ["tools/workflows/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "review-join self-test"
+argv = ["bash", "tools/workflows/check-review-join.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/hooks/", "tools/lib/", "tools/workflows/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "pytest-guardrails self-test"
+argv = ["bash", "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/lib/", "tools/pytest-parallel-guardrails/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "codebase-map kit selftest"
+argv = ["python3", "tools/codebase-map/selftest.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/codebase-map/", "tools/lib/", "tools/lexicon/"]
+
+[[leg]]
+name = "codebase-map coverage + freshness"
+argv = ["python3", "tools/codebase-map/test_codebase_map.py"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "codebase-map adopter e2e"
+argv = ["bash", "tools/codebase-map/adopt-codebase-map.test.sh"]
+chunk = "e2e"
+lane = "heavy"
+opt_in = true
+ceiling = 540
+guard = ["tools/codebase-map/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "settings-merge selftest"
+argv = ["python3", "tools/settings-merge.py", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2730s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "memory-recall kit selftest"
+argv = ["python3", "tools/memory-recall/selftest.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2730
+guard = ["tools/lib/", "tools/memory-recall/"]
+
+[[leg]]
+name = "recall floor"
+argv = ["python3", "tools/memory-recall/check-recall.py"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = ["tools/memory-recall/", "memory/"]
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+[[leg]]
+name = "recall floor arms"
+argv = ["python3", "tools/memory-recall/test_recall_floor.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/memory-recall/", "memory/", "tools/govkit/"]
+
+[[leg]]
+name = "memory-recall skill wiring"
+argv = ["bash", "tools/memory-recall/adopt-memory-recall.sh", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2300s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "drift-audit selftest"
+argv = ["python", "tools/drift-audit/selftest.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2300
+guard = ["tools/drift-audit/", "tools/lib/"]
+
+[[leg]]
+name = "drift-audit wiring"
+argv = ["bash", "tools/drift-audit/adopt-drift-audit.sh", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "drift-audit records"
+argv = ["python", "tools/drift-audit/drift_report.py", "--check"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 540
+guard = []
+
+# IMPURE: its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote`
+# against the real origin to observe what the remote advertises, and fails closed when it
+# cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real
+# endpoint — the six other legs whose scripts name a network verb are self-tests that build
+# their origin under `mktemp -d`.
+# Ceiling 16040s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "unattended kit gate"
+argv = ["bash", "tools/unattended/check-unattended.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 16040
+guard = []
+impure = true
+
+# Ceiling 4940s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "playbook validity gate"
+argv = ["bash", "tools/unattended/check-playbook.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 4940
+guard = []
+
+[[leg]]
+name = "unattended skill wiring"
+argv = ["bash", "tools/unattended/adopt-unattended.sh", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+# Ceiling 13200s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "run-gates canary"
+argv = ["bash", "tools/run-gates/run-gates.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 13200
+guard = ["tools/", "tools/gate-legs.json", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 7040s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "run-gates evidence"
+argv = ["bash", "tools/run-gates/run-gates.evidence.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 7040
+guard = ["tools/", "tools/lib/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 8210s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "run-gates turnstile"
+argv = ["bash", "tools/run-gates/run-gates.turnstile.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 8210
+guard = ["tools/run-gates/", "tools/lib/"]
+
+# HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
+# running on every bar, which the 2026-08-26 owner ruling corrected.
+[[leg]]
+name = "run-gates gov canary"
+argv = ["bash", "tools/run-gates/run-gates.gov.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/run-gates/", "tools/gate-legs.json"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "run-gates adopter e2e"
+argv = ["bash", "tools/run-gates/adopt-run-gates.test.sh"]
+chunk = "e2e"
+lane = "heavy"
+opt_in = true
+ceiling = 460
+guard = ["tools/run-gates/"]
+
+[[leg]]
+name = "run-gates wiring"
+argv = ["bash", "tools/run-gates/adopt-run-gates.sh", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 1910s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "profile-bar selftest"
+argv = ["bash", "tools/run-gates/profile_bar.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1910
+guard = ["tools/run-gates/"]
+
+# Ceiling 2940s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "install-prefix (shipped surface)"
+argv = ["bash", "tools/check-install-prefix.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 2940
+guard = []
+
+[[leg]]
+name = "agent-cap restatement"
+argv = ["bash", "tools/check-agent-cap-restatement.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 640
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "agent-cap restatement self-test"
+argv = ["bash", "tools/check-agent-cap-restatement.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1100
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "install-prefix self-test"
+argv = ["bash", "tools/check-install-prefix.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 1670
+guard = ["tools/", "tools/lib/"]
+
+[[leg]]
+name = "dead-path carriers (deleted files still named)"
+argv = ["bash", "tools/check-dead-paths.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 430
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 2070s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "dead-path carriers self-test"
+argv = ["bash", "tools/check-dead-paths.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 2070
+guard = ["tools/"]
+
+[[leg]]
+name = "govkit selfcheck"
+argv = ["python", "tools/govkit/govkit.py", "selfcheck"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 310
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+# Ceiling 11750s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "govkit selftest"
+argv = ["python", "tools/govkit/selftest.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 11750
+guard = ["tools/govkit/"]
+
+[[leg]]
+name = "lexicon naming predicates"
+argv = ["python", "tools/lexicon/lexicon.py"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "lexicon selftest"
+argv = ["python", "tools/lexicon/selftest.py"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 880
+guard = ["tools/lexicon/"]
+
+[[leg]]
+name = "lexicon wiring"
+argv = ["bash", "tools/lexicon/adopt-lexicon.sh", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 330
+guard = []
+
+[[leg]]
+name = "playbook placeholder catalogue"
+argv = ["bash", "tools/check-placeholders.sh"]
+chunk = "product"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "placeholder-catalogue self-test"
+argv = ["bash", "tools/check-placeholders.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/check-placeholders.sh", "tools/check-placeholders.test.sh"]
+
+# Ceiling 12720s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "memory hygiene"
+argv = ["bash", "tools/memory-tree/check-memory-hygiene.sh"]
+chunk = "records"
+lane = "heavy"
+opt_in = false
+ceiling = 12720
+guard = []
+
+# Ceiling 1840s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "marker contracts"
+argv = ["bash", "tools/memory-tree/marker-contract.test.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 1840
+guard = []
+
+[[leg]]
+name = "verifier fan-out"
+argv = ["bash", "tools/workflows/check-verifier-fanout.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+[[leg]]
+name = "govkit refusal join"
+argv = ["python", "tools/govkit/refusal_join.py"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = ["tools/govkit/"]
+
+# Ceiling 7030s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
+# was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
+# re-measured by this migration.
+[[leg]]
+name = "govkit acceptance matrix"
+argv = ["python", "tools/govkit/matrix.py"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 7030
+guard = ["tools/govkit/", "tools/playbook/", "tools/check-microformats.sh", "tools/check-line-length.sh"]
+
+[[leg]]
+name = "testsuite counts (every bar self-test prints one)"
+argv = ["bash", "tools/check-testsuite-counts.sh"]
+chunk = "declarations"
+lane = "heavy"
+opt_in = false
+ceiling = 630
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "testsuite counts self-test"
+argv = ["bash", "tools/check-testsuite-counts.test.sh"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 350
+guard = []
+
+[[leg]]
+name = "playbook render wiring"
+argv = ["bash", "tools/playbook/adopt-playbook.sh", "--target", ".", "--check"]
+chunk = "wiring"
+lane = "heavy"
+opt_in = false
+ceiling = 300
+guard = []
+
+# HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
+# changes.
+[[leg]]
+name = "playbook render selftest"
+argv = ["bash", "tools/playbook/adopt-playbook.sh", "--selftest"]
+chunk = "selftests"
+lane = "heavy"
+opt_in = true
+ceiling = 300
+guard = ["tools/playbook/"]

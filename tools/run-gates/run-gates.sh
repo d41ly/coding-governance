@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.3   # gov:kit run-gates@1.3
+KIT_RUN_GATES_VERSION=1.4   # gov:kit run-gates@1.4
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -81,7 +81,36 @@ fails=0; n=0; skips=0; ondemands=0
 # resolves to nothing. Never compare path strings across flavours.
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
-LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+# THE DECLARATION, TOML first (TOOL-aGatheredDeclaration-2). `gate-legs.toml` wins where it exists
+# AND the resolved interpreter can import tomllib, which entered the stdlib at CPython 3.11. Below
+# that floor the LEGACY PAIR -- gate-legs.json together with gate-profiles.txt -- is read instead and
+# the runner SAYS SO, naming the interpreter and its version. It does not exit: this kit's whole
+# premise is that it travels with nothing, resolve-python.sh has never asserted a VERSION, and a
+# target whose python predates 3.11 must get a working bar rather than `No module named tomllib`
+# followed by exit 2 with ZERO legs run. That is the outcome kit.toml's own header says this kit was
+# made deployable to prevent.
+#
+# GATE_LEGS still outranks the derivation (the aPacedTurnstile build's spec set, S3); its format is
+# taken from the extension, so a harness can drive either path.
+_LEGS_DIR=$(dirname "$KITREL")
+HAVE_TOMLLIB=no
+"$PYBIN" -c 'import tomllib' 2>/dev/null && HAVE_TOMLLIB=yes
+LEGS_FMT=json
+if [ -n "${GATE_LEGS:-}" ]; then
+  LEGS_FILE="$GATE_LEGS"
+  case "$LEGS_FILE" in *.toml) LEGS_FMT=toml ;; esac
+elif [ -f "$ROOT/$_LEGS_DIR/gate-legs.toml" ] && [ "$HAVE_TOMLLIB" = yes ]; then
+  LEGS_FILE="$_LEGS_DIR/gate-legs.toml"; LEGS_FMT=toml
+else
+  LEGS_FILE="$_LEGS_DIR/gate-legs.json"
+fi
+if [ "$LEGS_FMT" = json ] && [ -f "$ROOT/$_LEGS_DIR/gate-legs.toml" ] && [ "$HAVE_TOMLLIB" != yes ]; then
+  echo "run-gates: $_LEGS_DIR/gate-legs.toml is present but $PYBIN ($("$PYBIN" -c 'import sys;print(sys.version.split()[0])' 2>/dev/null || echo 'version unknown')) cannot import tomllib, which needs CPython 3.11+ -- reading the legacy pair ($_LEGS_DIR/gate-legs.json + $KITREL/gate-profiles.txt) instead" >&2
+fi
+if [ "$LEGS_FMT" = toml ] && [ "$HAVE_TOMLLIB" != yes ]; then
+  echo "run-gates: GATE_LEGS names a .toml file but $PYBIN cannot import tomllib (needs CPython 3.11+)" >&2
+  exit 2
+fi
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
@@ -845,12 +874,67 @@ TREE_CLEAN=no
 # Command-substitution surfaces a parse failure (a `< <()` process-sub would swallow it).
 legs=$("$PYBIN" -c '
 import json, os, sys
+# TWO FORMATS, ONE normalised shape. The TOML branch resolves every default HERE so the emitter
+# below and the dispatcher beneath it never learn there were two. `bar` carries the declaration-level
+# defaults; it may be absent entirely and every key in it is DEFAULTED, because "opt-in, default off"
+# means an absent key is the off state and a refusal on its absence would contradict it.
+BAR = {}
+path = sys.argv[1]
 try:
-    data = json.load(open(sys.argv[1]))
+    if path.endswith(".toml"):
+        import tomllib
+        doc = tomllib.load(open(path, "rb"))
+        BAR = doc.get("bar") or {}
+        if not isinstance(BAR, dict):
+            sys.stderr.write("[bar] is not a table\n"); sys.exit(3)
+        if not doc.get("profile"):
+            sys.stderr.write("%s declares no [[profile]] row\n" % path); sys.exit(3)
+        lanes = {l.get("name") for l in (doc.get("lane") or [])}
+        dflt = BAR.get("default_ceiling")
+        data = []
+        for l in (doc.get("leg") or []):
+            unknown = set(l) - {"name", "argv", "cwd", "chunk", "lane", "opt_in", "ceiling",
+                                "guard", "impure", "tool", "full_only"}
+            if unknown:
+                sys.stderr.write("leg %r declares unknown key(s): %s\n"
+                                 % (l.get("name"), ", ".join(sorted(unknown)))); sys.exit(3)
+            ln = l.get("lane", "heavy")
+            if lanes and ln not in lanes:
+                sys.stderr.write("leg %r names lane %r, which no [[lane]] row declares\n"
+                                 % (l.get("name"), ln)); sys.exit(3)
+            for k in ("opt_in", "impure", "full_only"):
+                if k in l and not isinstance(l[k], bool):
+                    sys.stderr.write("leg %r: %s must be a boolean\n" % (l.get("name"), k)); sys.exit(3)
+            data.append({"name": l.get("name"), "argv": l.get("argv"),
+                         "guard": l.get("guard", []), "impure": l.get("impure", False),
+                         "chunk": l.get("chunk", ""),
+                         # Field 6 is `subject` and TOML DECLARES NONE, so it is emitted EMPTY
+                         # rather than invented. Deriving it from `opt_in` was tried and is wrong:
+                         # the six legs whose subject is `repo` and whose chunk is `selftests` are
+                         # genuinely tests of THIS REPOSITORY, and calling them `kit` because they
+                         # are held would put a false answer in the field to make a parity diff
+                         # smaller. The field has ONE reader, the hold predicate, and field 8
+                         # replaced it. Kept on the wire so nothing downstream shifts position.
+                         "subject": "",
+                         # THE HOLD, resolved to ONE field. In TOML `opt_in` is authoritative and the
+                         # chunk name decides nothing, which is the point of the key: an adopter with
+                         # a `selftests` chunk they want on the bar gets what they declared.
+                         "opt_in": bool(l.get("opt_in")),
+                         "ceiling": l.get("ceiling") if l.get("ceiling") else dflt})
+    else:
+        data = json.load(open(path))
+        for l in data:
+            if isinstance(l, dict):
+                # The JSON hold is the UNION the shipped predicate implements: subject == kit OR
+                # chunk == selftests. Mapping `subject` alone would silently un-hold six legs,
+                # including both run-gates canaries, reverting the owner ruling of 2026-08-26.
+                l["opt_in"] = (l.get("subject") == "kit") or (l.get("chunk") == "selftests")
+except SystemExit:
+    raise
 except Exception as e:
     sys.stderr.write("parse error: %s\n" % e); sys.exit(3)
 if not isinstance(data, list) or not data:
-    sys.stderr.write("gate-legs.json empty or not a list\n"); sys.exit(3)
+    sys.stderr.write("%s empty or declares no legs\n" % path); sys.exit(3)
 durs = {}
 cache = sys.argv[2] if len(sys.argv) > 2 else ""   # argv[1] is the MANIFEST; the cache is argv[2]
 if cache and os.path.exists(cache):
@@ -896,18 +980,23 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
          # leg whose declaration was malformed.
          + "\x1e" + (str(l["ceiling"]) if isinstance(l.get("ceiling"), int)
                             and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
+         # THE EIGHTH FIELD, appended for the same reason the sixth and seventh were: a field
+         # inserted before an existing one is parsed AS that one by any reader not moved in the same
+         # commit. It is the RESOLVED hold -- the union for JSON, the declared key for TOML -- so the
+         # dispatcher asks one question of one field instead of re-deriving a two-armed predicate.
+         + "\x1e" + ("1" if l.get("opt_in") else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); optins=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce oi <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); optins+=("${oi:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -944,8 +1033,12 @@ for ((i=0; i<total; i++)); do
   # `GATE_SELFTESTS=1` remains the way to ask for it. The push boundary is where it matters, and
   # `.githooks/pre-push` decides there against a recorded green whose `selftests` key says whether
   # the recorded run had them held.
-  if { [ "${subjects[$i]}" = kit ] || [ "${chunks[$i]}" = selftests ]; } \
-     && [ -z "${GATE_SELFTESTS:-}" ]; then
+  # ONE resolved field, one question. The loader computes it for BOTH formats -- the
+  # subject/chunk UNION for JSON, the declared `opt_in` key for TOML -- so this predicate no longer
+  # re-derives a two-armed rule a manifest could disagree with. GATE_OPTIN is the spelling and
+  # GATE_SELFTESTS is its accepted alias; both reach the run record identically
+  # (TOOL-aGatheredDeclaration-2 S7), because .githooks/pre-push gates a predicate on that byte.
+  if [ "${optins[$i]}" = 1 ] && [ -z "${GATE_OPTIN:-${GATE_SELFTESTS:-}}" ]; then
     printf 'ondemand' > "$WORK/$i.rc"; continue
   fi
   [ -z "${guards[$i]}" ] && continue
@@ -1432,7 +1525,7 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     # whether the kit-subject legs ran, and the push boundary would trust a partial bar as
     # a whole one. The READER of this field is TOOL-dUnstalledConvoy-27; written without
     # that reader it is an inert byte, which is what a spec audit caught rev-2 shipping.
-    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
+    printf 'selftests\t%s\n' "${GATE_OPTIN:-${GATE_SELFTESTS:-}}"
     printf 'run_id\t%s\n' "$RUNID"
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \

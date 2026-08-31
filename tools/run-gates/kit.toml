@@ -143,5 +143,8 @@ why = "a CRLF shell script does not execute"
 pattern = "{prefix}/gate-legs.json"
 why = "the runner parses it through python with LF-only byte writes, and the canary byte-compares its rows"
 [[lf_pin]]
+pattern = "{prefix}/gate-legs.toml"
+why = "the declaration the runner parses through tomllib, whose comments are the argument for every number in it; a CRLF read is not the bytes the canary compares"
+[[lf_pin]]
 pattern = "{kit}/gate-profiles.txt"
 why = "the declared profile table is parsed at runtime with a TAB field separator, so a stray CR lands inside the last field and turns a knob value into one the runner refuses"
