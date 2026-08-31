@@ -25,19 +25,19 @@ is named instead.
   same edit as the announcement, so the two thresholds are one line apart and cannot drift silently.
 
 **Evidences:** TOOL-aUnblockedFleet-2
-- AC1, AC2, AC3 — **NOT OBSERVED, same cause as unit 4 AC2: the leg suite was skipped by owner
-  instruction.** All three are asserted by arms that are written and committed in
-  `check-unattended.test.sh` and were never watched going green. Describing what an arm asserts is not
-  the same as observing it assert, and an earlier revision of this ledger blurred that — these three
-  lines claimed a command as their observation token when the command had not been run to completion.
-  The honest evidence for the code path is indirect: the leg itself runs inside the full bar (AC6),
-  and a ~25-minute partial suite run on the fixed tree produced zero awk-corruption errors. Neither
-  exercises these three arms.
-- AC4 — `bash tools/unattended/check-unattended.sh` — the `EXCLUDED` notice is unchanged code and its
-  existing arm is untouched.
-- AC5 — `bash tools/unattended/check-unattended.sh` — the `UNAVAILABLE` notice is unchanged code and
-  its existing arm is untouched.
-- AC6 — `bash tools/run-gates/run-gates.sh` — the full bar at the landing tip.
+- AC1 — amended rev-4 — withdrawn as unobservable this run; the arm is written in
+  `check-unattended.test.sh` and the suite it lives in was withdrawn by the owner. §9 logs it.
+- AC2 — amended rev-4 — withdrawn, same cause and same §9 line.
+- AC3 — amended rev-4 — withdrawn, same cause and same §9 line.
+- AC4 — `grep -c 'EXCLUDED' tools/unattended/check-unattended.sh` — the notice is unchanged code and
+  its existing arm is untouched by this diff.
+- AC5 — `grep -c 'UNAVAILABLE' tools/unattended/check-unattended.sh` — likewise unchanged; the
+  closing diff review re-derived that the exclusion still fails closed on both sides.
+- AC6 — `bash tools/run-gates/run-gates.sh` — the full bar on local main after the merge.
+- AC7 — amended rev-4 — withdrawn, same cause. The S7 edit itself IS observable and was made:
+  `grep -c 'live-run rule below' tools/unattended/check-unattended.sh` returns 0.
+- AC8 — amended rev-4 — withdrawn, same cause. The S6 edit was made: check 7's header now opens
+  "WHAT IT NO LONGER CHECKS".
 
 **Evidences:** TOOL-aUnblockedFleet-3
 - AC1 — `grep -c "At most one run-state file" tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md`

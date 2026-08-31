@@ -313,26 +313,16 @@ close-only for the same reason: it is the record that the Definition-of-Done set
 phase move into it would be that claim without the evaluation, and `--landed` accepts a record only
 at `LANDING`. A run that is already terminal cannot be moved at all.
 
-**Concurrent runs are PERMITTED, and a run is never refused because another build is live.** A
-non-terminal run-state file for one build blocks nothing for another: the driver ANNOUNCES the
-concurrent runs at `--preflight` and the merge-bar leg REPORTS them, and neither fails on the count.
+**Concurrent runs are PERMITTED; a run is never refused because another build is live.** The driver
+ANNOUNCES them at `--preflight`; the leg persists its report to its `gate-logs/` entry, which a GREEN
+bar does not echo. Neither fails on the count. It replaced an at-most-one-live-run rule grounded on
+"the run" being ill-defined otherwise — nothing keys on it, because every verb is slug-addressed.
 
-This replaced an at-most-one-live-run rule whose stated ground was that "the run" would otherwise be
-ill-defined for anything keyed on it. Nothing is keyed on it, and that was established by
-construction rather than by reading: with both enforcement points neutered over two genuinely live
-records for unrelated builds, the whole merge-bar leg ran green and every verb resolved its own
-build. Every verb is slug-addressed, so no reader ever has to resolve "the run" at all. The rule's
-cost is on the record three times, twice cleared only by marking honest runs `ABORTED`.
+**A build folder still carries at most one live record** — one `RUN.md`, and the leg refuses an
+ARCHIVED record in a non-terminal phase. That is now the only check grading a phase for it.
 
-What still holds, and what enforces it: **a build folder carries at most one live record**, because
-there is one `RUN.md` per folder and the leg refuses an ARCHIVED record in a non-terminal phase.
-That check is now the only one grading a run-state phase for this property.
-
-**One residual, named rather than implied.** Two runs CLOSING at the same moment in one clone can
-still contend on the merge bar's own repo-wide turnstile, whose queue wait is charged against the
-run's declared gate bound — so the second may fail `gates-green` for contention rather than for a
-failing leg. That is a property of the bar, not of this kit, and it is a moment rather than a
-duration. It is tracked; it is not fixed here.
+**One residual:** two runs CLOSING together in one clone contend on the bar's turnstile, whose queue
+wait is charged against the gate bound, so the second can fail `gates-green` for contention.
 
 ## 4. The Definition of Done
 

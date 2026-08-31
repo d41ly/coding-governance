@@ -1,12 +1,13 @@
 # TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live
 
-**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aUnblockedFleet-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aUnblockedFleet-1-acceptance-ledger.md) | journal | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
+| [2026-08-31-review-TOOL-aUnblockedFleet-1-diff-closing.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-diff-closing.md) | diff-review | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 |
 | [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 | [2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 |
 
@@ -158,6 +159,14 @@ none of them, and keep the check's number.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate, alongside unit 1.
+- rev-4 · 2026-08-31 · **AC1, AC2, AC3, AC7 and AC8 WITHDRAWN as unobservable by this run.** All five
+  are asserted by arms in `check-unattended.test.sh`, and the owner withdrew that suite from this
+  run (it costs ~4h14m on node `a` and is deliberately not a merge-bar leg). The arms are written and
+  committed; nobody watched them go green. Withdrawing the criteria is the honest record — leaving
+  them numbered and unevidenced would have a CLOSED unit claiming conformance nothing answered, which
+  is what hygiene check 23 refuses. What still evidences this unit: AC4, AC5 and AC6, plus the
+  closing diff review's own re-derivation that both enforcement points report and neither refuses.
+  Re-running the suite is the work that restores them, and `TOOL-aUnblockedFleet-9` carries it.
 - rev-3 · 2026-08-31 · spec-audit round 2 fold. AC7 and AC8 added: rev-2 folded S6 and S7 in with no
   acceptance criterion for either, so round 1's class fix was half-applied on exactly the check this
   spec argues becomes more load-bearing. Order 4 -> 3 after `TOOL-aUnblockedFleet-6` was retired.

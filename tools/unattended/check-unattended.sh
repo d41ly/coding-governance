@@ -1217,9 +1217,15 @@ for c7f in $live; do
 done
 [ -z "$c7drop" ] || live="$c7keep"
 [ -z "$c7drop" ] || nlive="$c7n"
-# REPORTED, NEVER FAILED. TOOL-aUnblockedFleet-2. Silent at one or fewer, on the DEFAULT channel for
-# the reason this file's header gives about the EXCLUDED notice: routed through `report` it would be
-# invisible on every ordinary bar, which is a check quietly deleted.
+# REPORTED, NEVER FAILED. TOOL-aUnblockedFleet-2. Silent at one or fewer.
+#
+# WHERE THIS OUTPUT ACTUALLY LANDS, stated because the first version of this comment got it wrong and
+# the closing diff review caught it. It goes to the DEFAULT channel rather than through `report`,
+# which is right as far as it goes -- but `run-gates.sh` echoes a leg's captured stdout ONLY from
+# report_one's FAIL branch, and an rc=0 leg prints one line and nothing else. So on a GREEN bar
+# nobody sees this. The bytes are persisted, redacted, to <git-dir>/gate-logs/ and are fully visible
+# on a direct run of this script; the operator-facing half is the DRIVER's --preflight announcement,
+# which an agent does read. Do not restate the old claim that the default channel makes it visible.
 if [ "$nlive" -gt 1 ]; then
   printf 'unattended: %d concurrent unattended run(s) — none of them blocks another, and this leg does not fail on the count:
 ' "$nlive"
