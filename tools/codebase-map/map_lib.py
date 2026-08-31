@@ -45,7 +45,7 @@ from pathlib import Path
 
 #: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.5"
+KIT_CODEBASE_MAP_VERSION = "1.6"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -414,6 +414,27 @@ JS_DEFINITION_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 
+def _js_starts_regex(prev: str) -> str:
+    """TOOL-aPairedLexer-12: is a ``/`` at this position a REGEX start, or division?
+
+    Same conservative rule the JavaScript side states: a regex is recognised only after a token
+    that cannot END an expression. After an identifier, a number, a closing bracket or a closing
+    QUOTE the slash is DIVISION. Guessing the other way would consume live code to the next slash.
+
+    Returns a truthy string so the caller can read it as a bool; the ceiling is that a regex in an
+    ambiguous position stays mis-modelled. Python has no fallback view to route to, so that is a
+    straight limit here rather than a routed one."""
+    if prev == "":
+        return "y"  # start of input
+    if prev in "})]":
+        return ""
+    if prev.isalnum() or prev in "_$":
+        return ""
+    if prev in "\"'`":
+        return ""
+    return "y"
+
+
 def render_comment_free(text: str) -> str:
     """The source with COMMENTS blanked and everything else byte-identical, line count preserved.
 
@@ -443,6 +464,7 @@ def render_comment_free(text: str) -> str:
     """
     out: list[str] = []
     i, n = 0, len(text)
+    prev = ""  # last significant character emitted, for the regex/division decision
     while i < n:
         two = text[i : i + 2]
         if two == "//":
@@ -461,6 +483,36 @@ def render_comment_free(text: str) -> str:
             i = j + 2
             continue
         ch = text[i]
+        if ch == "/" and _js_starts_regex(prev):
+            # A regex literal. Consume it WHOLE and emit it verbatim, exactly as a string is
+            # emitted, so a backtick, quote or comment opener inside it cannot open anything. That
+            # is what stops a phantom template span forming: without it, a regex-borne backtick
+            # opened a span whose contents were emitted UNCHANGED, so a commented-out `export` was
+            # scanned as live code and a symbol that does not exist entered the committed map.
+            j = i + 1
+            cls = False
+            closed = False
+            while j < n:
+                c = text[j]
+                if c == "\\":
+                    j += 2
+                    continue
+                if c == "\n":
+                    break  # a regex literal cannot contain a line terminator
+                if c == "[":
+                    cls = True
+                elif c == "]":
+                    cls = False
+                elif c == "/" and not cls:
+                    closed = True
+                    break
+                j += 1
+            if closed:
+                out.append(text[i : j + 1])
+                prev = "/"
+                i = j + 1
+                continue
+            # Unterminated on its line: not a regex after all, fall through as punctuation.
         if ch in ("'", '"', "`"):
             j = i + 1
             while j < n:
@@ -474,9 +526,12 @@ def render_comment_free(text: str) -> str:
                 j += 1
             closed = j < n and text[j] == ch
             out.append(text[i : j + 1] if closed else ch)
+            prev = ch
             i = j + 1 if closed else i + 1
             continue
         out.append(ch)
+        if not ch.isspace():
+            prev = ch
         i += 1
     return "".join(out)
 
@@ -600,16 +655,23 @@ def enumerate_exports(
     completeness guarantee: a form the rule set forgot fails the gate loudly instead of
     vanishing (stronger than a parsed-vs-keyword count check, which cannot name the offender).
 
-    ``file`` is POSIX-relative to ``root``. Ceilings (documented, not silent): comments are
-    stripped by ``render_comment_free``, which is string-aware but models NO REGEX LITERAL, so a
-    line-comment or block-comment opener written INSIDE a regex still reads as one. Two losses
-    follow, both MEASURED and both pinned as ceilings by
-    ``test_enumerate_exports_regex_borne_comment_opener``: a regex carrying a block opener starts a
-    span that a later real closer ends, silently dropping every export between them; and a regex
-    carrying a line-comment opener truncates its own line, which also MASKS the multi-declarator
-    guard below, so a second declarator after it is dropped with no MapError. An unterminated span
-    is abandoned rather than swallowed, so the loss needs a real closer. Upgrade the pass and that
-    arm trips, which is how this paragraph gets corrected with it. Only statement-leading markers
+    ``file`` is POSIX-relative to ``root``. Ceilings (documented, not silent): comments are stripped
+    by ``render_comment_free``, which models strings, templates AND regex literals, so a comment
+    opener written inside any of the three cannot open one. TOOL-aPairedLexer-12 added the regex
+    model and RETIRED the two losses this paragraph used to declare — a regex-borne block opener no
+    longer swallows the exports up to a later closer, and a regex-borne line-comment opener no
+    longer truncates its line.
+
+    That second retirement has a CONSEQUENCE worth stating, because it is a new failure mode rather
+    than a removed one: the truncation was MASKING the multi-declarator guard below. With it gone the
+    guard sees the comma and RAISES on ``export const U = /^https?:...//, ALSO = 1;`` where it
+    previously returned the single name. That is the guard working, and
+    ``test_enumerate_exports_regex_borne_comment_opener`` asserts the raise.
+
+    The residual is the regex/division ambiguity itself: after an identifier, a number, a closing
+    bracket or a closing quote a ``/`` is read as DIVISION, so a regex in an ambiguous position is
+    still mis-modelled. The JavaScript side routes such a line to a fallback view; there is no
+    fallback here, so this is a straight limit. Only statement-leading markers
     are scanned — a ``marker`` inside a multi-line template literal would false-positive RAISE
     (fail-closed direction) and a multi-name ``export { a, b }`` is recognized-not-indexed
     (the names are indexed at their def sites). Use a real parser (tsc/tree-sitter) for full

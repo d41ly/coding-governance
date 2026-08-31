@@ -1270,18 +1270,22 @@ def test_enumerate_exports_string_borne_punctuation():
 
 
 def test_enumerate_exports_regex_borne_comment_opener():
-    r"""TOOL-aPairedLexer-4 (review D8): the KNOWN losses from `render_comment_free` modelling no
-    regex literal, pinned as CEILINGS so a future parser upgrade trips this arm and gets the
-    docstring corrected with it.
+    r"""TOOL-aPairedLexer-12: `render_comment_free` MODELS REGEX LITERALS, so a regex-borne
+    delimiter cannot open a comment or a template span.
 
-    These assert the WRONG answer on purpose. That is the project's own pattern for a documented
-    blind spot, and it is the opposite of a silent one: the arm fails the day someone fixes it.
+    This arm previously pinned two LOSSES as ceilings. Both are RETIRED here, and the arm is kept and
+    inverted rather than deleted so the suite records that the rows changed and why — the same
+    treatment `TOOL-aPairedLexer-4` gave the block-comment ceiling.
 
-    The review's stated repro did NOT reproduce, and the difference matters. An unterminated span is
-    ABANDONED rather than swallowed, so a regex-borne block opener with no later closer loses
-    nothing; the loss needs a REAL closer further down the file. Measured both ways below, because a
-    ceiling arm that pins a loss which does not happen is the same nothing as a gate that cannot
-    fire."""
+    The third direction is the one that forced the model: a regex holding a backtick opened a PHANTOM
+    template span, and the template arm emits its contents VERBATIM on close, so real comments inside
+    it were never blanked and a commented-out `export` was scanned as LIVE code. That ADDS a symbol
+    that does not exist to a committed artifact a coverage ratchet then demands be claimed.
+
+    An earlier design blanked comments inside the span instead. It was refuted by measurement: the
+    safety argument was about a REAL template while the premise is that the span is PHANTOM and
+    therefore holds live code, and implemented as written it LOST a real `export` between two
+    string-borne comment delimiters."""
     import tempfile
 
     def ids(src):
@@ -1291,29 +1295,92 @@ def test_enumerate_exports_regex_borne_comment_opener():
             rows = m.enumerate_exports(base, "web-ts", extensions=frozenset({".ts"}), root=base)
             return {r["id"] for r in rows}
 
-    # CEILING 1 — a regex carrying a block opener, closed by a REAL `*/` later. Everything between
-    # is silently dropped. `LOST` is the export this pass cannot see.
+    bt = chr(96)
+
+    # THE GHOST — the direction that forced the model. A commented-out export must NOT appear.
     got = ids(
-        "export const RX = /a\\/*b/;\n"
-        "export const LOST = 1;\n"
-        "const x = 2; /* real */\n"
+        "export const RX = /" + bt + "/;\n/*\nexport const GHOST = 1\n*/\n"
+        "export const T = " + bt + "x" + bt + ";\n"
+    )
+    assert got == {"RX", "T"}, f"a phantom span resurrected a comment: {sorted(got)}"
+
+    # THE TWO LOSSES the earlier design caused, pinned so it cannot come back.
+    got = ids(
+        "export const RX = /" + bt + "/;\nconst s = \"/*\";\nexport const KEEP = 1;\n"
+        "const t = \"*/\";\nexport const T = " + bt + "x" + bt + ";\n"
+    )
+    assert "KEEP" in got, f"a real export was lost inside a phantom span: {sorted(got)}"
+
+    got = ids(
+        "export const RX = /" + bt + "/;\nconst R = /a\\/*b/;\nexport const REAL = 1;\n"
+        "const x = 2; /* real */\nexport const T = " + bt + "x" + bt + ";\n"
+    )
+    assert "REAL" in got, f"a real export was lost to a regex-borne block opener: {sorted(got)}"
+
+    # CEILING 1, RETIRED. A regex carrying a block opener, closed by a genuine `*/` later, used to
+    # swallow every export between them. It no longer does, because the regex is consumed whole.
+    got = ids(
+        "export const RX = /a\\/*b/;\nexport const LOST = 1;\nconst x = 2; /* real */\n"
         "export const AFTER = 3;\n"
     )
-    assert got == {"RX", "AFTER"}, f"ceiling moved (good, then fix the docstring): {sorted(got)}"
-    assert "LOST" not in got, "the regex-borne block-comment ceiling is FIXED — update the docstring"
+    assert got == {"RX", "LOST", "AFTER"}, f"ceiling 1 did not retire: {sorted(got)}"
 
-    # CEILING 2 — a regex carrying a line-comment opener truncates its own line, which also MASKS
-    # the multi-declarator guard: `_has_top_level_comma` never sees the comma, so a second
-    # declarator is dropped with NO MapError. This is the more dangerous of the two, because the
-    # guard it disables is the one that exists to refuse exactly this silence.
-    got = ids("export const U = /^https?:\\/\\//, ALSO = 1;\n")
-    assert got == {"U"}, f"ceiling moved (good, then fix the docstring): {sorted(got)}"
+    # CEILING 2, INVERTED rather than retired, and this is the half worth reading. The regex-borne
+    # `//` was MASKING the multi-declarator guard by truncating the line before the comma. Modelling
+    # regexes removes the truncation, the guard sees the comma, and it RAISES. That is the guard
+    # working — the docstring calls the alternative "the green-by-absence hole" — but it is a new
+    # failure mode and is asserted rather than discovered.
+    with tempfile.TemporaryDirectory() as td:
+        base = Path(td)
+        (base / "m.ts").write_text("export const U = /^https?:\\/\\//, ALSO = 1;\n", encoding="utf-8")
+        try:
+            m.enumerate_exports(base, "web-ts", extensions=frozenset({".ts"}), root=base)
+        except m.MapError:
+            pass
+        else:
+            raise AssertionError("ceiling 2 must INVERT into a raise once the truncation is gone")
 
-    # NOT a ceiling — the review claimed this one and it does not reproduce. An unterminated span is
-    # abandoned, so both exports survive. Pinned so the docstring cannot drift back to claiming it.
-    got = ids("export const RX = /a\\/*b/;\nexport const KEEP = 1;\n")
-    assert got == {"RX", "KEEP"}, f"an unterminated span must be abandoned, not swallowed: {sorted(got)}"
+    # LINE COUNT is the statement-leading contract `JS_DEFINITION_RULES` depend on: they are `re.M`
+    # anchored at a leading-whitespace escape, so a collapsed line hides the second definition.
+    for src in (
+        "a\nb\nc\n// x /* y\nd\n",
+        "/* one\ntwo\nthree */\nfour\n",
+        "const r = /" + bt + "/\n// t\nfunction f() {}\n",
+    ):
+        assert m.render_comment_free(src).count("\n") == src.count("\n"), (
+            f"line count moved on {src!r}"
+        )
 
+
+def test_render_comment_free_corpus_is_unchanged():
+    """TOOL-aPairedLexer-12 AC6: modelling regex literals must not move this repo's own symbol set.
+
+    A REGRESSION guard, and it says so: this tree's map has no `.ts` layer, so the ghost the model
+    removes is adopter-facing. What this arm protects is the other direction — the docstring records
+    that an earlier revision of this function removed EIGHT real definitions from this repo's tracked
+    JavaScript, and that number was remembered rather than runnable. Now it is runnable.
+
+    A symbol-set comparison is blind to an EXCEPTION, so the no-raise half is asserted separately."""
+    import subprocess
+
+    files = [
+        f for f in subprocess.run(
+            ["git", "ls-files", "*.js"], capture_output=True, text=True, encoding="utf-8"
+        ).stdout.split("\n") if f.strip()
+    ]
+    assert files, "the corpus arm found no tracked .js files, so it would pass by finding nothing"
+
+    seen = set()
+    for f in files:
+        src = Path(f).read_text(encoding="utf-8")
+        stripped = m.render_comment_free(src)  # must not raise
+        for rx, _kind in m.JS_DEFINITION_RULES:
+            for mm in rx.finditer(stripped):
+                seen.add((f, mm.group(1)))
+
+    # The count is DERIVED, never typed beside the thing it counts: the assertion is that the pass
+    # finds definitions in this corpus at all, which is what a silent over-strip would destroy.
+    assert len(seen) > 50, f"the definition probe collapsed over the tracked corpus: {len(seen)}"
 
 def test_render_comment_free():
     """TOOL-aPairedLexer-3: comments blanked in ONE pass, strings TRACKED but not blanked, line
@@ -1538,8 +1605,12 @@ def main() -> int:
         test_enumerate_exports_string_borne_punctuation,
     )
     failures += check(
-        "enumerate_exports: the regex-borne comment ceilings, pinned",
+        "enumerate_exports: regex literals modelled; the two loss ceilings retire",
         test_enumerate_exports_regex_borne_comment_opener,
+    )
+    failures += check(
+        "render_comment_free: this repo's own symbol set is unchanged",
+        test_render_comment_free_corpus_is_unchanged,
     )
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
