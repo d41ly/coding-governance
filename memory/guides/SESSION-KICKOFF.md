@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-31T17:24:11+03:00 @ 7dae5ce9dccef35c30df1fb5f4623133db4f1a46
+last-audit: 2026-08-31T19:12:12+03:00 @ 3c91e00d97ee326fe3b6cf818fe1366147ce495c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d902165a87967eb0d3f1fe280876948745e6a8e3
+last-body-change: 3c91e00d97ee326fe3b6cf818fe1366147ce495c
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -89,6 +89,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   `memory/HYGIENE.md` under "Acceptance ledger" and the gate reads shape and coverage only. The
   cutoff is a `.memory-tree.conf` date, so units that closed before the grammar existed are outside
   it; anything this session closes is inside it.
+
+- **A CLOSED unit whose spec grades THIN blocks `build-complete`** — an empty section 2 Scope,
+  section 6 Acceptance criteria or section 7 Gates. Date-grandfathered on the spec's FILENAME
+  against `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF and `--close`
+  ANNOUNCES that rather than passing silently. `TOOL-aGradedMandate-4`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. Two builds rewrote
@@ -187,10 +192,6 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
   produce an arm that passes because its fixture was never there. Check what `git ls-files`
   actually holds before trusting a near-miss control.
-- The read-path ceiling is spent by things nobody thinks of as reading: the generated
-  `memory/LIVE.md` row a NEW BUILD FOLDER adds, and every `memory/DECISIONS.md` append. A
-  build can red check 16 on its own bookkeeping before it edits a guide. Read the margin
-  from `python tools/memory-tree/corpus_ids.py --report`, never from the ceiling alone.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
   recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
