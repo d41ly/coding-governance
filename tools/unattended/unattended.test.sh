@@ -88,6 +88,7 @@ mkconf() { # wiring · gate
   cat > .unattended.conf <<EOF
 MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
+SPEC_THIN_CUTOFF="${5-}"
 LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
@@ -391,13 +392,32 @@ bcsetup() {
   roster tRun "1. ARCH-tRun-1 — the unit"
   mkdir -p memory/builds/tRun/spec
   printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tRun/spec/one.md
+  # The spec-audit record `specs-audited` wants. This fixture's only unit is CLOSED, so without
+  # it every close arm below would red on an item none of them is about.
+  mkdir -p memory/builds/tRun/reviews
+  printf '**Serves:** spec-audit ARCH-tRun-1
+
+# the audit
+' > memory/builds/tRun/reviews/audit.md
   git add -A >/dev/null && git commit -q -m bc-fixture --no-verify && git push -q -f origin main
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
   BCP=$(git rev-parse HEAD)
 }
 bcreset() { git reset -q --hard "$BCP"; git clean -qfd; mkconf; }
 bcopen() { bcreset; run --preflight tRun --keepalive-id KA-1234 >/dev/null
-           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md; }
+           printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           # The CONVERGED closing round `closing-review-recorded`'s second term wants, written in
+           # `park()`'s own line shape. Every close arm below is about a DIFFERENT item, and without
+           # this they would all red on this one — which is a fixture answering a question nobody
+           # asked. The arms that are about this term strip the row or replace it.
+           printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED\n' \
+             >> memory/builds/tRun/RUN.md; }
+# Drop the round bcopen wrote, for the arms whose subject IS its absence.
+crdrop() { sed -i '/ review · item tRun · reason /d' memory/builds/tRun/RUN.md; }
+# Replace it with one of this run's choosing: subject · verdict · blockers · [terminal token]
+crround() { crdrop
+            printf '%s review · item %s · reason verdict %s · blockers %s%s\n' \
+              "2026-08-31T00:00:00Z" "$1" "$2" "$3" "${4:+ · $4}" >> memory/builds/tRun/RUN.md; }
 # Restore main to the shared BASE so the later arms see the tree they were written against.
 bcrestore() { git checkout -q main; git reset -q --hard "$BASE"; git push -q -f origin main; git checkout -qf unit; reset_tree; }
 
@@ -1096,6 +1116,11 @@ bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
 crbc='--override build-complete --reason fixture-build-is-one-open-unit'
 cropen() { reset_tree; run --preflight tRun --keepalive-id KA-1234 >/dev/null
            printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+           # The CONVERGED closing round the item's SECOND term wants. Every arm below is about
+           # the FIRST term - the record join - so without this they would all red on the other.
+           printf '2026-08-31T00:00:00Z review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED
+' \
+             >> memory/builds/tRun/RUN.md
            mkdir -p memory/builds/tRun/reviews; }
 crbase() { sed -n 's/^base: //p' memory/builds/tRun/RUN.md; }
 
@@ -4065,6 +4090,7 @@ hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "
 hit "$(run --review tRun --subject S1 --verdict MAYBE --blockers 1)" "--review names a verdict outside the closed set, and a verdict nothing can compare is prose in a field; legal verdicts"
 hit "$(run --review tRun --subject S1 --verdict BLOCKED)" "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"
 hit "$(run --review tRun --verdict BLOCKED --blockers 1)" "--review requires --subject, because the convergence predicate is per SUBJECT and a round with no subject cannot be sequenced against anything"
+crdrop
 same "a refused round wrote nothing" "$(grep -c 'review · item' memory/builds/tRun/RUN.md)" "0"
 # the SUBJECT is free text from the caller, and leg check 11 greps this file WHOLE for the declared
 # bypass flag — so a subject naming it would red the bar permanently on a record no verb can
@@ -4657,13 +4683,188 @@ out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
 reset_tree
 
+
+# ==================================================================================================
+# TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing LOOP to have ended.
+# ==================================================================================================
+# `crfix` writes the tracked diff-review the FIRST term wants, so every arm below isolates the
+# SECOND. Without it these arms would red on term one and prove nothing about the term they name —
+# a fixture answering a different question, which is this repo's own named class.
+crfix() { mkdir -p memory/builds/tRun/reviews
+          printf '**Serves:** diff-review ARCH-tRun-1\n\n# closing review\n\nrange %s...HEAD\n' \
+            "$(git rev-parse --short "$(sed -n 's/^base: //p' memory/builds/tRun/RUN.md)")" \
+            > memory/builds/tRun/reviews/r1.md
+          git add -A >/dev/null; }
+bcov="--override build-complete --reason fixture-roster"
+
+# ---- AC1: a tracked diff-review exists and NO round names the build slug. This is the state two
+# ---- LANDED records in this corpus were in, with the item MET.
+bcopen; crfix; crdrop; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "closing-review-recorded"
+hit "$out" "this run recorded no --review round whose subject is the build slug"
+
+# ---- ...and a round on a DIFFERENT subject does not satisfy it. `tRun-specs` is the live case: a
+# ---- spec-audit subject, and a substring join would have accepted it.
+bcopen; crfix; crround "tRun-specs" "CLEAN" 0 "CONVERGED"; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "this run recorded no --review round whose subject is the build slug"
+
+# ---- AC2: the last round for the slug carries no terminal token — the loop was abandoned.
+bcopen; crfix; crround "tRun" "BLOCKED" 1; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the last recorded review round for this build carries no terminal token"
+hit "$out" "blockers 1"
+
+# ---- AC3: CONVERGED naming a non-zero count. No verb can write that pairing, so reaching it means
+# ---- the record was hand-edited — the one thing a run-state file cannot rule out.
+bcopen; crfix; crround "tRun" "BLOCKED" 3 "CONVERGED"; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "claims CONVERGED while naming a non-zero blocker count"
+
+# ---- AC4: all THREE legal exits are MET. An arm proving only CONVERGED would leave the two exits a
+# ---- non-convergent loop actually takes unexercised.
+bcopen; crfix; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+bcopen; crfix; crround "tRun" "BLOCKED" 2 "NON-CONVERGENT"; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+bcopen; crfix; crround "tRun" "BLOCKED" 2 "CEILING"; git add -A >/dev/null
+out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
+
+# ==================================================================================================
+# TOOL-aGradedMandate-2 — `specs-audited`.
+# ==================================================================================================
+# ---- MET-with-nothing-to-check when no unit is CLOSED, and it ANNOUNCES that. A silent pass over an
+# ---- empty selection is indistinguishable from coverage.
+bcopen; crfix; mutate memory/builds/tRun/README.md 's/| CLOSED |/| OPEN |/'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "no unit of this build is CLOSED, so no spec audit is owed yet"
+
+# ---- AC1: a CLOSED unit no spec-audit record names blocks, and the message names the id.
+bcopen; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+hit "$out" "ARCH-tRun-1"
+
+# ---- AC2: a tracked record whose binding line names the id satisfies it.
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a1.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+
+# ---- AC4c, the RANGE form: `ARCH-tRun-1..3` names ARCH-tRun-1. Eighteen tracked binding lines in
+# ---- this corpus use it, and only the memory-tree generator expands it — which this kit ships
+# ---- without, so the expansion is the kit's own or the item blocks a unit that WAS audited.
+rm -f memory/builds/tRun/reviews/a1.md
+printf '**Serves:** spec-audit ARCH-tRun-1..3\n\n# audit\n' > memory/builds/tRun/reviews/a2.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "specs-audited"
+
+# ---- ...and the BOUNDARY: `ARCH-tRun-19` must NOT satisfy `ARCH-tRun-1`. A substring join accepts
+# ---- it, and both spellings are real ids in builds this corpus holds.
+rm -f memory/builds/tRun/reviews/a2.md
+printf '**Serves:** spec-audit ARCH-tRun-19\n\n# audit\n' > memory/builds/tRun/reviews/a3.md
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+
+# ---- ...and an UNTRACKED record is invisible, because the join reads the INDEX. The likeliest
+# ---- operator state and the least guessable one.
+rm -f memory/builds/tRun/reviews/a3.md; git add -A >/dev/null
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a4.md
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited"
+rm -f memory/builds/tRun/reviews/a4.md
+
+# ==================================================================================================
+# TOOL-aGradedMandate-5 / -10 — the parked split, on BOTH axes.
+# ==================================================================================================
+# ---- AC1 (unit 10): one retire row is counted among the decisions the owner is OWED and NOT among
+# ---- the notes. Before the act axis existed it was counted as both.
+bcopen; crdrop
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "the fixture retires its only unit" >/dev/null
+out=$(run --status tRun)
+hit "$out" "parked 1"
+miss "$out" "noted"
+
+# ---- ...and an ADD row is a NOTE. Growing the build is a declaration the run made; dropping
+# ---- declared scope is something the owner is entitled to read.
+bcopen; crdrop
+run --rescope tRun --act add --item ARCH-tRun-9 --reason "the fixture adds a unit" >/dev/null
+out=$(run --status tRun)
+hit "$out" "noted 1"
+miss "$out" "parked 1"
+
+# ---- AC2 (unit 10): the PARTITION, over one row of every shape. This arm gates the CLASS — any
+# ---- future kind or act landing in both alternations or in neither — where an arm about `retire`
+# ---- alone gates one instance.
+bcopen
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "owed by act" >/dev/null
+run --rescope tRun --act add --item ARCH-tRun-8 --reason "history by act" >/dev/null
+run --park tRun --item "a question" --reason "owed by kind" >/dev/null
+run --propose tRun --item "an amendment" --step "step 1" --reason "history by kind" >/dev/null
+_pt=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z [a-z]+ · item ' memory/builds/tRun/RUN.md)
+out=$(run --status tRun)
+_pp=$(printf '%s' "$out" | grep -oE 'parked [0-9]+' | grep -oE '[0-9]+'); _pp=${_pp:-0}
+_pn=$(printf '%s' "$out" | grep -oE 'noted [0-9]+' | grep -oE '[0-9]+'); _pn=${_pn:-0}
+same "the parked and noted counts PARTITION the parked rows" "$((_pp + _pn))" "$_pt"
+
+# ---- AC1 (unit 5): the surfaced COUNT the close checks includes a retirement, so an attested count
+# ---- that excludes it is refused. That is the whole point of moving the act across the class line.
+bcopen; crfix
+run --rescope tRun --act retire --item ARCH-tRun-1 --reason "dropped scope the owner must read" >/dev/null
+run --attest tRun --item parked-decisions-surfaced --value "yes, 0 surfaced" >/dev/null
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the attested count of surfaced parked decisions does not match the record"
+run --attest tRun --item parked-decisions-surfaced --value "yes, 1 surfaced" >/dev/null
+git add -A >/dev/null
+out=$(run --close tRun $bcov)
+miss "$out" "the attested count of surfaced parked decisions does not match"
+
+# ==================================================================================================
+# TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN.
+# ==================================================================================================
+# ---- The term is OFF and ANNOUNCES it when no cutoff is declared. A silently disabled term is what
+# ---- a blank declaration must never produce.
+bcopen; crfix; git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "the project declares no SPEC_THIN_CUTOFF"
+
+# ---- AC1: ON, with a DATED spec that grades THIN — its section 6 is empty — on a CLOSED unit.
+bcopen; crfix
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 2. Scope (IN)\n\nS1 a thing\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\nthe bar\n' \
+  > memory/builds/tRun/spec/2026-08-01-spec-thin.md
+mutate memory/builds/tRun/README.md 's#spec/one.md#spec/2026-08-01-spec-thin.md#'
+mkconf true true 2026-08-19 3600 2026-07-01
+printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a5.md
+git add -A >/dev/null
+out=$(run --close tRun)
+hit "$out" "grades THIN"
+hit "$out" "ARCH-tRun-1"
+
+# ---- AC2: the same spec, GRANDFATHERED by a cutoff after its filename date.
+mkconf true true 2026-08-19 3600 2026-09-01
+out=$(run --close tRun)
+miss "$out" "grades THIN"
+
+# ---- AC3: a spec that states an acceptance criterion is not THIN, with the term ON.
+mkconf true true 2026-08-19 3600 2026-07-01
+mutate memory/builds/tRun/spec/2026-08-01-spec-thin.md 's/^## 6. Acceptance criteria$/## 6. Acceptance criteria\n\nAC1 it works/'
+git add -A >/dev/null
+out=$(run --close tRun)
+miss "$out" "grades THIN"
+reset_tree
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=516
+FLOOR_ASSERTIONS=547
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4718,7 +4919,7 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=205
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=479
+FLOOR_SHARD_2=510
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

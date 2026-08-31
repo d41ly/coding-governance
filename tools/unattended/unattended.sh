@@ -3357,7 +3357,7 @@ $_bcnon"
       if [ -z "$_sa_ids" ]; then
         # ANNOUNCED, not silent. A met-with-nothing-to-check is indistinguishable from coverage
         # unless it says so, which is this repo's own named class.
-        DOD_OUT="skipped — no unit of this build is CLOSED, so no spec audit is owed yet"
+        DOD_OUT="specs-audited — no unit of this build is CLOSED, so no spec audit is owed yet"
         return 0
       fi
       # THE INDEX, not the worktree, and the first twelve UNFENCED lines, not the whole file. The
