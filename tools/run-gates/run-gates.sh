@@ -27,6 +27,51 @@ KIT_RUN_GATES_VERSION=1.4   # gov:kit run-gates@1.4
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
+
+# ================= ARGUMENTS (TOOL-aGatheredDeclaration-3) =======================================
+# Above every environment read, so nothing already declared changes meaning. A run with no arguments
+# behaves exactly as it did before this surface existed, which is what .githooks/pre-push and
+# tools/push-main.sh invoke.
+#
+# `--leg` is a FLAG and deliberately never an environment variable. An env var can be exported in a
+# shell that later invokes a hook, so the AUTHORITATIVE push bar could be silently narrowed to one
+# leg by something set hours earlier; a flag cannot reach .githooks/pre-push, which invokes this
+# runner with no arguments. The same reasoning is written into the adopter that first shipped it.
+MODE=run
+SHARD=()
+usage() {
+  cat <<'USAGE'
+usage: run-gates.sh [--leg <name>]... [--list] [--manifest] [--help]
+
+  (none)          run the bar
+  --leg <name>    run exactly this leg, ignoring its guard and its opt-in hold. REPEATABLE.
+                  Legs run in manifest order whatever order the flags are given in.
+  --list          print every declared leg name, one per line, and exit
+  --manifest      print the declared manifest -- counts, and one row per leg -- and exit
+  --help, -h      this text
+
+Every other knob is an environment variable; run-gates.sh's header lists them.
+USAGE
+}
+# A two-token flag validates its value BEFORE it shifts. `shift 2` with $#=1 fails WITHOUT shifting,
+# so the loop spins forever: the adopter this guard is ported from reproduced it as a HUNG push gate
+# at exit 124. `${2:-}` hides the missing value rather than catching it.
+need2() { [ "$1" -ge 2 ] || { echo "run-gates: $2 needs a value" >&2; exit 2; }; }
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --leg)      need2 $# "$1"; SHARD+=("$2"); shift 2 ;;
+    --list)     MODE=list; shift ;;
+    --manifest) MODE=manifest; shift ;;
+    -h|--help)  usage; exit 0 ;;
+    *) echo "run-gates: unknown argument: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+[ ${#SHARD[@]} -gt 0 ] && MODE=shard
+# A QUERY VERB is read-only and says so structurally: it never acquires the turnstile and writes only
+# its payload to stdout. `--list` answers before anything else can queue; `--manifest` needs the
+# profile row and the guard verdicts, so it runs the selection and stops before dispatch.
+QUERY=no
+case "$MODE" in list|manifest) QUERY=yes ;; esac
 # The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
 # kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and tools/lib/ is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
@@ -66,7 +111,7 @@ resolve_python() {
 }
 # <<< resolve_python
 PYBIN=$(resolve_python) || { echo "run-gates: no usable python — required to parse the leg manifest"; exit 2; }
-fails=0; n=0; skips=0; ondemands=0
+fails=0; n=0; skips=0; ondemands=0; shardouts=0
 
 # The leg manifest, overridable so a fixture can drive this runner without re-running the real bar.
 # Without a seam here the only way to exercise run-gates.sh is to invoke it against the repo, which
@@ -110,6 +155,25 @@ fi
 if [ "$LEGS_FMT" = toml ] && [ "$HAVE_TOMLLIB" != yes ]; then
   echo "run-gates: GATE_LEGS names a .toml file but $PYBIN cannot import tomllib (needs CPython 3.11+)" >&2
   exit 2
+fi
+
+# `--list` needs the NAMES and nothing else -- not the profile row, not the timing cache, not the
+# beacon. It answers here, the earliest point at which the declaration has been resolved, so a
+# read-only question can never wait behind a running bar. The reader is deliberately tiny and shares
+# no code with the dispatch loader below: they read one FILE and answer two different questions, and
+# it is a second spelling of a FORMAT that this build exists to remove, not a second reader of a file.
+if [ "$MODE" = list ]; then
+  "$PYBIN" -c '
+import json, sys
+p = sys.argv[1]
+if p.endswith(".toml"):
+    import tomllib
+    rows = (tomllib.load(open(p, "rb")).get("leg") or [])
+else:
+    rows = json.load(open(p))
+sys.stdout.buffer.write(("".join((r.get("name") or "") + "\n" for r in rows)).encode())
+' "$LEGS_FILE" || { echo "run-gates: cannot read $LEGS_FILE" >&2; exit 2; }
+  exit 0
 fi
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
@@ -431,7 +495,10 @@ if [ "$CEILINGS_LIVE" != 1 ]; then
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c; $PROF_TAG)"
-echo "$PROF_LINE"
+# A QUERY VERB writes only its PAYLOAD to stdout (TOOL-aGatheredDeclaration-3 S8). The profile
+# line and the queue line are diagnostics: on an ordinary run they belong on stdout with the
+# verdicts, and on `--list` or `--manifest` they would corrupt output a caller parses.
+if [ "$QUERY" = yes ]; then echo "$PROF_LINE" >&2; else echo "$PROF_LINE"; fi
 
 
 # ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
@@ -446,7 +513,7 @@ echo "$PROF_LINE"
 # of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
 # left exactly as they are: evidence is per-worktree, contention is per-repository.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
-if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+if [ "$QUERY" = no ] && [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
@@ -752,7 +819,7 @@ fi
 # past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
 # too, so the runner exits 2 before this line. No fixture in the turnstile suite can produce it.
 QUEUED="-"; QUEUED_FROM=off
-if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+if [ "$QUERY" = no ] && [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
   elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
@@ -770,7 +837,7 @@ QUEUE_SUMMARY="gate queue: queued $QUEUED from $QUEUED_FROM"
 # ITS BYTES ARE PINNED by two consumers — `profile_bar.py`'s `$`-anchored regex and
 # `run-gates.turnstile.test.sh` — so the state word above is NOT appended here. It goes to the
 # header and the summary file, which is why `QUEUE_SUMMARY` is a separate string.
-echo "gate queue: waited ${TS_WAITED}s"
+if [ "$QUERY" = yes ]; then echo "gate queue: waited ${TS_WAITED}s" >&2; else echo "gate queue: waited ${TS_WAITED}s"; fi
 
 WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
@@ -865,6 +932,12 @@ PORCELAIN_START=$(LC_ALL=C git status --porcelain 2>/dev/null | LC_ALL=C sort)
 # cannot reproduce at any sha.
 TREE_CLEAN=no
 [ -z "$PORCELAIN_START" ] && TREE_CLEAN=yes
+# A SHARDED RUN IS NEVER A FULL GREEN (TOOL-aGatheredDeclaration-3 S7). The stamp's name is a claim
+# about the whole bar, and `--leg` runs a hand-picked subset with every guard and every hold
+# bypassed. Folded into the tree-clean precondition rather than added beside it, because the stamp
+# already conjoins its preconditions here and a second gate somewhere else is a second place to
+# forget one.
+[ ${#SHARD[@]} -gt 0 ] && TREE_CLEAN=no
 
 # Read the leg manifest as name<RS>guard(comma-joined)<RS>argv(joined by <US>) per line, where
 # RS=\x1e and US=\x1f (non-whitespace, so an empty guard field survives `read`; a tab would collapse).
@@ -907,7 +980,7 @@ try:
                     sys.stderr.write("leg %r: %s must be a boolean\n" % (l.get("name"), k)); sys.exit(3)
             data.append({"name": l.get("name"), "argv": l.get("argv"),
                          "guard": l.get("guard", []), "impure": l.get("impure", False),
-                         "chunk": l.get("chunk", ""),
+                         "chunk": l.get("chunk", ""), "lane": l.get("lane", "heavy"),
                          # Field 6 is `subject` and TOML DECLARES NONE, so it is emitted EMPTY
                          # rather than invented. Deriving it from `opt_in` was tried and is wrong:
                          # the six legs whose subject is `repo` and whose chunk is `selftests` are
@@ -985,20 +1058,58 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
          # commit. It is the RESOLVED hold -- the union for JSON, the declared key for TOML -- so the
          # dispatcher asks one question of one field instead of re-deriving a two-armed predicate.
          + "\x1e" + ("1" if l.get("opt_in") else "")
+         # THE NINTH FIELD, the lane. DECLARED by TOOL-aGatheredDeclaration-2, CONSUMED by
+         # TOOL-aGatheredDeclaration-8, and REPORTED by --manifest in between -- which is why it
+         # is on the wire before anything dispatches on it: a column --manifest invented would be
+         # a second answer to a question the declaration already gives.
+         + "\x1e" + (l.get("lane") or "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); optins=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); optins=(); lanes=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce oi <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce oi ln <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); optins+=("${oi:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); optins+=("${oi:-}"); lanes+=("${ln:-}")
 done <<<"$legs"
 total=${#names[@]}
+
+# EVERY --leg NAME MUST MATCH, and the refusal prints the near-misses. Exact match only: a glob
+# dialect is a matching rule to specify and test, and printing what nearly matched gives an operator
+# the same benefit for the price of a refusal that has to exist anyway. Refusing here, before the
+# beacon and before dispatch, is what stops a typo from being reported as a green over zero legs.
+if [ ${#SHARD[@]} -gt 0 ]; then
+  _miss=()
+  for _s in "${SHARD[@]}"; do
+    _hit=no
+    for _nm in "${names[@]}"; do [ "$_s" = "$_nm" ] && { _hit=yes; break; }; done
+    [ "$_hit" = no ] && _miss+=("$_s")
+  done
+  if [ ${#_miss[@]} -gt 0 ]; then
+    for _s in "${_miss[@]}"; do
+      echo "run-gates: --leg '$_s' names no leg in $LEGS_FILE" >&2
+      _near=$(printf '%s
+' "${names[@]}" | grep -iF -- "$_s" | head -5)
+      [ -z "$_near" ] && _near=$(printf '%s
+' "${names[@]}" | grep -iE -- "$(printf '%s' "$_s" | tr -cd '[:alnum:] ' | tr ' ' '|')" 2>/dev/null | head -5)
+      if [ -n "$_near" ]; then
+        echo "run-gates:   did you mean:" >&2
+        # ONE printer. The first spelling of this used an unquoted command substitution beside the
+        # sed, so a multi-word leg name was word-split and every name was printed twice, once in
+        # pieces. Observed on the first run of this refusal.
+        printf '%s
+' "$_near" | sed 's/^/run-gates:     /' >&2
+      else
+        echo "run-gates:   nothing in the manifest resembles it; 'run-gates.sh --list' prints every name" >&2
+      fi
+    done
+    exit 2
+  fi
+fi
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED. TOOL-aBoundedCeiling-1 S6. The runner cannot know
 # whether a row with no ceiling is a gov leg somebody forgot or an adopter leg the deployer has no
@@ -1010,6 +1121,17 @@ total=${#names[@]}
 # Guard evaluation runs SERIALLY and up front: it is a read-only `git diff` per guarded leg, and
 # deciding before dispatch keeps the skip verdict independent of scheduling.
 for ((i=0; i<total; i++)); do
+  # THE SHARD, decided before every other selector (TOOL-aGatheredDeclaration-3 S1). A named leg
+  # runs whatever its guard says and whatever its opt-in hold says: the operator asked for THAT leg,
+  # and a shard that silently declined to run it would be indistinguishable from one that ran and
+  # passed. Everything not named is dropped. Selection is by exact name; the refusal below prints
+  # near-misses, which gives an operator the benefit of a glob without a matching rule to specify.
+  if [ ${#SHARD[@]} -gt 0 ]; then
+    _want=no
+    for _s in "${SHARD[@]}"; do [ "$_s" = "${names[$i]}" ] && { _want=yes; break; }; done
+    if [ "$_want" = yes ]; then continue; fi
+    printf 'shardout' > "$WORK/$i.rc"; continue
+  fi
   [ -z "${names[$i]}" ] && continue
   # SUBJECT FIRST, and in this pass rather than in the dispatch loop. A kit-subject leg tests the
   # KIT'S OWN SOURCE and has no job in a repo that copy-installs the kit and never edits it, so it
@@ -1045,6 +1167,56 @@ for ((i=0; i<total; i++)); do
   IFS=, read -ra gp <<<"${guards[$i]}"
   changed "${gp[@]}" || printf 'skip' > "$WORK/$i.rc"
 done
+
+# ================= --manifest (TOOL-aGatheredDeclaration-3 S3) ===================================
+# THE OUTPUT CONTRACT is unit 3 section 4's and is spelled there. Every count below is DERIVED at
+# emission from the loaded declaration and from the selection this run just performed -- no number
+# here is written in prose anywhere, which is the charter's rule and half the reason this verb
+# exists. Printed AFTER selection and BEFORE dispatch, so `would-run` is the real verdict rather
+# than a prediction.
+#
+# S9: each declared ceiling is joined against <git-dir>/gate-ledger.tsv and reported with the
+# measured seconds and their ratio. It REPORTS and never reds. The ledger is PER-CLONE and often
+# absent, so an unmeasured leg renders a DASH in both columns and never a zero -- a zero for a probe
+# that never ran is a reassuring number about nothing.
+if [ "$MODE" = manifest ]; then
+  _optin=0; _guarded=0; _would=0
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ "${optins[$i]}" = 1 ] && _optin=$((_optin+1))
+    [ -n "${guards[$i]}" ] && _guarded=$((_guarded+1))
+    [ -f "$WORK/$i.rc" ] || _would=$((_would+1))
+  done
+  _measured=0
+  [ -n "$LEDGER" ] && [ -s "$LEDGER" ] && _measured=1
+  printf 'gate manifest: %s legs · %s opt-in · %s guarded · %s would run · profile %s width %s · ceilings %s
+'     "$total" "$_optin" "$_guarded" "$_would" "${PROF_NAME:-?}" "${JOBS:-?}" "${prof_c:-live}"
+  [ "$_measured" = 0 ] && echo "gate manifest: no ${LEDGER:-gate-ledger.tsv} in this clone, so every measured column is a dash — the join found no measurements"
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    _hold=always; [ "${optins[$i]}" = 1 ] && _hold=opt-in
+    _ceil="${ceilings[$i]:-none}"
+    _gn=0; [ -n "${guards[$i]}" ] && _gn=$(printf '%s' "${guards[$i]}" | tr ',' '
+' | grep -c .)
+    _disp=would-run
+    if [ -f "$WORK/$i.rc" ]; then
+      case "$(cat "$WORK/$i.rc")" in
+        ondemand) _disp=held ;; skip) _disp=guarded-out ;; shardout) _disp=not-named ;; *) _disp=held ;;
+      esac
+    fi
+    _meas="-"; _ratio="-"
+    if [ "$_measured" = 1 ]; then
+      _m=$(awk -F'	' -v n="${names[$i]}" '$1==n {print $2; exit}' "$LEDGER" 2>/dev/null)
+      if [ -n "$_m" ]; then
+        _meas=$_m
+        case "$_ceil" in ''|none) ;; *) _ratio=$(awk -v c="$_ceil" -v m="$_m" 'BEGIN{ if (m+0>0) printf "%.1f", c/m; else print "-" }') ;; esac
+      fi
+    fi
+    printf 'LEG  %s  %s  %s  %s  %s  %s  %s  %s  %s
+'       "${names[$i]}" "${lanes[$i]:-heavy}" "$_hold" "$_ceil" "$_gn" "$_disp" "$_meas" "$_ratio"       "$([ "${prof_c:-live}" = live ] && echo enforced || echo declared-only)"
+  done
+  exit 0
+fi
 
 # UNBOUNDED LEGS ARE REPORTED, NEVER REFUSED, and counted over the legs that will actually RUN.
 # The runner cannot tell a leg somebody forgot from an adopter leg the deployer has no business
@@ -1259,7 +1431,16 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
-  if [ "$rc" = ondemand ]; then
+  if [ "$rc" = shardout ]; then
+    # THE SIXTH VERB. It is not `skip`, whose tail says `unchanged vs <branch>` and would be false
+    # here, and it is not `held`, whose tail names an environment variable that would not help. It is
+    # also NOT counted into `skips`: `skips` is conjoined into the `gate-full-green` stamp, and a
+    # sharded run must not be able to leave evidence that a whole bar happened. S7 blocks the stamp
+    # outright, and this keeps the count honest for the summary line as well.
+    shardouts=$((shardouts+1))
+    printf 'GATE skip  %s  (not named by --leg)
+' "${names[$i]}"
+  elif [ "$rc" = ondemand ]; then
     # THE FIFTH VERB, and it is NOT `skip`. Two reasons, both load-bearing. `skip`'s tail says
     # `unchanged vs <branch>`, which is false here — the leg is not unchanged, it is out of subject —
     # and `skips` is conjoined into the `gate-full-green` stamp, so counting an on-demand skip there
@@ -1443,7 +1624,12 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
 # the one a reader quotes. A leg that was held did not run, so counting it in the total is the
 # green-by-absence class stated as arithmetic. TOOL-dUnstalledConvoy-31.
-ran=$((n-skips-${ondemands:-0}))
+ran=$((n-skips-${ondemands:-0}-${shardouts:-0}))
+# THE SHARD IS NAMED IN THE TOTAL, and this line exists because the first run of --leg reported
+# `gates GREEN -- 86/86 legs passed` while executing ONE leg. A total that includes legs nobody ran
+# is the green-by-absence class stated as arithmetic, and on a SHARDED run it is the worst form of
+# it: the operator asked for one leg and the summary answered for the whole bar.
+[ "${shardouts:-0}" -gt 0 ] && skipnote="$skipnote (${shardouts} not named by --leg)"
 
 # A BAR THAT RAN NOTHING BECAUSE EVERYTHING WAS HELD IS NOT A GREEN BAR. It is the loudest possible
 # green-by-absence: a repository whose whole manifest is kit-subject would print `gates GREEN` on

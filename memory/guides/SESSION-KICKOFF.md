@@ -2,8 +2,8 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-31T05:38:06+03:00 @ 14e21399f7dd0559224837a2754fcbf9fc4a754b
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+last-audit: 2026-08-31T06:08:45+03:00 @ 14e21399f7dd0559224837a2754fcbf9fc4a754b
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; tools/gate-legs.toml; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: d902165a87967eb0d3f1fe280876948745e6a8e3
 check-script: skills/session-kickoff/manifest-check.sh
@@ -115,11 +115,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
-# Legs report in CHUNKS, each closing with its own verdict line, so a red is readable before the run ends. Chunks bound REPORTING only — dispatch is untouched, and a chunk whose every leg skipped reports as skipped, never green.
+bash tools/run-gates/run-gates.sh --leg "<name>"   # SHARD: that leg only, guard and hold bypassed, repeatable. Never stamps gate-full-green
+bash tools/run-gates/run-gates.sh --list|--manifest   # names, or the declaration as a table with each ceiling joined to gate-ledger.tsv
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
-GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
-# Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
+GATE_OPTIN=1 bash tools/run-gates/run-gates.sh   # also run every OPT-IN leg (GATE_SELFTESTS is the accepted alias). Held by default, owner ruling 2026-08-26; GATE_FULL does NOT unlock them
+# Every leg declares a `ceiling` in tools/gate-legs.toml and the runner KILLS one that outlives it, RED naming the leg. TOOL-aBoundedCeiling-1
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
