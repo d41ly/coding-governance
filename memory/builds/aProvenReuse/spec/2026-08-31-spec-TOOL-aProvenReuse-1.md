@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-2 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-2 |
 

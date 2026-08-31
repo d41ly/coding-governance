@@ -123,6 +123,30 @@ an absent region cannot be told from a spec nobody has recorded against.
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
+## §10 Reuse audit — the two facts, and what satisfies each
+
+Required on a Tier-2 spec whose FILENAME date is on or after `SPEC10_EVIDENCE_CUTOFF`
+(`.memory-tree.conf`; blank turns it off). Check 12 refuses the section naming whichever is absent.
+It lives HERE rather than in the skeleton because the skeleton is COPIED, and a body explaining the
+predicate necessarily contains the words that satisfy it.
+
+- **The probe result** — one of: a `{{TOOL_ROOT}}codebase-map/reuse_lookup.py` citation naming the
+  seam this unit extends; the phrase "no existing seam fits" with the evidence; or a named
+  `reuse-first` waiver, where a run was granted one.
+- **The recall terms you used**, on a line naming them (`Recall terms used: ...`, or the `--terms`
+  invocation). Composing 8-14 terms in this corpus's own jargon is the expensive half of the probe,
+  and BUILD-METHOD M7's regrounding step 5 re-runs the query FROM that line — a §10 without it makes
+  that step resolve to nothing.
+
+The probe half is scanned over the section with each TERMS VALUE removed, so a terms list containing
+`reuse-first` or `reuse_lookup` does not buy the probe half by itself. The line PREFIX survives, so
+the ordinary one-line form — the finding, then the terms — still satisfies both.
+
+Before this arm existed the section was graded on presence and non-emptiness alone, which made
+`N/A — none` a passing reuse audit. What the check still cannot see is whether either fact is TRUE:
+a citation naming the wrong seam satisfies it. That liveness belongs to whatever observes that a
+probe actually ran, which is outside this file.
+
 ## The skeleton (copy everything below this line)
 
 ```markdown
@@ -223,21 +247,15 @@ an item resolved and never suppresses a mark on the same item.
 
 ## 10. Reuse audit
 
-The reuse-discovery result, and **both halves are required** on a Tier-2 spec dated at or after
-`SPEC10_EVIDENCE_CUTOFF` — check 12 grades the section for them, and refuses it naming whichever is
-absent:
+Two facts, and check 12 refuses this section naming whichever is absent, for any Tier-2 spec dated
+at or after `SPEC10_EVIDENCE_CUTOFF`. **What each is, and what satisfies it, is the section ABOVE
+this skeleton — deliberately, and the reason is worth one line: every word that satisfies this
+predicate is a word an explanation would have to contain, so an instructional body sitting inside
+the copyable skeleton passes the gate on its boilerplate alone and an author who never fills the
+section is never told. Read the rules there; write your own findings here.**
 
-- **The probe result.** The existing seam this unit wires through, cited by path, from a
-  `{{TOOL_ROOT}}codebase-map/reuse_lookup.py` pass — or an explicit "no existing seam fits" with the
-  evidence, or a named `reuse-first` waiver where a run was granted one.
-- **The recall terms you used**, verbatim, on a line naming them. Composing 8–14 terms in this
-  corpus's own jargon is the expensive half of the probe, and BUILD-METHOD M7's regrounding step 5
-  re-runs the query FROM this line — so a §10 without it makes that step resolve to nothing.
+REPLACE both bullets. Delete this paragraph.
 
-Record the reuse decision so an author cannot silently skip it. Before the cutoff was introduced,
-this section was graded on presence and non-emptiness alone, which made `N/A — none` a passing reuse
-audit; measured across the kit's own corpus at the time, a majority of specs recorded no terms at
-all. What the check still cannot see is whether either fact is TRUE — a citation naming the wrong
-seam satisfies it — so the liveness half lives outside this file, in whatever observes that a probe
-actually ran.
+- The seam, by path, or that none fits, with the evidence.
+- The retrieval arguments you actually passed, verbatim, so the next session can re-run them.
 ```

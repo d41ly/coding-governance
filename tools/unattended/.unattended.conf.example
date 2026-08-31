@@ -56,14 +56,22 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # `reuse-probed`, and the floor is shrink-only, so leaving it at 10 makes `check-unattended.sh`
 # check 3 red with "the declared floor sits below the kit's own core count". Bump it when you take
 # the version.
-#
-# WHAT `reuse-probed` READS, because it is the one core item that looks outside this kit: the query
-# log `tools/memory-recall/query.py` writes under the git common dir. That is a SOFT edge and it is
-# deliberately not a `requires` — an adopter who took this kit without memory-recall gets an
-# announced SKIP rather than an unmeetable item, and `kit.toml` declares no `requires_if` for it
-# because check 7 resolves such an edge against a condition KEY, and no key here says whether
-# another kit is installed. Written down rather than declared, so the coupling is at least readable.
 CORE_FLOOR="12:11"
+
+# The recall CLI whose query log the `reuse-probed` Definition-of-Done item reads. REPO-RELATIVE
+# path, and BLANK is the default and means "not adopted": the item then reports an announced SKIP
+# rather than an unmeetable UNMET, so a project that took this kit and not the recall kit is not
+# wedged by a core item it can never satisfy.
+#
+# A DECLARATION rather than a path in the driver, for the reason every other key here exists: gov
+# ships its own bytes verbatim, so a `tools/<kit>/` literal in a script arrives unchanged in a tree
+# installed at another prefix and resolves to nothing there — `tools/check-install-prefix.sh` reds
+# on exactly that. You know where your recall kit lives; the driver does not.
+#
+# It is NOT a `requires_if` edge in kit.toml. `govkit` resolves such an edge against a condition key,
+# and conditioning "needs the recall kit" on "declares the recall kit" is a tautology, not a
+# dependency.
+RECALL_CLI=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many

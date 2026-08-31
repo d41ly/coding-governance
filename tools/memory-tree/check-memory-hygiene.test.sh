@@ -209,11 +209,23 @@ printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · 
 # ---- two arms need separate fixtures rather than one.
 ev()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
 evterms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
-evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: alpha beta gamma delta epsilon zeta.|'; }
+# The terms VALUE deliberately carries `reuse-first` and `reuse_lookup`. That is the F4 class from
+# the closing diff review: a terms list is 8-14 words of this corpus's jargon and those words
+# routinely include a probe token, so a single-blob scan let the terms line buy the probe half and
+# the probe arm could not fail. Both specs of the build that added this arm did exactly that. If the
+# probe blob ever stops excluding the terms value, THIS fixture goes silent and the arm below reds.
+evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reuse_lookup seam recall probe terms alpha beta.|'; }
+# The COPYABLE SKELETON's own section 10, which must NOT satisfy either arm. F3: the first cut put
+# the instructional prose inside the skeleton, and every word that satisfies this predicate is a word
+# such prose must contain -- so an author who filled sections 1-9 and left section 10 boilerplate
+# scored both arms and was never told. The rules now live above the fence; this fixture is what stops
+# them moving back.
+evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
 
 ev | evonlyt > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
 ev           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
 ev | evterms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
+ev | evskel  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
 # PRE-cutoff twin of 70+71 combined: a §10 with neither fact, dated before the cutoff. This is the
 # grandfathering arm, and without it "no landed spec goes retroactively red" is an untested claim.
 good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
@@ -681,6 +693,10 @@ hit  'tFixture-81.md (§10 Reuse audit does not record the recall terms used'
 miss 'tFixture-82.md (§10 Reuse audit'          # both facts present
 miss 'tFixture-83.md (§10 Reuse audit'          # PRE-cutoff, grandfathered
 miss 'tFixture-84.md (§10 Reuse audit'          # TIER-1, outside the arm by N4
+# F4: the terms value carries `reuse-first` AND `reuse_lookup`, and must still red on the PROBE arm.
+hit  'tFixture-80.md (§10 Reuse audit does not record the probe result'
+# F3: the skeleton's own boilerplate satisfies NEITHER arm.
+hit  'tFixture-85.md (§10 Reuse audit does not record the recall terms used AND the probe result'
 miss 'tFixture-84.md (header rev-1 not logged'  # and it reds for no OTHER reason either
 miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head

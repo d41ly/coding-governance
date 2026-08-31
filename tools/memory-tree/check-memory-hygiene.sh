@@ -1070,16 +1070,33 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- index() over a tolower()ed body, never a regex: the header of this file records that
     # ---- interval expressions are spelled out character by character because a build that does not
     # ---- honour {8} would demand those literal bytes. A substring test has no dialect surface.
+    # ----
+    # ---- THE TERMS ARM ACCEPTS TWO SPELLINGS AND WAS DELIBERATELY NOT WIDENED. Measured over this
+    # ---- corpus: of the Tier-2 post-cutoff specs that fail it, 15 do record their terms in looser
+    # ---- prose - "was run with terms", "with the terms", "the terms naming ...". Widening to a bare
+    # ---- `terms` would admit all 15 and also a sentence like "build-complete terms 3-5", which is a
+    # ---- false PASS on a spec that recorded nothing. A false red names its own remedy and the spec
+    # ---- template states both accepted spellings; a false pass is silent. All 15 are grandfathered.
     if (want == canon10 && ecut != "" && fdate != "" && fdate >= ecut) {
-      s10 = ""; in10 = 0
+      # ---- TWO BLOBS, and the second one is why. `s10p` is the section with each TERMS VALUE
+      # ---- REMOVED -- everything from the terms marker to end of line. A terms list is 8-14 words of
+      # ---- this corpus jargon and those words routinely include `reuse-first` or `reuse_lookup`, so
+      # ---- scanning one blob let a terms line alone satisfy BOTH arms and the probe half could not
+      # ---- fail. Both specs of the build that added this arm did exactly that. The line PREFIX is
+      # ---- kept, so the ordinary one-line form -- a finding, then the terms -- still satisfies both.
+      s10 = ""; s10p = ""; in10 = 0
       for (i = 1; i <= n; i++) {
         if (body[i] ~ /^## /) { in10 = (body[i] ~ /^## 10\. Reuse audit/); continue }
-        if (in10) s10 = s10 " " tolower(body[i])
+        if (!in10) continue
+        L10 = tolower(body[i]); s10 = s10 " " L10
+        cutT = index(L10, "recall terms"); cutF = index(L10, "--terms")
+        if (cutF > 0 && (cutT == 0 || cutF < cutT)) cutT = cutF
+        s10p = s10p " " (cutT > 0 ? substr(L10, 1, cutT - 1) : L10)
       }
       hasT = (index(s10, "recall terms") > 0 || index(s10, "--terms") > 0)
-      hasP = (index(s10, "reuse_lookup") > 0 || index(s10, "reuse-lookup") > 0 \
-              || index(s10, "no existing seam") > 0 || index(s10, "no seam fits") > 0 \
-              || index(s10, "reuse-first") > 0)
+      hasP = (index(s10p, "reuse_lookup") > 0 || index(s10p, "reuse-lookup") > 0 \
+              || index(s10p, "no existing seam") > 0 || index(s10p, "no seam fits") > 0 \
+              || index(s10p, "reuse-first") > 0)
       miss = ""
       if (!hasT) miss = "the recall terms used"
       if (!hasP) miss = (miss == "" ? "" : miss " AND ") \
@@ -1114,6 +1131,18 @@ case "$bad12_raw" in
 esac
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
+# ---- THE §10 EVIDENCE ARM ANNOUNCES A ZERO POPULATION. At adoption its cutoff is set strictly
+# ---- ahead of every dated spec on every branch, so it grades NOTHING and stays silent — which is
+# ---- byte-identical to an arm that is broken, mis-scoped, or reading an empty selection. A skip
+# ---- that looks like a pass is indistinguishable from coverage, so it says so. Counted by DATE
+# ---- alone, which OVER-counts (the arm reaches Tier-2 only), and that is the safe direction: a
+# ---- date-count of zero proves a Tier-2 count of zero, while a non-zero date-count only means the
+# ---- notice stays quiet, which is the state where the corpus itself is the evidence.
+if [ "$STAGED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then
+  _ev_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC10_EVIDENCE_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_ev_n:-0}" -gt 0 ] || echo "memory-hygiene: the §10 reuse-evidence arm graded NO spec — SPEC10_EVIDENCE_CUTOFF is $SPEC10_EVIDENCE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
 fi
 
 # 13-15 (pinned) + 16 (structural) — id + path corpus classification (delegates to the sibling classifier). ONE grammar and ONE

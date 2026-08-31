@@ -112,8 +112,8 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    Two rows carry a consequence worth knowing before you waive them. **`reuse-first`** — waiving it
    is no longer silent, and both halves that made it so are closed. The `reuse-probed` item reports
    the waiver and its recorded reason at `--close`, and where the project sets a reuse-evidence
-   cutoff the memory gate refuses a spec whose §10 records neither the recall terms nor a probe
-   result. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
+   cutoff the memory gate refuses a spec whose §10 is missing EITHER the recall terms or a probe
+   result — either one absent is a refusal, not only both. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
    accepts as a finding, so naming it is also how the spec lands. **`land-once-done`** — waiving it
    does not remove the Definition-of-Done item that observes completeness; that still owes an
    override at close.

@@ -769,10 +769,16 @@ ALIEN=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m alien </dev/null)
 sed -i "s/^base: .*/base: $ALIEN/" memory/builds/tRun/RUN.md
 hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
 
-# ---- reuse-probed, all five outcomes (TOOL-aProvenReuse-2). The scratch repo ships no
-# ---- tools/memory-recall/query.py, so EVERY other close arm in this suite meets this item through
-# ---- the kit-absent skip and none of them changes. These five arms are what make the other four
-# ---- outcomes reachable at all.
+# ---- reuse-probed, all five outcomes (TOOL-aProvenReuse-2). The fixture conf declares no
+# ---- RECALL_CLI, so EVERY other close arm in this suite meets this item through the not-adopted
+# ---- skip and none of them changes. These five arms are what make the other four outcomes
+# ---- reachable at all.
+# ----
+# ---- THE CLI IS A DECLARATION, and that is what makes this testable. The first cut probed two
+# ---- hardcoded kit paths under $ROOT; this suite runs the driver from OUTSIDE the scratch tree, so
+# ---- KIT_DIR was always the real repo and the probe always found the real repo's recall kit --
+# ---- the not-adopted branch could not be reached from here at all. A conf key can be set to a
+# ---- scratch path, so all five outcomes are exercised and none of them needs a kit literal.
 # ----
 # ---- THE `met` FIXTURE REPRODUCES A REAL ROW'S ESCAPING rather than copying a real row: the
 # ---- worktree here is a mktemp path, so a copied row names a tree this is not and could only ever
@@ -788,11 +794,21 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
 fixture; git push -q -f origin HEAD:main
 
-# 1. KIT ABSENT — no query.py anywhere. MET, and it says which kit is missing.
-hit "$(_rp_close)" "this tree ships no memory-recall kit"
+# 1. NOT ADOPTED — the fixture conf declares no RECALL_CLI. MET, and it names the key.
+hit "$(_rp_close)" "declares no readable RECALL_CLI"
 
-# From here the kit exists, so the log outcomes become reachable.
-mkdir -p tools/memory-recall && : > tools/memory-recall/query.py
+# 1b. DECLARED BUT UNREADABLE is the SAME outcome, and it must be, or a typo'd path would fall
+#     through to the log arms and report a missing PROBE when the real fault is a missing FILE.
+printf 'RECALL_CLI="no/such/cli.py"\n' >> .unattended.conf
+out=$(_rp_close)
+hit "$out" "declares no readable RECALL_CLI"
+hit "$out" "no/such/cli.py"
+
+# From here the declared CLI exists, so the log outcomes become reachable. The path is the scratch
+# tree's own -- no kit literal, because a kit literal in shipped bytes is what the carried-prefix
+# ratchet exists to refuse.
+sed -i 's|^RECALL_CLI=.*|RECALL_CLI="fake-recall-cli.py"|' .unattended.conf
+: > fake-recall-cli.py
 
 # 2. LOG ABSENT — the kit is installed and nothing has ever written a log. UNMET, and the word is
 #    ABSENT, not zero: an operator who confuses "cannot answer" with "answered no" repairs the wrong
@@ -814,9 +830,12 @@ printf '{"qid": 2, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_es
 out=$(_rp_close)
 hit "$out" "1 recall query recorded for this tree"
 # ...and the PREFIX arm, which is the whole reason the compare is `grep -xF` and not a substring.
-# A row for the PARENT of this tree must not be counted for this tree. Under a substring test both
-# rows match and the count reads 2.
-printf '{"qid": 3, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(dirname "$(git rev-parse --show-toplevel)")")" >> "$(_rp_log)"
+# THE EXTRA ROW IS A CHILD OF THIS TREE, NOT ITS PARENT, and the direction is the entire arm. A
+# parent row is SHORTER than this tree's path, so a substring test does not match it either and the
+# count reads 1 with or without `-x` — the first cut staged it that way and pinned nothing, caught
+# by this build's own closing diff review. A CHILD row CONTAINS this tree's path, so dropping `-x`
+# makes the count read 2 and the arm reds. Measured both ways before this was rewritten.
+printf '{"qid": 3, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)/nested-worktree")" >> "$(_rp_log)"
 out=$(_rp_close)
 hit "$out" "1 recall query recorded for this tree"
 miss "$out" "2 recall queries recorded for this tree"
@@ -3399,10 +3418,14 @@ hit "$out" "skipped — set-checks-recorded is scoped to recipe-mode runs and th
 # fixture's close is unmet for, it is not these.
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: pieces-complete"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
-# ...and EXACTLY TWO announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
+# ...and EXACTLY THREE announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
 # so an item with nothing to say would otherwise inherit the previous item's text and print one
-# item's explanation under another item's name.
-same "exactly two skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "2"
+# item's explanation under another item's name — that is what this count guards and it still does.
+# It was TWO until kit 1.13 added `reuse-probed`, whose kit-absent outcome is a THIRD legitimate
+# skip in this fixture: the fixture conf declares no RECALL_CLI, so the item
+# announces that it has nothing to observe rather than reporting a zero. Raising the pin without
+# this sentence would be indistinguishable from weakening the leak guard.
+same "exactly three skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "3"
 reset_tree
 
 # ---- ABSENT is `slug`, which is every build README written before this key existed. Run over

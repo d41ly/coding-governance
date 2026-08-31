@@ -1,12 +1,13 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-1 |
 
@@ -31,17 +32,26 @@ instead of passing in silence.
     the wrong repair.
   - **zero** — the log exists and holds no `query` row for this tree. UNMET, message names the
     remedy: run the probe, or override.
-  - **kit absent** — the adopting tree ships no `tools/memory-recall/query.py`. MET, and `DOD_OUT`
-    ANNOUNCES the skip, naming the kit that is not installed. This outcome is checked BEFORE `no
-    log`, and it exists because of round-1 finding 24: without it a CORE Definition-of-Done item is
-    structurally unmeetable in every adopter that took `unattended` without `memory-recall`, and
-    every `--close` there needs an override. A skip that announces itself is the
-    `pieces-complete|set-checks-recorded` idiom this arm already copies.
+  - **not adopted** — `RECALL_CLI` is blank or names nothing readable. MET, and `DOD_OUT` ANNOUNCES
+    the skip. Checked BEFORE `no log`, and it exists because of round-1 finding 24: without it a CORE
+    Definition-of-Done item is structurally unmeetable in every adopter that took `unattended`
+    without `memory-recall`, and every `--close` there needs an override. A skip that announces
+    itself is the `pieces-complete|set-checks-recorded` idiom this arm already copies.
   - **met** — one or more. MET, and `DOD_OUT` reports the count and the newest row's timestamp, so
     the wrap-up carries a number rather than a verdict.
 - **S3** — the log is located as `$(git rev-parse --git-common-dir)/recall/queries.jsonl`, which is
   where `query.py`'s own `log_path()` puts it and where `recall-opened.js` reads it. The location is
   DERIVED by the same rule both existing readers use, never spelled as a path literal.
+- **S3a** — the recall CLI is a DECLARATION, `RECALL_CLI` in `.unattended.conf`, optional and blank
+  by default, added to `tools/unattended/kit.toml`'s `optional_keys`. **Rev-4 probed two hardcoded
+  paths and that was wrong three ways at once**, which the closing diff review made visible. It broke
+  this kit's own stated rule — the dossier says the lander, the bypass flag, the gate command and the
+  scheduler tool names all live in `.unattended.conf` and *"a phase token or a DoD item spelled into
+  a script is a defect"*; a sibling kit's path is the same kind of fact. It raised the carried-prefix
+  ratchet in `tools/check-install-prefix.sh`, whose whole point is that a literal `tools/<kit>/`
+  arrives verbatim in an adopter installed at another prefix and resolves to nothing there. And it
+  could not be exercised by the self-test at all, because the suite runs the driver from outside the
+  scratch tree, so the probe always found the real repo's kit and the outcome was unreachable.
 - **S4** — a row belongs to this run when its `worktree` value EQUALS this run's tree. Three
   properties, and each was a round-1 blocker:
   - **The log is JSONL, so the separator is DOUBLE.** Measured on this node, the raw line reads
@@ -95,7 +105,9 @@ instead of passing in silence.
   joins `DOD_CORE` to that table in BOTH directions and separately word-compares the count sentence
   against the driver's set, and that leg is the unguarded `unattended kit gate`. Omitted, S1 reds the
   merge bar twice. The render `memory/guides/UNATTENDED-PROTOCOL.md` is refreshed with it.
-- **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all FIVE S2 outcomes. The
+- **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all FIVE S2 outcomes, each
+  reachable because S3a made the CLI a declaration the fixture conf can set to a scratch path rather
+  than a probe of the real tree. The
   `met` arm's fixture row REPRODUCES A REAL ROW'S ESCAPING — doubled backslashes, `"type": "query"`
   with the space, the same field order — with the `worktree` value set to the scratch tree's OWN
   path escaped the same way, and asserts the arm reports MET with a count of 1. Round 2's F9 caught
@@ -108,12 +120,14 @@ instead of passing in silence.
 - **S8** — the kickoff manifest's `last-audit` re-stamp. `memory/guides/SESSION-KICKOFF.md` watches
   `.unattended.conf`, which S5 edits, and `kickoff-manifest ratchet` is the first leg in
   `tools/gate-legs.json`.
-- **S9** — the memory-recall coupling is documented in `tools/unattended/.unattended.conf.example`,
-  beside the `CORE_FLOOR` key S5 moves, NOT declared in `tools/unattended/kit.toml`. **Rev-3 said
-  `tools/unattended/README.md`; that file does not exist** — this kit has no README, and its
-  adopter-facing prose is the conf example plus the rendered protocol. Corrected at build time
-  rather than papered over, because a spec naming a carrier that is not there is how the next reader
-  learns to distrust the inventory. Round 2's F6 asked which field, and the answer is
+- **S9** — the memory-recall coupling is DECLARED as `RECALL_CLI` (S3a) and documented beside it in
+  `tools/unattended/.unattended.conf.example`, next to the `CORE_FLOOR` key S5 moves. It is still
+  not a `requires` or a `requires_if` in `tools/unattended/kit.toml`: `govkit.py:1114-1129` resolves
+  a `requires_if` condition against a config KEY, and while `RECALL_CLI` is now such a key, making
+  the edge conditional on it would say "this kit needs memory-recall whenever the project says it
+  does", which is a tautology rather than a dependency. **Rev-3 said `tools/unattended/README.md`;
+  that file does not exist** — this kit has no README, and its adopter-facing prose is the conf
+  example plus the rendered protocol. Round 2's F6 asked which field, and the answer is
   none: `govkit.py:1114-1129` check 7 validates a `requires_if` edge by resolving every
   `when_any_key_set` member against the kit's own declared config key lists, and `.unattended.conf`
   declares no key that says whether memory-recall is installed. A hard `requires` is refused by N6.
@@ -302,6 +316,10 @@ where the item reports a SKIP and says so.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-5 · 2026-08-31 · closing-diff-review fold, blockers F1 and F2. The recall CLI became the
+  `RECALL_CLI` declaration (S3a) instead of two hardcoded paths, which is what this kit's own
+  declarations-not-constants rule always required; the hardcoded form also raised the carried-prefix
+  ratchet and left the not-adopted outcome unreachable by the suite. S9 re-stated on top of it.
 - rev-4 · 2026-08-31 · build-time correction. S9 and §4 Migration named `tools/unattended/README.md`
   as the adopter-facing carrier; that file does not exist in this kit, so both now name
   `tools/unattended/.unattended.conf.example`, beside the `CORE_FLOOR` key the same change moves.
