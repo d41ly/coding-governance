@@ -217,6 +217,13 @@ fi
 # driver and graded nowhere is decoration, and this one has a counter and a Definition-of-Done
 # predicate hanging off it.
 PARK_KINDS_OWED=$(core_of PARK_KINDS_OWED)
+# The ACT axis of the same taxonomy, read for the reason the kind axis is: it has a `--status`
+# counter and a Definition-of-Done predicate hanging off it, and a set declared in the driver and
+# graded nowhere is decoration. A SEPARATE read rather than a widened one, because these are acts and
+# that is kinds.
+PARK_ACTS_OWED=$(core_of PARK_ACTS_OWED)
+# The non-overridable Definition-of-Done set, read for arm 16d below.
+DOD_NO_OVERRIDE=$(core_of DOD_NO_OVERRIDE)
 # The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
 # second spelling of a bound is a bound that goes wrong silently when one copy moves.
 RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
@@ -257,7 +264,12 @@ else
     rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
     rv_now=""; rv_then=""; rv_readable=0
     if [ -f "$rv_readme" ]; then
-      rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+      # NON-WONTDO ONLY. The promotion clause discharges an exited loop by counting NEW unit ids,
+      # and it never looked at their status - so three thin specs flipped to `WONTDO` satisfied it,
+      # and `build-complete` saw no non-terminal row either. A promoted blocker that was retired is
+      # not a promotion. The status predicate is spelled EXACTLY as check 24's retire loop spells it,
+      # so the two clauses cannot disagree about what a retired unit looks like.
+      rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -vE '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
       if [ -n "$rv_base" ] && GIT cat-file -e "$rv_base^{commit}" 2>/dev/null; then
         rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
         rv_readable=1
@@ -298,7 +310,7 @@ else
           if (readable != 1)
             printf "\n  %s (%d subject(s) EXITED without converging and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
           else if (newids + 0 < nneed)
-            printf "\n  %s (%d subject(s) EXITED without converging and the generated units region gained only %d unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted)", f, nneed, newids + 0
+            printf "\n  %s (%d subject(s) EXITED without converging and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted. This is a LOWER BOUND: it demands one surviving id per exited SUBJECT, not one per standing BLOCKER, because the region records ids and not which subject promoted them)", f, nneed, newids + 0
         }
       }' "$rvf")"
   done
@@ -369,6 +381,25 @@ if [ -n "$PARK_KINDS_OWED" ]; then
     grep -qE "^[[:space:]]*park \"\\\$rel\" $pk " "$DRIVER" || pk_dead="$pk_dead $pk"
   done
   [ -z "$pk_dead" ] || fail 2 "the parked-kind taxonomy names a kind no park call site in the driver writes, so a count that exists to be narrow is silently wider than the code it measures:$pk_dead"
+  # THE ACT AXIS, joined to its WRITER the way the kind axis is joined to `park`. `verb_rescope`'s
+  # act argument is a closed `case` alternation and is the only thing that can put an act into a row,
+  # so an owed act outside it is a member no row can ever carry: the surfaced count silently returns
+  # to what it was, the split's whole purpose reverts, and every gate and every criterion stays green.
+  # A typo like `supercede` is exactly that, and is what this arm exists to catch.
+  if [ -n "$PARK_ACTS_OWED" ]; then
+    pa_case=$(grep -oE '^[[:space:]]*retire\|supersede\|add\)' "$DRIVER" | head -1)
+    if [ -z "$pa_case" ]; then
+      fail 2 "the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing: $DRIVER"
+    else
+      pa_dead=""
+      for pa in $PARK_ACTS_OWED; do
+        printf '%s' "$pa_case" | grep -qE "(^|\|)[[:space:]]*$pa(\||\))" || pa_dead="$pa_dead $pa"
+      done
+      [ -z "$pa_dead" ] || fail 2 "the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says:$pa_dead"
+    fi
+  else
+    fail 2 "the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed: $DRIVER"
+  fi
 else
   fail 2 "the driver declares no PARK_KINDS_OWED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read: $DRIVER"
 fi
@@ -1433,6 +1464,47 @@ else
     done
   fi
 fi
+# ---- 16d: the NON-OVERRIDABLE Definition-of-Done set, joined to the Skill an agent reads, in BOTH
+# ---- directions. The same shape as arm A one block up and for the same reason: the driver's
+# ---- constant and the Skill's hand-authored paragraph are two artifacts in two languages, and a
+# ---- member added to one and forgotten in the other is a run told it may override an item the verb
+# ---- will refuse - or worse, told the refusal has an override route it does not have. The Skill
+# ---- said ONE item where the driver held TWO for as long as the second existed, and nothing saw it.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: whether the paragraph's PROSE is correct, only that the member SET
+# ---- matches. A paragraph naming both items and describing them backwards passes.
+_no_tmpl="$HERE/SKILL.template.md"
+if [ -z "$DOD_NO_OVERRIDE" ]; then
+  fail 16 "cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing: $DRIVER"
+elif [ ! -f "$_no_tmpl" ]; then
+  fail 16 "the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces"
+else
+  # The PARAGRAPH, selected by its own sentence and terminated by the first blank line. Item names
+  # are backticked and lowercase-hyphen shaped, which is what excludes the `--abort` route named in
+  # the same paragraph without excluding a member the Skill invented.
+  _no_tbl=$(awk '
+      /items? (has|have) NO override/ { p = 1 }
+      p && /^[[:space:]]*$/ { exit }
+      p { print }' "$_no_tmpl"     | grep -oE '`[a-z][a-z-]*`' | tr -d '`' | sort -u)
+  if [ -z "$_no_tbl" ]; then
+    fail 16 "the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked"
+  else
+    _no_core=$(printf '%s
+' $DOD_NO_OVERRIDE | grep -c . >/dev/null; printf '%s
+' $DOD_NO_OVERRIDE | sort -u)
+    _no_only_drv=$(comm -23 <(printf '%s
+' "$_no_core") <(printf '%s
+' "$_no_tbl") | tr '
+' ' ')
+    _no_only_tbl=$(comm -13 <(printf '%s
+' "$_no_core") <(printf '%s
+' "$_no_tbl") | tr '
+' ' ')
+    [ -z "$(printf '%s' "$_no_only_drv" | tr -d '[:space:]')" ] || fail 16 "the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen:$_no_only_drv"
+    [ -z "$(printf '%s' "$_no_only_tbl" | tr -d '[:space:]')" ] || fail 16 "the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open:$_no_only_tbl"
+  fi
+fi
+
 # Arm C: the floor. Mirrors CORE_FLOOR's two branches — undeclared and malformed are both refusals,
 # because either one leaves the pin unenforced while the conf still looks configured.
 # TOOL-aPromptedMandate-6 fold, review H1 - a floor BELOW the kit's own core count is SLACK BY
@@ -1613,6 +1685,20 @@ for f in $RUNS; do
   elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
     report "check 24 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
   else
+    # THE RETIRE ARM'S BASELINE IS THE PINNED BASE, and the ADD ARM'S IS NOT. `baseline_units` stops
+    # at the first commit carrying BUILDING, RUNNING, VERIFYING, LANDING or LANDED - so SPECCING,
+    # REVIEWING, FOLDING, RESEARCHING and TESTING are all BEFORE it, and a unit authored `WONTDO`
+    # while speccing is already retired at that baseline and owes no row. That window is exactly
+    # where a prompt-authorized run does its speccing.
+    #
+    # The ADD arm keeps the live-phase baseline for the reason its own header states: M2 MANDATES
+    # authoring an absent spec, so an addition between BASE and BUILDING is the case that arm exists
+    # to PERMIT. A retirement between the same two points is not, and the asymmetry is the point
+    # rather than an inconsistency.
+    rs_pinned=""; rs_pwhy=""
+    if ! rs_pinned=$(pinned_units "$rb" "$bre" "${UNITS_REGION_CUTOFF:-}"); then
+      rs_pwhy=$rs_pinned; rs_pinned=""
+    fi
     rs_rows=$(grep -F -- ' rescope · item ' "$f" 2>/dev/null || true)
     # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
     # An `add` alone would red a correctly performed supersession, whose successor is present now
@@ -1623,12 +1709,19 @@ for f in $RUNS; do
       printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
       fail 24 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
     done
-    # RETIRED units: a status that is WONTDO now and was not then owes a retire or a supersede.
-    for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
-      id_rows "$rs_was" "$rsid" | grep -q '| WONTDO |' && continue
-      printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
-      fail 24 "a unit went WONTDO after this run entered BUILDING and no rescope row retires or supersedes it, so a unit was dropped with nothing on the record saying so: $rsid in $f"
-    done
+    # RETIRED units: a status that is WONTDO now and was not so at the PINNED BASE owes a retire or
+    # a supersede. Reported SEPARATELY when its own baseline is unreadable, because the whole-check
+    # skip this replaces took the ADD arm and the supersession arm down with it.
+    if [ -n "$rs_pwhy" ]; then
+      report "check 24's RETIRE arm skipped for $f — $rs_pwhy (the ADD arm still ran)"
+    else
+      for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
+        id_rows "$rs_pinned" "$rsid" | grep -q '| WONTDO |' && continue
+        id_in "$rs_pinned" "$rsid" || continue
+        printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
+        fail 24 "a unit is WONTDO now and was not at the BASE this run pinned, and no rescope row retires or supersedes it, so declared scope was dropped with nothing on the record saying so: $rsid in $f"
+      done
+    fi
     # A SUPERSESSION THAT NEVER LANDED ITS REPLACEMENT is a retirement wearing a better name.
     # A `for`, never a `| while`: `fail` in a pipeline subshell sets a status the parent never
     # sees, so the leg reports the violation and exits 0 — the shape this whole build is about.
