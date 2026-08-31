@@ -82,9 +82,13 @@ CORE of both sets and the project may only EXTEND them, asserted against a shrin
 without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
 and the fleet already has a recorded case of a pin RAISE being indistinguishable from a drain.
 
-**The run-state file is split mechanically, not by discipline.** The generated region is
-byte-compared against a fresh render; the authored region holds only the facts nothing in the
-tree derives — seven of them, enumerated in the protocol's own section 2 rather than counted here. The precedent is in this repo: one build's hand-kept status file still reads
+**The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
+contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
+every read, so "current" is the absence of a second answer rather than a comparison between two. It
+was once byte-compared against a fresh render, and that equality was unmaintainable in the ordinary
+case. The authored region holds only the facts nothing in the tree derives, enumerated in the
+protocol's own section 2 and deliberately not counted here — three carriers once held three different
+counts of them at the same time. The precedent is in this repo: one build's hand-kept status file still reads
 IN-PROGRESS while the generated region of the same build's README correctly reads CLOSED. The
 authored half rotted and the derived half did not.
 
@@ -95,7 +99,9 @@ the renderer for a target that did not select the kit. Two amended clauses sit i
 body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
 opt-in kit was rejected on both counts.
 
-**A run is bound by eleven named directives, and each is a POINTER.** The set is a kit constant the
+**A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
+driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
+about it once. The set is a kit constant the
 project may extend but not delete; the rules live in the build method and the contract names zero
 handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
 taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
@@ -141,6 +147,25 @@ graded by the mechanism arm plus an elapsed assertion on the terminal-record pat
 path is driven by a stub exiting the status `timeout` itself returns. The `http.lowSpeed*` and
 `ConnectTimeout` options are asserted BY INSPECTION only: exercising them needs a server that
 authenticates, stalls mid-transfer, and speaks ssh, and no fixture here has one.
+
+**The kit reads the evidence it already records, from `TOOL-aGradedMandate`.** Four Definition-of-Done
+terms were added or tightened, and every one of them consumes a fact the driver was already writing
+and nothing was reading. `closing-review-recorded` gained a second term: the LAST `--review` round
+whose subject is the build slug must carry a terminal token, and `CONVERGED` must name zero blockers.
+Two runs in this tree had reached `LANDED` with that item MET while their closing loop stopped at
+BLOCKED with blockers standing, and the incentive was inverted — recording one more round could oblige
+a run to promote every blocker into a built unit, while recording nothing owed nothing. `specs-audited`
+is an eleventh core item joining every CLOSED unit to a tracked `spec-audit` binding line, whole-token
+and expanding the `N..M` range form eighteen tracked records use. `build-complete` gained a sixth term
+over `plan_state`'s THIN grade, which `verb_plan` used to compute and overwrite one line later.
+
+**The parked split has TWO axes and the history side subtracts both.** `PARK_ACTS_OWED` names the acts
+of the `rescope` kind the owner is owed, so a retirement reaches the wrap-up while an addition stays a
+declaration. A `kind:act` member grammar inside `PARK_KINDS_OWED` was tried and REFUSED: the gate leg
+greps the driver for a `park` call site per owed member, and no `park "$rel" rescope:retire` site can
+exist, because the act is a field of the reason. The history complement subtracts the owed acts too —
+without that a retire row matches both alternations and `--status` reports one row as a decision AND
+as a note.
 
 ## Shared seams
 
