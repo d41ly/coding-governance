@@ -1538,11 +1538,6 @@
       "file": "tools/memory-recall/query.py"
     },
     {
-      "id": "log_lookup",
-      "kind": "function",
-      "file": "tools/codebase-map/reuse_lookup.py"
-    },
-    {
       "id": "log_path",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -3506,6 +3501,11 @@
       "id": "write_block",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_lookup",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
       "id": "write_text",
