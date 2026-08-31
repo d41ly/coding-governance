@@ -337,6 +337,43 @@ TIMINGS="$LEDGER"
 # stops a coverage knob being added without an author reading this paragraph.
 KNOWN_KNOBS="width timeout"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
+
+# THE [[profile]] ROWS BECOME THE TABLE when the declaration is TOML and carries any. They were a
+# DEAD DECLARATION until this: emitted into gate-legs.toml by the migration, read by nothing, while
+# the runner still parsed gate-profiles.txt beside it -- so the file that claims to hold the whole
+# bar held half of it and the owner could edit a width that changed nothing.
+#
+# RENDERED INTO THE SAME TSV the loop below already reads, rather than given a second selection
+# implementation. The thresholds, the most-capable-first ordering, the catch-all rule and every
+# refusal stay exactly one piece of code with two possible sources of rows. GATE_PROFILES still
+# outranks both, which is the documented rollback.
+if [ -z "${GATE_PROFILES:-}" ] && [ "$LEGS_FMT" = toml ]; then
+  _ptmp=$(mktemp 2>/dev/null) || _ptmp=""
+  if [ -n "$_ptmp" ] && "$PYBIN" -c '
+import sys, tomllib
+# NO BACKSLASH ESCAPES IN THIS BLOCK. It is embedded in a single-quoted shell string and every
+# two-character escape written here has been collapsed into a real byte on the way to the file --
+# five times in this build, the last one breaking this very program. chr() instead.
+TAB = chr(9); NL = chr(10)
+rows = (tomllib.load(open(sys.argv[1], "rb")).get("profile") or [])
+if not rows:
+    sys.exit(1)
+out = []
+for r in rows:
+    for k in ("name", "min_cores", "min_ram_mb", "width"):
+        if k not in r:
+            print("[[profile]] %r declares no %s" % (r.get("name"), k), file=sys.stderr); sys.exit(2)
+    out.append(TAB.join([str(r["name"]), str(int(r["min_cores"])),
+                         str(int(r["min_ram_mb"])), "width=%d" % int(r["width"])]))
+open(sys.argv[2], "w", encoding="utf-8", newline=NL).write(NL.join(out) + NL)
+' "$LEGS_FILE" "$_ptmp"; then
+    PROFILES=$_ptmp
+    _PTRAP="rm -f $_ptmp"
+    trap "$_PTRAP" EXIT
+  else
+    rm -f "$_ptmp" 2>/dev/null
+  fi
+fi
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
 # LENGTH-BOUNDED BEFORE ANY ARITHMETIC. Both `[ "$v" -gt 0 ]` and `$(( ))` ERROR on an int64 overflow
