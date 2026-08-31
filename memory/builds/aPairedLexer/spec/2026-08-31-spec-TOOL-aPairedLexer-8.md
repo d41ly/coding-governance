@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded
 
-**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
+**Status:** SPECCED · rev-6 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -45,11 +45,19 @@ instead of each carrying a copy. This unit therefore lands FIRST.
 - **S3** — the predicate reports, for every slash it DECLINES, that the LINE IS AMBIGUOUS when that
   line also carries a later slash **IN CODE MODE**. No opener test and no closure test: see §8,
   where the fork is resolved and both are refuted by measurement.
-  **The TOKEN reading is binding and the raw-character reading is refused**, because the two differ
-  by the entire population and the round-4 audit measured both: raw, 3 of this repo's 4 tracked
-  workflow harnesses report AMBIGUITY, every hit being the hook's OWN mandated
-  `Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers` idiom where the later slash is the
-  marker comment; token, 0 of 4. A slash inside a comment or a string is not a slash for this test.
+  **The span is scanned as a REGEX BODY, and ambiguity requires an opener inside it.** Scanning it
+  as CODE was the first implementation and it FAILED its own sibling criteria: a backtick in the
+  body reads as a string opener that swallows the closing slash, so unit 6's four rule arms all
+  reported clean. Measured. So the scan respects escapes and character classes the way a regex body
+  is read, finds the closer, and reports ambiguity only when the span carried a backtick, a quote or
+  a `/*`.
+
+  **This is NOT round 2's refuted opener test**, and the difference is the whole reason the cost is
+  bearable. That test scanned the REST OF THE LINE as code; this scans the SPAN as a regex body.
+  The hook's own mandated `Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers` idiom has a
+  later slash but no opener between, so it ADMITS — where the rest-of-line reading denies it and 3
+  of this repo's 4 tracked workflow harnesses with it. A span with no closer at all was never a
+  regex and reports nothing.
 - **S3-RETIRED** — the leak test three revisions tried to write.
   Retired unbuilt. rev-2 tested for an opener between two slashes and produced false LEAKS on
   ordinary division; rev-3 added a closure test and produced false NO-LEAKS on a balanced opener
@@ -209,6 +217,12 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
   are dropped from the set. B1: AC7 was byte-unchanged and still mandated the retired test, leaving
   S3 with no criterion at all. H3: a closing quote is treated as a regex position, which ADMITS a
   raw primitive with no declined slash anywhere — S4b and AC10 close it.
+- rev-6 · 2026-08-31 · BUILT, and the spec moved first because the build diverged. rev-5 said 'a
+  later slash IN CODE MODE' with no opener test; implemented literally that fails unit 6's four rule
+  arms, because a backtick in the regex body reads as a string opener and swallows the closer. The
+  rule that works scans the SPAN as a regex body and requires an opener inside it — which is not
+  round 2's refuted test, since that one scanned the rest of the LINE as code. Measured both ways:
+  the working rule admits the `// gov:fixed-verifiers` idiom and denies every phantom-span fixture.
 
 ## 10. Reuse audit
 

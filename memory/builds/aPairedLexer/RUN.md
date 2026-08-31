@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 20ae25b7d9c6430ed7de67bdff8df4e099f12ccf
-phase: REVIEWING
+witness: eb83eca018fba69a995f2a0f715f6cc87e035b54
+phase: BUILDING
 branch-sha: 72dff924d77c5a482a01150141da31e4bdd52334
 branch-ref: refs/heads/branch/paired-lexer-followup-9c31a2
 mode: prompt

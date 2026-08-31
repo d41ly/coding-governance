@@ -40,6 +40,23 @@ js() { # name expected_exit  (script on stdin)
   check "$name" "$want" "$payload"
 }
 
+# sel <name> <script> <json-path> <expected> — a STRUCTURAL assertion through the --selftest seam.
+# An exit code observes a VERDICT; these observe the view a verdict is computed from, which is what
+# "pins the SIGNAL, not the verdict" means and what an end-to-end arm structurally cannot do.
+sel() { # name script path expected
+  local name=$1 script=$2 path=$3 want=$4 got
+  got=$(printf '%s' "$script" | node "$HOOK" --selftest 2>/dev/null | node -e '
+    let d = ""
+    process.stdin.on("data", (c) => { d += c })
+    process.stdin.on("end", () => {
+      let v = JSON.parse(d)
+      for (const k of process.argv[1].split(".")) v = v[k]
+      process.stdout.write(String(v))
+    })
+  ' "$path")
+  if [ "$got" = "$want" ]; then echo "ok   $name"; pass=$((pass+1))
+  else echo "FAIL $name (path $path gave [$got], want [$want])"; fail=$((fail+1)); fi
+}
 # ---- rule 1: concurrency ------------------------------------------------------------------------
 check "raw parallel(items.map) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await parallel(D.map(d => () => agent(d.p)))"}}'
 check "raw pipeline(items,...) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await pipeline(files, s1, s2)"}}'
@@ -1083,6 +1100,136 @@ EOF
 js "rule5: control, the genuine join still denies" 2 <<'EOF'
 const pat = /\[[a-z]+\.ref\]/
 const v = byRef.get(finding.ref)
+EOF
+
+
+# ---- TOOL-aPairedLexer-8, -7, -6: one predicate, the sentinel, and the ambiguity signal ---------
+# Every arm below was measured against the shipped code before it was written. The suite printed
+# 125 passed / 0 failed with all four of the -6 fail-opens LIVE, which is the fourth time an
+# all-green suite has covered a fail-open in this file — so these arms are the evidence, not that
+# number.
+
+# -- TOOL-aPairedLexer-7: start of input is a REGEX position -------------------------------------
+# `'})]'.includes('')` is TRUE, so `let prev = ''` made the first slash in any script a DIVISION,
+# and a phantom template then blanked the whole body. Measured ADMIT at 1.11 with a 500-cap, an
+# unbounded per-item fan and a .ref join all live at once.
+js "rule1: a phantom span opened at START OF INPUT still denies" 2 <<'EOF'
+// tier-2 review harness
+/[`]/.test('a')
+async function run(work) {
+  const verdicts = {}
+  for (const f of work) verdicts[f.ref] = f
+  return await boundedParallel(work, 500)
+}
+/[`]/.test('b')
+EOF
+
+# The STRUCTURAL half. Every regex arm in this file writes the literal after `=`, an unambiguous
+# position, so the suite exercised the arm the fix covers and never the arm it did not. This asserts
+# the code view directly, through the --selftest seam, and survives a rewrite of the heuristic.
+sel "renderCodeView blanks a regex at start of input" '/x/' 'renderCodeView.code.0' '   '
+sel "blankLiterals blanks a regex at start of input"  '/x/' 'blankLiterals.code.0'  '   '
+
+# -- TOOL-aPairedLexer-8: the previous TOKEN, and the member guard --------------------------------
+js "rule1: a return-position regex holding a backtick still denies" 2 <<'EOF'
+function hasTickA(s) { return /`/.test(s) }
+await parallel(D.map((d) => () => agent(d)))
+function hasTickB(s) { return /`/.test(s) }
+EOF
+
+js "rule1: the markdown-fence shape still denies" 2 <<'EOF'
+const md = await read('r.md')
+function isFence(l) { return /^```/.test(l) }
+await parallel(D.map((d) => () => agent(d)))
+function isEnd(l) { return /```$/.test(l) }
+EOF
+
+# THE NEGATIVE HALF. A keyword used as a PROPERTY NAME is not a keyword, and a bare word match turns
+# each of these into a regex opener over live code — a fail-open introduced BY the fix. Measured on
+# a patched copy before the guard was written. A positive-only table cannot tell the two apart.
+js "rule1: obj.in is DIVISION, not a regex opener" 2 <<'EOF'
+const y = obj.in / 2; parallel(items.map(f)); const z = 9 / 3
+EOF
+
+js "rule1: x.of is DIVISION, not a regex opener" 2 <<'EOF'
+const y = x.of / 2; parallel(items.map(f)); const z = 9 / 3
+EOF
+
+js "rule1: m.delete is DIVISION, not a regex opener" 2 <<'EOF'
+const y = m.delete / 2; parallel(items.map(f)); const z = 9 / 3
+EOF
+
+# `of`, `await` and `yield` are CONTEXTUAL keywords and legal identifiers, so they are NOT in the
+# closed set. With them in it, this exits 0.
+js "rule1: 'of' bound as an identifier is not a keyword" 2 <<'EOF'
+const of = 5
+const r = of / 2
+await parallel(D.map((d) => () => agent(d)))
+const q = of / 3
+EOF
+
+# A closing QUOTE ends an expression. Without this the primitive is consumed inside a phantom regex
+# literal and ADMITTED — and NO slash is declined on that line, so the -6 signal could never see it.
+js "rule1: a closing quote ends an expression, so the slash is division" 2 <<'EOF'
+const x = "a" / 2; await parallel(D.map((d) => agent(d))); const y = "b" / 3
+EOF
+
+# -- TOOL-aPairedLexer-6: the DECLINED slash announces itself, to all FOUR rules ------------------
+# One arm per RULE, which is the class arm. Four fixtures of one shape is the instance arm that has
+# now missed this four times. Each fixture's trigger follows `)`, a position -8 DELIBERATELY
+# declines, so units 7 and 8 do not dissolve it.
+
+js "rule1: a raw primitive inside a declined span denies" 2 <<'EOF'
+const a = 1
+if (a) /`/.test(s)
+await parallel(D.map((d) => () => agent(d)))
+if (a) /`/.test(s)
+EOF
+
+js "rule5: a .ref join inside a declined span denies" 2 <<'EOF'
+const n = 1
+if (n) /`/.test(s)
+const v = byRef[finding.ref]
+if (n) /`/.test(s)
+EOF
+
+js "rule3: a cap of 500 inside a declined span denies" 2 <<'EOF'
+const n = 1
+if (n) /`/.test(s)
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), 500)
+if (n) /`/.test(s)
+EOF
+
+# The BLOCK-COMMENT opener, which a backtick-only condition missed entirely. No backtick appears
+# anywhere in this script; the first slash leaks `/*` into block mode and the second closes it, so
+# `stack` is empty and `mode` is 'code' at EOF and every EOF-based signal reports healthy.
+js "rule1: a declined span carrying /* still denies" 2 <<'EOF'
+const a = 1
+if (a) /x[/*]y/.test(s)
+await parallel(D.map((d) => () => agent(d)))
+if (a) /z[*/]w/.test(s)
+EOF
+
+# THE PRECISION BOUND, and the reason the span is scanned as a REGEX BODY rather than as the rest of
+# the line. This is the hook's OWN mandated idiom: the later slash is the `//` of the marker comment,
+# and the span between the division and it carries no opener. Under the rest-of-line reading this
+# denies, and 3 of this repo's 4 tracked workflow harnesses deny with it.
+js "rule2: the gov:fixed-verifiers idiom is not ambiguous" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const all = [1,2,3]
+const groups = chunk(all, Math.ceil(all.length / MAX_VERIFIERS)) // gov:fixed-verifiers
+await boundedParallel(groups.map((g) => () => agent(g)), 5)
+EOF
+
+# And TOOL-aPairedLexer-2's win is not undone: prose naming a primitive, with no ambiguous slash.
+js "rule1: lens prose still admits under the ambiguity signal" 0 <<'EOF'
+const MAX_VERIFIERS = 5
+const LENSES = [
+  { key: "a", prompt: `never write parallel(items.map(f)) here` },
+  { key: "b", prompt: `hunt seams` },
+]
+await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
 EOF
 
 # ---- version parity: a DENY may never become an ADMIT across a kit version -----------------------

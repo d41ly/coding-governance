@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.11' // gov:kit agent-cap@1.11 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.12' // gov:kit agent-cap@1.12 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -280,19 +280,78 @@ function boundedBranch(br, name, consts, ok) {
 // open anything, which also makes BLOCK comments safe to model again — TOOL-aLexedStripper-5 deleted
 // that branch precisely because a `/*` inside a regex literal was indistinguishable from a real one.
 //
-// WHERE A `/` STARTS A REGEX is the classic JavaScript ambiguity and this file is DELIBERATELY
-// CONSERVATIVE about it: a regex is recognised only after a token that cannot end an expression —
-// an operator, an opening bracket, a comma, a colon, a semicolon, or start of input. After an
-// identifier, a number, or a closing bracket the `/` is treated as DIVISION, which is the status quo.
-// Guessing the other way would consume live code to the next `/` and invent a fail-open worse than
-// the one being closed. The residual is therefore a regex in an ambiguous position, and the
-// `unterminated` fallback still covers what this cannot.
+// ---- TOOL-aPairedLexer-8: ONE regex-position predicate, called by BOTH scanners ----------------
+// WHERE A `/` STARTS A REGEX is the classic JavaScript ambiguity, and this file answers it in ONE
+// place because answering it twice is what produced three of its four shipped fail-opens. Both
+// `renderCodeView` and `blankLiterals` call `startsRegex`; neither carries a keyword list, a member
+// guard or a leak test of its own.
+//
+// The set is the keywords that CANNOT end an expression. `of`, `await` and `yield` are deliberately
+// ABSENT: they are CONTEXTUAL keywords and legal identifiers, so `const of = 5; x = of / 2` would
+// open a regex over live code. Measured as a DENY-to-ADMIT on all three before they were dropped.
+const REGEX_KEYWORDS = ['return', 'typeof', 'case', 'in', 'instanceof', 'new', 'delete', 'void', 'throw']
+// The SUBJECT is the running code text, never a bare trailing word and never the current line: a
+// bare word makes every keyword match, and a line prefix misses `obj.` on one line with `in / 2` on
+// the next, which is legal JavaScript. The leading alternative is start of INPUT, not start of line.
+const KEYWORD_TAIL = new RegExp('(?:^|[^.\\w$])(' + REGEX_KEYWORDS.join('|') + ')\\s*$')
+
+function startsRegex(prev, codeText) {
+  // A keyword that cannot end an expression — but not one used as a PROPERTY NAME. `obj.in`,
+  // `x.of`, `m.delete`, `p.new` and `r.case` are legal member accesses.
+  if (KEYWORD_TAIL.test(codeText)) return true
+  if (prev === '') return true // start of input. `'})]'.includes('')` is TRUE, which made this a
+  // DIVISION position and took the whole hook dark on any script whose first token was a regex.
+  if ('})]'.includes(prev)) return false // a closing bracket ends an expression
+  if (/[A-Za-z0-9_$]/.test(prev)) return false // an identifier or a number ends an expression
+  if (prev === '"' || prev === "'" || prev === '`') return false // a closing QUOTE ends one too:
+  // without this, `const x = "a" / 2; await parallel(D.map(f)); const y = "b" / 3` consumed the
+  // primitive inside a phantom regex literal and ADMITTED. No slash is declined on that line, so no
+  // decline signal could ever have reached it. Measured.
+  return true
+}
+
+// A slash DECLINED as a regex start leaks the rest of its line into code mode, and no test over the
+// span can tell a real leak from ordinary division — three revisions tried and each was refuted by
+// measurement (the build's spec §8 F1 carries the fork and its ratification). So the DECLINE itself
+// is the signal, bounded by this: the line is ambiguous only when a later slash IN CODE MODE could
+// have closed the regex.
+//
+// THE TOKEN READING IS BINDING. A slash inside a comment or a string is not a slash for this test.
+// Measured: the raw-character reading reports AMBIGUITY on 3 of this repo's 4 tracked workflow
+// harnesses, every hit being the hook's own mandated `// gov:fixed-verifiers` marker comment, where
+// the workaround is structurally unreachable. The token reading reports none of them.
+function declinedSpanIsAmbiguous(raw, from) {
+  // Scan the way a REGEX BODY is scanned — escapes and character classes — because if the slash HAD
+  // been a regex, everything to the closer is body. Scanning it as CODE is what a first attempt did,
+  // and a backtick in the body then read as a string opener that swallowed the closer, so the four
+  // rule arms this signal exists for all reported clean. Measured.
+  let k = from
+  let cls = false
+  let opener = false
+  while (k < raw.length) {
+    const c = raw[k]
+    if (c === "\\") { k += 2; continue }
+    if (c === '[') { cls = true; k++; continue }
+    if (c === ']') { cls = false; k++; continue }
+    if (c === '/' && !cls) return opener // the closer: ambiguous only if the span carried an opener
+    if (c === "`" || c === "\"" || c === "'") opener = true
+    if (raw.slice(k, k + 2) === '/*') opener = true
+    k++
+  }
+  return false // no closer on this line, so it was never a regex and nothing leaked
+}
+
 function renderCodeView(script) {
   const out = []
   let mode = 'code' // code | tmpl | block
   const stack = []
   let interpDepth = 0
-  let prev = '' // last significant code character emitted, for the regex/division decision
+  let dirty = false // TOOL-aPairedLexer-6: a declined slash a later code slash could have closed
+  let codeText = '' // TOOL-aPairedLexer-8: the running code text, the keyword guard's SUBJECT
+  // TOOL-aPairedLexer-7: seeded to a token that cannot END an expression. `''` made start of input
+  // a DIVISION position, because `'})]'.includes('')` is true, and that took every rule dark on a
+  // script whose first token was a regex.
+  let prev = ';' // last significant code character emitted, for the regex/division decision
   for (const raw of script.split(/\r?\n/)) {
     let res = ''
     let i = 0
@@ -302,7 +361,10 @@ function renderCodeView(script) {
       if (mode === 'code') {
         if (two === '//') break
         if (two === '/*') { mode = 'block'; i += 2; continue }
-        if (ch === '/' && !'})]'.includes(prev) && !/[A-Za-z0-9_$]/.test(prev)) {
+        // TOOL-aPairedLexer-6: a DECLINED slash that a later CODE-MODE slash could have closed.
+        // The view below it may be wrong, so say so rather than let a consumer read a gutted one.
+        if (ch === '/' && !startsRegex(prev, codeText) && declinedSpanIsAmbiguous(raw, i + 1)) dirty = true
+        if (ch === '/' && startsRegex(prev, codeText)) {
           // A regex literal. Consume it whole, including any backtick, `/*` or quote inside, so
           // none of them can open a construct. A class `[...]` may hold an unescaped `/`.
           let j = i + 1
@@ -338,6 +400,7 @@ function renderCodeView(script) {
           }
         }
         res += ch
+        codeText += ch
         if (!/\s/.test(ch)) prev = ch
         i++
       } else if (mode === 'tmpl') {
@@ -352,7 +415,9 @@ function renderCodeView(script) {
     }
     out.push(res)
   }
-  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
+  // TOOL-aPairedLexer-6: `dirty` is the per-line half. Without it this was an EOF-ONLY signal, and
+  // an EVEN number of phantom openers closes itself, so it never fired on the case that mattered.
+  return { code: out, unterminated: stack.length > 0 || mode !== 'code' || dirty }
 }
 
 function fanoutFindings(script) {
@@ -609,8 +674,12 @@ const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
 function blankLiterals(script) {
   const out = []
   let mode = 'code' // code | tmpl | block
-  let dirty = false // did any line end with a construct still open, or a quote never closed?
-  let prev = ''
+  // An unpaired quote, or (TOOL-aPairedLexer-6) a declined slash a later code slash could have
+  // closed. ONE flag, because both mean the same thing to a consumer: something was blanked that
+  // should not have been.
+  let dirty = false
+  let codeText = '' // TOOL-aPairedLexer-8: the running code text, the keyword guard's SUBJECT
+  let prev = ';' // TOOL-aPairedLexer-7, as renderCodeView
   for (const raw of script.split(/\r?\n/)) {
     let res = ''
     let i = 0
@@ -625,7 +694,10 @@ function blankLiterals(script) {
         // regex only after a token that cannot END an expression, and division otherwise. Without
         // this, ``/[`]/`` opened a phantom template and blanked every later line — and because two
         // such literals close each other, `endMode` finished at 'code' and reported nothing wrong.
-        if (ch === '/' && !'})]'.includes(prev) && !/[A-Za-z0-9_$]/.test(prev)) {
+        // TOOL-aPairedLexer-6: a DECLINED slash that a later CODE-MODE slash could have closed.
+        // The view below it may be wrong, so say so rather than let a consumer read a gutted one.
+        if (ch === '/' && !startsRegex(prev, codeText) && declinedSpanIsAmbiguous(raw, i + 1)) dirty = true
+        if (ch === '/' && startsRegex(prev, codeText)) {
           let j = i + 1
           let cls = false
           let closed = false
@@ -654,6 +726,7 @@ function blankLiterals(script) {
           continue
         }
         res += ch
+        codeText += ch
         if (!/\s/.test(ch)) prev = ch
         i++
       } else if (mode === 'tmpl') {
@@ -1244,4 +1317,29 @@ function main() {
   process.exit(0)
 }
 
-main()
+// ---- TOOL-aPairedLexer-8 S6: the test SEAM -----------------------------------------------------
+// Four criteria across this build assert a property of the SCANNERS rather than of a verdict, and
+// there was no way to call them: no `module.exports`, and `main()` ran unconditionally, so even a
+// `require` would consume stdin and exit. Each of those criteria is the one its unit nominates as
+// its durable half — "pins the SIGNAL, not the verdict", "survives a rewrite of the heuristic" —
+// and without a seam the build either invents one unscoped or quietly downgrades each to an
+// end-to-end verdict arm, which is the instance arm that failed to see three of four fail-opens.
+//
+// Reads a script on stdin, prints both views as JSON. Deployed verbatim in both copies.
+if (process.argv[2] === '--selftest') {
+  let src = ''
+  process.stdin.setEncoding('utf8')
+  process.stdin.on('data', (d) => { src += d })
+  process.stdin.on('end', () => {
+    const rcv = renderCodeView(src)
+    const bl = blankLiterals(src)
+    process.stdout.write(JSON.stringify({
+      renderCodeView: { code: rcv.code, unterminated: rcv.unterminated },
+      blankLiterals: { code: bl.code, endMode: bl.endMode, dirty: bl.dirty, clean: bl.clean },
+    }))
+    process.stdout.write('\n')
+    process.exit(0)
+  })
+} else {
+  main()
+}
