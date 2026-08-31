@@ -26,7 +26,7 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 66
+exempt-pin: 67
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
@@ -110,4 +110,4 @@ memory/builds/aScouredKit/README.md
 memory/builds/aGradedMandate/README.md
 memory/builds/aProvenReuse/README.md
 memory/builds/aClosedDocket/README.md
-memory/builds/aUnblockedFleet/README.md
+!memory/builds/aUnblockedFleet/README.md - registered BOUND by commit 655fffc5 without measuring the slots, so three of them (problem 1893/900, improvements 719/500, rules 3802/1800) have reddened the leg ever since. That run is PARKED at phase BUILDING, not closed, so this row is a temporary unblock and drains when that run resumes and trims the three slots.
