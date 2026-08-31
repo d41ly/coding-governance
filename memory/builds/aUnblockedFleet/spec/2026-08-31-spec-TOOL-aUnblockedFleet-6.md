@@ -1,14 +1,24 @@
 # TOOL-aUnblockedFleet-6 — the merge bar's turnstile stops eating the unattended close's deadline
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 3
+**Status:** WONTDO · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 3 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
+
+> **RETIRED (WONTDO), 2026-08-31, by spec-audit round 2.** All three mechanisms below were refuted
+> against source, and the review loop was NON-CONVERGENT (3 blockers in both rounds) so a corrected
+> design could not be re-reviewed. The PROBLEM this unit names is real and survives as a parked
+> decision in `RUN.md` and a backlog row; what is retired is this design, not the finding. Successor:
+> none authored — the property the fix needs was identified only in round 2 and rests on a
+> measurement (the cost of a CONTENDED bar) nobody on this fleet has taken. §9 records the three
+> refutations.
 
 Removing the two run-state checks unblocks a run from STARTING. It does not unblock it from CLOSING:
 `run-gates.sh` holds a repo-wide turnstile keyed on the git common dir, so two concurrent `--close`
@@ -161,6 +171,20 @@ it inside `GATE_BOUND`, deriving the value rather than declaring a second one.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-31 · RETIRED. Spec-audit round 2 refuted every mechanism, each verified against
+  source before the retirement: **(a)** S5, AC5 and §10 name `<git-common-dir>/gate-queue-status`,
+  but `run-gates.sh:686` writes `$gd`, which `:95` sets from `git rev-parse --git-dir` — the
+  PER-WORKTREE directory. On the sibling-worktree layout this build exists for, the driver would stat
+  a path nothing writes, and AC5 plants the file itself so the arm would have been green over a dead
+  feature. **(b)** `run-gates.sh:692` removes that file on BOTH exits from the wait loop, before the
+  bar runs, so the state S5 reports is unreachable and S3 and S5 answer one question incompatibly.
+  **(c)** the `GATE_BOUND / 4` derivation yields a 900s queue bound against a measured ~1560s bar, so
+  a queued close NEVER acquires: it always times out and runs contended, which is `GATE_TURNSTILE=0`
+  by another name and is what this spec's own §3 rejected. Round 2 also found a second consumer of
+  `TS_MAXWAIT` this spec never named — `ts_sweep_queue`'s cutoff at `:515` — whose safety property at
+  `:494-496` holds only while every bar shares one bound, so a 900s close would sweep a live waiter's
+  ticket and wedge a bystander. The correct property, named by round 2 and not designed here:
+  `GATE_BOUND` minus the queue bound must exceed a CONTENDED bar.
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate, promoted from spec-audit round 1
   blocker B1 via `--rescope --act add`. The audit found a safety property the removal loses that the
   build's own §4 measurement did not reach, because that measurement probed the run-state registry

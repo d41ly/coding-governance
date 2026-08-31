@@ -16,9 +16,10 @@ run-state file, and the merge bar's leg check 7 reds for the same reason. The tw
 driver's `check_single_live()` and `check-unattended.sh`'s check 7, and both carry one stated
 justification: that otherwise "the run" is not well-defined for anything keyed on it.
 
-**Measured before this folder was written: nothing is keyed on it.** All fourteen driver verbs take a
-`<slug>`. All three of the leg's tree-wide loops over `builds/*/RUN*.md` grade each file
-independently. No code path in this repository resolves "the run" without being told which build, so
+**Measured before this folder was written: nothing is keyed on it.** The driver's verb population is
+seventeen — `VERBS_SLUG` holds fourteen and `VERBS_INLINE` three more — and sixteen of them take a
+`<slug>`; the seventeenth is `--version`, which resolves nothing. All three of the leg's tree-wide
+loops over `builds/*/RUN*.md` grade each file independently. No code path in this repository resolves "the run" without being told which build, so
 the population the rule makes singular is a population nobody reads. The invariant's only consumers
 are the two checks that enforce it.
 
@@ -72,11 +73,17 @@ could preflight at all, and it is a special case for one of the twelve phases.
   (`--landed` refuses on a marker/HEAD mismatch and names both shas), and admitting concurrency makes
   it reachable rather than creating it. It gets a backlog row, not a unit.
 - **UNBLOCKING A START IS NOT UNBLOCKING A RUN, and the spec audit is what established that.** Round
-  1 confirmed a second, larger serialization the two run-state checks were hiding: `run-gates.sh`
-  holds a repo-wide turnstile keyed on the git common dir, and its queue wait is charged against the
-  unattended run's own `GATE_BOUND`. Removing only the two checks would have moved the fleet wedge
-  from STARTING to CLOSING and called it fixed. `TOOL-aUnblockedFleet-6` was added by `--rescope` and
-  lands before the carriers.
+  1 confirmed a second serialization the two run-state checks were hiding: `run-gates.sh` holds a
+  repo-wide turnstile, and its queue wait is charged against the unattended run's own `GATE_BOUND`,
+  so two concurrent CLOSES in one clone can make the second fail `gates-green` for pure contention.
+  `TOOL-aUnblockedFleet-6` was added by `--rescope` to fix it — and round 2 refuted all three of its
+  mechanisms, so it is RETIRED and the problem is PARKED for the owner with both rounds' evidence.
+- **WHAT THAT MEANS FOR WHAT SHIPS, stated plainly because it is the build's one honest limitation.**
+  This build removes the START-time block, which is what the owner asked about and which is the whole
+  duration of a run. It does NOT remove the close-time turnstile contention, which is a pre-existing
+  property of `run-gates.sh` that these units make REACHABLE rather than create, and which is a
+  moment rather than a duration. Strictly better than today, and not the whole problem — the residual
+  is documented in the protocol, parked in `RUN.md`, and carries a backlog row.
 - **The build-wide landing order lives in unit 1 §7 and is pointed at, never restated.** The
   `drift-audit records` ratchet sits at its ceiling with zero headroom, so a source header citing a
   unit id must land in the same commit range as that unit's status flip, and raising the pin is
@@ -98,11 +105,11 @@ and why the run refused it.)*
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aUnblockedFleet-1` | 2 | the driver: `check_single_live()` announces concurrent runs instead of refusing on them |
-| 2 | `TOOL-aUnblockedFleet-6` | 2 | the merge bar's repo-wide turnstile stops eating the unattended close's deadline |
-| 3 | `TOOL-aUnblockedFleet-2` | 2 | the leg: check 7 reports concurrent runs instead of failing on them |
-| 4 | `TOOL-aUnblockedFleet-3` | 1 | the carriers: the protocol, the Skill, and every one of the kit-version marker's carriers |
-| 5 | `TOOL-aUnblockedFleet-4` | 1 | the test arms for all three halves, each with its failing case observed |
-| 6 | `TOOL-aUnblockedFleet-5` | 1 | the records: two backlog rows closed, one narrowed, one filed, one decision row |
+| 2 | `TOOL-aUnblockedFleet-2` | 2 | the leg: check 7 reports concurrent runs instead of failing on them |
+| 3 | `TOOL-aUnblockedFleet-3` | 1 | the carriers: the protocol, the Skill, and every one of the kit-version marker's carriers |
+| 4 | `TOOL-aUnblockedFleet-4` | 1 | the test arms for both halves, each with its failing case observed |
+| 5 | `TOOL-aUnblockedFleet-5` | 1 | the records: two backlog rows closed, one narrowed, two filed, one decision row |
+| 6 | `TOOL-aUnblockedFleet-6` | 2 | RETIRED (WONTDO) — the turnstile bound; all three mechanisms refuted by spec-audit round 2, and the loop was non-convergent so no corrected design could be reviewed |
 
 <!-- /roster:units -->
 
@@ -114,18 +121,18 @@ ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aU
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-6 — the merge bar's turnstile stops eating the unattended close's deadline](spec/2026-08-31-spec-TOOL-aUnblockedFleet-6.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 5 | 1 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 6 | 1 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 7 | 1 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-6 — the merge bar's turnstile stops eating the unattended close's deadline](spec/2026-08-31-spec-TOOL-aUnblockedFleet-6.md) | 3 | 2 | WONTDO | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 4 | 1 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 6 | 1 | SPECCED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aUnblockedFleet-6.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aUnblockedFleet-6.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -133,11 +140,10 @@ Ids no `spec-audit` record has ever named: TOOL-aUnblockedFleet-6.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aUnblockedFleet-1` | no |
-| 3 | `TOOL-aUnblockedFleet-6` | no |
-| 4 | `TOOL-aUnblockedFleet-2` | no |
-| 5 | `TOOL-aUnblockedFleet-3` | no |
-| 6 | `TOOL-aUnblockedFleet-4` | no |
-| 7 | `TOOL-aUnblockedFleet-5` | no |
+| 3 | `TOOL-aUnblockedFleet-2`, `TOOL-aUnblockedFleet-6` | yes |
+| 4 | `TOOL-aUnblockedFleet-3` | no |
+| 5 | `TOOL-aUnblockedFleet-4` | no |
+| 6 | `TOOL-aUnblockedFleet-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

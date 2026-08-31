@@ -1,12 +1,13 @@
 # TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-5 |
+| [2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 |
 
 <!-- /gen:spec-records -->
 
@@ -125,7 +126,7 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate.
-- rev-2 · 2026-08-31 · spec-audit round 1 fold. Added S4b, an arm at exactly ONE concurrent record:
+- rev-2 · 2026-08-31 · spec-audit round 1 fold. (order 6 -> order 5 on unit 6's retirement.) Added S4b, an arm at exactly ONE concurrent record:
   rev-1's fixtures were zero and two, so the single threshold this whole build moves had no arm and a
   driver keeping the inherited `n > 1` trigger would have passed the suite while being silent in the
   commonest case (H7). Added S4c for unit 6's arms. AC6's invocation corrected to

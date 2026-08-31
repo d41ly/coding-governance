@@ -1,12 +1,13 @@
 # TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
+| [2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 |
 
 <!-- /gen:spec-records -->
 
@@ -126,6 +127,15 @@ touches are `TOOL-aUnblockedFleet-3`'s, which is where the full carrier set is e
   asserted by the existing arm — the liveness assertion survives the change that made it matter more.
 - **AC6** — When the full bar runs over THIS repository at the landing tip, `bash
   tools/run-gates/run-gates.sh` is green with the `unattended kit gate` leg among the legs it names.
+- **AC7** — When `grep -n "live-run rule below\|nlive <= 1" tools/unattended/check-unattended.sh`
+  runs, it returns nothing: check 4's header no longer explains itself by reference to a refusal that
+  no longer exists. This is S7's criterion, and rev-2 folded S7 in with no way to observe it — the
+  same half-applied shape round 1 found elsewhere, on the check this spec's own §3 calls MORE
+  load-bearing after the change.
+- **AC8** — When check 7's header block is read, it states what the check no longer asserts, per
+  template §7's rule that a gate's header names its own gaps. Asserted by
+  `grep -c "no longer asserts" tools/unattended/check-unattended.sh` returning at least 1. This is
+  S6's criterion, which rev-2 also left unobservable.
 
 ## 7. Gates
 
@@ -147,6 +157,9 @@ none of them, and keep the check's number.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate, alongside unit 1.
+- rev-3 · 2026-08-31 · spec-audit round 2 fold. AC7 and AC8 added: rev-2 folded S6 and S7 in with no
+  acceptance criterion for either, so round 1's class fix was half-applied on exactly the check this
+  spec argues becomes more load-bearing. Order 4 -> 3 after `TOOL-aUnblockedFleet-6` was retired.
 - rev-2 · 2026-08-31 · spec-audit round 1 fold. Dropped this unit's claims on
   `check-unattended.test.sh` (unit 4's) and on the version bump (unit 3's), both of which rev-1 took
   from other units (H6). Added S7, a third in-code carrier of the removed rule that no unit's
