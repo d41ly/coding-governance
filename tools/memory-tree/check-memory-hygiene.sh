@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.50   # gov:kit memory-tree@2.50 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.51   # gov:kit memory-tree@2.51 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -41,6 +41,18 @@ REVIEW_VERDICT_CUTOFF="" # date; review records whose filename date >= this MUST
 # resolves FORWARD to this value, below the conf source (TOOL-aDeclaredBound-2).
 SPEC10_CUTOFF="2026-08-04"  # date; specs dated >= this take the TEN-section canon (check 12)
 _SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback below needs no second literal
+# The FIFTH cutoff, and it takes the THREE siblings' semantics rather than the fourth's: it switches
+# an optional RULE on, so blank means OFF and the awk guards it with an explicit `ecut != ""` test.
+# It does NOT resolve forward. SPEC10_CUTOFF must hold a value because it SELECTS between two canons
+# and check 12 has to pick one for every spec; this one only ever adds a demand, and an adopter who
+# ships it blank means off (TOOL-aProvenReuse-1).
+#
+# PRESET HERE, above the conf source, and that is load-bearing rather than tidy: this script runs
+# `set -u`, and `adopt-memory-tree.sh` copies the example only when no conf exists — it never
+# back-fills a key into one that does. Without this line the gate ABORTS on an unbound variable in
+# every adopter tree whose .memory-tree.conf predates the key, which is a checker that fails to RUN
+# rather than one that fails. Its four siblings are preset above for exactly this reason.
+SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its reuse audit (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -795,7 +807,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1036,6 +1048,44 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
     if (s != "" && cnt == 0) { ne++; emp = (ne == 1) ? "    " s : emp "\n    " s }
     if (ne > 0) print f " (section with an empty body — write N/A — <why>):" "\n" emp
+
+    # ---- §10 EVIDENCE (TOOL-aProvenReuse-1). The empty-body test above already refuses a HOLLOW
+    # ---- §10; this refuses a §10 that says nothing about the audit it claims to record. What it
+    # ---- does NOT check: whether either arm is TRUE. A citation naming the wrong seam, or terms
+    # ---- nobody passed to the CLI, satisfies both arms — no substring test can reach that, and the
+    # ---- liveness half lives in the unattended kit as the `reuse-probed` DoD item, which reads the
+    # ---- recall query log. This arm asserts that the two facts BUILD-METHOD M5 demands are on the
+    # ---- page, and its whole value is that M7 regrounding step 5 (re-run the recall probe with the
+    # ---- terms recorded in §10) stops resolving to nothing. Measured before wiring: 188 of the 264
+    # ---- Tier-2 specs in this corpus fail it, so it was armed AHEAD of every dated spec on every
+    # ---- live branch rather than at the landing date.
+    # ----
+    # ---- FOUR CONJUNCTS, each load-bearing. `want == canon10` is the canon this check ALREADY chose
+    # ---- by filename date, so the evidence arm can never grade a spec the section canon did not; it
+    # ---- does not stand in for the cutoff. `ecut != ""` is blank-means-off — an empty string
+    # ---- compares earlier than every date, so `fdate >= ""` holds for every spec and omitting this
+    # ---- test would arm the rule over the whole corpus. `fdate != ""` matches the sibling cutoffs.
+    # ---- This takes STREAMS_CUTOFF semantics, NOT the SPEC10_CUTOFF forward resolution.
+    # ----
+    # ---- index() over a tolower()ed body, never a regex: the header of this file records that
+    # ---- interval expressions are spelled out character by character because a build that does not
+    # ---- honour {8} would demand those literal bytes. A substring test has no dialect surface.
+    if (want == canon10 && ecut != "" && fdate != "" && fdate >= ecut) {
+      s10 = ""; in10 = 0
+      for (i = 1; i <= n; i++) {
+        if (body[i] ~ /^## /) { in10 = (body[i] ~ /^## 10\. Reuse audit/); continue }
+        if (in10) s10 = s10 " " tolower(body[i])
+      }
+      hasT = (index(s10, "recall terms") > 0 || index(s10, "--terms") > 0)
+      hasP = (index(s10, "reuse_lookup") > 0 || index(s10, "reuse-lookup") > 0 \
+              || index(s10, "no existing seam") > 0 || index(s10, "no seam fits") > 0 \
+              || index(s10, "reuse-first") > 0)
+      miss = ""
+      if (!hasT) miss = "the recall terms used"
+      if (!hasP) miss = (miss == "" ? "" : miss " AND ") \
+        "the probe result (a reuse_lookup citation, an explicit \"no existing seam fits\", or a named reuse-first waiver)"
+      if (miss != "") print f " (§10 Reuse audit does not record " miss "; required at/after SPEC10_EVIDENCE_CUTOFF " ecut ")"
+    }
   }')
 fi
 # The section-canon excerpt keeps a REAL `diff`: reproducing its normal-format output inside awk

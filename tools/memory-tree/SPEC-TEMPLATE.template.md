@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.50 -->
+<!-- gov:kit memory-tree@2.51 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -223,8 +223,21 @@ an item resolved and never suppresses a mark on the same item.
 
 ## 10. Reuse audit
 
-The reuse-discovery result: the existing seam this unit wires through (from a
-`{{TOOL_ROOT}}codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the evidence.
-Records the reuse decision so an author cannot silently skip it — the machinery already ships in
-this kit, and a checklist item nobody is asked to answer is not a checklist item.
+The reuse-discovery result, and **both halves are required** on a Tier-2 spec dated at or after
+`SPEC10_EVIDENCE_CUTOFF` — check 12 grades the section for them, and refuses it naming whichever is
+absent:
+
+- **The probe result.** The existing seam this unit wires through, cited by path, from a
+  `{{TOOL_ROOT}}codebase-map/reuse_lookup.py` pass — or an explicit "no existing seam fits" with the
+  evidence, or a named `reuse-first` waiver where a run was granted one.
+- **The recall terms you used**, verbatim, on a line naming them. Composing 8–14 terms in this
+  corpus's own jargon is the expensive half of the probe, and BUILD-METHOD M7's regrounding step 5
+  re-runs the query FROM this line — so a §10 without it makes that step resolve to nothing.
+
+Record the reuse decision so an author cannot silently skip it. Before the cutoff was introduced,
+this section was graded on presence and non-emptiness alone, which made `N/A — none` a passing reuse
+audit; measured across the kit's own corpus at the time, a majority of specs recorded no terms at
+all. What the check still cannot see is whether either fact is TRUE — a citation naming the wrong
+seam satisfies it — so the liveness half lives outside this file, in whatever observes that a probe
+actually ran.
 ```

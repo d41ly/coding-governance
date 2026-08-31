@@ -61,7 +61,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -200,6 +200,30 @@ wit | unbold > "$D/spec/2026-08-10-spec-tFixture-53.md"   # post-cutoff, UNBOLDE
 # guard to Tier-2 left this harness byte-identical until this fixture existed.
 printf '# t54\n\n**Status:** OPEN · rev-1 · 2026-08-10 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 6. Acceptance criteria\n\n- **AC1** When run, it passes with nothing named.\n' \
   > "$D/spec/2026-08-10-spec-tFixture-54.md"
+# ---- §10 EVIDENCE arms (TOOL-aProvenReuse-1). SPEC10_EVIDENCE_CUTOFF is declared at 2026-08-24,
+# ---- AHEAD of every fixture above, so none of them changes and the eras are separable here exactly
+# ---- as STREAMS_CUTOFF and SPEC_WITNESS_CUTOFF separate theirs. The real corpus cannot exercise
+# ---- either arm: the live cutoff is 2026-09-01, set ahead of every dated spec on every branch, so
+# ---- these fixtures ARE the coverage. Note `good10` yields a §10 reading "No existing seam fits.",
+# ---- which satisfies the PROBE arm and not the TERMS arm — that is fixture 70 and it is why the
+# ---- two arms need separate fixtures rather than one.
+ev()      { good10 | sed "s/2026-08-10/2026-08-25/g; s/base 0123abcd/base 0123abcd · streams architecture/"; }
+evterms() { sed 's|^No existing seam fits\.$|No existing seam fits. Recall terms used: alpha beta gamma delta.|'; }
+evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: alpha beta gamma delta epsilon zeta.|'; }
+
+ev | evonlyt > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
+ev           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
+ev | evterms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
+# PRE-cutoff twin of 70+71 combined: a §10 with neither fact, dated before the cutoff. This is the
+# grandfathering arm, and without it "no landed spec goes retroactively red" is an untested claim.
+good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
+       | sed 's|^No existing seam fits\.$|Nothing here.|' \
+             > "$D/spec/2026-08-10-spec-tFixture-83.md"  # PRE-cutoff, neither fact          -> silent
+# TIER-1, post-cutoff, neither fact. N4 scopes the arm to Tier-2 by riding the existing
+# `if (hdr ~ /Tier-1/) next` cut, and without this fixture that scoping is asserted, not observed.
+printf '# t84\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · fixture.\n\n## 10. Reuse audit\n\nNothing here.\n' \
+  > "$D/spec/2026-08-25-spec-tFixture-84.md"
+
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
 printf '# t60
@@ -650,6 +674,14 @@ miss 'tFixture-51.md ('
 miss 'tFixture-52.md ('
 hit  'tFixture-53.md (acceptance bullets naming no backticked witness'
 hit  'tFixture-54.md (acceptance bullets naming no backticked witness'   # TIER-1: S3, both tiers
+# ---- §10 evidence. Each arm names WHICH fact is missing, so a red that names the wrong one is a
+# ---- failure here rather than a passing red — the two arms share one message and only differ in it.
+hit  'tFixture-80.md (§10 Reuse audit does not record the probe result'
+hit  'tFixture-81.md (§10 Reuse audit does not record the recall terms used'
+miss 'tFixture-82.md (§10 Reuse audit'          # both facts present
+miss 'tFixture-83.md (§10 Reuse audit'          # PRE-cutoff, grandfathered
+miss 'tFixture-84.md (§10 Reuse audit'          # TIER-1, outside the arm by N4
+miss 'tFixture-84.md (header rev-1 not logged'  # and it reds for no OTHER reason either
 miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head
 # the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
