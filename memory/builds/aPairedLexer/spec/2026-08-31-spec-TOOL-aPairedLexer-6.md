@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md) | spec-audit | TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -50,13 +51,15 @@ leak question is answered once, in `-8`'s predicate, and both scanners read the 
 that must agree and compute separately are the shape that produced three of this file's four
 fail-opens, and rev-1 reproduced it inside the build that promoted it.
 
-**The dirty condition is the declined span's EXTENT, not the rest of the line.** A declined `/` with
-a later `/` on the same line and an opener strictly between them was a regex, and everything between
-leaked. Ordinary division does not match: `const label = args.n / args.total + ` backtick `%`
-backtick has one slash, no extent, and no leak — so it does not route. That precision matters,
-because the per-line view this routes back to is the false-positive source `TOOL-aPairedLexer-2` was
-built to remove, and the audit measured rev-1's looser condition flipping legal lens-prompt scripts
-from ADMIT to DENY.
+**The condition is `TOOL-aPairedLexer-8` S3's, and this unit does not restate it.** A declined
+slash sharing its line with a later slash IN CODE MODE reports AMBIGUITY; this unit routes on that
+report and computes nothing itself. rev-4 left the retired opener/extent wording standing here, so §4
+described a mechanism §2 had already discarded.
+
+The per-line view this routes back to is the false-positive source `TOOL-aPairedLexer-2` was built to
+remove, which is why the TOKEN reading is binding rather than the raw one: measured, the raw reading
+routes 3 of this repo's 4 workflow harnesses — every hit the hook's own mandated marker-comment
+idiom — and the token reading routes none of them.
 
 **Ordering.** `-8` lands first: S1 consumes its predicate AND its `--selftest` seam.
 `-7` may land with either.
@@ -118,8 +121,8 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
 
 ## 8. Open questions
 
-none — AC6 decides the precision question the audit raised, in the ADMIT direction, and the
-extent-scoped condition in §4 is what makes that answer available.
+none — AC6 decides the precision question the audit raised, in the DENY direction, which is the cost
+of `TOOL-aPairedLexer-8` §8 F1 and is recorded there. rev-4 said ADMIT here while AC6 denied.
 
 ## 9. Revision log
 
@@ -141,6 +144,9 @@ extent-scoped condition in §4 is what makes that answer available.
   `TOOL-aPairedLexer-8` §8 resolves the fork toward reporting AMBIGUITY, so there is nothing to
   enumerate and the `*/` closer the predicate could never report goes with it. AC6 is RE-BASELINED
   from admit to deny, which is the honest cost of that resolution and is named as such in §4.
+- rev-5 · 2026-08-31 · folded round-4 B2. §4 still stated the retired opener/extent routing
+  condition after §2 discarded it, and §8 read ADMIT while AC6 denies. Both corrected, and the token
+  reading is named as the one that makes the cost bearable.
 
 ## 10. Reuse audit
 

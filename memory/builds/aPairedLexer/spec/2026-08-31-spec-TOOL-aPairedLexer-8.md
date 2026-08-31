@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-9 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -30,15 +31,25 @@ instead of each carrying a copy. This unit therefore lands FIRST.
 
 - **S1** — ONE predicate answering, for a given position, whether a `/` starts a regex. It decides on
   the previous TOKEN: the trailing WORD when there is one, else the previous significant character.
-- **S2** — the keyword set is closed, and a keyword preceded by `.` is NOT a keyword.
+- **S2** — the keyword set is closed and is `return typeof case in instanceof new delete void
+  throw`. **`of`, `await` and `yield` are CONTEXTUAL keywords and legal identifiers, so they are
+  excluded**: the round-4 audit patched a copy with S1+S2 as rev-4 worded them and measured a
+  DENY-to-ADMIT on all three — `const of = 5; x = of / 2` reads the `of` as a keyword, opens a
+  regex over live code, and blanks the primitive. Dropping them keeps `return /re/`, which is D2's
+  actual defect. A keyword preceded by `.` is NOT a keyword.
   **The SUBJECT of the guard is the running CODE TEXT emitted so far, not the current line and not
   a bare trailing word.** Against a bare word every keyword matches and the guard never fires;
   against a line prefix, `obj.` on one line and `in / 2` on the next is legal JavaScript the guard
   would miss. The `^` alternative therefore means START OF INPUT, never start of line. The test is:
   the code text ends with one of the keywords, and the character before that keyword is absent (start of input) or is not `.`, a word character or a dollar sign.
 - **S3** — the predicate reports, for every slash it DECLINES, that the LINE IS AMBIGUOUS when that
-  line also carries a later slash. No opener test and no closure test: see §8, where the fork is
-  resolved and both are refuted by measurement.
+  line also carries a later slash **IN CODE MODE**. No opener test and no closure test: see §8,
+  where the fork is resolved and both are refuted by measurement.
+  **The TOKEN reading is binding and the raw-character reading is refused**, because the two differ
+  by the entire population and the round-4 audit measured both: raw, 3 of this repo's 4 tracked
+  workflow harnesses report AMBIGUITY, every hit being the hook's OWN mandated
+  `Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers` idiom where the later slash is the
+  marker comment; token, 0 of 4. A slash inside a comment or a string is not a slash for this test.
 - **S3-RETIRED** — the leak test three revisions tried to write.
   Retired unbuilt. rev-2 tested for an opener between two slashes and produced false LEAKS on
   ordinary division; rev-3 added a closure test and produced false NO-LEAKS on a balanced opener
@@ -47,6 +58,11 @@ instead of each carrying a copy. This unit therefore lands FIRST.
   and §8 records the resolution.
 - **S4** — both `renderCodeView` and `blankLiterals` call it. Neither keeps a keyword list, a member
   guard, or a leak test of its own.
+- **S4b** — **a CLOSING QUOTE ends an expression.** `renderCodeView` treats `"`, `'` and a closing
+  backtick as regex positions today, so `const x = "a" / 2; await parallel(D.map((d) => agent(d)));
+  const y = "b" / 3` consumes the primitive inside a phantom regex literal and ADMITS — measured at
+  the tip AND under an S1+S2 patch, with the bare primitive exiting `2`. No slash is DECLINED on
+  that line, so S3 cannot reach it; the fix belongs in the position predicate itself.
 - **S5** — a TABLE-DRIVEN arm over the keyword class in BOTH directions, positive and negative.
 - **S6** — **the test SEAM**, moved here from `TOOL-aPairedLexer-6` because this unit lands FIRST
   and both this unit and `-7` state criteria that call the scanners directly. A `--selftest` argv
@@ -113,11 +129,15 @@ the other's. One predicate, one answer, both callers.
 - **AC6** — When a script containing `return /re/` is rendered by both scanners through this unit's
   own `--selftest` seam (S6), `renderCodeView` and `blankLiterals` BOTH blank the literal. Asserted
   by RUN over a corpus of regex-position fixtures, never by counting copies of a string.
-- **AC7** — When a declined slash has a later slash on its line and an opener still OPEN at the end
-  of the span, the predicate reports a LEAK. When the opener CLOSES inside the span it reports NO
-  leak, asserted over all three measured false positives named in S3. This is the precision control
-  for `TOOL-aPairedLexer-6`, and rev-2's version could not fail: its fixture had no later slash, so
-  the leak test could not fire on it under any reading.
+- **AC7** — When a declined slash shares its line with a later slash IN CODE MODE, the predicate
+  reports AMBIGUITY; when the only later slash is inside a comment or a string, it does NOT. The
+  binding fixture is the hook's own `Math.ceil(x.length / MAX_VERIFIERS)) // gov:fixed-verifiers`
+  idiom, which must report NO ambiguity — under the raw reading it reports ambiguity and 3 of this
+  repo's 4 workflow harnesses deny. This is S3's only acceptance criterion, and rev-4 left S3 —
+  the whole basis of the §8 resolution — shipping at order 5 with none, because AC7 was byte-
+  unchanged and still mandated the retired test.
+- **AC10** — When `const x = "a" / 2; await parallel(D.map((d) => agent(d))); const y = "b" / 3` is
+  fed to the hook, it exits `2`. S4b's criterion. Measured `0` at the tip and under an S1+S2 patch.
 - **AC9** — When `node tools/hooks/agent-cap.js --selftest` is invoked, the seam exists and returns
   the scanners' output for a given script, in BOTH copies. S6's own criterion, and the one every
   structural criterion in this build depends on.
@@ -145,7 +165,9 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
   declined slash shares a line with a later slash, and let the four rules fall back to the per-line
   view.
 
-  RESOLVED (agent, 2026-08-31, delegated): **(c)**. It is the only option that is not fail-open, and
+  RESOLVED (agent, 2026-08-31, delegated): **(c)**, under the TOKEN reading S3 makes binding — the
+  raw reading was measured to route 3 of 4 harnesses and is refused. It is the only option that is
+  not fail-open, and
   M3 ratifies the most feature-rich survivor after the vetoes — (a) and (b) both fail the acceptance
   criteria already written into `TOOL-aPairedLexer-6`, which is veto 1. No new dependency, surface or
   governance change, so vetoes 2 and 3 do not fire.
@@ -180,6 +202,13 @@ Legs read from `tools/gate-legs.json` at emission time. Direct: `bash tools/hook
   precision control — one input class required to answer two ways. Three revisions of one test,
   each refuted by measurement, is the same shape this build already named: stop mitigating and
   decide. §8 carries the decision.
+- rev-5 · 2026-08-31 · folded round-4 B1, B3, B4 and H3 after M4 ruled the loop NON-CONVERGENT.
+  B3: S3 never said whether "a later slash" was a raw character or a code-mode token, and the two
+  readings differ by the ENTIRE population — the token reading is now binding, measured. B4: `of`,
+  `await` and `yield` are contextual keywords and legal identifiers, measured DENY-to-ADMIT, and
+  are dropped from the set. B1: AC7 was byte-unchanged and still mandated the retired test, leaving
+  S3 with no criterion at all. H3: a closing quote is treated as a regex position, which ADMITS a
+  raw primitive with no declined slash anywhere — S4b and AC10 close it.
 
 ## 10. Reuse audit
 

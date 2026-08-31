@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-10 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -103,7 +104,9 @@ units delete would make this live defect look fixed. The review measured exactly
   denies. This arm pins the LINE-SET decision: `blankLiterals` emits nothing while in `tmpl`
   mode, so a build resolving S1 the other way turns this arm red instead of shipping.
 - **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is
-  green after it, except any this unit's sibling re-baselines by name.
+  green after it, EXCEPT `rule3: an exposed const resolves the cap and the script admits`, which S2c
+  re-baselines in THIS unit. rev-4 wrote the exemption as "any this unit's sibling re-baselines by
+  name" after S2c moved the re-baseline here, leaving the referent null and the criterion unpassable.
 
 ## 7. Gates
 
@@ -132,6 +135,9 @@ buys nothing AC1 does not.
 - rev-4 · 2026-08-31 · folded round-3 B3: AC4 still attributed the re-baseline to
   `TOOL-aPairedLexer-10` after S2c took it, so §2 and §6 gave opposite verdicts for the third round
   running, with an ordering violation on top.
+- rev-5 · 2026-08-31 · folded round-4 B5: AC7's exemption pointed at a sibling that no longer
+  performs the re-baseline, so it had a null referent and AC7 could not pass. Round 3's B3 had
+  relocated within this section rather than closing.
 
 ## 10. Reuse audit
 

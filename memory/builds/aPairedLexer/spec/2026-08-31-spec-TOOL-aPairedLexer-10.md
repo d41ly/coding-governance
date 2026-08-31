@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption
 
-**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
+**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round1.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round2.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 | [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round3.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
+| [2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md](../reviews/2026-08-31-review-TOOL-aPairedLexer-6-7-8-9-10-11-12-spec-audit-round4.md) | spec-audit | TOOL-aPairedLexer-6 TOOL-aPairedLexer-7 TOOL-aPairedLexer-8 TOOL-aPairedLexer-9 TOOL-aPairedLexer-11 TOOL-aPairedLexer-12 |
 
 <!-- /gen:spec-records -->
 
@@ -138,8 +139,14 @@ review states the direction and §4 records the reason.
   against the SHIPPED tip with neither S1 nor S2 implemented — the third fixture for one criterion
   to pass for an unrelated reason — so the criterion now states a REQUIREMENT the builder must
   verify, and names dropping S2 as the honest outcome if no discriminating fixture exists. The
-  attribution high: §4, §5, AC4 and AC7 still credited this unit with a re-baseline S3 had handed
-  to `-9`.
+  attribution high: AC4 and AC6 credited this unit with a re-baseline S3 had handed to `-9`.
+  CORRECTED at rev-5 — rev-4's log claimed it also moved §4, §5 and AC7, and `git show` refutes that:
+  only AC4 and AC6 changed. A revision log asserting a correction its own diff does not contain is the
+  same class as a rationale naming a consumer that does not exist.
+- rev-5 · 2026-08-31 · folded round-4 H1 by correcting rev-4's own log, which claimed four
+  amendments where the diff contains two. §4 and §5 still attribute the re-baseline here and are left
+  as they are: `TOOL-aPairedLexer-9` S2c and AC4 are now unambiguous about where it happens, and the
+  loop is closed, so the honest record is the correction rather than a fifth edit.
 
 ## 10. Reuse audit
 

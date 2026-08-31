@@ -91,16 +91,16 @@ ids TOOL-aPairedLexer-1 TOOL-aPairedLexer-2 TOOL-aPairedLexer-3 TOOL-aPairedLexe
 | [TOOL-aPairedLexer-2 — rule 1 stops reading a lens prompt as a call](spec/2026-08-30-spec-TOOL-aPairedLexer-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-3 — the definition probe strips comments in one pass](spec/2026-08-30-spec-TOOL-aPairedLexer-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-08-30 |
 | [TOOL-aPairedLexer-4 — both views model regex literals, and the ceiling retires](spec/2026-08-30-spec-TOOL-aPairedLexer-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-08-30 |
-| [TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 5 | 2 | SPECCED | rev-4 | 2026-08-31 |
+| [TOOL-aPairedLexer-8 — ONE regex-position predicate, keyword-aware and member-guarded](spec/2026-08-31-spec-TOOL-aPairedLexer-8.md) | 5 | 2 | SPECCED | rev-5 | 2026-08-31 |
 | [TOOL-aPairedLexer-7 — start of input is a REGEX position](spec/2026-08-31-spec-TOOL-aPairedLexer-7.md) | 6 | 2 | SPECCED | rev-3 | 2026-08-31 |
-| [TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 7 | 2 | SPECCED | rev-4 | 2026-08-31 |
-| [TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work](spec/2026-08-31-spec-TOOL-aPairedLexer-9.md) | 8 | 2 | SPECCED | rev-4 | 2026-08-31 |
-| [TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption](spec/2026-08-31-spec-TOOL-aPairedLexer-10.md) | 9 | 2 | SPECCED | rev-4 | 2026-08-31 |
+| [TOOL-aPairedLexer-6 — a DECLINED slash announces itself, to BOTH views](spec/2026-08-31-spec-TOOL-aPairedLexer-6.md) | 7 | 2 | SPECCED | rev-5 | 2026-08-31 |
+| [TOOL-aPairedLexer-9 — rule 3 keeps the paren-safe view for join work](spec/2026-08-31-spec-TOOL-aPairedLexer-9.md) | 8 | 2 | SPECCED | rev-5 | 2026-08-31 |
+| [TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption](spec/2026-08-31-spec-TOOL-aPairedLexer-10.md) | 9 | 2 | SPECCED | rev-5 | 2026-08-31 |
 | [TOOL-aPairedLexer-11 — rule 2 calls the same merge as rule 3](spec/2026-08-31-spec-TOOL-aPairedLexer-11.md) | 10 | 2 | SPECCED | rev-3 | 2026-08-31 |
 | [TOOL-aPairedLexer-12 — model regex literals, so the phantom span never exists](spec/2026-08-31-spec-TOOL-aPairedLexer-12.md) | 11 | 2 | SPECCED | rev-3 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
