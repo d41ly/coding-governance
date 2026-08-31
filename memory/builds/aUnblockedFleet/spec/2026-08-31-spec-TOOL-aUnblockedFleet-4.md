@@ -1,10 +1,12 @@
 # TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-5 |
 
 <!-- /gen:spec-records -->
 
@@ -29,6 +31,17 @@ Arm both halves so a regression is loud, and observe each arm's failing case bef
 - **S4** — a `miss` arm asserting an EXCLUDED `LANDING` record does not appear in the report. The
   exclusion and the report are two populations and a record must be in exactly one; without this arm
   a report that ignored the exclusion would pass every other arm.
+- **S4b** — **an arm at EXACTLY ONE concurrent record, in both suites.** This is the threshold the
+  build actually moves and rev-1 had no fixture for it: rev-1's cases were zero concurrent records
+  and two, so a driver that kept the inherited `n > 1` trigger would announce nothing in the single
+  competitor case and still pass every arm. That case is the commonest one this build exists to
+  enable — one other run live — so leaving it unarmed would have shipped the feature's main path
+  untested behind a green suite. It also arms unit 1's S6: at one record with no anchor, BOTH the
+  announcement and the UNAVAILABLE notice must appear.
+- **S4c** — the driver arms cover `TOOL-aUnblockedFleet-6`'s two states as well: the queue clause on a
+  `GATE_BOUND` kill with a planted `gate-queue-status`, and its absence without one. The turnstile
+  runner's own three arms live in `tools/run-gates/run-gates.turnstile.test.sh`, which is that unit's
+  declared seam.
 - **S5** — every arm's FAILING CASE IS OBSERVED before the unit closes, per template §7: stage the
   break, confirm RED, unstage. The observation is recorded in this build's acceptance ledger, naming
   what was broken and what text the suite printed.
@@ -37,8 +50,10 @@ Arm both halves so a regression is loud, and observe each arm's failing case bef
 
 - New arms for leg check 4, the review-round loop, the halt-code loop or the population guard. All
   four are untouched by units 1 and 2 and all four already have arms.
-- Raising or lowering the `check-arms` armed-branch floors. The rewrites are one-for-one on branch
-  count, so the pins should hold unchanged — if one moves, that is a finding, not a pin to edit.
+- Raising or lowering the `check-arms` armed-branch floors. VERIFIED at rev-2 rather than assumed:
+  `unattended.sh` runs 175 branches against floor 104 and 172 armed against floor 101, and
+  `check-unattended.sh` 162 against 101 and 162 against 100. Both have roughly seventy branches of
+  headroom, so removing one refusal from each moves no pin. If one moves anyway, that is a finding.
 - A fixture proving two runs can land concurrently end to end. That needs two clones and a real
   push, it would be the only test in this kit doing so, and the lander-marker race it would exercise
   is explicitly out of scope for this build.
@@ -87,8 +102,15 @@ over a fixture that never had the thing anyway proves nothing. Each is therefore
 - **AC5** — When the announcement is made UNCONDITIONAL (printed even at zero concurrent runs) and
   `unattended.test.sh` is re-run, the S2 silence arm FAILS. This is the arm that proves S2 is not
   vacuous, and it is the one most likely to be silently useless. Observed, recorded, unstaged.
-- **AC6** — When `python tools/memory-tree/check-arms.py` runs as part of the bar, both suites still
-  meet their armed-branch pins with no pin edited.
+- **AC6** — When `python3 tools/memory-tree/check-arms.py --check` runs — the spelling
+  `tools/gate-legs.json` declares, `python3` and the `--check` verb, because the program is not
+  runnable under `bash` and a bare invocation exits before checking anything — both suites still meet
+  their armed-branch pins with no pin edited.
+- **AC7** — When exactly ONE other run-state record is non-terminal, `unattended.test.sh` asserts the
+  announcement names it and `check-unattended.test.sh` asserts the report names it, and both suites
+  FAIL when the trigger is left at `n > 1`. This is S4b's criterion and the staged break for it is
+  the one that matters most: it is the only arm that distinguishes the shipped behaviour from the
+  inherited one.
 
 ## 7. Gates
 
@@ -103,6 +125,12 @@ none.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate.
+- rev-2 · 2026-08-31 · spec-audit round 1 fold. Added S4b, an arm at exactly ONE concurrent record:
+  rev-1's fixtures were zero and two, so the single threshold this whole build moves had no arm and a
+  driver keeping the inherited `n > 1` trigger would have passed the suite while being silent in the
+  commonest case (H7). Added S4c for unit 6's arms. AC6's invocation corrected to
+  `tools/gate-legs.json`'s own spelling — rev-1 would have run a Python program under `bash` (L1).
+  §3's floor claim replaced with the measured headroom. Order moved 4 -> 6.
 
 ## 10. Reuse audit
 

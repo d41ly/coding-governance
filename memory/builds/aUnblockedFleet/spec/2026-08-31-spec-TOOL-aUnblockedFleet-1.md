@@ -1,12 +1,13 @@
 # TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aUnblockedFleet-1-1.md](../prompts/2026-08-31-prompt-TOOL-aUnblockedFleet-1-1.md) | research | — |
+| [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 
 <!-- /gen:spec-records -->
 
@@ -29,9 +30,15 @@ concurrent runs, so a second unrelated build starts instead of being blocked.
 - **S4** — the `LANDING`-witness exclusion (`TOOL-aPrimedKeepalive-7`) is KEPT and keeps its notice.
   An excluded record is not a concurrent run and must not be announced as one; the notice stays
   because it is the only evidence the exclusion is still armed.
-- **S5** — refusal 5's exit code is retired from the driver's refusal vocabulary, and its
-  corresponding arm in `unattended.test.sh` is rewritten to assert the announcement rather than
-  deleted, because a deleted arm and a passing one are indistinguishable.
+- **S5** — refusal 5's exit code is retired from the driver's refusal vocabulary. The arm that
+  asserts the new behaviour belongs to `TOOL-aUnblockedFleet-4`, which owns every test edit in this
+  build; this unit does not touch `unattended.test.sh`.
+- **S6** — the UNAVAILABLE liveness notice's guard moves WITH the announcement's threshold. It reads
+  `[ "$n" -gt 1 ]` at `unattended.sh:1253`, which fires only at two or more counted records, while
+  the announcement after S1 fires at one. So the exact state the `LANDING` exclusion exists for — one
+  concurrent record and no observable anchor — would announce a competitor while the notice saying
+  the exclusion could not be computed stays mute. That is green-by-absence inside the sentence that
+  claims to prevent it, and the leg's two thresholds already agree where the driver's would not.
 
 ## 3. Non-goals (OUT)
 
@@ -83,16 +90,29 @@ run-state records for unrelated builds (`aThawedCorpus` at `BUILDING`, `aUnblock
 | `--phase` on the other slug | wrote only that record |
 | `--review` on one slug | counted that subject's rounds only |
 
-All fourteen driver verbs take a `<slug>` (`unattended.sh:4248-4261`). All three of the leg's
-tree-wide loops over `builds/*/RUN*.md` (`:247`, `:332`, `:448`) grade per file. The consumer the
-refusal protects does not exist, and the refusal's only consumers are the two checks that enforce it.
+The verb census is taken over the VERB POPULATION, not over the dispatch case, because the dispatch
+`case` at `:4248-4261` lists fourteen and the population is seventeen: `VERBS_SLUG` at `:86` holds
+fourteen and `VERBS_INLINE` at `:89` holds three more (`--plan`, `--phase`, `--version`). Of those
+seventeen, sixteen take a `<slug>` and the seventeenth is `--version`, which resolves nothing at all.
+So no verb in this driver resolves "the run" without being told which build. An earlier revision of
+this paragraph said "all fourteen" over the dispatch case and was caught by the spec audit — the
+conclusion was right and the number was not, which is the `assertion-between-two-derived-values`
+shape one level up.
+
+All three of the leg's tree-wide loops over `builds/*/RUN*.md` (`:247`, `:332`, `:448`) grade per
+file. The consumer the refusal protects does not exist, and the refusal's only consumers are the two
+checks that enforce it.
 
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `tools/unattended/unattended.sh` | `check_single_live()` — the `fail 5` line becomes a printed announcement; the function's header rewritten to state what it now does and does NOT claim |
-| `tools/unattended/unattended.test.sh` | the check-5 arm asserts the announcement and the non-refusal; a new arm asserts silence at zero concurrent runs |
+| `tools/unattended/unattended.sh` | `check_single_live()` — the `fail 5` line becomes a printed announcement; the UNAVAILABLE guard's threshold moves with it (S6); the function's header rewritten to state what it now does and does NOT claim |
+
+No test file appears here. Every arm in this build belongs to `TOOL-aUnblockedFleet-4`, and an
+earlier revision of this spec claimed `unattended.test.sh` in both §2 and this table while unit 4
+claimed it too — two units owning one file, which is the ordering hazard `--dispatch` refuses and
+which would have left this unit unverifiable at its own order position.
 
 ### Rollout
 
@@ -114,9 +134,15 @@ writes no new fact. An adopter on an older kit keeps the refusal until they re-c
   value degrades into. It prints on the default channel for the reason the leg's header at `:23`
   already gives about its sibling notice: a notice routed through a gated reporter is invisible on
   every ordinary run, which is a check quietly deleted.
-- risks — the one real concurrency hazard admitted by this change is two runs landing from one clone
-  racing on the shared lander marker. It fails CLOSED today: `--landed` requires the marker to name
-  HEAD exactly and refuses on a mismatch, naming both shas. Filed as a row by unit 5, not fixed here.
+- risks — TWO concurrency hazards are admitted by this change, and an earlier revision of this line
+  claimed the first was "the one real" one. It was not, and the spec audit refuted it. **First and
+  larger: the merge bar's repo-wide turnstile.** `run-gates.sh` serializes bars per git common dir,
+  and the queue wait is charged against the run's own `GATE_BOUND`, so two concurrent closes in one
+  clone make the second fail `gates-green` for pure contention. That relocates the fleet wedge from
+  STARTING to CLOSING rather than removing it, and it is `TOOL-aUnblockedFleet-6`, which lands BEFORE
+  the carriers for that reason. **Second: the lander-marker race** between two runs landing from one
+  clone. It fails CLOSED — `--landed` requires the marker to name HEAD exactly and refuses on a
+  mismatch, naming both shas — and is filed as a row by unit 5, not fixed here.
 - testing + left-shift gates — unit 4 owns the arms. Both halves stage their break and observe RED.
 - migration / rollback — revert the commit; nothing persists.
 - user docs — unit 3 owns the two carriers.
@@ -134,13 +160,32 @@ writes no new fact. An adopter on an older kit keeps the refusal until they re-c
 - **AC4** — When a `LANDING` record whose witness is an ancestor of the observed anchor is present, it
   is still EXCLUDED and its existing notice still prints, asserted by the existing arm text.
 - **AC5** — When the driver's refusal inventory is re-derived, exit code 5 no longer names a live-run
-  refusal, and `bash tools/memory-tree/check-arms.py` still finds every remaining branch armed.
+  refusal, and `python3 tools/memory-tree/check-arms.py --check` still finds every remaining branch
+  armed with no floor in `.memory-tree.conf` edited. Measured headroom at rev-2: `unattended.sh` is
+  175 branches against floor 104 and 172 armed against floor 101, so removing one branch moves no pin.
+- **AC6** — When one concurrent record exists and NO anchor can be observed, the preflight output
+  carries BOTH the announcement and the UNAVAILABLE notice, asserted by two `hit` arms over one
+  fixture. This is S6's criterion and it is the one that fails if the two thresholds drift apart.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh`. The legs that bind: `unattended kit gate`, `unattended skill
-wiring`, `memory hygiene`, and the `check-arms` armed-branch floor for
-`tools/unattended/unattended.test.sh`, whose pin must still be met after an arm is rewritten.
+wiring`, `memory hygiene`, `drift-audit records`, and the `check-arms` armed-branch floor for
+`tools/unattended/unattended.test.sh`.
+
+**The landing order this build runs under, stated once here and pointed at from units 2, 3 and 6.**
+`drift-audit records` is unguarded, so it runs on every bar including the push boundary, and its
+`non_terminal_specs_cited_by_product_source` signal reads **2 against pin 2 — zero headroom**,
+measured at rev-2. Its oracle greps each NON-TERMINAL spec's own id across `PRODUCT_GLOBS`, which
+covers `tools/`, `skills/` and `.claude/` — every path units 1, 2, 3 and 6 touch. Charter §6 mandates
+inline provenance ids on exactly the kind of non-obvious rule these headers state, so a rewritten
+header citing `TOOL-aUnblockedFleet-1` while that spec still reads `SPECCED` or `INPROGRESS` drives
+the signal to 3 and reds the bar. The rule: **a unit's status flip to `CLOSED` lands in the same
+commit range as the source edit that cites its id.** Raising the pin is FORBIDDEN — the key carries
+`weakens: up` in `RATCHETS`, so raising it prints `RATCHET WEAKENED` and trades a real signal for a
+green bar. `TOOL-aBoundedVerdict-30` measured this same signal at 10 against pin 2 with "shipped
+source naming UNBUILT ids" as a root cause, and the trap is documented inside the file this unit
+edits, at `unattended.sh:4205-4209`.
 
 ## 8. Open questions
 
@@ -151,6 +196,13 @@ the concurrent runs, refuse none of them.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate, after the §4 measurement.
+- rev-2 · 2026-08-31 · spec-audit round 1 fold. §5's "the one real concurrency hazard" was a false
+  exclusive claim and the turnstile is the larger one (B1, promoted to unit 6). §4's verb census was
+  taken over the dispatch case rather than the verb population, so the number was 14 where the
+  population is 17 (M1); the conclusion is unchanged. Added S6, the UNAVAILABLE guard's threshold,
+  which would otherwise have gone mute in exactly the state it exists for (H4). Dropped this unit's
+  claim on `unattended.test.sh`, which unit 4 owns (H5). §7 gained `drift-audit records` and the
+  build-wide landing order the ratchet's zero headroom forces (B3).
 
 ## 10. Reuse audit
 

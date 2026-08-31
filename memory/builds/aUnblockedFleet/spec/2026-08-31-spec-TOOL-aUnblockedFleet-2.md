@@ -1,10 +1,12 @@
 # TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 
 <!-- /gen:spec-records -->
 
@@ -35,6 +37,12 @@ green and still says what it saw.
 - **S6** — the check's header states what it now does NOT check, per template §7's rule that a gate's
   own header names its gaps: it no longer asserts anything about how many runs are live, and an
   abandoned record is now reported forever rather than blocking, with no staleness bound.
+- **S7** — the IN-CODE justification at `check-unattended.sh:716-720` is corrected in the same edit.
+  It sits in check 4's header and explains that check's existence by reference to "the live-run rule
+  below", naming `nlive <= 1` as a live refusal. After S1 that sentence is false, and it is the
+  justification for the check that becomes MORE load-bearing here — check 4 is what keeps the
+  per-build-folder live count at one once the tree-wide count stops failing. A false rationale on a
+  check whose importance just rose is worse than no rationale.
 
 ## 3. Non-goals (OUT)
 
@@ -73,13 +81,16 @@ act on, and the operator's only remedy is editing another node's record.
 
 | file | change |
 |---|---|
-| `tools/unattended/check-unattended.sh` | check 7's `fail 7` becomes a printed report; the `# ---- 7:` header block rewritten to state the new contract and its gaps |
-| `tools/unattended/check-unattended.test.sh` | the check-7 RED arm becomes a report arm; its GREEN control is kept and a silent-at-one arm added |
+| `tools/unattended/check-unattended.sh` | check 7's `fail 7` becomes a printed report; the `# ---- 7:` header block rewritten to state the new contract and its gaps; the stranded justification at `:716-720` corrected (S7) |
+
+No test file and no version bump appear here. `check-unattended.test.sh` belongs to
+`TOOL-aUnblockedFleet-4` and the `KIT_UNATTENDED_VERSION` bump to `TOOL-aUnblockedFleet-3`; rev-1 of
+this spec claimed both, which is two units owning one file twice over.
 
 ### Rollout
 
-The kit version bumps in both `unattended.sh` and `check-unattended.sh` (paired by
-`check-kit-versions.sh`), and the rendered Skill re-stamps. No record migrates.
+No record migrates and nothing in this unit is versioned. The kit version bump and every carrier it
+touches are `TOOL-aUnblockedFleet-3`'s, which is where the full carrier set is enumerated.
 
 ## 5. Production-readiness checklist
 
@@ -118,9 +129,14 @@ The kit version bumps in both `unattended.sh` and `check-unattended.sh` (paired 
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh`. Binding legs: `unattended kit gate`, `unattended skill wiring`,
-the `check-arms` armed-branch floor for `tools/unattended/check-unattended.test.sh`, and
-`check-kit-versions.sh`'s pairing of the two `KIT_UNATTENDED_VERSION` declarations.
+`bash tools/run-gates/run-gates.sh`. Binding legs: `unattended kit gate`, `drift-audit records`, and
+the `check-arms` armed-branch floor for `tools/unattended/check-unattended.test.sh`. Measured headroom
+at rev-2: that file is 162 branches against floor 101 and 162 armed against floor 100, so removing one
+branch moves no pin.
+
+**The landing order is unit 1 §7's**, and it binds this unit identically: this unit rewrites two
+headers inside `PRODUCT_GLOBS` while the `non_terminal_specs_cited_by_product_source` ratchet sits at
+2 against pin 2. Read it there rather than here — a second copy is the class this build keeps finding.
 
 ## 8. Open questions
 
@@ -131,6 +147,11 @@ none of them, and keep the check's number.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate, alongside unit 1.
+- rev-2 · 2026-08-31 · spec-audit round 1 fold. Dropped this unit's claims on
+  `check-unattended.test.sh` (unit 4's) and on the version bump (unit 3's), both of which rev-1 took
+  from other units (H6). Added S7, a third in-code carrier of the removed rule that no unit's
+  acceptance could see (H3). §7 gained `drift-audit records` and points at unit 1's landing order
+  rather than restating it (B3). Order moved 2 -> 4: unit 6 must land before the carriers.
 
 ## 10. Reuse audit
 

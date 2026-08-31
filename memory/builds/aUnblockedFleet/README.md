@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5
+ids: TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6
 authorized-by: prompt
 ---
 
@@ -71,6 +71,16 @@ could preflight at all, and it is a special case for one of the twelve phases.
   race between two runs landing from one clone. That is a separate defect, it fails CLOSED today
   (`--landed` refuses on a marker/HEAD mismatch and names both shas), and admitting concurrency makes
   it reachable rather than creating it. It gets a backlog row, not a unit.
+- **UNBLOCKING A START IS NOT UNBLOCKING A RUN, and the spec audit is what established that.** Round
+  1 confirmed a second, larger serialization the two run-state checks were hiding: `run-gates.sh`
+  holds a repo-wide turnstile keyed on the git common dir, and its queue wait is charged against the
+  unattended run's own `GATE_BOUND`. Removing only the two checks would have moved the fleet wedge
+  from STARTING to CLOSING and called it fixed. `TOOL-aUnblockedFleet-6` was added by `--rescope` and
+  lands before the carriers.
+- **The build-wide landing order lives in unit 1 §7 and is pointed at, never restated.** The
+  `drift-audit records` ratchet sits at its ceiling with zero headroom, so a source header citing a
+  unit id must land in the same commit range as that unit's status flip, and raising the pin is
+  forbidden.
 
 ## Parked decisions
 *(none yet — this section is where a refused decision lands, with its question, the options seen,
@@ -80,33 +90,35 @@ and why the run refused it.)*
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aUnblockedFleet-1` | 2 | the driver: `check_single_live()` counts within the run's own slug instead of the tree |
-| 2 | `TOOL-aUnblockedFleet-2` | 2 | the leg: check 7 grades per build folder instead of tree-wide |
-| 3 | `TOOL-aUnblockedFleet-3` | 1 | the carriers: protocol §3 and the kit `SKILL.template.md` state the scoped rule |
-| 4 | `TOOL-aUnblockedFleet-4` | 1 | the test arms for both halves, each with its failing case observed |
-| 5 | `TOOL-aUnblockedFleet-5` | 1 | the records: three OPEN backlog rows closed or re-scoped, one decision row, the marker-race row filed |
+| 1 | `TOOL-aUnblockedFleet-1` | 2 | the driver: `check_single_live()` announces concurrent runs instead of refusing on them |
+| 2 | `TOOL-aUnblockedFleet-6` | 2 | the merge bar's repo-wide turnstile stops eating the unattended close's deadline |
+| 3 | `TOOL-aUnblockedFleet-2` | 2 | the leg: check 7 reports concurrent runs instead of failing on them |
+| 4 | `TOOL-aUnblockedFleet-3` | 1 | the carriers: the protocol, the Skill, and every one of the kit-version marker's carriers |
+| 5 | `TOOL-aUnblockedFleet-4` | 1 | the test arms for all three halves, each with its failing case observed |
+| 6 | `TOOL-aUnblockedFleet-5` | 1 | the records: two backlog rows closed, one narrowed, one filed, one decision row |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 3 | 1 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-6 — the merge bar's turnstile stops eating the unattended close's deadline](spec/2026-08-31-spec-TOOL-aUnblockedFleet-6.md) | 3 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 5 | 1 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 6 | 1 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 7 | 1 | SPECCED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5.
+Ids no record names: TOOL-aUnblockedFleet-6.
 
-Ids no `spec-audit` record has ever named: TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5.
+Ids no `spec-audit` record has ever named: TOOL-aUnblockedFleet-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -114,10 +126,11 @@ Ids no `spec-audit` record has ever named: TOOL-aUnblockedFleet-1 TOOL-aUnblocke
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aUnblockedFleet-1` | no |
-| 2 | `TOOL-aUnblockedFleet-2` | no |
-| 3 | `TOOL-aUnblockedFleet-3` | no |
-| 4 | `TOOL-aUnblockedFleet-4` | no |
-| 5 | `TOOL-aUnblockedFleet-5` | no |
+| 3 | `TOOL-aUnblockedFleet-6` | no |
+| 4 | `TOOL-aUnblockedFleet-2` | no |
+| 5 | `TOOL-aUnblockedFleet-3` | no |
+| 6 | `TOOL-aUnblockedFleet-4` | no |
+| 7 | `TOOL-aUnblockedFleet-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

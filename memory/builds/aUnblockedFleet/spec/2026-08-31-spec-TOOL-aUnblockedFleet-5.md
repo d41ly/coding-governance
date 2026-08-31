@@ -1,10 +1,12 @@
 # TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 117de044 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 |
 
 <!-- /gen:spec-records -->
 
@@ -105,6 +107,8 @@ this build removes its blocking half and does not address its staleness half.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored under the aUnblockedFleet mandate.
+- rev-2 · 2026-08-31 · spec-audit round 1 fold. Order moved 5 -> 7 to sit last after unit 6's
+  insertion. Scope unchanged: no finding landed on this unit.
 
 ## 10. Reuse audit
 
