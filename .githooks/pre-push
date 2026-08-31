@@ -137,7 +137,16 @@ _gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
 [ -f "$_gate_env" ] && . "$_gate_env"
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
-kitfp="$(git rev-parse --show-toplevel)/tools/run-gates/gate-fingerprint.sh"
+# THE INSTALL PREFIX IS CONFIGURABLE (`prefix` in deploy.toml, defaulted to `tools`), and this
+# hook ships VERBATIM to every adopter -- so a target that installed the kit at `scripts/` had a
+# push gate that could not find its own fingerprint helper and silently lost the staleness check.
+# Probed, not spelled, the same way the runner derives its own manifest. TOOL-aBoundedCeiling-7.
+_top="$(git rev-parse --show-toplevel)"
+GOV_KITROOT=${GOV_KITROOT:-tools}
+[ -d "$_top/$GOV_KITROOT/run-gates" ] || for _c in tools scripts .governance; do
+  [ -d "$_top/$_c/run-gates" ] && { GOV_KITROOT=$_c; break; }
+done
+kitfp="$_top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
 force=""
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
@@ -192,7 +201,7 @@ fi
 # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
 #    widened or removed in this very push cannot be trusted to scope this very push.
 if [ -z "$force" ]; then
-  git diff --quiet "$rec_sha" "$main_local" -- tools/gate-legs.json 2>/dev/null \
+  git diff --quiet "$rec_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" "$GOV_KITROOT/gate-legs.toml" 2>/dev/null \
     || force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"
 fi
 
@@ -200,7 +209,9 @@ fi
 #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
 #    between two commits cannot see.
 if [ -z "$force" ] && [ -n "$rec_blob" ]; then
-  now_blob=$(git hash-object -- tools/gate-legs.json 2>/dev/null)
+  _decl="$GOV_KITROOT/gate-legs.json"
+  [ -f "$_top/$GOV_KITROOT/gate-legs.toml" ] && _decl="$GOV_KITROOT/gate-legs.toml"
+  now_blob=$(git hash-object -- "$_decl" 2>/dev/null)
   [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
     && force="the leg manifest differs from the one the recorded green was earned on"
 fi

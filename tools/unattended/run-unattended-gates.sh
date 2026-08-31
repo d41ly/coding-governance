@@ -167,9 +167,35 @@ run_one() { # label · kind · argv...
   fi
 }
 
-run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
-run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
-run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
+# THE THREE CHECKS ARE DECLARED LEGS, so they route through the ONE gate entry point rather than
+# being dispatched a second time here (TOOL-aGatheredDeclaration-6 S5). Matched by ARGV, not by
+# label: this script calls them `kit gate`, `playbook validity gate` and `skill wiring`, and the
+# manifest names them `unattended kit gate`, `playbook validity gate` and `unattended skill wiring`
+# — three of eight run_one calls, which is a fact nobody could have read off the labels.
+#
+# WHAT DOES NOT MOVE: the five selftests below. The owner ruled them off the bar on 2026-08-23, and
+# folding them back as opt_in rows would take the manifest 86 -> 91 and partially reverse a
+# governance ruling — outside a mandate's delegated authority. They are not declared legs, so
+# dispatching them here is not a second gate entry point: the single-entry rule governs what the
+# manifest declares.
+_RG="$(cd "$HERE/../run-gates" 2>/dev/null && pwd)/run-gates.sh"
+if [ -x "$_RG" ] || [ -f "$_RG" ]; then
+  printf '  -- the three declared checks, through the one entry point --
+'
+  bash "$_RG" --leg "unattended kit gate" --leg "playbook validity gate" --leg "unattended skill wiring"     || st=1
+  # THE LIVENESS COUNTER MUST SEE THEM. It increments inside run_one, which the delegated path no
+  # longer calls, so without this a run of only the three checks reports `graded nothing at all` and
+  # exits 2 — the assertion catching a regression it was written for, in the commit that caused it.
+  ran=$((ran + 3))
+else
+  # The runner is absent (an adopter that took this kit and not that one). Dispatch directly and SAY
+  # so, rather than reporting a green over three checks nobody ran.
+  printf '  -- run-gates is not installed here; dispatching the three checks directly --
+'
+  run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
+  run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
+  run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
+fi
 
 run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
 run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
