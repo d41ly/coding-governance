@@ -159,8 +159,18 @@ if bad:
 # pre-normalisation strip. What is asserted instead is that the three files carry the SAME two
 # derivation lines, byte for byte. One answer, checked; the pattern the resolver parity gate uses.
 a=$((a+1))
-read_derivation() {   # FILE -> the two derivation lines, whitespace-normalised
-  grep -hE '^KITDIR=|^ROOTN=|^KITREL=|^LEGS_FILE=' "$1"
+read_derivation() {   # FILE -> the SET of manifest filenames this file can resolve to
+  # WHAT THIS COMPARES, and why it is not the source lines. The anchored `^LEGS_FILE=` form matched
+  # only the canonical line, which is identical across the three files BY CONSTRUCTION -- so the arm
+  # compared a constant to itself and passed over a staged break. Widening it to every indented
+  # assignment went the other way: the runner carries a three-branch resolution and the harnesses
+  # carry a one-branch fallback, so the texts can never match and the arm could never pass. A gate
+  # that always fails is exactly as useless as one that never does.
+  #
+  # The property that MATTERS is neither text: it is whether a harness could grade a manifest the bar
+  # never reads. That is the SET of filenames each file can arrive at, sorted, and it is stable
+  # across however many branches each one needs to get there.
+  grep -hoE 'gate-legs[-a-zA-Z0-9]*\.(toml|json)' "$1" | sort -u
 }
 ref=$(read_derivation "$KITREL/run-gates.sh")
 if [ -z "$ref" ]; then
