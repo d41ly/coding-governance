@@ -1,6 +1,6 @@
 # TOOL-aPairedLexer-10 — a name only ONE view binds is a disagreement, not an exemption
 
-**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
+**Status:** SPECCED · rev-6 · 2026-08-31 · node a · Tier-2 · base 72dff924 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -34,9 +34,12 @@ meeting.
 - **S1** — when `!_bl.clean`, iterate the UNION of both key sets. A name both views bind to different
   integers keeps the MAX, as now; a name only ONE view binds is DELETED from `consts`, so `boundedK`
   refuses it and the denial names the unresolvable form.
-- **S2** — sweep `\b(?:const|let|var)\s+(\w+)\s*=` over `_bl.code` and delete every name the clean
-  view SAW but refused to resolve. A declaration the trusted view examined and rejected is stronger
-  evidence than one the untrusted view invented.
+- **S2** — **DROPPED at build time, on AC6's own instruction.** It swept the trusted view for
+  declarations it had SEEN but refused to resolve. A copy of the hook with S2 removed was diffed
+  against the full one over three candidate fixtures and changed NO verdict, because S1 already
+  deletes any name only ONE view binds — and a declaration the trusted view cannot resolve binds
+  nothing there, which IS that case. S2 was redundant with S1, not additional to it. The code
+  carries the removal and its measurement as a comment.
 - **S3** — the arm `rule3: an exposed const resolves the cap and the script admits` is ALREADY
   re-baselined by `TOOL-aPairedLexer-9` S2c, one step earlier: its S2b flips that arm from ADMIT to
   DENY. This unit inherits the inversion and does not repeat it. rev-2 claimed the re-baseline
@@ -100,17 +103,12 @@ only in the view the file distrusts. The arm is not deleted, it is inverted, wit
   left four other places still attributing it here.
 - **AC5** — When a script's view is CLEAN, `intConsts` binds the same table as before this unit,
   no name is deleted, and the verdict is unchanged.
-- **AC6** — When a name is bound by BOTH views but the clean view SAW it in a declaration it
-  refused to resolve, the denial names `K` as unresolvable, and the criterion FAILS with S1 alone.
-  **The fixture must make BOTH views bind `K`**, or S1 deletes it and the arm passes without S2.
-  A `const K = args.width` binds nothing — `intConsts` matches only a trailing integer — so rev-2's
-  fixture left round-1 finding 10 open. rev-3's replacement was worse: the audit measured it
-  passing against the SHIPPED tip with neither S1 nor S2 implemented, because `intConsts` already
-  carries a bare-reassignment sweep. **The criterion is therefore stated as a REQUIREMENT on the
-  fixture rather than as a fixture**: it must be one that FAILS at the shipped tip and FAILS with
-  S1 alone, and the builder verifies both before wiring it. If no such fixture exists, S2 is
-  unobservable and is dropped rather than shipped as prose — three fixtures have now been written
-  for this one criterion and every one of them passed for a reason unrelated to S2.
+- **AC6** — ANSWERED in the negative, which is the criterion doing its job. It required a fixture
+  that FAILS at the shipped tip and FAILS with S1 alone before S2 could ship. Three fixtures were
+  written for it across three revisions and every one passed for a reason unrelated to S2; the
+  fourth attempt measured S2 directly, by removing it, and found it changes no verdict on any
+  candidate. So S2 is dropped and this criterion is satisfied by that measurement rather than by an
+  arm. `bash tools/hooks/agent-cap.test.sh` carries no S2 arm because there is no S2.
 - **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, every arm green before this unit is green
   after it, except the one S3 re-baselines by name.
 
@@ -147,6 +145,9 @@ review states the direction and §4 records the reason.
   amendments where the diff contains two. §4 and §5 still attribute the re-baseline here and are left
   as they are: `TOOL-aPairedLexer-9` S2c and AC4 are now unambiguous about where it happens, and the
   loop is closed, so the honest record is the correction rather than a fifth edit.
+- rev-6 · 2026-08-31 · BUILT. S2 is DROPPED on AC6's own instruction: measured against a copy with
+  it removed, it changed no verdict on any candidate, because S1's union-delete already covers the
+  case it was written for. The criterion written to make S2 non-optional is what removed it.
 
 ## 10. Reuse audit
 

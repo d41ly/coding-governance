@@ -420,6 +420,45 @@ function renderCodeView(script) {
   return { code: out, unterminated: stack.length > 0 || mode !== 'code' || dirty }
 }
 
+// ---- TOOL-aPairedLexer-10 + -11: the const table BOTH cap rules resolve, from one helper ------
+// TOOL-aPairedLexer-4 cross-checked the two views but guarded on `consts.has(k)`, so a name the
+// CLEAN view does not bind was never visited. Its comment called that deliberate. It is not: for a
+// CAP, a name bound only by the view this file has already declared untrustworthy is not evidence,
+// it is FABRICATION. A prose `const K = 5` inside a lens prompt therefore governed a real
+// `const K = args.width`, which is the caller-settable knob this rule refuses by name elsewhere.
+//
+// And rule 2 never got the cross-check at all, so the identical fabrication lowered a real cap
+// there — the defect fixed next door and left standing, which is why this is ONE function with two
+// callers rather than two copies. It takes both views as PARAMETERS: `fanoutFindings` has no `_bl`
+// in scope, and a helper written against one caller's locals is not hoisted, it is moved.
+function resolvedConsts(trustedCode, fallbackCode, clean) {
+  const primary = intConsts(clean ? trustedCode : fallbackCode)
+  if (clean) return primary
+  const consts = primary.consts
+  const trusted = intConsts(trustedCode).consts
+  const names = new Set()
+  for (const k of consts.keys()) names.add(k)
+  for (const k of trusted.keys()) names.add(k)
+  for (const k of names) {
+    const a = consts.get(k)
+    const b = trusted.get(k)
+    // Both views bind it and disagree: keep the LARGER, which for a cap is fail-closed.
+    if (a !== undefined && b !== undefined) { if (a !== b) consts.set(k, Math.max(a, b)); continue }
+    // Only ONE view binds it. That is a disagreement, not an exemption: drop the name so the cap
+    // goes UNRESOLVABLE and the rule denies, naming the form it could not resolve.
+    consts.delete(k)
+  }
+  // TOOL-aPairedLexer-10 S2 was DROPPED here, not forgotten. It swept the trusted view for
+  // declarations it had SEEN but refused to resolve, and deleted those names too. Measured against
+  // a copy with it removed, on three candidate fixtures: it changed NO verdict, because S1 above
+  // already deletes any name only ONE view binds — and a declaration the trusted view could not
+  // resolve binds nothing there, so it is exactly that case. The unit's own acceptance criterion
+  // required a fixture that fails with S1 alone and named dropping S2 as the honest outcome if none
+  // existed. None did. Shipping it would have been an unobservable code path, which is the
+  // could-not-fail shape this build spent four review rounds removing.
+  return { consts, orBound: primary.orBound }
+}
+
 function fanoutFindings(script) {
   const lines = script.split(/\r?\n/)
   // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
@@ -428,8 +467,10 @@ function fanoutFindings(script) {
   const view = renderCodeView(script)
   const code = view.unterminated ? lines.map((l) => stripStrings(l).split('//')[0]) : view.code
 
-  // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`
-  const { consts } = intConsts(code)
+  // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`.
+  // TOOL-aPairedLexer-11: through the SAME helper rule 3 uses. Rule 2 had no cross-check at all,
+  // so a fabricated `const K = 5` still lowered a real `const K = 500` here.
+  const { consts } = resolvedConsts(view.code, lines.map((l) => stripStrings(l).split('//')[0]), !view.unterminated)
 
   // Receivers this file can prove are bounded. TWO PASSES, because a derived lens set is written
   // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
@@ -758,6 +799,19 @@ function blankLiterals(script) {
 // precedent is the bracket walk in the array-literal case above, which already joins lines until a
 // literal closes; every shipped call site spans lines, so a per-line read of argument 2 sees nothing
 // at all. Bounded by the balance point (and 200 lines), so the scan stays linear.
+// TOOL-aPairedLexer-9 S2: joins run on the PAREN-SAFE view, at a column RE-DERIVED there.
+// Reusing the column a match found in the fallback view makes `joinCall` walk a different string:
+// it returns null, the rule denies for "never closes its parens", and that denial is green while
+// observing nothing. S2b: a call site the paren-safe view cannot show AT ALL is a DENY naming the
+// ambiguity, never a dropped finding.
+function joinHere(joinView, i, needle) {
+  const line = joinView[i] === undefined ? '' : joinView[i]
+  const at = line.indexOf(needle)
+  if (at < 0) return { ambiguous: true }
+  const j = joinCall(joinView, i, at + needle.length - 1)
+  return j ? { j } : { ambiguous: true }
+}
+
 function joinCall(code, i, col) {
   let depth = 0
   let buf = ''
@@ -802,21 +856,21 @@ function capFindings(script) {
   // wrongly: it also feeds `intConsts`, where an EXPOSED `const K = 5` resolves a cap that was
   // unresolvable and REMOVES a finding. What it is, is a view of a script this rule can
   // actually read, in both directions, rather than a blank page.
-  const code = _bl.clean ? _bl.code : lines.map((l) => stripStrings(l).split('//')[0])
-  const { consts, orBound } = intConsts(code)
-  // TOOL-aPairedLexer-4: the fallback view strips neither template contents nor block comments,
-  // and `intConsts` matches anywhere in the text it is handed. Later binding wins, so a
-  // `const K = 5` written in PROSE overrode a real `const K = 500` and turned a correct denial of
-  // a 500-wide fan into an approval. Three spellings measured, all `node --check` clean.
+  // TOOL-aPairedLexer-9: WHICH view does what, stated, because leaving it implicit meant both
+  // readings broke a shipped arm. `stripStrings` leaves BACKTICKS alone, so the fallback view
+  // retains template CONTENTS: a `)` inside a lens prompt short-circuits `joinCall`, the second
+  // argument disappears, and the helper's own `cap = 5` default reads as governing a call site
+  // written 50. `blankLiterals`' docstring calls that paren join "the one mechanism this rule is
+  // built on", and TOOL-aPairedLexer-4's fallback threw it away.
   //
-  // Cross-check the two views and keep the LARGER of any two disagreeing integers: for a CAP,
-  // larger is fail-closed. A name only ONE view binds is not a disagreement — that is the exposed
-  // binding the fallback exists to serve, and its arm stays green.
-  if (!_bl.clean) {
-    for (const [k, v] of intConsts(_bl.code).consts) {
-      if (consts.has(k) && consts.get(k) !== v) consts.set(k, Math.max(consts.get(k), v))
-    }
-  }
+  // The FALLBACK view supplies the scan LINE SET, the call-site and helper DETECTION, and the
+  // `intConsts` bindings. The PAREN-SAFE view supplies `joinCall`/`topLevelArgs`. Detection on the
+  // paren-safe view instead would flip the block-comment arm to ADMIT, since its call-site line is
+  // empty there — a fresh fail-open.
+  const fallback = lines.map((l) => stripStrings(l).split('//')[0])
+  const code = _bl.clean ? _bl.code : fallback
+  const joinView = _bl.code // paren-safe, always: joins and paren balance are computed from it
+  const { consts, orBound } = resolvedConsts(_bl.code, fallback, _bl.clean)
   const bad = []
 
   // ONE explanation per unresolvable K, naming the FORM rather than shrugging — an operator who
@@ -840,8 +894,12 @@ function capFindings(script) {
   code.forEach((l, i) => {
     const d = /\bfunction\s+(boundedParallel|boundedPipeline)\s*\(/.exec(l)
     if (!d) return
-    const j = joinCall(code, i, d.index + d[0].length - 1)
-    if (!j) return
+    const h = joinHere(joinView, i, d[0])
+    if (h.ambiguous) {
+      bad.push({ n: i + 1, line: lines[i], why: `the ${d[1]}() DEFINITION cannot be read in the paren-safe view, so its default parameter is unresolvable — a definition this hook cannot parse is not one it may approve` })
+      return
+    }
+    const j = h.j
     const args = topLevelArgs(j.text)
     paramsOf.set(d[1], args.map((p) => (p.split('=')[0] || '').trim()).filter(Boolean))
     const second = args[1]
@@ -861,11 +919,12 @@ function capFindings(script) {
     while ((m = HELPERS.exec(l))) {
       if (/\bfunction\s+$/.test(l.slice(0, m.index))) continue // a definition — S2 judged it
       const name = m[1]
-      const j = joinCall(code, i, m.index + m[0].length - 1)
-      if (!j) {
-        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE never closes its parens within 200 lines, so the cap argument cannot be read — a call this hook cannot parse is not a call it may approve` })
+      const h = joinHere(joinView, i, m[0])
+      if (h.ambiguous) {
+        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE cannot be read in the paren-safe view — either it never closes its parens, or a mis-lexed span blanked it — so the cap argument is unresolvable, and a call this hook cannot parse is not a call it may approve` })
         continue
       }
+      const j = h.j
       const args = topLevelArgs(j.text)
       if (args.length >= 2) {
         if (!boundedK(args[1], consts))

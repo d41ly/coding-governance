@@ -964,9 +964,21 @@ const L = [{a:1},{a:2}]
 await boundedParallel(L.map((x) => () => agent(x)), 500)
 EOF
 
-# The REMOVING direction, pinned because this unit's first design claimed it could not happen. The
-# per-line view also feeds intConsts, so exposing a binding can RESOLVE a cap and drop a finding.
-js "rule3: an exposed const resolves the cap and the script admits" 0 <<'EOF'
+# RE-BASELINED at TOOL-aPairedLexer-9 S2c, from ADMIT to DENY, and kept rather than deleted so the
+# suite records that this row changed and when. TOOL-aPairedLexer-1 wrote it to pin the REMOVING
+# direction: an exposed `const K = 5` below an unterminated template resolving a cap that was
+# otherwise unresolvable. Two things now refuse it, and either alone is sufficient.
+#
+# TOOL-aPairedLexer-10: `K` is bound ONLY by the untrusted fallback view — the blanked view binds
+# nothing there — and a name only one view binds is FABRICATION for a cap, not evidence. It is
+# dropped, so the bound goes unresolvable and the rule denies.
+#
+# TOOL-aPairedLexer-9 S2b: the call-site line is blank in the paren-safe view, so the join cannot be
+# read there at all, and a call site this hook cannot parse is not one it may approve.
+#
+# Resolving a cap out of a view the file has DECLARED untrustworthy is the fail-open direction. The
+# arm pinned it as the admit direction, which is what made it worth inverting rather than keeping.
+js "rule3: a binding only the distrusted view sees does not resolve a cap" 2 <<'EOF'
 const t = `an unterminated template literal
 const K = 5
 const L = [{a:1},{a:2}]
@@ -1230,6 +1242,102 @@ const LENSES = [
   { key: "b", prompt: `hunt seams` },
 ]
 await boundedParallel(LENSES.map((l) => () => agent(l.prompt)), MAX_VERIFIERS)
+EOF
+
+
+# ---- TOOL-aPairedLexer-9, -10, -11: the two cap rules, one const table -------------------------
+# EVERY trigger below is a BALANCED declined span — `if (a) /``/.test(s)` — and that is not
+# cosmetic. A single-backtick trigger opens a template that blanks every later line, so unit 9's
+# S2b denies before the cap is ever resolved and the arm passes while observing nothing. Measured:
+# the first cut of these fixtures did exactly that, and read as green.
+#
+# The trigger's slash follows `)`, a position -8 DELIBERATELY declines, so units 7 and 8 do not
+# dissolve it. Each arm carries its trigger-deleted CONTROL.
+
+# -- TOOL-aPairedLexer-9: a `)` inside a prompt must not eat the cap argument ---------------------
+# `stripStrings` leaves backticks alone, so the fallback view keeps template CONTENTS: the `)` in
+# the prompt short-circuits joinCall, the second argument disappears, and the helper's own cap = 5
+# default reads as governing a call site written 50. Measured ADMIT before this unit.
+js "rule3: a paren inside a prompt does not eat the cap argument" 2 <<'EOF'
+const a = 1
+if (a) /``/.test(s)
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap) out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
+  return out
+}
+const r = await boundedParallel(pick(`x)y`), 50)
+EOF
+
+js "rule3: the same call site denies with the trigger removed (control)" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap) out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
+  return out
+}
+const r = await boundedParallel(pick(`x)y`), 50)
+EOF
+
+# -- TOOL-aPairedLexer-10: a name only ONE view binds is FABRICATION, not evidence ----------------
+# The prose `const K = 5` lives only in the untrusted view; the real bound is a caller-settable
+# knob. Measured ADMIT before this unit — the prose integer governed the knob.
+js "rule3: prose cannot resolve a cap the trusted view never bound" 2 <<'EOF'
+const a = 1
+if (a) /``/.test(s)
+const PROMPT = `
+  the width is set with
+  const K = 5
+  before the fan.
+`
+const K = args.width
+const thunks = [t1, t2, t3]
+const r = await boundedParallel(thunks, K)
+EOF
+
+js "rule3: the same script denies with the trigger removed (control)" 2 <<'EOF'
+const PROMPT = `
+  the width is set with
+  const K = 5
+  before the fan.
+`
+const K = args.width
+const thunks = [t1, t2, t3]
+const r = await boundedParallel(thunks, K)
+EOF
+
+# Both views bind it and DISAGREE: the LARGER governs, which for a cap is fail-closed. This arm is
+# green at BASE too — the max-merge predates this unit — and it is kept because unit 10's other
+# half INVERTS a rule, and an inversion needs the direction it must not break pinned beside it.
+js "rule3: two views disagreeing on a cap keep the LARGER" 2 <<'EOF'
+const a = 1
+if (a) /``/.test(s)
+const K = 500
+const doc = `prose saying const K = 5 here`
+const L = [{a:1},{a:2}]
+await boundedParallel(L.map((x) => () => agent(x)), K)
+EOF
+
+# -- TOOL-aPairedLexer-11: rule 2 resolves through the SAME helper --------------------------------
+# Not a regression — 1.9, 1.10, 1.11 and both lexer patches all admit it. It is the defect fixed
+# next door in rule 3 and left standing in rule 2, which is why the merge is one function with two
+# callers rather than two copies.
+js "rule2: a fabricated const cannot lower a real cap" 2 <<'EOF'
+const a = 1
+if (a) /``/.test(s)
+const K = 500
+/*
+ historical note: the verify stage used const K = 5
+*/
+const groups = chunk(args.findings, Math.ceil(args.findings.length / K)) // gov:fixed-verifiers
+const r = await boundedParallel(groups.map((g) => () => agent(g)), 5)
+EOF
+
+js "rule2: the same split denies with the block comment removed (control)" 2 <<'EOF'
+const a = 1
+if (a) /``/.test(s)
+const K = 500
+const groups = chunk(args.findings, Math.ceil(args.findings.length / K)) // gov:fixed-verifiers
+const r = await boundedParallel(groups.map((g) => () => agent(g)), 5)
 EOF
 
 # ---- version parity: a DENY may never become an ADMIT across a kit version -----------------------
