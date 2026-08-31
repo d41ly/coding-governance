@@ -1066,8 +1066,23 @@ try:
         dflt = BAR.get("default_ceiling")
         data = []
         for l in (doc.get("leg") or []):
-            unknown = set(l) - {"name", "argv", "cwd", "chunk", "lane", "opt_in", "ceiling",
+            unknown = set(l) - {"name", "argv", "chunk", "lane", "opt_in", "ceiling",
                                 "guard", "impure", "tool", "full_only"}
+            # `cwd` is REFUSED, not ignored. It was whitelisted here and honoured nowhere, so a leg
+            # declaring one ran from the repo root, graded the wrong subject and PASSED -- and a
+            # check that passes while examining the wrong thing is worse than one that reds. A leg
+            # that needs its own directory says so in its own argv, which is what every leg in this
+            # repo already does. If a corpus ever needs the key, implement it in runleg FIRST and
+            # delete this refusal in the same commit.
+            if "cwd" in l:
+                # print(), not stderr.write with an escape: this file embeds the program inside a
+                # single-quoted shell block, and a two-character escape written here has been
+                # collapsed into a real byte four times in this build. CRLF on Windows is fine --
+                # this is a human message, not a parsed value.
+                print("leg %r declares `cwd`, which this runner does not honour. Put the directory "
+                      "change in the leg argv instead: a silently ignored cwd grades the wrong "
+                      "subject and passes." % l.get("name"), file=sys.stderr)
+                sys.exit(3)
             if unknown:
                 sys.stderr.write("leg %r declares unknown key(s): %s\n"
                                  % (l.get("name"), ", ".join(sorted(unknown)))); sys.exit(3)

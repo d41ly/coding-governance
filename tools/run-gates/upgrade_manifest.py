@@ -177,11 +177,15 @@ for lg in legs:
         A(render_comment("CEILING: " + str(over[lg["name"]])))
     if lg.get("scope"):
         A(render_comment("Source `scope` was %r — %s" % (lg["scope"], DROP["scope"])))
+    if lg.get("cwd") and lg["cwd"] != ".":
+        A(render_comment("Source `cwd` was %r and is NOT carried: this runner refuses the key rather "
+                         "than ignoring it. Move the directory change into this leg's argv." % lg["cwd"]))
     A("[[leg]]")
     A("name = %s" % render_string(str(lg.get("name", ""))))
     A("argv = %s" % render_array(lg.get("argv") or []))
-    if lg.get("cwd") and lg["cwd"] != ".":
-        A("cwd = %s" % render_string(lg["cwd"]))
+    # `cwd` is NOT emitted: the runner refuses it, because a key it accepted and never honoured made
+    # a leg grade the wrong subject and pass. Carried as a comment so the owner can see which legs
+    # need their argv changed, which is the same treatment `scope` gets and for the same reason.
     A("chunk = %s" % render_string(str(lg.get("chunk") or "default")))
     A("lane = %s" % render_string(lg.get("phase") or (lanes[0] if len(lanes) == 1 else "heavy")))
     A("opt_in = %s" % ("true" if hold else "false"))

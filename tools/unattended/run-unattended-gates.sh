@@ -178,8 +178,14 @@ run_one() { # label · kind · argv...
 # governance ruling — outside a mandate's delegated authority. They are not declared legs, so
 # dispatching them here is not a second gate entry point: the single-entry rule governs what the
 # manifest declares.
+# THE $ONLY FILTER BINDS HERE TOO. run_one honours it; the delegated block walked straight past
+# it, so `--selftests` ran the three checks anyway AND the ran counter was bumped by three, which
+# made the ran-eq-0 liveness refusal below unreachable from every invocation. A liveness
+# assertion that can no longer fire is worse than none: it reads as coverage.
 _RG="$(cd "$HERE/../run-gates" 2>/dev/null && pwd)/run-gates.sh"
-if [ -x "$_RG" ] || [ -f "$_RG" ]; then
+if [ -n "$ONLY" ] && [ "$ONLY" != checks ]; then
+  : # this invocation did not ask for the checks
+elif [ -x "$_RG" ] || [ -f "$_RG" ]; then
   printf '  -- the three declared checks, through the one entry point --
 '
   bash "$_RG" --leg "unattended kit gate" --leg "playbook validity gate" --leg "unattended skill wiring"     || st=1
