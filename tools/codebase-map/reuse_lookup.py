@@ -389,7 +389,7 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
 # ======================================================================================
 
 
-def _common_git_dir(root: Path) -> Path | None:
+def _resolve_git_dir(root: Path) -> Path | None:
     """The COMMON git dir for ``root``, or None. Pure path math and two small file reads — NO
     child process, matching ``map_lib.resolve_root``'s own refusal to shell out and mirroring how
     ``memory-recall``'s ``recall-opened.js`` finds the same directory.
@@ -414,7 +414,7 @@ def _common_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def log_lookup(root: Path, query: str, n_shown: int) -> None:
+def write_lookup(root: Path, query: str, n_shown: int) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -436,7 +436,7 @@ def log_lookup(root: Path, query: str, n_shown: int) -> None:
     its ``try`` — a hole worth not copying.
     """
     try:
-        common = _common_git_dir(root)
+        common = _resolve_git_dir(root)
         if common is None:
             return
         path = common / "codebase-map" / "lookups.jsonl"
@@ -475,7 +475,7 @@ def main(argv: list[str] | None = None) -> int:
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
     # render() would leave evidence of a probe whose result nobody ever saw.
-    log_lookup(m.repo_root(), query, len(shortlist.ranked))
+    write_lookup(m.repo_root(), query, len(shortlist.ranked))
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 
