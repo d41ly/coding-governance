@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 58116a11be4bd98693d84e5ed1cb6d7a7036b497
-phase: BUILDING
+witness: 2aee73b884c020f12c51f4fd9211719ee4d32d01
+phase: VERIFYING
 branch-sha: 54309e9c565d30b695ba353adfb8503a3a98dfee
 branch-ref: refs/heads/branch/unattended-kit-adversarial-review-6810dc
 mode: prompt
@@ -38,3 +38,5 @@ base: 54309e9c565d30b695ba353adfb8503a3a98dfee
 2026-08-31T03:08:36Z review · item aGradedMandate-promoted · reason verdict BLOCKED · blockers 1
 
 2026-08-31T10:09:23Z decision · item The gate-leg self-test suite (check-unattended.test.sh) was NOT run over this build's leg-side units, on an explicit owner instruction to skip it mid-run. · reason WHAT IS THEREFORE UNVERIFIED, stated rather than implied away. Units 6, 7 and 9 and unit 5's leg half edit tools/unattended/check-unattended.sh and tools/unattended/lib-unattended.sh, and that suite is the only thing that stages breaks into those checkers and asserts they still catch them. WHAT IS VERIFIED WITHOUT IT, each observed directly. The leg itself runs GREEN on this tree end to end. Check 16d was observed RED in both directions against staged breaks: a driver DOD_NO_OVERRIDE carrying a bogus member fired the driver-side refusal, and a Skill paragraph naming an invented item fired the Skill-side one. The act-axis arm was observed RED against PARK_ACTS_OWED set to supercede. Check 16d's empty-population refusal was verified by running its own awk selector over a Skill whose sentence had been removed, which yields zero lines. WHAT REMAINS UNOBSERVED: the failing case of check 24's rekeyed RETIRE arm and of check 2's non-WONTDO promotion filter. Both need a multi-commit record fixture with phase history and a units-region delta, which is what that suite exists to build. The driver suite IS green at 895 assertions, so the driver-side units are covered
+
+2026-08-31T10:55:38Z review · item aGradedMandate · reason verdict BLOCKED · blockers 1

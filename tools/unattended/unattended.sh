@@ -353,6 +353,9 @@ PARK_KINDS="decision abort override waiver proposal rescope dispatch review"
 # an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
 # dispatch is a claim about what two passes will write. Counting any of them as parked would make a
 # run that recorded six of its own acts look like a run that stalled on six decisions.
+# NOT the only declaration of membership any more: `PARK_ACTS_OWED` below is the ACT axis, and a
+# reader who takes this set for the whole taxonomy gets the double-count `history_exclude_re` exists
+# to prevent.
 PARK_KINDS_OWED="decision abort override waiver"
 # The ACTS of the `rescope` kind the owner is owed an ANSWER to. A SECOND constant rather than a
 # `kind:act` member grammar inside the set above, and the reason is a measured refusal rather than a
@@ -1845,6 +1848,17 @@ nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
 _ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
+# The FIRST id on each row, which is the row's OWN id: a generated unit row leads with its link label
+# and may mention another id in the title text. `_ids_of` over a row SET cannot tell the two apart,
+# and a foreign id there would put a unit into a population it is not in. Measured over this corpus:
+# 80 generated regions, zero foreign ids — so this closes a shape rather than a live instance, which
+# is stated rather than implied.
+row_ids_of() { # stdin: unit rows -> each row's own id, one per line, sorted
+  while IFS= read -r _ri_row; do
+    [ -n "$_ri_row" ] || continue
+    printf '%s\n' "$_ri_row" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1
+  done | sort -u
+}
 # The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
 # wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
 # written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
@@ -3112,7 +3126,7 @@ dod_met() { # slug · run-state file · item · checker
       return 0 ;;
     build-complete)
       # The owner's "merge and push only when the entire build is fully done", given a checker.
-      # FIVE terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
+      # SIX terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
       # see a planned unit nobody specced, because the generated region is rendered from the specs
       # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
       # `region` exits 0 with empty stdout for a well-formed pair enclosing nothing, so a run-state
@@ -3120,7 +3134,7 @@ dod_met() { # slug · run-state file · item · checker
       # No new fail branch: this reports through verb_close's fail 13, which already prints the
       # exact --override spelling. A waiver on `land-once-done` relaxes the DIRECTIVE and never this
       # item, so a run that waived it still owes --override build-complete at close.
-      # THE UNITS REGION IS REPORTED BY NAME. The five terms were ANDed into one verdict, so a
+      # THE UNITS REGION IS REPORTED BY NAME. The terms were once ANDed into one verdict, so a
       # README predating this item failed with a bare "unmet" and nothing said a marker pair was what
       # it wanted -- which is every build folder in this tree older than the item.
       #
@@ -3193,19 +3207,34 @@ $_bcnon"
         DOD_OUT="note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
       fi
-      load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
-      for _bcid in $(printf '%s\n' "$_bcrows" | grep -E '\| CLOSED \|' | _ids_of); do
+      # EVERY SKIP IS ANNOUNCED. Three of them are reachable — a spec `load_spec_facts` could not
+      # resolve, a spec whose FILENAME carries no date for the grandfather to compare, and a spec the
+      # cutoff grandfathers — and a term that passes over any of them silently is indistinguishable
+      # from a term that graded them clean.
+      local _bcskip=""
+      if ! load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1; then
+        _bcskip="$_bcskip · the spec-fact reader refused, so no unit could be graded"
+      fi
+      for _bcid in $(printf '%s\n' "$_bcrows" | grep -E '\| CLOSED \|' | row_ids_of); do
         _bcsp="${SPEC_PATH[$_bcid]:-}"
-        [ -n "$_bcsp" ] && [ -r "$_bcsp" ] || continue
+        if [ -z "$_bcsp" ] || [ ! -r "$_bcsp" ]; then
+          _bcskip="$_bcskip · $_bcid (no readable spec)"; continue
+        fi
         _bcdate=$(basename "$_bcsp" | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2}')
-        [ -n "$_bcdate" ] || continue
-        printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C || continue
+        if [ -z "$_bcdate" ]; then
+          _bcskip="$_bcskip · $_bcid (its spec filename carries no date, so the grandfather has nothing to compare)"; continue
+        fi
+        if ! printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C; then
+          _bcskip="$_bcskip · $_bcid (dated $_bcdate, before the declared cutoff $SPEC_THIN_CUTOFF)"; continue
+        fi
         [ "$(plan_state "$_bcsp")" = THIN ] && _bcthin="$_bcthin $_bcid"
       done
       if [ -n "$_bcthin" ]; then
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
         return 1
       fi
+      [ -z "$_bcskip" ] && return 0
+      DOD_OUT="the THIN term passed, and it did NOT grade every CLOSED unit — each entry below was skipped and why:$_bcskip"
       return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
@@ -3353,7 +3382,7 @@ $_bcnon"
         DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
         return 1
       fi
-      _sa_ids=$(printf '%s\n' "$_sa_rows" | grep -E '\| CLOSED \|' | _ids_of)
+      _sa_ids=$(printf '%s\n' "$_sa_rows" | grep -E '\| CLOSED \|' | row_ids_of)
       if [ -z "$_sa_ids" ]; then
         # ANNOUNCED, not silent. A met-with-nothing-to-check is indistinguishable from coverage
         # unless it says so, which is this repo's own named class.
@@ -3373,7 +3402,7 @@ $_bcnon"
             fence  { next }
             { n++ }
             n > 12 { exit }
-            /^\*\*Serves:\*\*/ && /spec-audit/ { print }'
+            /^\*\*Serves:\*\*[ \t]*spec-audit([ \t]|$)/ { print }'
         done | expand_id_runs)
       for _sa_id in $_sa_ids; do
         printf '%s\n' "$_sa_named" | grep -qxF -- "$_sa_id" || _sa_miss="$_sa_miss $_sa_id"

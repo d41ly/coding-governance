@@ -1622,11 +1622,21 @@ hit "$out" "THIN"
 miss "$out" "FORKED"
 git reset -q --hard HEAD~1; git clean -qfd
 
-# ...a terminal spec is DONE whatever its sections say, and is never the next target.
+# ...a terminal spec is DONE whatever its sections say, and is never the next target — but the GRADE
+# is printed BESIDE `DONE` rather than in place of it. `hit "$out" "DONE"` alone cannot fail: it is
+# satisfied by `DONE` and by `DONE (THIN)` equally, so reverting the verb's edit left this arm green.
 reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 CLOSED "" "" "" "F1 unresolved"; fixture
 out=$(run --plan tPlan)
-hit "$out" "DONE"
+hit "$out" "DONE (THIN)"
 hit "$out" "next: none - every tracked spec is terminal"
+git reset -q --hard HEAD~1; git clean -qfd
+
+# ...and a terminal spec that is NOT thin prints a bare DONE, which is the other half of the same
+# claim: the parenthetical is the grade, not decoration on every terminal row.
+reset_tree; readme tPlan; mkspec tPlan ARCH-tPlan-1 CLOSED "S1 a thing" "AC1 it works" "the bar" "none"; fixture
+out=$(run --plan tPlan)
+hit "$out" "DONE"
+miss "$out" "DONE ("
 git reset -q --hard HEAD~1; git clean -qfd
 
 # ...and a build with no tracked spec REFUSES rather than printing an empty, complete-looking list.
@@ -4864,7 +4874,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=547
+FLOOR_ASSERTIONS=550
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -4916,7 +4926,7 @@ FLOOR_ASSERTIONS=675
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
-FLOOR_SHARD_1=205
+FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 FLOOR_SHARD_2=510

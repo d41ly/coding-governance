@@ -1473,10 +1473,9 @@ fi
 # ----
 # ---- WHAT THIS DOES NOT CHECK: whether the paragraph's PROSE is correct, only that the member SET
 # ---- matches. A paragraph naming both items and describing them backwards passes.
-_no_tmpl="$HERE/SKILL.template.md"
 if [ -z "$DOD_NO_OVERRIDE" ]; then
   fail 16 "cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing: $DRIVER"
-elif [ ! -f "$_no_tmpl" ]; then
+elif [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces"
 else
   # The PARAGRAPH, selected by its own sentence and terminated by the first blank line. Item names
@@ -1485,12 +1484,14 @@ else
   _no_tbl=$(awk '
       /items? (has|have) NO override/ { p = 1 }
       p && /^[[:space:]]*$/ { exit }
-      p { print }' "$_no_tmpl"     | grep -oE '`[a-z][a-z-]*`' | tr -d '`' | sort -u)
+      p { print }' "$tmpl"     | grep -oE '`[a-z][a-z-]*`' | tr -d '`' | sort -u)
   if [ -z "$_no_tbl" ]; then
     fail 16 "the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked"
   else
+    # The MEMBERS, one per line and deduplicated. A first cut also computed a count here and threw
+    # it away to /dev/null, taking the status with it: plumbing that ran, decided nothing, and read
+    # as a guard.
     _no_core=$(printf '%s
-' $DOD_NO_OVERRIDE | grep -c . >/dev/null; printf '%s
 ' $DOD_NO_OVERRIDE | sort -u)
     _no_only_drv=$(comm -23 <(printf '%s
 ' "$_no_core") <(printf '%s
@@ -1680,9 +1681,7 @@ for f in $RUNS; do
   if ! rs_was=$(baseline_units "$f" "$bre" "${UNITS_REGION_CUTOFF:-}" "$rb"); then
     rs_why=$rs_was; rs_was=""
   fi
-  if [ -n "$rs_why" ]; then
-    report "check 24 skipped for $f — $rs_why"
-  elif ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
+  if ! rs_now=$(region "$bre" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null); then
     report "check 24 skipped for $f — the working build README does not carry exactly one well-formed units pair, so the executing roster cannot be read"
   else
     # THE RETIRE ARM'S BASELINE IS THE PINNED BASE, and the ADD ARM'S IS NOT. `baseline_units` stops
@@ -1703,21 +1702,42 @@ for f in $RUNS; do
     # ADDED ids: accounted for by an `add` naming it, OR a `supersede` naming it as the successor.
     # An `add` alone would red a correctly performed supersession, whose successor is present now
     # and absent then with no `add` row that the sibling verb would even accept.
+    #
+    # SKIPPED SEPARATELY, and the message says which question could not be asked. Its two siblings
+    # below keep running on their own baseline.
+    if [ -n "$rs_why" ]; then
+      report "check 24's ADD arm skipped for $f — $rs_why (the RETIRE and supersession arms still ran)"
+    else
     for rsid in $(printf '%s\n' "$rs_now" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
       id_in "$rs_was" "$rsid" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item add $rsid( |\$)" && continue
       printf '%s\n' "$rs_rows" | grep -qE "item supersede [A-Za-z0-9-]+ -> $rsid( |\$)" && continue
       fail 24 "a unit is in the roster this run is executing and was not in the roster it entered BUILDING with, and no rescope row adds or supersedes into it, so the scope moved with nothing on the record saying so: $rsid in $f"
     done
+    fi
     # RETIRED units: a status that is WONTDO now and was not so at the PINNED BASE owes a retire or
     # a supersede. Reported SEPARATELY when its own baseline is unreadable, because the whole-check
     # skip this replaces took the ADD arm and the supersession arm down with it.
     if [ -n "$rs_pwhy" ]; then
       report "check 24's RETIRE arm skipped for $f — $rs_pwhy (the ADD arm still ran)"
     else
+      # ABSENCE FROM THE PINNED ROSTER IS NOT AN EXEMPTION, and a first cut of this arm made it one.
+      # A unit ADDED after the pinned BASE and flipped to WONTDO during the run would then owe a row
+      # nowhere: the ADD arm exempts it because `baseline_units`' roster already carries it, and
+      # `check_authorization` is a subset test that refuses only REMOVALS, which a status flip is
+      # not. Added-then-retired would have been silent — the exact drop units 5 and 6 exist to close,
+      # reintroduced by the fix for it.
+      #
+      # So absence falls back to the LIVE-PHASE baseline instead: a unit that was already WONTDO
+      # there was retired before building and owes nothing, and one that was not owes its row. When
+      # that baseline is unreadable the fallback is unavailable and the arm asks for the row, which
+      # is the strict direction and is the behaviour this arm had before the rekey.
       for rsid in $(printf '%s\n' "$rs_now" | grep -E '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u); do
-        id_rows "$rs_pinned" "$rsid" | grep -q '| WONTDO |' && continue
-        id_in "$rs_pinned" "$rsid" || continue
+        if id_in "$rs_pinned" "$rsid"; then
+          id_rows "$rs_pinned" "$rsid" | grep -q '| WONTDO |' && continue
+        elif [ -z "$rs_why" ]; then
+          id_rows "$rs_was" "$rsid" | grep -q '| WONTDO |' && continue
+        fi
         printf '%s\n' "$rs_rows" | grep -qE "item (retire|supersede) $rsid( |\$)" && continue
         fail 24 "a unit is WONTDO now and was not at the BASE this run pinned, and no rescope row retires or supersedes it, so declared scope was dropped with nothing on the record saying so: $rsid in $f"
       done

@@ -97,7 +97,7 @@ ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGrad
 | [TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory](spec/2026-08-31-spec-TOOL-aGradedMandate-11.md) | 11 | 1 | CLOSED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
