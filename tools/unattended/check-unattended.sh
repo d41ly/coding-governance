@@ -713,11 +713,12 @@ while IFS= read -r f; do
 
   case " $PHASES_TERMINAL " in *" $ph "*) ;; *) nlive=$((nlive+1)); live="$live $f";; esac
 
-  # AN ARCHIVED RECORD MUST BE TERMINAL, and this is its own branch rather than a consequence of the
-  # live-run rule below. Check 7 is `nlive <= 1`, which fires at TWO — so a `RUN.md` that has reached
-  # LANDED plus one archived record hand-edited back to RUNNING gives nlive=1 and the leg says
-  # nothing. That is the steady state after every completed second run, which makes it the one window
-  # where the widened population would otherwise buy less than it looks like it does.
+  # AN ARCHIVED RECORD MUST BE TERMINAL. Since TOOL-aUnblockedFleet-2 this is the ONLY check in this
+  # leg that still refuses on a run-state phase, and its importance rose accordingly: check 7 now
+  # REPORTS the concurrent count rather than failing on it, so nothing else keeps a build folder to
+  # one live record. That property is this branch's alone. It was already its own branch rather than
+  # a consequence of the count — a `RUN.md` at LANDED plus one archived record edited back to RUNNING
+  # left the old `nlive <= 1` silent, which was the steady state after every completed second run.
   case "$f" in
     */RUN.md) ;;
     *) case " $PHASES_TERMINAL " in *" $ph "*) ;;
@@ -1109,8 +1110,22 @@ done <<EOF
 $RUNS
 EOF
 
-# ---- 7: at most ONE non-terminal run-state file, or "the run" is not well-defined and anything
-# ---- keying on it must either OR the phases together or pick one arbitrarily.
+# ---- 7: REPORT the concurrent unattended runs. This check no longer asserts anything about how many
+# ---- are live, and it cannot fail. TOOL-aUnblockedFleet-2.
+# ----
+# ---- WHAT IT NO LONGER CHECKS, first, because a gate's own header owes its gaps. It does not bound
+# ---- the live count. It does not detect an ABANDONED record — one is now reported forever, with no
+# ---- staleness bound, and an operator has to read the report; TOOL-aReapedTicket-5 keeps that scope.
+# ---- The one property still enforced over run-state phases is check 4's, that an ARCHIVED record is
+# ---- terminal, and that is what keeps a build folder to one live record now that this one does not.
+# ----
+# ---- It refused, until this unit, whenever more than one tracked record was non-terminal, on the
+# ---- ground that "the run" would otherwise be ill-defined for anything keyed on it. Nothing is keyed
+# ---- on it: measured by construction with this check and the driver's refusal 5 both neutered over
+# ---- two genuinely live records, where the whole leg exited 0 and every driver verb resolved its own
+# ---- build. What the refusal cost is on the record three times — TOOL-aFusedCharter-4,
+# ---- TOOL-aBoundedVerdict-24 and TOOL-aReapedTicket-5 — twice cleared only by marking honest runs
+# ---- ABORTED.
 # ----
 # ---- THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION. A record at `LANDING` whose witness is an
 # ---- ancestor of the tip the remote advertises is NOT a competing run — it is a finished one missing
@@ -1171,7 +1186,15 @@ for c7f in $live; do
 done
 [ -z "$c7drop" ] || live="$c7keep"
 [ -z "$c7drop" ] || nlive="$c7n"
-[ "$nlive" -le 1 ] || fail 7 "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it:$live"
+# REPORTED, NEVER FAILED. TOOL-aUnblockedFleet-2. Silent at one or fewer, on the DEFAULT channel for
+# the reason this file's header gives about the EXCLUDED notice: routed through `report` it would be
+# invisible on every ordinary bar, which is a check quietly deleted.
+if [ "$nlive" -gt 1 ]; then
+  printf 'unattended: %d concurrent unattended run(s) — none of them blocks another, and this leg does not fail on the count:
+' "$nlive"
+  for c7r in $live; do printf '  %s · phase %s
+' "$c7r" "$(phase_of "$c7r")"; done
+fi
 
 # ---- 10: the kit ships what this repo runs. ONE pair. The comparison is written here rather than
 # ---- borrowed from the memory-tree harness because each kit is copy-installed standalone and an
