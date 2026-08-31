@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.50 -->
+<!-- gov:kit memory-tree@2.52 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -123,6 +123,40 @@ an absent region cannot be told from a spec nobody has recorded against.
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
+## §10 Reuse audit — the two facts, and what satisfies each
+
+Required on a Tier-2 spec whose FILENAME date is on or after `SPEC10_EVIDENCE_CUTOFF`
+(`.memory-tree.conf`; blank turns it off). Check 12 refuses the section naming whichever is absent.
+It lives HERE rather than in the skeleton because the skeleton is COPIED, and a body explaining the
+predicate necessarily contains the words that satisfy it.
+
+- **The probe result** — one of: a `tools/codebase-map/reuse_lookup.py` citation naming the
+  seam this unit extends; the phrase "no existing seam fits" with the evidence; or a named
+  `reuse-first` waiver, where a run was granted one.
+- **The recall terms you used**, on a line naming them (`Recall terms used: ...`, or the `--terms`
+  invocation). Composing 8-14 terms in this corpus's own jargon is the expensive half of the probe,
+  and BUILD-METHOD M7's regrounding step 5 re-runs the query FROM that line — a §10 without it makes
+  that step resolve to nothing.
+
+**RECORD THE PROBE RESULT BEFORE THE TERMS.** That order is the rule, not a style note: the probe
+half is scanned over the section TRUNCATED AT THE FIRST TERMS MARKER, so a probe token written after
+that marker is not seen. The ordinary one-line form — the finding, then the terms — satisfies both,
+and so does a finding paragraph followed by a terms line.
+
+Why the truncation exists: a terms list is 8-14 words of this corpus's own jargon and those words
+routinely include `reuse-first` or `reuse_lookup`, so scanning the whole section let a terms line
+alone satisfy BOTH arms and the probe half could not fail. Cutting only to end-of-LINE was tried and
+leaked, because a terms list that WRAPS puts its tail on a line carrying no marker.
+
+What it still cannot see, said plainly rather than left for a reader to discover: a section that
+writes the terms VALUES first and the marker last puts those values in the probe blob, so one such
+line can satisfy both arms. Nothing in this corpus is written that way and no gate catches it.
+
+Before this arm existed the section was graded on presence and non-emptiness alone, which made
+`N/A — none` a passing reuse audit. What the check still cannot see is whether either fact is TRUE:
+a citation naming the wrong seam satisfies it. That liveness belongs to whatever observes that a
+probe actually ran, which is outside this file.
+
 ## The skeleton (copy everything below this line)
 
 ```markdown
@@ -223,8 +257,15 @@ an item resolved and never suppresses a mark on the same item.
 
 ## 10. Reuse audit
 
-The reuse-discovery result: the existing seam this unit wires through (from a
-`tools/codebase-map/reuse_lookup.py` pass), or an explicit "no existing seam fits" with the evidence.
-Records the reuse decision so an author cannot silently skip it — the machinery already ships in
-this kit, and a checklist item nobody is asked to answer is not a checklist item.
+Two facts, and check 12 refuses this section naming whichever is absent, for any Tier-2 spec dated
+at or after `SPEC10_EVIDENCE_CUTOFF`. **What each is, and what satisfies it, is the section ABOVE
+this skeleton — deliberately, and the reason is worth one line: every word that satisfies this
+predicate is a word an explanation would have to contain, so an instructional body sitting inside
+the copyable skeleton passes the gate on its boilerplate alone and an author who never fills the
+section is never told. Read the rules there; write your own findings here.**
+
+REPLACE both bullets. Delete this paragraph.
+
+- The seam, by path, or that none fits, with the evidence.
+- The retrieval arguments you actually passed, verbatim, so the next session can re-run them.
 ```

@@ -43,6 +43,28 @@ SPEC_WITNESS_CUTOFF=""
 # corpus; lower it to ratchet an existing corpus toward the ten-section canon.
 SPEC10_CUTOFF="2026-08-04"
 
+# The FIFTH cutoff, and it takes the semantics of the three RULE cutoffs rather than SPEC10_CUTOFF's:
+# blank means OFF. A Tier-2 spec dated >= this must RECORD its reuse audit in §10 — the recall terms
+# used, AND the probe result (a `reuse_lookup` citation, an explicit "no existing seam fits", or a
+# named `reuse-first` waiver). Without it, check 12 grades §10 on presence and non-emptiness alone,
+# so "N/A — none" is a passing reuse audit and BUILD-METHOD M7's regrounding step 5 has no terms to
+# re-run. Set it STRICTLY AHEAD of every dated spec on every live branch, not just your own: a
+# cutoff on today's date reds this leg on the default branch for every in-flight branch carrying a
+# spec dated today. Your corpus then exercises neither arm, which is why the kit self-test carries
+# red and green fixtures for both.
+SPEC10_EVIDENCE_CUTOFF=""
+
+# Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
+# item must mark the SECTION with the documented resolution shape before its status may go terminal.
+# Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
+FORK_MARK_CUTOFF=""
+
+# Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
+# open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
+# grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes
+# that derivation resolve to nothing.
+REVIEW_VERDICT_CUTOFF=""
+
 # The document a session is pointed at before it touches code; check 16 derives the mandatory read
 # path from it. Usually AGENTS.md or CLAUDE.md.
 CHARTER="AGENTS.md"
