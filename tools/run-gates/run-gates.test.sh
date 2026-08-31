@@ -55,6 +55,17 @@ KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.toml}"
+# AND THE SAME FALLBACK THE RUNNER MAKES. The canonical line above is byte-identical across
+# all three files because the gov-only canary asserts exactly that -- but the runner does not
+# STOP there: it falls back to the legacy pair when the TOML is absent or the resolved
+# interpreter cannot import tomllib. A harness that resolved only the TOML would die with a
+# FileNotFoundError in every JSON-only or pre-3.11 tree where the bar itself still runs
+# happily, which is a shipped leg that reds on arrival for an adopter who did nothing wrong.
+if [ -z "${GATE_LEGS:-}" ]; then
+  if [ ! -f "$ROOTN/$LEGS_FILE" ] || ! "$PYBIN" -c "import tomllib" 2>/dev/null; then
+    LEGS_FILE="$(dirname "$KITREL")/gate-legs.json"
+  fi
+fi
 # THE SUITES GRADE WHAT THE BAR RUNS, whatever format that is. `LEGS_FILE` is the canonical
 # derivation the gov-only canary asserts byte-for-byte across all three files, so it cannot branch;
 # the branch happens HERE, once, and every reader below keeps its `json.load`. Normalising to a temp

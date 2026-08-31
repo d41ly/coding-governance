@@ -174,6 +174,10 @@ path = "tools/gate-legs.json"
 why = "gov's own leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
 
 [[exempt]]
+path = "tools/gate-legs.toml"
+why = "gov's own leg manifest, in the format that replaced the JSON beside it. Exempt for the same reason and by the same argument: a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied from gov's, because seeding an adopter with gov's leg names is the pin-copied-from-another-corpus class. The JSON stays exempt too — it is the rollback and the pre-3.11 floor, since the runner reads it wherever tomllib is unavailable."
+
+[[exempt]]
 path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
@@ -322,6 +326,10 @@ why = "every shell script in this repo, including ones no kit ships"
 [[gov_only_pin]]
 pattern = "tools/gate-legs.json"
 why = "gov's own leg manifest, a registry exemption"
+
+[[gov_only_pin]]
+pattern = "tools/gate-legs.toml"
+why = "gov's own leg manifest in its current format, a registry exemption"
 
 [[gov_only_pin]]
 pattern = "tools/govkit/*"

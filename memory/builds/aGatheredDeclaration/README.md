@@ -101,7 +101,7 @@ ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclar
 | [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

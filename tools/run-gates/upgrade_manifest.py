@@ -33,22 +33,22 @@ DROP = {"scope": "an adopter tier enum resolved through a second file; assign `g
 notes, dropped = [], {}
 
 
-def die(msg):
+def print_refusal(msg):
     sys.stderr.write("adopt-run-gates --upgrade: %s\n" % msg)
     sys.exit(2)
 
 
-def s(v):
+def render_string(v):
     if any(ord(c) < 0x20 for c in v):
-        die("a value carries a control byte and cannot be written as TOML: %r" % v)
+        print_refusal("a value carries a control byte and cannot be written as TOML: %r" % v)
     return '"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def arr(xs):
-    return "[" + ", ".join(s(str(x)) for x in xs) + "]"
+def render_array(xs):
+    return "[" + ", ".join(render_string(str(x)) for x in xs) + "]"
 
 
-def wrap(text, lead="# ", width=96):
+def render_comment(text, lead="# ", width=96):
     out, line = [], lead
     for w in str(text).split():
         if len(line) + len(w) + 1 > width and line != lead:
@@ -65,7 +65,7 @@ def wrap(text, lead="# ", width=96):
 try:
     doc = json.load(open(SRC, encoding="utf-8"))
 except Exception as e:
-    die("%s does not parse as JSON: %s" % (SRC, e))
+    print_refusal("%s does not parse as JSON: %s" % (SRC, e))
 
 if isinstance(doc, list):
     legs, extra, dialect = doc, {}, "A (bare array)"
@@ -74,11 +74,11 @@ elif isinstance(doc, dict) and isinstance(doc.get("legs"), list):
     extra = {k: v for k, v in doc.items() if k != "legs"}
     dialect = "B (object with a `legs` key)"
 else:
-    die("%s is neither a JSON array of legs nor an object carrying a `legs` array — this converter "
+    print_refusal("%s is neither a JSON array of legs nor an object carrying a `legs` array — this converter "
         "handles the two dialects it has observed and refuses a third rather than guessing" % SRC)
 
 if not legs:
-    die("%s declares no legs; refusing to write an empty manifest" % SRC)
+    print_refusal("%s declares no legs; refusing to write an empty manifest" % SRC)
 
 # ---- the profile table: REQUIRED, because the TOML wins wholesale --------------------------------
 # TOML absent -> the runner reads the legacy PAIR; TOML present -> it wins, and a manifest with no
@@ -93,11 +93,11 @@ if os.path.exists(PROF):
             continue
         f = raw.split("\t")
         if len(f) < 4:
-            die("%s carries a malformed row: %r" % (PROF, raw))
+            print_refusal("%s carries a malformed row: %r" % (PROF, raw))
         knobs = dict(kv.split("=", 1) for kv in f[3].split(",") if "=" in kv)
         profiles.append((f[0], f[1], f[2], knobs, pend)); pend = []
 if not profiles:
-    die("%s has no readable profile table, and a gate-legs.toml with no [[profile]] row silently "
+    print_refusal("%s has no readable profile table, and a gate-legs.toml with no [[profile]] row silently "
         "drops this target to the runner's built-in width formula. Keep the table, or declare the "
         "rows by hand after this converts the legs." % PROF)
 
@@ -105,21 +105,21 @@ L = []
 A = L.append
 A("# gate-legs.toml — the merge bar, DECLARED. One file: defaults, profiles, lanes, legs.")
 A("#")
-A(wrap("Converted from %s (dialect %s) by adopt-run-gates.sh --upgrade. AUTHORED from here on: this "
+A(render_comment("Converted from %s (dialect %s) by adopt-run-gates.sh --upgrade. AUTHORED from here on: this "
        "converter runs once. Needs CPython 3.11+ to be read at all; below that the runner reads the "
        "legacy pair and says so." % (os.path.basename(SRC), dialect)))
 # S4: the prose the source could only carry as data becomes COMMENTS. Losing it is the defect this
 # whole format exists to fix, so a converter that dropped it would be the joke telling itself.
 if extra.get("_doc"):
-    A("#"); A(wrap(str(extra["_doc"])))
+    A("#"); A(render_comment(str(extra["_doc"])))
 A("")
 A("[bar]")
-A(wrap("OWNER OPT-IN, shipped false. A ceiling KILLS a leg before it can answer, so enforcement OFF "
+A(render_comment("OWNER OPT-IN, shipped false. A ceiling KILLS a leg before it can answer, so enforcement OFF "
        "produces strictly more evidence than a ceiling that fired. GATE_CEILINGS=0|1 overrides."))
 A("enforce_ceilings = false")
 pol = extra.get("ceiling_policy")
 A("default_ceiling = %d" % (pol if isinstance(pol, int) and pol > 0 else 1800))
-A(wrap("OWNER OPT-IN, shipped false. The turnstile serialises one bar per repository and therefore "
+A(render_comment("OWNER OPT-IN, shipped false. The turnstile serialises one bar per repository and therefore "
        "enqueues parallel pushes behind each other. GATE_TURNSTILE=1 turns it on."))
 A("turnstile = false")
 A("turnstile_ttl = 1800")
@@ -128,7 +128,7 @@ A(""); A("# " + "-" * 96)
 for nm, c, r, knobs, cmts in profiles:
     for x in cmts:
         A(x)
-    A("[[profile]]"); A("name = %s" % s(nm)); A("min_cores = %s" % int(c))
+    A("[[profile]]"); A("name = %s" % render_string(nm)); A("min_cores = %s" % int(c))
     A("min_ram_mb = %s" % int(r)); A("width = %s" % int(knobs.get("width", 1))); A("")
 
 # ---- lanes: emitted from the lane values the legs actually map to ------------------------------
@@ -143,26 +143,26 @@ for lg in legs:
         lanes.append(ln)
 lanes.sort(key=lambda x: (ORDER.index(x) if x in ORDER else len(ORDER), x))
 A("# " + "-" * 96)
-A(wrap("LANES. A manifest that declared no `phase` gets ONE lane and every leg in it, which "
+A(render_comment("LANES. A manifest that declared no `phase` gets ONE lane and every leg in it, which "
        "reproduces the source's behaviour exactly — a conversion that changes behaviour is a "
        "conversion whose green means nothing."))
 for i, ln in enumerate(lanes):
-    A(""); A("[[lane]]"); A("name = %s" % s(ln))
+    A(""); A("[[lane]]"); A("name = %s" % render_string(ln))
     A('concurrency = 1' if ln in ("fast", "serial") else 'concurrency = "profile"')
     A("short_circuit = %s" % ("true" if ln == "fast" and len(lanes) > 1 else "false"))
 
 A(""); A("# " + "-" * 96)
-A(wrap("LEGS. opt_in = true means HELD unless asked for with GATE_OPTIN=1. It carries both source "
+A(render_comment("LEGS. opt_in = true means HELD unless asked for with GATE_OPTIN=1. It carries both source "
        "spellings: `subject = kit` and `optIn: true`."))
 
 over = extra.get("ceiling_over_policy") or {}
 held = 0
 for lg in legs:
     if not isinstance(lg, dict):
-        die("a leg row is not an object")
+        print_refusal("a leg row is not an object")
     unknown = [k for k in lg if k not in MAP and k not in DROP]
     if unknown:
-        die("leg %r declares key(s) no mapping covers: %s. The table is the SOURCE: add a rule for "
+        print_refusal("leg %r declares key(s) no mapping covers: %s. The table is the SOURCE: add a rule for "
             "each, or say it is dropped — this converter refuses rather than losing a field silently."
             % (lg.get("name", "?"), ", ".join(sorted(unknown))))
     for k in lg:
@@ -172,28 +172,28 @@ for lg in legs:
     held += hold
     A("")
     if isinstance(lg.get("impure"), str):
-        A(wrap("IMPURE: " + lg["impure"]))
+        A(render_comment("IMPURE: " + lg["impure"]))
     if lg.get("name") in over:
-        A(wrap("CEILING: " + str(over[lg["name"]])))
+        A(render_comment("CEILING: " + str(over[lg["name"]])))
     if lg.get("scope"):
-        A(wrap("Source `scope` was %r — %s" % (lg["scope"], DROP["scope"])))
+        A(render_comment("Source `scope` was %r — %s" % (lg["scope"], DROP["scope"])))
     A("[[leg]]")
-    A("name = %s" % s(str(lg.get("name", ""))))
-    A("argv = %s" % arr(lg.get("argv") or []))
+    A("name = %s" % render_string(str(lg.get("name", ""))))
+    A("argv = %s" % render_array(lg.get("argv") or []))
     if lg.get("cwd") and lg["cwd"] != ".":
-        A("cwd = %s" % s(lg["cwd"]))
-    A("chunk = %s" % s(str(lg.get("chunk") or "default")))
-    A("lane = %s" % s(lg.get("phase") or (lanes[0] if len(lanes) == 1 else "heavy")))
+        A("cwd = %s" % render_string(lg["cwd"]))
+    A("chunk = %s" % render_string(str(lg.get("chunk") or "default")))
+    A("lane = %s" % render_string(lg.get("phase") or (lanes[0] if len(lanes) == 1 else "heavy")))
     A("opt_in = %s" % ("true" if hold else "false"))
     c = lg.get("ceiling")
     if isinstance(c, int) and not isinstance(c, bool) and c > 0:
         A("ceiling = %d" % c)
     if lg.get("guard"):
-        A("guard = %s" % arr(lg["guard"]))
+        A("guard = %s" % render_array(lg["guard"]))
     if lg.get("impure"):
         A("impure = true")
     if lg.get("tool"):
-        A("tool = %s" % s(lg["tool"]))
+        A("tool = %s" % render_string(lg["tool"]))
     if lg.get("full_only"):
         A("full_only = true")
 
@@ -203,7 +203,7 @@ if DRY:
     sys.stdout.write(body)
 else:
     if os.path.exists(OUT) and not FORCE:
-        die("%s already exists. Re-run with --force to overwrite it; this converter will not "
+        print_refusal("%s already exists. Re-run with --force to overwrite it; this converter will not "
             "silently replace a declaration somebody may have edited." % OUT)
     open(OUT, "w", encoding="utf-8", newline="\n").write(body)
 

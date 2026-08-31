@@ -1958,6 +1958,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_refusal",
+      "kind": "function",
+      "file": "tools/run-gates/upgrade_manifest.py"
+    },
+    {
       "id": "print_summary",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2278,9 +2283,19 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_array",
+      "kind": "function",
+      "file": "tools/run-gates/upgrade_manifest.py"
+    },
+    {
       "id": "render_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_comment",
+      "kind": "function",
+      "file": "tools/run-gates/upgrade_manifest.py"
     },
     {
       "id": "render_edges",
@@ -2326,6 +2341,11 @@
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_string",
+      "kind": "function",
+      "file": "tools/run-gates/upgrade_manifest.py"
     },
     {
       "id": "render_symbols_json",
