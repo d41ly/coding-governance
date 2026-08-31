@@ -1,6 +1,6 @@
 # The owner's prompt — verbatim
 
-**Serves:** none — this record carries the prose that scoped the build, before any spec existed.
+**Serves:** research TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
 
 The run was started with `/unattended --prompt <value>`, where the value carried whitespace and named
 no readable file, so it is the prompt itself and is taken verbatim. The bytes travel here rather than

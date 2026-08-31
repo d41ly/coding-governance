@@ -35,7 +35,7 @@ tools/hooks/agent-cap.js	5
 tools/hooks/agent-cap.test.sh	3
 tools/hooks/scratch-guard.js	1
 tools/hooks/scratch-guard.test.sh	4
-tools/install-prefix-carried.txt	87
+tools/install-prefix-carried.txt	88
 tools/install-prefix-waivers.txt	6
 tools/lexicon/LEXICON.md	3
 tools/lexicon/README.md	10
@@ -85,6 +85,7 @@ tools/run-gates/run-gates.test.sh	33
 tools/run-gates/run-gates.turnstile.test.sh	21
 tools/settings-merge.py	1
 tools/unattended/.unattended.conf.example	2
+tools/unattended/SKILL.template.md	1
 tools/unattended/adopt-unattended.sh	2
 tools/unattended/adopt-unattended.test.sh	2
 tools/unattended/check-playbook.sh	1
@@ -95,7 +96,7 @@ tools/unattended/cross-component.test.sh	2
 tools/unattended/kit.toml	2
 tools/unattended/playbook.fixture.md	1
 tools/unattended/run-unattended-gates.sh	2
-tools/unattended/unattended.sh	5
+tools/unattended/unattended.sh	7
 tools/unattended/unattended.test.sh	8
 tools/workflows/check-protocol-parity.test.sh	3
 tools/workflows/check-review-join.sh	3
