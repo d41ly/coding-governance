@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
+| [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-3 |
 
 <!-- /gen:spec-records -->
 
@@ -45,8 +46,11 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
   neither CLI is declared-and-readable; a tree with one of them is measured on that one, and the
   message names which logs were read.
 - **S6** — self-test arms for the new outcomes, and a `codebase-map` arm asserting the row is written
-  and that a write failure does not change the exit code. **The map arm runs in a SCRATCH repo with
-  its own git dir and NEVER against this tree.** A test that invokes `reuse_lookup.py` here writes a
+  and that a write failure does not change the exit code. **The map arm sets `CODEBASE_MAP_ROOT` to a
+  scratch repo, and a `cd` is NOT sufficient.** Measured: `map_lib.repo_root()` resolves from the KIT
+  directory, not the working directory (`map_lib.py:113-119`), so an arm that merely changes
+  directory still writes into THIS tree's log. Round 2's H5 caught that rev-2's scratch-repo rule was
+  insufficient for exactly this reason. A test that invokes `reuse_lookup.py` here writes a
   real row, carrying this worktree's own path, into the very log `reuse-probed` counts — so every bar
   run would manufacture the liveness evidence the DoD item exists to observe, and the item would
   become unfalsifiable. That is round 1's blocker B3, and it is the same class as a fixture that
@@ -131,8 +135,10 @@ log it reads.
 ## 6. Acceptance criteria
 
 - **AC1** — running `python tools/codebase-map/reuse_lookup.py "<phrase>"` appends exactly one row to
-  `<git-common-dir>/codebase-map/lookups.jsonl` carrying `at`, `query`, `worktree` and
-  `n_candidates`. Observed by reading the file before and after.
+  `<git-common-dir>/codebase-map/lookups.jsonl` carrying `type` set to `lookup`, plus `at`, `query`,
+  `worktree` and `n_shown`. Observed by reading the file before and after. Rev-2 rewrote S2 to these
+  names and left this criterion grading rev-1's `n_candidates` with no `type` — round 2's B4, and
+  AC1 is the only criterion that observes the row shape at all.
 - **AC2** — with that directory made unwritable, the same command still prints its candidates and
   exits `0`, warning on stderr. This is S3's observable, and without it "never fatal" is a claim.
 - **AC3** — with only `MAP_CLI` declared and a map row present, `--close` reports `reuse-probed` MET
@@ -144,8 +150,13 @@ log it reads.
 - **AC6** — `bash tools/unattended/unattended.test.sh --shard 2/2` and
   `python tools/codebase-map/selftest.py` both pass with S6's arms present.
 - **AC6a** — after the whole suite runs, `<git-common-dir>/codebase-map/lookups.jsonl` in THIS tree
-  holds no row the suite wrote. Compared by row count before and after, because S6's scratch-repo
-  rule is a claim until something observes that the real log did not move.
+  holds no row the suite wrote. Observed by comparing the SHA of the file before and after, not by
+  row count: five worktrees of this repo share one common dir and a concurrent session's genuine row
+  would change a count without this arm having written it. A hash equal before and after is the only
+  form of this observation that attributes correctly.
+- **AC7** — `python tools/codebase-map/reuse_lookup.py` with `CODEBASE_MAP_ROOT` unset and its git-dir
+  resolution forced to raise still prints candidates and exits `0`. This is S3a's observable, which
+  round 2's H3 found had none.
 - **AC7** — `bash tools/check-install-prefix.sh` exits `0` and its carried-prefix ratchet does not
   RISE, which is the leg the first `reuse-probed` cut turned red and the reason S4 exists.
 - **AC8** — `bash tools/check-kit-versions.sh` exits `0` and `bash tools/unattended/check-unattended.sh`
@@ -174,6 +185,12 @@ was relevant. Both are `reuse-probed`'s existing stated limits and this unit wid
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-31 · round-2 spec-audit fold. B4: AC1 still graded rev-1's field names after S2
+  was rewritten, and it is the only criterion observing the row shape. H5: the scratch-repo rule was
+  INSUFFICIENT — `map_lib.repo_root()` resolves from the kit directory, so only `CODEBASE_MAP_ROOT`
+  redirects the log and a `cd` does not; AC6a also moved from a row count to a file hash, because
+  five worktrees share one common dir and a count cannot attribute a change. H3 gave S3a the
+  criterion it lacked, as AC7.
 - rev-2 · 2026-08-31 · round-1 spec-audit fold. Blocker B3: rev-1's map arm would have run
   `reuse_lookup.py` against this tree, writing a real row into the log `reuse-probed` counts, so the
   suite would manufacture the item's own evidence and the DoD item would stop being falsifiable —

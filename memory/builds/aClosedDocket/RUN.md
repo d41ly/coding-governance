@@ -24,3 +24,7 @@ base: 733552e11d36e93836767b6478fec3607a99aca4
 ## Parked
 
 2026-08-31T12:19:59Z review · item spec-set · reason verdict BLOCKED · blockers 3
+
+2026-08-31T12:53:51Z review · item spec-set · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT
+
+2026-08-31T12:54:10Z rescope · item add TOOL-aClosedDocket-4 · reason Round-2 blocker B2, promoted at the NON-CONVERGENT exit. M2 states verbatim that a separate document, gate, adopter or generated artifact is a separate unit with its own id and spec; rev-2 of unit 1 had put the M4 sentence, check-unattended.sh clause 3 and a new driver-written fact under one id. The gate half and the driver fact split out here, leaving unit 1 as the document change alone. This is promotion in its literal sense: the blocker needs a MECHANISM the build did not have, which is a second unit.

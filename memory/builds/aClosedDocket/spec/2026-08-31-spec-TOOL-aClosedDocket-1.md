@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 1 · ratified 2026-08-31
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 1 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
+| [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 |
 
 <!-- /gen:spec-records -->
 
@@ -20,35 +21,28 @@ unit that is not a mechanism, so a conforming run cannot follow both.
 
 ## 2. Scope (IN)
 
-- **S1** — M4's disposition sentence in `tools/memory-tree/BUILD-METHOD.template.md` is REPLACED, not
-  extended, so that it states both dispositions: FOLD as a `rev-N` bump when closing the blocker
-  edits a document the review was already reading, PROMOTE to a unit when closing it needs a
-  MECHANISM this build does not have. Both terminate, and the sentence says why each does.
-- **S1a** — **the edit must be byte-neutral or negative, and this is a hard constraint rather than a
-  preference.** Measured at authoring time: `memory/guides/BUILD-METHOD.md` is 24 549 B and its
-  template 24 560 B against M1's own 24 576 B cap — 27 and 16 bytes of headroom. M3's delegation
-  clause excludes M1's budget, so this run cannot raise the cap and has no ratified exit if the edit
-  overruns it. The replacement therefore pays for itself out of M4, and §4 names the sentences it
-  trims and why each trim is meaning-preserving.
+**This unit is the DOCUMENT change and nothing else.** The gate clause and the driver-written fact
+that rev-2 carried here are `TOOL-aClosedDocket-4`, split out at round 2's NON-CONVERGENT exit
+because M2 states verbatim that *"a separate document, gate, adopter or generated artifact is a
+separate unit with its own id and spec"*.
+
+- **S1** — M4's disposition sentence in `tools/memory-tree/BUILD-METHOD.template.md:137` is REPLACED,
+  not extended, so it states both dispositions: FOLD a defect in a document the review read, PROMOTE
+  one needing a mechanism this build lacks. Both terminate, and the sentence says why each does.
+- **S1a** — **the replacement fits in the existing headroom, measured rather than promised.** The
+  sentence it replaces is 217 B; the conforming replacement is **228 B**, `+11`. The template has
+  **16 B** of headroom (24 560 of M1's 24 576 cap) and the render 27 B. Rev-2 said §4 would name a
+  trim budget and §4 named none, which round 2 raised as B1 — there is no trim, because none is
+  needed. If a later wording exceeds 16 B the unit is blocked on arithmetic and the remedy is a
+  shorter sentence, never a raised cap: M3's delegation clause excludes M1's own budget.
 - **S2** — the split is a TEST a run applies, not a judgement it restates: mechanism-needed promotes,
   document-defect folds. Stated once, in M4, and pointed at from everywhere else.
-- **S3** — either disposition owes the same record. The build README's BUILD-LEVEL RULES slot carries
-  which one was taken and why, which is where M4 already sends a CEILING exit.
-- **S4** — `tools/unattended/unattended.sh`'s NON-CONVERGENT message names both dispositions, because
-  a run reads that line at the moment it decides and the guide at the start.
-- **S5** — **`tools/unattended/check-unattended.sh` clause 3 accepts a FOLD, and without this the
-  whole unit is a rule the bar refuses.** That clause (`:246-303`) requires, for every subject that
-  exited NON-CONVERGENT or CEILING, at least one unit id present at HEAD and ABSENT at the run's
-  pinned BASE — promotion, machine-enforced as the only disposition. It is `subject:repo` with no
-  guard, so it runs on every bar. A fold promotes no id and would red it permanently.
-- **S5a** — the fold's machine-readable trace is what clause 3 reads instead. It must be a fact the
-  DRIVER writes, not prose a run authors, for the reason every other run-state fact is: an authored
-  claim is not evidence. The shape is settled in §8 Q3.
-- **S6** — `tools/unattended/SKILL.template.md` and its render restate the promotion rule in full at
-  `:571-573`. They are registered method carriers, so they move with M4 or the two disagree.
-- **S7** — the memory-tree and unattended kit versions move and the renders regenerate;
-  `check-kit-versions.sh` and `check-verdict-epoch.sh` are the authorities on which carriers, not
-  this list.
+- **S3** — either disposition owes the same record: the build README's BUILD-LEVEL RULES slot, which
+  is where M4 already sends a CEILING exit.
+- **S4** — `tools/unattended/SKILL.template.md:571-573` and its render restate the promotion rule in
+  full. They are registered method carriers, so they move with M4 or the two disagree.
+- **S5** — the memory-tree kit version moves and the renders regenerate. `check-kit-versions.sh` and
+  `check-verdict-epoch.sh` are the authorities on which carriers, not this list.
 
 ## 3. Non-goals (OUT)
 
@@ -69,13 +63,25 @@ unit that is not a mechanism, so a conforming run cannot follow both.
 
 | Path | Change |
 |---|---|
-| `tools/memory-tree/BUILD-METHOD.template.md` | S1, S1a, S2, S3 — the disposition sentence and its trim. AUTHORED SOURCE |
+| `tools/memory-tree/BUILD-METHOD.template.md` | S1, S1a, S2, S3 — the sentence. AUTHORED SOURCE |
 | `memory/guides/BUILD-METHOD.md` | RENDERED from the row above, never hand-edited |
-| `tools/unattended/unattended.sh` | S4 the message; S5a the fold fact |
-| `tools/unattended/check-unattended.sh` | S5 — clause 3 |
-| `tools/unattended/SKILL.template.md` and its render | S6 — the restated rule |
-| `tools/unattended/PROTOCOL.template.md` and its render | S4/S5a — only where they restate the rule |
-| `tools/memory-tree/README.md`, `tools/unattended/kit.toml`, template markers | S7 — the versions |
+| `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` | S4 |
+| `tools/memory-tree/README.md`, template markers | S5 — the version |
+
+### The authority this unit is built under
+
+M3 veto 2 puts a change to a governance carrier outside what a standing mandate delegates, and
+`BUILD-METHOD.template.md` is one. The owner's instruction names `TOOL-aProvenReuse-3` by id, which
+IS that turn — for the row as written. The row states one thing: the promotion sentence has no legal
+referent when the subject is a spec. So S1 adds the missing case and S2 states its test; anything
+that would change what M4 demands of a DIFF-subject exit is outside the turn and is N2.
+
+### Why a fold is the right disposition and not a weaker one
+
+Promotion terminates because a promoted unit is audited as a SPEC — M4's own reasoning. When the
+blocker IS a spec defect, promotion does not terminate: the new unit's spec enters the same audit
+that produced the blocker. A fold terminates because the document stops being wrong, and the loop has
+already stopped by rule.
 
 ### Clause 3 is ALSO vacuously satisfiable today, and this unit does not fix that
 
@@ -118,15 +124,19 @@ stopped by rule.
 
 ### Rollout
 
-One commit. The change is to a document and a message; nothing is generated from it and nothing
-flips.
+One commit. Two of the four files it touches ARE generated — `memory/guides/BUILD-METHOD.md` and
+`.claude/skills/unattended/SKILL.md` — so the commit includes their re-render, and rev-1's
+"nothing is generated from it" was wrong from the moment S4 existed. Nothing flips and no state
+moves.
 
 ## 5. Production-readiness checklist
 
-- **Security** — N/A. Prose in a guide and one message string.
+- **Security** — N/A. Prose in a guide and two rendered carriers.
 - **Performance** — N/A.
-- **Error states** — N/A; no new predicate.
-- **Observability** — S4 puts both dispositions in the line a run reads at the moment it decides.
+- **Error states** — N/A. This unit adds no predicate; `TOOL-aClosedDocket-4` is where the predicate
+  went, and rev-1's "no new predicate" was true only after that split.
+- **Observability** — the guide states both dispositions; the line a run reads at the moment it
+  decides is `TOOL-aClosedDocket-4`'s.
 - **Testing** — S5's clause-3 arm, plus the guide's byte budget and the kit version gates. There is no
   arm that can assert a run applied the RIGHT disposition; §7 says so rather than implying coverage.
 - **Migration/rollback** — revert; no state.
@@ -136,32 +146,29 @@ flips.
 - **AC1** — `memory/guides/BUILD-METHOD.md` M4 states both dispositions and the test that selects
   between them, and `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, proving the render
   came from the template rather than a hand-edit.
-- **AC2** — `wc -c memory/guides/BUILD-METHOD.md` is **no larger than 24549**, its value before this
-  edit, and the template no larger than 24560. Byte-neutral-or-negative, not merely under the cap:
-  with 27 bytes of headroom, "under the cap" and "did not grow" are the same requirement and the
-  second is the one a reader can check without knowing the cap.
-- **AC3** — `bash tools/unattended/unattended.sh --review` prints both dispositions on a
-  NON-CONVERGENT verdict. Observed by driving a fixture to a non-shrinking second round.
-- **AC4** — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh`
-  both exit 0 after the version moves.
-- **AC5** — `bash tools/memory-tree/check-method-carriers.sh` exits 0, the leg that grades M4's
+- **AC2** — `wc -c tools/memory-tree/BUILD-METHOD.template.md` is **at most 24576** and
+  `wc -c memory/guides/BUILD-METHOD.md` at most 24576 after the edit. Measured before: 24 560 and
+  24 549. **No gate enforces M1's cap** — round 2 established that — so this criterion is the only
+  thing that measures it, which is why it names the number rather than pointing at a leg.
+- **AC3** — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh`
+  both exit 0 after the version move.
+- **AC4** — `bash tools/memory-tree/check-method-carriers.sh` exits 0, the leg that grades M4's
   carriers and the first to notice a pointer this edit broke.
-- **AC6** — a fixture run-state file recording a NON-CONVERGENT exit and a FOLD trace, with NO new
-  unit id since its BASE, passes `bash tools/unattended/check-unattended.sh`. This is S5's whole
-  point and it must be observed, because the same fixture reds the leg today.
-- **AC7** — the same fixture with the fold trace REMOVED still reds
-  `bash tools/unattended/check-unattended.sh`, naming the subject. Without this, AC6 cannot
-  distinguish a clause that accepts a fold from one that stopped checking.
-- **AC8** — `grep -c` for the promotion-only wording in `tools/unattended/SKILL.template.md` and its
-  render returns 0 after S6, and both carriers state the same pair of dispositions M4 does.
+- **AC5** — `grep -c` for the promotion-only wording in `tools/unattended/SKILL.template.md` and
+  `.claude/skills/unattended/SKILL.md` returns 0 after S4, and both state the same pair M4 does.
+- **AC6** — `bash tools/unattended/adopt-unattended.sh --check` exits 0, so the SKILL render is
+  regenerated from its template rather than hand-edited.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh`. Four legs are named because this unit reaches each:
-`memory hygiene`, `kit/dogfood doc parity`, `method carriers` and `unattended kit gate`.
-`bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` for AC4.
-What no gate here checks, and it is the honest limit: whether a run facing a NON-CONVERGENT exit
-applies the right disposition. That is a judgement, S2 gives it a test, and no predicate reads intent.
+`bash tools/run-gates/run-gates.sh`. Named because this unit reaches each: `memory hygiene`,
+`kit/dogfood doc parity`, `method carriers`, `unattended skill wiring`.
+`bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` for AC3.
+`bash tools/unattended/run-unattended-gates.sh`, which that script's own header mandates for
+`tools/unattended/` work and which S4 makes this unit owe.
+What no gate here checks, twice over: whether a run facing a NON-CONVERGENT exit applies the right
+disposition, which is a judgement no predicate reads; and M1's own byte budget, which nothing
+enforces and AC2 is therefore the only measurement of.
 
 ## 8. Open questions
 
@@ -175,16 +182,17 @@ applies the right disposition. That is a judgement, S2 gives it a test, and no p
   and the observation that decides it is whether the file states the rule or points at it. It can
   return zero, which is the liveness half. Edit it only where it RESTATES; where it points, editing
   would create the second copy this repo's rule against restatement exists to prevent.
-- **Q3 — what is the fold's machine-readable trace, given S5a says it must be driver-written?**
-  **RESOLVED (agent, 2026-08-31, delegated):** `--review` itself writes it. It already computes the
-  NON-CONVERGENT verdict, already writes the round row, and is the only actor that knows the exit
-  occurred at the moment it occurs; adding a fold marker to the row it already writes costs no new
-  verb, no new file and no new grammar. The alternatives were a new `--fold` verb (a second verb for
-  a fact the first one already has) and an authored README sentence (which S5a rejects, because an
-  authored claim is not evidence). Reuse of the seam that already writes the row beats both.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-31 · round-2 spec-audit fold, at the loop's NON-CONVERGENT exit (3 blockers then
+  4). B2 SPLIT this unit: M2 states verbatim that a document and a gate are separate units, and rev-2
+  had a document, a gate clause and a driver fact under one id — the gate half is now
+  `TOOL-aClosedDocket-4`, promoted at the exit, which is promotion in its literal sense. B1 settled
+  the arithmetic by measuring rather than promising: the replacement is 228 B against 217 B, +11
+  into 16 B of headroom, so there is no trim budget because none is needed. B3 swept §4 Rollout and
+  §5, which still said "nothing is generated" and "no new predicate" after S4 added two rendered
+  carriers. §7 gained the self-test DoD its own script header mandates.
 - rev-2 · 2026-08-31 · round-1 spec-audit fold. Blocker B1: BUILD-METHOD has 27 bytes of headroom
   against its own cap and M3's delegation excludes M1's budget, so S1 became a REPLACEMENT that pays
   for itself and S1a states the constraint. Blocker B2: `check-unattended.sh` clause 3 already

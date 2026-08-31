@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3
+ids: TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedDocket-4
 authorized-by: prompt
 ---
 
@@ -52,6 +52,17 @@ mandate and is recorded under [prompts/](prompts/2026-08-31-prompt-TOOL-aClosedD
 
 None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
+**The spec-audit loop exited NON-CONVERGENT at 3 then 4 blockers**, and unit 4 is the promotion that
+exit calls for — round 2's B2 said unit 1 held a document, a gate and a driver fact under one id
+against M2's verbatim rule, and closing that needed a MECHANISM the build did not have, which is a
+second unit. That is promotion in its literal sense rather than a departure from it, which is worth
+recording because the rule this build is written to fix is the same rule it just obeyed.
+
+**Filed, not folded:** clause 3 is separately VACUOUS on the prompt path. Measured on `aProvenReuse`
+— two subjects exited NON-CONVERGENT, the clause wanted two ids new since BASE and found three,
+because that run's BASE was its own opening commit with an empty units region. Every original unit
+read as promoted; none was. Unit 4's N2 records why closing it needs a signal nothing carries today.
+
 <!-- roster:units -->
 
 | # | Unit | Status | Mechanism |
@@ -59,25 +70,27 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 | 1 | `TOOL-aClosedDocket-1` | OPEN | M4 gains a disposition for a NON-CONVERGENT exit over a spec |
 | 2 | `TOOL-aClosedDocket-2` | OPEN | `reuse_lookup.py` logs, and `reuse-probed` counts either probe |
 | 3 | `TOOL-aClosedDocket-3` | OPEN | the bounded-observation arms assert on `RB_TOOK`, not the harness clock |
+| 4 | `TOOL-aClosedDocket-4` | OPEN | clause 3 accepts a FOLD, and the driver records one |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedDocket-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | OPEN | rev-2 | 2026-08-31 |
-| [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-2 | 2026-08-31 |
-| [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | OPEN | rev-3 | 2026-08-31 |
+| [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-3 | 2026-08-31 |
+| [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | OPEN | rev-3 | 2026-08-31 |
+| [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aClosedDocket-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aClosedDocket-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -87,6 +100,7 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 1 | `TOOL-aClosedDocket-1` | no |
 | 2 | `TOOL-aClosedDocket-2` | no |
 | 3 | `TOOL-aClosedDocket-3` | no |
+| 4 | `TOOL-aClosedDocket-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

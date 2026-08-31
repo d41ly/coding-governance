@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3 · ratified 2026-08-31
+**Status:** OPEN · rev-3 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 3 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aClosedDocket-1.md](../prompts/2026-08-31-prompt-TOOL-aClosedDocket-1.md) | research | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 | [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round1.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
+| [2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-1-spec-audit-round2.md) | spec-audit | TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 |
 
 <!-- /gen:spec-records -->
 
@@ -45,7 +46,7 @@ machine while the mechanism they test is working.
   and it is the worst: a check that stands down under load stands down exactly when a timing defect
   would show.
 - **N3** — a fleet-wide suite lock. Cross-session contention is real here, but serialising every
-  worktree's suite to fix three assertions prices a lock against a comment.
+  worktree's suite to fix two assertions prices a lock against a comment.
 - **N4** — the two DIRECT `run_bounded` wrappers at `:4651` and `:4661`, and every other
   `_t0=$(date +%s)` site in this suite. The direct wrappers already measure the bound's own scope,
   which is exactly what S1 is moving the other two TOWARD, so changing them would be a change away
@@ -57,7 +58,7 @@ machine while the mechanism they test is working.
 
 | Path | Change |
 |---|---|
-| `tools/unattended/unattended.test.sh` | S1–S4 — the three arms and their comments |
+| `tools/unattended/unattended.test.sh` | S1–S4 — the TWO verb-wrapping arms and their comments |
 
 ### The instrument, and why it is the right one
 
@@ -111,9 +112,10 @@ One commit. Test-only; no shipped behaviour moves.
   H6: the arms carry pre-existing `hit` assertions on the breach message at `:4694` and `:4707`, so
   AC2 alone cannot tell a working new assertion from a deleted one — the `hit` would red either way.
   Deleting the line and observing a DIFFERENT failure is what separates them.
-- **AC3** — no arm outside the three named in S1 changes, checked with
-  `git diff --stat tools/unattended/unattended.test.sh` and by reading the diff. N4 is the scope
-  boundary and this is its observable.
+- **AC3** — no arm outside the TWO named in S1 changes, checked with
+  `git diff tools/unattended/unattended.test.sh` and by reading it. N4 is the scope boundary and this
+  is its observable. Rev-2 narrowed S1 to two and left this criterion, the Inventory and N3 saying
+  three — round 2's H4.
 - **AC4** — `bash tools/unattended/check-unattended.sh` exits `0`, so the suite's own arm-count and
   message-literal gates still agree with the edited file.
 
@@ -136,6 +138,9 @@ rather than only the outcome.
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-31 · round-2 spec-audit fold. H4: rev-2 narrowed S1 from three arms to two and
+  left AC3, the Inventory row and N3 each still saying three — one edit, three surviving halves, the
+  `amendment-leaves-its-other-half-standing` class this build has now hit in every round.
 - rev-2 · 2026-08-31 · round-1 spec-audit fold. H5: rev-1 said three arms; measured, four wrappers
   exist and only TWO wrap a verb. The other two wrap `run_bounded` directly, already measure inside
   the bound's scope, and moved from unstated to N4. H6: AC2 named no artifact and could not be
