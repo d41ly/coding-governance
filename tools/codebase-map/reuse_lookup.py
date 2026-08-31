@@ -31,6 +31,7 @@ import json
 import os
 import re
 import sys
+from datetime import UTC, datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -388,6 +389,71 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
 # ======================================================================================
 
 
+def _common_git_dir(root: Path) -> Path | None:
+    """The COMMON git dir for ``root``, or None. Pure path math and two small file reads — NO
+    child process, matching ``map_lib.resolve_root``'s own refusal to shell out and mirroring how
+    ``memory-recall``'s ``recall-opened.js`` finds the same directory.
+
+    In a primary tree ``.git`` is a DIRECTORY and is the answer. In a linked worktree it is a FILE
+    holding ``gitdir: <path>``; that directory's ``commondir``, when present, names the shared one.
+    The common dir is the point: every worktree of a repo shares it, so a probe run in one worktree
+    is visible to a reader in another, which is what a five-worktree fleet needs.
+    """
+    dot = root / ".git"
+    if dot.is_dir():
+        return dot
+    if not dot.is_file():
+        return None
+    m_gd = re.match(r"^gitdir:\s*(.+)$", dot.read_text(encoding="utf-8").strip())
+    if not m_gd:
+        return None
+    gitdir = Path(os.path.abspath(root / m_gd.group(1).strip()))
+    commondir = gitdir / "commondir"
+    if commondir.is_file():
+        return Path(os.path.abspath(gitdir / commondir.read_text(encoding="utf-8").strip()))
+    return gitdir
+
+
+def log_lookup(root: Path, query: str, n_shown: int) -> None:
+    """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
+
+    WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
+    checker asking "did a reuse probe run" could observe half the obligation. This is the other
+    half. TOOL-aClosedDocket-2, from backlog row TOOL-aProvenReuse-4.
+
+    ITS OWN FILE, under this kit's own name. Sharing ``memory-recall``'s log would make this kit
+    depend on that kit's convention, which neither descriptor declares and which is exactly why the
+    backlog row was filed rather than built when it was first found.
+
+    THE FIELD NAMES ARE THE RECALL LOG'S, deliberately: ``type``, ``at``, ``query``, ``worktree``
+    and ``n_shown``, so one reader parses both without a per-kit branch. ``type`` is not decoration —
+    the existing reader FILTERS on it first, and a row without one is invisible to a reader built in
+    that log's image.
+
+    NEVER FATAL, and the whole body is inside the try INCLUDING the resolution. ``main`` records
+    that a RESULT never fails and only its refusal exits non-zero; a telemetry line must not be the
+    thing that breaks that. ``log_event`` in the recall kit leaves its own path resolution outside
+    its ``try`` — a hole worth not copying.
+    """
+    try:
+        common = _common_git_dir(root)
+        if common is None:
+            return
+        path = common / "codebase-map" / "lookups.jsonl"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        row = {
+            "type": "lookup",
+            "at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "query": query,
+            "worktree": str(root),
+            "n_shown": n_shown,
+        }
+        with path.open("a", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+    except OSError as exc:  # pragma: no cover - the answer outlives the record
+        print(f"warning: lookup log not written ({exc})", file=sys.stderr)
+
+
 def main(argv: list[str] | None = None) -> int:
     # `<kit>` resolved, so the usage line --help prints names this install's real prefix.
     parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
@@ -407,6 +473,9 @@ def main(argv: list[str] | None = None) -> int:
     ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
     shortlist = assemble_shortlist(query, corpus, ref_index)
     print(render(shortlist, corpus), end="")
+    # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
+    # render() would leave evidence of a probe whose result nobody ever saw.
+    log_lookup(m.repo_root(), query, len(shortlist.ranked))
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 

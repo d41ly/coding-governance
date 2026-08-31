@@ -108,3 +108,4 @@ memory/builds/aReapedTicket/README.md
 memory/builds/aLexedStripper/README.md
 memory/builds/aScouredKit/README.md
 memory/builds/aProvenReuse/README.md
+memory/builds/aClosedDocket/README.md
