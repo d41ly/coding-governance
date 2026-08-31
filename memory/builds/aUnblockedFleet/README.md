@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6
+ids: TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 TOOL-aUnblockedFleet-7 TOOL-aUnblockedFleet-8
 authorized-by: prompt
 ---
 
@@ -115,7 +115,7 @@ and why the run refused it.)*
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6
+ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 TOOL-aUnblockedFleet-7 TOOL-aUnblockedFleet-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

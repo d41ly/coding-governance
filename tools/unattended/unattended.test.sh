@@ -471,15 +471,38 @@ out=$(run --preflight tRun --keepalive-id k1)
 hit "$out" "the declared wiring check failed, and a dormant hook makes every later green meaningless"
 hit "$out" "WIRINGPROBE-the-declared-checks-own-remedy"
 
-# ---- check 5: a second non-terminal run-state file. Both are TRACKED, because the selector reads
-# ---- git, not the filesystem — an untracked second run would leave this arm passing over one file.
+# ---- TOOL-aUnblockedFleet-1/-4: a second non-terminal run-state file is ANNOUNCED, never refused,
+# ---- and the preflight SUCCEEDS. This arm asserted the opposite until kit 1.13. Both records are
+# ---- TRACKED, because the selector reads git, not the filesystem.
+# ----
+# ---- EXACTLY ONE CONCURRENT RECORD is the fixture, and that is the whole point of it (S4b). The
+# ---- threshold this unit moves is one: the announcement fires at n>=1 where the old refusal fired
+# ---- at n>1, so a driver that kept the inherited `n > 1` trigger would be SILENT here and would
+# ---- still pass a fixture built with two competitors.
 reset_tree
 readme tTwo; runmd tTwo "other"
 printf 'phase: RUNNING\n' >> memory/builds/tTwo/RUN.md
-sed -i 's/^## Run facts$/## Run facts\nphase: RUNNING/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m two --no-verify
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined"
+hit "$out" "1 concurrent unattended run(s) — this run is NOT blocked by them"
+hit "$out" "memory/builds/tTwo/RUN.md · phase RUNNING"
+miss "$out" "more than one run-state file is in a non-terminal phase"
+same "the announced-at-one preflight still created the run-state file" "$([ -f memory/builds/tRun/RUN.md ] && echo yes || echo no)" "yes"
+
+# ---- ...and SILENT at zero concurrent records. The green control for the arm above: without it, a
+# ---- driver that announced unconditionally passes every assertion in this file.
+reset_tree
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "concurrent unattended run(s)"
+
+# ---- ...and a run's OWN tracked record is not a competitor. The re-preflight case: after a
+# ---- compaction the run's record IS tracked and non-terminal, and counting it announces the run to
+# ---- itself. The `hit` above is what makes this `miss` discriminating rather than vacuous.
+reset_tree
+sed -i 's/^## Run facts$/## Run facts\nphase: RUNNING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m selfrec --no-verify
+out=$(run --preflight tRun --keepalive-id k1)
+miss "$out" "concurrent unattended run(s)"
 
 # ---- check 6: the build folder exists on the unit branch but NOT at the pinned BASE. The
 # ---- self-authored case in its purest form - the run invented the build that authorizes it.

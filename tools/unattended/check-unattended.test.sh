@@ -635,18 +635,22 @@ out=$(run)
 miss "$out" "a witness looks like a sha and resolves to no commit in this history"
 miss "$out" "a phase claim carries no witness"
 
-# ---- check 7: two non-terminal run-state files. The green half is the whole rest of this file —
+# ---- TOOL-aUnblockedFleet-2/-4: check 7 REPORTS two non-terminal run-state files and the leg still
+# ---- passes. It asserted a refusal until kit 1.13. The green half is the whole rest of this file —
 # ---- every other arm runs with exactly one live run and must not trip this.
 reset_tree; build tTwo
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tTwo/RUN.md
 sed -i "s/^base: BASE$/base: $(git merge-base main HEAD)/" memory/builds/tTwo/RUN.md
 git add -A && git commit -q -m two --no-verify
 out=$(run)
-hit "$out" "more than one run-state file is non-terminal, so 'the run' is not well-defined for anything keyed on it"
-# ...and a TERMINAL second run does not trip it: the invariant is about live runs, not about files.
+hit "$out" "2 concurrent unattended run(s) — none of them blocks another"
+hit "$out" "memory/builds/tTwo/RUN.md · phase RUNNING"
+miss "$out" "more than one run-state file is non-terminal"
+# ...and a TERMINAL second run produces NO report at all: the report is about live runs, not files.
+# This is the silent-at-one control, and without it a leg that reported unconditionally passes above.
 sed -i 's/^phase: RUNNING$/phase: LANDED/' memory/builds/tTwo/RUN.md
 out=$(run)
-miss "$out" "more than one run-state file is non-terminal"
+miss "$out" "concurrent unattended run(s)"
 
 # ---- check 4, the ARCHIVED-record branch (kit 1.6). An archived record must be TERMINAL, and this
 # ---- has its own branch rather than riding check 7 because check 7 fires at TWO: a live RUN.md that

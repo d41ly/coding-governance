@@ -1255,6 +1255,12 @@ check_single_live() {
   for f in $(GIT ls-files "$M/builds/*/RUN.md" "$M/builds/*/RUN.*.md" 2>/dev/null); do
     p=$(fact "$f" phase); [ -n "$p" ] || continue
     is_terminal "$p" && continue
+    # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
+    # does not exist yet and is certainly not tracked — but a RE-preflight after a compaction is a
+    # sanctioned resume, and there the run's own committed record is tracked and non-terminal. Without
+    # this skip the announcement reports the run to itself as its own competitor, which is worse than
+    # saying nothing: it is a true-looking count of the wrong population.
+    case "$f" in "$M/builds/${SLUG:-}/RUN.md"|"$M/builds/${SLUG:-}/RUN."*".md") continue ;; esac
     if [ "$p" = LANDING ] && [ -n "$anc" ]; then
       w=$(fact "$f" witness)
       # SHA-SHAPED, for the reason the leg's copy states: `rev-parse --verify` resolves a tag or a
