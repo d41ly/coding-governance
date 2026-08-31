@@ -2317,8 +2317,13 @@ build tRos
 awk -v r="$UROW" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/rosw.$$ \
   && mv /tmp/rosw.$$ memory/builds/tRos/README.md
 sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-sed -i "s/^base: BASE$/base: $(git merge-base origin/main HEAD)/" memory/builds/tRos/RUN.md
 git add -A && git commit -q -m "already retired before the run" --no-verify
+# THE PIN IS THIS COMMIT, not the merge-base, and this arm is the one that most needs it: its whole
+# subject is the exemption the RETIRE arm reads out of the PINNED roster. Against a merge-base that
+# predates this fixture build folder, `pinned_units` REFUSES, the arm SKIPS, and `miss "check 24
+# FAILED"` passes by absence - a rewritten predicate with no arm that can fail.
+sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "already retired, pinned" --no-verify
 miss "$(run)" "check 24 FAILED"
 # ITS LIVENESS HALF: the fixture must actually carry a WONTDO row, or the arm above is green because
 # the loop selected nothing rather than because the exemption fired.

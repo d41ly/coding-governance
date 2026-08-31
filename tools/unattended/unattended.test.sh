@@ -5003,7 +5003,7 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # shipped nine arms stranded past an unconditional `exit`: the file still contained them, so a static
 # grep saw nine and `check-arms.py` text-matched nine, and the only signal that moved was this total,
 # which nothing compared to anything. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=550
+FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bump here does nothing
 # ---- ONE MEASUREMENT, and the reason this block is a single paragraph is that it stopped being one.
 # ---- Both sides of the dUnstalledConvoy merge kept their own notes here and the result stated THREE
 # ---- mutually exclusive triples as though each described the merged tree, none of them in order and
@@ -5034,7 +5034,10 @@ FLOOR_ASSERTIONS=550
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=675
+FLOOR_ASSERTIONS=706
+# RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
+# paragraph above declares. The bump first landed on the SHADOWED assignment 31 lines up and did
+# nothing; this is the one the run reads.
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #

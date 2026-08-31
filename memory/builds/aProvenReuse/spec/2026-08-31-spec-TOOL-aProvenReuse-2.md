@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round2.md](../../aGradedMandate/reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round2.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 TOOL-aProvenReuse-1 TOOL-aProvenReuse-5 |
 | [2026-08-31-build-TOOL-aProvenReuse-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aProvenReuse-1-acceptance-ledger.md) | journal | TOOL-aProvenReuse-1 |
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-1 |
