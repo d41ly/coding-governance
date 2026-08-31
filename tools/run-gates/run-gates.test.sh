@@ -44,7 +44,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=135
+FLOOR_ASSERTIONS=136
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -266,6 +266,27 @@ case "$_uout" in
                        echo "canary: does not discriminate and proves nothing about the ceiling."
                        fail=1 ;;
 esac
+
+# 1e-list: --list IS A SECOND READER OF THE MANIFEST, and this is the arm that stops it becoming a
+#     second OPINION. It has its own tiny parser because it must answer before the profile row and
+#     the beacon, so a read-only question never waits behind a running bar — but two readers of one
+#     file that can disagree about which legs exist is `second-implementation-is-not-a-second-opinion`
+#     verbatim, and the only honest control is to assert they agree.
+#
+#     Compared as ORDERED LISTS, not as counts: two readers can agree on 86 and disagree on which 86.
+n=$((n+1))
+_ln=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" bash "$KITDIR/run-gates.sh" --list 2>/dev/null)
+_rn=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>/dev/null         | sed -n 's/^GATE \(ok\|FAIL\|skip\|held\|reuse\) *//p' | sed 's/  (.*//')
+if [ "$(printf '%s
+' "$_ln" | sort)" != "$(printf '%s
+' "$_rn" | sort)" ]; then
+  echo "canary: --list and the dispatch loader disagree about which legs the manifest declares."
+  echo "canary: --list said: $(printf '%s' "$_ln" | tr '
+' '|')"
+  echo "canary: the bar ran: $(printf '%s' "$_rn" | tr '
+' '|')"
+  fail=1
+fi
 
 # 1e-shipped: THE DEFAULT STATE, which is the one this suite would otherwise never exercise.
 #     TOOL-aGatheredDeclaration-4 makes ceiling ENFORCEMENT owner opt-in and ships it OFF, so every

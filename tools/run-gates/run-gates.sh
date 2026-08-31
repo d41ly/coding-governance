@@ -1414,7 +1414,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'leg_timeout\t%s\n' "$PROF_TIMEOUT"
     # THE REGIME the legs actually ran under, beside the profile knob rather than instead of it: the
     # knob is an input a later reader may want, and the regime is what the run did.
-    printf 'leg_ceilings\t%s\n' "$([ "$CEILINGS_LIVE" = 1 ] && echo live || echo inert)"
+    # THE EFFECTIVE STATE AND ITS SOURCE, because `inert` alone cannot tell a later reader that
+    # the OWNER turned enforcement off from a host that has no runnable `timeout` -- and those two
+    # facts call for opposite actions. Third site of that distinction in this file.
+    printf 'leg_ceilings\t%s\n' "$([ "$CEILINGS_LIVE" = 1 ] && echo live || { [ "$HAVE_TIMEOUT" = 0 ] && echo "inert (no runnable timeout)" || echo "off (from $CEIL_SRC)"; })"
     printf 'profile_from\t%s\n' "$PROF_TAG"
     printf 'legs\t%s\n' "$total"
     printf 'worktree\t%s\n' "$(git rev-parse --show-toplevel 2>/dev/null)"
@@ -1485,7 +1488,9 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # fired rather than a second lookup that could disagree with it. TOOL-aBoundedCeiling-1.
   local bound=${ceilings[$i]:-}
   [ -n "$bound" ] || bound=$PROF_TIMEOUT
-  # CEILINGS_LIVE is the liveness gate: with no runnable `timeout` a declared ceiling is INERT, and
+  # CEILINGS_LIVE is the EFFECTIVE gate and now carries two reasons: no runnable `timeout` (the
+  # capability, HAVE_TIMEOUT) or the owner opting out (the policy, CEIL_WANT). Either way a declared
+  # ceiling is not applied here, and
   # the leg runs UNBOUNDED rather than being skipped. A knob may cost speed and may turn a hang into
   # a RED; it may never turn a leg into a pass or a skip (gate-profiles.txt, the governing invariant).
   [ "$CEILINGS_LIVE" = 1 ] || bound=0
