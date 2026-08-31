@@ -38,7 +38,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.12   # gov:kit unattended@1.12 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.13   # gov:kit unattended@1.13 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1107,8 +1107,6 @@ check_wiring() {
   return 1
 }
 
-# At most one run-state file may be non-terminal, or "the run" is not well-defined and anything
-# keyed on it must either OR the phases together or pick one arbitrarily.
 # TOOL-cBriefedPilot-4 - every directive this run is bound by is a POINTER into a section of the
 # build method. A tree with no carrier holds a directive set that resolves to nothing, and before
 # this branch the run started anyway with nobody present to notice.
@@ -1207,6 +1205,31 @@ check_waivers() { # run-state file
   return 0
 }
 
+# CONCURRENT RUNS ARE ANNOUNCED, NEVER REFUSED. TOOL-aUnblockedFleet-1.
+#
+# WHAT THIS FUNCTION NO LONGER CLAIMS, stated here because a structural check reads as a semantic one
+# to everybody who did not write it. It does NOT bound how many runs are live, and it does not assert
+# that "the run" is well-defined tree-wide. It refuses nothing.
+#
+# Until this unit it refused whenever more than one tracked run-state file was non-terminal, on the
+# stated ground that anything keyed on "the run" would otherwise have to OR the phases together or
+# pick one arbitrarily. NOTHING IS KEYED ON IT, and that was tested by construction rather than read:
+# in a scratch copy with this refusal and leg check 7 both neutered, and two genuinely live records
+# for unrelated builds, the full leg exited 0 green and every verb resolved its own build. The
+# driver's verb population is seventeen and sixteen of them take a `<slug>`; the seventeenth is
+# `--version`, which resolves nothing. The leg's three tree-wide loops all grade per file.
+#
+# What the refusal DID buy was a crude staleness signal, and it bought it at a price this fleet paid
+# three times: TOOL-aFusedCharter-4 (three builds wedged at LANDING, cleared only by marking two
+# honest runs ABORTED), TOOL-aBoundedVerdict-24 (a run that closed but could not land reddening every
+# later bar) and TOOL-aReapedTicket-5 (a run that dies in BUILDING blocks every future run forever,
+# with no override). The announcement below is what that signal degrades into, and TOOL-aReapedTicket-5
+# stays OPEN for the staleness bound this unit deliberately does not build.
+#
+# NOT COVERED, and it is a real residual rather than an oversight: two runs CLOSING at the same moment
+# in one clone still contend on run-gates.sh's repo-wide turnstile, whose queue wait is charged
+# against GATE_BOUND. See the parked decision in this build's RUN.md — the fix was specced as
+# TOOL-aUnblockedFleet-6 and RETIRED when a spec audit refuted all three of its mechanisms.
 check_single_live() {
   local n=0 f p live=""
   # BOTH globs: the live record AND every archived one. Rotation puts finished records beside the
@@ -1250,13 +1273,24 @@ check_single_live() {
     fi
     n=$((n + 1)); live="$live $f"
   done
-  if [ "$n" -gt 1 ] && [ -z "$anc" ]; then
+  # THE THRESHOLD IS THE ANNOUNCEMENT'S, and the two must never drift apart. This guard used to read
+  # `-gt 1`, which fires at two or more COUNTED records — correct while the refusal below fired at
+  # two, and wrong the moment the announcement started firing at one. Left alone it would have gone
+  # mute in exactly the state the LANDING exclusion exists for: one concurrent record, no anchor, a
+  # competitor announced and no word that the exclusion could not be computed. That is
+  # green-by-absence inside the sentence written to prevent it. TOOL-aUnblockedFleet-1.
+  if [ "$n" -ge 1 ] && [ -z "$anc" ]; then
     printf 'unattended: the live-run exclusion is UNAVAILABLE — no anchor was observed, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted
 '
   fi
-  [ "$n" -le 1 ] && return 0
-  fail 5 "more than one run-state file is in a non-terminal phase, so 'the run' is not well-defined: $n live,${live}"
-  return 1
+  # SILENT AT ZERO. A line printed on every ordinary preflight is a line nobody reads, and the
+  # announcement's whole value is that its presence means something.
+  [ "$n" -lt 1 ] && return 0
+  printf 'unattended: %d concurrent unattended run(s) — this run is NOT blocked by them, and none of them is blocked by this one:\n' "$n"
+  for f in $live; do
+    printf '  %s · phase %s · witness %s\n' "$f" "$(fact "$f" phase)" "$(fact "$f" witness)"
+  done
+  return 0
 }
 
 # ONE comparison enforces BOTH provenance properties. At a pinned merge-base, "was it reachable from
@@ -2024,8 +2058,9 @@ verb_phase() { # slug · phase · witness
   # aStandingWrit review's F2 asked for, and the only one that was never built - because before the
   # terminal producers below existed, no record could BE terminal and the branch was unreachable.
   # Adding the producers is what makes it reachable, so it lands with them: without it,
-  # `--phase <slug> BUILDING` on a LANDED record returns the run to check_single_live and leg check 7,
-  # which is the counter this whole unit exists to free.
+  # `--phase <slug> BUILDING` on a LANDED record returned the run to a counter that refused the next
+  # preflight. Since TOOL-aUnblockedFleet-1 neither check_single_live nor leg check 7 refuses on that
+  # count, so what this guard now protects is the RECORD's own honesty rather than the fleet's.
   refuse_if_terminal "$rel" --phase || return 1
   # A TERMINAL phase is a PRODUCER's to write, never this verb's. Vocabulary membership is not
   # permission: a run that could set LANDED here would skip the entire Definition-of-Done gate, and

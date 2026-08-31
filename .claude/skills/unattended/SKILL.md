@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.12 -->
+<!-- gov:kit unattended@1.13 -->
 
 # Unattended runs
 
@@ -172,8 +172,9 @@ It schedules no keepalive, and the section above does not bind it: there is an o
 
    It refuses on a dirty tree, on the default branch, on an unwired repo, when the build README is
    absent at the pinned BASE or does not name this build, when the remote does not answer or
-   advertises no default branch of its own, and when a second run is already live. It writes nothing until every one of those
-   passes. Read the refusal it prints — each one names itself.
+   advertises no default branch of its own. It writes nothing until every one of those
+   passes. It does NOT refuse because another build is live — it announces the concurrent runs and
+   continues. Read the refusal it prints — each one names itself.
 
 4. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
    The engine's unattended hand-back fires only when a run-state file already exists in a
@@ -703,7 +704,8 @@ lander writes the commit it pushed and this verb requires the marker to name HEA
 equality, not ancestry: one more commit after the push — even the record commit — and `--landed`
 refuses. The refusal names both shas, the one it wanted and the one the marker holds, so a stale
 marker and a moved HEAD are distinguishable. Then commit the record it writes and land that commit too; until it is
-committed, every later run still counts yours as live and the bar reds on the second one.
+committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
+put your unfinished run in every later run's concurrency report.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
