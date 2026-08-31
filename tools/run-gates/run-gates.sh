@@ -161,6 +161,70 @@ if [ "$LEGS_FMT" = toml ] && [ "$HAVE_TOMLLIB" != yes ]; then
   exit 2
 fi
 
+# ================= [bar] — the declaration-level defaults =========================================
+# READ HERE, before the profile row and long before the legs, because the turnstile acquires at a
+# point the leg loader has not run yet. This is a second reader of the FILE and not a second spelling
+# of the FORMAT: it asks for one table the leg loader never looks at.
+#
+# EVERY VALUE IS MARSHALLED TO THE BYTE `0` OR `1` before it leaves this block. Both turnstile guards
+# are string tests of the form `[ "$x" != 0 ]`, so a TOML `false` substituted verbatim compares the
+# WORD `false` against `0`, which is TRUE, and would ship the mechanism ENABLED — the exact inversion
+# of what the declaration says, arriving with the value visibly wired.
+#
+# Every `[bar]` key is DEFAULTED and the table may be absent entirely. "Opt-in, default off" means an
+# absent key IS the off state, so a refusal on its absence would contradict the thing it declares.
+BAR_CEILINGS=0; BAR_TURNSTILE=0; BAR_DEFAULT_CEILING=0; BAR_TTL=0
+if [ "$LEGS_FMT" = toml ]; then
+  _bar=$("$PYBIN" -c '
+import sys, tomllib
+b = (tomllib.load(open(sys.argv[1], "rb")).get("bar") or {})
+def flag(k):
+    v = b.get(k)
+    if v is None: return "0"
+    if not isinstance(v, bool):
+        sys.stderr.write("[bar].%s must be a boolean, not %r\n" % (k, v)); sys.exit(3)
+    return "1" if v else "0"
+def num(k):
+    v = b.get(k)
+    if v is None: return "0"
+    if not isinstance(v, int) or isinstance(v, bool) or v <= 0:
+        sys.stderr.write("[bar].%s must be a positive integer, not %r\n" % (k, v)); sys.exit(3)
+    return str(v)
+# LF BYTES, never print(). Windows text stdout is CRLF, so print() would give every value a
+# trailing carriage return, and a shell equality test against a bare 0 is then FALSE -- which
+# silently ships both knobs ON while the profile line reports the declaration as their source.
+# Observed here first try. The leg loader below already writes bytes for exactly this reason and
+# says so on the line that does it.
+sys.stdout.buffer.write(("\n".join([flag("enforce_ceilings"), flag("turnstile"),
+                                    num("default_ceiling"), num("turnstile_ttl")]) + "\n").encode())
+' "$LEGS_FILE") || { echo "run-gates: cannot read [bar] from $LEGS_FILE" >&2; exit 2; }
+  { read -r BAR_CEILINGS; read -r BAR_TURNSTILE; read -r BAR_DEFAULT_CEILING; read -r BAR_TTL; } <<<"$_bar"
+fi
+
+# THE RESOLUTION, one per knob, printed on the profile line so a reader never has to guess which
+# input won. The env var outranks the declaration; the declaration outranks the shipped default; and
+# the shipped default is OFF for both, which is the owner ruling this build exists to carry.
+CEIL_SRC=default
+if [ -n "${GATE_CEILINGS:-}" ]; then
+  case "$GATE_CEILINGS" in 0|1) ;; *) echo "run-gates: GATE_CEILINGS must be 0 or 1 (got: $GATE_CEILINGS)" >&2; exit 2 ;; esac
+  CEIL_WANT=$GATE_CEILINGS; CEIL_SRC=env
+elif [ "$LEGS_FMT" = toml ]; then
+  CEIL_WANT=$BAR_CEILINGS; CEIL_SRC=declaration
+else
+  # A JSON manifest declares no `[bar]`, so there is nothing to read and the SHIPPED default applies.
+  # It is OFF, and that is a behaviour change for a legacy-pair tree too: the owner's ruling is about
+  # what a ceiling COSTS, not about which format the bar was declared in.
+  CEIL_WANT=0
+fi
+TS_SRC=default
+if [ -n "${GATE_TURNSTILE:-}" ]; then
+  TS_WANT=$([ "$GATE_TURNSTILE" != 0 ] && echo 1 || echo 0); TS_SRC=env
+elif [ "$LEGS_FMT" = toml ]; then
+  TS_WANT=$BAR_TURNSTILE; TS_SRC=declaration
+else
+  TS_WANT=0
+fi
+
 # `--list` needs the NAMES and nothing else -- not the profile row, not the timing cache, not the
 # beacon. It answers here, the earliest point at which the declaration has been resolved, so a
 # read-only question can never wait behind a running bar. The reader is deliberately tiny and shares
@@ -458,6 +522,27 @@ CEILINGS_LIVE=1
 # arm then blames `GATE_JOBS` or the clamp for a binary that was there the entire time. Raising the
 # bound costs nothing -- it is only ever reached if `timeout` genuinely hangs. TOOL-aSiftedFork-7.
 timeout -k 1s 10 true >/dev/null 2>&1 || CEILINGS_LIVE=0
+HAVE_TIMEOUT=$CEILINGS_LIVE   # the CAPABILITY, before any policy touches it
+# THE OWNER'S CHOICE, ANDed with the capability probe above (TOOL-aGatheredDeclaration-4). A ceiling
+# KILLS a leg before it can answer, so enforcement OFF produces strictly MORE evidence than a ceiling
+# that fired, never less: every leg still runs and is still judged on its own exit code. What it
+# costs is hang detection, and that is the whole trade. An adopter measured a leg killed at 2041 s
+# against a 2040 s ceiling -- by one second, on a bound already raised from a measurement that was
+# 3.07x low -- and that bar produced no evidence at all.
+#
+# IT ANNOUNCES ITSELF, twice and durably: this banner before any leg runs, and the `ceilings` field
+# on the profile line, which is what the summary file and the run record carry. A green earned with
+# ceilings off must never be mistakable for one earned with them on.
+if [ "$CEIL_WANT" = 0 ] && [ "$CEILINGS_LIVE" = 1 ]; then
+  CEILINGS_LIVE=0
+  if [ "$QUERY" = no ]; then
+    echo "=============================================================================" >&2
+    echo "  CEILINGS NOT ENFORCED (from $CEIL_SRC). Every leg runs to completion." >&2
+    echo "  A hung leg will NOT be caught -- watch this run rather than leaving it." >&2
+    echo "  Turn them on with GATE_CEILINGS=1, or [bar].enforce_ceilings in the declaration." >&2
+    echo "=============================================================================" >&2
+  fi
+fi
 if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0
@@ -491,11 +576,16 @@ prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
 # host that cannot honour it -- overloading it made an INERT run read as a live bound. But leaving
 # the line saying only `timeout off` while 85 legs carried a ceiling was the opposite lie, so the
 # regime is reported beside the knob rather than instead of it. TOOL-aBoundedCeiling-1.
-prof_c=live; [ "$CEILINGS_LIVE" = 1 ] || prof_c=INERT
+prof_c="live from $CEIL_SRC"
+[ "$CEILINGS_LIVE" = 1 ] || prof_c="OFF from $CEIL_SRC"
+# `INERT` stays a distinct word from `OFF`: one means the operator chose, the other means the host
+# has no runnable `timeout` and the choice could not be honoured. Collapsing them would hide a
+# capability gap behind a policy setting.
+[ "$CEIL_WANT" = 1 ] && [ "$CEILINGS_LIVE" = 0 ] && prof_c="INERT (no runnable timeout)"
 # ON STDERR, and independent of PROF_TIMEOUT. The pre-existing INERT notice at the profile probe is
 # gated on a knob every shipped row sets to 0, so it can never fire; without this line the only
 # signal that all 85 ceilings are dead would be a stdout suffix nobody reads for warnings.
-if [ "$CEILINGS_LIVE" != 1 ]; then
+if [ "$HAVE_TIMEOUT" != 1 ]; then   # THE CAPABILITY, not the policy. CEILINGS_LIVE is 0 whenever the owner turned enforcement off, and reporting that as a missing binary hides a capability gap behind a setting -- the same conflation the profile line above keeps apart.
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c; $PROF_TAG)"
@@ -517,7 +607,7 @@ if [ "$QUERY" = yes ]; then echo "$PROF_LINE" >&2; else echo "$PROF_LINE"; fi
 # of needing a predicate. The runner's per-worktree `$gd` resolutions above are deliberate and are
 # left exactly as they are: evidence is per-worktree, contention is per-repository.
 TS_COMMON=""; TS_DIR=""; TS_TICKET=""; TS_NONCE=""; TS_WAITED=0; TS_HELD=0; TS_Q=""; TS_UNTICKETED=0
-if [ "$QUERY" = no ] && [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+if [ "$QUERY" = no ] && [ "$TS_WANT" != 0 ]; then
   TS_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || TS_COMMON=""
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
@@ -823,7 +913,7 @@ fi
 # past its own repo guard, and breaking a linked worktree's `commondir` makes `--show-toplevel` fail
 # too, so the runner exits 2 before this line. No fixture in the turnstile suite can produce it.
 QUEUED="-"; QUEUED_FROM=off
-if [ "$QUERY" = no ] && [ "${GATE_TURNSTILE:-1}" != 0 ]; then
+if [ "$QUERY" = no ] && [ "$TS_WANT" != 0 ]; then
   if   [ -z "$TS_COMMON" ]; then QUEUED_FROM=unresolved
   elif [ "$TS_HELD" = 1 ];  then QUEUED="$TS_WAITED"; QUEUED_FROM=held
   elif [ "$TS_UNTICKETED" = 1 ]; then QUEUED="$TS_WAITED"; QUEUED_FROM=unticketed
