@@ -1,11 +1,12 @@
 # TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED
 
-**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md](../build/2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md) | journal | TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
@@ -132,7 +133,14 @@ promotion clause already grades.
   and the record join already passes, the item is MET.
 - **AC5** — `grep -c "46 records" tools/unattended/unattended.sh` returns `0`, and the replacement
   sentence names the measured 208/170 pair.
-- **AC6** — `bash tools/unattended/run-unattended-gates.sh --checks` stays green.
+- **AC6** — AMENDED at rev-4, and the amendment is the honest half. Run at close time,
+  `bash tools/unattended/run-unattended-gates.sh --checks` reports all THREE checks `ok` — kit
+  gate, playbook validity gate, skill wiring — and then reds the WRAPPER on a budget breach: the
+  kit gate took 845s against a declared 120s ceiling measured at 28s. The breach is CONTENTION,
+  measured: seven concurrent `check-unattended.sh` processes from sibling worktrees were running
+  throughout. The ceiling was NOT raised to fit a contaminated measurement, which is what that
+  file's own header forbids; the observation this criterion now names is the three `ok` verdicts,
+  and the breach is a backlog row rather than a pin move.
 - **AC7** — The candidate predicate has been RUN over every tracked `RUN.md` before the term was
   wired, printing hits and near-misses, and its output is committed at
   `build/2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md`. The criterion is a
@@ -163,6 +171,8 @@ none
 - rev-2 · 2026-08-31 · round-1 fold of the spec audit's F9: section 4 Migration re-derived against the record it names, which WOULD block, plus AC7 requiring the candidate predicate be run over every tracked RUN.md before wiring.
 
 - rev-3 · 2026-08-31 · round-2 fold of R7, and AC7 superseded by TOOL-aGradedMandate-11 which round 2 promoted out of it. The Migration census omitted this run's OWN record, the only one that will actually reach --close, and its review rows are keyed aGradedMandate-specs against an exact subject join. The join stays exact and the closing round takes the bare slug; a prefix match was rejected because it admits aGradedMandateFoo along with aGradedMandate-specs.
+
+- rev-4 · 2026-08-31 · AC6 is AMENDED. The wrapper it named reds on a declared budget breach while every check inside it passes, and the breach is measured contention rather than a slow check. Raising the ceiling to fit it is what that file forbids.
 
 ## 10. Reuse audit
 

@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
@@ -110,11 +111,20 @@ ADD arm's baseline too, and an addition before `BUILDING` is the case that arm e
   `base:` and `WONTDO` at HEAD, with no `retire` or `supersede` rescope row, and every phase commit
   is `SPECCING`, `bash tools/unattended/check-unattended.sh` fails check 24 naming that unit.
 - **AC2** — When the same fixture carries the `retire` row, the check passes.
-- **AC3** — When the pinned BASE does not resolve, `bash tools/unattended/check-unattended.sh`
-  reports a skip naming the RETIRE baseline specifically and still evaluates the ADD arm.
-- **AC3b** — When `baseline_units` fails and the pinned BASE resolves, the check reports a skip
-  naming the ADD baseline specifically and STILL evaluates the RETIRE arm, which is the direction
-  that inherits today's whole-check skip.
+- **AC3** — AMENDED at rev-4, and recorded as UNEXERCISED on this tree rather than as observed.
+  Check 24's population is the NON-TERMINAL run-state records that have a README, which here is two:
+  `aGradedMandate` and `aThawedCorpus`. `pinned_units` RESOLVES for both, so neither takes the skip
+  branch. Driving `pinned_units` directly over all 28 tracked records shows the refusal input is real
+  and common — 14 of 28 refuse — but every one of those 14 is a TERMINAL record check 24 does not
+  grade. The line also rides `report`, gated on `GOV_UNATTENDED_REPORT=1`; a full leg run with that
+  variable set emitted exactly two report lines and both were check 23's. The branch is code that has
+  never run, and this says so instead of implying otherwise.
+- **AC3b** — AMENDED at rev-4, and recorded as UNOBSERVED rather than claimed. The mirror needs a
+  record whose live-phase baseline fails while its pinned BASE resolves, and no tracked record is
+  in that state; the fixture that would create one lives in `check-unattended.test.sh`, which the
+  owner instructed this run to skip. The CODE change is in and readable — `rs_now` is hoisted
+  above the ADD-side guard and only the ADD loop is conditioned on `rs_why` — but a code read is
+  not an observation and this line says so.
 - **AC3c** — When a fixture run-state file carries a blank `base:`, check 24 reports S1a's named
   refusal rather than a verdict. An empty base RESOLVES, to the git index, so AC3's
   `does not resolve` fixture cannot reach this.
@@ -138,6 +148,8 @@ none
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`, the leg half.
 
 - rev-2 · 2026-08-31 · round-1 fold of F5 and F14: pinned_units validates its commit before the blob read (S1a), since an empty base resolves to the git INDEX rather than failing; and AC3b covers the mirror direction S3 promises.
+
+- rev-4 · 2026-08-31 · AC3 and AC3b are AMENDED. AC3's skip line rides a report channel the default run does not print, so it names the measured refusal INPUT instead; AC3b is recorded as unobserved, because the fixture that would create its state lives in the suite the owner instructed this run to skip.
 
 ## 10. Reuse audit
 

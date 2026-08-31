@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
+ids: TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 TOOL-aGradedMandate-12
 authorized-by: prompt
 ---
 
@@ -79,25 +79,25 @@ default branch and this session may not leave its worktree, the wall `aScouredKi
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 11 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
+ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 TOOL-aGradedMandate-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED](spec/2026-08-31-spec-TOOL-aGradedMandate-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-08-31 |
-| [TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item](spec/2026-08-31-spec-TOOL-aGradedMandate-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-08-31 |
-| [TOOL-aGradedMandate-3 — `gates-green` escalates onto held self-test legs by the run's own diff](spec/2026-08-31-spec-TOOL-aGradedMandate-3.md) | 3 | 2 | WONTDO | rev-2 | 2026-08-31 |
+| [TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED](spec/2026-08-31-spec-TOOL-aGradedMandate-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-08-31 |
+| [TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item](spec/2026-08-31-spec-TOOL-aGradedMandate-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-08-31 |
+| [TOOL-aGradedMandate-3 — `gates-green` escalates onto held self-test legs by the run's own diff](spec/2026-08-31-spec-TOOL-aGradedMandate-3.md) | 3 | 2 | WONTDO | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN](spec/2026-08-31-spec-TOOL-aGradedMandate-4.md) | 4 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act](spec/2026-08-31-spec-TOOL-aGradedMandate-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-6 — check 24's RETIRE arm keys its baseline to the run's pinned BASE](spec/2026-08-31-spec-TOOL-aGradedMandate-6.md) | 6 | 2 | CLOSED | rev-2 | 2026-08-31 |
 | [TOOL-aGradedMandate-7 — the promotion clause counts only ids that are non-WONTDO at HEAD](spec/2026-08-31-spec-TOOL-aGradedMandate-7.md) | 7 | 2 | CLOSED | rev-1 | 2026-08-31 |
 | [TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render](spec/2026-08-31-spec-TOOL-aGradedMandate-8.md) | 8 | 1 | CLOSED | rev-3 | 2026-08-31 |
-| [TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`](spec/2026-08-31-spec-TOOL-aGradedMandate-9.md) | 9 | 2 | CLOSED | rev-3 | 2026-08-31 |
-| [TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too](spec/2026-08-31-spec-TOOL-aGradedMandate-10.md) | 10 | 2 | CLOSED | rev-2 | 2026-08-31 |
+| [TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`](spec/2026-08-31-spec-TOOL-aGradedMandate-9.md) | 9 | 2 | CLOSED | rev-4 | 2026-08-31 |
+| [TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too](spec/2026-08-31-spec-TOOL-aGradedMandate-10.md) | 10 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory](spec/2026-08-31-spec-TOOL-aGradedMandate-11.md) | 11 | 1 | CLOSED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

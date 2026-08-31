@@ -1,11 +1,12 @@
 # TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`
 
-**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 9
+**Status:** CLOSED · rev-4 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
@@ -98,8 +99,11 @@ A join is cheaper and states the relation instead of hiding it in a substitution
   `bash tools/unattended/check-unattended.sh` fails with an empty-population refusal rather than
   passing.
 - **AC4** — On the tree at HEAD with `TOOL-aGradedMandate-8` landed, the check passes.
-- **AC5** — `bash tools/unattended/run-unattended-gates.sh --selftests` reports the leg suite green,
-  and any arms floor the suite pins is moved in the same commit with its reason.
+- **AC5** — AMENDED at rev-3. It named `bash tools/unattended/run-unattended-gates.sh --selftests`,
+  which the owner instructed this run to skip mid-build. What is observed instead: this check was
+  driven RED in BOTH directions against staged breaks and green over the shipped tree, and
+  `bash tools/unattended/check-unattended.sh` is GREEN end to end. The leg's own suite is unrun, and
+  the run-state record names that as an open gap rather than treating it as covered.
 
 ## 7. Gates
 
@@ -118,6 +122,8 @@ none
   `check-memory-hygiene.sh:919` cannot see because it fires only on a header AHEAD of its log.
 - rev-2 · 2026-08-31 · round-1 fold of the spec audit's F19: the prose count in section 3 replaced
   with a name, since the set is eleven by the time this unit lands.
+
+- rev-4 · 2026-08-31 · the acceptance criterion naming `run-unattended-gates.sh --selftests` is AMENDED: the owner instructed this run to skip that suite mid-build, and the criterion now names what WAS observed instead. The acceptance ledger's AMENDED form exists for exactly this case, so the divergence is visible rather than written untruly.
 
 ## 10. Reuse audit
 

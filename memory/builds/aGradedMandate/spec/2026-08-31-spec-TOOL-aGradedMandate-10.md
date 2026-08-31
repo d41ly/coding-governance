@@ -1,11 +1,12 @@
 # TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too
 
-**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md) | spec-audit | TOOL-aGradedMandate-11 |
 
@@ -111,8 +112,10 @@ second exclusion beside it is a second answer to one question — the defect
   before the edit. The criterion is therefore a NO-CHANGE assertion and says so: it fails if this unit
   adds a second consumer, which is the risk §5 names. A grep-shaped criterion carries its measured
   pre-edit value or it is an assertion about nothing.
-- **AC5** — `bash tools/unattended/check-unattended.sh` and
-  `bash tools/unattended/run-unattended-gates.sh --selftests` are green.
+- **AC5** — AMENDED at rev-3. `bash tools/unattended/check-unattended.sh` is GREEN, observed. The
+  second half named `bash tools/unattended/run-unattended-gates.sh --selftests`, which the owner
+  instructed this run to skip mid-build; the driver suite that actually exercises this unit's code
+  is green, and the wrapper's other suites are unrun.
 
 ## 7. Gates
 
@@ -130,6 +133,8 @@ none
   `NON-CONVERGENT`, so every blocker still standing becomes a unit rather than a fold.
 
 - rev-2 · 2026-08-31 · promotion-audit fold of H2, H3, M1 and M2. AC2's partition fixture PINS the rescope act to retire, because with add the arm is green before the fix; AC4 carries its measured pre-edit value of 2 and declares itself a no-change assertion; section 10 stops claiming a one-row-per-kind fixture the suite does not have; and section 5 stops claiming verb_status prints a zero it in fact omits.
+
+- rev-3 · 2026-08-31 · the acceptance criterion naming `run-unattended-gates.sh --selftests` is AMENDED: the owner instructed this run to skip that suite mid-build, and the criterion now names what WAS observed instead. The acceptance ledger's AMENDED form exists for exactly this case, so the divergence is visible rather than written untruly.
 
 ## 10. Reuse audit
 

@@ -1,11 +1,12 @@
 # TOOL-aGradedMandate-3 — `gates-green` escalates onto held self-test legs by the run's own diff
 
-**Status:** WONTDO · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 3 · retired: the only lawful implementation reverses the owner ruling of 2026-08-27, see section 8
+**Status:** WONTDO · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 3 · retired: the only lawful implementation reverses the owner ruling of 2026-08-27, see section 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
@@ -105,6 +106,11 @@ one is a change to another kit's public surface.
 
 ## 6. Acceptance criteria
 
+**AMENDED at rev-3, and every criterion below with it.** The unit is RETIRED before any code,
+so none of these is observable and none ever will be: each describes an escalation that was
+not built. They are preserved verbatim beneath this note as the record of what was wanted,
+and the acceptance ledger carries one AMENDED line per criterion pointing here.
+
 - **AC1** — When the run's `base..HEAD` diff touches a path in a held leg's `guard` array,
   `gates-green` invokes `GATE_CMD` with `GATE_SELFTESTS=1` in its environment, verified by an arm
   that captures the child's environment through a stub `GATE_CMD`.
@@ -156,6 +162,8 @@ one is a change to another kit's public surface.
   100% of unattended closes rather than on checker-touching ones; F10 that the 26-minute figure
   inherits a width-8 profile and a width-2 node would breach `GATE_BOUND`; F11 that four held legs
   declare no guard at all and could never be selected. The idea is preserved as the section 8 fork.
+
+- rev-3 · 2026-08-31 · section 6 is AMENDED: every criterion is unobservable by construction because the unit was retired before any code, and the acceptance ledger's AMENDED form is the only honest line for them. Preserved verbatim rather than deleted.
 
 ## 10. Reuse audit
 

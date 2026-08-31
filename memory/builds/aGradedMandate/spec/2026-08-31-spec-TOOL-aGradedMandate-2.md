@@ -1,11 +1,12 @@
 # TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item
 
-**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-acceptance-ledger.md) | journal | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-closing-diff-review-round1.md) | diff-review | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
@@ -118,8 +119,11 @@ an adopter would get an item keyed on a line nothing in their tree writes.
 - **AC4** — `bash tools/unattended/check-unattended.sh` stays green with `CORE_FLOOR="12:11"` in
   BOTH `.unattended.conf` and `tools/unattended/.unattended.conf.example`, and reds with `12:10`
   against the new core count, proving the floor pin moved for a reason.
-- **AC4a** — `bash tools/unattended/run-unattended-gates.sh --selftests` is green, which is what
-  exercises the example conf's floor against the driver's two set sizes.
+- **AC4a** — AMENDED at rev-4. It named `bash tools/unattended/run-unattended-gates.sh --selftests`,
+  which the owner instructed this run to skip mid-build. What is observed instead: the driver suite
+  `bash tools/unattended/unattended.test.sh` is GREEN, and it is the suite that reads the example
+  conf's `CORE_FLOOR` against the driver's two set sizes — the `--selftests` wrapper only invokes it.
+  The wrapper's other four suites are unexercised and the run-state record says so.
 - **AC4b** — Check 16 is green: the protocol's count sentence reads `Eleven` and agrees with
   `DOD_CORE`, verified by `bash tools/unattended/check-unattended.sh` reporting no count
   disagreement.
@@ -143,6 +147,8 @@ none
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
 
 - rev-2 · 2026-08-31 · round-1 fold of F4, F6 and F8: the id join becomes whole-token with range expansion (S2a), the protocol's spelled-out count sentence joins S4 because check 16 parses it, and the kit example conf's CORE_FLOOR joins the Inventory because unattended.test.sh asserts it.
+
+- rev-3 · 2026-08-31 · the acceptance criterion naming `run-unattended-gates.sh --selftests` is AMENDED: the owner instructed this run to skip that suite mid-build, and the criterion now names what WAS observed instead. The acceptance ledger's AMENDED form exists for exactly this case, so the divergence is visible rather than written untruly.
 
 ## 10. Reuse audit
 
