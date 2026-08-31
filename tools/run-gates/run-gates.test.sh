@@ -54,7 +54,31 @@ n=0
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
-LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.toml}"
+# THE SUITES GRADE WHAT THE BAR RUNS, whatever format that is. `LEGS_FILE` is the canonical
+# derivation the gov-only canary asserts byte-for-byte across all three files, so it cannot branch;
+# the branch happens HERE, once, and every reader below keeps its `json.load`. Normalising to a temp
+# JSON is not a second spelling of the format -- it is the same leg objects, decoded -- and it is
+# what stops these harnesses from grading gate-legs.json while the bar runs gate-legs.toml, which is
+# precisely the divergence the parity arm exists to catch. Removed when the legacy pair goes.
+LEGS_READ="$LEGS_FILE"
+case "$LEGS_FILE" in
+  *.toml)
+    LEGS_READ=$(mktemp) || { echo "canary: cannot create a temp file to decode $LEGS_FILE" >&2; exit 2; }
+    "$PYBIN" -c 'import sys, json, tomllib
+d = tomllib.load(open(sys.argv[1], "rb"))
+rows = d.get("leg") or []
+for r in rows:
+    # The JSON dialect these readers know spells the hold as `subject`; the TOML spells it `opt_in`.
+    # Decoded here so a reader that pins a key set sees the shape it was written against.
+    r.setdefault("subject", "kit" if r.get("opt_in") else "repo")
+json.dump(rows, open(sys.argv[2], "w"))
+' "$LEGS_FILE" "$LEGS_READ" || { echo "canary: cannot decode $LEGS_FILE" >&2; exit 2; }
+    [ -s "$LEGS_READ" ] || { echo "canary: decoding $LEGS_FILE produced nothing — refusing rather than grading an empty population" >&2; exit 2; }
+    trap 'rm -f "$LEGS_READ"' EXIT
+    ;;
+esac
+
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
 #    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
@@ -74,7 +98,7 @@ bad = [l.get("name", "?") for l in legs
        if not str(l.get("name", "")).strip() or not l.get("argv") or len(l["argv"]) < 2 or l["argv"][0] not in ok]
 if bad:
     print("canary: malformed leg(s) (empty name, argv len < 2, or argv[0] not in {bash,python,python3,node}): " + ", ".join(bad)); sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_READ" || fail=1
 
 # 1a. THE MANIFEST KEY SET. Every row carries `name` and `argv`, may carry `guard` and `impure`,
 #     and carries nothing else. A mistyped `impure` — `impur`, `Impure`, `inpure` — is otherwise
@@ -95,7 +119,13 @@ if bad:
 n=$((n+1))
 "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling",
+         # TOOL-aGatheredDeclaration-2 and -3. `opt_in` is the resolved hold the TOML declares
+         # and `lane` is what TOOL-aGatheredDeclaration-8 will dispatch on; both reach this
+         # reader through the decode above. `cwd`, `tool` and `full_only` are declared by the
+         # schema and accepted here so a leg using one is not a stray key -- the pin exists to
+         # catch a MISSPELLING, and every name added is one the loader itself validates.
+         "opt_in", "lane", "cwd", "tool", "full_only"}
 try:
     legs = json.load(open(sys.argv[1]))
 except Exception as e:
@@ -113,7 +143,7 @@ if stray:
     print("canary: a near-miss spelling of `impure` is exactly what this pin exists to catch —")
     print("canary: the reuse path would find no declaration and reuse a leg that reads a remote.")
     sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_READ" || fail=1
 
 # ---- 1c. THE PER-LEG CEILING'S BOUND IS A CLOCK, NOT A MESSAGE. TOOL-aBoundedCeiling-1 AC1/AC2.
 #     The message was always the correct half of memory/gotchas/bounded-through-a-pipe-is-unbounded.md,
@@ -255,7 +285,13 @@ printf '%s' '[{"name":"a","argv":["bash","x.sh"]},{"name":"b","argv":["bash","y.
 printf '%s' '[{"name":"a","argv":["bash","x.sh"],"impur":"typo"}]' > "$ctl/typo.json"
 keyset_probe() { "$PYBIN" -c '
 import json, sys
-KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling"}
+KNOWN = {"name", "argv", "guard", "impure", "chunk", "subject", "ceiling",
+         # TOOL-aGatheredDeclaration-2 and -3. `opt_in` is the resolved hold the TOML declares
+         # and `lane` is what TOOL-aGatheredDeclaration-8 will dispatch on; both reach this
+         # reader through the decode above. `cwd`, `tool` and `full_only` are declared by the
+         # schema and accepted here so a leg using one is not a stray key -- the pin exists to
+         # catch a MISSPELLING, and every name added is one the loader itself validates.
+         "opt_in", "lane", "cwd", "tool", "full_only"}
 legs = json.load(open(sys.argv[1]))
 sys.exit(1 if any(k not in KNOWN for l in legs for k in l) else 0)
 ' "$1"; }
@@ -282,7 +318,7 @@ for l in json.load(open(sys.argv[1])):
 if bad:
     print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
     sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_READ" || fail=1
 
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —
 #    launcher tokens (bash/python/python3) and flags are excluded; the parse path is the manifest
@@ -291,7 +327,7 @@ paths=$("$PYBIN" -c '
 import json, sys
 rows = [a for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
-' "$LEGS_FILE")
+' "$LEGS_READ")
 # ONE assertion over a population, counted once. Incrementing per iteration made the reported count
 # track the MANIFEST SIZE rather than the assertion set, so the floor would red the day a leg was
 # removed — a count that moves for reasons unrelated to the arms is not a count of the arms.

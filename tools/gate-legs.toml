@@ -152,7 +152,6 @@ chunk = "records"
 lane = "heavy"
 opt_in = false
 ceiling = 640
-guard = []
 
 [[leg]]
 name = "template size <=48KiB"
@@ -161,7 +160,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "charter size"
@@ -170,7 +168,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "micro-format definitions"
@@ -179,7 +176,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 650
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -199,7 +195,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -219,7 +214,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 560
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -241,7 +235,6 @@ chunk = "selftests"
 lane = "heavy"
 opt_in = true
 ceiling = 710
-guard = []
 
 [[leg]]
 name = "kickoff engine size <=18KiB"
@@ -250,7 +243,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "kit version markers"
@@ -259,7 +251,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 660
-guard = []
 
 [[leg]]
 name = "verdict epoch (kit version dates the engine)"
@@ -268,7 +259,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -288,7 +278,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -392,7 +381,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 1230
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -403,7 +391,6 @@ chunk = "selftests"
 lane = "heavy"
 opt_in = true
 ceiling = 460
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -423,7 +410,6 @@ chunk = "records"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -468,7 +454,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -555,7 +540,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "workflow script syntax"
@@ -564,7 +548,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -617,7 +600,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -682,7 +664,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -705,7 +686,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "drift-audit records"
@@ -714,7 +694,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 540
-guard = []
 
 # IMPURE: its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote`
 # against the real origin to observe what the remote advertises, and fails closed when it
@@ -731,7 +710,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 16040
-guard = []
 impure = true
 
 # Ceiling 4940s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
@@ -744,7 +722,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 4940
-guard = []
 
 [[leg]]
 name = "unattended skill wiring"
@@ -753,7 +730,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: it is in the selftests chunk; the subject = kit predicate alone left six such legs
 # running on every bar, which the 2026-08-26 owner ruling corrected.
@@ -826,7 +802,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -852,7 +827,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 2940
-guard = []
 
 [[leg]]
 name = "agent-cap restatement"
@@ -861,7 +835,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 640
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -872,7 +845,6 @@ chunk = "selftests"
 lane = "heavy"
 opt_in = true
 ceiling = 1100
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -892,7 +864,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 430
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -915,7 +886,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 310
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -958,7 +928,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 330
-guard = []
 
 [[leg]]
 name = "playbook placeholder catalogue"
@@ -967,7 +936,6 @@ chunk = "product"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -990,7 +958,6 @@ chunk = "records"
 lane = "heavy"
 opt_in = false
 ceiling = 12720
-guard = []
 
 # Ceiling 1840s exceeds default_ceiling 1800s. Carried across from the JSON manifest, where it
 # was derived as max(60, 3x this leg's measured seconds) from <git-dir>/gate-ledger.tsv. Not
@@ -1002,7 +969,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 1840
-guard = []
 
 [[leg]]
 name = "verifier fan-out"
@@ -1011,7 +977,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 [[leg]]
 name = "govkit refusal join"
@@ -1041,7 +1006,6 @@ chunk = "declarations"
 lane = "heavy"
 opt_in = false
 ceiling = 630
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.
@@ -1052,7 +1016,6 @@ chunk = "selftests"
 lane = "heavy"
 opt_in = true
 ceiling = 350
-guard = []
 
 [[leg]]
 name = "playbook render wiring"
@@ -1061,7 +1024,6 @@ chunk = "wiring"
 lane = "heavy"
 opt_in = false
 ceiling = 300
-guard = []
 
 # HELD: its subject is the KIT'S OWN SOURCE, and that job exists only when the kit source
 # changes.

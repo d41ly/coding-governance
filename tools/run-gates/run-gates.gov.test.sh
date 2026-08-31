@@ -79,7 +79,31 @@ FLOOR_ASSERTIONS=15
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
-LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.toml}"
+# THE SUITES GRADE WHAT THE BAR RUNS, whatever format that is. `LEGS_FILE` is the canonical
+# derivation the gov-only canary asserts byte-for-byte across all three files, so it cannot branch;
+# the branch happens HERE, once, and every reader below keeps its `json.load`. Normalising to a temp
+# JSON is not a second spelling of the format -- it is the same leg objects, decoded -- and it is
+# what stops these harnesses from grading gate-legs.json while the bar runs gate-legs.toml, which is
+# precisely the divergence the parity arm exists to catch. Removed when the legacy pair goes.
+LEGS_READ="$LEGS_FILE"
+case "$LEGS_FILE" in
+  *.toml)
+    LEGS_READ=$(mktemp) || { echo "canary: cannot create a temp file to decode $LEGS_FILE" >&2; exit 2; }
+    "$PYBIN" -c 'import sys, json, tomllib
+d = tomllib.load(open(sys.argv[1], "rb"))
+rows = d.get("leg") or []
+for r in rows:
+    # The JSON dialect these readers know spells the hold as `subject`; the TOML spells it `opt_in`.
+    # Decoded here so a reader that pins a key set sees the shape it was written against.
+    r.setdefault("subject", "kit" if r.get("opt_in") else "repo")
+json.dump(rows, open(sys.argv[2], "w"))
+' "$LEGS_FILE" "$LEGS_READ" || { echo "canary: cannot decode $LEGS_FILE" >&2; exit 2; }
+    [ -s "$LEGS_READ" ] || { echo "canary: decoding $LEGS_FILE produced nothing — refusing rather than grading an empty population" >&2; exit 2; }
+    trap 'rm -f "$LEGS_READ"' EXIT
+    ;;
+esac
+
 
 # ---- G0. THE CORPUS GATE -------------------------------------------------------------------------
 # Every arm in this file is keyed on gov's own manifest. Refuse — loudly, exit 2 — rather than pass,
@@ -97,7 +121,7 @@ try:
 except Exception as e:
     print("gov-canary: %s does not parse: %s" % (sys.argv[1], e)); sys.exit(1)
 sys.exit(0 if any(l.get("name") == sys.argv[2] for l in legs) else 1)
-' "$LEGS_FILE" "$WITNESS"; then
+' "$LEGS_READ" "$WITNESS"; then
   echo "gov-canary: REFUSING — $LEGS_FILE carries no leg named '$WITNESS', so this is not the corpus"
   echo "gov-canary: these arms were written for. This harness is gov-only by design (see its header);"
   echo "gov-canary: it is withheld from the kit payload and must never report a green it did not earn."
@@ -115,7 +139,7 @@ bad = [l["name"] for l in json.load(open(sys.argv[1])) if "  " in l.get("name", 
 if bad:
     print("gov-canary: leg name(s) contain a DOUBLE SPACE, which makes the report tail split"
           " ambiguous: " + "; ".join(bad)); sys.exit(1)
-' "$LEGS_FILE"; then fail=1; fi
+' "$LEGS_READ"; then fail=1; fi
 
 # ---- G2. the runner and both harnesses derive the manifest identically ---------------------------
 # SOURCE PARITY, not a re-derivation. An earlier draft of this arm recomputed the derivation inline
@@ -276,7 +300,7 @@ if bad:
     if len(bad) > 12:
         print("  ... and %d more" % (len(bad) - 12))
     sys.exit(1)
-' "$LEGS_FILE"; then
+' "$LEGS_READ"; then
   fail=1
 fi
 
@@ -319,7 +343,7 @@ if "guard" in rows[0]:
     print("  only while it is unguarded. With a guard, a scoped push skips it and the acceptance")
     print("  ledger is graded at neither boundary. Remove the guard, or retire that exemption.")
     sys.exit(1)
-' "$LEGS_FILE"; then
+' "$LEGS_READ"; then
   fail=1
 fi
 

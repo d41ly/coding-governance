@@ -137,6 +137,10 @@ KITREL=${KITDIR#"$ROOTN"/}
 #
 # GATE_LEGS still outranks the derivation (the aPacedTurnstile build's spec set, S3); its format is
 # taken from the extension, so a harness can drive either path.
+# THE CANONICAL DERIVATION, byte-identical in this runner and in both harnesses, which the
+# gov-only canary asserts line for line: a suite that derives the manifest differently grades a
+# different file than the bar runs. The fallback below REASSIGNS it; the default is the TOML.
+LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.toml}"
 _LEGS_DIR=$(dirname "$KITREL")
 HAVE_TOMLLIB=no
 "$PYBIN" -c 'import tomllib' 2>/dev/null && HAVE_TOMLLIB=yes
@@ -1743,13 +1747,17 @@ else
   # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
   # are read by the same person in the same terminal and a figure that changes meaning between them
   # is worse than either. TOOL-dUnstalledConvoy-31.
+  # THE THIRD EMISSION KEPT `$n` after the other two were fixed, and a SHARDED run is what made it
+  # visible: stdout said `1/2 legs failed` while gate-last-failure.txt said `1/86` for the same run.
+  # Fixing one of three call sites is the amendment-leaves-its-other-half-standing class, in the
+  # shipped runner. Found by TOOL-aGatheredDeclaration-3.
   [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
   echo "gates RED — $fails/$ran legs failed$skipnote"
