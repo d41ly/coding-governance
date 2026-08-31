@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-5
+unpushed-at-landing: 0
+landed-anchor: remote
 keepalive-reaped: yes
 parked-surfaced: yes, 0 surfaced
-witness: 09ad99157473d69753aff2544c667768cf555792
-phase: LANDING
+witness: a0ff2b57062d804cb8cfcf8bef2d0c259a6e9a15
+phase: LANDED
 branch-sha: 3bfc5e877e1c416781bffa9e5bf5e1b1b7a27036
 branch-ref: refs/heads/branch/unattended-kit-gaps-a3b869
 mode: prompt
