@@ -518,6 +518,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkDeclinedSpan",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkUnderRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -841,11 +846,6 @@
       "id": "decline_findings",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "declinedSpanIsAmbiguous",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "default_kits",
@@ -1354,11 +1354,6 @@
     },
     {
       "id": "joinCall",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "joinHere",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
@@ -2053,6 +2048,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "readJoinAt",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2388,6 +2388,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveConsts",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2396,6 +2401,11 @@
       "id": "resolveRealPath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveRegexStart",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "resolve_bash",
@@ -2501,11 +2511,6 @@
       "id": "resolve_tokens",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "resolvedConsts",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "rootSegments",
@@ -2876,11 +2881,6 @@
       "id": "spec_ids",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "startsRegex",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "stems",

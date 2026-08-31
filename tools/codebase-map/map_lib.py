@@ -414,7 +414,7 @@ JS_DEFINITION_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 
-def _js_starts_regex(prev: str) -> str:
+def _js_resolve_regex_start(prev: str) -> str:
     """TOOL-aPairedLexer-12: is a ``/`` at this position a REGEX start, or division?
 
     Same conservative rule the JavaScript side states: a regex is recognised only after a token
@@ -483,7 +483,7 @@ def render_comment_free(text: str) -> str:
             i = j + 2
             continue
         ch = text[i]
-        if ch == "/" and _js_starts_regex(prev):
+        if ch == "/" and _js_resolve_regex_start(prev):
             # A regex literal. Consume it WHOLE and emit it verbatim, exactly as a string is
             # emitted, so a backtick, quote or comment opener inside it cannot open anything. That
             # is what stops a phantom template span forming: without it, a regex-borne backtick

@@ -283,7 +283,7 @@ function boundedBranch(br, name, consts, ok) {
 // ---- TOOL-aPairedLexer-8: ONE regex-position predicate, called by BOTH scanners ----------------
 // WHERE A `/` STARTS A REGEX is the classic JavaScript ambiguity, and this file answers it in ONE
 // place because answering it twice is what produced three of its four shipped fail-opens. Both
-// `renderCodeView` and `blankLiterals` call `startsRegex`; neither carries a keyword list, a member
+// `renderCodeView` and `blankLiterals` call `resolveRegexStart`; neither carries a keyword list, a member
 // guard or a leak test of its own.
 //
 // The set is the keywords that CANNOT end an expression. `of`, `await` and `yield` are deliberately
@@ -295,7 +295,7 @@ const REGEX_KEYWORDS = ['return', 'typeof', 'case', 'in', 'instanceof', 'new', '
 // the next, which is legal JavaScript. The leading alternative is start of INPUT, not start of line.
 const KEYWORD_TAIL = new RegExp('(?:^|[^.\\w$])(' + REGEX_KEYWORDS.join('|') + ')\\s*$')
 
-function startsRegex(prev, codeText) {
+function resolveRegexStart(prev, codeText) {
   // A keyword that cannot end an expression — but not one used as a PROPERTY NAME. `obj.in`,
   // `x.of`, `m.delete`, `p.new` and `r.case` are legal member accesses.
   if (KEYWORD_TAIL.test(codeText)) return true
@@ -320,7 +320,7 @@ function startsRegex(prev, codeText) {
 // Measured: the raw-character reading reports AMBIGUITY on 3 of this repo's 4 tracked workflow
 // harnesses, every hit being the hook's own mandated `// gov:fixed-verifiers` marker comment, where
 // the workaround is structurally unreachable. The token reading reports none of them.
-function declinedSpanIsAmbiguous(raw, from) {
+function checkDeclinedSpan(raw, from) {
   // Scan the way a REGEX BODY is scanned — escapes and character classes — because if the slash HAD
   // been a regex, everything to the closer is body. Scanning it as CODE is what a first attempt did,
   // and a backtick in the body then read as a string opener that swallowed the closer, so the four
@@ -363,8 +363,8 @@ function renderCodeView(script) {
         if (two === '/*') { mode = 'block'; i += 2; continue }
         // TOOL-aPairedLexer-6: a DECLINED slash that a later CODE-MODE slash could have closed.
         // The view below it may be wrong, so say so rather than let a consumer read a gutted one.
-        if (ch === '/' && !startsRegex(prev, codeText) && declinedSpanIsAmbiguous(raw, i + 1)) dirty = true
-        if (ch === '/' && startsRegex(prev, codeText)) {
+        if (ch === '/' && !resolveRegexStart(prev, codeText) && checkDeclinedSpan(raw, i + 1)) dirty = true
+        if (ch === '/' && resolveRegexStart(prev, codeText)) {
           // A regex literal. Consume it whole, including any backtick, `/*` or quote inside, so
           // none of them can open a construct. A class `[...]` may hold an unescaped `/`.
           let j = i + 1
@@ -431,7 +431,7 @@ function renderCodeView(script) {
 // there — the defect fixed next door and left standing, which is why this is ONE function with two
 // callers rather than two copies. It takes both views as PARAMETERS: `fanoutFindings` has no `_bl`
 // in scope, and a helper written against one caller's locals is not hoisted, it is moved.
-function resolvedConsts(trustedCode, fallbackCode, clean) {
+function resolveConsts(trustedCode, fallbackCode, clean) {
   const primary = intConsts(clean ? trustedCode : fallbackCode)
   if (clean) return primary
   const consts = primary.consts
@@ -470,7 +470,7 @@ function fanoutFindings(script) {
   // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`.
   // TOOL-aPairedLexer-11: through the SAME helper rule 3 uses. Rule 2 had no cross-check at all,
   // so a fabricated `const K = 5` still lowered a real `const K = 500` here.
-  const { consts } = resolvedConsts(view.code, lines.map((l) => stripStrings(l).split('//')[0]), !view.unterminated)
+  const { consts } = resolveConsts(view.code, lines.map((l) => stripStrings(l).split('//')[0]), !view.unterminated)
 
   // Receivers this file can prove are bounded. TWO PASSES, because a derived lens set is written
   // AFTER the literal it derives from (`const LENSES = ALL_LENSES.filter(…)`), and a single forward
@@ -737,8 +737,8 @@ function blankLiterals(script) {
         // such literals close each other, `endMode` finished at 'code' and reported nothing wrong.
         // TOOL-aPairedLexer-6: a DECLINED slash that a later CODE-MODE slash could have closed.
         // The view below it may be wrong, so say so rather than let a consumer read a gutted one.
-        if (ch === '/' && !startsRegex(prev, codeText) && declinedSpanIsAmbiguous(raw, i + 1)) dirty = true
-        if (ch === '/' && startsRegex(prev, codeText)) {
+        if (ch === '/' && !resolveRegexStart(prev, codeText) && checkDeclinedSpan(raw, i + 1)) dirty = true
+        if (ch === '/' && resolveRegexStart(prev, codeText)) {
           let j = i + 1
           let cls = false
           let closed = false
@@ -804,7 +804,7 @@ function blankLiterals(script) {
 // it returns null, the rule denies for "never closes its parens", and that denial is green while
 // observing nothing. S2b: a call site the paren-safe view cannot show AT ALL is a DENY naming the
 // ambiguity, never a dropped finding.
-function joinHere(joinView, i, needle) {
+function readJoinAt(joinView, i, needle) {
   const line = joinView[i] === undefined ? '' : joinView[i]
   const at = line.indexOf(needle)
   if (at < 0) return { ambiguous: true }
@@ -870,7 +870,7 @@ function capFindings(script) {
   const fallback = lines.map((l) => stripStrings(l).split('//')[0])
   const code = _bl.clean ? _bl.code : fallback
   const joinView = _bl.code // paren-safe, always: joins and paren balance are computed from it
-  const { consts, orBound } = resolvedConsts(_bl.code, fallback, _bl.clean)
+  const { consts, orBound } = resolveConsts(_bl.code, fallback, _bl.clean)
   const bad = []
 
   // ONE explanation per unresolvable K, naming the FORM rather than shrugging — an operator who
@@ -894,7 +894,7 @@ function capFindings(script) {
   code.forEach((l, i) => {
     const d = /\bfunction\s+(boundedParallel|boundedPipeline)\s*\(/.exec(l)
     if (!d) return
-    const h = joinHere(joinView, i, d[0])
+    const h = readJoinAt(joinView, i, d[0])
     if (h.ambiguous) {
       bad.push({ n: i + 1, line: lines[i], why: `the ${d[1]}() DEFINITION cannot be read in the paren-safe view, so its default parameter is unresolvable — a definition this hook cannot parse is not one it may approve` })
       return
@@ -919,7 +919,7 @@ function capFindings(script) {
     while ((m = HELPERS.exec(l))) {
       if (/\bfunction\s+$/.test(l.slice(0, m.index))) continue // a definition — S2 judged it
       const name = m[1]
-      const h = joinHere(joinView, i, m[0])
+      const h = readJoinAt(joinView, i, m[0])
       if (h.ambiguous) {
         bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE cannot be read in the paren-safe view — either it never closes its parens, or a mis-lexed span blanked it — so the cap argument is unresolvable, and a call this hook cannot parse is not a call it may approve` })
         continue
