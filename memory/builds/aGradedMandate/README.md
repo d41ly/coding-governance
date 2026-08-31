@@ -33,26 +33,23 @@ standing, on a Definition-of-Done item that was MET. The report is
 - Every later green means less than it reads, here and in every adopter that copies the kit.
 
 ## Build-level rules
-- **The lens is narrow.** Not "is this kit correct" — that has had many rounds. Only: what lets a run
-  do worse work and land it green. A finding about bookkeeping is out of scope.
-- **The prompt authorizes the kit's own carriers.** "Changes to any layer of the kit" reaches
-  `PROTOCOL.template.md`, `SKILL.template.md` and `.unattended.conf`. It does NOT reach carriers
-  outside the kit — the charter, the build method, `memory/HYGIENE.md`. Those are M3 veto 2 and are
-  parked or backlogged, never edited here.
+- **The lens is narrow.** Only: what lets a run do worse work and land it green. Bookkeeping is out.
+- **The prompt authorizes the kit's own carriers** — `PROTOCOL.template.md`, `SKILL.template.md`,
+  `.unattended.conf`. It does NOT reach the charter, the build method or `memory/HYGIENE.md`. Those
+  are M3 veto 2 and are parked or backlogged, never edited here.
 - **A leg-side ratchet that reds a landed record is unlandable, and that decided two units.** The
   closing-loop fix is DRIVER-side only, and the promotion fix tightens the id-status half alone,
   because the blocker-sum half reds `aPrimedKeepalive` on main today.
 - **Every new predicate is observed RED against a staged break before it is called built**, and its
   own header states what it does NOT check.
-- **This build is the dogfood.** It must itself satisfy every item it adds: a spec audit naming
-  every unit, and a closing loop that ends. Its closing rounds take the BARE SLUG as `--subject`,
-  because unit 1's join is exact.
-- **A criterion is not accepted until its value has been MEASURED.** Round 2 found two written from
-  memory: a grep whose pre-edit count was already 2, and a census pinned at 3 against a tree that
-  answers 21. Both were criteria added to close a round-1 finding.
-- **The spec-audit loop ran two rounds and stopped NON-CONVERGENT** at 2 blockers then 2. Units 10
-  and 11 are its promotions, not new ideas.
-
+- **A criterion is not accepted until its value has been MEASURED.** The audits found three written
+  from memory: a grep already at 2, a census pinned at 3 against a tree answering 21, and a grep
+  already at 0.
+- **This build is the dogfood** and must satisfy every item it adds. Its closing rounds take the
+  BARE SLUG as `--subject`, because unit 1's join is exact.
+- **The spec-audit loop ran two rounds and stopped NON-CONVERGENT** at 2 then 2; units 10 and 11 are
+  its promotions. Their own audit ran ONE round, folded, and stopped — no second round was run and
+  its zero is NOT recorded as one. M4's stop rule: building is cheaper and stricter.
 ## Parked decisions
 Entries live in `RUN.md`. **The self-test escalation is the big one**: 46 of 86 legs are held, no
 carrier a run reads names `GATE_SELFTESTS`, and every lawful fix is an owner turn — the in-driver
@@ -96,15 +93,15 @@ ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGrad
 | [TOOL-aGradedMandate-7 — the promotion clause counts only ids that are non-WONTDO at HEAD](spec/2026-08-31-spec-TOOL-aGradedMandate-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-08-31 |
 | [TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render](spec/2026-08-31-spec-TOOL-aGradedMandate-8.md) | 8 | 1 | SPECCED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`](spec/2026-08-31-spec-TOOL-aGradedMandate-9.md) | 9 | 2 | SPECCED | rev-3 | 2026-08-31 |
-| [TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too](spec/2026-08-31-spec-TOOL-aGradedMandate-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory](spec/2026-08-31-spec-TOOL-aGradedMandate-11.md) | 11 | 1 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too](spec/2026-08-31-spec-TOOL-aGradedMandate-10.md) | 10 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory](spec/2026-08-31-spec-TOOL-aGradedMandate-11.md) | 11 | 1 | SPECCED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aGradedMandate-10 TOOL-aGradedMandate-11.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGradedMandate-10 TOOL-aGradedMandate-11.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -1,10 +1,12 @@
 # TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md) | spec-audit | TOOL-aGradedMandate-10 |
 
 <!-- /gen:spec-records -->
 
@@ -40,8 +42,15 @@ a committed record and rewrites AC7 to read that record instead of a number nobo
   reopen it.
 - **No change to S1's predicate.** The census measures the predicate as specced; it does not tune it
   to make the number smaller.
-- **No retrofit of the refusing records.** Twenty-one tracked records would refuse and every one of
-  them is terminal or is this build's own; rewriting a finished record is what the protocol forbids.
+- **No retrofit of the refusing records.** Twenty-one tracked records refuse, and **two of them are
+  NON-TERMINAL**: `memory/builds/aGradedMandate/RUN.md` at `FOLDING`, which is this build's own, and
+  `memory/builds/aThawedCorpus/RUN.md` at `LANDING`, which is not — `PHASES_TERMINAL` is
+  `LANDED ABORTED` at `unattended.sh:333`. So the census DOES fire the finding S2 and AC4 define, and
+  it is owed an answer rather than pre-declared harmless. What is owed per record: this build's own is
+  answered by `TOOL-aGradedMandate-1` AC8, which requires the closing round to take the bare slug;
+  `aThawedCorpus` has already had `--close` run and nothing re-evaluates it, which the census records
+  as its disposition. The nineteen terminal refusers are not rewritten, because rewriting a finished
+  record is what the protocol forbids.
 
 ## 4. Design
 
@@ -92,8 +101,12 @@ already ruled the join stays exact.
 - **AC2** — The record's per-record verdicts are reproducible: re-running the probe the record
   carries against `GIT ls-files 'memory/builds/*/RUN.md'` produces the same pass and refuse sets, and
   the record names both counts.
-- **AC3** — `TOOL-aGradedMandate-1` AC7 names no expected-hit count of its own and points at this
-  record, verified by `grep -c 'a fourth hit'` over that spec returning 0.
+- **AC3** — `TOOL-aGradedMandate-1` AC7 NAMES THIS RECORD BY FILENAME:
+  `grep -c 'closing-loop-census' memory/builds/aGradedMandate/spec/2026-08-31-spec-TOOL-aGradedMandate-1.md`
+  returns at least 1. **Measured before the edit: 0.** The obvious spelling was rejected as
+  unfalsifiable — `grep -c 'a fourth hit'` over that spec already returns 0, because the round-2 fold
+  replaced AC7 with a supersession note, so it cannot go red in either direction and S2 would have no
+  observer at all.
 - **AC4** — The record names every NON-TERMINAL `RUN.md` it examined and its verdict for each,
   which is the arm that would have caught round 2's R7 — this build's own
   `memory/builds/aGradedMandate/RUN.md` included.
@@ -112,6 +125,8 @@ none
 
 - rev-1 · 2026-08-31 · PROMOTED from round 2 of the spec audit, blocker R2, per the build method's
   M4 exit rule.
+
+- rev-2 · 2026-08-31 · promotion-audit fold of the BLOCKER B1 and of H1. AC3 was unfalsifiable - its grep already returned 0 because the round-2 fold had replaced AC7 with a supersession note - and now names this unit's record by filename, measured at 0 before the edit. Non-goal 3's claim that every refuser is terminal or this build's own is corrected: two are non-terminal and one of those is another build's.
 
 ## 10. Reuse audit
 

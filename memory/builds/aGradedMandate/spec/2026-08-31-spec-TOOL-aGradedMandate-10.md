@@ -1,10 +1,12 @@
 # TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md) | spec-audit | TOOL-aGradedMandate-11 |
 
 <!-- /gen:spec-records -->
 
@@ -77,9 +79,11 @@ second exclusion beside it is a second answer to one question — the defect
 - perf / scale — N/A. One predicate per parked row on a file already read whole.
 - a11y — N/A. No user surface.
 - i18n — N/A. No user surface.
-- error / empty / loading states — a record with no parked rows prints both counts as zero, which
-  the partition arm covers as its degenerate case and which is stated so a zero is not read as a
-  skip.
+- error / empty / loading states — a record with no parked rows prints NEITHER field. `verb_status`
+  omits `parked` at zero (`unattended.sh:2618-2619`) and `noted` at zero (`:2629`), by the design its
+  own comment at `:2615` states, and `unattended.test.sh:2840` already pins that. The partition arm
+  must therefore read an ABSENT field as zero rather than expect a printed `0`, which is stated here
+  because assuming the printed form is how this arm would pass against nothing.
 - observability — `--status` is the observability, and this unit is the reason its two numbers add
   up.
 - risks — the ONLY consumer of `park_kinds_unowed` is `verb_status`, verified by grep, so the blast
@@ -94,13 +98,18 @@ second exclusion beside it is a second answer to one question — the defect
 - **AC1** — Over a fixture record holding exactly one `rescope · item retire TOOL-x-1 · reason …`
   row, `bash tools/unattended/unattended.sh --status <slug>` prints `parked 1` and does NOT print a
   non-zero `noted`, verified by an arm in `unattended.test.sh`.
-- **AC2** — Over a fixture record holding one row of every member of `PARK_KINDS`, the printed
-  `parked` and `noted` counts SUM to the number of parked rows, verified by the same suite.
+- **AC2** — Over a fixture record holding one row of every member of `PARK_KINDS`, **whose
+  `rescope` row's act is `retire`**, the printed `parked` and `noted` counts SUM to the number of
+  parked rows. The act is PINNED because with `add` the arm is green before the fix — an `add` row is
+  owed by neither alternation, so the counts already partition — and a class arm that passes against
+  the defect is the shape this build has now produced three times.
 - **AC3** — Both arms are observed RED against the predicate as `TOOL-aGradedMandate-5` leaves it,
   and that observation is recorded in this build's journal record before the fix lands.
-- **AC4** — `grep -c 'park_kinds_unowed' tools/unattended/unattended.sh` shows the function has
-  exactly one consumer besides its own definition, so the risk line in §5 is measured rather than
-  asserted.
+- **AC4** — `grep -c 'park_kinds_unowed' tools/unattended/unattended.sh` returns exactly **2**
+  after this unit lands — one definition and one consumer — and **it returns 2 today**, measured
+  before the edit. The criterion is therefore a NO-CHANGE assertion and says so: it fails if this unit
+  adds a second consumer, which is the risk §5 names. A grep-shaped criterion carries its measured
+  pre-edit value or it is an assertion about nothing.
 - **AC5** — `bash tools/unattended/check-unattended.sh` and
   `bash tools/unattended/run-unattended-gates.sh --selftests` are green.
 
@@ -119,6 +128,8 @@ none
   M4 exit rule: the loop went 2 blockers then 2 blockers, did not shrink, and stopped
   `NON-CONVERGENT`, so every blocker still standing becomes a unit rather than a fold.
 
+- rev-2 · 2026-08-31 · promotion-audit fold of H2, H3, M1 and M2. AC2's partition fixture PINS the rescope act to retire, because with add the arm is green before the fix; AC4 carries its measured pre-edit value of 2 and declares itself a no-change assertion; section 10 stops claiming a one-row-per-kind fixture the suite does not have; and section 5 stops claiming verb_status prints a zero it in fact omits.
+
 ## 10. Reuse audit
 
 The SET-level probes are recorded in `TOOL-aGradedMandate-1` §10.
@@ -128,9 +139,12 @@ declared home of the history class and already computes it by difference. This u
 computation rather than adding a second exclusion somewhere else, which is what keeps one question
 with one answer.
 
-The partition arm has no seam and is new. Its shape is borrowed from `unattended.test.sh`'s existing
-taxonomy arms, which already build a fixture record holding one row per kind — so the fixture is
-reused and only the assertion is written.
+The partition arm has no seam and NEITHER DOES ITS FIXTURE. No arm in `unattended.test.sh` builds a
+record holding one row per kind: the nearest build one `decision` plus two `proposal` rows, and the
+file carries exactly one raw parked-row append at `:3771`. The verb route cannot produce the set
+either — `--abort` terminates the record and an `override` row is written only by `--close` — so the
+one-row-per-kind fixture is NEW CONSTRUCTION by direct append, priced here rather than assumed as
+reuse.
 
 A STALE hit is recorded rather than trusted: `TOOL-aGradedMandate-5`'s rev-1 §10 named `:3348` and
 `:3340` for this function and `kinds_re`; both had drifted to `:3352` and `:3344` and were verified
