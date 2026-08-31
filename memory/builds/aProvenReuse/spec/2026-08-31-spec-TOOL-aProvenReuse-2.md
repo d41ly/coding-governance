@@ -1,12 +1,13 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-1 |
 
 <!-- /gen:spec-records -->
 
@@ -21,7 +22,7 @@ instead of passing in silence.
 ## 2. Scope (IN)
 
 - **S1** — `reuse-probed:machine` joins `DOD_CORE` in `tools/unattended/unattended.sh`.
-- **S2** — a `reuse-probed)` arm in `dod_met` with exactly four outcomes, each with its own message:
+- **S2** — a `reuse-probed)` arm in `dod_met` with exactly five outcomes, each with its own message:
   - **waived** — `reuse-first` appears in `recorded_waivers "$rel"`. MET, and `DOD_OUT` names the
     waiver and its recorded reason. This is the arm that ends the silent waiver.
   - **no log** — the log file does not exist. UNMET, and the message says the log is ABSENT rather
@@ -29,21 +30,67 @@ instead of passing in silence.
     the wrong repair.
   - **zero** — the log exists and holds no `query` row for this tree. UNMET, message names the
     remedy: run the probe, or override.
+  - **kit absent** — the adopting tree ships no `tools/memory-recall/query.py`. MET, and `DOD_OUT`
+    ANNOUNCES the skip, naming the kit that is not installed. This outcome is checked BEFORE `no
+    log`, and it exists because of round-1 finding 24: without it a CORE Definition-of-Done item is
+    structurally unmeetable in every adopter that took `unattended` without `memory-recall`, and
+    every `--close` there needs an override. A skip that announces itself is the
+    `pieces-complete|set-checks-recorded` idiom this arm already copies.
   - **met** — one or more. MET, and `DOD_OUT` reports the count and the newest row's timestamp, so
     the wrap-up carries a number rather than a verdict.
 - **S3** — the log is located as `$(git rev-parse --git-common-dir)/recall/queries.jsonl`, which is
   where `query.py`'s own `log_path()` puts it and where `recall-opened.js` reads it. The location is
   DERIVED by the same rule both existing readers use, never spelled as a path literal.
-- **S4** — a row belongs to this run when its `worktree` value names this run's tree. Comparison is
-  on the path with backslashes folded to forward slashes, because the logged value is written by
-  Python on Windows and carries `\` while the shell's own root carries `/`.
+- **S4** — a row belongs to this run when its `worktree` value EQUALS this run's tree. Three
+  properties, and each was a round-1 blocker:
+  - **The log is JSONL, so the separator is DOUBLE.** Measured on this node, the raw line reads
+    `"worktree": "C:\\projects\\coding-governance\\.claude\\worktrees\\<name>"` — two
+    backslash BYTES per separator, because Python's `json.dumps` escapes each one. An earlier
+    revision said the value "carries `\`" and folded single backslashes; that yields
+    `C://projects//coding-governance//...`, which matches no shell-derived root. Verified: the
+    naive fold returns `0` on a worktree holding three real query rows, so the item would have
+    reported `zero` — UNMET, "go run a probe" — for every conforming Windows run. That is exactly
+    the false verdict §4 says the item exists to prevent.
+  - **The fold is fold-then-squeeze.** `tr '\134' '/'` turns every backslash byte into a slash and
+    `tr -s '/'` collapses the resulting doubles. Octal `\134` rather than a quoted backslash: the
+    literal spelling makes GNU tr warn `an unescaped backslash at end of string is not portable`,
+    and a gate that prints a warning on every green run trains its reader to ignore it.
+  - **The compare is EXACT, on the extracted value.** Every worktree here lives under
+    `C:/projects/coding-governance/.claude/worktrees/`, so the PRIMARY tree's own logged value is a
+    strict PREFIX of all 100-odd linked-worktree rows. A substring test reports MET off another
+    tree's probes and prints an inflated count. The value is extracted with
+    `grep -o '"worktree": "[^"]*"'`, stripped of its field prefix and closing quote, normalized, and
+    compared with `grep -xF`. This is `memory/gotchas/id-matched-as-a-substring.md` on paths.
+  - The row filter is the literal `"type": "query"` **with the space**, which is what `json.dumps`
+    writes; `recall-opened.js` writes `"type":"opened"` with none, so the two spellings do not
+    collide and the filter cannot pick up an `opened` row.
 - **S5** — `CORE_FLOOR` moves `12:10` to `12:11` in `.unattended.conf` and in
   `tools/unattended/.unattended.conf.example`.
-- **S6** — the kit's SKILL and PROTOCOL templates lose the sentence asserting that waiving
-  `reuse-first` is silent and that nothing machine-checks a reuse section, because after this build
-  both halves of it are false, and both renders are refreshed. The kit version moves; the carriers
-  are whatever `bash tools/check-kit-versions.sh` names.
-- **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all four S2 outcomes.
+- **S6** — the SILENT-WAIVER sentence is retired from `tools/unattended/SKILL.template.md` and its
+  render `.claude/skills/unattended/SKILL.md`, at BOTH occurrences in each — line 113 ("Waiving it
+  is SILENT: the bar stays green…") and line 157 ("`reuse-first` is silent and is recommended
+  against"). Measured at fold time: `grep -c reuse-first` returns 0 for
+  `tools/unattended/PROTOCOL.template.md` and 0 for `memory/guides/UNATTENDED-PROTOCOL.md`, so
+  round-1's "two templates and two renders" model was wrong in both directions and is corrected
+  here. The PROTOCOL carriers lose nothing; they GAIN S6a's row.
+- **S6a** — `tools/unattended/PROTOCOL.template.md` gains a `reuse-probed` row in its
+  Definition-of-Done table, and the count sentence above it moves `Ten kit-owned core items.` to
+  `Eleven`. Both are obligations of S1, not optional polish: `check-unattended.sh` check 16 arm E
+  joins `DOD_CORE` to that table in BOTH directions and separately word-compares the count sentence
+  against the driver's set, and that leg is the unguarded `unattended kit gate`. Omitted, S1 reds the
+  merge bar twice. The render `memory/guides/UNATTENDED-PROTOCOL.md` is refreshed with it.
+- **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all FIVE S2 outcomes. The
+  `met` arm's fixture row is a byte copy of a real `query` row out of a live `queries.jsonl`,
+  escapes included, never one hand-authored from this spec — a fixture written from the same wrong
+  rule as the code agrees with the bug and certifies it. One further arm carries two rows whose
+  paths are prefix-related and asserts the nested one is not counted for the parent.
+- **S8** — the kickoff manifest's `last-audit` re-stamp. `memory/guides/SESSION-KICKOFF.md` watches
+  `.unattended.conf`, which S5 edits, and `kickoff-manifest ratchet` is the first leg in
+  `tools/gate-legs.json`.
+- **S9** — `tools/unattended/kit.toml` declares the memory-recall edge. It ships
+  `requires = ["memory-tree"]` and nothing else today, so an adopter has no way to learn that a CORE
+  DoD item now reads a file another kit writes. S2's `kit absent` outcome makes the item survive
+  without memory-recall; this makes the coupling READABLE.
 
 ## 3. Non-goals (OUT)
 
@@ -62,6 +109,10 @@ instead of passing in silence.
 - **N5** — making the item unoverridable. `authorization-reachable` and `pieces-complete` are the
   two items with no override and both are about authorization; this one is about diligence, and a
   run resumed on a node whose log does not carry the probe has a legitimate reason to override.
+- **N6** — making `memory-recall` a HARD `requires` of the unattended kit. S9 declares the edge and
+  S2's `kit absent` outcome keeps the item meetable without it; forcing every adopter to take a
+  second kit to close a run is a wider change than this unit's goal, and M3 veto 2 puts a new
+  install requirement outside a delegated resolver's authority.
 
 ## 4. Design
 
@@ -71,9 +122,12 @@ instead of passing in silence.
 |---|---|
 | `tools/unattended/unattended.sh` | S1 `DOD_CORE`; S2–S4 the `dod_met` arm |
 | `.unattended.conf`, `tools/unattended/.unattended.conf.example` | S5 `CORE_FLOOR` |
-| `tools/unattended/SKILL.template.md`, `PROTOCOL.template.md` | S6 the retired sentence, the new item |
-| `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-PROTOCOL.md` | S6 renders |
-| `tools/unattended/unattended.test.sh` | S7 |
+| `tools/unattended/SKILL.template.md` | S6 — the silent-waiver sentence, BOTH occurrences |
+| `tools/unattended/PROTOCOL.template.md` | S6a — the DoD table row and the count sentence |
+| `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-PROTOCOL.md` | S6/S6a RENDERS |
+| `tools/unattended/kit.toml` | S9 — the memory-recall edge |
+| `tools/unattended/unattended.test.sh` | S7 — five outcome arms plus the prefix arm |
+| `memory/guides/SESSION-KICKOFF.md` | S8 — the `last-audit` re-stamp |
 
 ### What this item claims, and what it does not
 
@@ -83,6 +137,11 @@ that the probe was run FOR this build, that its question was relevant, or that i
 A worktree reused across two builds carries the earlier build's rows and would satisfy the later
 one. That limit is accepted because the alternative — a time window — has a worse failure, N3's, and
 because the item's job is to make zero distinguishable from unmeasured, which it does.
+
+It also does not observe anything at all in an adopter without the memory-recall kit. There the
+`kit absent` outcome fires and says so, which is a SKIP and is reported as one. A skip that looks
+like a pass is indistinguishable from coverage, so the message names the missing kit rather than the
+missing log.
 
 ### Alternatives rejected
 
@@ -94,6 +153,10 @@ because the item's job is to make zero distinguishable from unmeasured, which it
   preflight, so the check would refuse every correct run.
 - **A new verb, `--record-probe`.** Rejected: it would ask the agent to attest what a log already
   records, which is the weaker of two available evidences and one more thing to forget.
+- **A hard `requires = ["memory-recall"]` on the kit.** Rejected at round 1 (finding 24) — see N6.
+- **Folding single backslashes, and matching the worktree as a substring.** Both were in rev-1 and
+  both were round-1 blockers, measured against the live log. They are recorded here rather than
+  quietly corrected because a later reader will reach for exactly these two shapes.
 - **Reading the log through `query.py`.** Rejected: the driver is POSIX shell with no Python
   dependency in this path, and the read is one `grep` over a line-oriented file. Adding a Python
   hop to parse JSON the shell can substring-match would make the driver depend on the memory-recall
@@ -106,17 +169,24 @@ is the documented path for every other unmet item.
 
 ### Rollout
 
-One commit with `TOOL-aProvenReuse-1`'s, or immediately after it. The item is inert for any run that
-has run a probe, which every conforming run has.
+Its OWN commit, after `TOOL-aProvenReuse-1`'s, which is what the `order 1` / `order 2` headers
+already say. The shared-commit option an earlier revision offered is withdrawn: M6 requires a commit
+per pass with the unit id in the subject, and two mechanisms in one commit make the M6 bug-class
+checklist over `HEAD~1..HEAD` cover both at once and leave the closing review unable to attribute a
+finding. The item is inert for any run that has run a probe, which every conforming run has.
 
 ## 5. Production-readiness checklist
 
 - **Security** — the driver reads one more file inside the git common dir, a directory it already
   writes to. No new input from outside the repo, no new write.
-- **Performance** — one `grep -c` over a file whose growth is one line per query. Bounded by nothing
-  today; the read is a single pass and the file is tens of KB after 169 records.
-- **Error states** — the four S2 outcomes are exhaustive over "file absent / no match / match", plus
-  the waiver short-circuit which precedes all three.
+- **Performance** — one filtered pass over a file whose growth is one line per query. Measured on
+  this node at fold time: **358 453 bytes over 174 rows**, an order of magnitude above the "tens of
+  KB" an earlier revision guessed. `memory/builds/aQuarriedLantern/spec/2026-08-03-spec-aQuarriedLantern-1.md`
+  already recorded the shape at 2 414 771 bytes over 676 rows. "Bounded by nothing" is acceptable
+  rather than unexamined: `memory/builds/aDrainedSluice/spec/units/2026-08-08-spec-aDrainedSluice-7-v6-recall-cache-cap.md`
+  considered capping `queries.jsonl` and declined it, and that decision stands.
+- **Error states** — the five S2 outcomes are exhaustive: the waiver short-circuit, then the absent
+  kit, then "file absent / no match / match" over the log.
 - **Observability** — `DOD_OUT` carries a distinct sentence per outcome, and `--close` already
   prints it. The count reaches the wrap-up through the same channel every other item uses.
 - **Testing** — S7.
@@ -124,34 +194,55 @@ has run a probe, which every conforming run has.
 
 ## 6. Acceptance criteria
 
-- **AC1** — with `reuse-first` recorded as waived, `--close` reports `reuse-probed` MET and the
-  message names the handle and its recorded reason. Observed against a fixture run-state file
-  carrying a waiver row.
+- **AC1** — with `reuse-first` recorded as waived, `bash tools/unattended/unattended.sh --close`
+  reports `reuse-probed` MET and the message names the handle and its recorded reason. Observed
+  against a fixture run-state file carrying a `waiver · item reuse-first` row.
 - **AC2** — with no log file present, `--close` reports `reuse-probed` UNMET and the message
-  contains the word `absent`, distinct from AC3's message.
-- **AC3** — with a log present holding no row for this tree, `--close` reports UNMET and names the
-  remedy.
+  contains the word `absent`, textually distinct from AC3's and AC3a's messages.
+- **AC3** — with a log present holding no `query` row for this tree, `--close` reports UNMET and
+  names the remedy.
+- **AC3a** — with `tools/memory-recall/query.py` absent from the tree, `--close` reports MET and the
+  message names the missing kit. This is the observable for S2's `kit absent` outcome, and without
+  it nothing distinguishes "the skip works" from "the skip was never exercised".
 - **AC4** — with a log holding at least one `query` row for this tree, `--close` reports MET and the
-  message carries the row count.
+  message carries the row count. **The fixture row is a byte copy of a real `query` row**, doubled
+  backslashes included, not one hand-authored from this spec. Measured now, this tree's live log
+  holds `3` such rows, so the arm has a real subject.
+- **AC4a** — a log holding one row for `C:/projects/coding-governance` and one for
+  `C:/projects/coding-governance/.claude/worktrees/<this tree>` counts exactly ONE for this tree and
+  exactly one for the parent. This is S4's exact-compare property, and it fails under any substring
+  test.
 - **AC5** — `bash tools/unattended/unattended.sh --close <slug> --override reuse-probed --reason "…"`
-  records the override as a parked entry, proving N5. The negative control: `--override
+  records the override as a parked entry, proving N5. Negative control: `--override
   authorization-reachable` is still refused, so this unit did not widen the no-override set.
 - **AC6** — `bash tools/unattended/check-unattended.sh` exits 0 with `CORE_FLOOR` at `12:11`, and
   reds with it left at `12:10`. The second half is the liveness assertion for the first.
-- **AC7** — `bash tools/unattended/unattended.test.sh` passes with S7's arms present.
-- **AC8** — `bash tools/check-kit-versions.sh` exits 0, and no tracked file still asserts that
-  waiving `reuse-first` is silent. Checked by grep over the tree, because the claim appears in two
-  templates and two renders and a fold that misses one leaves a document contradicting the code.
+- **AC6a** — the same command reds when S6a is omitted, on BOTH of check 16 arm E's joins
+  independently: once for a `DOD_CORE` item absent from the protocol's Definition-of-Done table, and
+  once for the count sentence still reading `Ten`. Two failures, two observations — a single check
+  run that goes green after fixing one of them would hide the other.
+- **AC7** — `bash tools/unattended/unattended.test.sh` passes with S7's arms present, and
+  `bash tools/unattended/run-unattended-gates.sh` exits 0. This IS kit work, so the self-tests the
+  2026-08-23 ruling took off the bar are owed here by the Definition of Done.
+- **AC8** — `bash tools/check-kit-versions.sh` exits 0 after the version move, and
+  `grep -rn "is SILENT" tools/unattended/ .claude/skills/unattended/` returns nothing. The grep is
+  scoped to the kit and its renders and deliberately EXCLUDES `memory/builds/`: this build's own
+  README quotes the retired sentence verbatim as its problem statement, and a tree-wide grep would
+  demand deleting the record of why the build exists.
+- **AC9** — `bash skills/session-kickoff/manifest-check.sh` exits 0 after S8's re-stamp.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` for the bar, which carries `unattended kit gate` and
-`unattended skill wiring` unguarded. `bash tools/unattended/run-unattended-gates.sh` for the kit
-self-tests, which the owner's 2026-08-23 ruling took off the bar and which this unit's AC7 owes
-because this IS kit work. `bash tools/check-kit-versions.sh` for AC8.
-What no gate here checks: that the log this item reads is the log the agent's probe wrote. The two
-are joined by a path both readers derive the same way, and a divergence would show as AC2's
-`absent` outcome rather than as a wrong verdict.
+`bash tools/run-gates/run-gates.sh` for the bar. Three legs are named because this unit reaches
+each: `kickoff-manifest ratchet` (S8), `unattended kit gate` (unguarded, and the leg S6a exists to
+satisfy) and `unattended skill wiring` (S6's renders).
+`bash tools/unattended/run-unattended-gates.sh` for the kit self-tests, which the owner's 2026-08-23
+ruling took off the bar and which AC7 owes because this IS kit work.
+`bash tools/check-kit-versions.sh` for AC8, `bash skills/session-kickoff/manifest-check.sh` for AC9.
+What no gate here checks, and all three are §4's stated limits rather than oversights: that the log
+this item reads is the log the agent's probe wrote; that the probe was run FOR this build rather
+than earlier in the same worktree; and anything at all in an adopter without the memory-recall kit,
+where the item reports a SKIP and says so.
 
 ## 8. Open questions
 
@@ -168,6 +259,18 @@ are joined by a path both readers derive the same way, and a divergence would sh
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-2 · 2026-08-31 · round-1 spec-audit fold. Blockers 13, 22 and 34 rewrote S4: the log is
+  JSON-escaped, so the separator is two backslash bytes and the rev-1 fold produced
+  `C://projects//…` and matched nothing — the item would have reported UNMET on every conforming
+  Windows run. Blocker 12 added S6a, the protocol DoD table row and the `Ten` -> `Eleven` count
+  sentence that check 16 arm E joins in both directions. Finding 24 added S2's `kit absent` outcome,
+  S9 and N6 — a CORE item reading another kit's file was structurally unmeetable for an adopter
+  without it. Finding 35 made the worktree compare EXACT rather than a substring, because the
+  primary tree's path is a prefix of every linked worktree's. Findings 4 and 27 corrected S6's
+  carrier set, measured: the sentence is in the SKILL template and its render TWICE each and in
+  neither PROTOCOL carrier. Finding 23 added S8. Finding 40 replaced a log-size figure that was an
+  order of magnitude low. Finding 20 withdrew the shared-commit rollout option. AC3a, AC4a and AC6a
+  are new observables the fold created.
 
 ## 10. Reuse audit
 

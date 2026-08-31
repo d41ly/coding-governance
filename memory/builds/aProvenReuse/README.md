@@ -59,8 +59,12 @@ verbatim under [prompts/](prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md).
 ## Build-level rules
 
 - **Classification (M2), written before acting**: both units were MISSING at open — no conforming
-  spec carried either id — and are authored by this run at Tier 1. Neither adds a write path, a
-  migration, an auth surface or a shared contract; both extend an existing checker in place.
+  spec carried either id — and are authored by this run at **Tier 2**. An earlier revision of this
+  line said Tier 1 and was corrected by the round-1 spec audit, findings 6 and 41. The tier is
+  load-bearing rather than bookkeeping here: `check-memory-hygiene.sh` runs `if (hdr ~ /Tier-1/)
+  next` before every section-body assertion, so under the Tier-1 reading unit 1's own predicate
+  would grade a population of zero. Tier 2 is also what the kickoff manifest's tier rule assigns —
+  each unit changes a kit's contract, and the pair is cross-kit.
 - **Two mechanisms, two units, and the split is the tracked/local boundary.** Unit 1's evidence is
   a tracked file, so it belongs on the merge bar and works in any clone. Unit 2's evidence is a
   node-local log in the git common dir, so it belongs to the driver and could never be a bar leg.
@@ -71,8 +75,28 @@ verbatim under [prompts/](prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md).
   either a cross-kit dependency (codebase-map reading a memory-recall convention) or a third
   telemetry format and a third kit version bump. It is not strictly beneficial, so protocol §11
   makes it a backlog row rather than an adoption.
-- **Neither unit may red a landed spec.** A predicate that reds 253 tracked files is not a gate, it
-  is a migration nobody asked for. The cutoff idiom is the whole reason this is landable.
+- **Neither unit may red a landed spec — and "landed" includes other branches.** A predicate that
+  reds 253 tracked files is not a gate, it is a migration nobody asked for, and the cutoff idiom is
+  the whole reason this is landable. Round 1 found the rule broken by the build that wrote it: at a
+  cutoff of this build's own date, 21 Tier-2 specs dated `2026-08-31` on three live sibling branches
+  fail the predicate and would red `memory hygiene` on `main` the moment either side merges. The
+  cutoff is therefore `2026-09-01`, which costs this build the ability to grade its own two specs.
+  That trade is recorded in unit 1's §4 Migration rather than hidden here.
+- **Two figures, two populations, and they are not interchangeable.** The 253 above is the ALL-TIERS
+  count over the 348 post-`SPEC10_CUTOFF` specs carrying a §10. The predicate only ever reaches the
+  264 Tier-2 specs that survive check 12's `Tier-1` cut, and 188 of those fail. Round 1 confirmed
+  the same confusion twice, findings 1 and 25, because an acceptance criterion had been pinned to
+  the wrong one.
+
+## Review rounds
+
+- **Round 1 · spec audit · BLOCKED · 4 confirmed blockers.** 41 raw findings, 20 confirmed, 21
+  refuted, precision 0.49, over 10 agents. The harness's SYNTHESIS agent died on a session limit and
+  wrote no report, so
+  [the record](reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) is derived from
+  the run journal and says so in its own header. Both specs folded to rev-2. The highest-value
+  finding: unit 1's log join was specified against the wrong bytes and would have shipped a
+  Definition-of-Done item that reported UNMET on every conforming Windows run.
 
 ## Parked decisions
 
@@ -82,8 +106,8 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aProvenReuse-1` | OPEN | hygiene check 12 grades §10's CONTENT, behind a declared cutoff |
-| 2 | `TOOL-aProvenReuse-2` | OPEN | a `reuse-probed` DoD item joins the run to the recall query log |
+| 1 | `TOOL-aProvenReuse-1` | SPECCED | hygiene check 12 grades §10's CONTENT, behind a declared cutoff |
+| 2 | `TOOL-aProvenReuse-2` | SPECCED | a `reuse-probed` DoD item joins the run to the recall query log |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -93,15 +117,15 @@ ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | OPEN | rev-1 | 2026-08-31 |
-| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | OPEN | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aProvenReuse-1 TOOL-aProvenReuse-2.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
