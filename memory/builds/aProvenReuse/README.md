@@ -155,7 +155,7 @@ ids TOOL-aProvenReuse-1 TOOL-aProvenReuse-2 TOOL-aProvenReuse-3 TOOL-aProvenReus
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff](spec/2026-08-31-spec-TOOL-aProvenReuse-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-31 |
-| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log](spec/2026-08-31-spec-TOOL-aProvenReuse-2.md) | 2 | 2 | SPECCED | rev-4 | 2026-08-31 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).

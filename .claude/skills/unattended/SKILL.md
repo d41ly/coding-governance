@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.12 -->
+<!-- gov:kit unattended@1.13 -->
 
 # Unattended runs
 
@@ -109,12 +109,14 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    per directive is how a method grows until nobody re-reads it, which is what its own budget exists
    to prevent.
 
-   Two rows carry a consequence worth knowing before you waive them. **`reuse-first` — recommend
-   against.** Waiving it is SILENT: the bar stays green over a build that skipped the reuse probes,
-   because nothing machine-checks a spec's reuse section for content. A waived run's spec §10 must
-   NAME the waiver, or the skip leaves no trace at all. **`land-once-done`** — waiving it does not
-   remove the Definition-of-Done item that observes completeness; that still owes an override at
-   close.
+   Two rows carry a consequence worth knowing before you waive them. **`reuse-first`** — waiving it
+   is no longer silent, and both halves that made it so are closed. The `reuse-probed` item reports
+   the waiver and its recorded reason at `--close`, and where the project sets a reuse-evidence
+   cutoff the memory gate refuses a spec whose §10 records neither the recall terms nor a probe
+   result. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
+   accepts as a finding, so naming it is also how the spec lands. **`land-once-done`** — waiving it
+   does not remove the Definition-of-Done item that observes completeness; that still owes an
+   override at close.
 1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
    `memory/builds/<slug>/README.md` that resolves at the anchor this project declares is the
    whole precondition. **This project's anchor scope is `published`.**
@@ -154,8 +156,9 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    the line and invents a handle gets a question, not a silent relaxation. Carry each confirmed pair
    into step 3 as `--waive <handle> --reason "<text>"`, repeatable.
 
-   Say what the waiver costs, for the two handles that have a consequence: `reuse-first` is silent
-   and is recommended against, and `land-once-done` still owes an override at close.
+   Say what the waiver costs, for the two handles that have a consequence: `reuse-first` surfaces at
+   close through the `reuse-probed` item and still owes its spec §10 a named waiver, and
+   `land-once-done` still owes an override at close.
 
    **From the next command onward there is nobody to ask.** The driver enforces that rather than
    trusting it — `--waive` is accepted by `--preflight` alone, and only while no run-state file

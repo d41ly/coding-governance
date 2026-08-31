@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: a3c23955a67bd9f75a6f6456a2e44003511ddb9c
-phase: REVIEWING
+witness: 693eec21ef7be2652abc1ef6c1a5fd0c42291260
+phase: BUILDING
 branch-sha: 3bfc5e877e1c416781bffa9e5bf5e1b1b7a27036
 branch-ref: refs/heads/branch/unattended-kit-gaps-a3b869
 mode: prompt

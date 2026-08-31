@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -108,8 +108,12 @@ instead of passing in silence.
 - **S8** — the kickoff manifest's `last-audit` re-stamp. `memory/guides/SESSION-KICKOFF.md` watches
   `.unattended.conf`, which S5 edits, and `kickoff-manifest ratchet` is the first leg in
   `tools/gate-legs.json`.
-- **S9** — the memory-recall coupling is documented in `tools/unattended/README.md`'s update notes,
-  NOT declared in `tools/unattended/kit.toml`. Round 2's F6 asked which field, and the answer is
+- **S9** — the memory-recall coupling is documented in `tools/unattended/.unattended.conf.example`,
+  beside the `CORE_FLOOR` key S5 moves, NOT declared in `tools/unattended/kit.toml`. **Rev-3 said
+  `tools/unattended/README.md`; that file does not exist** — this kit has no README, and its
+  adopter-facing prose is the conf example plus the rendered protocol. Corrected at build time
+  rather than papered over, because a spec naming a carrier that is not there is how the next reader
+  learns to distrust the inventory. Round 2's F6 asked which field, and the answer is
   none: `govkit.py:1114-1129` check 7 validates a `requires_if` edge by resolving every
   `when_any_key_set` member against the kit's own declared config key lists, and `.unattended.conf`
   declares no key that says whether memory-recall is installed. A hard `requires` is refused by N6.
@@ -196,7 +200,7 @@ At the ADOPTER level, S5 raises the DoD half of `CORE_FLOOR` from 10 to 11, and 
 REQUIRED from the project's own `.unattended.conf` rather than defaulted — `check-unattended.sh:387`
 refuses an undeclared one outright and `:430` reds when the declared floor sits below the kit's core
 count. So taking this kit version obliges an adopter to edit their own conf, and the step goes in
-`tools/unattended/README.md`'s update notes where they will read it. Round 2's F13 found this
+`tools/unattended/.unattended.conf.example` beside the key itself, where they will read it. Round 2's F13 found this
 section reading `None` while S5 moved the floor.
 
 ### Rollout
@@ -298,6 +302,10 @@ where the item reports a SKIP and says so.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-4 · 2026-08-31 · build-time correction. S9 and §4 Migration named `tools/unattended/README.md`
+  as the adopter-facing carrier; that file does not exist in this kit, so both now name
+  `tools/unattended/.unattended.conf.example`, beside the `CORE_FLOOR` key the same change moves.
+  M2 requires the spec to change before the code diverges from it, so this rev precedes the edit.
 - rev-3 · 2026-08-31 · round-2 spec-audit fold, at the loop's NON-CONVERGENT exit. Blocker F4 named
   the comparison's OTHER operand, `git rev-parse --show-toplevel`: reproduced, S4's pipeline returns
   3 against it and 0 against `pwd`. Blocker F3 and F5 rewrote AC8, whose directory-scoped grep

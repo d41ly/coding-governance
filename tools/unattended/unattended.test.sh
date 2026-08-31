@@ -769,6 +769,69 @@ ALIEN=$(git commit-tree "$(git rev-parse HEAD^{tree})" -m alien </dev/null)
 sed -i "s/^base: .*/base: $ALIEN/" memory/builds/tRun/RUN.md
 hit "$(run --close tRun)" "the BASE recorded in the run-state file is not an ancestor of the base this history derives"
 
+# ---- reuse-probed, all five outcomes (TOOL-aProvenReuse-2). The scratch repo ships no
+# ---- tools/memory-recall/query.py, so EVERY other close arm in this suite meets this item through
+# ---- the kit-absent skip and none of them changes. These five arms are what make the other four
+# ---- outcomes reachable at all.
+# ----
+# ---- THE `met` FIXTURE REPRODUCES A REAL ROW'S ESCAPING rather than copying a real row: the
+# ---- worktree here is a mktemp path, so a copied row names a tree this is not and could only ever
+# ---- produce the `zero` outcome. What must be copied is the DOUBLED BACKSLASH, because that is
+# ---- where the bug was -- a fixture authored from the same wrong rule as the code agrees with it.
+_rp_close() { run --close tRun --override closing-review-recorded --reason r --override build-complete --reason r; }
+_rp_log()   { printf '%s/recall/queries.jsonl' "$(cd "$(git rev-parse --git-common-dir)" && pwd)"; }
+# Windows-escape a forward-slashed path the way json.dumps writes it: / -> \\ , doubled.
+_rp_esc()   { printf '%s' "$1" | sed 's|/|\\\\|g'; }
+
+reset_tree; git push -q -f origin unit:main
+run --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> memory/builds/tRun/RUN.md
+fixture; git push -q -f origin HEAD:main
+
+# 1. KIT ABSENT — no query.py anywhere. MET, and it says which kit is missing.
+hit "$(_rp_close)" "this tree ships no memory-recall kit"
+
+# From here the kit exists, so the log outcomes become reachable.
+mkdir -p tools/memory-recall && : > tools/memory-recall/query.py
+
+# 2. LOG ABSENT — the kit is installed and nothing has ever written a log. UNMET, and the word is
+#    ABSENT, not zero: an operator who confuses "cannot answer" with "answered no" repairs the wrong
+#    thing.
+rm -f "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "the recall query log is ABSENT"
+miss "$out" "holds no query for this tree"
+
+# 3. ZERO — a log that exists and names only ANOTHER tree. UNMET, and it names the remedy.
+mkdir -p "$(dirname "$(_rp_log)")"
+printf '{"qid": 1, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc /c/somewhere/else)" > "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "holds no query for this tree"
+miss "$out" "is ABSENT"
+
+# 4. MET — one row naming THIS tree, escaped as json.dumps writes it. The count rides the message.
+printf '{"qid": 2, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)")" >> "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "1 recall query recorded for this tree"
+# ...and the PREFIX arm, which is the whole reason the compare is `grep -xF` and not a substring.
+# A row for the PARENT of this tree must not be counted for this tree. Under a substring test both
+# rows match and the count reads 2.
+printf '{"qid": 3, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(dirname "$(git rev-parse --show-toplevel)")")" >> "$(_rp_log)"
+out=$(_rp_close)
+hit "$out" "1 recall query recorded for this tree"
+miss "$out" "2 recall queries recorded for this tree"
+
+# 5. WAIVED — short-circuits every arm above, INCLUDING a log that would have said zero. This is the
+#    arm that ends the silent waiver, so it asserts the reason reaches the message.
+rm -f "$(_rp_log)"
+printf '\n2026-08-31T00:00:00Z waiver · item reuse-first · reason the owner said so\n' >> memory/builds/tRun/RUN.md
+out=$(_rp_close)
+hit "$out" "the reuse-first directive was waived at preflight"
+hit "$out" "the owner said so"
+miss "$out" "the recall query log is ABSENT"
+
+reset_tree; git push -q -f origin unit:main
+
 # BRANCH 4 — THE POINT OF THE UNIT: a run whose work is fully LANDED can close. Same degenerate
 # merge-base as branch 1, and the only difference is that the recorded base is no longer HEAD —
 # which is exactly the discriminator the merge-base cannot express.

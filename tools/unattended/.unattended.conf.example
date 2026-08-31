@@ -51,7 +51,19 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
-CORE_FLOOR="12:10"
+#
+# UPDATING FROM unattended 1.12 OR EARLIER: the DoD half moves 10 -> 11. Kit 1.13 adds the core item
+# `reuse-probed`, and the floor is shrink-only, so leaving it at 10 makes `check-unattended.sh`
+# check 3 red with "the declared floor sits below the kit's own core count". Bump it when you take
+# the version.
+#
+# WHAT `reuse-probed` READS, because it is the one core item that looks outside this kit: the query
+# log `tools/memory-recall/query.py` writes under the git common dir. That is a SOFT edge and it is
+# deliberately not a `requires` — an adopter who took this kit without memory-recall gets an
+# announced SKIP rather than an unmeetable item, and `kit.toml` declares no `requires_if` for it
+# because check 7 resolves such an edge against a condition KEY, and no key here says whether
+# another kit is installed. Written down rather than declared, so the coupling is at least readable.
+CORE_FLOOR="12:11"
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
