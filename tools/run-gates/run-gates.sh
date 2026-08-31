@@ -543,7 +543,13 @@ if [ "$CEIL_WANT" = 0 ] && [ "$CEILINGS_LIVE" = 1 ]; then
     echo "=============================================================================" >&2
   fi
 fi
-if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$CEILINGS_LIVE" = 0 ]; then
+# THE CAPABILITY, not the policy — the second site of that distinction and the one I missed first
+# time. This message blames a missing `timeout` binary, so it may only fire when the binary is
+# missing. When the OWNER turned enforcement off instead, the declared knob stays on the profile line
+# (it is a true statement about the row) and the separate `ceilings` field says it is not enforced.
+# Two fields, two facts; zeroing the knob here made the line report a policy choice as a capability
+# gap AND blinded the canary arm that asserts GATE_JOBS is width-only.
+if [ "$PROF_TIMEOUT" -gt 0 ] && [ "$HAVE_TIMEOUT" = 0 ]; then
   echo "run-gates: profile '$PROF_NAME' asks for a ${PROF_TIMEOUT}s per-leg timeout but timeout does not run here — the knob is INERT this run" >&2
   PROF_TIMEOUT=0
 fi

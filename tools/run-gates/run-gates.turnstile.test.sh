@@ -16,6 +16,12 @@
 # graded the node's clock rather than the runner, and red three consecutive pushes on a tree it had
 # already passed.
 set -u
+# THE TURNSTILE SHIPS DISABLED (TOOL-aGatheredDeclaration-5), so this suite must ASK for its own
+# subject. Without this every arm below drives a mechanism that is off, asserts nothing, and the
+# assertion floor is the only thing that notices -- which is exactly what happened: 61 against a
+# pinned 62. Arms that deliberately test the DISABLED path set GATE_TURNSTILE=0 themselves and
+# override this; the shipped-default arm at the end reads the declaration instead.
+export GATE_TURNSTILE=1
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -30,7 +36,7 @@ bad=0
 # Raised from 42 to 62 by TOOL-aReapedTicket-3, which adds arms 15-21 — the QUEUE side, which this
 # suite had no arm for at all. The 20 they contribute were counted by running them, not derived on
 # paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
-FLOOR_ASSERTIONS=62
+FLOOR_ASSERTIONS=65
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -675,6 +681,25 @@ fi
 # fix. `TOOL-aBoundedCeiling-8` records arm 4c grading a source COMMENT and thereby asserting
 # nothing; this asserts that three real statements appear in the required order, so an edit that
 # moves the trap back inside the winning branch reds here rather than shipping the wedge again.
+# ---- THE SHIPPED DEFAULT, which every arm above overrides ------------------------------------
+# TOOL-aGatheredDeclaration-5 AC1 and AC2. This suite exports GATE_TURNSTILE=1 at the top because its
+# subject ships DISABLED; without an arm for the shipped state it proves nothing about what an
+# adopter actually gets -- the fixture-passes-by-finding-nothing shape unit 5's own F1 refuses by
+# name. The first spelling of THIS arm called a helper that does not exist, so its `&&` block never
+# ran and the assertion count did not move: the class, committed inside the arm written against it.
+#
+# TWO assertions, and the second is what makes the first mean something. Disabled must mean the run
+# CREATES nothing; it must NOT mean the run reaps whatever it finds, so a planted beacon SURVIVES.
+RD=$tmp/shipped; mk_repo "$RD" || { echo "turnstile-test: cannot build scratch"; exit 2; }
+legs "$RD" '[{"name":"q","argv":["bash","-c","true"],"chunk":"c","subject":"repo","ceiling":60}]'
+BD=$(beacon "$RD"); QD=$(queue "$RD")
+mkdir -p "$BD"
+( cd "$RD" && env GATE_TURNSTILE= GATE_FULL=1 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ) || true
+[ -d "$BD" ]   && ok "the shipped default leaves a planted beacon alone — disabled is not reaped"   || nope "a run with the turnstile at its shipped default DELETED a beacon it did not own"
+rm -rf "$BD" "$QD"
+( cd "$RD" && env GATE_TURNSTILE= GATE_FULL=1 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ) || true
+{ [ ! -d "$BD" ] && [ ! -d "$QD" ]; }   && ok "the shipped default creates no beacon and no queue"   || nope "the turnstile ships ENABLED — a default run created a beacon or a queue"
+
 rgs=$ROOT/tools/run-gates/run-gates.sh
 tl=$(grep -n 'TS_TICKET="\$TS_Q/' "$rgs" | head -1 | cut -d: -f1)
 pl=$(grep -n "^  trap 'ts_drop_ticket' EXIT" "$rgs" | head -1 | cut -d: -f1)

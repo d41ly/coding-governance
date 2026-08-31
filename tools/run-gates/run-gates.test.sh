@@ -44,7 +44,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=132
+FLOOR_ASSERTIONS=135
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -249,7 +249,7 @@ CEILPY
 # A SCRATCH REPO, cwd and all. $KITDIR/run-gates.sh is absolute and GATE_LEGS is explicit, so
 # nothing else moves; the runner's git dir and the turnstile beacon both follow cwd.
 _cr=$(mktemp -d); ( cd "$_cr" && git init -q . && git commit -q --allow-empty -m base ) >/dev/null 2>&1
-_bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+_bout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_CEILINGS=1 GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_bout" in
   *"GATE FAIL  slow bounded"*"timed out after 2s"*) ;;
   *) echo "canary: a leg declaring \"ceiling\": 2 over a 45s command was not reported as timed out —"
@@ -260,11 +260,31 @@ esac
 
 # 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
 #     that reds every long leg for any reason would read as proof that ceilings work.
-_uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+_uout=$(cd "$_cr" && GATE_LEGS="$_cd/unbounded.json" GATE_CEILINGS=1 GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
 case "$_uout" in
   *"timed out after"*) echo "canary: a leg declaring NO ceiling was reported as timed out, so the arm above"
                        echo "canary: does not discriminate and proves nothing about the ceiling."
                        fail=1 ;;
+esac
+
+# 1e-shipped: THE DEFAULT STATE, which is the one this suite would otherwise never exercise.
+#     TOOL-aGatheredDeclaration-4 makes ceiling ENFORCEMENT owner opt-in and ships it OFF, so every
+#     arm above now asks for it with GATE_CEILINGS=1. An arm set that only ever drives the
+#     non-default path proves nothing about what ships -- the same rule unit 5's own F1 states about
+#     the turnstile -- and this repo names that shape fixture-passes-by-finding-nothing.
+#
+#     Enforcement OFF must produce STRICTLY MORE evidence, never less: the identical over-ceiling leg
+#     RUNS TO COMPLETION and is reported ok, and the banner says so on stderr.
+n=$((n+1))
+_dout=$(cd "$_cr" && GATE_LEGS="$_cd/bounded.json" GATE_FULL=1 bash "$KITDIR/run-gates.sh" 2>&1)
+case "$_dout" in
+  *"timed out after"*) echo "canary: with enforcement at its SHIPPED default a leg over its ceiling was still"
+                       echo "canary: KILLED, so [bar].enforce_ceilings=false is not reaching the runner"; fail=1 ;;
+esac
+case "$_dout" in
+  *"CEILINGS NOT ENFORCED"*) ;;
+  *) echo "canary: enforcement is off and the run did not SAY so — a green earned unbounded must never"
+     echo "canary: be mistakable for one earned bounded, and the banner is half of that promise"; fail=1 ;;
 esac
 
 # 1e-report: an unbounded leg is COUNTED and never refused. spec-1 S6 -- the runner cannot tell a
@@ -1153,7 +1173,7 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 if [ "$HAVE_TIMEOUT" = 1 ]; then
-  o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
+  o=$(runp GATE_CEILINGS=1 GATE_PROFILES=fx/tbl-tight.txt)
   # THE LEG'S CLOCK, NOT THE PROCESS TREE'S. The first spelling subtracted two WHOLE-RUN wall clocks,
   # so the runner's fixed startup — measured at 19 s on node `a`, against a 17 s signal — sat inside
   # both terms along with its jitter. Three sequential pairs of this very fixture gave differences of
@@ -1187,7 +1207,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
 ]
 JSON
 n=$((n+1))
-  o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
+  o=$(runp GATE_CEILINGS=1 GATE_PROFILES=fx/tbl-tight.txt)
   printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(]timed out after 3s(, killed)?[)]$' \
     || { echo "canary: a leg that IGNORES SIGTERM was not reported with a timeout tail — the kill-after escalates to SIGKILL and that path exits 137, not 124, so it is the one case -k exists for"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   cat > "$P/tools/gate-legs.json" <<'JSON'
