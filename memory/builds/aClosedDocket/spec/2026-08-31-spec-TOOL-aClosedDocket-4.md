@@ -1,10 +1,12 @@
 # TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one
 
-**Status:** OPEN · rev-1 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 4 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-08-31-review-TOOL-aClosedDocket-4-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aClosedDocket-4-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -19,8 +21,16 @@ rule and the gate contradict each other and the first fold reds the bar permanen
 ## 2. Scope (IN)
 
 - **S1** — `--review` accepts a `--disposition fold|promote` flag, recorded on the round row it
-  already writes. It is REQUIRED when the verdict it computes is NON-CONVERGENT or CEILING and
-  refused otherwise, so the fact exists exactly where the exit does and nowhere else.
+  already writes. It is REQUIRED when the STATE `review_state` computes is `NON-CONVERGENT` or
+  `CEILING`, and refused otherwise, so the fact exists exactly where the exit does and nowhere else.
+- **S1a** — **the trigger is the computed STATE, never the verdict, and rev-1 had that wrong twice
+  over.** `--verdict` is CALLER-SUPPLIED and validated against the closed
+  `REVIEW_VERDICTS="CLEAN|CLEAN WITH FIXES|BLOCKED"` (`unattended.sh:444`, refused at `:3533-3535`);
+  `NON-CONVERGENT` is not a member of it and never was. What the verb computes is the STATE, in
+  `review_state` (`:3500`, called at `:3578`). Read literally, rev-1's trigger could never fire — and
+  worse, its AC3 was already satisfied by the pre-existing closed-set refusal, so that criterion
+  passed today with the unit unbuilt. The ORDERING follows: the flag is validated AFTER `review_state`
+  returns, because before that call there is nothing to key on.
 - **S2** — the flag joins the driver's existing refusal vocabulary: an unknown value is refused
   naming the legal set, on the same footing as `--verdict`'s closed `REVIEW_VERDICTS`. Round 2
   established that `verb_review` takes only slug, subject, verdict and blockers today, so this IS a
@@ -30,10 +40,27 @@ rule and the gate contradict each other and the first fold reds the bar permanen
   subject's exit row carries `disposition fold`. The existing promotion arm is untouched.
 - **S4** — the refusal text names both dispositions, so a run that recorded neither is told what is
   missing rather than being told it failed to promote.
+- **S4a** — `verb_review`'s own SUCCESS lines at `unattended.sh:3591-3592` hard-code promotion as the
+  only disposition, in the sentence a run reads at the moment it exits. They belong to neither
+  `TOOL-aClosedDocket-1` (a document) nor rev-1 of this unit (a refusal and a gate clause), so they
+  were about to be left saying the opposite of the rule. They move here.
+- **S4b** — clause 3's own message at `check-unattended.sh:301,:305` says a subject "exited without
+  promoting". Rev-1 fixed the DRIVER's refusal and left the GATE's wording — the same
+  document-contradicts-gate defect this whole unit exists to close, one file over.
 - **S5** — arms for both directions: a fold-recorded exit passes, and the same fixture with the
-  disposition removed still reds naming the subject.
-- **S6** — the unattended kit version moves; the protocol's own description of clause 3 and of the
-  `--review` verb moves with it, and the render regenerates.
+  disposition removed still reds. **It reds naming the FILE and the count, not the subject** — clause
+  3's promotion arm at `check-unattended.sh:299,:301` deliberately prints no subject, because its own
+  comment records that a per-subject attribution is not available for the id delta. Emitting one to
+  satisfy a nicer assertion would strand the verbatim expectation at
+  `check-unattended.test.sh:710`.
+- **S6** — the unattended kit version moves. The carriers are BOTH constant lines
+  (`unattended.sh`, `check-unattended.sh`) and ALL THREE shipped templates —
+  `SKILL.template.md`, `PROTOCOL.template.md` and `PLAYBOOK-TEMPLATE.template.md`, the third of which
+  rev-1 omitted — plus their renders. `check-kit-versions.sh` derives the template population from
+  the tree rather than a list, which is why omitting one reds rather than drifting.
+- **S6a** — the new `fail` branches S2 and S4 add are graded by the unguarded `check-arms` merge-bar
+  leg, and `ARMS_FLOORS` pins `unattended.sh` at `104:101`. That pin moves with the branches or the
+  leg reds; rev-1 named neither the leg nor the pin.
 
 ## 3. Non-goals (OUT)
 
@@ -100,8 +127,11 @@ on the first fold. They are ordered, not optional.
 - **Performance** — clause 3 gains one `grep` over a file it already reads per run-state file.
 - **Error states** — S2's refusal for an unknown value; S1's refusal for the flag in the wrong state;
   S4's refusal text when neither disposition is recorded.
-- **Observability** — the round row carries the disposition, so `--status` and the wrap-up derivation
-  read it with everything else on that line.
+- **Observability** — the round row carries the disposition, and clause 3 reads it. **Rev-1 also
+  claimed `--status` and the wrap-up derivation read it, and both are false**: `verb_status` only
+  COUNTS review rows into `noted`, and `BUILD-METHOD` M9 excludes `history`-class entries from the
+  wrap-up. Naming a reader that does not read is how a field gets built for an audience it never
+  reaches.
 - **Testing** — S5, both directions, on both sides of the join.
 - **Migration/rollback** — N4: landed records keep passing through the promotion arm. Revert is a
   revert; no state moves.
@@ -113,8 +143,11 @@ on the first fold. They are ordered, not optional.
   the run-state file.
 - **AC2** — the same call with `--disposition nonsense` is REFUSED and the message names the legal
   set. Observed, not read off the source.
-- **AC3** — the same call with a CONVERGING verdict is REFUSED by
-  `bash tools/unattended/unattended.sh --review`, because the field has no referent there.
+- **AC3** — the same call on a round whose computed STATE is `CONVERGING` is REFUSED by
+  `bash tools/unattended/unattended.sh --review`, because the field has no referent there. **The
+  fixture must drive a real CONVERGING state**, not merely pass a legal `--verdict`: rev-1's wording
+  was satisfied by the pre-existing closed-set refusal at `:3533`, so it passed with the unit
+  unbuilt — an acceptance criterion that could not fail.
 - **AC4** — a NON-CONVERGENT exit recorded with NO disposition is refused by `--review` naming both
   options, which is S4.
 - **AC5** — a fixture run-state file with a fold-recorded exit and NO new unit id since BASE passes
@@ -126,9 +159,13 @@ on the first fold. They are ordered, not optional.
 - **AC7** — a fixture recording a PROMOTED exit with a new id and no disposition still passes
   `bash tools/unattended/check-unattended.sh`, proving the existing arm is untouched, which is N4's
   observable.
-- **AC8** — `bash tools/unattended/check-unattended.sh` and
-  `bash tools/unattended/run-unattended-gates.sh` both exit 0, and
-  `bash tools/check-kit-versions.sh` exits 0 after the version move.
+- **AC8** — `bash tools/unattended/check-unattended.sh` exits 0;
+  `bash tools/unattended/run-unattended-gates.sh --selftests` exits 0, with the flag NAMED because
+  the bare call defaults away from the self-tests and skips `adopt --check`; and
+  `bash tools/check-kit-versions.sh` exits 0 after S6's five carriers move together.
+- **AC9** — `python tools/memory-tree/check-arms.py` exits 0 with `ARMS_FLOORS` raised to match the
+  new branch count, and reds with the pin left where it is. The second half is what proves the pin
+  is doing anything.
 
 ## 7. Gates
 
@@ -156,6 +193,17 @@ disposition was recorded rather than that it was right.
 
 ## 9. Revision log
 
+- rev-2 · 2026-08-31 · round-1 spec-audit fold, the terminating audit M4 requires of a promoted
+  unit. Blocker B1: S1 keyed the flag on "the verdict it computes" and `verb_review` computes no
+  verdict — `--verdict` is caller-supplied against a closed set that does not contain
+  `NON-CONVERGENT`, which is a computed STATE. Read literally the trigger could never fire, and AC3
+  passed today via the pre-existing closed-set refusal, with the unit unbuilt. H1 corrected S5: clause
+  3's promotion arm prints no subject by design. H2 and H3 added S4a and S4b — the driver's own
+  success lines and the gate's own message both still say promotion is the only disposition, and
+  belonged to no unit. M1 found a third template carrier and the `--selftests` default. M2 added the
+  `check-arms` leg and its `ARMS_FLOORS` pin. M3 deleted two claimed readers that do not read.
+  Recorded as CLEAN and not re-derived next time: S3's second arm IS buildable, N4 holds against all
+  nine tracked run-state files recording a non-convergent exit, and Q1/Q2 are sound.
 - rev-1 · 2026-08-31 · authored at round 2's NON-CONVERGENT exit, PROMOTED out of
   `TOOL-aClosedDocket-1` as blocker B2's disposition. M2 states verbatim that a separate document,
   gate, adopter or generated artifact is a separate unit with its own id and spec, and rev-2 of that

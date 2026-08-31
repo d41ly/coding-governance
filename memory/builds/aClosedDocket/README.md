@@ -83,14 +83,14 @@ ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedD
 | [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | OPEN | rev-3 | 2026-08-31 |
 | [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-4 | 2026-08-31 |
 | [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | OPEN | rev-3 | 2026-08-31 |
-| [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | OPEN | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aClosedDocket-4.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aClosedDocket-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
