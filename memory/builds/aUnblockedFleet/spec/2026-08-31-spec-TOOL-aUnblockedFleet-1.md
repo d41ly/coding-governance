@@ -1,11 +1,12 @@
 # TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 117de044 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aUnblockedFleet-1-acceptance-ledger.md](../build/2026-08-31-build-TOOL-aUnblockedFleet-1-acceptance-ledger.md) | journal | TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 | [2026-08-31-prompt-TOOL-aUnblockedFleet-1-1.md](../prompts/2026-08-31-prompt-TOOL-aUnblockedFleet-1-1.md) | research | — |
 | [2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-1-specs-round1.md) | spec-audit | TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 |
 | [2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md](../reviews/2026-08-31-review-TOOL-aUnblockedFleet-6-specs-round2.md) | spec-audit | TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 |

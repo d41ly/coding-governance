@@ -114,21 +114,21 @@ and why the run refused it.)*
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-08-31 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-08-31 · streams tooling
 ids TOOL-aUnblockedFleet-1 TOOL-aUnblockedFleet-2 TOOL-aUnblockedFleet-3 TOOL-aUnblockedFleet-4 TOOL-aUnblockedFleet-5 TOOL-aUnblockedFleet-6 TOOL-aUnblockedFleet-7 TOOL-aUnblockedFleet-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-1 — the driver stops refusing a run because another build is live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-2 — the merge bar stops reddening because two builds are live](spec/2026-08-31-spec-TOOL-aUnblockedFleet-2.md) | 3 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aUnblockedFleet-6 — the merge bar's turnstile stops eating the unattended close's deadline](spec/2026-08-31-spec-TOOL-aUnblockedFleet-6.md) | 3 | 2 | WONTDO | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 4 | 1 | SPECCED | rev-3 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 5 | 1 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 6 | 1 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-3 — the protocol and the Skill state the rule the code now runs](spec/2026-08-31-spec-TOOL-aUnblockedFleet-3.md) | 4 | 1 | CLOSED | rev-3 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-4 — the arms, each with its failing case observed](spec/2026-08-31-spec-TOOL-aUnblockedFleet-4.md) | 5 | 1 | CLOSED | rev-2 | 2026-08-31 |
+| [TOOL-aUnblockedFleet-5 — the records this build closes, narrows and files](spec/2026-08-31-spec-TOOL-aUnblockedFleet-5.md) | 6 | 1 | CLOSED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
