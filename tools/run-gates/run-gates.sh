@@ -1081,6 +1081,7 @@ try:
             data.append({"name": l.get("name"), "argv": l.get("argv"),
                          "guard": l.get("guard", []), "impure": l.get("impure", False),
                          "chunk": l.get("chunk", ""), "lane": l.get("lane", "heavy"),
+                         "tool": l.get("tool") or "",
                          # Field 6 is `subject` and TOML DECLARES NONE, so it is emitted EMPTY
                          # rather than invented. Deriving it from `opt_in` was tried and is wrong:
                          # the six legs whose subject is `repo` and whose chunk is `selftests` are
@@ -1163,18 +1164,22 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
          # is on the wire before anything dispatches on it: a column --manifest invented would be
          # a second answer to a question the declaration already gives.
          + "\x1e" + (l.get("lane") or "")
+         # THE TENTH FIELD, the tool a leg needs. Appended for the reason every field since the
+         # sixth was: one inserted before an existing one is parsed AS that one by a reader that
+         # has not moved in the same commit.
+         + "\x1e" + (l.get("tool") or "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); optins=(); lanes=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); optins=(); lanes=(); legtools=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce oi ln <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce oi ln tl <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); optins+=("${oi:-}"); lanes+=("${ln:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); optins+=("${oi:-}"); lanes+=("${ln:-}"); legtools+=("${tl:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -1226,6 +1231,19 @@ for ((i=0; i<total; i++)); do
   # and a shard that silently declined to run it would be indistinguishable from one that ran and
   # passed. Everything not named is dropped. Selection is by exact name; the refusal below prints
   # near-misses, which gives an operator the benefit of a glob without a matching rule to specify.
+  # THE TOOL PROBE (TOOL-aGatheredDeclaration-8 S5). A leg may declare the binary it needs, and an
+  # unusable one is a FAIL naming the tool -- never a skip and never a pass. That direction is the
+  # whole point: a missing interpreter that SKIPPED would make the bar quieter exactly when it has
+  # stopped checking, which is the green-by-absence class this repo names. Harvested from an adopter
+  # that has had it for months; gov declares `tool` on no leg yet, so this changes nothing here and
+  # is ready for the first leg that needs it.
+  #
+  # Probed BEFORE the shard and guard passes, because "the binary is missing" is true of a leg
+  # whether or not this run selected it, and an operator sharding onto that leg deserves the real
+  # answer rather than a skip.
+  if [ -n "${legtools[$i]}" ] && ! command -v "${legtools[$i]}" >/dev/null 2>&1; then
+    printf 'notool' > "$WORK/$i.rc"; continue
+  fi
   if [ ${#SHARD[@]} -gt 0 ]; then
     _want=no
     for _s in "${SHARD[@]}"; do [ "$_s" = "${names[$i]}" ] && { _want=yes; break; }; done
@@ -1531,7 +1549,14 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
   rc=$(cat "$WORK/$i.rc")
-  if [ "$rc" = shardout ]; then
+  if [ "$rc" = notool ]; then
+    # A FAILURE, counted as one. The leg declared a binary this host does not have, so the check it
+    # performs did not happen -- and a bar that reports that as anything other than red is a bar
+    # that got quieter when it stopped checking.
+    fails=$((fails+1)); c_fail=$((c_fail+1))
+    printf 'GATE FAIL  %s  (declares tool %s, which is not executable here)
+' "${names[$i]}" "${legtools[$i]}"
+  elif [ "$rc" = shardout ]; then
     # THE SIXTH VERB. It is not `skip`, whose tail says `unchanged vs <branch>` and would be false
     # here, and it is not `held`, whose tail names an environment variable that would not help. It is
     # also NOT counted into `skips`: `skips` is conjoined into the `gate-full-green` stamp, and a
