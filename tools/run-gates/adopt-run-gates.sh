@@ -22,6 +22,11 @@ print_usage() {
 usage: adopt-run-gates.sh [--check] [--target <dir>]
   --check           read-only: assert the target's [gate_runner] declaration still matches the
                     installed runner's output strings. Writes nothing, ever.
+  --upgrade         convert the target's JSON leg manifest into <prefix>/gate-legs.toml, carrying
+                    the prose its source could only hold as data. REPORTS what else must move; it
+                    never edits the target's own files and never deletes the legacy manifest.
+  --dry-run         with --upgrade: print the TOML and write nothing.
+  --force           with --upgrade: overwrite an existing gate-legs.toml.
   --target <dir>    the adopting repo. Defaults to the tree this kit is installed in.
 USAGE
   exit 2
@@ -29,9 +34,14 @@ USAGE
 
 MODE=adopt
 TARGET=""
+DRY=0
+FORCE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --check)  MODE=check; shift ;;
+    --upgrade) MODE=upgrade; shift ;;
+    --dry-run) DRY=1; shift ;;
+    --force)   FORCE=1; shift ;;
     --target) [ $# -ge 2 ] || print_usage; TARGET=$2; shift 2 ;;
     -h|--help) print_usage ;;
     *) echo "adopt-run-gates: unknown argument '$1'" >&2; print_usage ;;
@@ -71,6 +81,67 @@ tgt_top=$(cd "$TARGETN" && git rev-parse --show-toplevel 2>/dev/null) || tgt_top
 # operands share one spelling; a `pwd`-vs-`rev-parse` strip is the defect above.
 KITREL=$(cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null); KITREL=${KITREL%/}
 [ -n "$KITREL" ] || KITREL="."
+
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# ================= --upgrade (TOOL-aGatheredDeclaration-7) =======================================
+# DISPATCHED HERE, before the [gate_runner] declaration is read. Converting a manifest must not
+# require that declaration to be current: a target whose deploy.toml has drifted is exactly the
+# target most likely to need this verb, and refusing it there would make the tool unreachable from
+# the state it exists to leave.
+if [ "$MODE" = upgrade ]; then
+  # The manifest is the kit dir SIBLING, derived rather than spelled -- the runner's own rule, so a
+  # one-segment install resolves it at any prefix.
+  PREFIX=$(dirname "$KITREL"); [ "$PREFIX" = "." ] && PREFIX=""
+  _mdir=$TARGET${PREFIX:+/$PREFIX}
+  PYBIN=$(resolve_python) || { echo "adopt-run-gates: no usable python" >&2; exit 2; }
+  # THE INTERPRETER PROBE RUNS BEFORE ANYTHING IS WRITTEN. run-gates.sh PREFERS gate-legs.toml
+  # wherever it exists, so writing one into a target whose python predates 3.11 converts a working
+  # merge bar into a dead one, and --force is discoverable only after the breakage.
+  if ! "$PYBIN" -c "import tomllib" 2>/dev/null; then
+    _v=$("$PYBIN" -c "import sys; print(sys.version.split()[0])" 2>/dev/null || echo "version unknown")
+    echo "adopt-run-gates: $TARGET resolves python to $PYBIN ($_v), which cannot import tomllib." >&2
+    echo "adopt-run-gates: gate-legs.toml needs CPython 3.11+ and the runner PREFERS it wherever it" >&2
+    echo "adopt-run-gates: exists, so writing one here would leave this target with a manifest its" >&2
+    echo "adopt-run-gates: own bar cannot read. Refusing; nothing was written." >&2
+    exit 2
+  fi
+  _src="$_mdir/gate-legs.json"
+  [ -f "$_src" ] || { echo "adopt-run-gates: no ${PREFIX:+$PREFIX/}gate-legs.json in $TARGET to convert" >&2; exit 2; }
+  "$PYBIN" "$KITDIR/upgrade_manifest.py" "$_src" "$TARGET/$KITREL/gate-profiles.txt" \
+      "$_mdir/gate-legs.toml" "$DRY" "$FORCE" "$TARGET" || exit $?
+  exit 0
+fi
+
 
 RUNNER="$KITDIR/run-gates.sh"
 [ -f "$RUNNER" ] || { echo "adopt-run-gates: no runner at $RUNNER — this kit is not installed here" >&2; exit 2; }

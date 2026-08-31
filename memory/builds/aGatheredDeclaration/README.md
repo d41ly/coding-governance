@@ -92,10 +92,10 @@ ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclar
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | OPEN | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | OPEN | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | OPEN | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | OPEN | rev-4 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-2 | 2026-08-31 |

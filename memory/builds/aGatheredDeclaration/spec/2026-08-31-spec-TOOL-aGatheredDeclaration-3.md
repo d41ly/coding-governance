@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`
 
-**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
+**Status:** INPROGRESS · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

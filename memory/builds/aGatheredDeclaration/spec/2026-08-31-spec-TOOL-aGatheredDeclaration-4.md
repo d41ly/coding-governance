@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF
 
-**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
+**Status:** INPROGRESS · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
