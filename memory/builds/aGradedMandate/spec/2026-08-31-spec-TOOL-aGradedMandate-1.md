@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,19 @@ nothing re-evaluates it, so the term costs nothing today; and a record whose clo
 five blockers is exactly the state this term exists to refuse, so carving it out would be carving
 out the case.
 
+**There are TWO live records and the second is this run's own.** Round 2 of the spec audit found the
+census above omitting it, which is the one direction that matters: `memory/builds/aGradedMandate/RUN.md`
+is the record that will actually reach `--close`. Its review rows are keyed `aGradedMandate-specs`,
+and the subject join is EXACT (`review_counts`, `unattended.sh:3438`, `if (item != subj) next`), so
+a spec-audit row does not satisfy a join on the bare slug.
+
+**Which side gives is stated here rather than left to the run's head: S1 keeps the exact join, and
+this build's CLOSING diff review must record its rounds under the bare slug `aGradedMandate`.** A
+prefix match was rejected — `aGradedMandate-specs` and a hypothetical `aGradedMandateFoo` are
+different risks and only the first is wanted, so loosening the join to admit one admits the other.
+Seven records in the corpus already key a closing round on the bare slug, so the convention exists;
+what this unit adds is the dependency being written down.
+
 ### Alternatives rejected
 
 Anchoring `## Verdict:` on the selected review record — see §3. Requiring `CONVERGED` specifically —
@@ -117,11 +131,14 @@ promotion clause already grades.
 - **AC5** — `grep -c "46 records" tools/unattended/unattended.sh` returns `0`, and the replacement
   sentence names the measured 208/170 pair.
 - **AC6** — `bash tools/unattended/run-unattended-gates.sh --checks` stays green.
-- **AC7** — Before the term is wired, the candidate predicate is run over every tracked `RUN.md`
-  with `GIT ls-files`, printing hits AND near-misses, and its output is recorded in this build's
-  journal record. The expected hits are `memory/builds/aBoundedCeiling/RUN.md`,
-  `memory/builds/aPrimedKeepalive/RUN.md` and `memory/builds/aThawedCorpus/RUN.md`; a fourth hit is
-  a finding, not a pass.
+- **AC7** — SUPERSEDED by `TOOL-aGradedMandate-11`, which round 2 promoted out of this criterion.
+  The census pinned here was answered from memory rather than from the tree and was wrong by
+  eighteen: executed over all 28 tracked `RUN.md`, the predicate passes 7 and refuses 21. Unit 11
+  owns the measured record and the criterion that reads it.
+- **AC8** — This build's own closing diff review records its rounds with
+  `--review <slug> --subject aGradedMandate`, the bare slug, so this run's record satisfies S1's
+  exact join. Verified by `bash tools/unattended/unattended.sh --status aGradedMandate` before
+  `--close`.
 
 ## 7. Gates
 
@@ -138,6 +155,8 @@ none
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
 
 - rev-2 · 2026-08-31 · round-1 fold of the spec audit's F9: section 4 Migration re-derived against the record it names, which WOULD block, plus AC7 requiring the candidate predicate be run over every tracked RUN.md before wiring.
+
+- rev-3 · 2026-08-31 · round-2 fold of R7, and AC7 superseded by TOOL-aGradedMandate-11 which round 2 promoted out of it. The Migration census omitted this run's OWN record, the only one that will actually reach --close, and its review rows are keyed aGradedMandate-specs against an exact subject join. The join stays exact and the closing round takes the bare slug; a prefix match was rejected because it admits aGradedMandateFoo along with aGradedMandate-specs.
 
 ## 10. Reuse audit
 

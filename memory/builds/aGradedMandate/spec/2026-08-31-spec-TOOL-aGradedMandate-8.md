@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-1 · base 396cd9db · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -98,8 +99,13 @@ Hand-editing the renders. Rejected by the wiring leg's own existence.
   render.
 - **AC6** — The rendered Skill still passes the SHAPE checks the kit's leg applies to it, verified by
   `bash tools/unattended/check-unattended.sh`. There is no size half, for the reason section 5 gives.
-- **AC7** — `grep -c 'retire' .claude/skills/unattended/SKILL.md` inside the `--rescope` paragraph
-  is at least 1, which is the only observation S6 has.
+- **AC7** — The `--rescope` paragraph of `.claude/skills/unattended/SKILL.md` names the owner's
+  turn: `grep -c "owner's one turn" .claude/skills/unattended/SKILL.md` is at least 1. **Measured
+  before the edit: 0.** The obvious spelling was rejected because it is not falsifiable —
+  `grep -c 'retire'` on the unedited render returns 2, and one of those hits
+  (`--act retire|supersede|add`) sits INSIDE the `--rescope` bullet, so the paragraph qualifier does
+  not rescue it. A grep-shaped criterion whose pre-edit count nobody measured is an assertion about
+  nothing.
 
 ## 7. Gates
 
@@ -113,6 +119,10 @@ none
 
 - rev-1 · 2026-08-31 · authored from findings F10, F6 and F7 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
+- rev-3 · 2026-08-31 · round-2 fold of R5 and R11: AC7 is re-anchored on bytes S6 must INTRODUCE,
+  with the pre-edit measurement written down, because `grep -c 'retire'` was already 2 inside the
+  very paragraph the criterion scoped itself to; and this header, which read rev-1 over a rev-2 log
+  that hygiene's rev arm cannot see because it fires only on a header AHEAD of its log.
 - rev-2 · 2026-08-31 · round-1 fold. S5 deleted (F17: one edit, two owners), the escalation half of
   S6 deleted with `TOOL-aGradedMandate-3`, the section 5 size-ceiling claim corrected (F12: the
   mitigation did not exist), AC6 narrowed to the shape half it can actually observe, AC7 added for S6

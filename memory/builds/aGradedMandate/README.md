@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9
+ids: TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
 authorized-by: prompt
 ---
 
@@ -44,8 +44,14 @@ standing, on a Definition-of-Done item that was MET. The report is
   because the blocker-sum half reds `aPrimedKeepalive` on main today.
 - **Every new predicate is observed RED against a staged break before it is called built**, and its
   own header states what it does NOT check.
-- **This build is the dogfood.** It must itself satisfy every item it adds: a converged closing loop,
-  a spec audit naming every unit, and an escalated bar.
+- **This build is the dogfood.** It must itself satisfy every item it adds: a spec audit naming
+  every unit, and a closing loop that ends. Its closing rounds take the BARE SLUG as `--subject`,
+  because unit 1's join is exact.
+- **A criterion is not accepted until its value has been MEASURED.** Round 2 found two written from
+  memory: a grep whose pre-edit count was already 2, and a census pinned at 3 against a tree that
+  answers 21. Both were criteria added to close a round-1 finding.
+- **The spec-audit loop ran two rounds and stopped NON-CONVERGENT** at 2 blockers then 2. Units 10
+  and 11 are its promotions, not new ideas.
 
 ## Parked decisions
 Entries live in `RUN.md`. **The self-test escalation is the big one**: 46 of 86 legs are held, no
@@ -69,32 +75,36 @@ default branch and this session may not leave its worktree, the wall `aScouredKi
 | 7 | `TOOL-aGradedMandate-7` | 2 | the promotion clause counts only ids that are non-WONTDO at HEAD |
 | 8 | `TOOL-aGradedMandate-8` | 1 | the agent-facing carriers corrected, in one render |
 | 9 | `TOOL-aGradedMandate-9` | 2 | the leg's two-way Skill join extended to `DOD_NO_OVERRIDE` |
+| 10 | `TOOL-aGradedMandate-10` | 2 | PROMOTED: the history side of the parked split subtracts acts too |
+| 11 | `TOOL-aGradedMandate-11` | 1 | PROMOTED: the closing-loop census is measured and recorded, never pinned |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED](spec/2026-08-31-spec-TOOL-aGradedMandate-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aGradedMandate-1 — `closing-review-recorded` requires the closing loop to have ENDED](spec/2026-08-31-spec-TOOL-aGradedMandate-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-2 — `specs-audited`, an eleventh core Definition-of-Done item](spec/2026-08-31-spec-TOOL-aGradedMandate-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-08-31 |
 | [TOOL-aGradedMandate-3 — `gates-green` escalates onto held self-test legs by the run's own diff](spec/2026-08-31-spec-TOOL-aGradedMandate-3.md) | 3 | 2 | WONTDO | rev-2 | 2026-08-31 |
-| [TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN](spec/2026-08-31-spec-TOOL-aGradedMandate-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-08-31 |
-| [TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act](spec/2026-08-31-spec-TOOL-aGradedMandate-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-08-31 |
+| [TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN](spec/2026-08-31-spec-TOOL-aGradedMandate-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act](spec/2026-08-31-spec-TOOL-aGradedMandate-5.md) | 5 | 2 | SPECCED | rev-3 | 2026-08-31 |
 | [TOOL-aGradedMandate-6 — check 24's RETIRE arm keys its baseline to the run's pinned BASE](spec/2026-08-31-spec-TOOL-aGradedMandate-6.md) | 6 | 2 | SPECCED | rev-2 | 2026-08-31 |
 | [TOOL-aGradedMandate-7 — the promotion clause counts only ids that are non-WONTDO at HEAD](spec/2026-08-31-spec-TOOL-aGradedMandate-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render](spec/2026-08-31-spec-TOOL-aGradedMandate-8.md) | 8 | 1 | SPECCED | rev-1 | 2026-08-31 |
-| [TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`](spec/2026-08-31-spec-TOOL-aGradedMandate-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aGradedMandate-8 — the agent-facing carriers corrected, in one render](spec/2026-08-31-spec-TOOL-aGradedMandate-8.md) | 8 | 1 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`](spec/2026-08-31-spec-TOOL-aGradedMandate-9.md) | 9 | 2 | SPECCED | rev-3 | 2026-08-31 |
+| [TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too](spec/2026-08-31-spec-TOOL-aGradedMandate-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-08-31 |
+| [TOOL-aGradedMandate-11 — the closing-loop census is MEASURED and recorded, never pinned from memory](spec/2026-08-31-spec-TOOL-aGradedMandate-11.md) | 11 | 1 | SPECCED | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aGradedMandate-10 TOOL-aGradedMandate-11.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGradedMandate-10 TOOL-aGradedMandate-11.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -110,6 +120,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 7 | `TOOL-aGradedMandate-7` | no |
 | 8 | `TOOL-aGradedMandate-8` | no |
 | 9 | `TOOL-aGradedMandate-9` | no |
+| 10 | `TOOL-aGradedMandate-10` | no |
+| 11 | `TOOL-aGradedMandate-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

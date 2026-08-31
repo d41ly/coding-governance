@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-4 — `build-complete` refuses a CLOSED unit whose spec grades THIN
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -26,19 +27,30 @@ cannot be CLOSED against a spec that never said what done was.
   the grade is `THIN`.
 - **S2** — Order it AFTER the five existing terms, so a structural failure still reports as a
   structural failure and this term never masks one.
-- **S3** — A `DOD_OUT` message naming each thin unit and which of the three sections is empty, since
-  `plan_state` already knows which and the operator otherwise has to re-derive it.
+- **S3** — A `DOD_OUT` message naming each thin unit. It does NOT name which of the three sections
+  is empty: `plan_state`'s per-section map is built and consumed inside its own awk `END` block and
+  the caller receives one bare token, and §3 forbids widening that output because the function body
+  is SLICED out of the shipped bytes and graded by two harnesses, `unattended.test.sh` and the
+  cross-kit `marker-contract.test.sh`. A second section-emptiness derivation beside `plan_state`
+  would be a second spelling of M2's THIN rule. The grade is a single token by design.
 - **S4** — Date-grandfather the term on the spec's FILENAME date against a new `.unattended.conf`
   key `SPEC_THIN_CUTOFF`, absent or blank meaning "grandfather everything", set to this build's own
   landing date. Two of 307 tracked CLOSED specs grade THIN today, both from a pre-kit July build,
   and a term that reds a landed spec no run may rewrite is unlandable.
 - **S5** — At `--plan`, print the grade BESIDE `DONE` rather than in place of it, so the discard
   stops being silent for a human reader too.
-- **S6** — Declare `SPEC_THIN_CUTOFF` in THREE carriers, not one. `.unattended.conf` is the project
-  declaration; `tools/unattended/.unattended.conf.example` is the kit example, whose absence reds
-  check 22's `documented but in no example` arm; and the driver's conf-default init block, because
-  `unattended.sh` runs under `set -u` and every conf key it reads is defaulted there. Both sibling
-  cutoffs are carried in all three.
+- **S6** — Declare `SPEC_THIN_CUTOFF` in FOUR places, for three different reasons, and the reasons
+  do not overlap. **Check 22's three-way key join** needs two of them: the kit example
+  `tools/unattended/.unattended.conf.example`, and the row in the protocol's §8 declaration table —
+  the check computes `documented but in no example` as a `comm` between those two populations, and a
+  key in one and not the other reds `unattended kit gate`. **`set -u`** needs the third: the driver's
+  conf-default init block at `unattended.sh:288-291`, because every conf key the DRIVER reads is
+  defaulted there and this one is read in `dod_met`. **This project's own declaration** is the
+  fourth, `.unattended.conf`, which is what actually sets the date.
+  The sibling cutoffs are not carried identically and the difference is worth knowing before copying
+  one: `UNITS_REGION_CUTOFF` is a driver key and is defaulted at `unattended.sh:289`, while
+  `LANDED_ANCHOR_CUTOFF` is a LEG key and is defaulted at `check-unattended.sh:118`. This key is
+  read by the driver, so it follows the first.
 
 ## 3. Non-goals (OUT)
 
@@ -65,7 +77,8 @@ blank grandfathers everything, moving it later re-admits more.
 | `unattended.sh` `verb_plan` | the grade printed beside `DONE` |
 | `.unattended.conf` | `SPEC_THIN_CUTOFF`, with its reason beside it |
 | `tools/unattended/.unattended.conf.example` | the key, blank, with the grandfather semantics beside it |
-| `unattended.sh` conf-default init block | the key defaulted, or `set -u` aborts the driver |
+| `PROTOCOL.template.md` §8 · `memory/guides/UNATTENDED-PROTOCOL.md` §8 | the declaration-table row check 22 joins the example against |
+| `unattended.sh:288-291` conf-default init block | the key defaulted, or `set -u` aborts the driver |
 | `PROTOCOL.template.md` §8 · `memory/guides/UNATTENDED-PROTOCOL.md` §8 | one declaration-table row |
 | `unattended.test.sh` | a thin-and-CLOSED arm, a thin-but-grandfathered arm, a fat arm |
 
@@ -96,15 +109,16 @@ the driver never writes — so the refusal has to sit where the roster is read, 
   a file this unit inventories as untouched. A malformed value therefore sorts as an ordinary string
   and grandfathers unpredictably. Stated here rather than discovered, and it is the one residual this
   unit ships with.
-- testing + left-shift gates — three arms, each observed RED first.
+- testing + left-shift gates — five arms (AC1, AC2, AC3, AC6, AC7), each observed RED first where a
+  red is reachable; AC3's clean-roster arm is a control and is stated as one.
 - migration / rollback — deleting the term, or blanking the cutoff, reverts it.
 - user docs — none owed; the Skill does not enumerate `build-complete`'s terms.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a unit is `CLOSED` and its spec's §6 Acceptance criteria section is empty,
-  `--close` blocks on `build-complete` naming that unit and that section, verified by an arm in
-  `unattended.test.sh`.
+  `--close` blocks on `build-complete` naming that unit, verified by an arm in `unattended.test.sh`.
+  The message names the UNIT and not the section, for the reason S3 gives.
 - **AC2** — When the same spec's filename date is before `SPEC_THIN_CUTOFF`, the item is MET and the
   grandfather is announced.
 - **AC3** — When every CLOSED unit's spec grades READY under `plan_state`, the item is MET and
@@ -134,6 +148,8 @@ none
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`.
 
 - rev-2 · 2026-08-31 · round-1 fold of F7, F15 and F16: SPEC_THIN_CUTOFF gains its two missing carriers (S6), AC6 observes the term ORDERING S2 requires, AC7 the set -u default, and AC5's orphaned shape clause is dropped with the residual stated in section 5.
+
+- rev-3 · 2026-08-31 · round-2 fold of R6, R9 and R10: S3 stops promising a section name plan_state cannot emit past its own awk END block, S6 names check 22's actual join plus the set -u default and corrects a false claim about the sibling cutoffs, and section 5's arm count follows the criteria that now exist.
 
 ## 10. Reuse audit
 

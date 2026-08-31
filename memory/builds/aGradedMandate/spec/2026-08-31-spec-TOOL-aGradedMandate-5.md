@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-5 — a retirement becomes a `surfaced`-class parked act
 
-**Status:** SPECCED · rev-2 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
 <!-- /gen:spec-records -->
 
@@ -40,7 +41,19 @@ so `retire` and `supersede` reach the owner's one turn while `add` stays history
   whether they must be TOLD, and M3 delegates scope RESOLUTION rather than scope abandonment.
 - **S5** — Correct `memory/guides/UNATTENDED-PROTOCOL.md` §2 fact 3 and its template, which
   enumerate FIVE parked kinds against the driver's eight and state that all four listed kinds are
-  surfaced. **This unit owns that edit outright**, and `TOOL-aGradedMandate-8` S5 was deleted in the
+  surfaced. **AND the sentence directly after them, at `:193` in both copies**, which reads
+  *Membership is declared once, in the driver's `PARK_KINDS_OWED`, and `history` is the COMPLEMENT*.
+  Both clauses become false under S1: there are two declarations, and a `rescope retire` row is
+  surfaced while absent from `PARK_KINDS_OWED`. It is the BINDING contract, on the exact property a
+  reader consults it for, and a reader who follows it reproduces the double-count
+  `TOOL-aGradedMandate-10` exists to fix.
+- **S7** — Give `PARK_ACTS_OWED` the leg-side guard every sibling closed set already has, because a
+  set declared in the driver and graded nowhere is decoration and this one has a counter and a
+  Definition-of-Done predicate hanging off it — the leg's own words at `check-unattended.sh:215-217`.
+  Read it through `core_of` with an unreadable-refusal in its siblings' shape, and add a dead-member
+  arm asserting every member is a first token `verb_rescope`'s act case at `unattended.sh:3882` can
+  accept. Without it a typo like `supercede` silently returns those rows to history while every gate
+  and every criterion here stays green. **This unit owns that edit outright**, and `TOOL-aGradedMandate-8` S5 was deleted in the
   round-1 fold so one edit has one owner — the same cross-reference discipline `TOOL-aGradedMandate-7`
   S4 already uses. The edit lands in the TEMPLATE and reaches the render through
   `bash tools/unattended/adopt-unattended.sh`, never by hand-editing the render.
@@ -61,12 +74,16 @@ so `retire` and `supersede` reach the owner's one turn while `add` stays history
 
 Two kit constants instead of one, because kinds and acts are different things and the leg already
 reads the first one in two places. `PARK_KINDS_OWED` is unchanged — bare kinds only. `PARK_ACTS_OWED`
-is new and holds acts of the `rescope` kind. The complement rule is preserved on both axes: absent
-from a set IS history, so there is still no second list to keep in step, and `park_kinds_unowed`
-keeps computing the history side by difference.
+is new and holds acts of the `rescope` kind.
 
 A row is OWED when its kind is in `PARK_KINDS_OWED`, or when its kind is `rescope` and the first
-token of its item field is in `PARK_ACTS_OWED`.
+token of its item field is in `PARK_ACTS_OWED`. **This unit owns the OWED side only.** The HISTORY
+side is `park_kinds_unowed` at `unattended.sh:3352`, which subtracts at KIND granularity and would
+therefore return the whole `rescope` kind — so a retire row would match BOTH alternations and
+`--status` would print it as a decision AND as a note. That is a real defect and it is
+`TOOL-aGradedMandate-10`'s, promoted out of this unit by round 2 of the spec audit. Until unit 10
+lands, this unit's owed count is correct and the history count double-reports; the two are ordered
+and the ordering is recorded in the build order.
 
 ### Inventory
 
@@ -75,7 +92,9 @@ token of its item field is in `PARK_ACTS_OWED`.
 | `unattended.sh` `PARK_ACTS_OWED` | the new constant, with its header |
 | `unattended.sh` `PARK_KINDS_OWED` | UNCHANGED, and its header says why the acts live apart |
 | `unattended.sh` `dod_met` `parked-decisions-surfaced` | the count alternation gains the act arm |
-| `unattended.sh` `verb_status` | the same split |
+| `unattended.sh` `verb_status:2618` | the owed alternation gains the act arm |
+| `unattended.sh:3352` `park_kinds_unowed` | UNCHANGED here — the history axis is `TOOL-aGradedMandate-10` |
+| `check-unattended.sh` | S7: `core_of PARK_ACTS_OWED` with an unreadable-refusal, plus a dead-member arm |
 | `check-unattended.sh:366-371` | UNCHANGED — the `pk_dead` loop still reads bare kinds only |
 | `check-unattended.sh:1943-1951` | UNCHANGED — check 27's both-directions kind join is untouched |
 | `PROTOCOL.template.md` §2 · `memory/guides/UNATTENDED-PROTOCOL.md` §2 | fact 3's kind enumeration and its surfaced sentence |
@@ -131,6 +150,12 @@ the mechanism and the leg line it reds.
   `grep -c 'of eight kinds' memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/PROTOCOL.template.md`
   returns 1 for each, and the surfaced sentence names the members of `PARK_KINDS_OWED` plus the two
   owed acts. Byte-identity is true before the edit, after it, and if neither copy moves.
+- **AC7** — The `:193` sentence is corrected too:
+  `grep -c 'Membership is declared once' memory/guides/UNATTENDED-PROTOCOL.md` returns 0, measured at
+  1 before the edit, and the replacement names both declarations and both axes.
+- **AC8** — S7's guard is observed RED: with `PARK_ACTS_OWED` set to a member `verb_rescope`'s act
+  case cannot accept, `bash tools/unattended/check-unattended.sh` fails naming that member; with the
+  shipped value it is green.
 
 ## 7. Gates
 
@@ -148,16 +173,24 @@ none
 
 - rev-2 · 2026-08-31 · round-1 fold of the BLOCKER F2 and of F17: the kind:act member grammar is REFUSED and replaced by a separate PARK_ACTS_OWED constant, because check 2's dead-member loop would red on it; AC4 names both leg-side readers; and the protocol fact-3 edit becomes this unit's outright, TOOL-aGradedMandate-8 S5 having been deleted.
 
+- rev-3 · 2026-08-31 · round-2 fold of R3, R4 and R8, with R1 PROMOTED to TOOL-aGradedMandate-10. Section 10 was un-refolded rev-1 prose telling a builder to rebuild the member grammar round 1 rejected; S7 gives PARK_ACTS_OWED the leg-side guard every sibling closed set has; S5 grows to the protocol sentence at :193 that this unit falsifies; and the history-side complement is now explicitly out of scope and ordered after.
+
 ## 10. Reuse audit
 
 The SET-level probes are recorded in `TOOL-aGradedMandate-1` §10.
 
-The seam is `park_kinds_unowed` at `tools/unattended/unattended.sh:3348`, which already computes the
-history class as the COMPLEMENT of `PARK_KINDS_OWED` — so widening the owed set is the only edit the
-split needs, and the history side follows without a second declaration. `kinds_re` at `:3340` is the
-one place a word-list becomes an alternation and is the single site where the pair form has to be
-understood.
+**Rewritten at rev-3 against the SHIPPED design** — round 2 found this section surviving as rev-1
+prose telling a builder to rebuild the very member grammar round 1's blocker rejected. The reuse
+audit is the section written earliest and the one no acceptance criterion can observe, so a fold that
+changes a unit's design has to re-read it.
 
-The leg's both-directions taxonomy check at `check-unattended.sh:1943-1951` is the reader that would
-otherwise refuse the new member shape; it is extended rather than exempted, because an exemption
-would remove the very check that catches a kind with no writer.
+There are TWO owed-alternation sites, not one. `kinds_re` at `unattended.sh:3344` is called by
+`verb_status` at `:2618`; and `dod_met`'s `parked-decisions-surfaced` predicate at `:3226` open-codes
+its own alternation with `printf '%s' "$PARK_KINDS_OWED" | tr ' ' '|'` and never calls `kinds_re`.
+Both take the act arm. The history axis is `park_kinds_unowed` at `:3352` and belongs to
+`TOOL-aGradedMandate-10`.
+
+`check-unattended.sh:366-371` and `:1943-1951` are untouched BY CONSTRUCTION, because
+`PARK_KINDS_OWED` keeps bare kinds and S1a says why. What the leg does gain is S7's new read of
+`PARK_ACTS_OWED` through `core_of`, in the shape every sibling closed set already uses at `:196`,
+`:213`, `:219`, `:221`, `:225` and `:228-230`.

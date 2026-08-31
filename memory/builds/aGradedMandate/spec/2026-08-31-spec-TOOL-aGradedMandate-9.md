@@ -1,6 +1,6 @@
 # TOOL-aGradedMandate-9 — the leg's two-way Skill join extended to `DOD_NO_OVERRIDE`
 
-**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 9
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
+| [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,8 @@ none
 
 - rev-1 · 2026-08-31 · authored from finding F10 of
   `build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md`, its machine half.
+- rev-3 · 2026-08-31 · round-2 fold of R11: this header read rev-1 over a rev-2 log, which
+  `check-memory-hygiene.sh:919` cannot see because it fires only on a header AHEAD of its log.
 - rev-2 · 2026-08-31 · round-1 fold of the spec audit's F19: the prose count in section 3 replaced
   with a name, since the set is eleven by the time this unit lands.
 

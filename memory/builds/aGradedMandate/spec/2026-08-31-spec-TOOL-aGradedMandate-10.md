@@ -1,0 +1,137 @@
+# TOOL-aGradedMandate-10 — the history side of the parked split subtracts acts too
+
+**Status:** SPECCED · rev-1 · 2026-08-31 · node a · Tier-2 · base 396cd9db · streams tooling · order 10
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+PROMOTED, not authored: round 2 of this build's spec audit exited `NON-CONVERGENT`, and its blocker
+R1 became this unit rather than a fold. `TOOL-aGradedMandate-5` makes the OWED side of the parked
+split act-aware; `park_kinds_unowed` still subtracts at KIND granularity, so a
+`rescope · item retire …` row matches BOTH alternations and `--status` reports one retirement as an
+unanswered decision AND as a note. This unit makes the history side subtract the owed ACTS too, and
+adds the partition invariant that gates the class rather than the instance.
+
+## 2. Scope (IN)
+
+- **S1** — `park_kinds_unowed` at `unattended.sh:3352` stops being a pure kind-difference. A
+  `rescope` row is HISTORY only when the first token of its item field is outside `PARK_ACTS_OWED`;
+  every other kind keeps the existing kind-granular complement.
+- **S2** — `verb_status`'s history count at `:2628` reads that predicate, so the printed
+  `· parked N · noted M` is a PARTITION of the parked rows rather than two overlapping counts.
+- **S3** — The PARTITION INVARIANT becomes an arm: over a fixture record holding one row of every
+  member of `PARK_KINDS`, `parked + noted` equals the row count. That arm gates the CLASS — any
+  future kind or act landing in both alternations or in neither — where an arm about `retire`
+  specifically would gate this instance only.
+- **S4** — The complement rule is restated in `park_kinds_unowed`'s own header on BOTH axes, since
+  the one-axis sentence is what produced this defect and the function is where a later reader looks.
+
+## 3. Non-goals (OUT)
+
+- **No change to `PARK_KINDS_OWED` or `PARK_ACTS_OWED`.** Both are `TOOL-aGradedMandate-5`'s and this
+  unit consumes them.
+- **No change to the leg.** `check-unattended.sh:366-371` and `:1943-1951` read
+  `PARK_KINDS_OWED`, which still holds bare kinds; nothing there sees this edit.
+- **No new act vocabulary.** `verb_rescope`'s act case at `unattended.sh:3882` stays the writer's
+  closed set.
+
+## 4. Design
+
+### Data model
+
+No new fact and no new declaration. One predicate changes from a set difference over kinds to a
+difference over kinds PLUS a positional test on the `rescope` kind's first item token.
+
+### Inventory
+
+| Site | Change |
+|---|---|
+| `unattended.sh:3352` `park_kinds_unowed` | act-aware history side, and its header on both axes |
+| `unattended.sh:2628` `verb_status` history count | reads the new predicate |
+| `unattended.test.sh` | the retire-not-noted arm and the partition arm |
+
+`park_kinds_unowed` currently returns a WORD LIST that `kinds_re` turns into an alternation, and a
+positional act test does not fit a word list. The shape is therefore a predicate the counter applies
+per row rather than a widened alternation, and `kinds_re` is left alone — it is `verb_status`'s owed
+site and `TOOL-aGradedMandate-5` already took it.
+
+### Migration
+
+None. The only behaviour that changes is a count printed by `--status`, and no record stores it.
+
+### Alternatives rejected
+
+Excluding `rescope · item (retire|supersede) ` positionally in the NOTES alternation and leaving
+`park_kinds_unowed` alone. Rejected: the function is the declared home of the history class and a
+second exclusion beside it is a second answer to one question — the defect
+`TOOL-aGradedMandate-5`'s own §10 was folded for.
+
+## 5. Production-readiness checklist
+
+- security — N/A. A count printed by a status verb.
+- perf / scale — N/A. One predicate per parked row on a file already read whole.
+- a11y — N/A. No user surface.
+- i18n — N/A. No user surface.
+- error / empty / loading states — a record with no parked rows prints both counts as zero, which
+  the partition arm covers as its degenerate case and which is stated so a zero is not read as a
+  skip.
+- observability — `--status` is the observability, and this unit is the reason its two numbers add
+  up.
+- risks — the ONLY consumer of `park_kinds_unowed` is `verb_status`, verified by grep, so the blast
+  radius is one line of output. If a later reader adds a second consumer expecting a word list, the
+  header S4 rewrites is what tells them.
+- testing + left-shift gates — two arms, both observed RED against the pre-change predicate first.
+- migration / rollback — reverting the predicate restores the overlap.
+- user docs — none owed; `--status`'s output shape is not documented in the Skill.
+
+## 6. Acceptance criteria
+
+- **AC1** — Over a fixture record holding exactly one `rescope · item retire TOOL-x-1 · reason …`
+  row, `bash tools/unattended/unattended.sh --status <slug>` prints `parked 1` and does NOT print a
+  non-zero `noted`, verified by an arm in `unattended.test.sh`.
+- **AC2** — Over a fixture record holding one row of every member of `PARK_KINDS`, the printed
+  `parked` and `noted` counts SUM to the number of parked rows, verified by the same suite.
+- **AC3** — Both arms are observed RED against the predicate as `TOOL-aGradedMandate-5` leaves it,
+  and that observation is recorded in this build's journal record before the fix lands.
+- **AC4** — `grep -c 'park_kinds_unowed' tools/unattended/unattended.sh` shows the function has
+  exactly one consumer besides its own definition, so the risk line in §5 is measured rather than
+  asserted.
+- **AC5** — `bash tools/unattended/check-unattended.sh` and
+  `bash tools/unattended/run-unattended-gates.sh --selftests` are green.
+
+## 7. Gates
+
+`unattended kit gate` · `bash tools/run-gates/run-gates.sh` ·
+`bash tools/unattended/run-unattended-gates.sh --selftests`.
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-1 · 2026-08-31 · PROMOTED from round 2 of the spec audit, blocker R1, per the build method's
+  M4 exit rule: the loop went 2 blockers then 2 blockers, did not shrink, and stopped
+  `NON-CONVERGENT`, so every blocker still standing becomes a unit rather than a fold.
+
+## 10. Reuse audit
+
+The SET-level probes are recorded in `TOOL-aGradedMandate-1` §10.
+
+The seam is `park_kinds_unowed` itself at `tools/unattended/unattended.sh:3352`, which is already the
+declared home of the history class and already computes it by difference. This unit changes that
+computation rather than adding a second exclusion somewhere else, which is what keeps one question
+with one answer.
+
+The partition arm has no seam and is new. Its shape is borrowed from `unattended.test.sh`'s existing
+taxonomy arms, which already build a fixture record holding one row per kind — so the fixture is
+reused and only the assertion is written.
+
+A STALE hit is recorded rather than trusted: `TOOL-aGradedMandate-5`'s rev-1 §10 named `:3348` and
+`:3340` for this function and `kinds_re`; both had drifted to `:3352` and `:3344` and were verified
+against source before this spec was written.
