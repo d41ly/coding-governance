@@ -172,6 +172,63 @@ read_derivation() {   # FILE -> the SET of manifest filenames this file can reso
   # across however many branches each one needs to get there.
   grep -hoE 'gate-legs[-a-zA-Z0-9]*\.(toml|json)' "$1" | sort -u
 }
+# ---- G2b. THE TWO LIVE DECLARATIONS AGREE ------------------------------------------------------
+# Both are PERMANENTLY live: gate-legs.toml wins where tomllib is importable and gate-legs.json is
+# what every pre-3.11 interpreter reads, so this repo genuinely ships two manifests and nothing
+# asserted they described the same bar. They can drift silently, and the tree that would notice is
+# an adopter's -- below the floor, running a bar this repo never exercises.
+#
+# Compared through the RUNNER'S OWN LOADER, extracted from its source, so this grades the wire the
+# dispatcher actually reads rather than a re-parse that could agree with neither. `subject` is
+# excluded because TOML declares none and emits it empty by design; every other field must match.
+a=$((a+1))
+if [ -f "$KITREL/gate-legs.toml" ] && [ -f "$(dirname "$KITREL")/gate-legs.json" ]; then :; fi
+_gj="$(dirname "$KITREL")/gate-legs.json"; _gt="$(dirname "$KITREL")/gate-legs.toml"
+if [ -f "$_gj" ] && [ -f "$_gt" ]; then
+  if ! "$PYBIN" -c '
+import re, subprocess, sys
+src = open(sys.argv[1], encoding="utf-8").read()
+m = re.search(r"legs=[$][(]\"[$]PYBIN\" -c .(.*?).\s*\"[$]LEGS_FILE\"", src, re.S)
+if not m:
+    print("gov-canary: could not extract the loader from the runner", file=sys.stderr); sys.exit(2)
+prog = m.group(1)
+rows = {}
+for f in (sys.argv[2], sys.argv[3]):
+    r = subprocess.run([sys.executable, "-c", prog, f], capture_output=True)
+    if r.returncode:
+        print("gov-canary: the loader refused %s: %s" % (f, r.stderr.decode()[:200]), file=sys.stderr); sys.exit(2)
+    rows[f] = [x for x in r.stdout.decode().split(chr(10))[1:] if x]
+a_, b_ = rows[sys.argv[2]], rows[sys.argv[3]]
+if len(a_) != len(b_):
+    print("gov-canary: the two declarations hold %d and %d legs" % (len(a_), len(b_)), file=sys.stderr); sys.exit(1)
+RS = chr(30)
+# THE FIELDS THAT DECIDE THE BAR, named rather than blanket-skipped. Each excluded index is a
+# concept ONE dialect cannot express, and saying which is the difference between an exemption and
+# a hole: 5 `subject` (TOML declares none), 8 `lane`, 9 `tool`, 10 `cwd` (the JSON dialect has no
+# such keys). What remains is everything a verdict can turn on -- if any of these drift, the two
+# live declarations grade different bars and a below-floor adopter is the one who finds out.
+FIELDS = {0: "name", 1: "guard", 2: "argv", 3: "impure", 4: "chunk", 6: "ceiling", 7: "opt_in"}
+bad = []
+for x, y in zip(a_, b_):
+    fx, fy = x.split(RS), y.split(RS)
+    for k, nm in FIELDS.items():
+        if k < len(fx) and k < len(fy) and fx[k] != fy[k]:
+            bad.append("%s %s: %r vs %r" % (fx[0], nm, fx[k], fy[k]))
+if bad:
+    print("gov-canary: the two live declarations disagree about the bar:", file=sys.stderr)
+    for x in bad[:6]:
+        print("gov-canary:   " + x, file=sys.stderr)
+    sys.exit(1)
+' "$KITREL/run-gates.sh" "$_gj" "$_gt"; then
+    echo "gov-canary: gate-legs.json and gate-legs.toml describe DIFFERENT bars, and both are live —"
+    echo "gov-canary: the TOML wherever tomllib imports, the JSON on every interpreter below 3.11."
+    fail=1
+  fi
+else
+  echo "gov-canary: SKIP the two-declaration arm — this tree carries only one of the pair, so there"
+  echo "gov-canary: is nothing to compare. A skip that announces itself, not a silent pass."
+fi
+
 ref=$(read_derivation "$KITREL/run-gates.sh")
 if [ -z "$ref" ]; then
   echo "gov-canary: $KITREL/run-gates.sh carries no manifest derivation to compare against — the"
