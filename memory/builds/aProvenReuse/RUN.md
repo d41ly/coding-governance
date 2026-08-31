@@ -30,3 +30,5 @@ base: 3bfc5e877e1c416781bffa9e5bf5e1b1b7a27036
 2026-08-31T06:01:14Z review · item aProvenReuse · reason verdict BLOCKED · blockers 2
 
 2026-08-31T06:02:19Z rescope · item add TOOL-aProvenReuse-5 · reason Closing-review F9, adopted under protocol section 11 rather than parked: the example-conf parity arm derives its population from the engine's ${NAME:-} reads, so a BARE preset is invisible to it. Two adopter keys are already through that hole -- FORK_MARK_CUTOFF and REVIEW_VERDICT_CUTOFF are absent from the shipped example and nothing noticed -- and this build's own SPEC10_EVIDENCE_CUTOFF walked through it too. Strictly beneficial: it makes adopter-key discoverability strictly better, makes nothing worse, and trips no M3 veto. Gate the CLASS, not the instance.
+
+2026-08-31T08:04:46Z review · item aProvenReuse · reason verdict BLOCKED · blockers 1

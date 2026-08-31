@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** SPECCED · rev-5 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** SPECCED · rev-6 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-1 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md) | diff-review | TOOL-aProvenReuse-1 TOOL-aProvenReuse-5 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-1 |
 
@@ -105,6 +106,9 @@ instead of passing in silence.
   joins `DOD_CORE` to that table in BOTH directions and separately word-compares the count sentence
   against the driver's set, and that leg is the unguarded `unattended kit gate`. Omitted, S1 reds the
   merge bar twice. The render `memory/guides/UNATTENDED-PROTOCOL.md` is refreshed with it.
+  **And §8's key table gains a `RECALL_CLI` row**, which S3a's declaration makes mandatory: check
+  22 joins that table to the declared conf in BOTH directions, so a key this project sets and the
+  contract never documents reds the same unguarded leg.
 - **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all FIVE S2 outcomes, each
   reachable because S3a made the CLI a declaration the fixture conf can set to a scratch path rather
   than a probe of the real tree. The
@@ -182,10 +186,10 @@ A worktree reused across two builds carries the earlier build's rows and would s
 one. That limit is accepted because the alternative — a time window — has a worse failure, N3's, and
 because the item's job is to make zero distinguishable from unmeasured, which it does.
 
-It also does not observe anything at all in an adopter without the memory-recall kit. There the
-`kit absent` outcome fires and says so, which is a SKIP and is reported as one. A skip that looks
-like a pass is indistinguishable from coverage, so the message names the missing kit rather than the
-missing log.
+It also does not observe anything at all in a project that declares no `RECALL_CLI`. There the
+`not adopted` outcome fires and says so, which is a SKIP and is reported as one. A skip that looks
+like a pass is indistinguishable from coverage, so the message names the KEY rather than the missing
+log, and the two messages are deliberately unconfusable.
 
 ### Alternatives rejected
 
@@ -251,9 +255,11 @@ finding. The item is inert for any run that has run a probe, which every conform
   contains the word `absent`, textually distinct from AC3's and AC3a's messages.
 - **AC3** — with a log present holding no `query` row for this tree, `--close` reports UNMET and
   names the remedy.
-- **AC3a** — with `tools/memory-recall/query.py` absent from the tree, `--close` reports MET and the
-  message names the missing kit. This is the observable for S2's `kit absent` outcome, and without
-  it nothing distinguishes "the skip works" from "the skip was never exercised".
+- **AC3a** — with `RECALL_CLI` blank, `--close` reports MET and the message names the key. With it
+  set to a path that does not resolve, the SAME outcome and the message names the value — a typo'd
+  path must not fall through to the log arms and report a missing PROBE when the fault is a missing
+  FILE. This is the observable for S2's `not adopted` outcome, and without it nothing distinguishes
+  "the skip works" from "the skip was never exercised".
 - **AC4** — with a log holding at least one `query` row for this tree, `--close` reports MET and the
   message carries the row count. **The fixture row is a byte copy of a real `query` row**, doubled
   backslashes included, not one hand-authored from this spec. Measured now, this tree's live log
@@ -298,7 +304,7 @@ ruling took off the bar and which AC7 owes because this IS kit work.
 `bash tools/check-kit-versions.sh` for AC8, `bash skills/session-kickoff/manifest-check.sh` for AC9.
 What no gate here checks, and all three are §4's stated limits rather than oversights: that the log
 this item reads is the log the agent's probe wrote; that the probe was run FOR this build rather
-than earlier in the same worktree; and anything at all in an adopter without the memory-recall kit,
+than earlier in the same worktree; and anything at all in a project that declares no `RECALL_CLI`,
 where the item reports a SKIP and says so.
 
 ## 8. Open questions
@@ -316,6 +322,12 @@ where the item reports a SKIP and says so.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-6 · 2026-08-31 · closing-diff-review round-2 fold. Round 2 found rev-5 had changed S2, S3a
+  and S9 to the `RECALL_CLI` declaration and left AC3a, §4 and §7 still describing the hardcoded
+  two-path probe it replaced — the `amendment-leaves-its-other-half-standing` class, with AC3a false
+  against both the code and its own self-test. All three now describe what shipped. S6a also gained
+  the protocol's own `RECALL_CLI` row, without which `check-unattended.sh` check 22 reds on a key
+  the conf declares and the contract never documents.
 - rev-5 · 2026-08-31 · closing-diff-review fold, blockers F1 and F2. The recall CLI became the
   `RECALL_CLI` declaration (S3a) instead of two hardcoded paths, which is what this kit's own
   declarations-not-constants rule always required; the hardcoded form also raised the carried-prefix

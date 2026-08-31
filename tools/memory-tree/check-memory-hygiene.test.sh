@@ -221,11 +221,22 @@ evonlyt() { sed 's|^No existing seam fits\.$|Recall terms used: reuse-first reus
 # scored both arms and was never told. The rules now live above the fence; this fixture is what stops
 # them moving back.
 evskel()  { sed 's|^No existing seam fits\.$|REPLACE both bullets. Delete this paragraph.|'; }
+# A terms list that WRAPS, with a probe token on the CONTINUATION line. The first cut of the probe
+# blob cut per LINE, so a continuation carried no marker, was scanned whole, and a token there bought
+# the probe half -- reproduced against the shipped awk, and every spec in the build that wrote it
+# wraps its terms. The blob is now truncated at the first terms marker over the whole SECTION, so
+# this fixture reds; if that ever reverts to a per-line cut, this goes silent and the arm below reds.
+# Built by DELETING the one-line finding and APPENDING two lines, rather than by a sed whose
+# replacement carries an embedded newline: that spelling is fragile across sed builds, and authoring
+# it through a shell heredoc silently turned the escape into a real byte twice in one session.
+evwrap()  { sed 's|^No existing seam fits\.$||'
+            printf 'Recall terms used: alpha beta gamma delta epsilon zeta\nreuse_lookup eta theta iota.\n'; }
 
 ev | evonlyt > "$D/spec/2026-08-25-spec-tFixture-80.md"  # post-cutoff, terms only, no probe -> red
 ev           > "$D/spec/2026-08-25-spec-tFixture-81.md"  # post-cutoff, probe only, no terms -> red
 ev | evterms > "$D/spec/2026-08-25-spec-tFixture-82.md"  # post-cutoff, BOTH arms            -> silent
 ev | evskel  > "$D/spec/2026-08-25-spec-tFixture-85.md"  # post-cutoff, SKELETON boilerplate -> red
+ev | evwrap  > "$D/spec/2026-08-25-spec-tFixture-86.md"  # post-cutoff, WRAPPED terms, probe on line 2 -> red
 # PRE-cutoff twin of 70+71 combined: a §10 with neither fact, dated before the cutoff. This is the
 # grandfathering arm, and without it "no landed spec goes retroactively red" is an untested claim.
 good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
@@ -697,6 +708,9 @@ miss 'tFixture-84.md (§10 Reuse audit'          # TIER-1, outside the arm by N4
 hit  'tFixture-80.md (§10 Reuse audit does not record the probe result'
 # F3: the skeleton's own boilerplate satisfies NEITHER arm.
 hit  'tFixture-85.md (§10 Reuse audit does not record the recall terms used AND the probe result'
+# The wrapped-terms leak: the probe token sits on the terms list's CONTINUATION line and must not
+# count. This arm is the one that fails if the probe blob ever goes back to a per-line cut.
+hit  'tFixture-86.md (§10 Reuse audit does not record the probe result'
 miss 'tFixture-84.md (header rev-1 not logged'  # and it reds for no OTHER reason either
 miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head

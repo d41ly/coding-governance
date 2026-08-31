@@ -1078,21 +1078,29 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- false PASS on a spec that recorded nothing. A false red names its own remedy and the spec
     # ---- template states both accepted spellings; a false pass is silent. All 15 are grandfathered.
     if (want == canon10 && ecut != "" && fdate != "" && fdate >= ecut) {
-      # ---- TWO BLOBS, and the second one is why. `s10p` is the section with each TERMS VALUE
-      # ---- REMOVED -- everything from the terms marker to end of line. A terms list is 8-14 words of
-      # ---- this corpus jargon and those words routinely include `reuse-first` or `reuse_lookup`, so
-      # ---- scanning one blob let a terms line alone satisfy BOTH arms and the probe half could not
-      # ---- fail. Both specs of the build that added this arm did exactly that. The line PREFIX is
-      # ---- kept, so the ordinary one-line form -- a finding, then the terms -- still satisfies both.
-      s10 = ""; s10p = ""; in10 = 0
+      # ---- TWO BLOBS, and the second one is why. A terms list is 8-14 words of this corpus jargon
+      # ---- and those words routinely include `reuse-first` or `reuse_lookup`, so scanning ONE blob
+      # ---- let a terms line alone satisfy BOTH arms and the probe half could not fail. All three
+      # ---- specs of the build that added this arm did exactly that.
+      # ----
+      # ---- `s10p` is the section TRUNCATED AT THE FIRST TERMS MARKER, so the probe fact must be
+      # ---- recorded BEFORE the terms. A per-LINE cut was the first attempt and it leaked: a terms
+      # ---- list that WRAPS puts its tail on a line carrying no marker, so the whole continuation
+      # ---- was scanned and a probe token there bought the probe half. Reproduced, and every spec in
+      # ---- that same build wraps its terms.
+      # ----
+      # ---- MEASURED BEFORE WIRING, which is what makes the order defensible rather than arbitrary:
+      # ---- over the 264 Tier-2 post-SPEC10 specs here, 132 record the probe token before the terms
+      # ---- marker and 5 record it only after. The template states the order, the failure message
+      # ---- names the missing fact, and all 5 are grandfathered by the cutoff.
+      s10 = ""; in10 = 0
       for (i = 1; i <= n; i++) {
         if (body[i] ~ /^## /) { in10 = (body[i] ~ /^## 10\. Reuse audit/); continue }
-        if (!in10) continue
-        L10 = tolower(body[i]); s10 = s10 " " L10
-        cutT = index(L10, "recall terms"); cutF = index(L10, "--terms")
-        if (cutF > 0 && (cutT == 0 || cutF < cutT)) cutT = cutF
-        s10p = s10p " " (cutT > 0 ? substr(L10, 1, cutT - 1) : L10)
+        if (in10) s10 = s10 " " tolower(body[i])
       }
+      cutT = index(s10, "recall terms"); cutF = index(s10, "--terms")
+      if (cutF > 0 && (cutT == 0 || cutF < cutT)) cutT = cutF
+      s10p = (cutT > 0 ? substr(s10, 1, cutT - 1) : s10)
       hasT = (index(s10, "recall terms") > 0 || index(s10, "--terms") > 0)
       hasP = (index(s10p, "reuse_lookup") > 0 || index(s10p, "reuse-lookup") > 0 \
               || index(s10p, "no existing seam") > 0 || index(s10p, "no seam fits") > 0 \

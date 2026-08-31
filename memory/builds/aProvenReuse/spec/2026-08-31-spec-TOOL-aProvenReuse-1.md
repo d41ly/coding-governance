@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-1 — hygiene check 12 grades §10's CONTENT, behind a declared cutoff
 
-**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 1 · ratified 2026-08-31
+**Status:** SPECCED · rev-4 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 1 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round1.md) | diff-review | TOOL-aProvenReuse-2 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-diff-review-round2.md) | diff-review | TOOL-aProvenReuse-2 TOOL-aProvenReuse-5 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-2 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-2 |
 
@@ -48,10 +49,20 @@ the check works in a clone the run never touched.
   `tools/memory-tree/check-memory-hygiene.sh`: for a spec graded against the ten-section canon whose
   filename date is at or after `SPEC10_EVIDENCE_CUTOFF`, the §10 body must satisfy BOTH arms below.
 - **S3** — the arms, matched case-insensitively as plain substrings (`index()`, never a regex, so no
-  awk-dialect question arises):
-  - **arm T (the recall terms)** — the body contains `recall terms` or `--terms`.
-  - **arm P (the probe result)** — the body contains `reuse_lookup`, `reuse-lookup`,
-    `no existing seam`, `no seam fits`, or `reuse-first`.
+  awk-dialect question arises), over TWO blobs:
+  - **arm T (the recall terms)** — the whole §10 body contains `recall terms` or `--terms`.
+  - **arm P (the probe result)** — the §10 body TRUNCATED AT THE FIRST TERMS MARKER contains
+    `reuse_lookup`, `reuse-lookup`, `no existing seam`, `no seam fits`, or `reuse-first`. The probe
+    fact must therefore be recorded BEFORE the terms.
+  - **Why two blobs.** A terms list is 8-14 words of this corpus's jargon and those words routinely
+    include a probe token, so a single blob let the terms line alone satisfy BOTH arms — all three
+    of this build's own specs did exactly that, and the probe half could not fail. A per-LINE cut was
+    the first repair and it leaked in turn: a terms list that WRAPS puts its tail on a line carrying
+    no marker, and a probe token there bought the probe half. Both holes were reproduced against the
+    shipped awk before either fix was written.
+  - **The ordering is measured, not asserted.** Over the 264 Tier-2 post-`SPEC10_CUTOFF` specs here,
+    132 record the probe token before the terms marker and 5 record it only after. All 5 are
+    grandfathered, the template states the order, and the failure message names the missing fact.
 - **S4** — the failure line names WHICH arm is missing and the cutoff that armed it, so the remedy
   is readable without opening the checker.
 - **S5** — `tools/memory-tree/SPEC-TEMPLATE.template.md` §10 states the two required facts and names
@@ -64,8 +75,17 @@ the check works in a clone the run never touched.
   version discipline, and `bash tools/check-kit-versions.sh` is the authority on which carriers.
 - **S7** — self-test arms in `tools/memory-tree/check-memory-hygiene.test.sh` covering: a
   post-cutoff spec missing arm T reds; one missing arm P reds; one satisfying both passes; a
-  PRE-cutoff spec missing both passes; and a Tier-1 post-cutoff spec missing both PASSES, which is
-  the arm that pins N4.
+  PRE-cutoff spec missing both passes; a Tier-1 post-cutoff spec missing both PASSES, which is the
+  arm that pins N4; the SKELETON's own §10 body reds, which is what stops the instructional prose
+  moving back inside the copyable fence; and a WRAPPED terms list with a probe token on its
+  continuation line reds, which is the arm that fails if the probe blob ever returns to a per-line
+  cut. Arm T's fixture carries probe tokens INSIDE its terms value, so it also pins the two-blob
+  split from the other side.
+- **S9** — the §10 rules live ABOVE the skeleton fence in
+  `tools/memory-tree/SPEC-TEMPLATE.template.md`, not inside it. Every word that satisfies this
+  predicate is a word an explanation of it must contain, so instructional prose inside the copyable
+  skeleton passes the gate on its boilerplate alone and an author who never fills the section is
+  never told — the could-not-fail class this unit exists to refuse, one level up.
 - **S8** — the kickoff manifest's `last-audit` re-stamp. `memory/guides/SESSION-KICKOFF.md` watches
   `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`, both edited here, and
   `kickoff-manifest ratchet` is the first leg in `tools/gate-legs.json`. Its C5 fails on a watched
@@ -207,8 +227,14 @@ question and nothing to flip.
 - **AC5a** — the cutoff hazard is re-measured across `git for-each-ref refs/heads`, not just the
   worktree index, immediately before the value is pinned, and the declared value is strictly after
   every dated spec the enumeration returns.
-- **AC6** — `bash tools/memory-tree/check-memory-hygiene.test.sh` passes with S7's five arms present,
-  and the arm count the suite reports moves by five.
+- **AC6** — `bash tools/memory-tree/check-memory-hygiene.test.sh` passes with S7's arms present, and
+  the assertion count the suite reports rises. Measured: 254 before this unit, 262 after its first
+  five arms, and higher again once the skeleton and wrapped-terms arms landed.
+- **AC10** — the copyable skeleton's own §10 body, fed to the predicate lifted from
+  `tools/memory-tree/check-memory-hygiene.sh`, scores `hasT=0 hasP=0`. Observed directly against the
+  shipped awk, not inferred from a fixture passing.
+- **AC11** — a §10 whose terms list WRAPS with `reuse_lookup` on the continuation line scores
+  `hasT=1 hasP=0`. Observed the same way, and it is the case the per-line repair got wrong.
 - **AC7** — `bash tools/check-kit-versions.sh` exits 0 after the version move.
 - **AC8** — `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, and the RENDERED
   `memory/TEMPLATE-SPEC.md` §10 names both required facts and the `SPEC10_EVIDENCE_CUTOFF` key.
@@ -247,6 +273,11 @@ question the spec audit owns, not a predicate. Nothing checks arm content either
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-4 · 2026-08-31 · closing-diff-review round-2 fold. Round 2 found this spec had NOT been
+  folded after round 1 at all: it still specified a single-blob scan and five self-test arms while
+  the code had neither. S3 now states the two-blob split and the measurement behind its ordering, S7
+  names all seven arms, S9 records why the §10 rules sit above the skeleton fence, and AC10 and AC11
+  are the two observations that were made against the shipped awk but never written down.
 - rev-3 · 2026-08-31 · round-2 spec-audit fold, at the loop's NON-CONVERGENT exit. Blocker F2
   restored the shell-side `SPEC10_EVIDENCE_CUTOFF=""` preset the rev-2 edit had dropped; under
   `set -u` its absence aborts the gate in every adopter whose conf predates the key. Blocker F1
