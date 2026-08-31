@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-08-31T13:16:40+03:00 @ 14e21399f7dd0559224837a2754fcbf9fc4a754b
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; tools/gate-legs.toml; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+last-audit: 2026-08-31T13:46:01+03:00 @ 14e21399f7dd0559224837a2754fcbf9fc4a754b
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.toml; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d902165a87967eb0d3f1fe280876948745e6a8e3
+last-body-change: b6e6a84294c231c265c0da6db2f653b6dc8f31ba
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -115,12 +115,15 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
+# CEILINGS AND THE TURNSTILE SHIP OFF since 2026-08-31: a default bar enforces no leg ceiling and
+# claims no beacon, and says so on the profile line. GATE_CEILINGS=1 / GATE_TURNSTILE=1 or [bar]
+# in tools/gate-legs.toml turn them on. A green earned unbounded is not the older green.
 bash tools/run-gates/run-gates.sh --leg "<name>"   # SHARD: that leg only, guard and hold bypassed, repeatable. Never stamps gate-full-green
 bash tools/run-gates/run-gates.sh --list|--manifest   # names, or the declaration as a table with each ceiling joined to gate-ledger.tsv
-GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
-GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
-GATE_OPTIN=1 bash tools/run-gates/run-gates.sh   # also run every OPT-IN leg (GATE_SELFTESTS is the accepted alias). Held by default, owner ruling 2026-08-26; GATE_FULL does NOT unlock them
-# Every leg declares a `ceiling` in tools/gate-legs.toml and the runner KILLS one that outlives it, RED naming the leg. TOOL-aBoundedCeiling-1
+GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the concurrency rollback
+GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push DECIDES whether to set it and prints which it chose
+GATE_OPTIN=1 bash tools/run-gates/run-gates.sh   # also run every OPT-IN leg (GATE_SELFTESTS is an alias). Held by default
+# Every leg declares a `ceiling`; the runner KILLS one that outlives it ONLY when enforcement is on.
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```

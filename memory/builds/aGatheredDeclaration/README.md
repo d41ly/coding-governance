@@ -4,7 +4,7 @@ node: a
 opened: 2026-08-31
 streams: tooling
 roster: TOOL
-ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8
+ids: TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 TOOL-aGatheredDeclaration-9 TOOL-aGatheredDeclaration-10
 authorized-by: prompt
 ---
 
@@ -22,14 +22,11 @@ runner over a richer manifest, NicoCares runs this kit over a manifest declaring
 prompt record holds the measurements.
 
 ## Expected improvements
-- One owner-readable, commented `gate-legs.toml` declares legs, opt-in, ceilings, guards, lanes AND
-  the profile table, so adjusting the bar is one file and every number keeps its argument beside it.
-- `run-gates.sh` grows a real argument surface, so a single leg can be run by name and the manifest
-  can be printed — the shard the bar has never had.
-- Ceilings become owner opt-in and default OFF, which converts a class of killed-leg reds into
-  evidence.
-- The turnstile ships disabled, so no adopter inherits a queue that can wedge their landings.
-- One upgrader migrates any adopter's manifest and its tests onto the canonical declaration.
+- One owner-readable `gate-legs.toml` declares legs, opt-in, ceilings, guards, lanes AND profiles,
+  so adjusting the bar is one file and every number keeps its argument beside it.
+- A single leg can be run by name: 14 seconds against a 26-minute floor.
+- Ceilings and the turnstile ship OFF, opt-in, which turns killed-leg reds into evidence.
+- One upgrader migrates any adopter's manifest onto the declaration.
 
 ## Detriments if this is not built
 - Owners keep editing three files to change one bar, and JSON keeps silently deleting the reasoning.
@@ -38,35 +35,19 @@ prompt record holds the measurements.
 - The two adopter dialects keep diverging, and each new adopter picks a third.
 
 ## Build-level rules
-- **Reuse before invention: the runner already exists.** `tools/run-gates/` is a kit with an adopter
-  and 1480 lines of measured behaviour. Nothing here builds a second runner.
-- **inCMS is prior art, not a competitor.** Its `optIn`, `phase`, `cwd` and its `INCMS_GATE_UNBOUNDED`
-  banner discipline are harvested into the canonical schema. Its 863-line runner is not ported.
+- **Reuse before invention: the runner already exists.** Nothing here builds a second one.
+- **inCMS is prior art, not a competitor.** Its `optIn`, `cwd` and its unbounded-ceiling banner are
+  harvested; its 863-line runner is not ported.
 - **A knob may never turn a leg into a PASS or a SKIP.** `gate-profiles.txt`'s governing invariant
-  survives the move verbatim; ceilings going OFF produces strictly MORE evidence, never less.
-- **Ceilings off must announce themselves twice and durably** — a banner before the first leg and a
-  line in the summary — so a green earned unbounded is never mistakable for one earned bounded.
-- **Every new gate and every changed refusal has its failing case observed RED first.**
-- **The closing diff review returned BLOCKED at precision 0.94 and every blocker and high is fixed.**
-  Four blockers, three of which were this repo's own merge bar RED at HEAD — govkit selfcheck,
-  lexicon, codebase-map — so the branch could not have landed. Eight highs, including a gate proven
-  unable to fail, a `cwd` key accepted and honoured nowhere, and `[[profile]]` rows that were pure
-  decoration. Eleven mediums and three lows remain OPEN and are listed in the review record.
-- **Nothing lands outside this repository.** The adopters are reviewed and an upgrader is shipped;
-  migrating each one is that repo's own build, on its own bar (owner ruling, 2026-08-31).
-- **The spec-audit loop ended NON-CONVERGENT at round 4, and no blocker was promoted.** Blocker
-  counts ran 5, 4, 3, 4; four is not strictly smaller than three, so under `BUILD-METHOD.md` M4 the
-  loop STOPPED and there is no round 5. M4 promotes every blocker STILL STANDING at the exit, and
-  all four were closed by the round-4 fold, so none stands and none was promoted. Three of the four
-  were `amendment-leaves-its-other-half-standing` in the round-3 fold's own text — editing residue
-  in these specs, where the fold IS the fix and there is no unit of work left to spec. The fourth
-  was a real design contradiction and is resolved in unit 2 S10. Promoting a stale paragraph to a
-  numbered unit would be ceremony this method's own budget rule argues against.
-- **Round 4's report was written by this run, not by the harness.** Its synthesis agent died on a
-  session limit after every finder and skeptic had returned, so the record was reconstructed from
-  the run journal by the same agent that authored the specs it grades. The conflict is stated in
-  that record's opening section rather than hidden, and the adjudicated count went AGAINST this
-  run's interest — four ends the loop where two would have continued it.
+  survives the move verbatim; ceilings OFF produce strictly MORE evidence, never less.
+- **Ceilings off announce themselves twice and durably**, so a green earned unbounded is never
+  mistakable for one earned bounded.
+- **Every new gate has its failing case observed RED first — and its passing case too.** One arm
+  here was fixed from cannot-fail straight into cannot-pass before both were checked.
+- **Nothing lands outside this repository** (owner ruling, 2026-08-31).
+- **The closing diff review returned BLOCKED at precision 0.94; every blocker and high is fixed.**
+  Three of four blockers were this repo's own merge bar RED at HEAD. Eleven mediums and three lows
+  remain OPEN in the review record.
 
 ## Parked decisions
 **TWO UNITS SHIPPED PARTIALLY, and the unbuilt halves are named rather than left behind a green.**
@@ -100,20 +81,20 @@ inside a migration whose whole claim is behaviour-neutrality.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 8 unit(s) · node a · opened 2026-08-31 · streams tooling
-ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8
+**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-08-31 · streams tooling
+ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclaration-3 TOOL-aGatheredDeclaration-4 TOOL-aGatheredDeclaration-5 TOOL-aGatheredDeclaration-6 TOOL-aGatheredDeclaration-7 TOOL-aGatheredDeclaration-8 TOOL-aGatheredDeclaration-9 TOOL-aGatheredDeclaration-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | INPROGRESS | rev-1 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-3 — the runner's argument surface: `--list`, `--leg`, `--manifest`](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-3.md) | 3 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | CLOSED | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
 Records: 10 bound to this build, across 4 record folder(s).

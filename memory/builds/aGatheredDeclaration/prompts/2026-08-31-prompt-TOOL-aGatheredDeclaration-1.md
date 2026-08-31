@@ -93,7 +93,7 @@ of this build subsumes or must not break.
 | `TOOL-aScannedThrottle-7` | `run-gates evidence` reds under load on a 5-second bound |
 | `TOOL-aSiftedFork-6` | the canary's clamp arms use `timeout` unguarded and blame the clamp on a host without it |
 | `TOOL-aBoundedVerdict-26` | `run-gates.sh | tail -N` returns tail's status, discarding the verdict |
-| `TOOL-aDeclaredCeiling-1` | make a ceiling a DECLARED pin rather than a shell constant — the same shape this build generalises |
+| the `aDeclaredCeiling` build, row 1 | make a ceiling a DECLARED pin rather than a shell constant — the same shape this build generalises |
 | `TOOL-aMeteredTurnstile-3` | the timing cache evicts on the RUN, never on the manifest, so a renamed leg keeps its row forever |
 | `TOOL-aCollapsedScan-5` | written when no leg declared a ceiling; all 86 now do, so it needs re-reading against the tree rather than acting on |
 | `TOOL-dSpentCeiling-8` | the full bar is nondeterministic under its own concurrency on at least two legs |

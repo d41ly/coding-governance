@@ -1,5 +1,5 @@
 .githooks/pre-commit	1
-.githooks/pre-push	2
+.githooks/pre-push	1
 .githooks/pre-push.test.sh	1
 WIRE-INTO-PROJECT.md	27
 coding-governance-agents.template.md	2
@@ -35,7 +35,7 @@ tools/hooks/agent-cap.js	5
 tools/hooks/agent-cap.test.sh	3
 tools/hooks/scratch-guard.js	1
 tools/hooks/scratch-guard.test.sh	4
-tools/install-prefix-carried.txt	87
+tools/install-prefix-carried.txt	88
 tools/install-prefix-waivers.txt	6
 tools/lexicon/LEXICON.md	3
 tools/lexicon/README.md	10
@@ -75,6 +75,7 @@ tools/playbook/kit.toml	1
 tools/playbook/render_playbook.py	1
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3
 tools/run-gates/README.md	1
+tools/run-gates/adopt-run-gates.sh	1
 tools/run-gates/kit.toml	2
 tools/run-gates/profile_bar.py	1
 tools/run-gates/profile_bar.test.sh	9
@@ -82,7 +83,7 @@ tools/run-gates/run-gates.evidence.test.sh	5
 tools/run-gates/run-gates.gov.test.sh	4
 tools/run-gates/run-gates.sh	3
 tools/run-gates/run-gates.test.sh	33
-tools/run-gates/run-gates.turnstile.test.sh	21
+tools/run-gates/run-gates.turnstile.test.sh	23
 tools/settings-merge.py	1
 tools/unattended/.unattended.conf.example	2
 tools/unattended/adopt-unattended.sh	2

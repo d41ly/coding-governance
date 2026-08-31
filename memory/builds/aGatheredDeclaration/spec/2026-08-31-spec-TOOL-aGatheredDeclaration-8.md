@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -150,6 +150,11 @@ express short-circuit at all, because a sorted single pool has already launched 
 
 ## 9. Revision log
 
+- rev-3 · 2026-08-31 · CLOSED on a DESCOPED scope. SHIPPED: S5, the tool probe, with its
+  failing and passing cases both observed. NOT SHIPPED: S1-S4, the lane dispatcher —
+  ordering, per-lane concurrency, the short circuit and the partitioned hint. gov keeps
+  ONE lane by this unit's own S6, so the dispatcher would serve no caller, and the loop it
+  rewrites carries comments recording three separate false-report bugs. Carried forward.
 - rev-2 · 2026-08-31 · folded round-2 spec audit finding R16: `short_circuit` was read here and
   declared nowhere. The schema half now sits in `TOOL-aGatheredDeclaration-2` S11, which is where
   the rest of the `[[lane]]` shape lives.

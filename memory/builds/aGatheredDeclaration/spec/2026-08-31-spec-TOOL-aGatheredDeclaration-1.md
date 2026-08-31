@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-1 — the adopter review, and the schema union it implies
 
-**Status:** INPROGRESS · rev-1 · 2026-08-31 · node a · Tier-1 · base 44734f15 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-08-31 · node a · Tier-1 · base 44734f15 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-2 — `gate-legs.toml`, the one declaration the bar is read from
 
-**Status:** INPROGRESS · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

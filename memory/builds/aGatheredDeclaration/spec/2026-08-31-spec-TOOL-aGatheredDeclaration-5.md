@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED
 
-**Status:** INPROGRESS · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

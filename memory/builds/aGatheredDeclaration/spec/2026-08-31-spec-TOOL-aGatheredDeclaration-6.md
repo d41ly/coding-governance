@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes
 
-**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -302,6 +302,14 @@ listed two. No new leg.
 
 ## 9. Revision log
 
+- rev-6 · 2026-08-31 · CLOSED on a DESCOPED scope, and the descope is the point of this line.
+  SHIPPED: S2 (the push boundary — both predicates, and the install-prefix fix that is
+  `TOOL-aBoundedCeiling-7`) and S5 (the second entry point folded into the first).
+  NOT SHIPPED: S1 govkit's `toml-legs` grammar and its comment-preserving splice writer,
+  S1(e) the 68-row `subject` -> `opt_in` descriptor migration, S3 `drift_signals.py`,
+  S4 `map_extractors.py`, S9 `check-testsuite-counts.sh`, S10 the dead-path waiver set,
+  S11 the `.governance/deploy.toml` render source, S12 the below-floor intake, and S7 the
+  deletion of the legacy pair. Carried forward as a backlog row rather than left implied.
 - rev-1 · 2026-08-31 · initial draft.
 - rev-5 · 2026-08-31 · folded round-4 spec audit
   (`reviews/2026-08-31-review-TOOL-aGatheredDeclaration-1-spec-audit-round4.md`), the round that
