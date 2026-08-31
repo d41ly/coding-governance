@@ -1,6 +1,6 @@
 # TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration
 
-**Status:** OPEN · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
+**Status:** INPROGRESS · rev-5 · 2026-08-31 · node a · Tier-2 · base 44734f15 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

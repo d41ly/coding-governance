@@ -47,6 +47,11 @@ prompt record holds the measurements.
 - **Ceilings off must announce themselves twice and durably** — a banner before the first leg and a
   line in the summary — so a green earned unbounded is never mistakable for one earned bounded.
 - **Every new gate and every changed refusal has its failing case observed RED first.**
+- **The closing diff review returned BLOCKED at precision 0.94 and every blocker and high is fixed.**
+  Four blockers, three of which were this repo's own merge bar RED at HEAD — govkit selfcheck,
+  lexicon, codebase-map — so the branch could not have landed. Eight highs, including a gate proven
+  unable to fail, a `cwd` key accepted and honoured nowhere, and `[[profile]]` rows that were pure
+  decoration. Eleven mediums and three lows remain OPEN and are listed in the review record.
 - **Nothing lands outside this repository.** The adopters are reviewed and an upgrader is shipped;
   migrating each one is that repo's own build, on its own bar (owner ruling, 2026-08-31).
 - **The spec-audit loop ended NON-CONVERGENT at round 4, and no blocker was promoted.** Blocker
@@ -64,7 +69,17 @@ prompt record holds the measurements.
   run's interest — four ends the loop where two would have continued it.
 
 ## Parked decisions
-None. One AMENDMENT, recorded in `RUN.md`: the round-1 spec audit returned BLOCKED with five
+**TWO UNITS SHIPPED PARTIALLY, and the unbuilt halves are named rather than left behind a green.**
+`TOOL-aGatheredDeclaration-8` shipped its tool probe and NOT its lane dispatcher: gov keeps one lane
+by that unit's own S6, so the dispatcher would serve no caller, and the loop it would rewrite carries
+comments recording three separate false-report bugs. `TOOL-aGatheredDeclaration-6` shipped the push
+boundary and the entry-point fold and NOT govkit's `toml-legs` grammar, the 68-row descriptor
+migration, `drift_signals.py`, `map_extractors.py`, `check-testsuite-counts.sh`, the
+`.governance/deploy.toml` render source, the dead-path waiver set, or the deletion of the legacy
+pair. Each commit names its own remainder. The owner decides whether that remainder is a follow-up
+build or a reason to hold this one.
+
+One AMENDMENT, recorded in `RUN.md`: the round-1 spec audit returned BLOCKED with five
 blockers, and finding F9 showed unit 2 was carrying a dispatcher rewrite it had priced as a format
 change. Lanes and the tool probe became `TOOL-aGatheredDeclaration-8` rather than being built
 inside a migration whose whole claim is behaviour-neutrality.
@@ -97,7 +112,7 @@ ids TOOL-aGatheredDeclaration-1 TOOL-aGatheredDeclaration-2 TOOL-aGatheredDeclar
 | [TOOL-aGatheredDeclaration-4 — ceiling enforcement becomes owner opt-in, default OFF](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-4.md) | 4 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-5 — the turnstile beacon ships DISABLED](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-5.md) | 5 | 2 | INPROGRESS | rev-4 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-6 — every reader moves, and the second entry point closes](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-6.md) | 6 | 2 | OPEN | rev-5 | 2026-08-31 |
-| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | OPEN | rev-5 | 2026-08-31 |
+| [TOOL-aGatheredDeclaration-7 — the upgrader: any adopter's manifest and its tests, onto the declaration](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-7.md) | 7 | 2 | INPROGRESS | rev-5 | 2026-08-31 |
 | [TOOL-aGatheredDeclaration-8 — lanes, the tool probe, and the dispatcher they need](spec/2026-08-31-spec-TOOL-aGatheredDeclaration-8.md) | 8 | 2 | OPEN | rev-2 | 2026-08-31 |
 <!-- /gen:build-units -->
 
