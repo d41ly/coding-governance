@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md](../build/2026-08-31-build-TOOL-aGradedMandate-1-kit-quality-review.md) | research | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
+| [2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md](../build/2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md) | journal | TOOL-aGradedMandate-11 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round1.md) | spec-audit | TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 | [2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-1-spec-audit-round2.md) | spec-audit | TOOL-aGradedMandate-2 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 |
 
@@ -131,10 +132,14 @@ promotion clause already grades.
 - **AC5** — `grep -c "46 records" tools/unattended/unattended.sh` returns `0`, and the replacement
   sentence names the measured 208/170 pair.
 - **AC6** — `bash tools/unattended/run-unattended-gates.sh --checks` stays green.
-- **AC7** — SUPERSEDED by `TOOL-aGradedMandate-11`, which round 2 promoted out of this criterion.
-  The census pinned here was answered from memory rather than from the tree and was wrong by
-  eighteen: executed over all 28 tracked `RUN.md`, the predicate passes 7 and refuses 21. Unit 11
-  owns the measured record and the criterion that reads it.
+- **AC7** — The candidate predicate has been RUN over every tracked `RUN.md` before the term was
+  wired, printing hits and near-misses, and its output is committed at
+  `build/2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md`. The criterion is a
+  DIVERGENCE from that measured set, never a count typed here: re-running the probe the record
+  carries reproduces its pass and refuse sets, and any NON-TERMINAL record that refuses is a finding
+  the record must name and dispose of. The earlier form of this bullet pinned three expected hits,
+  was answered from memory rather than from the tree, and was wrong by eighteen — which is why
+  `TOOL-aGradedMandate-11` exists.
 - **AC8** — This build's own closing diff review records its rounds with
   `--review <slug> --subject aGradedMandate`, the bare slug, so this run's record satisfies S1's
   exact join. Verified by `bash tools/unattended/unattended.sh --status aGradedMandate` before

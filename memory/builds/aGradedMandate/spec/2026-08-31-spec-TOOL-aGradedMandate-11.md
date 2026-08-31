@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md](../build/2026-08-31-build-TOOL-aGradedMandate-11-closing-loop-census.md) | journal | TOOL-aGradedMandate-1 |
 | [2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md](../reviews/2026-08-31-review-TOOL-aGradedMandate-10-promotion-audit.md) | spec-audit | TOOL-aGradedMandate-10 |
 
 <!-- /gen:spec-records -->

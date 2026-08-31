@@ -179,19 +179,28 @@ belonging here:
 
 1. **The phase**, from the vocabulary in §3, each claim carrying a witness.
 2. **The keepalive id**, recorded by `--preflight` from the value the agent hands it (§5).
-3. **Parked entries**, of five kinds, which `park()`'s own kind argument already discriminates: a
+3. **Parked entries**, of eight kinds, which `park()`'s own kind argument already discriminates: a
    parked DECISION — the question, the options seen, and the reason the run refused, because a bare
    "parked" is indistinguishable from "forgotten" — an ABORT reason, a recorded DoD OVERRIDE, an
-   owner directive WAIVER (§10), and a PROPOSAL. Each kind names the verb that writes it: `--park`,
-   `--abort`, `--close --override`, `--preflight --waive` and `--propose` respectively. DECISION had no writer for as long as
+   owner directive WAIVER (§10), a PROPOSAL, a RESCOPE amendment, a DISPATCH write-set declaration
+   and a REVIEW round. Each kind names the verb that writes it: `--park`, `--abort`,
+   `--close --override`, `--preflight --waive`, `--propose`, `--rescope`, `--dispatch` and
+   `--review` respectively. DECISION had no writer for as long as
    this contract has instructed a run to park one, so the instruction could not be obeyed — a rule
    with no route is a rule nobody follows, and it took a build hitting it to notice.
 
    **Every kind belongs to one of two CLASSES, and the classes are not the kinds.** A `surfaced` kind
-   the owner must be shown; a `history` kind they need not adjudicate. All four kinds above are
-   `surfaced`, waiver included, since §10's waiver entry reaches the owner through the same wrap-up.
-   Membership is declared once, in the driver's `PARK_KINDS_OWED`, and `history` is the COMPLEMENT
-   — absent from that set IS history, so there is no second list to keep in step. The split exists
+   the owner must be shown; a `history` kind they need not adjudicate. DECISION, ABORT, OVERRIDE and
+   WAIVER are `surfaced`, the waiver included, since §10's waiver entry reaches the owner through the
+   same wrap-up.
+   Membership is declared on TWO AXES, and both declarations are the driver's. The KIND axis is
+   `PARK_KINDS_OWED`. The ACT axis is `PARK_ACTS_OWED`, which names the acts of the `rescope` kind
+   the owner is owed — `retire` and `supersede`, because M3 delegates a build's scope RESOLUTION and
+   not its scope ABANDONMENT, while `add` stays history as the declaration it is. `history` is the
+   COMPLEMENT on both axes, so there is still no third list to keep in step, and a row owed on either
+   axis is surfaced on neither count twice. A SECOND constant rather than a `kind:act` member grammar
+   inside the first: the gate leg greps this driver for a `park` call site per owed member, and no
+   `park "$rel" rescope:retire` call site can exist, because the act is a field of the reason. The split exists
    because a count of decisions the owner must adjudicate is worthless once append-only round history
    shares the region. The first `history` kind is `review`: a round carries a verdict and a count, not
    a question and options. Its shrink-only floor is NOT armed — the sets beside it pin from the project
@@ -310,7 +319,7 @@ deny) or pick one arbitrarily (nondeterminism, which is the worst property a gat
 
 ## 4. The Definition of Done
 
-Ten kit-owned core items. Each names its checker, because an override budget must not be spent on
+Eleven kit-owned core items. Each names its checker, because an override budget must not be spent on
 something no machine could have checked:
 
 | Item | Checked by | Asserts |
@@ -323,6 +332,7 @@ something no machine could have checked:
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures that a review of what shipped exists and is bound to THIS run, never what the review concluded |
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
 | `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
+| `specs-audited` | machine | every unit the build README's generated region carries as CLOSED is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`. The id join is WHOLE-TOKEN and expands the `N..M` range form the binding grammar admits, because a substring join lets `TOOL-x-19` satisfy `TOOL-x-1` and an unexpanded one blocks a unit that WAS audited. It measures that the pre-code review pass the build method makes MUST-by-default left evidence; it does not read what the audit found, whether it ran at the unit's current rev, or whether a WONTDO unit was audited at all — a LOWER bound, which is what makes it safe as a refusal and useless as a certificate |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
 
@@ -541,6 +551,7 @@ where this document says it may:
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
+| `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |

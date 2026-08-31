@@ -286,7 +286,7 @@ CONF="$ROOT/.unattended.conf"
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""
 GATE_BOUND=""
 # shellcheck disable=SC1090
@@ -340,7 +340,7 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent"
 
 # the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
 # for the reason those are: a parked row whose kind is outside this set lands in a region every
@@ -354,6 +354,19 @@ PARK_KINDS="decision abort override waiver proposal rescope dispatch review"
 # dispatch is a claim about what two passes will write. Counting any of them as parked would make a
 # run that recorded six of its own acts look like a run that stalled on six decisions.
 PARK_KINDS_OWED="decision abort override waiver"
+# The ACTS of the `rescope` kind the owner is owed an ANSWER to. A SECOND constant rather than a
+# `kind:act` member grammar inside the set above, and the reason is a measured refusal rather than a
+# preference: check 2's dead-member loop in the gate leg greps this driver for `park "$rel" <member> `
+# per member, and there is no `park "$rel" rescope:retire` call site and never will be, because the
+# act is a field of the reason and not part of the kind. A pair grammar therefore reds
+# `unattended kit gate` on the tree it ships with.
+#
+# WHY RETIREMENT IS OWED AT ALL. `rescope` sits outside the owed set on the argument that an
+# amendment is a DECLARATION the run made rather than a question it refused - which is about whether
+# the owner must ANSWER, not about whether they must be TOLD. M3 delegates a build's scope
+# RESOLUTION; it does not delegate scope ABANDONMENT. The mechanism that lets a run GROW its build
+# was silently shrinking it too, and `add` stays history for exactly the original reason.
+PARK_ACTS_OWED="retire supersede"
 # The Definition-of-Done items an override may NOT buy. A DECLARED set rather than a name hardcoded
 # into a case arm: it WAS one name, and the second arrived as an acceptance criterion this build had
 # ratified and never implemented — found by writing the arms the item never had.
@@ -1832,6 +1845,29 @@ nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
 _ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
+# The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
+# wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
+# written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
+# expands it, which is the memory-tree kit's, and this kit copy-installs without it. Measured over
+# this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
+# expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
+# `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
+expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
+  awk '{
+    n = split($0, w, /[ \t]+/)
+    for (i = 1; i <= n; i++) {
+      t = w[i]
+      sub(/@rev-[0-9]+$/, "", t)
+      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+        p = index(t, "..")
+        head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
+        match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
+        stem = substr(head, 1, RSTART - 1)
+        for (k = lo; k <= hi; k++) print stem k
+      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+    }
+  }'
+}
 # S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
 # exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
 # status as "absent", so the message names both possibilities and the repair.
@@ -1975,7 +2011,11 @@ verb_plan() { # slug
     # header parsed, so this branch grades a file already known to be a unit.
     st="${SPEC_ST[$spec]:-}"
     state=$(plan_state "$spec")
-    case "$st" in CLOSED|WONTDO) state="DONE" ;; esac
+    # The grade is printed BESIDE `DONE`, never in place of it. This line USED to overwrite it, so a
+    # unit closed against a spec stating no acceptance criterion read exactly like one closed against
+    # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
+    # answer mattered. `build-complete`'s sixth term is the refusal; this is the human half.
+    case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
     printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
     _graded=1
     case "$state" in
@@ -2615,7 +2655,7 @@ verb_status() { # slug
   # it to a file nobody re-opens. Omitted at zero, so the ordinary line does not grow a `· 0`.
   # DERIVED alternation. This line typed four kinds, so the fifth was a row --status did not
   # recognise at all - the silent-skip shape, one verb over from the gate that bans it.
-  nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$PARK_KINDS_OWED")) · item " "$rel" 2>/dev/null || true)
+  nparked=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z (($(kinds_re "$PARK_KINDS_OWED")) · item |rescope · item ($(kinds_re "$PARK_ACTS_OWED")) )" "$rel" 2>/dev/null || true)
   if [ "${nparked:-0}" -gt 0 ] 2>/dev/null; then parked=" · parked $nparked"; else parked=""; fi
   # The rows the owner is TOLD about but owes no answer to, counted apart and printed apart. Folded
   # into `parked`, a run that recorded six of its own acts would read exactly like a run that stalled
@@ -2625,7 +2665,10 @@ verb_status() { # slug
   # this line was written.
   unowed=$(park_kinds_unowed)
   if [ -n "$unowed" ]; then
-    nnoted=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null || true)
+    # PARTITION, not two overlapping counts: the kind alternation selects, and the act exclusion
+    # removes the `rescope` rows the owed count above already took. `parked + noted` equals the
+    # number of parked rows whose kind is in PARK_KINDS, which is the invariant the suite arms.
+    nnoted=$(grep -E "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null | grep -cvE "$(history_exclude_re)" || true)
     [ "${nnoted:-0}" -gt 0 ] 2>/dev/null && parked="$parked · noted $nnoted"
   fi
     # The halt code on the status line, when the record carries one. A vocabulary with no reader
@@ -3128,6 +3171,41 @@ dod_met() { # slug · run-state file · item · checker
 $_bcnon"
         return 1
       fi
+      # ---- TERM 6: a CLOSED unit whose spec grades THIN. `plan_state` already computes this - it is
+      # ---- the kit's own predicate for "too thin to build against" - and `verb_plan` overwrote the
+      # ---- grade with DONE one line after computing it, so nothing at any layer ever asserted what
+      # ---- "done" meant for the unit.
+      # ----
+      # ---- ORDERED LAST, so a structural failure still reports as a structural failure. Every term
+      # ---- above returns early with its own message and this one must never mask one.
+      # ----
+      # ---- The message names the UNIT and NOT the empty section: `plan_state`'s per-section map is
+      # ---- built and consumed inside its own awk END block and the caller receives one bare token,
+      # ---- and widening that output would ripple into two harnesses that SLICE the function body.
+      # ---- The grade is a single token by design.
+      # ----
+      # ---- DATE-GRANDFATHERED on the spec's FILENAME date against SPEC_THIN_CUTOFF, the same idiom
+      # ---- UNITS_REGION_CUTOFF uses. Two of 307 tracked CLOSED specs grade THIN today, both from a
+      # ---- pre-kit July build, and a term that reds a landed spec no run may rewrite is unlandable.
+      # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
+      local _bcthin="" _bcid _bcsp _bcdate
+      if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
+        DOD_OUT="note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
+        return 0
+      fi
+      load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+      for _bcid in $(printf '%s\n' "$_bcrows" | grep -E '\| CLOSED \|' | _ids_of); do
+        _bcsp="${SPEC_PATH[$_bcid]:-}"
+        [ -n "$_bcsp" ] && [ -r "$_bcsp" ] || continue
+        _bcdate=$(basename "$_bcsp" | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        [ -n "$_bcdate" ] || continue
+        printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C || continue
+        [ "$(plan_state "$_bcsp")" = THIN ] && _bcthin="$_bcthin $_bcid"
+      done
+      if [ -n "$_bcthin" ]; then
+        DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
+        return 1
+      fi
       return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
@@ -3144,10 +3222,16 @@ $_bcnon"
       # --preflight stages the run-state file, so an untracked review is excluded by construction
       # rather than by a filter. Through GIT() so the object-substitution lever stays inert.
       #
-      # It measures that a record EXISTS and names the pinned base. It does not judge what the
-      # review said, and no verdict grammar is anchored: `^## Verdict: CLEAN` matches zero of this
-      # corpus's 46 records, so anchoring one would make the item unsatisfiable against every review
-      # this repo has ever written.
+      # It measures that a record EXISTS and names the pinned base. It does not anchor a VERDICT
+      # GRAMMAR on the selected record, and the reason is no longer the one this comment used to
+      # give. It said `^## Verdict: CLEAN` matched zero of a 46-record corpus; RE-MEASURED
+      # 2026-08-31 the corpus is 208 tracked review records with 170 carrying `^## Verdict`, made
+      # mandatory forward of `REVIEW_VERDICT_CUTOFF` by memory hygiene check 22 and written by
+      # tools/workflows/tier2-review.js. The rule survives its own premise dying, for a better
+      # reason: this walk selects the FIRST matching record in ls-files order, a converged loop's
+      # round-1 record legitimately reads BLOCKED and is never rewritten, so a verdict anchored here
+      # reds honest landings. The DISPOSITION of a review loop is read from the --review rows
+      # instead, by the term at the bottom of this arm.
       # SEVEN characters, not eight. Git's default abbreviation here is seven, so that is how records
       # spell it: measured, 29 of 48 tracked records use seven and an eight-char needle matched NONE
       # of them, this build's own record included. The item was therefore UNMEETABLE and clearable
@@ -3204,6 +3288,104 @@ $_bcnon"
         fi
         return 1
       fi
+      # ---- SECOND TERM: the loop must have ENDED, and the record already says whether it did.
+      # A markdown file existing under `reviews/` says a review HAPPENED. It does not say the review
+      # loop reached an exit, and the difference is the whole finding this term was built for: a run
+      # that records BLOCKED, fixes the cheap half, records a smaller BLOCKED and then simply stops
+      # calling the verb satisfies every clause above. Two records in this tree reached LANDED in
+      # exactly that state with this item MET.
+      #
+      # THE INCENTIVE, which is the damaging half: recording one more round can return
+      # NON-CONVERGENT, which obliges the run to promote every standing blocker into a specced,
+      # built unit. Recording nothing owed nothing, because the gate leg's own loop check is
+      # population-gated on the rows a run VOLUNTEERED. Candour was charged for and silence was
+      # refunded, at exactly the moment the work is worst.
+      #
+      # WHAT THIS DOES NOT CHECK, per the charter's rule that a gate's own header says so: it does
+      # not read what the review CONCLUDED, does not open the review record, and does not judge
+      # whether the blockers were real. It reads that a loop for this build ran and reached one of
+      # its three declared exits. `NON-CONVERGENT` and `CEILING` are legitimate exits whose own
+      # obligations the leg's promotion clause grades; this term only refuses the absence of any exit.
+      #
+      # THE SUBJECT IS THE BUILD SLUG, exactly, because `review_last_reason` compares the item with
+      # `!=` as its sibling does. A spec-audit round keyed `<slug>-specs` is a different subject and
+      # does not satisfy a closing-review term - which is correct, and is why the build method tells a
+      # closing round to take the bare slug.
+      local _crlast _crb
+      _crlast=$(review_last_reason "$rel" "$slug")
+      if [ -z "$_crlast" ]; then
+        DOD_OUT="a tracked diff-review record exists, but this run recorded no --review round whose subject is the build slug, so nothing on the record says the closing loop ever ran or ever ended: expected --review $slug --subject $slug in $rel"
+        return 1
+      fi
+      case "$_crlast" in
+        *CONVERGED*|*NON-CONVERGENT*|*CEILING*) ;;
+        *)
+          DOD_OUT="the last recorded review round for this build carries no terminal token, so the closing loop is still open and was abandoned rather than finished; record the round that ends it: $_crlast"
+          return 1 ;;
+      esac
+      # CONVERGED IMPLIES ZERO. `verb_review` cannot write any other pairing, so this is a
+      # consistency assertion over a hand-edited record rather than a second policy.
+      case "$_crlast" in
+        *CONVERGED*)
+          _crb=$(printf '%s' "$_crlast" | grep -oE 'blockers [0-9]+' | grep -oE '[0-9]+' | head -1)
+          if [ "${_crb:-1}" != 0 ]; then
+            DOD_OUT="the last review round claims CONVERGED while naming a non-zero blocker count, which no verb in this driver can write, so the record was edited by hand: $_crlast"
+            return 1
+          fi ;;
+      esac
+      return 0 ;;
+    specs-audited)
+      # The spec audit is an `all`-scoped DIRECTIVE that no machine anywhere observed, while the
+      # memory-tree index generator renders the exact gap into every build README and the run commits
+      # that line as part of its own work. This item reads the evidence instead of the rendered line,
+      # because that line is the memory-tree kit's and this kit copy-installs without it.
+      #
+      # WHAT IT DOES NOT CHECK, per the charter's rule that a gate's own header says so: whether the
+      # audit FOUND anything, whether it was performed at the unit's current rev, and whether a
+      # WONTDO unit was ever audited. It is a LOWER bound by construction - `has ever named` - which
+      # is what makes it safe as a refusal condition and useless as a certificate.
+      #
+      # OVERRIDABLE, deliberately, unlike `authorization-reachable`: a genuinely thin Tier-1 unit
+      # becomes a recorded decision rather than an invisible skip.
+      DOD_OUT=""
+      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_miss=""
+      if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
+        DOD_OUT="the build README carries no well-formed units marker pair, and this item reads the roster from that region: $(readme_of "$slug") · repair: the --write mode of tools/memory-tree/gen_build_index.py"
+        return 1
+      fi
+      _sa_ids=$(printf '%s\n' "$_sa_rows" | grep -E '\| CLOSED \|' | _ids_of)
+      if [ -z "$_sa_ids" ]; then
+        # ANNOUNCED, not silent. A met-with-nothing-to-check is indistinguishable from coverage
+        # unless it says so, which is this repo's own named class.
+        DOD_OUT="skipped — no unit of this build is CLOSED, so no spec audit is owed yet"
+        return 0
+      fi
+      # THE INDEX, not the worktree, and the first twelve UNFENCED lines, not the whole file. The
+      # index is this kit's stated per-run population and the reason --preflight stages the run-state
+      # file; the twelve-line window is the binding grammar's own, and without it a review record
+      # QUOTING another record's binding line satisfies the join for a unit nobody audited. Through
+      # GIT() so the object-substitution lever stays inert.
+      _sa_named=$(
+        for _sa_f in $(GIT ls-files -- "$M/builds/$slug/" 2>/dev/null); do
+          case "$_sa_f" in *.md) ;; *) continue ;; esac
+          GIT show ":$_sa_f" 2>/dev/null | awk '
+            /^```/ { fence = !fence; next }
+            fence  { next }
+            { n++ }
+            n > 12 { exit }
+            /^\*\*Serves:\*\*/ && /spec-audit/ { print }'
+        done | expand_id_runs)
+      for _sa_id in $_sa_ids; do
+        printf '%s\n' "$_sa_named" | grep -qxF -- "$_sa_id" || _sa_miss="$_sa_miss $_sa_id"
+      done
+      if [ -n "$_sa_miss" ]; then
+        if [ -z "$(printf '%s' "$_sa_named" | tr -d '[:space:]')" ]; then
+          DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass the build method makes MUST-by-default left no evidence; units closed without one:$_sa_miss"
+        else
+          DOD_OUT="a CLOSED unit is named by no tracked spec-audit record, so its spec was never audited before its code was written:$_sa_miss"
+        fi
+        return 1
+      fi
       return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
@@ -3223,7 +3405,9 @@ $_bcnon"
       _pn=$(printf '%s' "$_pv" | grep -oE '[0-9]+' | head -1)
       # The SURFACED class only, and the qualifier is load-bearing: a count inflated by `history`
       # lines would report the opposite of what it is for.
-      _pa=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z ($(printf '%s' "$PARK_KINDS_OWED" | tr ' ' '|')) · item " "$rel" 2>/dev/null || true)
+      # TWO ALTERNATIONS, one per axis: a bare OWED KIND, or a `rescope` row whose first item token
+      # is an OWED ACT. `verb_status` spells the same pair and the two must not diverge.
+      _pa=$(grep -cE "^[0-9][0-9-]*T[0-9:]*Z (($(kinds_re "$PARK_KINDS_OWED")) · item |rescope · item ($(kinds_re "$PARK_ACTS_OWED")) )" "$rel" 2>/dev/null || true)
       # THE CLOSE VERB'S OWN OVERRIDE PARKS NEED NO ARITHMETIC, and getting that wrong once is why
       # this comment is here. They are appended AFTER the Definition of Done is evaluated, so at the
       # moment this predicate runs the record holds exactly the N the agent should have attested. The
@@ -3349,6 +3533,17 @@ kinds_re() { # word-list -> word|word|word
   for w in $1; do out="${out:+$out|}$w"; done
   printf '%s' "$out"
 }
+# The HISTORY side of the split, and it has TWO AXES because the owed side does. The KIND axis is
+# the complement below. The ACT axis is this pattern: a `rescope` row whose first item token is an
+# OWED act is NOT history, and without this exclusion such a row matches BOTH alternations and
+# `--status` reports one retirement as an unanswered decision AND as a note. That is the two-readers-
+# of-one-taxonomy defect the split exists to prevent, reproduced by the split preventing it.
+#
+# A PATTERN rather than a widened word list, because the complement below returns KINDS and an act is
+# not a kind. The counter applies it per row; `kinds_re` is untouched and stays the owed side's.
+history_exclude_re() { # -> the ERE for rows an unowed KIND matches but an owed ACT removes
+  printf '^[0-9][0-9-]*T[0-9:]*Z rescope · item (%s) ' "$(kinds_re "$PARK_ACTS_OWED")"
+}
 park_kinds_unowed() { # -> the kinds the owner is NOT owed an answer to, by DIFFERENCE
   # A difference rather than a second list, so the two sets cannot disagree. A sixth kind added to
   # PARK_KINDS and not to the owed set appears in the status split automatically instead of becoming
@@ -3435,6 +3630,24 @@ review_state() { # prior-counts (space separated) · this count -> the state
 
 # The rounds already recorded for one subject, in order. Derived from the LINE SET — there is no
 # round-count fact to parse, and the only grammar split here is the park helper's own output.
+# The LAST round's reason text for one subject, which is where the terminal token lives.
+# `review_counts` projects the COUNT out of the same rows and throws the token away, so this is its
+# sibling rather than a second parser: one grammar, spelled once per projection, in the same shape so
+# the two cannot disagree about what a row is.
+review_last_reason() { # run-state file · subject -> the last round's reason text, or empty
+  awk -v subj="$2" '
+    $0 ~ /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+      line = $0; sub(/\r$/, "", line)
+      i = index(line, " · item "); if (i == 0) next
+      rest = substr(line, i + length(" · item "))
+      j = index(rest, " · reason "); if (j == 0) next
+      item = substr(rest, 1, j - 1)
+      if (item != subj) next
+      last = substr(rest, j + length(" · reason "))
+    }
+    END { if (last != "") print last }' "$1"
+}
+
 review_counts() { # run-state file · subject -> the blocker counts, in order
   awk -v subj="$2" '
     $0 ~ /^[0-9][0-9-]*T[0-9:]*Z review · item / {

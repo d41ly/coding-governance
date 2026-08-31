@@ -494,8 +494,14 @@ definition, so the absence is a decision and not an oversight.
 
   ```bash
   bash {{KIT_DIR}}/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict PASS
+  bash {{KIT_DIR}}/unattended.sh --record-piece <slug> --path <piece> --leg <name> --verdict FAIL
   bash {{KIT_DIR}}/unattended.sh --record-set <slug> --leg <name> --verdict PASS
   ```
+
+  **`FAIL` is spelled here on purpose.** The verdict is validated for SPELLING and nothing else —
+  no leg is executed and nothing compares your word to an outcome — so an example set that only ever
+  says `PASS` is the instruction layer answering the question for you, on the one item `--close` will
+  not let you override. `NA` is the third member, for a leg whose declared coverage mode is dark.
 - **When building uncovers what speccing could not, AMEND — do not stall.** M3 delegates this build's
   own scope and M2 names the three acts: RETIRE a unit, SUPERSEDE it, or ADD one the build turns out
   to need. Every amendment owes a row, and this is the verb that writes it:
@@ -509,6 +515,13 @@ definition, so the absence is a decision and not an oversight.
   constraints. An id already in the units region may never LEAVE it — retiring is a status flip to
   `WONTDO` with a successor or reason in the header tail, never a deletion, because the
   authorization compares BASE against HEAD as a subset and refuses a removal.
+
+  **A RETIREMENT reaches the owner's one turn; an ADDITION does not.** `retire` and `supersede` are
+  surfaced-class rows and are counted among the decisions your `parked-decisions-surfaced`
+  attestation must cover, while `add` stays history. The asymmetry is the point: M3 delegates a
+  build's scope RESOLUTION and never its scope ABANDONMENT, so growing the build is a declaration you
+  made and dropping declared scope is something the owner is entitled to read. `--status` counts the
+  two apart.
 - **Before dispatching two passes at once, DECLARE what each will write.** The build method requires
   both path lists written down first, and this verb is what reads one:
 
@@ -523,6 +536,20 @@ definition, so the absence is a decision and not an oversight.
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+- **Run the bug-class checklist after every commit, and act on it before the next pass begins.** It
+  is the one per-pass quality act on CODE, the build method mandates it per pass and again over the
+  whole range on every closing round, and until now no carrier this kit ships even named it:
+
+  ```bash
+  python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
+  ```
+
+  It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
+  spelling resolves to an empty range and prints "touches no file", which reads exactly like a clean
+  checklist and is not one. Its stdout IS the checklist and it always exits 0, so finish it rather
+  than reading its status. A class it names that is already violated is the next pass. (Adopters
+  whose memory tree ships without that kit have no such command; the obligation is then whatever
+  their own build method names.)
 - Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
 
 ## While the work runs
@@ -566,8 +593,11 @@ It answers with one of four states, and the state is what you act on:
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
 - **CONVERGED** — zero blockers. The loop is done for that subject.
 - **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
-  becomes a UNIT of this build: specced at its tier, built, closed. Not parked, not waived, and not
-  re-reviewed — a promoted unit is audited as a SPEC, which is what makes promotion terminate.
+  becomes a UNIT of this build: specced at its tier, built, closed. Not parked, not waived, not
+  retired, and not re-reviewed — a promoted unit is audited as a SPEC, which is what makes promotion
+  terminate. **`not retired` is in that list because it is the cheapest exit and the one the
+  enumeration used to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion
+  count, which reads new ids, and `build-complete`, which reads only that no row is non-terminal.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
@@ -629,11 +659,17 @@ can observe them: that you reaped the keepalive (`{{KEEPALIVE_DELETE}}`), and th
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
 gate says so wherever it reports them.
 
-**One item has NO override, and this is where you will meet it.** `authorization-reachable` cannot be
-overridden, waived or attested around: an override on the authorization check IS the authorization
-check, so the verb refuses the pair rather than recording it. If a close blocks on that item, the
-answer is never a flag — it is that this run cannot show what authorized it, and the remedy is
-outside the close.
+**TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
+`pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
+authorization check IS the authorization check, so the verb refuses the pair rather than recording
+it; and `pieces-complete` is the item saying a recipe-mode run produced what the owner asked for over
+content nothing else on the bar can grade, so an override on it is the run certifying its own output.
+A recipe run is the one most likely to meet the second.
+
+**The exit is `--abort`, not a flag.** If a close blocks on either, the answer is never an override —
+it is that this run cannot show what authorized it, or cannot show it made what was asked for, and
+`--abort` is the honest exit. The refusal names the rule and the exit, so you do not have to
+remember which of the two you hit.
 
 Write each with the VERB, never by editing the record:
 

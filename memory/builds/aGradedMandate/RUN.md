@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 54309e9c565d30b695ba353adfb8503a3a98dfee
-phase: FOLDING
+witness: 58116a11be4bd98693d84e5ed1cb6d7a7036b497
+phase: BUILDING
 branch-sha: 54309e9c565d30b695ba353adfb8503a3a98dfee
 branch-ref: refs/heads/branch/unattended-kit-adversarial-review-6810dc
 mode: prompt
