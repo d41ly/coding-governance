@@ -3,7 +3,6 @@ slug: aClosedDocket
 node: a
 opened: 2026-08-31
 streams: tooling
-status: INPROGRESS
 roster: TOOL
 ids: TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3
 authorized-by: prompt
@@ -63,23 +62,31 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-08-31 · streams tooling
+**Build status:** OPEN · 3 unit(s) · node a · opened 2026-08-31 · streams tooling
 ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | OPEN | rev-1 | 2026-08-31 |
+| [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | OPEN | rev-1 | 2026-08-31 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aClosedDocket-1` | no |
+| 2 | `TOOL-aClosedDocket-2` | no |
+| 3 | `TOOL-aClosedDocket-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
