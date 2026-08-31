@@ -11,14 +11,19 @@ then with `aClosedDocket` while it ran, and a merge changes the population a cou
 
 | Figure | Value | Taken at |
 |---|---|---|
-| driver suite `unattended.test.sh` | GREEN, 895 assertions, up from 864 | `ed281374`, BEFORE both merges |
+| driver suite `unattended.test.sh` | GREEN, **910 assertions**, up from 864 | `5c9568da`, after both merges and both folds |
+| driver suite, earlier reading | GREEN, 895 assertions | `ed281374`, before the merges — kept because several lines below were written against it |
 | gate leg `check-unattended.sh` | GREEN end to end | `ed281374`, and again at `34f8c5bb` after the reconcile |
 | tracked `RUN.md` records | 28 | pre-merge; **29 at HEAD**, and the census record is dated evidence rather than a live query |
 | `DOD_CORE` members | 11 | pre-merge; **12 at HEAD**, after `reuse-probed` landed beside `specs-audited` |
 | `CORE_FLOOR` | `12:11` | pre-merge; **`12:12` at HEAD**, moved in the same reconcile |
 
-*The driver suite figure is the one to re-take: it predates both the closing fold's two arms and the
-merge's, so the post-merge run is a larger number and this line does not guess it. The leg's own
+*The driver suite figure WAS re-taken, which is why two rows carry it. Round 2 of the closing review
+asked for exactly that, and the answer is 910 rather than a number guessed forward from 895. Two
+earlier attempts at this reading are void and are named so nobody trusts them: one died on a syntax
+error because it was running while the merge had conflict markers in the driver, and one was killed
+because it was running while this build edited the suite's own floor block. A suite run over a file
+edited mid-flight is not evidence. The leg's own
 suite `check-unattended.test.sh` was NOT run, on an explicit owner instruction given mid-build, which
 is why several criteria carry the AMENDED form rather than a false OBSERVED one. No count is written
 here for those: the lines below are the population, and a number typed beside a set it does not derive
