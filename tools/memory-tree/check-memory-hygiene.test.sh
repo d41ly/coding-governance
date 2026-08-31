@@ -1480,8 +1480,21 @@ done
 # the parity requirement, which is precisely the failure this arm exists to prevent, one level up.
 # The comment strip matters for the same reason: the raw pattern matched prose, so a key could reach
 # the population by being MENTIONED rather than read.
-_engreads=$(sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memory-hygiene.sh" \
-  | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//' | sort -u)
+# ---- TWO DERIVATIONS, UNIONED, and the second one is TOOL-aProvenReuse-5. The `${NAME:-}` form
+# ---- below is not the only way the engine reads an adopter override: a key can be PRESET bare at
+# ---- the top, sourced over by the conf, and read bare thereafter. Every CUTOFF in this file works
+# ---- that way, so this arm could not see a single one of them — and two adopter keys were already
+# ---- through the hole when that was found. FORK_MARK_CUTOFF and REVIEW_VERDICT_CUTOFF were absent
+# ---- from the shipped example and nothing noticed; the build that found it had just added a third
+# ---- key by the same route. `_CUTOFF$` is the shape, because that is the convention every one of
+# ---- them follows and a broader `^[A-Z0-9_]+=` would sweep in engine internals.
+_engpresets=$(sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memory-hygiene.sh" \
+  | grep -oE '^[A-Z][A-Z0-9_]*_CUTOFF=' | sed 's/=$//' | sort -u)
+n=$((n+1))
+[ -n "$_engpresets" ] || { echo "FAIL could not derive any bare *_CUTOFF preset from the engine, so the parity arm is back to the blind spot TOOL-aProvenReuse-5 closed"; st=1; }
+_engreads=$( { sed 's/[[:space:]]#.*$//; s/^[[:space:]]*#.*$//' "$HERE/check-memory-hygiene.sh" \
+  | grep -oE '\$\{[A-Z][A-Z0-9_]+:[-=]' | sed 's/^\${//; s/:[-=]$//'
+  printf '%s\n' "$_engpresets"; } | grep . | sort -u)
 # NOT conf keys, and each says why. GOV_PYTHON is an environment override for the python launcher and
 # belongs to no conf; MAP_ROOT is the codebase-map kit's key, read from ITS conf by a check that
 # integrates with it. Declaring either here would tell adopters to set a key this kit does not own.

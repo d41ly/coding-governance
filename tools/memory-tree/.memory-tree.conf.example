@@ -54,6 +54,17 @@ SPEC10_CUTOFF="2026-08-04"
 # red and green fixtures for both.
 SPEC10_EVIDENCE_CUTOFF=""
 
+# Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
+# item must mark the SECTION with the documented resolution shape before its status may go terminal.
+# Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
+FORK_MARK_CUTOFF=""
+
+# Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
+# open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
+# grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes
+# that derivation resolve to nothing.
+REVIEW_VERDICT_CUTOFF=""
+
 # The document a session is pointed at before it touches code; check 16 derives the mandatory read
 # path from it. Usually AGENTS.md or CLAUDE.md.
 CHARTER="AGENTS.md"
