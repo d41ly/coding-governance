@@ -1,6 +1,6 @@
 # TOOL-aProvenReuse-2 — a `reuse-probed` DoD item joins the run to the recall query log
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
+**Status:** SPECCED · rev-3 · 2026-08-31 · node a · Tier-2 · base 3bfc5e87 · streams tooling · order 2 · ratified 2026-08-31
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-08-31-prompt-TOOL-aProvenReuse-1.md](../prompts/2026-08-31-prompt-TOOL-aProvenReuse-1.md) | research | TOOL-aProvenReuse-1 |
 | [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round1.md) | spec-audit | TOOL-aProvenReuse-1 |
+| [2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md](../reviews/2026-08-31-review-TOOL-aProvenReuse-1-spec-audit-round2.md) | spec-audit | TOOL-aProvenReuse-1 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,12 @@ instead of passing in silence.
     `tr -s '/'` collapses the resulting doubles. Octal `\134` rather than a quoted backslash: the
     literal spelling makes GNU tr warn `an unescaped backslash at end of string is not portable`,
     and a gate that prints a warning on every green run trains its reader to ignore it.
+  - **THIS RUN'S TREE IS `git rev-parse --show-toplevel`, and the choice is load-bearing.** Round 2
+    blocker F4 reproduced it: S4's own pipeline returns `3` against `--show-toplevel`
+    (`C:/projects/...`) and `0` against `pwd`, which under Git-Bash gives the MSYS spelling
+    `/c/projects/...`. `query.py` logs `str(repo)`, a Windows path, so only the git-derived operand
+    can ever match. Naming the fold rule while leaving the other operand unstated is half a
+    comparison, and the unstated half is where the false verdict lives.
   - **The compare is EXACT, on the extracted value.** Every worktree here lives under
     `C:/projects/coding-governance/.claude/worktrees/`, so the PRIMARY tree's own logged value is a
     strict PREFIX of all 100-odd linked-worktree rows. A substring test reports MET off another
@@ -73,6 +80,15 @@ instead of passing in silence.
   `tools/unattended/PROTOCOL.template.md` and 0 for `memory/guides/UNATTENDED-PROTOCOL.md`, so
   round-1's "two templates and two renders" model was wrong in both directions and is corrected
   here. The PROTOCOL carriers lose nothing; they GAIN S6a's row.
+- **S6b** — the sentences the S6 edit INVALIDATES but does not contain, which round 2's F15 found
+  still standing. `SKILL.template.md:114-115` continues *"A waived run's spec §10 must NAME the
+  waiver, or the skip leaves no trace at all"*: the first clause survives and becomes TRUE under
+  `TOOL-aProvenReuse-1`, and the trailing clause is falsified by this unit's own `waived` outcome,
+  where `DOD_OUT` names the waiver and its reason. It is replaced by what the `reuse-probed` line
+  now reports. The count phrases in the same paragraphs — *"Two rows carry a consequence"* and the
+  per-handle gloss at `:157` — move with it. An edit that retires a sentence and leaves its
+  neighbouring clause asserting the retired fact is this repo's
+  `amendment-leaves-its-other-half-standing` class.
 - **S6a** — `tools/unattended/PROTOCOL.template.md` gains a `reuse-probed` row in its
   Definition-of-Done table, and the count sentence above it moves `Ten kit-owned core items.` to
   `Eleven`. Both are obligations of S1, not optional polish: `check-unattended.sh` check 16 arm E
@@ -80,17 +96,27 @@ instead of passing in silence.
   against the driver's set, and that leg is the unguarded `unattended kit gate`. Omitted, S1 reds the
   merge bar twice. The render `memory/guides/UNATTENDED-PROTOCOL.md` is refreshed with it.
 - **S7** — self-test arms in `tools/unattended/unattended.test.sh` for all FIVE S2 outcomes. The
-  `met` arm's fixture row is a byte copy of a real `query` row out of a live `queries.jsonl`,
-  escapes included, never one hand-authored from this spec — a fixture written from the same wrong
-  rule as the code agrees with the bug and certifies it. One further arm carries two rows whose
-  paths are prefix-related and asserts the nested one is not counted for the parent.
+  `met` arm's fixture row REPRODUCES A REAL ROW'S ESCAPING — doubled backslashes, `"type": "query"`
+  with the space, the same field order — with the `worktree` value set to the scratch tree's OWN
+  path escaped the same way, and asserts the arm reports MET with a count of 1. Round 2's F9 caught
+  the rev-2 wording, which demanded a literal byte copy of a live row: the suite builds a `mktemp -d`
+  scratch repo, so a copied row names a worktree the fixture is not, and under S4's exact compare it
+  could only ever produce the `zero` outcome. What must be copied is the ESCAPING, which is where the
+  bug was; a fixture authored from the same wrong rule as the code agrees with it and certifies it.
+  One further arm carries two rows whose paths are prefix-related and asserts the nested one is not
+  counted for the parent.
 - **S8** — the kickoff manifest's `last-audit` re-stamp. `memory/guides/SESSION-KICKOFF.md` watches
   `.unattended.conf`, which S5 edits, and `kickoff-manifest ratchet` is the first leg in
   `tools/gate-legs.json`.
-- **S9** — `tools/unattended/kit.toml` declares the memory-recall edge. It ships
-  `requires = ["memory-tree"]` and nothing else today, so an adopter has no way to learn that a CORE
-  DoD item now reads a file another kit writes. S2's `kit absent` outcome makes the item survive
-  without memory-recall; this makes the coupling READABLE.
+- **S9** — the memory-recall coupling is documented in `tools/unattended/README.md`'s update notes,
+  NOT declared in `tools/unattended/kit.toml`. Round 2's F6 asked which field, and the answer is
+  none: `govkit.py:1114-1129` check 7 validates a `requires_if` edge by resolving every
+  `when_any_key_set` member against the kit's own declared config key lists, and `.unattended.conf`
+  declares no key that says whether memory-recall is installed. A hard `requires` is refused by N6.
+  So the edge is real, soft and unconditional, which is a shape the descriptor schema has no
+  evaluator for, and inventing a condition key to satisfy a gate would be a declaration written for
+  the checker rather than for the adopter. It goes where an adopter reads it, beside S5's
+  `CORE_FLOOR` step, and this bullet records WHY rather than leaving a later reader to re-derive it.
 
 ## 3. Non-goals (OUT)
 
@@ -164,8 +190,14 @@ missing log.
 
 ### Migration
 
-None. A run whose log carries no rows meets the `zero` outcome and can override with a reason, which
-is the documented path for every other unmet item.
+**Two migrations, and both are owed.** At the RUN level: none — a run whose log carries no rows meets
+the `zero` outcome and can override with a reason, the documented path for every other unmet item.
+At the ADOPTER level, S5 raises the DoD half of `CORE_FLOOR` from 10 to 11, and that floor is
+REQUIRED from the project's own `.unattended.conf` rather than defaulted — `check-unattended.sh:387`
+refuses an undeclared one outright and `:430` reds when the declared floor sits below the kit's core
+count. So taking this kit version obliges an adopter to edit their own conf, and the step goes in
+`tools/unattended/README.md`'s update notes where they will read it. Round 2's F13 found this
+section reading `None` while S5 moved the floor.
 
 ### Rollout
 
@@ -224,11 +256,18 @@ finding. The item is inert for any run that has run a probe, which every conform
 - **AC7** — `bash tools/unattended/unattended.test.sh` passes with S7's arms present, and
   `bash tools/unattended/run-unattended-gates.sh` exits 0. This IS kit work, so the self-tests the
   2026-08-23 ruling took off the bar are owed here by the Definition of Done.
-- **AC8** — `bash tools/check-kit-versions.sh` exits 0 after the version move, and
-  `grep -rn "is SILENT" tools/unattended/ .claude/skills/unattended/` returns nothing. The grep is
-  scoped to the kit and its renders and deliberately EXCLUDES `memory/builds/`: this build's own
-  README quotes the retired sentence verbatim as its problem statement, and a tree-wide grep would
-  demand deleting the record of why the build exists.
+- **AC8** — `bash tools/check-kit-versions.sh` exits 0 after the version move, and BOTH retired
+  phrases are gone from BOTH carriers. Measured at fold time so the criterion has a before as well
+  as an after: `grep -c` for the case-sensitive phrase `Waiving it is SILENT` returns **1** in each
+  of `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` and must return
+  **0**; `grep -ci` for `is silent and is recommended against` likewise returns **1** in each and
+  must return **0**. Two phrases, two greps, because they differ in CASE and a single
+  case-sensitive pattern for `is SILENT` never sees the second — round 2's F5, independent of F3.
+  The greps name the two files rather than a directory: `grep -rn "is SILENT" tools/unattended/`
+  returns **7** hits at HEAD, five of them unrelated source comments S6 does not touch, so a
+  directory-scoped emptiness assertion cannot pass even after a correct S6 — round 2's blocker F3.
+  `memory/builds/` is excluded for the same reason it always was: this build's README quotes the
+  retired sentence as its problem statement.
 - **AC9** — `bash skills/session-kickoff/manifest-check.sh` exits 0 after S8's re-stamp.
 
 ## 7. Gates
@@ -259,6 +298,15 @@ where the item reports a SKIP and says so.
 ## 9. Revision log
 
 - rev-1 · 2026-08-31 · authored by the aProvenReuse run.
+- rev-3 · 2026-08-31 · round-2 spec-audit fold, at the loop's NON-CONVERGENT exit. Blocker F4 named
+  the comparison's OTHER operand, `git rev-parse --show-toplevel`: reproduced, S4's pipeline returns
+  3 against it and 0 against `pwd`. Blocker F3 and F5 rewrote AC8, whose directory-scoped grep
+  returns 7 hits at HEAD and whose single case-sensitive pattern could not see the second retired
+  phrase. F6 settled S9 — the coupling is documented rather than declared, because check 7's
+  `requires_if` needs a condition key `.unattended.conf` does not have. F9 replaced AC4's
+  byte-copy fixture rule, which cannot match inside the suite's `mktemp` scratch repo, with an
+  escaping-reproduction rule. F15 added S6b for the clauses the S6 edit invalidates without
+  containing. F13 gave §4 the adopter migration S5 created. F14 moved this header OPEN -> SPECCED.
 - rev-2 · 2026-08-31 · round-1 spec-audit fold. Blockers 13, 22 and 34 rewrote S4: the log is
   JSON-escaped, so the separator is two backslash bytes and the rev-1 fold produced
   `C://projects//…` and matched nothing — the item would have reported UNMET on every conforming

@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 11e6d8bbc9e78db0aa275e0750f287871f186939
-phase: SPECCING
+witness: a3c23955a67bd9f75a6f6456a2e44003511ddb9c
+phase: REVIEWING
 branch-sha: 3bfc5e877e1c416781bffa9e5bf5e1b1b7a27036
 branch-ref: refs/heads/branch/unattended-kit-gaps-a3b869
 mode: prompt
@@ -24,3 +24,5 @@ base: 3bfc5e877e1c416781bffa9e5bf5e1b1b7a27036
 ## Parked
 
 2026-08-31T02:26:39Z review · item spec-set · reason verdict BLOCKED · blockers 4
+
+2026-08-31T03:00:51Z review · item spec-set · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT
