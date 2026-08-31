@@ -632,8 +632,7 @@ if [ -n "$adv_remote" ] && [ "$POP" != 0 ]; then
     # un-bounds the observation this leg spent a build bounding: a substitution reads until EOF, EOF
     # waits on the last inherited write end, and a surviving descendant holds it while `timeout`
     # reports on schedule. The name was in the bytes already captured, so it costs no second call.
-    [ "$_rc1" = 0 ] && ADV_NAME=$(awk -F'	' '{ sub(/
-$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); sub(/^refs\/heads\//,"",$1); print $1; exit }' "$adv_f")
+    [ "$_rc1" = 0 ] && ADV_NAME=$(awk -F'	' '{ sub(/$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); sub(/^refs\/heads\//,"",$1); print $1; exit }' "$adv_f")
     observe_remote ls-remote --heads "$adv_remote"; _rc2=$?
     [ "$_rc2" = 0 ] && ADV_TIPS=$(awk -F'\t' '$1 ~ /^[0-9a-f]+$/ { print $1 }' "$adv_f")
     # 124 is the bound firing. Either call hitting it means this leg observed nothing it can trust.
@@ -1105,8 +1104,7 @@ while IFS= read -r f; do
         || fail 17 "a parked waiver line is absent from the run-state file's FIRST committed blob, so it was appended after the record was created and the claim that the owner took it at preflight is not what landed: $wh in $f"
     fi
   done <<WAIVERS
-$(tr -d '
-' < "$f" 2>/dev/null | grep -E '^[0-9][0-9-]*T[0-9:]*Z waiver · item [^ ]* · reason ' || true)
+$(tr -d '' < "$f" 2>/dev/null | grep -E '^[0-9][0-9-]*T[0-9:]*Z waiver · item [^ ]* · reason ' || true)
 WAIVERS
 done <<EOF
 $RUNS
@@ -1574,10 +1572,8 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
   # First match of each, so a template naming either twice is judged on the occurrence the agent
   # reads first. Anchored on the fenced invocation and the literal skill name — neither is a
   # heading, which a reword survives while gutting the body.
-  pfl=$(awk '{ sub(/
-$/,"") } index($0, "unattended.sh --preflight") { print NR; exit }' "$tmpl")
-  kol=$(awk '{ sub(/
-$/,"") } index($0, "/session-kickoff") { print NR; exit }' "$tmpl")
+  pfl=$(awk '{ sub(/$/,"") } index($0, "unattended.sh --preflight") { print NR; exit }' "$tmpl")
+  kol=$(awk '{ sub(/$/,"") } index($0, "/session-kickoff") { print NR; exit }' "$tmpl")
   if [ -z "$pfl" ]; then
     fail 18 "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated: $tmpl"
   elif [ -z "$kol" ]; then
