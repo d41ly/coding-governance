@@ -165,18 +165,32 @@ turns the cap rules off with no diff.
   told from a real one. Modelling regex literals removed that ambiguity and the gap closed as a
   side effect. Worth remembering as a shape — an accepted ceiling can be a SYMPTOM of a different
   missing model, and pricing it on its own terms priced the wrong thing.
-- **Both views now model regex literals; the residual is the regex/division ambiguity.**
-  `TOOL-aPairedLexer-4`. A `/` opens a regex only after a token that cannot END an expression;
-  after an identifier, a number or a closing bracket it is read as DIVISION. Guessing the other
-  way would consume live code to the next `/`, a worse fail-open than the one closed. So a regex
-  literal in an ambiguous position is still mis-modelled, and the unterminated fallback covers it
-  at the per-line view's precision.
-  
-  The history is the useful part: THREE consecutive revisions each shipped a fail-open here, and
-  all three were mitigations of this one missing model — swap the view, widen the flag, key off an
-  EOF signal. An EVEN number of phantom openers closes itself, so every EOF-based signal was blind
-  by construction. The version-parity arm in the self-test now bounds the class: no deny-expected
-  fixture may admit at a version that denied at the previous one.
+- **Both views answer the regex/division question from ONE predicate**, `startsRegex`, and the
+  residual is the ambiguity itself. `TOOL-aPairedLexer-8`. It decides on the previous TOKEN, not the
+  previous character, so `return /re/` is a regex; a keyword used as a PROPERTY NAME is not a keyword,
+  so `obj.in / 2` stays division; `of`, `await` and `yield` are excluded as CONTEXTUAL keywords that
+  are legal identifiers; start of input is a regex position; and a closing QUOTE ends an expression.
+  Each of those five was a measured DENY-to-ADMIT before it was closed, and two of them were
+  introduced BY earlier attempts at this same fix.
+
+  After an identifier, a number, a closing bracket or a closing quote a `/` is DIVISION, so a regex
+  in an ambiguous position is still mis-modelled. `TOOL-aPairedLexer-6` makes that DECLINE announce
+  itself: a declined slash whose span could have been closed by a later slash, and which carried an
+  opener, marks the line ambiguous and routes ALL FOUR rules to the per-line view. Both scanners
+  raise it from the one predicate — an earlier revision patched `renderCodeView` alone while rules 3
+  and 5 gate on `blankLiterals`, so it widened the population that mattered by exactly zero.
+
+  **The cost is a declared trade, not a discovered one.** A legal script whose declined span carries
+  an opener now DENIES, and the workaround is one character: end the statement before the ambiguous
+  regex. Three revisions tried to test the span instead — no closure test gives false positives, a
+  closure test gives false negatives on an identical shape — and the fork is recorded in that unit's
+  spec §8 F1 rather than settled by a fourth attempt. The span is scanned as a REGEX BODY, which is
+  what lets the hook's own `// gov:fixed-verifiers` idiom admit while every phantom span denies.
+
+  The history is the useful part: FOUR consecutive revisions each shipped a fail-open here, and every
+  one was caught by a review rather than by the suite — which printed all-green each time, because
+  every regex arm in it wrote the literal after `=`, an unambiguous position. The version-parity arm
+  bounds the class: no deny-expected fixture may admit at a version that denied at the previous one.
 
 ## Reuse affordance
 
