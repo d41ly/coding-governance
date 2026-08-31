@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-aGradedMandate-1 TOOL-aGradedMandate-2 TOOL-aGradedMandate-3 TOOL-aGradedMandate-4 TOOL-aGradedMandate-5 TOOL-aGradedMandate-6 TOOL-aGradedMandate-7 TOOL-aGradedMandate-8 TOOL-aGradedMandate-9 TOOL-aGradedMandate-10 TOOL-aGradedMandate-11
+unpushed-at-landing: 0
+landed-anchor: remote
 parked-surfaced: yes, 6 surfaced
 keepalive-reaped: yes
-witness: 2aee73b884c020f12c51f4fd9211719ee4d32d01
-phase: LANDING
+witness: 1bf012fcc205d0b63e434d679518aaa9bf99e4e8
+phase: LANDED
 branch-sha: 54309e9c565d30b695ba353adfb8503a3a98dfee
 branch-ref: refs/heads/branch/unattended-kit-adversarial-review-6810dc
 mode: prompt
