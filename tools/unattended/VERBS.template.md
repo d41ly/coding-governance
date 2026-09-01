@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.14 -->
+<!-- gov:kit unattended@1.15 -->
 # Unattended runs — the verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,

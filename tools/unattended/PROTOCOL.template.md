@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.14 -->
+<!-- gov:kit unattended@1.15 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -115,12 +115,12 @@ the units that do not depend on that fork. Only when EVERY remaining unit depend
 halt, with the fork-unresolvable code — a run that can still make progress on something else is not
 stuck, and stopping early spends an owner turn that was not needed.
 
-**The build method is a RUN-TIME dependency of this kit.** Every directive is a pointer into a
-section of `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, so `--preflight` refuses a tree where it is absent rather than starting a run bound
-by a set that resolves to nothing.
+**The build method is a RUN-TIME dependency of this kit.** Every directive (§10) points into a
+section of it, so `--preflight` refuses a tree where `<MEMORY_ROOT>/guides/BUILD-METHOD.md` is absent
+rather than starting a run bound by a set that resolves to nothing.
 
-Absent or unreachable authorization → the run does not start. There is no override for this one: an
-override on the authorization check is the authorization check.
+Absent or unreachable authorization → the run does not start, with no override: an override on the
+authorization check IS the authorization check.
 
 **A SECOND item joined that set**, and the driver holds it as a declared list rather than a name in a
 case arm. `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
@@ -343,16 +343,16 @@ A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the g
 COUNT against the same shrink-only floor, for the reason §3 gives.
 
 `--close` BLOCKS on any unmet item. The override is named (it cites the item), recorded (it writes a
+parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
+override budget: attestation is not a machine verdict, and pretending otherwise makes an override
+look like a check that failed.
+
 **The two attested items have a VERB, the only way to write one.** `--attest <slug> --item <item>
 [--value <text>]` refuses a machine-checked item by reading its declared CHECKER, so a project
 declaring its own agent-attested extra gets the verb and one renaming a machine item gets the
 refusal. Before it existed the keys had no writer, which made `--abort` — the sole documented exit
 from a wedged run, requiring both — reachable only by hand-editing the authored region of a file this
 kit calls generated. The verb removes the hand edit, not the trust assumption §9 states.
-
-parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
-override budget: attestation is not a machine verdict, and pretending otherwise makes an override
-look like a check that failed.
 
 **`authorization-reachable` has NO override, and this is where a close meets that.** §1 states it at
 run START, which is where the rule is decided and not where it is hit — an agent whose close refuses
