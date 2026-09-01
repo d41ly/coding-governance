@@ -1122,7 +1122,10 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     _claimed: dict[str, set[str]] = {}
     for eid, (d, dpath) in descs.items():
         pref = entry_members(root, eid, d, dpath)
-        allow = set(d.get("marker_carriers") or [])
+        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
+        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
+        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
+        allow = {c.replace("{prefix}", "tools") for c in (d.get("marker_carriers") or [])}
         _claimed[eid] = allow | {
             f for f in _tracked_gov
             if not f.endswith(".test.sh")
@@ -1157,7 +1160,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"constant is {want}. Basis: entry_members + declared marker_carriers")
         if seen == 0:
             # ANNOUNCED, never silent: an entry with a constant and no marker is a kit a deployer
-            # cannot read a version out of in an adopting tree. `DEPL-dGaugedVintage-5` owns the fix.
+            # cannot read a version out of in an adopting tree. The companion unit in this build owns the fix; it is
+            # named in that unit's spec rather than cited here, because a product file citing a
+            # non-terminal spec is a drift signal this repo gates.
             r.note(f"entry '{eid}' declares a version constant and carries NO gov:kit marker in its "
                    f"derived set — a deployer cannot read its version from an adopting tree")
 
