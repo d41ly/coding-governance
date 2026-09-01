@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5
+unpushed-at-landing: 14 oldest 269dacae
+landed-anchor: local
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-witness: 0c1ce54b14ce1c01dfe924c06ef93a1a70d3f4b5
-phase: LANDING
+witness: 91fe6edb7f6a93df83be7f3e5791434af49c1fc2
+phase: LANDED
 branch-sha: 269dacae79bd5001486de32b3277675a953d3483
 branch-ref: refs/heads/branch/unattended-kit-workflow-40540b
 mode: prompt
