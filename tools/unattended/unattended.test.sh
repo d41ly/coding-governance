@@ -3852,6 +3852,64 @@ fkspec '- **F1 — a question?** options and a recommendation.
 same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
 
 
+# ---- TOOL-dBriefedPass-1 - THE TIER-1 ARMS. `plan_state` keyed on section ORDINALS, and a Tier-1
+# ---- spec legitimately drops `## 5. Production-readiness checklist`, so every section from five
+# ---- onward renumbers. The ordinal reader therefore graded a Tier-1 spec's GATES as its acceptance
+# ---- criteria, its OPEN QUESTIONS as its gates and its REVISION LOG as its open questions.
+# ----
+# ---- The QUIET half is the one that mattered and it is arm 2: the acceptance slot was filled by the
+# ---- Gates section, so a Tier-1 spec stating NO acceptance criterion at all graded READY. A THIN
+# ---- predicate that cannot fail on a whole spec shape is worse than the loud FORKED false positive
+# ---- beside it, and only one of the two was in the backlog row that reported this.
+t1spec() { # <acceptance body> <open-questions body> -> a TIER-1 shaped spec at $TMP/t1.md
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-1 · base 0123abcd\n\n## 1. Goal\n\n- g\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- n\n\n## 4. Design\n\n- d\n\n## 5. Acceptance criteria\n\n%s\n\n## 6. Gates\n\n- g\n\n## 7. Open questions\n\n%s\n\n## 8. Revision log\n\n- rev-1 first\n- rev-2 second\n' "$1" "$2" > "$TMP/t1.md"
+}
+
+t1spec '- AC1 something observable.' 'none'
+same "tier-1: a filled section 5 acceptance and a none section 7 grades READY" "$(plan_state "$TMP/t1.md")" "READY"
+
+# THE QUIET ONE. Empty acceptance on a Tier-1 spec. The ordinal reader never looked at section 5, so
+# it read the GATES section as acceptance, found it non-empty, and graded READY.
+t1spec '' 'none'
+same "tier-1: an EMPTY section 5 acceptance grades THIN" "$(plan_state "$TMP/t1.md")" "THIN"
+
+# THE LOUD ONE, from both directions. A revision log has bullets and no conforming mark, so the
+# ordinal reader graded EVERY Tier-1 spec FORKED off section 8.
+t1spec '- AC1 observable.' 'none - nothing open here.'
+same "tier-1: a bulleted section 8 revision log does NOT make the spec FORKED" "$(plan_state "$TMP/t1.md")" "READY"
+
+t1spec '- AC1 observable.' '- **F1 - a real question?** options, and no mark anywhere.'
+same "tier-1: a genuinely unresolved section 7 open question IS FORKED" "$(plan_state "$TMP/t1.md")" "FORKED"
+
+# ---- FIRST OCCURRENCE BINDS on a duplicate title. Two arms, because one alone is satisfied by a
+# ---- reader that always takes the LAST. Not a refusal: this function's contract is one bare token,
+# ---- a third outcome has no branch at verb_plan's case and build-complete's string equality
+# ---- discards the exit status, so a refusing spec would grade silently non-THIN where it decides a
+# ---- landing.
+# WHICH OF THESE ARMS ACTUALLY DISCRIMINATE, stated because an arm that passes against BOTH readers
+# is not evidence about the fix and reads exactly like one that is. Driven against the pre-fix bytes
+# before landing: the first THREE Tier-1 arms go RED on the ordinal reader and are the observation
+# this unit exists for. The fourth (an unresolved section 7) passes on both, and on the OLD reader it
+# passes for the wrong reason - it graded the section 8 revision log, whose bullets carry no mark, so
+# FORKED was right by accident. The two duplicate-title arms also pass on both, because the ordinal
+# reader could not match a second `## 9. Acceptance criteria` at all; they pin a rule that title
+# keying makes newly EXPRESSIBLE rather than a behaviour that changed.
+dupspec() { # <first acceptance body> <second acceptance body>
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n%s\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n\n## 9. Acceptance criteria\n\n%s\n' "$1" "$2" > "$TMP/dup.md"
+}
+dupspec '- AC1 filled.' ''
+same "duplicate title: the FIRST occurrence binds, so a filled first section is READY" "$(plan_state "$TMP/dup.md")" "READY"
+dupspec '' '- AC1 filled.'
+same "duplicate title: the FIRST occurrence binds, so an empty first section is THIN" "$(plan_state "$TMP/dup.md")" "THIN"
+
+# ---- THE TIER-2 CONTROL. 397 of the 401 tracked specs are Tier-2 shaped, and a fix that regraded
+# ---- any of them would be a corpus-wide change wearing a bug fix's clothes. Measured before landing
+# ---- by slicing BOTH readers and running them over every tracked spec: 401 graded, 4 regraded, all
+# ---- four Tier-1 and all four FORKED -> READY. These arms pin the shape that measurement covered.
+fkspec 'none'
+same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
+
+
 
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------

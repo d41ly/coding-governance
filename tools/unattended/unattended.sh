@@ -1648,11 +1648,35 @@ refuse_if_terminal() { # run-state file · verb
 # body out of the shipped bytes and evaluates it, so a constant defined outside it would arrive empty.
 plan_state() { # spec file -> prints the M2 state
   awk '
+    # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
+    # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
+    # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
+    # gates, and its REVISION LOG as its open questions. Both halves cost something and the quiet one
+    # cost more. Loud: a revision log has bullets and no conforming mark, so EVERY Tier-1 spec graded
+    # FORKED - reproduced on dTieredTribunal, 2 of 2 Tier-1 FORKED against 6 of 6 Tier-2 clean. Quiet:
+    # the acceptance slot was filled by the Gates section, so a Tier-1 spec stating NO acceptance
+    # criterion at all graded READY, which is a THIN predicate that could not fail on that shape.
+    #
+    # The ordinal is still REQUIRED and still numeric - only its VALUE stops being read - because a
+    # heading with no ordinal is not a canonical section and must not become one here. This is the
+    # spelling the sibling reader in the memory-tree kit already uses (check-memory-hygiene.sh:880,
+    # :939, :1326), copied rather than invented, so the two readers agree by construction instead of
+    # by a case table nobody re-runs. Measured over the tracked corpus before landing: the four titles
+    # are uniform at 393/393/391/396 occurrences with no variant spelling.
+    #
+    # FIRST OCCURRENCE BINDS. The ordinal made a duplicate title inexpressible; keying on the title
+    # removes that accident, so the choice is made here rather than left to whichever branch runs
+    # last. It is NOT a refusal: this function`s contract is one bare token on stdout, a third outcome
+    # has no branch at verb_plan`s case and build-complete`s string equality discards the exit status,
+    # so a refusing spec would have graded silently non-THIN at the one call site where the grade
+    # decides a landing.
     /^## / { sec = ""
-             if ($0 ~ /^## 2\./) sec = "scope"
-             else if ($0 ~ /^## 6\./) sec = "acc"
-             else if ($0 ~ /^## 7\./) sec = "gates"
-             else if ($0 ~ /^## 8\./) sec = "forks"
+             if ($0 ~ /^## [0-9]+\. Scope/) sec = "scope"
+             else if ($0 ~ /^## [0-9]+\. Acceptance criteria/) sec = "acc"
+             else if ($0 ~ /^## [0-9]+\. Gates/) sec = "gates"
+             else if ($0 ~ /^## [0-9]+\. Open questions/) sec = "forks"
+             if (sec != "" && (sec in bound)) sec = ""
+             if (sec != "") bound[sec] = 1
              cur = sec; next }
     cur == "" { next }
     { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
