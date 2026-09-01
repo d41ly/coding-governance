@@ -23,6 +23,8 @@
 - DEPL-dCarriedReceipt-14 · SPECCED · post-write verification: re-run each touched kit's own `[check].argv` and roll back from recorded OIDs on red. A clean three-way can still land a plausible, wrong, executable file → builds/dCarriedReceipt/
 - DEPL-dCarriedReceipt-15 · SPECCED · gov stops shipping literal `tools/<kit>/` paths inside kit bodies — 59 files do. The durable fix for the class `carry` only papers over; make check-install-prefix.sh prefix-parametric → builds/dCarriedReceipt/
 - DEPL-dCarriedReceipt-16 · OPEN · memory-tree renders a record's whole Serves id list into one build-README table row, so a build with 15 units cannot carry ONE spec-audit naming them all: 15 ids blow the 350-char entry cap whatever the filename. Split as a workaround → builds/dCarriedReceipt/
+- DEPL-dGaugedVintage-1 · OPEN · `selfcheck` check 5 asserts an entry's `version_from` file exists and matches one line, never that it sits inside that entry's installed population — so a kit could ship unpinnable. Latent: every include covers it today. 5b only notes → builds/dGaugedVintage/
+- DEPL-dGaugedVintage-2 · OPEN · Status sweep. DEPL-aFerriedDossier-1's declared closer DEPL-dCarriedReceipt-13 (`govkit adopt`) shipped and its spec reads CLOSED rev-8, but the row reads SPECCED — as do dCarriedReceipt-1..15. The rows outlived their specs → builds/dGaugedVintage/
 
 
 - DEPL-aTetheredConvoy-8 · CLOSED · Reconciled `TOOL-dClosedLexicon-13` against receipt schema 2. One of the four filed questions was the schema; two were arms riding the playbook role unit 1 corrected, one was fixture order, plus a vacuous `SKIP` mark. → builds/aTetheredConvoy/
