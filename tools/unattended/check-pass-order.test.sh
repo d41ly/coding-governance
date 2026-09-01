@@ -160,6 +160,21 @@ o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended \`exit 0\` cannot end the leg at 0"   || { echo "FAIL an appended exit 0 ended the leg at 0 -- the subject silenced its own gate"; st=1; }
 rm -rf "$T"
 
+# ---- THE VECTOR THE SPLICE MISSED, and the reason the import assigns an ALLOW-LIST rather than the
+# ---- sibling's uppercase glob. This leg sets DRIVER above the import — the path it eval's its
+# ---- classifier out of — so one tracked conf line redirected it at an attacker-chosen file. The
+# ---- sibling is safe with a glob because it sets nothing it cares about above its own import; a
+# ---- block copied verbatim between two scripts is not the same block.
+T=$(mkfixture build-first)
+( cd "$T" && printf 'echo OWNED; plan_state() { echo READY; }
+' > tools/unattended/evil.sh    && printf '
+DRIVER="tools/unattended/evil.sh"
+' >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+n=$((n+1)); case "$o" in *OWNED*) echo "FAIL a conf line redirected DRIVER, so the leg eval'd a file the graded run chose"; st=1 ;; *) echo "ok   hostile conf: DRIVER is not assignable from the conf" ;; esac
+same "hostile conf: the honest verdict survives the DRIVER line" "$rc" "1"
+rm -rf "$T"
+
 T=$(mkfixture build-first)
 ( cd "$T" && printf "
 trap 'exit 0' EXIT

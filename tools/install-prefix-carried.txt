@@ -35,7 +35,7 @@ tools/hooks/agent-cap.js	5
 tools/hooks/agent-cap.test.sh	3
 tools/hooks/scratch-guard.js	1
 tools/hooks/scratch-guard.test.sh	4
-tools/install-prefix-carried.txt	88
+tools/install-prefix-carried.txt	92
 tools/install-prefix-waivers.txt	6
 tools/lexicon/LEXICON.md	3
 tools/lexicon/README.md	10
@@ -88,6 +88,8 @@ tools/unattended/.unattended.conf.example	2
 tools/unattended/SKILL.template.md	1
 tools/unattended/adopt-unattended.sh	2
 tools/unattended/adopt-unattended.test.sh	2
+tools/unattended/check-pass-order.sh	2
+tools/unattended/check-pass-order.test.sh	14
 tools/unattended/check-playbook.sh	1
 tools/unattended/check-playbook.test.sh	24
 tools/unattended/check-unattended.sh	3
@@ -106,3 +108,5 @@ tools/workflows/check-verifier-fanout.test.sh	1
 tools/workflows/check-workflow-syntax.js	2
 tools/workflows/tier2-review.js	3
 tools/workflows/tier2-review.test.sh	1
+tools/workflows/unattended-build.js	4
+tools/workflows/unattended-build.test.sh	2

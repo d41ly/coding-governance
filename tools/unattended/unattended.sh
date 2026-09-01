@@ -1786,8 +1786,13 @@ order_verb_of() { # spec file -> prints the order integer, or nothing; refuses a
   if [ -z "$n" ]; then
     loose=$(printf '%s' "$hdr" | grep -oE "$ORDER_LOOSE_RE" | head -1)
     if [ -n "$loose" ]; then
-      fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $1 spells [$loose]"
-      return 1
+      # THE REFUSAL IS THE CALLER'S TO MAKE, not this function's. Both call sites read this through
+      # `$( )`, so a `fail` here writes its message into the captured stream and its status dies in
+      # the subshell — the verb then exited 0 with zero bytes of output on a malformed order verb,
+      # which is a silent pass on exactly the input this reader was added to refuse. So the sentinel
+      # comes back on stdout and the caller fails in ITS shell, where the status is real.
+      printf 'MALFORMED %s' "$loose"
+      return 0
     fi
   fi
   printf '%s' "$n"
@@ -4537,12 +4542,20 @@ verb_dispatch() { # slug · unit · writes...
   # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
   # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
   # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
-  _d_ord=$(order_verb_of "$_d_spec") || return 1
+  _d_ord=$(order_verb_of "$_d_spec")
+  case "$_d_ord" in MALFORMED\ *)
+    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
+    return 1 ;;
+  esac
   if [ -n "$_d_ord" ]; then
     for _o_id in $(unit_ids_of "$slug"); do
       [ "$_o_id" = "$unit" ] && continue
       _o_spec="${SPEC_PATH[$_o_id]:-}"; [ -n "$_o_spec" ] || continue
-      _o_ord=$(order_verb_of "$_o_spec") || return 1
+      _o_ord=$(order_verb_of "$_o_spec")
+      case "$_o_ord" in MALFORMED\ *)
+        fail 49 "a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it: $_o_spec spells [${_o_ord#MALFORMED }]"
+        return 1 ;;
+      esac
       [ -n "$_o_ord" ] || continue
       [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
       _o_st="${SPEC_ST[$_o_spec]:-}"

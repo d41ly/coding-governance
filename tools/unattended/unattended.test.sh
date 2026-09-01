@@ -3911,6 +3911,96 @@ same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$
 
 
 
+
+echo "MARK brief-and-dispatch-arms" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
+# ---- run. `check-arms.py` grades a branch as armed only when a test line carries that run, and an
+# ---- arm asserting a short substring reads as UNARMED with no hint why. The strings below were
+# ---- copied out of `check-arms.py --report` rather than retyped, which is what that mode is for.
+mkdir -p memory/builds/tRun/prompts memory/builds/tRun/spec
+printf 'a brief
+' > memory/builds/tRun/prompts/armbrief.md
+git add memory/builds/tRun/prompts/armbrief.md >/dev/null 2>&1
+o=$(run --brief tRun --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"*) echo "ok   brief: --unit is required" ;; *) echo "FAIL brief: --unit is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1)
+n=$((n+1)); case "$o" in *"--brief requires --path, because the brief is the FILE and a row with no path records that one existed"*) echo "ok   brief: --path is required" ;; *) echo "FAIL brief: --path is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-404 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build"*) echo "ok   brief: a unit off the roster is refused" ;; *) echo "FAIL brief: a unit off the roster is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/gone.md)
+n=$((n+1)); case "$o" in *"--brief names a path that is not a file in this tree, so there is nothing to hash and the row would describe nothing"*) echo "ok   brief: a --path naming no file is refused" ;; *) echo "FAIL brief: a --path naming no file is refused -- $o"; st=1 ;; esac
+printf 'untracked
+' > memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/armuntracked.md)
+n=$((n+1)); case "$o" in *"--brief names an UNTRACKED path, and an untracked brief does not travel with the push, so a later reader in a fresh clone finds neither the file nor anything to compare its hash against"*) echo "ok   brief: an UNTRACKED path is refused" ;; *) echo "FAIL brief: an UNTRACKED path is refused -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit "$(printf 'A
+B')" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"*) echo "ok   brief: a newline in the unit forges a second row and is refused" ;; *) echo "FAIL brief: a newline in the unit forges a second row and is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A · B" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"*) echo "ok   brief: the field separator in the unit is refused" ;; *) echo "FAIL brief: the field separator in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A--no-verify" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite"*) echo "ok   brief: the declared bypass flag in the unit is refused" ;; *) echo "FAIL brief: the declared bypass flag in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last"*) echo "ok   dispatch: a unit no spec defines is M2 MISSING" ;; *) echo "FAIL dispatch: a unit no spec defines is M2 MISSING -- $o"; st=1 ;; esac
+printf '# ARCH-tRun-1 — u
+
+**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it"*) echo "ok   dispatch: a THIN unit is refused" ;; *) echo "FAIL dispatch: a THIN unit is refused -- $o"; st=1 ;; esac
+printf '# t
+
+**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd · order 2x
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+- a
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $1 spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/spec/one.md
+
+# A slug with a README and NO run-state file, and one with neither: the two preconditions the
+# verb tests before it looks at anything the caller passed.
+mkdir -p memory/builds/tNoRun
+readme tNoRun
+o=$(run --brief tNoRun --unit ARCH-tNoRun-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no run-state file, so there is no run to record a brief against"*) echo "ok   brief: a build with no run-state file has no run to record against" ;; *) echo "FAIL brief: a build with no run-state file has no run to record against -- $o"; st=1 ;; esac
+mkdir -p memory/builds/tNoRm
+runmd tNoRm "$MANDATE"
+o=$(run --brief tNoRm --unit ARCH-tNoRm-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no build README, so there is no roster to check this unit against"*) echo "ok   brief: a build with no README has no roster to check against" ;; *) echo "FAIL brief: a build with no README has no roster to check against -- $o"; st=1 ;; esac
+
 echo "MARK pass-order-dispatch" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- TOOL-dBriefedPass-3 S1/S2 - THE M2 HARD FLOOR, AT THE MOMENT OF THE ACT. Never build a

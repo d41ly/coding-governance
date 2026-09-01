@@ -50,6 +50,12 @@ BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowed
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
+BUDGET_pass_order_history=90  # measured 12 s over 85 build folders; the walk is one rev-list per
+                              # build plus one plan_state per CLOSED unit, so it scales with the
+                              # build count and the headroom is deliberate. Matches the ceiling
+                              # its gate-legs.json row declares — one figure, two readers.
+BUDGET_pass_order_selftest=180 # measured 41 s; every arm builds a real fixture repository, so the
+                              # cost is git process creation and node d's AV taxes every exec
 
 ONLY="${1:---selftests}"
 case "$ONLY" in

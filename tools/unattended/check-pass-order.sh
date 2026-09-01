@@ -55,7 +55,7 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "pass-order: no .unattended.conf at the repo root, and every value this leg needs is a declaration"; exit 2; }
 [ -f "$DRIVER" ] || { echo "pass-order: no driver beside this script, and the classifier below is sliced out of it"; exit 2; }
 
-MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""; GENERATED_INDEXES=""
+MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""; GENERATED_INDEXES=""; SHARED_RECORDS=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL, and this block is `check-unattended.sh`'s
 # ---- verbatim rather than a third hand-written reader. `$CONF` is a TRACKED file the graded run
 # ---- commits, so sourcing it here executes it, and both siblings hardened this one recorded
@@ -79,7 +79,14 @@ while IFS= read -r -d '' _ck; do
   IFS= read -r -d '' _cv || break
   case "$_ck" in
     __CONF_IMPORT_OK__) _conf_ok=1 ;;
-    [A-Z][A-Z0-9_]*) eval "$_ck=\$_cv" ;;
+    # AN ALLOW-LIST, NOT A GLOB, and this is where the spliced block had to be adapted rather than
+    # copied. The sibling assigns EVERY uppercase key it sees, which is safe THERE because that
+    # script sets nothing it cares about above the import. This one sets DRIVER at :51 — the path it
+    # eval's the classifier out of — so one tracked conf line `DRIVER="tools/unattended/evil.sh"`
+    # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
+    # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
+    # so the stream cannot reach a name the leg did not ask for.
+    MEMORY_ROOT|PASS_ORDER_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS) eval "$_ck=\$_cv" ;;
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -182,10 +189,18 @@ for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
     #
     # `GENERATED_INDEXES` is read from the conf as `index:generator` pairs; only the index half is an
     # excluded path, because a commit touching the GENERATOR is touching product code.
+    # THE RECORD SURFACE a spec pass legitimately writes: this build's folder, the generated indexes,
+    # AND the SHARED RECORDS. The last was omitted at first and it is not a corner — template section
+    # 1 MANDATES a backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md`
+    # in the same commit, which put the commit back outside the exclusion and redded the run that
+    # followed the method exactly. Reproduced on this kit's own fixture.
     _gen_ex=""
     for _gi in $GENERATED_INDEXES; do
       _gp=${_gi%%:*}
       [ -n "$_gp" ] && _gen_ex="$_gen_ex -e ^$_gp"
+    done
+    for _sr in $SHARED_RECORDS; do
+      [ -n "$_sr" ] && _gen_ex="$_gen_ex -e ^$_sr"
     done
     build_c=""
     for c in $(GIT rev-list --reverse "$base..HEAD" 2>/dev/null); do
@@ -230,10 +245,22 @@ done
 # ------------------------------------------------------------------------------- THE LIVENESS LINE
 # THREE COUNTS, one per population this leg WALKS, because a liveness line naming fewer populations
 # than the check walks is a partial probe reporting as a whole one. `unbuilt` is the population step
-# 1 drops - a unit whose build commit is outside its run's own range, which is the ordinary shape for
-# a resumed build - and omitting it would let a run whose every unit fell outside the range print a
-# clean two-count line while grading nothing.
+# 1 drops: a unit whose build commit is outside its run's own range.
+#
+# DO NOT READ A NON-ZERO `unbuilt` AS BENIGN. It is the ordinary shape for a RESUMED build, and it is
+# ALSO what a widened exclusion set looks like — every commit falls inside the excluded surface, no
+# build commit is found, and the leg reports a clean bill with a count a reader has been taught to
+# ignore. An earlier revision of this comment said only the benign half, which is why the exclusion
+# set is now printed beside it.
+# THE EXCLUSION SET IS PRINTED, and that is not decoration. It is composed from two conf keys the
+# GRADED RUN can commit, so widening `GENERATED_INDEXES` to something like `tools:g memory:g` turns a
+# real violation green — and the only trace was the `unbuilt-in-range` count, which this file's own
+# comment teaches a reader is the ordinary shape for a resumed build. Naming the set makes a widened
+# one visible in the one line an operator actually reads. It does not PREVENT the widening: the conf
+# is inside the run's reach and protocol section 1 cost 2 concedes exactly that, so what this buys is
+# a trace, not a guard, and saying which is the point.
 echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $skipped_norun with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range"
+echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 
 if [ -n "$violations" ]; then
   echo "pass-order FAILED — a unit was BUILT before a conforming spec for it existed:$violations"

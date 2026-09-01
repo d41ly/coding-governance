@@ -60,3 +60,5 @@ base: 269dacae79bd5001486de32b3277675a953d3483
 2026-09-01T12:44:50Z dispatch · item 021d29bd TOOL-dBriefedPass-5 · reason tools/unattended/PROTOCOL.template.md tools/unattended/SKILL.template.md memory/guides/UNATTENDED-PROTOCOL.md .claude/skills/unattended/SKILL.md tools/unattended/unattended.sh .unattended.conf tools/unattended/.unattended.conf.example
 
 2026-09-01T13:42:12Z review · item dBriefedPass · reason verdict BLOCKED · blockers 3
+
+2026-09-01T14:37:52Z review · item dBriefedPass · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT

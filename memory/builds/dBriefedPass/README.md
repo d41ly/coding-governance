@@ -77,7 +77,7 @@ ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPas
 | [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

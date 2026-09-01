@@ -10,6 +10,7 @@
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-prompt-TOOL-dBriefedPass-3.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-3.md) | journal | — |
 | [2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
