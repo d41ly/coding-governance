@@ -116,6 +116,7 @@ fi
 ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
+DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
@@ -247,7 +248,28 @@ DOD="$DOD_CORE $DOD_EXTRA"
 # ---- There is no round-count fact to parse. The sequence is DERIVED from the line set, and the only
 # ---- grammar split here is the park helper's own output — which is why adding a round cannot make a
 # ---- record disagree with itself.
-if [ -z "$RUNAWAY_CEILING" ]; then
+_disp_ok=1
+# ---- DISPOSITION_CUTOFF: malformed is a REFUSAL, never a defaulted value, because a cutoff that
+# ---- quietly defaults grades every record or none and nobody can tell which. Same shape as the
+# ---- RUNAWAY_CEILING refusal below it and as check-pass-order.sh's own cutoff guard.
+if [ -n "$DISPOSITION_CUTOFF" ]; then
+  case "$DISPOSITION_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) fail 2 "DISPOSITION_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare grades every record or none: $DISPOSITION_CUTOFF"; _disp_ok=0 ;;
+  esac
+else
+  # ---- ANNOUNCED UNCONDITIONALLY, on stdout, once per run. NOT through report(), which is gated on
+  # ---- GOV_UNATTENDED_REPORT and would make a disabled term invisible on a default bar run — a
+  # ---- silently disabled clause reads exactly like a clause finding nothing wrong.
+  echo "unattended: DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy and reads no recorded disposition — a run that folded correctly is still graded as though it had promoted"
+fi
+if [ "$_disp_ok" != 1 ]; then
+  # ---- AND THE LOOP BELOW IS SKIPPED ENTIRELY. An unreadable cutoff means this leg cannot decide
+  # ---- WHICH predicate applies, and grading every record on the other one is precisely the silent
+  # ---- choice the refusal above exists to prevent. Same shape as the RUNAWAY_CEILING arm beside it:
+  # ---- a term that cannot be read says so instead of quietly picking a default.
+  echo "unattended: check 2 clause 3 graded NO record — the declared DISPOSITION_CUTOFF is unreadable, so which predicate applies cannot be decided and choosing one silently would be the fault the refusal above names"
+elif [ -z "$RUNAWAY_CEILING" ]; then
   fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 else
   rv_bad=""
@@ -277,7 +299,15 @@ else
     fi
     rv_new=""
     [ "$rv_readable" = 1 ] && rv_new=$(comm -23 <(printf '%s\n' "$rv_now") <(printf '%s\n' "$rv_then") | grep -c . || true)
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" '
+    # GRADED ON THE RECORD'S OWN FIRST-COMMIT DATE, the idiom LANDED_ANCHOR_CUTOFF already uses. A
+    # record whose first commit is at or after the cutoff is read for its dispositions; one before it
+    # keeps the id-delta proxy verbatim, messages included.
+    rv_graded=0
+    if [ -n "$DISPOSITION_CUTOFF" ]; then
+      rv_fc=$(GIT log --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
+      if [ -n "$rv_fc" ] && printf '%s\n%s\n' "$DISPOSITION_CUTOFF" "$rv_fc" | sort -C; then rv_graded=1; fi
+    fi
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -290,17 +320,41 @@ else
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING/) term[it] = 1
-        if (rs ~ /NON-CONVERGENT|CEILING/) needs[it] = 1
+        if (rs ~ /NON-CONVERGENT|CEILING/) {
+          needs[it] = 1
+          nf = split(rs, fld, " · ")
+          disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
+        }
       }
       END {
-        nneed = 0
+        nneed = 0; nomiss = ""; illegal = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
           else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
-          if (it in needs) nneed++
+          if (it in needs) {
+            if (graded != 1) nneed++
+            else if (disp[it] == "") nomiss = nomiss " " it
+            else if (disp[it] != "fold" && disp[it] != "promote") illegal = illegal " " it "=" disp[it]
+            else if (disp[it] == "promote") nneed++
+            # a subject recording `fold` demands NOTHING, which is the entire point of reading the
+            # field instead of inferring an answer from ids
+          }
         }
+        if (graded == 1) {
+          if (nomiss != "")
+            printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
+          if (illegal != "")
+            printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set fold|promote - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal
+          if (nneed > 0) {
+            if (readable != 1)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
+            else if (newids + 0 < nneed)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker has no unit. A subject recording disposition fold demands nothing here)", f, nneed, newids + 0
+          }
+        }
+        else {
         # COUNTED ACROSS SUBJECTS, because `newids` is a per-FILE delta. Consumed inside the
         # per-subject loop it let ONE promotion satisfy every subject in the file that exited
         # without converging. A per-subject attribution is not available - the region records ids,
@@ -312,9 +366,10 @@ else
           else if (newids + 0 < nneed)
             printf "\n  %s (%d subject(s) EXITED without converging and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted. This is a LOWER BOUND: it demands one surviving id per exited SUBJECT, not one per standing BLOCKER, because the region records ids and not which subject promoted them)", f, nneed, newids + 0
         }
+        }
       }' "$rvf")"
   done
-  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without promoting:$rv_bad"
+  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.

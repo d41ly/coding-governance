@@ -49,9 +49,9 @@ tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a hal
 # against a driver carrying a bogus member and a Skill naming an invented one. The other five are
 # degradation branches — a constant the leg cannot read, a template the kit does not ship — and are
 # unobserved. They drain when that suite is next run and its arms are written.
-tools/unattended/check-unattended.sh	2	9	the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing
-tools/unattended/check-unattended.sh	2	10	the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says
-tools/unattended/check-unattended.sh	2	11	the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed
+tools/unattended/check-unattended.sh	2	10	the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing
+tools/unattended/check-unattended.sh	2	11	the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says
+tools/unattended/check-unattended.sh	2	12	the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed
 tools/unattended/check-unattended.sh	16	13	cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing
 tools/unattended/check-unattended.sh	16	14	the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces
 tools/unattended/check-unattended.sh	16	15	the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked

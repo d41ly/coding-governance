@@ -216,3 +216,13 @@ LANDED_ANCHOR_CUTOFF=""
 # THIS repo's landing date would grade an adopter's whole back-catalogue from a day their tree
 # knows nothing about. Blank turns the term OFF and the leg announces that it did.
 PASS_ORDER_CUTOFF=""
+
+# DISPOSITION_CUTOFF - the date from which check 2 clause 3 reads a review exit's recorded
+# disposition instead of inferring one from new unit ids. Graded on the run-state record's own
+# first-commit date. A record before it keeps the id-delta proxy verbatim.
+#
+# BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
+# per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole
+# back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
+# announces that it did.
+DISPOSITION_CUTOFF=""
