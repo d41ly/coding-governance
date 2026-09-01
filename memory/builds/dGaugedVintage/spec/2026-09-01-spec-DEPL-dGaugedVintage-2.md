@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7
+**Status:** CLOSED · rev-2 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7 · ratified 2026-09-01
 
 *Tier-1 light profile per `memory/TEMPLATE-SPEC.md`: the status header binds, the ten-section canon
 does not. The sections below are the ones that carry decisions.*
@@ -9,6 +9,7 @@ does not. The sections below are the ones that carry decisions.*
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-2-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-2-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -54,11 +55,15 @@ a hand-fork update path whose declared closer, `DEPL-dCarriedReceipt-13`, shippe
 
 ## 8. Open questions
 
-- **F1 — whether a CLOSED spec is sufficient evidence to close its backlog row.** A spec closes when
-  its unit is built; a backlog row is an ASK, and an ask can outlive the unit that partly served it.
-  Recommendation: require the spec CLOSED and its acceptance ledger present, and where the row's ask
-  is wider than the unit, keep it open with a note. Unresolved.
+- **F1 — whether a CLOSED spec is sufficient evidence to close its backlog row.** RESOLVED (agent,
+  2026-09-01, delegated): the spec CLOSED **and** the acceptance ledger present where one is OWED —
+  which is Tier-2 only. Measured: all fifteen `dCarriedReceipt` specs read CLOSED and thirteen carry
+  a ledger; the two without, `-2` and `-3`, are Tier-1 and owe none, so the rule closes all fifteen
+  without an exception. `prior:` `memory/HYGIENE.md` scopes the ledger to a CLOSED Tier-2 unit.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · BUILT and CLOSED. Sixteen rows reconciled, F1 resolved, and S3 answered
+  YES with the row filed. Acceptance ledger at
+  `build/2026-09-01-build-DEPL-dGaugedVintage-2-acceptance-ledger.md`.

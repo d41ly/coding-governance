@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-01
 streams: deployer
 roster: DEPL
-ids: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11
+ids: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 DEPL-dGaugedVintage-12 DEPL-dGaugedVintage-13
 ---
 
 # dGaugedVintage — the second inCMS dossier, triaged against this tree
@@ -83,13 +83,13 @@ document scopes as a pull.
 | 8 | `DEPL-dGaugedVintage-11` | CLOSED | the relocate rung survives a kit that fans out |
 | 9 | `DEPL-dGaugedVintage-7` | CLOSED | the prefix ratchet counts literals, not lines |
 | 10 | `DEPL-dGaugedVintage-6` | CLOSED | drift-audit's install block stops contradicting itself |
-| 11 | `DEPL-dGaugedVintage-2` | OPEN | fifteen backlog rows reconciled against their CLOSED specs |
+| 11 | `DEPL-dGaugedVintage-2` | CLOSED | fifteen backlog rows reconciled against their CLOSED specs |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 11 unit(s) · node d · opened 2026-09-01 · streams deployer
-ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11
+**Build status:** CLOSED · 11 unit(s) · node d · opened 2026-09-01 · streams deployer
+ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 DEPL-dGaugedVintage-12 DEPL-dGaugedVintage-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -103,11 +103,11 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-10 — a stale measurer reports every row current](spec/2026-09-01-spec-DEPL-dGaugedVintage-10.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-11 — the relocate rung goes quiet exactly where a kit fans out](spec/2026-09-01-spec-DEPL-dGaugedVintage-11.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-7 — a ratchet that counts lines cannot see a swapped literal](spec/2026-09-01-spec-DEPL-dGaugedVintage-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-01 |
-| [DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs](spec/2026-09-01-spec-DEPL-dGaugedVintage-2.md) | 7 | 1 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs](spec/2026-09-01-spec-DEPL-dGaugedVintage-2.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | CLOSED | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 3 record folder(s).
+Records: 13 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
