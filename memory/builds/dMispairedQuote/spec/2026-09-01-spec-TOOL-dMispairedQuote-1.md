@@ -1,13 +1,15 @@
 # TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`
 
-**Status:** INPROGRESS · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-01-red-TOOL-dMispairedQuote-1.txt](../build/2026-09-01-red-TOOL-dMispairedQuote-1.txt) | journal | — |
+| [2026-09-01-build-TOOL-dMispairedQuote-1-acceptance-ledger.md](../build/2026-09-01-build-TOOL-dMispairedQuote-1-acceptance-ledger.md) | journal | TOOL-dMispairedQuote-3 |
+| [2026-09-01-build-TOOL-dMispairedQuote-1-staged-red.md](../build/2026-09-01-build-TOOL-dMispairedQuote-1-staged-red.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dMispairedQuote-1.md](../prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md) | research | TOOL-dMispairedQuote-2 |
+| [2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md) | diff-review | TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md) | spec-audit | TOOL-dMispairedQuote-2 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md) | spec-audit | TOOL-dMispairedQuote-2 |
 
@@ -289,6 +291,7 @@ numbers above come from lifting the predicate out of the candidate file rather t
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-01 · CLOSED. Folded the closing diff review's F1 and F2, both fail-opens this unit introduced and both reproduced: `checkLiteralOpen` copied the whole line prefix per quote, so 8000 literals on one line took 33.8 s and a hook that times out is NON-BLOCKING (now 83 ms, a backward identifier walk); and a throw in the corrected views exited 1, which is also non-blocking, before the shipped pass could run. A third residual was named — an apostrophe after an operator — filed as `TOOL-dMispairedQuote-8` and fixtured. Suite 150 passed / 0 failed.
 - rev-1 · 2026-09-01 · initial draft, written after the five-candidate measurement in §4.
 - rev-3 · 2026-09-01 · folded spec-audit round 2, which exited NON-CONVERGENT at 4 blockers against
   a ceiling of 2. Per BUILD-METHOD M4 the loop STOPPED and every standing blocker was disposed:

@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: da1ea33302de665dcc4a58f25f6d0f1c15da70e0
-phase: BUILDING
+witness: 1c01ce53e4afc22f2031e15dcdf33dcaaf92122d
+phase: VERIFYING
 branch-sha: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 branch-ref: refs/heads/branch/agent-cap-apostrophe-bug-46c953
 mode: prompt
@@ -38,3 +38,5 @@ base: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 2026-09-01T11:30:42Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2
 
 2026-09-01T12:04:02Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
+
+2026-09-01T13:16:41Z review · item dMispairedQuote · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

@@ -73,11 +73,37 @@ function readStdin() {
   }
 }
 
-// Blank the CONTENTS of single/double-quoted string literals so a `parallel(`
-// mentioned in prose (a meta.description, a log message) isn't read as a call.
-// Template literals (backticks) are left ALONE — they can hold real ${code}.
-// Escapes handled; an unbalanced quote (e.g. inside a comment) is left as-is.
-// Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
+// TOOL-dMispairedQuote-1 — the ONE decision this file makes about what OPENS a string literal.
+// All three views below ask it; none of them walks a line looking for a partner itself.
+//
+// A quote opens a literal only where one may legally BEGIN. In valid JavaScript a string's opening
+// quote is never GLUED to the character that ends an expression, and never follows a bare word that
+// is not a keyword — so `don't`, `won't`, `it's`, `y'all` and `run 'em` are TEXT, while `return 'x'`,
+// `case 'y':` and `throw 'z'` are ordinary openers. `LITERAL_OPENERS` is that keyword set, and it
+// omits `in`, `of` and `do`: those are ordinary English connectives, and admitting them let a
+// comment reading "one of 'em" open a span that swallowed a fan-out.
+//
+// WHY THIS AND NOT A REGEX-LITERAL MODEL, since the reported instance was `/won't/` sharing its line
+// with a fan-out and the obvious repair is to model `/…/`. That closes ONE spelling. Measured against
+// the pre-fix hook, four more admit the same raw `parallel(` and none of them is a regex: a
+// double-quoted `"don't"`, a block comment, a backticked `don't`, and loose prose. The APOSTROPHE is
+// the mechanism; the construct around it is not, and a fix keyed on the construct gates the instance.
+// Four of this file's five rules were defeated, rule 5's join ban included.
+//
+// WHAT THE PAIR TEST COULD NOT REACH. `addc6169` already required a matching PAIR before blanking,
+// which fixed an unpaired quote swallowing the rest of its line. A pair exists for
+// `/won't/ … agent('a'` too — the prose apostrophe and the quote opening the call — and blanking
+// between them erased the very call the rules count. Asking what a quote OPENS is the question a
+// partner test cannot ask, and it is why that repair looked like it closed the class and did not.
+//
+// THREE RESIDUALS, stated rather than closed, each with a fixture in the suite and a backlog row:
+//   (a) a BALANCED set of loose prose quotes straddling a fan-out — every quote finds a partner and
+//       none is left over, so nothing is left to notice;
+//   (b) prose whose last word before the apostrophe is one of the keywords below;
+//   (c) prose that puts the apostrophe after an OPERATOR — `/* rock - 'n roll */` — which is a legal
+//       opener position in code and which this predicate cannot tell from prose.
+// None of the three is a regression: all admit at the pre-fix revision too. What bounds them is the
+// dual evaluation in `runBothViews` — a denial from the shipped views still stands.
 const LITERAL_OPENERS = new Set([
   'return', 'case', 'throw', 'typeof', 'instanceof', 'new', 'delete', 'void', 'yield', 'await', 'else',
 ])
@@ -87,8 +113,17 @@ function checkLiteralOpen(line, i) {
   while (p >= 0 && (line[p] === ' ' || line[p] === '\t')) p--
   if (p < 0) return true
   if (!/[A-Za-z0-9_$)\]\\]/.test(line[p])) return true
-  const word = /([A-Za-z_$][\w$]*)$/.exec(line.slice(0, p + 1))
-  return word !== null && LITERAL_OPENERS.has(word[1])
+  // Walk the IDENTIFIER backwards. This read `/([A-Za-z_$][\w$]*)$/.exec(line.slice(0, p + 1))`,
+  // which copies the whole line prefix and rescans it FOR EVERY QUOTE — quadratic in line length,
+  // and every ordinary `return 'x'` pays it. Measured by the closing review on one long line:
+  // 253 KB took 33.8 s against 62 ms before this build, ~4x per doubling, so about half a megabyte
+  // clears the 60 s hook timeout. **A PreToolUse hook that times out is NON-BLOCKING**, so the cost
+  // was not slowness, it was a fan-out walking straight past the guard. The same measurement after
+  // this rewrite: 87 ms. The walk is bounded by the identifier, never by the line.
+  let s = p
+  while (s >= 0 && /[A-Za-z0-9_$]/.test(line[s])) s--
+  if (s === p) return false
+  return LITERAL_OPENERS.has(line.slice(s + 1, p + 1))
 }
 
 function resolveLiteralEnd(line, i) {
@@ -99,6 +134,17 @@ function resolveLiteralEnd(line, i) {
   return e < line.length ? e : -1
 }
 
+// Blank the CONTENTS of single/double-quoted string literals so a `parallel(`
+// mentioned in prose (a meta.description, a log message) isn't read as a call.
+// ONE ORDERED PASS, not two `replace()` sweeps: the single-quote sweep used to run first and pair
+// the apostrophe inside a DOUBLE-quoted `"don't"` with the quote opening `agent('a'`, blanking the
+// `parallel(` between them. A single pass consumes `"don't"` whole and never sees its apostrophe.
+// A same-line template span is skipped WHOLE — its prose contributes no opener — but its text is
+// KEPT, so a primitive named inside a lens prompt still denies exactly as it did before
+// (`TOOL-aLexedStripper-3` owns that false positive and this build does not touch it). The cost is
+// that a quoted `'http://x'` inside such a span survives into the line-comment strip below, which
+// the dual evaluation bounds rather than this function.
+// Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
 function renderStrippedLine(line) {
   let out = ''
   let i = 0
@@ -282,14 +328,33 @@ function renderBlankedLiterals(script) {
 // `capFindings` can push more than one finding for a single line and keying on `n` alone would drop
 // the second.
 function runBothViews(rule, script) {
-  const lexed = rule(script)
+  // BOTH passes are isolated, and neither may turn a crash into an admission. `main()` has no
+  // top-level catch and a PreToolUse hook that exits 1 is NON-BLOCKING, so an unguarded lexed pass
+  // handed a crashing script straight through — reproduced by the closing review with a
+  // 9000-deep nested ternary that the pre-fix hook DENIES at exit 2. A throw in the corrected views
+  // must fall through to the shipped ones, which is what this file did before this build.
+  let lexed = []
+  let lexedThrew = false
+  try {
+    lexed = rule(script)
+  } catch (e) {
+    lexedThrew = true
+  }
   VIEW_MODE = 'shipped'
-  let shipped
+  let shipped = []
+  let shippedThrew = false
   try {
     shipped = rule(script)
+  } catch (e) {
+    shippedThrew = true
   } finally {
     VIEW_MODE = 'lexed'
   }
+  // BOTH threw: this file cannot read the script at all, and FAIL CLOSED is its stated posture
+  // everywhere else. The pre-fix hook exited 1 here and admitted; denying is stricter than BASE and
+  // is the one place this build deliberately is.
+  if (lexedThrew && shippedThrew)
+    return [{ n: 1, line: String(script).split(/\r?\n/)[0] || '', why: 'this file could not scan the script under EITHER view — a script it cannot read is not a script it may approve' }]
   const key = (f) => f.n + '\u0000' + (f.why === undefined ? '' : f.why)
   const seen = new Set(lexed.map(key))
   return lexed.concat(shipped.filter((f) => !seen.has(key(f))))

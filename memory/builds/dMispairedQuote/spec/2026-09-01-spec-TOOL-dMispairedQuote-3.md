@@ -1,12 +1,14 @@
 # TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost
 
-**Status:** INPROGRESS · rev-5 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-01-red-TOOL-dMispairedQuote-3.txt](../build/2026-09-01-red-TOOL-dMispairedQuote-3.txt) | journal | — |
+| [2026-09-01-build-TOOL-dMispairedQuote-1-acceptance-ledger.md](../build/2026-09-01-build-TOOL-dMispairedQuote-1-acceptance-ledger.md) | journal | TOOL-dMispairedQuote-1 |
+| [2026-09-01-build-TOOL-dMispairedQuote-3-staged-red.md](../build/2026-09-01-build-TOOL-dMispairedQuote-3-staged-red.md) | journal | — |
+| [2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md) | diff-review | TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md) | spec-audit | — |
@@ -243,6 +245,7 @@ none
 
 ## 9. Revision log
 
+- rev-6 · 2026-09-01 · CLOSED. Folded the closing diff review's F3: the property arm scored admission as `exit == 0` where the hook BLOCKS only on 2, so a crash or a timeout counted as still-denied — the arm was blind to the two defects the same review found in the code it guards. It now scores `exit != 2` and carries a 120 s per-invocation timeout. Two arms added for those defects. `runBothViews` isolates BOTH passes and DENIES when neither can scan, which is stricter than the pre-fix hook and is this file's stated posture.
 - rev-1 · 2026-09-01 · initial draft. Promoted from unit 1's spec-audit round 2 NON-CONVERGENT exit,
   blockers 1, 8 and 17, per BUILD-METHOD M4.
 - rev-5 · 2026-09-01 · BUILT. Two corrections the build itself measured, neither of them a review

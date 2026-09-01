@@ -1,12 +1,13 @@
 # TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do
 
-**Status:** INPROGRESS · rev-3 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dMispairedQuote-1.md](../prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md) | research | TOOL-dMispairedQuote-1 |
+| [2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-3-closing-diff-round1.md) | diff-review | TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-3 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md) | spec-audit | TOOL-dMispairedQuote-1 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md) | spec-audit | TOOL-dMispairedQuote-1 |
 
@@ -130,6 +131,7 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-01 · CLOSED. The explanatory header this unit assumed unit 1 had written did not exist: the built bytes carried the original `stripStrings` docstring. Written now, covering the predicate, why not a regex model, what the pair test could not reach, and all three residuals. Dossier and backlog carry the third.
 - rev-1 · 2026-09-01 · initial draft.
 - rev-3 · 2026-09-01 · took blocker 8's carrier half from unit 1's spec-audit round 2, which no unit
   owned: S1's replacement ceiling names the template-span exception instead of shipping a second

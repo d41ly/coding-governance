@@ -182,7 +182,8 @@ turns the cap rules off with no diff.
   `resolveLiteralEnd` opener-tests only the OPENING quote, so a mispairing needs ONE apostrophe in a
   legal opener position before the fan-out and ANY unescaped quote of the same kind after it. And the
   keyword clause admits a quote after `return`, `case`, `throw` and eight more, every one of which is
-  also an English word — `/* throw 'em */` mispairs. Both are fixtured one arm per member of the
+  also an English word — `/* throw 'em */` mispairs. A THIRD, found by the closing diff review: an
+  apostrophe after an operator is in a legal opener position, so `/* rock - 'n roll */` mispairs too. Both are fixtured one arm per member of the
   declared set rather than sampled, and neither is a regression: all of them admit at the pre-fix
   revision too. What bounds the consequence is the next bullet.
 - **Each view exists TWICE, and that is the mechanism rather than duplication**

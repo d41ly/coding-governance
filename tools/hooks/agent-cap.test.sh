@@ -1079,7 +1079,11 @@ EOF
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
 GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
-if git -C "$HERE" show "$GOV_BASE_SHA:tools/hooks/agent-cap.js" > "$TMP/base-hook.js" 2>/dev/null; then
+# DERIVED, never spelled: a `tools/hooks/` literal is gov's own install prefix and resolves to
+# nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
+# refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
+HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$HOOK" 2>/dev/null | head -1)
+if [ -n "$HOOKREL" ] && git -C "$HERE" show "$GOV_BASE_SHA:$HOOKREL" > "$TMP/base-hook.js" 2>/dev/null; then
   cat > "$TMP/byte.py" <<'PYEOF'
 import sys, pathlib
 base = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -1111,7 +1115,7 @@ PYEOF
     echo "FAIL no-regress: a renderShipped* body has drifted from BASE"; sed 's/^/     /' "$TMP/byte.out"; fail=$((fail+1))
   fi
 else
-  echo "skip no-regress byte arm — $GOV_BASE_SHA:tools/hooks/agent-cap.js does not resolve in this tree, so there is nothing to compare the frozen bodies against"
+  echo "skip no-regress byte arm — $GOV_BASE_SHA:${HOOKREL:-<this hook is not tracked here>} does not resolve in this tree, so there is nothing to compare the frozen bodies against"
 fi
 
 # ---- S9: THE PROPERTY. No script this hook denied at BASE may be admitted now. --------------------
@@ -1164,14 +1168,17 @@ for p in pop:
     except Exception:
         continue
     payload = json.dumps({"tool_name": "Workflow", "tool_input": {"script": body}})
-    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True).returncode
+    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
     n += 1
     if a != 2:
         continue
     denied += 1
-    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True).returncode
-    if b == 0:
-        lost.append(str(p))
+    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
+    # ADMISSION IS `exit != 2`, not `exit == 0`. The hook BLOCKS only on 2, so a crash (1) or a
+    # timeout is an admission too — and scoring it as 0 made this arm blind to exactly the two
+    # defects the closing review found in the code it guards.
+    if b != 2:
+        lost.append("%s (exit %d)" % (p, b))
 for f in lost:
     print("LOST a denial: %s" % f)
 print("population %d scanned, %d denied at BASE, %d denial(s) lost" % (n, denied, len(lost)))
@@ -1186,6 +1193,57 @@ PYEOF
 else
   echo "skip no-regress property arm — the BASE blob does not resolve in this tree, so there is no shipped hook to compare verdicts against"
 fi
+
+
+# ---- closing-review folds: a guard that times out, or crashes, does not guard --------------------
+# A PreToolUse hook is NON-BLOCKING when it times out AND when it exits 1. Both were reachable.
+
+# F1. `checkLiteralOpen` copied the whole line prefix per quote, so cost was quadratic in LINE
+# length and every ordinary `return 'x'` paid it. Measured before the fix: 253 KB on one line took
+# 33.8 s against 62 ms at BASE. This arm is a BUDGET, not a verdict: it fails if the hook takes
+# longer on one long line than a generous multiple of the same script split across lines.
+long_one=$("$TESTPY" -c "
+import json
+n = 8000
+line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) + ']'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
+")
+t0=$(date +%s)
+printf '%s' "$long_one" | node "$HOOK" >/dev/null 2>&1
+t1=$(date +%s)
+if [ $((t1 - t0)) -le 10 ]; then
+  echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
+else
+  echo "FAIL quadratic budget: 8000 literals on ONE line took $((t1 - t0))s — a hook that times out is NON-BLOCKING"; fail=$((fail+1))
+fi
+
+# F2. A throw in the corrected views must not become an admission. This script drives
+# `parseBranches` past its recursion limit, which is PRE-EXISTING: the BASE hook exits 1 on it and
+# therefore does not block. Denying is stricter than BASE and is this file's stated posture.
+deep=$("$TESTPY" -c "
+import json
+k = ' ? args.big : '.join('c%d' % i for i in range(9000))
+sc = 'const K = ' + k + ' : args.big // gov:fixed-verifiers\nawait boundedParallel(K.map((g) => () => agent(g)), 5)'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': sc}}))
+")
+printf '%s' "$deep" | node "$HOOK" >/dev/null 2>&1; deeprc=$?
+if [ "$deeprc" = 2 ]; then
+  echo "ok   crash posture: a script neither view can scan is DENIED, not admitted at exit 1"; pass=$((pass+1))
+else
+  echo "FAIL crash posture: a script neither view can scan exited $deeprc — only 2 blocks"; fail=$((fail+1))
+fi
+
+
+# Residual (c), from the closing review: an apostrophe after an OPERATOR is in a legal opener
+# position, so prose that writes one still mispairs. Not a regression — it admits at BASE too — and
+# it is fixtured here so the leak is recorded rather than assumed away, with its control beside it.
+js "opener residual: an apostrophe after an operator still mispairs -> allow (stated residual)" 0 <<'EOF'
+/* rock - 'n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "opener residual: control, the same line without the apostrophe -> deny" 2 <<'EOF'
+/* rock - n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

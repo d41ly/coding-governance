@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-01
 streams: tooling
 roster: TOOL
-ids: TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3 TOOL-dMispairedQuote-4 TOOL-dMispairedQuote-5 TOOL-dMispairedQuote-6 TOOL-dMispairedQuote-7
+ids: TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3 TOOL-dMispairedQuote-4 TOOL-dMispairedQuote-5 TOOL-dMispairedQuote-6 TOOL-dMispairedQuote-7 TOOL-dMispairedQuote-8
 authorized-by: prompt
 ---
 
@@ -12,18 +12,15 @@ authorized-by: prompt
 
 ## The problem this build exists to solve
 
-`agent-cap.js` rule 1 bans the raw fan-out primitives. It scans a view of each line with string
-literals blanked, so prose mentioning `parallel(` is not read as a call. The blanker pairs a quote
-with the next quote of the same kind on the line. When an apostrophe sits in prose earlier on that
-line, the pair it forms is the prose apostrophe and the quote opening `agent('a'` — and everything
-between them, `parallel(` included, is blanked out of the view. The guard then admits an unbounded
-fan-out at exit 0. The owner's prose is the mandate and is recorded under
-[prompts/](prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md).
+`agent-cap.js` blanks quoted spans so prose naming `parallel(` is not read as a call. It pairs a
+quote with the next quote of the same kind on the line, so an apostrophe in prose earlier on that
+line pairs with the quote opening `agent('a'` and the span blanked between them carries the fan-out.
+The guard then admits an unbounded fan-out at exit 0.
 
-The reported instance is a regex literal, `/won't/`. Reproduced at HEAD, and the class is wider than
-the report: a double-quoted string, a block comment and a template literal carrying the same
-apostrophe each admit the same fan. The `addc6169` repair this file carries demands a matching pair
-before it blanks; a pair exists, and it is the wrong one.
+The reported instance is a regex literal. The class is wider: a double-quoted string, a block comment
+and a template literal each admit the same fan, and four of the file's five rules are defeated. The
+`addc6169` repair demands a matching pair; a pair exists, and it is the wrong one. The owner's prose
+is the mandate, recorded under [prompts/](prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md).
 
 ## Expected improvements
 
@@ -46,30 +43,21 @@ before it blanks; a pair exists, and it is the wrong one.
 
 - **Classification (M2)**: two units, MISSING at open, authored this run. Unit 1 is the code view;
   unit 2 is the prose that describes it. One mechanism each.
-- **The regression arms belong to unit 1, not to a unit of their own.** They go into an existing
-  gate, `tools/hooks/agent-cap.test.sh`, and are §7's observed failing case for unit 1's mechanism
-  rather than a second mechanism. Staged RED against the tip before they land.
-- **The fix is judged in BOTH directions.** A change to this file that only ever adds denials is not
-  obviously safe: rule 1's documented ceiling is fail-closed and a wider one costs false refusals an
-  operator cannot act on. Every candidate is measured against the shipped suite and against
-  `tools/workflows/*.js`, the real corpus this hook reads.
-- **This build does not take `TOOL-aLexedStripper-3` or `-4`.** Both are OPEN rows about rule 1's and
-  rule 3's views, and both are about FALSE POSITIVES. Unit 1 may close `-3` as a consequence of
-  sharing one view; it may not widen into rule 3, whose `blankLiterals` mode leak is a separate
-  mechanism with its own arms.
-- **`.claude/hooks/agent-cap.js` is a verbatim deploy copy.** Every byte of unit 1 lands in both, and
-  the suite's own parity arm is the check.
-- **The spec-audit loop over unit 1 exited NON-CONVERGENT, and unit 3 is the promotion that exit
-  calls for.** Round 1 confirmed 2 blockers; round 2, over the fold, confirmed 4. The count did not
-  shrink, so per M4 the loop STOPPED and every standing blocker was disposed rather than re-reviewed.
-  Three were one property — correcting what counts as a string literal un-hides delimiters as well as
-  fan-outs, and rules 2 and 3 walk across lines — and closing it needs a mechanism unit 1 does not
-  have. The fourth was folded. Unit 2 converged at round 1 and is not re-reviewed.
-- **Unit 1 may not land without unit 3.** The two are one behaviour change split across two
-  mechanisms, and unit 1 alone was measured to move three scripts from DENY to ADMIT.
-- **`--disposition` could not be recorded.** The rendered unattended Skill documents
-  `--review … --disposition fold|promote` and `unattended 1.14` refuses the flag. The disposition is
-  recorded here, in each spec's revision log, and as a parked decision in `RUN.md`.
+- **The fix is judged in BOTH directions.** A change that only ever adds denials is not obviously
+  safe: this file's ceiling is fail-closed and a wider one costs refusals an operator cannot act on.
+  Every candidate is measured against the shipped suite and the real tracked corpus.
+- **This build does not take `TOOL-aLexedStripper-3` or `-4`.** Both are OPEN rows about FALSE
+  POSITIVES in rule 1's and rule 3's views. The backlog rows record what this build did and did not
+  touch.
+- **Both spec-audit loops exited NON-CONVERGENT, and the dispositions are recorded here** because the
+  driver has no flag for them. Unit 1's exit at 4 blockers PROMOTED three to unit 3 and folded one.
+  Unit 3's exit at 2 FOLDED both, on the review's own reading that neither needed a mechanism this
+  build lacks. Unit 2 converged at round 1 and was not re-reviewed.
+- **Unit 1 may not land without unit 3.** One behaviour change across two mechanisms: unit 1 alone
+  was measured moving three scripts from DENY to ADMIT.
+- **Six review runs is more than this warranted.** Rounds 1 and 2 over unit 1 each reproduced a
+  fail-open the fix itself introduced and were worth their cost. Unit 3's rounds 2 and 3 returned
+  spec prose. Recorded because the next build reading this should stop a round earlier.
 
 ## Parked decisions
 
@@ -85,18 +73,18 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-09-01 · streams tooling
-ids TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3 TOOL-dMispairedQuote-4 TOOL-dMispairedQuote-5 TOOL-dMispairedQuote-6 TOOL-dMispairedQuote-7
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-09-01 · streams tooling
+ids TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3 TOOL-dMispairedQuote-4 TOOL-dMispairedQuote-5 TOOL-dMispairedQuote-6 TOOL-dMispairedQuote-7 TOOL-dMispairedQuote-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-01 |
-| [TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost](spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-09-01 |
-| [TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do](spec/2026-09-01-spec-TOOL-dMispairedQuote-2.md) | 3 | 1 | INPROGRESS | rev-3 | 2026-09-01 |
+| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-01 |
+| [TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost](spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-01 |
+| [TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do](spec/2026-09-01-spec-TOOL-dMispairedQuote-2.md) | 3 | 1 | CLOSED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
