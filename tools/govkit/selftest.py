@@ -613,6 +613,31 @@ def main() -> int:
         check("[dGV-8] and the override states what it overrode, so the choice is on the record",
               "ungraded row(s), --allow-ungraded" in p.stdout, p.stdout)
 
+        # --- DEPL-dGaugedVintage-9 S1. `update` REFRESHES A ROW'S `version`. It never did: every
+        # --- `"version":` write lived in `apply` or `adopt`, and `_cmd_update` did not contain the
+        # --- string at all — so a row moved to new bytes kept the version it originally landed at,
+        # --- against the NEW commit and the NEW sha256. aTetheredConvoy round-3 F6 reproduced that
+        # --- by bumping a constant 1.0 -> 9.9 and watching the receipt keep 1.0.
+        # --- A delta report over that field would have called a fully current target "behind".
+        vr = stale_target("verrefresh")
+        rp_v = vr / ".governance" / "install.json"
+        rec = json.loads(rp_v.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            f["version"] = "STALE-SENTINEL"
+        rp_v.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(vr), "--write")
+        rec = json.loads(rp_v.read_text(encoding="utf-8"))
+        _moved = [f for f in rec["files"] if f.get("version") != "STALE-SENTINEL"]
+        check("[dGV-9] update --write refreshes a refreshed row's version, not only sha256/commit",
+              len(_moved) > 0, json.dumps(rec["files"], indent=1)[:900])
+        check("[dGV-9] and the refreshed value is the constant's SOURCE LINE, the shape "
+              "entry_version returns",
+              any("KIT_CHECK_WIRING_VERSION" in (f.get("version") or "") for f in _moved),
+              json.dumps([f.get("version") for f in rec["files"]])[:500])
+        check("[dGV-9] and sha256 and commit moved with it, so the three stay one fact",
+              all(f.get("commit") and f.get("sha256") for f in _moved),
+              json.dumps(_moved, indent=1)[:600])
+
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
         (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")

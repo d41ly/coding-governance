@@ -353,6 +353,31 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+def entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+    """`entry_version`, resolved AT A COMMIT rather than in the working tree.
+
+    DEPL-dGaugedVintage-9 S1. `update --to <rev>` can name a commit that is not HEAD, and stamping a
+    row with the working tree's constant would record a version the run did not land. Returns the
+    same sentinels `entry_version` does, so its three non-level outcomes stay one vocabulary.
+    """
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file"):
+        return "(none declared)"
+    home = (desc.get("home") or "").rstrip("/")
+    src = f"{home}/{vf['file']}" if home else vf["file"]
+    data = blob_at(root, commit, src)
+    if data is None:
+        return "(unresolvable)"
+    try:
+        rx = re.compile(vf["pattern"])
+    except re.error:
+        return "(unresolvable)"
+    for ln in data.decode("utf-8", "replace").splitlines():
+        if rx.search(ln):
+            return ln.strip()
+    return "(unresolvable)"
+
+
 def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str) -> set[str]:
     """Every surface path this entry claims.
 
@@ -5333,6 +5358,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
     to_commit = out.stdout.strip()
 
+    # DEPL-dGaugedVintage-9 S1. Defined ONCE and called from all three mutating branches, because
+    # three copies of "what version did we just land" is three places for it to drift. Before this,
+    # `version` was written by `apply` and `adopt` only and `update` never touched it, so a row
+    # refreshed to new bytes kept the version it landed at — reproduced by aTetheredConvoy F6.
+    def _ver_at(_row: dict) -> str:
+        _d = descs.get(_row.get("kit") or "")
+        return entry_version_at(root, _d[0], to_commit) if _d else _row.get("version", "")
+
     if base_commit:
         chk = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{base_commit}^{{commit}}"],
                              capture_output=True)
@@ -5728,6 +5761,59 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"so there is no base to write against and none was written. "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write` supplies one")
 
+    # DEPL-dGaugedVintage-9 S2/S3/S4. THE PER-KIT VERSION DELTA, which nothing in gov reported.
+    # Every row has carried a `version` since schema 2 and no reader ever joined it to gov's own
+    # constant, so "which of my kits are behind" — the question an adopter asks BEFORE an update —
+    # had no answer in any verb.
+    #
+    # EQUALITY, never ordering. `entry_version` returns the constant's whole SOURCE LINE, not a
+    # number, so two of them compare for identity and nothing else; a parse into comparable versions
+    # would need its own stated failure mode and is not this unit's.
+    #
+    # FOUR non-level states, none collapsed into level: a row with no `version` key at all (a
+    # receipt older than the field), and the two sentinels `entry_version` itself returns.
+    _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    _by_kit: dict[str, set[str]] = {}
+    for _f in receipt.get("files", []):
+        _by_kit.setdefault(_f.get("kit") or "(no kit)", set()).add(_f.get("version", "__ABSENT__"))
+    if _by_kit:
+        print("govkit update — per-kit version delta (stored in the receipt vs gov at "
+              f"{to_commit[:8]}); EQUALITY, not ordering:")
+        for _k in sorted(_by_kit):
+            _d = descs.get(_k)
+            _live = entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
+            _stored = _by_kit[_k]
+            if _stored == {"__ABSENT__"}:
+                _verdict = "unknown — this receipt predates the version field"
+            elif len(_stored) > 1:
+                _verdict = f"MIXED across rows: {sorted(s for s in _stored if s != '__ABSENT__')}"
+            else:
+                _s = next(iter(_stored))
+                if _s == "__ABSENT__":
+                    _verdict = "unknown — this receipt predates the version field"
+                elif _s in ("(none declared)", "(unresolvable)"):
+                    _verdict = f"{_s.strip('()')} — no comparison is possible"
+                elif _live in ("(none declared)", "(unresolvable)"):
+                    _verdict = f"gov side {_live.strip('()')} — no comparison is possible"
+                else:
+                    # COMPARE THE VERSION, DISPLAY THE LINE. Found at build time by running this
+                    # report against a live adopter: `entry_version` returns the constant's whole
+                    # SOURCE LINE, so `DEPL-dGaugedVintage-5` adding a marker COMMENT to three
+                    # constants made all three read DIFFERS at an identical version. That is a false
+                    # "behind" — the same class B1 was about, one field over. When both sides yield
+                    # a dotted number the comparison is on the NUMBER; when either does not, it
+                    # falls back to the line and SAYS which it used, because a silent fallback is
+                    # how a comparison stops meaning what its output claims.
+                    _ms, _ml = _numv.search(_s), _numv.search(_live)
+                    if _ms and _ml:
+                        _verdict = ("level" if _ms.group(1) == _ml.group(1)
+                                    else f"DIFFERS — stored {_ms.group(1)}, gov has {_ml.group(1)}")
+                    else:
+                        _verdict = ("level (whole-line compare: no version number in one side)"
+                                    if _s == _live
+                                    else f"DIFFERS by whole line — gov has {_live!r}")
+            print(f"  {_k:<28} {_verdict}")
+
     if not write:
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
@@ -5877,6 +5963,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            row["version"] = _ver_at(row)
             if restored_carry:
                 row["carry"] = restored_carry
             changed.append(row["path"])
@@ -5995,6 +6082,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            row["version"] = _ver_at(row)
             renamed.extend([old_path, new_dest])
             # The DESTINATION line. The verdict row above names the old path, which is the only
             # spelling the receipt had when it was printed; where the file went is the other half,
@@ -6111,6 +6199,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit
+                row["version"] = _ver_at(row)
                 changed.append(row["path"])
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;

@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-9 — report the per-kit version delta, once the stored half stops lying
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-9-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-9-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -25,6 +26,8 @@ per-kit delta an adopter actually wants before an update.
   gov's version now, and whether they differ. Read from the stored rows.
 - **S3** — The comparison is EQUALITY, not ordering, and the report says so. A row whose stored value
   is absent, `"(none declared)"` or `"(unresolvable)"` is reported in its own state, never as level.
+  REVISED at build time: the equality is on the VERSION NUMBER extracted from each side, not on the
+  whole source line — see §4.
 - **S4** — The report is available without writing, from a verb an adopter already runs.
 
 ## 3. Non-goals (OUT)
@@ -43,7 +46,15 @@ per-kit delta an adopter actually wants before an update.
 `entry_version` (`tools/govkit/govkit.py:333-353`) does NOT return a version. It returns the whole
 matched SOURCE LINE via `return ln.strip()` at `:352` — `KIT_CODEBASE_MAP_VERSION = "1.3"`, not
 `1.3` — or one of the sentinels `"(none declared)"` (`:341`) and `"(unresolvable)"` (`:345`, `:348`,
-`:353`). That is why S3 is equality-only: two source lines compare for identity and nothing else.
+`:353`). That is why S3 is equality-only: there is no ordering to be had from a source line.
+
+**But the equality is on the NUMBER, and rev-2 got this wrong.** Comparing whole lines was the rev-2
+design, and running the finished report against the live adopter showed why it fails:
+`DEPL-dGaugedVintage-5` added a marker COMMENT to three constants, and all three immediately read
+DIFFERS at an identical version. A comment edit is not a version change, and reporting it as one is
+the same false-"behind" class B1 was about, one field over. The report now extracts a dotted number
+from each side and compares those; when either side yields none it falls back to the whole line AND
+SAYS SO, because a silent fallback makes the output claim more than it checked.
 
 **The stored half is stale by construction today.** `_cmd_update` spans `:5169-6317` and the string
 `version` does not occur anywhere inside it. Its three mutating branches refresh `row["sha256"]` and
@@ -117,17 +128,18 @@ ADDS the AC1/AC2 arm to the govkit selftest.
 
 ## 8. Open questions
 
-- **F1 — which verb carries the report.** Options: a flag on `check`, a flag on `update`, or a new
-  verb. Recommendation: a flag on `update`, because an adopter already runs it read-only before
-  writing. `prior:` no prior ruling found — `memory-recall` over `verb discoverability adopter runs
-  read-only update check flag new verb` returns nothing that decides it. Unresolved.
-- **F2 — whether an entry present in gov but absent from the receipt is in scope.** It is a
-  not-adopted entry, not a stale one, and `coverage_rows` at `:2051` already answers it.
-  Recommendation: out of scope. Unresolved.
-- **F3 — how a row refreshed before S1 landed is marked.** Its `version` is stale but present, which
-  S3's three states do not cover. Options: a receipt schema bump, or treat any row whose `commit`
-  post-dates the last `version` write as unknown. Recommendation: the second, since it needs no
-  schema change. Unresolved.
+- **F1 — which verb carries the report.** RESOLVED (agent, 2026-09-01, delegated): `update`, and NOT
+  behind a flag. An adopter already runs it read-only before writing, and a flag would make the
+  answer to "am I behind" opt-in — which is how this repo ended up with a five-lens manual audit
+  instead. `prior:` no prior ruling found.
+- **F2 — whether an entry present in gov but absent from the receipt is in scope.** RESOLVED (agent,
+  2026-09-01, delegated): out of scope. It is a not-adopted entry rather than a stale one, and
+  `coverage_rows` at `:2051` already answers it. `prior:` no prior ruling found.
+- **F3 — how a row refreshed before S1 landed is marked.** RESOLVED (agent, 2026-09-01, delegated):
+  NOT marked, and the report does not pretend to. Such a row reads as whatever it stores, which may
+  be stale; the next `update --write` refreshes it. Detecting the pre-S1 case needs a schema bump to
+  record when the field was last written, and that is a receipt-format change this unit is not
+  taking. Recorded as a known limitation in the ledger. `prior:` no prior ruling found.
 
 ## 9. Revision log
 
@@ -138,6 +150,12 @@ ADDS the AC1/AC2 arm to the govkit selftest.
   comparison is equality-only and "older" left §1 and the criteria. F1's citation to
   `DEPL-dGaugedVintage-2` was dropped; that record says nothing about verb discoverability.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED. S1 landed as `entry_version_at` plus one `_ver_at` in
+  all three of `_cmd_update`'s mutating branches. §4 REVISED at build time: the comparison is on
+  the extracted version NUMBER, not the whole source line — running the finished report against
+  the live adopter showed three kits reading DIFFERS purely because `-5` edited a comment on their
+  constant's line. F1, F2 and F3 resolved.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-9-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is `entry_version` at `tools/govkit/govkit.py:333-353`, already called by `apply` at
