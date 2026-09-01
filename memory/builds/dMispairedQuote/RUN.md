@@ -9,8 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 1c01ce53e4afc22f2031e15dcdf33dcaaf92122d
-phase: VERIFYING
+halt-code: gate-red-out-of-scope
+parked-surfaced: yes, 2 surfaced
+keepalive-reaped: yes
+witness: 91058925b19addc557954bae0f8884d7f03d81a3
+phase: ABORTED
 branch-sha: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 branch-ref: refs/heads/branch/agent-cap-apostrophe-bug-46c953
 mode: prompt
@@ -40,3 +43,7 @@ base: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 2026-09-01T12:04:02Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
 
 2026-09-01T13:16:41Z review · item dMispairedQuote · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-01T13:30:16Z decision · item This build cannot MERGE unattended: the unattended kit gate is red on check 2, and the merge bar is what the standing mandate leaned on. The check demands one new non-WONTDO unit id per review subject that exited NON-CONVERGENT. This run had two such exits. Unit 1's PROMOTED its three standing blockers into TOOL-dMispairedQuote-3. Unit 3's FOLDED both of its two, which BUILD-METHOD M4 permits verbatim and which the round-3 review itself prescribed - and a fold leaves no id, so the check reads it as a blocker neither fixed nor promoted. Both were in fact fixed and built. · reason Three options, and the choice is the owner's. (1) Accept and merge by hand: 85 of 86 legs are green, the reported bug is fixed and gated, and the check's own comment calls its count a LOWER BOUND that cannot attribute an id to a subject. (2) Give the driver the --disposition fold|promote flag its own rendered Skill already documents and the merge bar is said to read, then teach check 2 to accept a recorded fold. That is TOOL-dMispairedQuote-7, and it is new public CLI surface, which M3 veto 2 makes an owner turn a standing mandate does not delegate. (3) Retro-promote unit 3's two folded blockers into a unit to satisfy the counter - refused, because both are already fixed and a unit invented to move a number is the shape this repo gates against everywhere else. I refused to decide between them rather than pick the one that lands.
+
+2026-09-01T13:30:35Z abort · item dMispairedQuote · reason 85 of 86 merge-bar legs are green and the reported defect is fixed, gated and pushed on branch/agent-cap-apostrophe-bug-46c953. The one red is the unattended kit gate's check 2, about THIS run's own review bookkeeping and not about the product: it counts one promoted unit id per NON-CONVERGENT review exit, this run had two such exits, and one of them disposed its blockers by FOLDING them, which BUILD-METHOD M4 permits and which leaves no id to count. Both folded blockers were fixed and built. Closing the check needs the --disposition fold|promote flag the rendered Skill already documents and unattended 1.14 refuses, which is new public CLI surface and therefore an owner turn under M3 veto 2. The alternative code is scope-approval-needed and the difference is a reading: a gate is red AND the decision that clears it is the owner's. Nothing is lost - three units CLOSED, an acceptance ledger answering every criterion, and the merge is the only step withheld.
