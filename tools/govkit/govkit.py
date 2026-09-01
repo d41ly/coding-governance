@@ -1099,6 +1099,87 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.note(f"tools/check-kit-versions.sh asserts a constant in '{f}' that no registry entry "
                    f"claims — reported, not repaired")
 
+    # ---- 5c: DEPL-dGaugedVintage-4. EVERY `gov:kit <id>@<n>` MARKER AGREES WITH ITS ENTRY'S
+    # ---- CONSTANT, over a DERIVED basis and a DECLARED cross-entry allowance.
+    #
+    # THE BASIS IS NAMED rather than left implicit, because the implicit answer is wrong here:
+    # `tools/workflows/kit.toml` is entry `review-harness` and claims BOTH drift-audit workflow
+    # harnesses through its own `**`, while those two files carry `gov:kit drift-audit@`. No
+    # per-entry resolution can reach them. So a descriptor may declare `marker_carriers` — paths
+    # outside its own claim that carry its marker — DECLARED, never inferred, so the exception is
+    # visible. It works around `TOOL-aScouredKit-26`: no cross-entry destination token exists.
+    #
+    # THE POPULATION IS DECLARED TOO. A bare `git grep` for the marker returns spec and review PROSE
+    # under `memory/builds/**` — including the records of the unit that asked for this check — so
+    # that set is self-referential and cannot be the population. This walks each entry's own claim.
+    #
+    # `*.test.sh` is excluded: `check-verdict-epoch.test.sh` carries a marker inside a `sed` that
+    # mutates a scratch fixture. It is noise in a deployer's grep, not a wrong claim.
+    _mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
+    _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    _tracked_gov = subprocess.run(["git", "-C", str(root), "ls-files"],
+                                  capture_output=True, text=True).stdout.split()
+    _claimed: dict[str, set[str]] = {}
+    for eid, (d, dpath) in descs.items():
+        pref = entry_members(root, eid, d, dpath)
+        allow = set(d.get("marker_carriers") or [])
+        _claimed[eid] = allow | {
+            f for f in _tracked_gov
+            if not f.endswith(".test.sh")
+            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    _owner: dict[str, str] = {}
+    for eid, files in _claimed.items():
+        for f in files:
+            _owner.setdefault(f, eid)
+    for eid, (d, _dp) in sorted(descs.items()):
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("file"):
+            continue
+        _line = entry_version(root, d) or ""
+        _m = _numv.search(_line)
+        if not _m:
+            continue
+        want, seen = _m.group(1), 0
+        for f in sorted(_claimed[eid]):
+            fp = root / f
+            if not fp.is_file():
+                continue
+            try:
+                txt = fp.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            for hit in _mk.finditer(txt):
+                if hit.group(1) != eid:
+                    continue
+                seen += 1
+                if hit.group(2) != want:
+                    r.fail(f"entry '{eid}': {f} carries `gov:kit {eid}@{hit.group(2)}` but the "
+                           f"constant is {want}. Basis: entry_members + declared marker_carriers")
+        if seen == 0:
+            # ANNOUNCED, never silent: an entry with a constant and no marker is a kit a deployer
+            # cannot read a version out of in an adopting tree. `DEPL-dGaugedVintage-5` owns the fix.
+            r.note(f"entry '{eid}' declares a version constant and carries NO gov:kit marker in its "
+                   f"derived set — a deployer cannot read its version from an adopting tree")
+
+    # S3, the REVERSE direction, over the same declared population and no other. A file carrying a
+    # marker for an entry that neither claims it nor declares it a carrier is a marker nothing can
+    # keep true: whichever entry bumps, this file is not in its basis. Scoped to KNOWN entry ids, so
+    # a marker for something outside the registry is not read as a claim about the registry.
+    for f in sorted(_owner):
+        fp = root / f
+        if not fp.is_file():
+            continue
+        try:
+            txt = fp.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for hit in _mk.finditer(txt):
+            mid = hit.group(1)
+            if mid in descs and f not in _claimed.get(mid, set()):
+                r.fail(f"'{f}' carries `gov:kit {mid}@{hit.group(2)}` but entry '{mid}' neither "
+                       f"claims that path nor declares it in marker_carriers, so no bump can keep "
+                       f"it true")
+
     # ---- 6: every declared hole carries a discharge probe. A hole observed by NEITHER flag is the
     #         majority case measured across the shipped kits, and there the probe is the only
     #         evidence the hole exists at all.

@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-4 — derive each kit's marker population, and assert every site in it
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-4-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-4-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -124,9 +125,14 @@ already names derivation as the remedy.
   confirm `bash tools/check-kit-versions.sh` names all five stale files.
 - **AC5** — When an entry declares a version constant and its derived marker set is empty,
   `bash tools/check-kit-versions.sh` prints that entry with a zero count rather than omitting it.
-- **AC6** — A rendered artifact carrying its OWN kit's marker does NOT red: `bash
-  tools/check-kit-versions.sh` stays green over `memory/HYGIENE.md` and
-  `.claude/skills/unattended/SKILL.md`, so the exclusion is gated rather than assumed.
+- **AC6** — AMENDED at build time, because the criterion as written would have passed for the wrong
+  reason. Rendered DESTINATIONS are not in check 5c's population at all: `entry_members` returns an
+  entry's claimed SOURCES, and a probe of `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`,
+  `.claude/skills/unattended/SKILL.md` and `.claude/hooks/agent-cap.js` returns False for every one.
+  So they never red — not because an exclusion is gated, but because they are never examined. That is
+  green-by-absence and is recorded as a KNOWN GAP rather than reported as a pass: a rendered artifact
+  carrying a stale marker is caught today only by `check-verdict-epoch.sh` and
+  `tools/check-kit-versions.sh`, which cover memory-tree's rendered docs and nothing wider.
 - **AC7** — The two `tools/workflows/drift-audit-*.js` markers pass under the declared allowance and
   red without it, observed by removing the allowance row.
 
@@ -139,12 +145,14 @@ already names derivation as the remedy.
 
 - **F1 — where the derivation lives.** `check-kit-versions.sh` is shell and the descriptors are TOML.
   Recommendation: `selfcheck`, which already holds check 5b and reads the registry.
+  RESOLVED (agent, 2026-09-01, delegated): `selfcheck`, as check 5c beside 5b — it already parses
+  every descriptor, and the shell checker cannot read TOML without help.
   `prior:` `TOOL-aBoundedVerdict-29` says the remedy should be DERIVED from `kit.toml`, not
-  enumerated in prose; it does not say by which program. Unresolved.
+  enumerated in prose; it does not say by which program.
 - **F2 — whether a test fixture's marker counts.** `tools/memory-tree/check-verdict-epoch.test.sh:89`
   carries `gov:kit memory-tree@1.5` inside a `sed` mutating a scratch fixture. Recommendation:
-  exclude `*.test.sh` from the derived set and say so in the checker's header. `prior:` no prior
-  ruling found. Unresolved.
+  RESOLVED (agent, 2026-09-01, delegated): excluded from the derived set, and check 5c's own comment
+  says so. `prior:` no prior ruling found.
 
 ## 9. Revision log
 
@@ -156,6 +164,12 @@ already names derivation as the remedy.
   population — rev-1 named none, and the obvious grep is self-referential, returning this spec and
   its own review. AC6 and AC7 added.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED as check 5c in `selfcheck`. F1 and F2 resolved. AC6
+  AMENDED: rendered destinations are not in the population, so the criterion would have passed by
+  absence; the gap is recorded rather than reported as coverage. The zero-marker note found SIX
+  entries with no marker, not the five §1 predicted — `playbook` and `codebase-map` carry their
+  version by other declared routes, so `DEPL-dGaugedVintage-5`'s real target is four.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-4-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is `entry_members` (`tools/govkit/govkit.py:356`) beside `resolve_entry` (`:282`), which
