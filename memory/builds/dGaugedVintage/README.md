@@ -54,9 +54,9 @@ file at first install. The REFUSAL branch was built, which needs no ratification
 stays superseded and needs an owner id. "build it" was read as scope approval, not as that
 ratification.
 
-**Filed, not built.** `DEPL-dGaugedVintage-12` is `-7`'s unbuilt identity arm, so a kit path swapped
-for another's at equal count still passes. `DEPL-dGaugedVintage-13` gates the class `-2` swept by
-hand.
+**Both follow-ups were built too.** `-12` closed `-7`'s identity hole, so a swapped kit path at equal
+count now reds. `-13` measures the class `-2` swept by hand and found 27 more of it across TOOL,
+PLAY and KICK — pinned, shrink-only, because a row's ask can outlive its unit legitimately.
 
 **Unmeasured**, named rather than implied: the fan-out kit count in `-11` is the review lens's and
 was not re-derived; `-9`'s absent-`version`-key state is implemented but no receipt in reach
@@ -78,11 +78,12 @@ exercises it; and the ~1,900 upstream lines the document scopes as a pull were n
 | 10 | `DEPL-dGaugedVintage-6` | CLOSED | drift-audit's install block stops contradicting itself |
 | 11 | `DEPL-dGaugedVintage-2` | CLOSED | fifteen backlog rows reconciled against their CLOSED specs |
 | 12 | `DEPL-dGaugedVintage-12` | CLOSED | the prefix ratchet records identity, not only a count |
+| 13 | `DEPL-dGaugedVintage-13` | CLOSED | a backlog row outliving its CLOSED spec is measured |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 12 unit(s) · node d · opened 2026-09-01 · streams deployer
+**Build status:** CLOSED · 13 unit(s) · node d · opened 2026-09-01 · streams deployer
 ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 DEPL-dGaugedVintage-12 DEPL-dGaugedVintage-13
 
 <!-- gen:build-units -->
@@ -100,13 +101,14 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs](spec/2026-09-01-spec-DEPL-dGaugedVintage-2.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-12 — the prefix ratchet records identity, not only a count](spec/2026-09-01-spec-DEPL-dGaugedVintage-12.md) | 8 | 2 | CLOSED | rev-2 | 2026-09-01 |
+| [DEPL-dGaugedVintage-13 — a backlog row that outlived its own CLOSED spec](spec/2026-09-01-spec-DEPL-dGaugedVintage-13.md) | 9 | 2 | CLOSED | rev-2 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 3 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dGaugedVintage-12.
+Ids no `spec-audit` record has ever named: DEPL-dGaugedVintage-12 DEPL-dGaugedVintage-13.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -121,6 +123,7 @@ Ids no `spec-audit` record has ever named: DEPL-dGaugedVintage-12.
 | 6 | `DEPL-dGaugedVintage-7` | no |
 | 7 | `DEPL-dGaugedVintage-2`, `DEPL-dGaugedVintage-6` | yes |
 | 8 | `DEPL-dGaugedVintage-12` | no |
+| 9 | `DEPL-dGaugedVintage-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

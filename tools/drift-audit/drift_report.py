@@ -1358,11 +1358,74 @@ def build_readme_mechanism_drift(ctx) -> dict:
     }
 
 
+def build_backlog_rows_outliving_specs(ctx) -> dict:
+    """A backlog row still non-terminal while the spec bearing its id reads CLOSED or WONTDO.
+
+    DEPL-dGaugedVintage-13, filed by `-2` S3 after that unit swept sixteen such rows BY HAND:
+    `DEPL-dCarriedReceipt-1..15` all read SPECCED while every one of their specs read CLOSED, and
+    `DEPL-aFerriedDossier-1` sat OPEN six days after its own declared closer shipped. Nothing
+    measured the class, so it accumulated silently until somebody happened to look.
+
+    COUNTED, NEVER REFUSED, and that is the whole design decision. A row's ask can be legitimately
+    WIDER than the unit that partly served it -- `-2` section 8 F1 resolved exactly that -- so a gate
+    reading every such row as a defect would push an operator to close a row that should stay open,
+    which is worse than the drift. A pin holds the honest residue; it only falls.
+
+    A spec whose id appears in NO backlog row is NOT a finding: an id can be a unit without ever
+    having been an ask, which is the common case for a unit a build minted for itself.
+    """
+    shard_dir = f"{ctx.memory_root}/backlog"
+    rows: dict[str, tuple[str, str]] = {}
+    for rel in sorted(ln for ln in ctx.git.run("ls-files", f"{shard_dir}/").stdout.splitlines()
+                      if ln.strip().endswith(".md")):
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for ln in text.splitlines():
+            m = re.match(r"^- ([A-Z]+-[a-zA-Z]+-\d+)\s*\u00b7\s*([A-Z]+)\s*\u00b7", ln)
+            if m:
+                rows.setdefault(m.group(1), (rel, m.group(2)))
+
+    suspect, checked = [], 0
+    for sp in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
+        head = sp.read_text(encoding="utf-8", errors="replace")[:4000]
+        st, own = _STATUS.search(head), _OWN_ID.search(head)
+        if not st or not own:
+            continue
+        if st.group(1).upper() not in _TERMINAL_STATUSES:
+            continue
+        checked += 1
+        hit = rows.get(own.group(1))
+        if hit is None:
+            continue                      # never an ask; see the docstring
+        shard, token = hit
+        if token in _TERMINAL_STATUSES:
+            continue
+        suspect.append({
+            "id": own.group(1), "row": shard, "row_status": token,
+            "spec": str(sp.relative_to(ctx.root)).replace("\\", "/"),
+            "spec_status": st.group(1).upper(),
+        })
+    return {
+        "signal": "backlog_rows_outliving_closed_specs",
+        "value": len(suspect),
+        "of": checked,
+        "tolerance": 0,
+        "gateable": True,
+        # LIVENESS from what was actually examined. A corpus with no terminal spec must say the probe
+        # could not move rather than print a reassuring zero.
+        "live": checked > 0,
+        "detail": suspect,
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
-           build_live_backlog_rows, build_readme_mechanism_drift]
+           build_live_backlog_rows, build_readme_mechanism_drift,
+           build_backlog_rows_outliving_specs]
 
 
 # --------------------------------------------------------------------------------------------

@@ -22,6 +22,7 @@ import os
 import io
 import pathlib
 import shutil
+import re
 import subprocess
 import sys
 import tempfile
@@ -400,6 +401,47 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     s3b = report(r)["shrink_only_lists_not_shrinking"]
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
+
+    # --- DEPL-dGaugedVintage-13: a backlog row that outlived its own CLOSED spec ---
+    print("backlog rows outliving closed specs (dGV-13)")
+    b13 = report(r)["backlog_rows_outliving_closed_specs"]
+    check("[dGV-13] a spec whose id is in NO backlog row is not a finding",
+          b13["value"] == 0, f"got {b13['value']} detail={b13['detail']}")
+    check("[dGV-13] ...and the signal is LIVE, so a zero means it looked",
+          b13["live"] is True and b13["of"] >= 1, f"live={b13['live']} of={b13['of']}")
+    _shard = r / "memory" / "backlog"
+    _shard.mkdir(parents=True, exist_ok=True)
+    _ids = [x["id"] for x in report(r)["spec_status_terminal_ids"]["detail"]] \
+        if "spec_status_terminal_ids" in report(r) else []
+    _sp = sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md"))
+    _own = None
+    for _f in _sp:
+        _m = re.search(r"^#\s+([A-Z]+-[a-zA-Z]+-\d+)\b", _f.read_text(encoding="utf-8"), re.M)
+        _s = re.search(r"^\*\*Status:\*\*\s*([A-Za-z]+)", _f.read_text(encoding="utf-8"), re.M)
+        if _m and _s and _s.group(1).upper() in ("CLOSED", "WONTDO"):
+            _own = _m.group(1)
+            break
+    if _own is None:
+        skip("[dGV-13] the row arms", "this fixture carries no terminal spec to key a row on")
+    else:
+        _fam = _own.split("-", 1)[0]
+        _row = _shard / f"{_fam}.md"
+        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 OPEN \u00b7 a row that outlived its spec\n",
+                        encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 open row"], r)
+        b13o = report(r)["backlog_rows_outliving_closed_specs"]
+        check("[dGV-13] a NON-terminal row under a CLOSED spec is counted",
+              b13o["value"] == 1, f"got {b13o['value']} detail={b13o['detail']}")
+        check("[dGV-13] ...and the detail names the id, the row's token and the spec's",
+              bool(b13o["detail"]) and b13o["detail"][0]["id"] == _own
+              and b13o["detail"][0]["row_status"] == "OPEN",
+              str(b13o["detail"][:1]))
+        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 CLOSED \u00b7 reconciled\n",
+                        encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 closed row"], r)
+        b13c = report(r)["backlog_rows_outliving_closed_specs"]
+        check("[dGV-13] a TERMINAL row under the same spec is not counted",
+              b13c["value"] == 0, f"got {b13c['value']} detail={b13c['detail']}")
 
     # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
     print("closed-spec traceability (signal 6)")

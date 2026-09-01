@@ -35,7 +35,7 @@
 - DEPL-dGaugedVintage-10 · CLOSED · Nothing asserts the gov checkout is current with its remote — the only vintage guards are ancestry and reachability (`govkit.py:3769`). `update --to HEAD` on a stale clone reports `current` for rows gov has since moved → builds/dGaugedVintage/
 - DEPL-dGaugedVintage-11 · CLOSED · `derive_carry_map` (`govkit.py:4840`) drops any gov directory fanning into more than one target directory, silencing the `relocate` rung for every kit shipping a rendered SKILL.md beside its engine files — seven on this adopter → builds/dGaugedVintage/
 - DEPL-dGaugedVintage-12 · CLOSED · `check-install-prefix.sh` counts occurrences but not IDENTITY, so one kit's path swapped for another's at equal count still passes. Needs a third ledger field AND a second comparison in the ratchet's awk → builds/dGaugedVintage/
-- DEPL-dGaugedVintage-13 · OPEN · Gate the class DEPL-dGaugedVintage-2 swept by hand: a backlog row whose id matches a CLOSED spec while the row itself is non-terminal. Both sides are already parsed by the memory-tree kit, so it is cheap → builds/dGaugedVintage/
+- DEPL-dGaugedVintage-13 · CLOSED · Gate the class DEPL-dGaugedVintage-2 swept by hand: a backlog row whose id matches a CLOSED spec while the row itself is non-terminal. Both sides are already parsed by the memory-tree kit, so it is cheap → builds/dGaugedVintage/
 
 
 - DEPL-aTetheredConvoy-8 · CLOSED · Reconciled `TOOL-dClosedLexicon-13` against receipt schema 2. One of the four filed questions was the schema; two were arms riding the playbook role unit 1 corrected, one was fixture order, plus a vacuous `SKIP` mark. → builds/aTetheredConvoy/

@@ -343,6 +343,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_backlog_rows_outliving_specs",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_banned_index",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
