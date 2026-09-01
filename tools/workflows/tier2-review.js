@@ -1,6 +1,8 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.4', // gov:kit tier2-review@1.4 — engine identity (deployed verbatim; this field is the deployer's version marker)
+  version: '1.4', // gov:kit tier2-review@1.4 // gov:kit review-harness@1.4 — BOTH ids: the
+  // second is this entry's REGISTRY id, and without it a deployer grepping the id the
+  // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [

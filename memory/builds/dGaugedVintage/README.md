@@ -76,7 +76,7 @@ document scopes as a pull.
 | 1 | `DEPL-dGaugedVintage-8` | CLOSED | a way out of `unattributed`, and a stamp that cannot outrun it |
 | 2 | `DEPL-dGaugedVintage-3` | CLOSED | a default kit stops reporting adopted while landing no program |
 | 3 | `DEPL-dGaugedVintage-4` | CLOSED | derive each kit's marker population, assert every site |
-| 4 | `DEPL-dGaugedVintage-5` | OPEN | the five entries carrying no readable marker gain one |
+| 4 | `DEPL-dGaugedVintage-5` | CLOSED | the five entries carrying no readable marker gain one |
 | 5 | `DEPL-dGaugedVintage-1` | OPEN | `selfcheck` asserts the version constant actually ships |
 | 6 | `DEPL-dGaugedVintage-9` | OPEN | report the per-kit version delta the receipt already stores |
 | 7 | `DEPL-dGaugedVintage-10` | OPEN | refuse to measure from a gov checkout stale against its remote |
@@ -97,7 +97,7 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-8 — the stamp must not outrun the rows it never graded](spec/2026-09-01-spec-DEPL-dGaugedVintage-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-01 |
 | [DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program](spec/2026-09-01-spec-DEPL-dGaugedVintage-3.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-4 — derive each kit's marker population, and assert every site in it](spec/2026-09-01-spec-DEPL-dGaugedVintage-4.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-01 |
-| [DEPL-dGaugedVintage-5 — five entries an adopter cannot read a version out of](spec/2026-09-01-spec-DEPL-dGaugedVintage-5.md) | 3 | 2 | OPEN | rev-2 | 2026-09-01 |
+| [DEPL-dGaugedVintage-5 — five entries an adopter cannot read a version out of](spec/2026-09-01-spec-DEPL-dGaugedVintage-5.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-1 — a version constant an adopter never receives](spec/2026-09-01-spec-DEPL-dGaugedVintage-1.md) | 4 | 2 | OPEN | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-9 — report the per-kit version delta, once the stored half stops lying](spec/2026-09-01-spec-DEPL-dGaugedVintage-9.md) | 4 | 2 | OPEN | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-10 — a stale measurer reports every row current](spec/2026-09-01-spec-DEPL-dGaugedVintage-10.md) | 5 | 2 | OPEN | rev-2 | 2026-09-01 |
@@ -107,7 +107,7 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | CLOSED | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

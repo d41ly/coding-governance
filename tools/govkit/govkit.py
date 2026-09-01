@@ -1159,12 +1159,22 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     r.fail(f"entry '{eid}': {f} carries `gov:kit {eid}@{hit.group(2)}` but the "
                            f"constant is {want}. Basis: entry_members + declared marker_carriers")
         if seen == 0:
-            # ANNOUNCED, never silent: an entry with a constant and no marker is a kit a deployer
-            # cannot read a version out of in an adopting tree. The companion unit in this build owns the fix; it is
-            # named in that unit's spec rather than cited here, because a product file citing a
-            # non-terminal spec is a drift signal this repo gates.
-            r.note(f"entry '{eid}' declares a version constant and carries NO gov:kit marker in its "
-                   f"derived set — a deployer cannot read its version from an adopting tree")
+            # DEPL-dGaugedVintage-5 S2/S3. A REFUSAL, not a note: an entry with a constant and no
+            # marker is a kit a deployer cannot read a version out of in an adopting tree, which is
+            # what `tools/check-kit-versions.sh` calls the marker's whole job.
+            #
+            # ONE exemption and it is DECLARED, never special-cased by id: `version_from.kind`.
+            # `playbook` versions by a `governance-template: vN.N` marker rather than a `gov:kit`
+            # one, and its descriptor has said so since it was written — the key was simply read by
+            # nothing. Consuming it here is what makes the declaration true. A descriptor omitting
+            # `kind` is NOT exempted, which is the half that keeps this an assertion.
+            if (vf.get("kind") or "") == "marker":
+                r.note(f"entry '{eid}' is exempt from the gov:kit marker rule by its own declared "
+                       f"version_from.kind = \"marker\" — it versions by another convention")
+            else:
+                r.fail(f"entry '{eid}' declares a version constant and carries NO gov:kit marker in "
+                       f"its derived set, so a deployer cannot read its version from an adopting "
+                       f"tree. Add one, or declare version_from.kind if it versions another way")
 
     # S3, the REVERSE direction, over the same declared population and no other. A file carrying a
     # marker for an entry that neither claims it nor declares it a carrier is a marker nothing can

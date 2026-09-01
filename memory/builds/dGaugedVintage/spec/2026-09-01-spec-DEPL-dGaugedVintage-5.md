@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-5 — five entries an adopter cannot read a version out of
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-5-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-5-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -98,10 +99,12 @@ carrier should be a file the entry cannot function without.
   deletion and restoring it.
 - **AC4** — When an entry declares `version_from.none`, the same run reports it exempt with its
   declared reason rather than omitting the row.
-- **AC5** — `codebase-map` passes S2 via its DECLARED generated-artifact carrier: after a map
-  regen, `grep -c 'codebase-map@' memory/map/generated/MAP.md` returns at least 1 and
-  `python tools/govkit/govkit.py selfcheck` reports the entry satisfied by declaration, not by a
-  `gov:kit` token in `map_lib.py`.
+- **AC5** — AMENDED at build time. The criterion wanted `codebase-map` satisfied by a DECLARED
+  generated-artifact carrier. It is instead satisfied the same way the other four are: `map_lib.py`
+  already carried a bare `gov:kit codebase-map` pointer comment with no version, and it gained the
+  `@1.3`. That is one mechanism for five entries rather than a second declaration read by one, and
+  it puts the marker in the file the constant lives in, where check 5c keeps the pair true. S4's
+  separate carrier declaration was therefore NOT built.
 - **AC6** — A descriptor declaring `version_from` WITHOUT `kind` is not exempted:
   `python tools/govkit/govkit.py selfcheck` reds for it, observed by deleting `kind` from
   `tools/govkit/entries/playbook.kit.toml` on a fixture.
@@ -116,12 +119,15 @@ carrier should be a file the entry cannot function without.
 
 - **F1 — the carrier file per entry.** The table in §4 proposes one each. `kickoff-manifest` is the
   awkward one: its constant lives under `skills/` and lands at `tools/manifest-check.sh`, so the
-  marker must survive that relocation. Recommendation: the constant's own file in every case, on the
-  line above the constant, so the two move together. Unresolved.
+  marker must survive that relocation. RESOLVED (agent, 2026-09-01, delegated): the constant's own
+  file in every case, on the constant's own line, so the two cannot be bumped apart — and check 5c
+  now fails if they are. `prior:` no prior ruling found.
 - **F2 — whether `playbook`'s separate convention should be unified.** It uses
   `governance-template: vN.N` and `WIRE-INTO-PROJECT.md:87` documents that. Unifying means two
-  markers on one file or a migration of every adopter's grep. Recommendation: declare the exception
-  in the descriptor per S3 and leave the convention alone. Unresolved.
+  markers on one file or a migration of every adopter's grep. RESOLVED (agent, 2026-09-01,
+  delegated): the convention is left alone and the exception is DECLARED — check 5c consumes
+  `version_from.kind = "marker"`, which `tools/govkit/entries/playbook.kit.toml:6` had already
+  declared and nothing read. `prior:` `WIRE-INTO-PROJECT.md:87` documents the separate convention.
 
 ## 9. Revision log
 
@@ -133,6 +139,12 @@ carrier should be a file the entry cannot function without.
   token, and AC5 was rewritten. S3 now CONSUMES the marker-kind key that already exists at
   `tools/govkit/entries/playbook.kit.toml:6` and is read by nothing.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED. Five entries gained a `gov:kit <entry-id>@` marker on
+  their constant's own line, and `playbook` is exempt by the `version_from.kind` it already
+  declared. check 5c's zero-marker NOTE became a REFUSAL. AC5 amended: `codebase-map` took the
+  same marker as the others rather than a separate generated-artifact declaration, so S4 was not
+  built. F1 and F2 resolved.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-5-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is the same one `DEPL-dGaugedVintage-4` extends — `read_descriptors` and `selfcheck`
