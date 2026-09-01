@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-02T00:35:09+03:00 @ 090df50f56c27773132dc670b440d4f83a89af0c
+last-audit: 2026-09-02T00:35:37+03:00 @ 48ab7b712a7e08e48fcd11d4316f45a8067f289b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 3c91e00d97ee326fe3b6cf818fe1366147ce495c
@@ -66,7 +66,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
   (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
-  `memory/guides/UNATTENDED-PROTOCOL.md` (a run that merges and pushes with no owner turn).
+  `memory/guides/UNATTENDED-PROTOCOL.md` + `UNATTENDED-VERBS.md` (a run that merges and pushes
+  with no owner turn).
 - **An unattended run is bound by DIRECTIVES**, not just by the protocol: a kit-owned set, each one a
   POINTER into a `BUILD-METHOD.md` section rather than a copy of it, waivable only by the owner at
   preflight with a named reason. The list an agent reads is the table in the unattended Skill; the
