@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-1 — a version constant an adopter never receives
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
@@ -38,9 +38,15 @@ could ship without the constant an adopter pins against and every gate would sta
 ### Inventory
 
 Measured at `d65da7ab`: all fifteen entries with a `version_from` file resolve it into their own
-landed set. Fourteen do so via an `include = "**"` rule; `hooks` names `agent-cap.js` explicitly.
-So the arm lands GREEN and its value is forward-looking — a future narrowing of any include would
-otherwise ship an unpinnable kit silently.
+landed set. NINE do so via an `include = "**"` rule. The other SIX name their files explicitly and
+are the live risk surface, because a narrowing there is one edit away: `agent-cap`
+(`tools/hooks/kit.toml`), `playbook-render` (`tools/playbook/kit.toml`), and `check-wiring`,
+`kickoff-manifest`, `playbook` and `settings-merge` under `tools/govkit/entries/`. The entry id for
+the first is `agent-cap`, not `hooks`, which is only its descriptor's directory.
+
+So the arm lands GREEN and its value is forward-looking — a future narrowing of any of those six
+would otherwise ship an unpinnable kit silently, and `check-wiring` is the AC4 fixture for that
+reason.
 
 This is stated plainly because it changes how the unit must be verified: a gate that has only ever
 been seen pass is an assertion about nothing, so S3 is not optional here.
@@ -91,6 +97,10 @@ exists to catch.
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit H4, which four lenses reported independently. The
+  include split is nine glob to six explicit, not fourteen to one, and the six are now named because
+  they are the risk surface the arm exists for. `hooks` corrected to the entry id `agent-cap`. The
+  counts are re-derived, not copied: the audit reported ten-vs-five and that does not reproduce.
 
 ## 10. Reuse audit
 

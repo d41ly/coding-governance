@@ -65,7 +65,7 @@ gives up on — which is the defect, not a discrepancy in the count.
   `codebase-map`, `kickoff-manifest` and `playbook-render` carry zero `gov:kit` tokens anywhere.
   `tools/check-kit-versions.sh:84` calls the marker the thing a deployer reads a kit's version from
   in an adopting tree; for these four that read returns nothing.
-- **`-11` — the `relocate` rung goes quiet on fan-out.** `derive_carry_map` (`govkit.py:4840`) drops
+- **`-11` — the `relocate` rung goes quiet on fan-out.** `derive_carry_map` (`govkit.py:4835`) drops
   any gov directory fanning into more than one target directory — every kit that ships a rendered
   SKILL.md beside its engine files. Seven kits on this adopter.
 - **`-1` — `selfcheck` never checks that a version constant ships.** Check 5 (`govkit.py:1047`)

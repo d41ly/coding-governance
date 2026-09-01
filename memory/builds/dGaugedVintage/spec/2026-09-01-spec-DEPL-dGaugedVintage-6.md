@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-6 — an install block whose second line cannot run
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7
 
 *Tier-1 light profile per `memory/TEMPLATE-SPEC.md`: the status header binds, the ten-section canon
 does not. The sections below are the ones that carry decisions.*
@@ -30,8 +30,10 @@ first produced, and every later step in the file agrees with the second spelling
 
 - Rewriting the install instructions into a govkit invocation. `WIRE-INTO-PROJECT.md` owns the
   deployer path and the kit README's `cp -r` route is deliberate for adopters not using govkit.
-- The root-prefix waiver rows in `tools/install-prefix-waivers.txt` that name this README. They
-  excuse deliberate dual-spelling probes and are unrelated to a wrong destination.
+- Re-measuring the carried ledger. This README carries NO row in
+  `tools/install-prefix-waivers.txt` — measured, zero hits — and its only constraint is its
+  carried-ledger count of 3 at `tools/install-prefix-carried.txt:24`. The repair may lower that count
+  and must not raise it. Re-measuring the ledger itself is `DEPL-dGaugedVintage-7`'s work.
 - Any change to `adopt-drift-audit.sh` itself.
 
 ## 6. Acceptance criteria
@@ -55,3 +57,6 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit M2, reported by four lenses. The second non-goal
+  excluded waiver rows that do not exist; replaced with the measured constraint, which is the
+  carried-ledger count of 3.

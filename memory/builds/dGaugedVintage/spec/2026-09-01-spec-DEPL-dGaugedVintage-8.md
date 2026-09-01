@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-8 — a way out of `unattributed`, and a stamp that cannot outrun it
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 1
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -115,12 +115,16 @@ particular. This unit ADDS the S4 leg to `tools/gate-legs.json` with a declared 
 - **F2 — whether the re-attribution pass is a distinct verb or a phase of `update`.** A distinct
   verb is discoverable and testable in isolation; a phase means an adopter cannot forget it.
   Recommendation: a phase of `update` that reports always and writes only under `--write`, with no
-  new verb, because `DEPL-dGaugedVintage-2` shows this repo already struggles to keep verbs
-  discoverable. Unresolved.
+  new verb. The evidence is this build's own triage: a five-lens manual audit ran where `govkit
+  adopt` and `update` would have answered, so a further verb is a discoverability cost already paid
+  once here. `prior:` no prior ruling found. Unresolved.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit L1. F2 justified its recommendation by citing
+  `DEPL-dGaugedVintage-2`, which says nothing about verb discoverability; replaced with this build's
+  own measured finding and a `prior:` line.
 
 ## 10. Reuse audit
 

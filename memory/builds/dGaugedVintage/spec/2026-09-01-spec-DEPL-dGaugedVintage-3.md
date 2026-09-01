@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 2
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -14,29 +14,34 @@
 
 `memory-recall` is a registry default whose engine files are `role = "forked"`, which
 `LANDABLE_ROLES` excludes, so `apply` writes no query CLI into a fresh target while rendering a Skill
-that instructs an agent to run it. Make that state either impossible or loud.
+that instructs an agent to run it. Make that state loud.
 
 ## 2. Scope (IN)
 
 - **S1** — `apply` DETECTS the state: an entry is selected, its rendered artifacts land, and every
-  file that would carry its executable behaviour is withheld by a non-landable role. The detection is
-  derived from the descriptor, never a list of kit names.
+  file that would carry its executable behaviour is withheld by a non-landable role. The detection
+  reads `resolve_entry`'s `unlanded` return, never a list of kit names.
 - **S2** — On detection against a target that does NOT already hold those files, `apply` reports the
-  entry as INCOMPLETE rather than adopted, naming each withheld path and the role that withheld it.
-- **S3** — A `forked` rule gains an explicit declaration of what a fresh target should receive:
-  either a seed copy on first install, or a stated refusal with the adopter's own remedy.
-- **S4** — A regression gate: `apply` over a scratch target with no pre-existing `memory-recall`
-  files must not report that entry adopted while its CLI is absent.
+  entry as INCOMPLETE rather than adopted, naming each withheld path and, from `UNLANDED_REASON`, the
+  sentence for the role that withheld it.
+- **S3** — The operator is told what to do about it. The remedy is the adopter's own copy step, NOT a
+  seed — see §3 and F1 — and S3 is graded by AC5.
+- **S4** — A regression gate over the CLASS, not the instance: `apply` over a scratch target with no
+  pre-existing files must not report an entry adopted while its executable files are absent. The
+  fixture carries a SECOND, synthetic entry in the same state, because one live instance ships today.
 
 ## 3. Non-goals (OUT)
 
-- Changing what `forked` means for a target that ALREADY holds those files. Overwriting an adopter's
-  own `query.py` is the destruction `DEPL-dCarriedReceipt-10` introduced the role to prevent, and it
-  stays prevented.
-- Adding `forked` to `LANDABLE_ROLES`. That is the one-line change that would land the files and also
-  reintroduce the overwrite.
-- Auditing the other two kits with `forked` rules. This unit fixes the CLASS in `apply`; whether any
-  other entry is in the same state is measured by S1, not assumed here.
+- **Seeding a `forked` file on first install.** This is SUPERSEDED, not open.
+  `memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-10.md:74-76` ruled it out
+  verbatim — "**Not** teaching `apply` to install a forked file at first install either. A fork's
+  whole claim is that gov's bytes are wrong for the target, and that claim does not weaken because
+  the target's copy is absent" — and `tools/govkit/govkit.py:247-252` carries the same ruling in
+  code. Reversing it needs an owner ratification under a new id, which F1 asks for explicitly rather
+  than assuming.
+- Changing what `forked` means for a target that ALREADY holds those files. Same ratification.
+- Adding `forked` to the landable set. That set is DERIVED at `tools/govkit/govkit.py:1776` from
+  `ROLE_KINDS` at `:1749`; the edit site is the table, and see §4 on the shadowed duplicate.
 - Rewriting `SKILL.template.md` so it stops naming the CLI. The Skill is correct; the install is not.
 
 ## 4. Design
@@ -47,36 +52,40 @@ that instructs an agent to run it. Make that state either impossible or loud.
 |---|---|---|
 | `memory-recall` is a registry default | `tools/govkit/registry.toml:36` | yes |
 | `query.py`, `extract.py`, `recall-opened.js` are `forked` | `tools/memory-recall/kit.toml:77-79` | yes |
-| `forked` is not landable | `tools/govkit/govkit.py:236` | yes |
+| `ROLE_KINDS["forked"]` is not `"write"`, so the derived `LANDABLE_ROLES` excludes it | `:1749`, `:1776` | yes |
 | `SKILL.template.md` is `rendered` and lands | `tools/memory-recall/kit.toml:28-30` | yes |
-| 1 of 4 landable, 3 `forked` + 3 `project-owned` withheld | `aScouredKit` wave-2 review | recorded, as an observation |
+| `forked` rules shipping today | `git grep 'role = "forked"' -- '*.toml'` → 1 hit | one, `memory-recall` |
+| 1 of 4 landable, 3 `forked` + 3 `project-owned` withheld | `aScouredKit` wave-2 review | recorded as an observation |
 
-The state is already MEASURED in this repo, in a review table, with no row asking for a fix. This
-unit is that row.
+**The edit site is `ROLE_KINDS`, not `:236`.** `LANDABLE_ROLES` is bound twice at module level: a
+hand-written `("engine", "seed")` at `tools/govkit/govkit.py:236`, and the derived binding at `:1776`
+that shadows it. The literal at `:236` is dead and must not be edited or cited as the mechanism.
+
+**One live instance is why S4 carries a synthetic second.** Gating the single shipping case would
+certify coverage this unit does not have.
 
 ### Rollout
 
-S2 changes an exit condition an adopter sees, so it ships behind the existing outcome machinery
-rather than as a new refusal class: an entry that cannot complete reports INCOMPLETE and the run's
-overall verdict already accounts for a non-adopted entry.
+S2 changes an exit condition an adopter sees, so it ships behind the existing outcome machinery: an
+entry that cannot complete reports INCOMPLETE and the run's verdict already accounts for a
+non-adopted entry.
 
 ### Alternatives rejected
 
-Making the Skill conditional on the CLI's presence was rejected: it hides the defect at the point a
-reader would notice it, and leaves the adopter with a kit that silently does nothing.
+Making the Skill conditional on the CLI's presence: it hides the defect where a reader would notice
+it, and leaves the adopter with a kit that silently does nothing.
 
 ## 5. Production-readiness checklist
 
 - security — N/A. No new content write path.
-- perf / scale — S1 is a descriptor read per selected entry; no filesystem walk beyond existence.
+- perf / scale — S1 reads a return `resolve_entry` already computes; no extra walk.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — an entry with no `forked` rule must take the unchanged path and
-  say nothing new, so the common case gains no noise.
-- observability — the INCOMPLETE report is the observable and names paths, not counts.
-- risks — S2 could turn a currently-green adopter run red. That is the intent, and the run reports
-  which entry and why rather than failing wholesale.
-- testing + left-shift gates — S4.
+- error / empty / loading states — an entry with no non-landable rule takes the unchanged path and
+  says nothing new, so the common case gains no noise.
+- observability — the INCOMPLETE report names paths and role sentences, not counts.
+- risks — S2 turns a currently-green adopter run red. That is the intent, and it names which entry.
+- testing + left-shift gates — S4, with the synthetic second entry.
 - migration / rollback — none; no stored shape changes.
 - user docs — `WIRE-INTO-PROJECT.md` §3c gains the fresh-target note for this kit.
 
@@ -84,14 +93,19 @@ reader would notice it, and leaves the adopter with a kit that silently does not
 
 - **AC1** — When `python tools/govkit/govkit.py apply` runs over a scratch target holding no
   `memory-recall` files, the entry is reported INCOMPLETE and the report names `query.py` and
-  `extract.py` with the role that withheld each.
+  `extract.py` with each one's `UNLANDED_REASON` sentence.
 - **AC2** — When the same `apply` runs over a target that ALREADY holds those files, the entry
   reports as it does today and no byte of the target's `query.py` changes, observed by comparing
   `git hash-object` before and after.
 - **AC3** — When an entry declares no non-landable rule, its `apply` output is byte-identical to
   today's, observed by diffing the run output over an unaffected kit.
-- **AC4** — The S4 gate leg is observed RED before the fix: run it against current `HEAD` with
+- **AC4** — The S4 gate is observed RED before the fix: run it against current `HEAD` with
   `bash tools/run-gates/run-gates.sh` scoped to that leg and confirm it fails.
+- **AC5** — S3's remedy is observable: the INCOMPLETE report names the copy step an adopter runs, and
+  `bash tools/check-install-prefix.sh` stays green over the message, so the remedy is not spelled at
+  a prefix an adopter does not use.
+- **AC6** — S4 exercises the class: the fixture's SYNTHETIC second entry, in the same state and not
+  shipping today, is reported INCOMPLETE by the same arm that reports `memory-recall`.
 
 ## 7. Gates
 
@@ -100,25 +114,35 @@ reader would notice it, and leaves the adopter with a kit that silently does not
 
 ## 8. Open questions
 
-- **F1 — seed-on-first-install versus refuse.** A `seed` role copies once and then the target owns
-  the bytes, which is exactly the fresh-target semantics wanted, and `seed` is already landable.
-  Refusing instead keeps `apply` honest but leaves the adopter to copy by hand. Recommendation: seed
-  on first install, because the role already exists and carries the right ownership semantics.
-  Unresolved.
+- **F1 — refuse, or ask the owner to reverse a ratified non-goal.** §3 records that seeding a
+  `forked` file at first install was ruled out by `DEPL-dCarriedReceipt-10` §3 and is carried in code
+  at `tools/govkit/govkit.py:247-252`. So the branch this unit can build unilaterally is the REFUSAL:
+  report INCOMPLETE and name the adopter's own copy step. The seed branch is available only if the
+  owner ratifies the reversal under a new id. Recommendation: build the refusal branch.
+  `prior:` `DEPL-dCarriedReceipt-10` §3 says gov's bytes are wrong for a forked target whether or not
+  the target's copy is absent. Unresolved — it is the owner's.
 - **F2 — whether INCOMPLETE is a new outcome token or an existing one.** Adding a token touches the
   outcome vocabulary every adopter reads. Recommendation: reuse the existing machinery if a token
-  fits, and only add one if none does. Unresolved.
+  fits. `prior:` no prior ruling found. Unresolved.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit B4, H5, H9, M3, M4. F1 no longer recommends seeding
+  a `forked` file: `DEPL-dCarriedReceipt-10` ratified against it and rev-1 cited nothing, so building
+  the recommendation would have reversed a decision by silence. The seed option moved to §3 as
+  superseded. §4 and §10 repointed off the shadowed dead `LANDABLE_ROLES:236` onto `ROLE_KINDS:1749`.
+  S3 gained AC5 and S4 gained AC6 with a synthetic second entry, since exactly one `forked` rule
+  ships. §10 rewritten: two seams existed and rev-1 said none did.
 
 ## 10. Reuse audit
 
-- No existing seam fits the DETECTION, and the evidence is that
-  `python tools/codebase-map/reuse_lookup.py "land a file whose declared role the deployer excludes
-  from writing"` returns only generic writers — `write`, `write_text`, `tracked_files` — none of
-  which knows about roles. The role vocabulary itself is the seam this extends:
-  `LANDABLE_ROLES` and `ROLE_KINDS` at `tools/govkit/govkit.py:236` and `:1776`.
+- The seam exists and rev-1 missed it. `resolve_entry` (`tools/govkit/govkit.py:282`) already returns
+  `unlanded` rows carrying rule index, source, destination and role, and `UNLANDED_REASON`
+  (`:242-252`) already holds the per-role sentence explaining why each was withheld. S1 and S2 filter
+  and report over that return; they add no walk. `python tools/codebase-map/reuse_lookup.py "land a
+  file whose declared role the deployer excludes from writing"` returned only generic writers —
+  `write`, `write_text`, `tracked_files` — because the query asked about LANDING BYTES rather than
+  about the resolver's return, which is the query's defect and not evidence of absence.
 - Recall terms used: `forked role landable engine seed apply target fresh install memory-recall
   query extract rendered skill`

@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-7 — a ratchet that counts lines cannot see a swapped literal
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 6
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -12,15 +12,18 @@
 
 ## 1. Goal
 
-`tools/check-install-prefix.sh` ratchets root-prefix spellings with `grep -c`, which counts matching
-LINES. A second literal added to a line that already carries one keeps the count, and one kit's path
-swapped for another's keeps it too, so the shrink-only ledger can stay level while the surface it
-describes changes.
+`tools/check-install-prefix.sh` has TWO arms with two regexes, and this unit changes the second.
+Arm 1's `RE` (`:63`) matches the bare `<kit>/<file>` root spelling and is waived per `<path>:<line>`.
+Arm 2's `re_ship` (`:201`) binds a literal `tools/` prefix and feeds the shrink-only ratchet with
+`grep -cHE`, which counts matching LINES. So a second SHIPPING-prefix literal on a line that already
+carries one keeps the count, and one kit's path swapped for another's keeps it too: the ledger stays
+level while the surface it describes changes.
 
 ## 2. Scope (IN)
 
-- **S1** — Count LITERALS rather than lines: the ratchet's per-file number becomes the number of
-  root-prefix occurrences, so a second occurrence on one line raises it.
+- **S1** — Count LITERALS rather than lines in ARM 2 only: the ratchet's per-file number becomes the
+  number of `tools/<kit>/<file>` occurrences matched by `re_ship` (`:201`), so a second occurrence on
+  one line raises it.
 - **S2** — Re-measure `tools/install-prefix-carried.txt` against the new counting in the same change,
   because every existing row was written under line counting and most will move.
 - **S3** — An identity arm: the ledger records WHICH kit each occurrence names, so swapping one kit's
@@ -36,6 +39,10 @@ describes changes.
 - Making the checker prefix-parametric. That is `DEPL-dCarriedReceipt-15` and it is a larger unit
   this one must not absorb.
 - Reducing the carried count. This unit measures honestly; draining is separate work.
+- **Arm 1's identical blind spot.** `RE` at `:63` is waived per `<path>:<line>`, so two literals on
+  one line collapse there too. Deferred deliberately: arm 1's waiver granularity is line-keyed and
+  changing it rewrites `tools/install-prefix-waivers.txt`, which is a second migration. It wants its
+  own unit.
 
 ## 4. Design
 
@@ -43,7 +50,8 @@ describes changes.
 
 | Site | Today | After |
 |---|---|---|
-| `check-install-prefix.sh` counting | `xargs -0 -r grep -cHE "$re_ship"` — hit lines | occurrences |
+| arm 2 counting (`:201`, `re_ship`, shipping prefix) | `xargs -0 -r grep -cHE` — hit lines | occurrences |
+| arm 1 (`:63`, `RE`, bare root spelling) | `grep -HnE`, waived per `<path>:<line>` | unchanged — see §3 |
 | `install-prefix-carried.txt` | `<path>\t<count>` under line counting | re-measured under occurrence counting |
 | identity of the named kit | not recorded | recorded per S3 |
 
@@ -79,8 +87,9 @@ one population is a second answer to one question, and the older one would rot.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When two root-prefix literals sit on one line of a shipped file,
-  `bash tools/check-install-prefix.sh` counts two, observed on a fixture where today it counts one.
+- **AC1** — When two SHIPPING-prefix literals — `tools/<kit>/<file>.<ext>`, the form `re_ship`
+  matches — sit on one line of a shipped file, `bash tools/check-install-prefix.sh` counts two,
+  observed on a fixture where today it counts one.
 - **AC2** — When one kit's path is swapped for another's at equal count,
   `bash tools/check-install-prefix.sh` exits non-zero and names the file, observed on a fixture.
 - **AC3** — When the tree is unchanged, `bash tools/check-install-prefix.sh` exits 0 against the
@@ -108,6 +117,10 @@ arms.
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit H6. AC1's fixture used the bare root spelling, which
+  the arm this unit changes cannot match: `re_ship` at `:201` binds a literal `tools/` prefix. §1, §2
+  and §4 now name the two arms separately, AC1's fixture is a shipping-prefix pair, and §3 defers
+  arm 1's identical blind spot with the reason.
 
 ## 10. Reuse audit
 

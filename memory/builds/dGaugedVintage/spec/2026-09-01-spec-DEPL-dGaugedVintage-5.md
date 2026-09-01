@@ -1,6 +1,6 @@
-# DEPL-dGaugedVintage-5 — four kits an adopter cannot read a version out of
+# DEPL-dGaugedVintage-5 — five entries an adopter cannot read a version out of
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -12,9 +12,11 @@
 
 ## 1. Goal
 
-`check-wiring`, `codebase-map`, `kickoff-manifest` and `playbook-render` carry a version constant and
-zero `gov:kit` markers anywhere. `tools/check-kit-versions.sh:84` calls the marker the thing a
-deployer reads a kit's version from in an adopting tree, so for these four that read returns nothing.
+`check-wiring`, `kickoff-manifest`, `playbook-render` and `review-harness` carry a version constant
+and no `gov:kit <entry-id>@` token an adopter can grep. `tools/check-kit-versions.sh:84` calls the
+marker the thing a deployer reads a kit's version from in an adopting tree, so for these four that
+read returns nothing. `codebase-map` is a FIFTH case and a different one: it emits its version into
+its generated artifacts instead, deliberately.
 
 ## 2. Scope (IN)
 
@@ -23,8 +25,11 @@ deployer reads a kit's version from in an adopting tree, so for these four that 
 - **S2** — A `selfcheck` arm asserting that every entry declaring a version constant has at least one
   marker inside its own resolved file set. An entry declaring `version_from.none` is exempt by that
   declaration, not by omission.
-- **S3** — The exemption for `playbook`, which versions by a `governance-template: vN.N` marker
-  rather than `gov:kit`, declared in the descriptor rather than special-cased in the checker.
+- **S3** — CONSUME the exemption that already exists. `tools/govkit/entries/playbook.kit.toml:6`
+  already declares `version_from = { ... kind = "marker" }`, and no code path reads `kind` today. S2
+  reads it instead of special-casing `playbook`, and a descriptor omitting `kind` is NOT exempted.
+- **S4** — `codebase-map`'s generated-artifact carrier is declared the same way, so the exemption set
+  is a declaration rather than a list in the checker.
 
 ## 3. Non-goals (OUT)
 
@@ -42,13 +47,19 @@ deployer reads a kit's version from in an adopting tree, so for these four that 
 | Entry | Constant | Markers today | Candidate carrier |
 |---|---|---|---|
 | `check-wiring` | `tools/check-wiring.sh:20` | none | the same file's header |
-| `codebase-map` | `tools/codebase-map/map_lib.py:48` | none versioned | `map_lib.py`; `:46` has a bare `gov:kit codebase-map` with no `@` |
 | `kickoff-manifest` | `skills/session-kickoff/manifest-check.sh:21` | none | the checker, which lands as `tools/manifest-check.sh` |
 | `playbook-render` | `tools/playbook/render_playbook.py:621` | none | the renderer |
+| `review-harness` | `tools/workflows/kit.toml:6` names `tier2-review.js` | only `gov:kit tier2-review@`, a NON-registry id | the same file, under its entry id |
+| `codebase-map` | `tools/codebase-map/map_lib.py:48` | emits `codebase-map@<v>` into generated artifacts at `:1393`, `:1421`, `:1462` | ALREADY CARRIED — declare the artifact as its carrier |
 
-`codebase-map` is the interesting one: it already carries the marker's PREFIX with no version, so a
-deployer grepping `gov:kit codebase-map@` finds nothing while a reader skimming finds something that
-looks like a marker.
+`codebase-map` is not in the same state as the other four and rev-1 was wrong to group it.
+`map_lib.py:46-47` says so in its own words: the version is mirrored "into the generated artifacts as
+`codebase-map@<v>` so the deployer can grep the installed version", and `:1393`, `:1421` and `:1462`
+write it into `inventories.json`, `symbols.json` and `MAP.md`. The read an adopter needs already
+works; what is missing is a DECLARATION that this is its carrier, which is S4.
+
+`review-harness` is the fifth entry and the awkward one: its files carry `gov:kit tier2-review@`,
+which is not its registry id, so an entry-id grep finds nothing.
 
 ### Rollout
 
@@ -87,9 +98,15 @@ carrier should be a file the entry cannot function without.
   deletion and restoring it.
 - **AC4** — When an entry declares `version_from.none`, the same run reports it exempt with its
   declared reason rather than omitting the row.
-- **AC5** — The `codebase-map` bare `gov:kit codebase-map` token at `map_lib.py:46` either gains an
-  `@<version>` or is shown by `bash tools/check-kit-versions.sh` to be distinguishable from a real
-  marker.
+- **AC5** — `codebase-map` passes S2 via its DECLARED generated-artifact carrier: after a map
+  regen, `grep -c 'codebase-map@' memory/map/generated/MAP.md` returns at least 1 and
+  `python tools/govkit/govkit.py selfcheck` reports the entry satisfied by declaration, not by a
+  `gov:kit` token in `map_lib.py`.
+- **AC6** — A descriptor declaring `version_from` WITHOUT `kind` is not exempted:
+  `python tools/govkit/govkit.py selfcheck` reds for it, observed by deleting `kind` from
+  `tools/govkit/entries/playbook.kit.toml` on a fixture.
+- **AC7** — `review-harness` reports under its own entry id: after this unit,
+  `git grep -c 'gov:kit review-harness@'` is non-zero, or §3 names the follow-up that owns it.
 
 ## 7. Gates
 
@@ -109,6 +126,12 @@ carrier should be a file the entry cannot function without.
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit H8, M5, M6. The affected set is five entries, not
+  four: `review-harness` declares a version constant whose only marker is the non-registry id
+  `tier2-review`. `codebase-map` was wrongly grouped with the unreadable entries — it deliberately
+  emits `codebase-map@<v>` into its generated artifacts, so it needs a declared carrier, not a new
+  token, and AC5 was rewritten. S3 now CONSUMES the marker-kind key that already exists at
+  `tools/govkit/entries/playbook.kit.toml:6` and is read by nothing.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-4 — derive each kit's marker population, and assert every site in it
 
-**Status:** OPEN · rev-1 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
+**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -14,77 +14,102 @@
 
 `tools/check-kit-versions.sh` asserts three of drift-audit's eight `gov:kit` marker sites, so five
 shipped files carry `@1.2` and `@1.4` against a `1.8` constant and the bar stays green. Derive the
-marker population from each kit's descriptor and assert every member of it.
+marker population per kit and assert every member of it.
 
 ## 2. Scope (IN)
 
-- **S1** — A derivation that answers, for one entry, "which shipped files carry a `gov:kit <id>@`
-  marker" — computed from the entry's own resolved file set, never from a list typed into a checker.
-- **S2** — An assertion in both directions over that derived set: every marker in it equals the
-  entry's version constant, and a file carrying a marker for an entry that does not claim it reds.
-- **S3** — The five stale drift-audit markers repaired to `1.8` in the same change that arms S2, so
-  the assertion lands green rather than landing red and being waived.
-- **S4** — The remedy message names the DERIVED list, closing the half of
-  `TOOL-aBoundedVerdict-29` this unit reaches: a remedy naming three files when the kit has eight is
-  the defect that produced this state.
+- **S1** — A derivation naming its BASIS explicitly: `entry_members` (`tools/govkit/govkit.py:356`),
+  which claims an entry's non-landable and carved sources too, plus a DECLARED cross-entry allowance
+  (see §4). Not `resolve_entry`'s `writes`, which reaches neither.
+- **S2** — The forward assertion: every `gov:kit <id>@` marker inside the derived set equals that
+  entry's version constant.
+- **S3** — The reverse assertion over a DECLARED population, stated in §4 rather than left implicit:
+  a file in that population carrying a marker for an entry that neither claims it nor is allowed to
+  reds.
+- **S4** — The five stale drift-audit markers repaired to `1.8` in the same change that arms S2.
+- **S5** — The remedy message names the DERIVED list, closing the half of `TOOL-aBoundedVerdict-29`
+  this unit reaches.
 
 ## 3. Non-goals (OUT)
 
-- The four entries carrying no marker at all. That is `DEPL-dGaugedVintage-5`, which shares this
-  unit's derivation and is ordered beside it.
-- `tools/workflows/tier2-review.js`'s bare presence check. `TOOL-dTieredTribunal-6` owns that
-  question and it is explicitly still the owner's.
-- Changing any kit's version CONSTANT or bumping any kit. This unit makes the markers agree with the
-  constants that already exist.
-- The `check-verdict-epoch.sh` remedy for memory-tree. `TOOL-dSettledRoster-4` owns it; the same
-  derivation should serve it, and this unit does not do that work.
+- The four entries carrying no marker at all. That is `DEPL-dGaugedVintage-5`, ordered beside this.
+- `tools/workflows/tier2-review.js`'s bare presence check. `TOOL-dTieredTribunal-6` owns it.
+- Changing any kit's version CONSTANT. This unit makes markers agree with constants that exist.
+- Closing `TOOL-aScouredKit-26`, the missing cross-entry destination token. The allowance in S1 is a
+  DECLARATION that works around its absence, and §4 names it as the row that would retire it.
+- The `check-verdict-epoch.sh` remedy for memory-tree. `TOOL-dSettledRoster-4` owns it.
 
 ## 4. Design
 
+### The cross-entry problem, which rev-1 did not see
+
+`tools/drift-audit/kit.toml` declares `home = "tools/drift-audit"` (`:4`) with `include = "**"`
+(`:10`). So NO resolution of the drift-audit entry can contain
+`tools/workflows/drift-audit-code.js` or `-state.js`: `tools/workflows/kit.toml` is entry id
+`review-harness` and claims both through its own `**`. Yet both carry `// gov:kit drift-audit@1.8`
+at `:15`, and `check-kit-versions.sh:211` asserts them today.
+
+A naive per-entry basis therefore reds two CORRECTLY-valued markers while AC1 requires exit 0. Both
+cannot hold, which is why S1 carries an explicit allowance: a descriptor may declare that another
+entry's files carry its marker. That is a workaround for `TOOL-aScouredKit-26` — no cross-entry
+destination token exists — and it is declared rather than inferred so the exception is visible.
+
+`drift_signals.py` is NOT in this class. It is `project-owned` (`tools/drift-audit/kit.toml:14-15`),
+and `resolve_entry` keeps project-owned rows in `survivors` (`:304-306`), so the basis reaches it and
+S4 can name all five stale files.
+
+### The reverse population, declared
+
+A bare `git grep -lE 'gov:kit [a-z0-9-]+@[0-9]'` outside `tools/` and `skills/` returns 36 files at
+this base, and 30 of them are spec and review PROSE under `memory/builds/**` — including this build's
+own round-1 review record and an earlier revision of this very spec. That set is self-referential and
+cannot be the population.
+
+The declared population for S3 is: the union of every entry's `entry_members`, plus every declared
+rendered destination, MINUS `memory/builds/**`. The rendered carriers outside `tools/` and `skills/`
+are nine files: `.claude/hooks/agent-cap.js`, `.claude/hooks/scratch-guard.js`,
+`.claude/skills/lexicon/SKILL.md`, `.claude/skills/unattended/SKILL.md`, `memory/HYGIENE.md`,
+`memory/TEMPLATE-SPEC.md`, and the three `memory/guides/` documents.
+
 ### Inventory
 
-The eight drift-audit sites and what each says today, measured at `d65da7ab`:
+The eight drift-audit marker sites and the constant, measured at `d65da7ab`:
 
-| Site | Value | Asserted today |
-|---|---|---|
-| `tools/drift-audit/drift_report.py:51` (the constant) | `1.8` | yes |
-| `tools/drift-audit/README.md:3` | `@1.8` | yes |
-| `tools/workflows/drift-audit-code.js:15` | `@1.8` | yes |
-| `tools/workflows/drift-audit-state.js:15` | `@1.8` | yes |
-| `tools/drift-audit/adopt-drift-audit.sh:4` | `@1.2` | **no** |
-| `tools/drift-audit/drift_report.py:4` | `@1.4` | **no** |
-| `tools/drift-audit/drift_signals.py:3` | `@1.4` | **no** |
-| `tools/drift-audit/drift_signals.template.py:3` | `@1.4` | **no** |
-| `tools/drift-audit/selftest.py:4` | `@1.4` | **no** |
-
-That is nine rows for eight marker sites plus the constant; `drift_report.py` appears twice because
-it carries both the constant and a stale marker four lines above it.
+| Site | Value | Asserted today | In a per-entry basis |
+|---|---|---|---|
+| `tools/drift-audit/drift_report.py:51` (the constant) | `1.8` | yes | yes |
+| `tools/drift-audit/README.md:3` | `@1.8` | yes | yes |
+| `tools/workflows/drift-audit-code.js:15` | `@1.8` | yes | **no — `review-harness` claims it** |
+| `tools/workflows/drift-audit-state.js:15` | `@1.8` | yes | **no — same** |
+| `tools/drift-audit/adopt-drift-audit.sh:4` | `@1.2` | no | yes |
+| `tools/drift-audit/drift_report.py:4` | `@1.4` | no | yes |
+| `tools/drift-audit/drift_signals.py:3` | `@1.4` | no | yes, via `survivors` |
+| `tools/drift-audit/drift_signals.template.py:3` | `@1.4` | no | yes |
+| `tools/drift-audit/selftest.py:4` | `@1.4` | no | yes |
 
 ### Migration
 
-S3 is a value repair across five files. It is not a version bump: the constant does not move, so no
+S4 is a value repair across five files, not a version bump: the constant does not move, so no
 adopter's pin changes meaning.
 
 ### Alternatives rejected
 
-Enumerating the eight sites in the checker was rejected because it is the shape that failed: a
-hand-kept list is what let five files drift, and `TOOL-aBoundedVerdict-29` already names derivation
-as the remedy.
+Enumerating the sites in the checker: it is the shape that failed, and `TOOL-aBoundedVerdict-29`
+already names derivation as the remedy.
 
 ## 5. Production-readiness checklist
 
 - security — N/A.
-- perf / scale — one grep per entry over that entry's resolved file set; the sets are small.
+- perf / scale — one grep per entry over that entry's derived set.
 - a11y — N/A.
 - i18n — N/A.
 - error / empty / loading states — an entry whose derived marker set is EMPTY must announce that,
-  not pass silently; an empty population that reports clean is the vacuous-selector class.
-- observability — the checker prints the derived count per entry so a reader can see it moved.
-- risks — arming S2 before S3 would red the bar for every session until the repair lands, so the two
-  ship together and the spec says so.
-- testing + left-shift gates — the assertion IS the gate; its failing case is AC4.
+  not pass silently.
+- observability — the checker prints the derived count per entry and the allowance rows it honoured.
+- risks — arming S2 before S4 reds the bar for every session in between, so they ship together.
+- testing + left-shift gates — the assertion IS the gate; AC4 is its failing case.
 - migration / rollback — none.
-- user docs — none; the checker's own header states what it now covers.
+- user docs — none; the checker's header states what it now covers, including its BASIS by name.
 
 ## 6. Acceptance criteria
 
@@ -93,38 +118,50 @@ as the remedy.
 - **AC2** — When one of the five previously-unasserted markers is edited to a wrong value,
   `bash tools/check-kit-versions.sh` exits non-zero and names that file, observed by staging the
   break and restoring it.
-- **AC3** — When a file carries a `gov:kit` marker for an entry whose resolved file set does not
-  include it, the checker reds, observed on a fixture.
-- **AC4** — The assertion is observed RED before S3's repair lands: arm S2 alone against current
-  bytes and confirm `bash tools/check-kit-versions.sh` names all five stale files.
+- **AC3** — When a file in the DECLARED reverse population carries a marker for an entry that neither
+  claims it nor declares an allowance, `bash tools/check-kit-versions.sh` reds, observed on a fixture.
+- **AC4** — The assertion is observed RED before S4's repair: arm S2 alone against current bytes and
+  confirm `bash tools/check-kit-versions.sh` names all five stale files.
 - **AC5** — When an entry declares a version constant and its derived marker set is empty,
   `bash tools/check-kit-versions.sh` prints that entry with a zero count rather than omitting it.
+- **AC6** — A rendered artifact carrying its OWN kit's marker does NOT red: `bash
+  tools/check-kit-versions.sh` stays green over `memory/HYGIENE.md` and
+  `.claude/skills/unattended/SKILL.md`, so the exclusion is gated rather than assumed.
+- **AC7** — The two `tools/workflows/drift-audit-*.js` markers pass under the declared allowance and
+  red without it, observed by removing the allowance row.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the `kit version markers` leg is the one this unit changes, and
+`bash tools/run-gates/run-gates.sh` — the `kit version markers` leg is the one this unit changes;
 `govkit selfcheck` check 5b already reports registry-vs-checker disagreement in both directions.
 
 ## 8. Open questions
 
-- **F1 — where the derivation lives.** `check-kit-versions.sh` is shell and the descriptors are TOML,
-  which shell cannot read without help; `govkit.py` already parses them. Options: move the assertion
-  into `selfcheck`, or have the shell call a small python helper. Recommendation: `selfcheck`, since
-  it already holds check 5b and the registry is its subject. Unresolved.
+- **F1 — where the derivation lives.** `check-kit-versions.sh` is shell and the descriptors are TOML.
+  Recommendation: `selfcheck`, which already holds check 5b and reads the registry.
+  `prior:` `TOOL-aBoundedVerdict-29` says the remedy should be DERIVED from `kit.toml`, not
+  enumerated in prose; it does not say by which program. Unresolved.
 - **F2 — whether a test fixture's marker counts.** `tools/memory-tree/check-verdict-epoch.test.sh:89`
-  carries `gov:kit memory-tree@1.5` inside a `sed` that mutates a scratch fixture. It is noise in a
-  deployer's grep, not a wrong claim. Recommendation: exclude `*.test.sh` from the derived set and
-  say so in the checker's header. Unresolved.
+  carries `gov:kit memory-tree@1.5` inside a `sed` mutating a scratch fixture. Recommendation:
+  exclude `*.test.sh` from the derived set and say so in the checker's header. `prior:` no prior
+  ruling found. Unresolved.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-2 · 2026-09-01 · folded round-1 spec audit B2 and H7. The per-entry basis rev-1 specified
+  structurally cannot reach two of the eight sites its own table lists, because `review-harness`
+  claims `tools/workflows/**`; S1 now names `entry_members` as the basis and adds a declared
+  cross-entry allowance, and §4 carries the whole problem. S3's reverse direction now declares its
+  population — rev-1 named none, and the obvious grep is self-referential, returning this spec and
+  its own review. AC6 and AC7 added.
 
 ## 10. Reuse audit
 
-- The seam is `read_descriptors` in `tools/govkit/govkit.py`, which already resolves every entry's
-  descriptor and is what `selfcheck` check 5b reads;
-  `python tools/codebase-map/reuse_lookup.py "assert every gov kit version marker site against its
-  descriptor"` ranks it first among descriptor-aware symbols. No new seam is needed.
+- The seam is `entry_members` (`tools/govkit/govkit.py:356`) beside `resolve_entry` (`:282`), which
+  `selfcheck` check 5b already uses to walk each entry's declared file set; this unit asserts over
+  that walk rather than adding one. `python tools/codebase-map/reuse_lookup.py "assert every gov kit
+  version marker site against its descriptor"` ranks `read_descriptors` first among descriptor-aware
+  symbols in the same file.
 - Recall terms used: `gov:kit marker population derive descriptor kit.toml check-kit-versions
   verdict-epoch remedy carriers bump sites`
