@@ -1,11 +1,12 @@
 # TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dBriefedPass-4-1-harness.md](../build/2026-09-01-build-TOOL-dBriefedPass-4-1-harness.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
@@ -25,11 +26,17 @@ property of control flow rather than of an agent's recollection across a context
   `briefDir`, and REFUSES a prose string or a missing `repo` with the parse-then-validate guard
   `tier2-review.js:32-60` already carries. `TOOL-dTieredTribunal-4` records that the two drift-audit
   siblings lack it and audit whatever directory the process stands in; this file does not join them.
-- **S2** — three sequential stages and a CONVERGING PAIR: SPEC, then AUDIT and FOLD looping, then
-  BUILD. A unit reaches BUILD only by having passed through SPEC and at least one AUDIT in the same
-  program run. This is the unit's whole mechanism and it is JS control flow, not a check.
-- **S2b** — the AUDIT-FOLD loop is keyed on the `--review` verdict token and on nothing else, and
-  the CHANNEL that token arrives on is declared rather than assumed: the AUDIT stage's own agent runs
+- **S2** — three sequential stages: SPEC, AUDIT, BUILD. A unit reaches BUILD only by having passed
+  through SPEC and an AUDIT in the same program run, and only when that audit's verdict is TERMINAL.
+  This is the unit's whole mechanism and it is JS control flow, not a check.
+- **S2b** — the harness runs ONE audit round and GATES on its verdict: `CONVERGING` returns early
+  without reaching BUILD, and only `CONVERGED`, `NON-CONVERGENT` or `CEILING` admit it. The LOOP
+  lives in the caller, which folds and re-invokes; the harness holds the GATE, which is the half that
+  has to be structural. It is not a loop here because it cannot be — `agent-cap.js` denies an
+  `agent()` in any loop body, and a convergence loop's iteration count is data-dependent by
+  definition, so no bounded unroll exists. The owner's 2026-09-01 ruling is preserved in the half
+  that matters: the `--review` VERDICT is what decides whether BUILD is reachable, and no round cap
+  is introduced anywhere. The CHANNEL that token arrives on is declared rather than assumed: the AUDIT stage's own agent runs
   `bash tools/unattended/unattended.sh --review <slug> --subject <subject> --verdict <v>
   --blockers <n>` and returns the driver's answer in its schema, so the harness reads a field of a
   stage return it already awaits. No callback and no new `args` field: a Workflow script has no
@@ -54,8 +61,15 @@ the degraded run rather than a number it invents. After each
   the dead-lens and dead-skeptic counters, unverified-is-not-refuted — is inherited rather than
   re-lost. `TOOL-dHonouredPark-5` measured what re-implementing costs: 67 findings carrying 18
   distinct ids, and a whole verify stage discarded.
-- **S4** — the BUILD stage iterates the units in the ORDER the caller passed, one `agent()` per unit,
-  each handed its brief path and its spec path and nothing else. Dispatch is STRICTLY SEQUENTIAL,
+- **S4** — the BUILD stage is ONE agent, handed the units in the ORDER the caller passed and told to
+  take them one at a time, each from its brief path and its spec path and nothing else. One agent per
+  unit was specified through rev-4 and is not buildable: `tools/hooks/agent-cap.js` denies any
+  `agent()` inside a loop body unconditionally and names no marker that admits one, so the only
+  shapes it permits are a bounded PARALLEL fan — which `TOOL-cBriefedPilot-21` forbids — and a single
+  call. What the harness keeps is the property the owner's prompt is actually about: the STAGE order
+  stays structural, so BUILD is unreachable except through SPEC and AUDIT. Per-unit order moves to
+  `TOOL-dBriefedPass-3`'s `--dispatch` refusal, which is a machine check over the tree and is
+  therefore stronger than JS control flow, not weaker. Dispatch is STRICTLY SEQUENTIAL,
   including within a shared order value: `TOOL-cBriefedPilot-21`'s ratified verdict is
   `parallelism route: none`, and the Workflow-sidechain route this harness would otherwise take is
   that hunt's R2, which cleared E1 and E2 and FAILED E3 and E4. A shared order value therefore
@@ -177,14 +191,15 @@ file is registered like its siblings.
   guard this copies refused every legitimate caller.
 - **AC3** — the stage order is asserted from the file's own text: the SPEC stage's `await` precedes
   the AUDIT stage's, which precedes FOLD, which precedes BUILD. A reordering reds the arm.
-- **AC4** — in `tools/workflows/unattended-build.test.sh`, a unit list carrying two units at order 1
-  and one at order 2 dispatches all three ONE AT A TIME, in order. Asserted on the dispatch sequence
-  the script emits, not on wall clock. This is the arm that proves S4 ships no concurrent route:
-  at rev-1 this criterion asserted the opposite.
+- **AC4** — in `tools/workflows/unattended-build.test.sh`, the file contains NO `agent(` call inside
+  any loop body and no `parallel(`/`pipeline(` call at all, asserted over the script's own text, and
+  `node tools/hooks/agent-cap.js` ADMITS it when handed a Workflow call naming this script. Two arms:
+  the textual absence, and the hook's own verdict. At rev-1 this criterion asserted a concurrent
+  dispatch that a ratified decision forbids; at rev-4 it asserted a sequential loop the hook denies.
 - **AC7** — in `tools/workflows/unattended-build.test.sh`, an AUDIT stage returning `CONVERGING`
-  re-enters AUDIT and one returning `CONVERGED` does not; `NON-CONVERGENT` and `CEILING` each exit to
-  BUILD having promoted their standing blockers through S6. Four arms over the driver's four states,
-  because a loop tested only on its clean exit is a loop nothing proved re-enters.
+  returns WITHOUT reaching BUILD, and `CONVERGED`, `NON-CONVERGENT` and `CEILING` each admit it. Four
+  arms over the driver's four states, because a gate tested only on the state that opens it is a gate
+  nothing proved closes.
 - **AC8** — in `tools/workflows/unattended-build.test.sh`, the harness reports the number of AUDIT
   rounds it ran and an arm asserts that count is at least 1 on a run that reached BUILD. Without it a harness whose verdict channel is broken runs
   zero rounds and reads as convergence on the first pass, which is the reassuring-zero shape this
@@ -225,6 +240,19 @@ none
   contained zero occurrences of `--review`; S2 becomes three stages plus a converging pair, S2b
   states the loop and its four exits, and AC7 observes all four. L1 (finding 29): AC1 invoked a
   node file through bash, which exits 2 against the declared argv.
+- rev-5 · 2026-09-01 · found by BUILDING it, M2's route for a divergence: spec first, then code.
+  S4's one-agent-per-unit loop is not buildable — `tools/hooks/agent-cap.js:95-112` denies any
+  `agent()` in a loop body, its whitelist is closed, and it names no marker for the case. Measured by
+  running the hook's own predicate over the file: it denied both loop sites, calling a strictly
+  sequential `await agent(...)` "a loop-built thunk array". The conflict is exact and is PARKED for
+  the owner: bounded-parallel is permitted by the hook and forbidden by `parallelism route: none`,
+  sequential is required by that verdict and forbidden by the hook. S4 becomes one agent per STAGE
+  holding the ordered unit list, which keeps the stage order structural and moves per-unit order onto
+  `--dispatch`'s refusal. THE SAME DENIAL REACHES S2b, the second and larger consequence: the
+  AUDIT/FOLD convergence loop also spawns an agent inside a loop body, and unlike the per-unit case
+  it cannot be unrolled, because a convergence loop's iteration count is data-dependent by
+  definition. So the LOOP moves to the caller and the harness keeps the GATE — `CONVERGING` returns
+  early and never reaches BUILD. AC4 and AC7 are restated as arms over the new shape.
 - rev-3 · 2026-09-01 · round-2 spec-audit fold. H1 and H2 (findings 14 and 6, one defect from two
   axes): the rev-2 convergence loop keyed on a "caller-supplied review callback" that the §4 args
   table never declared and no other section named, so the loop's only input came from nowhere — S2b

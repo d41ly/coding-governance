@@ -1803,6 +1803,11 @@
       "file": "tools/workflows/tier2-review.js"
     },
     {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
       "id": "missing_bom",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
@@ -2276,6 +2281,11 @@
       "id": "renderDeny",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderRoster",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
     },
     {
       "id": "render_affordance_exempt",
