@@ -194,7 +194,13 @@ carried_live() {
 
 carried_rows() {
   # THE ONE EMITTER. `--list`'s section and the ratchet file are the same rows from the same call, so
-  # a report that disagrees with the artifact is not reachable. The count is hit LINES per path: a
+  # a report that disagrees with the artifact is not reachable. The count is OCCURRENCES per path,
+  # not hit lines. `grep -c` counted a line carrying two literals ONCE, so a second literal added
+  # beside an existing one -- or one kit's path swapped for another's -- held the count level while
+  # the surface it grades changed. DEPL-dGaugedVintage-7. Measured before the change: appending one
+  # line carrying two literals moved a file 3 -> 4 where occurrences make it 3 -> 5. `grep -o` emits
+  # one line per MATCH prefixed `<path>:`, and awk tallies per path; repo-relative paths carry no
+  # colon, so splitting on the first is exact here. The old note read: hit LINES per path, a
   # line carrying two literals counts once. The regex is the arm above's with the SHIPPING prefix
   # bound, and `{`/`}` stay in the excluded lead class for the reason that arm already gives — the
   # corrected placeholder form must not be a hit.
@@ -218,8 +224,8 @@ carried_rows() {
     [ -n "$f" ] || continue
     [ -f "$f" ] || continue
     printf '%s\0' "$f"
-  done | xargs -0 -r grep -cHE "$re_ship" -- 2>/dev/null \
-       | awk -F: 'NF>=2 && $NF+0 > 0 { c=$NF; sub(/:[^:]*$/, "", $0); printf "%s\t%s\n", $0, c }' \
+  done | xargs -0 -r grep -oHE "$re_ship" -- 2>/dev/null \
+       | awk -F: '{ n[$1]++ } END { for (k in n) printf "%s\t%s\n", k, n[k] }' \
        | LC_ALL=C sort || true
 }
 
