@@ -4,7 +4,6 @@ node: d
 opened: 2026-09-01
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
 ids: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5
 ---
@@ -60,23 +59,35 @@ answer on disk.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-09-01 · streams tooling
+**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-09-01 · streams tooling
 ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal](spec/2026-09-01-spec-TOOL-dBriefedPass-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dBriefedPass-1` | no |
+| 2 | `TOOL-dBriefedPass-2` | no |
+| 3 | `TOOL-dBriefedPass-3` | no |
+| 4 | `TOOL-dBriefedPass-4` | no |
+| 5 | `TOOL-dBriefedPass-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
